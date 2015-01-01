@@ -28,8 +28,10 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 
 gem 'mongoid', '~> 4.0.0'
-gem 'origin'
+gem 'origin', '~> 2.1.1'
+gem 'moped', '~> 2.0.2'
 gem 'carrierwave-mongoid', '0.7.1', :require => 'carrierwave/mongoid'
+gem "mongoid_auto_increment"
 
 gem 'aasm', '~> 4.0.7'
 gem 'haml'
@@ -59,8 +61,11 @@ group :development, :test do
   gem 'ruby-progressbar', '1.6.0'
 
   gem 'rspec-rails', '~> 3.1.0'
-  gem 'mongoid-rspec' 
+  # gem 'mongoid-rspec' # causes issue: irb: warn: can't alias context from irb_context
   gem 'cucumber-rails', '~> 1.4.2', :require => false
+  gem 'factory_girl_rails'
+  gem 'database_cleaner', '1.3.0'
+  
 end
 
 group :production do
