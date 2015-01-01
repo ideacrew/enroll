@@ -31,3 +31,6 @@ db/seedfiles/*.yml
 
 # Ignore Mongoid connection file
 # config/mongoid.yml
+
+# Ignore the gem folder
+/gems
