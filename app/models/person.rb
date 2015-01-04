@@ -37,17 +37,18 @@ class Person
   # belongs_to :employer_representatives, class_name: "Employer",  inverse_of: :representatives
 
   embeds_one :consumer
+  embeds_one :employee
   embeds_one :responsible_party
   embeds_one :broker
   embeds_one :hbx_staff
 
   embeds_many :person_relationships
-  embeds_many :employees
   embeds_many :addresses
   embeds_many :phones
   embeds_many :emails
 
-  accepts_nested_attributes_for :consumer, :responsible_party, :broker, :hbx_staff, :person_relationships, :employees, :addresses, :phones, :emails
+  accepts_nested_attributes_for :consumer, :responsible_party, :broker, :hbx_staff, 
+    :person_relationships, :employee, :addresses, :phones, :emails
 
 
   validates_presence_of :first_name, :last_name
