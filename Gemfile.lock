@@ -159,11 +159,11 @@ GEM
       moped (~> 2.0.0)
       origin (~> 2.1)
       tzinfo (>= 0.3.37)
+    mongoid-autoinc (4.0.0)
+      mongoid (~> 4.0)
     mongoid-grid_fs (2.1.0)
       mime-types (>= 1.0, < 3.0)
       mongoid (>= 3.0, < 5.0)
-    mongoid_auto_increment (0.1.2)
-      mongoid (>= 2.0)
     moped (2.0.2)
       bson (~> 2.2)
       connection_pool (~> 2.0)
@@ -232,6 +232,8 @@ GEM
     sdoc (0.4.1)
       json (~> 1.7, >= 1.7.7)
       rdoc (~> 4.0)
+    shoulda-matchers (2.7.0)
+      activesupport (>= 3.0.0)
     slop (3.6.0)
     spring (1.2.0)
     sprockets (2.12.3)
@@ -296,13 +298,14 @@ DEPENDENCIES
   jquery-ui-rails
   less-rails-bootstrap (~> 3.3.1.0)
   mongoid (~> 4.0.0)
-  mongoid_auto_increment
+  mongoid-autoinc
   moped (~> 2.0.2)
   origin (~> 2.1.1)
   rails (= 4.2.0)
   rspec-rails (~> 3.1.0)
   ruby-progressbar (= 1.6.0)
   sdoc (~> 0.4.0)
+  shoulda-matchers
   spring
   therubyracer
   turbolinks
