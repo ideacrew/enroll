@@ -1,0 +1,23 @@
+<div class="row">
+  <div class="col-xs-6 col-sm-5 col-md-5">
+    <div class="form-group">
+      <%= f.label :name_first, "First Name" %>
+      <%= f.text_field :name_first, class: "form-control", width: "100%" %>
+    </div>
+  </div>
+  <div class="col-xs-6 col-sm-2 col-md-2">
+    <div class="col-sm-6 form-group">
+      <%= f.label :name_middle, "M.I." %>
+      <%= f.text_field :name_middle, class: "form-control", width: "auto"  %>
+    </div>
+  </div>
+  <div class="col-sm-6 col-md-5">
+    <div class="form-group">
+      <%= f.label :name_last, "Last Name" %>
+      <%= f.text_field :name_last, class: "form-control", width: "100%" %>
+    </div>
+  </div>
+</div>
+
+<%= f.text_field :name_pfx, placeholder: "Pfx", label: "Prefix", disabled: true %>
+<%= f.text_field :name_sfx, placeholder: "Sfx", label: "Suffix", disabled: true %>

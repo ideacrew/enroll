@@ -1,0 +1,2 @@
+module Broker::WelcomeHelper
+end

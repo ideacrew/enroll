@@ -1,0 +1,9 @@
+<div class="form-inputs">
+	<fieldset>
+		<%= f.select :phone_type,  Phone::TYPES, {include_blank: "Type"}, { class: "select select-primary", data: { toggle: "select"}, disabled: true } %>
+		<%= f.text_field :phone_number, as: :tel, placeholder: "202-555-1212", input_html: { value: number_to_phone(f.object.phone_number) }, disabled: true %>
+		<%= f.text_field :extension, placeholder: "1234 (Extension)", disabled: true %>
+		<%= link_to '<span class="fui-cross-circle"> Delete Phone</span>'.html_safe, '#', :class => "remove_fields text-danger", disabled: true %>
+		<%= f.hidden_field :_destroy %>
+	</fieldset>
+</div>
