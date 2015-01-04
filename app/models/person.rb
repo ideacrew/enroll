@@ -1,10 +1,18 @@
 class Person
+  # require 'autoinc'
   include Mongoid::Document
   include Mongoid::Timestamps
+  # include Mongoid::Autoinc
 
-  # extend Mongorder
+  GENDER_KINDS = %W(male female unknown)
+  CHILD_MODELS = [
+      :consumer, :responsible_party, :broker, :hbx_staff, :person_relationships, :employees, 
+      :addresses, :phones, :emails
+    ]
 
-  field :hbx_assigned_id, type: String      # Enterprise-level unique ID for this person
+  # Enterprise-level unique ID for this person
+  field :hbx_assigned_id, type: Integer
+  # increments :hbx_assigned_id, seed: 9999
 
   field :name_pfx, type: String, default: ""
   field :first_name, type: String
@@ -17,7 +25,8 @@ class Person
   # Sub-model in-common attributes
   field :ssn, type: String
   field :dob, type: Date
-  field :death_date, type: Date
+  field :gender, type: String
+  field :date_of_death, type: Date
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
@@ -27,48 +36,69 @@ class Person
 
   # belongs_to :employer_representatives, class_name: "Employer",  inverse_of: :representatives
 
-  embeds_many :consumers
-  embeds_many :employees
-  embeds_many :brokers
-  embeds_many :hbx_staffs
-
-  embeds_many :addresses
-  accepts_nested_attributes_for :addresses, reject_if: proc { |attribs| attribs['address_1'].blank? }, allow_destroy: true
-
-  embeds_many :phones
-  accepts_nested_attributes_for :phones, reject_if: proc { |attribs| attribs['phone_number'].blank? }, allow_destroy: true
-
-  embeds_many :emails
-  accepts_nested_attributes_for :emails, reject_if: proc { |attribs| attribs['email_address'].blank? }, allow_destroy: true
+  embeds_one :consumer
+  embeds_one :responsible_party
+  embeds_one :broker
+  embeds_one :hbx_staff
 
   embeds_many :person_relationships
-  accepts_nested_attributes_for :person_relationships
+  embeds_many :employees
+  embeds_many :addresses
+  embeds_many :phones
+  embeds_many :emails
 
-  before_save :initialize_name_full, :death_date_follows_birth_date
+  accepts_nested_attributes_for :consumer, :responsible_party, :broker, :hbx_staff, :person_relationships, :employees, :addresses, :phones, :emails
+
 
   validates_presence_of :first_name, :last_name
 
   validates :ssn, 
-            allow_blank: true,
-            length: { is: 9, message: "SSN must be 9 digits" }, 
-            numericality: true
+    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" }, 
+    numericality: true,
+    uniqueness: true,
+    allow_blank: true
 
+  validates :gender, 
+    allow_blank: true,
+    inclusion: { in: GENDER_KINDS, message: "%{value} is not a valid gender" }
+
+
+  # validates_each CHILD_MODELS do | record, attrib, value | 
+  #   record.errors.add(attrib) 
+  # end
+
+
+  before_save :initialize_name_full, :date_of_death_follows_birth_date
 
   index({hbx_assigned_id: 1}, {unique: true})
-  index({ssn: 1}, {sparse: true, unique: true})
   index({last_name:  1})
   index({first_name: 1})
   index({last_name: 1, first_name: 1})
   index({first_name: 1, last_name:1})
+  index({ssn: 1}, {sparse: true, unique: true})
+  index({dob: 1}, {sparse: true, unique: true})
 
+  # Broker child model indexes
+  index({"broker._id" => 1})
+  index({"broker.kind" => 1})
+  index({"broker.hbx_assigned_id" => 1})
+  index({"broker.npn" => 1})
+
+  # Consumer child model indexes
+  index({"consumer._id" => 1})
+
+  # Employee child model indexes
+  index({"employee._id" => 1})
+  index({"employee.employer_id" => 1})
+
+  # HbxStaff child model indexes
+  index({"hbx_staff._id" => 1})
+
+  # PersonRelationship child model indexes
+  index({"person_relationship.relative_id" =>  1})
 
   scope :active,   ->{ where(is_active: true) }
   scope :inactive, ->{ where(is_active: false) }
-
-  def self.find_employees_by_employer(employer_instance)
-    return unless employer_instance.is_a? Employer
-    where("employees.employer_id" =>  employer_instance._id).to_a
-  end
 
   # Strip non-numeric chars from ssn
   # SSN validation rules, see: http://www.ssa.gov/employer/randomizationfaqs.html#a0=12
@@ -76,6 +106,16 @@ class Person
     return if val.blank?
     write_attribute(:ssn, val.to_s.gsub(/[^0-9]/i, ''))
   end
+
+  def gender=(val)
+    return if val.blank?
+    write_attribute(:gender, val.downcase)
+  end
+
+  # def dob=(val)
+  #   bday = DateTime.strptime(val, "%m-%d-%Y").to_date
+  #   write_attribute(:dob, bday)
+  # end
 
   def families
     Family.where(:family_member.person_id => self.id).to_a
@@ -208,11 +248,17 @@ private
     self.name_full = full_name
   end
 
-  def death_date_follows_birth_date
-    return if death_date.nil? || dob.nil?
-    errors.add(:death_date, "death_date cannot preceed dob") if death_date < dob
+  def date_of_death_follows_birth_date
+    return if date_of_death.nil? || dob.nil?
+    errors.add(:date_of_death, "date_of_death cannot preceed dob") if date_of_death < dob
   end
 
+  def dob_string
+    self.dob.blank? ? "" : self.dob.strftime("%Y%m%d")
+  end
 
+  def safe_downcase(val)
+    val.blank? ? val : val.downcase.strip
+  end
 
 end
