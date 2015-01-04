@@ -1,5 +1,33 @@
 Rails.application.routes.draw do
 
+  namespace :broker do
+  get 'welcome/index'
+  end
+
+  namespace :employer do
+  get 'welcome/index'
+  end
+
+  devise_for :users
+
+
+  resources :families do
+    get 'page/:page', :action => :index, :on => :collection
+
+    resources :family_members, only: [:index, :new, :create]
+    resources :households
+  end
+ 
+  resources :family_members, only: [:show, :edit, :update] do
+     member do
+       get :link_employee
+       get :challenge_identity
+     end
+   end
+ 
+  resources :people 
+
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
