@@ -19,7 +19,7 @@ class Consumer
   field :birth_location, type: String, default: ""
   field :marital_status, type: String, default: ""
 
-  field :citizen_status, type: String, default: 'us_citizen'
+  field :citizen_status, type: String
   field :is_state_resident, type: Boolean, default: true
   field :is_incarcerated, type: Boolean, default: false
   field :is_applicant, type: Boolean, default: true
@@ -27,17 +27,18 @@ class Consumer
 
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
+  field :is_active, type: Boolean, default: true
+
 
   delegate :hbx_assigned_id, to: :person, allow_nil: true
   delegate :ssn, :ssn=, to: :person, allow_nil: true
   delegate :dob, :dob=, to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
-  delegate :date_of_death, :date_of_death=, to: :person, allow_nil: true
-  delegate :is_active, :is_active=, :is_active?, to: :person, allow_nil: true
 
   # belongs_to :family
 
-  validates_presence_of :person, :ssn, :dob, :gender, :is_incarcerated, :is_applicant, :is_state_resident
+  validates_presence_of :person, :ssn, :dob, :gender, :is_incarcerated, :is_applicant, 
+    :is_state_resident, :citizen_status, :is_applicant
 
   validates :citizen_status,
     inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" },
@@ -52,6 +53,9 @@ class Consumer
   scope :all_over_or_equal_age, ->(age) {lte(:'dob' => (Date.today - age.years))}
   scope :all_under_or_equal_age, ->(age) {gte(:'dob' => (Date.today - age.years))}
 
+  def is_active?
+    self.is_active
+  end
 
   def parent
     raise "undefined parent: Person" unless person? 

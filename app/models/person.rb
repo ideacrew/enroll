@@ -86,13 +86,16 @@ class Person
 
   # Consumer child model indexes
   index({"consumer._id" => 1})
+  index({"consumer.is_active" => 1})
 
   # Employee child model indexes
   index({"employee._id" => 1})
   index({"employee.employer_id" => 1})
+  index({"employee.is_active" => 1})
 
   # HbxStaff child model indexes
   index({"hbx_staff._id" => 1})
+  index({"hbx_staff.is_active" => 1})
 
   # PersonRelationship child model indexes
   index({"person_relationship.relative_id" =>  1})
@@ -240,6 +243,10 @@ class Person
     Person.find(associated_ids).combination(2).all? do |addr_set|
       addr_set.first.addresses_match?(addr_set.last)
     end
+  end
+
+  def is_active?
+    self.is_active
   end
 
 private
