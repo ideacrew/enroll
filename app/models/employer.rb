@@ -39,6 +39,7 @@ class Employer
 
   # PlanYear child model indexes
   index({"plan_year.broker_id" => 1}, {sparse: true})
+  index({"plan_year.broker_id_as_string" => 1}, {sparse: true})
   index({"plan_year.start_date" => 1})
   index({"plan_year.end_date" => 1}, {sparse: true})
   index({"plan_year.open_enrollment_start" => 1})
