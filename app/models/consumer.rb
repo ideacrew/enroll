@@ -47,8 +47,7 @@ class Consumer
   validates :ssn, 
     length: { minimum: 9, maximum: 9, message: "Consumer SSN must be 9 digits" }, 
     numericality: true,
-    uniqueness: true,
-    allow_blank: true  
+    uniqueness: true
         
   scope :all_under_age_twenty_six, ->{ gt(:'dob' => (Date.today - 26.years))}
   scope :all_over_age_twenty_six,  ->{lte(:'dob' => (Date.today - 26.years))}
