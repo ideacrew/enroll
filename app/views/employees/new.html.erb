@@ -1,0 +1,36 @@
+<%- model_class = Employee -%>
+
+<section>
+  <div class="row">
+    <div class="col-md-12">
+      <nav class="page-header">
+        <%= render 'shared/breadcrumb', crumbs: [
+            link_to('Employees', employees_path),
+            'New'
+          ]
+        %>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<section>
+    <div class="col-md-6 col-md-offset-3 ">
+      <%= form_for(@employee) do |f| %>
+        <%#= f.hidden_field :family_id %>
+
+        <%= render 'form', f: f %>
+
+        <footer>
+          <div class="well well-sm well-default">
+            <div class="form-actions">
+              <%= f.submit nil, :class => 'btn btn-primary' %>
+              <%= link_to t('.cancel', :default => t("helpers.links.cancel")), employees_path, :class => 'btn btn-default' %>
+            </div>
+          </div>
+        </footer>
+
+      <% end %>
+  </div>
+</section>
+

@@ -1,0 +1,20 @@
+<% if @employee.errors.any? %>
+  <div class="alert alert-error">
+    <h4><%= pluralize(@employee.errors.count, "error") %> prohibited this employee from being saved:</h4>
+    <ul>
+      <% @employee.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+
+      <% @employee.embedded_error_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class='legend'>Name and Identifying Info</div>
+<%= f.fields_for :person, errors: {}, fieldset: false do |name|  %>
+  <%= render 'shared/name_fields', f: name %>
+<% end %>
+
