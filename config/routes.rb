@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  resources :employees
+
   namespace :broker do
   get 'welcome/index'
   end
