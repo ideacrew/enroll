@@ -1,2 +1,31 @@
-<h1>Broker::Welcome#index</h1>
-<p>Find me in app/views/broker/welcome/index.html.erb</p>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <div class="jumbotron">
+      <h1>Broker Portal</h1>
+      <p>Broker Registration and Account Maintenance</p>
+      <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
+      <div class="row">
+        <p><%= link_to "Consumer Portal", root_path, class: "btn btn-default" %>
+        <%= link_to "Employer Portal", employer_welcome_index_path, class: "btn btn-default" %>
+        <%= link_to "Broker Portal", broker_welcome_index_path, class: "btn btn-default" %></p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <form class="form-signin">
+      <h2 class="form-signin-heading">Please sign in</h2>
+      <label for="inputEmail" class="sr-only">Email address</label>
+      <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+      <label for="inputPassword" class="sr-only">Password</label>
+      <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" value="remember-me"> Remember me
+        </label>
+      </div>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+  </div>
+</div>
