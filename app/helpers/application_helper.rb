@@ -8,6 +8,21 @@ module ApplicationHelper
     [ver, date, who].reject(&:nil? || empty?).join(' | ')
   end
 
+  # Builds a Dropdown button
+  def select_dropdown(input_id, list)
+    return unless list.is_a? Array
+    content_tag(:select, class: "form-control", id: input_id) do
+      concat(content_tag :option, "Select", value: "")
+      list.each do |item|
+        if item.is_a? Array
+          concat(content_tag :option, item[0].humanize, value: item[1])
+        else
+          concat(content_tag :option, item.humanize, value: item)
+        end
+      end      
+    end
+  end
+
   # Formats first data row in a table indicating an empty set
   def table_empty_to_human
     content_tag(:tr, (content_tag(:td, "None given")))
