@@ -4,7 +4,6 @@ class PersonRelationship
 
   embedded_in :person
 
-
   MALE_RELATIONSHIPS_LIST   = %W(father grandfather grandson uncle nephew adopted\ child stepparent
                               foster\ child son-in-law brother-in-law father-in-law brother ward
                               stepson child sponsored\ dependent dependent\ of\ a\ minor\ dependent
@@ -84,15 +83,14 @@ class PersonRelationship
   field :kind, type: String
 
 	validates_presence_of :relative_id, message: "Choose a relative"
-  validates :kind, 
+  validates :kind,
             presence: true,
             allow_blank: false,
             allow_nil:   false,
             inclusion: {in: KINDS, message: "%{value} is not a valid person relationship"}
 
-
   def parent
-    raise "undefined parent class: Person" unless person? 
+    raise "undefined parent class: Person" unless person?
     self.person
   end
 
@@ -109,5 +107,4 @@ class PersonRelationship
     self.kind = INVERSE_MAP[self.kind]
     self
   end
-
 end

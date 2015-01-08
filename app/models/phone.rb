@@ -2,9 +2,6 @@ class Phone
   include Mongoid::Document
   include Mongoid::Timestamps
 
-
-  # include MergingModel
-
   KINDS = %W(home work mobile)
 
   field :kind, type: String
@@ -52,13 +49,4 @@ private
   def filter_non_numbers(str)
     str.gsub(/\D/,'') if str.present?
   end
-
-  def merge_update(m_phone)
-    merge_with_overwrite(
-      m_phone,
-      :phone_number,
-      :extension
-    )
-  end
-
 end

@@ -11,6 +11,4 @@ class HbxStaff
   def is_active?
     self.is_active
   end
-
-
 end

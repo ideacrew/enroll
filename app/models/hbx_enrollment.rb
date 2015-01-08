@@ -1,7 +1,7 @@
 class HbxEnrollment
   include Mongoid::Document
   include Mongoid::Timestamps
-  include AASM   
+  include AASM
 
   # Persists result of a completed plan shopping process
 
@@ -13,7 +13,7 @@ class HbxEnrollment
   field :enrollment_group_id, type: String
   field :applied_aptc_in_cents, type: Integer, default: 0
   field :elected_aptc_in_cents, type: Integer, default: 0
-  field :is_active, type: Boolean, default: true 
+  field :is_active, type: Boolean, default: true
   field :submitted_at, type: DateTime
   field :aasm_state, type: String
 
@@ -26,20 +26,19 @@ class HbxEnrollment
   embeds_many :comments
   accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
 
-  validates :kind, 
+  validates :kind,
     					presence: true,
     					allow_blank: false,
     					allow_nil:   false,
     					inclusion: {in: KINDS, message: "%{value} is not a valid enrollment type"}
 
   validates :applied_aptc_in_cents,
-              allow_nil: true, 
+              allow_nil: true,
               numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   validates :elected_aptc_in_cents,
-              allow_nil: true, 
+              allow_nil: true,
               numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-
 
   def policy=(policy_instance)
     return unless policy_instance.is_a? Policy
@@ -82,5 +81,4 @@ class HbxEnrollment
   def applicant_ids
     hbx_enrollment_members.map(&:applicant_id)
   end
-
 end

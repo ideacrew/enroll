@@ -122,7 +122,7 @@ class Family  # aka class ApplicationGroup
 
   def people_relationship_map
     map = Hash.new
-    people.each do |person|      
+    people.each do |person|
       map[person] = person_relationships.detect { |r| r.object_person == person.id }.relationship_kind
     end
     map

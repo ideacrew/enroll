@@ -23,17 +23,17 @@ class Address
 
   validates_presence_of :address_1, :city, :state, :zip
 
-  validates :zip, 
-    format: { :with => /\A\d{5}(-\d{4})?\z/, 
+  validates :zip,
+    format:
+      {
+        :with => /\A\d{5}(-\d{4})?\z/,
         :message => "should be in the form: 12345 or 12345-1234"
       }
-
 
   embedded_in :person
   embedded_in :employer
   embedded_in :employer_office
   embedded_in :broker
-  # embeds_one :location
 
   before_save :clean_fields
 
@@ -48,17 +48,6 @@ class Address
     end
   end
 
-  def match(another_address)
-    return(false) if another_address.nil?
-    attrs_to_match = [:kind, :address_1, :address_2, :city, :state, :zip]
-    attrs_to_match.all? { |attr| attribute_matches?(attr, another_address) }
-  end
-
-  def attribute_matches?(attribute, other)
-    return true if (self[attribute] == nil && other[attribute] == "")
-    safe_downcase(self[attribute]) == safe_downcase(other[attribute])
-  end
-
   def formatted_address
     city.present? ? city_delim = city + "," : city_delim = city
     line3 = [city_delim, state, zip].reject(&:nil? || empty?).join(' ')
@@ -68,17 +57,6 @@ class Address
   def full_address
     city.present? ? city_delim = city + "," : city_delim = city
     [address_1, address_2, city_delim, state, zip].reject(&:nil? || empty?).join(' ')
-  end
-
-  # NOTE: searching won't help -- dynamically called in PersonParser using send
-  def merge_update(m_address)
-    merge_with_overwrite(m_address,
-      :address_1,
-      :address_2,
-      :city,
-      :state,
-      :zip
-    )
   end
 
   def home?
@@ -95,11 +73,4 @@ class Address
     address.zip = data[:zip]
     address
   end
-
-private
-
-  def safe_downcase(val)
-    val.nil? ? nil : val.downcase
-  end
-
 end

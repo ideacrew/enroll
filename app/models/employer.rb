@@ -45,7 +45,6 @@ class Employer
   index({"plan_year.open_enrollment_start" => 1})
   index({"plan_year.open_enrollment_end" => 1})
 
-
   embeds_one :mailing_address
   embeds_many :employer_offices
   embeds_many :plan_years
@@ -57,15 +56,14 @@ class Employer
 
   validates_presence_of :name, :fein, :entity_kind
 
-  validates :fein, 
-    length: { is: 9, message: "%{value} is not a valid FEIN" }, 
+  validates :fein,
+    length: { is: 9, message: "%{value} is not a valid FEIN" },
     numericality: true,
     uniqueness: true
-            
+
   validates :entity_kind,
     inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid business entity" },
     allow_blank: false
-
 
   # has_many association
   def employees
@@ -97,7 +95,6 @@ class Employer
   #   save!
   # end
 
-
   #TODO: Seperate enrollment_open/closed into different state
   aasm do
     state :applicant, initial: true
@@ -110,9 +107,9 @@ class Employer
     state :terminated
 
     event :update_application do
-      transitions from: [:approval_pending, 
-          :approved, 
-          :approval_denied, 
+      transitions from: [:approval_pending,
+          :approved,
+          :approval_denied,
           :enrollment_open,
           :enrollment_closed,
           :pending_binder_payment,
@@ -155,15 +152,6 @@ class Employer
     write_attribute(:fein, new_fein.to_s.gsub(/[^0-9]/i, ''))
   end
 
-
-  def invalidate_find_caches
-    Rails.cache.delete("Employer/find/fein.#{fein}")
-#    elected_plans.each do |ep|
-#      Rails.cache.delete("Employer/find/employer_group_ids.#{ep.carrier_id}.#{ep.carrier_employer_group_id}")
-#    end
-    true
-  end
-
   def todays_bill
     e_id = self._id
     value = Policy.collection.aggregate(
@@ -189,60 +177,8 @@ class Employer
     "%.2f" % value
   end
 
-  def self.default_search_order
-    [[:name, 1]]
-  end
-
-  def self.search_hash(s_rex)
-    search_rex = Regexp.compile(Regexp.escape(s_rex), true)
-    {
-      "$or" => ([
-        {"name" => search_rex},
-        {"fein" => search_rex},
-        {"hbx_id" => search_rex}
-      ])
-    }
-  end
-
   def self.find_for_fein(e_fein)
-#    Rails.cache.fetch("Employer/find/fein.#{e_fein}") do
-      Employer.where(:fein => e_fein).first
-#    end
-  end
-
-  def self.find_for_carrier_and_group_id(carrier_id, group_id)
-      py = PlanYear.where({ :elected_plans => {
-        "$elemMatch" => {
-          "carrier_id" => carrier_id,
-          "carrier_employer_group_id" => group_id
-        }
-      }
-      }).first
-      Maybe.new(py).employer.value
-  end
-
-  def merge_address(m_address)
-    unless (self.addresses.any? { |p| p.match(m_address) })
-      self.addresses << m_address
-    end
-  end
-
-  def merge_email(m_email)
-    unless (self.emails.any? { |p| p.match(m_email) })
-      self.emails << m_email
-    end
-  end
-
-  def merge_phone(m_phone)
-    unless (self.phones.any? { |p| p.match(m_phone) })
-      self.phones << m_phone
-    end
-  end
-
-  def merge_broker(existing, incoming)
-    if existing.broker.nil?
-      existing.broker = incoming.broker
-    end
+    Employer.where(:fein => e_fein).first
   end
 
   def plan_year_of(coverage_start_date)
@@ -257,52 +193,7 @@ class Employer
     plan_year_of(coverage_start_date + 1.year)
   end
 
-  def merge_plan_year(incoming)
-    existing = self.plan_years.detect { |py| py.match(incoming) }
-    if(existing)
-      existing.merge_without_blanking(incoming,
-                                      :open_enrollment_start,
-                                      :open_enrollment_end,
-                                      :start_date,
-                                      :end_date,
-                                      :fte_count,
-                                      :pte_count
-                                     )
-      merge_broker(existing,incoming)
-      EmployerElectedPlansMerger.merge(existing, incoming)
-      update_carriers(existing)
-    else
-      update_carriers(incoming)
-      incoming.employer = self
-      incoming.save!
-    end
-  end
-
-  def update_carriers(existing)
-    incoming_carriers = existing.elected_plans.map { |ep| ep.plan.carrier_id }
-    self.carrier_ids = (self.carrier_ids.to_a + incoming_carriers).uniq
-  end
-
-  def update_all_elected_plans(carrier, g_id)
-    e_plans = self.plan_years.map { |py| py.elected_plans }.flatten
-    matching_plans = e_plans.select { |p| p.carrier_id == carrier._id }
-    matching_plans.each do |mp|
-      mp.carrier_employer_group_id = g_id
-    end
-  end
-
-  def self.make(data)
-    employer = Employer.new
-    employer.name = data[:name]
-    employer.fein = data[:fein]
-    employer.hbx_id = data[:hbx_id]
-    employer.sic_code = data[:sic_code]
-    employer.notes = data[:notes]
-    employer
-  end
-
   class << self
-
     def find_or_create_employer(m_employer)
       found_employer = Employer.where(
         :hbx_id => m_employer.hbx_id

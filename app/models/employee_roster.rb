@@ -17,22 +17,22 @@ class EmployeeRoster
   field :dob, type: Date
   field :date_of_hire, type: Date
   field :ssn, type: String
-  
+
   validates_presence_of :first_name, :last_name
-  
-  validates :employee_relationship, 
+
+  validates :employee_relationship,
             presence: true,
             allow_blank: false,
             allow_nil:   false,
             inclusion: {in: EMPLOYEE_RELATIONSHIP_KIND, message: "%{value} is not a valid employee relationship"}
-  
-  validates :ssn, 
-    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" }, 
+
+  validates :ssn,
+    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
     numericality: true,
     uniqueness: true
-    
+
   def parent
-    raise "undefined parent: Person" unless person? 
+    raise "undefined parent: Person" unless person?
     self.person
   end
 
@@ -44,7 +44,6 @@ class EmployeeRoster
   def broker
     Broker.find(self.broker_id) unless self.broker_id.blank?
   end
-
 
   embeds_one :address
   embeds_one :email

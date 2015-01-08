@@ -22,7 +22,7 @@ class FamilyMember
   validates_presence_of :person_id, :is_primary_applicant
 
   def parent
-    raise "undefined parent Family" unless family? 
+    raise "undefined parent Family" unless family?
     self.family
   end
 
@@ -63,5 +63,4 @@ class FamilyMember
   def is_active?
     self.is_active
   end
-
 end
