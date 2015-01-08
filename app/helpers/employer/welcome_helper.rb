@@ -1,2 +1,0 @@
-module Employer::WelcomeHelper
-end
