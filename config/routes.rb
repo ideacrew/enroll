@@ -1,14 +1,24 @@
 Rails.application.routes.draw do
 
+ namespace :brokers do
+    get 'welcome/index'
+
+    resources :brokers do
+      get 'new'
+      get 'my_account'
+    end
+  end
+
+  namespace :employers do
+    get 'welcome/index'
+
+    resources :employer do
+      get 'new'
+      get 'my_account'
+    end
+  end
+
   resources :employees
-
-  namespace :broker do
-  get 'welcome/index'
-  end
-
-  namespace :employer do
-  get 'welcome/index'
-  end
 
   devise_for :users
 

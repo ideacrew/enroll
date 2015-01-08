@@ -1,4 +1,4 @@
-class Broker::WelcomeController < ApplicationController
+class Brokers::WelcomeController < ApplicationController
   def index
   end
 end
