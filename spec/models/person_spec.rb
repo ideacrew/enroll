@@ -84,6 +84,96 @@ describe Person, '#home_phone' do
 end
 
 
+describe Person, "#subscriber_employee" do
+  it "returns employee based on subscriber_type is employee" do
+    ssn = "987654321"
+    date_of_hire = Date.today - 10.days
+    dob = Date.today - 36.years
+    gender = "female"
+    
+    person = Person.new(
+        first_name: "annie", 
+        last_name: "lennox",
+        addresses: [Address.new(
+            kind: "home",
+            address_1: "441 4th St, NW",
+            city: "Washington",
+            state: "DC",
+            zip: "20001"
+          )
+        ],
+        subscriber_type: "employee"
+      )
+    person.save!
+    employee = Employee.new
+    employee.ssn = ssn
+    employee.dob = dob
+    employee.gender = gender
+    employee.date_of_hire = date_of_hire
+    person.subscriber = employee
+    expect(person.subscriber).to eq employee
+  end
+end
+
+
+describe Person, "#subscriber_consumer" do
+  it "returns employee based on subscriber_type is consumer" do
+    ssn = "987654321"
+    dob = Date.today - 26.years
+    gender = "male"
+    
+    person = Person.create(
+        first_name: "annie", 
+        last_name: "lennox",
+        addresses: [Address.new(
+            kind: "home",
+            address_1: "441 4th St, NW",
+            city: "Washington",
+            state: "DC",
+            zip: "20001"
+          )
+        ],
+        subscriber_type: "consumer"
+      )
+
+    consumer = Consumer.new
+    consumer.ssn = ssn
+    consumer.dob = dob
+    consumer.gender = gender
+    consumer.is_state_resident = true
+    consumer.citizen_status = 'us_citizen'
+    person.subscriber = consumer
+    expect(person.subscriber).to eq consumer
+  end
+end
+
+describe Person, "#subscriber_broker" do
+  it "returns employee based on subscriber_type is broker" do
+   npn_value = "abx123xyz"
+    
+    person = Person.create(
+        first_name: "annie", 
+        last_name: "lennox",
+        addresses: [Address.new(
+            kind: "home",
+            address_1: "441 4th St, NW",
+            city: "Washington",
+            state: "DC",
+            zip: "20001"
+          )
+        ],
+        subscriber_type: "broker"
+      )
+
+    broker = Broker.new(
+        npn: npn_value,
+        kind: "broker"
+    )
+    person.subscriber = broker
+    expect(person.subscriber).to eq person.broker
+  end
+end
+
 describe Person, '#families' do
   it 'returns families where the person is present' do
   end
