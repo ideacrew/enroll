@@ -35,7 +35,10 @@ class Family  # aka class ApplicationGroup
 
   validates :e_case_id, uniqueness: true
 
-#  validates_inclusion_of :max_renewal_year, :in => 2013..2025, message: "must fall between 2013 and 2030"
+  validate :max_one_primary_family_member
+
+
+  #  validates_inclusion_of :max_renewal_year, :in => 2013..2025, message: "must fall between 2013 and 2030"
 
   index({e_case_id:  1})
   index({is_active:  1})
@@ -45,7 +48,7 @@ class Family  # aka class ApplicationGroup
   # FamilyMember child model indexes
   index({"family_member.person_id" => 1})
   index({"family_member.broker_id" =>  1})
-  index({"family_member.is_primary_applicant" => 1})
+  index({"family_member.is_primary_family_member" => 1})
 
   # HbxEnrollment child model indexes
   index({"hbx_enrollment.policy_id" => 1})
@@ -138,8 +141,17 @@ class Family  # aka class ApplicationGroup
 
 private
 
-  def validate_one_and_only_one_primary_family_member
-    # family_members.detect { |a| a.is_primary_applicant? }
+  def max_one_primary_family_member
+    primary_family_members = self.family_members.select do |family_member|
+      family_member.is_primary_applicant == true
+    end
+
+    if primary_family_members.size > 1
+      self.errors.add(:base, "Multiple primary family_members")
+      return false
+    else
+      return true
+    end
   end
 
 end
