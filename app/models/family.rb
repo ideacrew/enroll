@@ -138,8 +138,44 @@ class Family  # aka class ApplicationGroup
 
 private
 
-  def validate_one_and_only_one_primary_family_member
-    # family_members.detect { |a| a.is_primary_applicant? }
+  # This method will return true only if all the family_members in tax_household_members and coverage_household_members are present in self.family_members
+  def integrity_of_family_member_objects
+
+    family_members_in_application_group = self.family_members - [nil]
+
+    # puts family_members_in_application_group.map(&:id).inspect
+
+    tax_household_family_members_valid = are_arrays_of_family_members_same?(family_members_in_application_group.map(&:id), self.households.flat_map(&:tax_households).flat_map(&:tax_household_members).map(&:applicant_id))
+
+    coverage_family_members_valid = are_arrays_of_family_members_same?(family_members_in_application_group.map(&:id), self.households.flat_map(&:coverage_households).flat_map(&:coverage_household_members).map(&:applicant_id))
+
+    tax_household_family_members_valid && coverage_family_members_valid
+  end
+
+  def are_arrays_of_family_members_same?(base_set, test_set)
+    base_set.uniq.sort == test_set.uniq.sort
+  end
+
+  def max_one_primary_family_member
+    primary_family_members = self.family_members.select do |family_member|
+      family_member.is_primary_applicant == true
+    end
+
+    if primary_family_members.size > 1
+      self.errors.add(:base, "Multiple primary family_members")
+      return false
+    else
+      return true
+    end
+  end
+
+  #TODO need to verify this logic from Dan
+  def set_employee_family_members
+    primary_family_member.person.policies do |policy|
+      employee_family_member = self.primary_family_member.employee_family_members.build
+      employee_family_member.employer = policy.employer
+    end
+    return true
   end
 
 end
