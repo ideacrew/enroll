@@ -21,12 +21,11 @@ class Employee
   # has_one :office_location
 
   before_save :termination_date_must_follow_hire_date
-  
-  validates :ssn, 
-    length: { minimum: 9, maximum: 9, message: "Employee SSN must be 9 digits" }, 
+
+  validates :ssn,
+    length: { minimum: 9, maximum: 9, message: "Employee SSN must be 9 digits" },
     numericality: true,
     uniqueness: true
-
 
   def self.find_by_employer(employer_instance)
     # return unless employer_instance.is_a? Employer
@@ -53,6 +52,4 @@ private
     return if date_of_hire.nil? || date_of_termination.nil?
     errors.add(:date_of_termination, "date_of_termination cannot preceed date_of_hire") if date_of_termination < date_of_hire
   end
-
-
 end

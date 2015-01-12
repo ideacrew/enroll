@@ -7,5 +7,4 @@ class EmployerOffice
   field :location_name, type: String
 
   embeds_one :address
-
 end

@@ -1,7 +1,7 @@
 class User
   include Mongoid::Document
   include Mongoid::Timestamps
-  
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -32,7 +32,6 @@ class User
 
   # Enable polymorphic associations
   belongs_to :profile, polymorphic: true
-
 
   ## Confirmable
   # field :confirmation_token,   type: String
@@ -95,5 +94,4 @@ private
       break token unless User.where(authentication_token: token).first
     end
   end
-  
 end

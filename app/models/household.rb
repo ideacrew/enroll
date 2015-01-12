@@ -20,17 +20,17 @@ class Household
 
   embeds_many :hbx_enrollments
   accepts_nested_attributes_for :hbx_enrollments
-  
+
   # embeds_many :tax_households
   # accepts_nested_attributes_for :tax_households
-  
+
   # embeds_many :comments
   # accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
 
   # include HasApplicants
 
   def parent
-    raise "undefined parent ApplicationGroup" unless application_group? 
+    raise "undefined parent ApplicationGroup" unless application_group?
     self.application_group
   end
 
@@ -59,5 +59,4 @@ class Household
     end
     (th_applicant_ids + ch_applicant_ids + hbxe_applicant_ids).distinct
   end
-
 end

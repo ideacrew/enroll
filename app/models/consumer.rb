@@ -37,18 +37,18 @@ class Consumer
 
   # belongs_to :family
 
-  validates_presence_of :person, :ssn, :dob, :gender, :is_incarcerated, :is_applicant, 
+  validates_presence_of :person, :ssn, :dob, :gender, :is_incarcerated, :is_applicant,
     :is_state_resident, :citizen_status, :is_applicant
 
   validates :citizen_status,
     inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" },
     allow_blank: false
-  
-  validates :ssn, 
-    length: { minimum: 9, maximum: 9, message: "Consumer SSN must be 9 digits" }, 
+
+  validates :ssn,
+    length: { minimum: 9, maximum: 9, message: "Consumer SSN must be 9 digits" },
     numericality: true,
     uniqueness: true
-        
+
   scope :all_under_age_twenty_six, ->{ gt(:'dob' => (Date.today - 26.years))}
   scope :all_over_age_twenty_six,  ->{lte(:'dob' => (Date.today - 26.years))}
 
@@ -63,7 +63,7 @@ class Consumer
   end
 
   def parent
-    raise "undefined parent: Person" unless person? 
+    raise "undefined parent: Person" unless person?
     self.person
   end
 

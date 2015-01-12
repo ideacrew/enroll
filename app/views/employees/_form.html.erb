@@ -13,8 +13,13 @@
   </div>
 <% end %>
 
-<div class='legend'>Name and Identifying Info</div>
+<legend>Employee Information</legend>
 <%= f.fields_for :person, errors: {}, fieldset: false do |name|  %>
   <%= render 'shared/name_fields', f: name %>
 <% end %>
 
+<%= render 'shared/id_info_fields', f: f %>
+
+<%= f.fields_for @person.addresses, errors: {}, fieldset: false do |address|  %>
+  <%= render 'shared/address_fields', f: address %>
+<% end %>

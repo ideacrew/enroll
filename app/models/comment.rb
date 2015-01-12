@@ -13,7 +13,7 @@ class Comment
 
   validates_inclusion_of :priority, in: PRIORITY_TYPE, message: "Invalid priority"
   validates_presence_of :content
-  
+
   embedded_in :application_group
   embedded_in :household
   embedded_in :person

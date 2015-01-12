@@ -6,7 +6,7 @@ class Person
 
   GENDER_KINDS = %W(male female unknown)
   CHILD_MODELS = [
-      :consumer, :responsible_party, :broker, :hbx_staff, :person_relationships, :employees, 
+      :consumer, :responsible_party, :broker, :hbx_staff, :person_relationships, :employees,
       :addresses, :phones, :emails
     ]
 
@@ -47,27 +47,24 @@ class Person
   embeds_many :phones
   embeds_many :emails
 
-  accepts_nested_attributes_for :consumer, :responsible_party, :broker, :hbx_staff, 
+  accepts_nested_attributes_for :consumer, :responsible_party, :broker, :hbx_staff,
     :person_relationships, :employee, :addresses, :phones, :emails
-
 
   validates_presence_of :first_name, :last_name
 
-  validates :ssn, 
-    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" }, 
+  validates :ssn,
+    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
     numericality: true,
     uniqueness: true,
     allow_blank: true
 
-  validates :gender, 
+  validates :gender,
     allow_blank: true,
     inclusion: { in: GENDER_KINDS, message: "%{value} is not a valid gender" }
 
-
-  # validates_each CHILD_MODELS do | record, attrib, value | 
-  #   record.errors.add(attrib) 
+  # validates_each CHILD_MODELS do | record, attrib, value |
+  #   record.errors.add(attrib)
   # end
-
 
   before_save :initialize_name_full, :date_of_death_follows_birth_date
 
@@ -144,80 +141,6 @@ class Person
     self.update_attributes(props)
   end
 
-
-  def self.default_search_order
-    [
-      ["last_name", 1],
-      ["first_name", 1]
-    ]
-  end
-
-  def full_name
-    [name_pfx, first_name, middle_name, last_name, name_sfx].reject(&:blank?).join(' ').downcase.gsub(/\b\w/) {|first| first.upcase }
-  end
-
-  def merge_address(m_address)
-    unless (self.addresses.any? { |p| p.match(m_address) })
-      self.addresses << m_address
-    end
-  end
-
-  def update_address(m_address)
-    existing_address = self.addresses.select { |p| p.address_type == m_address.address_type }
-    existing_address.each do |ep|
-      self.addresses.delete(ep)
-    end
-    self.addresses << m_address
-    self.touch
-  end
-
-  def remove_address_of(address_type)
-    existing_address = self.addresses.detect { |p| p.address_type == address_type }
-    if existing_address
-      existing_address.destroy
-    end
-    self.touch
-  end
-
-  def merge_email(m_email)
-    unless (self.emails.any? { |p| p.match(m_email) })
-      self.emails << m_email
-    end
-  end
-
-  def update_email(m_email)
-    existing_email = self.emails.select { |p| p.email_type == m_email.email_type }
-    existing_email.each do |ep|
-      self.emails.delete(ep)
-    end
-    self.emails << m_email
-    self.touch
-  end
-
-  def merge_phone(m_phone)
-    unless (self.phones.any? { |p| p.match(m_phone) })
-      self.phones << m_phone
-    end
-  end
-
-  def update_phone(m_phone)
-    existing_phones = self.phones.select { |p| p.phone_type == m_phone.phone_type }
-    existing_phones.each do |ep|
-      self.phones.delete(ep)
-    end
-    self.phones << m_phone
-    self.touch
-  end
-
-  def addresses_match?(other_person)
-    my_home_addresses = addresses.select(&:home?)
-    other_home_addresses = other_person.addresses.select(&:home?)
-    return(false) if (my_home_addresses.length != other_home_addresses.length)
-    my_home_addresses.all? do |m_addy|
-      other_home_addresses.any? { |o_addy| o_addy.match(m_addy) }
-    end
-  end
-
   def home_address
     addresses.detect { |adr| adr.kind == "home" }
   end
@@ -251,7 +174,6 @@ class Person
   end
 
 private
-
   def initialize_name_full
     self.name_full = full_name
   end
@@ -268,5 +190,4 @@ private
   def safe_downcase(val)
     val.blank? ? val : val.downcase.strip
   end
-
 end
