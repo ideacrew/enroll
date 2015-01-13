@@ -1,4 +1,4 @@
-class EmployeeRoster
+class EmployeeCensus
   include Mongoid::Document
   include Mongoid::Timestamps
 
