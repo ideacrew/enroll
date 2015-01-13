@@ -7,12 +7,16 @@ class User
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
+  # Setup accessible (or protected) attributes for your model
+  attr_accessible :email, :password, :password_confirmation, :remember_me, :approved, :role
+
+  ## Enable Admin approval
+  ## Seed: https://github.com/plataformatec/devise/wiki/How-To%3a-Require-admin-to-activate-account-before-sign_in
+  field :approved, type: Boolean, default: false
+
   ## Database authenticatable
   field :email,              type: String, default: ""
   field :encrypted_password, type: String, default: ""
-
-  # Oracle Identity Manager ID
-  field :oim_id, type: String, default: ""  
 
   ## Recoverable
   field :reset_password_token,   type: String
@@ -31,11 +35,13 @@ class User
   field :authentication_token
   field :role, :type => String, :default => "user"
 
+  # Oracle Identity Manager ID
+  field :oim_id, type: String, default: ""
   ROLES = %w[user edi_ops admin]
 
   # Enable polymorphic associations
   belongs_to :profile, polymorphic: true
-  
+
   has_one :person
 
   ## Confirmable
@@ -86,7 +92,7 @@ class User
   def self.find_by_authentication_token(token)
     where(authentication_token: token).first
   end
-  
+
 protected
   def send_admin_mail
     AdminMailer.new_user_waiting_for_approval(self).deliver
