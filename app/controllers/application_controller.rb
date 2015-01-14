@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
 
   def authenticate_me!
     # Skip auth if you are trying to log in
-    if controller_name.downcase == "accounts"
+    if controller_name.downcase == "welcome"
       return true
     end
     authenticate_user!
