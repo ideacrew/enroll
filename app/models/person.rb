@@ -30,7 +30,8 @@ class Person
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
-
+  field :subscriber_type, type: String
+  
   # Login account
   has_one :user, as: :profile, dependent: :destroy
 
@@ -168,6 +169,32 @@ class Person
       addr_set.first.addresses_match?(addr_set.last)
     end
   end
+  
+  def subscriber
+    abs_subscriber = nil
+    case self.subscriber_type
+    when "employee"
+      abs_subscriber = self.employee
+    when "broker"
+      abs_subscriber =  self.broker
+    when "consumer"
+      abs_subscriber =  self.consumer
+    end
+    return abs_subscriber
+  end
+  
+  def subscriber=(subscriber_hash)
+    abs_subscriber = nil
+    case self.subscriber_type
+    when "employee"
+      self.employee = subscriber_hash
+    when "broker" 
+      self.broker = subscriber_hash
+    when "consumer"
+      self.consumer = subscriber_hash
+    end
+    
+  end
 
   def is_active?
     self.is_active
@@ -175,7 +202,7 @@ class Person
 
 private
   def initialize_name_full
-    self.name_full = full_name
+    #self.name_full = full_name
   end
 
   def date_of_death_follows_birth_date

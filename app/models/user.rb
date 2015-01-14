@@ -35,6 +35,8 @@ class User
 
   # Enable polymorphic associations
   belongs_to :profile, polymorphic: true
+  
+  has_one :person
 
   ## Confirmable
   # field :confirmation_token,   type: String
@@ -84,7 +86,7 @@ class User
   def self.find_by_authentication_token(token)
     where(authentication_token: token).first
   end
-
+  
 protected
   def send_admin_mail
     AdminMailer.new_user_waiting_for_approval(self).deliver
