@@ -30,11 +30,21 @@ class User
   field :last_sign_in_ip,    type: String
 
   field :authentication_token
-  field :role, :type => String, :default => "user"
+  field :role, :type => String, :default => "web_service"
 
   # Oracle Identity Manager ID
   field :oim_id, type: String, default: ""
-  ROLES = %w[user edi_ops admin]
+
+  ROLES = {
+    employer: "Employer",
+    employee: "Employee",
+    broker: "Broker",
+    undocumented_consumer: "Undocumented Consumer",
+    qhp_consumer: "QHP Consumer",
+    hbx_employee: "HBX Employee",
+    system_service: "System Service",
+    web_service: "Web Service"
+  }
 
   # Enable polymorphic associations
   belongs_to :profile, polymorphic: true
