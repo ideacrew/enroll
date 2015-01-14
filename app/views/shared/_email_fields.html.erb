@@ -1,14 +1,14 @@
 <fieldset>
   <div class="row">
-    <div class="col-xs-6 col-sm-3 col-md-3">
+    <div class="col-xs-6 col-sm-3 col-md-2">
       <div class="form-group">
         <%= f.label :kind %>
         <%= select_dropdown "employee_email_kind", Email::KINDS %>
       </div>
     </div>
-    <div class="col-xs-6 col-sm-4 col-md-4">
+    <div class="col-xs-6 col-sm-4 col-md-6">
       <div class="form-group">
-        <%= f.label :address %>
+        <%= f.label :address, "Email" %>
         <%= f.text_field :address, class: "form-control" %>
       </div>
     </div>

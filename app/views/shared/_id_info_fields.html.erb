@@ -7,20 +7,21 @@
   </div>
 
   <div class="col-xs-6 col-sm-4 col-md-4">
-    <div class="form-group">
-      <%= f.label :dob, "DOB" %>
-<%= f.text_field :dob,
-  start_year: Date.today.year - 110,
-  end_year: Date.today.year,
-  placeholder: "mm/dd/yyyy",
-  class: "date_picker form-control",
-  value: f.object.dob.try(:strftime, "%m/%d/%Y")
-%>
+    <div class="form-group required">
+      <%= f.label :dob, "Date of Birth" %>
+      <%= f.text_field :dob,
+        start_year: Date.today.year - 110,
+        end_year: Date.today.year,
+        placeholder: "mm/dd/yyyy",
+        class: "date_picker form-control",
+        required: true,
+        value: f.object.dob.try(:strftime, "%m/%d/%Y")
+      %>
     </div>
   </div>
 
   <div class="col-xs-6 col-sm-4 col-md-4">
-    <div class="btn-group">
+    <div class="form-group required">
       <%= f.label :gender, "Gender" %>
       <%= select_dropdown("employee_gender", Person::GENDER_KINDS) %>
     </div>

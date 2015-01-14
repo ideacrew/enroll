@@ -1,14 +1,14 @@
 <fieldset>
   <div class="row">
-    <div class="col-xs-6 col-sm-3 col-md-3">
+    <div class="col-xs-6 col-sm-3 col-md-2">
       <div class="form-group">
         <%= f.label :kind %>
         <%= select_dropdown "employee_phone_kind", Phone::KINDS %>
       </div>
     </div>
-    <div class="col-xs-6 col-sm-4 col-md-4">
+    <div class="col-xs-6 col-sm-4 col-md-5">
       <div class="form-group">
-        <%= f.label :number %>
+        <%= f.label :number, "Phone Number" %>
         <%= f.text_field :number, class: "form-control" %>
       </div>
     </div>
