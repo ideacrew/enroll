@@ -5,7 +5,7 @@ class Phone
   KINDS = %W(home work mobile)
 
   field :kind, type: String
-  field :phone_number, type: String
+  field :number, type: String
   field :extension, type: String, default: ""
   field :primary, type: Boolean
   field :country_code, type: String, default: ""

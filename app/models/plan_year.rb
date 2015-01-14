@@ -39,7 +39,7 @@ class PlanYear
   field :broker_id, type: BSON::ObjectId
   field :broker_id_as_string, type: String
 
-  embeds_one :employer_roster
+  embeds_one :employer_census
   embeds_many :elected_plans
 
   # has_one :contribution_strategy, :class_name => "EmployerContributions::Strategy", :inverse_of => :plan_year

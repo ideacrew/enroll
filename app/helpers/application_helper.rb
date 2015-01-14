@@ -15,7 +15,7 @@ module ApplicationHelper
       concat(content_tag :option, "Select", value: "")
       list.each do |item|
         if item.is_a? Array
-          concat(content_tag :option, item[0].humanize, value: item[1])
+          concat(content_tag :option, item[0], value: item[1])
         else
           concat(content_tag :option, item.humanize, value: item)
         end

@@ -6,7 +6,7 @@ class Broker
 
   KINDS = ["broker", "tpa"]
 
-  field :kind, type: String
+  field :kind, type: String, default: "broker"
 
   field :npn, type: String # Broker National Producer Number (unique identifier)
   field :is_active, type: Boolean, default: true
@@ -20,6 +20,9 @@ class Broker
 
   validates_inclusion_of :kind, in: KINDS, message: "%{value} is not a valid broker type"
   validates_presence_of :npn
+
+  # scope :all_active_brokers, ->{ and({ kind: "broker" }, { is_active: true })}
+  # scope :all_active_tpzs, ->{ and({ kind: "tpa" }, { is_active: true })}
 
   def parent
     raise "undefined parent: Person" unless person?
@@ -37,6 +40,7 @@ class Broker
 
   def is_active?
     self.is_active
+
   end
 
   private

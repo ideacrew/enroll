@@ -16,6 +16,7 @@ class EmployeeCensus
 
   field :dob, type: Date
   field :date_of_hire, type: Date
+  field :date_of_termination, type: Date
   field :ssn, type: String
 
   validates_presence_of :first_name, :last_name

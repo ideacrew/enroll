@@ -15,14 +15,14 @@
 </div>
 
 <div class="row">
-  <div class="col-xs-6 col-sm-6 col-md-6">
+  <div class="col-xs-6 col-sm-5 col-md-5">
     <div class="form-group">
       <%= f.label :city, "City" %>
       <%= f.text_field :city, placeholder: "City", required: true, class: "form-control" %>
     </div>
   </div>
 
-  <div class="col-xs-6 col-sm-3 col-md-3">
+  <div class="col-xs-6 col-sm-4 col-md-4">
     <div class="form-group">
       <%= f.label :state %>
       <%= select_dropdown "employee_address_state", State::NAME_IDS %>

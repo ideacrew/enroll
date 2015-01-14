@@ -10,7 +10,7 @@ class State
     [ "Colorado", "CO" ],
     [ "Connecticut", "CT" ],
     [ "Delaware", "DE" ],
-    [ "District Of Columbia", "DC" ],
+    [ "District of Columbia", "DC" ],
     [ "Florida", "FL" ],
     [ "Georgia", "GA" ],
     [ "Hawaii", "HI" ],

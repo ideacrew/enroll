@@ -20,6 +20,14 @@
 
 <%= render 'shared/id_info_fields', f: f %>
 
+<%= f.fields_for @person.phones, errors: {}, fieldset: false do |phone|  %>
+  <%= render 'shared/phone_fields', f: phone %>
+<% end %>
+
+<%= f.fields_for @person.emails, errors: {}, fieldset: false do |email|  %>
+  <%= render 'shared/email_fields', f: email %>
+<% end %>
+
 <%= f.fields_for @person.addresses, errors: {}, fieldset: false do |address|  %>
   <%= render 'shared/address_fields', f: address %>
 <% end %>
