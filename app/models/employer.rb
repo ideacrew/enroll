@@ -45,7 +45,13 @@ class Employer
   index({"plan_year.open_enrollment_start" => 1})
   index({"plan_year.open_enrollment_end" => 1})
 
-  embeds_one :mailing_address
+  index({"employer_census.family_id" => 1})
+  index({"employer_census.last_name" => 1})
+  index({"employer_census.dob" => 1})
+  index({"employer_census.ssn" => 1})
+
+
+  embeds_one :employer_census
   embeds_many :employer_offices
   embeds_many :plan_years
 

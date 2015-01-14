@@ -1,10 +1,10 @@
-class EmployeeCensus
+class EmployerCensus
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embedded_in :plan_year
+  embedded_in :employer
 
-  EMPLOYEE_RELATIONSHIP_KIND = %W[employee spouse dependent]
+  EMPLOYEE_RELATIONSHIP_KIND = %W[self spouse dependent]
 
   field :family_id, type: String
   field :employee_relationship, type: String
