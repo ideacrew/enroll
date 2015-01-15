@@ -5,15 +5,14 @@ class ApplicationController < ActionController::Base
   #devise filters
   before_filter :authenticate_user_from_token!
   before_filter :authenticate_me!
+  before_filter :configure_permitted_parameters, if: :devise_controller?
 
   #cancancan access denied
   rescue_from CanCan::AccessDenied, with: :access_denied
 
   def authenticate_me!
     # Skip auth if you are trying to log in
-    if controller_name.downcase == "welcome"
-      return true
-    end
+    return true if controller_name.downcase == "welcome"
     authenticate_user!
   end
 
@@ -30,4 +29,19 @@ class ApplicationController < ActionController::Base
       sign_in user, store: false
     end
   end
+
+  protected
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.for(:sign_in) { |u| u.permit(:email, :remember_me) }
+
+    devise_parameter_sanitizer.for(:sign_up) do |u|
+      u.permit(:email, :password, :password_confirmation, :remember_me)
+    end
+
+    devise_parameter_sanitizer.for(:account_update) do |u|
+      u.permit(:email, :password, :password_confirmation, :current_password)
+    end
+  end
+
 end
