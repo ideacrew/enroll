@@ -85,15 +85,14 @@
 
 
     <div id="wrapper" class="container-fluid">
-      <section>
         <div class="row">
           <div class="col-md-12">
             <%= render_flash %>
+            <%= yield %>
           </div>
         </div>
-      </section>
+    </div>
 
-      <%= yield %>
 
 <!-- <footer id="page-footer-section">
     <div class="container">
@@ -150,5 +149,7 @@
     </div>      </footer>
     </div> <!-- /container -->
 
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <!-- <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script> -->
   </body>
  </html>

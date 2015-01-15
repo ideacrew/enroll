@@ -1,5 +1,20 @@
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
+    <% if user_signed_in? %>
+      <li>
+        Welcome <%= current_user.email %> |
+        <%= link_to('Logout', destroy_user_session_path, :method => :delete) %>
+      </li>
+    <% else %>
+      <li>
+        <%= link_to('Login', new_user_session_path)  %>
+      </li>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
     <div class="jumbotron">
       <h1>Consumer Portal</h1>
       <p>DC Online Marketplace for ACA and non-ACA Health Insurance</p>
@@ -8,11 +23,12 @@
         <p><%= link_to "Consumer Portal", root_path, class: "btn btn-default" %>
         <%= link_to "Employer Portal", employers_welcome_index_path, class: "btn btn-default" %>
         <%= link_to "Broker Portal", brokers_welcome_index_path, class: "btn btn-default" %></p>
-      </div>      
+      </div>
     </div>
   </div>
 </div>
-<div class="row">
+
+<!-- <div class="row">
   <div class="col-md-6 col-md-offset-3">
     <form class="form-signin">
       <h2 class="form-signin-heading">Please sign in</h2>
@@ -29,3 +45,4 @@
     </form>
   </div>
 </div>
+-->
