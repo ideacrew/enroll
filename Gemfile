@@ -36,7 +36,7 @@ gem 'mongoid-autoinc'
 
 gem 'aasm', '~> 4.0.7'
 gem 'haml'
-gem 'bh'
+# gem 'bh'
 
 gem 'devise', '~> 3.4.1'
 # gem 'devise_ldap_authenticatable', '~> 0.8.1'
