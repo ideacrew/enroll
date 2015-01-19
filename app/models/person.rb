@@ -47,6 +47,11 @@ class Person
   embeds_many :addresses
   embeds_many :phones
   embeds_many :emails
+  
+  #building non person relation using through relation
+  has_one :employer, :inverse_of => :employee
+  has_many :broker_family_members, class_name: "FamilyMember", :inverse_of => :broker
+  has_many :employee_family_members, class_name: "FamilyMember", :inverse_of => :employee
 
   accepts_nested_attributes_for :consumer, :responsible_party, :broker, :hbx_staff,
     :person_relationships, :employee, :addresses, :phones, :emails
