@@ -19,9 +19,9 @@ class Address
   field :country_name, type: String, default: ""
   field :full_text, type: String
 
-  validates_inclusion_of :kind, in: KINDS, message: "%{value} is not a valid address type"
+  validates_presence_of :kind, :address_1, :city, :state, :zip
 
-  validates_presence_of :address_1, :city, :state, :zip
+  validates_inclusion_of :kind, in: KINDS, message: "'%{value}'' is not a valid address type"
 
   validates :zip,
     format:

@@ -1,6 +1,12 @@
 require 'rails_helper'
 
 describe Address do
+  it { should validate_presence_of :kind }
+  it { should validate_presence_of :address_1 }
+  it { should validate_presence_of :city }
+  it { should validate_presence_of :state }
+  it { should validate_presence_of :zip }
+
   it "should have an invalid zipcode" do
     subject.valid?
     expect(subject).to have_at_least(1).errors_on(:zip)
