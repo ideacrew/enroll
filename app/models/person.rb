@@ -35,7 +35,7 @@ class Person
   # Login account
   has_one :user, as: :profile, dependent: :destroy
 
-  # belongs_to :employer_representatives, class_name: "Employer",  inverse_of: :representatives
+  belongs_to :employer_representatives, class_name: "Employer",  inverse_of: :representatives
 
   embeds_one :consumer, 
     cascade_callbacks: true,
@@ -58,7 +58,6 @@ class Person
   embeds_many :emails
   
   #building non person relation using through relation
-  has_one :employer, :inverse_of => :employee
   has_many :broker_family_members, class_name: "FamilyMember", :inverse_of => :broker
   has_many :employee_family_members, class_name: "FamilyMember", :inverse_of => :employee
 
