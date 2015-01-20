@@ -30,6 +30,14 @@ class Employer
 
   field :is_active, type: Boolean, default: true
 
+  embeds_many :employer_census_families
+  embeds_many :employer_offices
+  embeds_many :plan_years
+
+  belongs_to :primary_contact, class_name: "Person",  inverse_of: :employer_primary_contact
+  has_many :representatives, class_name: "Person", inverse_of: :employer_representatives
+
+  # has_many :premium_payments, order: { paid_at: 1 }
   index({ hbx_assigned_id: 1 }, { unique: true })
   index({ name: 1 })
   index({ dba: 1 }, {sparse: true})
@@ -45,20 +53,10 @@ class Employer
   index({"plan_year.open_enrollment_start" => 1})
   index({"plan_year.open_enrollment_end" => 1})
 
-  index({"employer_census.family_id" => 1})
-  index({"employer_census.last_name" => 1})
-  index({"employer_census.dob" => 1})
-  index({"employer_census.ssn" => 1})
-
-
-  embeds_one :employer_census
-  embeds_many :employer_offices
-  embeds_many :plan_years
-
-  belongs_to :primary_contact, class_name: "Person",  inverse_of: :employer_primary_contact
-  has_many :representatives, class_name: "Person", inverse_of: :employer_representatives
-
-  # has_many :premium_payments, order: { paid_at: 1 }
+  index({"employer_census_families._id" => 1})
+  index({"employer_census_families.employer_census_employee.last_name" => 1})
+  index({"employer_census_families.employer_census_employee.dob" => 1})
+  index({"employer_census_families.employer_census_employee.ssn" => 1})
 
   validates_presence_of :name, :fein, :entity_kind
 
