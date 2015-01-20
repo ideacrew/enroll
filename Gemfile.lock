@@ -164,6 +164,10 @@ GEM
     mongoid-grid_fs (2.1.0)
       mime-types (>= 1.0, < 3.0)
       mongoid (>= 3.0, < 5.0)
+    mongoid-rspec (2.0.0)
+      mongoid (~> 4.0.0)
+      rake
+      rspec (~> 3.1)
     moped (2.0.2)
       bson (~> 2.2)
       connection_pool (~> 2.0)
@@ -212,6 +216,10 @@ GEM
     ref (1.0.5)
     responders (2.0.2)
       railties (>= 4.2.0.alpha, < 5)
+    rspec (3.1.0)
+      rspec-core (~> 3.1.0)
+      rspec-expectations (~> 3.1.0)
+      rspec-mocks (~> 3.1.0)
     rspec-core (3.1.7)
       rspec-support (~> 3.1.0)
     rspec-expectations (3.1.2)
@@ -299,6 +307,7 @@ DEPENDENCIES
   less-rails-bootstrap (~> 3.3.1.0)
   mongoid (~> 4.0.0)
   mongoid-autoinc
+  mongoid-rspec
   moped (~> 2.0.2)
   origin (~> 2.1.1)
   rails (= 4.2.0)

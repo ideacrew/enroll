@@ -12,7 +12,7 @@ class Phone
   field :area_code, type: String, default: ""
   field :full_phone_number, type: String, default: ""
 
-  validates_presence_of  :phone_number
+  validates_presence_of  :number
   validates_presence_of  :kind, message: "Choose a type"
   validates_inclusion_of :kind, in: KINDS, message: "%{value} is not a valid phone type"
 
@@ -22,7 +22,7 @@ class Phone
 
   def match(another_phone)
     return(false) if another_phone.nil?
-    attrs_to_match = [:kind, :phone_number]
+    attrs_to_match = [:kind, :number]
     attrs_to_match.all? { |attr| attribute_matches?(attr, another_phone) }
   end
 
@@ -30,7 +30,7 @@ class Phone
     self[attribute] == other[attribute]
   end
 
-  def phone_number=(value)
+  def number=(value)
     super filter_non_numbers(value)
   end
 
@@ -41,7 +41,7 @@ class Phone
   def self.make(data)
     phone = Phone.new
     phone.kind = data[:kind]
-    phone.phone_number = data[:phone_number]
+    phone.number = data[:number]
     phone
   end
 

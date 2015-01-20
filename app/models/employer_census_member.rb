@@ -18,7 +18,7 @@ class EmployerCensusMember
   embeds_one :address
   embeds_one :email
 
-  validates_presence_of :first_name, :last_name, :dob, :gender
+  validates_presence_of :first_name, :last_name, :dob, :gender, :employee_relationship
 
   validates :ssn,
     length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },

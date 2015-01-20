@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Family, :type => :model do
-  let(:p0) {Person.create!(name_first: "Dan", name_last: "Aurbach")}
-  let(:p1) {Person.create!(name_first: "Patrick", name_last: "Carney")}
+  let(:p0) {Person.create!(first_name: "Dan", last_name: "Aurbach")}
+  let(:p1) {Person.create!(first_name: "Patrick", last_name: "Carney")}
   let(:a0) {FamilyMember.new(person: p0, primary_applicant: true, consent_applicant: true)}
   let(:a1) {FamilyMember.new(person: p1)}
   let(:plan) {Plan.new(coverage_type: 'health', market_type: 'individual')}
@@ -11,11 +11,10 @@ RSpec.describe Family, :type => :model do
 
   describe "instantiates object." do
     it "sets and gets all basic model fields" do
-      ag = Family.new(
-          e_case_id: "6754632abc",
+      ag = Family.new(e_case_id: "6754632abc",
           renewal_consent_through_year: 2017,
           family_members: [a0, a1],
-          submitted_date: Date.today,
+          submitted_at: Date.today,
           is_active: true,
           updated_by: "rspec"
         )
@@ -28,8 +27,8 @@ RSpec.describe Family, :type => :model do
 
       expect(ag.family_members.size).to eql(2)
       expect(ag.primary_applicant.id).to eql(a0.id)
-      expect(ag.primary_applicant.person.name_first).to eql("Dan")
-      expect(ag.consent_applicant.person.name_last).to eql("Aurbach")
+      expect(ag.primary_applicant.person.first_name).to eql("Dan")
+      expect(ag.consent_applicant.person.last_name).to eql("Aurbach")
     end
   end
 
@@ -132,11 +131,11 @@ RSpec.describe Family, :type => :model do
 
       broker = Broker.create!(
         b_type: "broker",
-        name_first: "Tom",
-        name_last: "Schultz",
+        first_name: "Tom",
+        last_name: "Schultz",
         npn: "345987012",
         addresses: [Address.new(
-          address_type: "work", 
+          kind: "work", 
           address_1: "1 Copley Plaza", 
           city: "Boston", 
           state: "MA",

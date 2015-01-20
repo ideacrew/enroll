@@ -35,7 +35,7 @@ class Person
   # Login account
   has_one :user, as: :profile, dependent: :destroy
 
-  # belongs_to :employer_representatives, class_name: "Employer",  inverse_of: :representatives
+  belongs_to :employer_representatives, class_name: "Employer",  inverse_of: :representatives
 
   embeds_one :consumer, 
     cascade_callbacks: true,
@@ -56,6 +56,10 @@ class Person
   embeds_many :addresses
   embeds_many :phones
   embeds_many :emails
+  
+  #building non person relation using through relation
+  has_many :broker_family_members, class_name: "FamilyMember", :inverse_of => :broker
+  has_many :employee_family_members, class_name: "FamilyMember", :inverse_of => :employee
 
   accepts_nested_attributes_for :consumer, :responsible_party, :broker, :hbx_staff,
     :person_relationships, :employee, :addresses, :phones, :emails
@@ -205,13 +209,17 @@ class Person
     
   end
 
+  def full_name
+    [name_pfx, first_name, middle_name, last_name, name_sfx].reject(&:blank?).join(' ').downcase.gsub(/\b\w/) {|first| first.upcase }
+  end
+
   def is_active?
     self.is_active
   end
 
 private
   def initialize_name_full
-    #self.name_full = full_name
+    # self.name_full = full_name
   end
 
   def date_of_death_follows_birth_date

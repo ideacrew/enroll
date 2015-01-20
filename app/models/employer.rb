@@ -34,7 +34,6 @@ class Employer
   embeds_many :employer_offices
   embeds_many :plan_years
 
-  belongs_to :primary_contact, class_name: "Person",  inverse_of: :employer_primary_contact
   has_many :representatives, class_name: "Person", inverse_of: :employer_representatives
 
   # has_many :premium_payments, order: { paid_at: 1 }
@@ -57,6 +56,9 @@ class Employer
   index({"employer_census_families.employer_census_employee.last_name" => 1})
   index({"employer_census_families.employer_census_employee.dob" => 1})
   index({"employer_census_families.employer_census_employee.ssn" => 1})
+  index({"employer_census_families.employer_census_employee.ssn" => 1,
+         "employer_census_families.employer_census_employee.dob" => 1},
+         {name: "ssn_dob_index"})
 
   validates_presence_of :name, :fein, :entity_kind
 

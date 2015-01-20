@@ -9,14 +9,16 @@ describe Address do
 
   it "should have an invalid zipcode" do
     subject.valid?
-    expect(subject).to have_at_least(1).errors_on(:zip)
+    # expect(subject).to have_at_least(1).errors_on(:zip)
+    subject.errors[:zip] == ["can't be blank", "should be in the form: 12345 or 12345-1234"]
   end
 
   describe "with a zipcode of 99389" do
     it "should have a valid zipcode" do
       subject.zip = "99389"
       subject.valid?
-      expect(subject).not_to have_at_least(1).errors_on(:zip)
+      # expect(subject).not_to have_at_least(1).errors_on(:zip)
+      subject.errors[:zip].size == 0
     end
   end
 
@@ -25,14 +27,14 @@ describe Address do
       [:address_1, :city, :state, :zip].each do |missing|
         it ('is invalid without ' + missing.to_s) do
           trait = 'without_' + missing.to_s
-          address = build(:address, trait.to_sym)
+          address = FactoryGirl.build(:address, trait.to_sym)
           expect(address).to be_invalid
         end
       end
     end
 
     describe 'address type' do
-      let(:address) { build(:address, :with_invalid_address_type) }
+      let(:address) { FactoryGirl.build(:address, :with_invalid_address_type) }
       context 'when invalid' do
         it 'is invalid' do
           expect(address).to be_invalid
@@ -41,7 +43,7 @@ describe Address do
 
       ['home', 'work', 'mailing'].each do |type|
         context('when ' + type) do
-          before { address.address_type = type}
+          before { address.kind = type}
           it 'is valid' do
             expect(address).to be_valid
           end
@@ -51,7 +53,7 @@ describe Address do
   end
 
   describe 'view helpers/presenters' do
-    let(:address) { build :address }
+    let(:address) { FactoryGirl.build :address }
     describe '#formatted_address' do
       it 'returns a string with a formated address' do
         line_one = address.address_1
@@ -73,15 +75,15 @@ describe Address do
   describe '#home?' do
     context 'when not a home address' do
       it 'returns false' do
-        address = Address.new(address_type: 'work')
-        expect(address.home?).to be_false
+        address = Address.new(kind: 'work')
+        expect(address.home?).to be false
       end
     end
 
     context 'when a home address' do
       it 'returns true' do
-        address = Address.new(address_type: 'home')
-        expect(address.home?).to be_true
+        address = Address.new(kind: 'home')
+        expect(address.home?).to be true
       end
     end
   end
@@ -106,18 +108,18 @@ describe Address do
   end
 
   describe '#match' do
-    let(:address) { build :address }
+    let(:address) { FactoryGirl.build :address }
 
     context 'addresses are the same' do
       let(:second_address) { address.clone }
       it 'returns true' do
-        expect(address.match(second_address)).to be_true
+        expect(address.match(second_address)).to be true
       end
 
       context 'mismatched case' do
         before { second_address.address_1.upcase! }
         it 'returns true' do
-          expect(address.match(second_address)).to be_true
+          expect(address.match(second_address)).to be true
         end
       end
     end
@@ -129,7 +131,7 @@ describe Address do
         a
       end
       it 'returns false' do
-        expect(address.match(second_address)).to be_false
+        expect(address.match(second_address)).to be false
       end
     end
   end

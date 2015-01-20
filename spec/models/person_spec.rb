@@ -75,7 +75,7 @@ describe Person, '#home_phone' do
         phones_attributes: [{
           kind: 'home',
           area_code: '202',
-          phone_number: '555-1212'
+          number: '555-1212'
         }]
       )
 
