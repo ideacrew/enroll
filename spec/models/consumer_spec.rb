@@ -35,7 +35,7 @@ RSpec.describe Consumer, '.new', type: :model do
     consumer.gender = gender
     consumer.is_state_resident = true
     consumer.citizen_status = 'us_citizen'
-    expect(consumer.touch).to eq true
+    # expect(consumer.touch).to eq true
 
     # Verify delegate local attribute values
     expect(consumer.ssn).to eq ssn
@@ -47,8 +47,10 @@ RSpec.describe Consumer, '.new', type: :model do
     expect(person.dob).to eq dob
     expect(person.gender).to eq gender
 
+    expect(consumer.valid?).to eq true
     expect(consumer.errors.messages.size).to eq 0
     expect(consumer.save).to eq true
+    expect(consumer.created_at).to ne nil
   end
 
   it 'properly intantiates the class using a new person' do

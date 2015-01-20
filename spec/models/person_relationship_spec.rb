@@ -2,12 +2,10 @@ require 'rails_helper'
 
 describe PersonRelationship do
   subject { PersonRelationship.new(
-    :subject_person => subject_person,
-    :object_person => object_person
+    :relative => relative
   )}
 
-  let(:subject_person) { Person.new }
-  let(:object_person) { Person.new }
+  let(:relative) { Person.new }
 
   relationship_values = [
       "parent",
@@ -43,7 +41,7 @@ describe PersonRelationship do
   relationship_values.each do |rv|
     context("given a relationship_kind of #{rv}") do
       it "should be valid" do
-        subject.relationship_kind = rv
+        subject.kind = rv
         expect(subject).to be_valid
       end
     end

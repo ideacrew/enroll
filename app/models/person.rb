@@ -4,7 +4,7 @@ class Person
   include Mongoid::Timestamps
   # include Mongoid::Autoinc
 
-  GENDER_KINDS = %W(male female unknown)
+  GENDER_KINDS = %W(male female)
   CHILD_MODELS = [
       :consumer, :responsible_party, :broker, :hbx_staff, :person_relationships, :employees,
       :addresses, :phones, :emails
@@ -37,11 +37,20 @@ class Person
 
   # belongs_to :employer_representatives, class_name: "Employer",  inverse_of: :representatives
 
-  embeds_one :consumer
-  embeds_one :employee
+  embeds_one :consumer, 
+    cascade_callbacks: true,
+    validate: true
+  embeds_one :employee, 
+    cascade_callbacks: true,
+    validate: true
+  embeds_one :broker, 
+    cascade_callbacks: true,
+    validate: true
+  embeds_one :hbx_staff, 
+    cascade_callbacks: true,
+    validate: true
+
   embeds_one :responsible_party
-  embeds_one :broker
-  embeds_one :hbx_staff
 
   embeds_many :person_relationships
   embeds_many :addresses
