@@ -57,6 +57,9 @@ class Employer
   index({"employer_census_families.employer_census_employee.last_name" => 1})
   index({"employer_census_families.employer_census_employee.dob" => 1})
   index({"employer_census_families.employer_census_employee.ssn" => 1})
+  index({"employer_census_families.employer_census_employee.ssn" => 1,
+         "employer_census_families.employer_census_employee.dob" => 1},
+         {name: "ssn_dob_index"})
 
   validates_presence_of :name, :fein, :entity_kind
 
