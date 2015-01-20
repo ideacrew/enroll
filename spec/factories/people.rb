@@ -1,10 +1,12 @@
 FactoryGirl.define do
   factory :person do
     name_pfx 'Mr'
-    name_first 'John'
-    name_middle 'X'
-    sequence(:name_last) {|n| "Smith\##{n}" }
+    first_name 'John'
+    middle_name 'X'
+    sequence(:last_name) {|n| "Smith\##{n}" }
     name_sfx 'Jr'
+    subscriber_type ""
+    is_active ""
 
     after(:create) do |p, evaluator|
       create_list(:member, 2, person: p)
@@ -14,11 +16,11 @@ FactoryGirl.define do
     end
 
     trait :without_first_name do
-      name_first ' '
+      first_name ' '
     end
 
     trait :without_last_name do
-      name_last ' '
+      last_name ' '
     end
 
     factory :invalid_person, traits: [:without_first_name, 

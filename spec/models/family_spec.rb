@@ -128,6 +128,8 @@ RSpec.describe Family, :type => :model do
 
     it "sets and gets HbxEnrollment Policy associations" do
 
+      broker = FactoryGirl.build(:broker)
+      addresses = broker.addresses.build({kind: "work", address_1: "1 Copley Plaza", city: "Boston", state: "MA", zip: "03814"})
 
       broker = Broker.create!(
         b_type: "broker",

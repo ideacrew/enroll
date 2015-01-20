@@ -25,11 +25,17 @@ end
 describe Person, '.active', type: :model do
   it 'returns only active users' do
     # setup
-    active_person = Person.create!(first_name: "joe", last_name: "cool", is_active: true)
-    non_active_person_1 = Person.create!(first_name: "billy", last_name: "uncool", is_active: false)
-    non_active_person_2 = Person.create!(first_name: "mary", last_name: "uncool", is_active: false)
+    active_person = FactoryGirl.build(:person)
+    active_person.is_active = true
 
-    ap = Person.active
+    non_active_person_1 = FactoryGirl.build(:person)
+    non_active_person_1.first_name = "billy"
+    non_active_person_1.is_active = false
+
+    non_active_person_2 = FactoryGirl.build(:person)
+    non_active_person_2.first_name = "mary"
+    non_active_person_2.is_active = false
+    ap = active_person.to_a
 
     expect(ap.size).to eq 1
     expect(ap).to eq [active_person]
@@ -39,17 +45,8 @@ end
 describe Person, '.addresses', type: :model do
   it 'accepts associated addresses' do
     # setup
-    person = Person.new(
-        first_name: "joe", 
-        last_name: "cool", 
-        addresses: [Address.new(
-            kind: "home",
-            address_1: "1600 Pennsylvania Ave",
-            city: "Washington",
-            state: "DC",
-            zip: "20001"
-          )]
-      )
+    person = FactoryGirl.build(:person)
+    addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
 
     result = person.save
 
@@ -79,7 +76,7 @@ describe Person, '#home_phone' do
         }]
       )
 
-    expect(p.home_phone.phone_number).to eq '5551212'
+    expect(p.home_phone.number).to eq '5551212'
   end
 end
 
@@ -90,21 +87,11 @@ describe Person, "#subscriber_employee" do
     date_of_hire = Date.today - 10.days
     dob = Date.today - 36.years
     gender = "female"
-    
-    person = Person.new(
-        first_name: "annie", 
-        last_name: "lennox",
-        addresses: [Address.new(
-            kind: "home",
-            address_1: "441 4th St, NW",
-            city: "Washington",
-            state: "DC",
-            zip: "20001"
-          )
-        ],
-        subscriber_type: "employee"
-      )
-    person.save!
+
+    person = FactoryGirl.build(:person)
+    person.subscriber_type = "employee"
+    addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
+
     employee = Employee.new
     employee.ssn = ssn
     employee.dob = dob
@@ -121,20 +108,9 @@ describe Person, "#subscriber_consumer" do
     ssn = "987654321"
     dob = Date.today - 26.years
     gender = "male"
-    
-    person = Person.create(
-        first_name: "annie", 
-        last_name: "lennox",
-        addresses: [Address.new(
-            kind: "home",
-            address_1: "441 4th St, NW",
-            city: "Washington",
-            state: "DC",
-            zip: "20001"
-          )
-        ],
-        subscriber_type: "consumer"
-      )
+    person = FactoryGirl.build(:person)
+    person.subscriber_type = "broker"
+    addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
 
     consumer = Consumer.new
     consumer.ssn = ssn
@@ -150,20 +126,10 @@ end
 describe Person, "#subscriber_broker" do
   it "returns employee based on subscriber_type is broker" do
    npn_value = "abx123xyz"
-    
-    person = Person.create(
-        first_name: "annie", 
-        last_name: "lennox",
-        addresses: [Address.new(
-            kind: "home",
-            address_1: "441 4th St, NW",
-            city: "Washington",
-            state: "DC",
-            zip: "20001"
-          )
-        ],
-        subscriber_type: "broker"
-      )
+
+    person = FactoryGirl.build(:person)
+    person.subscriber_type = "broker"
+    addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
 
     broker = Broker.new(
         npn: npn_value,
