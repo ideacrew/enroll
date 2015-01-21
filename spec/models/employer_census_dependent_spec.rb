@@ -33,7 +33,7 @@ RSpec.describe EmployerCensusDependent, '.new', type: :model do
     expect(dependent.gender).to eq gender
     expect(dependent.employee_relationship).to eq employee_relationship
 
-    expect(dependent.errors.messages).to eq 0
+    expect(dependent.errors.messages.size).to eq 0
   end
 
   it 'fails unless provided with a proper gender' do

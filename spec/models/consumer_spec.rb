@@ -50,7 +50,7 @@ RSpec.describe Consumer, '.new', type: :model do
     expect(consumer.valid?).to eq true
     expect(consumer.errors.messages.size).to eq 0
     expect(consumer.save).to eq true
-    expect(consumer.created_at).to ne nil
+    expect(consumer.created_at).not_to eq nil
   end
 
   it 'properly intantiates the class using a new person' do
