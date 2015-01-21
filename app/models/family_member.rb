@@ -7,6 +7,7 @@ class FamilyMember
   field :consumer_id, type: BSON::ObjectId
   field :broker_id, type: BSON::ObjectId
   field :employee_id, type: BSON::ObjectId
+  field :person_id, type: BSON::ObjectId
 
   # Person responsible for this application group
   field :is_primary_applicant, type: Boolean, default: false

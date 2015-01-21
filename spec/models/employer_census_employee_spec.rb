@@ -13,6 +13,8 @@ RSpec.describe EmployerCensusEmployee, '.new', type: :model do
     ssn = "230987654"
     dob = Date.today
     gender = "male"
+    date_of_hire = "01/01/2014"
+    address = Address.new({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
 
     employee = EmployerCensusEmployee.new(
         first_name: first_name,
@@ -21,8 +23,11 @@ RSpec.describe EmployerCensusEmployee, '.new', type: :model do
         name_sfx: name_sfx,
         ssn: ssn,
         dob: dob,
-        gender: gender
+        gender: gender,
+        date_of_hire: date_of_hire
       )
+
+    employee.address = address
 
     expect(employee.first_name).to eq first_name
     expect(employee.middle_name).to eq middle_name
@@ -36,9 +41,8 @@ RSpec.describe EmployerCensusEmployee, '.new', type: :model do
     expect(employee.employee_relationship).to eq "self"
 
     # expect(employee.inspect).to eq 0
-
     expect(employee.valid?).to eq true
-    expect(employee.errors.messages).to eq 0
+    expect(employee.errors.messages.size).to eq 0
   end
 
 end

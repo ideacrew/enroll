@@ -16,18 +16,8 @@ RSpec.describe Consumer, '.new', type: :model do
     dob = Date.today - 26.years
     gender = "male"
 
-    person = Person.create(
-        first_name: "billy", 
-        last_name: "joel",
-        addresses: [Address.new(
-            kind: "home",
-            address_1: "1600 Pennsylvania Ave",
-            city: "Washington",
-            state: "DC",
-            zip: "20001"
-          )
-        ]
-      )
+    person = FactoryGirl.build(:person)
+    addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
 
     consumer = person.build_consumer
     consumer.ssn = ssn

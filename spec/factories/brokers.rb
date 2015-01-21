@@ -1,7 +1,6 @@
 FactoryGirl.define do
   factory :broker do
-    first_name 'John'
-    sequence(:npn) { |n| "#{n}"}
+    npn "abx123xyz"
     kind 'broker'
 
     after(:create) do |b, evaluator|
