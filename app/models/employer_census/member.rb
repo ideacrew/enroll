@@ -1,4 +1,4 @@
-class EmployerCensusMember
+class EmployerCensus::Member
   include Mongoid::Document
   include Mongoid::Timestamps
 
@@ -20,13 +20,7 @@ class EmployerCensusMember
 
   validates_presence_of :first_name, :last_name, :dob, :gender
 
-  validates :ssn,
-    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
-    numericality: true,
-    uniqueness: true
-
   validates :gender,
-    allow_blank: true,
     inclusion: { in: GENDER_KINDS, message: "%{value} is not a valid gender" }
 
 

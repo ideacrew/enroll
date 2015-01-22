@@ -1,4 +1,4 @@
-class EmployerCensusDependent < EmployerCensusMember
+class EmployerCensus::Dependent < EmployerCensus::Member
 
   EMPLOYEE_RELATIONSHIP_KINDS = %W[spouse dependent]
 
@@ -12,4 +12,11 @@ class EmployerCensusDependent < EmployerCensusMember
               in: EMPLOYEE_RELATIONSHIP_KINDS, 
               message: "'%{value}' is not a valid employee relationship"
             }
+
+  validates :ssn,
+    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
+    allow_blank: true,
+    numericality: true,
+    uniqueness: true
+
 end

@@ -30,8 +30,7 @@ class Employer
 
   field :is_active, type: Boolean, default: true
 
-  embeds_many :employer_census_families
-  embeds_many :employer_offices
+  embeds_many :employer_census_families, class_name: "EmployerCensus::Family"
   embeds_many :plan_years
 
   has_many :representatives, class_name: "Person", inverse_of: :employer_representatives
@@ -71,10 +70,10 @@ class Employer
     inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid business entity" },
     allow_blank: false
 
-  # has_many association
-  def employees
-    Employee.where(employer_id: self._id)
-  end
+
+  # has_one associations
+  field :broker_id, type: BSON::ObjectId
+  field :broker_id_as_string, type: String
 
   def broker=(new_broker)
     return if new_broker.blank?
@@ -86,11 +85,21 @@ class Employer
     Broker.find(self.broker_id) unless self.broker_id.blank?
   end
 
+  def has_broker?
+    !broker_id.blank?
+  end
+
+
+
+  # has_many association
+  def employees
+    Employee.where(employer_id: self._id)
+  end
+
   def self.find_by_broker_id(search_id)
     return if search_id.blank?
     where(broker_id_as_string: search_id.to_s)
   end
-
 
   def payment_transactions
     PremiumPayment.payment_transactions_for(self)

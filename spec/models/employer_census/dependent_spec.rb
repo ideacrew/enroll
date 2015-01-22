@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe EmployerCensusDependent, '.new', type: :model do
+RSpec.describe EmployerCensus::Dependent, '.new', type: :model do
   it { should validate_presence_of :employee_relationship }
 
   it 'properly intantiates the class' do

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe EmployerCensusEmployee, '.new', type: :model do
+RSpec.describe EmployerCensus::Employee, '.new', type: :model do
   it { should validate_presence_of :ssn }
   it { should validate_presence_of :date_of_hire }
   it { should validate_presence_of :address }
@@ -14,14 +14,16 @@ RSpec.describe EmployerCensusEmployee, '.new', type: :model do
     dob = Date.today
     gender = "male"
 
-    employee = EmployerCensusEmployee.new(
+    employee = EmployerCensus::Employee.new(
         first_name: first_name,
         middle_name: middle_name,
         last_name: last_name,
         name_sfx: name_sfx,
         ssn: ssn,
         dob: dob,
-        gender: gender
+        gender: gender,
+        date_of_hire: Date.today - 14.days,
+        address: { kind: "home", address_1: "10 Main St", city: "Washington", state: "DC", zip: "20001"}
       )
 
     expect(employee.first_name).to eq first_name
@@ -38,7 +40,7 @@ RSpec.describe EmployerCensusEmployee, '.new', type: :model do
     # expect(employee.inspect).to eq 0
 
     expect(employee.valid?).to eq true
-    expect(employee.errors.messages).to eq 0
+    expect(employee.errors.messages.size).to eq 0
   end
 
 end
