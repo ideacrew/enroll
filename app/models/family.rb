@@ -43,7 +43,7 @@ class Family  # aka class ApplicationGroup
   index({e_case_id:  1})
   index({is_active:  1})
   index({aasm_state:  1})
-  index({submitted_date:  1})
+  index({submitted_at:  1})
 
   # FamilyMember child model indexes
   index({"family_member.person_id" => 1})

@@ -209,13 +209,17 @@ class Person
     
   end
 
+  def full_name
+    [name_pfx, first_name, middle_name, last_name, name_sfx].reject(&:blank?).join(' ').downcase.gsub(/\b\w/) {|first| first.upcase }
+  end
+
   def is_active?
     self.is_active
   end
 
 private
   def initialize_name_full
-    #self.name_full = full_name
+    # self.name_full = full_name
   end
 
   def date_of_death_follows_birth_date

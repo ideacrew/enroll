@@ -63,6 +63,17 @@ class Address
     "home" == self.kind.downcase
   end
 
+  def match(another_address)
+    return(false) if another_address.nil?
+    attrs_to_match = [:kind, :address_1, :address_2, :city, :state, :zip]
+    attrs_to_match.all? { |attr| attribute_matches?(attr, another_address) }
+  end
+
+  def attribute_matches?(attribute, other)
+    return true if (self[attribute] == nil && other[attribute] == "")
+    safe_downcase(self[attribute]) == safe_downcase(other[attribute])
+  end
+
   def self.make(data)
     address = Address.new
     address.kind = data[:type]
@@ -72,5 +83,11 @@ class Address
     address.state = data[:state]
     address.zip = data[:zip]
     address
+  end
+
+  private
+
+  def safe_downcase(val)
+    val.nil? ? nil : val.downcase
   end
 end

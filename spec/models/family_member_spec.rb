@@ -1,9 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe FamilyMember, :type => :model do
-  let(:b0) {Broker.create!(b_type: "broker", npn: "987432010", name_last: "popeye")}
-  let(:p0) {Person.create!(name_first: "Dan", name_last: "Aurbach")}
-  let(:p1) {Person.create!(name_first: "Patrick", name_last: "Carney")}
+  # let(:b0) {Broker.create!(kind: "broker", npn: "987432010")}
+  let(:b0) {FactoryGirl.build(:broker)}
+  let(:p0) {FactoryGirl.build(:person)}
+  let(:p1) {Person.create!(first_name: "Patrick", last_name: "Carney")}
   let(:ag) {Family.create()}
 
   describe "indexes specified fields" do
@@ -16,16 +17,17 @@ RSpec.describe FamilyMember, :type => :model do
         broker: b0,
         is_primary_applicant: true,
         is_coverage_applicant: true,
-        is_consent_applicant: true,
-        is_active: true
+        is_consent_applicant: true
+        # is_active: true
         )
+      # a.person_id = 1
 
       a.family = ag
 
       expect(a.broker.npn).to eql(b0.npn)
       expect(a.broker_id).to eql(b0._id)
 
-      expect(a.person.name_last).to eql(p0.name_last)
+      expect(a.person.last_name).to eql(p0.last_name)
       expect(a.person_id).to eql(p0._id)
 
       expect(a.is_primary_applicant?).to eql(true)

@@ -4,7 +4,7 @@ describe Phone do
 
   describe 'validations' do
     describe 'phone type' do
-      let(:phone) { Phone.new(phone_type: 'invalid', phone_number: "12345") }
+      let(:phone) { Phone.new(kind: 'invalid', number: "12345") }
       context 'when invalid' do
         it 'is invalid' do
           expect(phone).to be_invalid
@@ -14,8 +14,8 @@ describe Phone do
       valid_types.each do |type|
         context('when ' + type) do
           before {
-            phone.phone_number = "12345"
-            phone.phone_type = type
+            phone.number = "12345"
+            phone.kind = type
           }
           it 'is valid' do
             expect(phone).to be_valid
@@ -28,8 +28,8 @@ describe Phone do
   describe '#match' do
     let(:phone) do
       p = Phone.new
-      p.phone_type = 'home'
-      p.phone_number = '222-222-2222'
+      p.kind = 'home'
+      p.number = '222-222-2222'
       p.extension = '12'
       p
     end
@@ -37,7 +37,7 @@ describe Phone do
     context 'phones are the same' do
       let(:other_phone) { phone.clone }
       it 'returns true' do
-        expect(phone.match(other_phone)).to be_true
+        expect(phone.match(other_phone)).to be true
       end
     end
 
@@ -45,21 +45,21 @@ describe Phone do
       context 'by type' do
         let(:other_phone) do
           p = phone.clone
-          p.phone_type = 'work'
+          p.kind = 'work'
           p
         end
         it 'returns false' do
-          expect(phone.match(other_phone)).to be_false
+          expect(phone.match(other_phone)).to be false
         end
       end
       context 'by number' do
         let(:other_phone) do
           p = phone.clone
-          p.phone_number = '666-666-6666'
+          p.number = '666-666-6666'
           p
         end
         it 'returns false' do
-          expect(phone.match(other_phone)).to be_false
+          expect(phone.match(other_phone)).to be false
         end
       end
     end
@@ -68,8 +68,8 @@ describe Phone do
   describe 'changing phone number' do
     let(:phone) { Phone.new }
     it 'removes non-numerals' do
-      phone.phone_number = 'a1b2c3d4'
-      expect(phone.phone_number).to eq '1234'
+      phone.number = 'a1b2c3d4'
+      expect(phone.number).to eq '1234'
     end
   end
 

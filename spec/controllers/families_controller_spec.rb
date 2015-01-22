@@ -2,6 +2,12 @@ require 'rails_helper'
 
 RSpec.describe FamiliesController, :type => :controller do
 
+  before(:each) do
+    @request.env["devise.mapping"] = Devise.mappings[:user]
+    user = FactoryGirl.create(:user)
+    sign_in user
+  end
+
   describe "GET index" do
     it "returns http success" do
       get :index
@@ -11,7 +17,7 @@ RSpec.describe FamiliesController, :type => :controller do
 
   describe "GET show" do
     it "returns http success" do
-      get :show
+      get :show, id: 1
       expect(response).to have_http_status(:success)
     end
   end
@@ -25,7 +31,7 @@ RSpec.describe FamiliesController, :type => :controller do
 
   describe "GET edit" do
     it "returns http success" do
-      get :edit
+      get :edit, id: 1
       expect(response).to have_http_status(:success)
     end
   end

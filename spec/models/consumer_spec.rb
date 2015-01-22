@@ -16,18 +16,8 @@ RSpec.describe Consumer, '.new', type: :model do
     dob = Date.today - 26.years
     gender = "male"
 
-    person = Person.create(
-        first_name: "billy", 
-        last_name: "joel",
-        addresses: [Address.new(
-            kind: "home",
-            address_1: "1600 Pennsylvania Ave",
-            city: "Washington",
-            state: "DC",
-            zip: "20001"
-          )
-        ]
-      )
+    person = FactoryGirl.build(:person)
+    addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
 
     consumer = person.build_consumer
     consumer.ssn = ssn
@@ -50,7 +40,7 @@ RSpec.describe Consumer, '.new', type: :model do
     expect(consumer.valid?).to eq true
     expect(consumer.errors.messages.size).to eq 0
     expect(consumer.save).to eq true
-    expect(consumer.created_at).to ne nil
+    expect(consumer.created_at).not_to eq nil
   end
 
   it 'properly intantiates the class using a new person' do

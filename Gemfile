@@ -70,6 +70,10 @@ group :development, :test do
   gem 'shoulda-matchers', require: false  
 end
 
+group :test do
+  gem 'mongoid-rspec'
+end
+
 group :production do
   # Use Unicorn as the app server
   gem 'unicorn', '~> 4.8.3'
