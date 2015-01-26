@@ -242,6 +242,9 @@ GEM
       rdoc (~> 4.0)
     shoulda-matchers (2.7.0)
       activesupport (>= 3.0.0)
+    simple_form (3.1.0)
+      actionpack (~> 4.0)
+      activemodel (~> 4.0)
     slop (3.6.0)
     spring (1.2.0)
     sprockets (2.12.3)
@@ -315,6 +318,7 @@ DEPENDENCIES
   ruby-progressbar (= 1.6.0)
   sdoc (~> 0.4.0)
   shoulda-matchers
+  simple_form
   spring
   therubyracer
   turbolinks

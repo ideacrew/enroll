@@ -31,7 +31,7 @@ class Address
       }
 
   embedded_in :person
-  embedded_in :employer
+  embedded_in :employer, :inverse_of => :addresses
   embedded_in :employer_office
   embedded_in :broker
 

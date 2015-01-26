@@ -32,6 +32,7 @@ class Employer
 
   embeds_many :employer_census_families, class_name: "EmployerCensus::Family"
   embeds_many :plan_years
+  # embeds_many :addresses, :inverse_of => :employer
 
   has_many :representatives, class_name: "Person", inverse_of: :employer_representatives
 
