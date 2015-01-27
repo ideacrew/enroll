@@ -72,9 +72,10 @@ class Person
   index({last_name:  1})
   index({first_name: 1})
   index({last_name: 1, first_name: 1})
-  index({first_name: 1, last_name:1})
+  index({first_name: 1, last_name: 1})
   index({ssn: 1}, {sparse: true, unique: true})
-  index({dob: 1}, {sparse: true, unique: true})
+  index({dob: 1}, {sparse: true})
+  index({last_name: 1, dob: 1}, {sparse: true})
 
   # Broker child model indexes
   index({"broker._id" => 1})
@@ -183,7 +184,7 @@ class Person
     gender = new_gender
 
     # Assign employee-specifc attributes
-    employee_role = self.build_employee(employer: new_employer, date_of_hire = new_date_of_hire)
+    employee_role = self.build_employee(employer: new_employer, date_of_hire: new_date_of_hire)
 
     # Add 'self' to personal relationship
     self.personal_relationships << PersonRelationhip.new()
@@ -234,6 +235,20 @@ class Person
     [name_pfx, first_name, middle_name, last_name, name_sfx].reject(&:blank?).join(' ').downcase.gsub(/\b\w/) {|first| first.upcase }
   end
 
+  # Return an instance list of active People who match identifying information criteria
+  def self.match_by_id_info(options)
+    ssn = options[:ssn]
+    dob = options[:dob]
+    last_name = options[:last_name]
+
+    raise ArgumentError, "must provide an ssn, last_name/dob or both" if (ssn.blank? && (dob.blank? || last_name.blank?))
+
+    matches = []
+    matches.concat Person.where(ssn: ssn).active.to_a unless ssn.blank?
+    matches.concat Person.where(last_name: last_name).active.and(dob: dob).to_a unless (dob.blank? || last_name.blank?)
+    matches.uniq
+  end
+
   def dob_to_string
     self.dob.blank? ? "" : self.dob.strftime("%Y%m%d")
   end
@@ -242,15 +257,6 @@ class Person
     self.is_active
   end
   
-  def existed_person_detail
-    # To chek glue db for existence of person if exist will get employer details from glue db
-    @people = JSON.parse(open("http://api/v2/gludb.com/get_person_by_ssn?ssn="+self.ssn+"&first_name="+self.first_name+"&date_of_birth="+self.dob).read, symbolize_names: true)
-    if !@people.blank?
-      employer_id = @people.employer_id
-      employer_name = @people.employer_name
-    end
-  end
-
 private
   def initialize_name_full
     # self.name_full = full_name
