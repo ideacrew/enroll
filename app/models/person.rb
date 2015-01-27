@@ -241,6 +241,15 @@ class Person
   def is_active?
     self.is_active
   end
+  
+  def existed_person_detail
+    # To chek glue db for existence of person if exist will get employer details from glue db
+    @people = JSON.parse(open("http://api/v2/gludb.com/get_person_by_ssn?ssn="+self.ssn+"&first_name="+self.first_name+"&date_of_birth="+self.dob).read, symbolize_names: true)
+    if !@people.blank?
+      employer_id = @people.employer_id
+      employer_name = @people.employer_name
+    end
+  end
 
 private
   def initialize_name_full
