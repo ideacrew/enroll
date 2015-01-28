@@ -112,19 +112,17 @@ describe Person, '#addresses' do
   end
 end
 
-# describe Person, '#person_relationships', type: :model do
-#   it 'accepts associated addresses' do
-#     # setup
-#     person = FactoryGirl.build(:person)
-#     addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
+describe Person, '#person_relationships' do
+  it 'accepts associated addresses' do
+    # setup
+    person = FactoryGirl.build(:person)
+    relationship = person.person_relationships.build({kind: "self", relative: person})
 
-#     result = person.save
-
-#     expect(result).to eq true
-#     expect(person.addresses.first.kind).to eq "home"
-#     expect(person.addresses.first.city).to eq "Washington"
-#   end
-# end
+    expect(person.save).to eq true
+    expect(person.person_relationships.size).to eq 1
+    expect(relationship.invert_relationship).to eq "self"
+  end
+end
 
 describe Person, '#full_name' do
   it 'returns the concatenated name attributes' do
