@@ -61,6 +61,7 @@ class PersonRelationship
     "ward" => "guardian",
 
     # bi directional
+    "self" => "self",
     "brother_or_sister_in_law" => "brother_or_sister_in_law",
     "sibling" => "sibling",
     "life_partner" => "life_partner",
