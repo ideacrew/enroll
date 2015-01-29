@@ -23,7 +23,7 @@ Rails.application.routes.draw do
   end
 
   resources :people do
-    get 'match'
+    get 'select_employer'
     get 'my_account'
   end
 
