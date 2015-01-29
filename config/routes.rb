@@ -1,9 +1,13 @@
 Rails.application.routes.draw do
 
- namespace :brokers do
+  # You can have the root of your site routed with "root"
+  root 'welcome#index'
+  # get 'welcome/index'
+
+  namespace :brokers do
     get 'welcome/index'
 
-    resources :brokers do
+    resources :broker do
       get 'new'
       get 'my_account'
     end
@@ -16,6 +20,11 @@ Rails.application.routes.draw do
       get 'new'
       get 'my_account'
     end
+  end
+
+  resources :people do
+    get 'match'
+    get 'my_account'
   end
 
   resources :employees
@@ -37,15 +46,11 @@ Rails.application.routes.draw do
      end
    end
  
-  resources :people 
 
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
-  # You can have the root of your site routed with "root"
-  root 'welcome#index'
-  # get 'welcome/index'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

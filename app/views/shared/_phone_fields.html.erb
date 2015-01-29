@@ -1,27 +1,28 @@
 <fieldset>
   <div class="row">
-    <div class="col-xs-12 col-sm-2 col-md-2">
+    <div class="col-xs-12 col-sm-6 col-md-6">
       <div class="form-group">
-        <%= f.label :kind %>
-        <%= select_dropdown "employee_phone_kind", Phone::KINDS %>
+        <%= f.text_field :number, placeholder: 'Home', class: "form-control" %>
       </div>
     </div>
-    <div class="col-xs-12 col-sm-5 col-md-5">
+
+    <div class="col-xs-12 col-sm-6 col-md-6">
       <div class="form-group">
-        <%= f.label :number, "Phone Number" %>
-        <%= f.text_field :number, class: "form-control" %>
+        <%= f.text_field :number, placeholder: 'Work', class: "form-control" %>
       </div>
     </div>
-    <div class="col-xs-12 col-sm-2 col-md-2">
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12 col-sm-6 col-md-6">
       <div class="form-group">
-        <%= f.label :extension %>
-        <%= f.text_field :extension, class: "form-control" %>
+        <%= f.text_field :number, placeholder: 'Cell', class: "form-control" %>
       </div>
     </div>
-    <div class="col-xs-12 col-sm-3 col-md-3">
+
+    <div class="col-xs-12 col-sm-6 col-md-6">
       <div class="form-group">
-        <%= link_to '<span class="fa fa-minus-square"> Delete Phone</span>'.html_safe, '#', :class => "remove_fields text-danger" %>
-        <%= f.hidden_field :_destroy %>
+        <%= f.text_field :number, placeholder: 'Fax', class: "form-control" %>
       </div>
     </div>
   </div>
