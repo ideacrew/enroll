@@ -32,13 +32,18 @@ class EnrollmentFactory
   
   end
    
-  def add_broker_role
+  def add_broker_role(new_kind, new_npn, new_mailing_address)
+
+    kind = new_kind
+    npn = new_npn
+    maling_address = new_maling_address
+
     # Instantiate new family model
     family = self.person.families.build()
 
     # Assign broker-specifc attributes
-    broker_role = self.person.build_broker()
-
+    broker_role = self.person.build_broker(mailing_address: mailing_address, npn: npn, kind: kind)
+    
     self.person.save
     broker_role.save
     family.save
