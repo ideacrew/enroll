@@ -8,6 +8,22 @@ class EnrollmentFactory
 
   def add_consumer_role
   end
+   
+  def add_broker_role
+    # Instantiate new family model
+    family = self.person.families.build()
+
+    # Assign broker-specifc attributes
+    broker_role = self.person.build_broker()
+
+    self.person.save
+    broker_role.save
+    family.save
+
+    # Return new instance
+    return broker_role
+
+  end
 
   def add_employee_role(new_employer, new_ssn, new_dob, new_gender, new_date_of_hire)
     # Return instance if this role already exists
@@ -31,7 +47,7 @@ class EnrollmentFactory
     family.save
 
     # Return new instance
-    employee_role
+    return employee_role
   end
 
 end
