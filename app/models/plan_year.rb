@@ -22,6 +22,6 @@ class PlanYear
   # Number of Medicare second payers
   field :msp_count, type: Integer, default: 0
 
-  embeds_many :employee_classes, class_name: "EmployerCensus::EmployeeClass"
+  embeds_many :benefit_groups
 
 end

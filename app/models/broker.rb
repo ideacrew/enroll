@@ -8,7 +8,11 @@ class Broker
 
   field :kind, type: String, default: "broker"
 
-  field :npn, type: String # Broker National Producer Number (unique identifier)
+  # Broker National Producer Number (unique identifier)
+  field :npn, type: String 
+
+  field :hbx_assigned_id, type: String
+
   field :is_active, type: Boolean, default: true
 
   embeds_one :mailing_address, class_name: "Address", inverse_of: :broker_mailing_address

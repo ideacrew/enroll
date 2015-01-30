@@ -1,18 +1,10 @@
 <div class="row">
   <div class="col-xs-12 col-sm-4 col-md-4">
-    <div class="form-group">
-      <%= f.label :ssn, "SSN" %>
-      <%= f.text_field :ssn, class: "form-control", value: number_to_ssn(f.object.ssn), maxlength: 11  %>
-    </div>
-  </div>
-
-  <div class="col-xs-12 col-sm-4 col-md-4">
     <div class="form-group required">
-      <%= f.label :dob, "Date of Birth" %>
       <%= f.text_field :dob,
         start_year: Date.today.year - 110,
         end_year: Date.today.year,
-        placeholder: "mm/dd/yyyy",
+        placeholder: "Birthdate",
         class: "date_picker form-control",
         required: true,
         value: f.object.dob.try(:strftime, "%m/%d/%Y")
@@ -21,8 +13,13 @@
   </div>
 
   <div class="col-xs-12 col-sm-4 col-md-4">
+    <div class="form-group">
+      <%= f.text_field :ssn, placeholder: "Social Security", class: "form-control", value: number_to_ssn(f.object.ssn), maxlength: 11  %>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-4 col-md-4">
     <div class="form-group required">
-      <%= f.label :gender, "Gender" %>
       <%= select_dropdown("employee_gender", Person::GENDER_KINDS) %>
     </div>
   </div>

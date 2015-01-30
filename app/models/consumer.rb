@@ -1,6 +1,8 @@
 class Consumer
   include Mongoid::Document
   include Mongoid::Timestamps
+  include AASM
+
 
   embedded_in :person
 
@@ -27,6 +29,7 @@ class Consumer
 
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
+  field :application_state, type: String
   field :is_active, type: Boolean, default: true
 
 
@@ -35,10 +38,8 @@ class Consumer
   delegate :dob, :dob=, to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
-  # belongs_to :family
-
   validates_presence_of :person, :ssn, :dob, :gender, :is_incarcerated, :is_applicant,
-    :is_state_resident, :citizen_status, :is_applicant
+    :is_state_resident, :citizen_status
 
   validates :citizen_status,
     inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" },
@@ -58,13 +59,26 @@ class Consumer
   scope :all_over_or_equal_age, ->(age) {lte(:'dob' => (Date.today - age.years))}
   scope :all_under_or_equal_age, ->(age) {gte(:'dob' => (Date.today - age.years))}
 
-  def is_active?
-    self.is_active
+  def family
+    
   end
 
-  def parent
-    raise "undefined parent: Person" unless person?
-    self.person
+  aasm column: "application_state" do
+    state :enrollment_closed, initial: true
+    state :open_enrollment_period
+    state :special_enrollment_period
+    state :open_and_special_enrollment_period
+
+    event :open_enrollment do
+      transitions from: :open_enrollment_period, to: :open_enrollment_period
+      transitions from: :special_enrollment_period, to: :open_and_special_enrollment_period
+      transitions from: :open_and_special_enrollment_period, to: :open_and_special_enrollment_period
+      transitions from: :enrollment_closed, to: :open_enrollment_period
+    end
+  end
+
+  def is_active?
+    self.is_active
   end
 
 end
