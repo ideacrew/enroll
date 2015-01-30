@@ -6,7 +6,30 @@ class EnrollmentFactory
     self.person = person
   end
 
-  def add_consumer_role
+  def add_consumer_role(new_ssn, new_dob, new_gender, new_is_incarcerated, new_is_applicant,
+                        new_is_state_resident, new_citizen_status)
+
+    ssn = new_ssn
+    dob = new_dob
+    gender = new_gender
+    is_incarcerated = new_is_incarcerated
+    is_applicant = new_is_applicant
+    is_state_resident = new_is_state_resident
+    citizen_status = new_citizen_status
+
+    # Assign consumer-specifc attributes
+    consumer_role = self.person.build_consumer(ssn: ssn,
+                                               dob: dob,
+                                               gender: gender,
+                                               is_incarcerated: is_incarcerated,
+                                               is_applicant: is_applicant,
+                                               is_state_resident: is_state_resident,
+                                               citizen_status: citizen_status)
+   self.person.save
+   consumer_role.save
+
+   return consumer_role
+  
   end
    
   def add_broker_role
