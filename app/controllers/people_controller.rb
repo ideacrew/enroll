@@ -50,8 +50,8 @@ class PeopleController < ApplicationController
   end
 
   def create
-    @person = Person.new(params[:Person])
-
+    @person = Person.new(person_params)
+    
     respond_to do |format|
       if @person.save
         format.html { redirect_to @person, notice: 'Person was successfully created.' }
@@ -74,6 +74,12 @@ private
     @person.phones.build if @person.phones.empty?
     @person.emails.build if @person.emails.empty?
   end
-
+  
+  def person_params
+    params.require(:person).permit(:name_pfx, :first_name, :middle_name, :last_name, 
+                                   :name_sfx, :name_full, :alternate_name, :ssn, :dob, 
+                                   :gender, :date_of_death, :is_active, :subscriber_type,  
+                                    addresses_attributes: [:kind, :address_1, :address_2, :address_3, :city, :county, :state, :location_state_code, :zip, :zip_extension, :country_name, :full_text ])
+  end
 
 end
