@@ -37,16 +37,15 @@ class EnrollmentFactory
     kind = new_kind
     npn = new_npn
     maling_address = new_maling_address
-
-    # Instantiate new family model
-    family = self.person.families.build()
-
+   
+    family = initialize_families
+    
     # Assign broker-specifc attributes
     broker_role = self.person.build_broker(mailing_address: mailing_address, npn: npn, kind: kind)
     
     self.person.save
     broker_role.save
-    family.save
+    family.save if family.present?
 
     # Return new instance
     return broker_role
@@ -65,17 +64,24 @@ class EnrollmentFactory
 
     # Add 'self' to personal relationship
     self.person.personal_relationships << PersonRelationhip.new()
-
-    # Instantiate new family model
-    family = self.person.families.build()
+    
+    family = initialize_families
 
     # Persist results?
     self.person.save
     employee_role.save
-    family.save
+    family.save if family.present?
 
     # Return new instance
     return employee_role
   end
-
+  
+  def initialize_families
+    family = nil
+    if self.person.families.blank?
+    # Instantiate new family model
+      family = self.person.families.build()
+    end
+    return family
+  end
 end
