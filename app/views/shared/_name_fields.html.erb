@@ -1,26 +1,14 @@
-<div class="row">
-  <div class="col-xs-12 col-sm-3 col-md-3">
-    <div class="form-group required">
-      <%= f.label :first_name %>
-      <%= f.text_field :first_name, class: "form-control", required: true %>
-    </div>
+<div class="row top-row">
+  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :first_name, class: "floatlabel form-control border-bottom-none border-right-none", required: true, placeholder: 'FIRST NAME' %>
   </div>
-  <div class="col-xs-12 col-sm-2 col-md-2">
-    <div class="form-group">
-      <%= f.label :middle_name %>
-      <%= f.text_field :middle_name, class: "form-control" %>
-    </div>
+  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :middle_name, class: "floatlabel form-control border-bottom-none border-right-none", placeholder: 'MIDDLE NAME' %>
   </div>
-  <div class="col-xs-12 col-sm-5 col-md-5">
-    <div class="form-group required">
-      <%= f.label :last_name %>
-      <%= f.text_field :last_name, class: "form-control", required: true %>
-    </div>
+  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :last_name, class: "floatlabel form-control border-right-none border-bottom-none", required: true, placeholder: 'LAST NAME' %>
   </div>
-  <div class="col-xs-12 col-sm-2 col-md-2">
-    <div class="form-group">
-      <%= f.label :name_sfx, "Suffix" %>
-      <%= f.text_field :name_sfx, class: "form-control" %>
-    </div>
+  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :name_sfx, class: "floatlabel form-control border-bottom-none", placeholder: 'SUFFIX' %>
   </div>
 </div>
