@@ -14,17 +14,7 @@
 <% end %>
 
 <!-- 
-<%= f.fields_for @person.phones, errors: {}, fieldset: false do |phone|  %>
-  <%= render 'shared/phone_fields', f: phone %>
-<% end %>
 
-<%= f.fields_for @person.emails, errors: {}, fieldset: false do |email|  %>
-  <%= render 'shared/email_fields', f: email %>
-<% end %>
-
-<%= f.fields_for @person.addresses, errors: {}, fieldset: false do |address|  %>
-  <%= render 'shared/address_fields', f: address %>
-<% end %>
  -->
 
 <div class="col-md-11 col-sm-12 col-xs-12">
@@ -56,124 +46,22 @@
     
     <br>
 
-    <div id="address_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
-      <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
-        <div class="row top-row">
-          <div class="col-md-9 col-sm-9 col-xs-12 form-group form-group-lg no-pd address">
-            <div class="form-group form-group-lg">
-              <div class="row" style="margin: 0;">
-                <div class="col-md-4 col-sm-3 col-xs-0 bg-color"></div>
-                <div class="col-md-4 col-sm-6 col-xs-12 no-pd">
-                  <div class="dropdown">
-                    <button class="form-control float-label adderess-select-box border-bottom-none border-right-none form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
-                      Home Address
-                      <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Home Address</a></li>
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Work Address</a></li>
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Mailing Address</a></li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="col-md-4 col-sm-3 col-xs-0 bg-color"></div>
-              </div>
-            </div>  
-          </div>
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <button class="btn btn-new-address border-bottom-none">NEW ADDRESS</button>
-            <!-- <button class="btn btn-new-address">NEW ADDRESS</button> -->
-          </div>
-        </div>
-
-        <div class="row middle-row form-group form-group-lg no-pd">
-          <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-            <input type="text" class="floatlabel form-control border-bottom-none border-right-none" placeholder="ADDRESS LINE 1">
-          </div>
-          <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-            <input type="text" class="floatlabel form-control border-bottom-none" placeholder="ADDRESS LINE 2">
-          </div>
-        </div>
-
-        <div class="row bottom-row">
-            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-              <input type="text" class="floatlabel form-control border-right-none" placeholder="CITY">  
-            </div>
-            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-              <input type="text" class="floatlabel form-control border-right-none" placeholder="STATE">
-            </div>
-            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-              <input type="text" class="floatlabel form-control border-right-none" placeholder="COUNTRY">
-            </div>
-            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-              <input type="text" class="floatlabel form-control" placeholder="ZIP">
-            </div>
-          </div>
-          <div class="error">
-            <div class="warning"><i class="fa fa-exclamation-triangle"></i>
-              All fields Required</div>
-          </div>
-      </div>
-      
-      
-
-      <div class="col-md-2 key col-sm-3 col-xs-12">
-        <!-- <p class="top-pad">Use the drop down to create new addresses</p> -->
-      </div>
-    </div>
+    <%= f.fields_for @person.addresses, errors: {}, fieldset: false do |address|  %>
+      <%= render 'shared/address_fields', f: address %>
+    <% end %>
 
     <br>
 
-    <div id="phone_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
-      <div class="phone col-md-10 col-sm-9 col-xs-12 no-pd first">
-        <div class="row top-row">
-          <div class="col-md-6 col-sm-6 no-pd">
-            <div class="form-group form-group-lg">
-              <input type="text" class="floatlabel form-control border-bottom-none border-right-none" placeholder="HOME">
-            </div>  
-          </div>
-          <div class="col-md-6 col-sm-6 no-pd">
-            <div class="form-group form-group-lg">
-              <input type="text" class="floatlabel form-control border-bottom-none" placeholder="BUSINESS">
-            </div>  
-          </div>
-        </div>
-        <div class="row bottom-row">
-          <div class="col-md-6 col-sm-6 no-pd">
-            <div class="form-group form-group-lg">
-              <input type="text" class="floatlabel form-control border-right-none" placeholder="CELL">
-            </div>  
-          </div>
-          <div class="col-md-6 col-sm-6 no-pd">
-            <div class="form-group form-group-lg">
-              <input type="text" class="floatlabel form-control" placeholder="FAX">
-            </div>  
-          </div>
-        </div>
-        <div class="error">
-          <div class="warning"><i class="fa fa-exclamation-triangle"></i>
-            All fields Required</div>
-        </div>
-      </div>
-    </div>
+    <%= f.fields_for @person.phones, errors: {}, fieldset: false do |phone|  %>
+      <%= render 'shared/phone_fields', f: phone %>
+    <% end %>
 
     <br>
+
+    <%= f.fields_for @person.emails, errors: {}, fieldset: false do |email|  %>
+      <%= render 'shared/email_fields', f: email %>
+    <% end %>
     
-    <div id="email_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
-      <div class="email">
-        <div class="col-md-10 col-sm-9 no-pd first">
-          <div class="form-group form-group-lg">
-            <input type="text" class="floatlabel form-control" placeholder="NAME@DOMAIN.COM">
-          </div>  
-          <div class="error">
-            <div class="warning"><i class="fa fa-exclamation-triangle"></i>
-              All fields Required</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
     <div class="focus_effect row personaol-info-row" style="opacity: 0.5;">
       <div class="">
         <div class="col-md-10 col-sm-9 no-pd">

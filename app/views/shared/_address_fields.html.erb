@@ -1,47 +1,65 @@
-<div class="row">
-  <div class="col-xs-12 col-sm-8 col-md-8">
-    <div class="form-group required">
-      <%= select_dropdown "person_address_kind", Address::KINDS %>
+<div id="address_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
+  <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
+    <div class="row top-row">
+      <div class="col-md-9 col-sm-9 col-xs-12 form-group form-group-lg no-pd address">
+        <div class="form-group form-group-lg">
+          <div class="row" style="margin: 0;">
+            <div class="col-md-4 col-sm-3 col-xs-0 bg-color"></div>
+            <div class="col-md-4 col-sm-6 col-xs-12 no-pd">
+              <div class="dropdown">
+                <button class="form-control float-label adderess-select-box border-bottom-none border-right-none form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                  Home Address
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                  <% Address::KINDS.each do |item| %>
+                    <li role="presentation"><a href="#" tabindex="-1" role="menuitem"><%= item.humanize %></a></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+            <div class="col-md-4 col-sm-3 col-xs-0 bg-color"></div>
+          </div>
+        </div>  
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <button class="btn btn-new-address border-bottom-none">NEW ADDRESS</button>
+        <!-- <button class="btn btn-new-address">NEW ADDRESS</button> -->
+      </div>
     </div>
-  </div>
-  <div class="col-xs-12 col-sm-3 col-md-3">
-    <div class="form-group">
-      <%= link_to '<span class="fa fa-plus-square"> Add Address</span>'.html_safe, '#', :class => "btn btn-primary remove_fields text-danger" %>
-      <%= f.hidden_field :_destroy %>
-    </div>
-  </div>
-</div>
 
-<div class="row">
-  <div class="col-xs-12 col-sm-6 col-md-6">
-    <div class="form-group required">
-      <%= f.text_field :address_1, placeholder: 'Address1', class: "form-control", required: true %>
+    <%= f.hidden_field :_destroy %>
+
+    <div class="row middle-row form-group form-group-lg no-pd">
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :address_1, placeholder: "ADDRESS LINE 1", class: "floatlabel form-control border-bottom-none border-right-none", required: true %>
+      </div>
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :address_2, placeholder: "ADDRESS LINE 2", class: "floatlabel form-control border-bottom-none" %>
+      </div>
     </div>
+
+    <div class="row bottom-row">
+        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+          <%= f.text_field :city, placeholder: "CITY", class: "floatlabel form-control", required: true %>
+        </div>
+        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+          <%= f.text_field :state, placeholder: "STATE", class: "floatlabel form-control" %>
+        </div>
+        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+          <%= f.text_field :state, placeholder: "COUNTRY", class: "floatlabel form-control", required: true %>
+        </div>
+        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+          <%= f.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control", required: true %>
+        </div>
+      </div>
+      <div class="error">
+        <div class="warning"><i class="fa fa-exclamation-triangle"></i>
+          All fields Required</div>
+      </div>
   </div>
 
-  <div class="col-xs-12 col-sm-6 col-md-6">
-    <div class="form-group">
-      <%= f.text_field :address_2, placeholder: 'Address2', class: "form-control" %>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-xs-12 col-sm-5 col-md-5">
-    <div class="form-group required">
-      <%= f.text_field :city, placeholder: "City", class: "form-control", required: true %>
-    </div>
-  </div>
-
-  <div class="col-xs-12 col-sm-4 col-md-4">
-    <div class="form-group required">
-      <%= select_dropdown "person_address_state", State::NAME_IDS %>
-    </div>
-  </div>
-
-  <div class="col-xs-12 col-sm-3 col-md-3">
-    <div class="form-group required">
-      <%= f.text_field :zip, placeholder: "Zip", class: "form-control", required: true %>
-    </div>
+  <div class="col-md-2 key col-sm-3 col-xs-12">
+    <!-- <p class="top-pad">Use the drop down to create new addresses</p> -->
   </div>
 </div>

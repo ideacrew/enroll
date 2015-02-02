@@ -1,29 +1,32 @@
-<fieldset>
-  <div class="row">
-    <div class="col-xs-12 col-sm-6 col-md-6">
-      <div class="form-group">
-        <%= f.text_field :number, placeholder: 'Home', class: "form-control" %>
+<div id="phone_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
+  <div class="phone col-md-10 col-sm-9 col-xs-12 no-pd first">
+    <div class="row top-row">
+      <div class="col-md-6 col-sm-6 no-pd">
+        <div class="form-group form-group-lg">
+          <%= f.text_field :number, placeholder: 'HOME', class: "floatlabel form-control border-bottom-none border-right-none" %>
+        </div>  
+      </div>
+      <div class="col-md-6 col-sm-6 no-pd">
+        <div class="form-group form-group-lg">
+          <%= f.text_field :number, placeholder: 'BUSINESS', class: "floatlabel form-control border-bottom-none" %>
+        </div>  
       </div>
     </div>
-
-    <div class="col-xs-12 col-sm-6 col-md-6">
-      <div class="form-group">
-        <%= f.text_field :number, placeholder: 'Work', class: "form-control" %>
+    <div class="row bottom-row">
+      <div class="col-md-6 col-sm-6 no-pd">
+        <div class="form-group form-group-lg">
+          <%= f.text_field :number, placeholder: 'CELL', class: "floatlabel form-control border-right-none" %>
+        </div>  
       </div>
+      <div class="col-md-6 col-sm-6 no-pd">
+        <div class="form-group form-group-lg">
+          <%= f.text_field :number, placeholder: 'FAX', class: "floatlabel form-control" %>
+        </div>  
+      </div>
+    </div>
+    <div class="error">
+      <div class="warning"><i class="fa fa-exclamation-triangle"></i>
+        All fields Required</div>
     </div>
   </div>
-
-  <div class="row">
-    <div class="col-xs-12 col-sm-6 col-md-6">
-      <div class="form-group">
-        <%= f.text_field :number, placeholder: 'Cell', class: "form-control" %>
-      </div>
-    </div>
-
-    <div class="col-xs-12 col-sm-6 col-md-6">
-      <div class="form-group">
-        <%= f.text_field :number, placeholder: 'Fax', class: "form-control" %>
-      </div>
-    </div>
-  </div>
-</fieldset>
+</div>
