@@ -18,12 +18,15 @@
     <div class="jumbotron">
       <h1>Consumer Portal</h1>
       <p>DC Online Marketplace for ACA and non-ACA Health Insurance</p>
-      <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
-      <div class="row">
-        <p><%= link_to "Consumer Portal", root_path, class: "btn btn-default" %>
-        <%= link_to "Employer Portal", employers_welcome_index_path, class: "btn btn-default" %>
-        <%= link_to "Broker Portal", brokers_welcome_index_path, class: "btn btn-default" %></p>
-      </div>
+      <p>
+        <%= link_to 'Sign in', new_user_session_path, class: "btn btn-primary btn-lg"  %>
+        <%= link_to 'Sign up', new_user_registration_path, class: "btn btn-default btn-lg"  %>
+      </p>
+      <p>
+        <%= link_to "Consumer Portal", root_path, class: "btn btn-default" %>
+        <%= link_to "Employer Portal", employers_root_path, class: "btn btn-default" %>
+        <%= link_to "Broker Portal", brokers_root_path, class: "btn btn-default" %>
+      </p>
     </div>
   </div>
 </div>
