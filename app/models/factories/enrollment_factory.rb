@@ -40,11 +40,15 @@ class EnrollmentFactory
    
     family = initialize_families
     
-    # Assign broker-specifc attributes
-    broker_role = self.person.build_broker(mailing_address: mailing_address, npn: npn, kind: kind)
+    broker_role = nil
+    
+    if self.person.broker.blank?
+      # Assign broker-specifc attributes
+      broker_role = self.person.build_broker(mailing_address: mailing_address, npn: npn, kind: kind)
+    end
     
     self.person.save
-    broker_role.save
+    broker_role.save if broker_role.present?
     family.save if family.present?
 
     # Return new instance
@@ -59,8 +63,12 @@ class EnrollmentFactory
     dob = new_dob
     gender = new_gender
 
-    # Assign employee-specifc attributes
-    employee_role = self.person.build_employee(employer: new_employer, date_of_hire: new_date_of_hire)
+    employee_role = nil
+    
+    if self.person.employee.blank?
+      # Assign employee-specifc attributes
+      employee_role = self.person.build_employee(employer: new_employer, date_of_hire: new_date_of_hire)
+    end
 
     # Add 'self' to personal relationship
     self.person.personal_relationships << PersonRelationhip.new()
@@ -69,7 +77,7 @@ class EnrollmentFactory
 
     # Persist results?
     self.person.save
-    employee_role.save
+    employee_role.save if employee_role.present?
     family.save if family.present?
 
     # Return new instance
