@@ -6,7 +6,8 @@ class PeopleController < ApplicationController
     # render action: "new", layout: "form"
   end
 
-  def match
+  # Uses identifying information to return single pre-existing Person instance if already in DB
+  def match_person
     @person = Person.new(params[:person])
 
     matched_person = Person.match_by_id_info(@person)
@@ -24,6 +25,13 @@ class PeopleController < ApplicationController
       build_nested_models
       format.json { render json: @matched_person, status: :matched, location: @person }
     end
+  end
+
+  # Uses identifying information to return one or more for matches in employer census
+  def match_employer
+  end
+
+  def link_employer
   end
 
   def update
