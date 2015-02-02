@@ -18,8 +18,6 @@ class Employee
 
   validates_presence_of :person, :ssn, :dob, :gender, :employer_id, :date_of_hire
 
-  # has_one :office_location
-
   before_save :termination_date_must_follow_hire_date
 
   validates :ssn,
