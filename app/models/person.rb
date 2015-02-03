@@ -7,6 +7,8 @@ class Person
   # TODO: Need simpler, Enterprise-level incrementing ID
   # field :hbx_assigned_id, type: Integer 
 
+  auto_increment :hbx_assigned_id, :seed => 9999
+
   field :name_pfx, type: String, default: ""
   field :first_name, type: String
   field :middle_name, type: String, default: ""
