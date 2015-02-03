@@ -1,7 +1,8 @@
 class Email
   include Mongoid::Document
   include Mongoid::Timestamps
-
+  include Mongoid::Attributes::Dynamic
+  
   KINDS = %W(home work)
 
   field :kind, type: String

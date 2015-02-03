@@ -1,7 +1,7 @@
 class Address
   include Mongoid::Document
   include Mongoid::Timestamps
-
+  include Mongoid::Attributes::Dynamic
   # include MergingModel
 
   KINDS = %W(home work mailing)

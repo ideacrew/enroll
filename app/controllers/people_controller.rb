@@ -8,22 +8,27 @@ class PeopleController < ApplicationController
 
   # Uses identifying information to return single pre-existing Person instance if already in DB
   def match_person
-    @person = Person.new(params[:person])
+    
+    @person = Person.new(person_params)
 
     matched_person = Person.match_by_id_info(@person)
 
     if matched_person.blank?
       # Preexisting Person not found, create new instance and return to complete form entry
-      if @person.save
-        format.json { render json: @person, status: :created, location: @person }
-      else
-        format.json { render json: @person.errors, status: :unprocessable_entity }
+      respond_to do |format|
+        if @person.save
+          format.json { render json: @person, status: :created, location: @person }
+        else
+          format.json { render json: @person.errors, status: :unprocessable_entity }
+        end
       end
     else
       # Matched Person, autofill form with found attributes
-      @person = matched_person
-      build_nested_models
-      format.json { render json: @matched_person, status: :matched, location: @person }
+      respond_to do |format|
+        @person = matched_person.first
+        build_nested_models
+        format.json { render json: @person, status: :ok, location: @person }
+      end
     end
   end
 
@@ -32,6 +37,15 @@ class PeopleController < ApplicationController
   end
 
   def link_employer
+  end
+  
+  def get_employer
+    @employers = Employer.all
+    
+    @employers = ["Test Employer-1", "Test Employer-2"] if @employers.blank?
+    respond_to do |format|
+      format.js {}
+    end
   end
 
   def update
@@ -52,6 +66,10 @@ class PeopleController < ApplicationController
   def create
     @person = Person.new(person_params)
     
+    #Added to store details for timebeing
+    @person.addresses = [Address.new(person_params[:address])]
+    @person.phones = [Phone.new(person_params[:phone])]
+    @person.emails = [Email.new(person_params[:email])]
     respond_to do |format|
       if @person.save
         format.html { redirect_to @person, notice: 'Person was successfully created.' }
@@ -76,10 +94,7 @@ private
   end
   
   def person_params
-    params.require(:person).permit(:name_pfx, :first_name, :middle_name, :last_name, 
-                                   :name_sfx, :name_full, :alternate_name, :ssn, :dob, 
-                                   :gender, :date_of_death, :is_active, :subscriber_type,  
-                                    addresses_attributes: [:kind, :address_1, :address_2, :address_3, :city, :county, :state, :location_state_code, :zip, :zip_extension, :country_name, :full_text ])
+    params.require(:person).permit!
   end
 
 end

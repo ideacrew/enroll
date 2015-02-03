@@ -1,6 +1,7 @@
 class Phone
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Attributes::Dynamic
 
   embedded_in :person
 
