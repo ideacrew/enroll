@@ -1,7 +1,8 @@
 class Person
   include Mongoid::Document
   include Mongoid::Timestamps
-
+  include Mongoid::Attributes::Dynamic
+  
   GENDER_KINDS = %W(male female)
 
   # TODO: Need simpler, Enterprise-level incrementing ID

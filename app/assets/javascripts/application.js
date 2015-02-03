@@ -23,4 +23,20 @@ $(document).ready(function () {
   $('.floatlabel').floatlabel({
       slideInput: false
   });
+  
+  $("#person_ssn").on("blur", function(){
+    confirm_flag = confirm("We may be able to auto-fill your information with data from our records");
+    if(confirm_flag){
+        $.ajax({
+      type: "POST",
+      url: "/people/match_person.json",   
+      data: $('#new_person').serialize(),
+      success: function (result) {
+        alert("find your details");
+      }
+ });
+    }
+    
+  });
+  
 });
