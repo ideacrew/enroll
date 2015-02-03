@@ -32,11 +32,20 @@ $(document).ready(function () {
       url: "/people/match_person.json",   
       data: $('#new_person').serialize(),
       success: function (result) {
-        alert("find your details");
+        alert("find your details.Please select employer");
+        getAllEmployers();
       }
  });
     }
     
   });
+  
+  function getAllEmployers()
+  {
+    $.ajax({
+      type: "GET",
+      url: "/people/get_employer.js"
+ });
+}
   
 });
