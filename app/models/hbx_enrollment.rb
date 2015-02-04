@@ -1,7 +1,7 @@
 class HbxEnrollment
   include Mongoid::Document
   include Mongoid::Timestamps
-  include AASM   
+  include AASM
 
   # Persists result of a completed plan shopping process
 
@@ -13,11 +13,13 @@ class HbxEnrollment
   field :enrollment_group_id, type: String
   field :applied_aptc_in_cents, type: Integer, default: 0
   field :elected_aptc_in_cents, type: Integer, default: 0
-  field :is_active, type: Boolean, default: true 
+  field :is_active, type: Boolean, default: true
   field :submitted_at, type: DateTime
   field :aasm_state, type: String
   field :policy_id, type: Integer
   field :employer_id, type: BSON::ObjectId
+
+  field :broker_agency_id, type: BSON::ObjectId
 
   embeds_many :hbx_enrollment_members
 
@@ -26,18 +28,18 @@ class HbxEnrollment
   embeds_many :comments
   accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
 
-  validates :kind, 
+  validates :kind,
     					presence: true,
     					allow_blank: false,
     					allow_nil:   false,
     					inclusion: {in: KINDS, message: "%{value} is not a valid enrollment type"}
 
   validates :applied_aptc_in_cents,
-              allow_nil: true, 
+              allow_nil: true,
               numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   validates :elected_aptc_in_cents,
-              allow_nil: true, 
+              allow_nil: true,
               numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   index({policy_id: 1})
@@ -93,4 +95,17 @@ class HbxEnrollment
     Employer.find(self.employer_id) unless self.employer_id.blank?
   end
 
+  def broker_agency=(new_broker_agency)
+    return if new_broker_agency.blank?
+    self.broker_agency_id = new_broker._id
+  end
+
+  def broker_agency
+    return unless has_broker_agency?
+    parent.broker_agency.find(self.broker_agency_id)
+  end
+
+  def has_broker_agency?
+    !broker_agency_id.blank?
+  end
 end
