@@ -1,19 +1,27 @@
-class Family  # aka class ApplicationGroup
+class Family
   include Mongoid::Document
   include Mongoid::Timestamps
+<<<<<<< HEAD
   include Mongoid::Attributes::Dynamic
+=======
+  include Mongoid::Versioning
+  # include Mongoid::Paranoia
+  include AASM
+>>>>>>> bea19b136dde633355ac3c3c5d95efe91911d5cc
 
   KINDS = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
 
-  # auto_increment :hbx_assigned_id, seed: 9999
+  auto_increment :hbx_assigned_id, seed: 9999
 
   field :e_case_id, type: String  # Eligibility system foreign key
   field :e_status_code, type: String
+  field :application_type, type: String
   field :renewal_consent_through_year, type: Integer  # Authorize auto-renewal elibility check through this year (CCYY format)
 
+  field :aasm_state, type: String
   field :is_active, type: Boolean, default: true   # ApplicationGroup active on the Exchange?
   field :submitted_at, type: DateTime            # Date application was created on authority system
-  field :updated_by, type: String, default: "consumer"
+  field :updated_by, type: String
 
   has_and_belongs_to_many :qualifying_life_events
 
@@ -21,13 +29,13 @@ class Family  # aka class ApplicationGroup
   embeds_many :family_members, cascade_callbacks: true
   accepts_nested_attributes_for :family_members
 
-  embeds_many :households, cascade_callbacks: true
-  accepts_nested_attributes_for :households
-
   embeds_many :irs_groups, cascade_callbacks: true
   accepts_nested_attributes_for :irs_groups
 
-  embeds_many :comments
+  embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
+  accepts_nested_attributes_for :households
+
+  embeds_many :comments, cascade_callbacks: true
   accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
 
   validates :renewal_consent_through_year,
@@ -36,28 +44,24 @@ class Family  # aka class ApplicationGroup
 
   validates :e_case_id, uniqueness: true
 
-  validate :max_one_primary_family_member
-
-
-  #  validates_inclusion_of :max_renewal_year, :in => 2013..2025, message: "must fall between 2013 and 2030"
+#  validates_inclusion_of :max_renewal_year, :in => 2013..2025, message: "must fall between 2013 and 2030"
 
   index({e_case_id:  1})
   index({is_active:  1})
   index({aasm_state:  1})
   index({submitted_at:  1})
-
-  # FamilyMember child model indexes
-  index({"family_member.person_id" => 1})
-  index({"family_member.broker_id" =>  1})
-  index({"family_member.is_primary_family_member" => 1})
-
-  # HbxEnrollment child model indexes
-  index({"hbx_enrollment.policy_id" => 1})
+  index({"hbx_enrollment.broker_agency_id" => 1}, {sparse: true})
 
   validate :no_duplicate_family_members
 
-  scope :all_with_single_family_member, ->{ exists({ :'family_members.1' => false })}
-  scope :all_with_multiple_family_members, ->{ exists({ :'family_members.1' => true })}
+  validate :integrity_of_family_member_objects
+
+  validate :max_one_primary_applicant
+
+  validate :max_one_active_household
+
+  scope :all_with_multiple_family_members, ->{exists({ :'family_members.1' => true })}
+  scope :all_with_household, ->{exists({ :'households.0' => true })}
 
   def no_duplicate_family_members
     family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
@@ -67,8 +71,9 @@ class Family  # aka class ApplicationGroup
   end
 
   def latest_household
-    return households.first if households.size = 1
-    households.sort_by(&:submitted_at).last.submitted_at
+    return households.first if households.size == 1
+    persisted_household = households.select(&:persisted?) - [nil] #remove any nils
+    persisted_household.sort_by(&:submitted_at).last
   end
 
   def active_family_members
@@ -107,6 +112,41 @@ class Family  # aka class ApplicationGroup
     return true unless find_family_member_by_person(person).blank?
   end
 
+  aasm do
+    state :enrollment_closed, initial: true
+    state :open_enrollment_period
+    state :special_enrollment_period
+    state :open_and_special_enrollment_period
+
+    event :open_enrollment do
+      transitions from: :open_enrollment_period, to: :open_enrollment_period
+      transitions from: :special_enrollment_period, to: :open_and_special_enrollment_period
+      transitions from: :open_and_special_enrollment_period, to: :open_and_special_enrollment_period
+      transitions from: :enrollment_closed, to: :open_enrollment_period
+    end
+
+    event :close_open_enrollment do
+      transitions from: :open_enrollment_period, to: :enrollment_closed
+      transitions from: :special_enrollment_period, to: :special_enrollment_period
+      transitions from: :open_and_special_enrollment_period, to: :special_enrollment_period
+      transitions from: :enrollment_closed, to: :enrollment_closed
+    end
+
+    event :open_special_enrollment do
+      transitions from: :open_enrollment_period, to: :open_and_special_enrollment_period
+      transitions from: :special_enrollment_period, to: :special_enrollment_period
+      transitions from: :open_and_special_enrollment_period, to: :open_and_special_enrollment_period
+      transitions from: :enrollment_closed, to: :special_enrollment_period
+    end
+
+    event :close_special_enrollment do
+      transitions from: :open_enrollment_period, to: :open_enrollment_period
+      transitions from: :special_enrollment_period, to: :enrollment_closed
+      transitions from: :open_and_special_enrollment_period, to: :open_enrollment_period
+      transitions from: :enrollment_closed, to: :enrollment_closed
+     end
+  end
+
   # single SEP with latest end date from list of active SEPs
   def current_sep
     active_seps.max { |sep| sep.end_date }
@@ -140,15 +180,71 @@ class Family  # aka class ApplicationGroup
     self.is_active
   end
 
-private
+  def active_household
 
-  def max_one_primary_family_member
-    primary_family_members = self.family_members.select do |family_member|
-      family_member.is_primary_applicant == true
+    household = self.households.detect do |household|
+      household.is_active?
     end
 
-    if primary_family_members.size > 1
-      self.errors.add(:base, "Multiple primary family_members")
+    return household
+  end
+
+  def find_irs_group_by_irs_group_id(irs_group_id)
+    self.irs_groups.detect do |irs_group|
+      irs_group.id == irs_group_id
+    end
+  end
+
+private
+
+  # This method will return true only if all the family_members in tax_household_members and coverage_household_members are present in self.family_members
+  def integrity_of_family_member_objects
+
+    return true if self.households.blank?
+
+    family_members_in_family = self.family_members - [nil]
+
+    tax_household_family_members_valid = are_arrays_of_family_members_same?(family_members_in_family.map(&:id), self.households.flat_map(&:tax_households).flat_map(&:tax_household_members).map(&:applicant_id))
+
+    coverage_family_members_valid = are_arrays_of_family_members_same?(family_members_in_family.map(&:id), self.households.flat_map(&:coverage_households).flat_map(&:coverage_household_members).map(&:applicant_id))
+
+    tax_household_family_members_valid && coverage_family_members_valid
+  end
+
+  def are_arrays_of_family_members_same?(base_set, test_set)
+    base_set.uniq.sort == test_set.uniq.sort
+  end
+
+  def max_one_primary_applicant
+    primary_applicants = self.family_members.select do |applicant|
+      applicant.is_primary_applicant == true
+    end
+
+    if primary_applicants.size > 1
+      self.errors.add(:base, "Multiple primary applicants")
+      return false
+    else
+      return true
+    end
+  end
+
+  def reset_active_household(new_household)
+    households.each do |household|
+      household.is_active = false
+    end
+    new_household.is_active = true
+  end
+
+  def max_one_active_household
+
+    return true if self.households.blank?
+
+    active_households = self.households.select do |household|
+      household.is_active?
+    end
+
+    if active_households.size > 1
+      self.errors.add(:base, "Multiple active households")
       return false
     else
       return true
