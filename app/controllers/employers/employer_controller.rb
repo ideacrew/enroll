@@ -41,7 +41,7 @@ class Employers::EmployerController < ApplicationController
   def update
     params.permit!
     @employer = Employer.find(params[:id])
-    @employer.assign_attributes(params[:employer], without_protection: true)
+    # @employer.assign_attributes(params[:employer], without_protection: true)
     respond_to do |format|
       if @employer.update_attributes(params[:employer])
         format.html { redirect_to employers_employer_path(@employer), notice: 'Employer Census Family is successfully created.'}

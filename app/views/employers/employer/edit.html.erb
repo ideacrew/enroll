@@ -19,7 +19,6 @@
               <%= ff.fields_for :dependents, errors: {}, fieldset: false do |member|  %>
                 <%= render 'dependent_fields', m: member %>
               <% end %>
-              <p class="text-right"><%= link_to_add_fields "Add Dependent", ff, :dependents %></p>
             </div>
 
           <br/>
