@@ -85,7 +85,6 @@ class Person
   index({"broker.kind" => 1})
   index({"broker.hbx_id" => 1})
   index({"broker.npn" => 1}, {unique: true})
-  index({"broker.agency_id" => 1})
 
   # Consumer child model indexes
   index({"consumer._id" => 1})

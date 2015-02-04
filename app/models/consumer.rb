@@ -30,8 +30,6 @@ class Consumer
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
 
-  field :broker_agency_id, type: BSON::ObjectId
-
   field :application_state, type: String
   field :is_active, type: Boolean, default: true
 
@@ -86,20 +84,6 @@ class Consumer
 
   def billing_address
     addresses.detect { |adr| adr.kind == "billing" } || home_address
-  end
-
-  def broker_agency=(new_broker_agency)
-    return if new_broker_agency.blank?
-    self.broker_agency_id = new_broker._id
-  end
-
-  def broker_agency
-    return unless has_broker_agency?
-    parent.broker_agency.find(self.broker_agency_id)
-  end
-
-  def has_broker_agency?
-    !broker_agency_id.blank?
   end
 
 
