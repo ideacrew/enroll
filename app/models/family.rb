@@ -1,13 +1,11 @@
 class Family
   include Mongoid::Document
   include Mongoid::Timestamps
-<<<<<<< HEAD
   include Mongoid::Attributes::Dynamic
-=======
   include Mongoid::Versioning
   # include Mongoid::Paranoia
   include AASM
->>>>>>> bea19b136dde633355ac3c3c5d95efe91911d5cc
+
 
   KINDS = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
 
