@@ -46,6 +46,7 @@ class Family
   index({is_active:  1})
   index({aasm_state:  1})
   index({submitted_at:  1})
+  index({"hbx_enrollment.broker_agency_id" => 1}, {sparse: true})
 
   validate :no_duplicate_family_members
 
