@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Consumer, '.new', type: :model do
+describe Consumer, '.new', type: :model do
   it { should delegate_method(:hbx_assigned_id).to :person }
   it { should delegate_method(:ssn).to :person }
   it { should delegate_method(:dob).to :person }
@@ -19,7 +19,8 @@ RSpec.describe Consumer, '.new', type: :model do
     expect(Consumer.create(ssn: "a7d8d9d").errors[:ssn].any?).to eq true
   end
 
-  it "citizen_status fails validation with unrecognized value" do
+  it "citizen_status fails validation with an empty or unrecognized value" do
+    expect(Consumer.create(citizen_status: "").errors[:citizen_status].any?).to eq true
     expect(Consumer.create(citizen_status: "alaskan").errors[:citizen_status].any?).to eq true
   end
 
@@ -62,6 +63,8 @@ RSpec.describe Consumer, '.new', type: :model do
     expect(consumer.created_at).not_to eq nil
   end
 
+  describe Consumer, '.new', type: :model do
+  end
 
 
 end

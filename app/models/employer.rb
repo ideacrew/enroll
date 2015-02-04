@@ -4,12 +4,9 @@ class Employer
 
   include AASM
 
-  ENTITY_KINDS = %w[c_corporation s_corporation partnership tax_exempt_organization]
+  ENTITY_KINDS = [:c_corporation, :s_corporation, :partnership, :tax_exempt_organization]
 
-  # include MergingModel
-  # extend Mongorder
-
-  field :hbx_assigned_id, type: Integer
+  auto_increment :hbx_id, type: Integer
 
   # Employer registered legal name
   field :name, type: String
@@ -22,30 +19,28 @@ class Employer
   field :entity_kind, type: String
   field :sic_code, type: String
 
-  field :broker_id, type: BSON::ObjectId
-  field :broker_id_as_string, type: String
-
   field :aasm_state, type: String
   field :aasm_message, type: String
 
   field :is_active, type: Boolean, default: true
 
+  embeds_many :contacts
   embeds_many :employer_census_families, class_name: "EmployerCensus::Family"
   embeds_many :plan_years
 
+  belongs_to :broker_agency, counter_cache: true
   has_many :representatives, class_name: "Person", inverse_of: :employer_representatives
 
   # has_many :premium_payments, order: { paid_at: 1 }
-  index({ hbx_assigned_id: 1 }, { unique: true })
+  index({ hbx_id: 1 }, { unique: true })
   index({ name: 1 })
   index({ dba: 1 }, {sparse: true})
   index({ fein: 1 }, { unique: true })
+  index({ broker_agency_id: 1}, {sparse: true})
   index({ aasm_state: 1 })
   index({ is_active: 1 })
 
   # PlanYear child model indexes
-  index({"plan_year.broker_id" => 1}, {sparse: true})
-  index({"plan_year.broker_id_as_string" => 1}, {sparse: true})
   index({"plan_year.start_date" => 1})
   index({"plan_year.end_date" => 1}, {sparse: true})
   index({"plan_year.open_enrollment_start" => 1})
@@ -70,35 +65,15 @@ class Employer
     inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid business entity" },
     allow_blank: false
 
-
-  # has_one associations
-  field :broker_id, type: BSON::ObjectId
-  field :broker_id_as_string, type: String
-
-  def broker=(new_broker)
-    return if new_broker.blank?
-    self.broker_id = new_broker._id
-    self.broker_id_as_string = new_broker._id.to_s
+  ## Class methods
+  def self.find_by_broker(broker)
+    return if broker.blank?
+    where(broker_agency_id: broker._id)
   end
 
-  def broker
-    Broker.find(self.broker_id) unless self.broker_id.blank?
-  end
-
-  def has_broker?
-    !broker_id.blank?
-  end
-
-
-
-  # has_many association
+  # has_many employees
   def employees
     Employee.where(employer_id: self._id)
-  end
-
-  def self.find_by_broker_id(search_id)
-    return if search_id.blank?
-    where(broker_id_as_string: search_id.to_s)
   end
 
   def payment_transactions

@@ -29,11 +29,13 @@ class Consumer
 
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
+
+  field :broker_agency_id, type: BSON::ObjectId
+
   field :application_state, type: String
   field :is_active, type: Boolean, default: true
 
-
-  delegate :hbx_assigned_id, to: :person, allow_nil: true
+  delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn, :ssn=, to: :person, allow_nil: true
   delegate :dob, :dob=, to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
@@ -54,14 +56,52 @@ class Consumer
   scope :all_over_age_twenty_six,  ->{lte(:'dob' => (Date.today - 26.years))}
 
   # TODO: Add scope that accepts age range
-  # scope :all_between_age_range, ->(range) {}
-
   scope :all_over_or_equal_age, ->(age) {lte(:'dob' => (Date.today - age.years))}
   scope :all_under_or_equal_age, ->(age) {gte(:'dob' => (Date.today - age.years))}
 
-  def family
-    
+  def parent
+    raise "undefined parent: Person" unless person?
+    self.person
   end
+
+  def families
+    Family.by_consumer(self)
+  end
+
+  def phone
+    parent.phones.detect { |phone| phone.kind == "home" }
+  end
+
+  def email
+    parent.emails.detect { |email| email.kind == "home" }
+  end
+
+  def home_address
+    addresses.detect { |adr| adr.kind == "home" }
+  end
+
+  def mailing_address
+    addresses.detect { |adr| adr.kind == "mailing" } || home_address
+  end
+
+  def billing_address
+    addresses.detect { |adr| adr.kind == "billing" } || home_address
+  end
+
+  def broker_agency=(new_broker_agency)
+    return if new_broker_agency.blank?
+    self.broker_agency_id = new_broker._id
+  end
+
+  def broker_agency
+    return unless has_broker_agency?
+    parent.broker_agency.find(self.broker_agency_id)
+  end
+
+  def has_broker_agency?
+    !broker_agency_id.blank?
+  end
+
 
   aasm column: "application_state" do
     state :enrollment_closed, initial: true
