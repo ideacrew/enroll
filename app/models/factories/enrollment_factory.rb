@@ -1,4 +1,4 @@
-class EnrollmentFactory
+class Factories::EnrollmentFactory
 
   attr_accessor :person
 
@@ -36,14 +36,14 @@ class EnrollmentFactory
 
     kind = new_kind
     npn = new_npn
-    maling_address = new_maling_address
+    mailing_address = new_mailing_address
    
     family = initialize_families
     
     broker_role = nil
     
     if self.person.broker.blank?
-      # Assign broker-specifc attributes
+      # Assign broker-specifc attributes 
       broker_role = self.person.build_broker(mailing_address: mailing_address, npn: npn, kind: kind)
     end
     
@@ -70,7 +70,7 @@ class EnrollmentFactory
       employee_role = self.person.build_employee(employer: new_employer, date_of_hire: new_date_of_hire)
     end
 
-    # Add 'self' to personal relationship
+    # Add 'self' to personal relationship need detailed implementation
     self.person.personal_relationships << PersonRelationhip.new()
     
     family = initialize_families
@@ -86,9 +86,9 @@ class EnrollmentFactory
   
   def initialize_families
     family = nil
-    if self.person.families.blank?
-    # Instantiate new family model
-      family = self.person.families.build()
+    if self.person.family.blank?
+    # Instantiate new family model need detailed implementation
+      family = self.person.build_family()
     end
     return family
   end
