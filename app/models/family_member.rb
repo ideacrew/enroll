@@ -4,12 +4,7 @@ class FamilyMember
 
   embedded_in :family
 
-  field :consumer_id, type: BSON::ObjectId
-  field :broker_id, type: BSON::ObjectId
-  field :employee_id, type: BSON::ObjectId
-  field :person_id, type: BSON::ObjectId
-
-  # Person responsible for this application group
+  # Person responsible for this family
   field :is_primary_applicant, type: Boolean, default: false
 
   # Person is applying for coverage
@@ -18,13 +13,25 @@ class FamilyMember
   # Person who authorizes auto-renewal eligibility check
   field :is_consent_applicant, type: Boolean, default: false
 
-  embeds_many :hbx_enrollment_exemptions
-  embeds_many :employee_applicants
+  field :is_active, type: Boolean, default: true
 
-  validates_presence_of :person_id, :is_primary_applicant
+  field :person_id, type: BSON::ObjectId
+  field :broker_id, type: BSON::ObjectId
+
+  embeds_many :hbx_enrollment_exemptions
+  accepts_nested_attributes_for :hbx_enrollment_exemptions
+
+  embeds_many :comments, cascade_callbacks: true
+  accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
+
+  index({person_id: 1})
+  index({broker_id:  1})
+  index({is_primary_applicant: 1})
+
+  validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
 
   def parent
-    raise "undefined parent Family" unless family?
+    raise "undefined parent family" unless family
     self.family
   end
 
@@ -65,4 +72,5 @@ class FamilyMember
   def is_active?
     self.is_active
   end
+
 end

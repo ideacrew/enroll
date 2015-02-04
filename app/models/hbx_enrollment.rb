@@ -1,7 +1,7 @@
 class HbxEnrollment
   include Mongoid::Document
   include Mongoid::Timestamps
-  include AASM
+  include AASM   
 
   # Persists result of a completed plan shopping process
 
@@ -13,32 +13,34 @@ class HbxEnrollment
   field :enrollment_group_id, type: String
   field :applied_aptc_in_cents, type: Integer, default: 0
   field :elected_aptc_in_cents, type: Integer, default: 0
-  field :is_active, type: Boolean, default: true
+  field :is_active, type: Boolean, default: true 
   field :submitted_at, type: DateTime
   field :aasm_state, type: String
-
   field :policy_id, type: Integer
+  field :employer_id, type: BSON::ObjectId
 
   embeds_many :hbx_enrollment_members
 
-  # include HasApplicants
+  include HasFamilyMembers
 
   embeds_many :comments
   accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
 
-  validates :kind,
+  validates :kind, 
     					presence: true,
     					allow_blank: false,
     					allow_nil:   false,
     					inclusion: {in: KINDS, message: "%{value} is not a valid enrollment type"}
 
   validates :applied_aptc_in_cents,
-              allow_nil: true,
+              allow_nil: true, 
               numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   validates :elected_aptc_in_cents,
-              allow_nil: true,
+              allow_nil: true, 
               numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+
+  index({policy_id: 1})
 
   def policy=(policy_instance)
     return unless policy_instance.is_a? Policy
@@ -73,12 +75,22 @@ class HbxEnrollment
     self.is_active
   end
 
-  def application_group
+  def family
     return nil unless household
-    household.application_group
+    household.family
   end
 
   def applicant_ids
     hbx_enrollment_members.map(&:applicant_id)
   end
+
+  def employer=(employer_instance)
+    return unless employer_instance.is_a? Employer
+    self.employer_id = employer_instance._id
+  end
+
+  def employer
+    Employer.find(self.employer_id) unless self.employer_id.blank?
+  end
+
 end
