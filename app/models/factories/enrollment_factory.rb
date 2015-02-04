@@ -29,24 +29,24 @@ class EnrollmentFactory
    consumer_role.save
 
    return consumer_role
-  
+
   end
-   
+
   def add_broker_role(new_kind, new_npn, new_mailing_address)
 
     kind = new_kind
     npn = new_npn
     maling_address = new_maling_address
-   
+
     family = initialize_families
-    
+
     broker_role = nil
-    
+
     if self.person.broker.blank?
       # Assign broker-specifc attributes
       broker_role = self.person.build_broker(mailing_address: mailing_address, npn: npn, kind: kind)
     end
-    
+
     self.person.save
     broker_role.save if broker_role.present?
     family.save if family.present?
@@ -64,7 +64,7 @@ class EnrollmentFactory
     gender = new_gender
 
     employee_role = nil
-    
+
     if self.person.employee.blank?
       # Assign employee-specifc attributes
       employee_role = self.person.build_employee(employer: new_employer, date_of_hire: new_date_of_hire)
@@ -72,7 +72,7 @@ class EnrollmentFactory
 
     # Add 'self' to personal relationship
     self.person.personal_relationships << PersonRelationhip.new()
-    
+
     family = initialize_families
 
     # Persist results?
@@ -83,7 +83,7 @@ class EnrollmentFactory
     # Return new instance
     return employee_role
   end
-  
+
   def initialize_families
     family = nil
     if self.person.families.blank?
