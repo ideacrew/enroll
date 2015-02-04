@@ -26,6 +26,11 @@ Rails.application.routes.draw do
   resources :people do
     get 'select_employer'
     get 'my_account'
+    collection do
+      post 'match_person'
+      get 'get_employer'
+    end
+    
   end
 
   resources :employees

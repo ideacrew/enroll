@@ -135,7 +135,7 @@ describe Person, '#phones' do
     person = Person.new
     person.phones.build({kind: 'home', area_code: '202', number: '555-1212'})
 
-    expect(person.home_phone.number).to eq '5551212'
+    expect(person.phones.first.number).to eq '5551212'
   end
 end
 
@@ -144,65 +144,7 @@ describe Person, '#emails' do
     person = Person.new
     person.emails.build({kind: 'home', address: 'sam@example.com'})
 
-    expect(person.home_email.address).to eq 'sam@example.com'
-  end
-end
-
-describe Person, "#subscriber_employee" do
-  it "returns employee based on subscriber_type is employee" do
-    ssn = "987654321"
-    date_of_hire = Date.today - 10.days
-    dob = Date.today - 36.years
-    gender = "female"
-
-    person = FactoryGirl.build(:person)
-    person.subscriber_type = "employee"
-    addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
-
-    employee = Employee.new
-    employee.ssn = ssn
-    employee.dob = dob
-    employee.gender = gender
-    employee.date_of_hire = date_of_hire
-    person.subscriber = employee
-    expect(person.subscriber).to eq employee
-  end
-end
-
-describe Person, "#subscriber_consumer" do
-  it "returns employee based on subscriber_type is consumer" do
-    ssn = "987654321"
-    dob = Date.today - 26.years
-    gender = "male"
-    person = FactoryGirl.build(:person)
-    person.subscriber_type = "broker"
-    addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
-
-    consumer = Consumer.new
-    consumer.ssn = ssn
-    consumer.dob = dob
-    consumer.gender = gender
-    consumer.is_state_resident = true
-    consumer.citizen_status = 'us_citizen'
-    person.subscriber = consumer
-    expect(person.subscriber).to eq consumer
-  end
-end
-
-describe Person, "#subscriber_broker" do
-  it "returns employee based on subscriber_type is broker" do
-   npn_value = "abx123xyz"
-
-    person = FactoryGirl.build(:person)
-    person.subscriber_type = "broker"
-    addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
-
-    broker = Broker.new(
-        npn: npn_value,
-        kind: "broker"
-    )
-    person.subscriber = broker
-    expect(person.subscriber).to eq person.broker
+    expect(person.emails.first.address).to eq 'sam@example.com'
   end
 end
 

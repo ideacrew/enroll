@@ -31,7 +31,7 @@ gem 'mongoid', '~> 4.0.0'
 gem 'origin', '~> 2.1.1'
 gem 'moped', '~> 2.0.2'
 gem 'carrierwave-mongoid', '0.7.1', :require => 'carrierwave/mongoid'
-# gem "mongoid_auto_increment"
+gem "mongoid_auto_increment"
 # gem 'mongoid-autoinc'
 
 gem 'aasm', '~> 4.0.7'
