@@ -1,16 +1,21 @@
 Rails.application.routes.draw do
 
- namespace :brokers do
-    get 'welcome/index'
+  # You can have the root of your site routed with "root"
+  root 'welcome#index'
 
-    resources :brokers do
+  # get 'user/index'
+
+  namespace :brokers do
+    root 'welcome#index'
+
+    resources :broker do
       get 'new'
       get 'my_account'
     end
   end
 
   namespace :employers do
-    get 'welcome/index'
+    root 'welcome#index'
 
     resources :employer do
       get 'new'
@@ -18,10 +23,18 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :people do
+    get 'select_employer'
+    get 'my_account'
+  end
+
   resources :employees
 
-  devise_for :users
-
+  devise_for :users #, :controllers => { :registrations => "registrations" }
+  # devise_scope :user do
+  #   get "/sign_in" => "devise/sessions#new"
+  #   get "/sign_up" => "devise/registrations#new"
+  # end
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
@@ -37,15 +50,11 @@ Rails.application.routes.draw do
      end
    end
  
-  resources :people 
 
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
-  # You can have the root of your site routed with "root"
-  root 'welcome#index'
-  # get 'welcome/index'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

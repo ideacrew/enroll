@@ -15,3 +15,12 @@
 //= require twitter/bootstrap
 //= require turbolinks
 //= require_tree .
+
+
+$('input.floatlabel').floatlabel();
+
+$(document).ready(function () {
+  $('.floatlabel').floatlabel({
+      slideInput: false
+  });
+});

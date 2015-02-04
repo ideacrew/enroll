@@ -1,0 +1,43 @@
+<%= form_for @employer, url: {action: "update"} do |f| %>
+
+  <div class="row">
+    <div class="col-sm-6">
+      <div>
+        <h3>Add new family</h3>
+      </div>
+        <%= f.fields_for :employer_census_families, errors: {}, fieldset: false do |ff|%>
+          <%= ff.fields_for :employee, errors: {}, fieldset: false do |member|  %>
+          <div><h3>Employee Information</h3></div>
+            <div>
+              <%= render 'name_fields', m: member %>
+              <%= render 'member_fields', m: member %>
+            </div>
+          <% end %>
+          <br/>
+          <div><h3>Dependent Information</h3></div>
+            <div>
+              <%= ff.fields_for :dependents, errors: {}, fieldset: false do |member|  %>
+                <%= render 'dependent_fields', m: member %>
+              <% end %>
+              <p class="text-right"><%= link_to_add_fields "Add Dependent", ff, :dependents %></p>
+            </div>
+
+          <br/>
+          <div>
+            <h3>Addresses</h3>
+          </div>
+
+          <%= ff.fields_for :address, errors: {}, fieldset: false do |address|  %>
+            <%= render 'address_fields', f: address %>
+          <% end %>
+        <% end %>
+    </div>
+  </div>
+
+
+  <div class="well well-sm well-default">
+    <%= f.submit "Save Changes", class: "btn btn-primary" %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")), employers_employer_path(@employer), class: "btn btn-primary" %>
+	</div>
+
+<% end %>

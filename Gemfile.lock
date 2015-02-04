@@ -159,8 +159,6 @@ GEM
       moped (~> 2.0.0)
       origin (~> 2.1)
       tzinfo (>= 0.3.37)
-    mongoid-autoinc (4.0.0)
-      mongoid (~> 4.0)
     mongoid-grid_fs (2.1.0)
       mime-types (>= 1.0, < 3.0)
       mongoid (>= 3.0, < 5.0)
@@ -309,7 +307,6 @@ DEPENDENCIES
   jquery-ui-rails
   less-rails-bootstrap (~> 3.3.1.0)
   mongoid (~> 4.0.0)
-  mongoid-autoinc
   mongoid-rspec
   moped (~> 2.0.2)
   origin (~> 2.1.1)

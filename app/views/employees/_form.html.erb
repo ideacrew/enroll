@@ -13,21 +13,93 @@
   </div>
 <% end %>
 
-<legend>Employee Information</legend>
-<%= f.fields_for :person, errors: {}, fieldset: false do |name|  %>
-  <%= render 'shared/name_fields', f: name %>
-<% end %>
+<!-- 
 
-<%= render 'shared/id_info_fields', f: f %>
+ -->
 
-<%= f.fields_for @person.phones, errors: {}, fieldset: false do |phone|  %>
-  <%= render 'shared/phone_fields', f: phone %>
-<% end %>
+<div class="col-md-11 col-sm-12 col-xs-12">
+  <p class="information row" style="opacity: 0.2;">Personal Information</p>
+  <div id="overlay"></div>
+    <div id="personal_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
+      <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
 
-<%= f.fields_for @person.emails, errors: {}, fieldset: false do |email|  %>
-  <%= render 'shared/email_fields', f: email %>
-<% end %>
+        <%= f.fields_for :person, errors: {}, fieldset: false do |name|  %>
+          <%= render 'shared/name_fields', f: name %>
+        <% end %>
 
-<%= f.fields_for @person.addresses, errors: {}, fieldset: false do |address|  %>
-  <%= render 'shared/address_fields', f: address %>
-<% end %>
+        <%= render 'shared/id_info_fields', f: f %>
+
+        <div class="error">
+          <div class="warning"><i class="fa fa-exclamation-triangle"></i>
+            All fields Required</div>
+        </div>
+      </div>
+      
+      <div class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
+        <a href="#" class="btn btn-save">Save & Exit</a>
+        <p class="top-pad">
+          <span>Your personal information is safe, secured with 64 bit SSL encryption</span>
+          <span><i></i></span>
+        </p>
+      </div>
+    </div>
+    
+    <br>
+
+    <%= f.fields_for @person.addresses, errors: {}, fieldset: false do |address|  %>
+      <%= render 'shared/address_fields', f: address %>
+    <% end %>
+
+    <br>
+
+    <%= f.fields_for @person.phones, errors: {}, fieldset: false do |phone|  %>
+      <%= render 'shared/phone_fields', f: phone %>
+    <% end %>
+
+    <br>
+
+    <%= f.fields_for @person.emails, errors: {}, fieldset: false do |email|  %>
+      <%= render 'shared/email_fields', f: email %>
+    <% end %>
+    
+    <div class="focus_effect row personaol-info-row" style="opacity: 0.5;">
+      <div class="">
+        <div class="col-md-10 col-sm-9 no-pd">
+        </div>
+        <div class="col-md-2 col-sm-3 no-pd">
+          <a href="#" class="btn disable-btn">Continue</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="autofill-cloud autofill-initial hidden">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <%= image_tag 'autofill-cloud.png' %>
+          <span class="close"></span>
+        </div>
+        <p>
+          We may be able to auto-fill your information with data from our records.
+        </p>
+        <a href="#" class="btn btn-ok autofill_yes">Yes</a>
+        <div class="clearfix"></div>
+        <a href="#" class="btn btn-cancel autofill_no">No Thanks</a>
+      </div>
+    </div>
+    <div class="autofill-cloud autofill-failed hidden">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <%= image_tag 'autofill-cloud-failed.png' %>
+          <span class="close"></span>
+        </div>
+        <p>
+          We were not able to find your information. Double check your social security number and birthdate
+        </p>
+        <a href="#" class="btn btn-try-again btn-primary">Try Again</a>
+      </div>
+    </div>
+    <div class="less-opacity hidden">
+      <%= image_tag 'autofill-cloud.png' %>
+      <p>Autofill</p>
+    </div>
+  </div>

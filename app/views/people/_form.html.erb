@@ -1,18 +1,53 @@
-<% if @person.errors.any? %>
-  <div class="alert alert-error">
-    <h4><%= pluralize(@person.errors.count, "error") %> prohibited this person from being saved:</h4>
-    <ul>
-      <% @person.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
+<div class="row">
+  <div class="col-md-12">
+    <% if @person.errors.any? %>
+      <div class="alert alert-error">
+        <h4><%= pluralize(@person.errors.count, "error") %> prohibited this person from being saved:</h4>
+        <ul>
+          <% @person.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
 
-      <% @person.embedded_error_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
+          <% @person.embedded_error_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-2" id="sidebar">
+    <ul>
+      <li>Name</li>
+      <li>Birth Date</li>
+      <li>Gender</li>
+      <li>Social Security</li>
     </ul>
   </div>
-<% end %>
 
-<div class='legend'>Name and Identifying Info</div>
-<%= render 'shared/name_fields', f: f %>
+  <div class="col-md-7">
+    <fieldset>
+      <%= render 'shared/name_fields', f: f %>
+    </fieldset>
+    <fieldset>
+      <%= render 'shared/id_info_fields', f: f %>  
+    </fieldset>
 
+    <%= f.fields_for @person.addresses, errors: {}, fieldset: true do |address|  %>
+      <%= render 'shared/address_fields', f: address %>
+    <% end %>
+
+    <%= f.fields_for @person.phones, errors: {}, fieldset: true do |phone|  %>
+      <%= render 'shared/phone_fields', f: phone %>
+    <% end %>
+
+    <%= f.fields_for @person.emails, errors: {}, fieldset: true do |email|  %>
+      <%= render 'shared/email_fields', f: email %>
+    <% end %>
+  </div>
+  <div class="col-md-3">
+    <p>Your personal information is safe, secured with 128 bit SSL encryption.</p>
+  </div>
+</div>

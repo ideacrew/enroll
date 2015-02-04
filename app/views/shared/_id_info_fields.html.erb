@@ -1,31 +1,25 @@
-<div class="row">
-  <div class="col-xs-12 col-sm-4 col-md-4">
-    <div class="form-group">
-      <%= f.label :ssn, "SSN" %>
-      <%= f.text_field :ssn, class: "form-control", value: number_to_ssn(f.object.ssn), maxlength: 11  %>
+<div class="row bottom-row form-group form-group-lg no-pd">
+  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :dob, start_year: Date.today.year - 110, end_year: Date.today.year, placeholder: "BIRTHDATE",
+        class: "date_picker floatlabel form-control border-right-none", required: true, value: f.object.dob.try(:strftime, "%m/%d/%Y") %>
+  </div>
+  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "floatlabel form-control border-right-none", value: number_to_ssn(f.object.ssn), maxlength: 11  %>
+  </div>
+  <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+    <div class="radio border-right-none">
+      <label>
+        <%= radio_button_tag(:employee_gender, "male") %>
+        Male
+      </label>
     </div>
   </div>
-
-  <div class="col-xs-12 col-sm-4 col-md-4">
-    <div class="form-group required">
-      <%= f.label :dob, "Date of Birth" %>
-      <%= f.text_field :dob,
-        start_year: Date.today.year - 110,
-        end_year: Date.today.year,
-        placeholder: "mm/dd/yyyy",
-        class: "date_picker form-control",
-        required: true,
-        value: f.object.dob.try(:strftime, "%m/%d/%Y")
-      %>
+  <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+    <div class="radio">
+      <label>
+        <%= radio_button_tag(:employee_gender, "female") %>
+        Female
+      </label>
     </div>
   </div>
-
-  <div class="col-xs-12 col-sm-4 col-md-4">
-    <div class="form-group required">
-      <%= f.label :gender, "Gender" %>
-      <%= select_dropdown("employee_gender", Person::GENDER_KINDS) %>
-    </div>
-  </div>
-
-
-  </div>
+</div>

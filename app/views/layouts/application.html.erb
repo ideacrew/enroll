@@ -18,7 +18,10 @@
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
       <![endif]-->
   </head>
-  <body>
+  <body class="font">
+
+    <%= render 'layouts/header' %>
+    
 <!-- <div id="top-header">
     <div class="container">
         <div class="row">
@@ -84,13 +87,9 @@
  -->
 
 
-    <div id="wrapper" class="container-fluid">
-        <div class="row">
-          <div class="col-md-12">
-            <%= render_flash %>
-            <%= yield %>
-          </div>
-        </div>
+    <div class="row content landing" id="wrapper" class="container-fluid">
+        <%= render_flash %>
+        <%= yield %>
     </div>
 
 
