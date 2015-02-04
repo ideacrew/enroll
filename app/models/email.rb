@@ -1,8 +1,9 @@
 class Email
   include Mongoid::Document
   include Mongoid::Timestamps
-  include Mongoid::Attributes::Dynamic
   
+  embedded_in :person
+
   KINDS = %W(home work)
 
   field :kind, type: String
@@ -16,7 +17,6 @@ class Email
     uniqueness: true,
     presence: true
 
-  embedded_in :person
 
   def match(another_email)
     return false if another_email.nil?
