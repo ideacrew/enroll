@@ -1835,3 +1835,7 @@ a .arrow-right {display: none;}
 }
 
 /*** landing page css end ***/
+
+.small-textfield {
+  width: 125px;
+}
