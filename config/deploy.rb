@@ -9,6 +9,7 @@ set :repo_url, 'git@github.com:dchbx/enroll.git'
 
 # Default deploy_to directory is /var/www/my_app_name
 set :deploy_to, '/var/www/deployments/enroll'
+set :rails_env, 'production'
 
 # Default value for :scm is :git
 # set :scm, :git
