@@ -32,6 +32,7 @@
 
     <div class="row middle-row form-group form-group-lg no-pd">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.hidden_field :kind, value: "home" %>
         <%= f.text_field :address_1, placeholder: "ADDRESS LINE 1", class: "floatlabel form-control border-bottom-none border-right-none", required: true %>
       </div>
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
