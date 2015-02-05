@@ -4,7 +4,7 @@ class CoverageHouseholdMember
 
   embedded_in :coverage_household
 
-  field :applicant_id, type: Moped::BSON::ObjectId
+  field :applicant_id, type: BSON::ObjectId
   field :is_subscriber, type: Boolean, default: false
 
   include BelongsToFamilyMember

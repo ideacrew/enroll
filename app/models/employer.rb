@@ -28,7 +28,7 @@ class Employer
   embeds_many :employer_census_families, class_name: "EmployerCensus::Family"
   embeds_many :plan_years
 
-  belongs_to :broker_agency, counter_cache: true
+  belongs_to :broker_agency, counter_cache: true, index: true
   has_many :representatives, class_name: "Person", inverse_of: :employer_representatives
 
   # has_many :premium_payments, order: { paid_at: 1 }
@@ -36,7 +36,6 @@ class Employer
   index({ name: 1 })
   index({ dba: 1 }, {sparse: true})
   index({ fein: 1 }, { unique: true })
-  index({ broker_agency_id: 1}, {sparse: true})
   index({ aasm_state: 1 })
   index({ is_active: 1 })
 
