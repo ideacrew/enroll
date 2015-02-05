@@ -36,10 +36,8 @@
     <%= f.fields_for :addresses, errors: {}, fieldset: true do |address|  %>
       <%= render 'shared/address_fields', f: address %>
     <% end %>
-
-    <%= f.fields_for :phones, errors: {}, fieldset: true do |phone|  %>
-      <%= render 'shared/phone_fields', f: phone %>
-    <% end %>
+    
+    <%= render 'shared/phone_fields', f: f %>
 
     <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
       <%= render 'shared/email_fields', f: email %>

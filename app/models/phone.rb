@@ -5,7 +5,7 @@ class Phone
 
   embedded_in :person
 
-  KINDS = ["home", "work", "mobile"]
+  KINDS = ["home", "work", "mobile", "fax"]
 
   field :kind, type: String
   field :country_code, type: String, default: ""
@@ -18,7 +18,7 @@ class Phone
   validates :area_code,
     numericality: true,
     length: { minimum: 3, maximum: 3, message: "%{value} is not a valid area code" },
-    allow_blank: false
+    allow_blank: true
 
   validates :number,
     numericality: true,
