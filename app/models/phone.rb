@@ -18,7 +18,7 @@ class Phone
   validates :area_code,
     numericality: true,
     length: { minimum: 3, maximum: 3, message: "%{value} is not a valid area code" },
-    allow_blank: true
+    allow_blank: false
 
   validates :number,
     numericality: true,
