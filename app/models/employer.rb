@@ -31,6 +31,8 @@ class Employer
   field :is_active, type: Boolean, default: true
 
   embeds_many :employer_census_families, class_name: "EmployerCensus::Family"
+  accepts_nested_attributes_for :employer_census_families, reject_if: :all_blank, allow_destroy: true
+
   embeds_many :plan_years
   # embeds_many :addresses, :inverse_of => :employer
 
@@ -88,6 +90,14 @@ class Employer
 
   def has_broker?
     !broker_id.blank?
+  end
+
+  def build_family
+    family = self.employer_census_families.build
+    family.members.build
+    family.build_employee
+    family.build_employee.build_address
+    family.dependents.build
   end
 
 

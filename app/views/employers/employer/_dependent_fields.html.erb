@@ -1,12 +1,11 @@
-<%= m.text_field :first_name, placeholder: "First", label: "First Name"  %> <br/>
-<%= m.text_field :last_name, placeholder: "Last", label: "Last Name"  %> <br/>
-<%= m.text_field :name_sfx, placeholder: "Sfx", label: "Suffix" %> <br/>
-<%= m.text_field :dob, as: :string,
+<%= dependent.input :first_name, placeholder: "First", label: "First Name"  %> <br/>
+<%= dependent.input :last_name, placeholder: "Last", label: "Last Name"  %> <br/>
+<%= dependent.input :name_sfx, placeholder: "Sfx", label: "Suffix" %> <br/>
+<%= dependent.input :dob, as: :string,
   start_year: Date.today.year - 110,
   end_year: Date.today.year,
   placeholder: "mm/dd/yyyy",
   class: "date_picker",
-  value: ""
-%><br/>
-<%= m.select :gender, EmployerCensus::Member::GENDER_KINDS, {include_blank: "Select"}, { class: "select select-primary", data: { toggle: "select"} } %> <br/>
-<%= m.text_field :employee_relationship, placeholder: "Relationship", label: "Employee Relationship"  %> <br/>
+  value: "" %><br/>
+<%= dependent.input :gender, label: "Gender", collection: EmployerCensus::Member::GENDER_KINDS, include_blank: "Select" %> <br/>
+<%= dependent.input :employee_relationship, placeholder: "Relationship", label: "Employee Relationship"  %> <br/>

@@ -1,6 +1,6 @@
 class Employers::EmployerController < ApplicationController
 
-  before_filter :find_employer, only: [:show, :destroy, :edit]
+  before_filter :find_employer, only: [:show, :destroy, :edit, :update]
 
   def index
     @employers = Employer.all.to_a
@@ -34,16 +34,13 @@ class Employers::EmployerController < ApplicationController
   end
 
   def edit
-    @family = @employer.employer_census_families.build
-    build_nested_models
+    @family = @employer.build_family
   end
 
   def update
     params.permit!
-    @employer = Employer.find(params[:id])
-    # @employer.assign_attributes(params[:employer], without_protection: true)
     respond_to do |format|
-      if @employer.update_attributes(params[:employer])
+      if @employer.update_attributes(params["employer"])
         format.html { redirect_to employers_employer_path(@employer), notice: 'Employer Census Family is successfully created.'}
         format.json { render json: @employer, status: :created, location: @employer }
       else
@@ -70,13 +67,6 @@ class Employers::EmployerController < ApplicationController
 
   def employer_params
     params.require(:employer).permit(:name, :fein, :entity_kind)
-  end
-
-  def build_nested_models
-    @family.members.build
-    @family.build_employee
-    @family.build_employee.build_address
-    @family.dependents.build
   end
 
 end
