@@ -1,1 +1,12 @@
+$('.search_results').removeClass('hidden')
 $('.employers-row').html("<%= escape_javascript(render 'employers').html_safe %>")
+
+$('#sidebar_partial_value').html("<%= escape_javascript(render 'sidebar', :page => 'search').html_safe %>")
+
+
+$('.search_alert_msg').addClass('hidden');
+$('.searching_span').text('Search');
+$('.searching_span').parent().removeClass('active');
+$('.searching_span').parent().addClass('back');
+$('.results_link').removeClass('style_s_link');
+$('.results').addClass('style_s_link');

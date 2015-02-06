@@ -26,16 +26,24 @@ $(document).ready(function () {
 
   $('.autofill_yes').click(function(){
     $('.autofill-initial').addClass('hidden');
-    $('.autofill-failed').removeClass('hidden');
+
+    $('#address_info').addClass('hidden');
+    $('#phone_info').addClass('hidden');
+    $('#email_info').addClass('hidden');
+
     common_body_style();
     side_bar_link_style();
+
+    $('.search_alert_msg').removeClass('hidden');
+    $('.searching_span').text('Searching');
 
     $.ajax({
         type: "POST",
         url: "/people/match_person.json",
         data: $('#new_person').serialize(),
         success: function (result) {
-          alert("find your details.Please select employer");
+          // alert("find your details.Please select employer");
+          
           getAllEmployers();
         }
     });
@@ -47,6 +55,7 @@ $(document).ready(function () {
   });
   
   $("#person_ssn").on("blur", function(){
+    $('.autofill-failed').addClass('hidden');
     $('.autofill-cloud.autofill-initial').removeClass('hidden');
     // confirm_flag = confirm("We may be able to auto-fill your information with data from our records");
     // if(confirm_flag){
@@ -60,7 +69,6 @@ $(document).ready(function () {
     //       }
     //  });
     // }
-    
   });
   
   function getAllEmployers()

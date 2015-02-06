@@ -4,20 +4,10 @@
       <div class="panel panel-default">
         <div class="panel-body left">
           <div class="nama">
+
             <div class="col-sm-2 left-pd">
-              <div class="sidebar list-group text-center">
-                <a style="padding-top: 65px;" class="personal_info list-group-item name style_s_link" href="#">
-                        Name <br> Birthdate <br>Gender <br> Social Security<div class="arrow-right"></div>
-                </a>
-                <a class="address_info list-group-item address" href="#">
-                  Address <div class="arrow-right"></div>
-                </a>
-                <a class="phone_info list-group-item phone" href="#">
-                  Phone <div style="top: 52px;" class="arrow-right"></div>
-                </a>
-                <a class="email_info list-group-item email sidebar-email-field" href="#">
-                  Email <div style="top: 20px;" class="arrow-right"></div>
-                </a>
+              <div class="sidebar list-group text-center" id="sidebar_partial_value">
+                <%= render 'people/sidebar', :page => 'new' %>
               </div>
             </div>
 
@@ -119,10 +109,16 @@
                   <p>Autofill</p>
                 </div>
               </div>
-            </div>
 
-            <div class="row employers-row">
-                  
+              <div class="search_results row result-row hidden" style="opacity: 1;">
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                  <div class="col-md-10 col-sm-9 col-xs-12 no-pd search_alert_msg hidden">
+                    <p class="subtitle">We are filtering through our records looking for your Employer plan. <span>Please Wait</span></p>
+                  </div>
+                  <div class="row employers-row">
+                  </div>
+                </div>
+              </div>
             </div>
 
           </div>

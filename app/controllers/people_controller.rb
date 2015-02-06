@@ -41,6 +41,8 @@ class PeopleController < ApplicationController
   
   def get_employer
     @employers = Employer.all
+
+    @employers = ["Test Employer-1", "Test Employer-2"] if @employers.blank?
     
     respond_to do |format|
       format.js {}

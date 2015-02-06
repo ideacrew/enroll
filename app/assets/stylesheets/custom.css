@@ -1477,7 +1477,7 @@ a.list-group-item.results {
   opacity: 0.25;
 }
 .result-row .list-group .badge i {
-  background: url("../img/checkmark.png") no-repeat;
+  background: url("checkmark.png") no-repeat;
   display: block;
   height: 14px;
   margin: 7px auto 0;
