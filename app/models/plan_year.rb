@@ -10,8 +10,8 @@ class PlanYear
   field :start_date, type: Date
   field :end_date, type: Date
 
-  field :open_enrollment_start_date, type: Date
-  field :open_enrollment_end_date, type: Date
+  field :open_enrollment_start_on, type: Date
+  field :open_enrollment_end_on, type: Date
 
   # Number of full-time employees
   field :fte_count, type: Integer, default: 0
