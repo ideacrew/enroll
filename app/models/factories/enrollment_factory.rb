@@ -83,11 +83,7 @@ class EnrollmentFactory
 
     if person.save
       if family.save
-        if role.save
-          role
-        else
-          family.delete
-        end
+        family.delete unless role.save
       else
         role.errors.add(:family, "unable to create family")
       end
