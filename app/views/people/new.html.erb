@@ -26,15 +26,6 @@
 
     <%= render 'form', f: f %>
 
-    <footer>
-      <div class="well well-sm well-default">
-        <div class="form-actions">
-          <%= f.submit nil, :class => 'btn btn-primary' %>
-          <%= link_to t('.cancel', :default => t("helpers.links.cancel")), people_path, :class => 'btn btn-default' %>
-        </div>
-      </div>
-    </footer>
-
   <% end %>
 </section>
 
