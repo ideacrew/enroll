@@ -1,14 +1,13 @@
 class Person
   include Mongoid::Document
   include Mongoid::Timestamps
-  include Mongoid::Attributes::Dynamic
   
   GENDER_KINDS = %W(male female)
 
   # TODO: Need simpler, Enterprise-level incrementing ID
-  # field :hbx_assigned_id, type: Integer 
+  # field :hbx_id, type: Integer 
 
-  auto_increment :hbx_assigned_id, :seed => 9999
+  auto_increment :hbx_id, :seed => 9999
 
   field :name_pfx, type: String, default: ""
   field :first_name, type: String
@@ -36,10 +35,11 @@ class Person
   belongs_to :family
 
   embeds_one :consumer, cascade_callbacks: true, validate: true
-  embeds_one :employee, cascade_callbacks: true, validate: true
   embeds_one :broker, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff, cascade_callbacks: true, validate: true
   embeds_one :responsible_party, cascade_callbacks: true, validate: true
+
+  embeds_many :employees, cascade_callbacks: true, validate: true
 
   embeds_many :person_relationships, cascade_callbacks: true, validate: true
   embeds_many :addresses, cascade_callbacks: true, validate: true
@@ -51,7 +51,7 @@ class Person
   # has_many :employee_family_members, class_name: "FamilyMember", :inverse_of => :employee
 
   accepts_nested_attributes_for :consumer, :responsible_party, :broker, :hbx_staff,
-    :person_relationships, :employee, :addresses, :phones, :emails
+    :person_relationships, :employees, :addresses, :phones, :emails
 
   validates_presence_of :first_name, :last_name
 
@@ -71,7 +71,7 @@ class Person
 
   before_save :initialize_name_full, :date_of_death_follows_date_of_birth
 
-  index({hbx_assigned_id: 1}, {unique: true})
+  index({hbx_id: 1}, {unique: true})
   index({last_name:  1})
   index({first_name: 1})
   index({last_name: 1, first_name: 1})
@@ -83,9 +83,8 @@ class Person
   # Broker child model indexes
   index({"broker._id" => 1})
   index({"broker.kind" => 1})
-  index({"broker.hbx_assigned_id" => 1})
+  index({"broker.hbx_id" => 1})
   index({"broker.npn" => 1}, {unique: true})
-  index({"broker.agency_id" => 1})
 
   # Consumer child model indexes
   index({"consumer._id" => 1})

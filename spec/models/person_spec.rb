@@ -6,9 +6,9 @@ describe Person, '.new' do
   it { should validate_presence_of :first_name }
   it { should validate_presence_of :last_name }
 
-  # it "generates hbx_assigned_id" do
-  #   expect(Person.create!(first_name: "ginger", last_name: "baker").hbx_assigned_id).to eq 9999
-  # end
+  it "generates hbx_id" do
+    expect(Person.create!(first_name: "ginger", last_name: "baker").hbx_id).to eq 9999
+  end
 
   it "ssn invalid with non-numeric value" do
     expect(Person.create(ssn: "a7d8d9d00").errors[:ssn].any?).to eq true

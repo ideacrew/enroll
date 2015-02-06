@@ -42,7 +42,6 @@ class PeopleController < ApplicationController
   def get_employer
     @employers = Employer.all
     
-    @employers = ["Test Employer-1", "Test Employer-2"] if @employers.blank?
     respond_to do |format|
       format.js {}
     end
@@ -66,10 +65,7 @@ class PeopleController < ApplicationController
   def create
     @person = Person.new(person_params)
     
-    #Added to store details for timebeing
-    @person.addresses = [Address.new(person_params[:address])]
-    @person.phones = [Phone.new(person_params[:phone])]
-    @person.emails = [Email.new(person_params[:email])]
+    build_nested_models
     respond_to do |format|
       if @person.save
         format.html { redirect_to @person, notice: 'Person was successfully created.' }
@@ -88,9 +84,16 @@ class PeopleController < ApplicationController
 
 private
   def build_nested_models
+    
+    ["home","mobile","work","fax"].each do |kind|
+       @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
+    end
+   
     @person.addresses.build if @person.addresses.empty?
-    @person.phones.build if @person.phones.empty?
-    @person.emails.build if @person.emails.empty?
+    
+    ["home","work"].each do |kind|
+       @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
+    end
   end
   
   def person_params

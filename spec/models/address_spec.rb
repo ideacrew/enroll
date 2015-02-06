@@ -1,54 +1,37 @@
 require 'rails_helper'
 
-describe Address do
-  it { should validate_presence_of :kind }
+describe Address, type: :model do
   it { should validate_presence_of :address_1 }
   it { should validate_presence_of :city }
   it { should validate_presence_of :state }
   it { should validate_presence_of :zip }
 
-  it "should have an invalid zipcode" do
-    subject.valid?
-    # expect(subject).to have_at_least(1).errors_on(:zip)
-    subject.errors[:zip] == ["can't be blank", "should be in the form: 12345 or 12345-1234"]
+  describe 'kind' do
+    it "invalid with blank value" do
+      expect(Address.create(kind: "").errors[:kind].any?).to eq true
+    end
+
+    it "invalid with unrecognized value" do
+      expect(Address.create(kind: "fake").errors[:kind].any?).to eq true
+    end
+
+    it 'accepts all valid values' do
+      ['home', 'work', 'mailing'].each do |type|
+        expect(Address.create(kind: type).errors[:kind].any?).to eq false
+      end
+    end
+  end
+
+
+  it "zipcode is invalid with empty or unrecognized value" do
+    expect(Address.create(zip: "").errors[:zip].any?).to eq true
+    expect(Address.create(zip: "324-67").errors[:zip].any?).to eq true
   end
 
   describe "with a zipcode of 99389" do
     it "should have a valid zipcode" do
-      subject.zip = "99389"
-      subject.valid?
-      # expect(subject).not_to have_at_least(1).errors_on(:zip)
-      subject.errors[:zip].size == 0
-    end
-  end
-
-  describe 'validations' do
-    describe 'presence' do
-      [:address_1, :city, :state, :zip].each do |missing|
-        it ('is invalid without ' + missing.to_s) do
-          trait = 'without_' + missing.to_s
-          address = FactoryGirl.build(:address, trait.to_sym)
-          expect(address).to be_invalid
-        end
-      end
-    end
-
-    describe 'address type' do
-      let(:address) { FactoryGirl.build(:address, :with_invalid_address_type) }
-      context 'when invalid' do
-        it 'is invalid' do
-          expect(address).to be_invalid
-        end
-      end
-
-      ['home', 'work', 'mailing'].each do |type|
-        context('when ' + type) do
-          before { address.kind = type}
-          it 'is valid' do
-            expect(address).to be_valid
-          end
-        end
-      end
+      expect(Address.create(zip: "99389").errors[:zip].any?).to eq false
+      expect(Address.create(zip: "99389-3425").errors[:zip].any?).to eq false
     end
   end
 

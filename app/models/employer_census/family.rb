@@ -3,6 +3,8 @@ class EmployerCensus::Family
 
   embedded_in :employer
 
+
+  field :matched_at, type: DateTime
   field :is_active, type: Boolean, default: true
 
   embeds_one :employee,
@@ -25,6 +27,16 @@ class EmployerCensus::Family
   validates_presence_of :employee
 
   scope :active, ->{ where(:is_active => true) }
+
+  # Create a copy of this instance for rehires into same organization
+  def clone
+    copy = self.dup
+    copy.employee.date_of_hire = nil
+    copy.employee.date_of_termination = nil
+    copy.matched_at = nil
+    copy.is_active = true
+    copy
+  end
 
   def is_active?
     self.is_active

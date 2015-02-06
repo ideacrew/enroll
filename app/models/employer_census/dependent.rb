@@ -1,6 +1,6 @@
 class EmployerCensus::Dependent < EmployerCensus::Member
 
-  EMPLOYEE_RELATIONSHIP_KINDS = %W[spouse dependent]
+  EMPLOYEE_RELATIONSHIP_KINDS = %W[spouse child domestic_partner]
 
   embedded_in :employer_census_family
 
