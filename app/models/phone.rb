@@ -5,7 +5,7 @@ class Phone
 
   embedded_in :person
 
-  KINDS = ["home", "work", "mobile"]
+  KINDS = ["home", "work", "mobile", "fax"]
 
   field :kind, type: String
   field :country_code, type: String, default: ""

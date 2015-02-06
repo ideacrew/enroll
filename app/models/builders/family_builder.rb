@@ -1,4 +1,4 @@
-require "irs_groups/irs_group_builder"
+require "builders/irs_group_builder"
 
 class FamilyBuilder
 

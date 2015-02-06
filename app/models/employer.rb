@@ -32,11 +32,13 @@ class Employer
   field :is_active, type: Boolean, default: true
 
   # embeds_many :contacts
-  embeds_many :plan_years
   embeds_many :employer_census_families, class_name: "EmployerCensus::Family"
+  accepts_nested_attributes_for :employer_census_families, reject_if: :all_blank, allow_destroy: true
 
-  # Agency representing this employer
-  belongs_to :broker_agency, counter_cache: true
+  embeds_many :plan_years
+  # embeds_many :addresses, :inverse_of => :employer
+
+  belongs_to :broker_agency, counter_cache: true, index: true
   has_many :representatives, class_name: "Person", inverse_of: :employer_representatives
 
   validates_presence_of :name, :fein, :entity_kind
@@ -55,7 +57,6 @@ class Employer
   index({ name: 1 })
   index({ dba: 1 }, {sparse: true})
   index({ fein: 1 }, { unique: true })
-  index({ broker_agency_id: 1}, {sparse: true})
   index({ aasm_state: 1 })
   index({ is_active: 1 })
 
@@ -83,6 +84,16 @@ class Employer
     return if broker.blank?
     where(broker_id: broker._id)
   end
+
+  def build_family
+    family = self.employer_census_families.build
+    family.members.build
+    family.build_employee
+    family.build_employee.build_address
+    family.dependents.build
+  end
+
+
 
   # has_many employees
   def employees
