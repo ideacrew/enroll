@@ -8,6 +8,8 @@ class HbxStaff
   field :department, type: String, default: ""
   field :is_active, type: Boolean, default: true
 
+  delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
+
   def is_active?
     self.is_active
   end
