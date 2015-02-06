@@ -43,6 +43,7 @@ $(document).ready(function () {
         data: $('#new_person').serialize(),
         success: function (result) {
           // alert("find your details.Please select employer");
+          $('.search_alert_msg').addClass('hidden');
           
           getAllEmployers();
         }
