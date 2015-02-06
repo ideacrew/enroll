@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe Employee, type: :model do
-  it { should delegate_method(:hbx_assigned_id).to :person }
+  it { should delegate_method(:hbx_id).to :person }
   it { should delegate_method(:ssn).to :person }
   it { should delegate_method(:dob).to :person }
   it { should delegate_method(:gender).to :person }
@@ -13,6 +13,23 @@ describe Employee, type: :model do
   it { should validate_presence_of :employer_id }
   it { should validate_presence_of :date_of_hire }
 
+
+  # it "updates instance timestamps" do
+  #   er = FactoryGirl.build(:employer)
+  #   ee = FactoryGirl.build(:employee)
+  #   pn = Person.create(first_name: "Ginger", last_name: "Baker")
+  #   # ee = Employee.new(ssn: "345907654", dob: Date.today - 40.years, gender: "male", employer: er, date_of_hire: Date.today)
+  #   ee = FactoryGirl.build(:employee)
+  #   pn.employees << ee
+  #   pn.valid?
+  #   expect(ee.errors.messages.inspect).to eq 0
+  #   expect(pn.save).to eq true
+  #   expect(ee.created_at).to eq ee.updated_at
+  #   employee.date_of_termination = Date.today
+  #   expect(ee.save).to eq true
+  #   expect(ee.created_at).not_to eq ee.updated_at
+  # end
+
   it 'properly intantiates the class using an existing person' do
     ssn = "987654321"
     date_of_hire = Date.today - 10.days
@@ -22,7 +39,7 @@ describe Employee, type: :model do
     employer = Employer.create(
         name: "ACME Widgets, Inc.",
         fein: "098765432",
-        entity_kind: "c_corporation"
+        entity_kind: :c_corporation
       )
 
     person = Person.create(
@@ -42,12 +59,12 @@ describe Employee, type: :model do
     employee.ssn = ssn
     employee.dob = dob
     employee.gender = gender
-    employee.employer_id = employer._id
+    employee.employers << employer._id
     employee.date_of_hire = date_of_hire
     expect(employee.touch).to eq true
 
     # Verify local getter methods
-    expect(employee.employer).to eq employer
+    expect(employee.employers.first).to eq employer._id
     expect(employee.date_of_hire).to eq date_of_hire
 
     # Verify delegate local attribute values
@@ -82,11 +99,11 @@ describe Employee, type: :model do
     employee.ssn = ssn
     employee.dob = dob
     employee.gender = gender
-    employee.employer_id = employer._id
+    # employee.employer << employer
     employee.date_of_hire = date_of_hire
 
     # Verify local getter methods
-    expect(employee.employer).to eq employer
+    # expect(employee.employers.first).to eq employer_.id
     expect(employee.date_of_hire).to eq date_of_hire
 
     # Verify delegate local attribute values
@@ -106,5 +123,9 @@ describe Employee, type: :model do
     expect(employee.errors.messages.size).to eq 0
     expect(employee.save).to eq true
   end
+end
 
+describe Employee, type: :model do
+  it '' do
+  end
 end

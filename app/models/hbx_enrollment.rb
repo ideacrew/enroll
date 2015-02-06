@@ -16,12 +16,14 @@ class HbxEnrollment
   field :is_active, type: Boolean, default: true
   field :submitted_at, type: DateTime
   field :aasm_state, type: String
-
   field :policy_id, type: Integer
+  field :employer_id, type: BSON::ObjectId
+
+  field :broker_agency_id, type: BSON::ObjectId
 
   embeds_many :hbx_enrollment_members
 
-  # include HasApplicants
+  include HasFamilyMembers
 
   embeds_many :comments
   accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
@@ -39,6 +41,8 @@ class HbxEnrollment
   validates :elected_aptc_in_cents,
               allow_nil: true,
               numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+
+  index({policy_id: 1})
 
   def policy=(policy_instance)
     return unless policy_instance.is_a? Policy
@@ -73,12 +77,35 @@ class HbxEnrollment
     self.is_active
   end
 
-  def application_group
+  def family
     return nil unless household
-    household.application_group
+    household.family
   end
 
   def applicant_ids
     hbx_enrollment_members.map(&:applicant_id)
+  end
+
+  def employer=(employer_instance)
+    return unless employer_instance.is_a? Employer
+    self.employer_id = employer_instance._id
+  end
+
+  def employer
+    Employer.find(self.employer_id) unless self.employer_id.blank?
+  end
+
+  def broker_agency=(new_broker_agency)
+    return if new_broker_agency.blank?
+    self.broker_agency_id = new_broker._id
+  end
+
+  def broker_agency
+    return unless has_broker_agency?
+    parent.broker_agency.find(self.broker_agency_id)
+  end
+
+  def has_broker_agency?
+    !broker_agency_id.blank?
   end
 end

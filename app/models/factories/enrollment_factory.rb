@@ -1,4 +1,4 @@
-class EnrollmentFactory
+class Factories::EnrollmentFactory
 
   attr_accessor :person
 
@@ -29,24 +29,28 @@ class EnrollmentFactory
    consumer_role.save
 
    return consumer_role
-  
+
   end
-   
+
   def add_broker_role(new_kind, new_npn, new_mailing_address)
 
     kind = new_kind
     npn = new_npn
-    maling_address = new_maling_address
 
-    # Instantiate new family model
-    family = self.person.families.build()
+    mailing_address = new_mailing_address
+   
+    family = initialize_families
 
-    # Assign broker-specifc attributes
-    broker_role = self.person.build_broker(mailing_address: mailing_address, npn: npn, kind: kind)
-    
+    broker_role = nil
+
+    if self.person.broker.blank?
+      # Assign broker-specifc attributes 
+      broker_role = self.person.build_broker(mailing_address: mailing_address, npn: npn, kind: kind)
+    end
+
     self.person.save
-    broker_role.save
-    family.save
+    broker_role.save if broker_role.present?
+    family.save if family.present?
 
     # Return new instance
     return broker_role
@@ -60,22 +64,33 @@ class EnrollmentFactory
     dob = new_dob
     gender = new_gender
 
-    # Assign employee-specifc attributes
-    employee_role = self.person.build_employee(employer: new_employer, date_of_hire: new_date_of_hire)
+    employee_role = nil
 
-    # Add 'self' to personal relationship
+    if self.person.employee.blank?
+      # Assign employee-specifc attributes
+      employee_role = self.person.build_employee(employer: new_employer, date_of_hire: new_date_of_hire)
+    end
+
+    # Add 'self' to personal relationship need detailed implementation
     self.person.personal_relationships << PersonRelationhip.new()
 
-    # Instantiate new family model
-    family = self.person.families.build()
+    family = initialize_families
 
     # Persist results?
     self.person.save
-    employee_role.save
-    family.save
+    employee_role.save if employee_role.present?
+    family.save if family.present?
 
     # Return new instance
     return employee_role
   end
 
+  def initialize_families
+    family = nil
+    if self.person.family.blank?
+    # Instantiate new family model need detailed implementation
+      family = self.person.build_family()
+    end
+    return family
+  end
 end

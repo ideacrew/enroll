@@ -1,6 +1,6 @@
 class EmployerCensus::Employee < EmployerCensus::Member
 
-  embedded_in :employer_census, class_name: "EmployerCensus::Family"
+  embedded_in :family, class_name: "EmployerCensus::Family"
 
   field :date_of_hire, type: Date
   field :date_of_termination, type: Date

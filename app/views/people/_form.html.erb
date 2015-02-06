@@ -8,9 +8,7 @@
             <li><%= msg %></li>
           <% end %>
 
-          <% @person.embedded_error_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
+
         </ul>
       </div>
     <% end %>
@@ -35,19 +33,20 @@
       <%= render 'shared/id_info_fields', f: f %>  
     </fieldset>
 
-    <%= f.fields_for @person.addresses, errors: {}, fieldset: true do |address|  %>
+    <%= f.fields_for :addresses, errors: {}, fieldset: true do |address|  %>
       <%= render 'shared/address_fields', f: address %>
     <% end %>
+    
+    <%= render 'shared/phone_fields', f: f %>
 
-    <%= f.fields_for @person.phones, errors: {}, fieldset: true do |phone|  %>
-      <%= render 'shared/phone_fields', f: phone %>
-    <% end %>
-
-    <%= f.fields_for @person.emails, errors: {}, fieldset: true do |email|  %>
+    <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
       <%= render 'shared/email_fields', f: email %>
     <% end %>
   </div>
   <div class="col-md-3">
     <p>Your personal information is safe, secured with 128 bit SSL encryption.</p>
   </div>
+</div>
+<div class="row employers-row">
+  
 </div>

@@ -5,6 +5,8 @@ FactoryGirl.define do
     gender 'male'
     is_state_resident 'yes'
     citizen_status 'citizen'
+    is_incarcerated 'yes'
+    is_applicant 'yes'
 
   end
 end

@@ -6,23 +6,44 @@ class PeopleController < ApplicationController
     # render action: "new", layout: "form"
   end
 
-  def match
-    @person = Person.new(params[:person])
+  # Uses identifying information to return single pre-existing Person instance if already in DB
+  def match_person
+    
+    @person = Person.new(person_params)
 
     matched_person = Person.match_by_id_info(@person)
 
     if matched_person.blank?
       # Preexisting Person not found, create new instance and return to complete form entry
-      if @person.save
-        format.json { render json: @person, status: :created, location: @person }
-      else
-        format.json { render json: @person.errors, status: :unprocessable_entity }
+      respond_to do |format|
+        if @person.save
+          format.json { render json: @person, status: :created, location: @person }
+        else
+          format.json { render json: @person.errors, status: :unprocessable_entity }
+        end
       end
     else
       # Matched Person, autofill form with found attributes
-      @person = matched_person
-      build_nested_models
-      format.json { render json: @matched_person, status: :matched, location: @person }
+      respond_to do |format|
+        @person = matched_person.first
+        build_nested_models
+        format.json { render json: @person, status: :ok, location: @person }
+      end
+    end
+  end
+
+  # Uses identifying information to return one or more for matches in employer census
+  def match_employer
+  end
+
+  def link_employer
+  end
+  
+  def get_employer
+    @employers = Employer.all
+    
+    respond_to do |format|
+      format.js {}
     end
   end
 
@@ -42,8 +63,9 @@ class PeopleController < ApplicationController
   end
 
   def create
-    @person = Person.new(params[:Person])
-
+    @person = Person.new(person_params)
+    
+    build_nested_models
     respond_to do |format|
       if @person.save
         format.html { redirect_to @person, notice: 'Person was successfully created.' }
@@ -62,10 +84,20 @@ class PeopleController < ApplicationController
 
 private
   def build_nested_models
+    
+    ["home","mobile","work","fax"].each do |kind|
+       @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
+    end
+   
     @person.addresses.build if @person.addresses.empty?
-    @person.phones.build if @person.phones.empty?
-    @person.emails.build if @person.emails.empty?
+    
+    ["home","work"].each do |kind|
+       @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
+    end
   end
-
+  
+  def person_params
+    params.require(:person).permit!
+  end
 
 end

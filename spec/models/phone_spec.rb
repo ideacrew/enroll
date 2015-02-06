@@ -1,83 +1,46 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe Phone do
+describe Phone, type: :model do
 
-  describe 'validations' do
-    describe 'phone type' do
-      let(:phone) { Phone.new(kind: 'invalid', number: "12345") }
-      context 'when invalid' do
-        it 'is invalid' do
-          expect(phone).to be_invalid
-        end
-      end
-      valid_types = ['home', 'work', 'mobile']
-      valid_types.each do |type|
-        context('when ' + type) do
-          before {
-            phone.number = "12345"
-            phone.kind = type
-          }
-          it 'is valid' do
-            expect(phone).to be_valid
-          end
-        end
-      end
-    end
+  it "area_code invalid with improper characters" do
+    expect(Phone.create(area_code: "a7d8d9d8h").errors[:area_code].any?).to eq true
   end
 
-  describe '#match' do
-    let(:phone) do
-      p = Phone.new
-      p.kind = 'home'
-      p.number = '222-222-2222'
-      p.extension = '12'
-      p
-    end
-
-    context 'phones are the same' do
-      let(:other_phone) { phone.clone }
-      it 'returns true' do
-        expect(phone.match(other_phone)).to be true
-      end
-    end
-
-    context 'phones differ' do
-      context 'by type' do
-        let(:other_phone) do
-          p = phone.clone
-          p.kind = 'work'
-          p
-        end
-        it 'returns false' do
-          expect(phone.match(other_phone)).to be false
-        end
-      end
-      context 'by number' do
-        let(:other_phone) do
-          p = phone.clone
-          p.number = '666-666-6666'
-          p
-        end
-        it 'returns false' do
-          expect(phone.match(other_phone)).to be false
-        end
-      end
-    end
+  it "area_code invalid when length <> 3" do
+    expect(Phone.create(area_code: "20").errors[:area_code].any?).to eq true
+    expect(Phone.create(area_code: "2020").errors[:area_code].any?).to eq true
   end
 
-  describe 'changing phone number' do
-    let(:phone) { Phone.new }
-    it 'removes non-numerals' do
-      phone.number = 'a1b2c3d4'
-      expect(phone.number).to eq '1234'
-    end
+  it "strips non-numeric characters in valid area code" do
+    expect(Phone.create(area_code: "(202)").errors[:area_code].any?).to eq false
   end
 
-  describe 'changing phone extension' do
-    let(:phone) { Phone.new }
-    it 'removes non-numerals' do
-      phone.extension = 'a1b2c3d4'
-      expect(phone.extension).to eq '1234'
-    end
+  it "area_code valid with correct numeric-only value" do
+    expect(Phone.create(area_code: "202").errors[:area_code].any?).to eq false
   end
+
+  it "number invalid when length <> 7" do
+    expect(Phone.create(number: "20").errors[:number].any?).to eq true
+    expect(Phone.create(number: "202578987420").errors[:number].any?).to eq true
+  end
+
+  it "strips non-numeric characters in valid number" do
+    expect(Phone.create(number: "741-9874").errors[:number].any?).to eq false
+  end
+
+  it "kind invalid with null value" do
+    expect(Phone.create(kind: "").errors[:kind].any?).to eq true
+  end
+
+  it "kind invalid with improper value" do
+    expect(Phone.create(kind: :banana).errors[:kind].any?).to eq true
+  end
+
+  it "kind valid with proper value" do
+    expect(Phone.create(kind: "work").errors[:kind].any?).to eq false
+
+  end
+
+
 end
+

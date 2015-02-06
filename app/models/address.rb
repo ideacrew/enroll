@@ -2,7 +2,9 @@ class Address
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  # include MergingModel
+  embedded_in :person
+  embedded_in :employer
+  embedded_in :broker_agency
 
   KINDS = %W(home work mailing)
 
@@ -19,23 +21,18 @@ class Address
   field :country_name, type: String, default: ""
   field :full_text, type: String
 
-  validates_presence_of :kind, :address_1, :city, :state, :zip
+  validates_presence_of :address_1, :city, :state, :zip
 
-  validates_inclusion_of :kind, in: KINDS, message: "'%{value}'' is not a valid address type"
+  validates :kind,
+    inclusion: { in: KINDS, message: "%{value} is not a valid address type" },
+    allow_blank: false
 
   validates :zip,
-    format:
-      {
+    format: {
         :with => /\A\d{5}(-\d{4})?\z/,
         :message => "should be in the form: 12345 or 12345-1234"
       }
 
-  embedded_in :person
-  embedded_in :employer
-  embedded_in :employer_office
-  embedded_in :broker
-
-  before_save :clean_fields
 
   def location
     nil #todo
@@ -74,20 +71,9 @@ class Address
     safe_downcase(self[attribute]) == safe_downcase(other[attribute])
   end
 
-  def self.make(data)
-    address = Address.new
-    address.kind = data[:type]
-    address.address_1 = data[:street1]
-    address.address_2 = data[:street2]
-    address.city = data[:city]
-    address.state = data[:state]
-    address.zip = data[:zip]
-    address
-  end
+private
 
-  private
-
-  def safe_downcase(val)
-    val.nil? ? nil : val.downcase
+  def safe_downcase(value)
+    value.downcase unless value.blank?
   end
 end

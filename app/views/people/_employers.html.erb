@@ -1,0 +1,12 @@
+<div class="col-md-2">
+</div>
+<div class="col-md-7">
+<% if @employers.present? %>
+  <fieldset> Select Employer</fieldset>
+  <% @employers.each do |employer| %>
+    <span> <%= employer %> </span></br>
+  <% end %>
+<% else%>
+  <fieldset> Employers not found</fieldset>
+<% end %>  
+</div>

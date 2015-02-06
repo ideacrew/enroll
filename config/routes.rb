@@ -2,10 +2,11 @@ Rails.application.routes.draw do
 
   # You can have the root of your site routed with "root"
   root 'welcome#index'
-  # get 'welcome/index'
+
+  # get 'user/index'
 
   namespace :brokers do
-    get 'welcome/index'
+    root 'welcome#index'
 
     resources :broker do
       get 'new'
@@ -14,7 +15,7 @@ Rails.application.routes.draw do
   end
 
   namespace :employers do
-    get 'welcome/index'
+    root 'welcome#index'
 
     resources :employer do
       get 'new'
@@ -25,12 +26,20 @@ Rails.application.routes.draw do
   resources :people do
     get 'select_employer'
     get 'my_account'
+    collection do
+      post 'match_person'
+      get 'get_employer'
+    end
+    
   end
 
   resources :employees
 
-  devise_for :users
-
+  devise_for :users #, :controllers => { :registrations => "registrations" }
+  # devise_scope :user do
+  #   get "/sign_in" => "devise/sessions#new"
+  #   get "/sign_up" => "devise/registrations#new"
+  # end
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection

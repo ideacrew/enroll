@@ -1,6 +1,8 @@
 class BenefitGroup
   include Mongoid::Document
 
+  embedded_in :plan_year
+
   EFFECTIVE_DATE_KINDS = [:date_of_hire, :first_of_month]
   OFFSET_KINDS = [0, 30, 60]
   PERSONAL_RELATIONSHIP_KINDS = [
@@ -21,7 +23,8 @@ class BenefitGroup
 
   # Non-congressional
   field :reference_plan_id, type: BSON::ObjectId
-  field :percentage, type: Integer
+  field :premium_pct_as_int, type: Integer, default: Integer
+  field :employer_max_amt_in_cents, type: Integer, default: 0
 
   validates :effective_date_kind,
     allow_blank: false,
@@ -36,4 +39,8 @@ class BenefitGroup
       in: OFFSET_KINDS, 
       message: "%{value} is not a valid effective date offset kind" 
     }
+
+  def reference_plan
+  end
+
 end

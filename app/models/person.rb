@@ -1,11 +1,13 @@
 class Person
   include Mongoid::Document
   include Mongoid::Timestamps
-
+  
   GENDER_KINDS = %W(male female)
 
   # TODO: Need simpler, Enterprise-level incrementing ID
-  # field :hbx_assigned_id, type: Integer 
+  # field :hbx_id, type: Integer 
+
+  auto_increment :hbx_id, :seed => 9999
 
   field :name_pfx, type: String, default: ""
   field :first_name, type: String
@@ -33,10 +35,11 @@ class Person
   belongs_to :family
 
   embeds_one :consumer, cascade_callbacks: true, validate: true
-  embeds_one :employee, cascade_callbacks: true, validate: true
   embeds_one :broker, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff, cascade_callbacks: true, validate: true
   embeds_one :responsible_party, cascade_callbacks: true, validate: true
+
+  embeds_many :employees, cascade_callbacks: true, validate: true
 
   embeds_many :person_relationships, cascade_callbacks: true, validate: true
   embeds_many :addresses, cascade_callbacks: true, validate: true
@@ -48,7 +51,7 @@ class Person
   # has_many :employee_family_members, class_name: "FamilyMember", :inverse_of => :employee
 
   accepts_nested_attributes_for :consumer, :responsible_party, :broker, :hbx_staff,
-    :person_relationships, :employee, :addresses, :phones, :emails
+    :person_relationships, :employees, :addresses, :phones, :emails
 
   validates_presence_of :first_name, :last_name
 
@@ -68,7 +71,7 @@ class Person
 
   before_save :initialize_name_full, :date_of_death_follows_date_of_birth
 
-  index({hbx_assigned_id: 1}, {unique: true})
+  index({hbx_id: 1}, {unique: true})
   index({last_name:  1})
   index({first_name: 1})
   index({last_name: 1, first_name: 1})
@@ -80,8 +83,8 @@ class Person
   # Broker child model indexes
   index({"broker._id" => 1})
   index({"broker.kind" => 1})
-  index({"broker.hbx_assigned_id" => 1})
-  index({"broker.npn" => 1})
+  index({"broker.hbx_id" => 1})
+  index({"broker.npn" => 1}, {unique: true})
 
   # Consumer child model indexes
   index({"consumer._id" => 1})
@@ -118,87 +121,6 @@ class Person
   #   bday = DateTime.strptime(new_dob, "%m-%d-%Y").to_date
   #   write_attribute(:dob, bday)
   # end
-
-  def families
-    Family.where(:family_member.person_id => self.id).to_a
-  end
-
-  def update_attributes_with_delta(props = {})
-    old_record = self.find(self.id)
-    self.assign_attributes(props)
-    delta = self.changes_with_embedded
-    return false unless self.valid?
-    # As long as we call right here, whatever needs to be notified,
-    # with the following three arguments:
-    # - the old record
-    # - the properties to update ("props")
-    # - the delta ("delta")
-    # We have everything we need to construct whatever messages care about that data.
-    # E.g. (again, ignore the naming as it is terrible)
-    #Protocols::Notifier.update_notification(old_record, props, delta)
-    Protocols::Notifier.update_notification(old_record, delta) #The above statement was giving error with 3 params
-
-    # Then we proceed normally
-    self.update_attributes(props)
-  end
-
-  def home_address
-    addresses.detect { |adr| adr.kind == "home" }
-  end
-
-  def mailing_address
-    addresses.detect { |adr| adr.kind == "mailing" } || home_address
-  end
-
-  def billing_address
-    addresses.detect { |adr| adr.kind == "billing" } || home_address
-  end
-
-  def home_phone
-    phones.detect { |phone| phone.kind == "home" }
-  end
-
-  def home_email
-    emails.detect { |email| email.kind == "home" }
-  end
-
-  def can_edit_family_address?
-    associated_ids = associated_for_address
-    return(true) if associated_ids.length < 2
-    Person.find(associated_ids).combination(2).all? do |addr_set|
-      addr_set.first.addresses_match?(addr_set.last)
-    end
-  end
-  
-  # May include multiple active employees
-  # def employees=()
-  # end
-
-  def subscriber
-    abs_subscriber = nil
-    case self.subscriber_type
-    when "employee"
-      abs_subscriber = self.employee
-    when "broker"
-      abs_subscriber =  self.broker
-    when "consumer"
-      abs_subscriber =  self.consumer
-    end
-    return abs_subscriber
-  end
-  
-  def subscriber=(subscriber_hash)
-    abs_subscriber = nil
-    case self.subscriber_type
-    when "employee"
-      self.employee = subscriber_hash
-    when "broker" 
-      self.broker = subscriber_hash
-    when "consumer"
-      self.consumer = subscriber_hash
-    end
-    
-  end
 
   def full_name
     [name_pfx, first_name, middle_name, last_name, name_sfx].reject(&:blank?).join(' ').downcase.gsub(/\b\w/) {|first| first.upcase }

@@ -1,33 +1,36 @@
 class Phone
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Attributes::Dynamic
 
-  KINDS = %W(home work mobile)
+  embedded_in :person
+
+  KINDS = ["home", "work", "mobile", "fax"]
 
   field :kind, type: String
+  field :country_code, type: String, default: ""
+  field :area_code, type: String, default: ""
   field :number, type: String
   field :extension, type: String, default: ""
   field :primary, type: Boolean
-  field :country_code, type: String, default: ""
-  field :area_code, type: String, default: ""
   field :full_phone_number, type: String, default: ""
 
-  validates_presence_of  :number
-  validates_presence_of  :kind, message: "Choose a type"
-  validates_inclusion_of :kind, in: KINDS, message: "%{value} is not a valid phone type"
+  validates :area_code,
+    numericality: true,
+    length: { minimum: 3, maximum: 3, message: "%{value} is not a valid area code" },
+    allow_blank: false
 
-  embedded_in :person, :inverse_of => :phones
-  embedded_in :employer, :inverse_of => :phones
-  embedded_in :broker, :inverse_of => :phones
+  validates :number,
+    numericality: true,
+    length: { minimum: 7, maximum: 7, message: "%{value} is not a valid phone number" },
+    allow_blank: false
 
-  def match(another_phone)
-    return(false) if another_phone.nil?
-    attrs_to_match = [:kind, :number]
-    attrs_to_match.all? { |attr| attribute_matches?(attr, another_phone) }
-  end
+  validates :kind,
+    inclusion: { in: KINDS, message: "%{value} is not a valid phone type" },
+    allow_blank: false
 
-  def attribute_matches?(attribute, other)
-    self[attribute] == other[attribute]
+  def area_code=(value)
+    super filter_non_numbers(value)
   end
 
   def number=(value)
@@ -36,13 +39,6 @@ class Phone
 
   def extension=(value)
     super filter_non_numbers(value)
-  end
-
-  def self.make(data)
-    phone = Phone.new
-    phone.kind = data[:kind]
-    phone.number = data[:number]
-    phone
   end
 
 private
