@@ -7,16 +7,14 @@
 <% end %>
 
 <section>
-  <div class="row">
-    <div class="col-md-12">
-      <nav>
-        <%= render 'shared/breadcrumb', crumbs: [
-            link_to('People', people_path),
-            'New'
-          ]
-        %>
-      </nav>
-    </div>
+  <div class="col-md-12">
+    <nav>
+      <%= render 'shared/breadcrumb', crumbs: [
+          link_to('People', people_path),
+          'New'
+        ]
+      %>
+    </nav>
   </div>
 </section>
 
