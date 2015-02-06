@@ -53,25 +53,20 @@
                 </div>
 
                 <div class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
-                  <a href="#" class="btn btn-save">Save & Exit</a>
+                  <!-- <a href="#" class="btn btn-save">Save & Exit</a> -->
+                  <%= f.submit 'Save & Exit', :class => 'btn btn-save' %>
                   <p class="top-pad">
                     <span>Your personal information is safe, secured with 64 bit SSL encryption</span>
                     <span><i></i></span>
                   </p>
                 </div>
-              </div>
-
-              <br>
+              </div><br>
 
               <%= f.fields_for :addresses, errors: {}, fieldset: true do |address|  %>
                 <%= render 'shared/address_fields', f: address %>
-              <% end %>
+              <% end %><br>
 
-              <br>
-
-              <%= render 'shared/phone_fields', f: f %>
-
-              <br>
+              <%= render 'shared/phone_fields', f: f %><br>
 
               <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
                 <%= render 'shared/email_fields', f: email %>
