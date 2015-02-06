@@ -6,11 +6,13 @@
         <h3>Add new family</h3>
       </div>
         <%= f.simple_fields_for :employer_census_families, errors: {}, fieldset: false do |family|%>
+
           <%= family.simple_fields_for :employee, errors: {}, fieldset: false do |employee|  %>
 
-            <%= render 'member_fields', employee: employee %>
+            <%= render 'member_fields', f: employee %>
+
             <%= employee.simple_fields_for :address, errors: {}, fieldset: false do |address|  %>
-              <%= render 'address_fields', address: address %>
+              <%= render 'address_fields', f: address %>
             <% end %>
 
           <% end %>
@@ -19,8 +21,9 @@
           <div><h3>Dependent Information</h3></div>
             <div>
               <%= family.simple_fields_for :dependents, errors: {}, fieldset: false do |dependent|  %>
-                <%= render 'dependent_fields', dependent: dependent %>
+                <%= render 'dependent_fields', f: dependent %>
               <% end %>
+              <p class="text-right"><%= link_to_add_fields "Add Dependent", family, :dependents %></p>
             </div>
 
           <br/>
