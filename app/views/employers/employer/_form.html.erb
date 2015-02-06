@@ -1,0 +1,48 @@
+
+<%= simple_form_for @employer, url: {action: "create"} do |f| %>
+
+  <% if @employer.errors.any? %>
+    <div class="alert alert-error">
+      <h4><%= pluralize(@employer.errors.count, "error") %> prohibited this person from being saved:</h4>
+      <ul>
+        <% @employer.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <legend>Employer</legend>
+  <div class="row">
+    <div class="col-md-offset-1 col-md-10">
+      <div class="form-inputs">
+        <div class="row">
+          <div class="col-md-6">
+            <%= f.input :name, placeholder: "Company Name" %>
+          </div>
+          <div class="col-md-4">
+            <%= f.input :fein, placeholder: "FEIN" %>
+          </div>
+
+          <div class="col-md-6">
+            <%= f.input :dba, placeholder: "Company DBA's Name" %>
+          </div>
+
+          <div class="col-md-4">
+            <%= f.input :entity_kind, placeholder: "Employer Type" %>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+
+
+  <div class="well well-sm well-default">
+    <div class="form-actions">
+      <%= f.submit nil, :class => 'btn btn-primary' %>
+    </div>
+  </div>
+<% end %>
+

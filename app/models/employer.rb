@@ -26,7 +26,10 @@ class Employer
 
   embeds_many :contacts
   embeds_many :employer_census_families, class_name: "EmployerCensus::Family"
+  accepts_nested_attributes_for :employer_census_families, reject_if: :all_blank, allow_destroy: true
+
   embeds_many :plan_years
+  # embeds_many :addresses, :inverse_of => :employer
 
   belongs_to :broker_agency, counter_cache: true, index: true
   has_many :representatives, class_name: "Person", inverse_of: :employer_representatives
@@ -69,6 +72,16 @@ class Employer
     return if broker.blank?
     where(broker_agency_id: broker._id)
   end
+
+  def build_family
+    family = self.employer_census_families.build
+    family.members.build
+    family.build_employee
+    family.build_employee.build_address
+    family.dependents.build
+  end
+
+
 
   # has_many employees
   def employees

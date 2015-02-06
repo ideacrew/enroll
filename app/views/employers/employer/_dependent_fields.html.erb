@@ -1,0 +1,11 @@
+<%= f.input :first_name, placeholder: "First", label: "First Name"  %> <br/>
+<%= f.input :last_name, placeholder: "Last", label: "Last Name"  %> <br/>
+<%= f.input :name_sfx, placeholder: "Sfx", label: "Suffix" %> <br/>
+<%= f.input :dob, as: :string,
+  start_year: Date.today.year - 110,
+  end_year: Date.today.year,
+  placeholder: "mm/dd/yyyy",
+  class: "date_picker",
+  value: "" %><br/>
+<%= f.input :gender, label: "Gender", collection: EmployerCensus::Member::GENDER_KINDS, include_blank: "Select" %> <br/>
+<%= f.input :employee_relationship, placeholder: "Relationship", label: "Employee Relationship"  %> <br/>

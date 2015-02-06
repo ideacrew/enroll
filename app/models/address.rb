@@ -33,7 +33,6 @@ class Address
         :message => "should be in the form: 12345 or 12345-1234"
       }
 
-
   def location
     nil #todo
   end

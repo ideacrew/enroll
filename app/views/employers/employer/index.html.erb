@@ -1,0 +1,21 @@
+<h3>Employers</h3>
+
+<table class="table table-condensed">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>FEIN</th>
+      <th>Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @employers.each do |employer| %>
+      <tr>
+        <td><%= link_to employer.name, employers_employer_path(employer) %></td>
+        <td><%= employer.fein %></td>
+
+        <td><%= employer.entity_kind %></td>
+       </tr>
+    <% end %>
+  </tbody>
+</table>
