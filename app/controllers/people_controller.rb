@@ -41,7 +41,7 @@ class PeopleController < ApplicationController
   
   def get_employer
     @employers = Employer.all
-    
+
     respond_to do |format|
       format.js {}
     end

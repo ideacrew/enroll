@@ -1,12 +1,23 @@
-<div class="col-md-2">
-</div>
-<div class="col-md-7">
 <% if @employers.present? %>
-  <fieldset> Select Employer</fieldset>
-  <% @employers.each do |employer| %>
-    <span> <%= employer %> </span></br>
-  <% end %>
-<% else%>
-  <fieldset> Employers not found</fieldset>
-<% end %>  
-</div>
+	<p>
+		<span> Please select your Employer.</span>
+		<a class="pull-right" href="#">Search Again?</a>
+	</p>
+
+	<ul class="list-group">
+		<% @employers.each do |employer| %>
+			<li class="list-group-item">
+				<div class="row">
+					<div class="col-md-3 col-sm-9 col-xs-9">
+						<h4><%= employer %></h4>
+					</div>
+					<div class="col-md-7 col-sm-1 col-xs-1">
+					</div>
+					<div class="col-md-2 col-sm-2 col-xs-2">
+						<span class="badge"><i></i></span>
+					</div>
+				</div>
+			</li>
+		<% end %>
+	</ul>
+<% end %>

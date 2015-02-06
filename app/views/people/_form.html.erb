@@ -1,52 +1,127 @@
-<div class="row">
-  <div class="col-md-12">
-    <% if @person.errors.any? %>
-      <div class="alert alert-error">
-        <h4><%= pluralize(@person.errors.count, "error") %> prohibited this person from being saved:</h4>
-        <ul>
-          <% @person.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
+<div class="container-fluid no-pd-left">
+  <div class="col-md-12 col-sm-12 no-pd">
+    <div class="panel panel-default">
+      <div class="panel-body left">
+        <div class="nama">
 
+          <div class="col-sm-2 left-pd">
+            <div class="sidebar list-group text-center" id="sidebar_partial_value">
+              <%= render 'people/sidebar', :page => 'new' %>
+            </div>
+          </div>
 
-        </ul>
+          <div class="col-md-10 col-sm-12">
+
+            <div class="row welcome-msg">
+              <div class="col-md-11 col-sm-12 col-xs-12 no-pd">
+                <div class="col-md-10 col-sm-10 no-pd col-xs-12">
+                  <p>
+                    <span>Welcome.</span> Let’s get you signed up for health care. Lorem ipsum dolot sit amet. Ut enim ad minim vineam, quis nostrud exarciation ullamco laboris nisi ut aliquip ex ea commondo consequat. Lorem ipsum dolor sit amet. Ut enim ad dolor sit
+                  </p>
+                </div>
+                <a href="#" class="btn btn-continue" id="continue">Continue</a>
+              </div>
+            </div>
+
+            <div class="col-md-11 col-sm-12 col-xs-12">
+
+              <% if @person.errors.any? %>
+                <div class="alert alert-error">
+                  <h4><%= pluralize(@person.errors.count, "error") %> prohibited this person from being saved:</h4>
+                  <ul>
+                    <% @person.errors.full_messages.each do |msg| %>
+                      <li><%= msg %></li>
+                    <% end %>
+                  </ul>
+                </div>
+              <% end %>
+
+              <p class="information row" style="opacity: 0.2;">Personal Information</p>
+              <div id="overlay"></div>
+
+              <div id="personal_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
+                <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
+                  <%= render 'shared/name_fields', f: f %>
+                  <%= render 'shared/id_info_fields', f: f %>
+
+                  <div class="error">
+                    <div class="warning">
+                      <i class="fa fa-exclamation-triangle"></i>
+                      All fields Required
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
+                  <a href="#" class="btn btn-save">Save & Exit</a>
+                  <p class="top-pad">
+                    <span>Your personal information is safe, secured with 64 bit SSL encryption</span>
+                    <span><i></i></span>
+                  </p>
+                </div>
+              </div>
+
+              <br>
+
+              <%= f.fields_for :addresses, errors: {}, fieldset: true do |address|  %>
+                <%= render 'shared/address_fields', f: address %>
+              <% end %>
+
+              <br>
+
+              <%= render 'shared/phone_fields', f: f %>
+
+              <br>
+
+              <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+                <%= render 'shared/email_fields', f: email %>
+              <% end %>
+
+              <div class="autofill-cloud autofill-initial hidden">
+                <div class="row">
+                  <div class="col-md-12 text-center">
+                    <%= image_tag 'autofill-cloud.png' %>
+                    <span class="close"></span>
+                  </div>
+                  <p>
+                    We may be able to auto-fill your information with data from our records.
+                  </p>
+                  <a href="#" class="btn btn-ok autofill_yes">Yes</a>
+                  <div class="clearfix"></div>
+                  <a href="#" class="btn btn-cancel autofill_no">No Thanks</a>
+                </div>
+              </div>
+              <div class="autofill-cloud autofill-failed hidden">
+                <div class="row">
+                  <div class="col-md-12 text-center">
+                    <%= image_tag 'autofill-cloud-failed.png' %>
+                    <span class="close"></span>
+                  </div>
+                  <p>
+                    We were not able to find your information. Double check your social security number and birthdate
+                  </p>
+                  <a href="#" class="btn btn-try-again btn-primary">Try Again</a>
+                </div>
+              </div>
+              <div class="less-opacity hidden">
+                <%= image_tag 'autofill-cloud.png' %>
+                <p>Autofill</p>
+              </div>
+
+              <div class="search_results row result-row hidden" style="opacity: 1;">
+                <div class="col-md-10 col-sm-9 col-xs-12 no-pd">
+                  <div class="col-md-10 col-sm-9 col-xs-12 no-pd search_alert_msg hidden">
+                    <p class="subtitle">We are filtering through our records looking for your Employer plan. <span>Please Wait</span></p>
+                  </div>
+                  <div class="row employers-row">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
-    <% end %>
+    </div>
   </div>
-</div>
-
-<div class="row">
-  <div class="col-md-2" id="sidebar">
-    <ul>
-      <li>Name</li>
-      <li>Birth Date</li>
-      <li>Gender</li>
-      <li>Social Security</li>
-    </ul>
-  </div>
-
-  <div class="col-md-7">
-    <fieldset>
-      <%= render 'shared/name_fields', f: f %>
-    </fieldset>
-    <fieldset>
-      <%= render 'shared/id_info_fields', f: f %>  
-    </fieldset>
-
-    <%= f.fields_for :addresses, errors: {}, fieldset: true do |address|  %>
-      <%= render 'shared/address_fields', f: address %>
-    <% end %>
-    
-    <%= render 'shared/phone_fields', f: f %>
-
-    <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
-      <%= render 'shared/email_fields', f: email %>
-    <% end %>
-  </div>
-  <div class="col-md-3">
-    <p>Your personal information is safe, secured with 128 bit SSL encryption.</p>
-  </div>
-</div>
-<div class="row employers-row">
-  
 </div>
