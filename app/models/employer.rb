@@ -4,7 +4,7 @@ class Employer
 
   include AASM
 
-  ENTITY_KINDS = [:c_corporation, :s_corporation, :partnership, :tax_exempt_organization]
+  ENTITY_KINDS = ["c_corporation", "s_corporation", "partnership", "tax_exempt_organization"]
 
   auto_increment :hbx_id, type: Integer
 
@@ -19,40 +19,25 @@ class Employer
   field :entity_kind, type: String
   field :sic_code, type: String
 
+  # Writing agent credited for enrollment and transmitted on 834
+  field :broker_id, type: BSON::ObjectId
+
+  # Employers terminated for non-payment may re-enroll one additional time
+  field :terminated_count, type: Integer, default: 0
+  field :terminated_on, type: Date
+
   field :aasm_state, type: String
   field :aasm_message, type: String
 
   field :is_active, type: Boolean, default: true
 
-  embeds_many :contacts
-  embeds_many :employer_census_families, class_name: "EmployerCensus::Family"
+  # embeds_many :contacts
   embeds_many :plan_years
+  embeds_many :employer_census_families, class_name: "EmployerCensus::Family"
 
+  # Agency representing this employer
   belongs_to :broker_agency, counter_cache: true
   has_many :representatives, class_name: "Person", inverse_of: :employer_representatives
-
-  # has_many :premium_payments, order: { paid_at: 1 }
-  index({ hbx_id: 1 }, { unique: true })
-  index({ name: 1 })
-  index({ dba: 1 }, {sparse: true})
-  index({ fein: 1 }, { unique: true })
-  index({ broker_agency_id: 1}, {sparse: true})
-  index({ aasm_state: 1 })
-  index({ is_active: 1 })
-
-  # PlanYear child model indexes
-  index({"plan_year.start_date" => 1})
-  index({"plan_year.end_date" => 1}, {sparse: true})
-  index({"plan_year.open_enrollment_start" => 1})
-  index({"plan_year.open_enrollment_end" => 1})
-
-  index({"employer_census_families._id" => 1})
-  index({"employer_census_families.employer_census_employee.last_name" => 1})
-  index({"employer_census_families.employer_census_employee.dob" => 1})
-  index({"employer_census_families.employer_census_employee.ssn" => 1})
-  index({"employer_census_families.employer_census_employee.ssn" => 1,
-         "employer_census_families.employer_census_employee.dob" => 1},
-         {name: "ssn_dob_index"})
 
   validates_presence_of :name, :fein, :entity_kind
 
@@ -65,10 +50,38 @@ class Employer
     inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid business entity" },
     allow_blank: false
 
+  # has_many :premium_payments, order: { paid_at: 1 }
+  index({ hbx_id: 1 }, { unique: true })
+  index({ name: 1 })
+  index({ dba: 1 }, {sparse: true})
+  index({ fein: 1 }, { unique: true })
+  index({ broker_agency_id: 1}, {sparse: true})
+  index({ aasm_state: 1 })
+  index({ is_active: 1 })
+
+  # PlanYear child model indexes
+  index({"plan_year.start_date" => 1})
+  index({"plan_year.end_date" => 1}
+  index({"plan_year.open_enrollment_start_on" => 1})
+  index({"plan_year.open_enrollment_end_on" => 1})
+
+  index({"employer_census_families._id" => 1})
+  index({"employer_census_families.matched_at" => 1} {sparse: true})
+  index({"employer_census_families.terminated_at" => 1} {sparse: true})
+  index({"employer_census_families.employer_census_employee.last_name" => 1})
+  index({"employer_census_families.employer_census_employee.dob" => 1})
+  index({"employer_census_families.employer_census_employee.ssn" => 1})
+  index({"employer_census_families.employer_census_employee.ssn" => 1,
+         "employer_census_families.employer_census_employee.dob" => 1},
+         {name: "ssn_dob_index"})
+
+
+  scope :active, ->{ where(:is_active => true) }
+
   ## Class methods
   def self.find_by_broker(broker)
     return if broker.blank?
-    where(broker_agency_id: broker._id)
+    where(broker_id: broker._id)
   end
 
   # has_many employees
@@ -78,62 +91,6 @@ class Employer
 
   def payment_transactions
     PremiumPayment.payment_transactions_for(self)
-  end
-
-  # def associate_all_carriers_and_plans_and_brokers
-  #   self.policies.each { |pol| self.carriers << pol.carrier; self.brokers << pol.broker; self.plans << pol.plan }
-  #   save!
-  # end
-
-  #TODO: Seperate enrollment_open/closed into different state
-  aasm do
-    state :applicant, initial: true
-    state :approval_pending
-    state :approved
-    state :approval_denied
-    state :enrollment_open
-    state :enrollment_closed
-    state :pending_binder_payment
-    state :terminated
-
-    event :update_application do
-      transitions from: [:approval_pending,
-          :approved,
-          :approval_denied,
-          :enrollment_open,
-          :enrollment_closed,
-          :pending_binder_payment,
-          :terminated
-        ], to: :approval_pending
-    end
-
-    event :submit_employer do
-      transitions from: :applicant, to: :approval_pending
-    end
-
-    event :approve_employer do
-      transitions from: :approval_pending, to: :approved
-    end
-
-    event :deny_employer do
-      transitions from: :approval_pending, to: :approval_denied
-    end
-
-    event :start_enrollment do
-      transitions from: [:approved, :enrollment_closed], to: :enrollment_open
-    end
-
-    event :end_enrollment do
-      transitions from: :enrollment_open, to: :enrollment_closed
-    end
-
-    event :receive_binder_payment do
-      transitions from: :pending_binder_payment, to: :binder_payment_received
-    end
-
-    event :terminate_employer do
-      transitions from: [:binder_payment_received, :enrollment_open, :enrollment_closed], to: :terminated
-    end
   end
 
   # Strip non-numeric characters
@@ -167,10 +124,6 @@ class Employer
     "%.2f" % value
   end
 
-  def self.find_for_fein(e_fein)
-    Employer.where(:fein => e_fein).first
-  end
-
   def plan_year_of(coverage_start_date)
     # The #to_a is a caching thing.
     plan_years.to_a.detect do |py|
@@ -184,25 +137,79 @@ class Employer
   end
 
   class << self
-    def find_or_create_employer(m_employer)
-      found_employer = Employer.where(
-        :hbx_id => m_employer.hbx_id
-      ).first
-      return found_employer unless found_employer.nil?
-      m_employer.save!
-      m_employer
-    end
-
-    def find_or_create_employer_by_fein(m_employer)
-      found_employer = Employer.find_for_fein(m_employer.fein)
-      return found_employer unless found_employer.nil?
-      m_employer.save!
-      m_employer
+    def find_by_fein(e_fein)
+      Employer.where(:fein => e_fein).first
     end
   end
 
   def is_active?
     self.is_active
+  end
+
+
+  # Workflow for automatic approval
+  aasm do
+    state :applicant, initial: true
+    state :ineligible       # Unable to enroll business per SHOP market regulations (e.g. Sole proprieter)
+    state :registered       # Business information complete, before initial open enrollment period
+    state :enrolling        # Employees registering and plan shopping
+    state :binder_pending   # Initial open enrollment period closed, first premium payment not received/processed
+    state :canceled         # Coverage didn't take effect, as Employer either didn't complete enrollment or pay binder premium
+    state :enrolled         # Enrolled and premium payment up-to-date
+    state :enrolled_renewal_ready  # Annual renewal date is 90 days or less
+    state :enrolled_renewing       #
+    state :enrolled_overdue        # Premium payment 1-29 days past due
+    state :enrolled_late           # Premium payment 30-60 days past due - send notices to employees
+    state :enrolled_suspended      # Premium payment 61-90 - transmit terms to carriers with retro date
+    state :terminated              # Premium payment > 90 days past due (day 91)
+
+    event :submit do
+      transitions from: [:applicant, :ineligible, :terminated], to: [:registered, :ineligible]
+    end
+
+    event :open_enrollment do
+      transitions from: [:registered, :enrolled_renewing], to: :enrolling
+    end
+
+    event :close_enrollment do
+      transitions from: :enrolling, to: [:binder_pending, :enrolled]
+    end
+
+    event :cancel do
+      transitions from: [:registered, :enrolling, :binder_pending], to: :canceled
+    end
+
+    event :allocate_binder do
+      transitions from: :binder_pending, to: :enrolled
+    end
+
+    event :prepare_for_renewal do
+      transitions from: :enrolled, to: :enrolled_renewal_ready
+    end
+
+    event :renew do
+      transitions from: :enrolled_renewal_ready, to: :enrolled_renewing
+    end
+
+    event :premium_paid do
+      transitions from: [:enrolled, :enrolled_overdue, :enrolled_late, :enrolled_suspended], to: :enrolled
+    end
+
+    event :premium_overdue do
+      transitions from: [:enrolled, :enrolled_renewal_ready, :enrolled_renewing], to: :enrolled_overdue
+    end
+
+    event :premium_late do
+      transitions from: :enrolled_overdue, to: :enrolled_late
+    end
+
+    event :suspend do
+      transitions from: :enrolled_late, to: :enrolled_suspended
+    end
+
+    event :terminate do
+      transitions from: :enrolled_suspended, to: :terminated
+    end
   end
 
 
