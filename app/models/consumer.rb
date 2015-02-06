@@ -33,6 +33,12 @@ class Consumer
   field :application_state, type: String
   field :is_active, type: Boolean, default: true
 
+  # Writing agent credited for enrollment and transmitted on 834
+  field :broker_id, type: BSON::ObjectId
+
+  # Agency representing this employer
+  field :broker_agency_id, type: BSON::ObjectId
+
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn, :ssn=, to: :person, allow_nil: true
   delegate :dob, :dob=, to: :person, allow_nil: true
@@ -60,6 +66,26 @@ class Consumer
   def parent
     raise "undefined parent: Person" unless person?
     self.person
+  end
+
+  # belongs_to Broker
+  def broker=(new_broker)
+    return unless new_broker.is_a? Broker
+    self.broker_id = new_broker._id
+  end
+
+  def broker
+    parent.broker.find(self.broker_id) unless broker_id.blank?
+  end
+
+  # belongs_to BrokerAgency
+  def broker_agency=(new_broker_agency)
+    return unless new_broker_agency.is_a? BrokerAgency
+    self.broker_agency_id = new_broker_agency._id
+  end
+
+  def broker_agency
+    BrokerAgency.find(self.broker_agency_id) unless broker_agency_id.blank?
   end
 
   def families
