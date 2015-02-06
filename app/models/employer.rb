@@ -62,13 +62,13 @@ class Employer
 
   # PlanYear child model indexes
   index({"plan_year.start_date" => 1})
-  index({"plan_year.end_date" => 1}
+  index({"plan_year.end_date" => 1})
   index({"plan_year.open_enrollment_start_on" => 1})
   index({"plan_year.open_enrollment_end_on" => 1})
 
   index({"employer_census_families._id" => 1})
-  index({"employer_census_families.matched_at" => 1} {sparse: true})
-  index({"employer_census_families.terminated_at" => 1} {sparse: true})
+  index({"employer_census_families.matched_at" => 1}, {sparse: true})
+  index({"employer_census_families.terminated_at" => 1}, {sparse: true})
   index({"employer_census_families.employer_census_employee.last_name" => 1})
   index({"employer_census_families.employer_census_employee.dob" => 1})
   index({"employer_census_families.employer_census_employee.ssn" => 1})
