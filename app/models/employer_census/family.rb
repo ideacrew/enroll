@@ -1,10 +1,12 @@
 class EmployerCensus::Family
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   embedded_in :employer
 
 
   field :matched_at, type: DateTime
+  field :terminated_at, type: DateTime
   field :is_active, type: Boolean, default: true
 
   embeds_one :employee, 
