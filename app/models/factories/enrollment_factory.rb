@@ -1,4 +1,4 @@
-class Factories::EnrollmentFactory
+class EnrollmentFactory
 
   attr_accessor :person
 
@@ -6,8 +6,8 @@ class Factories::EnrollmentFactory
     self.person = person
   end
 
-  def add_consumer_role(new_ssn, new_dob, new_gender, new_is_incarcerated, new_is_applicant,
-                        new_is_state_resident, new_citizen_status)
+  def self.add_consumer_role(person:, ssn: nil, dob: nil, gender: nil, is_incarcerated:, is_applicant:,
+                             is_state_resident:, citizen_status:)
 
     ssn = new_ssn
     dob = new_dob
@@ -32,19 +32,19 @@ class Factories::EnrollmentFactory
 
   end
 
-  def add_broker_role(new_kind, new_npn, new_mailing_address)
+  def self.add_broker_role(new_kind, new_npn, new_mailing_address)
 
     kind = new_kind
     npn = new_npn
 
     mailing_address = new_mailing_address
-   
+
     family = initialize_families
 
     broker_role = nil
 
     if self.person.broker.blank?
-      # Assign broker-specifc attributes 
+      # Assign broker-specifc attributes
       broker_role = self.person.build_broker(mailing_address: mailing_address, npn: npn, kind: kind)
     end
 
@@ -57,32 +57,45 @@ class Factories::EnrollmentFactory
 
   end
 
-  def add_employee_role(new_employer, new_ssn, new_dob, new_gender, new_date_of_hire)
+  def self.add_employee_role(person:, employer:, ssn: nil, dob: nil, gender: nil, date_of_hire:)
+    [:ssn, :dob, :gender].each do |value|
+      name = value.id2name
+
+      raise ArgumentError.new("missing value: #{name}, expected as keyword or on person") if person.send(value).blank? and eval(name).blank?
+    end
+
+    person.ssn = ssn unless ssn.blank?
+    person.dob = dob unless dob.blank?
+    person.gender = gender unless gender.blank?
+
     # Return instance if this role already exists
-    # Verify/assign required additional local attributes
-    ssn = new_ssn
-    dob = new_dob
-    gender = new_gender
+    role = person.employees.find_by_employer_id(employer.id);
 
-    employee_role = nil
-
-    if self.person.employee.blank?
+    if role.blank?
       # Assign employee-specifc attributes
-      employee_role = self.person.build_employee(employer: new_employer, date_of_hire: new_date_of_hire)
+      role = person.build_employee(employer: new_employer, date_of_hire: new_date_of_hire)
     end
 
     # Add 'self' to personal relationship need detailed implementation
-    self.person.personal_relationships << PersonRelationhip.new()
+    person.personal_relationships << PersonRelationhip.new()
 
     family = initialize_families
 
-    # Persist results?
-    self.person.save
-    employee_role.save if employee_role.present?
-    family.save if family.present?
+    if person.save
+      if family.save
+        if role.save
+          role
+        else
+          family.delete
+        end
+      else
+        role.errors.add(:family, "unable to create family")
+      end
+    else
+      role.errors.add(:person, "unable to update person")
+    end
 
-    # Return new instance
-    return employee_role
+    role
   end
 
   def initialize_families

@@ -1,34 +1,36 @@
 require 'rails_helper'
 
 describe Employer, type: :model do
-  it { should validate_presence_of :name }
-  it { should validate_presence_of :fein }
-  it { should validate_presence_of :entity_kind }
+  context ".new" do
+    let(:name) {"ACME Widgets, Inc"}
+    let(:dba) {"Widgetworks"}
+    let(:fein) {"034267123"}
+    let(:kind) {"tax_exempt_organization"}
 
-  it 'properly intantiates the class' do
+    let(:employer) {Employer.new(name: name, dba: dba, fein: fein, entity_kind: kind)}
 
-    employer = Employer.new(
-        name: "ACME Widgets, Inc",
-        dba: "Widgetworks",
-        fein: "034267123",
-        entity_kind: "tax_exempt_organization"
-      )
+    it { should validate_presence_of :name }
+    it { should validate_presence_of :fein }
+    it { should validate_presence_of :entity_kind }
 
-    # Verify attributes
-    expect(employer.name).to eq "ACME Widgets, Inc"
-    expect(employer.dba).to eq "Widgetworks"
-    expect(employer.fein).to eq "034267123"
-    expect(employer.entity_kind).to eq "tax_exempt_organization"
+    it('.name'){ expect(employer.name).to eq name }
+    it('.dba'){ expect(employer.dba).to eq dba }
+    it('.fein'){ expect(employer.fein).to eq fein }
+    it('.entity_kind'){ expect(employer.entity_kind).to eq kind }
+    it('should be valid'){ expect(employer.valid?).to eq true }
 
-    expect(employer.errors.messages.size).to eq 0
-    expect(employer.save).to eq true
+    context ".save" do
+      let(:saved?) {employer.save}
+
+      it { expect(saved?).to eq true }
+    end
   end
 end
 
 # Class methods
 describe Employer, '.find_by_broker_id', :type => :model do
   it 'returns employers represented by the specified broker' do
-
+    pending "broker to employee relationship needs to be clarified here"
     id = BSON::ObjectId.from_time(Time.now)
     broker = instance_double("Broker", _id: id)
 
