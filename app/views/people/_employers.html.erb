@@ -14,11 +14,13 @@
 					<div class="col-md-7 col-sm-1 col-xs-1">
 					</div>
 					<div class="col-md-2 col-sm-2 col-xs-2">
+            <%= form_tag("", class: "person-search-form") do %>
+            <% end %>
 						<span id="badge" class="badge" style="cursor:pointer"><i></i></span>
 					</div>
 				</div>
 			</li>
-
+      
 		<% end %>
   </ul>
   <div style="float:right;">
@@ -29,7 +31,18 @@
 $('.search_continue').hide();
 $(".badge").on('click',function(){
   $('.badge').removeClass('badge-active');
+  $(".person-search-form").removeClass('person-search-form-active');
   $(this).toggleClass('badge-active');
+  $(this).closest(".person-search-form").addClass('person-search-form-active');
   $('.search_continue').show();
 });
+$('.search_continue').on('click',function(){
+      $.ajax({
+        type: "POST",
+        url: "/people/person_confirm.js",
+        data: $('.person-search-form-active').serialize(),
+        success: function (result) {
+        }
+    });
+})
 </script>
