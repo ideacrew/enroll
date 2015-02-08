@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe EmployerCensus::Employee, '.new', type: :model do
   it { should validate_presence_of :ssn }
-  it { should validate_presence_of :date_of_hire }
+  it { should validate_presence_of :hired_on }
   it { should validate_presence_of :address }
 
   it 'properly intantiates the class' do
@@ -22,7 +22,7 @@ RSpec.describe EmployerCensus::Employee, '.new', type: :model do
         ssn: ssn,
         dob: dob,
         gender: gender,
-        date_of_hire: Date.today - 14.days,
+        hired_on: Date.today - 14.days,
         address: { kind: "home", address_1: "10 Main St", city: "Washington", state: "DC", zip: "20001"}
       )
 

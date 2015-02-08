@@ -1,7 +1,6 @@
 FactoryGirl.define do
   factory :broker do
     npn "abx123xyz"
-    kind 'broker'
 
     after(:create) do |b, evaluator|
       create_list(:address, 2, broker: b)
@@ -10,7 +9,7 @@ FactoryGirl.define do
     end
 
     trait :with_invalid_b_type do
-      kind ' '
+      npn ' '
     end
   end
 end

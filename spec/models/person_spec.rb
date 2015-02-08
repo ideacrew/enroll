@@ -7,7 +7,7 @@ describe Person, '.new' do
   it { should validate_presence_of :last_name }
 
   it "generates hbx_id" do
-    expect(Person.create!(first_name: "ginger", last_name: "baker").hbx_id).to eq 9999
+    expect(Person.create!(first_name: "ginger", last_name: "baker").hbx_id).to eq 10000
   end
 
   it "ssn invalid with non-numeric value" do

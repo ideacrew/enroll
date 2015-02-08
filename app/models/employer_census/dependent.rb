@@ -2,7 +2,7 @@ class EmployerCensus::Dependent < EmployerCensus::Member
 
   EMPLOYEE_RELATIONSHIP_KINDS = %W[spouse child domestic_partner]
 
-  embedded_in :employer_census_family
+  embedded_in :employee_family, class_name: "EmployerCensus::EmployeeFamily"
 
   validates :employee_relationship,
             presence: true,

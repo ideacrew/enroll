@@ -26,8 +26,6 @@ class Person
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
   
-  field :subscriber_type, type: String
-
   # Login account
   has_one :user, as: :profile, dependent: :destroy
 

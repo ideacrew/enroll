@@ -5,8 +5,7 @@ FactoryGirl.define do
     middle_name 'X'
     sequence(:last_name) {|n| "Smith\##{n}" }
     name_sfx 'Jr'
-    subscriber_type ""
-    is_active ""
+    is_active true
 
     after(:create) do |p, evaluator|
       create_list(:member, 2, person: p)
@@ -23,7 +22,9 @@ FactoryGirl.define do
       last_name ' '
     end
 
-    factory :invalid_person, traits: [:without_first_name, 
-      :without_last_name]
+    factory :invalid_person, traits: [:without_first_name, :without_last_name]
+
+    
   end
+
 end

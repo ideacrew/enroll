@@ -35,7 +35,7 @@ class Employee
 
   # belongs_to Employer
   def employer=(new_employer)
-    return unless new_employer.is_a? Employer
+    raise ArgumentError.new("expected Employer class") unless new_employer.is_a? Employer
     self.employer_id = new_employer._id
   end
 
@@ -45,7 +45,7 @@ class Employee
 
   # belongs_to BenefitGroup
   def benefit_group=(new_benefit_group)
-    return unless new_benefit_group.is_a? BenefitGroup
+    raise ArgumentError.new("expected BenefitGroup class") unless new_benefit_group.is_a? BenefitGroup
     self.benefit_group_id = new_benefit_group._id
   end
 

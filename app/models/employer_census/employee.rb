@@ -1,12 +1,13 @@
 class EmployerCensus::Employee < EmployerCensus::Member
 
-  embedded_in :family, class_name: "EmployerCensus::Family"
+  embedded_in :employee_family, class_name: "EmployerCensus::EmployeeFamily"
 
-  field :date_of_hire, type: Date
-  field :date_of_termination, type: Date
+  field :hired_on, type: Date
+  field :terminated_on, type: Date
 
-  validates_presence_of :ssn, :date_of_hire, :address
+  validates_presence_of :ssn, :hired_on, :address
 
+  # TODO: Move common validations to single validates_with model
   validates :ssn,
     length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
     numericality: true

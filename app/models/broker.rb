@@ -4,15 +4,15 @@ class Broker
 
   # Broker National Producer Number (unique identifier)
   field :npn, type: String
-  field :agency_id, type: BSON::ObjectId
+  field :broker_agency_id, type: BSON::ObjectId
 
-  field :aasm_state, type: String
-  field :aasm_message, type: String
+  # field :aasm_state, type: String
+  # field :aasm_message, type: String
   field :is_active, type: Boolean, default: true
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
 
-  validates_presence_of :npn, :agency_id
+  validates_presence_of :npn, :broker_agency_id
 
   # scope :all_active_brokers, ->{ and({ kind: "broker" }, { is_active: true })}
   # scope :all_active_tpzs, ->{ and({ kind: "tpa" }, { is_active: true })}
@@ -22,24 +22,23 @@ class Broker
     self.person
   end
 
-  # belongs_to agency
-  def agency=(new_agency)
-    return if new_agency.blank?
-    self.agency_id = new_agency._id
+  # belongs_to broker_agency
+  def broker_agency=(new_broker_agency)
+    raise ArgumentError.new("expected BrokerAgency class") unless new_broker_agency.is_a? BrokerAgency
+    self.broker_agency_id = new_broker_agency._id
   end
 
-  def agency
-    return unless has_agency?
-    BrokerAgency.find(self.agency_id)
+  def broker_agency
+    BrokerAgency.find(self.broker_agency_id) if has_broker_agency?
   end
 
-  def has_agency?
-    !agency_id.blank?
+  def has_broker_agency?
+    broker_agency_id.present?
   end
 
-  def self.find_by_agency(agency)
-    return unless broker.is_a? BrokerAgency
-    where(agency_id: agency._id)
+  def self.find_by_broker_agency(broker_agency)
+    return unless broker_agency.is_a? BrokerAgency
+    where(broker_agency_id: broker_agency._id)
   end
 
   def address

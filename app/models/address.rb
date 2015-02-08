@@ -4,7 +4,6 @@ class Address
 
   embedded_in :person
   embedded_in :employer
-  embedded_in :broker_agency
 
   KINDS = %W(home work mailing)
 

@@ -19,8 +19,8 @@ class Employer
   field :entity_kind, type: String
   field :sic_code, type: String
 
-  # Writing agent credited for enrollment and transmitted on 834
-  field :broker_id, type: BSON::ObjectId
+  # Broker writing_agent credited for enrollment and transmitted on 834
+  field :writing_agent_id, type: BSON::ObjectId
 
   # Employers terminated for non-payment may re-enroll one additional time
   field :terminated_count, type: Integer, default: 0
@@ -31,15 +31,20 @@ class Employer
 
   field :is_active, type: Boolean, default: true
 
-  # embeds_many :contacts
-  embeds_many :employer_census_families, class_name: "EmployerCensus::Family"
-  accepts_nested_attributes_for :employer_census_families, reject_if: :all_blank, allow_destroy: true
+  embeds_many :employee_families, 
+    class_name: "EmployerCensus::EmployeeFamily",
+    cascade_callbacks: true, 
+    validate: true
+  accepts_nested_attributes_for :employee_families, reject_if: :all_blank, allow_destroy: true
 
-  embeds_many :plan_years
-  # embeds_many :addresses, :inverse_of => :employer
+  embeds_many :plan_years, cascade_callbacks: true, validate: true
+  accepts_nested_attributes_for :plan_years, reject_if: :all_blank, allow_destroy: true
+
+  # embeds_many :contacts
+  embeds_many :addresses, :inverse_of => :employer
+  has_many :representatives, class_name: "Person", inverse_of: :employer_representatives
 
   belongs_to :broker_agency, counter_cache: true, index: true
-  has_many :representatives, class_name: "Person", inverse_of: :employer_representatives
 
   validates_presence_of :name, :fein, :entity_kind
 
@@ -52,28 +57,33 @@ class Employer
     inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid business entity" },
     allow_blank: false
 
+  validate :writing_agent_employed_by_broker
+
   # has_many :premium_payments, order: { paid_at: 1 }
   index({ hbx_id: 1 }, { unique: true })
   index({ name: 1 })
   index({ dba: 1 }, {sparse: true})
   index({ fein: 1 }, { unique: true })
+  index({ writing_agent_id: 1 }, {sparse: true})
   index({ aasm_state: 1 })
   index({ is_active: 1 })
 
   # PlanYear child model indexes
+  index({"plan_year._id" => 1})
   index({"plan_year.start_date" => 1})
   index({"plan_year.end_date" => 1})
   index({"plan_year.open_enrollment_start_on" => 1})
   index({"plan_year.open_enrollment_end_on" => 1})
 
-  index({"employer_census_families._id" => 1})
-  index({"employer_census_families.matched_at" => 1}, {sparse: true})
-  index({"employer_census_families.terminated_at" => 1}, {sparse: true})
-  index({"employer_census_families.employer_census_employee.last_name" => 1})
-  index({"employer_census_families.employer_census_employee.dob" => 1})
-  index({"employer_census_families.employer_census_employee.ssn" => 1})
-  index({"employer_census_families.employer_census_employee.ssn" => 1,
-         "employer_census_families.employer_census_employee.dob" => 1},
+  index({"employee_families._id" => 1})
+  index({"employee_families.linked_at" => 1}, {sparse: true})
+  index({"employee_families.linked_by" => 1}, {sparse: true})
+  index({"employee_families.terminated" => 1})
+  index({"employee_families.employee.last_name" => 1})
+  index({"employee_families.employee.dob" => 1})
+  index({"employee_families.employee.ssn" => 1})
+  index({"employee_families.employee.ssn" => 1,
+         "employee_families.employee.dob" => 1},
          {name: "ssn_dob_index"})
 
 
@@ -110,46 +120,31 @@ class Employer
     write_attribute(:fein, new_fein.to_s.gsub(/[^0-9]/i, ''))
   end
 
-  def todays_bill
-    e_id = self._id
-    value = Policy.collection.aggregate(
-      { "$match" => {
-        "employer_id" => e_id,
-        "enrollment_members" =>
-        {
-          "$elemMatch" => {"$or" => [{
-            "coverage_end" => nil
-          },
-          {"coverage_end" => { "$gt" => Time.now }}
-          ]}
-
-        }
-      }},
-      {"$group" => {
-        "_id" => "$employer_id",
-        "total" => { "$addToSet" => "$pre_amt_tot" }
-      }}
-    ).first["total"].inject(0.00) { |acc, item|
-      acc + BigDecimal.new(item)
-    }
-    "%.2f" % value
-  end
-
-  def plan_year_of(coverage_start_date)
+  def find_plan_year_by_date(coverage_date)
     # The #to_a is a caching thing.
     plan_years.to_a.detect do |py|
-      (py.start_date <= coverage_start_date) &&
-        (py.end_date >= coverage_start_date)
+      (py.start_date <= coverage_date) &&
+      (py.end_date   >= coverage_date)
     end
   end
 
-  def renewal_plan_year_of(coverage_start_date)
-    plan_year_of(coverage_start_date + 1.year)
+  # belongs_to writing agent (broker)
+  def writing_agent=(new_writing_agent)
+    raise ArgumentError.new("expected Broker class") unless new_writing_agent.is_a? Broker
+    self.new_writing_agent_id = new_writing_agent._id
+  end
+
+  def writing_agent
+    Broker.find(self.writing_agent_id) unless writing_agent_id.blank?
   end
 
   class << self
-    def find_by_fein(e_fein)
-      Employer.where(:fein => e_fein).first
+    def find_by_fein(fein)
+      Employer.where(:fein => fein).first
+    end
+
+    def find_by_broker_agency(agency)
+      where(:broker_agency_id => agency._id)
     end
   end
 
@@ -220,6 +215,15 @@ class Employer
 
     event :terminate do
       transitions from: :enrolled_suspended, to: :terminated
+    end
+  end
+
+private
+  def writing_agent_employed_by_broker
+    if writing_agent.present? && broker_agency.present?
+      unless broker_agency.writing_agents.detect(writing_agent)
+        errors.add(:writing_agent, "must be broker at broker_agency")
+      end
     end
   end
 

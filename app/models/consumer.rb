@@ -1,7 +1,7 @@
 class Consumer
   include Mongoid::Document
   include Mongoid::Timestamps
-  include AASM
+  # include AASM
 
 
   embedded_in :person
@@ -34,7 +34,7 @@ class Consumer
   field :is_active, type: Boolean, default: true
 
   # Writing agent credited for enrollment and transmitted on 834
-  field :broker_id, type: BSON::ObjectId
+  field :writing_agent_id, type: BSON::ObjectId
 
   # Agency representing this employer
   field :broker_agency_id, type: BSON::ObjectId
@@ -68,19 +68,19 @@ class Consumer
     self.person
   end
 
-  # belongs_to Broker
-  def broker=(new_broker)
-    return unless new_broker.is_a? Broker
-    self.broker_id = new_broker._id
+  # belongs_to writing agent (broker)
+  def writing_agent=(new_writing_agent)
+    raise ArgumentError.new("expected Broker class") unless new_writing_agent.is_a? Broker
+    self.new_writing_agent_id = new_writing_agent._id
   end
 
-  def broker
-    parent.broker.find(self.broker_id) unless broker_id.blank?
+  def writing_agent
+    Broker.find(self.writing_agent_id) unless writing_agent_id.blank?
   end
 
   # belongs_to BrokerAgency
   def broker_agency=(new_broker_agency)
-    return unless new_broker_agency.is_a? BrokerAgency
+    raise ArgumentError.new("expected BrokerAgency class") unless new_broker_agency.is_a? BrokerAgency
     self.broker_agency_id = new_broker_agency._id
   end
 
@@ -113,19 +113,19 @@ class Consumer
   end
 
 
-  aasm column: "application_state" do
-    state :enrollment_closed, initial: true
-    state :open_enrollment_period
-    state :special_enrollment_period
-    state :open_and_special_enrollment_period
+  # aasm column: "application_state" do
+  #   state :enrollment_closed, initial: true
+  #   state :open_enrollment_period
+  #   state :special_enrollment_period
+  #   state :open_and_special_enrollment_period
 
-    event :open_enrollment do
-      transitions from: :open_enrollment_period, to: :open_enrollment_period
-      transitions from: :special_enrollment_period, to: :open_and_special_enrollment_period
-      transitions from: :open_and_special_enrollment_period, to: :open_and_special_enrollment_period
-      transitions from: :enrollment_closed, to: :open_enrollment_period
-    end
-  end
+  #   event :open_enrollment do
+  #     transitions from: :open_enrollment_period, to: :open_enrollment_period
+  #     transitions from: :special_enrollment_period, to: :open_and_special_enrollment_period
+  #     transitions from: :open_and_special_enrollment_period, to: :open_and_special_enrollment_period
+  #     transitions from: :enrollment_closed, to: :open_enrollment_period
+  #   end
+  # end
 
   def is_active?
     self.is_active

@@ -5,10 +5,10 @@ FactoryGirl.define do
     sequence(:address_2, 111) { |n| "##{n}" }
     city 'Washington'
     state 'DC'
-    zip '20002'
+    sequence(:zip, 11111)
 
-    trait :with_invalid_address_type do
-      kind 'invalid'
+    trait :without_kind do
+      kind ' '
     end
 
     trait :without_address_1 do
@@ -27,7 +27,7 @@ FactoryGirl.define do
       zip ' '
     end
 
-    factory :invalid_address, traits: [:without_address_1, 
+    factory :invalid_address, traits: [:without_kind, :without_address_1, 
       :without_city, :without_state, :without_zip]
   end
 end

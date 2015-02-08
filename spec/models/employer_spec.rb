@@ -28,24 +28,25 @@ describe Employer, type: :model do
 end
 
 # Class methods
-describe Employer, '.find_by_broker_id', :type => :model do
-  it 'returns employers represented by the specified broker' do
-    pending "broker to employee relationship needs to be clarified here"
-    id = BSON::ObjectId.from_time(Time.now)
-    broker = instance_double("Broker", _id: id)
+describe Employer, '.find_by_broker_agency', :type => :model do
+  it 'returns employers represented by the specified broker agency' do
+    # id = BSON::ObjectId.from_time(Time.now)
+    # broker_agency = instance_double("BrokerAgency", _id: id)
+
+    broker_agency = FactoryGirl.create(:broker_agency)
 
     employer_one = Employer.new(
         name: "ACME Widgets",
         fein: "034267123",
         entity_kind: "s_corporation",
-        broker: broker
+        broker_agency: broker_agency
       )
 
     employer_two = Employer.new(
         name: "Megacorp, Inc",
         fein: "427636010",
         entity_kind: "c_corporation",
-        broker: broker
+        broker_agency: broker_agency
       )
 
     employer_without_broker = Employer.new(
@@ -54,7 +55,8 @@ describe Employer, '.find_by_broker_id', :type => :model do
         entity_kind: "partnership"
       )
 
-    expect(employer_one.broker_id).to eq id
+    expect(employer_one.broker_agency_id).to eq broker_agency.id
+    expect(employer_two.broker_agency_id).to eq broker_agency.id
 
     expect(employer_one.errors.messages.size).to eq 0
     expect(employer_one.save).to eq true
@@ -63,7 +65,7 @@ describe Employer, '.find_by_broker_id', :type => :model do
 
     expect(Employer.all.size).to eq 3
 
-    employers_with_broker = Employer.find_by_broker_id(id)
-    expect(employers_with_broker.size).to eq 2
+    employers_with_broker_agency = Employer.find_by_broker_agency(broker_agency)
+    expect(employers_with_broker_agency.size).to eq 2
   end
 end
