@@ -1,17 +1,17 @@
-<%= simple_form_for @employer, url: {action: "update"} do |f| %>
+<%= form_for @employer, url: {action: "update"} do |f| %>
 
   <div class="row">
     <div class="col-sm-6">
       <div>
         <h3>Add new family</h3>
       </div>
-        <%= f.simple_fields_for :employer_census_families, errors: {}, fieldset: false do |family|%>
+        <%= f.fields_for :employer_census_families, errors: {}, fieldset: false do |family|%>
 
-          <%= family.simple_fields_for :employee, errors: {}, fieldset: false do |employee|  %>
+          <%= family.fields_for :employee, errors: {}, fieldset: false do |employee|  %>
 
             <%= render 'member_fields', f: employee %>
 
-            <%= employee.simple_fields_for :address, errors: {}, fieldset: false do |address|  %>
+            <%= employee.fields_for :address, errors: {}, fieldset: false do |address|  %>
               <%= render 'address_fields', f: address %>
             <% end %>
 
@@ -20,7 +20,7 @@
 
           <div><h3>Dependent Information</h3></div>
             <div>
-              <%= family.simple_fields_for :dependents, errors: {}, fieldset: false do |dependent|  %>
+              <%= family.fields_for :dependents, errors: {}, fieldset: false do |dependent|  %>
                 <%= render 'dependent_fields', f: dependent %>
               <% end %>
               <p class="text-right"><%= link_to_add_fields "Add Dependent", family, :dependents %></p>
@@ -33,7 +33,7 @@
 
 
   <div class="well well-sm well-default">
-    <%= f.button :submit, "Save Changes", class: "btn btn-primary" %>
+    <%= f.submit "Save Changes", class: "btn btn-primary" %>
     <%= link_to t('.cancel', :default => t("helpers.links.cancel")), employers_employer_path(@employer), class: "btn btn-primary" %>
 	</div>
 

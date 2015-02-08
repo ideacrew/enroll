@@ -1,5 +1,5 @@
 
-<%= simple_form_for @employer, url: {action: "create"} do |f| %>
+<%= form_for @employer, url: {action: "create"} do |f| %>
 
   <% if @employer.errors.any? %>
     <div class="alert alert-error">
@@ -18,18 +18,18 @@
       <div class="form-inputs">
         <div class="row">
           <div class="col-md-6">
-            <%= f.input :name, placeholder: "Company Name" %>
+            <%= f.text_field :name, placeholder: "Company Name" %>
           </div>
           <div class="col-md-4">
-            <%= f.input :fein, placeholder: "FEIN" %>
+            <%= f.text_field :fein, placeholder: "FEIN" %>
           </div>
 
           <div class="col-md-6">
-            <%= f.input :dba, placeholder: "Company DBA's Name" %>
+            <%= f.text_field :dba, placeholder: "Company DBA's Name" %>
           </div>
 
           <div class="col-md-4">
-            <%= f.input :entity_kind, placeholder: "Employer Type" %>
+            <%= f.text_field :entity_kind, placeholder: "Employer Type" %>
           </div>
         </div>
 

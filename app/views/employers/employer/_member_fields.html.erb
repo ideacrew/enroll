@@ -2,18 +2,18 @@
   <h3>Employee Information</h3>
 </div>
 <div>
-  <%= f.input :first_name, placeholder: "First", label: "First Name"  %> <br/>
-  <%= f.input :middle_name, placeholder: "Mid", label: "Middle Name"  %> <br/>
-  <%= f.input :last_name, placeholder: "Last", label: "Last Name"  %> <br/>
-  <%= f.input :name_sfx, placeholder: "Sfx", label: "Suffix" %> <br/>
-  <%= f.input :gender, label: "Gender", collection: EmployerCensus::Member::GENDER_KINDS, include_blank: "Select" %> <br/>
-  <%= f.input :ssn, as: :string, title: "SSN", placeholder: "SSN", input_html: { value: "", maxlength: 11 }, label: "Social Security" %> <br/>
-  <%= f.input :dob, as: :string,
+  <%= f.text_field :first_name, placeholder: "First" %> <br/>
+  <%= f.text_field :middle_name, placeholder: "Mid" %> <br/>
+  <%= f.text_field :last_name, placeholder: "Last" %> <br/>
+  <%= f.text_field :name_sfx, placeholder: "Sfx" %> <br/>
+  <%= f.select :gender, EmployerCensus::Member::GENDER_KINDS, include_blank: "Select" %> <br/>
+  <%= f.text_field :ssn, as: :string, title: "SSN", placeholder: "SSN", input_html: { value: "", maxlength: 11 }%> <br/>
+  <%= f.text_field :dob, as: :string,
     start_year: Date.today.year - 110,
     end_year: Date.today.year,
-    placeholder: "mm/dd/yyyy",
+    placeholder: "mm/dd/yyyy DOB",
     class: "date_picker",
-    value: "" %>
-  <%= f.input :date_of_hire, as: :string, placeholder: "mm/dd/yyyy", class: "date_picker", value: "" %>
+    value: "" %><br/>
+  <%= f.text_field :date_of_hire, as: :string, placeholder: "mm/dd/yyyy Hire Date", class: "date_picker", value: "" %>
   <br/>
 </div>

@@ -8,23 +8,8 @@ Entity Kind: <%= @employer.entity_kind %>
 </br>
 
 <%= link_to "Back", employers_employer_index_path %> &nbsp;&nbsp;
-<%= link_to "Edit", edit_employers_employer_path(@employer) %> &nbsp;&nbsp;
 <%= link_to 'Destroy',  @employers_employer,  method: :delete, confirm: 'Are you sure?'  %>
 
 <hr/>
 
-<button class="btn btn-primary add_field_button">Add Employer Census Family</button>
-<div class="input_fields_wrap">
-</div>
-<script src="/assets/adding_more_emp_details.js"></script>
-<style>
-  a { color: #224f99; }
-  a { color:#999; text-decoration: none; }
-  a:hover { color:#802727; }
-  span
-    {
-      display: block;
-    }
-  span { padding:5px;}
-  div#emp_details_group { margin-right: 20px; width: 500px;float: right; max-width: 337px;border:1px solid #999; border-radius:4px; -moz-border-radius:4px; -web-kit-border-radius:4px; -khtml-border-radius:4px;}
-</style>
+<%= link_to "Add Employer Census Family", edit_employers_employer_path(@employer), class: "btn btn-primary" %> &nbsp;&nbsp;
