@@ -81,6 +81,12 @@ class PeopleController < ApplicationController
     @person = Person.find(params[:id])
     build_nested_models
   end
+  
+   def show
+    @person = Person.find(params[:id])
+    build_nested_models
+  end
+  
 
 private
   def build_nested_models

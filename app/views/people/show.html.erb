@@ -1,0 +1,30 @@
+<%- model_class = Person -%>
+
+<% content_for :side_nav do %>
+  <ul>
+    <li>Name<br/>Birtdate<br/>Gender<br/>Social Security</li>
+  </ul>
+<% end %>
+
+<section>
+  <div class="col-md-12">
+    <nav>
+      <%= render 'shared/breadcrumb', crumbs: [
+          link_to('People', people_path),
+          'New'
+        ]
+      %>
+    </nav>
+  </div>
+</section>
+
+
+
+<section>
+  <%= form_for(@person) do |f| %>
+    <%#= f.hidden_field :family_id %>
+
+    <%= render 'form', f: f %>
+
+  <% end %>
+</section>
