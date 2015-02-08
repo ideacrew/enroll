@@ -1,4 +1,7 @@
-<!--<h1>Employers::Employer#new</h1>
-<p>Find me in app/views/employers/employer/new.html.erb</p>  -->
 <%- model_class = Employer -%>
-<%= render :partial => 'form' %>
+
+<section>
+  <%= form_for @employer, url: {action: "create"} do |f| %>
+    <%= render 'form', f: f %>
+  <% end %>
+</section>

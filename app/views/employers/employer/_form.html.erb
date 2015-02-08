@@ -1,48 +1,83 @@
+<div class="container-fluid no-pd-left">
+  <div class="col-md-12 col-sm-12 no-pd">
+    <div class="panel panel-default">
+      <div class="panel-body left">
+        <div class="nama">
 
-<%= simple_form_for @employer, url: {action: "create"} do |f| %>
-
-  <% if @employer.errors.any? %>
-    <div class="alert alert-error">
-      <h4><%= pluralize(@employer.errors.count, "error") %> prohibited this person from being saved:</h4>
-      <ul>
-        <% @employer.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <legend>Employer</legend>
-  <div class="row">
-    <div class="col-md-offset-1 col-md-10">
-      <div class="form-inputs">
-        <div class="row">
-          <div class="col-md-6">
-            <%= f.input :name, placeholder: "Company Name" %>
-          </div>
-          <div class="col-md-4">
-            <%= f.input :fein, placeholder: "FEIN" %>
+          <div class="col-sm-2 left-pd">
+            <div class="sidebar list-group text-center" id="sidebar_partial_value">
+              <%= render 'sidebar', :page => 'new' %>
+            </div>
           </div>
 
-          <div class="col-md-6">
-            <%= f.input :dba, placeholder: "Company DBA's Name" %>
+          <div class="col-md-10 col-sm-12">
+
+            <div class="row welcome-msg">
+              <div class="col-md-11 col-sm-12 col-xs-12 no-pd">
+                <div class="col-md-10 col-sm-10 no-pd col-xs-12">
+                  <p>
+                    <span>Welcome.</span> Let’s get your Employees signed up for health care. Lorem ipsum dolot sit amet. Ut enim ad minim vineam, quis nostrud exarciation ullamco laboris nisi ut aliquip ex ea commondo consequat. Lorem ipsum dolor sit amet. Ut enim ad dolor sit
+                  </p>
+                </div>
+                <a href="#" class="btn btn-continue" id="continue">Continue</a>
+              </div>
+            </div>
+
+            <div class="col-md-11 col-sm-12 col-xs-12">
+              <% if @employer.errors.any? %>
+                <div class="alert alert-error">
+                  <h4><%= pluralize(@employer.errors.count, "error") %> prohibited this employer from being saved:</h4>
+                  <ul>
+                    <% @employer.errors.full_messages.each do |msg| %>
+                      <li><%= msg %></li>
+                    <% end %>
+                  </ul>
+                </div>
+              <% end %>
+            </div>
           </div>
 
-          <div class="col-md-4">
-            <%= f.input :entity_kind, placeholder: "Employer Type" %>
+
+          <p class="information row" style="opacity: 0.2;">Employer Information</p>
+                <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
+
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :name, class: "floatlabel form-control border-bottom-none border-right-none", required: true, placeholder: 'FEDERAL EMPLOYER ID' %>
+      </div>
+
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :fein, class: "floatlabel form-control border-bottom-none border-right-none", required: true, placeholder: 'COMPANY NAME' %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :dba, class: "floatlabel form-control border-bottom-none border-right-none", required: true, placeholder: 'DOING BUSINESS AS' %>
+      </div>
+
+      <div class="form-group form-group-lg">
+        <div class="row" style="margin: 0;">
+          <div class="col-md-4 col-sm-3 col-xs-0 bg-color"></div>
+          <div class="col-md-4 col-sm-6 col-xs-12 no-pd">
+            <div class="dropdown">
+              <button class="form-control float-label adderess-select-box border-bottom-none border-right-none form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                C Corporation
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                <% Employer::ENTITY_KINDS.each do |item| %>
+                  <li role="presentation"><a href="#" tabindex="-1" role="menuitem"><%= item.humanize %></a></li>
+                <% end %>
+              </ul>
+            </div>
           </div>
+          <div class="col-md-4 col-sm-3 col-xs-0 bg-color"></div>
         </div>
+      </div>  
+    </div>
+  </div>
 
 
+    <div class="well well-sm well-default">
+      <div class="form-actions">
+        <%= f.submit nil, :class => 'btn btn-primary' %>
       </div>
     </div>
-  </div>
-
-
-  <div class="well well-sm well-default">
-    <div class="form-actions">
-      <%= f.submit nil, :class => 'btn btn-primary' %>
-    </div>
-  </div>
-<% end %>
 
