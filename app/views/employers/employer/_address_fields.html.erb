@@ -7,11 +7,11 @@
     <p class="text-right col-md-6 col-md-push-6">
     </p>
   </div>
-  <%= f.input :kind, label: "Kind", collection: Address::KINDS, include_blank: "Type" %> <br/>
-  <%= f.input :address_1, placeholder: 'Street', required: true %><br/>
-  <%= f.input :address_2, placeholder: "Apt, Suite, Bldg (optional)" %><br/>
-  <%= f.input :city, placeholder: "City", required: true %><br/>
-  <%= f.input :state, label: "State", collection: State::NAME_IDS, include_blank: "State" %><br/>
-  <%= f.input :zip, placeholder: "Zip code"%><br/>
+  <%= f.select :kind, Address::KINDS, {include_blank: "Type"}%><br/>
+  <%= f.text_field :address_1, placeholder: 'Street', required: true %><br/>
+  <%= f.text_field :address_2, placeholder: "Apt, Suite, Bldg (optional)" %><br/>
+  <%= f.text_field :city, placeholder: "City", required: true %><br/>
+  <%= f.select :state, State::NAME_IDS, include_blank: "State" %><br/>
+  <%= f.text_field :zip, placeholder: "Zip code"%><br/>
   <hr>
 </div>

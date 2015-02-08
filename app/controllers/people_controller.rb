@@ -46,6 +46,15 @@ class PeopleController < ApplicationController
       format.js {}
     end
   end
+  
+  def person_confirm
+    @employe_family = EmployerCensus::Family.last
+
+    respond_to do |format|
+      format.js {}
+    end
+  end
+  
 
   def update
     @person = Person.find(params[:id])
@@ -81,6 +90,12 @@ class PeopleController < ApplicationController
     @person = Person.find(params[:id])
     build_nested_models
   end
+  
+   def show
+    @person = Person.find(params[:id])
+    build_nested_models
+  end
+  
 
 private
   def build_nested_models

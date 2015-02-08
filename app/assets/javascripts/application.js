@@ -23,13 +23,14 @@ $(document).ready(function () {
   $('.floatlabel').floatlabel({
       slideInput: false
   });
+  
 
   $('.autofill_yes').click(function(){
     $('.autofill-initial').addClass('hidden');
 
     $('#address_info').addClass('hidden');
     $('#phone_info').addClass('hidden');
-    $('#email_info').addClass('hidden');
+    $('.email_info').addClass('hidden');
 
     common_body_style();
     side_bar_link_style();
@@ -79,8 +80,6 @@ $(document).ready(function () {
       url: "/people/get_employer.js"
     });
   }
-
-
 
   // People/new Page
   $('.focus_effect').click(function(e){

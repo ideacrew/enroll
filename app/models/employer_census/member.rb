@@ -15,7 +15,7 @@ class EmployerCensus::Member
 
   field :employee_relationship, type: String
 
-  embedded_in :employer_census,
+  embedded_in :family,
     class_name: "EmployerCensus::Family"
 
   embeds_one :address

@@ -29,6 +29,7 @@ Rails.application.routes.draw do
     collection do
       post 'match_person'
       get 'get_employer'
+      post 'person_confirm'
     end
     
   end
