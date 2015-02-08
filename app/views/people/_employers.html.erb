@@ -20,13 +20,16 @@
 			</li>
 
 		<% end %>
-	</ul>
-  
+  </ul>
+  <div style="float:right;">
+    <a href="#" class="btn btn-save search_continue" >Continue</a>
+  </div>
 <% end %>
-      <script>
-
+<script>
+$('.search_continue').hide();
 $(".badge").on('click',function(){
-   $('.badge').removeClass('badge-active');
-  $(this).toggleClass('badge-active')
+  $('.badge').removeClass('badge-active');
+  $(this).toggleClass('badge-active');
+  $('.search_continue').show();
 });
 </script>
