@@ -9,15 +9,24 @@
 			<li class="list-group-item">
 				<div class="row">
 					<div class="col-md-3 col-sm-9 col-xs-9">
-						<h4><%= employer %></h4>
+						<h4><%= employer.name %></h4>
 					</div>
 					<div class="col-md-7 col-sm-1 col-xs-1">
 					</div>
 					<div class="col-md-2 col-sm-2 col-xs-2">
-						<span class="badge"><i></i></span>
+						<span id="badge" class="badge" style="cursor:pointer"><i></i></span>
 					</div>
 				</div>
 			</li>
+
 		<% end %>
 	</ul>
+  
 <% end %>
+      <script>
+
+$(".badge").on('click',function(){
+   $('.badge').removeClass('badge-active');
+  $(this).toggleClass('badge-active')
+});
+</script>
