@@ -68,7 +68,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.1.0'
   # gem 'mongoid-rspec' # causes issue: irb: warn: can't alias context from irb_context
   gem 'cucumber-rails', '~> 1.4.2', :require => false
-  gem 'factory_girl_rails'
+  gem 'factory_girl_rails', "~> 4.0"
   gem 'database_cleaner', '1.3.0'
   gem 'shoulda-matchers', require: false  
 end

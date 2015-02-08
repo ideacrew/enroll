@@ -301,7 +301,7 @@ DEPENDENCIES
   cucumber-rails (~> 1.4.2)
   database_cleaner (= 1.3.0)
   devise (~> 3.4.1)
-  factory_girl_rails
+  factory_girl_rails (~> 4.0)
   font-awesome-rails (= 4.2.0.0)
   haml
   jbuilder (~> 2.0)
