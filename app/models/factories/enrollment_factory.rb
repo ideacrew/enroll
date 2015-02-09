@@ -32,23 +32,30 @@ class EnrollmentFactory
 
   end
 
-  def self.add_broker_role(new_kind, new_npn, new_mailing_address)
+  def self.add_broker_role(person:, new_kind:, new_npn:, new_mailing_address:)
+    
+    [:new_kind, :new_npn, :new_mailing_address].each do |value|
+      name = value.id2name
 
+      raise ArgumentError.new("missing value: #{name}, expected as keyword ") if eval(name).blank?
+    end
+    
     kind = new_kind
     npn = new_npn
 
     mailing_address = new_mailing_address
 
-    family = initialize_families
+    family = self.initialize_families(person)
 
     broker_role = nil
 
-    if self.person.broker.blank?
+    if person.broker.blank?
       # Assign broker-specifc attributes
-      broker_role = self.person.build_broker(mailing_address: mailing_address, npn: npn, kind: kind)
+      #broker_role = person.build_broker(mailing_address: mailing_address, npn: npn, kind: kind)
+      broker_role = person.build_broker(npn: npn)
     end
 
-    self.person.save
+    person.save
     broker_role.save if broker_role.present?
     family.save if family.present?
 
@@ -77,28 +84,28 @@ class EnrollmentFactory
     end
 
     # Add 'self' to personal relationship need detailed implementation
-    person.personal_relationships << PersonRelationhip.new()
+    #person.person_relationships << PersonRelationhip.new()
 
-    family = initialize_families
+    family = self.initialize_families(person)
 
-    if person.save
-      if family.save
-        family.delete unless role.save
-      else
-        role.errors.add(:family, "unable to create family")
-      end
-    else
-      role.errors.add(:person, "unable to update person")
-    end
+    #if person.save
+     # if family.save
+      #  family.delete unless role.save
+      #else
+       # role.errors.add(:family, "unable to create family")
+      #end
+    #else
+     # role.errors.add(:person, "unable to update person")
+    #send*/
 
     role
   end
 
-  def initialize_families
+  def self.initialize_families(person)
     family = nil
-    if self.person.family.blank?
+    if person.family.blank?
     # Instantiate new family model need detailed implementation
-      family = self.person.build_family()
+      family = person.build_family()
     end
     return family
   end
