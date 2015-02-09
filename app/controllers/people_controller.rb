@@ -48,7 +48,7 @@ class PeopleController < ApplicationController
   end
   
   def person_confirm
-    @employe_family = EmployerCensus::Family.last
+    @employe_family = EmployerCensus::EmployeeFamily.last
 
     respond_to do |format|
       format.js {}

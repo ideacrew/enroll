@@ -9,7 +9,7 @@
   <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
     <div class="radio border-right-none">
       <label>
-        <%= radio_button_tag(:employee_gender, "male") %>
+        <%= f.radio_button :gender, "male" %>
         Male
       </label>
     </div>
@@ -17,7 +17,7 @@
   <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
     <div class="radio">
       <label>
-        <%= radio_button_tag(:employee_gender, "female") %>
+        <%= f.radio_button :gender, "female" %>
         Female
       </label>
     </div>
