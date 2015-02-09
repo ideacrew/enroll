@@ -6,8 +6,8 @@ class Employee
 
   field :employer_id, type: BSON::ObjectId
   field :benefit_group_id, type: BSON::ObjectId
-  field :date_of_hire, type: Date
-  field :date_of_termination, type: Date
+  field :hired_on, type: Date
+  field :terminated_on, type: Date
   field :is_active, type: Boolean, default: true
 
   delegate :hbx_id, to: :person, allow_nil: true
@@ -15,7 +15,7 @@ class Employee
   delegate :dob, :dob=, to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
-  validates_presence_of :person, :ssn, :dob, :gender, :employer_id, :date_of_hire
+  validates_presence_of :person, :ssn, :dob, :gender, :employer_id, :hired_on
 
   before_save :termination_date_must_follow_hire_date
 
@@ -59,7 +59,7 @@ class Employee
 
 private
   def termination_date_must_follow_hire_date
-    return if date_of_hire.nil? || date_of_termination.nil?
-    errors.add(:date_of_termination, "date_of_termination cannot preceed date_of_hire") if date_of_termination < date_of_hire
+    return if hired_on.nil? || terminated_on.nil?
+    errors.add(:terminated_on, "terminated_on cannot preceed hired_on") if terminated_on < hired_on
   end
 end
