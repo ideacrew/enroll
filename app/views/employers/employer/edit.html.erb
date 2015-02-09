@@ -5,7 +5,7 @@
       <div>
         <h3>Add new family</h3>
       </div>
-        <%= f.fields_for :employer_census_families, errors: {}, fieldset: false do |family|%>
+        <%= f.fields_for :employee_families, errors: {}, fieldset: false do |family|%>
 
           <%= family.fields_for :employee, errors: {}, fieldset: false do |employee|  %>
 

@@ -96,8 +96,7 @@ class Employer
   end
 
   def build_family
-    family = self.employer_census_families.build
-    family.members.build
+    family = self.employee_families.build
     family.build_employee
     family.build_employee.build_address
     family.dependents.build
