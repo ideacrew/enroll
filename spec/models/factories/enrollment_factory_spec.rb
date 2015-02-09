@@ -2,19 +2,20 @@ require 'rails_helper'
 require 'factories/enrollment_factory'
 
 RSpec.describe EnrollmentFactory do
+  let(:employer) {FactoryGirl.create(:employer)}
+  let(:employee_family) {FactoryGirl.create(:employer_census_employee_family)}
   let(:person) {FactoryGirl.build(:person)}
-  let(:employer) {FactoryGirl.build(:employer)}
   let(:ssn) {"123456789"}
   let(:gender) {"male"}
   let(:dob) {"01/01/1970"}
-  let(:date_of_hire) {"01/01/2014"}
+  let(:hired_on) {"01/01/2014"}
   let(:valid_params) do
     { person: person,
       employer: employer,
       ssn: ssn,
       gender: gender,
       dob: dob,
-      date_of_hire: date_of_hire
+      hired_on: hired_on
     }
   end
 
@@ -41,7 +42,7 @@ RSpec.describe EnrollmentFactory do
     end
 
     context "with no date of hire" do
-      let(:params) {valid_params.except(:date_of_hire)}
+      let(:params) {valid_params.except(:hired_on)}
       it "should raise" do
         expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
       end

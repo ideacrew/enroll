@@ -57,7 +57,7 @@ class EnrollmentFactory
 
   end
 
-  def self.add_employee_role(person:, employer:, ssn: nil, dob: nil, gender: nil, date_of_hire:)
+  def self.add_employee_role(person:, employer:, ssn: nil, dob: nil, gender: nil, hired_on:)
     [:ssn, :dob, :gender].each do |value|
       name = value.id2name
 
@@ -69,11 +69,11 @@ class EnrollmentFactory
     person.gender = gender unless gender.blank?
 
     # Return instance if this role already exists
-    role = person.employees.find_by_employer_id(employer.id);
+    role = person.employees.detect { |ee| ee.id == employer.id }
 
     if role.blank?
       # Assign employee-specifc attributes
-      role = person.build_employee(employer: new_employer, date_of_hire: new_date_of_hire)
+      role = person.employees.build(employer: employer, hired_on: hired_on)
     end
 
     # Add 'self' to personal relationship need detailed implementation
