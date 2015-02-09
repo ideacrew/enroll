@@ -523,6 +523,9 @@ ul.social li a span i{
   .list-group{
     display: none;
   }
+  .emp-sidebar {
+    display: none;
+  }
   .panel-body.left{
     padding-left: 15px;
     margin-right: 15px;
@@ -553,9 +556,9 @@ ul.social li a span i{
     width: 100%;
     margin-top: 15px;
   }
-  .dropdown-menu{
+/*  .dropdown-menu{
   left: 255px;
-  }
+  }*/
   li.nav{
     display: none;
   }
@@ -752,9 +755,9 @@ a.family{
   background-color: #f06344;
   color: #ffffff;
 }
-.dropdown-menu{
+/*.dropdown-menu{
   left: 0 !important;
-}
+}*/
 .dropdown.confirm{
   padding-top: 20px;
 }
@@ -790,6 +793,9 @@ a.family{
   font-size: 14px;
   font-weight: 300;
   font-family: 'AvenirLTStd-Light';
+  padding-bottom: 8px;
+  padding-left: 10px;
+  padding-right: 10px; 
 }
 .form-control:focus{
   border-color: #e3e3e3;
@@ -850,7 +856,7 @@ h5.active a{
   font-weight: 300;
 }
 .list-group a.phone{
-  padding-top: 43px;
+  padding-top: 102px;
   padding-bottom: 48px;
   background-color: #337ab7;
   border-color: #337ab7;
@@ -914,7 +920,7 @@ p.information{
   right: 0;
 }
 .key p i{
-  background: url("secure-lock.png") no-repeat;
+  background: url("../img/secure-lock.png") no-repeat;
   display: block;
   height: 26px;
   width: 20px;
@@ -929,7 +935,7 @@ input {
 label.label-floatlabel {
   font-size: 10px !important;
   top: 6px !important;
-  left: 17px !important;
+  left: 10px !important;
 }
 .row.check{
   margin-left: 0 !important;
@@ -1031,7 +1037,7 @@ input.floatlabe{
 }
 .sidebar-email-field {
   padding-bottom: 101px !important;
-  padding-top: 20px !important; 
+  padding-top: 90px !important; 
 } 
 
 @media screen and (-webkit-min-device-pixel-ratio:0) { 
@@ -1171,7 +1177,7 @@ input.floatlabe{
   padding-bottom: 20px;
 }
 .autofill-cloud .close {
-  background: url("autofill-close.png") no-repeat;
+  background: url("../img/autofill-close.png") no-repeat;
   display: block;
   width: 19px;
   height: 19px;
@@ -1225,16 +1231,17 @@ input.floatlabe{
   border: 1px solid #bdbbbb;
   border-radius: 0;
   width: 100%;
+  left: 0 !important;
 }
 .adderess-select-box + ul li a {
-  background: url("delete.png") no-repeat 8px center;
+  background: url("../img/delete.png") no-repeat 8px center;
   display: block;
   padding: 10px 0;
   text-align: center;
   border-bottom: 1px solid #bdbbbb;
 }
 .adderess-select-box + ul li:first-child a {
-  background: url("delete.png") no-repeat 8px center, url("address-close.png") no-repeat 95% center;
+  background: url("../img/delete.png") no-repeat 8px center, url("../img/address-close.png") no-repeat 95% center;
   display: block;
   background-size: auto auto,auto auto;
 }
@@ -1266,6 +1273,7 @@ input.floatlabe{
   position: absolute;
   right: 31px;
   top: 209px;
+  cursor: pointer;
 }
 
 @media (min-width: 300px) and (max-width: 767px) {
@@ -1301,6 +1309,24 @@ input.floatlabe{
   }
   .welcome-msg .btn-continue {
     margin-left: 20px;
+  }
+  .bg-color {
+    height: 0 !important;
+  }
+  .less-opacity {
+    display: none;
+  }
+  p.information {
+    margin-bottom: 27px;
+  }
+  #address_info {
+    margin-top: 14px;
+  }
+  #phone_info {
+    margin-top: 10px;
+  }
+  #email_info {
+    margin-top: 12px;
   }
 }
 
@@ -1464,29 +1490,10 @@ a.list-group-item.results {
   color: #616161 !important;
   font-size: 18px;
 }
-.result-row .list-group .badge {
-  background-color: #128d00;
-  border-radius: 9px;
+.result-row .list-group label {
   float: right;
-  font-size: 18px;
-  font-weight: normal;
-  height: 29px;
-  padding: 0;
   text-align: center;
-  width: 29px;
   opacity: 0.25;
-}
-
-.badge-active {
-  opacity: 1 !important;
-}
-
-.result-row .list-group .badge i {
-  background: url("checkmark.png") no-repeat;
-  display: block;
-  height: 14px;
-  margin: 7px auto 0;
-  width: 18px;
 }
 .result-row .list-group-item {
   border-color: #bbb;
@@ -1495,7 +1502,7 @@ a.list-group-item.results {
   background: none;
   border-color: #bbb;
 }
-.result-row .list-group .list-group-item.active .badge {
+.result-row .list-group .list-group-item.active label {
   opacity: 1;
 }
 .result-row .list-group .list-group-item p {
@@ -1691,7 +1698,7 @@ a .arrow-right {display: none;}
   color: #007bc3;
   padding-bottom: 0;
   padding-top: 0;
-  background: url("landing-page-delete.png") no-repeat #fff;
+  background: url("../img/landing-page-delete.png") no-repeat #fff;
   font-size: 11.45px;
 }
 .landing-row .left-side .search-table {
@@ -1841,6 +1848,237 @@ a .arrow-right {display: none;}
 
 /*** landing page css end ***/
 
+
+
+/*** employer-page css Start ***/
+
+.emp-sidebar {
+  background: #004f80;
+  min-height: 700px;
+}
+.emp-sidebar .arrow-right {
+  border-left: 20px solid #004f80;
+}
+.emp-sidebar a:hover, .emp-sidebar a:focus {
+  color: #fff !important;
+}
+.welcome_msg, .credential_info, .name_info, .tax_info {
+  background: #004f80;
+  border: #004f80;
+  color: #fff;
+  font-size: 18px;
+  padding-bottom: 50px;
+  padding-top: 50px;
+  display: block;
+  position: relative;
+}
+.welcome_msg {
+  padding-top: 89px;
+  display: block;
+}
+.welcome_msg .arrow-right {
+  top: 87px;
+  display: block;
+}
+.credential_info {
+  padding-top: 50px
+}
+.credential_info .arrow-right {
+  top: 44px;
+} 
+.name_info {
+  padding-top: 120px;
+}
+.name_info .arrow-right {
+  top: 129px;
+}
+.tax_info .arrow-right {
+  top: 43px;
+}
+.emp-welcome-msg {
+  padding-top: 25px;
+}
+.emp-welcome-msg p {
+  color: #616161;
+  font-size: 18px;
+  letter-spacing: 1px;
+  margin: 0 0 0 20px;
+}
+.emp-welcome-msg p span {
+  color: #004e82;
+}
+.emp-welcome-msg a {
+  display: inline-block;
+}
+.emp-welcome-msg .btn-continue {
+  background: none repeat scroll 0 0 #00b22d;
+  color: #fff;
+  font-family: "AvenirLTStd-Light";
+  font-size: 18px;
+  margin: 11px 0 18px 20px;
+  padding: 6px 40px;
+} 
+.margin-top {
+  margin-top: 40px !important;
+}
+#tax_info .disable-btn {
+  margin-top: 60px;
+}
+#tax_info .btn-continue {
+  background: none repeat scroll 0 0 #00b22d;
+  color: #fff;
+  font-family: "AvenirLTStd-Light";
+  font-size: 18px;
+  margin-top: 53px;
+  padding: 6px 40px;
+  display: none;
+}
+.employer-section .personaol-info-top-row .form-control::-moz-placeholder {
+  color: #a1a1a1;
+}
+.employer-section .personaol-info-top-row .form-control:-ms-input-placeholder {
+  color: #a1a1a1;
+}
+.employer-section .personaol-info-top-row .form-control:-webkit-input-placeholder {
+  color: #a1a1a1;
+}
+.employer-section .personaol-info-top-row .form-control:-o-input-placeholder {
+  color: #a1a1a1;
+}
+.emp-sidebar a.style_s_link{
+  font-weight: bold !important;
+}
+a .arrow-right {
+  display: none;
+}
+.emp-sidebar a.style_s_link .arrow-right {
+  display: block;
+}
+.coverage_info {
+  padding-top: 30px;
+  padding-bottom: 0;
+}
+.coverage_info .arrow-right {
+  top: 35px;
+}
+.plan_selection {
+  padding-top: 30px;
+}
+.plan_selection .arrow-right {
+  top: 23px;
+}
+.plan-top-row {
+  margin: 0;
+  border: none;
+}
+.plan-selection {
+  color: #ccc;
+}
+.personaol-info-top-row .plan-selection {
+  color: #bbb;
+}
+.plan-selection + ul {
+  width: 100%;
+}
+.plan-selection + ul li {
+  text-align: center;
+  width: 100%;
+}
+.plan-selection + ul li a { 
+  padding: 6px 0; 
+  color: #bbb;
+}
+.plan-selection + ul li a:hover, .plan-selection + ul li a:focus {
+  background: rgba(220, 234, 241, 1);
+  color: #bbb;
+}
+.eligibility_rules {
+  padding-bottom: 46px;
+  padding-top: 30px;
+}
+.eligibility_rules .arrow-right {
+  top: 32px;
+}
+.broker-info {
+  padding-top: 15px;
+}
+.broker-info .arrow-right {
+  top: 24px;
+}
+.emp-btn-continue .btn, .emp-save-btn .btn {
+  background: none repeat scroll 0 0 #00b22d;
+  color: #fff;
+  display: inline-block;
+  font-family: "AvenirLTStd-Light";
+  font-size: 18px;
+  margin-top: 8px;
+  padding: 6px 20px;
+}
+
+@media (min-width: 300px) and (max-width: 767px) {
+  #tax_info .disable-btn {
+    margin-left: -15px;
+    margin-top: 25px;
+  }
+}
+
+/*** employer-page css end ***/
+
+/* swop-show-page css Start */ 
+
+
+
+/* swop-show-page css End */
+
+/*** landing page css end ***/
+
 .small-textfield {
   width: 125px;
+}
+
+.result-row .list-group .badge {
+  background-color: #128d00;
+  border-radius: 9px;
+  float: right;
+  font-size: 18px;
+  font-weight: normal;
+  height: 29px;
+  padding: 0;
+  text-align: center;
+  width: 29px;
+  opacity: 0.25;
+}
+.badge-active {
+  opacity: 1 !important;
+}
+.result-row .list-group .badge i {
+  background: url("checkmark.png") no-repeat;
+  display: block;
+  height: 14px;
+  margin: 7px auto 0;
+  width: 18px;
+}
+.result-row .list-group-item {
+  border-color: #bbb;
+}
+.result-row .list-group-item.active, .result-row .list-group-item.active:hover, .result-row .list-group-item.active:focus {
+  background: none;
+  border-color: #bbb;
+}
+.result-row .list-group .list-group-item.active .badge {
+  opacity: 1;
+}
+.result-row .list-group .list-group-item p {
+  color: #a5a5a5;
+  font-size: 14px;
+}
+.result-row .right {
+  text-align: left !important;
+}
+.result-row .right h6 {
+  color: #616161;
+  line-height: 19px;
+  margin-bottom: 27px;
+  margin-top: 184px;
+  padding-right: 56px;
 }

@@ -5,7 +5,7 @@
       <div>
         <h3>Add new family</h3>
       </div>
-        <%= f.fields_for :employer_census_families, errors: {}, fieldset: false do |family|%>
+        <%= f.fields_for :employee_families, errors: {}, fieldset: false do |family|%>
 
           <%= family.fields_for :employee, errors: {}, fieldset: false do |employee|  %>
 
@@ -18,13 +18,16 @@
           <% end %>
           <br/>
 
-          <div><h3>Dependent Information</h3></div>
-            <div>
+          <div>
+            <h3>Dependent Information</h3>
+            <div class='form-inputs'>
               <%= family.fields_for :dependents, errors: {}, fieldset: false do |dependent|  %>
                 <%= render 'dependent_fields', f: dependent %>
               <% end %>
-              <p class="text-right"><%= link_to_add_fields "Add Dependent", family, :dependents %></p>
+              <br/>
+              <p><%= link_to_add_fields "Add Dependent", family, :dependents %></p>
             </div>
+          </div>
 
           <br/>
         <% end %>

@@ -30,7 +30,7 @@ $(document).ready(function () {
 
     $('#address_info').addClass('hidden');
     $('#phone_info').addClass('hidden');
-    $('.email_info').addClass('hidden');
+    $('#email_info').addClass('hidden');
 
     common_body_style();
     side_bar_link_style();

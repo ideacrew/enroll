@@ -7,7 +7,7 @@
 	<ul class="list-group">
 		<% @employers.each do |employer| %>
 			<li class="list-group-item">
-				<div class="row">
+				<div class="row skinned-form-controls skinned-form-controls-mac">
 					<div class="col-md-3 col-sm-9 col-xs-9">
 						<h4><%= employer.name %></h4>
 					</div>
@@ -23,7 +23,7 @@
       
 		<% end %>
   </ul>
-  <div style="float:right;">
+  <div style="float:right;padding-top: 20px;">
     <a href="#" class="btn btn-save search_continue" >Continue</a>
   </div>
 <% end %>

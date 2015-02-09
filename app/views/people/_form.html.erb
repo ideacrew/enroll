@@ -68,9 +68,11 @@
 
               <%= render 'shared/phone_fields', f: f %><br>
 
-              <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
-                <%= render 'shared/email_fields', f: email %>
-              <% end %>
+              <div id="email_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
+                <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+                  <%= render 'shared/email_fields', f: email %>
+                <% end %>
+              </div>
 
               <div class="autofill-cloud autofill-initial hidden">
                 <div class="row">
