@@ -44,9 +44,9 @@ class Consumer
   delegate :dob, :dob=, to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
-  include Validations::ConsumerInformation
+  include Validations::ConsumerInformationRequired
 
-  validates_presence_of :person, :ssn, :dob, :gender, :is_incarcerated, :is_applicant,
+  validates_presence_of :person, :is_incarcerated, :is_applicant,
     :is_state_resident, :citizen_status
 
   validates :citizen_status,
