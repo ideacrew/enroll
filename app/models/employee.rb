@@ -2,10 +2,13 @@ class Employee
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  EMPLOYMENT_STATUS_KINDS   = ["active", "full-time", "part-time", "retired", "terminated"]
+
   embedded_in :person
 
   field :employer_id, type: BSON::ObjectId
   field :benefit_group_id, type: BSON::ObjectId
+  field :employee_status, type: String
   field :hired_on, type: Date
   field :terminated_on, type: Date
   field :is_active, type: Boolean, default: true
