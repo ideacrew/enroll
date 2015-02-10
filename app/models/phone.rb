@@ -14,7 +14,8 @@ class Phone
   field :extension, type: String, default: ""
   field :primary, type: Boolean
   field :full_phone_number, type: String, default: ""
-
+  before_validation :save_phone_components
+  
   validates :area_code,
     numericality: true,
     length: { minimum: 3, maximum: 3, message: "%{value} is not a valid area code" },
@@ -29,17 +30,26 @@ class Phone
     inclusion: { in: KINDS, message: "%{value} is not a valid phone type" },
     allow_blank: false
 
-  def area_code=(value)
-    super filter_non_numbers(value)
+    
+  def save_phone_components
+    phone_number = filter_non_numbers(self.full_phone_number)
+    if phone_number.length == 10
+      self.area_code = phone_number[0,3].to_i
+      self.number = phone_number[3,9].to_i
+    end
   end
+  
+  #def area_code=(value)
+   # super filter_non_numbers(value)
+  #end
 
-  def number=(value)
-    super filter_non_numbers(value)
-  end
+  #def number=(value)
+   # super filter_non_numbers(value)
+  #end
 
-  def extension=(value)
-    super filter_non_numbers(value)
-  end
+  #def extension=(value)
+   # super filter_non_numbers(value)
+  #end
 
 private
   def filter_non_numbers(str)

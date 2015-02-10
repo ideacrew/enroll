@@ -15,6 +15,7 @@
 //= require jquery_ujs
 //= require twitter/bootstrap
 //= require turbolinks
+//= require jquery.inputmask
 //= require_tree .
 
 
@@ -27,6 +28,7 @@ $(document).ready(function () {
       slideInput: false
   });
   
+  $(".phone-mask").inputmask("(999) 999-9999");
 
   $('.autofill_yes').click(function(){
     $('.autofill-initial').addClass('hidden');
@@ -154,6 +156,7 @@ $(document).ready(function () {
   
   function common_body_style()
   {
+
     $('#personal_info').addClass('personaol-info-row');
     $('.focus_effect').removeClass('personaol-info-top-row');
     $('#address_info').addClass('personaol-info-top-row');
@@ -162,7 +165,7 @@ $(document).ready(function () {
   
   function check_personal_info_exists()
   {
-    var check = $('#personal_info [required]').filter(function() { return this.value == ""; });
+    var check = $('#personal_info input[required]').filter(function() { return this.value == ""; });
     return check;
   }
 
