@@ -45,13 +45,9 @@ class Consumer
   delegate :gender, :gender=, to: :person, allow_nil: true
 
   include Validations::ConsumerInformationRequired
+  include Validations::Residency
 
-  validates_presence_of :person, :is_incarcerated, :is_applicant,
-    :is_state_resident, :citizen_status
-
-  validates :citizen_status,
-    inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" },
-    allow_blank: false
+  validates_presence_of :person, :is_incarcerated, :is_applicant
 
   scope :all_under_age_twenty_six, ->{ gt(:'dob' => (Date.today - 26.years))}
   scope :all_over_age_twenty_six,  ->{lte(:'dob' => (Date.today - 26.years))}
