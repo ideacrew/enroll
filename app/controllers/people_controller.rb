@@ -12,22 +12,17 @@ class PeopleController < ApplicationController
     @person = Person.new(person_params)
 
     matched_person = Person.match_by_id_info(@person)
-
     if matched_person.blank?
       # Preexisting Person not found, create new instance and return to complete form entry
       respond_to do |format|
-        if @person.save
-          format.json { render json: @person, status: :created, location: @person }
-        else
-          format.json { render json: @person.errors, status: :unprocessable_entity }
-        end
+        format.json { render json: { person: @person, matched: false}, status: :ok, location: @person }
       end
     else
       # Matched Person, autofill form with found attributes
       respond_to do |format|
         @person = matched_person.first
         build_nested_models
-        format.json { render json: @person, status: :ok, location: @person }
+        format.json { render json: { person: @person, matched: true}, status: :ok, location: @person, matched: true }
       end
     end
   end

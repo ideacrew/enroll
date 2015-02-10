@@ -42,18 +42,10 @@ $(document).ready(function () {
 
     $('.search_alert_msg').removeClass('hidden');
     $('.searching_span').text('Searching');
-
-    $.ajax({
-        type: "POST",
-        url: "/people/match_person.json",
-        data: $('#new_person').serialize(),
-        success: function (result) {
-          // alert("find your details.Please select employer");
-          $('.search_alert_msg').addClass('hidden');
-          
-          getAllEmployers();
-        }
-    });
+    $('.search_alert_msg').addClass('hidden');
+    getAllEmployers();
+    
+ 
   });
   
   $('.autofill_no').click(function(){
@@ -63,7 +55,21 @@ $(document).ready(function () {
   
   $("#person_ssn").on("blur", function(){
     $('.autofill-failed').addClass('hidden');
+    $(".div-cloud-image").hide();
     $('.autofill-cloud.autofill-initial').removeClass('hidden');
+       $.ajax({
+        type: "POST",
+        url: "/people/match_person.json",
+        data: $('#new_person').serialize(),
+        success: function (result) {
+         // result.person gives person info to populate
+        
+        if(result.matched == true)
+        {
+          $(".div-cloud-image").show();
+        }
+      }
+    });
     // confirm_flag = confirm("We may be able to auto-fill your information with data from our records");
     // if(confirm_flag){
     //     $.ajax({
