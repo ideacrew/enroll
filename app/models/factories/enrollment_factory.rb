@@ -6,8 +6,13 @@ class EnrollmentFactory
     self.person = person
   end
 
-  def self.add_consumer_role(person:, ssn: nil, dob: nil, gender: nil, is_incarcerated:, is_applicant:,
-                             is_state_resident:, citizen_status:)
+  def self.add_consumer_role(person:, new_ssn: nil, new_dob: nil, new_gender: nil, new_is_incarcerated:, new_is_applicant:,
+                             new_is_state_resident:, new_citizen_status:)
+
+    [:new_is_incarcerated, :new_is_applicant, :new_is_state_resident, :new_citizen_status].each do |value|
+      name = value.id2name
+      raise ArgumentError.new("missing value: #{name}, expected as keyword ") if eval(name).blank?
+    end
 
     ssn = new_ssn
     dob = new_dob
@@ -18,15 +23,18 @@ class EnrollmentFactory
     citizen_status = new_citizen_status
 
     # Assign consumer-specifc attributes
-    consumer_role = self.person.build_consumer(ssn: ssn,
+    consumer_role = person.build_consumer(ssn: ssn,
                                                dob: dob,
                                                gender: gender,
                                                is_incarcerated: is_incarcerated,
                                                is_applicant: is_applicant,
                                                is_state_resident: is_state_resident,
                                                citizen_status: citizen_status)
-   self.person.save
-   consumer_role.save
+#   if person.save
+#      consumer_role.save
+#    else
+#      consumer_role.errors.add(:person, "unable to update person")
+#    end
 
    return consumer_role
 
@@ -55,9 +63,15 @@ class EnrollmentFactory
       broker_role = person.build_broker(npn: npn)
     end
 
-    person.save
-    broker_role.save if broker_role.present?
-    family.save if family.present?
+#    if person.save
+#      if family.save
+#        family.delete unless broker_role.save
+#      else
+#        broker_role.errors.add(:family, "unable to create family")
+#      end
+#    else
+#      broker_role.errors.add(:person, "unable to update person")
+#    end
 
     # Return new instance
     return broker_role
@@ -88,15 +102,15 @@ class EnrollmentFactory
 
     family = self.initialize_families(person)
 
-    #if person.save
-     # if family.save
-      #  family.delete unless role.save
-      #else
-       # role.errors.add(:family, "unable to create family")
-      #end
-    #else
-     # role.errors.add(:person, "unable to update person")
-    #send*/
+#    if person.save
+#      if family.save
+#        family.delete unless role.save
+#      else
+#        role.errors.add(:family, "unable to create family")
+#      end
+#    else
+#      role.errors.add(:person, "unable to update person")
+#    end
 
     role
   end
