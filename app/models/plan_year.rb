@@ -5,8 +5,8 @@ class PlanYear
   embedded_in :employer
 
   # Plan Year time period
-  field :start_date_on, type: Date
-  field :end_date_on, type: Date
+  field :start_on, type: Date
+  field :end_on, type: Date
 
   field :open_enrollment_start_on, type: Date
   field :open_enrollment_end_on, type: Date
@@ -22,7 +22,7 @@ class PlanYear
 
   embeds_many :benefit_groups
 
-  validates_presence_of :start_date_on, :end_date_on, :open_enrollment_start_on, :open_enrollment_end_on
+  validates_presence_of :start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on
 
   validate :open_enrollment_date_checks
 
@@ -43,21 +43,21 @@ class PlanYear
 private
 
   def open_enrollment_date_checks
-    if start_date_on.day != 1
-      errors.add(:start_date_on, "must be first day of the month")
+    if start_on.day != 1
+      errors.add(:start_on, "must be first day of the month")
     end
 
-    if end_date_on != Date.civil(end_date_on.year, end_date_on.month, -1)
+    if end_on != Date.civil(end_on.year, end_on.month, -1)
 first    end
 
     # TODO: Create HBX object with configuration settings including shop_plan_year_maximum_in_days
     shop_plan_year_maximum_in_days = 365
-    if (end_date_on - start_date_on) > plan_year_max
-      errors.add(:end_date_on, "must be less than #{shop_plan_year_maximum_in_days} days from start date")      
+    if (end_on - start_on) > plan_year_max
+      errors.add(:end_on, "must be less than #{shop_plan_year_maximum_in_days} days from start date")      
     end
 
-    if open_enrollment_end_on < start_date_on
-      errors.add(:start_date_on, "can't occur before open enrollment end date")
+    if open_enrollment_end_on < start_on
+      errors.add(:start_on, "can't occur before open enrollment end date")
     end
 
     if open_enrollment_end_on < open_enrollment_start_on
