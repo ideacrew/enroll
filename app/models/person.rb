@@ -51,17 +51,8 @@ class Person
   accepts_nested_attributes_for :consumer, :responsible_party, :broker, :hbx_staff,
     :person_relationships, :employees, :addresses, :phones, :emails
 
-  validates_presence_of :first_name, :last_name
-
-  validates :ssn,
-    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
-    numericality: true,
-    uniqueness: true,
-    allow_blank: true
-
-  validates :gender,
-    allow_blank: true,
-    inclusion: { in: GENDER_KINDS, message: "%{value} is not a valid gender" }
+  include Validations::IndividualName
+  include Validations::ConsumerInformation
 
   # validates_each CHILD_MODELS do | record, attrib, value |
   #   record.errors.add(attrib)

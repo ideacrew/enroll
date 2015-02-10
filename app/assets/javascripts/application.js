@@ -11,19 +11,24 @@
 // about supported directives.
 //
 //= require jquery
+//= require jquery-ui
 //= require jquery_ujs
 //= require twitter/bootstrap
 //= require turbolinks
+//= require jquery.inputmask
 //= require_tree .
 
 
 $('input.floatlabel').floatlabel();
 
 $(document).ready(function () {
+  
+  $(".date-picker, .date_picker").datepicker();
   $('.floatlabel').floatlabel({
       slideInput: false
   });
   
+  $(".phone-mask").inputmask("(999) 999-9999");
 
   $('.autofill_yes').click(function(){
     $('.autofill-initial').addClass('hidden');
@@ -37,18 +42,10 @@ $(document).ready(function () {
 
     $('.search_alert_msg').removeClass('hidden');
     $('.searching_span').text('Searching');
-
-    $.ajax({
-        type: "POST",
-        url: "/people/match_person.json",
-        data: $('#new_person').serialize(),
-        success: function (result) {
-          // alert("find your details.Please select employer");
-          $('.search_alert_msg').addClass('hidden');
-          
-          getAllEmployers();
-        }
-    });
+    $('.search_alert_msg').addClass('hidden');
+    getAllEmployers();
+    
+ 
   });
   
   $('.autofill_no').click(function(){
@@ -58,7 +55,21 @@ $(document).ready(function () {
   
   $("#person_ssn").on("blur", function(){
     $('.autofill-failed').addClass('hidden');
+    $(".div-cloud-image").hide();
     $('.autofill-cloud.autofill-initial').removeClass('hidden');
+       $.ajax({
+        type: "POST",
+        url: "/people/match_person.json",
+        data: $('#new_person').serialize(),
+        success: function (result) {
+         // result.person gives person info to populate
+        
+        if(result.matched == true)
+        {
+          $(".div-cloud-image").show();
+        }
+      }
+    });
     // confirm_flag = confirm("We may be able to auto-fill your information with data from our records");
     // if(confirm_flag){
     //     $.ajax({
@@ -151,6 +162,7 @@ $(document).ready(function () {
   
   function common_body_style()
   {
+
     $('#personal_info').addClass('personaol-info-row');
     $('.focus_effect').removeClass('personaol-info-top-row');
     $('#address_info').addClass('personaol-info-top-row');
@@ -159,7 +171,7 @@ $(document).ready(function () {
   
   function check_personal_info_exists()
   {
-    var check = $('#personal_info input:text').filter(function() { return this.value == ""; });
+    var check = $('#personal_info input[required]').filter(function() { return this.value == ""; });
     return check;
   }
 

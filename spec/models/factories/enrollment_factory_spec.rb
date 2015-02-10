@@ -3,7 +3,6 @@ require 'factories/enrollment_factory'
 
 RSpec.describe EnrollmentFactory do
   let(:employer) {FactoryGirl.create(:employer)}
-  let(:broker) {FactoryGirl.create(:broker)}
   let(:employee_family) {FactoryGirl.create(:employer_census_employee_family)}
   let(:person) {FactoryGirl.build(:person)}
   let(:new_mailing_address) do
@@ -37,6 +36,23 @@ RSpec.describe EnrollmentFactory do
       new_npn: npn,
       new_kind: broker_kind,
       new_mailing_address: new_mailing_address
+    }
+  end
+
+  let(:is_incarcerated) {true}
+  let(:is_applicant) {true}
+  let(:is_state_resident) {true}
+  let(:citizen_status) {"us_citizen"}
+
+  let(:valid_consumer_params) do
+    { person: person,
+      new_is_incarcerated: is_incarcerated,
+      new_is_applicant: is_applicant,
+      new_is_state_resident: is_state_resident,
+      new_ssn: ssn,
+      new_dob: dob,
+      new_gender: gender,
+      new_citizen_status: citizen_status
     }
   end
 
@@ -98,7 +114,53 @@ RSpec.describe EnrollmentFactory do
     end
 
   end
-  
+
+  describe ".add_consumer_role" do
+    context "with no arguments" do
+      let(:params) {{}}
+      it "should raise" do
+        expect{EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
+      end
+    end
+
+   context "with no is_incarcerated" do
+      let(:params) {valid_params.except(:new_is_incarcerated)}
+      it "should raise" do
+        expect{EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
+      end
+   end
+
+   context "with no is_applicant" do
+      let(:params) {valid_params.except(:new_is_applicant)}
+      it "should raise" do
+        expect{EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
+      end
+   end
+
+   context "with no is_state_resident" do
+      let(:params) {valid_params.except(:new_is_state_resident)}
+      it "should raise" do
+        expect{EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
+      end
+   end
+
+   context "with no citizen_status" do
+      let(:params) {valid_params.except(:new_citizen_status)}
+      it "should raise" do
+        expect{EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
+      end
+   end
+
+   context "with all required data" do
+      let(:params) {valid_consumer_params}
+      it "should not raise" do
+        expect{EnrollmentFactory.add_consumer_role(**params)}.not_to raise_error
+      end
+    end
+
+  end
+
+
   describe ".add_broker_role" do
     context "with no arguments" do
       let(:params) {{}}
@@ -114,11 +176,26 @@ RSpec.describe EnrollmentFactory do
       end
     end
     
-     context "with no npn" do
+    context "with no npn" do
       let(:params) {valid_broker_params.except(:new_npn)}
       it "should raise" do
         expect{EnrollmentFactory.add_broker_role(**params)}.to raise_error(ArgumentError)
       end
     end
+
+    context "with no kind" do
+      let(:params) {valid_broker_params.except(:new_kind)}
+      it "should raise" do
+        expect{EnrollmentFactory.add_broker_role(**params)}.to raise_error(ArgumentError)
+      end
+    end
+
+    context "with no mailing address" do
+      let(:params) {valid_broker_params.except(:new_mailing_address)}
+      it "should raise" do
+        expect{EnrollmentFactory.add_broker_role(**params)}.to raise_error(ArgumentError)
+      end
+    end
+
   end
 end

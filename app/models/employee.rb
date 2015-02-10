@@ -18,14 +18,11 @@ class Employee
   delegate :dob, :dob=, to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
-  validates_presence_of :person, :ssn, :dob, :gender, :employer_id, :hired_on
+  validates_presence_of :person, :employer_id, :hired_on
 
   before_save :termination_date_must_follow_hire_date
 
-  validates :ssn,
-    length: { minimum: 9, maximum: 9, message: "Employee SSN must be 9 digits" },
-    numericality: true,
-    uniqueness: true
+  include Validations::ConsumerInformationRequired
 
   def families
     Family.by_employee(self)

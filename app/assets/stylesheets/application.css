@@ -11,6 +11,7 @@
  * file per style scope.
  *
  *= require custom_bootstrap/custom_bootstrap
+ *= require jquery-ui
  *= require font-awesome
  *= require_tree .
  *= require_self
