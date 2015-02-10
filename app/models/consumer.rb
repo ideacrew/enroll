@@ -44,17 +44,14 @@ class Consumer
   delegate :dob, :dob=, to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
+  include Validations::ConsumerInformation
+
   validates_presence_of :person, :ssn, :dob, :gender, :is_incarcerated, :is_applicant,
     :is_state_resident, :citizen_status
 
   validates :citizen_status,
     inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" },
     allow_blank: false
-
-  validates :ssn,
-    length: { minimum: 9, maximum: 9, message: "Consumer SSN must be 9 digits" },
-    numericality: true,
-    uniqueness: true
 
   scope :all_under_age_twenty_six, ->{ gt(:'dob' => (Date.today - 26.years))}
   scope :all_over_age_twenty_six,  ->{lte(:'dob' => (Date.today - 26.years))}
