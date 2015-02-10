@@ -159,7 +159,7 @@ $(document).ready(function () {
   
   function check_personal_info_exists()
   {
-    var check = $('#personal_info input:text').filter(function() { return this.value == ""; });
+    var check = $('#personal_info [required]').filter(function() { return this.value == ""; });
     return check;
   }
 
