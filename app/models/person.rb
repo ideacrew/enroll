@@ -51,8 +51,7 @@ class Person
   accepts_nested_attributes_for :consumer, :responsible_party, :broker, :hbx_staff,
     :person_relationships, :employees, :addresses, :phones, :emails
 
-  validates_presence_of :first_name, :last_name
-
+  include Validations::IndividualName
   include Validations::ConsumerInformation
 
   # validates_each CHILD_MODELS do | record, attrib, value |
