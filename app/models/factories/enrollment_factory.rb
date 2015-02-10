@@ -30,11 +30,11 @@ class EnrollmentFactory
                                                is_applicant: is_applicant,
                                                is_state_resident: is_state_resident,
                                                citizen_status: citizen_status)
-#   if person.save
-#      consumer_role.save
-#    else
-#      consumer_role.errors.add(:person, "unable to update person")
-#    end
+   if person.save
+      consumer_role.save
+    else
+      consumer_role.errors.add(:person, "unable to update person")
+    end
 
    return consumer_role
 
@@ -63,15 +63,15 @@ class EnrollmentFactory
       broker_role = person.build_broker(npn: npn)
     end
 
-#    if person.save
-#      if family.save
-#        family.delete unless broker_role.save
-#      else
-#        broker_role.errors.add(:family, "unable to create family")
-#      end
-#    else
-#      broker_role.errors.add(:person, "unable to update person")
-#    end
+    if person.save
+      if family.save
+        family.delete unless broker_role.save
+      else
+        broker_role.errors.add(:family, "unable to create family")
+      end
+    else
+      broker_role.errors.add(:person, "unable to update person")
+    end
 
     # Return new instance
     return broker_role
@@ -102,15 +102,15 @@ class EnrollmentFactory
 
     family = self.initialize_families(person)
 
-#    if person.save
-#      if family.save
-#        family.delete unless role.save
-#      else
-#        role.errors.add(:family, "unable to create family")
-#      end
-#    else
-#      role.errors.add(:person, "unable to update person")
-#    end
+    if person.save
+      if family.save
+        family.delete unless role.save
+      else
+        role.errors.add(:family, "unable to create family")
+      end
+    else
+      role.errors.add(:person, "unable to update person")
+    end
 
     role
   end
