@@ -11,6 +11,7 @@
 // about supported directives.
 //
 //= require jquery
+//= require jquery-ui
 //= require jquery_ujs
 //= require twitter/bootstrap
 //= require turbolinks
@@ -20,6 +21,8 @@
 $('input.floatlabel').floatlabel();
 
 $(document).ready(function () {
+  
+  $(".date-picker, .date_picker").datepicker();
   $('.floatlabel').floatlabel({
       slideInput: false
   });
