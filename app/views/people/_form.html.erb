@@ -4,27 +4,15 @@
       <div class="panel-body left">
         <div class="nama">
 
-          <div class="col-sm-2 left-pd">
-            <div class="sidebar list-group text-center" id="sidebar_partial_value">
-              <%= render 'people/sidebar', :page => 'new' %>
-            </div>
+          <div class="col-sm-2 left-pd" id="sidebar_partial_value">
+            <%= render 'people/sidebar', :page => 'new' %>
           </div>
 
           <div class="col-md-10 col-sm-12">
 
-            <div class="row welcome-msg">
-              <div class="col-md-11 col-sm-12 col-xs-12 no-pd">
-                <div class="col-md-10 col-sm-10 no-pd col-xs-12">
-                  <p>
-                    <span>Welcome.</span> Let’s get you signed up for health care. Lorem ipsum dolot sit amet. Ut enim ad minim vineam, quis nostrud exarciation ullamco laboris nisi ut aliquip ex ea commondo consequat. Lorem ipsum dolor sit amet. Ut enim ad dolor sit
-                  </p>
-                </div>
-                <a href="#" class="btn btn-continue" id="continue">Continue</a>
-              </div>
-            </div>
+            <%= render 'welcome_msg' %>
 
             <div class="col-md-11 col-sm-12 col-xs-12">
-
               <% if @person.errors.any? %>
                 <div class="alert alert-error">
                   <h4><%= pluralize(@person.errors.count, "error") %> prohibited this person from being saved:</h4>
