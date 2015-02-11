@@ -25,7 +25,6 @@
 
             <p class="information row" style="opacity: 0.2;">Personal Information</p>
             <div id="overlay"></div>
-
             <div id="personal_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
               <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
                 <%= render 'shared/name_fields', f: f %>
@@ -40,10 +39,8 @@
                 </p>
               </div>
             </div><br>
-
-            <%= f.fields_for :addresses, errors: {}, fieldset: true do |address|  %>
-              <%= render 'shared/address_fields', f: address %>
-            <% end %><br>
+            
+            <%= render 'shared/address_fields', f: f %><br>
 
             <%= render 'shared/phone_fields', f: f %><br>
 
