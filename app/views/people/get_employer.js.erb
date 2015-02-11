@@ -2,7 +2,7 @@ $('.search_results').removeClass('hidden')
 $('.employers-row').html("<%= escape_javascript(render 'employers').html_safe %>")
 
 <% if @employers.present? %>
-	$('#sidebar_partial_value').html("<%= escape_javascript(render 'sidebar', :page => 'search').html_safe %>")
+	// $('#sidebar_partial_value').html("<%= escape_javascript(render 'sidebar', :page => 'search').html_safe %>")
 
 	$('.search_alert_msg').addClass('hidden');
 	$('.searching_span').text('Search');
@@ -11,7 +11,7 @@ $('.employers-row').html("<%= escape_javascript(render 'employers').html_safe %>
 	$('.results_link').removeClass('style_s_link');
 	$('.results').addClass('style_s_link');
 <% else %>
-	$('#sidebar_partial_value').html("<%= escape_javascript(render 'sidebar', :page => 'new').html_safe %>")
+	// $('#sidebar_partial_value').html("<%= escape_javascript(render 'sidebar', :page => 'new').html_safe %>")
 	$('.autofill-failed').removeClass('hidden');
 	$('#address_info').removeClass('hidden');
     $('#phone_info').removeClass('hidden');
