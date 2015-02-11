@@ -55,7 +55,6 @@ $(document).ready(function () {
   
   $("#person_ssn").on("blur", function(){
     $('.autofill-failed').addClass('hidden');
-    $(".div-cloud-image").hide();
     $('.autofill-cloud.autofill-initial').removeClass('hidden');
        $.ajax({
         type: "POST",
