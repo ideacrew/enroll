@@ -128,14 +128,19 @@ $(document).ready(function () {
 
   $('#continue').click(function() {
     $("#overlay").css("display", "none");
-    $(".welcome-msg").css("display", "none");
+    $(".emp-welcome-msg").css("display", "none");
     $(".focus_effect").css("opacity", "1");
     $(".information").css("opacity", "1");
     $("a.name").css("padding-top", "65px");
     $(".disable-btn").css("display", "inline-block");
+    $(".welcome-msg").css("display", "none");
+    $("a.welcome_msg").css("display", "none");
+    $("a.credential_info, a.name_info, a.tax_info").css("display", "block");
+    $("#tax_info .btn-continue").css("display", "inline-block");
     $('.focus_effect:first').addClass('personaol-info-top-row');
     $('.focus_effect:first').removeClass('personaol-info-row');
     $('.sidebar a:first').addClass('style_s_link');
+    $('.sidebar a.credential_info').addClass('style_s_link');
     $(".key").css("display", "block");
     var check = check_personal_info_exists();
     if(check.length==0) {
