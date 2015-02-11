@@ -71,7 +71,7 @@ class PeopleController < ApplicationController
     
     build_nested_models
     respond_to do |format|
-      if @person.save
+      if @person.save(validate: false)
         format.html { redirect_to @person, notice: 'Person was successfully created.' }
         format.json { render json: @person, status: :created, location: @person }
       else
