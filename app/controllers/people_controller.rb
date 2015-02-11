@@ -67,14 +67,20 @@ class PeopleController < ApplicationController
   end
 
   def create
-    @person = Person.new(person_params)
     
-    build_nested_models
+    person_params["addresses_attributes"].each do |key, address|
+      if address["kind"] != 'home' && (address["city"].blank? && address["zip"].blank? && address["address_1"].blank?) 
+        person_params["addresses_attributes"].delete("#{key}")
+      end
+    end
+    puts person_params
+    @person = Person.new(person_params)
     respond_to do |format|
       if @person.save(validate: false)
         format.html { redirect_to @person, notice: 'Person was successfully created.' }
         format.json { render json: @person, status: :created, location: @person }
       else
+        build_nested_models
         format.html { render action: "new" }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end
@@ -99,7 +105,9 @@ private
        @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
     end
    
-    @person.addresses.build if @person.addresses.empty?
+    Address::KINDS.each do |kind|
+      @person.addresses.build(kind: kind) if @person.addresses.select{|address| address.kind == kind}.blank?
+    end
     
     ["home","work"].each do |kind|
        @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?

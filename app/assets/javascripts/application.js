@@ -28,6 +28,13 @@ $(document).ready(function () {
       slideInput: false
   });
   
+  $(".address-li").on('click',function(){
+    $(".address-span").html($(this).data("address-text"));
+    $(".address-row").hide();
+    divtoshow = $(this).data("value") + "-div";
+    $("."+divtoshow).show();
+  })
+  
   $(".phone-mask").inputmask("(999) 999-9999");
 
   $('.autofill_yes').click(function(){
@@ -188,20 +195,28 @@ $(document).ready(function () {
     $('#address_info').removeClass('personaol-info-row');
   }
   
+  function change_address(kind)
+  {
+    $(".address-row").hide();
+    $(kind+"-div").show();
+    
+    //address-li
+  }
+    
   function check_personal_info_exists()
   {
-    var check = $('#personal_info input[required]').filter(function() { return this.value == ""; });
+    var check = $('#personal_info input[required1]').filter(function() { return this.value == ""; });
     return check;
   }
 
-  $(".adderess-select-box").focusin(function() {
+  $(".qqqadderess-select-box").focusin(function() {
     $(".bg-color").css({
       "background-color": "rgba(220, 234, 241, 1)", 
       "height": "46px", 
     });
   });
   
-  $(".adderess-select-box").focusout(function() {
+  $(".qqadderess-select-box").focusout(function() {
     $(".bg-color").css({
       "background-color": "rgba(255, 255, 255, 1)", 
       "height": "46px", 
