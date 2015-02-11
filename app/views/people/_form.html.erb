@@ -1,64 +1,61 @@
-<div class="container-fluid no-pd-left">
-  <div class="col-md-12 col-sm-12 no-pd">
+<div class="row content landing">
+  <div class="container-fluid no-pd-left">          
     <div class="panel panel-default">
       <div class="panel-body left">
-        <div class="nama">
+        
+        <div class="col-sm-2 left-pd" id="sidebar_partial_value">
+          <%= render 'people/sidebar' %>
+        </div>
 
-          <div class="col-sm-2 left-pd" id="sidebar_partial_value">
-            <%= render 'people/sidebar' %>
-          </div>
+        <div class="col-md-10 col-sm-12">
 
-          <div class="col-md-10 col-sm-12">
+          <%= render 'welcome_msg' %>
 
-            <%= render 'welcome_msg' %>
+          <div class="col-md-11 col-sm-12 col-xs-12">
+            <% if @person.errors.any? %>
+              <div class="alert alert-error">
+                <h4><%= pluralize(@person.errors.count, "error") %> prohibited this person from being saved:</h4>
+                <ul>
+                  <% @person.errors.full_messages.each do |msg| %>
+                    <li><%= msg %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
 
-            <div class="col-md-11 col-sm-12 col-xs-12">
-              <% if @person.errors.any? %>
-                <div class="alert alert-error">
-                  <h4><%= pluralize(@person.errors.count, "error") %> prohibited this person from being saved:</h4>
-                  <ul>
-                    <% @person.errors.full_messages.each do |msg| %>
-                      <li><%= msg %></li>
-                    <% end %>
-                  </ul>
-                </div>
-              <% end %>
+            <p class="information row" style="opacity: 0.2;">Personal Information</p>
+            <div id="overlay"></div>
 
-              <p class="information row" style="opacity: 0.2;">Personal Information</p>
-              <div id="overlay"></div>
-
-              <div id="personal_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
-                <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
-                  <%= render 'shared/name_fields', f: f %>
-                  <%= render 'shared/id_info_fields', f: f %>
-                </div>
-
-                <div class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
-                  <%= f.submit 'Save & Exit', :class => 'btn btn-save' %>
-                  <p class="top-pad">
-                    <span>Your personal information is safe, secured with 64 bit SSL encryption</span>
-                    <span><i></i></span>
-                  </p>
-                </div>
-              </div><br>
-
-              <%= f.fields_for :addresses, errors: {}, fieldset: true do |address|  %>
-                <%= render 'shared/address_fields', f: address %>
-              <% end %><br>
-
-              <%= render 'shared/phone_fields', f: f %><br>
-
-              <div id="email_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
-                <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
-                  <%= render 'shared/email_fields', f: email %>
-                <% end %>
+            <div id="personal_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
+              <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
+                <%= render 'shared/name_fields', f: f %>
+                <%= render 'shared/id_info_fields', f: f %>
               </div>
 
-              <%= render 'autofill_cloud' %>
-              <%= render 'employer_search' %>
-            </div>
-          </div>
+              <div class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
+                <%= f.submit 'Save & Exit', :class => 'btn btn-save' %>
+                <p class="top-pad">
+                  <span>Your personal information is safe, secured with 64 bit SSL encryption</span>
+                  <span><i></i></span>
+                </p>
+              </div>
+            </div><br>
 
+            <%= f.fields_for :addresses, errors: {}, fieldset: true do |address|  %>
+              <%= render 'shared/address_fields', f: address %>
+            <% end %><br>
+
+            <%= render 'shared/phone_fields', f: f %><br>
+
+            <div id="email_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
+              <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+                <%= render 'shared/email_fields', f: email %>
+              <% end %>
+            </div><br>
+
+            <%= render 'autofill_cloud' %>
+            <%= render 'employer_search' %>
+          </div>
         </div>
       </div>
     </div>
