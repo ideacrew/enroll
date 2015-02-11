@@ -920,7 +920,7 @@ p.information{
   right: 0;
 }
 .key p i{
-  background: url("../img/secure-lock.png") no-repeat;
+  background: url("secure-lock.png") no-repeat;
   display: block;
   height: 26px;
   width: 20px;
@@ -1177,7 +1177,7 @@ input.floatlabe{
   padding-bottom: 20px;
 }
 .autofill-cloud .close {
-  background: url("../img/autofill-close.png") no-repeat;
+  background: url("autofill-close.png") no-repeat;
   display: block;
   width: 19px;
   height: 19px;
@@ -1234,14 +1234,14 @@ input.floatlabe{
   left: 0 !important;
 }
 .adderess-select-box + ul li a {
-  background: url("../img/delete.png") no-repeat 8px center;
+  background: url("delete.png") no-repeat 8px center;
   display: block;
   padding: 10px 0;
   text-align: center;
   border-bottom: 1px solid #bdbbbb;
 }
 .adderess-select-box + ul li:first-child a {
-  background: url("../img/delete.png") no-repeat 8px center, url("../img/address-close.png") no-repeat 95% center;
+  background: url("delete.png") no-repeat 8px center, url("address-close.png") no-repeat 95% center;
   display: block;
   background-size: auto auto,auto auto;
 }
@@ -1532,7 +1532,7 @@ a.list-group-item.results {
   margin: 0;
 }
 .no-result-row .row .fa_exclamation_triangle {
-  background: url("../img/warning.png") no-repeat;
+  background: url("warning.png") no-repeat;
   display: block;
   width: 37px;
   height: 35px;
@@ -1698,7 +1698,7 @@ a .arrow-right {display: none;}
   color: #007bc3;
   padding-bottom: 0;
   padding-top: 0;
-  background: url("../img/landing-page-delete.png") no-repeat #fff;
+  background: url("landing-page-delete.png") no-repeat #fff;
   font-size: 11.45px;
 }
 .landing-row .left-side .search-table {
