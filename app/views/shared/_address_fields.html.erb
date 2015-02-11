@@ -20,7 +20,7 @@
             </div>
             <div class="col-md-4 col-sm-3 col-xs-0 bg-color"></div>
           </div>
-        </div>  
+        </div>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <button class="btn btn-new-address border-bottom-none">NEW ADDRESS</button>
@@ -54,10 +54,7 @@
           <%= f.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control", required: true %>
         </div>
       </div>
-      <div class="error">
-        <div class="warning"><i class="fa fa-exclamation-triangle"></i>
-          All fields Required</div>
-      </div>
+      <%= render 'shared/error_warning' %>
   </div>
 
   <div class="col-md-2 key col-sm-3 col-xs-12">

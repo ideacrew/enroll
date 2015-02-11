@@ -1,6 +1,6 @@
 <div id="phone_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
   <div class="phone col-md-10 col-sm-9 col-xs-12 no-pd first">
-    
+
     <%= f.fields_for :phones, errors: {}, fieldset: true do |phone|  %>
     <div class="row top-row">
       <div class="col-md-6 col-sm-6 no-pd">
@@ -12,10 +12,7 @@
       </div>
     </div>
     <% end%>
-    
-    <div class="error">
-      <div class="warning"><i class="fa fa-exclamation-triangle"></i>
-        All fields Required</div>
-    </div>
+
+    <%= render 'shared/error_warning' %>
   </div>
 </div>
