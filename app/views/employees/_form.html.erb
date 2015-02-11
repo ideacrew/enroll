@@ -13,7 +13,7 @@
   </div>
 <% end %>
 
-<!-- 
+<!--
 
  -->
 
@@ -29,12 +29,9 @@
 
         <%= render 'shared/id_info_fields', f: f %>
 
-        <div class="error">
-          <div class="warning"><i class="fa fa-exclamation-triangle"></i>
-            All fields Required</div>
-        </div>
+        <%= render 'shared/error_warning' %>
       </div>
-      
+
       <div class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
         <a href="#" class="btn btn-save">Save & Exit</a>
         <p class="top-pad">
@@ -43,7 +40,7 @@
         </p>
       </div>
     </div>
-    
+
     <br>
 
     <%= f.fields_for @person.addresses, errors: {}, fieldset: false do |address|  %>
@@ -61,7 +58,7 @@
     <%= f.fields_for @person.emails, errors: {}, fieldset: false do |email|  %>
       <%= render 'shared/email_fields', f: email %>
     <% end %>
-    
+
     <div class="focus_effect row personaol-info-row" style="opacity: 0.5;">
       <div class="">
         <div class="col-md-10 col-sm-9 no-pd">

@@ -15,8 +15,6 @@ class Enrollee
 
   validates_presence_of :person_id, :relationship_kind
 
-  validates_inclusion_of :relationship_kindS, in: RELATIONSHIP_KINDS
-
   def person=(new_person)
   end
 

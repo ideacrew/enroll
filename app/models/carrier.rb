@@ -14,8 +14,7 @@ class Carrier
   field :shp_dtl, as: :shop_market_dental, type: Boolean, default: false
   field :is_active, type: Boolean, default: true
 
-  has_many :policies, counter_cache: true, index: true
-
+  has_many :policies, counter_cache: true
   embeds_many :plans
 
   index({name: 1})
@@ -29,11 +28,11 @@ class Carrier
   index({ "plans.market_type" => 1 })
   index({ "plans.year" => 1 })
   index({ "plans.hios_plan_id" => 1 })
-  index({ "plans.year" => 1 }, "plans.hios_plan_id" => 1 })
+  index({ "plans.year" => 1, "plans.hios_plan_id" => 1 })
   index({ "plans.premium_tables.quarter" => 1 })
   index({ "plans.premium_tables.age" => 1 })
 
-  scope :by_name, order_by(name: 1)
+  scope :by_name, ->{order_by(name: 1)}
 
   def self.individual_market_health
     where(individual_market_health: true)
