@@ -45,7 +45,9 @@ $(document).ready(function () {
     $('.search_alert_msg').addClass('hidden');
     getAllEmployers();
     
- 
+    //Sidebar Switch - Search Active
+    $('#personal_sidebar').addClass('hidden');
+    $('#search_sidebar').removeClass('hidden');
   });
   
   $('.autofill_no').click(function(){
@@ -55,7 +57,6 @@ $(document).ready(function () {
   
   $("#person_ssn").on("blur", function(){
     $('.autofill-failed').addClass('hidden');
-    $(".div-cloud-image").hide();
     $('.autofill-cloud.autofill-initial').removeClass('hidden');
        $.ajax({
         type: "POST",
@@ -93,6 +94,19 @@ $(document).ready(function () {
   }
 
   // People/new Page
+
+  $('.back').click(function() {
+    //Sidebar Switch - Personal Active
+    $('#personal_sidebar').removeClass('hidden');
+    $('#search_sidebar').addClass('hidden');
+
+    //
+    $('.search_results').addClass('hidden');
+    $('#address_info').removeClass('hidden');
+    $('#phone_info').removeClass('hidden');
+    $('#email_info').removeClass('hidden');
+  });
+
   $('.focus_effect').click(function(e){
     var check = check_personal_info_exists();
     active_div_id = $(this).attr('id');
