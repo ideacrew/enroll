@@ -30,7 +30,7 @@ class Plan
 
   before_save :invalidate_find_cache
 
-  scope :by_name, order_by(name: 1, hios_plan_id: 1)
+  scope :by_name, ->{order_by(name: 1, hios_plan_id: 1)}
 
   def invalidate_find_cache
 #    Rails.cache.delete("Plan/find/hios_plan_id.#{self.hios_plan_id}")

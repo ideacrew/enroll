@@ -50,18 +50,18 @@ class Policy
 
   index({:hbx_id => 1})
   index({:effective_on => 1})
-  index({:terminated_on => 1} {sparse: true})
+  index({:terminated_on => 1}, {sparse: true})
   index({:aasm_state => 1})
   index({ "enrollees.person_id" => 1 })
   index({ "enrollees.coverage_start_on" => 1 })
-  index({ "enrollees.coverage_end_on" => 1} {sparse: true})
+  index({ "enrollees.coverage_end_on" => 1}, {sparse: true})
 
   validates_presence_of :hbx_id, :plan_id, :effective_on, :premium_total_in_cents, :family_premium_in_cents
 
   before_save :check_for_cancel_or_term
 
-  scope :all_active_states,   where(:aasm_state.in => %w[submitted resubmitted effectuated])
-  scope :all_inactive_states, where(:aasm_state.in => %w[canceled carrier_canceled terminated])
+  scope :all_active_states,   ->{where(:aasm_state.in => %w[applicant submitted transmitted effectuated])}
+  scope :all_inactive_states, ->{where(:aasm_state.in => %w[hbx_canceled hbx_terminated carrier_canceled carrier_terminated])}
 
   def self.find_by_person(person_instance)
     self.where("enrollees.person_id" => person_instance.id).order_by([:hbx_id])
@@ -82,10 +82,33 @@ class Policy
     # TODO: determine the current instance & return value
   end
 
-  def aptc_in_dollars=(new_amount)
+  def family_premium_in_dollars=(new_family_premium)
+    family_premium_in_cents = dollars_to_cents(new_family_premium)
+  end
+
+  def family_premium_in_dollars
+    cents_to_dollars(family_premium_in_cents)
+  end
+
+  def er_premium_in_dollars=(new_er_premium)
+    er_premium_in_cents = dollars_to_cents(new_er_premium)
+  end
+
+  def er_premium_in_dollars
+    cents_to_dollars(er_premium_in_cents)
+  end
+
+  def premium_total_in_dollars=(new_premium_total)
+    premium_total_in_cents = dollars_to_cents(new_premium_total)
+  end
+
+  def premium_total_in_dollars
+    cents_to_dollars(premium_total_in_cents)
   end
 
   def aptc_in_dollars
+    return 0 if premium_credits.nil?
+    cents_to_dollars(aptc_in_cents)
   end
 
   def plan=(new_plan)
@@ -152,14 +175,14 @@ class Policy
     end
 
     event :carrier_terminate do
-      transitions from: [:submitted, :ack] to: :carrier_terminated
+      transitions from: [:submitted, :ack], to: :carrier_terminated
       transitions from: :effectuated, to: :carrier_terminated
       transitions from: :carrier_terminated, to: :carrier_terminated
       transitions from: :hbx_terminated, to: :hbx_terminated
     end
 
     event :hbx_cancel do
-      transitions from: [:submitted, :ack, :nak] to: :hbx_canceled
+      transitions from: [:submitted, :ack, :nak], to: :hbx_canceled
       transitions from: :effectuated, to: :hbx_canceled
       transitions from: :carrier_canceled, to: :hbx_canceled
       transitions from: :carrier_terminated, to: :hbx_canceled
@@ -190,10 +213,12 @@ class Policy
   end
 
 private
-  def dollars_to_cents(val)
+  def dollars_to_cents(amount_in_dollars)
+    Rational(amount_in_dollars) * Rational(100) if amount_in_dollars
   end
 
-  def cents_to_dollars(val)
+  def cents_to_dollars(amount_in_cents)
+    (Rational(amount_in_cents) / Rational(100)).to_f if amount_in_cents
   end
 
   def format_money(val)
