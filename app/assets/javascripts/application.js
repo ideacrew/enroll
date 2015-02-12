@@ -70,6 +70,8 @@ $(document).ready(function () {
 
         if(result.matched == true)
         {
+          person = result.person
+          $("#people_id").val(person._id);
           $(".div-cloud-image").show();
         }
       }
@@ -92,6 +94,7 @@ $(document).ready(function () {
   {
     $.ajax({
       type: "GET",
+      data:{id: $("#people_id").val()},
       url: "/people/get_employer.js"
     });
   }

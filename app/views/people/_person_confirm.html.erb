@@ -3,5 +3,8 @@
 	</p>
   <div class="row top-row">
     <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= @employee.first_name %> <%= @employee.middle_name %> <%= @employee.last_name %><br/>
+       Born: <%= @employee.dob.strftime("%b %d, %Y") %><br/>
+       Social Security:  <%= @employee.ssn %><br/>
     </div>
   </div>
