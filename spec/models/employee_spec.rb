@@ -11,7 +11,7 @@ describe Employee, type: :model do
   it { should validate_presence_of :dob }
   it { should validate_presence_of :gender }
   it { should validate_presence_of :employer_id }
-  it { should validate_presence_of :date_of_hire }
+  it { should validate_presence_of :hired_on }
 
 
   # it "updates instance timestamps" do
