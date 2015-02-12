@@ -12,6 +12,7 @@ class Policy
   field :terminated_on, type: Date
 
   field :plan_id, type: BSON::ObjectId
+  field :hbx_carrier_id, type: String
 
   # Premium amount for which the consumer/employee is responsible
   field :family_premium_in_cents, as: :total_responsible_amount, type: Integer, default: 0
@@ -35,7 +36,6 @@ class Policy
   embeds_many :enrollees
   accepts_nested_attributes_for :enrollees, reject_if: :all_blank, allow_destroy: true
 
-  belongs_to :carrier, counter_cache: true, index: true
   belongs_to :employer, counter_cache: true, index: true
 
   # belongs_to :consumer
@@ -109,6 +109,8 @@ class Policy
   def aptc_in_dollars
     return 0 if premium_credits.nil?
     cents_to_dollars(aptc_in_cents)
+
+    # TODO determine most recent premium_credit record 
   end
 
   def plan=(new_plan)
@@ -118,7 +120,7 @@ class Policy
   end
 
   def canceled?
-    aasm.state == :hbx_canceled || :carrier_canceled
+    hbx_canceled? || carrier_canceled?
   end
 
   def started_on
@@ -207,8 +209,7 @@ class Policy
 
     # Carrier Attestation documentation reference should accompany this non-standard transition
     event :carrier_reinstate do
-      transitions from: :carrier_terminated, to: :effectuated
-      transitions from: :carrier_canceled, to: :effectuated
+      transitions from: [:carrier_terminated, :carrier_canceled], to: :effectuated
     end
   end
 
