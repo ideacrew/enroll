@@ -35,7 +35,8 @@ class PeopleController < ApplicationController
   end
   
   def get_employer
-    @employers = Employer.all
+    @person = Person.find(params[:id])
+    @employers = Employer.where(:"employee_families.employee.ssn" => @person.ssn).all
 
     respond_to do |format|
       format.js {}
@@ -43,7 +44,9 @@ class PeopleController < ApplicationController
   end
   
   def person_confirm
-    @employe_family = EmployerCensus::EmployeeFamily.last
+    @person = Person.find(params[:person_id])
+    @employer = Employer.find(params[:employer_id])
+    @employee = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last.employee
 
     respond_to do |format|
       format.js {}

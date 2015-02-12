@@ -16,7 +16,7 @@
 					<div class="col-md-2 col-sm-2 col-xs-2">
             <%= form_tag("", class: "person-search-form") do %>
             <% end %>
-						<span id="badge" class="badge" style="cursor:pointer"><i></i></span>
+						<span id="badge" person-id="<%= @person.id %>" employer-id="<%= employer.id %>" class="badge" style="cursor:pointer"><i></i></span>
 					</div>
 				</div>
 			</li>
@@ -37,10 +37,12 @@ $(".badge").on('click',function(){
   $('.search_continue').show();
 });
 $('.search_continue').on('click',function(){
+      person_id = $(".badge-active").attr("person-id")
+      employer_id = $(".badge-active").attr("employer-id")
       $.ajax({
         type: "POST",
         url: "/people/person_confirm.js",
-        data: $('.person-search-form-active').serialize(),
+        data: {person_id: person_id, employer_id: employer_id},
         success: function (result) {
         }
     });
