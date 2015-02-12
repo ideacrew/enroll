@@ -6,7 +6,7 @@ FactoryGirl.define do
     gender "female"
     employee_relationship "spouse"
     ssn "333333333"
-   
+
   end
 
 end
