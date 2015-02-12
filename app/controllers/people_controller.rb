@@ -57,13 +57,17 @@ class PeopleController < ApplicationController
   def update
     @person = Person.find(params[:id])
     @person.updated_by = current_user.email unless current_user.nil?
-
+    person_params["addresses_attributes"].each do |key, address|
+      if address["kind"] != 'home' && (address["city"].blank? && address["zip"].blank? && address["address_1"].blank?) 
+        person_params["addresses_attributes"].delete("#{key}")
+      end
+    end
     respond_to do |format|
-      if @person.update_attributes(params[:person])
+      if @person.update_attributes(person_params)
         format.html { redirect_to @person, notice: 'Person was successfully updated.' }
         format.json { head :no_content }
       else
-        format.html { render action: "edit" }
+        format.html { render action: "show" }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end
     end
@@ -76,7 +80,7 @@ class PeopleController < ApplicationController
         person_params["addresses_attributes"].delete("#{key}")
       end
     end
-    puts person_params
+    
     @person = Person.new(person_params)
     respond_to do |format|
       if @person.save(validate: false)
