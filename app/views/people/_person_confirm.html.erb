@@ -6,5 +6,10 @@
       <%= @employee.first_name %> <%= @employee.middle_name %> <%= @employee.last_name %><br/>
        Born: <%= @employee.dob.strftime("%b %d, %Y") %><br/>
        Social Security:  <%= @employee.ssn %><br/>
+       
+       <h4> <%= @employer.legal_name %> </h4> </br>
+        
+       Hired : <%= @employee.hired_on.strftime("%b %d, %Y") %>
+      
     </div>
   </div>

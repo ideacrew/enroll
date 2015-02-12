@@ -37,7 +37,7 @@ describe Employee, type: :model do
     gender = "female"
 
     employer = Employer.create(
-        name: "ACME Widgets, Inc.",
+        legal_name: "ACME Widgets, Inc.",
         fein: "098765432",
         entity_kind: :c_corporation
       )
@@ -88,7 +88,7 @@ describe Employee, type: :model do
     gender = "female"
 
     employer = Employer.create(
-        name: "Ace Ventures, Ltd.",
+        legal_name: "Ace Ventures, Ltd.",
         fein: "098765437",
         entity_kind: "s_corporation"
       )

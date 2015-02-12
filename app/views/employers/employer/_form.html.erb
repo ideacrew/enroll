@@ -24,21 +24,40 @@
             <% end %>
 
             <div id="overlay"></div>
-                
-            <div id="credential_info" class="focus_effect row personaol-info-row margin-top" style="opacity: 0.5;">
-              <%= render 'credentials_fields', f: f %>
-            </div><br>
-
-            <div id="name_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
-              <%= render 'name_fields', f: f %>
-            </div><br>
+            
+            <!-- Step 1 -->
+            <%= render 'credentials_fields', f: f %>
+            <%= render 'name_fields', f: f %>
 
             <div id="tax_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
               <%= render 'tax_fields', f: f %>
               <div class="col-md-2 col-sm-2 col-xs-12">
-                <%= f.submit 'Continue', :class => 'btn btn-continue' %>
+                <%= link_to 'Continue', '#', :class => 'btn btn-continue employer_step2' %>
               </div>
             </div>
+
+            <!-- Step 2 -->
+            <%= render 'emp_contact_fields', f: f %>
+            <%= render 'coverage_fields', f: f %>
+
+            <div id="plan_selection_info" class="focus_effect row personaol-info-row hidden" style="opacity: 0.5;">
+              <%= render 'plan_selection_fields', f: f %>
+              <div class="col-md-2 col-sm-2 col-xs-12 emp-btn-continue">
+                <%= link_to 'Continue', '#', :class => 'btn employer_step3' %>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <%= render 'emp_contributions_fields', f: f %>
+            <%= render 'eligibility_rules_fields', f: f %>
+
+            <div id="broker_info" class="focus_effect row personaol-info-row hidden" style="opacity: 0.5;">
+              <%= render 'broker_info_fields', f: f %>
+              <div class="col-md-2 col-sm-2 col-xs-12 emp-save-btn">
+                <%= f.submit 'Save', :class => 'btn btn-continue' %>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

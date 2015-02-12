@@ -1,11 +1,11 @@
 class Person
   include Mongoid::Document
   include Mongoid::Timestamps
-  
+
   GENDER_KINDS = %W(male female)
 
   # TODO: Need simpler, Enterprise-level incrementing ID
-  # field :hbx_id, type: Integer 
+  # field :hbx_id, type: Integer
 
   auto_increment :hbx_id, :seed => 9999
 
@@ -25,7 +25,7 @@ class Person
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
-  
+
   # Login account
   has_one :user, as: :profile, dependent: :destroy
 
@@ -43,7 +43,7 @@ class Person
   embeds_many :addresses, cascade_callbacks: true, validate: true
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
-  
+
   #building non person relation using through relation
   # has_many :broker_family_members, class_name: "FamilyMember", :inverse_of => :broker
   # has_many :employee_family_members, class_name: "FamilyMember", :inverse_of => :employee
@@ -136,7 +136,7 @@ class Person
   def is_active?
     self.is_active
   end
-  
+
 private
   def initialize_name_full
     # self.name_full = full_name

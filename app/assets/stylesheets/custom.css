@@ -1253,6 +1253,10 @@ input.floatlabe{
   -o-transition: border-color 0.3s ease-in-out 0s !important;
   -ms-transition: border-color 0.3s ease-in-out 0s !important;
 }
+
+.personaol-info-row, .personaol-info-top-row {
+  margin-bottom: 20px;
+}
 .personaol-info-top-row .first {
   border: 1px solid #999; 
 }
@@ -1889,7 +1893,7 @@ a .arrow-right {display: none;}
 .emp-sidebar a:hover, .emp-sidebar a:focus {
   color: #fff !important;
 }
-.welcome_msg, .credential_info, .name_info, .tax_info {
+.sidebar .info {
   background: #004f80;
   border: #004f80;
   color: #fff;
@@ -1914,7 +1918,7 @@ a .arrow-right {display: none;}
   top: 44px;
 } 
 .name_info {
-  padding-top: 120px;
+  padding-top: 120px !important;
 }
 .name_info .arrow-right {
   top: 129px;
@@ -1982,14 +1986,14 @@ a .arrow-right {
   display: block;
 }
 .coverage_info {
-  padding-top: 30px;
-  padding-bottom: 0;
+  padding-top: 30px !important;
+  padding-bottom: 0 !important;
 }
 .coverage_info .arrow-right {
   top: 35px;
 }
-.plan_selection {
-  padding-top: 30px;
+.plan_selection_info {
+  padding-top: 30px !important;
 }
 .plan_selection .arrow-right {
   top: 23px;
@@ -2019,15 +2023,15 @@ a .arrow-right {
   background: rgba(220, 234, 241, 1);
   color: #bbb;
 }
-.eligibility_rules {
-  padding-bottom: 46px;
-  padding-top: 30px;
+.eligibility_rules_info {
+  padding-bottom: 46px !important;
+  padding-top: 30px !important;
 }
-.eligibility_rules .arrow-right {
+.eligibility_rules_info .arrow-right {
   top: 32px;
 }
 .broker-info {
-  padding-top: 15px;
+  padding-top: 15px !important;
 }
 .broker-info .arrow-right {
   top: 24px;

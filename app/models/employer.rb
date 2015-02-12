@@ -52,7 +52,7 @@ class Employer
 
   belongs_to :broker_agency, counter_cache: true, index: true
 
-  validates_presence_of :name, :fein, :entity_kind
+  validates_presence_of :legal_name, :fein, :entity_kind
 
   validates :fein,
     length: { is: 9, message: "%{value} is not a valid FEIN" },
@@ -67,10 +67,9 @@ class Employer
 
   # has_many :premium_payments, order: { paid_at: 1 }
   index({ hbx_id: 1 }, { unique: true })
-  index({ name: 1 })
+  index({ legal_name: 1 })
   index({ dba: 1 }, {sparse: true})
   index({ fein: 1 }, { unique: true })
-  index({ name: 1 })
   index({ last_paid_premium_on: 1 })
   index({ aasm_state: 1 })
   index({ is_active: 1 })

@@ -134,15 +134,21 @@ $(document).ready(function () {
 
   $('#continue').click(function() {
     $("#overlay").css("display", "none");
-    $(".welcome-msg").css("display", "none");
+    $(".emp-welcome-msg").css("display", "none");
     $(".focus_effect").css("opacity", "1");
     $(".information").css("opacity", "1");
     $("a.name").css("padding-top", "65px");
     $(".disable-btn").css("display", "inline-block");
+    $(".welcome-msg").css("display", "none");
+    $("a.welcome_msg").css("display", "none");
+    $("a.credential_info, a.name_info, a.tax_info").css("display", "block");
+    $("#tax_info .btn-continue").css("display", "inline-block");
     $('.focus_effect:first').addClass('personaol-info-top-row');
     $('.focus_effect:first').removeClass('personaol-info-row');
     $('.sidebar a:first').addClass('style_s_link');
+    $('.sidebar a.credential_info').addClass('style_s_link');
     $(".key").css("display", "block");
+    
     var check = check_personal_info_exists();
     if(check.length==0) {
       $('.autofill-cloud.autofill-initial').removeClass('hidden');
@@ -207,5 +213,47 @@ $(document).ready(function () {
       "background-color": "rgba(255, 255, 255, 1)",
       "height": "46px",
     });
+  });
+
+  // Employer Registration
+  $('.employer_step2').click(function() {
+    
+    // Display correct sidebar
+    $('.credential_info').addClass('hidden');
+    $('.name_info').addClass('hidden');
+    $('.tax_info').addClass('hidden');
+    $('.emp_contact_info').removeClass('hidden');
+    $('.coverage_info').removeClass('hidden');
+    $('.plan_selection_info').removeClass('hidden');
+
+    // Display correct form fields
+    $('#credential_info').addClass('hidden');
+    $('#name_info').addClass('hidden');
+    $('#tax_info').addClass('hidden');
+
+    $('#emp_contact_info').removeClass('hidden');
+    $('#coverage_info').removeClass('hidden');
+    $('#plan_selection_info').removeClass('hidden');
+  });
+
+  $('.employer_step3').click(function() {
+    
+    // Display correct sidebar
+    $('.emp_contact_info').addClass('hidden');
+    $('.coverage_info').addClass('hidden');
+    $('.plan_selection_info').addClass('hidden');
+
+    $('.emp_contributions_info').removeClass('hidden');
+    $('.eligibility_rules_info').removeClass('hidden');
+    $('.broker-info').removeClass('hidden');
+
+    // Display correct form fields
+    $('#emp_contact_info').addClass('hidden');
+    $('#coverage_info').addClass('hidden');
+    $('#plan_selection_info').addClass('hidden');
+    
+    $('#emp_contributions_info').removeClass('hidden');
+    $('#eligibility_rules_info').removeClass('hidden');
+    $('#broker_info').removeClass('hidden');
   });
 });
