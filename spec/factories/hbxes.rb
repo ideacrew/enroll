@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :premium_table do
+  factory :hbx do
     
   end
 
