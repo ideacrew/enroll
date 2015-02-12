@@ -1253,6 +1253,10 @@ input.floatlabe{
   -o-transition: border-color 0.3s ease-in-out 0s !important;
   -ms-transition: border-color 0.3s ease-in-out 0s !important;
 }
+
+.personaol-info-row, .personaol-info-top-row {
+  margin-bottom: 20px;
+}
 .personaol-info-top-row .first {
   border: 1px solid #999; 
 }
@@ -1889,7 +1893,7 @@ a .arrow-right {display: none;}
 .emp-sidebar a:hover, .emp-sidebar a:focus {
   color: #fff !important;
 }
-.welcome_msg, .credential_info, .name_info, .tax_info {
+.sidebar .info {
   background: #004f80;
   border: #004f80;
   color: #fff;
