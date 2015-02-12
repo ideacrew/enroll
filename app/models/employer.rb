@@ -52,7 +52,7 @@ class Employer
 
   belongs_to :broker_agency, counter_cache: true, index: true
 
-  validates_presence_of :name, :fein, :entity_kind
+  validates_presence_of :legal_name, :fein, :entity_kind
 
   validates :fein,
     length: { is: 9, message: "%{value} is not a valid FEIN" },
