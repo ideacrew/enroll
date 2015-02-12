@@ -21,10 +21,12 @@ class Enrollee
   def person
   end
 
-  def premium_amount_in_dollars=(new_amount)
+  def premium_amount_in_dollars=(new_premium)
+    premium_amount_in_cents = dollars_to_cents(new_premium)
   end
 
   def premium_amount_in_dollars
+    cents_to_dollars(premium_amount_in_cents)
   end
 
   def calculate_premium_using(plan, rate_start_date)
@@ -38,4 +40,17 @@ class Enrollee
   def coverage_end?
     coverage_end_on.present?
   end
+
+private
+
+  def dollars_to_cents(amount_in_dollars)
+    Rational(amount_in_dollars) * Rational(100) if amount_in_dollars
+  end
+
+  def cents_to_dollars(amount_in_cents)
+    (Rational(amount_in_cents) / Rational(100)).to_f if amount_in_cents
+  end
+
+
+
 end
