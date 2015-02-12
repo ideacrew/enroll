@@ -57,6 +57,8 @@ Rails.application.routes.draw do
    end
  
 
+  # Temporary for Generic Form Template
+  match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
