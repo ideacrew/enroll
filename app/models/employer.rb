@@ -9,7 +9,7 @@ class Employer
   auto_increment :hbx_id, type: Integer
 
   # Employer registered legal name
-  field :name, type: String
+  field :legal_name, type: String
 
   # Doing Business As (alternate employer name)
   field :dba, type: String
@@ -21,6 +21,12 @@ class Employer
 
   # Broker writing_agent credited for enrollment and transmitted on 834
   field :writing_agent_id, type: BSON::ObjectId
+
+  # Payment status
+  field :last_paid_premium_on, type: Date
+  field :last_paid_premium_in_cents, type: Integer
+  field :next_due_premium_on, type: Date
+  field :next_due_premium_in_cents, type: Integer
 
   # Employers terminated for non-payment may re-enroll one additional time
   field :terminated_count, type: Integer, default: 0
@@ -64,7 +70,8 @@ class Employer
   index({ name: 1 })
   index({ dba: 1 }, {sparse: true})
   index({ fein: 1 }, { unique: true })
-  index({ writing_agent_id: 1 }, {sparse: true})
+  index({ name: 1 })
+  index({ last_paid_premium_on: 1 })
   index({ aasm_state: 1 })
   index({ is_active: 1 })
 
@@ -214,6 +221,10 @@ class Employer
 
     event :terminate do
       transitions from: :enrolled_suspended, to: :terminated
+    end
+
+    event :reinstate do
+      transitions from: :terminated, to: :enrolled
     end
   end
 
