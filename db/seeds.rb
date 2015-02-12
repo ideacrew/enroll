@@ -6,6 +6,17 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
+puts "*"*80
+puts "::::Starting to create seed data:::::"
+puts "*"*80
+
+puts ":::Cleaning up Employers if any::::::"
+puts "*"*80
+
+Employer.all.each do |employer|
+  employer.destroy
+end
+
 # Employer addresses
 employer_address_1 = Address.new(kind: "mailing", address_1: "13025 Elm Tree CT", address_2: "Suite 300", city: "Herndon", state: "VA", county: "Fairfax", zip: "20172", country_name: "USA")
 employer_address_2 = Address.new(kind: "work", address_1: "320 W Illinois St", address_2: "suite 180", city: "Chicago", state: "IL", county: "Chicago", zip: "60654", country_name: "USA")
@@ -13,12 +24,17 @@ employer_address_3 = Address.new(kind: "home", address_1: "43 Russells Way", add
 employer_address_4 = Address.new(kind: "home", address_1: "20178 E Hampden PL", address_2: "Suite 45", city: "Aurora", state: "CO", county: "", zip: "80013", country_name: "USA")
 employer_address_5 = Address.new(kind: "work", address_1: "1010 Potomac Rd", address_2: "APT 102", city: "Atlanta", state: "GA", county: "Fulton", zip: "30338", country_name: "USA")
 
+puts "*"*80
+puts "::: Creating Employers:::"
 # Employer creation
 employer_1 = Employer.create!(entity_kind: "c_corporation", fein: "897897897", dba: "1234", legal_name: "Global Systems", is_active: true, addresses: [employer_address_1])
 employer_2 = Employer.create!(entity_kind: "partnership", fein: "397897897", dba: "3434", legal_name: "Technology Solutions Inc", is_active: true, addresses:[employer_address_2])
 employer_3 = Employer.create!(entity_kind: "s_corporation", fein: "597897897", dba: "9034", legal_name: "Futurewave Systems Inc", is_active: true, addresses:[employer_address_3])
 employer_4 = Employer.create!(entity_kind: "tax_exempt_organization", fein: "797897897", dba: "8934", legal_name: "Primus Software Corporation", is_active: true,  addresses:[employer_address_4])
 employer_5 = Employer.create!(entity_kind: "partnership", fein: "997897897", dba: "5634", legal_name: "OneCare", is_active: false, addresses:[employer_address_5])
+
+puts ":::Created 5 Employers:::"
+puts "*"*80
 
 # Employee Addresses
 address_1 = Address.new(kind: "work", address_1: "145 I45 St", address_2: "suite 200", city: "Washington", state: "DC", county: "Fairfax", zip: "20004", country_name: "USA")
@@ -32,6 +48,9 @@ employee_1 = EmployerCensus::Employee.new(first_name: "John", last_name: "Doe", 
 dependent_1_1 = EmployerCensus::Dependent.new(first_name: "Matt", last_name: "Doe", dob: "01/12/2011", gender: "male", employee_relationship: "child", ssn: "222333111")
 dependent_1_2 = EmployerCensus::Dependent.new(first_name: "Jessica", last_name: "Doe", dob: "02/12/1982", gender: "female", employee_relationship: "spouse", ssn: "212333111")
 dependent_1_3 = EmployerCensus::Dependent.new(first_name: "Caroline", last_name: "Doe", dob: "02/12/2010", gender: "female", employee_relationship: "child", ssn: "212333211")
+
+puts "*"*80
+puts "Creating Families"
 
 # Employee Family Creation
 family_1 = employer_1.employee_families.new
@@ -75,3 +94,7 @@ employee_5 = EmployerCensus::Employee.new(first_name: "Martina", last_name: "Wil
 family_5 = employer_5.employee_families.new
 family_5.employee = employee_5
 family_5.save!
+
+puts "Successfully Created Families for Employers"
+puts "*"*80
+puts "End of Seed Data"
