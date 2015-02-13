@@ -2,13 +2,17 @@
 		<span> Employer Information.</span>
 	</p>
   <div class="row top-row">
-    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+    <div class="col-md-7 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <%= @employee.first_name %> <%= @employee.middle_name %> <%= @employee.last_name %><br/>
        Born: <%= @employee.dob.strftime("%b %d, %Y") %><br/>
        Social Security:  <%= @employee.ssn %><br/>
        
-       <h4> <%= @employer.legal_name %> </h4> </br>
-        
+       <h4> <%= @employer.legal_name %> </h4>
+       <% address = @employer.addresses.last%>
+       <% if address.present? %>
+          <spa><%= address.full_address%></span>
+       <% end %> 
+       </br>
        Hired : <%= @employee.hired_on.strftime("%b %d, %Y") %>
       
     </div>
