@@ -8,41 +8,54 @@ class Enrollee
   field :carrier_member_id, type: String
   field :carrier_policy_id, type: String
 
-  field :premium_amount_in_cents, type: Integer
+  field :premium_in_cents, type: Integer
 
   field :coverage_start_on, type: Date
   field :coverage_end_on, type: Date
 
-  validates_presence_of :person_id, :relationship_kind
+  validates_presence_of :person_id, :coverage_start_on
+
+  before_save :set_premium
 
   def person=(new_person)
+    raise ArgumentError.new("expected Person class") unless new_person.is_a? Person
+    self.person_id = new_person._id
   end
 
   def person
+    Person.find(self.person_id) unless person_id.nil?
   end
 
-  def premium_amount_in_dollars=(new_premium)
-    premium_amount_in_cents = dollars_to_cents(new_premium)
+  def set_premium
+    return if policy.plan.blank? || coverage_start_age.blank?
+
+    premium = Display::Premium.lookup(person.gender, coverage_start_age)
+    premium_in_cents = premium.amount_in_cents
   end
 
-  def premium_amount_in_dollars
-    cents_to_dollars(premium_amount_in_cents)
+  def coverage_start_age
+    return if person.blank? || parent.coverage_start_on.blank?
+    age = coverage_start_on.year - person.dob.year
+
+    # Shave off one year if coverage starts before birthday
+    if coverage_start_on.month == person.dob.month
+      age -= 1 if coverage_start_on.day < person.dob.day
+    else
+      age -= 1 if coverage_start_on.month < person.dob.month
+    end
+
+    age
   end
 
-  def calculate_premium_using(plan, rate_start_date)
-    self.pre_amt = sprintf("%.2f", plan.rate(rate_start_date, self.coverage_start_on, self.member.dob).amount)
+  def premium_in_dollars=(new_premium)
+    premium_in_cents = dollars_to_cents(new_premium)
   end
 
-  def reference_premium_for(plan, rate_date)
-    plan.rate(rate_date, coverage_start_on, member.dob).amount
-  end
-
-  def coverage_end?
-    coverage_end_on.present?
+  def premium_in_dollars
+    cents_to_dollars(premium_in_cents)
   end
 
 private
-
   def dollars_to_cents(amount_in_dollars)
     Rational(amount_in_dollars) * Rational(100) if amount_in_dollars
   end
