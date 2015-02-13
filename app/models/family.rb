@@ -1,7 +1,7 @@
 class Family
   include Mongoid::Document
   include Mongoid::Timestamps
-  include Mongoid::Attributes::Dynamic
+  # include Mongoid::Attributes::Dynamic
   include Mongoid::Versioning
   # include Mongoid::Paranoia
   include AASM
