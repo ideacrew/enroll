@@ -41,19 +41,19 @@ class EnrollmentFactory
   end
 
   def self.add_broker_role(person:, new_kind:, new_npn:, new_mailing_address:)
-    
+
     [:new_kind, :new_npn, :new_mailing_address].each do |value|
       name = value.id2name
 
       raise ArgumentError.new("missing value: #{name}, expected as keyword ") if eval(name).blank?
     end
-    
+
     kind = new_kind
     npn = new_npn
 
     mailing_address = new_mailing_address
 
-    family = self.initialize_families(person)
+    family, = self.initialize_family(person)
 
     broker_role = nil
 
@@ -100,27 +100,36 @@ class EnrollmentFactory
     # Add 'self' to personal relationship need detailed implementation
     #person.person_relationships << PersonRelationhip.new()
 
-    family = self.initialize_families(person)
-
-    if person.save
-      if family.save
-        family.delete unless role.save
-      else
-        role.errors.add(:family, "unable to create family")
-      end
-    else
-      role.errors.add(:person, "unable to update person")
-    end
-
+    family, primary_applicant = self.initialize_family(person)
+    save_all_or_delete_new(person, family, primary_applicant, role)
     role
   end
 
-  def self.initialize_families(person)
-    family = nil
-    if person.family.blank?
-    # Instantiate new family model need detailed implementation
-      family = person.build_family()
+  private
+
+  def self.initialize_family(person)
+    family = person.family
+    family = person.build_family() if family.blank?
+    primary_applicant = family.primary_applicant
+    primary_applicant = initialize_primary_applicant(family, person) if primary_applicant.blank?
+    return family, primary_applicant
+  end
+
+  def self.initialize_primary_applicant(family, person)
+    family_member = family.family_members.build(
+      person_id: person.id,
+      is_primary_applicant: true,
+      is_coverage_applicant: true)
+  end
+
+  def self.save_all_or_delete_new(*list)
+    objects_to_save = list.reject {|o| !o.changed?}
+    num_saved = objects_to_save.count {|o| o.save}
+    if num_saved < objects_to_save.count
+      objects_to_save.each {|o| o.delete}
+      false
+    else
+      true
     end
-    return family
   end
 end
