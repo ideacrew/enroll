@@ -1,15 +1,11 @@
 FactoryGirl.define do
   factory :broker do
-    npn "abx123xyz"
+    person { FactoryGirl.build(:person) }
+    sequence(:npn) {|n| "abcxyz\##{n}" }
+    provider_kind {"broker"}
 
-    after(:create) do |b, evaluator|
-      create_list(:address, 2, broker: b)
-      create_list(:phone, 2, broker: b)
-      create_list(:email, 2, broker: b)
-    end
-
-    trait :with_invalid_b_type do
-      npn ' '
+    trait :with_invalid_provider_kind do
+      provider_kind ' '
     end
   end
 end
