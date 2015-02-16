@@ -39,7 +39,7 @@ describe Broker do
     end
   end
 
-  describe Broker, '.by_npn', :type => :model do
+  describe Broker, '.find_by_npn', :type => :model do
     it 'returns Broker instance for the specified National Producer Number' do
       b0 = Broker.create(person: person0, npn: npn0, provider_kind: provider_kind)
       b1 = Broker.create(person: person1, npn: npn1, provider_kind: provider_kind)
@@ -47,6 +47,20 @@ describe Broker do
       expect(Broker.find_by_npn(npn0).npn).to eq b0.npn
     end
   end
+
+
+  describe Broker, '.find_by_broker_agency', :type => :model do
+    let(:ba) {FactoryGirl.create(:broker_agency)}
+
+    it 'returns Broker instance for the specified National Producer Number' do
+      b0 = Broker.create(person: person0, npn: npn0, provider_kind: provider_kind, broker_agency: ba)
+      b1 = Broker.create(person: person1, npn: npn1, provider_kind: provider_kind, broker_agency: ba)
+
+      expect(Broker.find_by_broker_agency(ba).size).to eq 2
+      expect(Broker.find_by_broker_agency(ba).first.broker_agency_id).to eq ba._id
+    end
+  end
+
 
   describe Broker, '.all', :type => :model do
     it 'returns all Broker instances' do
@@ -59,35 +73,6 @@ describe Broker do
     end
   end
 
-end
-
-
 # Instance methods
-describe Broker, '.npn', :type => :model do
-  # it 'returns broker with supplied National Producer Number' do
 
-  #   ba = FactoryGirl.create(:broker_agency)
-  #   npn_value = "abx123xyz"
-  #   broker_one = Broker.create!(
-  #       broker_agency: ba, 
-  #       npn: npn_value,
-  #       person: Person.new(
-  #           first_name: "paxton",
-  #           last_name: "thomas",
-  #           addresses: [Address.new(
-  #               kind: "home",
-  #               address_1: "1600 Pennsylvania Ave",
-  #               city: "Washington",
-  #               state: "DC",
-  #               zip: "20001"
-  #             )]
-  #         )
-  #     )
-
-  #   expect(broker_one.person.valid?).to eq false
-
-  #   b = Broker.find_by(npn: npn_value)
-  #   expect(b.inspect).to eq nil
-  #   expect(b.npn).to eq npn_value
-  # end
 end

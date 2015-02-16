@@ -22,36 +22,38 @@ class Broker
   # scope :all_active_brokers, ->{ and({ kind: "broker" }, { is_active: true })}
   # scope :all_active_tpzs, ->{ and({ kind: "tpa" }, { is_active: true })}
 
-  def parent
-    raise "undefined parent: Person" unless self.person?
-    self.person
+  def self.find(broker_id)
+    Person.where("broker._id" => broker_id).first.broker
+  end  
+
+  def self.find_by_npn(npn_value)
+    Person.where("broker.npn" => npn_value).first.broker
+  end
+
+  def self.list_brokers(collection)
+    collection.reduce([]) { |brokers, person| brokers << person.broker }
   end
 
   # TODO; return as chainable Mongoid::Criteria
   def self.all
     # criteria = Mongoid::Criteria.new(Person)
-    Person.exists(:broker => true).reduce([]) { |brokers, person| brokers << person.broker }
-  end
-
-  def self.find(broker_id)
-    Person.where("broker._id" => broker_id).first.broker
-  end  
-
-  def self.find_by_npn(npn_id)
-    Person.where("broker.npn" => npn_id).first.broker
+    list_brokers Person.exists(:broker => true)
   end
 
   def self.find_by_broker_agency(broker_agency)
     return unless broker_agency.is_a? BrokerAgency
-    where(broker_agency_id: broker_agency._id)
+    list_brokers Person.where("broker.broker_agency_id" => broker_agency._id)
   end
 
-
+  def parent
+    raise "undefined parent: Person" unless self.person?
+    self.person
+  end
 
   # belongs_to broker_agency
   def broker_agency=(new_broker_agency)
     raise ArgumentError.new("expected BrokerAgency class") unless new_broker_agency.is_a? BrokerAgency
-    broker_agency_id = new_broker_agency._id
+    self.broker_agency_id = new_broker_agency._id
   end
 
   def broker_agency
