@@ -2,9 +2,14 @@ class Broker
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  PROVIDER_KINDS = %W[broker assister]
+
+  embedded_in :person
+
   # Broker National Producer Number (unique identifier)
   field :npn, type: String
   field :broker_agency_id, type: BSON::ObjectId
+  field :provider_kind, type: String, default: "broker"
 
   # field :aasm_state, type: String
   # field :aasm_message, type: String
@@ -12,7 +17,7 @@ class Broker
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
 
-  validates_presence_of :npn, :broker_agency_id
+  validates_presence_of :npn, :provider_kind
 
   # scope :all_active_brokers, ->{ and({ kind: "broker" }, { is_active: true })}
   # scope :all_active_tpzs, ->{ and({ kind: "tpa" }, { is_active: true })}
@@ -21,6 +26,16 @@ class Broker
     raise "undefined parent: Person" unless self.person?
     self.person
   end
+
+  # TODO; return as chainable Mongoid::Criteria
+  def self.all
+    # criteria = Mongoid::Criteria.new(Person)
+    Person.exists(:broker => true).reduce([]) { |brokers, person| brokers << person.broker }
+  end
+
+  def self.find(broker_id)
+    Person.where("broker._id" => broker_id).first.broker
+  end  
 
   # belongs_to broker_agency
   def broker_agency=(new_broker_agency)
@@ -41,6 +56,10 @@ class Broker
     where(broker_agency_id: broker_agency._id)
   end
 
+  def addresses=(new_address)
+    parent.addresses << new_address
+  end
+
   def address
     parent.addresses.detect { |adr| adr.kind == "work" }
   end
@@ -56,5 +75,6 @@ class Broker
   def is_active?
     self.is_active
   end
+
 
 end
