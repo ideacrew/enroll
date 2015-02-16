@@ -66,7 +66,7 @@ class Person
     allow_blank: true,
     inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
 
-  before_save :set_full_name, :date_of_death_follows_date_of_birth
+  before_save :update_full_name, :date_of_death_follows_date_of_birth
 
   index({hbx_id: 1}, {unique: true})
   index({last_name:  1})
@@ -79,8 +79,7 @@ class Person
 
   # Broker child model indexes
   index({"broker._id" => 1})
-  index({"broker.kind" => 1})
-  index({"broker.hbx_id" => 1})
+  index({"broker.provider_kind" => 1})
   index({"broker.npn" => 1}, {unique: true})
 
   # Consumer child model indexes
@@ -144,7 +143,7 @@ class Person
   end
 
 private
-  def set_full_name
+  def update_full_name
     full_name
   end
 

@@ -8,7 +8,6 @@ FactoryGirl.define do
     is_active true
 
     after(:create) do |p, evaluator|
-      create_list(:member, 2, person: p)
       create_list(:address, 2, person: p)
       create_list(:phone, 2, person: p)
       create_list(:email, 2, person: p)
