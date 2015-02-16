@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :broker_agency do
     name "Trusty Broker, Inc"
+    market_kind "both"
     primary_broker { FactoryGirl.build(:broker) }
 
     factory :broker_agency_with_writing_agents do
