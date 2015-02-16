@@ -1,21 +1,19 @@
 class Person
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Versioning
 
   GENDER_KINDS = %W(male female)
 
-  # TODO: Need simpler, Enterprise-level incrementing ID
-  # field :hbx_id, type: Integer
-
   auto_increment :hbx_id, :seed => 9999
 
-  field :name_pfx, type: String, default: ""
+  field :name_pfx, type: String
   field :first_name, type: String
-  field :middle_name, type: String, default: ""
+  field :middle_name, type: String
   field :last_name, type: String
-  field :name_sfx, type: String, default: ""
-  field :name_full, type: String
-  field :alternate_name, type: String, default: ""
+  field :name_sfx, type: String
+  field :full_name, type: String
+  field :alternate_name, type: String
 
   # Sub-model in-common attributes
   field :ssn, type: String
@@ -29,7 +27,16 @@ class Person
   # Login account
   has_one :user, as: :profile, dependent: :destroy
 
-  belongs_to :employer_representatives, class_name: "Employer",  inverse_of: :representatives
+  belongs_to :employer_contact, 
+                class_name: "Employer",  
+                inverse_of: :employer_contacts,
+                index: true
+
+  belongs_to :broker_agency_contact, 
+                class_name: "BrokerAgency",  
+                inverse_of: :broker_agency_contacts, 
+                index: true
+
   belongs_to :family
 
   embeds_one :consumer, cascade_callbacks: true, validate: true
@@ -44,21 +51,22 @@ class Person
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
 
-  #building non person relation using through relation
-  # has_many :broker_family_members, class_name: "FamilyMember", :inverse_of => :broker
-  # has_many :employee_family_members, class_name: "FamilyMember", :inverse_of => :employee
-
   accepts_nested_attributes_for :consumer, :responsible_party, :broker, :hbx_staff,
     :person_relationships, :employees, :addresses, :phones, :emails
 
-  include Validations::IndividualName
-  include Validations::ConsumerInformation
+  validates_presence_of :first_name, :last_name
 
-  # validates_each CHILD_MODELS do | record, attrib, value |
-  #   record.errors.add(attrib)
-  # end
+  validates :ssn,
+    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
+    numericality: true,
+    uniqueness: true,
+    allow_blank: true
 
-  before_save :initialize_name_full, :date_of_death_follows_date_of_birth
+  validates :gender,
+    allow_blank: true,
+    inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
+
+  before_save :set_full_name, :date_of_death_follows_date_of_birth
 
   index({hbx_id: 1}, {unique: true})
   index({last_name:  1})
@@ -97,13 +105,11 @@ class Person
   # Strip non-numeric chars from ssn
   # SSN validation rules, see: http://www.ssa.gov/employer/randomizationfaqs.html#a0=12
   def ssn=(new_ssn)
-    return if new_ssn.blank?
-    write_attribute(:ssn, new_ssn.to_s.gsub(/[^0-9]/i, ''))
+    write_attribute(:ssn, new_ssn.to_s.gsub(/\D/, ''))
   end
 
   def gender=(new_gender)
-    return if new_gender.blank?
-    write_attribute(:gender, new_gender.downcase)
+    write_attribute(:gender, new_gender.to_s.downcase)
   end
 
   # def dob=(new_dob)
@@ -112,7 +118,7 @@ class Person
   # end
 
   def full_name
-    [name_pfx, first_name, middle_name, last_name, name_sfx].reject(&:blank?).join(' ').downcase.gsub(/\b\w/) {|first| first.upcase }
+    @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
   end
 
   # Return an instance list of active People who match identifying information criteria
@@ -130,16 +136,16 @@ class Person
   end
 
   def dob_to_string
-    self.dob.blank? ? "" : self.dob.strftime("%Y%m%d")
+    @dob.blank? ? "" : @dob.strftime("%Y%m%d")
   end
 
   def is_active?
-    self.is_active
+    @is_active
   end
 
 private
-  def initialize_name_full
-    # self.name_full = full_name
+  def set_full_name
+    full_name
   end
 
   def date_of_death_follows_date_of_birth
@@ -147,7 +153,4 @@ private
     errors.add(:date_of_death, "date of death cannot preceed date of birth") if date_of_death < dob
   end
 
-  def safe_downcase(value)
-    value.blank? ? value : value.downcase.strip
-  end
 end
