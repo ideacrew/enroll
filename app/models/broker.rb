@@ -37,23 +37,29 @@ class Broker
     Person.where("broker._id" => broker_id).first.broker
   end  
 
-  # belongs_to broker_agency
-  def broker_agency=(new_broker_agency)
-    raise ArgumentError.new("expected BrokerAgency class") unless new_broker_agency.is_a? BrokerAgency
-    self.broker_agency_id = new_broker_agency._id
-  end
-
-  def broker_agency
-    BrokerAgency.find(self.broker_agency_id) if has_broker_agency?
-  end
-
-  def has_broker_agency?
-    broker_agency_id.present?
+  def self.find_by_npn(npn_id)
+    Person.where("broker.npn" => npn_id).first.broker
   end
 
   def self.find_by_broker_agency(broker_agency)
     return unless broker_agency.is_a? BrokerAgency
     where(broker_agency_id: broker_agency._id)
+  end
+
+
+
+  # belongs_to broker_agency
+  def broker_agency=(new_broker_agency)
+    raise ArgumentError.new("expected BrokerAgency class") unless new_broker_agency.is_a? BrokerAgency
+    broker_agency_id = new_broker_agency._id
+  end
+
+  def broker_agency
+    BrokerAgency.find(broker_agency_id) if has_broker_agency?
+  end
+
+  def has_broker_agency?
+    @broker_agency_id.present?
   end
 
   def addresses=(new_address)

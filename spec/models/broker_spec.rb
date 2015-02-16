@@ -14,12 +14,12 @@ describe Broker do
       expect(person0.build_broker(npn: npn0, provider_kind: provider_kind).save).to eq true
     end
 
-    it 'properly intantiates class referncing parent Person instance' do
+    it 'properly intantiates class referencing a parent Person instance' do
       expect(Broker.new(person: person1, npn: npn1, provider_kind: provider_kind).save).to eq true
     end
   end
 
-  describe Broker, '.all', :type => :model do
+  describe Broker, '.find', :type => :model do
     it 'returns Broker instance for the specified ID' do
       b0 = Broker.create(person: person0, npn: npn0, provider_kind: provider_kind)
 
@@ -39,15 +39,27 @@ describe Broker do
     end
   end
 
-end
+  describe Broker, '.by_npn', :type => :model do
+    it 'returns Broker instance for the specified National Producer Number' do
+      b0 = Broker.create(person: person0, npn: npn0, provider_kind: provider_kind)
+      b1 = Broker.create(person: person1, npn: npn1, provider_kind: provider_kind)
 
-
-
-describe Broker, '.find', :type => :model do
-  it 'returns Broker instance for the specified ID' do
+      expect(Broker.find_by_npn(npn0).npn).to eq b0.npn
+    end
   end
-end
 
+  describe Broker, '.all', :type => :model do
+    it 'returns all Broker instances' do
+      b0 = Broker.create(person: person0, npn: npn0, provider_kind: provider_kind)
+      b1 = Broker.create(person: person1, npn: npn1, provider_kind: provider_kind)
+
+      # expect(Broker.all).to be_an_instance_of Mongoid::Criteria
+      expect(Broker.all.last).to be_an_instance_of Broker
+      expect(Broker.all.size).to eq 2
+    end
+  end
+
+end
 
 
 # Instance methods
