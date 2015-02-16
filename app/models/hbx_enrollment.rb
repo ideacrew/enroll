@@ -42,8 +42,6 @@ class HbxEnrollment
               allow_nil: true,
               numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
-  index({policy_id: 1})
-
   def policy=(policy_instance)
     return unless policy_instance.is_a? Policy
     self.policy_id = policy_instance._id

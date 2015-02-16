@@ -17,9 +17,7 @@ class HbxEnrollmentExemption
   embeds_many :comments
   accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
 
-  index({certificate_number:  1})
-
-  validates :kind, 
+  validates :kind,
   					presence: true,
   					allow_blank: false,
   					allow_nil:   false,
@@ -27,7 +25,7 @@ class HbxEnrollmentExemption
 
 
   def parent
-    raise "undefined parent ApplicationGroup" unless application_group? 
+    raise "undefined parent ApplicationGroup" unless application_group?
     self.family
   end
 

@@ -11,14 +11,12 @@ class FinancialStatement
 
   field :eligibility_determination_id, type: BSON::ObjectId
 
-  # Has access to employer-sponsored coverage that meets ACA minimum standard value and 
+  # Has access to employer-sponsored coverage that meets ACA minimum standard value and
   #   employee responsible premium amount is <= 9.5% of Household income
   field :is_enrolled_for_es_coverage, type: Boolean, default: false
   field :is_without_assistance, type: Boolean, default: true
   field :submitted_date, type: DateTime
   field :is_active, type: Boolean, default: true
-
-  index({submitted_date:  1})
 
   embedded_in :tax_household_member
 

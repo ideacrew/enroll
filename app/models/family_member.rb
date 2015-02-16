@@ -24,9 +24,6 @@ class FamilyMember
   embeds_many :comments, cascade_callbacks: true
   accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
 
-  index({person_id: 1})
-  index({broker_id:  1})
-  index({is_primary_applicant: 1})
 
   validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
 
