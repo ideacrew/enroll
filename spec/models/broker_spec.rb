@@ -73,6 +73,19 @@ describe Broker do
     end
   end
 
-# Instance methods
+  # Instance methods
+  describe Broker, :type => :model do
+    let(:ba) {FactoryGirl.create(:broker_agency)}
+
+    it '#broker_agency returns' do
+      expect(Broker.new(broker_agency: ba).broker_agency.id).to eq ba._id
+    end
+
+    it '#has_broker_agency? is true when assigned' do
+      expect(Broker.new(broker_agency: nil).has_broker_agency?).to be_false
+      expect(Broker.new(broker_agency: ba).has_broker_agency?).to be_true
+    end
+  end
+
 
 end

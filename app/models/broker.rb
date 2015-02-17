@@ -52,8 +52,13 @@ class Broker
 
   # belongs_to broker_agency
   def broker_agency=(new_broker_agency)
-    raise ArgumentError.new("expected BrokerAgency class") unless new_broker_agency.is_a? BrokerAgency
-    self.broker_agency_id = new_broker_agency._id
+    if new_broker_agency.nil?
+      self.broker_agency_id = nil
+    else
+      raise ArgumentError.new("expected BrokerAgency class") unless new_broker_agency.is_a? BrokerAgency
+      self.broker_agency_id = new_broker_agency._id
+    end
+    self.broker_agency
   end
 
   def broker_agency
@@ -61,7 +66,7 @@ class Broker
   end
 
   def has_broker_agency?
-    @broker_agency_id.present?
+    self.broker_agency_id.present?
   end
 
   def addresses=(new_address)
