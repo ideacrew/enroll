@@ -75,15 +75,22 @@ class PeopleController < ApplicationController
 
   def create
     
-    person_params["addresses_attributes"].each do |key, address|
+   person_params["addresses_attributes"].each do |key, address|
       if address["kind"] != 'home' && (address["city"].blank? && address["zip"].blank? && address["address_1"].blank?) 
         person_params["addresses_attributes"].delete("#{key}")
       end
-    end
+   end
+    
+   person_params["phones_attributes"].each do |key, phone|
+     if phone["kind"] != 'home' && phone["full_phone_number"].blank? 
+       person_params["phones_attributes"].delete("#{key}")
+     end
+   end
+    
     
     @person = Person.new(person_params)
     respond_to do |format|
-      if @person.save(validate: false)
+      if @person.save
         format.html { redirect_to @person, notice: 'Person was successfully created.' }
         format.json { render json: @person, status: :created, location: @person }
       else
