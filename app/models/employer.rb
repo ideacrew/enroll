@@ -1,7 +1,6 @@
 class Employer
   include Mongoid::Document
   include Mongoid::Timestamps
-
   include AASM
 
   ENTITY_KINDS = ["c_corporation", "s_corporation", "partnership", "tax_exempt_organization"]
@@ -46,10 +45,9 @@ class Employer
   embeds_many :plan_years, cascade_callbacks: true, validate: true
   accepts_nested_attributes_for :plan_years, reject_if: :all_blank, allow_destroy: true
 
-  # embeds_many :contacts
   embeds_many :addresses, :inverse_of => :employer
-  has_many :representatives, class_name: "Person", inverse_of: :employer_representatives
 
+  has_many :employer_contacts, class_name: "Person", inverse_of: :employer_contact
   belongs_to :broker_agency, counter_cache: true, index: true
 
   validates_presence_of :legal_name, :fein, :entity_kind
@@ -115,14 +113,9 @@ class Employer
     Employee.where(employer_id: self._id)
   end
 
-  def payment_transactions
-    PremiumPayment.payment_transactions_for(self)
-  end
-
   # Strip non-numeric characters
   def fein=(new_fein)
-    return if new_fein.blank?
-    write_attribute(:fein, new_fein.to_s.gsub(/[^0-9]/i, ''))
+    write_attribute(:fein, new_fein.to_s.gsub(/\D/, ''))
   end
 
   def find_plan_year_by_date(coverage_date)
@@ -136,16 +129,17 @@ class Employer
   # belongs_to writing agent (broker)
   def writing_agent=(new_writing_agent)
     raise ArgumentError.new("expected Broker class") unless new_writing_agent.is_a? Broker
-    self.new_writing_agent_id = new_writing_agent._id
+    @writing_agent_id = new_writing_agent._id
+    new_writing_agent
   end
 
   def writing_agent
-    Broker.find(self.writing_agent_id) unless writing_agent_id.blank?
+    Broker.find(@writing_agent_id) unless @writing_agent_id.blank?
   end
 
   class << self
     def find_by_fein(fein)
-      Employer.where(:fein => fein).first
+      where(:fein => fein).first
     end
 
     def find_by_broker_agency(agency)
