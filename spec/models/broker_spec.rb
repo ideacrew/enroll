@@ -1,22 +1,84 @@
 require 'rails_helper'
 
-describe Broker do
+describe Broker, type: :model do
 
   let(:person0) {FactoryGirl.create(:person)}
   let(:person1) {FactoryGirl.create(:person)}
+  let(:broker_agency) {FactoryGirl.create(:broker_agency)}
   let(:npn0) {"xyz123xyz"}
   let(:npn1) {"123xyz123"}
   let(:provider_kind)  {"assister"}
 
-  # Class methods
-  describe Broker, '.new', :type => :model do
-    it 'properly intantiates class using build_broker' do
-      expect(person0.build_broker(npn: npn0, provider_kind: provider_kind).save).to eq true
+
+  describe ".new" do
+    let(:valid_params) do
+      { person: person0,
+        npn: npn0,
+        provider_kind: provider_kind
+      }
     end
 
-    it 'properly intantiates class referencing a parent Person instance' do
-      expect(Broker.new(person: person1, npn: npn1, provider_kind: provider_kind).save).to eq true
+    context "with no arguments" do
+      let(:params) {{}}
+
+      it "should not save" do
+        expect(Broker.new(**params).save).to be_false
+      end
     end
+
+    context "with no person" do
+      let(:params) {valid_params.except(:person)}
+
+      it "should raise" do
+        expect{Broker.create(**params)}.to raise_error(Mongoid::Errors::NoParent)
+      end
+    end
+
+    context "with no npn" do
+      let(:params) {valid_params.except(:npn)}
+
+      it "should fail validation" do
+        expect(Broker.create(**params).errors[:npn].any?).to be_true
+      end
+    end
+
+    context "with no provider_kind" do
+      let(:params) {valid_params.except(:provider_kind)}
+
+      it "should fail validation" do
+        expect(Broker.create(**params).errors[:provider_kind].any?).to be_true
+      end
+    end
+
+    context "with all required data" do
+      let(:params) {valid_params}
+
+      it "should successfully save" do
+        expect(Broker.new(**params).save).to be_true
+      end
+
+      it 'successfully save using build_broker' do
+        expect(person0.build_broker(**params.except(:person)).save).to eq true
+      end
+
+    end
+
+    context "with duplicate npn number" do
+      let(:params) {valid_params}
+
+      it "should raise" do
+        expect(Broker.with(safe: true).create(**params)).to be_true
+
+        ## TODO: Change this to proper Error when Mongoid is coerced into raising it
+        # expect{Broker.with(safe: true).create(**params)}.to raise_error(Mongoid::Errors::NoParent)
+      end
+    end
+  end
+
+
+  # Class methods
+  describe Broker, '.new', :type => :model do
+
   end
 
   describe Broker, '.find', :type => :model do
@@ -77,14 +139,26 @@ describe Broker do
   describe Broker, :type => :model do
     let(:ba) {FactoryGirl.create(:broker_agency)}
 
-    it '#broker_agency returns' do
+    it '#broker_agency sets agency' do
       expect(Broker.new(broker_agency: ba).broker_agency.id).to eq ba._id
     end
 
-    it '#has_broker_agency? is true when assigned' do
+    it '#has_broker_agency? is true when agency is assigned' do
       expect(Broker.new(broker_agency: nil).has_broker_agency?).to be_false
       expect(Broker.new(broker_agency: ba).has_broker_agency?).to be_true
     end
+
+    # TODO
+    it '#address= and #address sets & gets work address on parent person instance' do
+      # address = FactoryGirl.build(:address)
+      # address.kind = "work"
+      
+      # expect(person0.build_broker(address: address).address._id).to eq address._id
+      # expect(person0.build_broker(npn: npn0, provider_kind: provider_kind, address: address).save).to eq true
+    end
+
+
+
   end
 
 

@@ -9,7 +9,7 @@ class Broker
   # Broker National Producer Number (unique identifier)
   field :npn, type: String
   field :broker_agency_id, type: BSON::ObjectId
-  field :provider_kind, type: String, default: "broker"
+  field :provider_kind, type: String
 
   # field :aasm_state, type: String
   # field :aasm_message, type: String
@@ -18,6 +18,11 @@ class Broker
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
 
   validates_presence_of :npn, :provider_kind
+  validates :npn, uniqueness: true
+  validates :provider_kind,
+    allow_blank: false,
+    inclusion: { in: PROVIDER_KINDS, message: "%{value} is not a valid provider kind" }
+
 
   # scope :all_active_brokers, ->{ and({ kind: "broker" }, { is_active: true })}
   # scope :all_active_tpzs, ->{ and({ kind: "tpa" }, { is_active: true })}
@@ -46,7 +51,7 @@ class Broker
   end
 
   def parent
-    raise "undefined parent: Person" unless self.person?
+    # raise "undefined parent: Person" unless self.person?
     self.person
   end
 
@@ -69,12 +74,12 @@ class Broker
     self.broker_agency_id.present?
   end
 
-  def addresses=(new_address)
+  def address=(new_address)
     parent.addresses << new_address
   end
 
   def address
-    parent.addresses.detect { |adr| adr.kind == "work" }
+    parent.addresses.detect { |addr| addr.kind == "work" }
   end
 
   def phone
