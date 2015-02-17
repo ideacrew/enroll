@@ -15,7 +15,7 @@ class Enrollee
 
   validates_presence_of :person_id, :coverage_start_on
 
-  before_save :set_premium
+  before_save :update_premium
 
   def person=(new_person)
     raise ArgumentError.new("expected Person class") unless new_person.is_a? Person
@@ -64,6 +64,9 @@ private
     (Rational(amount_in_cents) / Rational(100)).to_f if amount_in_cents
   end
 
-
+private
+  def update_premium
+    set_premium
+  end
 
 end
