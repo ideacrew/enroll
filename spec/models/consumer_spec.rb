@@ -6,66 +6,77 @@ describe Consumer, '.new', type: :model do
   it { should delegate_method(:dob).to :person }
   it { should delegate_method(:gender).to :person }
 
-  it { should validate_presence_of :ssn }
-  it { should validate_presence_of :dob }
-  it { should validate_presence_of :gender }
   it { should validate_presence_of :is_incarcerated }
   it { should validate_presence_of :is_applicant }
   it { should validate_presence_of :is_state_resident }
   it { should validate_presence_of :citizen_status }
+  it { should validate_presence_of :gender }
+  it { should validate_presence_of :ssn }
+  it { should validate_presence_of :dob }
+  
+  let(:person) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789" )}
+  
+  let(:is_incarcerated) {true}
+  let(:is_applicant) {true}
+  let(:is_state_resident) {true}
+  let(:citizen_status) {"us_citizen"}
+  let(:citizen_error_message) {"test citizen_status is not a valid citizen status"}
+  
+  describe ".new" do
+    let(:valid_params) do
+      { is_incarcerated: is_incarcerated,
+        is_applicant: is_applicant,
+        is_state_resident: is_state_resident,
+        citizen_status: citizen_status,
+        person: person
+      }
+    end
+    
+    context "with no arguments" do
+      let(:params) {{}}
+      it "should not save" do
+        expect(Consumer.new(**params).save).to be_false
+      end
+    end
+    
+    context "with all valid arguments" do
+      let(:params) {valid_params}
+      it "should save" do
+        expect(Consumer.new(**params).save).to be_true
+      end
+    end
+    
+    context "with no is_incarcerated" do
+      let(:params) {valid_params.except(:is_incarcerated)}
 
-  it "ssn fails validation with improper value" do
-    expect(Consumer.create(ssn: "a7d8d9d").errors[:ssn].any?).to eq true
+      it "should fail validation " do
+        expect(Consumer.create(**params).errors[:is_incarcerated].any?).to be_true
+      end
+    end
+    
+    context "with no is_applicant" do
+      let(:params) {valid_params.except(:is_applicant)}
+      it "should fail validation" do
+        expect(Consumer.create(**params).errors[:is_applicant].any?).to be_true
+      end
+    end
+    
+    context "with no citizen_status" do
+      let(:params) {valid_params.except(:citizen_status)}
+      it "should fail validation" do
+        expect(Consumer.create(**params).errors[:citizen_status].any?).to be_true
+      end
+    end
+    
+    context "with improper citizen_status" do
+      let(:params) {valid_params}
+      it "should fail validation with improper citizen_status" do
+        params[:citizen_status] = "test citizen_status"
+        expect(Consumer.create(**params).errors[:citizen_status].any?).to be_true
+        expect(Consumer.create(**params).errors[:citizen_status]).to eq [citizen_error_message]
+        
+      end
+    end
   end
-
-  it "citizen_status fails validation with an empty or unrecognized value" do
-    expect(Consumer.create(citizen_status: "").errors[:citizen_status].any?).to eq true
-    expect(Consumer.create(citizen_status: "alaskan").errors[:citizen_status].any?).to eq true
-  end
-
-  it "citizen_status succeeds validation with correct value" do
-    expect(Consumer.create(citizen_status: "us_citizen").errors[:citizen_status].any?).to eq false
-  end
-
-  it 'properly intantiates the class' do
-    ssn = "987654321"
-    dob = Date.today - 26.years
-    gender = "male"
-
-    person = FactoryGirl.build(:person)
-    addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
-
-    # Persist Person before building role
-    expect(person.save).to eq true
-
-    consumer = person.build_consumer
-    consumer.ssn = ssn
-    consumer.dob = dob
-    consumer.gender = gender
-    consumer.is_applicant = true
-    consumer.is_incarcerated = false
-    consumer.is_state_resident = true
-    consumer.citizen_status = 'us_citizen'
-    expect(consumer.touch).to eq true
-
-    # Verify delegate local attribute values
-    expect(consumer.ssn).to eq ssn
-    expect(consumer.dob).to eq dob
-    expect(consumer.gender).to eq gender
-
-    # Verify delegated attribute values
-    expect(person.ssn).to eq ssn
-    expect(person.dob).to eq dob
-    expect(person.gender).to eq gender
-
-    expect(consumer.valid?).to eq true
-    expect(consumer.errors.messages.size).to eq 0
-    expect(consumer.save).to eq true
-    expect(consumer.created_at).not_to eq nil
-  end
-
-  describe Consumer, '.new', type: :model do
-  end
-
-
+  
 end
