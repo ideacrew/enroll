@@ -31,6 +31,14 @@ $(document).ready(function () {
       slideInput: false
   });
 
+  
+  $(".address-li").on('click',function(){
+    $(".address-span").html($(this).data("address-text"));
+    $(".address-row").hide();
+    divtoshow = $(this).data("value") + "-div";
+    $("."+divtoshow).show();
+  })
+  
   $(".phone-mask").inputmask("(999) 999-9999");
 
   $('.autofill_yes').click(function(){

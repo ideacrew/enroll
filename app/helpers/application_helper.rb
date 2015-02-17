@@ -1,5 +1,22 @@
 module ApplicationHelper
 
+  def generate_breadcrumbs(breadcrumbs)
+    html = "<ul class='breadcrumb'>".html_safe
+    breadcrumbs.each_with_index do |breadcrumb, index|
+      if breadcrumb[:path]
+        html += "<li>".html_safe + link_to(breadcrumb[:name], breadcrumb[:path], data: breadcrumb[:data])
+        html += "<span class='divider'></span>".html_safe if index < breadcrumbs.length-1
+        html += "</li>".html_safe
+      else
+        html += "<li class='active #{breadcrumb[:class]}'>".html_safe + breadcrumb[:name]
+        html += "<span class='divider'></span>".html_safe if index < breadcrumbs.length-1
+        html += "</li>".html_safe
+      end
+    end
+    html += "</ul>".html_safe
+    return html
+  end
+  
   # Formats version information in HTML string for the referenced object instance
   def version_for_record(obj)
     ver  = "version: #{obj.version}" if obj.respond_to?('version')

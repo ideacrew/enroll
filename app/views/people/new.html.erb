@@ -9,16 +9,10 @@
 <section>
   <div class="col-md-12">
     <nav>
-      <%= render 'shared/breadcrumb', crumbs: [
-          link_to('People', people_path),
-          'New'
-        ]
-      %>
+      <%= generate_breadcrumbs([{:name => "People", :path => people_path}, {:name => "New"}]) %>      
     </nav>
   </div>
 </section>
-
-
 
 <section>
   <%= form_for(@person) do |f| %>
