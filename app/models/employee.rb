@@ -18,7 +18,7 @@ class Employee
   delegate :dob, :dob=, to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
-  validates_presence_of :person, :employer_id, :hired_on
+  validates_presence_of :employer_id, :hired_on
 
   before_save :termination_date_must_follow_hire_date
 
