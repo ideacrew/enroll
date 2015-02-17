@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Consumer, '.new', type: :model do
+describe Consumer, type: :model do
   it { should delegate_method(:hbx_id).to :person }
   it { should delegate_method(:ssn).to :person }
   it { should delegate_method(:dob).to :person }
