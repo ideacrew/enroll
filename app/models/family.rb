@@ -50,6 +50,16 @@ class Family
   index({submitted_at:  1})
   index({"hbx_enrollment.broker_agency_id" => 1}, {sparse: true})
 
+  # child model indexes
+  index({"family_member.person_id" => 1})
+  index({"family_member.broker_id" => 1})
+  index({"family_member.is_primary_applicant" => 1})
+  index({"family_member.hbx_enrollment_exemption.certificate_number" => 1})
+  index({"household.hbx_enrollment.policy_id" => 1})
+  index({"household.tax_household.hbx_assigned_id" => 1})
+  index({"household.tax_household.tax_household_member.financial_statement.submitted_date" => 1})
+  index({"irs_group.hbx_assigned_id" => 1})
+
   validate :no_duplicate_family_members
 
   validate :integrity_of_family_member_objects

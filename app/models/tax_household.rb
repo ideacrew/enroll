@@ -17,8 +17,6 @@ class TaxHousehold
   field :effective_end_date, type: Date
   field :submitted_at, type: DateTime
 
-  index({hbx_assigned_id: 1})
-
   embeds_many :tax_household_members
   accepts_nested_attributes_for :tax_household_members
 
@@ -45,7 +43,7 @@ class TaxHousehold
 
   #TODO: return count for adults (21-64), children (<21) and total
   def size
-    members.size 
+    members.size
   end
 
   def family
