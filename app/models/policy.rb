@@ -67,6 +67,10 @@ class Policy
     self.where("enrollees.person_id" => person_instance.id).order_by([:hbx_id])
   end
 
+  def set_policy_premium
+
+  end
+
   def market
     employer_id.present? ? :shop : :individual
   end
@@ -114,9 +118,18 @@ class Policy
   end
 
   def plan=(new_plan)
+    raise ArgumentError.new("expected Directory::Plan class") unless new_plan.is_a? Directory::Plan
+    self.plan_id = new_plan._id
+
+    calculate_enrollee_premiums
   end
 
   def plan
+    Directory::Plan.find(self.plan_id) unless plan.nil?
+  end
+
+  def calculate_enrollee_premiums
+
   end
 
   def canceled?
