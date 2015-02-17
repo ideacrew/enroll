@@ -6,7 +6,6 @@ describe Consumer, '.new', type: :model do
   it { should delegate_method(:dob).to :person }
   it { should delegate_method(:gender).to :person }
 
-  it { should validate_presence_of :person }
   it { should validate_presence_of :ssn }
   it { should validate_presence_of :dob }
   it { should validate_presence_of :gender }
@@ -43,6 +42,8 @@ describe Consumer, '.new', type: :model do
     consumer.ssn = ssn
     consumer.dob = dob
     consumer.gender = gender
+    consumer.is_applicant = true
+    consumer.is_incarcerated = false
     consumer.is_state_resident = true
     consumer.citizen_status = 'us_citizen'
     expect(consumer.touch).to eq true

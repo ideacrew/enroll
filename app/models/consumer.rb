@@ -3,7 +3,6 @@ class Consumer
   include Mongoid::Timestamps
   # include AASM
 
-
   embedded_in :person
 
   CITIZEN_STATUS_KINDS = %W[
@@ -16,16 +15,16 @@ class Consumer
       not_lawfully_present_in_us
   ]
 
-  field :ethnicity, type: String, default: ""
-  field :race, type: String, default: ""
-  field :birth_location, type: String, default: ""
-  field :marital_status, type: String, default: ""
+  field :ethnicity, type: String
+  field :race, type: String
+  field :birth_location, type: String
+  field :marital_status, type: String
 
   field :citizen_status, type: String
-  field :is_state_resident, type: Boolean, default: true
-  field :is_incarcerated, type: Boolean, default: false
-  field :is_applicant, type: Boolean, default: true
-  field :is_disabled, type: Boolean, default: false
+  field :is_state_resident, type: Boolean
+  field :is_incarcerated, type: Boolean
+  field :is_applicant, type: Boolean
+  field :is_disabled, type: Boolean
 
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
@@ -33,21 +32,24 @@ class Consumer
   field :application_state, type: String
   field :is_active, type: Boolean, default: true
 
-  # Writing agent credited for enrollment and transmitted on 834
-  field :writing_agent_id, type: BSON::ObjectId
+  ## Move these to Family model
+  # # Writing agent credited for enrollment and transmitted on 834
+  # field :writing_agent_id, type: BSON::ObjectId
 
-  # Agency representing this employer
-  field :broker_agency_id, type: BSON::ObjectId
+  # # Agency representing this employer
+  # field :broker_agency_id, type: BSON::ObjectId
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn, :ssn=, to: :person, allow_nil: true
   delegate :dob, :dob=, to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
-  include Validations::ConsumerInformationRequired
-  include Validations::Residency
+  validates_presence_of :ssn, :dob, :gender, :is_incarcerated, :is_applicant, :is_state_resident, :citizen_status
 
-  validates_presence_of :person, :is_incarcerated, :is_applicant
+  validates :citizen_status,
+    inclusion: { in: Consumer::CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" },
+    allow_blank: false
+
 
   scope :all_under_age_twenty_six, ->{ gt(:'dob' => (Date.today - 26.years))}
   scope :all_over_age_twenty_six,  ->{lte(:'dob' => (Date.today - 26.years))}
