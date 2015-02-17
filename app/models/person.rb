@@ -80,7 +80,8 @@ class Person
   # Broker child model indexes
   index({"broker._id" => 1})
   index({"broker.provider_kind" => 1})
-  index({"broker.npn" => 1}, {unique: true})
+  index({"broker.broker_agency_id" => 1})
+  index({"broker.npn" => 1}, {sparse: true, unique: true})
 
   # Consumer child model indexes
   index({"consumer._id" => 1})
