@@ -18,7 +18,7 @@ class BrokerAgency
   has_many :broker_agency_contacts, class_name: "Person", inverse_of: :broker_agency_contact
   has_many :employers
 
-  validates_presence_of :name, :primary_broker_id, :market_kind
+  validates_presence_of :name, :market_kind
 
   validates :market_kind,
     inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid market" },
@@ -28,8 +28,12 @@ class BrokerAgency
 
   # has_one primary_broker
   def primary_broker=(new_primary_broker)
-    raise ArgumentError.new("expected Broker class") unless new_primary_broker.is_a? Broker
-    self.primary_broker_id = new_primary_broker._id
+    if new_primary_broker.present?
+      raise ArgumentError.new("expected Broker class") unless new_primary_broker.is_a? Broker
+      self.primary_broker_id = new_primary_broker._id
+    else
+      primary_broker = nil
+    end
   end
 
   def primary_broker
