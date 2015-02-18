@@ -1,38 +1,96 @@
 require 'rails_helper'
 
-describe Address, type: :model do
+RSpec.describe Address, type: :model do
   it { should validate_presence_of :address_1 }
   it { should validate_presence_of :city }
   it { should validate_presence_of :state }
   it { should validate_presence_of :zip }
 
-  describe 'kind' do
-    it "invalid with blank value" do
-      expect(Address.create(kind: "").errors[:kind].any?).to eq true
+  let(:person) {Person.new(first_name: "John", last_name: "Doe", gender: "male", dob: "10/10/1974", ssn: "123456789" )}
+  let(:address) {FactoryGirl.create(:address)}
+  let(:employer){FactoryGirl.create(:employer)}
+
+  describe "add address" do
+    let(:valid_params) do
+      {
+        kind: "home",
+        address_1: "1 Clear Crk",
+        city: "Irvine",
+        state: "CA",
+        zip: "20171"
+      }
     end
 
-    it "invalid with unrecognized value" do
-      expect(Address.create(kind: "fake").errors[:kind].any?).to eq true
-    end
-
-    it 'accepts all valid values' do
-      ['home', 'work', 'mailing'].each do |type|
-        expect(Address.create(kind: type).errors[:kind].any?).to eq false
+    context "with no arguments" do
+      let(:params){{}}
+      it "should not save" do
+        expect(Address.create(**params).valid?).to be_false
       end
     end
-  end
 
-
-  it "zipcode is invalid with empty or unrecognized value" do
-    expect(Address.create(zip: "").errors[:zip].any?).to eq true
-    expect(Address.create(zip: "324-67").errors[:zip].any?).to eq true
-  end
-
-  describe "with a zipcode of 99389" do
-    it "should have a valid zipcode" do
-      expect(Address.create(zip: "99389").errors[:zip].any?).to eq false
-      expect(Address.create(zip: "99389-3425").errors[:zip].any?).to eq false
+    context "with empty address kind" do
+      let(:params) {valid_params.except(:kind)}
+      it "is not a valid address kind" do
+        expect(Address.create(**params).errors[:kind].any?).to be_true
+      end
     end
+
+    context "with no address_1" do
+      let(:params) {valid_params.except(:address_1)}
+      it "is not a valid address kind" do
+        expect(Address.create(**params).errors[:address_1].any?).to be_true
+      end
+    end
+
+    context "with no city" do
+      let(:params) {valid_params.except(:city)}
+      it "is not a valid address" do
+        expect(Address.create(**params).errors[:city].any?).to be_true
+      end
+    end
+
+    context "with no state" do
+      let(:params) {valid_params.except(:state)}
+      it "is not valid address" do
+        expect(Address.create(**params).errors[:state].any?).to be_true
+      end
+    end
+
+    context "zip" do
+      let(:params) {valid_params.except(:zip)}
+
+      it "is empty" do
+        expect(Address.create(**params).errors[:zip].any?).to be_true
+      end
+
+      it "is not valid with invalid code" do
+        params[:zip] = "123-24"
+        expect(Address.create(**params).errors[:zip].any?).to be_true
+      end
+
+    end
+
+    context "with invalid address kind" do
+      let(:params) {valid_params}
+      it "is with unrecognized value" do
+        params[:kind] = "fake"
+        expect(Address.create(**params).errors[:kind].any?).to be_true
+      end
+    end
+
+    context "accepts all valid values" do
+      let(:params) {valid_params.except(:kind)}
+      it "should save the address" do
+        ['home', 'work', 'mailing'].each do |type|
+          params[:kind] = type
+          address = Address.new(**params)
+          person.addresses << address
+          expect(address.errors[:kind].any?).to be_false
+          expect(address.valid?).to be_true
+        end
+      end
+    end
+
   end
 
   describe 'view helpers/presenters' do
