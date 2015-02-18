@@ -38,7 +38,16 @@ describe Phone, type: :model do
 
   it "kind valid with proper value" do
     expect(Phone.create(kind: "work").errors[:kind].any?).to eq false
-
+  end
+  
+  
+  let(:person) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789" )}
+  let(:params) {{kind: "home", full_phone_number: "(222)-1111-111", person: person}}
+  it "strips valid area code and number from full phone number" do
+    phone = Phone.new(**params)
+    expect(phone.save).to eq true
+    expect(phone.area_code).to eq "222"
+    expect(phone.number).to eq "1111111"
   end
 
 

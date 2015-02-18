@@ -31,10 +31,10 @@ class Phone
 
 
   def save_phone_components
-    phone_number = filter_non_numbers(self.full_phone_number)
+    phone_number = filter_non_numbers(self.full_phone_number).to_s
     if phone_number && phone_number.length == 10
-      self.area_code = phone_number[0,3].to_i
-      self.number = phone_number[3,9].to_i
+      self.area_code = phone_number[0,3]
+      self.number = phone_number[3,9]
     end
   end
 
@@ -52,6 +52,6 @@ class Phone
 
 private
   def filter_non_numbers(str)
-    str.gsub(/\D/,'') if str.present?
+    str.gsub(/\D/,'') if str.present? 
   end
 end
