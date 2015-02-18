@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :broker do
-    person { FactoryGirl.build(:person) }
+    person { FactoryGirl.create(:person) }
     sequence(:npn) {|n| "abcxyz\##{n}" }
     provider_kind {"broker"}
 
