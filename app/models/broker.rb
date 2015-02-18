@@ -17,6 +17,8 @@ class Broker
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
 
+  accepts_nested_attributes_for :person
+
   validates_presence_of :npn, :provider_kind
   validates :npn, uniqueness: true
   validates :provider_kind,
@@ -26,6 +28,11 @@ class Broker
 
   # scope :all_active_brokers, ->{ and({ kind: "broker" }, { is_active: true })}
   # scope :all_active_tpzs, ->{ and({ kind: "tpa" }, { is_active: true })}
+
+  # def initialize(attrs = nil, options = nil)
+  #   super
+  #   # put code here
+  # end
 
   def self.find(broker_id)
     Person.where("broker._id" => broker_id).first.broker
@@ -43,6 +50,10 @@ class Broker
   def self.all
     # criteria = Mongoid::Criteria.new(Person)
     list_brokers Person.exists(:broker => true)
+  end
+
+  def self.first
+    self.all.first
   end
 
   def self.find_by_broker_agency(broker_agency)
@@ -82,8 +93,16 @@ class Broker
     parent.addresses.detect { |addr| addr.kind == "work" }
   end
 
+  def phone=(new_phone)
+    parent.phones << new_phone
+  end
+
   def phone
     parent.phones.detect { |phone| phone.kind == "work" }
+  end
+
+  def email=(new_email)
+    parent.emails << new_email
   end
 
   def email
