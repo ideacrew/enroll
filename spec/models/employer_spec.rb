@@ -1,32 +1,88 @@
 require 'rails_helper'
 
 describe Employer, type: :model do
-  context ".new" do
-    let(:legal_name) {"ACME Widgets, Inc"}
-    let(:dba) {"Widgetworks"}
-    let(:fein) {"034267123"}
-    let(:kind) {"tax_exempt_organization"}
-
-    let(:employer) {Employer.new(legal_name: legal_name, dba: dba, fein: fein, entity_kind: kind)}
-
-    it { should validate_presence_of :legal_name }
-    it { should validate_presence_of :fein }
-    it { should validate_presence_of :entity_kind }
-
-    it('.name'){ expect(employer.legal_name).to eq legal_name }
-    it('.dba'){ expect(employer.dba).to eq dba }
-    it('.fein'){ expect(employer.fein).to eq fein }
-    it('.entity_kind'){ expect(employer.entity_kind).to eq kind }
-    it('should be valid'){ expect(employer.valid?).to eq true }
-
-    context ".save" do
-      let(:saved?) {employer.save}
-
-      it { expect(saved?).to eq true }
+  it { should validate_presence_of :legal_name }
+  it { should validate_presence_of :fein }
+  it { should validate_presence_of :entity_kind }
+  
+  let(:legal_name) {"ACME Widgets, Inc"}
+  let(:dba) {"Widgetworks"}
+  let(:fein) {"034267123"}
+  let(:kind) {"tax_exempt_organization"}
+  
+  let(:kind_error_message) {"test entity_kind is not a valid business entity"}
+  let(:fein_error_message) {"123123 is not a valid FEIN"}
+  
+  
+  describe ".new" do
+    let(:valid_params) do
+      {  legal_name: legal_name,
+         fein: fein,
+         entity_kind: kind
+      }
     end
+    
+    context "with no arguments" do
+      let(:params) {{}}
+      it "should not save" do
+        expect(Employer.new(**params).save).to be_false
+      end
+    end
+    
+    context "with all valid arguments" do
+      let(:params) {valid_params}
+      it "should save" do
+        expect(Employer.new(**params).save).to be_true
+      end
+    end
+    
+    context "with no legal_name" do
+      let(:params) {valid_params.except(:legal_name)}
+
+      it "should fail validation " do
+        expect(Employer.create(**params).errors[:legal_name].any?).to be_true
+      end
+    end
+    
+    context "with no fein" do
+      let(:params) {valid_params.except(:fein)}
+
+      it "should fail validation " do
+        expect(Employer.create(**params).errors[:fein].any?).to be_true
+      end
+    end
+    
+    context "with no entity_kind" do
+      let(:params) {valid_params.except(:entity_kind)}
+
+      it "should fail validation " do
+        expect(Employer.create(**params).errors[:entity_kind].any?).to be_true
+      end
+    end
+    
+    context "with improper entity_kind" do
+      let(:params) {valid_params}
+      it "should fail validation with improper entity_kind" do
+        params[:entity_kind] = "test entity_kind"
+        expect(Employer.create(**params).errors[:entity_kind].any?).to be_true
+        expect(Employer.create(**params).errors[:entity_kind]).to eq [kind_error_message]
+        
+      end
+    end
+    
+    context "with improper fein" do
+      let(:params) {valid_params}
+      it "should fail validation with improper fein" do
+        params[:fein] = "123123"
+        expect(Employer.create(**params).errors[:fein].any?).to be_true
+        expect(Employer.create(**params).errors[:fein]).to eq [fein_error_message]
+        
+      end
+    end
+    
+    
   end
 end
-
 # Class methods
 describe Employer, '.find_by_broker_agency', :type => :model do
   it 'returns employers represented by the specified broker agency' do
