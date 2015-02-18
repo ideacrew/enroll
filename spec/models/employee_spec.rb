@@ -12,24 +12,43 @@ describe Employee, type: :model do
   it { should validate_presence_of :employer_id }
   it { should validate_presence_of :hired_on }
 
+  let(:ssn) {"987654321"}
+  let(:dob) { 36.years.ago.to_date }
+  let(:gender) {"female"}
+  let(:hired_on) { 10.days.ago.to_date }
 
-  # it "updates instance timestamps" do
-  #   er = FactoryGirl.build(:employer)
-  #   ee = FactoryGirl.build(:employee)
-  #   pn = Person.create(first_name: "Ginger", last_name: "Baker")
-  #   # ee = Employee.new(ssn: "345907654", dob: Date.today - 40.years, gender: "male", employer: er, date_of_hire: Date.today)
-  #   ee = FactoryGirl.build(:employee)
-  #   pn.employees << ee
-  #   pn.valid?
-  #   expect(ee.errors.messages.inspect).to eq 0
-  #   expect(pn.save).to eq true
-  #   expect(ee.created_at).to eq ee.updated_at
-  #   employee.date_of_termination = Date.today
-  #   expect(ee.save).to eq true
-  #   expect(ee.created_at).not_to eq ee.updated_at
-  # end
+  describe "built" do
+    let(:address) {FactoryGirl.build(:address)}
+    let(:saved_person) {FactoryGirl.create(:person, first_name: "Annie", last_name: "Lennox", addresses: [address])}
+    let(:new_person) {FactoryGirl.build(:person, first_name: "Carly", last_name: "Simon")}
+    let(:employer) {FactoryGirl.create(:employer)}
+
+    let(:valid_params) do
+      {
+        person_attributes: {
+          ssn: ssn,
+          dob: dob,
+          gender: gender,
+        },
+        employer: employer,
+        hired_on: hired_on,
+      }
+    end
+
+    context "with valid parameters" do
+      let(:employee) {saved_person.employees.build(valid_params)}
+
+      %w[employer ssn dob gender employer hired_on].each do |m|
+        it "should have the right #{m}" do
+          expect(employee.send(m)).to eq send(m)
+        end
+      end
+
+    end
+  end
 
   it 'properly intantiates the class using an existing person' do
+    pending "replace with pattern"
     ssn = "987654321"
     date_of_hire = Date.today - 10.days
     dob = Date.today - 36.years
@@ -42,7 +61,7 @@ describe Employee, type: :model do
       )
 
     person = Person.create(
-        first_name: "annie", 
+        first_name: "annie",
         last_name: "lennox",
         addresses: [Address.new(
             kind: "home",
@@ -81,6 +100,7 @@ describe Employee, type: :model do
   end
 
   it 'properly intantiates the class using a new person' do
+    pending "replace with pattern"
     ssn = "987654320"
     date_of_hire = Date.today - 10.days
     dob = Date.today - 26.years
@@ -122,6 +142,21 @@ describe Employee, type: :model do
     expect(employee.errors.messages.size).to eq 0
     expect(employee.save).to eq true
   end
+  # it "updates instance timestamps" do
+  #   er = FactoryGirl.build(:employer)
+  #   ee = FactoryGirl.build(:employee)
+  #   pn = Person.create(first_name: "Ginger", last_name: "Baker")
+  #   # ee = Employee.new(ssn: "345907654", dob: Date.today - 40.years, gender: "male", employer: er, date_of_hire: Date.today)
+  #   ee = FactoryGirl.build(:employee)
+  #   pn.employees << ee
+  #   pn.valid?
+  #   expect(ee.errors.messages.inspect).to eq 0
+  #   expect(pn.save).to eq true
+  #   expect(ee.created_at).to eq ee.updated_at
+  #   employee.date_of_termination = Date.today
+  #   expect(ee.save).to eq true
+  #   expect(ee.created_at).not_to eq ee.updated_at
+  # end
 end
 
 describe Employee, type: :model do

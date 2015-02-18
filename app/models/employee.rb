@@ -20,14 +20,35 @@ class Employee
 
   validates_presence_of :ssn, :dob, :gender, :employer_id, :hired_on
 
+  accepts_nested_attributes_for :person
+
   before_save :termination_date_must_follow_hire_date
+
+  # hacky fix for nested attributes
+  # TODO: remove this when it is no longer needed
+  after_initialize do |employee|
+    if employee.person.present?
+      @changed_nested_person_attributes = {}
+      %w[ssn dob gender hbx_id].each do |field|
+        if employee.person.send("#{field}_changed?")
+          @changed_nested_person_attributes[field] = employee.person.send(field)
+        end
+      end
+    end
+  end
+  after_build do |employee|
+    if employee.person.present? && @changed_nested_person_attributes.present?
+      employee.person.update_attributes(@changed_nested_person_attributes)
+      unset @changed_nested_person_attributes
+    end
+  end
 
   def families
     Family.by_employee(self)
   end
 
   # def self.find_by_employer(employer_instance)
-  #   # return unless employer_instance.is_a? Employer 
+  #   # return unless employer_instance.is_a? Employer
   #   where("employer_id" =>  employer_instance._id).to_a
   # end
 
