@@ -1,7 +1,6 @@
 class Phone
   include Mongoid::Document
   include Mongoid::Timestamps
-  include Mongoid::Attributes::Dynamic
 
   embedded_in :person
 
@@ -39,17 +38,17 @@ class Phone
     end
   end
 
-  #def area_code=(value)
-   # super filter_non_numbers(value)
-  #end
+  def area_code=(value)
+   super filter_non_numbers(value)
+  end
 
-  #def number=(value)
-   # super filter_non_numbers(value)
-  #end
+  def number=(value)
+   super filter_non_numbers(value)
+  end
 
-  #def extension=(value)
-   # super filter_non_numbers(value)
-  #end
+  def extension=(value)
+   super filter_non_numbers(value)
+  end
 
 private
   def filter_non_numbers(str)
