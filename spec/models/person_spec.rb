@@ -1,52 +1,90 @@
 require 'rails_helper'
 
-## Class methods
-describe Person, '.new' do
-  # it { should validate_presence_of :hbx_assigned_id }
+describe Person, type: :model do
+
   it { should validate_presence_of :first_name }
   it { should validate_presence_of :last_name }
 
-  it "generates hbx_id" do
-    expect(Person.create!(first_name: "Ginger", last_name: "Baker").hbx_id).to eq 10000
+  let(:first_name) {"Martina"}
+  let(:last_name) {"Williams"}
+  let(:ssn) {"123456789"}
+  let(:gender) {"male"}
+  let(:address) {FactoryGirl.build(:address)}
+  
+
+  describe ".new" do
+    let(:valid_params) do
+      { first_name: first_name,
+        last_name: last_name,
+        ssn: ssn,
+        gender: gender,
+        addresses: [address]
+      }
+    end
+
+    context "with no arguments" do
+      let(:params) {{}}
+
+      it "should not save" do
+        expect(Person.new(**params).save).to be_false
+      end
+    end
+
+    context "with all valid arguments" do
+      let(:params) {valid_params}
+
+      it "should save" do
+        expect(Person.new(**params).save).to be_true
+      end
+    end
+
+    context "with no first_name" do
+      let(:params) {valid_params.except(:first_name)}
+
+      it "should fail validation" do
+        expect(Person.create(**params).errors[:first_name].any?).to be_true
+      end
+    end
+
+    context "with no last_name" do
+      let(:params) {valid_params.except(:last_name)}
+
+      it "should fail validation" do
+        expect(Person.create(**params).errors[:last_name].any?).to be_true
+      end
+    end
+
+    context "with no ssn" do
+      let(:params) {valid_params.except(:ssn)}
+
+      it "should not fail validation" do
+        expect(Person.create(**params).errors[:ssn].any?).to be_false
+      end
+    end
+
+   context "with invalid gender" do
+      let(:params) {valid_params}
+      
+      it "should fail validation" do
+        params[:gender] = "abc"
+        expect(Person.create(**params).errors[:gender]).to eq ["abc is not a valid gender"]
+      end
+    end
+   
+   context "with invalid ssn" do
+      let(:params) {valid_params}
+      
+      it "should fail validation" do
+        params[:ssn] = "123345"
+        expect(Person.create(**params).errors[:ssn]).to eq ["SSN must be 9 digits"]
+      end
+    end
+
   end
 
-  it "ssn invalid if non-numric/too short value" do
-    expect(Person.create(ssn: "a7d8d9d00").errors[:ssn].any?).to eq true
-  end
-
-  it "ssn valid with correct numeric-only value" do
-    expect(Person.create(ssn: "765890532").errors[:ssn].any?).to eq false
-  end
-
-  it "ssn valid with correct value passed in containing dashes" do
-    expect(Person.create(ssn: "765-89-0532").errors[:ssn].any?).to eq false
-  end
-
-  it "gender invalid with improper value" do
-    expect(Person.create(gender: "green").errors[:gender].any?).to eq true
-  end
-
-  it "gender valid with correct value" do
-    expect(Person.create(gender: "female").errors[:gender].any?).to eq false
-  end
-
-  it 'properly intantiates the class' do
-    person = Person.new(
-        name_pfx: "mr",
-        first_name: "paxton",
-        middle_name: "x",
-        last_name: "thomas",
-        name_sfx: "III",
-        ssn: "076690012",
-        dob: Date.today - 34.years,
-        gender: "male",
-        updated_by: "rspec"
-      )
-
-    expect(person.errors.size).to eq 0
-  end
 end
 
+## Class methods
 describe Person, '.match_by_id_info' do
   let(:p0) { Person.create!(first_name: "Jack",   last_name: "Bruce",   dob: "1943-05-14", ssn: "517994321") }
   let(:p1) { Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654") }
