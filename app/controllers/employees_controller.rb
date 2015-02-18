@@ -12,7 +12,6 @@ class EmployeesController < ApplicationController
     @person.addresses.first.city = "Washington"
     @person.addresses.first.state = "DC"
 
-    @employee = @person.build_employee
   end
 
   def edit
