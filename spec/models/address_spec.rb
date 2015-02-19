@@ -64,16 +64,15 @@ RSpec.describe Address, type: :model do
       end
 
       it "is not valid with invalid code" do
-        params[:zip] = "123-24"
+        params.deep_merge!({zip: "123-24"})
         expect(Address.create(**params).errors[:zip].any?).to be_true
       end
 
     end
 
     context "with invalid address kind" do
-      let(:params) {valid_params}
+      let(:params) {valid_params.deep_merge!({kind: "fake"})}
       it "is with unrecognized value" do
-        params[:kind] = "fake"
         expect(Address.create(**params).errors[:kind].any?).to be_true
       end
     end
@@ -82,7 +81,7 @@ RSpec.describe Address, type: :model do
       let(:params) {valid_params.except(:kind)}
       it "should save the address" do
         ['home', 'work', 'mailing'].each do |type|
-          params[:kind] = type
+          params.deep_merge!({kind: type})
           address = Address.new(**params)
           person.addresses << address
           expect(address.errors[:kind].any?).to be_false

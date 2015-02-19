@@ -1,22 +1,76 @@
 require 'spec_helper'
 
 describe Email do
+  let(:person) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789" )}
+  let(:valid_params) do
+    {
+      kind: "home",
+      address: "test@test.com",
+      person: person
+    }
+  end
 
   describe 'validations' do
+    it { should validate_presence_of :address }
+    it { should validate_presence_of :kind }
+
     describe 'email type' do
-      let(:email) { Email.new(kind: 'invalid', address: 'example@example.com') }
-      context 'when invalid' do
+
+      context 'when empty' do
+        let(:params){valid_params.deep_merge!({kind: ""})}
         it 'is invalid' do
-          expect(email).to be_invalid
+          expect(Email.create(**params).errors[:kind].any?).to be_true
+          expect(Email.create(**params).errors[:kind]).to eq ["Choose a type", " is not a valid email type"]
         end
       end
-      valid_types = ['home', 'work']
+
+      context "when invalid" do
+        let(:params){valid_params.deep_merge!(kind: "fake")}
+        it 'is invalid' do
+          expect(Email.create(**params).errors[:kind].any?).to be_true
+          expect(Email.create(**params).errors[:kind]).to eq ["fake is not a valid email type"]
+        end
+      end
+
+      valid_types = Email::KINDS
       valid_types.each do |type|
-        context('when ' + type) do
-          before { email.kind = type}
+        context("when valid #{type} address") do
+          let(:params){valid_params}
           it 'is valid' do
-            expect(email).to be_valid
+            params.deep_merge!({kind: type, address: "#{type}@#{type}.com"})
+            record = Email.create(**params)
+            expect(record).to be_true
+            expect(record.errors.messages.size).to eq 0
           end
+        end
+      end
+    end
+
+    describe "address" do
+
+      context "when empty" do
+        let(:params){valid_params.deep_merge!({address: ""})}
+        it "should give an error" do
+          record = Email.create(**params)
+          expect(record.errors[:address].any?).to be_true
+          expect(record.errors[:address]).to eq ["is invalid", "can't be blank"]
+        end
+      end
+
+      context "when invalid" do
+        let(:params){valid_params.deep_merge!({address: "invalid@invalid"})}
+        it "should give an error" do
+          record = Email.create(**params)
+          expect(record.errors[:address].any?).to be_true
+          expect(record.errors[:address]).to eq ["is invalid"]
+        end
+      end
+
+      context "when adding already email present" do
+        let(:params) {valid_params}
+        it "should throw an error" do
+          expect(Email.create(**params).valid?).to be_true
+          expect(Email.create(**params).errors[:address]).to eq ["is already taken"]
         end
       end
     end
@@ -33,11 +87,13 @@ describe Email do
   end
 
   describe '#match' do
-    let(:email) { Email.new(kind: 'home', address: 'example@example.com') }
+    let(:params){valid_params}
+    let(:email) { Email.create(**params)}
+
     context 'emails are the same' do
       let(:other_email) { email.clone }
       it 'returns true' do
-        email.errors[:kind] == ["invalid is not a valid email type"]
+        expect(email.match(other_email)).to be_true
       end
     end
 
