@@ -35,12 +35,14 @@ class Employee
         end
       end
     end
+    true
   end
   after_build do |employee|
     if employee.person.present? && @changed_nested_person_attributes.present?
       employee.person.update_attributes(@changed_nested_person_attributes)
       unset @changed_nested_person_attributes
     end
+    true
   end
 
   def families
