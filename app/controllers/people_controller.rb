@@ -57,11 +57,7 @@ class PeopleController < ApplicationController
   def update
     @person = Person.find(params[:id])
     @person.updated_by = current_user.email unless current_user.nil?
-    person_params["addresses_attributes"].each do |key, address|
-      if address["kind"] != 'home' && (address["city"].blank? && address["zip"].blank? && address["address_1"].blank?) 
-        person_params["addresses_attributes"].delete("#{key}")
-      end
-    end
+    santize_person_params
     respond_to do |format|
       if @person.update_attributes(person_params)
         format.html { redirect_to @person, notice: 'Person was successfully updated.' }
@@ -74,25 +70,7 @@ class PeopleController < ApplicationController
   end
 
   def create
-    
-   person_params["addresses_attributes"].each do |key, address|
-      if address["city"].blank? && address["zip"].blank? && address["address_1"].blank?
-        person_params["addresses_attributes"].delete("#{key}")
-      end
-   end
-    
-   person_params["phones_attributes"].each do |key, phone|
-     if phone["full_phone_number"].blank? 
-       person_params["phones_attributes"].delete("#{key}")
-     end
-   end
-   
-   person_params["emails_attributes"].each do |key, phone|
-     if phone["address"].blank? 
-       person_params["emails_attributes"].delete("#{key}")
-     end
-   end  
-    
+    santize_person_params
     @person = Person.new(person_params)
     respond_to do |format|
       if @person.save
@@ -132,6 +110,27 @@ private
        @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
     end
   end
+  
+  def santize_person_params
+    person_params["addresses_attributes"].each do |key, address|
+      if address["city"].blank? && address["zip"].blank? && address["address_1"].blank?
+        person_params["addresses_attributes"].delete("#{key}")
+      end
+    end
+    
+    person_params["phones_attributes"].each do |key, phone|
+      if phone["full_phone_number"].blank? 
+        person_params["phones_attributes"].delete("#{key}")
+      end
+    end
+   
+    person_params["emails_attributes"].each do |key, phone|
+      if phone["address"].blank? 
+        person_params["emails_attributes"].delete("#{key}")
+      end
+    end  
+  end
+  
   
   def person_params
     params.require(:person).permit!
