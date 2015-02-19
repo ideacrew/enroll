@@ -69,9 +69,8 @@ describe Consumer, type: :model do
     end
     
     context "with improper citizen_status" do
-      let(:params) {valid_params}
+      let(:params) {valid_params.deep_merge({citizen_status: "test citizen_status"})}
       it "should fail validation with improper citizen_status" do
-        params[:citizen_status] = "test citizen_status"
         expect(Consumer.create(**params).errors[:citizen_status].any?).to be_true
         expect(Consumer.create(**params).errors[:citizen_status]).to eq [citizen_error_message]
         

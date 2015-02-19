@@ -63,19 +63,17 @@ describe Person, type: :model do
     end
 
    context "with invalid gender" do
-      let(:params) {valid_params}
+      let(:params) {valid_params.deep_merge({gender: "abc"})}
       
       it "should fail validation" do
-        params[:gender] = "abc"
         expect(Person.create(**params).errors[:gender]).to eq ["abc is not a valid gender"]
       end
     end
    
    context "with invalid ssn" do
-      let(:params) {valid_params}
+      let(:params) {valid_params.deep_merge({ssn: "123345"})}
       
       it "should fail validation" do
-        params[:ssn] = "123345"
         expect(Person.create(**params).errors[:ssn]).to eq ["SSN must be 9 digits"]
       end
     end

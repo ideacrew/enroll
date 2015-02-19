@@ -61,9 +61,8 @@ describe Employer, type: :model do
     end
     
     context "with improper entity_kind" do
-      let(:params) {valid_params}
+      let(:params) {valid_params.deep_merge({entity_kind: "test entity_kind"})}
       it "should fail validation with improper entity_kind" do
-        params[:entity_kind] = "test entity_kind"
         expect(Employer.create(**params).errors[:entity_kind].any?).to be_true
         expect(Employer.create(**params).errors[:entity_kind]).to eq [kind_error_message]
         
@@ -71,9 +70,8 @@ describe Employer, type: :model do
     end
     
     context "with improper fein" do
-      let(:params) {valid_params}
+      let(:params) {valid_params.deep_merge({fein: "123123"})}
       it "should fail validation with improper fein" do
-        params[:fein] = "123123"
         expect(Employer.create(**params).errors[:fein].any?).to be_true
         expect(Employer.create(**params).errors[:fein]).to eq [fein_error_message]
         
