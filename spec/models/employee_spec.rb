@@ -160,6 +160,173 @@ describe Employee, type: :model do
 end
 
 describe Employee, type: :model do
-  it '' do
+  let(:person_created_at) { 10.minutes.ago }
+  let(:person_updated_at) { 8.minutes.ago }
+  let(:employee_created_at) { 9.minutes.ago }
+  let(:employee_updated_at) { 7.minutes.ago }
+  let(:ssn) { "019283746" }
+  let(:dob) { 45.years.ago.to_date }
+  let(:hired_on) { 2.years.ago.to_date }
+  let(:gender) { "male" }
+
+  context "when created" do
+    let(:employer) { FactoryGirl.create(:employer) }
+
+    let(:person) {
+      FactoryGirl.create(:person,
+        created_at: person_created_at,
+        updated_at: person_updated_at
+      )
+    }
+
+    let(:employee) {
+      person.employees.create(
+        employer: employer,
+        hired_on: hired_on,
+        created_at: employee_created_at,
+        updated_at: employee_updated_at,
+        person_attributes: {
+          ssn: ssn,
+          dob: dob,
+          gender: gender,
+        }
+      )
+    }
+
+    it "parent created_at should be right" do
+      expect(person.created_at).to eq person_created_at
+    end
+
+    it "parent updated_at should be right" do
+      expect(person.updated_at).to eq person_updated_at
+    end
+
+    it "created_at should be right" do
+      expect(employee.created_at).to eq employee_created_at
+    end
+
+    it "updated_at should be right" do
+      expect(employee.updated_at).to eq employee_updated_at
+    end
+
+    context "then parent updated" do
+      let(:middle_name) { "Albert" }
+      before do
+        person.middle_name = middle_name
+        person.save
+      end
+
+      it "parent created_at should not have changed" do
+        expect(person.created_at).to eq person_created_at
+      end
+
+      it "parent updated_at should have changed" do
+        expect(person.updated_at).to be > person_updated_at
+      end
+
+      it "created_at should not have changed" do
+        expect(employee.created_at).to eq employee_created_at
+      end
+
+      it "updated_at should not have changed" do
+        expect(employee.updated_at).to eq employee_updated_at
+      end
+    end
+
+    context "then parent touched" do
+      before do
+        person.touch
+      end
+
+      it "parent created_at should not have changed" do
+        expect(person.created_at).to eq person_created_at
+      end
+
+      it "parent updated_at should not have changed" do
+        expect(person.updated_at).to be > person_updated_at
+      end
+
+      it "created_at should not have changed" do
+        expect(employee.created_at).to eq employee_created_at
+      end
+
+      it "updated_at should not have changed" do
+        expect(employee.updated_at).to eq employee_updated_at
+      end
+    end
+
+    context "then a nested parent attribute is updated" do
+      before do
+        employee.ssn = "647382910"
+        employee.save
+      end
+
+      it "parent created_at should not have changed" do
+        expect(person.created_at).to eq person_created_at
+      end
+
+      it "parent updated_at should have changed" do
+        expect(person.updated_at).to be > person_updated_at
+      end
+
+      it "created_at should not have changed" do
+        expect(employee.created_at).to eq employee_created_at
+      end
+
+      it "updated_at should not have changed" do
+        expect(employee.updated_at).to eq employee_updated_at
+      end
+
+      it "parent should be saved" do
+        expect(person.changed?).to be false
+      end
+    end
+
+    context "then updated" do
+      let(:new_hired_on) { 10.days.ago.to_date }
+
+      before do
+        employee.hired_on = new_hired_on
+        employee.save
+      end
+
+      it "parent created_at should not have changed" do
+        expect(person.created_at).to eq person_created_at
+      end
+
+      it "parent updated_at should have changed" do
+        expect(person.updated_at).to be > person_updated_at
+      end
+
+      it "created_at should not have changed" do
+        expect(employee.created_at).to eq employee_created_at
+      end
+
+      it "updated_at should have changed" do
+        expect(employee.updated_at).to be > employee_updated_at
+      end
+    end
+
+    context "then touched" do
+      before do
+        employee.touch
+      end
+
+      it "parent created_at should not have changed" do
+        expect(person.created_at).to eq person_created_at
+      end
+
+      it "parent updated_at should have changed" do
+        expect(person.updated_at).to be > person_updated_at
+      end
+
+      it "created_at should not have changed" do
+        expect(employee.created_at).to eq employee_created_at
+      end
+
+      it "updated_at should have changed" do
+        expect(employee.updated_at).to be > employee_updated_at
+      end
+    end
   end
 end
