@@ -76,17 +76,22 @@ class PeopleController < ApplicationController
   def create
     
    person_params["addresses_attributes"].each do |key, address|
-      if address["kind"] != 'home' && (address["city"].blank? && address["zip"].blank? && address["address_1"].blank?) 
+      if address["city"].blank? && address["zip"].blank? && address["address_1"].blank?
         person_params["addresses_attributes"].delete("#{key}")
       end
    end
     
    person_params["phones_attributes"].each do |key, phone|
-     if phone["kind"] != 'home' && phone["full_phone_number"].blank? 
+     if phone["full_phone_number"].blank? 
        person_params["phones_attributes"].delete("#{key}")
      end
    end
-    
+   
+   person_params["emails_attributes"].each do |key, phone|
+     if phone["address"].blank? 
+       person_params["emails_attributes"].delete("#{key}")
+     end
+   end  
     
     @person = Person.new(person_params)
     respond_to do |format|
