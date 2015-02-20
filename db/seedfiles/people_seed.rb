@@ -10,9 +10,13 @@ ml_addr = Address.new(kind: "mailing", address_1: "440 4th St, NW", city: "Washi
 wk_phone = Phone.new(kind: "work", area_code: 202, number: 5551211)
 hm_phone = Phone.new(kind: "home", area_code: 202, number: 5551212)
 mb_phone = Phone.new(kind: "mobile", area_code: 202, number: 5551213)
+wk_phone1 = Phone.new(kind: "home", area_code: 202, number: 5551214)
+
 
 wk_email = Email.new(kind: "work", address: "dude@dc.gov")
 hm_email = Email.new(kind: "home", address: "dudette@me.com")
+wk_dan_email = Email.new(kind: "work", address: "thomas.dan@dc.gov")
+
 
 npn0 = "1682443"
 npn1 = "2068981"
@@ -21,6 +25,7 @@ p0 = Person.create!(first_name: "Bill", last_name: "Murray", addresses: [hm_addr
 p1 = Person.create!(first_name: "Dan", last_name: "Aykroyd")
 p2 = Person.create!(first_name: "Chevy", last_name: "Chase")
 p3 = Person.create!(first_name: "Jane", last_name: "Curtin", addresses: [hm_addr, ml_addr], phones: [mb_phone])
+p4 = Person.create!(first_name: "Martina", last_name: "Williams", ssn: "151482930", dob: "01/25/1990", gender: "female")
 
 puts "::: Generating Broker Roles :::"
 bk0 = p0.build_broker(npn: npn0, provider_kind: "assister")

@@ -63,6 +63,7 @@ class PeopleController < ApplicationController
         format.html { redirect_to @person, notice: 'Person was successfully updated.' }
         format.json { head :no_content }
       else
+        build_nested_models
         format.html { render action: "show" }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end
