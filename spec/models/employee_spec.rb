@@ -23,13 +23,17 @@ describe Employee, type: :model do
     let(:new_person) {FactoryGirl.build(:person, first_name: "Carly", last_name: "Simon")}
     let(:employer) {FactoryGirl.create(:employer)}
 
+    let(:valid_person_attributes) do
+      {
+        ssn: ssn,
+        dob: dob,
+        gender: gender,
+      }
+    end
+
     let(:valid_params) do
       {
-        person_attributes: {
-          ssn: ssn,
-          dob: dob,
-          gender: gender,
-        },
+        person_attributes: valid_person_attributes,
         employer: employer,
         hired_on: hired_on,
       }
@@ -44,6 +48,79 @@ describe Employee, type: :model do
         end
       end
 
+    end
+
+    context "with no employer" do
+      let(:params) {valid_params.except(:employer)}
+      let(:employee) {saved_person.employees.build(params)}
+      before() {employee.valid?}
+
+      it "should not be valid" do
+        expect(employee.valid?).to be false
+      end
+
+      it "should have an error on employer_id" do
+        expect(employee.errors[:employer_id].any?).to be true
+      end
+    end
+
+    context "with no hired_on" do
+      let(:params) {valid_params.except(:hired_on)}
+      let(:employee) {saved_person.employees.build(params)}
+      before() {employee.valid?}
+
+      it "should not be valid" do
+        expect(employee.valid?).to be false
+      end
+
+      it "should have an error on hired_on" do
+        expect(employee.errors[:hired_on].any?).to be true
+      end
+    end
+
+    context "with no ssn" do
+      let(:person_params) {valid_person_attributes.except(:ssn)}
+      let(:params) {valid_params.merge(person_attributes: person_params)}
+      let(:employee) {saved_person.employees.build(params)}
+      before() {employee.valid?}
+
+      it "should not be valid" do
+        expect(employee.valid?).to be false
+      end
+
+      it "should have an error on ssn" do
+        expect(employee.errors[:ssn].any?).to be true
+      end
+    end
+
+    context "with no gender" do
+      let(:person_params) {valid_person_attributes.except(:gender)}
+      let(:params) {valid_params.merge(person_attributes: person_params)}
+      let(:employee) {saved_person.employees.build(params)}
+      before() {employee.valid?}
+
+      it "should not be valid" do
+        expect(employee.valid?).to be false
+      end
+
+      it "should have an error on gender" do
+        expect(employee.errors[:gender].any?).to be true
+      end
+    end
+
+    context "with no dob" do
+      let(:person_params) {valid_person_attributes.except(:dob)}
+      let(:params) {valid_params.merge(person_attributes: person_params)}
+      let(:employee) {saved_person.employees.build(params)}
+      before() {employee.valid?}
+
+      it "should not be valid" do
+        expect(employee.valid?).to be false
+      end
+
+      it "should have an error on dob" do
+        expect(employee.errors[:dob].any?).to be true
+      end
     end
   end
 
@@ -275,10 +352,6 @@ describe Employee, type: :model do
 
       it "updated_at should not have changed" do
         expect(employee.updated_at).to eq employee_updated_at
-      end
-
-      it "parent should be saved" do
-        expect(person.changed?).to be false
       end
     end
 
