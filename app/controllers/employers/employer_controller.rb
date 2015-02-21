@@ -20,6 +20,7 @@ class Employers::EmployerController < ApplicationController
   end
 
   def create
+    params["employer"]["entity_kind"] = Employer::ENTITY_KINDS.sample # temp hack for getting employer creation working.
     @employer = Employer.new(employer_params)
 
     respond_to do |format|
@@ -66,7 +67,7 @@ class Employers::EmployerController < ApplicationController
   end
 
   def employer_params
-    params.require(:employer).permit(:name, :fein, :entity_kind)
+    params.require(:employer).permit(:legal_name, :fein, :entity_kind)
   end
 
 end
