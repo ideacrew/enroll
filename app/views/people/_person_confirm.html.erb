@@ -14,6 +14,24 @@
        <% end %> 
        </br>
        Hired : <%= @employee.hired_on.strftime("%b %d, %Y") %>
-      
     </div>
+     <div style="float:right;padding-top: 20px;">
+      <a href="#" data-person-id="<%= @person.id %>" data-employer-id="<%= @employer.id %>" class="btn btn-save person_landing_continue" >Continue</a>
+     </div>
   </div>
+  <script>
+$('.person_landing_continue').on('click',function(){
+      console.log($(this));
+      person_id = $(this).data("person-id");
+      employer_id = $(this).data("employer-id");
+      console.log(person_id)
+      console.log(employer_id)
+      $.ajax({
+        type: "POST",
+        url: "/people/person_landing.js",
+        data: {person_id: person_id, employer_id: employer_id},
+        success: function (result) {
+        }
+    });
+})
+</script>

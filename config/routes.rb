@@ -30,6 +30,7 @@ Rails.application.routes.draw do
       post 'match_person'
       get 'get_employer'
       post 'person_confirm'
+      post 'person_landing'
     end
     
   end

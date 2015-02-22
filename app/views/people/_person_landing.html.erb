@@ -1,0 +1,26 @@
+<div role="tabpanel" id="myTab">
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Profile</a></li>
+    <li role="presentation"><a href="#plans" aria-controls="plans" role="tab" data-toggle="tab">Plans</a></li>
+    <li role="presentation"><a href="#documents" aria-controls="documents" role="tab" data-toggle="tab">Documents</a></li>
+    <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Messages</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="profile"><%= render 'people/landing_pages/profile' %></div>
+    <div role="tabpanel" class="tab-pane" id="plans"><%= render 'people/landing_pages/plans' %></div>
+    <div role="tabpanel" class="tab-pane" id="documents"><%= render 'people/landing_pages/documents' %></div>
+    <div role="tabpanel" class="tab-pane" id="messages"><%= render 'people/landing_pages/messages' %></div>
+  </div>
+
+</div>
+
+<script>
+$('#myTab a').click(function (e) {
+  e.preventDefault()
+  $(this).tab('show')
+})
+</script>
