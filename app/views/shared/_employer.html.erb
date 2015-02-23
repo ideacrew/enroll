@@ -1,0 +1,5 @@
+<h4><%= employer.legal_name %></h4>
+<% address = employer.addresses.last %>
+<% if address.present? %>
+  <spa><%= address.full_address%></span>
+<% end %>   
