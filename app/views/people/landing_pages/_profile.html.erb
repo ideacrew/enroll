@@ -4,16 +4,50 @@
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a href="#personal" aria-controls="personal" role="tab" data-toggle="tab">Personal</a></li>
     <li role="presentation"><a href="#employer" aria-controls="employer" role="tab" data-toggle="tab">Employer</a></li>
-    <li role="presentation"><a href="#family" aria-controls="family" role="tab" data-toggle="tab">Family</a></li>
+    <li role="presentation"><a href="#family" aria-controls="family" role="tab" data-toggle="tab">Family Members</a></li>
+    <li role="presentation"><a href="#contact" aria-controls="contact" role="tab" data-toggle="tab">Contact Information</a></li>
+    
   </ul>
 
-  <!-- Tab panes -->
+<%= form_for(@person) do |f| %>
   <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="personal">Personal Info</div>
-    <div role="tabpanel" class="tab-pane" id="employer">Employer Info</div>
-    <div role="tabpanel" class="tab-pane" id="family">Family Info</div>
+    <div role="tabpanel" class="tab-pane active" id="personal">
+      <p class="information row" style="opacity: 0.2;">Personal Information</p>
+       <%= render 'shared/name_fields', f: f %>
+       <%= render 'shared/id_info_fields', f: f %>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="employer">
+      
+      <p>
+		<span> Employer Information.</span>
+	</p>
+  <div class="row top-row">
+    <div class="col-md-7 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= @employee.first_name %> <%= @employee.middle_name %> <%= @employee.last_name %><br/>
+       Born: <%= @employee.dob.strftime("%b %d, %Y") %><br/>
+       Social Security:  <%= @employee.ssn %><br/>
+       
+       <h4> <%= @employer.legal_name %> </h4>
+       <% address = @employer.addresses.last%>
+       <% if address.present? %>
+          <spa><%= address.full_address%></span>
+       <% end %> 
+       </br>
+       Hired : <%= @employee.hired_on.strftime("%b %d, %Y") %>
+    </div>
   </div>
-
+      
+    </div>
+    <div role="tabpanel" class="tab-pane" id="family">Family Info</div>
+    <div role="tabpanel" class="tab-pane" id="contact">
+      <%= render 'shared/address_fields', f: f %><br>
+      <%= render 'shared/phone_fields', f: f %><br>
+      <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+        <%= render 'shared/email_fields', f: email %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
 </div>
 
 <script>
