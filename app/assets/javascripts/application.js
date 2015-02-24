@@ -23,7 +23,15 @@
 $('input.floatlabel').floatlabel();
 
 $(document).ready(function () {
-
+  
+  $('#address_info').addClass('hidden');
+  $('#phone_info').addClass('hidden');
+  $('#email_info').addClass('hidden');
+  $('.address_info').addClass('hidden');
+  $('.phone_info').addClass('hidden');
+  $('.email_info').addClass('hidden');
+  $(".save-btn").attr("disabled",true);
+  
   $(".date-picker, .date_picker").datepicker({
     changeMonth: true,
     changeYear: true
@@ -43,7 +51,43 @@ $(document).ready(function () {
   $(".phone-mask").inputmask("(999) 999-9999");
 
   $('.autofill_yes').click(function(){
-    $('.autofill-initial').addClass('hidden');
+      });
+
+  $('.autofill_no').click(function(){
+    $('.autofill-cloud').addClass('hidden');
+    side_bar_link_style();
+  });
+
+  $("#person_ssn").on("blur", function(){
+    //$('.autofill-failed').addClass('hidden');
+    //$('.autofill-cloud.autofill-initial').removeClass('hidden');
+       $.ajax({
+        type: "POST",
+        url: "/people/match_person.json",
+        data: $('#new_person').serialize(),
+        success: function (result) {
+         // result.person gives person info to populate
+        console.log(result);
+        if(result.matched == true)
+        {
+          person = result.person
+          $("#people_id").val(person._id);
+          _getEmployers();
+          //$(".div-cloud-image").show();
+        }
+        else
+        {
+          $('.search_results').removeClass('hidden');
+          $('.employers-row').html("");
+          $('.employers-row').html('<span style="color:red;"> <h2><b>No Employer Found.</b></h2> </span>');
+        }
+      }
+    });
+  });
+
+  function _getEmployers()
+  {
+    //$('.autofill-initial').addClass('hidden');
 
     $('#address_info').addClass('hidden');
     $('#phone_info').addClass('hidden');
@@ -60,45 +104,9 @@ $(document).ready(function () {
     //Sidebar Switch - Search Active
     $('#personal_sidebar').addClass('hidden');
     $('#search_sidebar').removeClass('hidden');
-  });
 
-  $('.autofill_no').click(function(){
-    $('.autofill-cloud').addClass('hidden');
-    side_bar_link_style();
-  });
-
-  $("#person_ssn").on("blur", function(){
-    $('.autofill-failed').addClass('hidden');
-    $('.autofill-cloud.autofill-initial').removeClass('hidden');
-       $.ajax({
-        type: "POST",
-        url: "/people/match_person.json",
-        data: $('#new_person').serialize(),
-        success: function (result) {
-         // result.person gives person info to populate
-
-        if(result.matched == true)
-        {
-          person = result.person
-          $("#people_id").val(person._id);
-          $(".div-cloud-image").show();
-        }
-      }
-    });
-    // confirm_flag = confirm("We may be able to auto-fill your information with data from our records");
-    // if(confirm_flag){
-    //     $.ajax({
-    //       type: "POST",
-    //       url: "/people/match_person.json",
-    //       data: $('#new_person').serialize(),
-    //       success: function (result) {
-    //         alert("find your details.Please select employer");
-    //         getAllEmployers();
-    //       }
-    //  });
-    // }
-  });
-
+  }
+  
   function getAllEmployers()
   {
     $.ajax({
@@ -160,14 +168,14 @@ $(document).ready(function () {
     
     var check = check_personal_info_exists();
     if(check.length==0) {
-      $('.autofill-cloud.autofill-initial').removeClass('hidden');
+      //$('.autofill-cloud.autofill-initial').removeClass('hidden');
     }
   });
 
   $('#personal_info input:text').focusout(function(){
     var check = check_personal_info_exists();
     if(check.length==0) {
-      $('.autofill-cloud.autofill-initial').removeClass('hidden');
+      //$('.autofill-cloud.autofill-initial').removeClass('hidden');
     }
   })
 
@@ -184,7 +192,7 @@ $(document).ready(function () {
   })
 
   $('span.close').click(function(){
-    $('.autofill-cloud').addClass('hidden');
+    //$('.autofill-cloud').addClass('hidden');
     common_body_style();
     side_bar_link_style();
   });
