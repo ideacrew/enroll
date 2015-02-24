@@ -8,7 +8,7 @@ class EmployerCensus::EmployeeFamily
   field :benefit_group_id, type: BSON::ObjectId
 
   # UserID that connected and timestamp
-  field :linked_by, type: BSON::ObjectId
+  field :linked_person_id, type: BSON::ObjectId
   field :linked_at, type: DateTime
 
   field :terminated, type: Boolean, default: false
@@ -36,10 +36,10 @@ class EmployerCensus::EmployeeFamily
   # Create a copy of this instance for rehires into same ER
   def clone
     copy = self.dup
+    copy.linked_person_id = nil
+    copy.linked_at = nil
     copy.employee.hired_on = nil
     copy.employee.terminated_on = nil
-    copy.linked_by = nil
-    copy.linked_at = nil
     copy
   end
 
@@ -64,14 +64,23 @@ class EmployerCensus::EmployeeFamily
     parent.plan_year.benefit_group.find(:plan_year_id => self.plan_year_id)
   end
 
-  def link(user)
-    raise if  is_linked?
-    self.linked_by = user._id
-    self.linked_at = Time.now
+  def link_person(person)
+    raise EmployeeFamilyLinkError.new(person) if is_linked?
+    self.linked_person_id = person._id
+    self.linked_at = ->{ Time.now }
+  end
+
+  def delink_person
+    self.linked_person_id = nil
+    self.linked_at = nil
+  end  
+
+  def linked_person
+    Person.find(self.linked_person_id) unless linked_person_id.blank?
   end
 
   def is_linked?
-    self.linked_at.present?
+    self.linked_person_id.present?
   end
 
   def terminate(last_day_of_work)
@@ -84,3 +93,11 @@ class EmployerCensus::EmployeeFamily
   end
 
 end
+
+class < EmployeeFamilyLinkError < StandardError
+  def initialize(person)
+    @person = person
+    super("employee_family already linked to person #{person.inspect}")
+  end
+end
+
