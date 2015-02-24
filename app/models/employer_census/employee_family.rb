@@ -94,7 +94,7 @@ class EmployerCensus::EmployeeFamily
 
 end
 
-class < EmployeeFamilyLinkError < StandardError
+class EmployeeFamilyLinkError < StandardError
   def initialize(person)
     @person = person
     super("employee_family already linked to person #{person.inspect}")
