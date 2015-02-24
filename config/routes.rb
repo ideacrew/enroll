@@ -14,12 +14,17 @@ Rails.application.routes.draw do
     end
   end
 
+  post 'employers/employer/:id/update' => "employers/employer#update"
+  get 'employers/employer/:id/new_family' => "employers/employer#new_family"
+  post 'employers/employer/:id/create_family' => "employers/employer#create_family"
+
   namespace :employers do
     root 'welcome#index'
 
     resources :employer do
       get 'new'
       get 'my_account'
+      resources :family
     end
   end
 

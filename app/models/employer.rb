@@ -100,10 +100,11 @@ class Employer
   end
 
   def build_family
-    family = self.employee_families.build
+    family = EmployerCensus::EmployeeFamily.new
     family.build_employee
     family.build_employee.build_address
     family.dependents.build
+    family
   end
 
 

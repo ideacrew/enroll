@@ -3,7 +3,7 @@ require 'factories/enrollment_factory'
 puts "*"*80
 puts "::: Creating Employee Roles:::"
 
-Employer.each do |employer|
+[Employer.first, Employer.last].each do |employer|
   employer.employee_families.each do |census_employee_family|
     census_employee = census_employee_family.employee
     person = Person.create!(

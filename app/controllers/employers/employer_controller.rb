@@ -1,22 +1,19 @@
 class Employers::EmployerController < ApplicationController
 
-  before_filter :find_employer, only: [:show, :destroy, :edit, :update]
+  before_filter :find_employer, only: [:show, :destroy]
 
   def index
     @employers = Employer.all.to_a
   end
 
-  def show
+  def my_account
+  end
 
+  def show
   end
 
   def new
     @employer = Employer.new
-    # @family = @employer.employer_census_families.build
-    # build_nested_models
-  end
-
-  def my_account
   end
 
   def create
@@ -26,23 +23,6 @@ class Employers::EmployerController < ApplicationController
     respond_to do |format|
       if @employer.save
         format.html { redirect_to employers_employer_index_path, notice: 'Employer was successfully created.' }
-        format.json { render json: @employer, status: :created, location: @employer }
-      else
-        format.html { render action: "new" }
-        format.json { render json: @employer.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  def edit
-    @family = @employer.build_family
-  end
-
-  def update
-    params.permit!
-    respond_to do |format|
-      if @employer.update_attributes(params["employer"])
-        format.html { redirect_to employers_employer_path(@employer), notice: 'Employer Census Family is successfully created.'}
         format.json { render json: @employer, status: :created, location: @employer }
       else
         format.html { render action: "new" }
