@@ -6,7 +6,7 @@ FactoryGirl.define do
     gender "male"
     employee_relationship "self"
     hired_on "01/01/2015"
-    ssn "222222222"
+    sequence(:ssn, 111111111)
     address { FactoryGirl.build(:address) }
     email { FactoryGirl.build(:email) }
   end

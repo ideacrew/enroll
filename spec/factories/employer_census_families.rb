@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :employer_census_employee_family, :class => 'EmployerCensus::EmployeeFamily' do
 
-    employer { FactoryGirl.create :employer }
+    # employer { FactoryGirl.create :employer }
     employee { FactoryGirl.build :employer_census_employee }
     dependents { FactoryGirl.build(:employer_census_dependent).to_a }
     terminated { false }
