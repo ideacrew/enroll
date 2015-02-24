@@ -1,5 +1,5 @@
-$('.search_results').removeClass('hidden')
-$('.employers-row').html("<%= escape_javascript(render 'employers').html_safe %>")
+$('.search_results').removeClass('hidden');
+$('.employers-row').html("<%= escape_javascript(render 'employers').html_safe %>");
 
 <% if @employers.present? %>
 	// $('#sidebar_partial_value').html("<%= escape_javascript(render 'sidebar', :page => 'search').html_safe %>")
