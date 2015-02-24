@@ -30,8 +30,8 @@ class EmployerCensus::EmployeeFamily
   scope :active,     ->{ where(:terminated => false) }
   scope :terminated, ->{ where(:terminated => true) }
 
-  scope :linked,     ->{ where("linked_at <= ?", Time.now) }
-  scope :unlinked,   ->{ where(:linked_at.blank? ) }
+  scope :linked,     ->{ where(:is_linked => true) }
+  scope :unlinked,   ->{ where(:is_linked => false) }
 
   # Create a copy of this instance for rehires into same ER
   def clone
