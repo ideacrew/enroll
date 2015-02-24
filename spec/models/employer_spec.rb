@@ -77,49 +77,98 @@ describe Employer, type: :model do
         
       end
     end
-    
-    
   end
 end
-# Class methods
-describe Employer, '.find_by_broker_agency', :type => :model do
-  it 'returns employers represented by the specified broker agency' do
-    # id = BSON::ObjectId.from_time(Time.now)
-    # broker_agency = instance_double("BrokerAgency", _id: id)
 
-    broker_agency = FactoryGirl.create(:broker_agency)
+describe Employer, "Class methods", type: :model do
 
-    employer_one = Employer.new(
-        legal_name: "ACME Widgets",
-        fein: "034267123",
-        entity_kind: "s_corporation",
-        broker_agency: broker_agency
-      )
+  broker_agency = FactoryGirl.create(:broker_agency)
 
-    employer_two = Employer.new(
-        legal_name: "Megacorp, Inc",
-        fein: "427636010",
-        entity_kind: "c_corporation",
-        broker_agency: broker_agency
-      )
+  employer_one = Employer.new(
+      legal_name: "ACME Widgets",
+      fein: "034267123",
+      entity_kind: "s_corporation",
+      broker_agency: broker_agency
+    )
 
-    employer_without_broker = Employer.new(
-        legal_name: "Tiny Services",
-        fein: "576747654",
-        entity_kind: "partnership"
-      )
+  employer_two = Employer.new(
+      legal_name: "Megacorp, Inc",
+      fein: "427636010",
+      entity_kind: "c_corporation",
+      broker_agency: broker_agency
+    )
 
-    expect(employer_one.broker_agency_id).to eq broker_agency.id
-    expect(employer_two.broker_agency_id).to eq broker_agency.id
+  employer_without_broker = Employer.new(
+      legal_name: "Tiny Services",
+      fein: "576747654",
+      entity_kind: "partnership"
+    )
 
-    expect(employer_one.errors.messages.size).to eq 0
-    expect(employer_one.save).to eq true
-    expect(employer_two.save).to eq true
-    expect(employer_without_broker.save).to eq true
+  describe ".find_employee_families_by_person" do
 
-    expect(Employer.all.size).to eq 3
+    ee0 = FactoryGirl.build(:employer_census_employee, ssn: "369851245")
+    ee1 = FactoryGirl.build(:employer_census_employee, ssn: "258741239")
 
-    employers_with_broker_agency = Employer.find_by_broker_agency(broker_agency)
-    expect(employers_with_broker_agency.size).to eq 2
+    ef0 = FactoryGirl.build(:employer_census_employee_family, employee: ee0)
+    ef1 = FactoryGirl.build(:employer_census_employee_family, employee: ee1)
+
+    er0 = FactoryGirl.create(:employer, fein: "687654321", employee_families: [ef0])
+    er1 = FactoryGirl.create(:employer, fein: "587654321", employee_families: [ef0, ef1])
+    er2 = FactoryGirl.create(:employer, fein: "487654321", employee_families: [ef1])
+
+    let(:valid_params) do
+      {  ssn:        ee0.ssn,
+         first_name: ee0.first_name,
+         last_name:  ee0.last_name
+      }
+    end
+
+    context "with person not matching ssn" do
+      let(:params) {valid_params}
+      let(:p0) {Person.new(**params)}
+
+      it "should return an empty array" do
+        expect(Employer.find_employee_families_by_person(p0)).to be_a Array
+        expect(Employer.find_employee_families_by_person(p0).size).to eq 0
+      end
+    end
+
+    context "with person matching ssn" do
+      let(:params) {valid_params}
+      let(:p0) {Person.new(**params)}
+
+      it "should return an instance of EmployerFamily" do
+        # expect(er0.employee_families.first.employee.inspect).to eq true
+        expect(Employer.find_employee_families_by_person(p0).first).to be_a EmployerCensus::EmployeeFamily
+      end
+
+      it "should return employee_families where employee matches person" do
+        expect(Employer.find_employee_families_by_person(p0).size).to eq 2
+      end
+
+      it "returns employee_families where employee matches person" do
+        expect(Employer.find_employee_families_by_person(p0).first.employee.dob).to eq ef0.employee.employee.dob
+      end
+    end
+
+  end
+      
+  describe '.find_by_broker_agency' do
+
+    it 'returns employers represented by the specified broker agency' do
+
+      expect(employer_one.broker_agency_id).to eq broker_agency.id
+      expect(employer_two.broker_agency_id).to eq broker_agency.id
+
+      expect(employer_one.errors.messages.size).to eq 0
+      expect(employer_one.save).to eq true
+      expect(employer_two.save).to eq true
+      expect(employer_without_broker.save).to eq true
+
+      expect(Employer.all.size).to eq 3
+
+      employers_with_broker_agency = Employer.find_by_broker_agency(broker_agency)
+      expect(employers_with_broker_agency.size).to eq 2
+    end
   end
 end

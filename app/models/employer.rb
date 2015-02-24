@@ -81,7 +81,7 @@ class Employer
 
   index({"employee_families._id" => 1})
   index({"employee_families.linked_at" => 1}, {sparse: true})
-  index({"employee_families.linked_by" => 1}, {sparse: true})
+  index({"employee_families.linked_person_id" => 1}, {sparse: true})
   index({"employee_families.terminated" => 1})
   index({"employee_families.employee.last_name" => 1})
   index({"employee_families.employee.dob" => 1})
@@ -150,7 +150,7 @@ class Employer
     def find_employee_families_by_person(person)
       return [] if person.ssn.blank?
       employers = where("employee_families.employee.ssn" => person.ssn)
-      employers.reduce([]) { |families, er| families << er.employee_family }
+      employers.reduce([]) { |families, er| families << er.employee_families.detect { |ef| ef.employee.ssn == person.ssn } }
     end
   end
 
