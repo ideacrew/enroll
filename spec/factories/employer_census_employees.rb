@@ -7,6 +7,8 @@ FactoryGirl.define do
     employee_relationship "self"
     hired_on "01/01/2015"
     ssn "222222222"
+    address { FactoryGirl.build(:address) }
+    email { FactoryGirl.build(:email) }
   end
 
 end
