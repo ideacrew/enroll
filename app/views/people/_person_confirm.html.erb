@@ -15,12 +15,14 @@
        </br>
        Hired : <%= @employee.hired_on.strftime("%b %d, %Y") %>
     </div>
-     <div style="float:right;padding-top: 20px;">
-      <a href="#" data-person-id="<%= @person.id %>" data-employer-id="<%= @employer.id %>" class="btn btn-save person_landing_continue" >Continue</a>
-     </div>
   </div>
   <script>
-$('.person_landing_continue').on('click',function(){
+   $(".save-btn").removeAttr("disabled");  
+   person_id = "<%= @person.id%>";
+   employer_id = "<%= @employer.id %>"; 
+
+   $(".submit_section").html("<a href='#' data-person-id='"+person_id+"' data-employer-id='"+employer_id+"' class='btn btn-save person_landing_continue'> Save </a>")
+   $('.person_landing_continue').on('click',function(){
       console.log($(this));
       person_id = $(this).data("person-id");
       employer_id = $(this).data("employer-id");

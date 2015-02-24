@@ -23,7 +23,15 @@
 $('input.floatlabel').floatlabel();
 
 $(document).ready(function () {
-
+  
+  $('#address_info').addClass('hidden');
+  $('#phone_info').addClass('hidden');
+  $('#email_info').addClass('hidden');
+  $('.address_info').addClass('hidden');
+  $('.phone_info').addClass('hidden');
+  $('.email_info').addClass('hidden');
+  $(".save-btn").attr("disabled",true);
+  
   $(".date-picker, .date_picker").datepicker({
     changeMonth: true,
     changeYear: true
