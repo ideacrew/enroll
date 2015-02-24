@@ -4,16 +4,16 @@ describe Employer, type: :model do
   it { should validate_presence_of :legal_name }
   it { should validate_presence_of :fein }
   it { should validate_presence_of :entity_kind }
-  
+
   let(:legal_name) {"ACME Widgets, Inc"}
   let(:dba) {"Widgetworks"}
   let(:fein) {"034267123"}
   let(:kind) {"tax_exempt_organization"}
-  
+
   let(:kind_error_message) {"test entity_kind is not a valid business entity"}
   let(:fein_error_message) {"123123 is not a valid FEIN"}
-  
-  
+
+
   describe ".new" do
     let(:valid_params) do
       {  legal_name: legal_name,
@@ -21,21 +21,21 @@ describe Employer, type: :model do
          entity_kind: kind
       }
     end
-    
+
     context "with no arguments" do
       let(:params) {{}}
       it "should not save" do
         expect(Employer.new(**params).save).to be_false
       end
     end
-    
+
     context "with all valid arguments" do
       let(:params) {valid_params}
       it "should save" do
         expect(Employer.new(**params).save).to be_true
       end
     end
-    
+
     context "with no legal_name" do
       let(:params) {valid_params.except(:legal_name)}
 
@@ -43,7 +43,7 @@ describe Employer, type: :model do
         expect(Employer.create(**params).errors[:legal_name].any?).to be_true
       end
     end
-    
+
     context "with no fein" do
       let(:params) {valid_params.except(:fein)}
 
@@ -51,7 +51,7 @@ describe Employer, type: :model do
         expect(Employer.create(**params).errors[:fein].any?).to be_true
       end
     end
-    
+
     context "with no entity_kind" do
       let(:params) {valid_params.except(:entity_kind)}
 
@@ -59,22 +59,22 @@ describe Employer, type: :model do
         expect(Employer.create(**params).errors[:entity_kind].any?).to be_true
       end
     end
-    
+
     context "with improper entity_kind" do
       let(:params) {valid_params.deep_merge({entity_kind: "test entity_kind"})}
       it "should fail validation with improper entity_kind" do
         expect(Employer.create(**params).errors[:entity_kind].any?).to be_true
         expect(Employer.create(**params).errors[:entity_kind]).to eq [kind_error_message]
-        
+
       end
     end
-    
+
     context "with improper fein" do
       let(:params) {valid_params.deep_merge({fein: "123123"})}
       it "should fail validation with improper fein" do
         expect(Employer.create(**params).errors[:fein].any?).to be_true
         expect(Employer.create(**params).errors[:fein]).to eq [fein_error_message]
-        
+
       end
     end
   end
@@ -82,39 +82,44 @@ end
 
 describe Employer, "Class methods", type: :model do
 
-  broker_agency = FactoryGirl.create(:broker_agency)
+  let(:broker_agency) {FactoryGirl.create(:broker_agency)}
 
-  employer_one = Employer.new(
+  let(:employer_one) do Employer.new(
       legal_name: "ACME Widgets",
       fein: "034267123",
       entity_kind: "s_corporation",
       broker_agency: broker_agency
     )
+  end
 
-  employer_two = Employer.new(
+  let(:employer_two) do Employer.new(
       legal_name: "Megacorp, Inc",
       fein: "427636010",
       entity_kind: "c_corporation",
       broker_agency: broker_agency
     )
+  end
 
-  employer_without_broker = Employer.new(
+  let(:employer_without_broker) do Employer.new(
       legal_name: "Tiny Services",
       fein: "576747654",
       entity_kind: "partnership"
     )
+  end
 
   describe ".find_employee_families_by_person" do
 
-    ee0 = FactoryGirl.build(:employer_census_employee, ssn: "369851245")
-    ee1 = FactoryGirl.build(:employer_census_employee, ssn: "258741239")
+    let(:ee0) {FactoryGirl.build(:employer_census_employee, ssn: "369851245")}
+    let(:ee1) {FactoryGirl.build(:employer_census_employee, ssn: "258741239")}
 
-    ef0 = FactoryGirl.build(:employer_census_employee_family, employee: ee0)
-    ef1 = FactoryGirl.build(:employer_census_employee_family, employee: ee1)
+    let(:ef0) {FactoryGirl.build(:employer_census_employee_family, employee: ee0)}
+    let(:ef1) {FactoryGirl.build(:employer_census_employee_family, employee: ee1)}
 
-    er0 = FactoryGirl.create(:employer, fein: "687654321", employee_families: [ef0])
-    er1 = FactoryGirl.create(:employer, fein: "587654321", employee_families: [ef0, ef1])
-    er2 = FactoryGirl.create(:employer, fein: "487654321", employee_families: [ef1])
+    let(:er0) {FactoryGirl.create(:employer, fein: "687654321", employee_families: [ef0])}
+    let(:er1) {FactoryGirl.create(:employer, fein: "587654321", employee_families: [ef0, ef1])}
+    let(:er2) {FactoryGirl.create(:employer, fein: "487654321", employee_families: [ef1])}
+
+    before { ee0; ee1; ef0; ef1; er0; er1; er2 }
 
     let(:valid_params) do
       {  ssn:        ee0.ssn,
@@ -127,9 +132,16 @@ describe Employer, "Class methods", type: :model do
       let(:params) {valid_params}
       let(:p0) {Person.new(**params)}
 
-      it "should return an empty array" do
+      it "should return an array" do
         expect(Employer.find_employee_families_by_person(p0)).to be_a Array
+      end
+
+      it "should return an empty array" do
         expect(Employer.find_employee_families_by_person(p0).size).to eq 0
+      end
+
+      it "should return an empty array" do
+        expect(Employer.find_employee_families_by_person(p0)).to eq []
       end
     end
 
@@ -152,7 +164,7 @@ describe Employer, "Class methods", type: :model do
     end
 
   end
-      
+
   describe '.find_by_broker_agency' do
 
     it 'returns employers represented by the specified broker agency' do
