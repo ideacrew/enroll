@@ -121,24 +121,14 @@ describe Employer, "Class methods", type: :model do
 
     before { ee0; ee1; ef0; ef1; er0; er1; er2 }
 
-    let(:valid_params) do
-      {  ssn:        ee0.ssn,
-         first_name: ee0.first_name,
-         last_name:  ee0.last_name
-      }
-    end
-
     context "with person not matching ssn" do
-      let(:params) {valid_params}
+      let(:params) do
+        {  ssn:        "019283746",
+           first_name: ee0.first_name,
+           last_name:  ee0.last_name
+        }
+      end
       let(:p0) {Person.new(**params)}
-
-      it "should return an array" do
-        expect(Employer.find_employee_families_by_person(p0)).to be_a Array
-      end
-
-      it "should return an empty array" do
-        expect(Employer.find_employee_families_by_person(p0).size).to eq 0
-      end
 
       it "should return an empty array" do
         expect(Employer.find_employee_families_by_person(p0)).to eq []
@@ -146,7 +136,12 @@ describe Employer, "Class methods", type: :model do
     end
 
     context "with person matching ssn" do
-      let(:params) {valid_params}
+      let(:params) do
+        {  ssn:        ee0.ssn,
+           first_name: ee0.first_name,
+           last_name:  ee0.last_name
+        }
+      end
       let(:p0) {Person.new(**params)}
 
       it "should return an instance of EmployerFamily" do
@@ -159,7 +154,7 @@ describe Employer, "Class methods", type: :model do
       end
 
       it "returns employee_families where employee matches person" do
-        expect(Employer.find_employee_families_by_person(p0).first.employee.dob).to eq ef0.employee.employee.dob
+        expect(Employer.find_employee_families_by_person(p0).first.employee.dob).to eq ef0.employee.dob
       end
     end
 
