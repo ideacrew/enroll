@@ -10,18 +10,47 @@ describe Person, type: :model do
   let(:ssn) {"123456789"}
   let(:gender) {"male"}
   let(:address) {FactoryGirl.build(:address)}
-  
+  let(:valid_params) do
+    { first_name: first_name,
+      last_name: last_name,
+      ssn: ssn,
+      gender: gender,
+      addresses: [address]
+    }
+  end
+
+  describe ".create" do
+    context "with valid arguments" do
+      let(:params) {valid_params}
+      let(:person) {Person.create(**params)}
+      before do
+        person.valid?
+      end
+
+      context "and a second person is created with the same ssn" do
+        let(:person2) {Person.create(**params)}
+        before do
+          person2.valid?
+        end
+
+        context "the second person" do
+          it "should not be valid" do
+             expect(person2.valid?).to be false
+          end
+
+          it "should have an error on ssn" do
+            expect(person2.errors[:ssn].any?).to be true
+          end
+
+          it "should not have the same id as the first person" do
+            expect(person2.id).not_to eq person.id
+          end
+        end
+      end
+    end
+  end
 
   describe ".new" do
-    let(:valid_params) do
-      { first_name: first_name,
-        last_name: last_name,
-        ssn: ssn,
-        gender: gender,
-        addresses: [address]
-      }
-    end
-
     context "with no arguments" do
       let(:params) {{}}
 
@@ -64,15 +93,15 @@ describe Person, type: :model do
 
    context "with invalid gender" do
       let(:params) {valid_params.deep_merge({gender: "abc"})}
-      
+
       it "should fail validation" do
         expect(Person.create(**params).errors[:gender]).to eq ["abc is not a valid gender"]
       end
     end
-   
+
    context "with invalid ssn" do
       let(:params) {valid_params.deep_merge({ssn: "123345"})}
-      
+
       it "should fail validation" do
         expect(Person.create(**params).errors[:ssn]).to eq ["SSN must be 9 digits"]
       end

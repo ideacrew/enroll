@@ -14,6 +14,7 @@
 //= require jquery-ui
 //= require jquery_ujs
 //= require twitter/bootstrap
+//= require twitter/bootstrap/tab
 //= require turbolinks
 //= require jquery.inputmask
 //= require_tree .

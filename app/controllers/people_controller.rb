@@ -53,6 +53,16 @@ class PeopleController < ApplicationController
     end
   end
   
+  def person_landing
+    @person = Person.find(params[:person_id])
+    @employer = Employer.find(params[:employer_id])
+    @employee = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last.employee
+    build_nested_models
+    respond_to do |format|
+      format.js {}
+    end
+  end
+  
 
   def update
     @person = Person.find(params[:id])
