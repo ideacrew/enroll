@@ -33,11 +33,8 @@
    <% end %>
    //$(".submit_section").html("<a href='#' data-person-id='"+person_id+"' data-employer-id='"+employer_id+"' class='btn btn-save person_landing_continue'> Save </a>")
    $('.person_landing_continue').on('click',function(){
-      console.log($(this));
       person_id = $(this).data("person-id");
       employer_id = $(this).data("employer-id");
-      console.log(person_id)
-      console.log(employer_id)
       $.ajax({
         type: "POST",
         url: "/people/person_landing.js",
