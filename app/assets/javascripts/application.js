@@ -57,17 +57,22 @@ $(document).ready(function () {
     $('.autofill-cloud').addClass('hidden');
     side_bar_link_style();
   });
-
-  $("#person_ssn").on("blur", function(){
-    //$('.autofill-failed').addClass('hidden');
-    //$('.autofill-cloud.autofill-initial').removeClass('hidden');
-       $.ajax({
+  
+  $('.required').on("change" ,function(){
+    match_person();
+  });
+  
+  
+  function match_person()
+  {
+    if(check_personal_info_exists().length==0)
+    {
+      $.ajax({
         type: "POST",
         url: "/people/match_person.json",
         data: $('#new_person').serialize(),
         success: function (result) {
          // result.person gives person info to populate
-        console.log(result);
         if(result.matched == true)
         {
           person = result.person
@@ -83,8 +88,10 @@ $(document).ready(function () {
         }
       }
     });
-  });
-
+  
+    }
+  }
+  
   function _getEmployers()
   {
     //$('.autofill-initial').addClass('hidden');
