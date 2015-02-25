@@ -47,7 +47,9 @@ class PeopleController < ApplicationController
     @person = Person.find(params[:person_id])
     @employer = Employer.find(params[:employer_id])
     @employee = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last.employee
-
+    employee_family = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last
+    @coverage = employee_family.dependents.present? ? "Individual + Family" : "Individual"
+    @coverage_flag = "I"
     respond_to do |format|
       format.js {}
     end
