@@ -9,6 +9,7 @@ class EmployerCensus::EmployeeFamily
 
   # UserID that connected and timestamp
   field :linked_person_id, type: BSON::ObjectId
+  field :linked_employee_id, type: BSON::ObjectId
   field :linked_at, type: DateTime
 
   field :terminated, type: Boolean, default: false
@@ -37,6 +38,7 @@ class EmployerCensus::EmployeeFamily
   def clone
     copy = self.dup
     copy.linked_person_id = nil
+    copy.linked_employee_id = nil
     copy.linked_at = nil
     copy.employee.hired_on = nil
     copy.employee.terminated_on = nil
@@ -44,7 +46,7 @@ class EmployerCensus::EmployeeFamily
   end
 
   def parent
-    raise "undefined parent Employer" unless employer? 
+    raise "undefined parent Employer" unless employer?
     self.employer
   end
 
@@ -64,28 +66,37 @@ class EmployerCensus::EmployeeFamily
     parent.plan_year.benefit_group.find(:plan_year_id => self.plan_year_id)
   end
 
-  def link_person(person)
-    raise EmployeeFamilyLinkError.new(person) if is_linked?
-    self.linked_person_id = person._id
-    self.linked_at = ->{ Time.now }
+  def link_employee(employee)
+    raise EmployeeFamilyLinkError.new(employee) if is_linked?
+    self.linked_person_id = employee.person._id
+    self.linked_employee_id = employee._id
+    self.linked_at = Time.now
+    self
   end
 
-  def delink_person
+  def delink_employee
     self.linked_person_id = nil
+    self.linked_employee_id = nil
     self.linked_at = nil
-  end  
+    self
+  end
 
-  def linked_person
-    Person.find(self.linked_person_id) unless linked_person_id.blank?
+  def linked_employee
+    if is_linked?
+      p = Person.find(linked_person_id)
+      es = p.employees
+      e = es.find(linked_employee_id)
+    end
   end
 
   def is_linked?
-    self.linked_person_id.present?
+    self.linked_employee_id.present? && self.linked_person_id.present?
   end
 
   def terminate(last_day_of_work)
     self.employee.terminated_on = date
     self.terminated = true
+    self
   end
 
   def is_terminated?
@@ -100,4 +111,3 @@ class EmployeeFamilyLinkError < StandardError
     super("employee_family already linked to person #{person.inspect}")
   end
 end
-

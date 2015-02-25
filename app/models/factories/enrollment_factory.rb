@@ -99,14 +99,13 @@ class EnrollmentFactory
       role = person.employees.build(employer: employer, hired_on: hired_on)
     end
 
-    employer_census_employee_family.link_person(person)
+    employer_census_employee_family.link_employee(role)
 
     # Add 'self' to personal relationship need detailed implementation
     #person.person_relationships << PersonRelationhip.new()
 
     family, primary_applicant = self.initialize_family(person)
     save_all_or_delete_new(person, family, primary_applicant, role, employer_census_employee_family)
-    $stderr.puts employer_census_employee_family.errors
     role
   end
 

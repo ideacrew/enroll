@@ -78,7 +78,31 @@ class Employee
     self.is_active
   end
 
+  def self.find(id)
+    people = Person.where("#{klass}._id" => id).collect(&:itself)
+    person = people.first
+    person.send(klass)
+  end
+
+  def self.list(collection)
+    collection.reduce([]) { |elements, person| elements << person.send(klass) }
+  end
+
+  # TODO; return as chainable Mongoid::Criteria
+  def self.all
+    # criteria = Mongoid::Criteria.new(Person)
+    list Person.exists(klass.to_sym => true)
+  end
+
+  def self.first
+    self.all.first
+  end
+
 private
+  def self.klass
+    self.to_s.downcase
+  end
+
   def termination_date_must_follow_hire_date
     return if hired_on.nil? || terminated_on.nil?
     errors.add(:terminated_on, "terminated_on cannot preceed hired_on") if terminated_on < hired_on
