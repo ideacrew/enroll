@@ -18,18 +18,20 @@
        <% end %>
        </br>
        
-       
+      <div style="float:right;padding-top: 20px;">   
+      <a href="#" data-person-id="<%= @person.id %>" data-employer-id="<%= @employer.id %>" class="btn btn-save person_landing_continue" >Continue</a>   
+     </div>
     </div>
   </div>
   <script>
-   $(".save-btn").removeAttr("disabled");  
+  // $(".save-btn").removeAttr("disabled");  
    person_id = "<%= @person.id%>";
    <% if @employer.present? %>
      employer_id = "<%= @employer.id %>"; 
    <% else %>
      employer_id = 0;
    <% end %>
-   $(".submit_section").html("<a href='#' data-person-id='"+person_id+"' data-employer-id='"+employer_id+"' class='btn btn-save person_landing_continue'> Save </a>")
+   //$(".submit_section").html("<a href='#' data-person-id='"+person_id+"' data-employer-id='"+employer_id+"' class='btn btn-save person_landing_continue'> Save </a>")
    $('.person_landing_continue').on('click',function(){
       console.log($(this));
       person_id = $(this).data("person-id");
