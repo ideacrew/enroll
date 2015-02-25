@@ -6,7 +6,7 @@
       <%= @employee.first_name %> <%= @employee.middle_name %> <%= @employee.last_name %><br/>
        Born: <%= @employee.dob.strftime("%b %d, %Y") %><br/>
        Social Security:  <%= @employee.ssn %><br/>
-       <% if @emplloyer.present? %>
+       <% if @employer.present? %>
        <h4> <%= @employer.legal_name %> </h4>
        <% address = @employer.addresses.last%>
        <% if address.present? %>
