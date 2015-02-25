@@ -3,7 +3,7 @@ require 'factories/enrollment_factory'
 
 RSpec.describe EnrollmentFactory do
   let(:employer) {FactoryGirl.create(:employer)}
-  let(:employee_family) {FactoryGirl.create(:employer_census_employee_family)}
+  let(:employee_family) {FactoryGirl.create(:employer_census_employee_family, employer: employer)}
   let(:person) {FactoryGirl.create(:person)}
   let(:ssn) {"123456789"}
   let(:dob) {"01/01/1970"}
@@ -13,7 +13,7 @@ RSpec.describe EnrollmentFactory do
     let(:hired_on) {"01/01/2014"}
     let(:valid_params) do
       { person: person,
-        employer: employer,
+        employer_census_employee_family: employee_family,
         ssn: ssn,
         gender: gender,
         dob: dob,
@@ -38,7 +38,7 @@ RSpec.describe EnrollmentFactory do
     end
 
     context "with no employer" do
-      let(:params) {valid_params.except(:employer)}
+      let(:params) {valid_params.except(:employer_census_employee_family)}
 
       it "should raise" do
         expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
@@ -88,6 +88,7 @@ RSpec.describe EnrollmentFactory do
         let(:employee) {EnrollmentFactory.add_employee_role(**params)}
         let(:family) {employee.person.family}
         let(:primary_applicant) {family.primary_applicant}
+        let(:employer_census_employee_family) {EmployerCensus::EmployeeFamily.find(employee_family.id)}
 
         it "should have a family" do
           expect(family.class).to be Family
@@ -95,6 +96,10 @@ RSpec.describe EnrollmentFactory do
 
         it "should be the primary applicant" do
           expect(employee.person).to eq primary_applicant.person
+        end
+
+        it "should have linked the family" do
+          expect(employer_census_employee_family.linked_person_id).to eq employee.person.id
         end
       end
     end
