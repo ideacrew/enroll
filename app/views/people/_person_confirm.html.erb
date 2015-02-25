@@ -6,7 +6,7 @@
       <%= @employee.first_name %> <%= @employee.middle_name %> <%= @employee.last_name %><br/>
        Born: <%= @employee.dob.strftime("%b %d, %Y") %><br/>
        Social Security:  <%= @employee.ssn %><br/>
-       
+       <% if @emplloyer.present? %>
        <h4> <%= @employer.legal_name %> </h4>
        <% address = @employer.addresses.last%>
        <% if address.present? %>
@@ -15,13 +15,20 @@
        </br>
        Hired : <%= @employee.hired_on.strftime("%b %d, %Y") %></br>
        Coverage : <%= @coverage %>
+       <% end %>
+       </br>
+       
+       
     </div>
   </div>
   <script>
    $(".save-btn").removeAttr("disabled");  
    person_id = "<%= @person.id%>";
-   employer_id = "<%= @employer.id %>"; 
-
+   <% if @employer.present? %>
+     employer_id = "<%= @employer.id %>"; 
+   <% else %>
+     employer_id = 0;
+   <% end %>
    $(".submit_section").html("<a href='#' data-person-id='"+person_id+"' data-employer-id='"+employer_id+"' class='btn btn-save person_landing_continue'> Save </a>")
    $('.person_landing_continue').on('click',function(){
       console.log($(this));

@@ -45,11 +45,15 @@ class PeopleController < ApplicationController
   
   def person_confirm
     @person = Person.find(params[:person_id])
-    @employer = Employer.find(params[:employer_id])
-    @employee = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last.employee
-    employee_family = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last
-    @coverage = employee_family.dependents.present? ? "Individual + Family" : "Individual"
-    @coverage_flag = "I"
+    if params[:employer_id].to_i != 0
+      @employer = Employer.find(params[:employer_id])
+      @employee = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last.employee
+      employee_family = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last
+      @coverage = employee_family.dependents.present? ? "Individual + Family" : "Individual"
+      @coverage_flag = "I"
+    else
+      @employee = @person
+    end
     respond_to do |format|
       format.js {}
     end
@@ -57,8 +61,12 @@ class PeopleController < ApplicationController
   
   def person_landing
     @person = Person.find(params[:person_id])
-    @employer = Employer.find(params[:employer_id])
-    @employee = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last.employee
+    if params[:employer_id].to_i != 0
+      @employer = Employer.find(params[:employer_id])
+      @employee = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last.employee
+    else
+      @employee = @person
+    end
     build_nested_models
     respond_to do |format|
       format.js {}
