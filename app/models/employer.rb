@@ -150,7 +150,13 @@ class Employer
     def find_employee_families_by_person(person)
       return [] if person.ssn.blank?
       employers = where("employee_families.employee.ssn" => person.ssn)
-      #employers.reduce([]) { |families, er| families << er.employee_families.detect { |ef| ef.employee.ssn == person.ssn } }
+      employers.reduce([]) { |families, er| families << er.employee_families.detect { |ef| ef.employee.ssn == person.ssn } }
+    end
+
+   def find_employer_by_person(person)
+      return [] if person.ssn.blank?
+      employers = where("employee_families.employee.ssn" => person.ssn)
+  
     end
   end
 

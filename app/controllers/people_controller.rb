@@ -36,7 +36,7 @@ class PeopleController < ApplicationController
   
   def get_employer
     @person = Person.find(params[:id])
-    @employers = Employer.find_employee_families_by_person(@person)
+    @employers = Employer.find_employer_by_person(@person)
 
     respond_to do |format|
       format.js {}
