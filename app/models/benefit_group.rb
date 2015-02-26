@@ -2,6 +2,7 @@ class BenefitGroup
   include Mongoid::Document
 
   embedded_in :plan_year
+  Benefit = Struct.new(:relationship, :premium_pct, :employer_max_amt)
 
   EFFECTIVE_ON_KINDS = ["date_of_hire", "first_of_month"]
   OFFSET_KINDS = [0, 30, 60]
@@ -17,6 +18,7 @@ class BenefitGroup
 
   field :title, type: String, default: ""
 
+  field :benefit_list, type: Array, default: []
   field :effective_on_kind, type: String, default: "date_of_hire"
   field :terminate_on_kind, type: String, default: "end_of_month"
 
@@ -25,10 +27,15 @@ class BenefitGroup
 
   # Non-congressional
   field :reference_plan_id, type: BSON::ObjectId
+
+  # Employer contribution amount as percentage of reference plan premium 
   field :premium_pct_as_int, type: Integer, default: Integer
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
   embeds_many :elected_plans
+
+  validates_presence_of :benefit_list, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
+    :reference_plan_id, :premium_pct_as_int, :employer_max_amt_in_cents
 
   validates :effective_on_kind,
     allow_blank: false,
@@ -44,8 +51,35 @@ class BenefitGroup
       message: "%{value} is not a valid effective date offset kind" 
     }
 
+  def reference_plan=(new_reference_plan)
+  end
+
   def reference_plan
   end
+
+  # belongs_to association (traverse the model)
+  def employee_families
+    plan_year.employer.employee_families.where(benefit_group_id: self._id).to_a
+  end
+
+
+  def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
+    employer_max_amt_in_cents = dollars_to_cents(new_employer_max_amt_in_cents)
+  end
+
+  def premium_in_dollars
+    cents_to_dollars(employer_max_amt_in_cents)
+  end
+
+private
+  def dollars_to_cents(amount_in_dollars)
+    Rational(amount_in_dollars) * Rational(100) if amount_in_dollars
+  end
+
+  def cents_to_dollars(amount_in_cents)
+    (Rational(amount_in_cents) / Rational(100)).to_f if amount_in_cents
+  end
+
 
 # Non-congressional
 # pick reference plan
