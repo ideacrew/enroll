@@ -1,53 +1,14 @@
-<div class="col-md-5 col-sm-5 col-xs-12 no-pd">
-	<div class="emp-info">
-		Employer : Pets.com<br>
-		Hired : March 30, 2013 <br>
-		Eligible for Coverage : March 30, 2014
-	</div>
-</div>
-<div class="col-md-5 col-sm-4 col-xs-12 no-pd text-right">
-	<p>Not your employer? <a href="#"><u>Click Here</u></a></p>
-</div>
-
-<% if @employers.present? %>
-	<p>
-		<span> Please select your Employer.</span>
-		<a class="pull-right" href="#">Search Again?</a>
-	</p>
-
-	<ul class="list-group">
-		<% @employers.each do |employer| %>
-			<li class="list-group-item">
-				<div class="row skinned-form-controls skinned-form-controls-mac">
-					<div class="col-md-7 col-sm-9 col-xs-9">
-						 <%= render 'shared/employer', employer: employer %>
-					</div>
-					<div class="col-md-3 col-sm-1 col-xs-1">
-					</div>
-					<div class="col-md-2 col-sm-2 col-xs-2">
-						<span id="badge" person-id="<%= @person.id %>" employer-id="<%= employer.id %>" class="badge" style="cursor:pointer"><i></i></span>
-					</div>
-				</div>
-			</li>
-      
-		<% end %>
-    <li class="list-group-item">
-				<div class="row skinned-form-controls skinned-form-controls-mac">
-					<div class="col-md-7 col-sm-9 col-xs-9">
-						<h4>None</h4>
-					</div>
-					<div class="col-md-3 col-sm-1 col-xs-1">
-					</div>
-					<div class="col-md-2 col-sm-2 col-xs-2">
-						<span id="badge" person-id="<%= @person.id %>" employer-id="0" class="badge" style="cursor:pointer"><i></i></span>
-					</div>
-				</div>
-			</li>
-  </ul>
-  <div style="float:right;padding-top: 20px;">
-    <a href="#" class="btn btn-save search_continue" >Continue</a>
-  </div>
+<% if @employers.present? %>	
+	<% @employers.each do |employer| %>
+		<div class="col-md-5 col-sm-5 col-xs-12 no-pd">
+			<%= render 'shared/employer', employer: employer %>
+		</div>
+		<div class="col-md-5 col-sm-4 col-xs-12 no-pd text-right">
+			<p>Not your employer? <a href="#"><u>Click Here</u></a></p>
+		</div>
+	<% end %>
 <% end %>
+
 <script>
 $('.search_continue').hide();
 $(".badge").on('click',function(){

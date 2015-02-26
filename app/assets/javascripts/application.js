@@ -95,6 +95,10 @@ $(document).ready(function () {
             $('.employers-row').html("");
             $('.employers-row').html('<span style="color:red;"> <h2><b>No Employer Found.</b></h2> </span>');
           }
+
+          //Sidebar Switch - Search Active
+          $('#personal_sidebar').removeClass('hidden');
+          $('#search_sidebar').addClass('hidden');
         }
       });  
     } else {
@@ -105,10 +109,7 @@ $(document).ready(function () {
   function _getEmployers()
   {
     //$('.autofill-initial').addClass('hidden');
-
-    $('#address_info').addClass('hidden');
-    $('#phone_info').addClass('hidden');
-    $('#email_info').addClass('hidden');
+    $("#key-section").css("display", "block");
 
     common_body_style();
     side_bar_link_style();
@@ -117,10 +118,6 @@ $(document).ready(function () {
     $('.searching_span').text('Searching');
     $('.search_alert_msg').addClass('hidden');
     getAllEmployers();
-
-    //Sidebar Switch - Search Active
-    $('#personal_sidebar').removeClass('hidden');
-    $('#search_sidebar').addClass('hidden');
 
     $('.search-btn-row').addClass('hidden');
     $('#employer-info').removeClass('hidden');
