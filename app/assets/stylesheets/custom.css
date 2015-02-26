@@ -2226,3 +2226,71 @@ a.btn-search {
 }
 
 /* Custom css for Checkboxes and Radio Buttons End */
+
+.list-group a {
+    padding-bottom: 50px;
+    padding-top: 50px;
+}
+.list-group a.active {
+    border-top-right-radius: 0;
+    font-family: "AvenirLTStd-black";
+    font-weight: 500;
+    padding-bottom: 65px;
+    padding-top: 65px;
+}
+.list-group a.name {
+    border-color: #337ab7;
+    border-top-right-radius: 0;
+    color: #fff;
+    padding-bottom: 0;
+    padding-top: 65px;
+}
+.list-group a.address {
+    background-color: #337ab7;
+    border-color: #337ab7;
+    color: #ffffff;
+    font-weight: 300;
+    padding-bottom: 55px;
+    padding-top: 55px;
+}
+.list-group a.phone {
+    background-color: #337ab7;
+    border-color: #337ab7;
+    color: #ffffff;
+    font-weight: 300;
+    padding-bottom: 48px;
+    padding-top: 102px;
+}
+.list-group a.email {
+    background-color: #337ab7;
+    border-bottom-right-radius: 0;
+    border-color: #337ab7;
+    color: #ffffff;
+    font-weight: 300;
+    padding-bottom: 53px;
+    padding-top: 54px;
+}
+.list-group {
+    margin-bottom: 0;
+}
+
+.personal_info {
+    padding-top: 30px !important;
+}
+
+a.employer_info {
+    border-color: #337ab7;
+    border-top-right-radius: 0;
+    color: #fff !important;
+    padding: 35px 0 60px;
+}
+
+#employer-info {
+  color: #999;
+  font-family: "AvenirLTStd-Light";
+  padding: 10px 0;
+}
+
+#employer-info .text-right {
+    line-height: 52px;
+}

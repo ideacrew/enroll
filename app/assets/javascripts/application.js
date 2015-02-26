@@ -58,9 +58,13 @@ $(document).ready(function () {
     side_bar_link_style();
   });
   
-  $('.required').on("change" ,function(){
+  // $('.required').on("change" ,function(){
+  //   match_person();
+  // });
+
+  $('#search-employer').click(function() {
     match_person();
-  });
+  })
   
   
   function match_person()
@@ -69,28 +73,32 @@ $(document).ready(function () {
     
     if(check_personal_info_exists().length==0 && gender_checked)
     {
+      //Sidebar Switch - Search Active
+      $('#personal_sidebar').addClass('hidden');
+      $('#search_sidebar').removeClass('hidden');
+
       $.ajax({
         type: "POST",
         url: "/people/match_person.json",
         data: $('#new_person').serialize(),
         success: function (result) {
-         // result.person gives person info to populate
-        if(result.matched == true)
-        {
-          person = result.person
-          $("#people_id").val(person._id);
-          _getEmployers();
-          //$(".div-cloud-image").show();
+          // result.person gives person info to populate
+          if(result.matched == true)
+          {
+            person = result.person
+            $("#people_id").val(person._id);
+            _getEmployers();
+          }
+          else
+          {
+            $('.search_results').removeClass('hidden');
+            $('.employers-row').html("");
+            $('.employers-row').html('<span style="color:red;"> <h2><b>No Employer Found.</b></h2> </span>');
+          }
         }
-        else
-        {
-          $('.search_results').removeClass('hidden');
-          $('.employers-row').html("");
-          $('.employers-row').html('<span style="color:red;"> <h2><b>No Employer Found.</b></h2> </span>');
-        }
-      }
-    });
-  
+      });  
+    } else {
+      alert("Enter all data");
     }
   }
   
@@ -111,9 +119,18 @@ $(document).ready(function () {
     getAllEmployers();
 
     //Sidebar Switch - Search Active
-    $('#personal_sidebar').addClass('hidden');
-    $('#search_sidebar').removeClass('hidden');
+    $('#personal_sidebar').removeClass('hidden');
+    $('#search_sidebar').addClass('hidden');
 
+    $('.search-btn-row').addClass('hidden');
+    $('#employer-info').removeClass('hidden');
+    $('.employer_info').removeClass('hidden');
+    $('#address_info').removeClass('hidden');
+    $('.address_info').removeClass('hidden');
+    $('#phone_info').removeClass('hidden');
+    $('.phone_info').removeClass('hidden');
+    $('#email_info').removeClass('hidden');
+    $('.email_info').removeClass('hidden');
   }
   
   function getAllEmployers()
