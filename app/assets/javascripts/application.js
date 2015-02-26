@@ -173,7 +173,8 @@ $(document).ready(function () {
     $('.focus_effect:first').removeClass('personaol-info-row');
     $('.sidebar a:first').addClass('style_s_link');
     $('.sidebar a.credential_info').addClass('style_s_link');
-    $(".key").css("display", "block");
+    // $(".key").css("display", "block");
+    $(".search-btn-row").css("display", "block");
     
     var check = check_personal_info_exists();
     if(check.length==0) {
