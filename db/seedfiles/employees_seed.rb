@@ -13,7 +13,7 @@ puts "::: Creating Employee Roles:::"
     )
     employee = EnrollmentFactory.add_employee_role(
       person: person,
-      employer: employer,
+      employer_census_employee_family: census_employee_family,
       gender: census_employee.gender,
       ssn: census_employee.ssn,
       dob: census_employee.dob,

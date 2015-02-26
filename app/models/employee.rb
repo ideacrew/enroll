@@ -79,7 +79,7 @@ class Employee
   end
 
   def self.find(id)
-    people = Person.where("#{klass}._id" => id).collect(&:itself)
+    people = Person.where("#{klass.pluralize}._id" => id).collect(&:itself)
     person = people.first
     person.send(klass)
   end

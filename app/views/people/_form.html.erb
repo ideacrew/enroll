@@ -32,8 +32,8 @@
                 <%= render 'shared/id_info_fields', f: f %>
               </div>
 
-              <div class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
-                
+              <div id="key-section" class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
+                <a href="#" class="btn btn-save">Save & Exit</a>
                 <p class="top-pad">
                   <span>Your personal information is safe, secured with 64 bit SSL encryption</span>
                   <span><i></i></span>
@@ -55,7 +55,6 @@
             <div id="employer-info" class="row hidden"></div>
             
             <%= render 'shared/address_fields', f: f %><br>
-
             <%= render 'shared/phone_fields', f: f %><br>
 
             <div id="email_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">

@@ -860,15 +860,6 @@ h5.active a{
   color: #ffffff;
   font-weight: 300;
 }
-.list-group a.email{
-  padding-top: 54px;
-  padding-bottom: 53px;
-  background-color: #337ab7;
-  border-color: #337ab7;
-  color: #ffffff;
-  border-bottom-right-radius: 0px;
-  font-weight: 300;
-}
 .list-group{
   margin-bottom: 0;
 }
@@ -1033,9 +1024,9 @@ input.floatlabe{
   color: #ccc;
 }
 .sidebar-email-field {
-  padding-bottom: 101px !important;
+/*  padding-bottom: 101px !important;
   padding-top: 90px !important; 
-} 
+*/} 
 
 @media screen and (-webkit-min-device-pixel-ratio:0) { 
   ::i-block-chrome,.form_group_lg {
@@ -2242,7 +2233,7 @@ a.btn-search {
     border-color: #337ab7;
     border-top-right-radius: 0;
     color: #fff;
-    padding-bottom: 0;
+    padding-bottom: 10px;
     padding-top: 65px;
 }
 .list-group a.address {
@@ -2251,24 +2242,35 @@ a.btn-search {
     color: #ffffff;
     font-weight: 300;
     padding-bottom: 55px;
-    padding-top: 55px;
+    padding-top: 60px;
 }
+.list-group a.address .arrow-right {
+  top: 55px;
+}
+
 .list-group a.phone {
     background-color: #337ab7;
     border-color: #337ab7;
     color: #ffffff;
     font-weight: 300;
-    padding-bottom: 48px;
+    padding-bottom: 102px;
     padding-top: 102px;
 }
+.list-group a.phone .arrow-right {
+  top: 96px;
+}
+
 .list-group a.email {
     background-color: #337ab7;
     border-bottom-right-radius: 0;
     border-color: #337ab7;
     color: #ffffff;
     font-weight: 300;
-    padding-bottom: 53px;
-    padding-top: 54px;
+    padding-bottom: 52px;
+    padding-top: 38px;
+}
+.list-group a.email .arrow-right {
+  top: 30px;
 }
 .list-group {
     margin-bottom: 0;
@@ -2282,13 +2284,13 @@ a.employer_info {
     border-color: #337ab7;
     border-top-right-radius: 0;
     color: #fff !important;
-    padding: 35px 0 60px;
+    padding: 35px 0 40px;
 }
 
 #employer-info {
   color: #999;
   font-family: "AvenirLTStd-Light";
-  padding: 10px 0;
+  padding: 20px 0;
 }
 
 #employer-info .text-right {

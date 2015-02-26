@@ -1,5 +1,5 @@
-<h4><%= employer.legal_name %></h4>
-<% address = employer.addresses.last %>
-<% if address.present? %>
-  <spa><%= address.full_address%></span>
-<% end %>   
+<div class="emp-info">
+	Employer : <%= employer.legal_name %><br>
+	Hired : March 30, 2013 <br>
+	Eligible for Coverage : March 30, 2014
+</div>
