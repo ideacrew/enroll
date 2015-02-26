@@ -88,7 +88,9 @@ RSpec.describe EnrollmentFactory do
         let(:employee) {EnrollmentFactory.add_employee_role(**params)}
         let(:family) {employee.person.family}
         let(:primary_applicant) {family.primary_applicant}
-        let(:employer_census_employee_family) {EmployerCensus::EmployeeFamily.find(employee_family.id)}
+        let(:employer_census_employee_family) do
+          Employer.find(employer).employee_families.find(employee_family)
+        end
 
         it "should have a family" do
           expect(family.class).to be Family
@@ -99,7 +101,7 @@ RSpec.describe EnrollmentFactory do
         end
 
         it "should have linked the family" do
-          expect(employer_census_employee_family.linked_person_id).to eq employee.person.id
+          expect(employee_family.linked_employee).to eq employee
         end
       end
     end

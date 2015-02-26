@@ -65,7 +65,9 @@ $(document).ready(function () {
   
   function match_person()
   {
-    if(check_personal_info_exists().length==0)
+    gender_checked = $("#person_gender_male").prop("checked") || $("#person_gender_female").prop("checked")
+    
+    if(check_personal_info_exists().length==0 && gender_checked)
     {
       $.ajax({
         type: "POST",

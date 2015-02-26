@@ -1,6 +1,12 @@
-	<p>
+<% if @employer.present? %>
+  <p>
 		<span> Employer Information.</span>
 	</p>
+<% else %>
+    <p>
+		<span> Employee Information.</span>
+	</p>
+<% end %>  
   <div class="row top-row">
     <div class="col-md-7 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <%= @employee.first_name %> <%= @employee.middle_name %> <%= @employee.last_name %><br/>
@@ -20,6 +26,11 @@
        
       <div style="float:right;padding-top: 20px;">   
       <a href="#" data-person-id="<%= @person.id %>" data-employer-id="<%= @employer.id %>" class="btn btn-save person_landing_continue" >Continue</a>   
+       <% if @employer.present? %>
+        <a href="#" data-person-id="<%= @person.id %>" data-employer-id="<%= @employer.id %>" class="btn btn-save person_landing_continue" >Continue</a>   
+       <% else %>
+        <a href="#" data-person-id="<%= @person.id %>" data-employer-id="0" class="btn btn-save person_landing_continue" >Continue</a>   
+       <% end %>
      </div>
     </div>
   </div>
@@ -33,11 +44,8 @@
    <% end %>
    //$(".submit_section").html("<a href='#' data-person-id='"+person_id+"' data-employer-id='"+employer_id+"' class='btn btn-save person_landing_continue'> Save </a>")
    $('.person_landing_continue').on('click',function(){
-      console.log($(this));
       person_id = $(this).data("person-id");
       employer_id = $(this).data("employer-id");
-      console.log(person_id)
-      console.log(employer_id)
       $.ajax({
         type: "POST",
         url: "/people/person_landing.js",
