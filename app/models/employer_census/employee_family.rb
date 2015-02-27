@@ -1,4 +1,5 @@
 class EmployerCensus::EmployeeFamily
+
   include Mongoid::Document
   include Mongoid::Timestamps
 
@@ -14,19 +15,19 @@ class EmployerCensus::EmployeeFamily
 
   field :terminated, type: Boolean, default: false
 
-  embeds_one :employee,
+  embeds_one :census_employee,
     class_name: "EmployerCensus::Employee",
     cascade_callbacks: true,
     validate: true
-  accepts_nested_attributes_for :employee, reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :census_employee, reject_if: :all_blank, allow_destroy: true
 
-  embeds_many :dependents,
+  embeds_many :census_dependents,
     class_name: "EmployerCensus::Dependent",
     cascade_callbacks: true,
     validate: true
-  accepts_nested_attributes_for :dependents, reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :census_dependents, reject_if: :all_blank, allow_destroy: true
 
-  validates_presence_of :employee
+  validates_presence_of :census_employee
 
   scope :active,     ->{ where(:terminated => false) }
   scope :terminated, ->{ where(:terminated => true) }
@@ -34,15 +35,23 @@ class EmployerCensus::EmployeeFamily
   scope :linked,     ->{ where(:is_linked => true) }
   scope :unlinked,   ->{ where(:is_linked => false) }
 
-  # Create a copy of this instance for rehires into same ER
+  # Initialize a new, refreshed instance for rehires via deep copy
   def clone
-    copy = self.dup
-    copy.linked_person_id = nil
-    copy.linked_employee_id = nil
-    copy.linked_at = nil
-    copy.employee.hired_on = nil
-    copy.employee.terminated_on = nil
-    copy
+    new_family = self.dup
+    new_family.linked_person_id = nil
+    new_family.linked_employee_id = nil
+    new_family.linked_at = nil
+    new_family.terminated = false
+
+    new_family.census_dependents = self.census_dependents unless self.census_dependents.blank?
+      
+    if self.census_employee.present?
+      new_family.census_employee = self.census_employee
+      new_family.census_employee.hired_on = nil
+      new_family.census_employee.terminated_on = nil
+    end
+
+    new_family
   end
 
   def parent
