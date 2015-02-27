@@ -7,6 +7,7 @@ class Employee
   embedded_in :person
 
   field :employer_id, type: BSON::ObjectId
+  field :census_family_id, type: BSON::ObjectId
   field :benefit_group_id, type: BSON::ObjectId
   field :employee_status, type: String
   field :hired_on, type: Date
@@ -78,10 +79,8 @@ class Employee
     self.is_active
   end
 
-  def self.find(id)
-    people = Person.where("#{klass.pluralize}._id" => id).collect(&:itself)
-    person = people.first
-    person.send(klass)
+  def self.find(employee_id)
+    Person.where({"employees._id" => employee_id }).first.employees.first
   end
 
   def self.list(collection)

@@ -9,7 +9,6 @@ class EmployerCensus::EmployeeFamily
   field :benefit_group_id, type: BSON::ObjectId
 
   # UserID that connected and timestamp
-  field :linked_person_id, type: BSON::ObjectId
   field :linked_employee_id, type: BSON::ObjectId
   field :linked_at, type: DateTime
 
@@ -36,21 +35,18 @@ class EmployerCensus::EmployeeFamily
   scope :unlinked,   ->{ where(:is_linked => false) }
 
   # Initialize a new, refreshed instance for rehires via deep copy
-  def clone
+  def replicate
     new_family = self.dup
-    new_family.linked_person_id = nil
-    new_family.linked_employee_id = nil
-    new_family.linked_at = nil
+    new_family.delink_employee
     new_family.terminated = false
 
-    new_family.census_dependents = self.census_dependents unless self.census_dependents.blank?
-      
     if self.census_employee.present?
       new_family.census_employee = self.census_employee
       new_family.census_employee.hired_on = nil
       new_family.census_employee.terminated_on = nil
     end
 
+    new_family.census_dependents = self.census_dependents unless self.census_dependents.blank?
     new_family
   end
 
@@ -60,7 +56,7 @@ class EmployerCensus::EmployeeFamily
   end
 
   def plan_year=(new_plan_year)
-    parent.households.where(:irs_group_id => self.id)
+    self.plan_year_id = new_plan_year._id unless new_plan_year.blank?
   end
 
   def plan_year
@@ -69,41 +65,37 @@ class EmployerCensus::EmployeeFamily
   end
 
   def benefit_group=(new_benefit_group)
+    self.benefit_group_id = new_benefit_group._id unless new_benefit_group.blank?
+    self.plan_year = new_benefit_group.plan_year
   end
 
   def benefit_group
-    parent.plan_year.benefit_group.find(:plan_year_id => self.plan_year_id)
+    parent.plan_year.benefit_group.find(:plan_year_id => self.benefit_group_id)
   end
 
-  def link_employee(employee)
-    raise EmployeeFamilyLinkError.new(employee) if is_linked?
-    self.linked_person_id = employee.person._id
-    self.linked_employee_id = employee._id
+  def link_employee(new_employee)
+    raise EmployeeFamilyLinkError.new(new_employee) if is_linked?
+    self.linked_employee_id = new_employee._id
     self.linked_at = Time.now
     self
   end
 
   def delink_employee
-    self.linked_person_id = nil
     self.linked_employee_id = nil
     self.linked_at = nil
     self
   end
 
   def linked_employee
-    if is_linked?
-      p = Person.find(linked_person_id)
-      es = p.employees
-      e = es.find(linked_employee_id)
-    end
+    Employee.find(self.linked_employee_id) if is_linked?
   end
 
   def is_linked?
-    self.linked_employee_id.present? && self.linked_person_id.present?
+    self.linked_employee_id.present?
   end
 
   def terminate(last_day_of_work)
-    self.employee.terminated_on = date
+    self.census_employee.terminated_on = date
     self.terminated = true
     self
   end
@@ -115,8 +107,8 @@ class EmployerCensus::EmployeeFamily
 end
 
 class EmployeeFamilyLinkError < StandardError
-  def initialize(person)
-    @person = person
-    super("employee_family already linked to person #{person.inspect}")
+  def initialize(employee)
+    @employee = employee
+    super("employee_family already linked to employee #{employee.inspect}")
   end
 end

@@ -88,9 +88,11 @@ class Person
   index({"consumer.is_active" => 1})
 
   # Employee child model indexes
-  index({"employee._id" => 1})
-  index({"employee.employer_id" => 1})
-  index({"employee.is_active" => 1})
+  index({"employees._id" => 1})
+  index({"employees.employer_id" => 1})
+  index({"employees.census_family_id" => 1})
+  index({"employees.benefit_group_id" => 1})
+  index({"employees.is_active" => 1})
 
   # HbxStaff child model indexes
   index({"hbx_staff._id" => 1})

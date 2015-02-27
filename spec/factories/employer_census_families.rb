@@ -1,12 +1,12 @@
 FactoryGirl.define do
-  factory :employer_census_employee_family, :class => 'EmployerCensus::EmployeeFamily' do
+  factory :employer_census_family, :class => 'EmployerCensus::EmployeeFamily' do
 
     # employer { FactoryGirl.create :employer }
-    employee { FactoryGirl.build :employer_census_employee }
-    dependents { FactoryGirl.build(:employer_census_dependent).to_a }
+    census_employee { FactoryGirl.build :employer_census_employee }
+    census_dependents { FactoryGirl.build(:employer_census_dependent).to_a }
     terminated false
 
-    factory :employer_census_employee_family_with_dependents do
+    factory :employer_census_family_with_dependents do
       transient do
         dependents_count 3
       end

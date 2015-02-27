@@ -81,13 +81,13 @@ class Employer
 
   index({"employee_families._id" => 1})
   index({"employee_families.linked_at" => 1}, {sparse: true})
-  index({"employee_families.linked_person_id" => 1}, {sparse: true})
+  index({"employee_families.linked_employee_id" => 1}, {sparse: true})
   index({"employee_families.terminated" => 1})
-  index({"employee_families.employee.last_name" => 1})
-  index({"employee_families.employee.dob" => 1})
-  index({"employee_families.employee.ssn" => 1})
-  index({"employee_families.employee.ssn" => 1,
-         "employee_families.employee.dob" => 1},
+  index({"employee_families.census_employee.last_name" => 1})
+  index({"employee_families.census_employee.dob" => 1})
+  index({"employee_families.census_employee.ssn" => 1})
+  index({"employee_families.census_employee.ssn" => 1,
+         "employee_families.census_employee.dob" => 1},
          {name: "ssn_dob_index"})
 
 
