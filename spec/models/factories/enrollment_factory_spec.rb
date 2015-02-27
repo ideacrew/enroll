@@ -101,6 +101,7 @@ RSpec.describe EnrollmentFactory do
         end
 
         it "should have linked the family" do
+          
           expect(employee_family.linked_employee).to eq employee
         end
       end
