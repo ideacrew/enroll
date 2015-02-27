@@ -42,7 +42,7 @@ Rails.application.routes.draw do
 
   resources :employees
 
-  devise_for :users #, :controllers => { :registrations => "registrations" }
+  devise_for :users, :controllers => { :registrations => "registrations" }
   # devise_scope :user do
   #   get "/sign_in" => "devise/sessions#new"
   #   get "/sign_up" => "devise/registrations#new"

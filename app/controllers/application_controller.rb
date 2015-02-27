@@ -6,7 +6,6 @@ class ApplicationController < ActionController::Base
   ## Devise filters
   before_filter :authenticate_user_from_token!
   before_filter :authenticate_me!
-  before_filter :configure_permitted_parameters, if: :devise_controller?
 
   # before_action do
   #   resource = controller_name.singularize.to_sym
@@ -39,20 +38,6 @@ class ApplicationController < ActionController::Base
     user = user_token && User.find_by_authentication_token(user_token.to_s)
     if user
       sign_in user, store: false
-    end
-  end
-
-  protected
-
-  def configure_permitted_parameters
-    devise_parameter_sanitizer.for(:sign_in) { |u| u.permit(:email, :remember_me) }
-
-    devise_parameter_sanitizer.for(:sign_up) do |u|
-      u.permit(:email, :password, :password_confirmation, :remember_me)
-    end
-
-    devise_parameter_sanitizer.for(:account_update) do |u|
-      u.permit(:email, :password, :password_confirmation, :current_password)
     end
   end
 
