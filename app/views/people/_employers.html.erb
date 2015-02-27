@@ -1,3 +1,4 @@
+
 <% if @employers.present? %>	
  <table class="table" style="with:60%">
 	<% @employers.each do |employer| %>
@@ -13,9 +14,17 @@
   </tr>
 	<% end %>
 </table>
+<div class="col-md-5 col-sm-4 col-xs-12 no-pd text-right">
+  <p>Change Details? <a href="#" class="change_personal_info"><u>Search Again</u></a></p>
+</div>
 <% end %>
 
 <script>
+  $(".change_personal_info").click(function(){
+    $('.search-btn-row').removeClass('hidden');
+    $('#employer-info').html("");
+    $(".employer_info").html('');
+  });
 $('.search_continue').hide();
 $(".badge").on('click',function(){
   $('.badge').removeClass('badge-active');
