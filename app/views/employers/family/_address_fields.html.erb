@@ -1,16 +1,58 @@
-<div>
-  <h3>Addresses</h3>
-</div>
+<div id="address_info" class="focus_effect personaol-info-row">
+  <div class="col-md-12 no-pd col-sm-9 col-xs-12">
+    <div class="row top-row">
+      <div class="col-md-9 col-sm-9 col-xs-12 form-group form-group-lg no-pd address">
+        <div class="form-group form-group-lg">
+          <div class="row" style="margin: 0;">
+            <div class="col-md-4 col-sm-3 col-xs-0 bg-color"></div>
+            <div class="col-md-4 col-sm-6 col-xs-12 no-pd">
+              <div class="dropdown">
+                <button class="form-control float-label adderess-select-box border-bottom-none border-right-none form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                  <span class="address-span">Home Address</span>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                  <% Address::KINDS.each do |item| %>
+                    <% address_text = item.capitalize + "Address" %>
+                    <li role="presentation" data-value="<%= item %>" data-address-text="<%= address_text %>" class="address-li"><a href="#" role="menuitem"><%= item.humanize %></a></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+            <div class="col-md-4 col-sm-3 col-xs-0 bg-color"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <button class="btn btn-new-address border-bottom-none">NEW ADDRESS</button>
+        <!-- <button class="btn btn-new-address">NEW ADDRESS</button> -->
+      </div>
+    </div>
+    
+    <div class="row middle-row form-group form-group-lg no-pd address-row">
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.hidden_field :kind %>
+        <%= f.text_field :address_1, placeholder: "ADDRESS LINE 1", class: "floatlabel form-control border-bottom-none border-right-none" %>
+      </div>
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :address_2, placeholder: "ADDRESS LINE 2", class: "floatlabel form-control border-bottom-none" %>
+      </div>
+    </div>
 
-<div>
-  <div class="row">
-    <p class="text-right col-md-6 col-md-push-6">
-    </p>
+
+    <div class="row bottom-row address-row">
+        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+          <%= f.text_field :city, placeholder: "CITY", class: "floatlabel form-control" %>
+        </div>
+        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+          <%= f.text_field :state, placeholder: "STATE", class: "floatlabel form-control" %>
+        </div>
+        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+          <%= f.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control" %>
+        </div>
+    </div>
+    
+    <%= render 'shared/error_warning' %>
+      
   </div>
-  <%= f.select :kind, Address::KINDS, include_blank: "Type"%><br/>
-  <%= f.text_field :address_1, placeholder: 'Street', required: true %><br/>
-  <%= f.text_field :address_2, placeholder: "Apt, Suite, Bldg (optional)" %><br/>
-  <%= f.text_field :city, placeholder: "City", required: true %><br/>
-  <%= f.select :state, State::NAME_IDS, include_blank: "State" %><br/>
-  <%= f.text_field :zip, placeholder: "Zip code"%><br/>
 </div>

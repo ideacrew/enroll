@@ -1,0 +1,71 @@
+<div class="container-fluid no-pd-left">          
+	<div class="panel panel-default">
+		<div class="panel-body left">
+
+			<div class="col-sm-2 left-pd" id="sidebar_partial_value">
+				<%= render partial: 'sidebar' %>
+			</div>
+
+			<div class="col-md-10 col-sm-12">
+				<div class="col-md-11 col-sm-12 col-xs-12">
+		            <% if @family.errors.any? %>
+		              <div class="alert alert-error">
+		                <h4><%= pluralize(@family.errors.count, "error") %> prohibited this person from being saved:</h4>
+		                <ul>
+		                  <% @family.errors.full_messages.each do |msg| %>
+		                    <li><%= msg %></li>
+		                  <% end %>
+		                </ul>
+		              </div>
+		            <% end %>
+
+		            <p class="information row">Add New Family</p>
+		            <!-- <div id="overlay"></div> -->
+		            
+					<%= f.fields_for :employee, errors: {}, fieldset: false do |employee|  %>
+						<div id="employer_info" class="focus_effect row personaol-info-row">
+							<div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
+				        		<%= render 'member_fields', f: employee %>
+				        	</div>
+				        	<div class="col-md-2 key no-pd-right col-sm-3 col-xs-12" id="key-section">
+				        		<%= f.submit "Create Family", class: "btn btn-save" %>
+				                <p class="top-pad">
+				                  <span>Your personal information is safe, secured with 64 bit SSL encryption</span>
+				                  <span><i></i></span>
+				                </p>
+				            </div>
+			        	</div><br>
+
+				        <%= employee.fields_for :address, errors: {}, fieldset: false do |address|  %>
+				        	<div id="address_info" class="focus_effect row personaol-info-row">
+				        		<div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
+				        			<%= render 'address_fields', f: address %>
+				        		</div>
+				        	</div>
+				        <% end %><br>
+
+				        <%= f.fields_for :dependents, errors: {}, fieldset: false do |dependent|  %>
+				        	<div id="dependent_info" class="focus_effect row personaol-info-row">
+					        	<div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
+					            	<%= render 'dependent_fields', f: dependent %>
+					            </div>
+					            <div class="col-md-2 no-pd-right col-sm-3 col-xs-12" id="key-section">
+									<%= link_to '<span class="fui-cross-circle">Delete Dependent</span>'.html_safe, '#', :class => "remove_fields" %>
+									</div>
+					        </div><br>
+					        <%= link_to_add_fields "Add Dependent", f, :dependents %>
+				        <% end %>
+				    <% end %>
+
+					<div id="key-section" class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
+						<a href="#" class="btn btn-save">Save & Exit</a>
+						<p class="top-pad">
+							<span>Your personal information is safe, secured with 64 bit SSL encryption</span>
+							<span><i></i></span>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

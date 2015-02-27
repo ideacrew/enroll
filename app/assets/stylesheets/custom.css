@@ -2287,6 +2287,14 @@ a.employer_info {
     padding: 35px 0 40px;
 }
 
+#family_sidebar a.employer_info {
+  padding-bottom: 24px !important;
+  margin-bottom: 20px;
+}
+#family_sidebar a.address_info {
+  margin-bottom: 20px;
+}
+
 #employer-info {
   color: #999;
   font-family: "AvenirLTStd-Light";

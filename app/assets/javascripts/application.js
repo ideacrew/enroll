@@ -24,13 +24,13 @@ $('input.floatlabel').floatlabel();
 
 $(document).ready(function () {
   
-  $('#address_info').addClass('hidden');
-  $('#phone_info').addClass('hidden');
-  $('#email_info').addClass('hidden');
-  $('.address_info').addClass('hidden');
-  $('.phone_info').addClass('hidden');
-  $('.email_info').addClass('hidden');
-  $(".save-btn").attr("disabled",true);
+  $('#personal_sidebar #address_info').addClass('hidden');
+  $('#personal_sidebar #phone_info').addClass('hidden');
+  $('#personal_sidebar #email_info').addClass('hidden');
+  $('#personal_sidebar .address_info').addClass('hidden');
+  $('#personal_sidebar .phone_info').addClass('hidden');
+  $('#personal_sidebar .email_info').addClass('hidden');
+  $("#personal_sidebar .save-btn").attr("disabled",true);
   
   $(".date-picker, .date_picker").datepicker({
     changeMonth: true,

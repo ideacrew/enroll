@@ -1,44 +1,38 @@
-<fieldset>
-  <hr>
-  <table border="1" style="width:325px">
-    <tr>
-      <td>
-        <div class="row">
-          <p class="text-right col-md-6 col-md-push-6">
-            <%= link_to '<span class="fui-cross-circle"> Delete Dependent</span>'.html_safe, '#', :class => "remove_fields" %>
-          </p>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td><%= f.text_field :first_name, placeholder: "First", style: "width:100%" %></td>
-    </tr>
-    <tr>
-      <td><%= f.text_field :last_name, placeholder: "Last", style: "width:100%" %></td>
-    </tr>
-    <tr>
-      <td><%= f.text_field :name_sfx, placeholder: "Sfx", style: "width:100%" %></td>
-    </tr>
-    <tr>
-      <td>
-        <%= f.text_field :dob, as: :string,
-          start_year: Date.today.year - 110,
-          end_year: Date.today.year,
-          placeholder: "mm/dd/yyyy",
-          class: "date_picker",
-          style: "width:100%" %>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <%= f.select :gender, EmployerCensus::Member::GENDER_KINDS, include_blank: "Select", style: "width:100%" %>
-      </td>
-    </tr>
-    <tr>
-      <td><%= f.text_field :employee_relationship, placeholder: "Relationship", style: "width:100%" %></td>
-    </tr>
-    <tr>
-      <td><%= f.hidden_field :_destroy %></td>
-    </tr>
-  </table>
-</fieldset>
+<div class="row middle-row form-group form-group-lg no-pd">
+  <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :first_name, class: "floatlabel form-control border-bottom-none", placeholder: 'FIRST NAME' %>
+  </div>
+  <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME' %>
+  </div>
+  <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :name_sfx, class: "floatlabel form-control", placeholder: 'SUFFIX' %>
+  </div>
+</div>
+
+<div class="row bottom-row">
+  <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :dob, start_year: Date.today.year - 110, end_year: Date.today.year, placeholder: "BIRTHDATE",
+        class: "date_picker floatlabel form-control", value: f.object.dob.try(:strftime, "%m/%d/%Y") %>
+  </div>
+  <div class="col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+    <div class="radio skinned-form-controls skinned-form-controls-mac">
+      <label>
+        <%= f.radio_button :gender, "male", class: "" %>
+        <span>Male</span>
+      </label>
+    </div>
+  </div>
+  <div class="col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+    <div class="radio skinned-form-controls skinned-form-controls-mac">
+      <label>
+        <%= f.radio_button :gender, "female",class: ""  %>
+        <span>Female</span>
+      </label>
+    </div>
+  </div>
+  <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :employee_relationship, class: "floatlabel form-control", placeholder: 'RELATIONSHIP' %>
+  </div>
+</div>
+<%= f.hidden_field :_destroy %>
