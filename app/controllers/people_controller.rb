@@ -47,7 +47,7 @@ class PeopleController < ApplicationController
     @person = Person.find(params[:person_id])
     if params[:employer_id].to_i != 0
       @employer = Employer.find(params[:employer_id])
-      @employee = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last.employee
+      #@employee = Employer
       employee_family = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last
       @coverage = employee_family.dependents.present? ? "Individual + Family" : "Individual"
       @coverage_flag = "I"

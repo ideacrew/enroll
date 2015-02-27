@@ -1,5 +1,6 @@
 <div class="emp-info">
-	Employer : <%= employer.legal_name %><br>
-	Hired : March 30, 2013 <br>
-	Eligible for Coverage : March 30, 2014
+    Employer : <%= employer.legal_name %><br>
+    <% employee = employer.employee_family_details(@person).employee %>
+	  Hired : <%= employee.hired_on.strftime("%B %d %Y") %> <br>
+	  Eligible for Coverage : <%= employee.hired_on.strftime("%B %d %Y") %> <br>
 </div>

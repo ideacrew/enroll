@@ -127,6 +127,10 @@ class Employer
     end
   end
 
+  def employee_family_details(person)
+    return Employer.where(id: id).where(:"employee_families.employee.ssn" => person.ssn).last.employee_families.last
+  end
+  
   # belongs_to writing agent (broker)
   def writing_agent=(new_writing_agent)
     raise ArgumentError.new("expected Broker class") unless new_writing_agent.is_a? Broker
@@ -137,6 +141,8 @@ class Employer
   def writing_agent
     Broker.find(@writing_agent_id) unless @writing_agent_id.blank?
   end
+  
+  
 
   class << self
     def find_by_fein(fein)
