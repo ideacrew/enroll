@@ -112,8 +112,8 @@ describe Employer, "Class methods", type: :model do
     let(:ee0) {FactoryGirl.build(:employer_census_employee, ssn: "369851245")}
     let(:ee1) {FactoryGirl.build(:employer_census_employee, ssn: "258741239")}
 
-    let(:ef0) {FactoryGirl.build(:employer_census_employee_family, employee: ee0)}
-    let(:ef1) {FactoryGirl.build(:employer_census_employee_family, employee: ee1)}
+    let(:ef0) {FactoryGirl.build(:employer_census_family, census_employee: ee0)}
+    let(:ef1) {FactoryGirl.build(:employer_census_family, census_employee: ee1)}
 
     let(:er0) {FactoryGirl.create(:employer, fein: "687654321", employee_families: [ef0])}
     let(:er1) {FactoryGirl.create(:employer, fein: "587654321", employee_families: [ef0, ef1])}
@@ -154,7 +154,7 @@ describe Employer, "Class methods", type: :model do
       end
 
       it "returns employee_families where employee matches person" do
-        expect(Employer.find_employee_families_by_person(p0).first.employee.dob).to eq ef0.employee.dob
+        expect(Employer.find_employee_families_by_person(p0).first.census_employee.dob).to eq ef0.census_employee.dob
       end
     end
 

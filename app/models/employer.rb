@@ -128,7 +128,7 @@ class Employer
   end
 
   def employee_family_details(person)
-    return Employer.where(id: id).where(:"employee_families.employee.ssn" => person.ssn).last.employee_families.last
+    return Employer.where(id: id).where(:"employee_families.census_employee.ssn" => person.ssn).last.employee_families.last
   end
   
   # belongs_to writing agent (broker)
@@ -155,13 +155,13 @@ class Employer
 
     def find_employee_families_by_person(person)
       return [] if person.ssn.blank?
-      employers = where("employee_families.employee.ssn" => person.ssn)
-      employers.reduce([]) { |families, er| families << er.employee_families.detect { |ef| ef.employee.ssn == person.ssn } }
+      employers = where("employee_families.census_employee.ssn" => person.ssn)
+      employers.reduce([]) { |families, er| families << er.employee_families.detect { |ef| ef.census_employee.ssn == person.ssn } }
     end
 
    def find_employer_by_person(person)
       return [] if person.ssn.blank?
-      employers = where("employee_families.employee.ssn" => person.ssn)
+      employers = where("employee_families.census_employee.ssn" => person.ssn)
   
     end
   end
