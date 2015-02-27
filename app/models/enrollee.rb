@@ -64,7 +64,6 @@ private
     (Rational(amount_in_cents) / Rational(100)).to_f if amount_in_cents
   end
 
-private
   def update_premium
     set_premium
   end
