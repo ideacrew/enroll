@@ -43,12 +43,12 @@ puts "::: Generating Employer Rosters :::"
 
 # Employee Family Creation
 family_0 = employer_1.employee_families.new
-family_0.employee = employee_0
+family_0.census_employee = employee_0
 family_0.save!
 
 family_1 = employer_1.employee_families.new
-family_1.employee = employee_1
-family_1.dependents = [dependent_1_1, dependent_1_2, dependent_1_3]
+family_1.census_employee = employee_1
+family_1.census_dependents = [dependent_1_1, dependent_1_2, dependent_1_3]
 family_1.save!
 
 employee_2 = EmployerCensus::Employee.new(first_name: "Melaine", last_name: "Roger", dob: "01/15/1975", gender: "male", employee_relationship: "self", hired_on: "12/01/2012", ssn: "111422333", address: address_2)
@@ -57,8 +57,8 @@ dependent_2_2 = EmployerCensus::Dependent.new(first_name: "Monica", last_name: "
 dependent_2_3 = EmployerCensus::Dependent.new(first_name: "Caroline", last_name: "Roger", dob: "04/12/2010", gender: "female", employee_relationship: "child", ssn: "212339211")
 
 family_2 = employer_2.employee_families.new
-family_2.employee = employee_2
-family_2.dependents = [dependent_2_1, dependent_2_2, dependent_2_3]
+family_2.census_employee = employee_2
+family_2.census_dependents = [dependent_2_1, dependent_2_2, dependent_2_3]
 family_2.save!
 
 employee_3 = EmployerCensus::Employee.new(first_name: "Kareena", last_name: "Johnson", dob: "01/15/1978", gender: "female", employee_relationship: "self", hired_on: "04/01/2011", ssn: "151422333", address: address_3)
@@ -67,8 +67,8 @@ dependent_3_2 = EmployerCensus::Dependent.new(first_name: "Martin", last_name: "
 dependent_3_3 = EmployerCensus::Dependent.new(first_name: "Frazier", last_name: "Johnson", dob: "04/16/2010", gender: "male", employee_relationship: "child", ssn: "212439261")
 
 family_3 = employer_3.employee_families.new
-family_3.employee = employee_3
-family_3.dependents = [dependent_3_1, dependent_3_2, dependent_3_3]
+family_3.census_employee = employee_3
+family_3.census_dependents = [dependent_3_1, dependent_3_2, dependent_3_3]
 family_3.save!
 
 employee_4 = EmployerCensus::Employee.new(first_name: "Mario", last_name: "Gomez", dob: "01/25/1968", gender: "male", employee_relationship: "self", hired_on: "02/02/2011", ssn: "151422930", address: address_4)
@@ -77,14 +77,14 @@ dependent_4_2 = EmployerCensus::Dependent.new(first_name: "Martina", last_name: 
 dependent_4_3 = EmployerCensus::Dependent.new(first_name: "Rafael", last_name: "Gomez", dob: "04/16/2012", gender: "male", employee_relationship: "child", ssn: "212439267")
 
 family_4 = employer_4.employee_families.new
-family_4.employee = employee_4
-family_4.dependents = [dependent_4_1, dependent_4_2, dependent_4_3]
+family_4.census_employee = employee_4
+family_4.census_dependents = [dependent_4_1, dependent_4_2, dependent_4_3]
 family_4.save!
 
 employee_5 = EmployerCensus::Employee.new(first_name: "Martina", last_name: "Williams", dob: "01/25/1990", gender: "female", employee_relationship: "self", hired_on: "02/02/2014", ssn: "151482930", address: address_5)
 
 family_5 = employer_5.employee_families.new
-family_5.employee = employee_5
+family_5.census_employee = employee_5
 family_5.save!
 
 puts "::: Employers Complete :::"

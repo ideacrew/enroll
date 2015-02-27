@@ -5,7 +5,7 @@ puts "::: Creating Employee Roles:::"
 
 [Employer.first, Employer.last].each do |employer|
   employer.employee_families.each do |census_employee_family|
-    census_employee = census_employee_family.employee
+    census_employee = census_employee_family.census_employee
     person = Person.create!(
         first_name: census_employee.first_name,
         last_name: census_employee.last_name,
