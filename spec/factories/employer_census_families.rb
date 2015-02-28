@@ -3,16 +3,17 @@ FactoryGirl.define do
 
     # employer { FactoryGirl.create :employer }
     census_employee { FactoryGirl.build :employer_census_employee }
-    census_dependents { FactoryGirl.build(:employer_census_dependent).to_a }
     terminated false
 
-    factory :employer_census_family_with_dependents do
-      transient do
-        dependents_count 3
+    factory :with_employer do
+      before :create do |employer_census_family|
+        build :employer, employer_census_family: employer_census_family
       end
+    end
 
-      after(:create) do |employer_census_employee_family, evaluator|
-        create_list(:dependent, evaluator.dependents_count, dependent: broker)
+    factory :with_dependents do
+      after :create do |employer_census_family|
+        create_list :employer_census_dependent, 3, employer_census_family: employer_census_family
       end
     end
 
