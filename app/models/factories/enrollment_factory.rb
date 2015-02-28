@@ -23,7 +23,7 @@ class EnrollmentFactory
     citizen_status = new_citizen_status
 
     # Assign consumer-specifc attributes
-    consumer_role = person.build_consumer(ssn: ssn,
+    consumer_role = person.build_consumer_role(ssn: ssn,
                                                dob: dob,
                                                gender: gender,
                                                is_incarcerated: is_incarcerated,

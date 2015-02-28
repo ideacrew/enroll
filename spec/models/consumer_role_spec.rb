@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Consumer, type: :model do
+describe ConsumerRole, type: :model do
   it { should delegate_method(:hbx_id).to :person }
   it { should delegate_method(:ssn).to :person }
   it { should delegate_method(:dob).to :person }
@@ -35,14 +35,14 @@ describe Consumer, type: :model do
     context "with no arguments" do
       let(:params) {{}}
       it "should not save" do
-        expect(Consumer.new(**params).save).to be_false
+        expect(ConsumerRole.new(**params).save).to be_false
       end
     end
     
     context "with all valid arguments" do
       let(:params) {valid_params}
       it "should save" do
-        expect(Consumer.new(**params).save).to be_true
+        expect(ConsumerRole.new(**params).save).to be_true
       end
     end
     
@@ -50,29 +50,29 @@ describe Consumer, type: :model do
       let(:params) {valid_params.except(:is_incarcerated)}
 
       it "should fail validation " do
-        expect(Consumer.create(**params).errors[:is_incarcerated].any?).to be_true
+        expect(ConsumerRole.create(**params).errors[:is_incarcerated].any?).to be_true
       end
     end
     
     context "with no is_applicant" do
       let(:params) {valid_params.except(:is_applicant)}
       it "should fail validation" do
-        expect(Consumer.create(**params).errors[:is_applicant].any?).to be_true
+        expect(ConsumerRole.create(**params).errors[:is_applicant].any?).to be_true
       end
     end
     
     context "with no citizen_status" do
       let(:params) {valid_params.except(:citizen_status)}
       it "should fail validation" do
-        expect(Consumer.create(**params).errors[:citizen_status].any?).to be_true
+        expect(ConsumerRole.create(**params).errors[:citizen_status].any?).to be_true
       end
     end
     
     context "with improper citizen_status" do
       let(:params) {valid_params.deep_merge({citizen_status: "test citizen_status"})}
       it "should fail validation with improper citizen_status" do
-        expect(Consumer.create(**params).errors[:citizen_status].any?).to be_true
-        expect(Consumer.create(**params).errors[:citizen_status]).to eq [citizen_error_message]
+        expect(ConsumerRole.create(**params).errors[:citizen_status].any?).to be_true
+        expect(ConsumerRole.create(**params).errors[:citizen_status]).to eq [citizen_error_message]
         
       end
     end

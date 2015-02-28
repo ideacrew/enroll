@@ -45,9 +45,9 @@ class BrokerAgency
     Broker.find_by_broker_agency(self)
   end
 
-  # has_many consumers
-  def consumers
-    Consumer.where(:broker_agency_id => self._id)
+  # has_many consumer_roles
+  def consumer_roles
+    ConsumerRole.where(:broker_agency_id => self._id)
   end
 
   def is_active?

@@ -1,4 +1,4 @@
-class Consumer
+class ConsumerRole
   include Mongoid::Document
   include Mongoid::Timestamps
   # include AASM
@@ -47,7 +47,7 @@ class Consumer
   validates_presence_of :ssn, :dob, :gender, :is_incarcerated, :is_applicant, :is_state_resident, :citizen_status
 
   validates :citizen_status,
-    inclusion: { in: Consumer::CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" },
+    inclusion: { in: ConsumerRole::CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" },
     allow_blank: false
 
 
@@ -84,7 +84,7 @@ class Consumer
   end
 
   def families
-    Family.by_consumer(self)
+    Family.by_consumerRole(self)
   end
 
   def phone

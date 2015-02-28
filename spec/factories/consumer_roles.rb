@@ -1,6 +1,6 @@
 FactoryGirl.define do
-  factory :consumer do
-    ssn '1111111111'
+  factory :consumer_role do
+    sequence(:ssn) { |n| "75634863" + "#{n}" }
     dob "01/01/1980"
     gender 'male'
     is_state_resident 'yes'

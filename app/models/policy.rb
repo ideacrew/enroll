@@ -38,8 +38,8 @@ class Policy
 
   belongs_to :employer, counter_cache: true, index: true
 
-  # belongs_to :consumer
-  field :consumer_id, type: BSON::ObjectId
+  # belongs_to :consumer_role
+  field :consumer_role_id, type: BSON::ObjectId
 
   # belongs_to :employee
   # belongs_to :responsible_party
@@ -68,7 +68,9 @@ class Policy
   end
 
   def set_policy_premium
-
+    enrollees.each do
+      price_premium
+    end
   end
 
   def market

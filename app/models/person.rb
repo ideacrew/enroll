@@ -39,7 +39,7 @@ class Person
 
   belongs_to :family
 
-  embeds_one :consumer, cascade_callbacks: true, validate: true
+  embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :broker, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff, cascade_callbacks: true, validate: true
   embeds_one :responsible_party, cascade_callbacks: true, validate: true
@@ -51,7 +51,7 @@ class Person
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
 
-  accepts_nested_attributes_for :consumer, :responsible_party, :broker, :hbx_staff,
+  accepts_nested_attributes_for :consumer_role, :responsible_party, :broker, :hbx_staff,
     :person_relationships, :employees, :addresses, :phones, :emails
 
   validates_presence_of :first_name, :last_name
@@ -84,8 +84,8 @@ class Person
   index({"broker.npn" => 1}, {sparse: true, unique: true})
 
   # Consumer child model indexes
-  index({"consumer._id" => 1})
-  index({"consumer.is_active" => 1})
+  index({"consumer_role._id" => 1})
+  index({"consumer_role.is_active" => 1})
 
   # Employee child model indexes
   index({"employees._id" => 1})
