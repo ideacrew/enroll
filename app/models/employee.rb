@@ -46,6 +46,9 @@ class Employee
     true
   end
 
+
+  ## TODO: propogate to EmployerCensus updates to employee demographics and family 
+
   def families
     Family.by_employee(self)
   end
@@ -80,7 +83,8 @@ class Employee
   end
 
   def self.find(employee_id)
-    Person.where({"employees._id" => employee_id }).first.employees.first
+    person = Person.where({"employees._id" => employee_id }).first
+    person.employees.detect { |e| e.id == employee_id } unless person.nil?
   end
 
   def self.list(collection)
