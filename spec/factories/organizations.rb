@@ -4,7 +4,7 @@ FactoryGirl.define do
     dba         "Turner Brokerage"
     fein        "675762234"
     home_page   "http://www.example.com"
-    office_locations  create_list :office_location, 3, organization: organization
+    office_locations  FactoryGirl.build_list(:office_location, 3)
 
   end
 
