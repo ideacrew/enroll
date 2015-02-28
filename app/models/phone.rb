@@ -3,8 +3,10 @@ class Phone
   include Mongoid::Timestamps
 
   embedded_in :person
+  embedded_in :office_location
+  embedded_in :employer_census_member, class_name: "EmployerCensus::Member"
 
-  KINDS = ["home", "work", "mobile", "fax"]
+  KINDS = ["home", "work", "mobile", "main", "fax"]
 
   field :kind, type: String
   field :country_code, type: String, default: ""

@@ -3,6 +3,8 @@ class Email
   include Mongoid::Timestamps
   
   embedded_in :person
+  embedded_in :office_location
+  embedded_in :employer_census_member, class_name: "EmployerCensus::Member"
 
   KINDS = %W(home work)
 
