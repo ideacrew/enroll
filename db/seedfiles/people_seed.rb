@@ -28,13 +28,13 @@ p3 = Person.create!(first_name: "Jane", last_name: "Curtin", addresses: [hm_addr
 p4 = Person.create!(first_name: "Martina", last_name: "Williams", ssn: "151482930", dob: "01/25/1990", gender: "female", phones: [wk_phone1], emails: [wk_dan_email])
 
 puts "::: Generating Broker Roles :::"
-bk0 = p0.build_broker(npn: npn0, provider_kind: "assister")
+bk0 = p0.build_broker_role(npn: npn0, provider_kind: "assister")
 bk0.person.addresses << wk_addr
 bk0.person.phones << wk_phone
 bk0.person.emails << wk_email
 bk0.save!
 
-bk1 = p3.build_broker(npn: npn1, provider_kind: "broker")
+bk1 = p3.build_broker_role(npn: npn1, provider_kind: "broker")
 bk1.person.addresses << wk_addr
 bk1.person.phones << wk_phone
 bk1.person.emails << wk_email

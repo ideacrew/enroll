@@ -16,7 +16,7 @@ class FamilyMember
   field :is_active, type: Boolean, default: true
 
   field :person_id, type: BSON::ObjectId
-  field :broker_id, type: BSON::ObjectId
+  field :broker_role_id, type: BSON::ObjectId
 
   embeds_many :hbx_enrollment_exemptions
   accepts_nested_attributes_for :hbx_enrollment_exemptions
@@ -32,9 +32,9 @@ class FamilyMember
     self.family
   end
 
-  def person=(person_instance)
-    return unless person_instance.is_a? Person
-    self.person_id = person_instance._id
+  def person=(new_person)
+    return unless new_person.is_a? Person
+    self.person_id = new_person._id
   end
 
   def person
@@ -45,13 +45,13 @@ class FamilyMember
     # TODO parent.households.coverage_households.where()
   end
 
-  def broker=(broker_instance)
-    return unless broker_instance.is_a? Broker
-    self.broker_id = broker_instance._id
+  def broker=(new_broker)
+    return unless new_broker.is_a? BrokerRole
+    self.broker_role_id = new_broker._id
   end
 
   def broker
-    Broker.find(self.broker_id) unless self.broker_id.blank?
+    Broker.find(self.broker_role_id) unless self.broker_role_id.blank?
   end
 
   def is_primary_applicant?

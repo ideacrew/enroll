@@ -96,7 +96,7 @@ class Employer
   ## Class methods
   def self.find_by_broker(broker)
     return if broker.blank?
-    where(broker_id: broker._id)
+    where(broker_role_id: broker._id)
   end
 
   def build_family
@@ -133,7 +133,7 @@ class Employer
   
   # belongs_to writing agent (broker)
   def writing_agent=(new_writing_agent)
-    raise ArgumentError.new("expected Broker class") unless new_writing_agent.is_a? Broker
+    raise ArgumentError.new("expected BrokerRole class") unless new_writing_agent.is_a? BrokerRole
     @writing_agent_id = new_writing_agent._id
     new_writing_agent
   end

@@ -8,7 +8,7 @@ class BrokerAgency
 
   auto_increment :hbx_id, :seed => 9999
   field :name, type: String
-  field :primary_broker_id, type: BSON::ObjectId
+  field :primary_broker_role_id, type: BSON::ObjectId
   field :market_kind, type: String
 
   field :aasm_state, type: String
@@ -29,20 +29,20 @@ class BrokerAgency
   # has_one primary_broker
   def primary_broker=(new_primary_broker)
     if new_primary_broker.present?
-      raise ArgumentError.new("expected Broker class") unless new_primary_broker.is_a? Broker
-      self.primary_broker_id = new_primary_broker._id
+      raise ArgumentError.new("expected BrokerRole class") unless new_primary_broker.is_a? BrokerRole
+      self.primary_broker_role_id = new_primary_broker._id
     else
-      primary_broker = nil
+      primary_broker_role = nil
     end
   end
 
   def primary_broker
-    Broker.find(self.primary_broker_id) unless primary_broker_id.blank?
+    BrokerRole.find(self.primary_broker_role_id) unless primary_broker_role_id.blank?
   end
 
   # has_many writing_agents
   def writing_agents
-    Broker.find_by_broker_agency(self)
+    BrokerRole.find_by_broker_agency(self)
   end
 
   # has_many consumer_roles

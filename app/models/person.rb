@@ -40,7 +40,7 @@ class Person
   belongs_to :family
 
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
-  embeds_one :broker, cascade_callbacks: true, validate: true
+  embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff, cascade_callbacks: true, validate: true
   embeds_one :responsible_party, cascade_callbacks: true, validate: true
 
@@ -51,7 +51,7 @@ class Person
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
 
-  accepts_nested_attributes_for :consumer_role, :responsible_party, :broker, :hbx_staff,
+  accepts_nested_attributes_for :consumer_role, :responsible_party, :broker_role, :hbx_staff,
     :person_relationships, :employees, :addresses, :phones, :emails
 
   validates_presence_of :first_name, :last_name
@@ -78,10 +78,10 @@ class Person
   index({last_name: 1, dob: 1}, {sparse: true})
 
   # Broker child model indexes
-  index({"broker._id" => 1})
-  index({"broker.provider_kind" => 1})
-  index({"broker.broker_agency_id" => 1})
-  index({"broker.npn" => 1}, {sparse: true, unique: true})
+  index({"broker_role._id" => 1})
+  index({"broker_role.provider_kind" => 1})
+  index({"broker_role.broker_agency_id" => 1})
+  index({"broker_role.npn" => 1}, {sparse: true, unique: true})
 
   # Consumer child model indexes
   index({"consumer_role._id" => 1})

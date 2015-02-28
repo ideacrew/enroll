@@ -52,7 +52,7 @@ class Family
 
   # child model indexes
   index({"family_member.person_id" => 1})
-  index({"family_member.broker_id" => 1})
+  index({"family_member.broker_role_id" => 1})
   index({"family_member.is_primary_applicant" => 1})
   index({"family_member.hbx_enrollment_exemption.certificate_number" => 1})
   index({"household.hbx_enrollment.policy_id" => 1})
@@ -97,11 +97,11 @@ class Family
   end
 
   def brokers
-    hbx_enrollments.inject([]) { |b, e| b << e.broker unless e.broker.blank? } || []
+    hbx_enrollments.inject([]) { |b, e| b << e.broker_role unless e.broker_role.blank? } || []
   end
 
-  def active_brokers
-    hbx_enrollments.inject([]) { |b, e| b << e.broker if e.is_active? && !e.broker.blank? } || []
+  def active_broker_roles
+    hbx_enrollments.inject([]) { |b, e| b << e.broker_role if e.is_active? && !e.broker_role.blank? } || []
   end
 
   def primary_applicant

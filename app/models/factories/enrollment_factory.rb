@@ -57,10 +57,10 @@ class EnrollmentFactory
 
     broker_role = nil
 
-    if person.broker.blank?
+    if person.broker_role.blank?
       # Assign broker-specifc attributes
       #broker_role = person.build_broker(mailing_address: mailing_address, npn: npn, kind: kind)
-      broker_role = person.build_broker(npn: npn)
+      broker_role = person.build_broker_role(npn: npn)
     end
 
     if person.save

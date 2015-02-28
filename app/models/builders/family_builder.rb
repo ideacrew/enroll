@@ -165,7 +165,7 @@ class FamilyBuilder
 
       hbx_enrollement = @household.hbx_enrollments.build
       hbx_enrollement.policy = policy
-      @family.primary_applicant.broker_id = Broker.find(policy.broker_id) unless policy.broker_id.blank?
+      @family.primary_applicant.broker_role_id = Broker.find(policy.broker_role_id) unless policy.broker_role_id.blank?
       #hbx_enrollement.employer = Employer.find(policy.employer_id) unless policy.employer_id.blank?
       #hbx_enrollement.broker   = Broker.find(policy.broker_id) unless policy.broker_id.blank?
       #hbx_enrollement.primary_applicant = alpha_person

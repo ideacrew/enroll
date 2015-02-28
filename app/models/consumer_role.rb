@@ -63,14 +63,14 @@ class ConsumerRole
     self.person
   end
 
-  # belongs_to writing agent (broker)
+  # belongs_to writing agent (broker_role)
   def writing_agent=(new_writing_agent)
-    raise ArgumentError.new("expected Broker class") unless new_writing_agent.is_a? Broker
+    raise ArgumentError.new("expected BrokerRole class") unless new_writing_agent.is_a? BrokerRole
     self.new_writing_agent_id = new_writing_agent._id
   end
 
   def writing_agent
-    Broker.find(self.writing_agent_id) unless writing_agent_id.blank?
+    BrokerRole.find(self.writing_agent_id) unless writing_agent_id.blank?
   end
 
   # belongs_to BrokerAgency

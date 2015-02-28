@@ -9,7 +9,7 @@ describe BrokerAgency, type: :model do
 
   let(:name) {"Acme Brokers, Inc"}
   let(:market_kind) {"individual"}
-  let(:primary_broker) {FactoryGirl.create(:broker)}
+  let(:primary_broker) {FactoryGirl.create(:broker_role)}
 
   describe ".new" do
     let(:valid_params) do

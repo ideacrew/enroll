@@ -1,4 +1,4 @@
-class Broker
+class BrokerRole
   include Mongoid::Document
   include Mongoid::Timestamps
 
@@ -27,38 +27,42 @@ class Broker
 
 
   # scope :all_active_brokers, ->{ and({ kind: "broker" }, { is_active: true })}
-  # scope :all_active_tpzs, ->{ and({ kind: "tpa" }, { is_active: true })}
+  # scope :all_active_tpas, ->{ and({ kind: "tpa" }, { is_active: true })}
 
   # def initialize(attrs = nil, options = nil)
   #   super
   #   # put code here
   # end
 
-  def self.find(broker_id)
-    Person.where("broker._id" => broker_id).first.broker
+  def self.find(broker_role_id)
+    Person.where("broker_role._id" => broker_role_id).first.broker_role
   end  
 
   def self.find_by_npn(npn_value)
-    Person.where("broker.npn" => npn_value).first.broker
+    Person.where("broker_role.npn" => npn_value).first.broker_role
   end
 
-  def self.list_brokers(collection)
-    collection.reduce([]) { |brokers, person| brokers << person.broker }
+  def self.list_brokers(person_list)
+    person_list.reduce([]) { |brokers, person| brokers << person.broker_role }
   end
 
   # TODO; return as chainable Mongoid::Criteria
   def self.all
     # criteria = Mongoid::Criteria.new(Person)
-    list_brokers Person.exists(:broker => true)
+    list_brokers(Person.exists(broker_role: true))
   end
 
   def self.first
     self.all.first
   end
 
+  def self.last
+    self.all.last
+  end
+
   def self.find_by_broker_agency(broker_agency)
     return unless broker_agency.is_a? BrokerAgency
-    list_brokers Person.where("broker.broker_agency_id" => broker_agency._id)
+    list_brokers(Person.where("broker_role.broker_agency_id" => broker_agency._id))
   end
 
   def parent
