@@ -24,7 +24,7 @@ class Address
   validates_presence_of :address_1, :city, :state, :zip
 
   validates :kind,
-    inclusion: { in: KINDS, message: "%{value} is not a valid address type" },
+    inclusion: { in: KINDS, message: "%{value} is not a valid address kind" },
     allow_blank: false
 
   validates :zip,
@@ -35,13 +35,6 @@ class Address
 
   def location
     nil #todo
-  end
-
-  def clean_fields
-    attrs_to_clean = [:kind, :address_1, :address_2, :city, :state, :zip]
-    attrs_to_clean.each do |a|
-      self[a].strip! unless self[a].blank?
-    end
   end
 
   def formatted_address
@@ -55,24 +48,45 @@ class Address
     [address_1, address_2, city_delim, state, zip].reject(&:nil? || empty?).join(' ')
   end
 
-  def home?
-    "home" == self.kind.downcase
+  def kind=(new_kind)
+    write_attribute(:kind, new_kind.to_s.strip.downcase)
   end
 
-  def match(another_address)
+  def address_1=(new_address_1)
+    write_attribute(:address_1, new_address_1.to_s.strip)
+  end
+
+  def address_2=(new_address_2)
+    write_attribute(:address_2, new_address_2.to_s.strip)
+  end
+
+  def address_3=(new_address_3)
+    write_attribute(:address_3, new_address_3.to_s.strip)
+  end
+
+  def city=(new_city)
+    write_attribute(:city, new_city.to_s.strip)
+  end
+
+  def state=(new_state)
+    write_attribute(:state, new_state.to_s.strip)
+  end
+
+  def zip=(new_zip)
+    write_attribute(:zip, new_zip.to_s.strip)
+  end
+
+  def home?
+    "home" == self.kind.to_s
+  end
+
+  def matches?(another_address)
     return(false) if another_address.nil?
-    attrs_to_match = [:kind, :address_1, :address_2, :city, :state, :zip]
+    attrs_to_match = [:kind, :address_1, :address_2, :address_3, :city, :state, :zip]
     attrs_to_match.all? { |attr| attribute_matches?(attr, another_address) }
   end
 
   def attribute_matches?(attribute, other)
-    return true if (self[attribute] == nil && other[attribute] == "")
-    safe_downcase(self[attribute]) == safe_downcase(other[attribute])
-  end
-
-private
-
-  def safe_downcase(value)
-    value.downcase unless value.blank?
+    self[attribute].to_s.downcase == other[attribute].to_s.downcase
   end
 end

@@ -7,6 +7,14 @@ FactoryGirl.define do
     state 'DC'
     sequence(:zip, 11111)
 
+    trait :work_kind do
+      kind 'work'
+    end
+
+    trait :mailing_kind do
+      kind 'mailing'
+    end
+
     trait :without_kind do
       kind ' '
     end

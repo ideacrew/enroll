@@ -130,36 +130,29 @@ RSpec.describe Address, type: :model do
 
   describe '#clean_fields' do
     it 'removes trailing and leading whitespace from fields' do
-      address = Address.new
-      address.address_1 = '   4321 Awesome Drive   '
-      address.address_2 = '   #321   '
-      address.city = '   Washington    '
-      address.state = '    DC     '
-      address.zip = '   20002    '
 
-      address.clean_fields
-
-      expect(address.address_1).to eq '4321 Awesome Drive'
-      expect(address.address_2).to eq '#321'
-      expect(address.city).to eq 'Washington'
-      expect(address.state).to eq 'DC'
-      expect(address.zip).to eq '20002'
+      expect(Address.new(address_1: '   4321 Awesome Drive   ').address_1).to eq '4321 Awesome Drive'
+      expect(Address.new(address_2: '   NW   ').address_2).to eq 'NW'
+      expect(Address.new(address_3: '   Apt 6   ').address_3).to eq 'Apt 6'
+      expect(Address.new(city: '   Washington   ').city).to eq 'Washington'
+      expect(Address.new(state: '   DC   ').state).to eq 'DC'
+      expect(Address.new(zip: '   20002   ').zip).to eq '20002'
     end
   end
 
-  describe '#match' do
+  describe '#matches?' do
     let(:address) { FactoryGirl.build :address }
 
     context 'addresses are the same' do
       let(:second_address) { address.clone }
       it 'returns true' do
-        expect(address.match(second_address)).to be true
+        expect(address.matches?(second_address)).to be_true
       end
 
       context 'mismatched case' do
         before { second_address.address_1.upcase! }
         it 'returns true' do
-          expect(address.match(second_address)).to be true
+          expect(address.matches?(second_address)).to be_true
         end
       end
     end
@@ -171,7 +164,7 @@ RSpec.describe Address, type: :model do
         a
       end
       it 'returns false' do
-        expect(address.match(second_address)).to be false
+        expect(address.matches?(second_address)).to be_false
       end
     end
   end
