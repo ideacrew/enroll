@@ -64,6 +64,10 @@ class BrokerAgencyProfile
     BrokerRole.find_by_broker_agency(self)
   end
 
+  def market_kind=(new_market_kind)
+    write_attribute(:market_kind, new_market_kind.to_s.downcase)
+  end
+
   def is_active?
     self.is_approved?
   end
