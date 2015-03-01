@@ -7,7 +7,10 @@ RSpec.describe Organization, type: :model do
 
   let(:legal_name) {"Acme Brokers, Inc"}
   let(:fein) {"065872626"}
+  let(:bad_fein) {"123123"}
   let(:office_locations) {FactoryGirl.build(:office_locations)}
+
+  let(:fein_error_message) {"#{bad_fein} is not a valid FEIN"}
 
   let(:valid_office_location_attributes) do
     {
@@ -100,10 +103,10 @@ RSpec.describe Organization, type: :model do
     end
 
    context "with invalid fein" do
-      let(:params) {valid_params.deep_merge({fein: "123345"})}
+      let(:params) {valid_params.deep_merge({fein: bad_fein})}
 
       it "should fail validation" do
-        expect(Organization.create(**params).errors[:fein]).to eq ["123345 is not a valid FEIN"]
+        expect(Organization.create(**params).errors[:fein]).to eq [fein_error_message]
       end
     end
 
