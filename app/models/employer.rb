@@ -162,7 +162,6 @@ class Employer
    def find_employer_by_person(person)
       return [] if person.ssn.blank?
       employers = where("employee_families.census_employee.ssn" => person.ssn)
-  
     end
   end
 
