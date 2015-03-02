@@ -2,9 +2,21 @@ require 'rails_helper'
 
 RSpec.describe EmployeesController, :type => :controller do
 
+  let(:person) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789" )}
+
+  let(:valid_params) do
+    {
+      email: "test@test.com",
+      password: "test1234",
+      password_confirmation: "test1234",
+      approved: true,
+      person: person
+    }
+  end
+
   before(:each) do
     @request.env["devise.mapping"] = Devise.mappings[:user]
-    user = FactoryGirl.create(:user)
+    user = User.create(**valid_params)
     sign_in user
   end
 
