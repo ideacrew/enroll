@@ -101,9 +101,9 @@ class Employer
 
   def build_family
     family = EmployerCensus::EmployeeFamily.new
-    family.build_employee
-    family.build_employee.build_address
-    family.dependents.build
+    family.build_census_employee
+    family.build_census_employee.build_address
+    family.census_dependents.build
     family
   end
 
