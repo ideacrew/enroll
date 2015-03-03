@@ -15,10 +15,6 @@ class User
   field :email,              type: String, default: ""
   field :encrypted_password, type: String, default: ""
 
-  field :first_name, type: String
-  field :last_name, type: String
-  validates_presence_of :first_name, :last_name
-
   ## Recoverable
   field :reset_password_token,   type: String
   field :reset_password_sent_at, type: Time
@@ -53,7 +49,10 @@ class User
   # Enable polymorphic associations
   belongs_to :profile, polymorphic: true
 
-  has_one :person
+  has_one :person, dependent: :destroy
+  accepts_nested_attributes_for :person, :allow_destroy => true
+
+  after_initialize :instantiate_person
 
   ## Confirmable
   # field :confirmation_token,   type: String
@@ -76,6 +75,10 @@ class User
 
   def active_for_authentication?
     super && approved?
+  end
+
+  def instantiate_person
+    self.build_person if self.person.nil?
   end
 
   def inactive_message

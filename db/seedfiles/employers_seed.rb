@@ -51,6 +51,12 @@ family_1.census_employee = employee_1
 family_1.census_dependents = [dependent_1_1, dependent_1_2, dependent_1_3]
 family_1.save!
 
+#to check multiple employers for person creation added below snippet
+family_11 = employer_2.employee_families.new
+family_11.census_employee = employee_1
+family_11.census_dependents = [dependent_1_1, dependent_1_2]
+family_11.save!
+
 employee_2 = EmployerCensus::Employee.new(first_name: "Melaine", last_name: "Roger", dob: "01/15/1975", gender: "male", employee_relationship: "self", hired_on: "12/01/2012", ssn: "111422333", address: address_2)
 dependent_2_1 = EmployerCensus::Dependent.new(first_name: "Martina", last_name: "Roger", dob: "01/31/2011", gender: "female", employee_relationship: "child", ssn: "222333141")
 dependent_2_2 = EmployerCensus::Dependent.new(first_name: "Monica", last_name: "Roger", dob: "02/09/1983", gender: "female", employee_relationship: "spouse", ssn: "212333311")

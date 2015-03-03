@@ -63,7 +63,8 @@ class PeopleController < ApplicationController
     @person = Person.find(params[:person_id])
     if params[:employer_id].to_i != 0
       @employer = Employer.find(params[:employer_id])
-      @employee = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last.employee
+      employee_family = Employer.find(@employer.id).employee_families.where(:"census_employee.ssn" => "111222333").last
+      @employee = employee_family.census_employee
     else
       @employee = @person
     end

@@ -7,15 +7,10 @@
     <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
       <%= devise_error_messages! %>
 
-        <div class="form-group">
-          <%= f.label :first_name %>
-          <%= f.text_field :first_name, autofocus: true, class: "form-control", required: true %>
-        </div>
-
-        <div class="form-group">
-          <%= f.label :last_name %>
-          <%= f.text_field :last_name, class: "form-control", required: true %>
-        </div>
+        <%= f.fields_for :person, errors: {}, fieldset: false do |person|  %>
+          <%= render 'shared/name_fields', f: person %><br>
+          <%= render 'shared/id_info_fields', f: person %><br>
+        <% end %>
 
         <div class="form-group">
           <%= f.label :email %>

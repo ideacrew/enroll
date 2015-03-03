@@ -25,7 +25,7 @@ class Person
   field :updated_by, type: String
 
   # Login account
-  has_one :user, as: :profile, dependent: :destroy
+  belongs_to :user
 
   belongs_to :employer_contact, 
                 class_name: "Employer",  

@@ -2074,6 +2074,20 @@ a .arrow-right {
   width: 29px;
   opacity: 0.25;
 }
+
+.badge {
+  background-color: #128d00;
+  border-radius: 9px;
+  float: right;
+  font-size: 18px;
+  font-weight: normal;
+  height: 29px;
+  padding: 0;
+  text-align: center;
+  width: 29px;
+  opacity: 0.25;
+}
+
 .badge-active {
   opacity: 1 !important;
 }

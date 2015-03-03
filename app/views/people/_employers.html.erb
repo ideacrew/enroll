@@ -7,14 +7,21 @@
 		  <div class="col-md-5 col-sm-5 col-xs-12 no-pd">
 			  <%= render 'shared/employer', employer: employer %>
 		  </div>
-		  <div class="col-md-5 col-sm-4 col-xs-12 no-pd text-right">
+      <div class="col-md-2 col-sm-2 col-xs-2">
+        <span id="badge" person-id="<%= @person.id %>" employer-id="<%= employer.id %>" class="badge" style="cursor:pointer"><i></i></span>
+			</div>
+		  <div class="col-md-3 col-sm-2 col-xs-12 no-pd text-right">
 			  <p>Not your employer? <a href="#"><u>Click Here</u></a></p>
 		  </div>
     </td>
   </tr>
 	<% end %>
 </table>
-<div class="col-md-5 col-sm-4 col-xs-12 no-pd text-right">
+
+<div class="col-md-3 col-sm-4 col-xs-12 no-pd">
+  <a href="#" id="continue-employer" class="btn btn-search search_continue">Continue</a>
+</div>
+<div class="col-md-3 col-sm-4 col-xs-12 no-pd text-right">
   <p>Change Details? <a href="#" class="change_personal_info"><u>Search Again</u></a></p>
 </div>
 <% end %>
@@ -38,7 +45,7 @@ $('.search_continue').on('click',function(){
       employer_id = $(".badge-active").attr("employer-id")
       $.ajax({
         type: "POST",
-        url: "/people/person_confirm.js",
+        url: "/people/person_landing.js",
         data: {person_id: person_id, employer_id: employer_id},
         success: function (result) {
         }

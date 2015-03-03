@@ -1,3 +1,8 @@
+<div>
+  <p>Check Basic Details? <a href="#" class="change_basic_details"><u>Base Page</u></a></p>
+</div>
+<br/>
+<%= form_for(@person) do |f| %>
 <div role="tabpanel" id="myTab">
 
   <!-- Nav tabs -->
@@ -17,10 +22,15 @@
   </div>
 
 </div>
+<% end %>
 
 <script>
 $('#myTab a').click(function (e) {
   e.preventDefault()
   $(this).tab('show')
-})
+});
+$(".change_basic_details").click(function(e) {
+  $('#person_new').show();
+  $('#person_landing').html("");
+});
 </script>
