@@ -31,7 +31,7 @@
        Social Security:  <%= @employee.ssn %><br/>
        <% if @employer.present? %>
         <h4> <%= @employer.legal_name %> </h4>
-        <% address = @employer.addresses.last%>
+        <% address = @employer.office_locations.first.address%>
         <% if address.present? %>
           <spa><%= address.full_address%></span>
         <% end %> 
