@@ -9,7 +9,7 @@ class EmployerCensus::EmployeeFamily
   field :benefit_group_id, type: BSON::ObjectId
 
   # UserID that connected and timestamp
-  field :linked_employee_id, type: BSON::ObjectId
+  field :linked_employee_role_id, type: BSON::ObjectId
   field :linked_at, type: DateTime
 
   field :terminated, type: Boolean, default: false
@@ -75,23 +75,23 @@ class EmployerCensus::EmployeeFamily
 
   def link_employee(new_employee)
     raise EmployeeFamilyLinkError.new(new_employee) if is_linked?
-    self.linked_employee_id = new_employee._id
+    self.linked_employee_role_id = new_employee._id
     self.linked_at = Time.now
     self
   end
 
   def delink_employee
-    self.linked_employee_id = nil
+    self.linked_employee_role_id = nil
     self.linked_at = nil
     self
   end
 
   def linked_employee
-    Employee.find(self.linked_employee_id) if is_linked?
+    Employee.find(self.linked_employee_role_id) if is_linked?
   end
 
   def is_linked?
-    self.linked_employee_id.present?
+    self.linked_employee_role_id.present?
   end
 
   def terminate(last_day_of_work)

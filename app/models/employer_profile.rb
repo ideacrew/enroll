@@ -111,10 +111,6 @@ class EmployerProfile
     end
   end
 
-  def employee_family_details(person)
-    return Employer.where(id: id).where(:"employee_families.census_employee.ssn" => person.ssn).last.employee_families.last
-  end
-  
   def is_active?
     self.is_active
   end
@@ -127,6 +123,12 @@ class EmployerProfile
 
     def all
       list_embedded Organization.exists(employer_profile: true).to_a
+    end
+
+    def find(id)
+      organization = Organization.where("employer_profile._id" => id).documents
+      raise organization.inspect
+      organization.first.employer_profile unless organization.blank? 
     end
 
     def find_by_fein(fein)

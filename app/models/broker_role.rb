@@ -8,7 +8,7 @@ class BrokerRole
 
   # Broker National Producer Number (unique identifier)
   field :npn, type: String
-  field :broker_agency_id, type: BSON::ObjectId
+  field :broker_agency_profile_id, type: BSON::ObjectId
   field :provider_kind, type: String
 
   # field :aasm_state, type: String
@@ -34,37 +34,6 @@ class BrokerRole
   #   # put code here
   # end
 
-  def self.find(broker_role_id)
-    Person.where("broker_role._id" => broker_role_id).first.broker_role
-  end  
-
-  def self.find_by_npn(npn_value)
-    Person.where("broker_role.npn" => npn_value).first.broker_role
-  end
-
-  def self.list_brokers(person_list)
-    person_list.reduce([]) { |brokers, person| brokers << person.broker_role }
-  end
-
-  # TODO; return as chainable Mongoid::Criteria
-  def self.all
-    # criteria = Mongoid::Criteria.new(Person)
-    list_brokers(Person.exists(broker_role: true))
-  end
-
-  def self.first
-    self.all.first
-  end
-
-  def self.last
-    self.all.last
-  end
-
-  def self.find_by_broker_agency(broker_agency)
-    return unless broker_agency.is_a? BrokerAgency
-    list_brokers(Person.where("broker_role.broker_agency_id" => broker_agency._id))
-  end
-
   def parent
     # raise "undefined parent: Person" unless self.person?
     self.person
@@ -73,20 +42,20 @@ class BrokerRole
   # belongs_to broker_agency
   def broker_agency=(new_broker_agency)
     if new_broker_agency.nil?
-      self.broker_agency_id = nil
+      self.broker_agency_profile_id = nil
     else
-      raise ArgumentError.new("expected BrokerAgency class") unless new_broker_agency.is_a? BrokerAgency
-      self.broker_agency_id = new_broker_agency._id
+      raise ArgumentError.new("expected BrokerAgencyProfile class") unless new_broker_agency.is_a? BrokerAgencyProfile
+      self.broker_agency_profile_id = new_broker_agency._id
     end
     self.broker_agency
   end
 
   def broker_agency
-    BrokerAgency.find(broker_agency_id) if has_broker_agency?
+    BrokerAgencyProfile.find(broker_agency_profile_id) if has_broker_agency?
   end
 
   def has_broker_agency?
-    self.broker_agency_id.present?
+    self.broker_agency_profile_id.present?
   end
 
   def address=(new_address)
@@ -114,8 +83,41 @@ class BrokerRole
   end
 
   def is_active?
-    self.is_active
+    @is_active
   end
 
+  ## Class methods
+  class << self
+    def find(broker_role_id)
+      Person.where("broker_role._id" => broker_role_id).first.broker_role unless broker_role_id.blank?
+    end  
+
+    def find_by_npn(npn_value)
+      Person.where("broker_role.npn" => npn_value).first.broker_role
+    end
+
+    def list_brokers(person_list)
+      person_list.reduce([]) { |brokers, person| brokers << person.broker_role }
+    end
+
+    # TODO; return as chainable Mongoid::Criteria
+    def all
+      # criteria = Mongoid::Criteria.new(Person)
+      list_brokers(Person.exists(broker_role: true))
+    end
+
+    def first
+      all.first
+    end
+
+    def last
+      all.last
+    end
+
+    def find_by_broker_agency(broker_agency)
+      return unless broker_agency.is_a? BrokerAgencyProfile
+      list_brokers(Person.where("broker_role.broker_agency_profile_id" => broker_agency._id))
+    end
+  end
 
 end

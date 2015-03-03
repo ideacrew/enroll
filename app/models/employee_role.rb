@@ -1,4 +1,4 @@
-class Employee
+class EmployeeRole
   include Mongoid::Document
   include Mongoid::Timestamps
 
@@ -6,10 +6,10 @@ class Employee
 
   embedded_in :person
 
-  field :employer_id, type: BSON::ObjectId
+  field :employer_profile_id, type: BSON::ObjectId
   field :census_family_id, type: BSON::ObjectId
   field :benefit_group_id, type: BSON::ObjectId
-  field :employee_status, type: String
+  field :employment_status, type: String
   field :hired_on, type: Date
   field :terminated_on, type: Date
   field :is_active, type: Boolean, default: true
@@ -19,7 +19,7 @@ class Employee
   delegate :dob, :dob=, to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
-  validates_presence_of :ssn, :dob, :gender, :employer_id, :hired_on
+  validates_presence_of :ssn, :dob, :gender, :employer_profile_id, :hired_on
 
   accepts_nested_attributes_for :person
 
@@ -27,20 +27,20 @@ class Employee
 
   # hacky fix for nested attributes
   # TODO: remove this when it is no longer needed
-  after_initialize do |employee|
-    if employee.person.present?
+  after_initialize do |employee_role|
+    if employee_role.person.present?
       @changed_nested_person_attributes = {}
       %w[ssn dob gender hbx_id].each do |field|
-        if employee.person.send("#{field}_changed?")
-          @changed_nested_person_attributes[field] = employee.person.send(field)
+        if employee_role.person.send("#{field}_changed?")
+          @changed_nested_person_attributes[field] = employee_role.person.send(field)
         end
       end
     end
     true
   end
-  after_build do |employee|
-    if employee.person.present? && @changed_nested_person_attributes.present?
-      employee.person.update_attributes(@changed_nested_person_attributes)
+  after_build do |employee_role|
+    if employee_role.person.present? && @changed_nested_person_attributes.present?
+      employee_role.person.update_attributes(@changed_nested_person_attributes)
       unset @changed_nested_person_attributes
     end
     true
@@ -55,17 +55,17 @@ class Employee
 
   # def self.find_by_employer(employer_instance)
   #   # return unless employer_instance.is_a? Employer
-  #   where("employer_id" =>  employer_instance._id).to_a
+  #   where("employer_profile_id" =>  employer_instance._id).to_a
   # end
 
   # belongs_to Employer
   def employer=(new_employer)
-    raise ArgumentError.new("expected Employer class") unless new_employer.is_a? Employer
-    self.employer_id = new_employer._id
+    raise ArgumentError.new("expected EmployerProfile") unless new_employer.is_a? EmployerProfile
+    self.employer_profile_id = new_employer._id
   end
 
   def employer
-    Employer.find(self.employer_id) unless employer_id.blank?
+    EmployerProfile.find(self.employer_profile_id)
   end
 
   # belongs_to BenefitGroup

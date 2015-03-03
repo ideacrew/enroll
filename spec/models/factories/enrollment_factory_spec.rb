@@ -2,7 +2,7 @@ require 'rails_helper'
 require 'factories/enrollment_factory'
 
 RSpec.describe EnrollmentFactory do
-  let(:employer) {FactoryGirl.create(:employer)}
+  let(:employer) {FactoryGirl.create(:employer_profile)}
   let(:employee_family) {FactoryGirl.create(:employer_census_family, employer: employer)}
   let(:person) {FactoryGirl.create(:person)}
   let(:ssn) {"123456789"}

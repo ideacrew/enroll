@@ -36,7 +36,7 @@ class Policy
   embeds_many :enrollees
   accepts_nested_attributes_for :enrollees, reject_if: :all_blank, allow_destroy: true
 
-  belongs_to :employer, counter_cache: true, index: true
+  # belongs_to :employer, counter_cache: true, index: true
 
   # belongs_to :consumer_role
   field :consumer_role_id, type: BSON::ObjectId

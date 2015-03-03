@@ -73,14 +73,14 @@ class ConsumerRole
     BrokerRole.find(self.writing_agent_id) unless writing_agent_id.blank?
   end
 
-  # belongs_to BrokerAgency
+  # belongs_to BrokerAgencyProfile
   def broker_agency=(new_broker_agency)
-    raise ArgumentError.new("expected BrokerAgency class") unless new_broker_agency.is_a? BrokerAgency
+    raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency.is_a? BrokerAgencyProfile
     self.broker_agency_id = new_broker_agency._id
   end
 
   def broker_agency
-    BrokerAgency.find(self.broker_agency_id) unless broker_agency_id.blank?
+    BrokerAgencyProfile.find(self.broker_agency_id) unless broker_agency_id.blank?
   end
 
   def families

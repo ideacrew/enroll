@@ -8,7 +8,7 @@ RSpec.describe Address, type: :model do
 
   let(:person) {Person.new(first_name: "John", last_name: "Doe", gender: "male", dob: "10/10/1974", ssn: "123456789" )}
   let(:address) {FactoryGirl.create(:address)}
-  let(:employer){FactoryGirl.create(:employer)}
+  let(:employer){FactoryGirl.create(:employer_profile)}
 
   describe "add address" do
     let(:valid_params) do

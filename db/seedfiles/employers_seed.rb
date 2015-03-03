@@ -3,8 +3,8 @@ puts "::: Cleaning Employers :::"
 Employer.delete_all
 
 # Retrieve Brokers
-broker_agency_0 = BrokerAgency.first
-broker_agency_1 = BrokerAgency.last
+broker_agency_0 = BrokerAgencyFile.first
+broker_agency_1 = BrokerAgencyFile.last
 
 # Employer addresses
 employer_address_1 = Address.new(kind: "mailing", address_1: "13025 Elm Tree CT", address_2: "Suite 300", city: "Herndon", state: "VA", county: "Fairfax", zip: "20172", country_name: "USA")

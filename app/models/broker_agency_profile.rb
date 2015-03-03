@@ -72,6 +72,31 @@ class BrokerAgencyProfile
     self.is_approved?
   end
 
+  ## Class methods
+  class << self
+    def list_embedded(parent_list)
+      parent_list.reduce([]) { |list, parent_instance| list << parent_instance.broker_agency_profile }
+    end
+
+    # TODO; return as chainable Mongoid::Criteria
+    def all
+      list_embedded Organization.exists(broker_agency_profile: true).to_a
+    end
+
+    def find(broker_agency_profile_id)
+      Organization.where("broker_agency_profile._id" => broker_agency_profile_id).first.broker_agency_profile unless broker_agency_profile_id.blank?
+    end  
+
+    def first
+      all.first
+    end
+
+    def last
+      all.last
+    end
+  end
+
+
   aasm do #no_direct_assignment: true do
     state :is_applicant, initial: true
     state :is_approved

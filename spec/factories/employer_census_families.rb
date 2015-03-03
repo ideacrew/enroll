@@ -7,7 +7,7 @@ FactoryGirl.define do
 
     factory :with_employer do
       before :create do |employer_census_family|
-        build :employer, employer_census_family: employer_census_family
+        build :employer_profile, employer_census_family: employer_census_family
       end
     end
 

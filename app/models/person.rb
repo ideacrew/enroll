@@ -33,7 +33,7 @@ class Person
                 index: true
 
   belongs_to :broker_agency_contact, 
-                class_name: "BrokerAgency",  
+                class_name: "BrokerAgencyProfile",  
                 inverse_of: :broker_agency_contacts, 
                 index: true
 
@@ -44,7 +44,7 @@ class Person
   embeds_one :hbx_staff, cascade_callbacks: true, validate: true
   embeds_one :responsible_party, cascade_callbacks: true, validate: true
 
-  embeds_many :employees, cascade_callbacks: true, validate: true
+  embeds_many :employee_roles, cascade_callbacks: true, validate: true
 
   embeds_many :person_relationships, cascade_callbacks: true, validate: true
   embeds_many :addresses, cascade_callbacks: true, validate: true
@@ -52,7 +52,7 @@ class Person
   embeds_many :emails, cascade_callbacks: true, validate: true
 
   accepts_nested_attributes_for :consumer_role, :responsible_party, :broker_role, :hbx_staff,
-    :person_relationships, :employees, :addresses, :phones, :emails
+    :person_relationships, :employee_roles, :addresses, :phones, :emails
 
   validates_presence_of :first_name, :last_name
 
@@ -88,11 +88,11 @@ class Person
   index({"consumer_role.is_active" => 1})
 
   # Employee child model indexes
-  index({"employees._id" => 1})
-  index({"employees.employer_id" => 1})
-  index({"employees.census_family_id" => 1})
-  index({"employees.benefit_group_id" => 1})
-  index({"employees.is_active" => 1})
+  index({"employee_roles._id" => 1})
+  index({"employee_roles.employer_id" => 1})
+  index({"employee_roles.census_family_id" => 1})
+  index({"employee_roles.benefit_group_id" => 1})
+  index({"employee_roles.is_active" => 1})
 
   # HbxStaff child model indexes
   index({"hbx_staff._id" => 1})

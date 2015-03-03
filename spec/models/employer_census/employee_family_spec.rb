@@ -3,13 +3,13 @@ require 'rails_helper'
 describe EmployerCensus::EmployeeFamily, type: :model do
   it { should validate_presence_of :census_employee }
 
-  let(:employer) {FactoryGirl.create(:employer)}
+  let(:employer_profile) {FactoryGirl.create(:employer_profile)}
   let(:census_employee) {FactoryGirl.build(:employer_census_employee)}
 
   describe ".new" do
     let(:valid_params) do
       { 
-        employer: employer,
+        employer_profile: employer_profile,
         census_employee: census_employee
       }
     end
@@ -22,8 +22,8 @@ describe EmployerCensus::EmployeeFamily, type: :model do
       end
     end
 
-    context "with no employer" do
-      let(:params) {valid_params.except(:employer)}
+    context "with no employer_profile" do
+      let(:params) {valid_params.except(:employer_profile)}
 
       it "should raise" do
         expect{EmployerCensus::EmployeeFamily.create(**params)}.to raise_error(Mongoid::Errors::NoParent)
@@ -54,21 +54,21 @@ end
 describe EmployerCensus::EmployeeFamily, 'class methods' do
 
   describe 'links and unlinks employees' do
-    let(:employer) {FactoryGirl.create(:employer)}
-    let(:employee) {FactoryGirl.build(:employee)}
+    let(:employer_profile) {FactoryGirl.create(:employer_profile)}
+    let(:employee_role) {FactoryGirl.build(:employee_role)}
     let(:census_family) {FactoryGirl.build(:employer_census_family)}
 
     it 'link_employee' do
-      census_family.link_employee(employee)
-      expect(census_family.linked_employee_id).to eq employee.id
+      census_family.link_employee(employee_role)
+      expect(census_family.linked_employee_id).to eq employee_role.id
     end
 
     it 'returns #linked_employee' do
-      employee.employer = employer
-      employee.save!
-      census_family.link_employee(employee)
-      expect(census_family.linked_employee).to be_an_instance_of Employee
-      expect(census_family.linked_employee).to eq employee
+      employee_role.employer = employer_profile
+      employee_role.save!
+      census_family.link_employee(employee_role)
+      expect(census_family.linked_employee).to be_an_instance_of EmployeeRole
+      expect(census_family.linked_employee).to eq employee_role
     end
 
     it 'delinks employee' do
@@ -98,7 +98,7 @@ describe EmployerCensus::EmployeeFamily, 'class methods' do
   describe '#replicate' do
       it 'copies this family to new instance' do
         # user - FactoryGirl.create(:user)
-        er = FactoryGirl.create(:employer)
+        er = FactoryGirl.create(:employer_profile)
         ee = FactoryGirl.build(:employer_census_employee)
         ee.address = FactoryGirl.build(:address)
 

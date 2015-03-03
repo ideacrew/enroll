@@ -112,14 +112,14 @@ describe BrokerRole, type: :model do
 
 
   describe BrokerRole, '.find_by_broker_agency', :type => :model do
-    let(:ba) {FactoryGirl.create(:broker_agency)}
+    let(:ba) {FactoryGirl.create(:broker_agency_profile)}
 
     it 'returns Broker instance for the specified National Producer Number' do
       b0 = BrokerRole.create(person: person0, npn: npn0, provider_kind: provider_kind, broker_agency: ba)
       b1 = BrokerRole.create(person: person1, npn: npn1, provider_kind: provider_kind, broker_agency: ba)
 
       expect(BrokerRole.find_by_broker_agency(ba).size).to eq 2
-      expect(BrokerRole.find_by_broker_agency(ba).first.broker_agency_id).to eq ba._id
+      expect(BrokerRole.find_by_broker_agency(ba).first.broker_agency_profile_id).to eq ba._id
     end
   end
 
@@ -137,7 +137,7 @@ describe BrokerRole, type: :model do
 
   # Instance methods
   describe BrokerRole, :type => :model do
-    let(:ba) {FactoryGirl.create(:broker_agency)}
+    let(:ba) {FactoryGirl.create(:broker_agency_profile)}
 
     it '#broker_agency sets agency' do
       expect(BrokerRole.new(broker_agency: ba).broker_agency.id).to eq ba._id

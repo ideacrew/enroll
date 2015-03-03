@@ -3,9 +3,6 @@ FactoryGirl.define do
 
     market_kind             "both"
     primary_broker_role_id  "8754985"
-
-    factory :with_organization do
-      association :organization, factory: :organization
-    end
+    organization            {FactoryGirl.create(:organization)}
   end
 end

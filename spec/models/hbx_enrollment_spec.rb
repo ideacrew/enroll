@@ -3,7 +3,7 @@ require 'rails_helper'
 describe HbxEnrollment do
 
   before(:all) do
-    @employer = Employer.new
+    @employer = EmployerProfile.new
     @hbx_enrollment = HbxEnrollment.new
   end
 

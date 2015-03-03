@@ -85,7 +85,7 @@ class HbxEnrollment
   end
 
   def employer=(employer_instance)
-    return unless employer_instance.is_a? Employer
+    return unless employer_instance.is_a? EmployerProfile
     self.employer_id = employer_instance._id
   end
 
