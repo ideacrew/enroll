@@ -38,6 +38,10 @@ gem "mongoid_auto_increment"
 # gem 'mongoid-autoinc'
 gem 'mongoid-versioning'
 
+## Add field-level encryption
+# gem 'mongoid-encrypted-fields', '~> 1.3.3'
+# gem 'symmetric-encryption', '~> 3.6.0'
+
 gem 'aasm', '~> 4.0.7'
 gem 'haml'
 # gem 'bh'
@@ -80,7 +84,6 @@ end
 group :production do
   # Use Unicorn as the app server
   gem 'unicorn', '~> 4.8.3'
-  # gem 'bluepill', '0.0.68'
 end
 
 

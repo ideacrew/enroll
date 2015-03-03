@@ -1,6 +1,5 @@
 FactoryGirl.define do
   factory :organization do
-
     legal_name  "Turner Agency, Inc"
     dba         "Turner Brokers"
     fein        "675762234"

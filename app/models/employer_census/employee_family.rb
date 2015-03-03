@@ -3,7 +3,7 @@ class EmployerCensus::EmployeeFamily
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embedded_in :employer
+  embedded_in :employer_profile
 
   field :plan_year_id, type: BSON::ObjectId
   field :benefit_group_id, type: BSON::ObjectId
@@ -51,8 +51,8 @@ class EmployerCensus::EmployeeFamily
   end
 
   def parent
-    raise "undefined parent Employer" unless employer?
-    self.employer
+    raise "undefined parent EmployerProfile" unless employer_profile?
+    self.employer_profile
   end
 
   def plan_year=(new_plan_year)
