@@ -1,6 +1,6 @@
 <div class="emp-info">
-    Employer : <%= employer_profile.legal_name %><br>
-    <% employee = employer_profile.employee_family_details(@person).census_employee %>
+    Employer : <%= organization.legal_name %><br>
+    <% employee = organization.employee_family_details(@person).census_employee %>
     Hired : <%= employee.hired_on.strftime("%B %d %Y") %> <br>
     Eligible for Coverage : <%= employee.hired_on.strftime("%B %d %Y") %> <br>
 </div>
