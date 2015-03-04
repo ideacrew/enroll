@@ -34,7 +34,7 @@ describe EmployeeRole, type: :model do
     let(:valid_params) do
       {
         person_attributes: valid_person_attributes,
-        employer: employer_profile,
+        employer_profile: employer_profile,
         hired_on: hired_on,
       }
     end
@@ -42,7 +42,7 @@ describe EmployeeRole, type: :model do
     context "with valid parameters" do
       let(:employee_role) {saved_person.employee_roles.build(valid_params)}
 
-      # %w[employer ssn dob gender hired_on].each do |m|
+      # %w[employer_profile ssn dob gender hired_on].each do |m|
       %w[ssn dob gender hired_on].each do |m|
         it "should have the right #{m}" do
           expect(employee_role.send(m)).to eq send(m)
@@ -51,8 +51,8 @@ describe EmployeeRole, type: :model do
 
     end
 
-    context "with no employer" do
-      let(:params) {valid_params.except(:employer)}
+    context "with no employer_profile" do
+      let(:params) {valid_params.except(:employer_profile)}
       let(:employee_role) {saved_person.employee_roles.build(params)}
       before() {employee_role.valid?}
 
@@ -132,7 +132,7 @@ describe EmployeeRole, type: :model do
     dob = Date.today - 36.years
     gender = "female"
 
-    employer = Employer.create(
+    employer_profile = EmployerProfile.create(
         legal_name: "ACME Widgets, Inc.",
         fein: "098765432",
         entity_kind: :c_corporation
@@ -155,12 +155,12 @@ describe EmployeeRole, type: :model do
     employee_role.ssn = ssn
     employee_role.dob = dob
     employee_role.gender = gender
-    employee_role.employers << employer._id
+    employee_role.employers << employer_profile._id
     employee_role.date_of_hire = date_of_hire
     expect(employee_role.touch).to eq true
 
     # Verify local getter methods
-    expect(employee_role.employers.first).to eq employer._id
+    expect(employee_role.employers.first).to eq employer_profile._id
     expect(employee_role.date_of_hire).to eq date_of_hire
 
     # Verify delegate local attribute values
@@ -184,7 +184,7 @@ describe EmployeeRole, type: :model do
     dob = Date.today - 26.years
     gender = "female"
 
-    employer = Employer.create(
+    employer_profile = employer_profile.create(
         legal_name: "Ace Ventures, Ltd.",
         fein: "098765437",
         entity_kind: "s_corporation"
@@ -196,7 +196,7 @@ describe EmployeeRole, type: :model do
     employee_role.ssn = ssn
     employee_role.dob = dob
     employee_role.gender = gender
-    # employee_role.employer << employer
+    # employee_role.employer_profile << employer_profile
     employee_role.date_of_hire = date_of_hire
 
     # Verify local getter methods
@@ -221,10 +221,10 @@ describe EmployeeRole, type: :model do
     expect(employee_role.save).to eq true
   end
   # it "updates instance timestamps" do
-  #   er = FactoryGirl.build(:employer)
+  #   er = FactoryGirl.build(:employer_profile)
   #   ee = FactoryGirl.build(:employee_role)
   #   pn = Person.create(first_name: "Ginger", last_name: "Baker")
-  #   # ee = Employee_role.new(ssn: "345907654", dob: Date.today - 40.years, gender: "male", employer: er, date_of_hire: Date.today)
+  #   # ee = Employee_role.new(ssn: "345907654", dob: Date.today - 40.years, gender: "male", employer_profile: er, date_of_hire: Date.today)
   #   ee = FactoryGirl.build(:employee_role)
   #   pn.employees << ee
   #   pn.valid?
@@ -259,7 +259,7 @@ describe EmployeeRole, type: :model do
 
     let(:employee_role) {
       person.employee_roles.create(
-        employer: employer_profile,
+        employer_profile: employer_profile,
         hired_on: hired_on,
         created_at: employee_role_created_at,
         updated_at: employee_role_updated_at,

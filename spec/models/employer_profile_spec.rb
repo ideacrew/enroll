@@ -14,7 +14,7 @@ RSpec.describe EmployerProfile, :type => :model do
 
   describe ".new" do
     let(:valid_params) do
-      {  
+      {
         organization: organization,
         entity_kind: entity_kind
       }
@@ -121,25 +121,25 @@ describe EmployerProfile, "Class methods", type: :model do
 
   end
 
-  describe '.find_by_broker_agency' do
+  describe '.find_by_broker_agency_profile' do
     let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
-    let(:broker_agency)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
+    let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
 
     let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
     let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
     let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
 
-    let(:er3) {organization3.create_employer_profile(entity_kind: "partnership", broker_agency: broker_agency)}
-    let(:er4) {organization4.create_employer_profile(entity_kind: "partnership", broker_agency: broker_agency)}
+    let(:er3) {organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile)}
+    let(:er4) {organization4.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile)}
     let(:er5) {organization5.create_employer_profile(entity_kind: "partnership")}
-    before { broker_agency; er3; er4; er5 }
+    before { broker_agency_profile; er3; er4; er5 }
 
     it 'returns employers represented by the specified broker agency' do
-      expect(er3.broker_agency_profile_id).to eq broker_agency.id
-      expect(er4.broker_agency_profile_id).to eq broker_agency.id
+      expect(er3.broker_agency_profile_id).to eq broker_agency_profile.id
+      expect(er4.broker_agency_profile_id).to eq broker_agency_profile.id
       expect(er5.broker_agency_profile_id).to be_nil
 
-      employers_with_broker = EmployerProfile.find_by_broker_agency(broker_agency)
+      employers_with_broker = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile)
       expect(employers_with_broker.first).to be_a EmployerProfile
       expect(employers_with_broker.size).to eq 2
     end

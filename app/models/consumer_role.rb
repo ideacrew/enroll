@@ -74,12 +74,12 @@ class ConsumerRole
   end
 
   # belongs_to BrokerAgencyProfile
-  def broker_agency=(new_broker_agency)
+  def broker_agency_profile=(new_broker_agency)
     raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency.is_a? BrokerAgencyProfile
     self.broker_agency_id = new_broker_agency._id
   end
 
-  def broker_agency
+  def broker_agency_profile
     BrokerAgencyProfile.find(self.broker_agency_id) unless broker_agency_id.blank?
   end
 

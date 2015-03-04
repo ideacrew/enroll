@@ -35,13 +35,13 @@ class EmployerProfile
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
   delegate :dba, :dba=, to: :organization, allow_nil: true
   delegate :fein, :fein=, to: :organization, allow_nil: true
-  delegate :is_active, :is_active=, to: :organization, allow_nil: false  
-  delegate :updated_by, :updated_by=, to: :organization, allow_nil: false  
+  delegate :is_active, :is_active=, to: :organization, allow_nil: false
+  delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
 
-  embeds_many :employee_families, 
+  embeds_many :employee_families,
     class_name: "EmployerCensus::EmployeeFamily",
-    cascade_callbacks: true, 
+    cascade_callbacks: true,
     validate: true
   accepts_nested_attributes_for :employee_families, reject_if: :all_blank, allow_destroy: true
 
@@ -72,13 +72,13 @@ class EmployerProfile
   end
 
   # belongs_to broker_agency_profile
-  def broker_agency=(new_broker_agency_profile)
+  def broker_agency_profile=(new_broker_agency_profile)
     raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a?(BrokerAgencyProfile)
     self.broker_agency_profile_id = new_broker_agency_profile._id
     new_broker_agency_profile
   end
 
-  def broker_agency
+  def broker_agency_profile
     parent.broker_agency_profile.where(id: @broker_agency_profile_id) unless @broker_agency_profile_id.blank?
   end
 
@@ -128,17 +128,17 @@ class EmployerProfile
     def find(id)
       organization = Organization.where("employer_profile._id" => id).documents
       raise organization.inspect
-      organization.first.employer_profile unless organization.blank? 
+      organization.first.employer_profile unless organization.blank?
     end
 
     def find_by_fein(fein)
       organization = Organization.find(fein: fein)
-      organization.employer_profile unless organization.blank? 
+      organization.employer_profile unless organization.blank?
     end
 
-    def find_by_broker_agency(agency)
-      raise ArgumentError.new("expected BrokerAgencyProfile") unless agency.is_a?(BrokerAgencyProfile)
-      list_embedded Organization.where("employer_profile.broker_agency_profile_id" => agency._id).to_a
+    def find_by_broker_agency_profile(profile)
+      raise ArgumentError.new("expected BrokerAgencyProfile") unless profile.is_a?(BrokerAgencyProfile)
+      list_embedded Organization.where("employer_profile.broker_agency_profile_id" => profile._id).to_a
     end
 
     def find_by_writing_agent(writing_agent)

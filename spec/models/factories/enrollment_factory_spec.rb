@@ -2,8 +2,8 @@ require 'rails_helper'
 require 'factories/enrollment_factory'
 
 RSpec.describe EnrollmentFactory do
-  let(:employer) {FactoryGirl.create(:employer_profile)}
-  let(:employee_family) {FactoryGirl.create(:employer_census_family, employer: employer)}
+  let(:employer_profile) {FactoryGirl.create(:employer_profile)}
+  let(:employee_family) {FactoryGirl.create(:employer_census_family, employer_profile: employer_profile)}
   let(:person) {FactoryGirl.create(:person)}
   let(:ssn) {"123456789"}
   let(:dob) {"01/01/1970"}
@@ -37,7 +37,7 @@ RSpec.describe EnrollmentFactory do
       end
     end
 
-    context "with no employer" do
+    context "with no employer_profile" do
       let(:params) {valid_params.except(:employer_census_family)}
 
       it "should raise" do
@@ -89,7 +89,7 @@ RSpec.describe EnrollmentFactory do
         let(:family) {employee.person.family}
         let(:primary_applicant) {family.primary_applicant}
         let(:employer_census_family) do
-          Employer.find(employer).employee_families.find(employee_family)
+          employer_profile.find(employer_profile).employee_families.find(employee_family)
         end
 
         it "should have a family" do
@@ -101,7 +101,7 @@ RSpec.describe EnrollmentFactory do
         end
 
         it "should have linked the family" do
-          
+
           expect(employee_family.linked_employee).to eq employee
         end
       end

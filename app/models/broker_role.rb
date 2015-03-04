@@ -39,22 +39,22 @@ class BrokerRole
     self.person
   end
 
-  # belongs_to broker_agency
-  def broker_agency=(new_broker_agency)
+  # belongs_to broker_agency_profile
+  def broker_agency_profile=(new_broker_agency)
     if new_broker_agency.nil?
       self.broker_agency_profile_id = nil
     else
       raise ArgumentError.new("expected BrokerAgencyProfile class") unless new_broker_agency.is_a? BrokerAgencyProfile
       self.broker_agency_profile_id = new_broker_agency._id
     end
-    self.broker_agency
+    self.broker_agency_profile
   end
 
-  def broker_agency
-    BrokerAgencyProfile.find(broker_agency_profile_id) if has_broker_agency?
+  def broker_agency_profile
+    BrokerAgencyProfile.find(broker_agency_profile_id) if has_broker_agency_profile?
   end
 
-  def has_broker_agency?
+  def has_broker_agency_profile?
     self.broker_agency_profile_id.present?
   end
 
@@ -90,7 +90,7 @@ class BrokerRole
   class << self
     def find(broker_role_id)
       Person.where("broker_role._id" => broker_role_id).first.broker_role unless broker_role_id.blank?
-    end  
+    end
 
     def find_by_npn(npn_value)
       Person.where("broker_role.npn" => npn_value).first.broker_role
@@ -114,9 +114,9 @@ class BrokerRole
       all.last
     end
 
-    def find_by_broker_agency(broker_agency)
-      return unless broker_agency.is_a? BrokerAgencyProfile
-      list_brokers(Person.where("broker_role.broker_agency_profile_id" => broker_agency._id))
+    def find_by_broker_agency_profile(profile)
+      return unless profile.is_a? BrokerAgencyProfile
+      list_brokers(Person.where("broker_role.broker_agency_profile_id" => profile._id))
     end
   end
 

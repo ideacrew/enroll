@@ -89,17 +89,17 @@ class EnrollmentFactory
     person.dob = dob unless dob.blank?
     person.gender = gender unless gender.blank?
 
-    employer = employer_census_family.employer
+    employer_profile = employer_census_family.employer_profile
 
     # Return instance if this role already exists
-    role = person.employees.detect { |ee| ee.id == employer.id }
+    role = person.employee_roles.detect { |ee| ee.id == employer_profile.id }
 
     if role.blank?
       # Assign employee-specifc attributes
-      role = person.employees.build(employer: employer, hired_on: hired_on)
+      role = person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on)
     end
 
-    employer_census_family.link_employee(role)
+    employer_census_family.link_employee_role(role)
 
     # Add 'self' to personal relationship need detailed implementation
     #person.person_relationships << PersonRelationhip.new()

@@ -84,21 +84,21 @@ class HbxEnrollment
     hbx_enrollment_members.map(&:applicant_id)
   end
 
-  def employer=(employer_instance)
+  def employer_profile=(employer_instance)
     return unless employer_instance.is_a? EmployerProfile
     self.employer_id = employer_instance._id
   end
 
-  def employer
+  def employer_profile
     Employer.find(self.employer_id) unless self.employer_id.blank?
   end
 
-  def broker_agency=(new_broker_agency)
+  def broker_agency_profile=(new_broker_agency)
     return if new_broker_agency.blank?
     self.broker_agency_id = new_broker._id
   end
 
-  def broker_agency
+  def broker_agency_profile
     return unless has_broker_agency?
     parent.broker_agency.find(self.broker_agency_id)
   end

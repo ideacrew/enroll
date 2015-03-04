@@ -8,7 +8,7 @@ describe HbxEnrollment do
   end
 
   it 'sets employer_id' do
-    @hbx_enrollment.employer=@employer
+    @hbx_enrollment.employer_profile=@employer
     expect(@hbx_enrollment.employer_id).to eq(@employer.id)
   end
 end

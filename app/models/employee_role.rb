@@ -47,24 +47,24 @@ class EmployeeRole
   end
 
 
-  ## TODO: propogate to EmployerCensus updates to employee demographics and family 
+  ## TODO: propogate to EmployerCensus updates to employee demographics and family
 
   def families
     Family.by_employee(self)
   end
 
-  # def self.find_by_employer(employer_instance)
-  #   # return unless employer_instance.is_a? Employer
-  #   where("employer_profile_id" =>  employer_instance._id).to_a
+  # def self.find_by_employer_profile(profile)
+  #   # return unless profile.is_a? EmployerProfile
+  #   where("employer_profile_id" =>  profile._id).to_a
   # end
 
   # belongs_to Employer
-  def employer=(new_employer)
+  def employer_profile=(new_employer)
     raise ArgumentError.new("expected EmployerProfile") unless new_employer.is_a? EmployerProfile
     self.employer_profile_id = new_employer._id
   end
 
-  def employer
+  def employer_profile
     EmployerProfile.find(self.employer_profile_id)
   end
 

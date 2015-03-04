@@ -8,7 +8,7 @@ describe EmployerCensus::EmployeeFamily, type: :model do
 
   describe ".new" do
     let(:valid_params) do
-      { 
+      {
         employer_profile: employer_profile,
         census_employee: census_employee
       }
@@ -59,16 +59,16 @@ describe EmployerCensus::EmployeeFamily, 'class methods' do
     let(:census_family) {FactoryGirl.build(:employer_census_family)}
 
     it 'link_employee' do
-      census_family.link_employee(employee_role)
-      expect(census_family.linked_employee_id).to eq employee_role.id
+      census_family.link_employee_role(employee_role)
+      expect(census_family.linked_employee_role_id).to eq employee_role.id
     end
 
     it 'returns #linked_employee' do
-      employee_role.employer = employer_profile
+      employee_role.employer_profile = employer_profile
       employee_role.save!
-      census_family.link_employee(employee_role)
-      expect(census_family.linked_employee).to be_an_instance_of EmployeeRole
-      expect(census_family.linked_employee).to eq employee_role
+      census_family.link_employee_role(employee_role)
+      expect(census_family.linked_employee_role).to be_an_instance_of EmployeeRole
+      expect(census_family.linked_employee_role).to eq employee_role
     end
 
     it 'delinks employee' do
@@ -109,7 +109,7 @@ describe EmployerCensus::EmployeeFamily, 'class methods' do
         ditto = family.replicate
 
         expect(ditto).to be_an_instance_of EmployerCensus::EmployeeFamily
-        expect(ditto.linked_employee_id).to be_nil
+        expect(ditto.linked_employee_role_id).to be_nil
         expect(ditto.is_linked?).to eq false
 
         expect(ditto.census_employee).to eq ee

@@ -18,9 +18,9 @@ class BrokerAgencyProfile
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: false
   delegate :dba, :dba=, to: :organization, allow_nil: true
-  delegate :fein, :fein=, to: :organization, allow_nil: false  
-  delegate :is_active, :is_active=, to: :organization, allow_nil: false  
-  delegate :updated_by, :updated_by=, to: :organization, allow_nil: false  
+  delegate :fein, :fein=, to: :organization, allow_nil: false
+  delegate :is_active, :is_active=, to: :organization, allow_nil: false
+  delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
   validates_presence_of :market_kind, :primary_broker_role_id
 
@@ -36,13 +36,13 @@ class BrokerAgencyProfile
   # has_many employers
   def employer_clients
     return unless MARKET_KINDS.except("individual").include?(market_kind)
-    EmployerProfile.find_by_broker_agency(self.id)
+    EmployerProfile.find_by_broker_agency_profile(self.id)
   end
 
   # TODO: has_many families
   def family_clients
     return unless MARKET_KINDS.except("shop").include?(market_kind)
-    Family.find_by_broker_agency(self.id)
+    Family.find_by_broker_agency_profile(self.id)
   end
 
   # has_one primary_broker
@@ -61,7 +61,7 @@ class BrokerAgencyProfile
 
   # has_many writing_agents
   def writing_agents
-    BrokerRole.find_by_broker_agency(self)
+    BrokerRole.find_by_broker_agency_profile(self)
   end
 
   def market_kind=(new_market_kind)
@@ -85,7 +85,7 @@ class BrokerAgencyProfile
 
     def find(broker_agency_profile_id)
       Organization.where("broker_agency_profile._id" => broker_agency_profile_id).first.broker_agency_profile unless broker_agency_profile_id.blank?
-    end  
+    end
 
     def first
       all.first
@@ -123,13 +123,15 @@ class BrokerAgencyProfile
 
 private
   def writing_agent_employed_by_broker
-    if writing_agents.present? && broker_agency.present?
-      unless broker_agency.writing_agents.detect(writing_agent)
-        errors.add(:writing_agent, "must be broker at broker_agency")
+    # TODO: make this work when I'm not tired - Sean Carley
+    if writing_agents.present?
+      employers = EmployerProfile.find_by_broker_agency_profile(self)
+      writing_agents.each do |broker_role|
+        brokers = EmployerProfile.find_by_writing_agent(broker_role)
+        unless true
+          errors.add(:writing_agent, "must be broker at broker_agency")
+        end
       end
     end
   end
-
-
-
 end

@@ -37,7 +37,7 @@ class EmployerCensus::EmployeeFamily
   # Initialize a new, refreshed instance for rehires via deep copy
   def replicate
     new_family = self.dup
-    new_family.delink_employee
+    new_family.delink_employee_role
     new_family.terminated = false
 
     if self.census_employee.present?
@@ -73,21 +73,21 @@ class EmployerCensus::EmployeeFamily
     parent.plan_year.benefit_group.find(:plan_year_id => self.benefit_group_id)
   end
 
-  def link_employee(new_employee)
-    raise EmployeeFamilyLinkError.new(new_employee) if is_linked?
-    self.linked_employee_role_id = new_employee._id
+  def link_employee_role(employee_role)
+    raise EmployeeFamilyLinkError.new(employee_role) if is_linked?
+    self.linked_employee_role_id = employee_role._id
     self.linked_at = Time.now
     self
   end
 
-  def delink_employee
+  def delink_employee_role
     self.linked_employee_role_id = nil
     self.linked_at = nil
     self
   end
 
-  def linked_employee
-    Employee.find(self.linked_employee_role_id) if is_linked?
+  def linked_employee_role
+    EmployeeRole.find(self.linked_employee_role_id) if is_linked?
   end
 
   def is_linked?

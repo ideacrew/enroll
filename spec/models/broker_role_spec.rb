@@ -4,7 +4,7 @@ describe BrokerRole, type: :model do
 
   let(:person0) {FactoryGirl.create(:person)}
   let(:person1) {FactoryGirl.create(:person)}
-  let(:broker_agency) {FactoryGirl.create(:broker_agency)}
+  let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
   let(:npn0) {"xyz123xyz"}
   let(:npn1) {"123xyz123"}
   let(:provider_kind)  {"assister"}
@@ -111,15 +111,15 @@ describe BrokerRole, type: :model do
   end
 
 
-  describe BrokerRole, '.find_by_broker_agency', :type => :model do
+  describe BrokerRole, '.find_by_broker_agency_profile', :type => :model do
     let(:ba) {FactoryGirl.create(:broker_agency_profile)}
 
     it 'returns Broker instance for the specified National Producer Number' do
-      b0 = BrokerRole.create(person: person0, npn: npn0, provider_kind: provider_kind, broker_agency: ba)
-      b1 = BrokerRole.create(person: person1, npn: npn1, provider_kind: provider_kind, broker_agency: ba)
+      b0 = BrokerRole.create(person: person0, npn: npn0, provider_kind: provider_kind, broker_agency_profile: ba)
+      b1 = BrokerRole.create(person: person1, npn: npn1, provider_kind: provider_kind, broker_agency_profile: ba)
 
-      expect(BrokerRole.find_by_broker_agency(ba).size).to eq 2
-      expect(BrokerRole.find_by_broker_agency(ba).first.broker_agency_profile_id).to eq ba._id
+      expect(BrokerRole.find_by_broker_agency_profile(ba).size).to eq 2
+      expect(BrokerRole.find_by_broker_agency_profile(ba).first.broker_agency_profile_id).to eq ba._id
     end
   end
 
@@ -139,20 +139,20 @@ describe BrokerRole, type: :model do
   describe BrokerRole, :type => :model do
     let(:ba) {FactoryGirl.create(:broker_agency_profile)}
 
-    it '#broker_agency sets agency' do
-      expect(BrokerRole.new(broker_agency: ba).broker_agency.id).to eq ba._id
+    it '#broker_agency_profile sets agency' do
+      expect(BrokerRole.new(broker_agency_profile: ba).broker_agency_profile.id).to eq ba._id
     end
 
-    it '#has_broker_agency? is true when agency is assigned' do
-      expect(BrokerRole.new(broker_agency: nil).has_broker_agency?).to be_false
-      expect(BrokerRole.new(broker_agency: ba).has_broker_agency?).to be_true
+    it '#has_broker_agency_profile? is true when agency is assigned' do
+      expect(BrokerRole.new(broker_agency_profile: nil).has_broker_agency_profile?).to be_false
+      expect(BrokerRole.new(broker_agency_profile: ba).has_broker_agency_profile?).to be_true
     end
 
     # TODO
     it '#address= and #address sets & gets work address on parent person instance' do
       # address = FactoryGirl.build(:address)
       # address.kind = "work"
-      
+
       # expect(person0.build_broker_role(address: address).address._id).to eq address._id
       # expect(person0.build_broker_role(npn: npn0, provider_kind: provider_kind, address: address).save).to eq true
     end
