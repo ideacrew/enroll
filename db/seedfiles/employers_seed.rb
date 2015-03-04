@@ -1,10 +1,7 @@
 puts "*"*80
-puts "::: Cleaning Employers :::"
-Employer.delete_all
-
 # Retrieve Brokers
-broker_agency_0 = BrokerAgencyFile.first
-broker_agency_1 = BrokerAgencyFile.last
+#broker_agency_0 = BrokerAgencyFile.first
+#broker_agency_1 = BrokerAgencyFile.last
 
 puts "::: Cleaning Organizations :::"
 Organization.delete_all
