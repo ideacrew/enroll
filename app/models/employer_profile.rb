@@ -125,6 +125,14 @@ class EmployerProfile
       list_embedded Organization.exists(employer_profile: true).to_a
     end
 
+    def first
+      all.first
+    end
+
+    def last
+      all.last
+    end
+
     def find(id)
       organization = Organization.where("employer_profile._id" => id).documents
       raise organization.inspect

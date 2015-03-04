@@ -1,10 +1,10 @@
 puts "*"*80
 puts "::: Cleaning Employers :::"
-Employer.delete_all
+# Employer.delete_all
 
 # Retrieve Brokers
-broker_agency_0 = BrokerAgencyFile.first
-broker_agency_1 = BrokerAgencyFile.last
+broker_agency_0 = BrokerAgencyProfile.first
+broker_agency_1 = BrokerAgencyProfile.last
 
 # Employer addresses
 employer_address_1 = Address.new(kind: "mailing", address_1: "13025 Elm Tree CT", address_2: "Suite 300", city: "Herndon", state: "VA", county: "Fairfax", zip: "20172", country_name: "USA")
@@ -15,11 +15,17 @@ employer_address_5 = Address.new(kind: "work", address_1: "1010 Potomac Rd", add
 
 puts "::: Generating Employers :::"
 # Employer creation
-employer_1 = Employer.create!(entity_kind: "c_corporation", fein: "897897897", dba: "1234", legal_name: "Global Systems", is_active: true, addresses: [employer_address_1], broker_agency: broker_agency_0)
-employer_2 = Employer.create!(entity_kind: "partnership", fein: "397897897", dba: "3434", legal_name: "Technology Solutions Inc", is_active: true, addresses:[employer_address_2], broker_agency: broker_agency_0)
-employer_3 = Employer.create!(entity_kind: "s_corporation", fein: "597897897", dba: "9034", legal_name: "Futurewave Systems Inc", is_active: true, addresses:[employer_address_3], broker_agency: broker_agency_0)
-employer_4 = Employer.create!(entity_kind: "tax_exempt_organization", fein: "797897897", dba: "8934", legal_name: "Primus Software Corporation", is_active: true,  addresses:[employer_address_4], broker_agency: broker_agency_1)
-employer_5 = Employer.create!(entity_kind: "partnership", fein: "997897897", dba: "5634", legal_name: "OneCare", is_active: false, addresses:[employer_address_5])
+organization_1 = Organization.new(fein: "897897897", dba: "1234", legal_name: "Global Systems", office_locations: [employer_address_1])
+organization_2 = Organization.new(fein: "397897897", dba: "3434", legal_name: "Technology Solutions Inc", office_locations:[employer_address_2])
+organization_3 = Organization.new(fein: "597897897", dba: "9034", legal_name: "Futurewave Systems Inc", office_locations:[employer_address_3])
+organization_4 = Organization.new(fein: "797897897", dba: "8934", legal_name: "Primus Software Corporation", office_locations:[employer_address_4])
+organization_5 = Organization.new(fein: "997897897", dba: "5634", legal_name: "OneCare", is_active: false, office_locations:[employer_address_5])
+
+employer_1 = organization_1.create_employer_profile(entity_kind: "c_corporation", broker_agency_profile: broker_agency_0)
+employer_2 = organization_2.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_0)
+employer_3 = organization_3.create_employer_profile(entity_kind: "s_corporation", broker_agency_profile: broker_agency_0)
+employer_4 = organization_4.create_employer_profile(entity_kind: "tax_exempt_organization", broker_agency_profile: broker_agency_1)
+employer_5 = organization_5.create_employer_profile(entity_kind: "partnership")
 
 puts "::: Created 5 Employers :::"
 
