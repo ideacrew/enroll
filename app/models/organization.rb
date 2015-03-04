@@ -73,5 +73,8 @@ class Organization
   index({"broker_agency_profile.market_kind" => 1})
   index({"broker_agency_profile.aasm_state" => 1})
 
-
+  def employee_family_details(person)
+    return Organization.where(id: id).where(:"employer_profile.employee_families.census_employee.ssn" => person.ssn).last.employer_profile.employee_families.last
+  end
+  
 end

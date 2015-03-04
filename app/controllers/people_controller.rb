@@ -12,6 +12,7 @@ class PeopleController < ApplicationController
     @person = Person.new(person_params)
 
     matched_person = Person.match_by_id_info(@person)
+    
     if matched_person.blank?
       # Preexisting Person not found, create new instance and return to complete form entry
       respond_to do |format|
@@ -36,8 +37,7 @@ class PeopleController < ApplicationController
   
   def get_employer
     @person = Person.find(params[:id])
-    @employers = Employer.find_employer_by_person(@person)
-
+    @employers = EmployerProfile.match_census_employees(@person)
     respond_to do |format|
       format.js {}
     end
@@ -62,8 +62,8 @@ class PeopleController < ApplicationController
   def person_landing
     @person = Person.find(params[:person_id])
     if params[:employer_id].to_i != 0
-      @employer = Employer.find(params[:employer_id])
-      employee_family = Employer.find(@employer.id).employee_families.where(:"census_employee.ssn" => "111222333").last
+      @employer = Organization.find(params[:employer_id])
+      employee_family = Organization.find(@employer.id).employee_family_details(@person)
       @employee = employee_family.census_employee
     else
       @employee = @person
