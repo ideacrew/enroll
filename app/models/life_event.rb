@@ -3,7 +3,7 @@ class LifeEvent
   include Mongoid::Timestamps
   include Mongoid::Versioning
 
-  KINDS = %w[add_member drop_member change_location change_benefit terminate_benefit administrative]
+  KINDS = %w[add_member drop_member change_benefit terminate_benefit administrative]
   MARKET_KINDS = %w[shop individual]
 
   field :title, type: String
