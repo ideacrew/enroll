@@ -167,4 +167,16 @@ module ApplicationHelper
     direction = (column == params[:sort] && params[:direction] == "desc") ? "asc" : "desc"
     ((link_to title, params.merge(:sort => column, :direction => direction, :page => nil) ) + content_tag(:sort, raw("&nbsp;"), class: css_class))
   end
+  
+  def extract_phone_number(phones, type)
+    phone = phones.select{|phone| phone.kind == type}
+    if phone.present?
+      phone = phone.first
+      phone = "#{phone.area_code} #{phone.number}"
+    else
+      phone = ""
+    end
+    return phone
+  end
+  
 end
