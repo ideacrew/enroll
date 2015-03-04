@@ -1,23 +1,14 @@
 puts "*"*80
-<<<<<<< HEAD
-puts "::: Cleaning Employers :::"
+
+puts "::: Seeding Employers :::"
 # Employer.delete_all
 
 # Retrieve Brokers
 broker_agency_0 = BrokerAgencyProfile.first
 broker_agency_1 = BrokerAgencyProfile.last
-=======
-# Retrieve Brokers
-#broker_agency_0 = BrokerAgencyFile.first
-#broker_agency_1 = BrokerAgencyFile.last
-
-puts "::: Cleaning Organizations :::"
-Organization.delete_all
->>>>>>> 898ad06ab4d2968b9a05dc7c3dea20bed5b80036
 
 puts "::: Creating addresses for office location :::"
 # Employer addresses
-<<<<<<< HEAD
 employer_address_1 = Address.new(kind: "mailing", address_1: "13025 Elm Tree CT", address_2: "Suite 300", city: "Herndon", state: "VA", county: "Fairfax", zip: "20172", country_name: "USA")
 employer_address_2 = Address.new(kind: "work", address_1: "320 W Illinois St", address_2: "suite 180", city: "Chicago", state: "IL", county: "Chicago", zip: "60654", country_name: "USA")
 employer_address_3 = Address.new(kind: "home", address_1: "43 Russells Way", address_2: "Suite 23", city: "Westford", state: "MA", county: "", zip: "01886", country_name: "USA")
@@ -41,43 +32,6 @@ employer_5 = organization_5.create_employer_profile(entity_kind: "partnership")
 puts "::: Created 5 Employers :::"
 
 # Employee Addresses
-=======
-org_address_1 = Address.new(kind: "work", address_1: "13025 Elm Tree CT", address_2: "Suite 300", city: "Herndon", state: "VA", county: "Fairfax", zip: "20172", country_name: "USA")
-org_address_2 = Address.new(kind: "work", address_1: "320 W Illinois St", address_2: "suite 180", city: "Chicago", state: "IL", county: "Chicago", zip: "60654", country_name: "USA")
-org_address_3 = Address.new(kind: "work", address_1: "43 Russells Way", address_2: "Suite 23", city: "Westford", state: "MA", county: "", zip: "01886", country_name: "USA")
-org_address_4 = Address.new(kind: "work", address_1: "20178 E Hampden PL", address_2: "Suite 45", city: "Aurora", state: "CO", county: "", zip: "80013", country_name: "USA")
-org_address_5 = Address.new(kind: "work", address_1: "1010 Potomac Rd", address_2: "APT 102", city: "Atlanta", state: "GA", county: "Fulton", zip: "30338", country_name: "USA")
-
-puts "::: Creating phones for office location :::"
-org_phone1 = Phone.new(kind: "work", area_code: 202, number: 5551211)
-org_phone2 = Phone.new(kind: "work", area_code: 202, number: 5551212)
-org_phone3 = Phone.new(kind: "mobile", area_code: 202, number: 5551213)
-org_phone4 = Phone.new(kind: "mobile", area_code: 202, number: 5551214)
-org_phone5 = Phone.new(kind: "mobile", area_code: 202, number: 5551215)
-
-puts "::: Creating office locations for organizations :::"
-office_location_1 = OfficeLocation.new(address: org_address_1, phone: org_phone1)
-office_location_2 = OfficeLocation.new(address: org_address_2, phone: org_phone2)
-office_location_3 = OfficeLocation.new(address: org_address_3, phone: org_phone3)
-office_location_4 = OfficeLocation.new(address: org_address_4, phone: org_phone4)
-office_location_5 = OfficeLocation.new(address: org_address_5, phone: org_phone5)
-
-puts "::: Creating Employer Profile :::"
-employer_1 = EmployerProfile.new(entity_kind: "c_corporation")
-employer_2 = EmployerProfile.new(entity_kind: "partnership")
-employer_3 = EmployerProfile.new(entity_kind: "s_corporation")
-employer_4 = EmployerProfile.new(entity_kind: "tax_exempt_organization")
-employer_5 = EmployerProfile.new(entity_kind: "partnership")
-
-puts "::: Creating organizations :::"
-organization_1 = Organization.create!(employer_profile: employer_1, fein: "897897897", dba: "1234", legal_name: "Global Systems", is_active: true, home_page: "www.global.com", office_locations: [office_location_1] )
-organization_2 = Organization.create!(employer_profile: employer_2, fein: "397897897", dba: "3434", legal_name: "Technology Solutions Inc", is_active: true, home_page: "www.Technologysolutioninc.com", office_locations: [office_location_2] )
-organization_3 = Organization.create!(employer_profile: employer_3, fein: "597897897", dba: "9034", legal_name: "Futurewave Systems Inc", is_active: true, home_page: "www.Futurewave.com", office_locations: [office_location_3] )
-organization_4 = Organization.create!(employer_profile: employer_4, fein: "797897897", dba: "8934", legal_name: "Primus Software Corporation", is_active: true, home_page: "www.primus.com", office_locations: [office_location_4] )
-organization_5 = Organization.create!(employer_profile: employer_5, fein: "997897897", dba: "5634", legal_name: "OneCare", is_active: false, home_page: "www.onecare.com", office_locations: [office_location_5] )
-
-puts "::: Creating addresses for employee :::"
->>>>>>> 898ad06ab4d2968b9a05dc7c3dea20bed5b80036
 address_0 = Address.new(kind: "home", address_1: "1225 I St, NW", address_2: "Apt A7", city: "Washington", state: "DC", county: "Fairfax", zip: "20004", country_name: "USA")
 address_1 = Address.new(kind: "work", address_1: "145 I45 St", address_2: "suite 200", city: "Washington", state: "DC", county: "Fairfax", zip: "20004", country_name: "USA")
 address_2 = Address.new(kind: "home", address_1: "1 North State St", address_2: "suite 100", city: "Chicago", state: "IL", county: "chicago", zip: "60654", country_name: "USA")
