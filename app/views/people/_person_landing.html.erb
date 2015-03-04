@@ -1,36 +1,380 @@
-<div>
-  <p>Check Basic Details? <a href="#" class="change_basic_details"><u>Base Page</u></a></p>
-</div>
-<br/>
-<%= form_for(@person) do |f| %>
-<div role="tabpanel" id="myTab">
+<div class="container-fluid no-pd-left">          
+        <div class="panel panel-default" style="border:none; box-shadow: none;">
+          <div class="row tab-row">
+            <form>
+              <ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
+                <li class="active" role="presentation">
+                  <a aria-expanded="true" aria-controls="home" data-toggle="tab" role="tab" id="home-tab" href="#home">
+                    <span class="home-icon" title="Home"></span>
+                  </a>
+                </li>
+                <li role="presentation">
+                  <a aria-expanded="true" aria-controls="profile" data-toggle="tab" role="tab" id="profile-tab" href="#profile">
+                    <span class="hidden-xs">Profile</span>
+                    <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Profile"></span>
+                  </a>
+                </li>
+                <li role="presentation">
+                  <a aria-controls="plans" data-toggle="tab" id="plans-tab" role="tab" href="#plans">
+                    <span class="hidden-xs">Plans</span>
+                    <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Plans"></span>
+                  </a>
+                </li>
+                <li role="presentation">
+                  <a aria-controls="documents" data-toggle="tab" id="documents-tab" role="tab" href="#documents">
+                    <span class="hidden-xs">Documents</span>
+                    <span class="glyphicon glyphicon-file hidden-md hidden-sm hidden-lg" title="Documents"></span>
+                  </a>
+                </li>
+                <li role="presentation">
+                  <a aria-controls="messages" data-toggle="tab" id="messages-tab" role="tab" href="#messages">
+                    <span class="hidden-xs">Messages</span>
+                    <span class="glyphicon glyphicon-envelope hidden-md hidden-sm hidden-lg" title="Messages"></span>
+                    <span class="badge">3</span>
+                  </a>
+                </li>
+              </ul>
+              <div class="tab-content" id="myTabContent">
+                <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
+                  <div class="col-md-12 col-sm-12 no-pd">
+                    <div class="row landing-row">
+                      <div class="col-md-6 col-sm-6 col-xs-12 left-side">
+                        <p class="head">Personal</p>
+                        <p class="subhead">
+                          <span>J<%= @person.first_name %> <%= @person.middle_name %> <%= @person.last_name %></span>
+                          <span class="pull-right">edit personal info</span>
+                        </p>
+                        <div class="table-responsive">
+                          <table class="table search-table">
+                            <tbody>
+                              <tr>
+                                <td colspan="3">
+                                  <button class="form-control float-label adderess-select-box" type="button">
+                                    Home Address
+                                    <span class="caret"></span>
+                                  </button>
+                                </td>
+                                <td>
+                                  <button class="btn btn-new-address">NEW ADDRESS</button>
+                                </td>
+                              </tr>
+                              <% @person.addresses.each do |address| %>
+                                <tr>
+                                <td colspan="2">
+                                  <span>ADDRESS LINE 1</span>
+                                  <span><%= address.address_1 %></span>
+                                </td>
+                                <td colspan="2">
+                                  <span>ADDRESS LINE 2</span>
+                                  <span><%= address.address_2 %> </span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <span>CITY</span>
+                                  <span><%= address.city %> </span>
+                                </td>
+                                <td>
+                                  <span>STATE</span>
+                                  <span><%= address.state %></span>
+                                </td>
+                                <td>
+                                  <span>COUNTRY</span>
+                                  <span><%= address.country_name %></span>
+                                </td>
+                                <td>
+                                  <span>ZIP</span>
+                                  <span><%= address.zip %></span>
+                                </td>
+                              </tr>
+                              <% end %>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                      <div class="col-md-6 col-sm-6 col-xs-12 right-side">
+                        <p class="head">
+                          <span>Members</span>
+                          <span>new members</span>
+                        </p>
+                        <ul class="list-group">
+                          <% @employee.employee_family.census_dependents.each do |dependent| %>
+                            <li class="list-group-item">
+                            <div class="row">
+                              <div class="col-md-10 col-sm-8 col-xs-8">
+                                  <h4><h4> <%= dependent.first_name %> <%= dependent.last_name %> </h4> </h4>
+                              </div>
+                              <div class="col-md-2 col-sm-4 col-xs-4 text-right">
+                                <a href="#"><%= image_tag 'edit.png' %></a>
+                                <a href="#"><%= image_tag 'member-close.png' %></a>
+                              </div>
+                            </div>
+                          </li>
+                          <% end %>
+                          <button class="btn btn-see-all">See All</button>
+                        </ul>
+                      </div>
+                      <div class="cleafix"></div>
+                    </div>
 
-  <!-- Nav tabs -->
-  <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Profile</a></li>
-    <li role="presentation"><a href="#plans" aria-controls="plans" role="tab" data-toggle="tab">Plans</a></li>
-    <li role="presentation"><a href="#documents" aria-controls="documents" role="tab" data-toggle="tab">Documents</a></li>
-    <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Messages</a></li>
-  </ul>
+                    <div class="landing-row row bottom-row">
+                      <div class="col-md-6 col-sm-6 col-xs-12 left-side">
+                        <p><span>Employer</span></p>
+                        <div class="emp-info">
+                          <%= render 'people/landing_pages/employer' %> 
+                        </div>
+                      </div>
+                      <div class="col-md-6 col-sm-6 col-xs-12 right-side">
+                        <p><span>Coverage</span>Kasier</p>
+                      </div>
+                      <div class="cleafix"></div>
+                    </div>
+                  </div>
+                <div class="clearfix"></div>
+                </div>
+                <div aria-labelledby="profile-tab" id="profile" class="tab-pane fade" role="tabpanel">
+                  <div class="submenu">
+                    <ul role="tablist" class="nav nav-tabs" id="myTab1">
+                      <li class="active" role="presentation"><a aria-expanded="true" aria-controls="personal" data-toggle="tab" role="tab" id="personal-tab" href="#personal">Personal</a></li>
+                      <li role="presentation"><a aria-controls="employer" data-toggle="tab" id="employer-tab" role="tab" href="#employer">Employer</a></li>
+                      <li role="presentation"><a aria-controls="family" data-toggle="tab" id="family-tab" role="tab" href="#family">Family Members</a></li>
+                      <li role="presentation"><a aria-controls="contact" data-toggle="tab" id="contact-tab" role="tab" href="#contact">Contact Information</a></li>
+                    </ul>
+                  </div>
+                  <div class="tab-content" id="myTabContent1">
+                    <div aria-labelledby="personal-tab" id="personal" class="tab-pane fade in active" role="tabpanel">
+                      <div id="personal_info" class="focus_effect row personaol-info-top-row">
+                        <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
+                          <div class="table-responsive">
+                            <%= render 'people/landing_pages/personal' %> 
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-  <!-- Tab panes -->
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="profile"><%= render 'people/landing_pages/profile' %></div>
-    <div role="tabpanel" class="tab-pane" id="plans"><%= render 'people/landing_pages/plans' %></div>
-    <div role="tabpanel" class="tab-pane" id="documents"><%= render 'people/landing_pages/documents' %></div>
-    <div role="tabpanel" class="tab-pane" id="messages"><%= render 'people/landing_pages/messages' %></div>
-  </div>
+                    <div aria-labelledby="employer-tab" id="employer" class="tab-pane fade" role="tabpanel">
+                      <div class="emp-info">
+                       <%= render 'people/landing_pages/employer' %> 
+                      </div>
+                    </div>
+                    
+                    <div aria-labelledby="family-tab" id="family" class="tab-pane fade landing-row" role="tabpanel">
+                      <%= render 'people/landing_pages/family_members' %> 
+                    </div>
+                    
+                    <div aria-labelledby="contact-tab" id="contact" class="tab-pane fade" role="tabpanel">
+                      <div id="address_info" class="focus_effect row personaol-info-top-row">
+                        <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
+                          <div class="row top-row">
+                            <div class="col-md-9 col-sm-9 col-xs-12 form-group form-group-lg no-pd address">
+                              <div class="form-group form-group-lg">
+                                <div class="row" style="margin: 0;">
+                                  <div class="col-md-4 col-sm-3 col-xs-12 bg-color"></div>
+                                  <div class="col-md-4 col-sm-6 col-xs-12 no-pd">
+                                    <div class="dropdown">
+                                      <button class="form-control float-label adderess-select-box form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                                        Home Address
+                                        <span class="caret"></span>
+                                      </button>
+                                      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Home Address</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Work Address</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Mailing Address</a></li>
+                                      </ul>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-4 col-sm-3 col-xs-12 bg-color"></div>
+                                </div>
+                              </div>  
+                            </div>
+                            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+                              <button class="btn btn-new-address">NEW ADDRESS</button>
+                              <!-- <button class="btn btn-new-address">NEW ADDRESS</button> -->
+                            </div>
+                          </div>
 
-</div>
-<% end %>
-
+                            <%= render 'people/landing_pages/address' %> 
+                          <div class="error">
+                            <div class="warning"><i class="fa fa-exclamation-triangle"></i>
+                              All fields Required</div>
+                          </div>
+                        </div>
+                      </div>
+                      <br>
+                      <div id="phone_info" class="focus_effect row personaol-info-top-row">
+                          <%= render 'people/landing_pages/phone' %> 
+                      </div>
+                      <br>                      
+                      <div id="email_info" class="focus_effect row personaol-info-top-row">
+                      <% @person.emails.each do |email| %>
+                       <% if email.address.present? %>
+                        <div class="email">
+                          <div class="col-md-10 col-sm-12 no-pd first">
+                            <div class="form-group form-group-lg">
+                              <input type="text" value="<%= email.address %>" class="floatlabel form-control" placeholder="NAME@DOMAIN.COM">
+                            </div>
+                          </div>
+                        </div>
+                        <% end %>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div aria-labelledby="plans-tab" id="plans" class="tab-pane fade" role="tabpanel">
+                  <div class="col-md-12 col-xs-12 col-sm-12">
+                    <h3>Open Access Plus Coverage Summmary</h3>
+                    <h4><b>Account Number:</b> 3209264</h4>
+                    <div class="coverage-table coverage-prevent-table">
+                      <h5 class="heading">Preventive Care</h5>
+                      <div class="table-responsive">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th>Coverages</th>
+                              <th>In-Network</th>
+                              <th>Out-of-Network</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                            </tr>
+                            <tr>
+                              <td>Well Child Care</td>
+                              <td>You pay 0%<br>Plan pays 100%</td>
+                              <td>You pay 20%<br>Plan pays 80%</td>
+                            </tr>
+                            <tr>
+                              <td>Adult Preventive Care</td>
+                              <td>You pay 0%<br>Plan pays 100%</td>
+                              <td>You pay 20%<br>Plan pays 80%</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div class="coverage-table">
+                      <h5 class="heading">Doctor office visit</h5>
+                      <div class="table-responsive">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th>Coverages</th>
+                              <th>In-Network</th>
+                              <th>Out-of-Network</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Primary Care Physician</td>
+                              <td>You pay $25</td>
+                              <td>You pay 20%<br>Plan pays 80%</td>
+                            </tr>
+                            <tr>
+                              <td>Speciallist</td>
+                              <td>You pay $40</td>
+                              <td>Does Not Apply</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div class="coverage-table">
+                      <h5 class="heading">outpatient hospital</h5>
+                      <div class="table-responsive">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th>Coverages</th>
+                              <th>In-Network</th>
+                              <th>Out-of-Network</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Outpatient Hospital</td>
+                              <td>You pay $150<br>You pay 0%<br>Plan pays 100%</td>
+                              <td>You pay 20%<br>Plan pays 80%</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div class="coverage-table">
+                      <h5 class="heading">intpatient hospital</h5>
+                      <div class="table-responsive">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th>Coverages</th>
+                              <th>In-Network</th>
+                              <th>Out-of-Network</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Intpatient Hospital</td>
+                              <td>You pay $250<br>You pay 0%<br>Plan pays 100%</td>
+                              <td>You pay 20%<br>Plan pays 80%</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div class="coverage-table">
+                      <h5 class="heading">Emergency and urgent care services</h5>
+                      <div class="table-responsive">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th>Coverages</th>
+                              <th>In-Network</th>
+                              <th>Out-of-Network</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Emergency Room</td>
+                              <td>You pay $150</td>
+                              <td>You pay $150</td>
+                            </tr>
+                            <tr>
+                              <td>Urgent Care</td>
+                              <td>You pay $50</td>
+                              <td>You pay $50</td>
+                            </tr>
+                            <tr>
+                              <td>Ambulance</td>
+                              <td>You pay 0%<br>Plan pays 100%</td>
+                              <td>You pay 0%<br>Plan pays 100%</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <br><br>
+                  </div>
+                </div>
+                <div aria-labelledby="documents-tab" id="documents" class="tab-pane fade" role="tabpanel">
+                </div>
+                <div aria-labelledby="messages-tab" id="messages" class="tab-pane fade" role="tabpanel">
+                </div>
+                <div class="clearfix"></div>
+              </div>
+              <div class="clearfix"></div>
+            </form >
+          </div>
+        </div>
+      </div>
+    </div>
 <script>
-$('#myTab a').click(function (e) {
-  e.preventDefault()
-  $(this).tab('show')
-});
-$(".change_basic_details").click(function(e) {
-  $('#person_new').show();
-  $('#person_landing').html("");
-});
-</script>
+      $('input.floatlabel').floatlabel();
+      $(document).ready(function () {
+        $('.floatlabel').floatlabel({
+              slideInput: false
+          });
+      });
+    </script>
