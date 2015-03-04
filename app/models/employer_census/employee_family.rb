@@ -73,21 +73,21 @@ class EmployerCensus::EmployeeFamily
     parent.plan_year.benefit_group.find(:plan_year_id => self.benefit_group_id)
   end
 
-  def link_employee_role(employee_role)
-    raise EmployeeFamilyLinkError.new(employee_role) if is_linked?
-    self.linked_employee_role_id = employee_role._id
+  def link_employee_role(new_employee_role)
+    raise EmployeeFamilyLinkError.new(new_employee_role) if is_linked?
+    self.linked_employee_role_id = new_employee_role._id
     self.linked_at = Time.now
     self
+  end
+
+  def linked_employee_role
+    EmployeeRole.find(self.linked_employee_role_id) if is_linked?
   end
 
   def delink_employee_role
     self.linked_employee_role_id = nil
     self.linked_at = nil
     self
-  end
-
-  def linked_employee_role
-    EmployeeRole.find(self.linked_employee_role_id) if is_linked?
   end
 
   def is_linked?

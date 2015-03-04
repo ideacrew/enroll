@@ -83,8 +83,8 @@ class EmployeeRole
   end
 
   def self.find(employee_id)
-    person = Person.where({"employees._id" => employee_id }).first
-    person.employees.detect { |e| e.id == employee_id } unless person.nil?
+    person = Person.where({"employee_roles._id" => employee_id }).first
+    person.employee_roles.detect { |ee| ee.id == employee_id } unless person.nil?
   end
 
   def self.list(collection)

@@ -85,24 +85,25 @@ RSpec.describe EnrollmentFactory do
       end
 
       context "successfully created" do
-        let(:employee) {EnrollmentFactory.add_employee_role(**params)}
-        let(:family) {employee.person.family}
+        let(:employee_role) {EnrollmentFactory.add_employee_role(**params)}
+        let(:family) {employee_role.person.family}
         let(:primary_applicant) {family.primary_applicant}
         let(:employer_census_family) do
           employer_profile.find(employer_profile).employee_families.find(employee_family)
         end
+        before {family; employee_role; employer_profile; employee_family}
 
         it "should have a family" do
           expect(family.class).to be Family
         end
 
         it "should be the primary applicant" do
-          expect(employee.person).to eq primary_applicant.person
+          expect(employee_role.person).to eq primary_applicant.person
         end
 
         it "should have linked the family" do
 
-          expect(employee_family.linked_employee).to eq employee
+          expect(employee_family.linked_employee_role).to eq employee_role
         end
       end
     end
