@@ -16,6 +16,9 @@
 //= require twitter/bootstrap
 //= require twitter/bootstrap/tab
 //= require turbolinks
+//= require classie
+//= require modalEffects
+//= require bootstrap.min
 //= require jquery.inputmask
 //= require_tree .
 

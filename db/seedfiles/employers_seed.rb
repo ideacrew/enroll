@@ -52,10 +52,10 @@ family_0.census_employee = employee_0
 family_0.census_dependents = [dependent_1_1, dependent_1_2]
 family_0.save!
 
-# family_1 = organization_1.employer_profile.employee_families.new
-# family_1.census_employee = employee_1
-# family_1.census_dependents = [dependent_1_1, dependent_1_2, dependent_1_3]
-# family_1.save!
+family_1 = organization_1.employer_profile.employee_families.new
+family_1.census_employee = employee_1
+family_1.census_dependents = [dependent_1_1, dependent_1_2, dependent_1_3]
+family_1.save!
 
 #to check multiple employers for person creation added below snippet
 family_11 = organization_2.employer_profile.employee_families.new

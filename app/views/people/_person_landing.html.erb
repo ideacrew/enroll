@@ -30,7 +30,7 @@
                   <a aria-controls="messages" data-toggle="tab" id="messages-tab" role="tab" href="#messages">
                     <span class="hidden-xs">Messages</span>
                     <span class="glyphicon glyphicon-envelope hidden-md hidden-sm hidden-lg" title="Messages"></span>
-                    <span class="badge">3</span>
+                    <span class="badge">27</span>
                   </a>
                 </li>
               </ul>
@@ -39,26 +39,32 @@
                   <div class="col-md-12 col-sm-12 no-pd">
                     <div class="row landing-row">
                       <div class="col-md-6 col-sm-6 col-xs-12 left-side">
-                        <p class="head">Personal</p>
-                        <p class="subhead">
-                          <span>J<%= @person.first_name %> <%= @person.middle_name %> <%= @person.last_name %></span>
-                          <span class="pull-right">edit personal info</span>
-                        </p>
+                        <p class="head">Contact Information</p>
                         <div class="table-responsive">
-                          <table class="table search-table">
+                          <table class="table table-bordered search-table">
                             <tbody>
                               <tr>
-                                <td colspan="3">
+                                <td colspan="4">
                                   <button class="form-control float-label adderess-select-box" type="button">
-                                    Home Address
+                                    <%= @person.first_name %> <%= @person.middle_name %> <%= @person.last_name %>
                                     <span class="caret"></span>
                                   </button>
                                 </td>
+                              </tr>
+                              <tr>
                                 <td>
                                   <button class="btn btn-new-address">NEW ADDRESS</button>
                                 </td>
+                                <td colspan="3">
+                                  <button class="form-control float-label adderess-select-box home" type="button" style="float: left; width: 91%;">
+                                    Home Address
+                                    <span class="caret"></span>
+                                  </button>
+                                  <!-- <i class="fa fa-trash" style="font-weight: normal; font-size: 25px; line-height: 35px;"></i> -->
+                                </td>
                               </tr>
                               <% @person.addresses.each do |address| %>
+                               <% if address.address_1.present? %>
                                 <tr>
                                 <td colspan="2">
                                   <span>ADDRESS LINE 1</span>
@@ -88,14 +94,15 @@
                                 </td>
                               </tr>
                               <% end %>
+                              <% end %>
                             </tbody>
                           </table>
                         </div>
                       </div>
                       <div class="col-md-6 col-sm-6 col-xs-12 right-side">
                         <p class="head">
-                          <span>Members</span>
-                          <span>new members</span>
+                          <span>Household</span>
+                          <span>add members</span>
                         </p>
                         <ul class="list-group">
                           <% @employee.employee_family.census_dependents.each do |dependent| %>
@@ -119,13 +126,80 @@
 
                     <div class="landing-row row bottom-row">
                       <div class="col-md-6 col-sm-6 col-xs-12 left-side">
-                        <p><span>Employer</span></p>
-                        <div class="emp-info">
-                          <%= render 'people/landing_pages/employer' %> 
-                        </div>
+                        <p class="head">
+                          <span>Employers & Plans</span>
+                          <span>add employer</span>
+                        </p>
+                         <ul class="list-group emp-ul">
+                          <li class="list-group-item">
+                            <div class="row">
+                              <div class="col-md-10 col-sm-12 col-xs-12">
+                                  <h4>Pets.com</h4>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="list-group-item">
+                            <div class="row">
+                              <div class="col-md-10 col-sm-12 col-xs-12">
+                                  <h4>Kaiser 300+ Unoiversal</h4>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="list-group-item">
+                            <div class="row">
+                              <div class="col-md-10 col-sm-12 col-xs-12">
+                                  <h4>VSP Premium Eye Family Plan</h4>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="list-group-item">
+                            <div class="row">
+                              <div class="col-md-10 col-sm-12 col-xs-12">
+                                  <h4>VSP Premium Eye Family Plan</h4>
+                              </div>
+                            </div>
+                          </li>
+                          <button class="btn btn-see-all">See Details</button>
+                        </ul>
                       </div>
                       <div class="col-md-6 col-sm-6 col-xs-12 right-side">
-                        <p><span>Coverage</span>Kasier</p>
+                        <p class="head">
+                          <span>Life Events</span>
+                          <span></span>
+                        </p>
+                         <ul class="list-group">
+                          <li class="list-group-item">
+                            <div class="row">
+                              <div class="col-md-8 col-sm-8 col-xs-12">
+                                <h4>"We have a new child in the family"</h4>
+                              </div>
+                              <div class="col-md-4 col-sm-4 col-xs-12 text-right">
+                                <a href="#">add a new family member</a>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="list-group-item">
+                            <div class="row">
+                              <div class="col-md-8 col-sm-8 col-xs-12">
+                                <h4>"I just got married"</h4>
+                              </div>
+                              <div class="col-md-4 col-sm-4 col-xs-12 text-right">
+                                <a href="#">add a new family member</a>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="list-group-item">
+                            <div class="row">
+                              <div class="col-md-8 col-sm-8 col-xs-12">
+                                <h4>"I changed jobs"</h4>
+                              </div>
+                              <div class="col-md-4 col-sm-4 col-xs-12 text-right">
+                                <a href="#">add new emloyer plan</a>
+                              </div>
+                            </div>
+                          </li>
+                         <button class="btn btn-see-all md-trigger" data-modal="modal-3">See All</button>
+                        </ul>
                       </div>
                       <div class="cleafix"></div>
                     </div>
@@ -161,7 +235,6 @@
                     <div aria-labelledby="family-tab" id="family" class="tab-pane fade landing-row" role="tabpanel">
                       <%= render 'people/landing_pages/family_members' %> 
                     </div>
-                    
                     <div aria-labelledby="contact-tab" id="contact" class="tab-pane fade" role="tabpanel">
                       <div id="address_info" class="focus_effect row personaol-info-top-row">
                         <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
@@ -191,10 +264,9 @@
                               <button class="btn btn-new-address">NEW ADDRESS</button>
                               <!-- <button class="btn btn-new-address">NEW ADDRESS</button> -->
                             </div>
-                          </div>
-
-                            <%= render 'people/landing_pages/address' %> 
-                          <div class="error">
+                            </div>
+                         <%= render 'people/landing_pages/address' %> 
+                        <div class="error">
                             <div class="warning"><i class="fa fa-exclamation-triangle"></i>
                               All fields Required</div>
                           </div>
@@ -202,10 +274,10 @@
                       </div>
                       <br>
                       <div id="phone_info" class="focus_effect row personaol-info-top-row">
-                          <%= render 'people/landing_pages/phone' %> 
+                         <%= render 'people/landing_pages/phone' %> 
                       </div>
                       <br>                      
-                      <div id="email_info" class="focus_effect row personaol-info-top-row">
+                     <div id="email_info" class="focus_effect row personaol-info-top-row">
                       <% @person.emails.each do |email| %>
                        <% if email.address.present? %>
                         <div class="email">
@@ -370,11 +442,149 @@
         </div>
       </div>
     </div>
-<script>
-      $('input.floatlabel').floatlabel();
-      $(document).ready(function () {
-        $('.floatlabel').floatlabel({
-              slideInput: false
-          });
+
+    <!-- <button class="btn btn-success" data-modal="modal-3">modal</button> -->
+    <div class="md-modal md-effect-3" id="modal-3">
+      <div class="md-content">
+        <h3>
+          Life Events
+          <img src="img/autofill-close.png" class="md-close">
+        </h3>
+        <div class="body">
+          <input type="text" class="form-control" placeholder="search life events">
+          <ul class="modal-links">
+            <li class="active"><a href="#">family events</a></li>
+            <li><a href="#">job events</a></li>
+            <li><a href="#">tax events</a></li>
+            <div class="clearfix"></div>
+          </ul>
+          <div aria-multiselectable="true" role="tablist" id="accordion" class="panel-group event-accordion">
+            <div class="panel panel-default">
+              <div id="headingOne" role="tab" class="panel-heading">
+                <h4 class="panel-title">
+                  <a aria-controls="collapseOne" aria-expanded="false" href="#collapseOne" data-parent="#accordion" data-toggle="collapse" class="collapsed">
+                    <span>"We have a new child in the family"</span>
+                    <span>add a family member</span>
+                    <div class="clearfix"></div>
+                  </a>
+                </h4>
+              </div>
+              <div aria-labelledby="headingOne" role="tabpanel" class="panel-collapse collapse" id="collapseOne" aria-expanded="false" style="height: 0px;">
+                <div class="panel-body">
+                  Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div id="headingTwo" role="tab" class="panel-heading">
+                <h4 class="panel-title">
+                  <a aria-controls="collapseTwo" aria-expanded="false" href="#collapseTwo" data-parent="#accordion" data-toggle="collapse" class="collapsed">
+                    <span>"I just got married"</span>
+                    <span>add a family member</span>
+                    <div class="clearfix"></div>
+                  </a>
+                </h4>
+              </div>
+              <div aria-labelledby="headingTwo" role="tabpanel" class="panel-collapse collapse" id="collapseTwo" aria-expanded="false" style="height: 0px;">
+                <div class="panel-body">
+                  Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default active">
+              <div id="headingThree" role="tab" class="panel-heading">
+                <h4 class="panel-title">
+                  <a aria-controls="collapseThree" aria-expanded="true" href="#collapseThree" data-parent="#accordion" data-toggle="collapse" class="">
+                    <span>"I changed jobs"</span>
+                    <span>add new employer plan</span>
+                    <div class="clearfix"></div>
+                  </a>
+                </h4>
+              </div>
+              <div aria-labelledby="headingThree" role="tabpanel" class="panel-collapse collapse in" id="collapseThree" aria-expanded="true" style="">
+                <div class="panel-body">
+                  Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div id="headingFour" role="tab" class="panel-heading">
+                <h4 class="panel-title">
+                  <a aria-controls="collapseFour" aria-expanded="false" href="#collapseFour" data-parent="#accordion" data-toggle="collapse" class="collapsed">
+                    <span>"I got divorced"</span>
+                    <span>remove family member</span>
+                    <div class="clearfix"></div>
+                  </a>
+                </h4>
+              </div>
+              <div aria-labelledby="headingFour" role="tabpanel" class="panel-collapse collapse" id="collapseFour" aria-expanded="false" style="height: 0px;">
+                <div class="panel-body">
+                  Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div id="headingFive" role="tab" class="panel-heading">
+                <h4 class="panel-title">
+                  <a aria-controls="collapseFive" aria-expanded="false" href="#collapseFive" data-parent="#accordion" data-toggle="collapse" class="collapsed">
+                    <span>"I need to add family members to my plan"</span>
+                    <span>add a family member</span>
+                    <div class="clearfix"></div>
+                  </a>
+                </h4>
+              </div>
+              <div aria-labelledby="headingFive" role="tabpanel" class="panel-collapse collapse" id="collapseFive" aria-expanded="false" style="height: 0px;">
+                <div class="panel-body">
+                  Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="md-overlay"></div><!-- the overlay element -->
+
+    <script>
+      $(".adderess-select-box").focusin(function() {
+        $(".bg-color").css({
+          "background-color": "rgba(220, 234, 241, 1)", 
+          "height": "46px", 
+        });
       });
+      
+      $(".adderess-select-box").focusout(function() {
+        $(".bg-color").css({
+          "background-color": "rgba(255, 255, 255, 1)", 
+          "height": "46px", 
+        });
+      });
+
+      $(document).on("click", ".heading", function(){
+        $(this).closest('div').find(".table-responsive").slideToggle("slow");
+      });
+
+      // $( ".landing-row .left-side .search-table tbody tr td" ).hover(function() {
+      //   $( ".landing-row .left-side .search-table span" ).css("color", "#666 !important");
+      // });
+
+      $('.md-trigger').click(function(e){
+       e.preventDefault();
+      });
+
+      $('.event-accordion .panel').click(function () {
+        $(this).toggleClass('active');
+        $(this).siblings().removeClass('active');
+      });
+    </script>
+
+
+    <!-- classie.js by @desandro: https://github.com/desandro/classie -->
+    
+
+    <!-- for the blur effect -->
+    <!-- by @derSchepp https://github.com/Schepp/CSS-Filters-Polyfill -->
+    <script>
+      // this is important for IEs
+      var polyfilter_scriptpath = '/js/';
     </script>

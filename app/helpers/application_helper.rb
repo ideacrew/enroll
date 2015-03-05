@@ -172,9 +172,9 @@ module ApplicationHelper
     phone = phones.select{|phone| phone.kind == type}
     if phone.present?
       phone = phone.first
-      phone = "#{phone.area_code} #{phone.number}"
+      phone = phone.area_code.present? ? "#{phone.area_code} #{phone.number}" : nil
     else
-      phone = ""
+      phone = nil
     end
     return phone
   end
