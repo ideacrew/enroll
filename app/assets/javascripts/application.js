@@ -34,6 +34,9 @@ $(document).ready(function () {
   $('#personal_sidebar .phone_info').addClass('hidden');
   $('#personal_sidebar .email_info').addClass('hidden');
   $("#personal_sidebar .save-btn").attr("disabled",true);
+  $("#address_info").addClass('hidden');
+  $("#phone_info").addClass('hidden');
+  $("#email_info").addClass('hidden');
   
   $(".date-picker, .date_picker").datepicker({
     changeMonth: true,
@@ -124,14 +127,15 @@ $(document).ready(function () {
     getAllEmployers();
 
     $('.search-btn-row').addClass('hidden');
-    $('#employer-info').removeClass('hidden');
     $('.employer_info').removeClass('hidden');
-    $('#address_info').removeClass('hidden');
+    $('#employer-info').removeClass('hidden');
+    
+    /*$('#address_info').removeClass('hidden');
     $('.address_info').removeClass('hidden');
     $('#phone_info').removeClass('hidden');
     $('.phone_info').removeClass('hidden');
     $('#email_info').removeClass('hidden');
-    $('.email_info').removeClass('hidden');
+    $('.email_info').removeClass('hidden');*/
   }
   
   function getAllEmployers()
