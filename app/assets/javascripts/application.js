@@ -19,7 +19,6 @@
 //= require classie
 //= require modalEffects
 //= require bootstrap.min
-//= require jquery.inputmask
 //= require_tree .
 
 
@@ -54,7 +53,7 @@ $(document).ready(function () {
     $("."+divtoshow).show();
   })
   
-  $(".phone-mask").inputmask("(999) 999-9999");
+//  $(".phone-mask").inputmask("(999) 999-9999");
 
   $('.autofill_yes').click(function(){
       });
