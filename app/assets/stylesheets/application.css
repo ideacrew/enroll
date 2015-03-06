@@ -12,10 +12,10 @@
  *
  *= require jquery-ui
  *= require bootstrap-theme
- *= require style
- *= require custom
  *= require font-awesome
  *= require bootstrap
  *= require component
+ *= require style
+ *= require custom
  *= require_self
  */
