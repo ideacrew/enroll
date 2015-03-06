@@ -10,7 +10,7 @@
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-          <% Employer::ENTITY_KINDS.each do |item| %>
+          <% EmployerProfile::ENTITY_KINDS.each do |item| %>
             <li role="presentation"><a href="#" tabindex="-1" role="menuitem"><%= item.humanize %></a></li>
           <% end %>
         </ul>

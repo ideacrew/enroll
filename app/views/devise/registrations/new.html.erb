@@ -6,11 +6,7 @@
     <h2>Sign up</h2>
     <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
       <%= devise_error_messages! %>
-
-        <%= f.fields_for :person, errors: {}, fieldset: false do |person|  %>
-          <%= render 'shared/name_fields', f: person %><br>
-          <%= render 'shared/id_info_fields', f: person %><br>
-        <% end %>
+        <%= f.hidden_field :referer, value: request.env["HTTP_REFERER"] %>
 
         <div class="form-group">
           <%= f.label :email %>

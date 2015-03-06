@@ -3,7 +3,7 @@ class Employers::EmployerController < ApplicationController
   before_filter :find_employer, only: [:show, :destroy]
 
   def index
-    @employers = Employer.all.to_a
+    @employers = EmployerProfile.all.to_a
   end
 
   def my_account
@@ -13,12 +13,12 @@ class Employers::EmployerController < ApplicationController
   end
 
   def new
-    @employer = Employer.new
+    @employer = EmployerProfile.new
   end
 
   def create
-    params["employer"]["entity_kind"] = Employer::ENTITY_KINDS.sample # temp hack for getting employer creation working.
-    @employer = Employer.new(employer_params)
+    params["employer"]["entity_kind"] = EmployerProfile::ENTITY_KINDS.sample # temp hack for getting employer creation working.
+    @employer = EmployerProfile.new(employer_params)
 
     respond_to do |format|
       if @employer.save
@@ -43,7 +43,7 @@ class Employers::EmployerController < ApplicationController
   private
 
   def find_employer
-    @employer = Employer.find(params[:id])
+    @employer = EmployerProfile.find(params[:id])
   end
 
   def employer_params

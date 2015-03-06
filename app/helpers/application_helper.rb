@@ -16,7 +16,7 @@ module ApplicationHelper
     html += "</ul>".html_safe
     return html
   end
-  
+
   # Formats version information in HTML string for the referenced object instance
   def version_for_record(obj)
     ver  = "version: #{obj.version}" if obj.respond_to?('version')
@@ -36,7 +36,7 @@ module ApplicationHelper
         else
           concat(content_tag :option, item.humanize, value: item)
         end
-      end      
+      end
     end
   end
 
@@ -167,7 +167,7 @@ module ApplicationHelper
     direction = (column == params[:sort] && params[:direction] == "desc") ? "asc" : "desc"
     ((link_to title, params.merge(:sort => column, :direction => direction, :page => nil) ) + content_tag(:sort, raw("&nbsp;"), class: css_class))
   end
-  
+
   def extract_phone_number(phones, type)
     phone = phones.select{|phone| phone.kind == type}
     if phone.present?
@@ -178,5 +178,17 @@ module ApplicationHelper
     end
     return phone
   end
-  
+
+# the following methods are used when we are embedding devise signin and signup pages in views other than devise.
+  def resource_name
+    :user
+  end
+
+  def resource
+    @resource ||= User.new
+  end
+
+  def devise_mapping
+    @devise_mapping ||= Devise.mappings[:user]
+  end
 end

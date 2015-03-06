@@ -4,25 +4,30 @@ class RegistrationsController < Devise::RegistrationsController
     super
   end
 
+  def create
+    referer = params["user"]["referer"] || ""
+    request.env['HTTP_REFERER'] = referer
+    params["user"]["role"] = ["employer_profile"]  if referer.include?("employers")
+    super
+  end
+
+  def edit
+    super
+  end
+
+  def update
+    super
+  end
+
   private
 
   def sign_up_params
     params.require(:user)
           .permit(
                   :email,
+                  {role: []},
                   :password,
-                  :password_confirmation,
-                  :person_attributes => [
-                    :first_name,
-                    :middle_name,
-                    :last_name,
-                    :name_sfx,
-                    :name_pfx,
-                    :dob,
-                    :ssn,
-                    :gender,
-                    :is_active
-                  ]
+                  :password_confirmation
                  )
   end
 
@@ -30,9 +35,26 @@ class RegistrationsController < Devise::RegistrationsController
     params.require(:user)
           .permit(
                   :email,
+                  {role: []},
                   :password,
                   :password_confirmation,
                   :current_password
                  )
   end
+
+  protected
+
+  def after_sign_up_path_for(user)
+    role, profile = user.role, User::PROFILES
+    if role.include?(profile[:employer_profile])
+      new_employers_employer_path
+    elsif role.include?(profile[:broker_profile])
+      brokers_root_path
+    elsif role.include?(profile[:employee_profile])
+      new_person_path
+    else
+      root_path
+    end
+  end
+
 end

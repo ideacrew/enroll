@@ -9,7 +9,7 @@ class User
 
   ## Enable Admin approval
   ## Seed: https://github.com/plataformatec/devise/wiki/How-To%3a-Require-admin-to-activate-account-before-sign_in
-  field :approved, type: Boolean, default: false
+  field :approved, type: Boolean, default: true
 
   ## Database authenticatable
   field :email,              type: String, default: ""
@@ -30,7 +30,7 @@ class User
   field :last_sign_in_ip,    type: String
 
   field :authentication_token
-  field :role, :type => String, :default => "web_service"
+  field :role, :type => Array, :default => []
 
   # Oracle Identity Manager ID
   field :oim_id, type: String, default: ""
@@ -46,13 +46,19 @@ class User
     web_service: "Web Service"
   }
 
+  PROFILES = {
+    employer_profile: "employer_profile",
+    broker_profile: "broker_profile",
+    employee_profile: "employee_profile"
+  }
+
   # Enable polymorphic associations
   belongs_to :profile, polymorphic: true
 
   has_one :person, dependent: :destroy
   accepts_nested_attributes_for :person, :allow_destroy => true
 
-  after_initialize :instantiate_person
+  # after_initialize :instantiate_person
 
   ## Confirmable
   # field :confirmation_token,   type: String

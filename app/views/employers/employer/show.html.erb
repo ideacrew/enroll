@@ -26,9 +26,9 @@ Entity Kind: <%= @employer.entity_kind %>
 
 <% @employer.employee_families.each do |family| %>
   <tr>
-    <td> <%= link_to family.employee.first_name, "/employers/employer/#{family.id}/edit_family" %> </td>
-    <td> <%= family.employee.dob %> </td>
-    <td> <%= family.employee.hired_on %> </td>
+    <td> <%= link_to family.census_employee.first_name, "/employers/employer/#{family.id}/edit_family" %> </td>
+    <td> <%= family.census_employee.dob %> </td>
+    <td> <%= family.census_employee.hired_on %> </td>
     <td> <%= link_to "Delete", employers_employer_family_path(@employer.id, family.id), confirm: "Are you sure you want to delete this family?", method: :delete %> </td>
   </tr>
 <% end %>

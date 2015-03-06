@@ -28,7 +28,7 @@ class Person
   belongs_to :user
 
   belongs_to :employer_contact, 
-                class_name: "Employer",  
+                class_name: "EmployerProfile",  
                 inverse_of: :employer_contacts,
                 index: true
 
