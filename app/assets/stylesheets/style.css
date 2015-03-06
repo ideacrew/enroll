@@ -2538,6 +2538,7 @@ a .arrow-right {
 }
 #employer-info .emp-info {
   font-size: 17px;
+  padding-bottom: 0;
 }
 #employee-signup #employer-info .text-right {
   line-height: 70px;

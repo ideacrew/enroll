@@ -69,9 +69,7 @@ $(document).ready(function () {
 
   $('#search-employer').click(function() {
     match_person();
-  })
-  
-
+  });
   
   function match_person()
   {
@@ -129,12 +127,12 @@ $(document).ready(function () {
     $('.employer_info').removeClass('hidden');
     $('#employer-info').removeClass('hidden');
     
-    /*$('#address_info').removeClass('hidden');
+    $('#address_info').removeClass('hidden');
     $('.address_info').removeClass('hidden');
     $('#phone_info').removeClass('hidden');
     $('.phone_info').removeClass('hidden');
     $('#email_info').removeClass('hidden');
-    $('.email_info').removeClass('hidden');*/
+    $('.email_info').removeClass('hidden');
   }
   
   function getAllEmployers()
