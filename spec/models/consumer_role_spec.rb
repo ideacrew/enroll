@@ -14,9 +14,10 @@ describe ConsumerRole, type: :model do
   it { should validate_presence_of :ssn }
   it { should validate_presence_of :dob }
   
-  let(:person) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789" )}
-  
-  let(:is_incarcerated) {true}
+  let(:address) {FactoryGirl.build(:address)}
+  let(:saved_person) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789")}
+
+  let(:is_incarcerated) {false}
   let(:is_applicant) {true}
   let(:is_state_resident) {true}
   let(:citizen_status) {"us_citizen"}
@@ -24,11 +25,12 @@ describe ConsumerRole, type: :model do
   
   describe ".new" do
     let(:valid_params) do
-      { is_incarcerated: is_incarcerated,
+      { 
+        is_incarcerated: is_incarcerated,
         is_applicant: is_applicant,
         is_state_resident: is_state_resident,
         citizen_status: citizen_status,
-        person: person
+        person: saved_person
       }
     end
     
@@ -40,9 +42,20 @@ describe ConsumerRole, type: :model do
     end
     
     context "with all valid arguments" do
-      let(:params) {valid_params}
+      let(:consumer_role) {saved_person.build_consumer_role(valid_params)}
+
       it "should save" do
-        expect(ConsumerRole.new(**params).save).to be_true
+        expect(consumer_role.save).to be_true
+      end
+
+      context "and it is saved" do
+        before do
+          consumer_role.save
+        end
+
+        it "should be findable" do
+          expect(ConsumerRole.find(consumer_role.id).id.to_s).to eq consumer_role.id.to_s
+        end
       end
     end
     
