@@ -34,6 +34,7 @@ Rails.application.routes.draw do
       post 'person_landing'
       post 'plan_details'
       post 'dependent_details'
+      get 'dependent_details'
     end
     
   end

@@ -32,6 +32,14 @@ class PeopleController < ApplicationController
   def match_employer
   end
 
+  def person_lading
+    @person = Person.find(params[:person_id])
+    @employer = Organization.find(params[:employer_id])
+    employee_family = Organization.find(@employer.id).employee_family_details(@person)
+    @employee = employee_family.census_employee
+    build_nested_models
+  end
+  
   def link_employer
   end
   
@@ -84,6 +92,7 @@ class PeopleController < ApplicationController
     build_nested_models
     respond_to do |format|
       format.js {}
+      format.html {}
     end
   end
   
