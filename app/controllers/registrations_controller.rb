@@ -7,7 +7,13 @@ class RegistrationsController < Devise::RegistrationsController
   def create
     referer = params["user"]["referer"] || ""
     request.env['HTTP_REFERER'] = referer
-    params["user"]["role"] = ["employer_profile"]  if referer.include?("employers")
+    params["user"]["role"] = if referer.include?("employers")
+      ["employer_profile"]
+      elsif referer.include?("brokers")
+        ["broker_profile"]
+      else
+        ["employee_profile"]
+      end
     super
   end
 
