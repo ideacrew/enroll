@@ -49,6 +49,19 @@ describe EmployeeRole, type: :model do
         end
       end
 
+      it "should save" do
+        expect(employee_role.save).to be_true
+      end
+
+      context "and it is saved" do
+        before do
+          employee_role.save
+        end
+
+        it "should be findable" do
+          expect(EmployeeRole.find(employee_role.id).id.to_s).to eq employee_role.id.to_s
+        end
+      end
     end
 
     context "with no employer_profile" do
