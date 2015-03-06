@@ -160,7 +160,7 @@ span.red{
   font-weight: 400;
 }
 .no-pd{
-  padding: 0;
+  padding: 0 !important;
 }
 .no-pd-right{
   padding-right: 0;
@@ -784,15 +784,15 @@ a.family{
   background-color: #f4f4f4;
 }
 .input-lg, .form-group-lg .form-control{
-  border-radius: 0;
+  border-radius: 0 !important;
   /*padding: 22px 12px;*/
   border: none !important;
-  font-size: 14px;
-  font-weight: 300;
-  font-family: 'AvenirLTStd-Light';
-  padding-bottom: 8px;
-  padding-left: 10px;
-  padding-right: 10px; 
+  font-size: 14px !important;
+  font-weight: 300 !important;
+  font-family: 'AvenirLTStd-Light' !important;
+  padding-bottom: 8px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important; 
 }
 .form-control:focus{
   border-color: #e3e3e3;
@@ -931,8 +931,8 @@ label.label-floatlabel {
 }
 .radio{
   background-color: #ffffff;
-  margin-top: 0;
-  margin-bottom: 0;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
   height: 46px;
   line-height: 46px;
   border: none !important;
@@ -1058,7 +1058,7 @@ input.floatlabe{
   right: 4.5%;
 }
 .top-row, .middle-row, .bottom-row {
-  margin: 0;
+  margin: 0 !important;
 }
 .error {
   display: none;
@@ -2317,4 +2317,7 @@ a.employer_info {
 
 #employer-info .text-right {
     line-height: 52px;
+}
+.left-pd{
+  padding-left: 0 !important;
 }
