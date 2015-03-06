@@ -29,11 +29,19 @@ class Employers::FamilyController < ApplicationController
   private
 
   def find_employer
-    @employer = Employer.find params["employer_id"]
+    @employer = EmployerProfile.find params["employer_id"]
   end
 
   def find_family
     @family = @employer.employee_families.where(id: params["id"]).to_a.first
+  end
+
+  def build_family
+    family = EmployerCensus::EmployeeFamily.new
+    family.build_employee
+    family.build_employee.build_address
+    family.dependents.build
+    family
   end
 
 end

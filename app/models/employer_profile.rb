@@ -58,13 +58,13 @@ class EmployerProfile
 
   scope :active, ->{ where(:is_active => true) }
 
-  # def build_family
-  #   family = EmployerCensus::EmployeeFamily.new
-  #   family.build_employee
-  #   family.build_employee.build_address
-  #   family.dependents.build
-  #   family
-  # end
+  def build_family
+    family = EmployerCensus::EmployeeFamily.new
+    family.build_census_employee
+    family.build_census_employee.build_address
+    family.census_dependents.build
+    family
+  end
 
   def parent
     raise "undefined parent Organization" unless organization?
@@ -134,8 +134,8 @@ class EmployerProfile
     end
 
     def find(id)
-      organization = Organization.where("employer_profile._id" => id).documents
-      raise organization.inspect
+      organization = Organization.where("employer_profile._id" => BSON::ObjectId.from_string(id)).to_a
+      # raise organization.inspect
       organization.first.employer_profile unless organization.blank?
     end
 
