@@ -2319,7 +2319,8 @@ a.employer_info {
 }
 
 #new_person .sidebar-email-field {
-  padding-top: 40px !important; 
+  padding-top: 40px !important;
+  padding-bottom: 120px !important;
 } 
 .left-pd{
   padding-left: 0 !important;

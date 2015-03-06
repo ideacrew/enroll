@@ -13,12 +13,12 @@
 //= require jquery
 //= require jquery-ui
 //= require jquery_ujs
+//= require bootstrap.min
 //= require twitter/bootstrap
 //= require twitter/bootstrap/tab
 //= require turbolinks
 //= require classie
 //= require modalEffects
-//= require bootstrap.min
 //= require_tree .
 
 
@@ -133,6 +133,7 @@ $(document).ready(function () {
     $('.phone_info').removeClass('hidden');
     $('#email_info').removeClass('hidden');
     $('.email_info').removeClass('hidden');
+    $('.search_continue').removeClass('hidden');
   }
   
   function getAllEmployers()

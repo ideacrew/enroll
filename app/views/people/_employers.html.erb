@@ -10,8 +10,9 @@
           <% url = dependent_details_people_path(person_id: @person.id, employer_id: organization.id) %>
         <% else %>
           <% url = plan_details_people_path(person_id: @person.id, employer_id: organization.id) %>
-         <% end %>
+        <% end %>
         
+        <input type="hidden" data-url="<%= url %>" class="badge">
         <!-- <span id="badge" data-url="<%= url %>"  class="badge" style="cursor:pointer"><i></i></span> -->
 			</div>
 		  <div class="col-md-3 col-sm-2 col-xs-12 no-pd text-right">
@@ -27,12 +28,13 @@
   <p>Change Details? <a href="#" class="change_personal_info"><u>Search Again</u></a></p>
 </div> -->
 <script>
+
   $(".change_personal_info").click(function(){
     $('.search-btn-row').removeClass('hidden');
     $('#employer-info').html("");
     $(".employer_info").html('');
   });
-$('.search_continue').hide();
+// $('.search_continue').hide();
 $(".badge").on('click',function(){
   $('.badge').removeClass('badge-active');
   $(".person-search-form").removeClass('person-search-form-active');
@@ -40,7 +42,11 @@ $(".badge").on('click',function(){
   $(this).closest(".person-search-form").addClass('person-search-form-active');
   url = $(".badge-active").attr("data-url");
   $('.search_continue').attr("href",url);
-  $('.search_continue').show();
+  // $('.search_continue').show();
+});
+
+$('.search_continue').on('click', function() {
+  $('.search_continue').attr("href",$('.badge').first().attr("data-url"));
 });
 /*$('.search_continue').on('click',function(){
       person_id = $(".badge-active").attr("person-id");
