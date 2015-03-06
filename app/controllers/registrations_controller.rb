@@ -1,19 +1,13 @@
 class RegistrationsController < Devise::RegistrationsController
 
+  before_action :set_referer, only: [:create, :new]
+
   def new
     super
   end
 
   def create
-    referer = params["user"]["referer"] || ""
-    request.env['HTTP_REFERER'] = referer
-    params["user"]["role"] = if referer.include?("employers")
-      ["employer_profile"]
-      elsif referer.include?("brokers")
-        ["broker_profile"]
-      else
-        ["employee_profile"]
-      end
+    set_role
     super
   end
 
@@ -26,6 +20,23 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   private
+
+  def set_referer
+    @@referer ||= request.env["HTTP_REFERER"]
+  end
+
+  def set_role
+    profiles = User::PROFILES
+    referer = params["user"]["referer"]
+    referer = @@referer.present? ? @@referer : (referer || "")
+    params["user"]["role"] = if referer.include?("employers")
+        profile[:employer_profile]
+      elsif referer.include?("brokers")
+        profile[:broker_profile]
+      else
+        profile[:employee_profile]
+      end
+  end
 
   def sign_up_params
     params.require(:user)
@@ -55,7 +66,7 @@ class RegistrationsController < Devise::RegistrationsController
     if role.include?(profile[:employer_profile])
       new_employers_employer_path
     elsif role.include?(profile[:broker_profile])
-      brokers_root_path
+      new_brokers_broker_path
     elsif role.include?(profile[:employee_profile])
       new_person_path
     else

@@ -14,10 +14,6 @@ Rails.application.routes.draw do
     end
   end
 
-  post 'employers/employer/:id/update' => "employers/employer#update"
-  get 'employers/employer/:id/new_family' => "employers/employer#new_family"
-  post 'employers/employer/:id/create_family' => "employers/employer#create_family"
-
   namespace :employers do
     root 'welcome#index'
 
@@ -44,7 +40,8 @@ Rails.application.routes.draw do
 
   resources :employees
 
-  devise_for :users, :controllers => { :registrations => "registrations" }
+  devise_for :users, :controllers => { registrations: "registrations",
+                                        sessions: "sessions" }
   # devise_scope :user do
   #   get "/sign_in" => "devise/sessions#new"
   #   get "/sign_up" => "devise/registrations#new"
