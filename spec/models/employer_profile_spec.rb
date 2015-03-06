@@ -29,8 +29,20 @@ RSpec.describe EmployerProfile, :type => :model do
 
     context "with all valid arguments" do
       let(:params) {valid_params}
+      let(:employer_profile) {EmployerProfile.new(**params)}
+
       it "should save" do
-        expect(EmployerProfile.new(**params).save).to be_true
+        expect(employer_profile.save).to be_true
+      end
+
+      context "and it is saved" do
+        before do
+          employer_profile.save
+        end
+
+        it "should be findable" do
+          expect(EmployerProfile.find(employer_profile.id).id.to_s).to eq employer_profile.id.to_s
+        end
       end
     end
 
