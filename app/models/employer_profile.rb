@@ -134,14 +134,13 @@ class EmployerProfile
     end
 
     def find(id)
-      organization = Organization.where("employer_profile._id" => BSON::ObjectId.from_string(id)).to_a
-      # raise organization.inspect
-      organization.first.employer_profile unless organization.blank?
+      organizations = Organization.where("employer_profile._id" => BSON::ObjectId.from_string(id))
+      organizations.size > 0 ? organizations.first.employer_profile : nil
     end
 
     def find_by_fein(fein)
       organization = Organization.find(fein: fein)
-      organization.employer_profile unless organization.blank?
+      organizations.present? ? organization.employer_profile : nil
     end
 
     def find_by_broker_agency_profile(profile)

@@ -82,9 +82,10 @@ class EmployeeRole
     self.is_active
   end
 
-  def self.find(employee_id)
-    person = Person.where({"employee_roles._id" => employee_id }).first
-    person.employee_roles.detect { |ee| ee.id == employee_id } unless person.nil?
+  def self.find(employee_role_id)
+    bson_id = BSON::ObjectId.from_string(employee_role_id)
+    person = Person.where({"employee_roles._id" => bson_id }).first
+    person.employee_roles.detect { |ee| ee.id == bson_id } unless person.nil?
   end
 
   def self.list(collection)
