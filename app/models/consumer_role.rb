@@ -107,6 +107,11 @@ class ConsumerRole
     addresses.detect { |adr| adr.kind == "billing" } || home_address
   end
 
+  def self.find(consumer_role_id)
+    Person.where("consumer_role._id" => consumer_role_id).first.consumer_role unless consumer_role_id.blank?
+  end
+
+
 
   # aasm column: "application_state" do
   #   state :enrollment_closed, initial: true

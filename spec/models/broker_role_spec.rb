@@ -2,6 +2,9 @@ require 'rails_helper'
 
 describe BrokerRole, type: :model do
 
+  let(:address) {FactoryGirl.build(:address)}
+  let(:saved_person) {FactoryGirl.create(:person, addresses: [address])}
+
   let(:person0) {FactoryGirl.create(:person)}
   let(:person1) {FactoryGirl.create(:person)}
   let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
@@ -12,7 +15,8 @@ describe BrokerRole, type: :model do
 
   describe ".new" do
     let(:valid_params) do
-      { person: person0,
+      { 
+        person: saved_person,
         npn: npn0,
         provider_kind: provider_kind
       }
@@ -51,16 +55,21 @@ describe BrokerRole, type: :model do
     end
 
     context "with all required data" do
-      let(:params) {valid_params}
+      let(:broker_role) {saved_person.build_broker_role(valid_params)}
 
-      it "should successfully save" do
-        expect(BrokerRole.new(**params).save).to be_true
+      it "should save" do
+        expect(broker_role.save).to be_true
       end
 
-      it 'successfully save using build_broker' do
-        expect(person0.build_broker_role(**params.except(:person)).save).to eq true
-      end
+      context "and it is saved" do
+        before do
+          broker_role.save
+        end
 
+        it "should be findable" do
+          expect(BrokerRole.find(broker_role.id).id.to_s).to eq broker_role.id.to_s
+        end
+      end
     end
 
     context "with duplicate npn number" do
