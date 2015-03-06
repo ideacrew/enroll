@@ -2317,6 +2317,10 @@ a.employer_info {
 #employer-info .text-right {
     line-height: 52px;
 }
+
+#new_person .sidebar-email-field {
+  padding-top: 40px !important; 
+} 
 .left-pd{
   padding-left: 0 !important;
 }
