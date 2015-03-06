@@ -59,6 +59,19 @@ class PeopleController < ApplicationController
     end
   end
   
+  def plan_details
+    
+  end
+  
+  def dependent_details
+    @person = Person.find(params[:person_id])
+    @employer = Organization.find(params[:employer_id])
+    employee_family = Organization.find(@employer.id).employee_family_details(@person)
+    @employee = employee_family.census_employee
+    build_nested_models
+  end
+    
+  
   def person_landing
     @person = Person.find(params[:person_id])
     if params[:employer_id].to_i != 0

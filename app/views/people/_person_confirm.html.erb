@@ -24,20 +24,20 @@
        <% end %>
        </br>
        
-      <div style="float:right;padding-top: 20px;">   
-       <% if @employer.present? %>
-        <a href="#" data-person-id="<%= @person.id %>" data-employer-id="<%= @employer.id %>" class="btn btn-save person_landing_continue" >Continue</a>   
+      <div style="float:right;padding-top: 20px;"> 
+       <% if @employee.present? %>
+        <% url = dependent_details_people_path(person_id: @person.id, employer_id: @employer.id) %>
        <% else %>
-        <a href="#" data-person-id="<%= @person.id %>" data-employer-id="0" class="btn btn-save person_landing_continue" >Continue</a>   
+        <% url = plan_details_people_path()person_id: @person.id, employer_id: @employer.id %>
        <% end %>
-        
+        <a href="<% url %>" class="btn btn-save person_landing_continue" >Continue</a>   
      </div>
     </div>
   </div>
   <script>
   // $(".save-btn").removeAttr("disabled");  
    //$(".submit_section").html("<a href='#' data-person-id='"+person_id+"' data-employer-id='"+employer_id+"' class='btn btn-save person_landing_continue'> Save </a>")
-   $('.person_landing_continue').on('click',function(){
+   /*$('.person_landing_continue').on('click',function(){
       person_id = $(this).data("person-id");
       employer_id = $(this).data("employer-id");
       $.ajax({
@@ -47,5 +47,5 @@
         success: function (result) {
         }
     });
-})
+})*/
 </script>

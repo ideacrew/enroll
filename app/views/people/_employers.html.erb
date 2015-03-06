@@ -5,10 +5,17 @@
   <tr>
     <td>
 		  <div class="col-md-5 col-sm-5 col-xs-12 no-pd">
-			  <%= render 'shared/employer', organization: organization %>
+        <% employee = organization.employee_family_details(@person) %>
+			  <%= render 'shared/employer', organization: organization,employee: employee.census_employee %>
 		  </div>
       <div class="col-md-2 col-sm-2 col-xs-2">
-        <span id="badge" person-id="<%= @person.id %>" employer-id="<%= organization.id %>" class="badge" style="cursor:pointer"><i></i></span>
+        <% if employee.census_dependents.present? %>
+          <% url = dependent_details_people_path(person_id: @person.id, employer_id: organization.id) %>
+        <% else %>
+          <% url = plan_details_people_path(person_id: @person.id, employer_id: organization.id) %>
+         <% end %>
+        
+        <span id="badge" data-url="<%= url %>"  class="badge" style="cursor:pointer"><i></i></span>
 			</div>
 		  <div class="col-md-3 col-sm-2 col-xs-12 no-pd text-right">
 			  <p>Not your employer? <a href="#"><u>Click Here</u></a></p>
@@ -17,12 +24,11 @@
   </tr>
 	<% end %>
 </table>
-
-<div class="col-md-3 col-sm-4 col-xs-12 no-pd">
-  <a href="#" id="continue-employer" class="btn btn-search search_continue">Continue</a>
-</div>
-
 <% end %>
+<div class="col-md-3 col-sm-4 col-xs-12 no-pd">
+  <a href="#" data-method="POST" id="continue-employer" class="btn btn-search search_continue">Continue</a>
+</div>
+ 
 <div class="col-md-3 col-sm-4 col-xs-12 no-pd text-right">
   <p>Change Details? <a href="#" class="change_personal_info"><u>Search Again</u></a></p>
 </div>
@@ -38,11 +44,14 @@ $(".badge").on('click',function(){
   $(".person-search-form").removeClass('person-search-form-active');
   $(this).toggleClass('badge-active');
   $(this).closest(".person-search-form").addClass('person-search-form-active');
+  url = $(".badge-active").attr("data-url");
+  $('.search_continue').attr("href",url);
   $('.search_continue').show();
 });
-$('.search_continue').on('click',function(){
-      person_id = $(".badge-active").attr("person-id")
-      employer_id = $(".badge-active").attr("employer-id")
+/*$('.search_continue').on('click',function(){
+      person_id = $(".badge-active").attr("person-id");
+      employer_id = $(".badge-active").attr("employer-id");
+      window.location.href  = 
       $.ajax({
         type: "POST",
         url: "/people/person_landing.js",
@@ -50,5 +59,6 @@ $('.search_continue').on('click',function(){
         success: function (result) {
         }
     });
-})
+})*/
+
 </script>

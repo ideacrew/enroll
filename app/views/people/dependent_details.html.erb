@@ -1,0 +1,20 @@
+<a href="javascript:history.back()">Go Back to Landing Page</a>
+<h3> Family Member Details</h3>
+<div class="right-side">
+  <div class="col-md-10 col-xs-12 col-sm-10 no-pd">
+    <ul class="list-group">
+      <% @employee.employee_family.census_dependents.each do |dependent| %>
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col-md-10 col-sm-8 col-xs-8">
+            <h4> <%= dependent.first_name %> <%= dependent.last_name %> </h4>
+          </div>
+        </div>
+      </li>
+      <% end %>
+    </ul>
+  </div>
+  <div class="col-md-2 col-xs-12 col-sm-2">
+    <button class="btn">New Member</button>
+  </div>
+</div>
