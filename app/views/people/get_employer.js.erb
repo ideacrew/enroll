@@ -1,4 +1,28 @@
 $('#employer-info').html("<%= escape_javascript(render 'employers').html_safe %>");
+var index = 0;
+<% @person.addresses.each do |address| %>
+  $("#person_addresses_attributes_"+index+"_address_1").val("<%= address.address_1 %>");
+  $("#person_addresses_attributes_"+index+"_address_2").val("<%= address.address_2 %>");
+  $("#person_addresses_attributes_"+index+"_city").val("<%= address.city %>");
+  $("#person_addresses_attributes_"+index+"_state").val("<%= address.state %>");
+  $("#person_addresses_attributes_"+index+"_zip").val("<%= address.zip %>");
+  $("#person_addresses_attributes_"+index+"_kind").val("<%= address.kind %>");
+  index = index+1;
+<% end %>
+
+var index = 0;
+<% @person.phones.each do |phone| %>
+  $("#person_phones_attributes_"+index+"_full_phone_number").val("<%= phone.area_code %> <%= phone.number %>");
+  $("#person_phones_attributes_"+index+"_kind").val("<%= phone.kind %>");
+  index = index+1;
+<% end %>
+
+var index = 0;
+<% @person.emails.each do |email| %>
+  $("#person_emails_attributes_"+index+"_address").val("<%= email.address %>");
+  $("#person_emails_attributes_"+index+"_kind").val("<%= email.kind %>");
+  index = index+1;
+<% end %>
 
 // $('.search_results').removeClass('hidden');
 // $('.employers-row').html("<%= escape_javascript(render 'employers').html_safe %>");
