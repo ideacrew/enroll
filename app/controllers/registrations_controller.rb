@@ -26,7 +26,7 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def set_role
-    profiles = User::PROFILES
+    profile = User::PROFILES
     referer = params["user"]["referer"]
     referer = @@referer.present? ? @@referer : (referer || "")
     params["user"]["role"] = if referer.include?("employers")
