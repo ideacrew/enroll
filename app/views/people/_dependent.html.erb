@@ -1,0 +1,53 @@
+<li class="list-group-item">
+ <form method="POST" id="form-<%=dependent.id%>" action="<%= add_dependents_people_path(:id => 12) %>">
+  <div class="row" >
+    <div class="col-md-5 col-sm-10 col-xs-10">
+      <div class="form-group">
+          <%= label_tag :first_name %>
+          <%= hidden_field_tag "dependent",:id, value: dependent.id %>
+          <%= text_field_tag "dependent",:first_name, value: dependent.first_name,class: "form-control", required: true %>
+      </div>
+    </div>
+    <div class="col-md-2 col-sm-10 col-xs-10">
+       <%= label_tag :mi %>
+       <%= text_field_tag "dependent",:middle_name, value: dependent.middle_name, class: "form-control", required: true %>
+    </div>
+    <div class="col-md-5 col-sm-10 col-xs-10">
+       <%= label_tag :last_name %>
+       <%= text_field_tag "dependent",:last_name, value: dependent.last_name ,class: "form-control", required: true %>
+    </div>
+  </div>
+  <div class="row" >
+    <div class="col-md-4 col-sm-10 col-xs-10">
+       <%= label_tag :ssn %>
+       <%= text_field_tag "dependent",:ssn, value: dependent.ssn, class: "form-control", required: true %>
+    </div>
+    <div class="col-md-4 col-sm-10 col-xs-10">
+       <%= label_tag :dob %>
+       <%= text_field_tag "dependent",:dob, value: dependent.dob, class: "form-control", required: true %>
+    </div>
+    <div class="col-md-4 col-sm-10 col-xs-10">
+       <%= label_tag :gender %>
+       <%= text_field_tag "dependent",:gender,value: dependent.gender, class: "form-control", required: true %>
+    </div>
+  </div>
+  <div class="row" >
+    <div class="col-md-10 row col-sm-10 col-xs-10">
+      <%= label_tag :relationship %>
+      <%= text_field_tag "dependent",:relationship,value: dependent.employee_relationship, class: "form-control", required: true %>
+    </div>
+    <div class="col-md-1 col-sm-1 col-xs-1">
+      <%= link_to (image_tag "check.png"), "#",  style: "background-color:white !important;", class: "save_dependent", :"data-id" => dependent.id %>
+    </div>    
+    <div class="col-md-1 col-sm-1 col-xs-1">  
+      <%= link_to (image_tag "delete.png"), "#", style: "background-color:white !important;", :remote => true %>
+    </div>
+  </div>
+ </form>
+</li>
+<script>
+$(".save_dependent").click(function(){
+   form = "form"+$(this).data("id");
+   $("#"+form).ubmit();
+  });
+</script>
