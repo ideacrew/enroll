@@ -30,9 +30,6 @@ class BrokerAgencyProfile
 
   validate :writing_agent_employed_by_broker
 
-  def self.find_by_broker(search_broker)
-  end
-
   # has_many employers
   def employer_clients
     return unless MARKET_KINDS.except("individual").include?(market_kind)
@@ -45,13 +42,13 @@ class BrokerAgencyProfile
     Family.find_by_broker_agency_profile(self.id)
   end
 
-  # has_one primary_broker
-  def primary_broker=(new_primary_broker)
-    if new_primary_broker.present?
-      raise ArgumentError.new("expected BrokerRole class") unless new_primary_broker.is_a? BrokerRole
-      self.primary_broker_role_id = new_primary_broker._id
+  # has_one primary_broker_role
+  def primary_broker_role=(new_primary_broker_role)
+    if new_primary_broker_role.present?
+      raise ArgumentError.new("expected BrokerRole class") unless new_primary_broker_role.is_a? BrokerRole
+      self.primary_broker_role_role_id = new_primary_broker_role._id
     else
-      primary_broker_role = nil
+      primary_broker_role_id = nil
     end
   end
 
@@ -59,8 +56,13 @@ class BrokerAgencyProfile
     BrokerRole.find(self.primary_broker_role_id) unless primary_broker_role_id.blank?
   end
 
-  # has_many writing_agents
+  # alias for brokers
   def writing_agents
+    brokers
+  end
+
+  # has_many brokers
+  def brokers
     BrokerRole.find_by_broker_agency_profile(self)
   end
 
@@ -80,11 +82,7 @@ class BrokerAgencyProfile
 
     # TODO; return as chainable Mongoid::Criteria
     def all
-      list_embedded Organization.exists(broker_agency_profile: true).to_a
-    end
-
-    def find(broker_agency_profile_id)
-      Organization.where("broker_agency_profile._id" => broker_agency_profile_id).first.broker_agency_profile unless broker_agency_profile_id.blank?
+      list_embedded Organization.exists(broker_agency_profile: true).order_by([:dba]).to_a
     end
 
     def first
@@ -94,6 +92,12 @@ class BrokerAgencyProfile
     def last
       all.last
     end
+
+    def find(id)
+      organizations = Organization.where("broker_agency_profile._id" => BSON::ObjectId.from_string(id))
+      organizations.size > 0 ? organizations.first.broker_agency_profile : nil
+    end
+
   end
 
 
