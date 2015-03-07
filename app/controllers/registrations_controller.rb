@@ -9,6 +9,7 @@ class RegistrationsController < Devise::RegistrationsController
   def create
     set_role
     super
+    @@referer = ""
   end
 
   def edit
@@ -30,11 +31,11 @@ class RegistrationsController < Devise::RegistrationsController
     referer = params["user"]["referer"]
     referer = @@referer.present? ? @@referer : (referer || "")
     params["user"]["role"] = if referer.include?("employers")
-        profile[:employer_profile]
+        [profile[:employer_profile]]
       elsif referer.include?("brokers")
-        profile[:broker_profile]
+        [profile[:broker_profile]]
       else
-        profile[:employee_profile]
+        [profile[:employee_profile]]
       end
   end
 
