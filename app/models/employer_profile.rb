@@ -58,14 +58,6 @@ class EmployerProfile
 
   scope :active, ->{ where(:is_active => true) }
 
-  def build_family
-    family = EmployerCensus::EmployeeFamily.new
-    family.build_census_employee
-    family.build_census_employee.build_address
-    family.census_dependents.build
-    family
-  end
-
   def parent
     raise "undefined parent Organization" unless organization?
     self.organization

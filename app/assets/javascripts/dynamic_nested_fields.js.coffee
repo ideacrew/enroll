@@ -1,4 +1,4 @@
-jQuery ->
+ready = ->
   $('form').on 'click', '.add_fields', (event) ->
     event.preventDefault()
     time = new Date().getTime()
@@ -26,3 +26,6 @@ style_select_picker = ->
       delete_button.hide()
     else
       delete_button.show()
+
+$(document).ready(ready)
+$(document).on('page:load', ready)

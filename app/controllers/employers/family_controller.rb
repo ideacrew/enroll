@@ -4,14 +4,14 @@ class Employers::FamilyController < ApplicationController
   before_filter :find_family, only: [:destroy]
 
   def new
-    @family = @employer.build_family
+    @family = build_family
   end
 
   def create
     params.permit!
-    family = EmployerCensus::EmployeeFamily.new
-    family.attributes = params["employer_census_employee_family"]
-    @employer.employee_families << family
+    @family = EmployerCensus::EmployeeFamily.new
+    @family.attributes = params["employer_census_employee_family"]
+    @employer.employee_families << @family
     if @employer.save
       flash.notice = "Employer Census Family is successfully created."
       redirect_to employers_employer_path(@employer)
@@ -38,9 +38,9 @@ class Employers::FamilyController < ApplicationController
 
   def build_family
     family = EmployerCensus::EmployeeFamily.new
-    family.build_employee
-    family.build_employee.build_address
-    family.dependents.build
+    family.build_census_employee
+    family.build_census_employee.build_address
+    family.census_dependents.build
     family
   end
 

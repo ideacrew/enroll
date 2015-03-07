@@ -23,15 +23,11 @@
           </div>
         </div>
       </div>
-      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <button class="btn btn-new-address border-bottom-none">NEW ADDRESS</button>
-        <!-- <button class="btn btn-new-address">NEW ADDRESS</button> -->
-      </div>
     </div>
     
     <div class="row middle-row form-group form-group-lg no-pd address-row">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.hidden_field :kind %>
+        <%= f.hidden_field :kind, value: "home" %>
         <%= f.text_field :address_1, placeholder: "ADDRESS LINE 1", class: "floatlabel form-control border-bottom-none border-right-none" %>
       </div>
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
