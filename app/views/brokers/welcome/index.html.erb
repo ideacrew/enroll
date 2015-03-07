@@ -1,18 +1,39 @@
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
+    <% if user_signed_in? %>
+      <li>
+        Welcome <%= current_user.email %> |
+        <%= link_to('Logout', destroy_user_session_path, :method => :delete) %>
+      </li>
+    <% else %>
+      <li>
+        <%= link_to('Login', new_user_session_path)  %>
+      </li>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
     <div class="jumbotron">
-      <h1>Broker Portal</h1>
-      <p>Broker Registration and Account Maintenance</p>
-      <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
-      <div class="row">
-        <p><%= link_to "Consumer Portal", root_path, class: "btn btn-default" %>
+    <div class="row">
+  <div class="col-md-12">
+      <h2>DC HealthLink Broker Portal</h2>
+      <p>DC's Online Health Insurance Marketplace</p>
+      <p>
+        <%= link_to 'Sign in', new_user_session_path, class: "btn btn-primary btn-lg"  %>
+        <%= link_to 'Sign up', new_user_registration_path, class: "btn btn-default btn-lg"  %>
+      </p>
+      <p>
+        <%= link_to "Consumer Portal", root_path, class: "btn btn-default" %>
         <%= link_to "Employer Portal", employers_root_path, class: "btn btn-default" %>
-        <%= link_to "Broker Portal", brokers_root_path, class: "btn btn-default" %></p>
+        <%= link_to "Broker Portal", brokers_root_path, class: "btn btn-default" %>
+      </p>
+      </div>
       </div>
     </div>
   </div>
 </div>
-
 <% if !user_signed_in? %>
   <%= render "devise/shared/sign_in"%>
 <%end%>
