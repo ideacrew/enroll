@@ -114,7 +114,7 @@ class EmployerProfile
     end
 
     def all
-      list_embedded Organization.exists(employer_profile: true).to_a
+      list_embedded Organization.exists(employer_profile: true).order_by([:dba]).to_a
     end
 
     def first

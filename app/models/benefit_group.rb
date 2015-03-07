@@ -1,5 +1,6 @@
 class BenefitGroup
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   embedded_in :plan_year
   Benefit = Struct.new(:relationship, :premium_pct, :employer_max_amt)
