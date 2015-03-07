@@ -25,6 +25,10 @@ class Plan
 
   field :premiums, type: Array, default: []
 
+  field :is_active, type: Boolean, default: true
+  field :updated_by, type: String
+
+
   index({ hbx_id: 1 })
   index({ coverage_type: 1 })
   index({ metal_level: 1 })
