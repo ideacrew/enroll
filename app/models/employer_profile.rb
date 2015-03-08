@@ -104,7 +104,7 @@ class EmployerProfile
   end
 
   # Enrollable employees are active and unlinked
-  def linkable_census_family_by_person(person)
+  def linkable_employee_family_by_person(person)
     return if employee_families.nil?
     employee_families.detect { |ef| (ef.census_employee.ssn == person.ssn) && (ef.is_linkable?) }
   end

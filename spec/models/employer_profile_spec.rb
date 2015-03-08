@@ -212,12 +212,12 @@ describe EmployerProfile, "instance methods" do
   let (:census_family) {FactoryGirl.build(:employer_census_family, census_employee: census_employee, employer_profile: nil)}  
   let (:person) {Person.new(first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn)}
 
-  describe "#linkable_census_family_by_person" do
+  describe "#linkable_employee_family_by_person" do
     let (:employer_profile) {FactoryGirl.create(:employer_profile)}
 
     context "with no census_family employees matching SSN" do
       it "should return nil" do
-        expect(employer_profile.linkable_census_family_by_person(person)).to be_nil
+        expect(employer_profile.linkable_employee_family_by_person(person)).to be_nil
       end
     end
 
@@ -225,8 +225,8 @@ describe EmployerProfile, "instance methods" do
       let (:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [census_family])}
 
       it "should return the matching census_family" do
-        expect(employer_profile.linkable_census_family_by_person(person)).to be_a EmployerCensus::EmployeeFamily
-        expect(employer_profile.linkable_census_family_by_person(person)).to eq census_family
+        expect(employer_profile.linkable_employee_family_by_person(person)).to be_a EmployerCensus::EmployeeFamily
+        expect(employer_profile.linkable_employee_family_by_person(person)).to eq census_family
       end
 
       context "with employee previously terminated" do
@@ -235,7 +235,7 @@ describe EmployerProfile, "instance methods" do
         let (:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [prior_census_family, census_family])}
 
         it "should return only the matching census family" do
-          expect(employer_profile.linkable_census_family_by_person(person)).to eq census_family
+          expect(employer_profile.linkable_employee_family_by_person(person)).to eq census_family
         end
 
         context "with employee who was never linked" do
@@ -244,7 +244,7 @@ describe EmployerProfile, "instance methods" do
           let (:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [prior_census_family, census_family])}
 
           it "should return only the matching census family" do
-            expect(employer_profile.linkable_census_family_by_person(person)).to eq census_family
+            expect(employer_profile.linkable_employee_family_by_person(person)).to eq census_family
           end
         end
       end
