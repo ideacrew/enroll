@@ -75,8 +75,8 @@ RSpec.describe EnrollmentFactory do
     context 'with no user' do
       let(:params) {valid_params.except(:user)}
 
-      it 'should raise' do
-        expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+      it 'should not raise' do
+        expect{EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
       end
     end
 

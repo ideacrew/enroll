@@ -78,7 +78,7 @@ class EnrollmentFactory
 
   end
 
-  def self.add_employee_role(user:, employer_profile:,
+  def self.add_employee_role(user: nil, employer_profile:,
         name_pfx: nil, first_name:, middle_name: nil, last_name:, name_sfx: nil,
         ssn:, dob:, gender:, hired_on:
         )
@@ -89,7 +89,7 @@ class EnrollmentFactory
       people.first
     when 0
       Person.create(
-        user_id: user.id,
+        user: user,
         name_pfx: name_pfx,
         first_name: first_name,
         middle_name: middle_name,
