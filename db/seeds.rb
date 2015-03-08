@@ -24,7 +24,7 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'people_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'broker_agencies_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'carriers_seed')
-# require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
+require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
 
 puts "*"*80
 puts "::: Generating Plans:::"
