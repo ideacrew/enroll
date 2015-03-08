@@ -31,12 +31,11 @@ class Phone
     inclusion: { in: KINDS, message: "%{value} is not a valid phone type" },
     allow_blank: false
 
-
   def save_phone_components
     phone_number = filter_non_numbers(self.full_phone_number).to_s
     if phone_number && phone_number.length == 10
       self.area_code = phone_number[0,3]
-      self.number = phone_number[3,9]
+      self.number = phone_number[3,7]
     end
   end
 
