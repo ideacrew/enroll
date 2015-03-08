@@ -19,13 +19,14 @@ class CarrierProfile
     if new_associated_carrier_profile.present?
       raise ArgumentError.new("expected CarrierProfile") unless new_associated_carrier_profile.is_a? CarrierProfile
       self.associated_carrier_profile_id = new_associated_carrier_profile._id
+      new_associated_carrier_profile
     else
-      associated_carrier_profile_id = nil
+      self.associated_carrier_profile_id = nil
     end
   end
 
-  def associated_carrier
-    CarrierProfile.find(self.associated_carrier_profile_id) unless associated_carrier_profile_id.blank?
+  def associated_carrier_profile
+    CarrierProfile.find(self.associated_carrier_profile_id) unless self.associated_carrier_profile_id.blank?
   end
 
   ## Class methods
@@ -48,7 +49,7 @@ class CarrierProfile
     end
 
     def find(id)
-      organizations = Organization.where("carrier_profile._id" => BSON::ObjectId.from_string(id))
+      organizations = Organization.where("carrier_profile._id" => BSON::ObjectId.from_string(id.to_s)).to_a
       organizations.size > 0 ? organizations.first.carrier_profile : nil
     end
 
