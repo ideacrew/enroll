@@ -1,10 +1,17 @@
+<style>
+.notice {
+  color: #4F8A10;
+  background-color: #DFF2BF;
+  background-image:url('success.png');
+}
+</style>
 <div class="container-fluid no-pd-left">
   <div class="panel panel-default">
     <div class="panel-body left">
       <div class="col-sm-2 left-pd" id="sidebar_partial_value">
         <div class="sidebar list-group text-center" >
           <div id="dependents_sidebar">
-            <a href="#" class="personal_info list-group-item name">
+            <a href="#" class="personal_info list-group-item name hide">
             Employer Information
             </a>
             <a href="#" class="list-group-item name" style="display:none">
@@ -21,7 +28,7 @@
         &nbsp;&nbsp;
         <a href="<%= plan_details_people_path(person_id: params[:person_id], employer_id: params[:employer_id])%>" data-method="POST"> Plan Details</a>
       </div>
-      <div class="col-md-10 col-sm-12">
+      <div class="col-md-10 col-sm-12 hide">
         <p class="information row" style="opacity: 1;"> Employer Information</p>
         <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
           <h4><%= @employer.legal_name%></h4>

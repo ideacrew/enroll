@@ -80,20 +80,52 @@ class PeopleController < ApplicationController
   end
   
   def add_dependents
-    puts "============================== #{params.inspect}"
     @person = Person.find(params[:person_id])
     @employer = Organization.find(params[:employer_id])
-    @employee = @employer.employer_profile.employee_families.where(id: params[:employee_id])
+    employee_family = Organization.find(@employer.id).employee_family_details(@person)
+    @employee = employee_family.census_employee
     @dependent = EmployerCensus::Dependent.new
   end
   
-  def update_dependents
+  def save_dependents
+    new_dependent = EmployerCensus::Dependent.new(dependent_params)
+    @person = Person.find(params[:person])
+    @employer = Organization.find(params[:employer])
+    employee_family = Organization.find(@employer.id).employee_family_details(@person)
+    @dependent = employee_family.census_dependents.where(id: new_dependent.id).first
+    if @dependent.blank?
+      @dependent = employee_family.census_dependents.build(params[:employer_census_dependent])
+      respond_to do |format|
+        if @dependent.save
+          format.js { flash.now[:notice] = "Family Member Added." }
+        else
+          format.js { flash.now[:error_msg] = "Error in Family Member Addition." } 
+        end
+      end
+    else
+      if @dependent.update_attributes(params[:employer_census_dependent])
+        respond_to do |format|
+          format.js { flash.now[:notice] = "Family Member Updated." } 
+        end
+      else
+        respond_to do |format|
+          format.js { flash.now[:error_msg] = "Error in Family Member Edit." } 
+        end
+      end
+    end
+  end
+  
+  def remove_dependents
     @person = Person.find(params[:person_id])
     @employer = Organization.find(params[:employer_id])
-    @employee = @employer.employer_profile.employee_families.where(id: params[:employee_id])
-    @dependent = EmployerCensus::Dependent.new
+    employee_family = Organization.find(@employer.id).employee_family_details(@person)
+    @dependent = employee_family.census_dependents.where(id: params[:id]).first
+    @family_member_id = @dependent.id
+    @dependent.destroy
+    respond_to do |format|
+      format.js { flash.now[:notice] = "Family Member Removed" } 
+    end
   end
-    
   
   def person_landing
     @person = Person.find(params[:person_id])
@@ -193,6 +225,10 @@ private
   
   def person_params
     params.require(:person).permit!
+  end
+  
+  def dependent_params
+    params.require(:employer_census_dependent).permit!
   end
 
 end
