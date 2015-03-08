@@ -39,12 +39,14 @@ class Organization
     uniqueness: true
 
 
-
   index({ hbx_id: 1 }, { unique: true })
   index({ legal_name: 1 })
   index({ dba: 1 }, {sparse: true})
   index({ fein: 1 }, { unique: true })
   index({ is_active: 1 })
+
+  # CarrierProfile child model indexes
+  index({"carrier_profile._id" => 1}, { unique: true })
 
   # EmployerProfile child model indexes
   index({"employer_profile._id" => 1}, { unique: true })
