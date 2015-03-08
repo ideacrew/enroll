@@ -26,7 +26,7 @@ RSpec.describe BrokerAgencyProfile, type: :model do
       { 
         organization: organization,
         market_kind: market_kind,
-        primary_broker_role_id: primary_broker_role_id,
+        primary_broker_role_id: primary_broker_role_id
       }
     end
 
@@ -72,9 +72,20 @@ RSpec.describe BrokerAgencyProfile, type: :model do
 
     context "with all valid arguments" do
       let(:params) {valid_params}
+      let(:broker_agency_profile) {BrokerAgencyProfile.new(**params)}
        
       it "should save" do
-        expect(BrokerAgencyProfile.new(**params).save!).to be_true
+        expect(broker_agency_profile.save!).to be_true
+      end
+
+      context "and it is saved" do
+        before do
+          broker_agency_profile.save
+        end
+
+        it "should be findable" do
+          expect(BrokerAgencyProfile.find(broker_agency_profile.id).id.to_s).to eq broker_agency_profile.id.to_s
+        end
       end
     end
 
