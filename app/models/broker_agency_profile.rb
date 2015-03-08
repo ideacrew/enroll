@@ -46,13 +46,13 @@ class BrokerAgencyProfile
   def primary_broker_role=(new_primary_broker_role)
     if new_primary_broker_role.present?
       raise ArgumentError.new("expected BrokerRole class") unless new_primary_broker_role.is_a? BrokerRole
-      self.primary_broker_role_role_id = new_primary_broker_role._id
+      self.primary_broker_role_id = new_primary_broker_role._id
     else
       primary_broker_role_id = nil
     end
   end
 
-  def primary_broker
+  def primary_broker_role
     BrokerRole.find(self.primary_broker_role_id) unless primary_broker_role_id.blank?
   end
 
