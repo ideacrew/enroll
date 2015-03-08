@@ -78,35 +78,57 @@ class EnrollmentFactory
 
   end
 
-  def self.add_employee_role(person:, employer_census_family:, ssn: nil, dob: nil, gender: nil, hired_on:)
-    [:ssn, :dob, :gender].each do |value|
-      name = value.id2name
-
-      raise ArgumentError.new("missing value: #{name}, expected as keyword or on person") if person.send(value).blank? and eval(name).blank?
+  def self.add_employee_role(user:, employer_census_family:,
+        name_pfx: nil, first_name:, middle_name: nil, last_name:, name_sfx: nil,
+        ssn:, dob:, gender:, hired_on:
+        )
+    # TODO: find existing person or create a new person
+    people = Person.match_by_id_info(ssn: ssn)
+    if people.count == 1
+      person = people.first
+    else
+      person = Person.create(
+        user_id: user.id,
+        name_pfx: name_pfx,
+        first_name: first_name,
+        middle_name: middle_name,
+        last_name: last_name,
+        name_sfx: name_sfx,
+        ssn: ssn,
+        dob: dob,
+        gender: gender,
+      )
     end
-
-    person.ssn = ssn unless ssn.blank?
-    person.dob = dob unless dob.blank?
-    person.gender = gender unless gender.blank?
 
     employer_profile = employer_census_family.employer_profile
 
     # Return instance if this role already exists
-    role = person.employee_roles.detect { |ee| ee.id == employer_profile.id }
+    roles = person.employee_roles.where(
+        "employer_profile_id" => employer_profile.id.to_s,
+        "hired_on" => employer_census_family.census_employee.hired_on
+      )
 
-    if role.blank?
+    role = case roles.count
+    when 0
       # Assign employee-specifc attributes
-      role = person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on)
+      person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on)
+    when 1
+      roles.first
+    else
+      # What am I doing here?
+      nil
     end
 
     employer_census_family.link_employee_role(role)
 
     # Add 'self' to personal relationship need detailed implementation
-    #person.person_relationships << PersonRelationhip.new()
+    # person.person_relationships << PersonRelationhip.new()
 
     family, primary_applicant = self.initialize_family(person)
+    # TODO: create extra family stuff if in census
+
     save_all_or_delete_new(person, family, primary_applicant, role, employer_census_family)
-    role
+    return role, family
   end
 
   private

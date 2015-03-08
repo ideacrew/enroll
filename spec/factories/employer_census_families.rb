@@ -2,12 +2,13 @@ FactoryGirl.define do
   factory :employer_census_family, :class => 'EmployerCensus::EmployeeFamily' do
 
     # employer { FactoryGirl.create :employer }
-    census_employee { FactoryGirl.build :employer_census_employee }
+    employer_profile
+    association :census_employee, factory: :employer_census_employee, strategy: :build
     terminated false
 
     factory :with_employer do
       before :create do |employer_census_family|
-        build :employer_profile, employer_census_family: employer_census_family
+        association :employer_profile, employer_census_family: employer_census_family, strategy: :build
       end
     end
 

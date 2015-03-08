@@ -7,8 +7,8 @@ FactoryGirl.define do
     employee_relationship "self"
     hired_on "01/01/2015"
     sequence(:ssn, 111111111)
-    address { FactoryGirl.build(:address) }
-    email { FactoryGirl.build(:email) }
+    association :address, strategy: :build
+    association :email, strategy: :build
   end
 
 end

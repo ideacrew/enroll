@@ -71,8 +71,8 @@ describe EmployerProfile, "Class methods", type: :model do
   let(:ee0) {FactoryGirl.build(:employer_census_employee, ssn: "369851245")}
   let(:ee1) {FactoryGirl.build(:employer_census_employee, ssn: "258741239")}
 
-  let(:family0) {FactoryGirl.build(:employer_census_family, census_employee: ee0)}
-  let(:family1) {FactoryGirl.build(:employer_census_family, census_employee: ee1)}
+  let(:family0) {FactoryGirl.build(:employer_census_family, census_employee: ee0, employer_profile: nil)}
+  let(:family1) {FactoryGirl.build(:employer_census_family, census_employee: ee1, employer_profile: nil)}
 
   let(:er0) {EmployerProfile.new(entity_kind: "partnership", employee_families: [family0])}
   let(:er1) {EmployerProfile.new(entity_kind: "partnership", employee_families: [family0, family1])}
@@ -87,8 +87,11 @@ describe EmployerProfile, "Class methods", type: :model do
 
 
   describe ".all" do
-    it "should return an array of all employer_profiles" do
+    it "should return an array of with employer_profiles in it" do
       expect(EmployerProfile.all.first).to be_a EmployerProfile
+    end
+
+    it "should return the right number of employer_profiles" do
       expect(EmployerProfile.all.size).to eq 3
     end
   end
