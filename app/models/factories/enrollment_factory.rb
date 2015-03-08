@@ -78,17 +78,18 @@ class EnrollmentFactory
 
   end
 
-  def self.add_employee_role(user:, employer_census_family:,
+  def self.add_employee_role(user: nil, employer_profile:,
         name_pfx: nil, first_name:, middle_name: nil, last_name:, name_sfx: nil,
         ssn:, dob:, gender:, hired_on:
         )
     # TODO: find existing person or create a new person
     people = Person.match_by_id_info(ssn: ssn)
-    if people.count == 1
-      person = people.first
-    else
-      person = Person.create(
-        user_id: user.id,
+    person = case people.count
+    when 1
+      people.first
+    when 0
+      Person.create(
+        user: user,
         name_pfx: name_pfx,
         first_name: first_name,
         middle_name: middle_name,
@@ -98,9 +99,12 @@ class EnrollmentFactory
         dob: dob,
         gender: gender,
       )
+    else
+      # what am I doing here?  More than one person had the same SSN?
+      nil
     end
 
-    employer_profile = employer_census_family.employer_profile
+    employer_census_family = employer_profile.linkable_employee_family_by_person(person)
 
     # Return instance if this role already exists
     roles = person.employee_roles.where(

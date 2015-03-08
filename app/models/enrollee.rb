@@ -29,7 +29,7 @@ class Enrollee
   def set_premium
     return if policy.plan.blank? || coverage_start_age.blank?
 
-    premium = Display::Premium.lookup(person.gender, coverage_start_age)
+    premium = Directory::Premium.lookup(person.gender, coverage_start_age)
     premium_in_cents = premium.amount_in_cents
   end
 

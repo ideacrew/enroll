@@ -4,8 +4,16 @@ class CarrierProfile
 
   embedded_in :organization
 
+  # temporary field for importing seed files
+  field :hbx_carrier_id, type: Integer
+
   field :abbrev, type: String
   field :associated_carrier_profile_id, type: BSON::ObjectId
+
+  field :ivl_health, type: Boolean
+  field :ivl_dental, type: Boolean
+  field :shop_health, type: Boolean
+  field :shop_dental, type: Boolean
 
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: false
@@ -29,6 +37,11 @@ class CarrierProfile
     CarrierProfile.find(self.associated_carrier_profile_id) unless self.associated_carrier_profile_id.blank?
   end
 
+  # has_many Plans
+  def plans
+    Plan.where(carrier_profile_id: self._id)
+  end
+
   ## Class methods
   class << self
     def list_embedded(parent_list)
@@ -37,7 +50,7 @@ class CarrierProfile
 
     # TODO; return as chainable Mongoid::Criteria
     def all
-      list_embedded Organization.exists(carrier_profile: true).order_by([:dba]).to_a
+      list_embedded Organization.exists(carrier_profile: true).order_by([:legal_name]).to_a
     end
 
     def first
@@ -52,8 +65,6 @@ class CarrierProfile
       organizations = Organization.where("carrier_profile._id" => BSON::ObjectId.from_string(id.to_s)).to_a
       organizations.size > 0 ? organizations.first.carrier_profile : nil
     end
-
-
   end
 
 end

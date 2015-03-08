@@ -2,7 +2,7 @@ class PlanYear
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embedded_in :employer
+  embedded_in :employer_profile
 
   # Plan Year time period
   field :start_on, type: Date
@@ -27,8 +27,8 @@ class PlanYear
   validate :open_enrollment_date_checks
 
   def parent
-    raise "undefined parent Employer" unless employer? 
-    self.employer
+    raise "undefined parent employer_profile" unless employer_profile?
+    self.employer_profile
   end
 
   # embedded association: has_many :employee_families
@@ -52,11 +52,11 @@ first    end
 
     # TODO: Create HBX object with configuration settings including shop_plan_year_maximum_in_days
     shop_plan_year_maximum_in_days = 365
-    if (end_on - start_on) > plan_year_max
-      errors.add(:end_on, "must be less than #{shop_plan_year_maximum_in_days} days from start date")      
+    if (end_on - start_on) > shop_plan_year_maximum_in_days
+      errors.add(:end_on, "must be less than #{shop_plan_year_maximum_in_days} days from start date")
     end
 
-    if open_enrollment_end_on < start_on
+    if open_enrollment_end_on > start_on
       errors.add(:start_on, "can't occur before open enrollment end date")
     end
 

@@ -9,12 +9,26 @@
 puts "Start of seed data"
 puts "*"*80
 
+puts "::: Cleaning Broker Agencies:::"
+Organization.delete_all
+puts "::: Cleaning People :::"
+Person.delete_all
+puts "::: Cleaning Plans :::"
+Plan.delete_all
+
+
+
 # require File.join(File.dirname(__FILE__),'seedfiles', 'carriers')
 # require File.join(File.dirname(__FILE__),'seedfiles', 'premiums')
 require File.join(File.dirname(__FILE__),'seedfiles', 'people_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'broker_agencies_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employers_seed')
+require File.join(File.dirname(__FILE__),'seedfiles', 'carriers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
+
+puts "*"*80
+puts "::: Generating Plans:::"
+system "rake seed:plans"
 
 puts "*"*80
 puts "End of Seed Data"

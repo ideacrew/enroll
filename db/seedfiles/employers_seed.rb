@@ -1,7 +1,6 @@
 puts "*"*80
 
 puts "::: Seeding Employers :::"
-# Employer.delete_all
 
 # Retrieve Brokers
 broker_agency_0 = BrokerAgencyProfile.first
