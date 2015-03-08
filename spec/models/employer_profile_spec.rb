@@ -96,6 +96,36 @@ describe EmployerProfile, "Class methods", type: :model do
     end
   end
 
+  describe ".find_by_fein" do
+  end
+
+  describe '.find_by_broker_agency_profile' do
+    let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
+    let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
+
+    let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
+    let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
+    let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
+
+    let(:er3) {organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile)}
+    let(:er4) {organization4.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile)}
+    let(:er5) {organization5.create_employer_profile(entity_kind: "partnership")}
+    before { broker_agency_profile; er3; er4; er5 }
+
+    it 'returns employers represented by the specified broker agency' do
+      expect(er3.broker_agency_profile_id).to eq broker_agency_profile.id
+      expect(er4.broker_agency_profile_id).to eq broker_agency_profile.id
+      expect(er5.broker_agency_profile_id).to be_nil
+
+      employers_with_broker = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile)
+      expect(employers_with_broker.first).to be_a EmployerProfile
+      expect(employers_with_broker.size).to eq 2
+    end
+  end
+
+  describe ".find_by_writing_agent" do
+  end
+
   describe ".find_census_families_by_person" do
     context "with person not matching ssn" do
       let(:params) do
@@ -173,27 +203,53 @@ describe EmployerProfile, "Class methods", type: :model do
     end
   end
 
-  describe '.find_by_broker_agency_profile' do
-    let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
-    let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
-
-    let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
-    let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
-    let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
-
-    let(:er3) {organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile)}
-    let(:er4) {organization4.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile)}
-    let(:er5) {organization5.create_employer_profile(entity_kind: "partnership")}
-    before { broker_agency_profile; er3; er4; er5 }
-
-    it 'returns employers represented by the specified broker agency' do
-      expect(er3.broker_agency_profile_id).to eq broker_agency_profile.id
-      expect(er4.broker_agency_profile_id).to eq broker_agency_profile.id
-      expect(er5.broker_agency_profile_id).to be_nil
-
-      employers_with_broker = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile)
-      expect(employers_with_broker.first).to be_a EmployerProfile
-      expect(employers_with_broker.size).to eq 2
-    end
+  describe ".match_census_employees" do
   end
+end
+
+describe EmployerProfile, "instance methods" do
+  let (:census_employee) {FactoryGirl.build(:employer_census_employee, ssn: "069851240")}
+  let (:census_family) {FactoryGirl.build(:employer_census_family, census_employee: census_employee, employer_profile: nil)}  
+  let (:person) {Person.new(first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn)}
+
+  describe "#linkable_census_family_by_person" do
+    let (:employer_profile) {FactoryGirl.create(:employer_profile)}
+
+    context "with no census_family employees matching SSN" do
+      it "should return nil" do
+        expect(employer_profile.linkable_census_family_by_person(person)).to be_nil
+      end
+    end
+
+    context "with matching census_family employee" do
+      let (:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [census_family])}
+
+      it "should return the matching census_family" do
+        expect(employer_profile.linkable_census_family_by_person(person)).to be_a EmployerCensus::EmployeeFamily
+        expect(employer_profile.linkable_census_family_by_person(person)).to eq census_family
+      end
+
+      context "with employee previously terminated" do
+        let (:prior_census_employee) {FactoryGirl.build(:employer_census_employee, ssn: "069851240", terminated_on: Date.today )}
+        let (:prior_census_family) {FactoryGirl.build(:employer_census_family, census_employee: prior_census_employee, linked_at: Date.today - 1,terminated: true, employer_profile: nil)}  
+        let (:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [prior_census_family, census_family])}
+
+        it "should return only the matching census family" do
+          expect(employer_profile.linkable_census_family_by_person(person)).to eq census_family
+        end
+
+        context "with employee who was never linked" do
+          let (:prior_census_employee) {FactoryGirl.build(:employer_census_employee, ssn: "069851240", terminated_on: Date.today )}
+          let (:prior_census_family) {FactoryGirl.build(:employer_census_family, census_employee: prior_census_employee, terminated: true, employer_profile: nil)}  
+          let (:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [prior_census_family, census_family])}
+
+          it "should return only the matching census family" do
+            expect(employer_profile.linkable_census_family_by_person(person)).to eq census_family
+          end
+        end
+      end
+    end
+
+  end
+
 end

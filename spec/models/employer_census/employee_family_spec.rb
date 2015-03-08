@@ -1,5 +1,9 @@
 require 'rails_helper'
 
+# Should only be one active employee_family per employer at one time
+# terminate employee must set the employee family inactive
+# replicate_for_rehire
+
 describe EmployerCensus::EmployeeFamily, type: :model do
   it { should validate_presence_of :census_employee }
 

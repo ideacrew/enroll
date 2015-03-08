@@ -28,14 +28,14 @@ class EmployerCensus::EmployeeFamily
 
   validates_presence_of :census_employee
 
-  scope :active,     ->{ where(:terminated => false) }
-  scope :terminated, ->{ where(:terminated => true) }
+  scope :active,  ->{ where(:terminated => false) }
+  scope :terminated,      ->{ where(:terminated => true) }
 
   scope :linked,     ->{ where(:is_linked => true) }
   scope :unlinked,   ->{ where(:is_linked => false) }
 
   # Initialize a new, refreshed instance for rehires via deep copy
-  def replicate
+  def replicate_for_rehire
     new_family = self.dup
     new_family.delink_employee_role
     new_family.terminated = false
@@ -74,7 +74,22 @@ class EmployerCensus::EmployeeFamily
   end
 
   def link_employee_role(new_employee_role)
-    raise EmployeeFamilyLinkError.new(new_employee_role) if is_linked?
+    # 
+    if is_linked?
+      raise EmployeeFamilyLinkError.new(
+          new_employee_role, 
+          message: "census_employee_family is already linked to employee_role"
+        )
+    end
+
+    # Only one instance of the same employee may be linkable
+    if parent.employee_families.where(census_employee.ssn == new_employee_role.ssn && census_employee.is_linkable?).size > 1
+      raise EmployeeFamilyLinkError.new(
+          new_employee_role, 
+          message: "more than one active census_employee_family instance with this employee"
+        )
+    end
+
     self.linked_employee_role_id = new_employee_role._id
     self.linked_at = Time.now
     self
@@ -94,6 +109,10 @@ class EmployerCensus::EmployeeFamily
     self.linked_employee_role_id.present?
   end
 
+  def is_linkable?
+    (is_linked? == false) && (is_terminated? == false)
+  end
+
   def terminate(last_day_of_work)
     self.census_employee.terminated_on = date
     self.terminated = true
@@ -107,8 +126,9 @@ class EmployerCensus::EmployeeFamily
 end
 
 class EmployeeFamilyLinkError < StandardError
-  def initialize(employee)
+  def initialize(employee, options={})
     @employee = employee
-    super("employee_family already linked to employee #{employee.inspect}")
+    @message = options[:message]
+    super("#{message} - #{employee.inspect}")
   end
 end

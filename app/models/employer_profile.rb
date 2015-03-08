@@ -103,6 +103,12 @@ class EmployerProfile
     end
   end
 
+  # Enrollable employees are active and unlinked
+  def linkable_census_family_by_person(person)
+    return if employee_families.nil?
+    employee_families.detect { |ef| (ef.census_employee.ssn == person.ssn) && (ef.is_linkable?) }
+  end
+
   def is_active?
     self.is_active
   end
@@ -166,8 +172,6 @@ class EmployerProfile
       Organization.where("employer_profile.employee_families.census_employee.ssn" => person.ssn).to_a
     end
 
-    def find_active_employee_family_by_person(person)
-    end
   end
 
 
