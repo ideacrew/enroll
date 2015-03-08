@@ -1,5 +1,14 @@
 require 'rails_helper'
 
-RSpec.describe PlanYear, :type => :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+describe PlanYear, :type => :model do
+  it { should validate_presence_of :start_on }
+  it { should validate_presence_of :end_on }
+  it { should validate_presence_of :open_enrollment_start_on }
+  it { should validate_presence_of :open_enrollment_end_on }
+end
+
+describe PlanYear do
+  describe "" do
+
+  end
 end

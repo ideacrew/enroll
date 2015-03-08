@@ -29,7 +29,7 @@ RSpec.describe EnrollmentFactory do
     }
   end
   let(:valid_params) do
-    {employer_census_family: employee_family}.merge(valid_person_params).merge(valid_employee_params)
+    {employer_profile: employer_profile}.merge(valid_person_params).merge(valid_employee_params)
   end
 
 
@@ -47,17 +47,18 @@ RSpec.describe EnrollmentFactory do
         end
 
         context "successfully created" do
-          let(:add_employee_role) {EnrollmentFactory.add_employee_role(**params)}
-          let(:employee_role) {add_employee_role[0]}
-          let(:family) {add_employee_role[1]}
           let(:primary_applicant) {family.primary_applicant}
           let(:employer_census_families) do
             EmployerProfile.find(employer_profile.id.to_s).employee_families
           end
-          before {add_employee_role}
+          before {@employee_role, @family = EnrollmentFactory.add_employee_role(**params)}
 
           it "should return the existing employee" do
-            expect(employee_role.id.to_s).to eq employee.id.to_s
+            expect(@employee_role.id.to_s).to eq employee.id.to_s
+          end
+
+          it "should return a family" do
+            expect(@family).to be_a Family
           end
         end
       end
@@ -74,13 +75,13 @@ RSpec.describe EnrollmentFactory do
     context 'with no user' do
       let(:params) {valid_params.except(:user)}
 
-      it 'should raise' do
-        expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+      it 'should not raise' do
+        expect{EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
       end
     end
 
-    context 'with no employer_census_family' do
-      let(:params) {valid_params.except(:employer_census_family)}
+    context 'with no employer_profile' do
+      let(:params) {valid_params.except(:employer_profile)}
 
       it 'should raise' do
         expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
@@ -143,26 +144,24 @@ RSpec.describe EnrollmentFactory do
       end
 
       context "successfully created" do
-        let(:add_employee_role) {EnrollmentFactory.add_employee_role(**params)}
-        let(:employee_role) {add_employee_role[0]}
-        let(:family) {add_employee_role[1]}
-        let(:primary_applicant) {family.primary_applicant}
+        let(:primary_applicant) {@family.primary_applicant}
         let(:employer_census_families) do
           EmployerProfile.find(employer_profile.id.to_s).employee_families
         end
-        before {add_employee_role}
-        # before {employer_profile; employee_family; add_employee_role; employee_role; family; employer_census_family}
+        before do
+          @employee_role, @family = EnrollmentFactory.add_employee_role(**params)
+        end
 
         it "should have a family" do
-          expect(family.class).to be Family
+          expect(@family).to be_a Family
         end
 
         it "should be the primary applicant" do
-          expect(employee_role.person).to eq primary_applicant.person
+          expect(@employee_role.person).to eq primary_applicant.person
         end
 
         it "should have linked the family" do
-          expect(employee_family.linked_employee_role).to eq employee_role
+          expect(employee_family.linked_employee_role).to eq @employee_role
         end
       end
     end

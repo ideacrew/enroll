@@ -74,18 +74,21 @@ class EmployerCensus::EmployeeFamily
   end
 
   def link_employee_role(new_employee_role)
-    # 
+    #
     if is_linked?
       raise EmployeeFamilyLinkError.new(
-          new_employee_role, 
+          new_employee_role,
           message: "census_employee_family is already linked to employee_role"
         )
     end
 
     # Only one instance of the same employee may be linkable
-    if parent.employee_families.where(census_employee.ssn == new_employee_role.ssn && census_employee.is_linkable?).size > 1
+    if parent.employee_families.where("census_employee.ssn" => new_employee_role.ssn,
+                                      "linked_employee_role_id" => nil,
+                                      "terminated" => false).size > 1
+    # if parent.employee_families.where(census_employee.ssn == new_employee_role.ssn && census_employee.is_linkable?).size > 1
       raise EmployeeFamilyLinkError.new(
-          new_employee_role, 
+          new_employee_role,
           message: "more than one active census_employee_family instance with this employee"
         )
     end
