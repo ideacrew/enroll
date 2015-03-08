@@ -2,7 +2,7 @@ require 'rails_helper'
 
 # Should only be one active employee_family per employer at one time
 # terminate employee must set the employee family inactive
-# replicate_for_rehire
+# replicate_for_rehire_for_rehire
 
 describe EmployerCensus::EmployeeFamily, type: :model do
   it { should validate_presence_of :census_employee }
@@ -99,7 +99,7 @@ describe EmployerCensus::EmployeeFamily, 'class methods' do
     end
   end
 
-  describe '#replicate' do
+  describe '#replicate_for_rehire' do
       it 'copies this family to new instance' do
         # user - FactoryGirl.create(:user)
         er = FactoryGirl.create(:employer_profile)
@@ -110,7 +110,7 @@ describe EmployerCensus::EmployeeFamily, 'class methods' do
         # family.link(user)
         family.census_employee.hired_on = Date.today - 1.year
         family.census_employee.terminated_on = Date.today - 10.days
-        ditto = family.replicate
+        ditto = family.replicate_for_rehire
 
         expect(ditto).to be_an_instance_of EmployerCensus::EmployeeFamily
         expect(ditto.linked_employee_role_id).to be_nil
