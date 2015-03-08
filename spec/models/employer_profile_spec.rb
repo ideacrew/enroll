@@ -133,7 +133,44 @@ describe EmployerProfile, "Class methods", type: :model do
         expect(EmployerProfile.find_census_families_by_person(p0).first.census_employee.dob).to eq family0.census_employee.dob
       end
     end
+  end
 
+  describe ".find_employer_profiles_by_person" do
+    let(:valid_ssn) {ee0.ssn}
+    let(:invalid_ssn) {"000000000"}
+    let(:params) do
+      {  
+        first_name: ee0.first_name,
+        last_name:  ee0.last_name,
+        dob:        ee0.dob
+      }
+    end
+
+    context "finds an EmployerProfile employee" do
+      let(:valid_person) {Person.new(**params, ssn: valid_ssn)}
+
+      it "should find the active employee in multiple employer_profiles" do
+        # expect(valid_person.ssn).to eq valid_ssn
+        expect(EmployerProfile.find_employer_profiles_by_person(valid_person).size).to eq 2
+      end
+
+      it "should return EmployerProfile" do
+        expect(EmployerProfile.find_employer_profiles_by_person(valid_person).first).to be_a EmployerProfile
+      end
+
+      it "should include the matching employee" do
+        expect(EmployerProfile.find_employer_profiles_by_person(valid_person).last).to eq ee0.employee_family.employer_profile
+      end
+    end
+
+    context "fails to match an employee" do
+      let(:invalid_person) {Person.new(**params, ssn: invalid_ssn)}
+
+      it "should not return any matches" do
+        # expect(invalid_person.ssn).to eq invalid_ssn
+        expect(EmployerProfile.find_employer_profiles_by_person(invalid_person).size).to eq 0
+      end
+    end
   end
 
   describe '.find_by_broker_agency_profile' do
