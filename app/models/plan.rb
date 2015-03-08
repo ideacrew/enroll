@@ -113,4 +113,13 @@ class Plan
     given_age
   end
 
+  class << self
+    def find_by_carrier_profile(carrier_profile)
+      raise ArgumentError("expected CarrierProfile") unless carrier_profile is_a? CarrierProfile
+      where(carrier_profile_id: carrier_profile._id)
+    end
+
+  end
+
+
 end

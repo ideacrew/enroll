@@ -1,6 +1,4 @@
 puts "*"*80
-puts "::: Cleaning People :::"
-Person.delete_all
 
 puts "::: Generating People :::"
 wk_addr = Address.new(kind: "work", address_1: "1600 Pennsylvania Ave", city: "Washington", state: "DC", zip: "20001")

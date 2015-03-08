@@ -1,7 +1,4 @@
 puts "*"*80
-puts "::: Cleaning Broker Agencies:::"
-Organization.delete_all
-
 puts "::: Generating Broker Agencies:::"
 
 p0 = Person.where(last_name: "Murray").first
