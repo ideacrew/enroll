@@ -107,5 +107,10 @@ class Plan
     find(renewal_plan_id) unless renewal_plan_id.blank?
   end
 
+  def age_for_rating(given_age)
+    return minimum_age if given_age < minimum_age
+    return maximum_age if given_age > maximum_age
+    given_age
+  end
 
 end
