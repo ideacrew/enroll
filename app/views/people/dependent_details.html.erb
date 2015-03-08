@@ -1,37 +1,123 @@
-  <div class="container-fluid no-pd-left">          
-    <div class="panel panel-default">
-      <div class="panel-body left">
+<div class="container-fluid no-pd-left">
+  <div class="panel panel-default">
+    <div class="panel-body left">
+      <div class="col-sm-2 left-pd" id="sidebar_partial_value">
+        <div class="sidebar list-group text-center" >
+          <div id="dependents_sidebar">
+            <a href="#" class="personal_info list-group-item name">
+            Employer Information
+            </a>
+            <a href="#" class="list-group-item name" style="display:none">
+            Employee Information
+            </a> 
+            <a href="#" class="list-group-item name" >
+            Dependents Information
+            </a>        
+          </div>
+        </div>
+      </div>
+      <div class="col-md-10 col-sm-12">
+        <a href="<%= person_landing_people_path(employer_id: params[:employer_id], person_id: params[:person_id])  %>" data-method="POST"> Landing Page</a>
+        &nbsp;&nbsp;
+        <a href="<%= plan_details_people_path(person_id: params[:person_id], employer_id: params[:employer_id])%>" data-method="POST"> Plan Details</a>
+      </div>
+      <div class="col-md-10 col-sm-12">
+        <p class="information row" style="opacity: 1;"> Employer Information</p>
+        <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
+          <h4><%= @employer.legal_name%></h4>
+        </div>
+      </div>
+      <div class="col-md-10 col-sm-12" style="display:none">
+        <p class="information row" style="opacity: 1;"> Employee Information</p>
         
-        <div class="col-sm-2 left-pd" id="sidebar_partial_value">
-          <div class="sidebar list-group text-center">
-            <div id="dependents_sidebar">
-              <a href="#" class="personal_info list-group-item name">
-                Dependent Details
-              </a>
+        <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
+          <div class="row top-row form-group form-group-lg no-pd">
+            <div class="col-md-5 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <div class="form-group">
+              <label>First Name</label>
+              <input type="text" value="<%= @employee.first_name %>" class="form-control" >
+            </div>
+            </div>
+            <div class="col-md-2 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <div class="form-group">
+             <label>M.I</label>
+             <input type="text" value="<%= @employee.middle_name %>" class="form-control" >
+            </div>
+          </div>
+            <div class="col-md-5 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+              <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" value="<%= @employee.last_name %>" class="form-control" >
+            </div>
+          </div>
+          </div>
+          <div class="row middle-row form-group form-group-lg no-pd address-row">
+            <div class="col-md-4 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <label>SSN</label>
+              <input type="text" value="<%= @employee.ssn %>" class="form-control" >
+            </div>
+            <div class="col-md-4 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+             <label>DOB</label>
+            <input type="text" value="<%= @employee.dob %>" class="form-control" >
+            </div>
+            <div class="col-md-4 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+              <label>Gender</label>
+              <input type="text" value="<%= @employee.gender %>" class="form-control" >
+            </div>
+          </div>
+          
+          <div class="row middle-row form-group form-group-lg no-pd address-row">
+            <div class="col-md-6 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <label>Email</label>
+              <input type="text" value="<%= @employee.email %>" class="form-control" >
+            </div>
+            <div class="col-md-6 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+              <label>Phone</label>
+            </div>
+          </div>
+          <% address = @employee.address %>
+          <div class="row middle-row form-group form-group-lg no-pd address-row">
+            <div class="col-md-6 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <label>Address</label>
+              <input type="text" value="<%= address.address_1 %>" class="form-control" >
+            </div>
+            <div class="col-md-6 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+              <label>Address2</label>
+              <input type="text" value="<%= address.address_2 %>" class="form-control" >
+            </div>
+          </div>
+          
+              <div class="row middle-row form-group form-group-lg no-pd address-row">
+            <div class="col-md-6 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <label>City</label>
+              <input type="text" value="<%= address.city %>" class="form-control" >
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+             <label>State</label>
+            <input type="text" value="<%= address.state %>" class="form-control" >
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+              <label>Zip</label>
+              <input type="text" value="<%= address.zip %>" class="form-control" >
             </div>
           </div>
         </div>
-
-        <div class="col-md-10 col-sm-12">
-          <a href="<%= person_landing_people_path(employer_id: params[:employer_id], person_id: params[:person_id])  %>" data-method="POST"> Landing Page</a>
-          &nbsp;&nbsp;
-          <a href="<%= plan_details_people_path(person_id: params[:person_id], employer_id: params[:employer_id])%>" data-method="POST"> Plan Details</a>
-          
-          <ul class="list-group">
+      </div>
+      
+      <div class="col-md-10 col-sm-12" style="margin-top:25px;">
+        <p class="information row" style="opacity: 1;"> Dependent Information</p>
+        <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
+          <ul class="list-group" id="dependent_ul">
             <% @employee.employee_family.census_dependents.each do |dependent| %>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-md-10 col-sm-8 col-xs-8">
-                    <h4> <%= dependent.first_name %> <%= dependent.last_name %> </h4>
-                  </div>
-                </div>
-              </li>
+              <%= render "dependent", dependent: dependent,employer: @employer,person: @person,employee: @employee %>
             <% end %>
           </ul>
         </div>
         <div class="col-md-2 col-xs-12 col-sm-2">
-          <button class="btn">New Member</button>
+        <% add_member_url = add_dependents_people_path(person_id: params[:person_id], employer_id: params[:employer_id], employee_id: @employee.id) %>
+          <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-primary', :remote => true %>
         </div>
       </div>
     </div>
   </div>
+</div>

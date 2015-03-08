@@ -78,6 +78,21 @@ class PeopleController < ApplicationController
     @employee = employee_family.census_employee
     build_nested_models
   end
+  
+  def add_dependents
+    puts "============================== #{params.inspect}"
+    @person = Person.find(params[:person_id])
+    @employer = Organization.find(params[:employer_id])
+    @employee = @employer.employer_profile.employee_families.where(id: params[:employee_id])
+    @dependent = EmployerCensus::Dependent.new
+  end
+  
+  def update_dependents
+    @person = Person.find(params[:person_id])
+    @employer = Organization.find(params[:employer_id])
+    @employee = @employer.employer_profile.employee_families.where(id: params[:employee_id])
+    @dependent = EmployerCensus::Dependent.new
+  end
     
   
   def person_landing

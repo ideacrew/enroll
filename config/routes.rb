@@ -34,7 +34,10 @@ Rails.application.routes.draw do
       post 'person_landing'
       post 'plan_details'
       post 'dependent_details'
+      post 'add_dependents'
       get 'dependent_details'
+      post 'save_dependents'
+      delete 'remove_dependents'
     end
     
   end

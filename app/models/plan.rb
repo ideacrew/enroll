@@ -1,45 +1,47 @@
 class Plan
   include Mongoid::Document
   include Mongoid::Timestamps
-  include Mongoid::Versioning
-
-  Premium = Struct.new(:age, :cost_in_cents, :start_on, :end_on)
+#  include Mongoid::Versioning
 
   COVERAGE_KINDS = %w[health dental]
-  METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic]
+  METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental]
+  MARKET_KINDS = %w(shop individual)
 
 
+  field :ehb, type: Float, default: 0.0
   field :hbx_id, type: String
   field :name, type: String
   field :abbrev, type: String
 
   field :coverage_kind, type: String
   field :metal_level, type: String
+  field :market, type: String
 
   field :carrier_profile_id, type: BSON::ObjectId
   field :active_year, type: Integer
   field :hios_id, type: String
+  field :minimum_age, type: Integer, default: 0
+  field :maximum_age, type: Integer, default: 120
 
-  field :ehb_pct_as_int, type: Integer
   field :renewal_plan_id, type: BSON::ObjectId
 
-  field :premiums, type: Array, default: []
+  embeds_many :premium_tables
+  accepts_nested_attributes_for :premium_tables
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
 
 
   index({ hbx_id: 1 })
-  index({ coverage_type: 1 })
+  index({ coverage_kind: 1 })
   index({ metal_level: 1 })
-  index({ market_type: 1 })
+  index({ market: 1 })
 
-  index({ carrier_id: 1 })
+  index({ carrier_profile_id: 1 })
   index({ active_year: 1, hios_id: 1}, {unique: true})
   index({ renewal_plan_id: 1 })
 
-  validates_presence_of :name, :coverage_type, :metal_level, :carrier_id, :active_year, :hios_id,
-                        :ehb_pct_as_int
+  validates_presence_of :name, :carrier_profile_id, :hios_id
 
   validates :coverage_kind,
    allow_blank: false,
@@ -48,24 +50,25 @@ class Plan
      message: "%{value} is not a valid coverage kind" 
   }
              
-  validates :metal_level_kind,
+  validates :metal_level,
    allow_blank: false,
    inclusion: { 
      in: METAL_LEVEL_KINDS, 
      message: "%{value} is not a valid metal level kind" 
   }
+
+  validates :market,
+   allow_blank: false,
+   inclusion: { 
+     in: MARKET_KINDS, 
+     message: "%{value} is not a valid market" 
+   }
              
   validates :active_year,
     length: { minimum: 4, maximum: 4, message: "active year must be four digits" },
     numericality: { greater_than: 2013, less_than: 2020, message: "active year must fall between 2014..2019" },
     allow_blank: false
   
-  validates :ehb_pct_as_int,
-    length: { minimum: 1, maximum: 3, message: "EHB percent must be between 0 and 100" },
-    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100, message: "ehb percent must fall between 1..100" },
-    allow_blank: false
-  
-
   def metal_level=(new_metal_level)
     write_attribute(:metal_level, new_metal_level.to_s.downcase)
   end
