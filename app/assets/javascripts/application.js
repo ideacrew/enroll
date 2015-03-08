@@ -11,6 +11,7 @@
 // about supported directives.
 //
 //= require jquery
+//= require jquery.turbolinks
 //= require jquery-ui
 //= require jquery_ujs
 //= require bootstrap.min
@@ -26,16 +27,16 @@ $('input.floatlabel').floatlabel();
 
 $(document).ready(function () {
   
-  $('#personal_sidebar #address_info').addClass('hidden');
+  $('#personal_sidebar .address_info').addClass('hidden');
   $('#personal_sidebar #phone_info').addClass('hidden');
   $('#personal_sidebar #email_info').addClass('hidden');
   $('#personal_sidebar .address_info').addClass('hidden');
   $('#personal_sidebar .phone_info').addClass('hidden');
   $('#personal_sidebar .email_info').addClass('hidden');
   $("#personal_sidebar .save-btn").attr("disabled",true);
-  $("#address_info").addClass('hidden');
-  $("#phone_info").addClass('hidden');
-  $("#email_info").addClass('hidden');
+  $(".people #address_info").addClass('hidden');
+  $(".people #phone_info").addClass('hidden');
+  $(".people #email_info").addClass('hidden');
   
   $(".date-picker, .date_picker").datepicker({
     changeMonth: true,

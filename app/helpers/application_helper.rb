@@ -25,6 +25,10 @@ module ApplicationHelper
     [ver, date, who].reject(&:nil? || empty?).join(' | ')
   end
 
+  def format_date(date_value)
+    date_value.strftime("%m-%d-%Y") if date_value.respond_to?(:strftime)
+  end
+
   # Builds a Dropdown button
   def select_dropdown(input_id, list)
     return unless list.is_a? Array
@@ -57,9 +61,9 @@ module ApplicationHelper
 
   # Formats a full name into upper/lower case with last name wrapped in HTML <strong> tag
   def name_to_listing(person)
-    given_name = [person.name_first, person.name_middle].reject(&:nil? || empty?).join(' ')
-    sir_name  = content_tag(:strong, mixed_case(person.name_last))
-    raw([person.name_pfx, mixed_case(given_name), sir_name, person.name_sfx].reject(&:nil? || empty?).join(' '))
+    given_name = [person.first_name, person.middle_name].reject(&:nil? || empty?).join(' ')
+    sir_name  = content_tag(:strong, mixed_case(person.last_name))
+    raw([mixed_case(given_name), sir_name, person.name_sfx].reject(&:nil? || empty?).join(' '))
   end
 
   # Formats each word in a string to capital first character and lower case for all other characters

@@ -1,7 +1,7 @@
 class Employers::FamilyController < ApplicationController
 
   before_filter :find_employer
-  before_filter :find_family, only: [:destroy]
+  before_filter :find_family, only: [:destroy, :show]
 
   def new
     @family = build_family
@@ -24,6 +24,9 @@ class Employers::FamilyController < ApplicationController
     @family.destroy
     flash.notice = "Successfully Deleted Employer Census Family."
     redirect_to employers_employer_path(@employer)
+  end
+
+  def show
   end
 
   private
