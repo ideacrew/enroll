@@ -5,6 +5,7 @@ FactoryGirl.define do
     middle_name 'X'
     sequence(:last_name) {|n| "Smith\##{n}" }
     name_sfx 'Jr'
+    dob "04/04/1972"
     is_active true
 
     after(:create) do |p, evaluator|

@@ -47,7 +47,7 @@
       <%= image_submit_tag("check.png") %>
     </div>    
     <div class="col-md-1 col-sm-1 col-xs-1">  
-      <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: person.id, employer_id: employer) %>
+      <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: person.id, organization_id: employer) %>
       <%= link_to (image_tag "delete.png",style: "margin-top:13px;"), remove_url, style: "background-color:white !important;", :method => :delete, :remote => true %>
    </div>
 </div>

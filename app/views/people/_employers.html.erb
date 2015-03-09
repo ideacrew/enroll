@@ -1,15 +1,15 @@
 
-<% if @employers.present? %>	
-	<% @employers.each do |organization| %>
+<% if @employer_profile.present? %>	
 		  <div class="col-md-5 col-sm-5 col-xs-12 no-pd">
+        <% organization = @employer_profile.organization %>
         <% employee = organization.employee_family_details(@person) %>
 			  <%= render 'shared/employer', organization: organization,employee: employee.census_employee %>
 		  </div>
       <div class="col-md-2 col-sm-2 col-xs-2">
         <% if employee.census_dependents.present? %>
-          <% url = dependent_details_people_path(person_id: @person.id, employer_id: organization.id) %>
+          <% url = dependent_details_people_path(person_id: @person.id, organization_id: organization.id) %>
         <% else %>
-          <% url = plan_details_people_path(person_id: @person.id, employer_id: organization.id) %>
+          <% url = plan_details_people_path(person_id: @person.id, organization_id: organization.id) %>
         <% end %>
         
         <input type="hidden" data-url="<%= url %>" class="badge">
@@ -18,7 +18,6 @@
 		  <div class="col-md-3 col-sm-2 col-xs-12 no-pd text-right">
 			  <p>Not your employer? <a href="#"><u>Click Here</u></a></p>
       </div>
-	<% end %>
 <% end %>
 <!-- <div class="col-md-3 col-sm-4 col-xs-12 no-pd">
   <a href="#" data-method="POST" id="continue-employer" class="btn btn-search search_continue">Continue</a>
