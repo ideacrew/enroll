@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     get 'select_employer'
     get 'my_account'
     collection do
+      get 'plans_converson'
       post 'match_person'
       get 'get_employer'
       post 'person_confirm'

@@ -1,4 +1,5 @@
 require 'factories/enrollment_factory'
+require 'plans_parser'
 
 class PeopleController < ApplicationController
 
@@ -32,6 +33,16 @@ class PeopleController < ApplicationController
 
   # Uses identifying information to return one or more for matches in employer census
   def match_employer
+  end
+  
+  def plans_converson
+    file_contents = File.read(Rails.root.join('public/xml/AE_DC_SG_73987_Benefits_ON_v2.xml'))
+    @rows = []
+    PlansParser.parse(file_contents).each do |plan|
+      row = []
+      row << plan.benefit_type_code
+      @rows << row
+    end
   end
 
   def person_lading
