@@ -82,7 +82,6 @@ class EnrollmentFactory
         name_pfx: nil, first_name:, middle_name: nil, last_name:, name_sfx: nil,
         ssn:, dob:, gender:, hired_on:
         )
-    # TODO: find existing person or create a new person
     people = Person.match_by_id_info(ssn: ssn)
     person = case people.count
     when 1
@@ -105,6 +104,8 @@ class EnrollmentFactory
     end
 
     employer_census_family = employer_profile.linkable_employee_family_by_person(person)
+
+    raise ArgumentError.new("employee_family does not exist for provided person details") unless employer_census_family.present?
 
     # Return instance if this role already exists
     roles = person.employee_roles.where(
