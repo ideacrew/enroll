@@ -35,16 +35,6 @@ class PeopleController < ApplicationController
   def match_employer
   end
   
-  def plans_converson
-    file_contents = File.read(Rails.root.join('public/xml/AE_DC_SG_73987_Benefits_ON_v2.xml'))
-    @rows = []
-    PlansParser.parse(file_contents).each do |plan|
-      row = []
-      row << plan.benefit_type_code
-      @rows << row
-    end
-  end
-
   def person_lading
     @person = Person.find(params[:person_id])
     @employer = Organization.find(params[:organization_id])
