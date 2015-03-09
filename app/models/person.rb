@@ -3,10 +3,12 @@ class Person
   include Mongoid::Timestamps
   include Mongoid::Versioning
 
-  GENDER_KINDS = %W(male female)
+# REMOVE "unknown" once data is corrected
+  GENDER_KINDS = %W(male female unknown)
 
-  auto_increment :hbx_id, :seed => 9999
+#  auto_increment :hbx_id, :seed => 9999
 
+  field :hbx_id, type: Integer
   field :name_pfx, type: String
   field :first_name, type: String
   field :middle_name, type: String
@@ -56,10 +58,12 @@ class Person
 
   validates_presence_of :first_name, :last_name
 
+
+# RE-ENABLE UNIQUNESS CHECK ONCE DATA IS CORRECTED
   validates :ssn,
     length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
     numericality: true,
-    uniqueness: true,
+#    uniqueness: true,
     allow_blank: true
 
   validates :gender,
