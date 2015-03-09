@@ -53,7 +53,7 @@ class EnrollmentFactory
 
     mailing_address = new_mailing_address
 
-    family, = self.initialize_family(person)
+    family, = self.initialize_family(person, [])
 
     broker_role = nil
 
@@ -82,26 +82,8 @@ class EnrollmentFactory
         name_pfx: nil, first_name:, middle_name: nil, last_name:, name_sfx: nil,
         ssn:, dob:, gender:, hired_on:
         )
-    people = Person.match_by_id_info(ssn: ssn)
-    person = case people.count
-    when 1
-      people.first
-    when 0
-      Person.create(
-        user: user,
-        name_pfx: name_pfx,
-        first_name: first_name,
-        middle_name: middle_name,
-        last_name: last_name,
-        name_sfx: name_sfx,
-        ssn: ssn,
-        dob: dob,
-        gender: gender,
-      )
-    else
-      # what am I doing here?  More than one person had the same SSN?
-      nil
-    end
+    person = initialize_person(user, name_pfx, first_name, middle_name,
+                               last_name, name_sfx, ssn, dob, gender)
 
     employer_census_family = employer_profile.linkable_employee_family_by_person(person)
 
@@ -129,7 +111,7 @@ class EnrollmentFactory
     # Add 'self' to personal relationship need detailed implementation
     # person.person_relationships << PersonRelationhip.new()
 
-    family, primary_applicant = self.initialize_family(person)
+    family, primary_applicant = self.initialize_family(person, employer_census_family.census_dependents)
     # TODO: create extra family stuff if in census
 
     save_all_or_delete_new(person, family, primary_applicant, role, employer_census_family)
@@ -138,19 +120,59 @@ class EnrollmentFactory
 
   private
 
-  def self.initialize_family(person)
+  def self.initialize_person(user, name_pfx, first_name, middle_name,
+                             last_name, name_sfx, ssn, dob, gender)
+    people = Person.match_by_id_info(ssn: ssn)
+    case people.count
+    when 1
+      people.first
+    when 0
+      Person.create(
+        user: user,
+        name_pfx: name_pfx,
+        first_name: first_name,
+        middle_name: middle_name,
+        last_name: last_name,
+        name_sfx: name_sfx,
+        ssn: ssn,
+        dob: dob,
+        gender: gender,
+      )
+    else
+      # what am I doing here?  More than one person had the same SSN?
+      nil
+    end
+  end
+
+  def self.initialize_family(person, dependents)
     family = person.family
     family = person.build_family() if family.blank?
-    primary_applicant = family.primary_applicant
-    primary_applicant = initialize_primary_applicant(family, person) if primary_applicant.blank?
-    return family, primary_applicant
+    applicant = family.primary_applicant
+    applicant = initialize_primary_applicant(family, person) if applicant.blank?
+    dependents.each do |dependent|
+      initialize_dependent(family, dependent)
+    end
+    return family, applicant
+  end
+
+  def self.intialize_family_member(family, person)
   end
 
   def self.initialize_primary_applicant(family, person)
-    family_member = family.family_members.build(
+    family.family_members.build(
       person_id: person.id,
       is_primary_applicant: true,
       is_coverage_applicant: true)
+  end
+
+  def self.initialize_dependent(family, dependent)
+    person = initialize_person(nil, nil, dependent.first_name,
+                               dependent.middle_name, dependent.last_name,
+                               dependent.name_sfx, dependent.ssn,
+                               dependent.dob, dependent.gender)
+    family.family_members.build(person_id: person.id,
+                               is_primary_applicant: false,
+                               is_coverage_applicant: true)
   end
 
   def self.save_all_or_delete_new(*list)

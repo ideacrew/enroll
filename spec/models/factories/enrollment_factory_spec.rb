@@ -65,8 +65,8 @@ RSpec.describe EnrollmentFactory do
       expect(employee_family.linked_employee_role).to eq @employee_role
     end
 
-    it "should only have one family_member" do
-      expect(@family.family_members.count).to be 1
+    it "should have all family_members" do
+      expect(@family.family_members.count).to eq (employee_family.census_dependents.count + 1)
     end
   end
 
