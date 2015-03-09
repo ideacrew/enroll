@@ -1,3 +1,5 @@
+require 'factories/enrollment_factory'
+
 class PeopleController < ApplicationController
 
   def new
@@ -45,7 +47,8 @@ class PeopleController < ApplicationController
   
   def get_employer
     @person = Person.find(params[:id])
-    @employers = EmployerProfile.match_census_employees(@person)
+    @employer_profile= EmployerProfile.find_employer_profiles_by_person(@person).first
+    
     respond_to do |format|
       format.js {}
     end
@@ -68,15 +71,33 @@ class PeopleController < ApplicationController
   end
   
   def plan_details
-    
+    add_employee_role
   end
   
   def dependent_details
+    
+    add_employee_role
+    # employee_family = Organization.find(@employer.id).employee_family_details(@person)
+    # @employee = employee_family.census_employee
+    # build_nested_models
+  end
+  
+  def add_employee_role
     @person = Person.find(params[:person_id])
-    @employer = Organization.find(params[:employer_id])
-    employee_family = Organization.find(@employer.id).employee_family_details(@person)
-    @employee = employee_family.census_employee
-    build_nested_models
+    @employer_profile = Organization.find(params[:organization_id]).employer_profile    
+    enroll_parms = {}
+    enroll_parms[:user] = current_user
+    enroll_parms[:employer_profile] = @employer_profile
+    enroll_parms[:ssn] = @person.ssn
+    enroll_parms[:last_name] = @person.last_name
+    enroll_parms[:first_name] = @person.first_name
+    enroll_parms[:gender] = @person.gender
+    enroll_parms[:dob] = @person.dob
+    enroll_parms[:name_sfx] = @person.name_sfx
+    enroll_parms[:name_pfx] = @person.name_pfx
+    enroll_parms[:hired_on] = params[:hired_on]
+    
+    EnrollmentFactory.add_employee_role(enroll_parms)
   end
   
   def add_dependents
