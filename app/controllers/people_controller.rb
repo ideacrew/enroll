@@ -36,7 +36,7 @@ class PeopleController < ApplicationController
 
   def person_lading
     @person = Person.find(params[:person_id])
-    @employer = Organization.find(params[:employer_id])
+    @employer = Organization.find(params[:organization_id])
     employee_family = Organization.find(@employer.id).employee_family_details(@person)
     @employee = employee_family.census_employee
     build_nested_models
@@ -71,12 +71,15 @@ class PeopleController < ApplicationController
   end
   
   def plan_details
-    add_employee_role
+    #add_employee_role
   end
   
   def dependent_details
-    
     add_employee_role
+    @employer_profile = @employee_role.employer_profile
+    @employer = @employer_profile.organization
+    @person = @employee_role.person
+    @employee = @employer_profile.find_employee_by_person(@person)
     # employee_family = Organization.find(@employer.id).employee_family_details(@person)
     # @employee = employee_family.census_employee
     # build_nested_models
@@ -97,12 +100,12 @@ class PeopleController < ApplicationController
     enroll_parms[:name_pfx] = @person.name_pfx
     enroll_parms[:hired_on] = params[:hired_on]
     
-    EnrollmentFactory.add_employee_role(enroll_parms)
+    @employee_role, @family = EnrollmentFactory.add_employee_role(enroll_parms)
   end
   
   def add_dependents
     @person = Person.find(params[:person_id])
-    @employer = Organization.find(params[:employer_id])
+    @employer = Organization.find(params[:organization_id])
     employee_family = Organization.find(@employer.id).employee_family_details(@person)
     @employee = employee_family.census_employee
     @dependent = EmployerCensus::Dependent.new
@@ -138,7 +141,7 @@ class PeopleController < ApplicationController
   
   def remove_dependents
     @person = Person.find(params[:person_id])
-    @employer = Organization.find(params[:employer_id])
+    @employer = Organization.find(params[:organization_id])
     employee_family = Organization.find(@employer.id).employee_family_details(@person)
     @dependent = employee_family.census_dependents.where(id: params[:id]).first
     @family_member_id = @dependent.id
@@ -150,8 +153,8 @@ class PeopleController < ApplicationController
   
   def person_landing
     @person = Person.find(params[:person_id])
-    if params[:employer_id].to_i != 0
-      @employer = Organization.find(params[:employer_id])
+    if params[:organization_id].to_i != 0
+      @employer = Organization.find(params[:organization_id])
       employee_family = Organization.find(@employer.id).employee_family_details(@person)
       @employee = employee_family.census_employee
     else

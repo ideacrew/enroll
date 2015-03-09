@@ -112,6 +112,10 @@ class EmployerProfile
   def is_active?
     self.is_active
   end
+  
+  def find_employee_by_person(person)
+    return self.employee_families.select{|emf| emf.census_employee.ssn == person.ssn}.first.census_employee
+  end
 
   ## Class methods
   class << self
@@ -157,7 +161,7 @@ class EmployerProfile
         families << er.employer_profile.employee_families.detect { |ef| ef.census_employee.ssn == person.ssn }
       end
     end
-
+    
     # Returns all EmployerProfiles where person is active on the employee_census
     def find_employer_profiles_by_person(person)
       organizations = match_census_employees(person)

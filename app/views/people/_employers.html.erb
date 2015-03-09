@@ -7,9 +7,9 @@
 		  </div>
       <div class="col-md-2 col-sm-2 col-xs-2">
         <% if employee.census_dependents.present? %>
-          <% url = dependent_details_people_path(person_id: @person.id, organization_id: organization.id, hired_on: employee.census_employee.hired_on) %>
+          <% url = dependent_details_people_path(person_id: @person.id, organization_id: organization.id) %>
         <% else %>
-          <% url = plan_details_people_path(person_id: @person.id, organization_id: organization.id, hired_on: employee.census_employee.hired_on) %>
+          <% url = plan_details_people_path(person_id: @person.id, organization_id: organization.id) %>
         <% end %>
         
         <input type="hidden" data-url="<%= url %>" class="badge">
