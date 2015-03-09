@@ -33,8 +33,13 @@ class Enrollee
     premium_in_cents = premium.amount_in_cents
   end
 
+  def parent
+    raise "undefined parent Policy" unless policy?
+    self.policy
+  end
+
   def coverage_start_age
-    return if person.blank? || parent.coverage_start_on.blank?
+    return if person.blank? || parent.effective_on.blank?
     age = coverage_start_on.year - person.dob.year
 
     # Shave off one year if coverage starts before birthday
@@ -45,6 +50,13 @@ class Enrollee
     end
 
     age
+  end
+
+  def calculate_premium
+    premiums = Collections::Premiums.new(parent.plan_id.premium_tables)
+                                    .for_age(coverage_start_age)
+                                    .for_date(parent.effective_on)
+    premiums.to_a.first
   end
 
   def premium_in_dollars=(new_premium)
