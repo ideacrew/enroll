@@ -7,8 +7,19 @@ namespace :seed do
     plan_file.close
     plan_data = JSON.load(data)
     plan_data.each do |pd|
-      per = Person.new(pd)
       Person.create!(pd)
+    end
+  end
+
+  desc "Load the family data"
+  task :families => :environment do
+    Family.delete_all
+    plan_file = File.open("db/seedfiles/families.json", "r")
+    data = plan_file.read
+    plan_file.close
+    plan_data = JSON.load(data)
+    plan_data.each do |pd|
+      Family.create!(pd)
     end
   end
 end
