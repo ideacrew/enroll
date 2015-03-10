@@ -81,7 +81,7 @@ $(document).ready(function () {
       //Sidebar Switch - Search Active
       $('#personal_sidebar').addClass('hidden');
       $('#search_sidebar').removeClass('hidden');
-
+      $('.employers-row').html("");
       $.ajax({
         type: "POST",
         url: "/people/match_person.json",

@@ -16,7 +16,7 @@ class Household
   field :irs_group_id, type: BSON::ObjectId
 
   field :is_active, type: Boolean, default: true
-  field :effective_start_date, type: Date
+  field :effective_start_date, type: Date, default: Date.new(2014,1,1)
   field :effective_end_date, type: Date
 
   field :submitted_at, type: DateTime
