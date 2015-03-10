@@ -2,15 +2,19 @@
   <div class="phone col-md-10 col-sm-9 col-xs-12 no-pd first">
 
     <%= f.fields_for :phones, errors: {}, fieldset: true do |phone|  %>
-    <div class="row top-row">
-      <div class="col-md-6 col-sm-6 no-pd">
-        <div class="form-group form-group-lg">
-          <% kind = phone.object.kind.upcase %>
-          <%= phone.hidden_field :kind %>
-          <%= phone.text_field :full_phone_number, placeholder: "#{kind} Phone number ", class: "phone-mask textfield floatlabel form-control border-bottom-none border-right-none" %>
-        </div>
-      </div>
-    </div>
+    	<% if((phone.index+1) % 2 == 0) %>
+	    	<div class="row top-row">
+	    <% end %>
+		<div class="col-md-6 col-sm-6 no-pd">
+			<div class="form-group form-group-lg">
+			  <% kind = phone.object.kind.upcase %>
+			  <%= phone.hidden_field :kind %>
+			  <%= phone.text_field :full_phone_number, placeholder: "#{kind}", class: "phone-mask textfield floatlabel form-control border-bottom-none border-right-none" %>
+			</div>
+		</div>
+		<% if((phone.index+1) % 2 == 0) %>
+	    	</div>
+	    <% end %>
     <% end%>
 
     <%= render 'shared/error_warning' %>

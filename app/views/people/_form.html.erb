@@ -29,14 +29,7 @@
                 <%= hidden_field "people","id" %>
                 <%= render 'shared/name_fields', f: f %>
                 <%= render 'shared/id_info_fields', f: f %>
-              </div>
-
-              <div id="key-section" class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
-                <a href="#" class="btn btn-save">Save & Exit</a>
-                <p class="top-pad">
-                  <span>Your personal information is safe, secured with 64 bit SSL encryption</span>
-                  <span><i></i></span>
-                </p>
+                <div class="overlay-in"></div>
               </div>
             </div>
 				  
@@ -51,8 +44,6 @@
                 <a href="#" id="search-employer" class="btn btn-search">Search</a>
               </div>
             </div>
-
-            <div id="employer-info" class="row hidden"></div>
             
             <div class="fail-search hidden" class="row">
 				<div class="col-md-10 col-sm-9 col-xs-12 no-pd">
@@ -66,6 +57,8 @@
 					</div>
 				</div>
 			</div>
+			
+			<div id="employer-info" class="row hidden"></div>
             
             <%= render 'shared/address_fields', f: f %><br>
             <%= render 'shared/phone_fields', f: f %><br>
@@ -77,12 +70,32 @@
             </div>
 
             <div class="focus_effect row personaol-info-row">
-              <div class="col-md-10 col-sm-9 no-pd">
-                <a href="#" data-method="POST" id="continue-employer" class="btn btn-search search_continue hidden">Continue</a>
-              </div>
+				<div class="col-md-10 col-sm-9 no-pd"></div>
+				<div class="col-md-2 col-sm-3 no-pd">
+					<a href="#" data-method="POST" id="continue-employer" class="btn disable-btn search_continue hidden">Continue</a>
+				</div>
             </div>
+            
+            <div class="clear-fix"></div>
+            <div class="col-md-2 col-md-offset-10 key no-pd-right col-sm-3 col-xs-12 hidden" id="key-section">
+				<a href="#" class="btn btn-save">Save & Exit</a>
+				<p class="top-pad" id="top-pad15">15% Complete</p>
+				<p class="top-pad" id="top-pad30">30% Complete</p>
+				<p class="top-pad" id="top-pad80">80% Complete</p>
+				<p class="top-pad" id="top-pad85">85% Complete</p>
+				<ul>
+				  <li><a class="one" href="#">personal info</a></li>
+				  <li><a class="two" href="#">confirm employer</a></li>
+				  <li><a class="three" href="#">confirm address</a></li>
+				  <li><a class="four" href="#">confirm phone</a></li>
+				  <li><a class="five" href="#">add email</a></li>
+				  <li><a class="six" href="#">add members</a></li>
+				  <li><a class="seven" href="#">select plan</a></li>
+				  <li><a class="eight" href="#">submit</a></li>
+				</ul>
+			</div>
 
-            <%= render 'autofill_cloud' %>
+            <%#= render 'autofill_cloud' %>
             <%= render 'employer_search' %>
           </div>
         </div>
