@@ -2,7 +2,7 @@
  <div class="dependent_notice_div_<%= dependent.id%>">
  </div>
 <%= form_for dependent, :remote => true, method: :post,:url => {action: "save_dependents"} do |f| %>
-<div class="row" >
+  <div class="row" >
     <div class="col-md-5 col-sm-10 col-xs-10">
       <div class="form-group">
           <%= label_tag :first_name %>
@@ -34,22 +34,23 @@
        <%= f.select :gender, EmployerCensus::Member::GENDER_KINDS,{},{class: "form-control", required: true}%>
     </div>
   </div>
-  <div class="row" >
-    <div class="col-md-10 row col-sm-10 col-xs-10">
-      <%= label_tag :relationship %>
+  <div class="row" style="margin-top:20px;">
+    <div class="col-md-6 col-sm-10 col-xs-10" style="width:470px;">
+       <%= label_tag :relationship %>
       <%= f.select :employee_relationship, EmployerCensus::Dependent::EMPLOYEE_RELATIONSHIP_KINDS,{},{class: "form-control", required: true}%>
     </div>
-    <div class="col-md-1 col-sm-1 col-xs-1">
+    <div class="col-md-1 col-sm-10 col-xs-10">
       <%= f.hidden_field :id, :value => dependent.id %>
       <%= hidden_field_tag :person, :id, value: person.id %>
       <%= hidden_field_tag :employer, :id, value: employer.id %>
       <%= hidden_field_tag :employee, :id, value: employee.id %>
       <%= image_submit_tag("check.png") %>
-    </div>    
+    </div>   
     <div class="col-md-1 col-sm-1 col-xs-1">  
       <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: person.id, organization_id: employer) %>
       <%= link_to (image_tag "delete.png",style: "margin-top:13px;"), remove_url, style: "background-color:white !important;", :method => :delete, :remote => true %>
-   </div>
-</div>
+     </div>
+  </div>
+  
 <% end %>
 </li>
