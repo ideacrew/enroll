@@ -114,8 +114,13 @@ class EnrollmentFactory
     family, primary_applicant = self.initialize_family(person, employer_census_family.census_dependents)
     # TODO: create extra family stuff if in census
 
-    saved = save_all_or_delete_new(family, primary_applicant, role, employer_census_family)
-    person.delete if !saved && person_new
+    byebug
+    saved = save_all_or_delete_new(family, primary_applicant, role)
+    if saved
+      employer_census_family.save
+    elsif person_new
+      person.delete
+    end
     return role, family
   end
 
