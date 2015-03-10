@@ -9,7 +9,7 @@ class EmployerCensus::EmployeeFamily
   field :benefit_group_id, type: BSON::ObjectId
 
   # UserID that connected and timestamp
-  field :linked_employee_role_id, type: BSON::ObjectId
+  field :employee_role_id, type: BSON::ObjectId
   field :linked_at, type: DateTime
 
   field :terminated, type: Boolean, default: false
@@ -74,42 +74,26 @@ class EmployerCensus::EmployeeFamily
   end
 
   def link_employee_role(new_employee_role)
-    #
-    if is_linked?
-      raise EmployeeFamilyLinkError.new(
-          new_employee_role,
-          message: "census_employee_family is already linked to employee_role"
-        )
-    end
+    raise EmployeeFamilyLinkError, "already linked to an employee role" if is_linked?
+    raise EmployeeFamilyLinkError, "invalid to link a terminated employee" if is_terminated?
 
-    # Only one instance of the same employee may be linkable
-    if parent.employee_families.where("census_employee.ssn" => new_employee_role.ssn,
-                                      "linked_employee_role_id" => nil,
-                                      "terminated" => false).size > 1
-    # if parent.employee_families.where(census_employee.ssn == new_employee_role.ssn && census_employee.is_linkable?).size > 1
-      raise EmployeeFamilyLinkError.new(
-          new_employee_role,
-          message: "more than one active census_employee_family instance with this employee"
-        )
-    end
-
-    self.linked_employee_role_id = new_employee_role._id
+    self.employee_role_id = new_employee_role._id
     self.linked_at = Time.now
     self
   end
 
   def linked_employee_role
-    EmployeeRole.find(self.linked_employee_role_id) if is_linked?
+    EmployeeRole.find(self.employee_role_id) if is_linked?
   end
 
   def delink_employee_role
-    self.linked_employee_role_id = nil
+    self.employee_role_id = nil
     self.linked_at = nil
     self
   end
 
   def is_linked?
-    self.linked_employee_role_id.present?
+    self.employee_role_id.present?
   end
 
   def is_linkable?
@@ -117,7 +101,14 @@ class EmployerCensus::EmployeeFamily
   end
 
   def terminate(last_day_of_work)
-    self.census_employee.terminated_on = date
+    coverage_term_date = last_day_of_work.end_of_month
+
+    max_retro_term = HbxProfile::ShopMaximumRetroactiveTerminationInDays
+    if (Date.today - coverage_term_date) > max_retro_term
+      raise HbxPolicyError, "termination date exceeds maximum number of days for a retroactive termination"
+    end
+
+    self.census_employee.terminated_on = coverage_term_date
     self.terminated = true
     self
   end
@@ -126,12 +117,12 @@ class EmployerCensus::EmployeeFamily
     self.terminated
   end
 
+  class << self
+    def find_by_employee_role(employee_role)
+      where(employee_role_id: employee_role._id).first
+    end
+  end
+
 end
 
-class EmployeeFamilyLinkError < StandardError
-  def initialize(employee, options={})
-    @employee = employee
-    @message = options[:message]
-    super("#{message} - #{employee.inspect}")
-  end
-end
+class EmployeeFamilyLinkError < StandardError; end

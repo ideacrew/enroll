@@ -60,7 +60,7 @@ class Organization
 
   index({"employer_profile.employee_families._id" => 1}, { unique: true, sparse: true })
   index({"employer_profile.employee_families.linked_at" => 1}, {sparse: true})
-  index({"employer_profile.employee_families.linked_employee_profile_id" => 1}, {sparse: true})
+  index({"employer_profile.employee_families.employee_profile_id" => 1}, {sparse: true})
   index({"employer_profile.employee_families.terminated" => 1})
   index({"employer_profile.employee_families.census_employee.last_name" => 1})
   index({"employer_profile.employee_families.census_employee.dob" => 1})

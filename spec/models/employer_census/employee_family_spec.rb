@@ -44,38 +44,111 @@ describe EmployerCensus::EmployeeFamily, type: :model do
 
     context "with all required data" do
       let(:params) {valid_params}
+      let(:census_family) {EmployerCensus::EmployeeFamily.new(**params)}
 
       it "should successfully save" do
-        expect(EmployerCensus::EmployeeFamily.new(**params).save).to be_true
+        expect(census_family.save).to be_true
+      end
+
+      context "and it is saved" do
+        before do
+          census_family.save
+        end
+
+        it "should not be linked" do
+          expect(census_family.is_linked?).to be_false
+        end
+
+        it "should be linkable" do
+          expect(census_family.is_linkable?).to be_true
+        end
       end
     end
   end
 end
 
-  # let(:linked_at) {Date.today}
-  # let(:census_dependent) {FactoryGirl.create(:employer_census_dependent)}
+describe EmployerCensus::EmployeeFamily, 'instance methods' do
 
-describe EmployerCensus::EmployeeFamily, 'class methods' do
+  let(:employer_profile) {FactoryGirl.create(:employer_profile)}
+  let(:employee_role) {FactoryGirl.build(:employee_role)}
+  let(:census_family) {FactoryGirl.build(:employer_census_family)}
 
-  describe 'links and unlinks employees' do
-    let(:employer_profile) {FactoryGirl.create(:employer_profile)}
-    let(:employee_role) {FactoryGirl.build(:employee_role)}
-    let(:census_family) {FactoryGirl.build(:employer_census_family)}
+  describe '#link_employee_role' do
 
-    it 'link_employee' do
-      census_family.link_employee_role(employee_role)
-      expect(census_family.linked_employee_role_id).to eq employee_role.id
+    context "and it is linked" do
+      before do
+        census_family.save
+        census_family.link_employee_role(employee_role)
+      end
+
+      it "should raise an error" do
+        expect{census_family.link_employee_role(employee_role)}.to raise_error(EmployeeFamilyLinkError)
+      end
     end
 
-    it 'returns #linked_employee' do
-      employee_role.employer_profile = employer_profile
-      employee_role.save!
-      census_family.link_employee_role(employee_role)
-      expect(census_family.linked_employee_role).to be_an_instance_of EmployeeRole
-      expect(census_family.linked_employee_role).to eq employee_role
+    context "and it is terminated" do
+      before do
+        census_family.terminate(Date.today)
+      end
+
+      it "should raise an error" do
+        expect{census_family.link_employee_role(employee_role)}.to raise_error(EmployeeFamilyLinkError)
+      end
     end
 
-    it 'delinks employee' do
+    context "with a valid employee" do
+      before do
+        census_family.link_employee_role(employee_role)
+      end
+
+      pending "fix employee_role belongs_to association"
+      it 'should link to the employee' do
+        expect(census_family.is_linked?).to be_true
+        expect(census_family.is_linkable?).to be_false
+        expect(census_family.employee_role_id).to eq employee_role.id
+        # expect(employee_role.census_family.employee_role).to eq employee_role
+      end
+    end
+  end
+
+  # describe "#delink_employee_role" do
+
+  #   context "and it isn't linked" do
+  #     it "should return the employee_family" do
+  #       expect(census_family.delink_employee_role).to be_an_instance_of EmployerCensus::EmployeeFamily
+  #     end
+  #   end
+
+  #   context "and it is linked" do
+  #     before
+  #       census_family.link_employee_role(employee_role)
+  #     end
+
+  #     it "should make it linkable" do
+  #       expect(census_family.delink_employee_role.is_linkable?).to be_true
+  #     end
+  #   end
+  # end
+
+  describe '#terminate' do
+    let(:maximum_retroactive_termination) {HbxProfile::ShopMaximumRetroactiveTerminationInDays}
+    let(:valid_termination_date) {Date.today - (maximum_retroactive_termination)}
+
+    context "termination date > HBX policy for retro terms" do
+      let(:overdue_termination_date) {Date.today.beginning_of_month - (maximum_retroactive_termination)}
+
+      context "user role isn't an HBX admin" do
+        it "should raise an error" do
+          # raise overdue_termination_date.inspect
+          expect{census_family.terminate(overdue_termination_date)}.to raise_error(HbxPolicyError)
+        end
+      end
+
+      context "user role is HBX admin" do
+        pending "add HBX admin role authorization to override"
+        it "should terminate employee" do
+        end
+      end
     end
   end
 
@@ -100,26 +173,26 @@ describe EmployerCensus::EmployeeFamily, 'class methods' do
   end
 
   describe '#replicate_for_rehire' do
-      it 'copies this family to new instance' do
-        # user - FactoryGirl.create(:user)
-        er = FactoryGirl.create(:employer_profile)
-        ee = FactoryGirl.build(:employer_census_employee)
-        ee.address = FactoryGirl.build(:address)
+    it 'copies this family to new instance' do
+      # user - FactoryGirl.create(:user)
+      er = FactoryGirl.create(:employer_profile)
+      ee = FactoryGirl.build(:employer_census_employee)
+      ee.address = FactoryGirl.build(:address)
 
-        family = er.employee_families.build(census_employee: ee)
-        # family.link(user)
-        family.census_employee.hired_on = Date.today - 1.year
-        family.census_employee.terminated_on = Date.today - 10.days
-        ditto = family.replicate_for_rehire
+      family = er.employee_families.build(census_employee: ee)
+      # family.link(user)
+      family.census_employee.hired_on = Date.today - 1.year
+      family.census_employee.terminated_on = Date.today - 10.days
+      ditto = family.replicate_for_rehire
 
-        expect(ditto).to be_an_instance_of EmployerCensus::EmployeeFamily
-        expect(ditto.linked_employee_role_id).to be_nil
-        expect(ditto.is_linked?).to eq false
+      expect(ditto).to be_an_instance_of EmployerCensus::EmployeeFamily
+      expect(ditto.employee_role_id).to be_nil
+      expect(ditto.is_linked?).to eq false
 
-        expect(ditto.census_employee).to eq ee
-        expect(ditto.census_employee.hired_on).to be_nil
-        expect(ditto.census_employee.terminated_on).to be_nil
-        expect(ditto.census_employee.address).to eq ee.address
-      end
+      expect(ditto.census_employee).to eq ee
+      expect(ditto.census_employee.hired_on).to be_nil
+      expect(ditto.census_employee.terminated_on).to be_nil
+      expect(ditto.census_employee.address).to eq ee.address
     end
+  end
 end
