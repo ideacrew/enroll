@@ -39,6 +39,7 @@
                 </p>
               </div>
             </div>
+				  
             <div class="row search-btn-row">
               <div class="col-md-8 col-sm-6 col-xs-12 key no-pd">
                 <p class="top-pad">
@@ -52,6 +53,19 @@
             </div>
 
             <div id="employer-info" class="row hidden"></div>
+            
+            <div class="fail-search hidden" class="row">
+				<div class="col-md-10 col-sm-9 col-xs-12 no-pd">
+					<div class="panel panel-default">
+						<div class="panel-body text-center">
+						  <a href="#" class="close-fail"><i class="fa fa-times"></i></a>
+						  <p class="fail"><span class="notice"><i class="fa fa-exclamation-triangle"></i></span>No Employer plan found. Double check your personal <br>information and try again <span class="bold">OR</span> please contact support:</p>
+						  <p class="fail"><span class="bold">DCHBX Phone Support</span><br>
+						  1-800-555-1212 option 1</p>
+						</div>
+					</div>
+				</div>
+			</div>
             
             <%= render 'shared/address_fields', f: f %><br>
             <%= render 'shared/phone_fields', f: f %><br>

@@ -98,7 +98,8 @@ $(document).ready(function () {
           {
             $('.search_results').removeClass('hidden');
             $('.employers-row').html("");
-            $('.employers-row').html('<span style="color:red;"> <h2><b>No Employer Found.</b></h2> </span>');
+            $('.fail-search').removeClass('hidden');
+            // $('.employers-row').html('<span style="color:red;"> <h2><b>No Employer Found.</b></h2> </span>');
           }
 
           //Sidebar Switch - Search Active
@@ -303,5 +304,23 @@ $(document).ready(function () {
     $('#emp_contributions_info').removeClass('hidden');
     $('#eligibility_rules_info').removeClass('hidden');
     $('#broker_info').removeClass('hidden');
+  });
+  
+  $(".close-fail").click(function() {
+	$(".fail-search").addClass('hidden');
+	// $("#overlay").css("display", "none");
+	// $(".welcome-msg").css("display", "none");
+	// $(".information").css("opacity", "1");
+	// $("a.name").css("padding-top", "30px");
+	// $(".disable-btn").css("display", "inline-block");
+	$('.focus_effect:first').addClass('personaol-info-top-row');
+	$('.focus_effect:first').removeClass('personaol-info-row');
+	$('.sidebar a:first').addClass('style_s_link');
+	$("#personal_info").css("opacity", "1");
+	$(".search-btn-row").css("display", "block");
+	$(".disable-btn, #key-section").hide();
+	$('.personal_info').addClass('style_s_link');
+	$("#personal_info .first").removeClass('employee-info');
+	$(".overlay-in").css("display", "none");
   });
 });

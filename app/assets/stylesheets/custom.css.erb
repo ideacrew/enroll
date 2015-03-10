@@ -2129,7 +2129,7 @@ a.btn-search {
     margin: 23px 0 0;
     padding: 6px 30px;
 }
-a.btn-search:hover {color: #fff;}
+a.btn-search:hover, a.btn-search:focus {color: #fff;}
 
 .search-btn-row {
   display: none;
@@ -2324,4 +2324,35 @@ a.employer_info {
 } 
 .left-pd{
   padding-left: 0 !important;
+}
+
+.fail-search{
+  margin-top: 15px;
+  margin-left: -15px;
+  margin-right: -15px;
+}
+.fail-search .panel-body{
+  padding-top: 30px;
+}
+p.fail{
+  font-size: 18px !important;
+  color: #616161;
+  letter-spacing: 1px;
+}
+p.fail span.bold{
+  font-weight: bold;
+}
+span.notice{
+  font-size: 36px;
+  position: absolute;
+  left: 20px;
+  color: #b20000;
+}
+a.close-fail{
+  color: #cecece;
+  font-weight: 300;
+  font-size: 24px;
+  position: absolute;
+  right: 15px;
+  top: 5px;
 }
