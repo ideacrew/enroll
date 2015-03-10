@@ -6,7 +6,7 @@ puts "::: Creating Employee Roles:::"
 Organization.all.collect{|org| org.employer_profile}.each do |employer_profile|
   employer = employer_profile
   if employer.present?
-  employer.employee_families.each do |family|
+  [employer.employee_families.first, employer.employee_families.last].each do |family|
     census_employee = family.census_employee
 
     employee, family = EnrollmentFactory.add_employee_role(
