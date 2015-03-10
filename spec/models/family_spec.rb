@@ -54,4 +54,22 @@ describe Family do
     end
 
   end
+
+  describe "one family exists" do
+    let!(:primary_person) {FactoryGirl.create(:person)}
+    let!(:dependent_person) {FactoryGirl.create(:person)}
+    let!(:first_family) {primary_person.create_family}
+    let!(:first_primary_member) {FactoryGirl.create(:family_member, :primary, family: first_family, person: primary_person)}
+    let!(:first_dependent_member) {FactoryGirl.create(:family_member, family: first_family, person: dependent_person)}
+
+    context "and a second family is built" do
+      let!(:second_family) {FactoryGirl.build(:family)}
+      let!(:second_primary_member) {FactoryGirl.build(:family_member, :primary, family: second_family, person: primary_person)}
+      let!(:second_dependent_member) {FactoryGirl.build(:family_member, family: second_family, person: dependent_person)}
+
+      it "second family should be valid" do
+        expect(second_family.valid?).to be
+      end
+    end
+  end
 end

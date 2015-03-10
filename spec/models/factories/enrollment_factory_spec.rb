@@ -68,6 +68,42 @@ RSpec.describe EnrollmentFactory do
     it "should have all family_members" do
       expect(@family.family_members.count).to eq (employee_family.census_dependents.count + 1)
     end
+
+    context "and another employer profile exists with the same employee and dependents in the census" do
+      let(:second_employee_family) do
+        dependents = employee_family.census_dependents.collect(&:dup)
+        employee = census_employee.dup
+        FactoryGirl.create(:employer_census_family, census_employee: employee, census_dependents: dependents)
+      end
+      let(:second_employer_profile) {second_employee_family.employer_profile}
+      let(:second_census_employee) {second_employee_family.census_employee}
+      let(:second_params) {valid_params.merge(employer_profile: second_employer_profile)}
+      before do
+        @second_employee_role, @second_family = EnrollmentFactory.add_employee_role(**second_params)
+      end
+
+      it "should still have a findable person" do
+        people = Person.match_by_id_info(ssn: ssn)
+        expect(people.count).to eq 1
+        expect(people.first).to be_a Person
+      end
+
+      it "second employee role should be saved" do
+        expect(@second_employee_role.persisted?).to be
+      end
+
+      it "second family should be saved" do
+        expect(@second_family.persisted?).to be
+      end
+
+      it "second employee role should be valid" do
+        expect(@second_employee_role.valid?).to be
+      end
+
+      it "second employee role should be valid" do
+        expect(@second_family.valid?).to be
+      end
+    end
   end
 
   describe ".add_employee_role" do

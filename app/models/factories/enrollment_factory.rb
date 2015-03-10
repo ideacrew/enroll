@@ -81,9 +81,9 @@ class EnrollmentFactory
   def self.add_employee_role(user: nil, employer_profile:,
         name_pfx: nil, first_name:, middle_name: nil, last_name:, name_sfx: nil,
         ssn:, dob:, gender:, hired_on:
-        )
-    person = initialize_person(user, name_pfx, first_name, middle_name,
-                               last_name, name_sfx, ssn, dob, gender)
+    )
+    person, person_new = initialize_person(user, name_pfx, first_name, middle_name,
+                                           last_name, name_sfx, ssn, dob, gender)
 
     employer_census_family = employer_profile.linkable_employee_family_by_person(person)
 
@@ -114,7 +114,8 @@ class EnrollmentFactory
     family, primary_applicant = self.initialize_family(person, employer_census_family.census_dependents)
     # TODO: create extra family stuff if in census
 
-    save_all_or_delete_new(person, family, primary_applicant, role, employer_census_family)
+    saved = save_all_or_delete_new(family, primary_applicant, role, employer_census_family)
+    person.delete if !saved && person_new
     return role, family
   end
 
@@ -125,9 +126,9 @@ class EnrollmentFactory
     people = Person.match_by_id_info(ssn: ssn)
     case people.count
     when 1
-      people.first
+      return people.first, false
     when 0
-      Person.create(
+      return Person.create(
         user: user,
         name_pfx: name_pfx,
         first_name: first_name,
@@ -137,10 +138,10 @@ class EnrollmentFactory
         ssn: ssn,
         dob: dob,
         gender: gender,
-      )
+      ), true
     else
       # what am I doing here?  More than one person had the same SSN?
-      nil
+      return nil, nil
     end
   end
 
@@ -155,9 +156,6 @@ class EnrollmentFactory
     return family, applicant
   end
 
-  def self.intialize_family_member(family, person)
-  end
-
   def self.initialize_primary_applicant(family, person)
     family.family_members.build(
       person_id: person.id,
@@ -166,13 +164,21 @@ class EnrollmentFactory
   end
 
   def self.initialize_dependent(family, dependent)
-    person = initialize_person(nil, nil, dependent.first_name,
+    person, new_person = initialize_person(nil, nil, dependent.first_name,
                                dependent.middle_name, dependent.last_name,
                                dependent.name_sfx, dependent.ssn,
                                dependent.dob, dependent.gender)
-    family.family_members.build(person_id: person.id,
-                               is_primary_applicant: false,
-                               is_coverage_applicant: true)
+    members = family.family_members.where(person_id: person.id)
+    case members.count
+    when 0
+      family.family_members.build(person_id: person.id,
+                                  is_primary_applicant: false,
+                                  is_coverage_applicant: true)
+    when 1
+      members.first
+    else
+      # what am I doing here?  The same person was in the family twice?
+    end
   end
 
   def self.save_all_or_delete_new(*list)

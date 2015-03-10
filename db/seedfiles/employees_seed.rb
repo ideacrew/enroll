@@ -8,11 +8,6 @@ Organization.all.collect{|org| org.employer_profile}.each do |employer_profile|
   if employer.present?
   employer.employee_families.each do |family|
     census_employee = family.census_employee
-    # person = Person.create!(
-    #     first_name: census_employee.first_name,
-    #     last_name: census_employee.last_name,
-    #     addresses: [census_employee.address],
-    # )
 
     employee, family = EnrollmentFactory.add_employee_role(
       employer_profile: employer_profile,

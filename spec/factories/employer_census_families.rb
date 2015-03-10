@@ -1,7 +1,5 @@
 FactoryGirl.define do
   factory :employer_census_family, :class => 'EmployerCensus::EmployeeFamily' do
-
-    # employer { FactoryGirl.create :employer }
     employer_profile
     association :census_employee, factory: :employer_census_employee, strategy: :build
     terminated false
@@ -17,6 +15,5 @@ FactoryGirl.define do
         create_list :employer_census_dependent, 3, employee_family: employer_census_family
       end
     end
-
   end
 end
