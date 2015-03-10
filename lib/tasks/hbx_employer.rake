@@ -1,5 +1,6 @@
 require 'csv'
 require 'tasks/hbx_employer_import'
+require 'tasks/hbx_census_import'
 
 namespace :hbx do
   namespace :employers do
@@ -10,6 +11,11 @@ namespace :hbx do
     end
 
     namespace :census do
+      desc "Import new employer census from csv file."
+      task :add, [:file_name] => [:environment] do |t, args|
+        import = HbxCensusImport.new(args[:file_name])
+        import.run
+      end
     end
   end
 end
