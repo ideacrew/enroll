@@ -5,6 +5,7 @@
   background-image:url('success.png');
 }
 </style>
+
 <div class="container-fluid no-pd-left">
   <div class="panel panel-default">
     <div class="panel-body left">
@@ -19,7 +20,7 @@
             </a> 
             <a href="#" class="list-group-item name" >
             Dependents Information
-            </a>        
+            </a>
           </div>
         </div>
       </div>
@@ -28,6 +29,7 @@
         &nbsp;&nbsp;
         <a href="<%= plan_details_people_path(person_id: params[:person_id], organization_id: params[:organization_id])%>" data-method="POST"> Plan Details</a>
       </div>
+      
       <div class="col-md-10 col-sm-12 hide">
         <p class="information row" style="opacity: 1;"> Employer Information</p>
         <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
@@ -110,8 +112,41 @@
         </div>
       </div>
       
+      <div class="col-md-10 col-sm-12">
+      	<div class="col-md-11 col-sm-12 col-xs-12">
+      		<p class="information row">Household Information</p>
+      		
+      		<div id="household_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
+              <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
+                <div class="row top-row">
+				  <div class="col-md-6 col-sm-6 no-pd form-group form-group-lg no-pd">
+				    <%= text_field_tag :name, "", class: "required floatlabel form-control", required: true, placeholder: 'NAME' %>
+				  </div>
+				  <div class="col-md-6 col-sm-6 no-pd form-group form-group-lg no-pd">
+				    <%= text_field_tag :relation, "", class: "floatlabel form-control", placeholder: 'RELATION' %>
+				  </div>
+				</div>
+              </div>
+            </div>
+            
+            <div class="fail-search add-member" class="row">
+	            <div class="col-md-10 col-sm-9 col-xs-12 no-pd">
+	              <div class="panel panel-default">
+	                <div class="panel-body member">
+	                	<center>
+		                  <div class="fail"><span class="bold">Here's your chance to add family members to your plan.</span> Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</div>
+		                  <br>
+		                  <a class=" text-center btn btn-save blue-btn">Add Member</a> &nbsp; &nbsp;
+		                  <a class="text-center btn btn-save">Continue</a>
+		                </center>
+	                </div>
+	              </div>
+				</div>
+          	</div>
+      	</div>
+      </div>
+      		
       <div class="col-md-10 col-sm-12" style="margin-top:25px;">
-        <p class="information row" style="opacity: 1;"> Dependent Information</p>
         <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
           <ul class="list-group" id="dependent_ul">
             <% @employee.employee_family.census_dependents.each do |dependent| %>
