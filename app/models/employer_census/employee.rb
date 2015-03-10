@@ -5,7 +5,7 @@ class EmployerCensus::Employee < EmployerCensus::Member
   field :hired_on, type: Date
   field :terminated_on, type: Date
 
-  validates_presence_of :ssn, :hired_on, :address
+  validates_presence_of :ssn, :hired_on#, :address
 
   # TODO: Move common validations to single validates_with model
   validates :ssn,
