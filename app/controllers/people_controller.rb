@@ -214,9 +214,10 @@ class PeopleController < ApplicationController
     file_contents = File.read(Rails.root.join('public/xml/AE_DC_SG_73987_Benefits_ON_v2.xml'))
     @rows = []
     PlansParser.parse(file_contents).each do |plan|
-     row = []
-     row << plan.benefit_type_code
-     @rows << row
+    row = []
+      if Benefit::PLAN_BENEFITS.include?(plan.visit_type.squish)
+        @rows << plan
+      end
     end
   end
   

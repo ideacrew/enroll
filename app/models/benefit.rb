@@ -16,4 +16,18 @@ class Benefit
   field :non_preferred_brand_name_drug_cost, type: String
   field :speciality_drug_cost, type: String
 
+  PLAN_BENEFITS = [
+    "Primary Care Visit to Treat an Injury or Illness",
+    "Urgent Care Centers or Facilities",
+    "Specialist Visit",
+    "Emergency Room Services",
+    "Inpatient Hospital Services (e.g., Hospital Stay)",
+    "Laboratory Outpatient and Professional Services",
+    "X-rays and Diagnostic Imaging",
+    "Generic Drugs",
+    "Preferred Brand Drugs",
+    "Non-Preferred Brand Drugs",
+    "Specialty Drugs"
+  ]
+
 end

@@ -1,9 +1,18 @@
-<table class="table bordered">
-<% @rows.each do |row| %>
+<table class="table bordered", border = "1" >
+<tr>
+  <th>Plan Benefits</th>
+  <th>Copay - In Network</th>
+  <th>Copay - Out of Network</th>
+  <th>Co-insurance - In Network</th>
+  <th>Co-insurance - Out of Network</th>
+</tr>
+<% @rows.uniq.each do |row| %>
   <tr>
-    <td>
-      <%= row[0]%>
-    </td>
+    <td><%= row.visit_type.squish%></td>
+    <td><%= row.copay_in_network_tier1.squish%></td>
+    <td><%= row.copay_out_of_network.squish%></td>
+    <td><%= row.co_insurance_in_network_tier1.squish%></td>
+    <td><%= row.co_insurance_out_of_network.squish%></td>
   </tr>
 <% end %>
 </table>
