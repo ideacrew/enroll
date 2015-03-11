@@ -93,17 +93,22 @@ $(document).ready(function () {
             person = result.person
             $("#people_id").val(person._id);
             _getEmployers();
+            
+            $('#key-section').removeClass('hidden');
+            $('#house_info, #add_info, #top-pad30, #top-pad80, #top-pad85').hide();
+            $('a.one, a.two').css("color", "#00b22d");
           }
           else
           {
             $('.search_results').removeClass('hidden');
             $('.employers-row').html("");
-            $('.employers-row').html('<span style="color:red;"> <h2><b>No Employer Found.</b></h2> </span>');
+            $('.fail-search').removeClass('hidden');
           }
 
           //Sidebar Switch - Search Active
           $('#personal_sidebar').removeClass('hidden');
           $('#search_sidebar').addClass('hidden');
+          $(".overlay-in").css("display", "block");
         }
       });  
     } else {
@@ -304,4 +309,87 @@ $(document).ready(function () {
     $('#eligibility_rules_info').removeClass('hidden');
     $('#broker_info').removeClass('hidden');
   });
+  
+	$(".close-fail").click(function() {
+		$(".fail-search").addClass('hidden');
+		// $("#overlay").css("display", "none");
+		// $(".welcome-msg").css("display", "none");
+		// $(".information").css("opacity", "1");
+		// $("a.name").css("padding-top", "30px");
+		// $(".disable-btn").css("display", "inline-block");
+		// $('.focus_effect:first').addClass('personaol-info-top-row');
+		// $('.focus_effect:first').removeClass('personaol-info-row');
+		// $('.sidebar a:first').addClass('style_s_link');
+		// $("#personal_info").css("opacity", "1");
+		// $(".search-btn-row").css("display", "block");
+		// $(".disable-btn, #key-section").hide();
+		// $('.personal_info').addClass('style_s_link');
+		// $("#personal_info .first").removeClass('employee-info');
+		$(".overlay-in").css("display", "none");
+	});
+  
+	//Focus effect
+	$("#personal_info .floatlabel").focusin(function() {
+		$('#personal_info div.first').addClass('employee-info');
+		$("a.personal_info").css("color","#98cbff");
+		// $("a.first").css("color","#00b420");
+		$("#personal_info div.first").css("opacity","1");
+	});
+	$("#personal_info .floatlabel").blur(function() {
+    	$("#personal_info div.first").css("opacity","0.5");
+	});
+	
+	$('#address_info div.first').addClass('employee-info');
+        $("#address_info .floatlabel").focusin(function() {
+            $('#address_info div.first').addClass('employee-info');
+            $("a.address_info").css("color","#98cbff");
+            $("a.three").css("color","#00b420");
+            $("#address_info div.first").css("opacity","1");
+            $("#top-pad").innerHTML="30%";
+
+        });
+        $("#address_info .floatlabel").blur(function() {
+            $("#address_info div.first").css("opacity","0.5");
+        });
+        
+        $("#phone_info .floatlabel").focusin(function() {
+            $('#phone_info div.first').addClass('employee-info');
+            $("a.phone_info").css("color","#98cbff");
+            $("a.four").css("color","#00b420");
+            $("#phone_info div.first").css("opacity","1");
+        });
+        $("#phone_info .floatlabel").blur(function() {
+            $("#phone_info div.first").css("opacity","0.5");
+        });
+        
+        $("#email_info .floatlabel").focusin(function() {
+            $('#email_info div.first').addClass('employee-info');
+            $("a.email_info").css("color","#98cbff");
+            $("a.five").css("color","#00b420");
+            $("#email_info div.first").css("opacity","1");
+        });
+        $("#email_info .floatlabel").blur(function() {
+            $("#email_info div.first").css("opacity","0.5");
+        });
+	
+		$("#address_info .floatlabel").focusin(function() {
+            $("#top-pad15").hide();
+            $("#top-pad30").show();
+            $("#top-pad80").hide();
+            $("#top-pad85").hide();
+		});  
+
+		$("#phone_info .floatlabel").focusin(function() {
+            $("#top-pad15").hide();
+            $("#top-pad30").hide();
+            $("#top-pad80").show();
+            $("#top-pad85").hide();
+		});    
+
+		$("#email_info .floatlabel").focusin(function() {
+            $("#top-pad15").hide();
+            $("#top-pad30").hide();
+            $("#top-pad80").hide();
+            $("#top-pad85").show();
+		});
 });
