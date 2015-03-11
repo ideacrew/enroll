@@ -39,11 +39,9 @@ class Person
                 inverse_of: :broker_agency_contacts, 
                 index: true
 
-  belongs_to :family
-
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
-  embeds_one :hbx_staff, cascade_callbacks: true, validate: true
+  embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
   embeds_one :responsible_party, cascade_callbacks: true, validate: true
 
   embeds_many :employee_roles, cascade_callbacks: true, validate: true
@@ -53,7 +51,7 @@ class Person
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
 
-  accepts_nested_attributes_for :consumer_role, :responsible_party, :broker_role, :hbx_staff,
+  accepts_nested_attributes_for :consumer_role, :responsible_party, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :addresses, :phones, :emails
 
   validates_presence_of :first_name, :last_name
@@ -99,8 +97,8 @@ class Person
   index({"employee_roles.is_active" => 1})
 
   # HbxStaff child model indexes
-  index({"hbx_staff._id" => 1})
-  index({"hbx_staff.is_active" => 1})
+  index({"hbx_staff_role._id" => 1})
+  index({"hbx_staff_role.is_active" => 1})
 
   # PersonRelationship child model indexes
   index({"person_relationship.relative_id" =>  1})
@@ -122,6 +120,13 @@ class Person
   #   bday = DateTime.strptime(new_dob, "%m-%d-%Y").to_date
   #   write_attribute(:dob, bday)
   # end
+
+  def primary_family
+  end
+
+  def families
+  end
+
 
   def full_name
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
