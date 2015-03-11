@@ -920,7 +920,7 @@ p.information{
   right: 0;
 }
 .key p i{
-  background: url("../img/secure-lock.png") no-repeat;
+  background: url("<%= asset_path('secure-lock.png') %>") no-repeat;
   display: block;
   height: 26px;
   width: 20px;
@@ -1159,7 +1159,7 @@ input.floatlabe{
   padding-bottom: 20px;
 }
 .autofill-cloud .close {
-  background: url("../img/autofill-close.png") no-repeat;
+  background: url("<%= asset_path('autofill-close.png') %>") no-repeat;
   display: block;
   width: 19px;
   height: 19px;
@@ -1216,14 +1216,14 @@ input.floatlabe{
   left: 0 !important;
 }
 .adderess-select-box + ul li a {
-  background: url("../img/delete.png") no-repeat 8px center;
+  background: url("<%= asset_path('delete.png') %>") no-repeat 8px center;
   display: block;
   padding: 10px 0;
   text-align: center;
   border-bottom: 1px solid #bdbbbb;
 }
 .adderess-select-box + ul li:first-child a {
-  background: url("../img/delete.png") no-repeat 8px center, url("../img/address-close.png") no-repeat 95% center;
+  background: url("<%= asset_path('img/delete.png') %>") no-repeat 8px center, url("<%= asset_path('address-close.png') %>") no-repeat 95% center;
   display: block;
   background-size: auto auto,auto auto;
 }
@@ -1514,7 +1514,7 @@ a.list-group-item.results {
   margin: 0;
 }
 .no-result-row .row .fa_exclamation_triangle {
-  background: url("../img/warning.png") no-repeat;
+  background: url("<%= asset_path('warning.png') %>") no-repeat;
   display: block;
   width: 37px;
   height: 35px;
@@ -1688,7 +1688,7 @@ a .arrow-right {display: none;}
 }
 .landing-row .left-side .adderess-select-box.home{
   background-position: right !important;
-   background: url("../img/landing-page-delete.png") no-repeat #fff;
+  background: url("<%= asset_path('landing-page-delete.png') %>") no-repeat #fff;
 }
 .landing-row .left-side .adderess-select-box:hover, .landing-row .left-side .adderess-select-box:hover .caret {
   color: #666 !important;
@@ -2119,13 +2119,13 @@ a .arrow-right {
 .skinned-form-controls.skinned-form-controls-mac input[type="checkbox"] + span::before,
 .skinned-form-controls.skinned-form-controls-mac input[type="radio"] + span::before
 {
-  background-image: url("../img/search-sprite.png");
+  background-image: url("<%= asset_path('search-sprite.png') %>");
 }
 
 .skinned-form-controls.skinned-form-controls-mac.radio input[type="checkbox"] + span::before,
 .skinned-form-controls.skinned-form-controls-mac.radio input[type="radio"] + span::before
 {
-  background-image: url("../img/radio-img.png");
+  background-image: url("<%= asset_path('radio-img.png') %>");
 }
 
 /* Custom css for Checkboxes and Radio Buttons End */
@@ -2217,14 +2217,14 @@ a .arrow-right {
   position: relative;
 }
 .home-icon {
-  background: url("../img/home-icon-gray.png") no-repeat;
+  background: url("<%= asset_path('home-icon-gray.png') %>") no-repeat;
   display: block;
   height: 34px;
   width: 34px;
   top: 0 !important;
 }
 .top-menu > li.active > a .home-icon, .home-icon:hover, .home-icon:focus {
-  background: url("../img/home-icon.png") no-repeat;
+  background: url("<%= asset_path('home-icon.png') %>") no-repeat;
 }
 .top-menu > li.active > a:after {
   top: 100%;
@@ -2329,7 +2329,7 @@ a .arrow-right {
   border:  1px solid #009acc;
 }
 .coverage-table .heading {
-  background: url("../img/arrow-down.png") no-repeat scroll 7px center #009acc;
+  background: url("<%= asset_path('arrow-down.png') %>") no-repeat scroll 7px center #009acc;
   color: #fff;
   display: block;
   font-weight: bold;
