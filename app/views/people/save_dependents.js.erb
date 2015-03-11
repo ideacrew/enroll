@@ -4,6 +4,9 @@ html = "<div><center>"
   html = html + "<div class='<%= key%>' style='color: #D63301;background-color: #FFCCBA;'> <%= message %> </div>" ; 
  <% else %>
   html = html + "<div class='<%= key%>' style='color: #4F8A10;background-color: #DFF2BF;background-image:url('success.png');'> <%= message %> </div>" ;
+  
+	$("#dependent_buttons div:first").removeClass('hidden');
+	$('#dependent_buttons div:last').addClass('hidden');
  <% end %>
 <% end %>
 <% @dependent.errors.each do |error|%>
