@@ -1,4 +1,4 @@
-class HbxStaff
+class HbxStaffRole
   include Mongoid::Document
   include Mongoid::Timestamps
 
