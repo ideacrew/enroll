@@ -28,6 +28,9 @@ class Plan
   embeds_many :premium_tables
   accepts_nested_attributes_for :premium_tables
 
+  embeds_many :benefits
+  accepts_nested_attributes_for :benefits
+
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
 

@@ -126,6 +126,8 @@ GEM
       activesupport (>= 4.1.0)
     haml (4.0.6)
       tilt
+    happymapper (0.4.1)
+      libxml-ruby (~> 2.0)
     hike (1.2.3)
     i18n (0.7.0)
     jbuilder (2.2.8)
@@ -151,6 +153,7 @@ GEM
     less-rails-bootstrap (3.3.1.0)
       less-rails (~> 2.6.0)
     libv8 (3.16.14.7)
+    libxml-ruby (2.8.0)
     loofah (2.0.1)
       nokogiri (>= 1.5.9)
     mail (2.6.3)
@@ -308,6 +311,7 @@ DEPENDENCIES
   factory_girl_rails (~> 4.0)
   font-awesome-rails (= 4.2.0.0)
   haml
+  happymapper
   jbuilder (~> 2.0)
   jquery-inputmask-rails
   jquery-rails
