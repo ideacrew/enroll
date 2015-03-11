@@ -392,4 +392,22 @@ $(document).ready(function () {
             $("#top-pad80").hide();
             $("#top-pad85").show();
 		});
+		
+		//Employee Dependents Page
+		$('.add_member').click(function() {
+			$('.fail-search').addClass('hidden');
+			$("#dependent_buttons").removeClass('hidden');
+			$("#dependent_buttons div:first").addClass('hidden');
+			$('#dependent_buttons div:last').removeClass('hidden');
+		});
+		
+		$('#cancel_member').click(function() {
+			$("#dependent_buttons div:first").removeClass('hidden');
+			$('#dependent_buttons div:last').addClass('hidden');
+			$('.add_member_list:last-child').addClass('hidden');
+		});
+		
+		$('#save_member').click(function() {
+			$('#new_employer_census_dependent:last').submit();
+		});
 });
