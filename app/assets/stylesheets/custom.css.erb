@@ -176,30 +176,33 @@ a.btn.add{
   padding-top: 30px;
   border-top: 1px solid #bbbbbb
 }
-.green-btn{
+.btn {
   color: #fff;
-  background-color: #1cbbb4;
   font-size: 18px;
   font-weight: 500;
   padding-right: 30px;
   padding-left: 30px;
   border: 0px;
 }
-.green-btn:hover, .green-btn:active{
+.green-btn{
+  background-color: #1cbbb4;
+}
+.green-btn:hover, .green-btn:active, .green-btn:focus{
   background-color: #ffffff;
   color: #1cbbb4;
 }
-.blue-btn{
-  color: #fff;
+.btn-blue{
   background-color: #008ecd;
-  font-size: 18px;
-  font-weight: 500;
-  padding-right: 20px;
-  padding-left: 20px;
-  border: 0px;
 }
-.blue-btn:hover, .blue-btn:active{
+.btn-blue:hover, .btn-blue:active, .btn-blue:focus{
   background-color: #008ecd;
+  color: #ffffff;
+}
+.btn-red {
+  background-color: #8c0000;
+}
+.btn-red:hover, .btn-red:active, .btn-red:focus{
+  background-color: #8c0000;
   color: #ffffff;
 }
 .need-help a{
@@ -439,18 +442,6 @@ ul.social li a span i{
 .panel-middle a.no-pd{
   padding-left: 0 !important;
 }
-.btn-blue{
-  color: #ffffff !important;
-  background-color: #008ecd;
-  font-style: 18px !important;
-  font-weight: 500 !important;
-  padding-left: 60px !important;
-  padding-right: 60px !important;
-  border: 0 !important;
-}
-
-
-
 
 /* ==========================================================================
    1200px
@@ -548,7 +539,7 @@ ul.social li a span i{
     width: 100%;
     margin-bottom: 15px;
   }
-  .blue-btn{
+  .btn-blue{
     display: block;
     width: 100%;
     margin-top: 15px;
@@ -2377,3 +2368,9 @@ a.close-fail{
 #key-section ul li a{
   color: #999;
 }
+a.close-2{
+  position: absolute;
+  top: 13px;
+  right: 10px;
+}
+#dependent_ul {list-style: none;padding: 0;}
