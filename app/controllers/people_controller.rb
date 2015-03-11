@@ -1,5 +1,5 @@
 require 'factories/enrollment_factory'
-# require 'plans_parser'
+require 'plans_parser'
 
 class PeopleController < ApplicationController
 
@@ -76,7 +76,6 @@ class PeopleController < ApplicationController
   end
   
   def dependent_details
-    
     add_employee_role
     @employer_profile = @employee_role.employer_profile
     @employer = @employer_profile.organization
@@ -90,27 +89,19 @@ class PeopleController < ApplicationController
   def add_employee_role
     @person = Person.find(params[:person_id])
     @employer_profile = Organization.find(params[:organization_id]).employer_profile    
-    employer_census_family = @employer_profile.linkable_employee_family_by_person(@person)
-
-    #calling add_employee_role when linkable employee family present
-    if employer_census_family.present? && employer_census_family.person.present?
-      enroll_parms = {}
-      enroll_parms[:user] = current_user
-      enroll_parms[:employer_profile] = @employer_profile
-      enroll_parms[:ssn] = @person.ssn
-      enroll_parms[:last_name] = @person.last_name
-      enroll_parms[:first_name] = @person.first_name
-      enroll_parms[:gender] = @person.gender
-      enroll_parms[:dob] = @person.dob
-      enroll_parms[:name_sfx] = @person.name_sfx
-      enroll_parms[:name_pfx] = @person.name_pfx
-      enroll_parms[:hired_on] = params[:hired_on]
+    enroll_parms = {}
+    enroll_parms[:user] = current_user
+    enroll_parms[:employer_profile] = @employer_profile
+    enroll_parms[:ssn] = @person.ssn
+    enroll_parms[:last_name] = @person.last_name
+    enroll_parms[:first_name] = @person.first_name
+    enroll_parms[:gender] = @person.gender
+    enroll_parms[:dob] = @person.dob
+    enroll_parms[:name_sfx] = @person.name_sfx
+    enroll_parms[:name_pfx] = @person.name_pfx
+    enroll_parms[:hired_on] = params[:hired_on]
     
-      @employee_role, @family = EnrollmentFactory.add_employee_role(enroll_parms)
-    else
-      @employee_role = @person.employee_roles.first
-    end
-    
+    @employee_role, @family = EnrollmentFactory.add_employee_role(enroll_parms)
   end
   
   def add_dependents
@@ -220,14 +211,14 @@ class PeopleController < ApplicationController
   end
 
   def plans_converson
-    file_contents = File.read(Rails.root.join('public/xml/AE_DC_SG_73987_Benefits_ON_v2.xml'))
-    @rows = []
-    PlansParser.parse(file_contents).each do |plan|
-    row = []
-      if Benefit::PLAN_BENEFITS.include?(plan.visit_type.squish)
-        @rows << plan
-      end
-    end
+    # file_contents = File.read(Rails.root.join('public/xml/AE_DC_SG_73987_Benefits_ON_v2.xml'))
+    # @rows = []
+    # PlansParser.parse(file_contents).each do |plan|
+    # row = []
+    #   if Benefit::PLAN_BENEFITS.include?(plan.visit_type.squish)
+    #     @rows << plan
+    #   end
+    # end
   end
   
 
