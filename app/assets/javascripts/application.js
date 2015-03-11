@@ -407,7 +407,9 @@ $(document).ready(function () {
 		$('#cancel_member').click(function() {
 			$("#dependent_buttons div:first").removeClass('hidden');
 			$('#dependent_buttons div:last').addClass('hidden');
-			$('.add_member_list:last-child').addClass('hidden');
+			
+			var last_dependent = '$("#add_member_list_' + $('#last_member').val() + '")';
+			$("#add_member_list_" + $('#last_member').val()).remove();
 		});
 		
 		$('#save_member').click(function() {

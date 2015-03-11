@@ -1,1 +1,2 @@
-$("#dependent_ul").append("<%= escape_javascript(render 'dependent', dependent: @dependent,employer: @employer,person: @person,employee: @employee).html_safe %>")
+$("#dependent_ul").append("<%= escape_javascript(render 'dependent', dependent: @dependent,employer: @employer,person: @person,employee: @employee).html_safe %>");
+$("#last_member").val('<%= @dependent.id %>');

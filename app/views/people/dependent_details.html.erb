@@ -156,6 +156,7 @@
 				<% @employee.employee_family.census_dependents.each do |dependent| %>
 					<%= render "dependent", dependent: dependent,employer: @employer,person: @person,employee: @employee %>
 				<% end %>
+				<input type="hidden" id="last_member" value="">
 			</ul>
 			
 			<div id="dependent_buttons" class="focus_effect row personaol-info-row <%= 'hidden' if @employee.employee_family.census_dependents.empty? %>">
