@@ -1,5 +1,5 @@
 require 'factories/enrollment_factory'
-require 'plans_parser'
+# require 'plans_parser'
 
 class PeopleController < ApplicationController
 
