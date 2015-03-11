@@ -4,17 +4,28 @@ class Benefit
 
   embedded_in :plan
 
-  field :primary_care_visit_cost, type: String
-  field :urgent_care_visit_cost, type: String
-  field :specialist_visit_cost, type: String
-  field :emergency_room_service_cost, type: String
-  field :hospitalization_cost, type: String
-  field :laboratory_service_cost, type: String
-  field :diagnostic_service_cost, type: String  # x-ray or imaging
-  field :generic_drug_cost, type: String
-  field :preferred_brand_name_drug_cost, type: String
-  field :non_preferred_brand_name_drug_cost, type: String
-  field :speciality_drug_cost, type: String
+  field :in_primary_care_visit_cost, type: String
+  field :in_urgent_care_visit_cost, type: String
+  field :in_specialist_visit_cost, type: String
+  field :in_emergency_room_service_cost, type: String
+  field :in_hospitalization_cost, type: String
+  field :in_laboratory_service_cost, type: String
+  field :in_diagnostic_service_cost, type: String  # x-ray or imaging
+  field :in_generic_drug_cost, type: String
+  field :in_preferred_brand_name_drug_cost, type: String
+  field :in_non_preferred_brand_name_drug_cost, type: String
+  field :in_speciality_drug_cost, type: String
+  field :out_primary_care_visit_cost, type: String
+  field :out_urgent_care_visit_cost, type: String
+  field :out_specialist_visit_cost, type: String
+  field :out_emergency_room_service_cost, type: String
+  field :out_hospitalization_cost, type: String
+  field :out_laboratory_service_cost, type: String
+  field :out_diagnostic_service_cost, type: String  # x-ray or imaging
+  field :out_generic_drug_cost, type: String
+  field :out_preferred_brand_name_drug_cost, type: String
+  field :out_non_preferred_brand_name_drug_cost, type: String
+  field :out_speciality_drug_cost, type: String
 
   PLAN_BENEFITS = [
     "Primary Care Visit to Treat an Injury or Illness",

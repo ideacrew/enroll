@@ -29,6 +29,7 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
 puts "*"*80
 puts "::: Generating Plans:::"
 system "rake seed:plans"
+require File.join(File.dirname(__FILE__),'seedfiles', 'plan_benefits_seed')
 
 puts "*"*80
 puts "End of Seed Data"
