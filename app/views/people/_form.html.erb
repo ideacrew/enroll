@@ -77,7 +77,10 @@
             </div>
             
             <div class="clear-fix"></div>
-            <%= render 'shared/signup_progress' %>
+            <div class="col-md-2 col-md-offset-10 key no-pd-right col-sm-3 col-xs-12 hidden" id="key-section">
+				<a href="#" class="btn btn-save">Save & Exit</a>
+            	<%= render 'shared/signup_progress' %>
+            </div>
 
             <%#= render 'autofill_cloud' %>
             <%= render 'employer_search' %>

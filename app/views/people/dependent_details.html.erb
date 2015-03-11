@@ -6,7 +6,7 @@
 }
 </style>
 
-<div class="container-fluid no-pd-left">
+<div class="container-fluid no-pd-left" id="dependents_info">
   <div class="panel panel-default">
     <div class="panel-body left">
       <div class="col-sm-2 left-pd" id="sidebar_partial_value">
@@ -127,38 +127,88 @@
 				  </div>
 				</div>
               </div>
-            </div>
+            </div><br>
             
-            <div class="fail-search add-member" class="row">
+            <div class="fail-search add-member <%= 'hidden' if !@employee.employee_family.census_dependents.empty? %>" class="row">
 	            <div class="col-md-10 col-sm-9 col-xs-12 no-pd">
 	              <div class="panel panel-default">
 	                <div class="panel-body member">
 	                	<center>
 		                  <div class="fail"><span class="bold">Here's your chance to add family members to your plan.</span> Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</div>
 		                  <br>
-		                  <a class=" text-center btn btn-save blue-btn">Add Member</a> &nbsp; &nbsp;
+		                  <% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee.id) %>
+						  <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
+		                  &nbsp; &nbsp;
 		                  <a class="text-center btn btn-save">Continue</a>
 		                </center>
 	                </div>
 	              </div>
 				</div>
           	</div>
+          	<div class="clear-fix"></div>
+          	
+			<ul class="" id="dependent_ul">
+				<% @employee.employee_family.census_dependents.each do |dependent| %>
+					<%= render "dependent", dependent: dependent,employer: @employer,person: @person,employee: @employee %>
+				<% end %>
+			</ul>
+			
+			<div id="dependent_buttons" class="focus_effect row personaol-info-row <%= 'hidden' if @employee.employee_family.census_dependents.empty? %>">
+				<div class="col-md-10 no-pd col-sm-9 col-xs-12">
+					<% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee.id) %>
+					<%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
+					
+					<a class="text-center btn btn-save pull-right">Continue</a>
+				</div>
+				
+				<div class="col-md-10 no-pd col-sm-9 col-xs-12 last hidden">
+					<%= link_to "Cancel", 'javascript:void(0)', class: 'btn btn-red', id: 'cancel_member' %>
+					
+					<a class="text-center btn btn-save pull-right" id="save_member">Confirm</a>
+				</div>
+			</div>
+		            <!-- <div class="house col-md-10 col-sm-9 col-xs-12 no-pd first house-2">
+		              <div class="row top-row top-row-2">
+		                <div class="col-md-6 col-sm-6 no-pd">
+		                  <div class="form-group form-group-lg">
+		                    <input type="text" class="home floatlabel form-control" placeholder="NAME">
+		                  </div>  
+		                </div>
+		                <div class="col-md-6 col-sm-6 no-pd">
+		                  <div class="form-group form-group-lg">
+		                    <input type="text" class="floatlabel form-control" placeholder="RELATION">
+		                    <div class="text-right">
+		                      <a class="close-2" href="#"><%= image_tag('member-close.png') %></a>
+		                    </div>
+		                  </div>  
+		                </div>
+		              </div>                                            
+		            </div>
+		            <div class="house col-md-10 col-sm-9 col-xs-12 no-pd first">
+		              <div class="row top-row top-row-2">
+		                <div class="col-md-6 col-sm-6 no-pd">
+		                  <div class="form-group form-group-lg">
+		                    <input type="text" class="home floatlabel form-control" placeholder="DATE OF BIRTH">
+		                  </div>  
+		                </div>
+		                <div class="col-md-6 col-sm-6 no-pd">
+		                  <div class="form-group form-group-lg">
+		                    <input type="text" class="floatlabel form-control" placeholder="SOCIAL SECURITY">
+		                  </div>  
+		                </div>
+		              </div>                                            
+		            </div>
+		            <div class="margin01"></div> -->
+		            
+		            <div class="clear-fix"></div>
+					<div class="col-md-2 col-md-offset-10 key no-pd-right col-sm-3 col-xs-12" id="key-section">
+                      <a href="#" class="btn btn-save">Save & Exit</a>
+                      <%= render 'shared/signup_progress' %>
+					</div>
+
       	</div>
       </div>
-      		
-      <div class="col-md-10 col-sm-12" style="margin-top:25px;">
-        <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
-          <ul class="list-group" id="dependent_ul">
-            <% @employee.employee_family.census_dependents.each do |dependent| %>
-              <%= render "dependent", dependent: dependent,employer: @employer,person: @person,employee: @employee %>
-            <% end %>
-          </ul>
-        </div>
-        <div class="col-md-2 col-xs-12 col-sm-2">
-        <% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee.id) %>
-          <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-primary', :remote => true %>
-        </div>
-      </div>
+      
     </div>
   </div>
 </div>
