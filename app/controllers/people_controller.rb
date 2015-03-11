@@ -110,7 +110,6 @@ class PeopleController < ApplicationController
       @employee_role = @person.employee_roles.first
     end
     
-    @employee_role, @family = EnrollmentFactory.add_employee_role(enroll_parms)
   end
   
   def add_dependents
