@@ -29,17 +29,15 @@ class Person
   # Login account
   belongs_to :user
 
-  belongs_to :employer_contact, 
-                class_name: "EmployerProfile",  
+  belongs_to :employer_contact,
+                class_name: "EmployerProfile",
                 inverse_of: :employer_contacts,
                 index: true
 
-  belongs_to :broker_agency_contact, 
-                class_name: "BrokerAgencyProfile",  
-                inverse_of: :broker_agency_contacts, 
+  belongs_to :broker_agency_contact,
+                class_name: "BrokerAgencyProfile",
+                inverse_of: :broker_agency_contacts,
                 index: true
-
-  belongs_to :family
 
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
@@ -125,6 +123,14 @@ class Person
 
   def full_name
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
+  end
+
+  def primary_family
+    Family.find_by_primary_applicant(self)
+  end
+
+  def families
+    Family.find_all_by_person(self)
   end
 
   # Return an instance list of active People who match identifying information criteria
