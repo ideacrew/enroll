@@ -112,7 +112,7 @@ class EmployerProfile
   def is_active?
     self.is_active
   end
-  
+
   def find_employee_by_person(person)
     return self.employee_families.select{|emf| emf.census_employee.ssn == person.ssn}.first.census_employee
   end
@@ -124,7 +124,7 @@ class EmployerProfile
     end
 
     def all
-      list_embedded Organization.exists(employer_profile: true).order_by([:dba]).to_a
+      list_embedded Organization.exists(employer_profile: true).order_by([:legal_name]).to_a
     end
 
     def first
@@ -141,8 +141,8 @@ class EmployerProfile
     end
 
     def find_by_fein(fein)
-      organization = Organization.find(fein: fein)
-      organizations.present? ? organization.employer_profile : nil
+      organization = Organization.where(fein: fein).first
+      organization.present? ? organization.employer_profile : nil
     end
 
     def find_by_broker_agency_profile(profile)
@@ -161,7 +161,7 @@ class EmployerProfile
         families << er.employer_profile.employee_families.detect { |ef| ef.census_employee.ssn == person.ssn }
       end
     end
-    
+
     # Returns all EmployerProfiles where person is active on the employee_census
     def find_employer_profiles_by_person(person)
       organizations = match_census_employees(person)
@@ -171,7 +171,7 @@ class EmployerProfile
     end
 
     def match_census_employees(person)
-      raise ArgumentError.new("expected Person") unless person.is_a?(Person)
+      raise ArgumentError.new("expected Person") unless person.respond_to?(:ssn)
       return [] if person.ssn.blank?
       Organization.where("employer_profile.employee_families.census_employee.ssn" => person.ssn).to_a
     end

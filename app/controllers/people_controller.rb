@@ -1,4 +1,5 @@
 require 'factories/enrollment_factory'
+# require 'plans_parser'
 
 class PeopleController < ApplicationController
 
@@ -75,7 +76,6 @@ class PeopleController < ApplicationController
   end
   
   def dependent_details
-    
     add_employee_role
     @employer_profile = @employee_role.employer_profile
     @employer = @employer_profile.organization
@@ -104,7 +104,7 @@ class PeopleController < ApplicationController
       enroll_parms[:name_sfx] = @person.name_sfx
       enroll_parms[:name_pfx] = @person.name_pfx
       enroll_parms[:hired_on] = params[:hired_on]
-    
+
       @employee_role, @family = EnrollmentFactory.add_employee_role(enroll_parms)
     else
       @employee_role = @person.employee_roles.first
@@ -216,6 +216,17 @@ class PeopleController < ApplicationController
    def show
     @person = Person.find(params[:id])
     build_nested_models
+  end
+
+  def plans_converson
+    # file_contents = File.read(Rails.root.join('public/xml/AE_DC_SG_73987_Benefits_ON_v2.xml'))
+    # @rows = []
+    # PlansParser.parse(file_contents).each do |plan|
+    # row = []
+    #   if Benefit::PLAN_BENEFITS.include?(plan.visit_type.squish)
+    #     @rows << plan
+    #   end
+    # end
   end
   
 

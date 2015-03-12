@@ -114,8 +114,12 @@ class EnrollmentFactory
     family, primary_applicant = self.initialize_family(person, employer_census_family.census_dependents)
     # TODO: create extra family stuff if in census
 
-    saved = save_all_or_delete_new(family, primary_applicant, role, employer_census_family)
-    person.delete if !saved && person_new
+    saved = save_all_or_delete_new(family, primary_applicant, role)
+    if saved
+      employer_census_family.save
+    elsif person_new
+      person.delete
+    end
     return role, family
   end
 
@@ -146,8 +150,8 @@ class EnrollmentFactory
   end
 
   def self.initialize_family(person, dependents)
-    family = person.family
-    family = person.build_family() if family.blank?
+    family = person.primary_family
+    family = Family.new if family.blank?
     applicant = family.primary_applicant
     applicant = initialize_primary_applicant(family, person) if applicant.blank?
     dependents.each do |dependent|

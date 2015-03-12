@@ -12,13 +12,9 @@ DOB: <%= format_date census_employee.dob %> <br>
 Hired On: <%= format_date census_employee.hired_on %><br>
 
 <h3> Address </h3>
-
-<%= address.address_1 + ", " +
-    address.address_2 + ", " +
-    address.city + ", " +
-    address.state + ", " +
-    address.zip
-  %>
+<% if address.present? %>
+  <%= address.formatted_address %>
+<% end %>
 
 <h3> Dependents </h3>
 
