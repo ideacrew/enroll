@@ -30,7 +30,7 @@ class User
   field :last_sign_in_ip,    type: String
 
   field :authentication_token
-  field :role, :type => Array, :default => []
+  field :roles, :type => Array, :default => []
 
   # Oracle Identity Manager ID
   field :oim_id, type: String, default: ""
@@ -72,6 +72,10 @@ class User
   # field :locked_at,       type: Time
 
   before_save :ensure_authentication_token
+
+  def has_role?(role_sym)
+    roles.any? { |r| r == role_sym }
+  end
 
   def ensure_authentication_token
     if authentication_token.blank?
