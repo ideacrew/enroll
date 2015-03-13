@@ -40,7 +40,8 @@ $(document).ready(function () {
   
   $(".date-picker, .date_picker").datepicker({
     changeMonth: true,
-    changeYear: true
+    changeYear: true,
+    yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()
     });
   $('.floatlabel').floatlabel({
       slideInput: false
@@ -310,36 +311,36 @@ $(document).ready(function () {
     $('#broker_info').removeClass('hidden');
   });
   
-	$(".close-fail").click(function() {
-		$(".fail-search").addClass('hidden');
-		// $("#overlay").css("display", "none");
-		// $(".welcome-msg").css("display", "none");
-		// $(".information").css("opacity", "1");
-		// $("a.name").css("padding-top", "30px");
-		// $(".disable-btn").css("display", "inline-block");
-		// $('.focus_effect:first').addClass('personaol-info-top-row');
-		// $('.focus_effect:first').removeClass('personaol-info-row');
-		// $('.sidebar a:first').addClass('style_s_link');
-		// $("#personal_info").css("opacity", "1");
-		// $(".search-btn-row").css("display", "block");
-		// $(".disable-btn, #key-section").hide();
-		// $('.personal_info').addClass('style_s_link');
-		// $("#personal_info .first").removeClass('employee-info');
-		$(".overlay-in").css("display", "none");
-	});
+  $(".close-fail").click(function() {
+    $(".fail-search").addClass('hidden');
+    // $("#overlay").css("display", "none");
+    // $(".welcome-msg").css("display", "none");
+    // $(".information").css("opacity", "1");
+    // $("a.name").css("padding-top", "30px");
+    // $(".disable-btn").css("display", "inline-block");
+    // $('.focus_effect:first').addClass('personaol-info-top-row');
+    // $('.focus_effect:first').removeClass('personaol-info-row');
+    // $('.sidebar a:first').addClass('style_s_link');
+    // $("#personal_info").css("opacity", "1");
+    // $(".search-btn-row").css("display", "block");
+    // $(".disable-btn, #key-section").hide();
+    // $('.personal_info').addClass('style_s_link');
+    // $("#personal_info .first").removeClass('employee-info');
+    $(".overlay-in").css("display", "none");
+  });
   
-	//Focus effect
-	$("#personal_info .floatlabel").focusin(function() {
-		$('#personal_info div.first').addClass('employee-info');
-		$("a.personal_info").css("color","#98cbff");
-		// $("a.first").css("color","#00b420");
-		$("#personal_info div.first").css("opacity","1");
-	});
-	$("#personal_info .floatlabel").blur(function() {
-    	$("#personal_info div.first").css("opacity","0.5");
-	});
-	
-	$('#address_info div.first').addClass('employee-info');
+  //Focus effect
+  $("#personal_info .floatlabel").focusin(function() {
+    $('#personal_info div.first').addClass('employee-info');
+    $("a.personal_info").css("color","#98cbff");
+    // $("a.first").css("color","#00b420");
+    $("#personal_info div.first").css("opacity","1");
+  });
+  $("#personal_info .floatlabel").blur(function() {
+      $("#personal_info div.first").css("opacity","0.5");
+  });
+  
+  $('#address_info div.first').addClass('employee-info');
         $("#address_info .floatlabel").focusin(function() {
             $('#address_info div.first').addClass('employee-info');
             $("a.address_info").css("color","#98cbff");
@@ -371,48 +372,48 @@ $(document).ready(function () {
         $("#email_info .floatlabel").blur(function() {
             $("#email_info div.first").css("opacity","0.5");
         });
-	
-		$("#address_info .floatlabel").focusin(function() {
+  
+    $("#address_info .floatlabel").focusin(function() {
             $("#top-pad15").hide();
             $("#top-pad30").show();
             $("#top-pad80").hide();
             $("#top-pad85").hide();
-		});  
+    });  
 
-		$("#phone_info .floatlabel").focusin(function() {
+    $("#phone_info .floatlabel").focusin(function() {
             $("#top-pad15").hide();
             $("#top-pad30").hide();
             $("#top-pad80").show();
             $("#top-pad85").hide();
-		});    
+    });    
 
-		$("#email_info .floatlabel").focusin(function() {
+    $("#email_info .floatlabel").focusin(function() {
             $("#top-pad15").hide();
             $("#top-pad30").hide();
             $("#top-pad80").hide();
             $("#top-pad85").show();
-		});
-		
-		//Employee Dependents Page
-		$('#dependents_info #top-pad15, #dependents_info #top-pad30, #dependents_info #top-pad80').hide();
-		$("a.one, a.two, a.three, a.four, a.five").css("color","#00b420");
-		
-		$('.add_member').click(function() {
-			$('.fail-search').addClass('hidden');
-			$("#dependent_buttons").removeClass('hidden');
-			$("#dependent_buttons div:first").addClass('hidden');
-			$('#dependent_buttons div:last').removeClass('hidden');
-		});
-		
-		$('#cancel_member').click(function() {
-			$("#dependent_buttons div:first").removeClass('hidden');
-			$('#dependent_buttons div:last').addClass('hidden');
-			
-			var last_dependent = '$("#add_member_list_' + $('#last_member').val() + '")';
-			$("#add_member_list_" + $('#last_member').val()).remove();
-		});
-		
-		$('#save_member').click(function() {
-			$('#new_employer_census_dependent:last').submit();
-		});
+    });
+    
+    //Employee Dependents Page
+    $('#dependents_info #top-pad15, #dependents_info #top-pad30, #dependents_info #top-pad80').hide();
+    $("a.one, a.two, a.three, a.four, a.five").css("color","#00b420");
+    
+    $('.add_member').click(function() {
+      $('.fail-search').addClass('hidden');
+      $("#dependent_buttons").removeClass('hidden');
+      $("#dependent_buttons div:first").addClass('hidden');
+      $('#dependent_buttons div:last').removeClass('hidden');
+    });
+    
+    $('#cancel_member').click(function() {
+      $("#dependent_buttons div:first").removeClass('hidden');
+      $('#dependent_buttons div:last').addClass('hidden');
+      
+      var last_dependent = '$("#add_member_list_' + $('#last_member').val() + '")';
+      $("#add_member_list_" + $('#last_member').val()).remove();
+    });
+    
+    $('#save_member').click(function() {
+      $('#new_employer_census_dependent:last').submit();
+    });
 });
