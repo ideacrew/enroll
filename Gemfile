@@ -27,7 +27,7 @@ gem 'jbuilder', '~> 2.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'less-rails-bootstrap', '~> 3.3.1.0'
 gem 'font-awesome-rails', '4.2.0.0'
-gem 'nokogiri-happymapper'
+gem 'nokogiri-happymapper', :require => 'happymapper'
 
 gem 'mongoid', '~> 4.0.0'
 gem 'origin', '~> 2.1.1'
