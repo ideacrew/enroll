@@ -80,8 +80,8 @@ $(document).ready(function () {
     if(check_personal_info_exists().length==0 && gender_checked)
     {
       //Sidebar Switch - Search Active
-      $('#personal_sidebar').addClass('hidden');
-      $('#search_sidebar').removeClass('hidden');
+      //$('#personal_sidebar').addClass('hidden');
+      //$('#search_sidebar').removeClass('hidden');
       $('.employers-row').html("");
       $.ajax({
         type: "POST",
@@ -108,7 +108,7 @@ $(document).ready(function () {
 
           //Sidebar Switch - Search Active
           $('#personal_sidebar').removeClass('hidden');
-          $('#search_sidebar').addClass('hidden');
+          //$('#search_sidebar').addClass('hidden');
           $(".overlay-in").css("display", "block");
         }
       });  
