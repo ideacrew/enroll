@@ -1,6 +1,35 @@
-<div id="address_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
+<div id="address_info1" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
   <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
     <div class="row top-row">
+    	
+	  <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+		<button class="btn btn-new-address">NEW ADDRESS</button>
+	  </div>
+    	
+	  <div class="col-md-8 col-sm-8 col-xs-12 form-group form-group-lg no-pd address">
+	      <div class="form-group form-group-lg">
+	        <div class="row" style="margin: 0;">
+	            <div class="dropdown">
+	              <button class="form-control float-label adderess-select-box form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+	                Home Address
+	                <span class="caret"></span>
+	              </button>
+	              <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+	                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Home Address</a></li>
+	                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Work Address</a></li>
+	                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Mailing Address</a></li>
+	              </ul>
+	            </div>
+	        </div>
+	      </div>  
+		</div>
+                        
+	   <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+		<%= link_to image_tag('delete.png'), '#', class: 'close-2' %>
+	  </div>
+	</div>
+
+	<!-- <div class="row top-row">
       <div class="col-md-9 col-sm-9 col-xs-12 form-group form-group-lg no-pd address">
         <div class="form-group form-group-lg">
           <div class="row" style="margin: 0;">
@@ -26,7 +55,7 @@
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <button class="btn btn-new-address border-bottom-none">NEW ADDRESS</button>
       </div>
-    </div>
+    </div> -->
     <%= f.fields_for :addresses, errors: {}, fieldset: true do |address|  %>
      <%= address.hidden_field :_destroy %>
      <% kind = address.object.kind %>

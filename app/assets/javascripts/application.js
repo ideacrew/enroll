@@ -396,7 +396,7 @@ $(document).ready(function () {
     
     //Employee Dependents Page
     $('#dependents_info #top-pad15, #dependents_info #top-pad30, #dependents_info #top-pad80').hide();
-    $("a.one, a.two, a.three, a.four, a.five").css("color","#00b420");
+    $("#dependents_info a.one, #dependents_info a.two, #dependents_info a.three, #dependents_info a.four, #dependents_info a.five").css("color","#00b420");
     
     $('.add_member').click(function() {
       $('.fail-search').addClass('hidden');
