@@ -15,8 +15,6 @@
 //= require jquery-ui
 //= require jquery_ujs
 //= require bootstrap.min
-//= require twitter/bootstrap
-//= require twitter/bootstrap/tab
 //= require turbolinks
 //= require classie
 //= require modalEffects
