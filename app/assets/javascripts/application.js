@@ -331,7 +331,6 @@ $(document).ready(function () {
   $("#personal_info .floatlabel").focusin(function() {
     $('#personal_info div.first').addClass('employee-info');
     $("a.personal_info").css("color","#98cbff");
-    // $("a.first").css("color","#00b420");
     $("#personal_info div.first").css("opacity","1");
   });
   $("#personal_info .floatlabel").blur(function() {
