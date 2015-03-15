@@ -107,6 +107,32 @@ describe Person, type: :model do
       end
     end
 
+    context "with invalid date values" do
+      context "and date of birth is in future" do
+        let(:params) {valid_params.deep_merge({dob: Date.today + 1})}
+
+        it "should fail validation" do
+          expect(Person.create(**params).errors[:dob].size).to eq 1
+        end
+      end
+
+      context "and date of death is in future" do
+        let(:params) {valid_params.deep_merge({date_of_death: Date.today + 1})}
+
+        it "should fail validation" do
+          expect(Person.create(**params).errors[:date_of_death].size).to eq 1
+        end
+      end
+
+      context "and date of death preceeds date of birth" do
+        let(:params) {valid_params.deep_merge({date_of_death: Date.today - 10, dob: Date.today - 1})}
+
+        it "should fail validation" do
+          expect(Person.create(**params).errors[:date_of_death].size).to eq 1
+        end
+      end
+    end
+
   end
 
 end
