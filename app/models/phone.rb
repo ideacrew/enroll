@@ -33,9 +33,16 @@ class Phone
 
   def save_phone_components
     phone_number = filter_non_numbers(self.full_phone_number).to_s
-    if phone_number && phone_number.length == 10
-      self.area_code = phone_number[0,3]
-      self.number = phone_number[3,7]
+    if phone_number
+      case phone_number.length
+      when 11
+        self.country_code = phone_number[1,1]
+        self.area_code = phone_number[1,3]
+        self.number = phone_number[4,7]
+      when 10
+        self.area_code = phone_number[0,3]
+        self.number = phone_number[3,7]
+      end
     end
   end
 

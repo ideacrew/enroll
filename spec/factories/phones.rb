@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :phone do
     kind 'home'
-    sequence(:area_code, 111) { |n| "#{n}"}
+    sequence(:area_code, WrappingSequence.new(100, 999)) { |n| "#{n}"}
     sequence(:number, 1111111) { |n| "#{n}"}
     sequence(:extension) { |n| "#{n}"}
 

@@ -17,3 +17,7 @@ describe Forms::ConsumerIdentity do
       expect(subject.errors).to include(:ssn)
     end
 end
+
+describe Forms::ConsumerIdentity do
+
+end
