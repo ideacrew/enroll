@@ -3,8 +3,7 @@ class Person
   include Mongoid::Timestamps
   include Mongoid::Versioning
 
-# REMOVE "unknown" once data is corrected
-  GENDER_KINDS = %W(male female unknown)
+  GENDER_KINDS = %W(male female)
 
 #  auto_increment :hbx_id, :seed => 9999
 
@@ -55,6 +54,7 @@ class Person
     :person_relationships, :employee_roles, :addresses, :phones, :emails
 
   validates_presence_of :first_name, :last_name
+  validate :date_functional_validations
 
   validates :ssn,
     length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
@@ -66,7 +66,8 @@ class Person
     allow_blank: true,
     inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
 
-  before_save :update_full_name, :date_of_death_follows_date_of_birth
+
+  before_save :update_full_name
 
   index({hbx_id: 1}) #, {unique: true})
   index({last_name:  1})
@@ -157,9 +158,30 @@ private
     full_name
   end
 
+  # Verify basic date rules
+  def date_functional_validations
+    date_of_birth_is_past
+    date_of_death_is_blank_or_past
+    date_of_death_follows_date_of_birth
+  end
+
+  def date_of_death_is_blank_or_past
+    return unless self.date_of_death.present?
+    errors.add(:date_of_death, "future date: %{self.date_of_death} is invalid date of death") if Date.today < self.date_of_death
+  end
+
+  def date_of_birth_is_past
+    return unless self.dob.present?
+    errors.add(:dob, "future date: %{self.dob} is invalid date of birth") if Date.today < self.dob
+  end
+
   def date_of_death_follows_date_of_birth
-    return if date_of_death.nil? || dob.nil?
-    errors.add(:date_of_death, "date of death cannot preceed date of birth") if date_of_death < dob
+    return unless self.date_of_death.present? && self.dob.present?
+
+    if self.date_of_death < self.dob 
+      errors.add(:date_of_death, "date of death cannot preceed date of birth") 
+      errors.add(:dob, "date of birth cannot follow date of death")
+    end
   end
 
 end

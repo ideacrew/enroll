@@ -94,13 +94,13 @@ RSpec.describe Address, type: :model do
 
   describe 'view helpers/presenters' do
     let(:address) { FactoryGirl.build :address }
-    describe '#formatted_address' do
+    describe '#to_s' do
       it 'returns a string with a formated address' do
         line_one = address.address_1
         line_two = address.address_2
         line_three = "#{address.city}, #{address.state} #{address.zip}"
 
-        expect(address.formatted_address).to eq "#{line_one}<br/>#{line_two}<br/>#{line_three}"
+        expect(address.to_s).to eq "#{line_one}<br/>#{line_two}<br/>#{line_three}"
       end
     end
 

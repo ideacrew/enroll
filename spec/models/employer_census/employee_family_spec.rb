@@ -75,7 +75,7 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
 
   describe '#link_employee_role' do
 
-    context "and it is linked" do
+    context "and employee is linked" do
       before do
         census_family.save
         census_family.link_employee_role(employee_role)
@@ -86,13 +86,22 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
       end
     end
 
-    context "and it is terminated" do
+    context "and employee is terminated" do
       before do
         census_family.terminate(Date.today)
       end
 
       it "should raise an error" do
         expect{census_family.link_employee_role(employee_role)}.to raise_error(EmployeeFamilyLinkError)
+      end
+    end
+
+    context "and the eligibility date is too far in future" do
+    end
+
+    context "and the special enrollment period has expired" do
+
+      context "and the employee's roster entry wasn't timely" do
       end
     end
 
@@ -120,7 +129,7 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
   #   end
 
   #   context "and it is linked" do
-  #     before
+  #     before do
   #       census_family.link_employee_role(employee_role)
   #     end
 
@@ -130,24 +139,38 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
   #   end
   # end
 
-  describe '#terminate' do
-    let(:maximum_retroactive_termination) {HbxProfile::ShopMaximumRetroactiveTerminationInDays}
+  describe '#terminate and #terminate!' do
     let(:valid_termination_date) {Date.today - (maximum_retroactive_termination)}
+    let(:maximum_retroactive_termination) {HbxProfile::ShopRetroactiveTerminationMaximumInDays}
 
     context "termination date > HBX policy for retro terms" do
       let(:overdue_termination_date) {Date.today.beginning_of_month - (maximum_retroactive_termination)}
 
       context "user role isn't an HBX admin" do
-        it "should raise an error" do
-          # raise overdue_termination_date.inspect
-          expect{census_family.terminate(overdue_termination_date)}.to raise_error(HbxPolicyError)
+        context "and terminate! is called" do
+          it "should raise an error" do
+            expect{census_family.terminate!(overdue_termination_date)}.to raise_error(HbxPolicyError)
+          end
+        end
+
+        context "and terminate is called" do
+          it "should return nil" do
+            expect(census_family.terminate(overdue_termination_date)).to be_nil
+          end
         end
       end
 
       context "user role is HBX admin" do
         pending "add HBX admin role authorization to override"
         it "should terminate employee" do
+          expect(census_family.terminate(valid_termination_date).is_terminated?).to be_true
         end
+      end
+    end
+
+    context "termination date is valid for retro terms" do
+      it "should return terminated employee" do
+        expect(census_family.terminate(valid_termination_date).is_terminated?).to be_true
       end
     end
   end

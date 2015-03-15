@@ -15,6 +15,7 @@ class Phone
   field :extension, type: String, default: ""
   field :primary, type: Boolean
   field :full_phone_number, type: String, default: ""
+
   before_validation :save_phone_components
 
   validates :area_code,
@@ -32,8 +33,8 @@ class Phone
     allow_blank: false
 
   def save_phone_components
-    phone_number = filter_non_numbers(self.full_phone_number).to_s
-    if phone_number
+    phone_number = filter_non_numeric(self.full_phone_number).to_s
+    if !phone_number.blank?
       case phone_number.length
       when 11
         self.country_code = phone_number[1,1]
@@ -46,20 +47,34 @@ class Phone
     end
   end
 
-  def area_code=(value)
-   super filter_non_numbers(value)
+  def full_phone_number=(new_full_phone_number)
+   super filter_non_numeric(new_full_phone_number)
+   save_phone_components
   end
 
-  def number=(value)
-   super filter_non_numbers(value)
+  def area_code=(new_area_code)
+   super filter_non_numeric(new_area_code)
   end
 
-  def extension=(value)
-   super filter_non_numbers(value)
+  def number=(new_number)
+   super filter_non_numeric(new_number)
+  end
+
+  def extension=(new_extension)
+   super filter_non_numeric(new_extension)
+  end
+
+  def to_s
+    full_number = (self.area_code + self.number).to_i
+    if self.extension.present?
+      full_number.to_s(:phone, area_code: true, extension: self.extension)
+    else
+      full_number.to_s(:phone, area_code: true)
+    end
   end
 
 private
-  def filter_non_numbers(str)
+  def filter_non_numeric(str)
     str.to_s.gsub(/\D/,'') if str.present? 
   end
 end

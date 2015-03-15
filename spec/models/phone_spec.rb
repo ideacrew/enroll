@@ -41,13 +41,17 @@ describe Phone, type: :model do
   end
   
   
-  let(:person) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789" )}
-  let(:params) {{kind: "home", full_phone_number: "(222)-1111-111", person: person}}
+  let(:person) {FactoryGirl.create(:person)}
+  let(:params) {{kind: "home", full_phone_number: "(222)-111-3333", person: person}}
+
   it "strips valid area code and number from full phone number" do
     phone = Phone.new(**params)
-    expect(phone.save).to eq true
     expect(phone.area_code).to eq "222"
-    expect(phone.number).to eq "1111111"
+    expect(phone.number).to eq "1113333"
+    expect(phone.to_s).to eq "(222) 111-3333"
+    phone.extension = "876"
+    expect(phone.to_s).to eq "(222) 111-3333 x 876"
+    expect(phone.save).to eq true
   end
 
 
