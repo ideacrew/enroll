@@ -84,8 +84,8 @@ class EmployeeRole
 
   def self.find(employee_role_id)
     bson_id = BSON::ObjectId.from_string(employee_role_id)
-    person = Person.where({"employee_roles._id" => bson_id }).first
-    person.employee_roles.detect { |ee| ee.id == bson_id } unless person.nil?
+    person = Person.where({"employee_roles._id" => bson_id })
+    person.first.employee_roles.detect { |ee| ee.id == bson_id } unless person.size < 1
   end
 
   def self.list(collection)
