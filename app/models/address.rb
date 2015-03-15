@@ -37,7 +37,7 @@ class Address
     nil #todo
   end
 
-  def formatted_address
+  def to_s
     city.present? ? city_delim = city + "," : city_delim = city
     line3 = [city_delim, state, zip].reject(&:nil? || empty?).join(' ')
     [address_1, address_2, line3].reject(&:nil? || empty?).join('<br/>').html_safe
@@ -49,31 +49,31 @@ class Address
   end
 
   def kind=(new_kind)
-    write_attribute(:kind, new_kind.to_s.strip.downcase)
+    write_attribute(:kind, new_kind.to_s.squish.downcase)
   end
 
   def address_1=(new_address_1)
-    write_attribute(:address_1, new_address_1.to_s.strip)
+    write_attribute(:address_1, new_address_1.to_s.squish)
   end
 
   def address_2=(new_address_2)
-    write_attribute(:address_2, new_address_2.to_s.strip)
+    write_attribute(:address_2, new_address_2.to_s.squish)
   end
 
   def address_3=(new_address_3)
-    write_attribute(:address_3, new_address_3.to_s.strip)
+    write_attribute(:address_3, new_address_3.to_s.squish)
   end
 
   def city=(new_city)
-    write_attribute(:city, new_city.to_s.strip)
+    write_attribute(:city, new_city.to_s.squish)
   end
 
   def state=(new_state)
-    write_attribute(:state, new_state.to_s.strip)
+    write_attribute(:state, new_state.to_s.squish)
   end
 
   def zip=(new_zip)
-    write_attribute(:zip, new_zip.to_s.strip)
+    write_attribute(:zip, new_zip.to_s.squish)
   end
 
   def home?
