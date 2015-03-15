@@ -101,11 +101,25 @@ class EmployerCensus::EmployeeFamily
   end
 
   def terminate(last_day_of_work)
+    begin
+      terminate!(last_day_of_work)
+    rescue
+      nil
+    else
+      self
+    end
+  end
+
+  def terminate!(last_day_of_work)
     coverage_term_date = last_day_of_work.end_of_month
 
-    max_retro_term = HbxProfile::ShopMaximumRetroactiveTerminationInDays
+    max_retro_term = HbxProfile::ShopRetroactiveTerminationMaximumInDays
     if (Date.today - coverage_term_date) > max_retro_term
-      raise HbxPolicyError, "termination date exceeds maximum number of days for a retroactive termination"
+      message =  "Error while terminating: #{census_employee.first_name} #{census_employee.last_name} (id=#{id}). "
+      message << "Termination date: #{last_day_of_work.end_of_month} exceeds maximum period "
+      message << "(#{HbxProfile::ShopRetroactiveTerminationMaximumInDays} days) for a retroactive termination"
+      Rails.logger.error { message }
+      raise HbxPolicyError, message
     end
 
     self.census_employee.terminated_on = coverage_term_date
