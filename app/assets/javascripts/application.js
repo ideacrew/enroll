@@ -27,7 +27,6 @@ $(document).ready(function () {
   $('#personal_sidebar .address_info').addClass('hidden');
   $('#personal_sidebar #phone_info').addClass('hidden');
   $('#personal_sidebar #email_info').addClass('hidden');
-  $('#personal_sidebar .address_info').addClass('hidden');
   $('#personal_sidebar .phone_info').addClass('hidden');
   $('#personal_sidebar .email_info').addClass('hidden');
   $("#personal_sidebar .save-btn").attr("disabled",true);
@@ -453,4 +452,14 @@ $(document).ready(function () {
   		$('#email_info .email .first').removeClass('field_error');
   	}
   }
+  
+  // Add new address
+  $('.btn-new-address').click(function(e){
+	e.preventDefault();
+    $(".new-address-flow").css("display", "block");
+  });
+  
+  $('.new-address-flow p a').click(function(){
+  	$(".new-address-flow").removeAttr("style");
+  });
 });

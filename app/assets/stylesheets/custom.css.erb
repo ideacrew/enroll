@@ -2437,3 +2437,66 @@ a.close-2{
 #email_error, .field_error.employee-info label, .field_error.employee-info input {
 	color: red !important;
 }
+
+/* New address flow start */
+
+
+#address_info .new-address-flow{
+  position: absolute;
+  height: 100%;
+  background: rgba(255,255,255,0.85);
+  width: 100%;
+  top: 0;
+  display: none;
+}
+#address_info .new-address-flow h5{
+  font-size: 16px;
+  margin-top: 19px;
+}
+#address_info .new-address-flow input[type="text"]{
+  height: 47px;
+  margin-top: 10px;
+  text-align: center;
+  padding: 0 !important;
+  color: #666;
+  border: 2px solid #e3e3e3;
+  background: none;
+  font-size: 16px;
+} 
+#address_info .new-address-flow p a{
+  color: red;
+  float: left;
+  font-size: 16px;
+  margin-top: 2px;
+}
+#address_info .new-address-flow a:last-child{
+  color: #007bc3;
+  float: right;
+}
+#address_info .new-address-flow input[type="text"]::-moz-placeholder{
+  font-size: 16px;
+  color: #888;
+}
+#address_info .new-address-flow input[type="text"]::-webkit-input-placeholder{
+  font-size: 16px;
+  color: #888;
+}
+#address_info .new-address-flow input[type="text"]:-ms-input-placeholder{
+  font-size: 16px;
+  color: #888;
+}
+#address_info .new-address-flow input[type="text"]:-moz-placeholder{
+  font-size: 16px;
+  color: #888;
+}
+
+@media(max-width: 500px){
+  #address_info .new-address-flow{
+    padding-top: 40%;
+  }
+}
+@media(min-width: 501px) and (max-width: 767px){
+  #address_info .new-address-flow{
+    padding-top: 20%;
+  }
+}
