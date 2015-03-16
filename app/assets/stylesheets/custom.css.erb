@@ -1069,7 +1069,7 @@ input.floatlabe{
   margin: 0 !important;
 }
 .error {
-  display: none;
+  <!-- display: none; -->
 }
 .require-field {
   border: 1px solid red !important;
@@ -1109,8 +1109,10 @@ input.floatlabe{
   padding-bottom: 20px !important;
   padding-top: 20px !important;
 }
-#email_info .email:first-child > .first {border-right: none;}
-#email_info .email:last-child > .first {border-left: none;}
+/* 
+ * #email_info .email:first-child > .first {border-right: none;}
+ * #email_info .email:last-child > .first {border-left: none;}
+ */
 
 .list-group a.sidebar-employer-field {
   color: #fff;
@@ -2422,4 +2424,16 @@ a.close-2{
 .employee-info label, .employee-info input {
   color: #007bc3 !important;
 }
-
+#email_error {
+  right: 14px;
+  top: 14px;
+  font-size: 0.8em;
+  position: absolute;
+  transition: all 0.3s ease-in-out 0s;
+}
+.field_error {
+	border: 1px solid red !important;
+}
+#email_error, .field_error.employee-info label, .field_error.employee-info input {
+	color: red !important;
+}

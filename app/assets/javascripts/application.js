@@ -50,7 +50,7 @@ $(document).ready(function () {
     $(".address-row").hide();
     divtoshow = $(this).data("value") + "-div";
     $("."+divtoshow).show();
-  })
+  });
   
 //  $(".phone-mask").inputmask("(999) 999-9999");
 
@@ -430,4 +430,27 @@ $(document).ready(function () {
   $('#save_member').click(function() {
     $('#new_employer_census_dependent:last').submit();
   });
+  
+  // Email validation after 3 seconds of stopping typing
+  var timeout;
+  $('#email_info input').keyup(function() {
+    if(timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+    }
+
+    timeout = setTimeout(check_email, 1000);
+  });
+  
+  function check_email() {
+	var email = $('.email .floatlabel').val(); 
+    var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if(!re.test(email)) {
+  		$('#email_error').text('Enter a valid email address. ( e.g. name@domain.com )');
+  		$('#email_info .email .first').addClass('field_error');
+  	} else {
+  		$('#email_error').text('');
+  		$('#email_info .email .first').removeClass('field_error');
+  	}
+  }
 });
