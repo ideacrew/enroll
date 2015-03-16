@@ -462,4 +462,28 @@ $(document).ready(function () {
   $('.new-address-flow p a').click(function(){
   	$(".new-address-flow").removeAttr("style");
   });
+  
+  // Customize Dependent Family Member Delete Confirmation
+  $(function() {
+	  $.rails.allowAction = function(link) {
+	    if (!link.attr('data-confirm')) {
+	      return true;
+	    }
+	    $.rails.showConfirmDialog(link);
+	    return false;
+	  };
+	  $.rails.confirmed = function(link) {
+	    link.removeAttr('data-confirm');
+	    return link.trigger('click.rails');
+	  };
+	  return $.rails.showConfirmDialog = function(link) {
+	    var html, message;
+	    message = link.attr('data-confirm');
+	    html = "<div class=\"modal\" id=\"confirmationDialog\">\n  <div class=\"modal-dialog\">\n    <div class=\"modal-content\">\n      <div class=\"modal-header\">\n        <a class=\"close\" data-dismiss=\"modal\">×</a>\n        <h1>" + message + "</h1>\n      </div>\n      <div class=\"modal-footer\">\n        <a data-dismiss=\"modal\" class=\"btn\">" + (link.data('cancel')) + "</a>\n        <a data-dismiss=\"modal\" class=\"btn btn-primary confirm\">" + (link.data('ok')) + "</a>\n      </div>\n    </div>\n  </div>\n</div>";
+	    $(html).modal();
+	    return $('#confirmationDialog .confirm').on('click', function() {
+	      return $.rails.confirmed(link);
+	    });
+	  };
+	});
 });
