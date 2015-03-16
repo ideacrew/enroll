@@ -1,12 +1,12 @@
 <div id="address_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
   <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
     <div class="row top-row">
-    	
-	  <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
-		  <%= link_to 'New Address', '#', class: 'btn btn-small' %>
-	  </div>
-    	
-	  <div class="col-md-8 col-sm-8 col-xs-12 form-group form-group-lg no-pd address">
+      
+    <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+      <%= link_to 'New Address', '#', class: 'btn btn-small' %>
+    </div>
+      
+    <div class="col-md-8 col-sm-8 col-xs-12 form-group form-group-lg no-pd address">
         <div class="form-group form-group-lg">
           <div class="row" style="margin: 0;">
             <div class="col-md-4 col-sm-3 col-xs-0 floatlabel"></div>
@@ -29,12 +29,12 @@
         </div>
       </div>
                         
-	   <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
-		<%= link_to image_tag('delete.png'), '#', class: 'close-2' %>
-	  </div>
-	</div>
+     <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+    <%= link_to image_tag('delete.png'), '#', class: 'close-2' %>
+    </div>
+  </div>
 
-	<!-- <div class="row top-row">
+  <!-- <div class="row top-row">
       <div class="col-md-9 col-sm-9 col-xs-12 form-group form-group-lg no-pd address">
         <div class="form-group form-group-lg">
           <div class="row" style="margin: 0;">
@@ -91,7 +91,7 @@
           <%= address.text_field :county, placeholder: "COUNTY", class: "floatlabel form-control" %>
         </div>
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-          <%= address.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control" %>
+          <%= address.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control", 'data-mask': "99999" %>
         </div>
     </div>
     <% end%>
