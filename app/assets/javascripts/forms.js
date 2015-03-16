@@ -24,3 +24,17 @@ $(".date-picker").on("change", function () {
 //       selectedDate.setMonth month - 1 // 0-11
 //       selectedDate.setFullYear year
 //       $(this).datepicker "setDate", selectedDate
+
+$(document).ready(function() {
+  $("input.capital").keyup(function() {
+    var val = $(this).val();
+    $(this).val(val.toUpperCase());
+  });
+  
+  $('input.capital').bind('keypress', function (e) {
+   if(this.value.length>= 2) 
+      {
+        return false;
+      }
+  });
+});
