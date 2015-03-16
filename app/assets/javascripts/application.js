@@ -20,7 +20,6 @@
 //= require modalEffects
 //= require_tree .
 
-
 $('input.floatlabel').floatlabel();
 
 $(document).ready(function () {
