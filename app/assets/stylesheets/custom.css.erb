@@ -2414,16 +2414,7 @@ a.close-2{
 	background: none;
 }
 .dropdown-menu {padding: 0;}
-.employee-info {
-  border-color: #007bc3 !important;
-  opacity: 0.5;
-}
-.employee-info .top-row, .employee-info .middle-row {
-  border-color: #007bc3 !important;
-}
-.employee-info label, .employee-info input {
-  color: #007bc3 !important;
-}
+
 #email_error {
   right: 14px;
   top: 14px;
@@ -2436,6 +2427,23 @@ a.close-2{
 }
 #email_error, .field_error.employee-info label, .field_error.employee-info input {
 	color: red !important;
+}
+
+/* Dependent remove confirm dialog */
+#remove_confirm {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  padding: 20px;
+  text-align: center;
+  color: red;
+}
+
+#remove_confirm a.cancel {
+  color: red;
 }
 
 /* New address flow start */
@@ -2499,4 +2507,15 @@ a.close-2{
   #address_info .new-address-flow{
     padding-top: 20%;
   }
+}
+
+.first.employee-info {
+  border-color: #007bc3;
+  opacity: 0.5;
+}
+.employee-info .top-row, .employee-info .middle-row {
+  border-color: #007bc3;
+}
+.employee-info label, .employee-info input {
+  color: #007bc3;
 }

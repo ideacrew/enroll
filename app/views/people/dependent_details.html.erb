@@ -141,7 +141,7 @@
                       <div class="fail"><span class="bold">Here's your chance to add family members to your plan.</span> Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</div>
                       <br>
                       <% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee.id) %>
-              <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
+              		  <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
                       &nbsp; &nbsp;
                       <a class="text-center btn btn-save">Continue</a>
                     </center>

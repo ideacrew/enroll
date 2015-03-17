@@ -87,7 +87,7 @@ $(document).ready(function () {
           // result.person gives person info to populate
           if(result.matched == true)
           {
-            person = result.person
+            person = result.person;
             $("#people_id").val(person._id);
             _getEmployers();
             
@@ -378,12 +378,14 @@ $(document).ready(function () {
   });
 
   $("#dependent_ul .floatlabel").focusin(function() {
-    $('#dependent_ul div.first').addClass('employee-info');
+  	$('.house').css("opacity","0.5");
+  	$(this).closest('.house').addClass('employee-info');
     $("a.dependent_ul").css("color","#98cbff");
-    $("#dependent_ul div.first").css("opacity","1");
+    $(this).closest('.house').css("opacity","1");
   });
   $("#dependent_ul .floatlabel").blur(function() {
-      $("#dependent_ul div.first").css("opacity","0.5");
+  	$(this).closest('.house').css("opacity","0.5");
+      // $("#dependent_ul div.first").css("opacity","0.5");
   });
   
   $("#address_info .floatlabel").focusin(function() {
@@ -488,9 +490,24 @@ $(document).ready(function () {
     return $.rails.showConfirmDialog = function(link) {
       var html, message;
       message = link.attr('data-confirm');
-      html = "<div class=\"modal\" id=\"confirmationDialog\">\n  <div class=\"modal-dialog\">\n    <div class=\"modal-content\">\n      <div class=\"modal-header\">\n        <a class=\"close\" data-dismiss=\"modal\">×</a>\n        <h1>" + message + "</h1>\n      </div>\n      <div class=\"modal-footer\">\n        <a data-dismiss=\"modal\" class=\"btn\">" + (link.data('cancel')) + "</a>\n        <a data-dismiss=\"modal\" class=\"btn btn-primary confirm\">" + (link.data('ok')) + "</a>\n      </div>\n    </div>\n  </div>\n</div>";
-      $(html).modal();
-      return $('#confirmationDialog .confirm').on('click', function() {
+      
+      $('.close-2').on('click', function() {
+      	$('.house').css("opacity","0.5");
+      	$(this).closest("div.house").css('border', '1px solid red');      	
+      	$(this).closest('div.house').css("opacity","1.0");
+      	$(this).closest("div.house").find("#remove_confirm")
+      		.html('<div>' + message + '?</div><a href="javascript:void(0);" class="btn remove_dependent cancel">' + (link.data('cancel')) + '</a> <a class="btn remove_dependent confirm" href="javascript:void(0);">' + (link.data('ok')) + '</a>')
+      		.removeClass('hidden'); 
+      });
+      
+      $('.remove_dependent').on('click', function() {
+      	$(this).closest("div.house").css('border-color', '#999');
+      	$(this).closest("#remove_confirm")
+      		.addClass('hidden')
+      		.html('');
+      });
+      
+      return $('#remove_confirm .confirm').on('click', function() {
         return $.rails.confirmed(link);
       });
     };
