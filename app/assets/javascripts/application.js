@@ -442,48 +442,57 @@ $(document).ready(function () {
   });
   
   function check_email() {
-	var email = $('.email .floatlabel').val(); 
+  var email = $('.email .floatlabel').val(); 
     var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if(!re.test(email)) {
-  		$('#email_error').text('Enter a valid email address. ( e.g. name@domain.com )');
-  		$('#email_info .email .first').addClass('field_error');
-  	} else {
-  		$('#email_error').text('');
-  		$('#email_info .email .first').removeClass('field_error');
-  	}
+      $('#email_error').text('Enter a valid email address. ( e.g. name@domain.com )');
+      $('#email_info .email .first').addClass('field_error');
+    } else {
+      $('#email_error').text('');
+      $('#email_info .email .first').removeClass('field_error');
+    }
   }
   
   // Add new address
   $('.btn-new-address').click(function(e){
-	e.preventDefault();
+  e.preventDefault();
     $(".new-address-flow").css("display", "block");
   });
   
-  $('.new-address-flow p a').click(function(){
-  	$(".new-address-flow").removeAttr("style");
+  $('.new-address-flow p a.cancel').click(function(){
+    $(".new-address-flow").removeAttr("style");
+  });
+  
+  $('.new-address-flow p a.confirm').click(function(){
+    var address_name = $('.address_name').val();
+    if(address_name.length!=0) {
+      var new_option = "<li class='address-li' data-address-text='"+address_name+"Address' data-value='"+address_name+"' role='presentation'><a role='menuitem' href='#'>"+address_name+"</a></li>";
+      $(".address ul").prepend(new_option);
+      $(".new-address-flow").removeAttr("style");
+    }
   });
   
   // Customize Dependent Family Member Delete Confirmation
   $(function() {
-	  $.rails.allowAction = function(link) {
-	    if (!link.attr('data-confirm')) {
-	      return true;
-	    }
-	    $.rails.showConfirmDialog(link);
-	    return false;
-	  };
-	  $.rails.confirmed = function(link) {
-	    link.removeAttr('data-confirm');
-	    return link.trigger('click.rails');
-	  };
-	  return $.rails.showConfirmDialog = function(link) {
-	    var html, message;
-	    message = link.attr('data-confirm');
-	    html = "<div class=\"modal\" id=\"confirmationDialog\">\n  <div class=\"modal-dialog\">\n    <div class=\"modal-content\">\n      <div class=\"modal-header\">\n        <a class=\"close\" data-dismiss=\"modal\">×</a>\n        <h1>" + message + "</h1>\n      </div>\n      <div class=\"modal-footer\">\n        <a data-dismiss=\"modal\" class=\"btn\">" + (link.data('cancel')) + "</a>\n        <a data-dismiss=\"modal\" class=\"btn btn-primary confirm\">" + (link.data('ok')) + "</a>\n      </div>\n    </div>\n  </div>\n</div>";
-	    $(html).modal();
-	    return $('#confirmationDialog .confirm').on('click', function() {
-	      return $.rails.confirmed(link);
-	    });
-	  };
-	});
+    $.rails.allowAction = function(link) {
+      if (!link.attr('data-confirm')) {
+        return true;
+      }
+      $.rails.showConfirmDialog(link);
+      return false;
+    };
+    $.rails.confirmed = function(link) {
+      link.removeAttr('data-confirm');
+      return link.trigger('click.rails');
+    };
+    return $.rails.showConfirmDialog = function(link) {
+      var html, message;
+      message = link.attr('data-confirm');
+      html = "<div class=\"modal\" id=\"confirmationDialog\">\n  <div class=\"modal-dialog\">\n    <div class=\"modal-content\">\n      <div class=\"modal-header\">\n        <a class=\"close\" data-dismiss=\"modal\">×</a>\n        <h1>" + message + "</h1>\n      </div>\n      <div class=\"modal-footer\">\n        <a data-dismiss=\"modal\" class=\"btn\">" + (link.data('cancel')) + "</a>\n        <a data-dismiss=\"modal\" class=\"btn btn-primary confirm\">" + (link.data('ok')) + "</a>\n      </div>\n    </div>\n  </div>\n</div>";
+      $(html).modal();
+      return $('#confirmationDialog .confirm').on('click', function() {
+        return $.rails.confirmed(link);
+      });
+    };
+  });
 });
