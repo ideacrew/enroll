@@ -147,44 +147,17 @@
                     </center>
                   </div>
                 </div>
-        </div>
+        	  </div>
             </div>
             <div class="clear-fix"></div>
             
-      <ul class="" id="dependent_ul">
-        <% @employee.employee_family.census_dependents.each do |dependent| %>
-          <%= render "dependent", dependent: dependent,employer: @employer,person: @person,employee: @employee %>
-        <% end %>
-        
-        
-        
-        
-        
-        <!-- Modal Dialog -->
-		<div class="modal fade" id="confirmDelete" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
-		  <div class="modal-dialog">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		        <h4 class="modal-title">Delete Parmanently</h4>
-		      </div>
-		      <div class="modal-body">
-		        <p>Are you sure about this ?</p>
-		      </div>
-		      <div class="modal-footer">
-		        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-		        <button type="button" class="btn btn-danger" id="confirm">Delete</button>
-		      </div>
-		    </div>
-		  </div>
-		</div>
-
-
-
-
-
-        <input type="hidden" id="last_member" value="">
-      </ul>
+      		<ul class="" id="dependent_ul">
+		        <% @employee.employee_family.census_dependents.each do |dependent| %>
+		          <%= render "dependent", dependent: dependent,employer: @employer,person: @person,employee: @employee %>
+		        <% end %>
+	       
+	        	<input type="hidden" id="last_member" value="">
+	      </ul>
       
       <div id="dependent_buttons" class="focus_effect row personaol-info-row <%= 'hidden' if @employee.employee_family.census_dependents.empty? %>">
         <div class="col-md-10 no-pd col-sm-9 col-xs-12">

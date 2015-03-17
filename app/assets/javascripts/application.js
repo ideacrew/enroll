@@ -488,10 +488,12 @@ $(document).ready(function () {
       return link.trigger('click.rails');
     };
     return $.rails.showConfirmDialog = function(link) {
-      var html, message;
-      message = link.attr('data-confirm');
-      
+      var current_element, message;
+
       $('.close-2').on('click', function() {
+      	current_element = $(this).closest("div.house");
+      	message = 'Remove ' + current_element.find('#employer_census_dependent_first_name').val() + ' ' + current_element.find('#employer_census_dependent_middle_name').val() + ' ' + current_element.find('#employer_census_dependent_last_name').val();
+      	
       	$('.house').css("opacity","0.5");
       	$(this).closest("div.house").css('border', '1px solid red');      	
       	$(this).closest('div.house').css("opacity","1.0");
@@ -501,7 +503,7 @@ $(document).ready(function () {
       });
       
       $('.remove_dependent').on('click', function() {
-      	$(this).closest("div.house").css('border-color', '#999');
+      	$(this).closest("div.house").css('border-color', '#007bc3');
       	$(this).closest("#remove_confirm")
       		.addClass('hidden')
       		.html('');
