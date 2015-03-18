@@ -12,6 +12,7 @@ class Plan
   field :hbx_id, type: String
   field :name, type: String
   field :abbrev, type: String
+  field :provider, type: String
 
   field :coverage_kind, type: String
   field :metal_level, type: String
