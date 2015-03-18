@@ -1110,8 +1110,8 @@ input.floatlabe{
   padding-top: 20px !important;
 }
 
-#email_info .email:first-child > .first {border-right: none;}
-#email_info .email:last-child > .first {border-left: none;}
+#email_info .email:first-child > .first, #email_info .email:nth-child(1) > .field_error {border-right: none !important;}
+#email_info .email:nth-child(2) > .first, #email_info .email:nth-child(2) > .field_error {border-left: none !important;}
 
 .list-group a.sidebar-employer-field {
   color: #fff;
@@ -2415,8 +2415,8 @@ a.close-2{
 .dropdown-menu {padding: 0;}
 
 #email_error {
-  right: 14px;
-  top: 14px;
+  left: 10px;
+  top: 10px;
   font-size: 0.8em;
   position: absolute;
   transition: all 0.3s ease-in-out 0s;

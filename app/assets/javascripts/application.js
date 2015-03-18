@@ -432,19 +432,21 @@ $(document).ready(function () {
     $('#new_employer_census_dependent:last').submit();
   });
   
-  // Email validation after 3 seconds of stopping typing
+  // Email validation after 1 seconds of stopping typing
   var timeout;
   $('#email_info input').keyup(function() {
+  	var email = $(this).val();
     if(timeout) {
         clearTimeout(timeout);
         timeout = null;
     }
 
-    timeout = setTimeout(check_email, 1000);
+    timeout = setTimeout(function() {
+    	check_email(email);
+    	}, 1000);
   });
   
-  function check_email() {
-  var email = $('.email .floatlabel').val(); 
+  function check_email(email) { 
     var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if(!re.test(email)) {
       $('#email_error').text('Enter a valid email address. ( e.g. name@domain.com )');
