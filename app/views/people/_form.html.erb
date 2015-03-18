@@ -66,6 +66,7 @@
               <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
                 <%= render 'shared/email_fields', f: email %>
               <% end %>
+              <div id="email_error"></div>
             </div>
 
             <div class="focus_effect row personaol-info-row">
