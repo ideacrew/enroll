@@ -18,6 +18,7 @@
 //= require turbolinks
 //= require classie
 //= require modalEffects
+//= require maskedinput
 //= require_tree .
 
 $('input.floatlabel').floatlabel();

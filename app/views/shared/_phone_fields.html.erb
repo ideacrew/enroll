@@ -9,7 +9,7 @@
       <div class="form-group form-group-lg">
         <% kind = phone.object.kind.upcase %>
         <%= phone.hidden_field :kind %>
-        <%= phone.text_field :full_phone_number, placeholder: "#{kind}", class: "phone-mask textfield floatlabel form-control border-bottom-none border-right-none", data: {:mask => "(999) 999-9999"} %>
+        <%= phone.text_field :full_phone_number, placeholder: "#{kind}", class: "textfield floatlabel phone_number form-control border-bottom-none border-right-none" %>
       </div>
     </div>
     <% if((phone.index == 1) || (phone.index == 3)) %>
@@ -20,3 +20,8 @@
     <%= render 'shared/error_warning' %>
   </div>
 </div>
+<script>
+jQuery(function($){
+   $(".phone_number").mask("(999) 999-9999");
+});
+</script>
