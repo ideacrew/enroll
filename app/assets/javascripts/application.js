@@ -51,8 +51,6 @@ $(document).ready(function () {
     divtoshow = $(this).data("value") + "-div";
     $("."+divtoshow).show();
   });
-  
-//  $(".phone-mask").inputmask("(999) 999-9999");
 
   $('.autofill_yes').click(function(){
       });
@@ -518,5 +516,8 @@ $(document).ready(function () {
     };
   });
   
+  // Input Masks
+  $(".phone_number").mask("(999) 999-9999");
+  $(".zip").mask("99999");
   
 });
