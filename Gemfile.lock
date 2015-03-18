@@ -316,11 +316,11 @@ DEPENDENCIES
   jquery-turbolinks
   jquery-ui-rails
   less-rails-bootstrap (~> 3.3.1.0)
-  mongoid (~> 4.0.0)
+  mongoid (~> 4.0.2)
   mongoid-rspec
   mongoid-versioning
   mongoid_auto_increment
-  moped (~> 2.0.2)
+  moped (~> 2.0.4)
   nokogiri-happymapper
   origin (~> 2.1.1)
   rails (= 4.2.0)
