@@ -11,8 +11,8 @@ class HbxEnrollment
 
   field :kind, type: String
   field :enrollment_group_id, type: String
-  field :applied_aptc_in_cents, type: Integer, default: 0
-  field :elected_aptc_in_cents, type: Integer, default: 0
+  field :applied_aptc, type: Money, default: 0
+  field :elected_aptc, type: Money, default: 0
   field :is_active, type: Boolean, default: true
   field :submitted_at, type: DateTime
   field :aasm_state, type: String
