@@ -9,7 +9,7 @@ class EmployerCensus::Employee < EmployerCensus::Member
 
   # TODO: Move common validations to single validates_with model
   validates :ssn,
-    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
+    length: { minimum: 8, maximum: 8, message: "SSN must be 8 digits" },
     numericality: true
 
   def initialize(*args)

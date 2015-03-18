@@ -519,5 +519,6 @@ $(document).ready(function () {
   // Input Masks
   $(".phone_number").mask("(999) 999-9999");
   $(".zip").mask("99999");
+  $("#person_ssn").mask("99999999");
   
 });
