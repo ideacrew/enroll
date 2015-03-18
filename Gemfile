@@ -41,12 +41,18 @@ gem "mongoid_auto_increment"
 # gem 'mongoid-autoinc'
 gem 'mongoid-versioning'
 
+gem 'money-rails', '~> 1.3.0'
+gem "mongoid-enum", '~> 0.2.0'
+
 ## Add field-level encryption
 # gem 'mongoid-encrypted-fields', '~> 1.3.3'
 # gem 'symmetric-encryption', '~> 3.6.0'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
+
+gem 'acapi', git: "git://github.com/dchbx/acapi.git"
+# gem 'acapi', path: "../acapi"
 
 gem 'aasm', '~> 4.0.7'
 gem 'haml'
