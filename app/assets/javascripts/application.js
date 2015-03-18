@@ -59,10 +59,6 @@ $(document).ready(function () {
     $('.autofill-cloud').addClass('hidden');
     side_bar_link_style();
   });
-  
-  // $('.required').on("change" ,function(){
-  //   match_person();
-  // });
 
   $('#search-employer').click(function() {
     match_person();
@@ -70,13 +66,10 @@ $(document).ready(function () {
   
   function match_person()
   {
-    gender_checked = $("#person_gender_male").prop("checked") || $("#person_gender_female").prop("checked")
+    gender_checked = $("#person_gender_male").prop("checked") || $("#person_gender_female").prop("checked");
     
     if(check_personal_info_exists().length==0 && gender_checked)
     {
-      //Sidebar Switch - Search Active
-      //$('#personal_sidebar').addClass('hidden');
-      //$('#search_sidebar').removeClass('hidden');
       $('.employers-row').html("");
       $.ajax({
         type: "POST",
@@ -108,7 +101,7 @@ $(document).ready(function () {
         }
       });  
     } else {
-      alert("Enter all data");
+      $('#personal_info .col-md-10').addClass('require-field');
     }
   }
   
@@ -204,13 +197,6 @@ $(document).ready(function () {
     }
   });
 
-  $('#personal_info input:text').focusout(function(){
-    var check = check_personal_info_exists();
-    if(check.length==0) {
-      //$('.autofill-cloud.autofill-initial').removeClass('hidden');
-    }
-  })
-
   $('#personal_info.focus_effect').focusout(function(){
     var tag_id = $(this).attr('id');
     var has_class = $(this).hasClass('personaol-info-top-row');
@@ -221,7 +207,7 @@ $(document).ready(function () {
     else {
       $('#personal_info .col-md-10').removeClass('require-field');
     }
-  })
+  });
 
   $('span.close').click(function(){
     //$('.autofill-cloud').addClass('hidden');
