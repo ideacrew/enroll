@@ -36,12 +36,14 @@ RSpec.describe EmployerProfile, :type => :model do
       end
 
       context "and it is saved" do
-        before do
-          employer_profile.save
+        let!(:saved_employer_profile) do
+          er = employer_profile
+          er.save
+          er
         end
 
         it "should be findable" do
-          expect(EmployerProfile.find(employer_profile.id).id.to_s).to eq employer_profile.id.to_s
+          expect(EmployerProfile.find(saved_employer_profile.id).id.to_s).to eq saved_employer_profile.id.to_s
         end
       end
     end
