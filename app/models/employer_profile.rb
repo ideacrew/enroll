@@ -163,7 +163,7 @@ class EmployerProfile
     end
 
     # Returns all EmployerProfiles where person is active on the employee_census
-    def find_employer_profiles_by_person(person)
+    def find_all_by_person(person)
       organizations = match_census_employees(person)
       organizations.reduce([]) do |profiles, er|
         profiles << er.employer_profile
@@ -171,9 +171,10 @@ class EmployerProfile
     end
 
     def match_census_employees(person)
-      raise ArgumentError.new("expected Person") unless person.respond_to?(:ssn)
-      return [] if person.ssn.blank?
-      Organization.where("employer_profile.employee_families.census_employee.ssn" => person.ssn).to_a
+      raise ArgumentError.new("expected Person") unless person.respond_to?(:ssn) && person.respond_to?(:dob)
+      return [] if person.ssn.blank? || person.dob.blank?
+      Organization.and("employer_profile.employee_families.census_employee.ssn" => person.ssn,
+                       "employer_profile.employee_families.census_employee.dob" => person.dob).to_a
     end
 
   end

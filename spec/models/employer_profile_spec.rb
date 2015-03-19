@@ -68,8 +68,8 @@ end
 
 describe EmployerProfile, "Class methods", type: :model do
 
-  let(:ee0) {FactoryGirl.build(:employer_census_employee, ssn: "369851245")}
-  let(:ee1) {FactoryGirl.build(:employer_census_employee, ssn: "258741239")}
+  let(:ee0) {FactoryGirl.build(:employer_census_employee, ssn: "369851245", dob: 32.years.ago.to_date)}
+  let(:ee1) {FactoryGirl.build(:employer_census_employee, ssn: "258741239", dob: 42.years.ago.to_date)}
 
   let(:family0) {FactoryGirl.build(:employer_census_family, census_employee: ee0, employer_profile: nil)}
   let(:family1) {FactoryGirl.build(:employer_census_family, census_employee: ee1, employer_profile: nil)}
@@ -131,7 +131,8 @@ describe EmployerProfile, "Class methods", type: :model do
       let(:params) do
         {  ssn:        "019283746",
            first_name: ee0.first_name,
-           last_name:  ee0.last_name
+           last_name:  ee0.last_name,
+           dob:        ee0.dob
         }
       end
       let(:p0) {Person.new(**params)}
@@ -141,11 +142,27 @@ describe EmployerProfile, "Class methods", type: :model do
       end
     end
 
-    context "with person matching ssn" do
+    context "with person not matching dob" do
       let(:params) do
         {  ssn:        ee0.ssn,
            first_name: ee0.first_name,
-           last_name:  ee0.last_name
+           last_name:  ee0.last_name,
+           dob:        (ee0.dob - 1.year).to_date
+        }
+      end
+      let(:p0) {Person.new(**params)}
+
+      it "should return an empty array" do
+        expect(EmployerProfile.find_census_families_by_person(p0)).to eq []
+      end
+    end
+
+    context "with person matching ssn and dob" do
+      let(:params) do
+        {  ssn:        ee0.ssn,
+           first_name: ee0.first_name,
+           last_name:  ee0.last_name,
+           dob:        ee0.dob
         }
       end
       let(:p0) {Person.new(**params)}
@@ -165,11 +182,38 @@ describe EmployerProfile, "Class methods", type: :model do
     end
   end
 
-  describe ".find_employer_profiles_by_person" do
+  describe ".find_all_by_person" do
+    let(:black_and_decker) do
+      org = FactoryGirl.create(:organization, legal_name: "Black and Decker, Inc.", dba: "Black + Decker")
+      er = org.create_employer_profile(entity_kind: "c_corporation")
+    end
+    let(:atari) do
+      org = FactoryGirl.create(:organization, legal_name: "Atari Corporation", dba: "Atari Games")
+      er = org.create_employer_profile(entity_kind: "s_corporation")
+    end
+    let(:google) do
+      org = FactoryGirl.create(:organization, legal_name: "Google Inc.", dba: "Google")
+      er = org.create_employer_profile(entity_kind: "partnership")
+    end
+    let(:bob_params) {{first_name: "Uncle", last_name: "Bob", ssn: "999441111", dob: 35.years.ago.to_date}}
+    let!(:black_and_decker_bob) do
+      fam = black_and_decker.employee_families.create()
+      ee = FactoryGirl.create(:employer_census_employee, employee_family: fam, **bob_params)
+    end
+    let!(:atari_bob) do
+      fam = atari.employee_families.create()
+      ee = FactoryGirl.create(:employer_census_employee, employee_family: fam, **bob_params)
+    end
+    let!(:google_bob) do
+      fam = google.employee_families.create()
+      # different dob
+      ee = FactoryGirl.create(:employer_census_employee, employee_family: fam, **bob_params.merge(dob: 40.years.ago.to_date))
+    end
+
     let(:valid_ssn) {ee0.ssn}
     let(:invalid_ssn) {"000000000"}
     let(:params) do
-      {  
+      {
         first_name: ee0.first_name,
         last_name:  ee0.last_name,
         dob:        ee0.dob
@@ -177,28 +221,31 @@ describe EmployerProfile, "Class methods", type: :model do
     end
 
     context "finds an EmployerProfile employee" do
-      let(:valid_person) {Person.new(**params, ssn: valid_ssn)}
+      let(:valid_person) {FactoryGirl.build(:person, **bob_params)}
 
       it "should find the active employee in multiple employer_profiles" do
-        # expect(valid_person.ssn).to eq valid_ssn
-        expect(EmployerProfile.find_employer_profiles_by_person(valid_person).size).to eq 2
+        # it shouldn't find google bob because dob are different
+        expect(EmployerProfile.find_all_by_person(valid_person).size).to eq 2
       end
 
       it "should return EmployerProfile" do
-        expect(EmployerProfile.find_employer_profiles_by_person(valid_person).first).to be_a EmployerProfile
+        expect(EmployerProfile.find_all_by_person(valid_person).first).to be_a EmployerProfile
       end
 
       it "should include the matching employee" do
-        expect(EmployerProfile.find_employer_profiles_by_person(valid_person).last).to eq ee0.employee_family.employer_profile
+        found = EmployerProfile.find_all_by_person(valid_person).last.employee_families.last.census_employee
+        [:first_name, :last_name, :ssn, :dob].each do |attr|
+          expect(found.send(attr)).to eq valid_person.send(attr)
+        end
       end
     end
 
     context "fails to match an employee" do
-      let(:invalid_person) {Person.new(**params, ssn: invalid_ssn)}
+      let(:invalid_person) {Person.new(**params.merge(ssn: invalid_ssn))}
 
       it "should not return any matches" do
         # expect(invalid_person.ssn).to eq invalid_ssn
-        expect(EmployerProfile.find_employer_profiles_by_person(invalid_person).size).to eq 0
+        expect(EmployerProfile.find_all_by_person(invalid_person).size).to eq 0
       end
     end
   end
@@ -208,9 +255,9 @@ describe EmployerProfile, "Class methods", type: :model do
 end
 
 describe EmployerProfile, "instance methods" do
-  let (:census_employee) {FactoryGirl.build(:employer_census_employee, ssn: "069851240")}
-  let (:census_family) {FactoryGirl.build(:employer_census_family, census_employee: census_employee, employer_profile: nil)}  
-  let (:person) {Person.new(first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn)}
+  let (:census_employee) {FactoryGirl.build(:employer_census_employee, ssn: "069851240", dob: 34.years.ago.to_date)}
+  let (:census_family) {FactoryGirl.build(:employer_census_family, census_employee: census_employee, employer_profile: nil)}
+  let (:person) {Person.new(first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: 34.years.ago.to_date)}
 
   describe "#linkable_employee_family_by_person" do
     let (:employer_profile) {FactoryGirl.create(:employer_profile)}
@@ -231,7 +278,7 @@ describe EmployerProfile, "instance methods" do
 
       context "with employee previously terminated" do
         let (:prior_census_employee) {FactoryGirl.build(:employer_census_employee, ssn: "069851240", terminated_on: Date.today )}
-        let (:prior_census_family) {FactoryGirl.build(:employer_census_family, census_employee: prior_census_employee, linked_at: Date.today - 1,terminated: true, employer_profile: nil)}  
+        let (:prior_census_family) {FactoryGirl.build(:employer_census_family, census_employee: prior_census_employee, linked_at: Date.today - 1,terminated: true, employer_profile: nil)}
         let (:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [prior_census_family, census_family])}
 
         it "should return only the matching census family" do
@@ -240,7 +287,7 @@ describe EmployerProfile, "instance methods" do
 
         context "with employee who was never linked" do
           let (:prior_census_employee) {FactoryGirl.build(:employer_census_employee, ssn: "069851240", terminated_on: Date.today )}
-          let (:prior_census_family) {FactoryGirl.build(:employer_census_family, census_employee: prior_census_employee, terminated: true, employer_profile: nil)}  
+          let (:prior_census_family) {FactoryGirl.build(:employer_census_family, census_employee: prior_census_employee, terminated: true, employer_profile: nil)}
           let (:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [prior_census_family, census_family])}
 
           it "should return only the matching census family" do
