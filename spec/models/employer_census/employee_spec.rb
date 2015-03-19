@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe EmployerCensus::Employee, '.new', type: :model do
   it { should validate_presence_of :ssn }
   it { should validate_presence_of :hired_on }
-  it { should validate_presence_of :address }
 
   it 'properly intantiates the class' do
     first_name = "Lynyrd"
