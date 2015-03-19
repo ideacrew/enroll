@@ -123,9 +123,9 @@ describe EmployeeRole, type: :model do
     end
 
     context "with no dob" do
-      let(:person_params) {valid_person_attributes.except(:dob)}
-      let(:params) {valid_params.merge(person_attributes: person_params)}
-      let(:employee_role) {saved_person.employee_roles.build(params)}
+      let(:employee_role) do
+        FactoryGirl.build(:employee_role, dob: nil)
+      end
       before() {employee_role.valid?}
 
       it "should not be valid" do
