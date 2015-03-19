@@ -1,4 +1,4 @@
-<% if signed_in? && (controller_name == 'employees' || controller_name == 'family' || controller_name == 'people') %>
+<% if controller_name == 'sessions' || controller_name == 'welcome' || controller_name == 'registrations' || (signed_in? && (controller_name == 'employees' || controller_name == 'family' || controller_name == 'people')) %>
   <nav role="navigation" class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->

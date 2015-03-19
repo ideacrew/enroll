@@ -5,6 +5,7 @@ puts "::: Creating Employee Roles:::"
 
 employer_profiles = Organization.all.collect(&:employer_profile).reject(&:nil?)
 employer_profiles.select(&:employee_families).each do |employer_profile|
+# =begin
     case employer_profile.employee_families.count
     when 1
       [employer_profile.employee_families.first]
@@ -28,6 +29,7 @@ employer_profiles.select(&:employee_families).each do |employer_profile|
     employee.person.save
     employee
   end
+# =end
 end
 
 puts "::: Employees Complete :::"

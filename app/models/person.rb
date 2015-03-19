@@ -133,6 +133,14 @@ class Person
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
   end
 
+  def primary_family
+    Family.find_by_primary_applicant(self)
+  end
+
+  def families
+    Family.find_all_by_person(self)
+  end
+
   # Return an instance list of active People who match identifying information criteria
   def self.match_by_id_info(options)
     ssn = options[:ssn]

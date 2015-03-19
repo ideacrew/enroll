@@ -1,7 +1,7 @@
-  <div class="container-fluid no-pd-left">          
+  <div class="container-fluid no-pd-left">
     <div class="panel panel-default">
       <div class="panel-body left">
-        
+
         <div class="col-sm-2 left-pd" id="sidebar_partial_value">
           <%= render 'people/sidebar' %>
         </div>
@@ -28,17 +28,10 @@
               <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
                 <%= hidden_field "people","id" %>
                 <%= render 'shared/name_fields', f: f %>
-                <%= render 'shared/id_info_fields', f: f %>
-              </div>
-
-              <div id="key-section" class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
-                <a href="#" class="btn btn-save">Save & Exit</a>
-                <p class="top-pad">
-                  <span>Your personal information is secure.</span>
-                  <span><i></i></span>
-                </p>
+                <div class="overlay-in"></div>
               </div>
             </div>
+
             <div class="row search-btn-row">
               <div class="col-md-8 col-sm-6 col-xs-12 key no-pd">
                 <p class="top-pad">
@@ -51,8 +44,21 @@
               </div>
             </div>
 
-            <div id="employer-info" class="row hidden"></div>
-            
+            <div class="fail-search hidden" class="row">
+				<div class="col-md-10 col-sm-9 col-xs-12 no-pd">
+					<div class="panel panel-default">
+						<div class="panel-body text-center">
+						  <a href="#" class="close-fail"><i class="fa fa-times"></i></a>
+						  <p class="fail"><span class="notice"><i class="fa fa-exclamation-triangle"></i></span>No Employer plan found. Double check your personal <br>information and try again <span class="bold">OR</span> please contact support:</p>
+						  <p class="fail"><span class="bold">DCHBX Phone Support</span><br>
+						  1-800-555-1212 option 1</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="employer-info" class="row hidden"></div>
+
             <%= render 'shared/address_fields', f: f %><br>
             <%= render 'shared/phone_fields', f: f %><br>
 
@@ -60,15 +66,23 @@
               <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
                 <%= render 'shared/email_fields', f: email %>
               <% end %>
+              <div class="col-md-10 col-sm-10"><div id="email_error"></div></div>
             </div>
 
             <div class="focus_effect row personaol-info-row">
-              <div class="col-md-10 col-sm-9 no-pd">
-                <a href="#" data-method="POST" id="continue-employer" class="btn btn-search search_continue hidden">Continue</a>
-              </div>
+				<div class="col-md-10 col-sm-9 no-pd"></div>
+				<div class="col-md-2 col-sm-3 no-pd">
+					<a href="#" data-method="POST" id="continue-employer" class="btn disable-btn search_continue hidden">Continue</a>
+				</div>
             </div>
 
-            <%= render 'autofill_cloud' %>
+            <div class="clear-fix"></div>
+            <div class="col-md-2 col-md-offset-10 key no-pd-right col-sm-3 col-xs-12 hidden" id="key-section">
+				<a href="#" class="btn btn-save">Save & Exit</a>
+            	<%= render 'shared/signup_progress' %>
+            </div>
+
+            <%#= render 'autofill_cloud' %>
             <%= render 'employer_search' %>
           </div>
         </div>

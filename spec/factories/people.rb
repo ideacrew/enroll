@@ -1,10 +1,10 @@
 FactoryGirl.define do
   factory :person do
-    name_pfx 'Mr'
+    # name_pfx 'Mr'
     first_name 'John'
-    middle_name 'X'
+    # middle_name 'X'
     sequence(:last_name) {|n| "Smith\##{n}" }
-    name_sfx 'Jr'
+    # name_sfx 'Jr'
     dob "04/04/1972"
     is_active true
 
@@ -29,14 +29,6 @@ FactoryGirl.define do
     end
 
     trait :female do
-      gender "female"
-    end
-
-    factory :male do
-      gender "male"
-    end
-
-    factory :female do
       gender "female"
     end
   end

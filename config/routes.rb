@@ -33,6 +33,7 @@ Rails.application.routes.draw do
       get 'get_employer'
       post 'person_confirm'
       post 'person_landing'
+      get 'person_landing'
       post 'plan_details'
       post 'dependent_details'
       post 'add_dependents'

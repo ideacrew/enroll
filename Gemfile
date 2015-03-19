@@ -18,8 +18,7 @@ gem 'therubyracer', platforms: :ruby
 gem 'jquery-rails'
 gem 'jquery-ui-rails'
 gem 'animate-rails', '~> 1.0.7'
-gem 'jquery-inputmask-rails'
-
+gem 'maskedinput-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'jquery-turbolinks'
 gem 'turbolinks'
@@ -81,7 +80,7 @@ group :development, :test do
   gem 'cucumber-rails', '~> 1.4.2', :require => false
   gem 'factory_girl_rails', "~> 4.0"
   gem 'database_cleaner', '1.3.0'
-  gem 'shoulda-matchers', require: false  
+  gem 'shoulda-matchers', require: false
 end
 
 group :test do

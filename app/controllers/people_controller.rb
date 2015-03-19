@@ -1,5 +1,5 @@
 require 'factories/enrollment_factory'
-require 'plans_parser'
+# require 'plans_parser'
 
 class PeopleController < ApplicationController
 
@@ -89,19 +89,27 @@ class PeopleController < ApplicationController
   def add_employee_role
     @person = Person.find(params[:person_id])
     @employer_profile = Organization.find(params[:organization_id]).employer_profile    
-    enroll_parms = {}
-    enroll_parms[:user] = current_user
-    enroll_parms[:employer_profile] = @employer_profile
-    enroll_parms[:ssn] = @person.ssn
-    enroll_parms[:last_name] = @person.last_name
-    enroll_parms[:first_name] = @person.first_name
-    enroll_parms[:gender] = @person.gender
-    enroll_parms[:dob] = @person.dob
-    enroll_parms[:name_sfx] = @person.name_sfx
-    enroll_parms[:name_pfx] = @person.name_pfx
-    enroll_parms[:hired_on] = params[:hired_on]
+    employer_census_family = @employer_profile.linkable_employee_family_by_person(@person)
+
+    #calling add_employee_role when linkable employee family present
+    if employer_census_family.present? && employer_census_family.person.present?
+      enroll_parms = {}
+      enroll_parms[:user] = current_user
+      enroll_parms[:employer_profile] = @employer_profile
+      enroll_parms[:ssn] = @person.ssn
+      enroll_parms[:last_name] = @person.last_name
+      enroll_parms[:first_name] = @person.first_name
+      enroll_parms[:gender] = @person.gender
+      enroll_parms[:dob] = @person.dob
+      enroll_parms[:name_sfx] = @person.name_sfx
+      enroll_parms[:name_pfx] = @person.name_pfx
+      enroll_parms[:hired_on] = params[:hired_on]
+
+      @employee_role, @family = EnrollmentFactory.add_employee_role(enroll_parms)
+    else
+      @employee_role = @person.employee_roles.first
+    end
     
-    @employee_role, @family = EnrollmentFactory.add_employee_role(enroll_parms)
   end
   
   def add_dependents
@@ -144,9 +152,13 @@ class PeopleController < ApplicationController
     @person = Person.find(params[:person_id])
     @employer = Organization.find(params[:organization_id])
     employee_family = Organization.find(@employer.id).employee_family_details(@person)
-    @dependent = employee_family.census_dependents.where(id: params[:id]).first
-    @family_member_id = @dependent.id
-    @dependent.destroy
+    @dependent = employee_family.census_dependents.where(_id: params[:id]).first
+    if !@dependent.nil?
+      @family_member_id = @dependent._id
+      @dependent.destroy
+    else
+      @family_member_id = params[:id]
+    end
     respond_to do |format|
       format.js { flash.now[:notice] = "Family Member Removed" } 
     end

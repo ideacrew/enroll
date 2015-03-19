@@ -1,2 +1,5 @@
-alert("Family Member Removed.");
-$(".dependent_notice_div_<%= @family_member_id %>").closest("li").remove();
+$(".dependent_notice_div_<%= @family_member_id %>").closest("li").html('Family Member Removed.').delay(3200).fadeOut(300);
+
+$("#dependent_buttons").removeClass('hidden');
+$("#dependent_buttons div:first").removeClass('hidden');
+$('#dependent_buttons div:last').addClass('hidden');
