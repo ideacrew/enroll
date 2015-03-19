@@ -31,5 +31,8 @@ FactoryGirl.define do
     trait :female do
       gender "female"
     end
+
+    factory :male, traits: [:male]
+    factory :female, traits: [:female]
   end
 end
