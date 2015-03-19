@@ -16,7 +16,6 @@ class Email
   validates_inclusion_of :kind, in: KINDS, message: "%{value} is not a valid email type"
 
   validates :address,
-#    uniqueness: true,
     presence: true
 
 

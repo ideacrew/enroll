@@ -68,9 +68,8 @@ describe Email do
 
       context "when adding already email present" do
         let(:params) {valid_params}
-        it "should throw an error" do
+        it "should not throw an error" do
           expect(Email.create(**params).valid?).to be_true
-          expect(Email.create(**params).errors[:address]).to eq ["is already taken"]
         end
       end
     end
