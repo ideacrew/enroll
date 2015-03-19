@@ -28,14 +28,14 @@ class Person
   # Login account
   belongs_to :user
 
-  belongs_to :employer_contact, 
-                class_name: "EmployerProfile",  
+  belongs_to :employer_contact,
+                class_name: "EmployerProfile",
                 inverse_of: :employer_contacts,
                 index: true
 
-  belongs_to :broker_agency_contact, 
-                class_name: "BrokerAgencyProfile",  
-                inverse_of: :broker_agency_contacts, 
+  belongs_to :broker_agency_contact,
+                class_name: "BrokerAgencyProfile",
+                inverse_of: :broker_agency_contacts,
                 index: true
 
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
@@ -121,9 +121,11 @@ class Person
   # end
 
   def primary_family
+    Family.find_by_primary_applicant(self)
   end
 
   def families
+    Family.find_all_by_person(self)
   end
 
 
@@ -178,8 +180,8 @@ private
   def date_of_death_follows_date_of_birth
     return unless self.date_of_death.present? && self.dob.present?
 
-    if self.date_of_death < self.dob 
-      errors.add(:date_of_death, "date of death cannot preceed date of birth") 
+    if self.date_of_death < self.dob
+      errors.add(:date_of_death, "date of death cannot preceed date of birth")
       errors.add(:dob, "date of birth cannot follow date of death")
     end
   end

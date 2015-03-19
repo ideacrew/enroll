@@ -172,6 +172,19 @@ class Family
     ]
   end
 
+  def self.find_by_primary_applicant(person)
+    find_all_by_primary_applicant(person).first
+  end
+
+  # TODO: should probably go away assuming 1 person should only have 1 family with them as primary
+  def self.find_all_by_primary_applicant(person)
+    Family.find_all_by_person(person).select() {|f|f.primary_applicant.person.id.to_s == person.id.to_s}
+  end
+
+  def self.find_all_by_person(person)
+    Family.where("family_members.person_id" => person.id)
+  end
+
   def people_relationship_map
     map = Hash.new
     people.each do |person|
