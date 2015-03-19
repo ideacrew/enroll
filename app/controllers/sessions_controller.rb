@@ -10,7 +10,7 @@ class SessionsController < Devise::SessionsController
     else
       profile[:employee_profile]
     end
-    resource.update_attribute(:role, resource.role.push(session[:user_role])) if !resource.role.include?(session[:user_role])
+    resource.update_attribute(:roles, resource.roles.push(session[:user_role])) if !resource.roles.include?(session[:user_role])
     if session[:user_role] == profile[:employer_profile]
       url = current_user.person.present? ? employers_root_path : new_employers_employer_path
     end
