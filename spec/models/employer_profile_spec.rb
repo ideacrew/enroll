@@ -5,11 +5,11 @@ RSpec.describe EmployerProfile, :type => :model do
 
   it { should validate_presence_of :entity_kind }
 
-  let(:organization) {FactoryGirl.create(:organization)}
-  let(:entity_kind) {"partnership"}
-  let(:bad_entity_kind) {"fraternity"}
+  def organization; FactoryGirl.create(:organization); end
+  def entity_kind; "partnership"; end
+  def bad_entity_kind; "fraternity"; end
 
-  let(:entity_kind_error_message) {"#{bad_entity_kind} is not a valid business entity kind"}
+  def entity_kind_error_message; "#{bad_entity_kind} is not a valid business entity kind"; end
 
 
   describe ".new" do
@@ -21,15 +21,15 @@ RSpec.describe EmployerProfile, :type => :model do
     end
 
     context "with no arguments" do
-      let(:params) {{}}
+      def params; {}; end
       it "should not save" do
         expect(EmployerProfile.new(**params).save).to be_false
       end
     end
 
     context "with all valid arguments" do
-      let(:params) {valid_params}
-      let(:employer_profile) {EmployerProfile.new(**params)}
+      def params; valid_params; end
+      def employer_profile; EmployerProfile.new(**params); end
 
       it "should save" do
         expect(employer_profile.save).to be_true
@@ -47,7 +47,7 @@ RSpec.describe EmployerProfile, :type => :model do
     end
 
     context "with no entity_kind" do
-      let(:params) {valid_params.except(:entity_kind)}
+      def params; valid_params.except(:entity_kind); end
 
       it "should fail validation " do
         expect(EmployerProfile.create(**params).errors[:entity_kind].any?).to be_true
@@ -55,7 +55,7 @@ RSpec.describe EmployerProfile, :type => :model do
     end
 
     context "with improper entity_kind" do
-      let(:params) {valid_params.deep_merge({entity_kind: bad_entity_kind})}
+      def params; valid_params.deep_merge({entity_kind: bad_entity_kind}); end
       it "should fail validation with improper entity_kind" do
         expect(EmployerProfile.create(**params).errors[:entity_kind].any?).to be_true
         expect(EmployerProfile.create(**params).errors[:entity_kind]).to eq [entity_kind_error_message]
@@ -67,22 +67,21 @@ RSpec.describe EmployerProfile, :type => :model do
 end
 
 describe EmployerProfile, "Class methods", type: :model do
+  def ee0; FactoryGirl.build(:employer_census_employee, ssn: "369851245", dob: 32.years.ago.to_date); end
+  def ee1; FactoryGirl.build(:employer_census_employee, ssn: "258741239", dob: 42.years.ago.to_date); end
 
-  let(:ee0) {FactoryGirl.build(:employer_census_employee, ssn: "369851245", dob: 32.years.ago.to_date)}
-  let(:ee1) {FactoryGirl.build(:employer_census_employee, ssn: "258741239", dob: 42.years.ago.to_date)}
+  def family0; FactoryGirl.build(:employer_census_family, census_employee: ee0, employer_profile: nil); end
+  def family1; FactoryGirl.build(:employer_census_family, census_employee: ee1, employer_profile: nil); end
 
-  let(:family0) {FactoryGirl.build(:employer_census_family, census_employee: ee0, employer_profile: nil)}
-  let(:family1) {FactoryGirl.build(:employer_census_family, census_employee: ee1, employer_profile: nil)}
+  def er0; EmployerProfile.new(entity_kind: "partnership", employee_families: [family0]); end
+  def er1; EmployerProfile.new(entity_kind: "partnership", employee_families: [family0, family1]); end
+  def er2; EmployerProfile.new(entity_kind: "partnership", employee_families: [family1]); end
 
-  let(:er0) {EmployerProfile.new(entity_kind: "partnership", employee_families: [family0])}
-  let(:er1) {EmployerProfile.new(entity_kind: "partnership", employee_families: [family0, family1])}
-  let(:er2) {EmployerProfile.new(entity_kind: "partnership", employee_families: [family1])}
+  def home_office; FactoryGirl.build(:office_location); end
 
-  let(:home_office) {FactoryGirl.build(:office_location)}
-
-  let(:organization0) {er0.create_organization(legal_name: "huey",  fein: "687654321", office_locations: [home_office])}
-  let(:organization1) {er1.create_organization(legal_name: "dewey", fein: "587654321", office_locations: [home_office])}
-  let(:organization2) {er2.create_organization(legal_name: "louie", fein: "487654321", office_locations: [home_office])}
+  def organization0; er0.create_organization(legal_name: "huey",  fein: "687654321", office_locations: [home_office]); end
+  def organization1; er1.create_organization(legal_name: "dewey", fein: "587654321", office_locations: [home_office]); end
+  def organization2; er2.create_organization(legal_name: "louie", fein: "487654321", office_locations: [home_office]); end
   before { organization0; organization1; organization2 }
 
 
@@ -107,9 +106,9 @@ describe EmployerProfile, "Class methods", type: :model do
     let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
     let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
 
-    let(:er3) {organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile)}
-    let(:er4) {organization4.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile)}
-    let(:er5) {organization5.create_employer_profile(entity_kind: "partnership")}
+    def er3; organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile); end
+    def er4; organization4.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile); end
+    def er5; organization5.create_employer_profile(entity_kind: "partnership"); end
     before { broker_agency_profile; er3; er4; er5 }
 
     it 'returns employers represented by the specified broker agency' do
@@ -135,7 +134,7 @@ describe EmployerProfile, "Class methods", type: :model do
            dob:        ee0.dob
         }
       end
-      let(:p0) {Person.new(**params)}
+      def p0; Person.new(**params); end
 
       it "should return an empty array" do
         expect(EmployerProfile.find_census_families_by_person(p0)).to eq []
@@ -150,7 +149,7 @@ describe EmployerProfile, "Class methods", type: :model do
            dob:        (ee0.dob - 1.year).to_date
         }
       end
-      let(:p0) {Person.new(**params)}
+      def p0; Person.new(**params); end
 
       it "should return an empty array" do
         expect(EmployerProfile.find_census_families_by_person(p0)).to eq []
@@ -165,7 +164,7 @@ describe EmployerProfile, "Class methods", type: :model do
            dob:        ee0.dob
         }
       end
-      let(:p0) {Person.new(**params)}
+      def p0; Person.new(**params); end
 
       it "should return an instance of EmployerFamily" do
         # expect(organization0.save).errors.messages).to eq ""
@@ -195,7 +194,7 @@ describe EmployerProfile, "Class methods", type: :model do
       org = FactoryGirl.create(:organization, legal_name: "Google Inc.", dba: "Google")
       er = org.create_employer_profile(entity_kind: "partnership")
     end
-    let(:bob_params) {{first_name: "Uncle", last_name: "Bob", ssn: "999441111", dob: 35.years.ago.to_date}}
+    def bob_params; {first_name: "Uncle", last_name: "Bob", ssn: "999441111", dob: 35.years.ago.to_date}; end
     let!(:black_and_decker_bob) do
       fam = black_and_decker.employee_families.create()
       ee = FactoryGirl.create(:employer_census_employee, employee_family: fam, **bob_params)
@@ -210,8 +209,8 @@ describe EmployerProfile, "Class methods", type: :model do
       ee = FactoryGirl.create(:employer_census_employee, employee_family: fam, **bob_params.merge(dob: 40.years.ago.to_date))
     end
 
-    let(:valid_ssn) {ee0.ssn}
-    let(:invalid_ssn) {"000000000"}
+    def valid_ssn; ee0.ssn; end
+    def invalid_ssn; "000000000"; end
     let(:params) do
       {
         first_name: ee0.first_name,
@@ -221,7 +220,7 @@ describe EmployerProfile, "Class methods", type: :model do
     end
 
     context "finds an EmployerProfile employee" do
-      let(:valid_person) {FactoryGirl.build(:person, **bob_params)}
+      def valid_person; FactoryGirl.build(:person, **bob_params); end
 
       it "should find the active employee in multiple employer_profiles" do
         # it shouldn't find google bob because dob are different
@@ -241,7 +240,7 @@ describe EmployerProfile, "Class methods", type: :model do
     end
 
     context "fails to match an employee" do
-      let(:invalid_person) {Person.new(**params.merge(ssn: invalid_ssn))}
+      def invalid_person; Person.new(**params.merge(ssn: invalid_ssn)); end
 
       it "should not return any matches" do
         # expect(invalid_person.ssn).to eq invalid_ssn

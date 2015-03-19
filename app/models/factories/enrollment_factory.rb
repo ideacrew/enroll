@@ -150,8 +150,8 @@ class EnrollmentFactory
   end
 
   def self.initialize_family(person, dependents)
-    family = person.family
-    family = person.build_family() if family.blank?
+    family = person.primary_family
+    family = Family.new if family.blank?
     applicant = family.primary_applicant
     applicant = initialize_primary_applicant(family, person) if applicant.blank?
     dependents.each do |dependent|

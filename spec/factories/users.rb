@@ -4,7 +4,7 @@ FactoryGirl.define do
     password '12345678'
     password_confirmation '12345678'
     approved true
-    role ['web_service']
+    roles ['web_service']
   end
 
   trait :without_email do
