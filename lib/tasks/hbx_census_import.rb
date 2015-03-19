@@ -8,7 +8,6 @@ class HbxCensusImport
   def run
     ees = []
     CSV.foreach(file_name, headers: true) do |row|
-      row["GENDER"] = "male"
       ees << CensusRecord.from_row(row)
     end
 
@@ -32,7 +31,6 @@ class HbxCensusImport
           cee.ssn = ee.ssn
           cee.dob = ee.dob
           cee.hired_on = ee.doh
-          cee.gender = ee.gender
           cee.build_email(kind: "work", address: ee.work_email)
           cee.terminated_on = ee.dot
           objects_to_save << cee
@@ -51,7 +49,7 @@ end
 CensusRecord = Struct.new(
   :dba, :fein, :first_name, :last_name, :ssn, :dob, :doh, :work_email,
   :person_email, :dot, :individual_external_id, :employee_external_id,
-  :record_start_date, :record_end_date, :gender
+  :record_start_date, :record_end_date
 )
 
 CensusRecord.class_eval do
@@ -72,7 +70,7 @@ CensusRecord.class_eval do
        itself to_date_safe itself itself itself itself itself].each_with_index do |conversion, index|
       ee.send("#{ee.members[index]}=", row[index].send(conversion))
     end
-    ee = nil if ee.fein.nil? || ee.ssn.nil? || ee.dob.nil? || ee.doh.nil? || ee.gender.nil?
+    ee = nil if ee.fein.nil? || ee.ssn.nil? || ee.dob.nil? || ee.doh.nil?
     ee
   end
 

@@ -5,9 +5,8 @@ class EmployerCensus::Employee < EmployerCensus::Member
   field :hired_on, type: Date
   field :terminated_on, type: Date
 
-  validates_presence_of :ssn, :hired_on#, :address
+  validates_presence_of :ssn, :hired_on
 
-  # TODO: Move common validations to single validates_with model
   validates :ssn,
     length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
     numericality: true
