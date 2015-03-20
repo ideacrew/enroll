@@ -51,7 +51,7 @@ class FamilyMember
   end
 
   def broker
-    Broker.find(self.broker_role_id) unless self.broker_role_id.blank?
+    BrokerRole.find(self.broker_role_id) unless self.broker_role_id.blank?
   end
 
   def is_primary_applicant?
