@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe EmployerCensus::Employee, '.new', type: :model do
   it { should validate_presence_of :ssn }
+  it { should validate_presence_of :dob }
   it { should validate_presence_of :hired_on }
 
   it 'properly intantiates the class' do

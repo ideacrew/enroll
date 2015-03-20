@@ -25,6 +25,11 @@ class EmployerCensus::Member
   validates :gender,
     inclusion: { in: GENDER_KINDS, message: "%{value} is not a valid gender" }
 
+  validates :ssn,
+    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
+    allow_blank: true,
+    numericality: true
+
 
   # Strip non-numeric chars from ssn
   # SSN validation rules, see: http://www.ssa.gov/employer/randomizationfaqs.html#a0=12

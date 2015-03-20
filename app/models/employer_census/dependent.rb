@@ -1,6 +1,6 @@
 class EmployerCensus::Dependent < EmployerCensus::Member
 
-  EMPLOYEE_RELATIONSHIP_KINDS = %W[spouse child domestic_partner]
+  EMPLOYEE_RELATIONSHIP_KINDS = %W[spouse domestic_partner child_under_26  child_26_and_over disabled_child_26_and_over]
 
   embedded_in :employee_family, class_name: "EmployerCensus::EmployeeFamily"
 
@@ -13,10 +13,5 @@ class EmployerCensus::Dependent < EmployerCensus::Member
               message: "'%{value}' is not a valid employee relationship"
             }
 
-  validates :ssn,
-    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
-    allow_blank: true,
-    numericality: true,
-    uniqueness: true
 
 end
