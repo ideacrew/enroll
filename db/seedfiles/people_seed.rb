@@ -23,7 +23,7 @@ p0 = Person.create!(first_name: "Bill", last_name: "Murray", addresses: [hm_addr
 p1 = Person.create!(first_name: "Dan", last_name: "Aykroyd")
 p2 = Person.create!(first_name: "Chevy", last_name: "Chase")
 p3 = Person.create!(first_name: "Jane", last_name: "Curtin", addresses: [hm_addr, ml_addr], phones: [mb_phone])
-p4 = Person.create!(first_name: "Martina", last_name: "Williams", ssn: "15148293", dob: "01/25/1990", gender: "female", phones: [wk_phone1], emails: [wk_dan_email])
+p4 = Person.create!(first_name: "Martina", last_name: "Williams", ssn: "151482930", dob: "01/25/1990", gender: "female", phones: [wk_phone1], emails: [wk_dan_email])
 
 puts "::: Generating Broker Roles :::"
 bk0 = p0.build_broker_role(npn: npn0, provider_kind: "assister")
