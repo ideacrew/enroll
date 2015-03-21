@@ -6,6 +6,76 @@ puts "::: Seeding Employers :::"
 broker_agency_0 = BrokerAgencyProfile.first
 broker_agency_1 = BrokerAgencyProfile.last
 
+
+puts "::: Creating Jetsons :::"
+spacely = Organization.new(
+      dba: "Spacely's Sprockets",
+      legal_name: "Spacely's Sprockets, Inc",
+      fein: 444123456,
+      office_locations: [
+        Address.new(
+            kind: "work",
+            address_1: "100 Cosmic Way, NW",
+            city: "Washington",
+            state: "DC",
+            zip: "20001"
+          )
+      ]
+    )
+
+cogswell = Organization.new(
+      dba: "Cogswell Cogs",
+      legal_name: "Cogswell Cogs, Inc",
+      fein: 555123457,
+      office_locations: [
+        Address.new(
+            kind: "work",
+            address_1: "100 Milky Way, SW",
+            city: "Washington",
+            state: "DC",
+            zip: "20001"
+          )
+      ]
+    )
+
+jetson_0 = EmployerCensus::EmployeeFamily.new(
+    census_employee: EmployerCensus::Employee.new(
+        last_name: "Jetson", first_name: "George", dob: "04/01/1974", ssn: 987654321, hired_on: "03/20/2015", 
+        email: Email.new(kind: "work", address: "dan.thomas@dc.gov")
+      ),
+    census_dependents: [
+      EmployerCensus::Dependent.new(
+        last_name: "Jetson", first_name: "Jane", dob: "04/01/1981", ssn: 987654322, employee_relationship: "spouse"
+        ),
+      EmployerCensus::Dependent.new(
+        last_name: "Jetson", first_name: "Judy", dob: "04/01/2000", ssn: 987654323, employee_relationship: "child_under_26"
+        ),
+      EmployerCensus::Dependent.new(
+        last_name: "Jetson", first_name: "Elroy", dob: "04/01/2008", ssn: 987654324, employee_relationship: "child_under_26"
+        )
+    ]
+  )
+
+jetson_1 = EmployerCensus::EmployeeFamily.new(
+    census_employee: EmployerCensus::Employee.new(
+        last_name: "Jetson", first_name: "Jane", dob: "04/01/1981", ssn: 987654322, hired_on: "03/23/2015",
+        email: Email.new(kind: "work", address: "dan.thomas@dc.gov")
+      )
+    )
+
+spacely.create_employer_profile(
+    entity_kind: "s_corporation", 
+    broker_agency_profile: broker_agency_0,
+    employee_families: [jetson_0]
+  )
+
+cogswell.create_employer_profile(
+    entity_kind: "s_corporation", 
+    broker_agency_profile: broker_agency_1,
+    employee_families: [jetson_1]
+  )
+
+
 puts "::: Creating addresses for office location :::"
 # Employer addresses
 employer_address_1 = Address.new(kind: "mailing", address_1: "13025 Elm Tree CT", address_2: "Suite 300", city: "Herndon", state: "VA", county: "Fairfax", zip: "20172", country_name: "USA")
@@ -41,9 +111,9 @@ address_5 = Address.new(kind: "home", address_1: "15 Darlington", address_2: "su
 # Employee and Dependents Creation
 employee_0 = EmployerCensus::Employee.new(first_name: "Guy", last_name: "Noir", dob: "01/12/1950", gender: "male", employee_relationship: "self", hired_on: "01/01/2014", ssn: "011222331", address: address_0)
 employee_1 = EmployerCensus::Employee.new(first_name: "John", last_name: "Doe", dob: "01/12/1980", gender: "male", employee_relationship: "self", hired_on: "01/01/2014", ssn: "111222331", address: address_1)
-dependent_1_1 = EmployerCensus::Dependent.new(first_name: "Matt", last_name: "Doe", dob: "01/12/2011", gender: "male", employee_relationship: "child", ssn: "022233311")
+dependent_1_1 = EmployerCensus::Dependent.new(first_name: "Matt", last_name: "Doe", dob: "01/12/2011", gender: "male", employee_relationship: "child_under_26", ssn: "022233311")
 dependent_1_2 = EmployerCensus::Dependent.new(first_name: "Jessica", last_name: "Doe", dob: "02/12/1982", gender: "female", employee_relationship: "spouse", ssn: "021233311")
-dependent_1_3 = EmployerCensus::Dependent.new(first_name: "Caroline", last_name: "Doe", dob: "02/12/2010", gender: "female", employee_relationship: "child", ssn: "021233321")
+dependent_1_3 = EmployerCensus::Dependent.new(first_name: "Caroline", last_name: "Doe", dob: "02/12/2010", gender: "female", employee_relationship: "child_under_26", ssn: "021233321")
 
 # Employee Family Creation
 family_0 = organization_1.employer_profile.employee_families.new
@@ -63,9 +133,9 @@ family_11.census_dependents = [dependent_1_1, dependent_1_2]
 family_11.save!
 
 employee_2 = EmployerCensus::Employee.new(first_name: "Melaine", last_name: "Roger", dob: "01/15/1975", gender: "male", employee_relationship: "self", hired_on: "12/01/2012", ssn: "011142233", address: address_2)
-dependent_2_1 = EmployerCensus::Dependent.new(first_name: "Martina", last_name: "Roger", dob: "01/31/2011", gender: "female", employee_relationship: "child", ssn: "022233314")
+dependent_2_1 = EmployerCensus::Dependent.new(first_name: "Martina", last_name: "Roger", dob: "01/31/2011", gender: "female", employee_relationship: "child_under_26", ssn: "022233314")
 dependent_2_2 = EmployerCensus::Dependent.new(first_name: "Monica", last_name: "Roger", dob: "02/09/1983", gender: "female", employee_relationship: "spouse", ssn: "021233331")
-dependent_2_3 = EmployerCensus::Dependent.new(first_name: "Caroline", last_name: "Roger", dob: "04/12/2010", gender: "female", employee_relationship: "child", ssn: "021233921")
+dependent_2_3 = EmployerCensus::Dependent.new(first_name: "Caroline", last_name: "Roger", dob: "04/12/2010", gender: "female", employee_relationship: "child_under_26", ssn: "021233921")
 
 family_2 = organization_2.employer_profile.employee_families.new
 family_2.census_employee = employee_2
@@ -73,9 +143,9 @@ family_2.census_dependents = [dependent_2_1, dependent_2_2, dependent_2_3]
 family_2.save!
 
 employee_3 = EmployerCensus::Employee.new(first_name: "Kareena", last_name: "Johnson", dob: "01/15/1978", gender: "female", employee_relationship: "self", hired_on: "04/01/2011", ssn: "015142233", address: address_3)
-dependent_3_1 = EmployerCensus::Dependent.new(first_name: "Melissa", last_name: "Johnson", dob: "12/31/2011", gender: "female", employee_relationship: "child", ssn: "022233313")
+dependent_3_1 = EmployerCensus::Dependent.new(first_name: "Melissa", last_name: "Johnson", dob: "12/31/2011", gender: "female", employee_relationship: "child_under_26", ssn: "022233313")
 dependent_3_2 = EmployerCensus::Dependent.new(first_name: "Martin", last_name: "Johnson", dob: "02/19/1972", gender: "male", employee_relationship: "spouse", ssn: "081235331")
-dependent_3_3 = EmployerCensus::Dependent.new(first_name: "Frazier", last_name: "Johnson", dob: "04/16/2010", gender: "male", employee_relationship: "child", ssn: "021243926")
+dependent_3_3 = EmployerCensus::Dependent.new(first_name: "Frazier", last_name: "Johnson", dob: "04/16/2010", gender: "male", employee_relationship: "child_under_26", ssn: "021243926")
 
 family_3 = organization_3.employer_profile.employee_families.new
 family_3.census_employee = employee_3
@@ -83,9 +153,9 @@ family_3.census_dependents = [dependent_3_1, dependent_3_2, dependent_3_3]
 family_3.save!
 
 employee_4 = EmployerCensus::Employee.new(first_name: "Mario", last_name: "Gomez", dob: "01/25/1968", gender: "male", employee_relationship: "self", hired_on: "02/02/2011", ssn: "015142293", address: address_4)
-dependent_4_1 = EmployerCensus::Dependent.new(first_name: "Paula", last_name: "Gomez", dob: "12/29/2010", gender: "female", employee_relationship: "child", ssn: "022233303")
+dependent_4_1 = EmployerCensus::Dependent.new(first_name: "Paula", last_name: "Gomez", dob: "12/29/2010", gender: "female", employee_relationship: "child_under_26", ssn: "022233303")
 dependent_4_2 = EmployerCensus::Dependent.new(first_name: "Martina", last_name: "Gomez", dob: "02/19/1982", gender: "female", employee_relationship: "spouse", ssn: "081235339")
-dependent_4_3 = EmployerCensus::Dependent.new(first_name: "Rafael", last_name: "Gomez", dob: "04/16/2012", gender: "male", employee_relationship: "child", ssn: "021243926")
+dependent_4_3 = EmployerCensus::Dependent.new(first_name: "Rafael", last_name: "Gomez", dob: "04/16/2012", gender: "male", employee_relationship: "child_under_26", ssn: "021243926")
 
 family_4 = organization_4.employer_profile.employee_families.new
 family_4.census_employee = employee_4
@@ -98,4 +168,3 @@ family_5 = organization_5.employer_profile.employee_families.new
 family_5.census_employee = employee_5
 family_5.save!
 puts "*"*80
-

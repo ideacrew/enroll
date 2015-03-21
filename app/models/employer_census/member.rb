@@ -20,7 +20,7 @@ class EmployerCensus::Member
   embeds_one :address
   embeds_one :email
 
-  validates_presence_of :first_name, :last_name, :dob, :gender, :employee_relationship
+  validates_presence_of :first_name, :last_name, :dob, :employee_relationship
 
   validates :gender,
     inclusion: { in: GENDER_KINDS, message: "%{value} is not a valid gender" }
