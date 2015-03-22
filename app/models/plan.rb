@@ -134,7 +134,7 @@ class Plan
       begin_date = Date.parse(coverage_begin_date)
       plan_documents = Plan.and({ active_year: plan_year }, { hios_id: hios_id }).entries
       premium_table = plan_documents.first.premium_tables.detect do |table|
-        (table.age == insured_age) && (begin_date > table.start_on) && (begin_date < table.end_on)
+        (table.age == insured_age) && (begin_date >= table.start_on) && (begin_date <= table.end_on)
       end
       plan_premium = premium_table.cost
     end
