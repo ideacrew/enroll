@@ -168,4 +168,3 @@ family_5 = organization_5.employer_profile.employee_families.new
 family_5.census_employee = employee_5
 family_5.save!
 puts "*"*80
-
