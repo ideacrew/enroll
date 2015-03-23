@@ -1,10 +1,4 @@
 class PlansParser
-  
-  PARSER_ELEMENTS = ["name","metal_level","active_year","standard_component_id","hpid","serviceAreaID","formularyID",
-"isNewPlan","planType","metalLevel","uniquePlanDesign","qhpOrNonQhp","insurancePlanPregnancyNoticeReqInd","isSpecialistReferralRequired","healthCareSpecialistReferralType","insurancePlanBenefitExclusionText","indianPlanVariation","hsaEligibility","employerHSAHRAContributionIndicator","empContributionAmountForHSAOrHRA","childOnlyOffering","childOnlyPlanID","isWellnessProgramOffered","isDiseaseMgmtProgramsOffered",
-"ehbApportionmentForPediatricDental","guaranteedVsEstimatedRate","maximumCoinsuranceForSpecialtyDrugs","maxNumDaysForChargingInpatientCopay",
-"beginPrimaryCareCostSharingAfterSetNumberVisits","beginPrimaryCareDeductibleOrCoinsuranceAfterSetNumberCopays","planEffectiveDate","planExpirationDate","outOfCountryCoverage","outOfCountryCoverageDescription","outOfServiceAreaCoverage",
-"outOfServiceAreaCoverageDescription","nationalNetwork","summaryBenefitAndCoverageURL","enrollmentPaymentURL","planBrochure"]
 
   include HappyMapper
   tag 'planAttributes'
