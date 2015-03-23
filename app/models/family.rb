@@ -6,6 +6,7 @@ class Family
   # include Mongoid::Paranoia
   include AASM
 
+  before_save :update_household
 
   KINDS = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
 
@@ -216,6 +217,15 @@ class Family
     end
   end
 
+  def update_household
+
+    return if family_members.length == 0
+
+    household = get_household
+    #create_hbx_enrollments(household)
+    create_coverage_households(household)
+  end
+
 private
 
   # This method will return true only if all the family_members in tax_household_members and coverage_household_members are present in self.family_members
@@ -272,4 +282,44 @@ private
     end
   end
 
+  def get_household
+    return self.active_household if self.active_household #if active_houshold exists
+    return self.households.build #create a new empty household
+  end
+
+  def create_coverage_households(household)
+    coverage_household = household.coverage_households.build({submitted_at: self.submitted_at})
+
+    family_members.each do |family_member|
+      if family_member.is_coverage_applicant
+        if valid_relationship?(family_member)
+          coverage_household_member = coverage_household.coverage_household_members.build
+          coverage_household_member.applicant_id = family_member.id
+        else
+          #$logger.warn "WARNING: Family e_case_id: #{@family.e_case_id} Relationship #{@family.primary_applicant.person.find_relationship_with(family_member.person)} not valid for a coverage household between primary applicant person #{@family.primary_applicant.person.id} and #{family_member.person.id}"
+        end
+      end
+    end
+  end
+
+  def create_hbx_enrollments(household)
+
+  end
+
+  def create_hbx_enrollment(household)
+
+  end
+
+  def valid_relationship?(family_member)
+    return true if self.primary_applicant.nil? #responsible party case
+    return true if self.primary_applicant.person.id == family_member.person.id
+
+    valid_relationships = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter}
+
+    if valid_relationships.include? self.primary_applicant.person.find_relationship_with(family_member.person)
+      return true
+    else
+      return false
+    end
+  end
 end

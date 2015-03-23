@@ -11,6 +11,7 @@ describe Family do
   family_member.person=p1;
   family_member }
 
+=begin
   describe "instantiates object." do
     it "sets and gets all basic model fields" do
       now = DateTime.now.utc
@@ -168,6 +169,44 @@ describe Family do
         end
         it "should find Carol's family" do
           expect(find).to include carols_family.id
+        end
+      end
+    end
+  end
+=end
+  describe "update_household callback" do
+    let!(:primary_person) { FactoryGirl.create(:person) }
+    let!(:second_person) {FactoryGirl.create(:person)}
+
+    context "family is saved" do
+      let!(:new_family) { FactoryGirl.create(:family) }
+      let!(:first_primary_member) { FactoryGirl.create(:family_member, :primary, family: new_family, person: primary_person) }
+=begin
+      it "should create a household" do
+        new_family.valid?
+        expect(new_family.save).to be_truthy
+        expect(new_family.households.length).to eq(1)
+      end
+
+      it "should create a coverage_household" do
+        new_family.valid?
+        expect(new_family.save).to be_truthy
+        expect(new_family.active_household.coverage_households.length).to eq(1)
+      end
+
+      it "should create a member in coverage_household" do
+        new_family.valid?
+        expect(new_family.save).to be_truthy
+        expect(new_family.active_household.coverage_households.first.coverage_household_members.length).to eq(1)
+      end
+=end
+      describe " " do
+        let!(:second_member) { FactoryGirl.create(:family_member, family: new_family, person: second_person) }
+        it "should create coverage_household with 2 members (self and spouse)" do
+          new_family.family_members.first.person.person_relationships << PersonRelationship.new({kind:'spouse', relative_id: second_person.id})
+          new_family.valid?
+          expect(new_family.save).to be_truthy
+          expect(new_family.active_household.coverage_households.first.coverage_household_members.length).to eq(2)
         end
       end
     end
