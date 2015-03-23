@@ -1,5 +1,7 @@
 puts "*"*80
 require 'plans_parser'
+
+#destroy_all command added to delete plans at safe side can comment if want
 Plan.destroy_all
 
 puts ":::Generating Plans from xml file:::"
