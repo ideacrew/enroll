@@ -1,6 +1,6 @@
 module Factories
   class EmployeeSignup
-    def build(roster_employee, person)
+    def build(consumer_identity, roster_employee, person)
 
     end
   end

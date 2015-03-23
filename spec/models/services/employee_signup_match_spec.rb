@@ -28,7 +28,7 @@ describe Services::EmployeeSignupMatch do
     let(:built_form) { double }
 
     it "should match that roster entry" do
-      allow(signup_builder).to receive(:build).with(census_employee, nil).and_return(built_form)
+      allow(signup_builder).to receive(:build).with(consumer_identity, census_employee, nil).and_return(built_form)
       expect(subject.call(consumer_identity)).to eq built_form
     end
 
@@ -37,7 +37,7 @@ describe Services::EmployeeSignupMatch do
       let(:consumer_identity) { instance_double("Forms::ConsumerIdentity", :match_census_employees => census_employees, :match_person => matched_person) }
 
       it "should match the person as well" do
-        allow(signup_builder).to receive(:build).with(census_employee, matched_person).and_return(built_form)
+        allow(signup_builder).to receive(:build).with(consumer_identity, census_employee, matched_person).and_return(built_form)
         expect(subject.call(consumer_identity)).to eq built_form
       end
     end
