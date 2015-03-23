@@ -7,9 +7,7 @@ class Enrollee
   field :person_id, type: BSON::ObjectId
   field :carrier_member_id, type: String
   field :carrier_policy_id, type: String
-
   field :premium_in_cents, type: Integer
-
   field :coverage_start_on, type: Date
   field :coverage_end_on, type: Date
 
@@ -27,7 +25,7 @@ class Enrollee
   end
 
   def set_premium
-    return if policy.plan.blank? || coverage_start_age.blank?
+    return if policy.try(:plan).blank? || coverage_start_age.blank?
 
     premium = Directory::Premium.lookup(person.gender, coverage_start_age)
     premium_in_cents = premium.amount_in_cents

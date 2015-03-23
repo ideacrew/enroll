@@ -37,7 +37,7 @@ class Phone
     if !phone_number.blank?
       case phone_number.length
       when 11
-        self.country_code = phone_number[1,1]
+        self.country_code = phone_number[0,1]
         self.area_code = phone_number[1,3]
         self.number = phone_number[4,7]
       when 10
