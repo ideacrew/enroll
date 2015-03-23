@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :plan_benifit do
+  factory :plan_benefit do
     
   end
 
