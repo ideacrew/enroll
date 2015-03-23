@@ -26,8 +26,7 @@ module Forms
       end
     end
 
-    def validate_employee_role
-
+    def match_census_employee
     end
   end
 end
