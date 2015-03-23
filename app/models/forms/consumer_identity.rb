@@ -27,6 +27,10 @@ module Forms
     end
 
     def match_census_employee
+      EmployerCensus::Employee.where({
+        :dob => dob,
+        :ssn => ssn        
+      }).first
     end
   end
 end

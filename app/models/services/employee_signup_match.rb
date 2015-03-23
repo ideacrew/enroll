@@ -1,7 +1,8 @@
 module Services
   class EmployeeSignupMatch
     def call(consumer_identity)
-      consumer_identity.match_census_employee      
+      found_employee = consumer_identity.match_census_employee
+      return nil if found_employee.blank?
     end 
   end
 end
