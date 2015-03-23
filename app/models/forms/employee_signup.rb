@@ -11,8 +11,12 @@ module Forms
     attr_accessor :name_pfx, :name_sfx
     attr_accessor :gender, :ssn, :dob
 
+    attr_accessor :home_email, :work_email
+
+    attr_accessor :home_phone, :mobile_phone, :work_phone
+
     include ComposedModel
 
-    composed_of_many :phones, "::Forms::Phone"
+    composed_of_many :addresses, "::Forms::Address", true
   end
 end

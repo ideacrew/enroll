@@ -1,5 +1,14 @@
 require 'rails_helper'
 
+describe Forms::EmployeeSignup, "given an invalid address " do
+
+  subject { Forms::EmployeeSignup.new(:addresses => [Forms::Address.new]) }
+
+  it "should not be valid" do
+    expect(subject.valid?).to be_falsey
+  end
+end
+
 describe Forms::EmployeeSignup, "for an employee who doesn't have a corresponding person yet" do
 
   describe "given an ssn that collides with any person record" do
