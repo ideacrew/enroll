@@ -26,8 +26,18 @@ module Forms
       end
     end
 
-    def validate_employee_role
+    def match_census_employees
+      EmployerCensus::Employee.where({
+        :dob => dob,
+        :ssn => ssn        
+      })
+    end
 
+    def match_person
+      Person.where({
+        :dob => dob,
+        :ssn => ssn        
+      }).first
     end
   end
 end
