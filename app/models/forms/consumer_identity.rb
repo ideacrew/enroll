@@ -8,6 +8,8 @@ module Forms
     attr_accessor :gender, :ssn, :date_of_birth
     attr_reader :ssn
 
+    attr_accessor :user_id
+
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
     include Validations::USDate.on(:date_of_birth)
