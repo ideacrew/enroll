@@ -35,7 +35,9 @@ class Plan
   embeds_many :benefits
   accepts_nested_attributes_for :benefits
 
-
+  embeds_many :plan_benifits
+  accepts_nested_attributes_for :plan_benifits
+  
   index({ hbx_id: 1 })
   index({ coverage_kind: 1 })
   index({ metal_level: 1 })

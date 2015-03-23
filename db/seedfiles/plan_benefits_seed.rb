@@ -18,7 +18,19 @@ provider_dirs.each do |directory|
       plan_name = plan_parse.name.squish
       hios_id = plan_parse.standard_component_id.squish
       if (!blacklist_plan_names.include? plan_name) && (!blacklist_hios_ids.include? hios_id)
+        
         plan = Plan.new(provider: provider, name: plan_name, market: "individual", coverage_kind: "dental", carrier_profile_id: "1234", hios_id: hios_id, metal_level: plan_parse.metal_level.squish, active_year: plan_parse.active_year.strftime("%Y"))
+        plan_benifits = []
+        plan_parse.instance_variables.each do |variable_name|
+          variable_name = variable_name.to_s.gsub!("@","")
+          value = plan_parse.send("#{variable_name}").to_s
+          if value.present?
+            value = value.squish
+          end
+          plan_benifits << PlanBenifit.new(benifit_attribute_name: variable_name, benifit_attribute_value: value)
+        end
+        
+        plan.plan_benifits = plan_benifits
         plan.save!
       end
     end
