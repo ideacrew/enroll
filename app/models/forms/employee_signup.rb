@@ -10,5 +10,9 @@ module Forms
     attr_accessor :first_name, :middle_name, :last_name
     attr_accessor :name_pfx, :name_sfx
     attr_accessor :gender, :ssn, :dob
+
+    include ComposedModel
+
+    composed_of_many :phones, "::Forms::Phone"
   end
 end
