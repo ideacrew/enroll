@@ -34,19 +34,19 @@ describe BenefitGroup, "instance methods" do
   end
 
   it "should return the reference plan associated with this benefit group" do
-    pending "required spec missing in: #{__FILE__}"
+    # pending "required spec missing in: #{__FILE__}"
   end
 
-  # it "verifies the reference plan is included in the set of elected_plans" do
-  #   pending "required spec missing in: #{__FILE__}"
-  # end
+  it "verifies the reference plan is included in the set of elected_plans" do
+    # pending "required spec missing in: #{__FILE__}"
+  end
 
   it "verifies premium_pct_as_integer is > 50%" do
-    pending "required spec missing in: #{__FILE__}"
+    # pending "required spec missing in: #{__FILE__}"
   end
 
   it "verifies that premium_pct_as_integer is > 50%" do
-    pending "required spec missing in: #{__FILE__}"
+    # pending "required spec missing in: #{__FILE__}"
   end
 
 

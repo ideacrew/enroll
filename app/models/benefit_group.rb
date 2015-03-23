@@ -19,7 +19,7 @@ class BenefitGroup
 
   field :title, type: String, default: ""
 
-  field :benefit_list, type: Array, default: []
+  field :benefit_list, type: Array, default: PERSONAL_RELATIONSHIP_KINDS[0...-1]
   field :effective_on_kind, type: String, default: "date_of_hire"
   field :terminate_on_kind, type: String, default: "end_of_month"
 
@@ -27,7 +27,8 @@ class BenefitGroup
   field :effective_on_offset, type: Integer, default: 0
 
   # Non-congressional
-  field :reference_plan_id, type: BSON::ObjectId
+  belongs_to :reference_plan, class_name: "Plan"
+  # field :reference_plan_id, type: BSON::ObjectId
 
   # Employer contribution amount as percentage of reference plan premium
   field :premium_pct_as_int, type: Integer, default: Integer
@@ -52,15 +53,15 @@ class BenefitGroup
       message: "%{value} is not a valid effective date offset kind"
     }
 
-  def reference_plan=(new_reference_plan)
-  end
-
-  def reference_plan
-  end
+  # def reference_plan=(new_reference_plan)
+  # end
+  #
+  # def reference_plan
+  # end
 
   # belongs_to association (traverse the model)
   def employee_families
-    plan_year.employer_profile.employee_families.where(benefit_group_id: self._id).to_a
+    plan_year.employer_profile.employee_families.to_a
   end
 
 
