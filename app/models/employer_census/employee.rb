@@ -12,4 +12,9 @@ class EmployerCensus::Employee < EmployerCensus::Member
     write_attribute(:employee_relationship, "self")
   end
 
+  def is_linkable?
+    return false if employee_family.blank?
+    employee_family.is_linkable?
+  end
+
 end
