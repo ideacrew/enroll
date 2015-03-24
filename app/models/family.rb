@@ -222,7 +222,7 @@ class Family
     return if family_members.length == 0
 
     household = get_household
-    #create_hbx_enrollments(household)
+    create_hbx_enrollments(household)
     create_coverage_households(household)
   end
 
@@ -288,6 +288,9 @@ private
   end
 
   def create_coverage_households(household)
+
+    household.coverage_households.delete_all  #clear any existing
+
     coverage_household = household.coverage_households.build({submitted_at: self.submitted_at})
 
     family_members.each do |family_member|
@@ -303,11 +306,36 @@ private
   end
 
   def create_hbx_enrollments(household)
+    return if self.primary_applicant.nil?
 
+    household.hbx_enrollments.delete_all #clear any existing
+
+    policies = Policy.find_by_person(self.primary_applicant.person)
+
+    policies.each do |policy|
+      create_hbx_enrollment(household, policy)
+    end
   end
 
-  def create_hbx_enrollment(household)
+  def create_hbx_enrollment(household, policy)
 
+    hbx_enrollement = household.hbx_enrollments.build
+    hbx_enrollement.policy = policy
+    hbx_enrollement.submitted_at = self.submitted_at
+
+    policy.enrollees.each do |enrollee|
+      begin
+        person = enrollee.person
+        self.family_members.build({person: person}) unless self.person_is_family_member?(person)
+        family_member = self.find_family_member_by_person(person)
+        hbx_enrollement_member = hbx_enrollement.hbx_enrollment_members.build({family_member: family_member,
+                                                                               premium_amount: enrollee.premium_in_cents})
+        #hbx_enrollement_member.is_subscriber = true if (enrollee.rel_code == "self")
+
+      rescue FloatDomainError
+        next
+      end
+    end
   end
 
   def valid_relationship?(family_member)
