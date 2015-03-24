@@ -23,6 +23,7 @@ class EmployerCensus::Member
   validates_presence_of :first_name, :last_name, :dob, :employee_relationship
 
   validates :gender,
+    allow_blank: true,
     inclusion: { in: GENDER_KINDS, message: "%{value} is not a valid gender" }
 
   validates :ssn,

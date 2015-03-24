@@ -1,3 +1,5 @@
+require "tasks/hbx_employer_monkeypatch"
+
 class HbxCensusImport
   attr_reader :file_name
 
@@ -19,7 +21,7 @@ class HbxCensusImport
     ees.each do |ee|
       er = EmployerProfile.find_by_fein(ee.fein)
       if er.present?
-        eefs = EmployerProfile.find_census_families_by_person(Struct.new(:ssn).new(ee.ssn))
+        eefs = EmployerProfile.find_census_families_by_person(ee)
         # TODO: make sure first is the right one
         eef = eefs.first
         eef = er.employee_families.build if eef.nil?
@@ -67,7 +69,7 @@ CensusRecord.class_eval do
   def self.from_row(row)
     ee = CensusRecord.new
     %w[itself to_digits itself itself to_digits to_date_safe to_date_safe itself
-       itself to_date_safe itself itself itself itself itself].each_with_index do |conversion, index|
+       itself to_date_safe itself itself itself itself].each_with_index do |conversion, index|
       ee.send("#{ee.members[index]}=", row[index].send(conversion))
     end
     ee = nil if ee.fein.nil? || ee.ssn.nil? || ee.dob.nil? || ee.doh.nil?
@@ -87,41 +89,5 @@ CensusRecord.class_eval do
   def <=>(another)
     self.class.set_last_order(self, another)
     sort_attributes <=> another.sort_attributes
-  end
-end
-
-Object.class_eval do
-  def to_digits
-    self.to_s.to_digits
-  end
-
-  def to_date_safe
-    self.to_s.to_date_safe
-  end
-end
-
-String.class_eval do
-  def to_digits
-    self.gsub(/\D/, '')
-  end
-
-  def to_date_safe
-    date = nil
-    unless self.blank?
-      begin
-        date = Date.parse(self)
-      rescue
-        begin
-          date = Date.strptime(self, '%m/%d/%Y')
-        rescue
-          begin
-            date = Date.strptime(self, '%Y%m%d')
-          rescue Exception => e
-            puts "There was an error parsing {#{self}} as a date."
-          end
-        end
-      end
-    end
-    date
   end
 end

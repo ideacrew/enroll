@@ -48,7 +48,8 @@ private
     end
 
     if end_on != Date.civil(end_on.year, end_on.month, -1)
-first    end
+      errors.add(:end_on, "must be last day of the month")
+    end
 
     # TODO: Create HBX object with configuration settings including shop_plan_year_maximum_in_days
     shop_plan_year_maximum_in_days = 365

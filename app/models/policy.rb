@@ -127,7 +127,7 @@ class Policy
   end
 
   def plan
-    Directory::Plan.find(self.plan_id) unless plan.nil?
+    Directory::Plan.where(id: self.plan_id).first unless plan_id.nil?
   end
 
   def calculate_enrollee_premiums
