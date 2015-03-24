@@ -1,0 +1,10 @@
+<% if @person.errors.any? %>
+  <div class="alert alert-error">
+    <h4><%= pluralize(@person.errors.count, "error") %> prohibited this person from being saved:</h4>
+    <ul>
+      <% @person.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

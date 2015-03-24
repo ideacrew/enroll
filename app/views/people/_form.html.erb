@@ -2,62 +2,20 @@
     <div class="panel panel-default">
       <div class="panel-body left">
 
-        <div class="col-sm-2 left-pd" id="sidebar_partial_value">
-          <%= render 'people/sidebar' %>
-        </div>
+		<%= render 'people/sidebar' %>
 
         <div class="col-md-10 col-sm-12">
 
           <%= render 'welcome_msg' %>
 
           <div class="col-md-11 col-sm-12 col-xs-12">
-            <% if @person.errors.any? %>
-              <div class="alert alert-error">
-                <h4><%= pluralize(@person.errors.count, "error") %> prohibited this person from being saved:</h4>
-                <ul>
-                  <% @person.errors.full_messages.each do |msg| %>
-                    <li><%= msg %></li>
-                  <% end %>
-                </ul>
-              </div>
-            <% end %>
-
-            <p class="information row" style="opacity: 0.2;">Personal Information</p>
-            <div id="overlay"></div>
-            <div id="personal_info" class="focus_effect row personal-info-row" style="opacity: 0.5;">
-              <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
-                <%= hidden_field "people","id" %>
-                <%= render 'shared/name_fields', f: f %>
-                <div class="overlay-in"></div>
-              </div>
-            </div>
-
-            <div class="row search-btn-row">
-              <div class="col-md-8 col-sm-6 col-xs-12 key no-pd">
-                <p class="top-pad">
-                  <span>Your personal information is secure.</span>
-                  <span><i></i></span>
-                </p>
-              </div>
-              <div class="col-md-2 col-sm-3 col-xs-12 no-pd">
-                <a href="#" id="search-employer" class="btn btn-search">Search</a>
-              </div>
-            </div>
-
-            <div class="fail-search hidden" class="row">
-				<div class="col-md-10 col-sm-9 col-xs-12 no-pd">
-					<div class="panel panel-default">
-						<div class="panel-body text-center">
-						  <a href="#" class="close-fail"><i class="fa fa-times"></i></a>
-						  <p class="fail"><span class="notice"><i class="fa fa-exclamation-triangle"></i></span>No Employer plan found. Double check your personal <br>information and try again <span class="bold">OR</span> please contact support:</p>
-						  <p class="fail"><span class="bold">DCHBX Phone Support</span><br>
-						  1-800-555-1212 option 1</p>
-						</div>
-					</div>
-				</div>
-			</div>
+          	<%= render 'shared/error_messages' %>
+          	<%= render 'shared/person_search_fields', f: f %>
+          	
+          	<%= render 'people/no_results' %>
 
 			<div id="employer-info" class="row hidden"></div>
+			
             <%= render 'shared/address_fields', f: f %><br>
             <%= render 'shared/phone_fields', f: f %><br>
 
@@ -81,7 +39,6 @@
             	<%= render 'shared/signup_progress' %>
             </div>
 
-            <%#= render 'autofill_cloud' %>
             <%= render 'employer_search' %>
           </div>
         </div>
