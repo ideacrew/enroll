@@ -1,3 +1,5 @@
+require "tasks/hbx_employer_monkeypatch"
+
 class HbxEmployerImport
   attr_reader :employer_file_name, :ignore_file_name
 
@@ -188,43 +190,41 @@ Employer.class_eval do
 
       oer = o.build_employer_profile
       oer.entity_kind = "c_corporation" # TODO: fix, this should probably come from the data
+
+      py = oer.plan_years.build
+      py.start_on = effective_date
+      py.end_on = ((effective_date + 1.year) - 1.day).to_date
+      py.open_enrollment_start_on = open_enrollment_start
+      py.open_enrollment_end_on = open_enrollment_end
+      py.fte_count = census_count
+
+      locations.each do |loc|
+        bg = py.benefit_groups.build
+        case new_hire_wait_index
+        when 1
+          bg.effective_on_kind = "date_of_hire"
+          bg.effective_on_offset = 0
+        when 2
+          bg.effective_on_kind = "first_of_month"
+          bg.effective_on_offset = 0
+        when 3
+          bg.effective_on_kind = "first_of_month"
+          bg.effective_on_offset = 30
+        when 4
+          bg.effective_on_kind = "first_of_month"
+          bg.effective_on_offset = 60
+        end
+        # TODO: figure out how to match plans
+        # bg.reference_plan =
+        bg.premium_pct_as_int = loc.employee_contribution
+        bg.title = loc.name
+      end
+
       # oer.broker_agency_id = broker_agency_id # TODO: fix, this isn't really our broker_agency_id
       # oer.
 
       # TODO: must save here because later rows might be updates to this employer
     end
     o
-  end
-end
-
-String.class_eval do
-  def to_digits
-    self.gsub(/\D/, '')
-  end
-
-  def to_date_safe
-    date = nil
-    unless self.blank?
-      begin
-        date = Date.parse(self)
-      rescue
-        begin
-          date = Date.strptime(self, '%m/%d/%Y')
-        rescue Exception => e
-          puts "There was an error parsing {#{self}} as a date."
-        end
-      end
-    end
-    date
-  end
-end
-
-Object.class_eval do
-  def to_digits
-    self.to_s.to_digits
-  end
-
-  def to_date_safe
-    self.to_s.to_date_safe
   end
 end

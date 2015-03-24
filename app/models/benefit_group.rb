@@ -37,7 +37,8 @@ class BenefitGroup
   #embeds_many :elected_plans
 
   validates_presence_of :benefit_list, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
-    :reference_plan_id, :premium_pct_as_int, :employer_max_amt_in_cents
+  :premium_pct_as_int, :employer_max_amt_in_cents
+  # :reference_plan_id, :premium_pct_as_int, :employer_max_amt_in_cents
 
   validates :effective_on_kind,
     allow_blank: false,
