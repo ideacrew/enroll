@@ -32,7 +32,7 @@ class HbxProfile
 
 
   # Maximum number of days an Employer may notify HBX of termination 
-   may terminate an employee and effective date
+  # may terminate an employee and effective date
   ShopRetroactiveTerminationMaximumInDays = 60
 
   # Number of days preceeding effective date that an employee may submit a plan enrollment 
