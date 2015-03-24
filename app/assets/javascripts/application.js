@@ -310,57 +310,60 @@ $(document).ready(function () {
     $(".overlay-in").css("display", "none");
   });
   
-  //Focus effect
-  $("#personal_info .floatlabel").focusin(function() {
-    $('#personal_info div.first').addClass('employee-info');
-    $("a.personal_info").css("color","#98cbff");
-    $("#personal_info div.first").css("opacity","1");
-  });
-  $("#personal_info .floatlabel").blur(function() {
-      $("#personal_info div.first").css("opacity","0.5");
+  // ----- Focus Effect & Progress -----
+  $("body").click(function(e) {
+  	fade_all();
+  	hide_all();
+  	if (e.target.id == "personal_info" || $(e.target).parents("#personal_info").size()) { 
+		$('#personal_info div.first').addClass('employee-info');
+		$("a.personal_info").css("color","#98cbff");
+		$("#personal_info div.first").css("opacity","1");
+		$("#top-pad15").show();
+	} 
+	else if (e.target.id == "address_info" || $(e.target).parents("#address_info").size()) {
+		$('#address_info div.first').addClass('employee-info');
+		$("a.address_info").css("color","#98cbff");
+		$("a.three").css("color","#00b420");
+		$("#address_info div.first").css("opacity","1");
+		$("#top-pad").innerHTML="30%";
+		$("#top-pad30").show();
+	}
+	else if (e.target.id == "phone_info" || $(e.target).parents("#phone_info").size()) {
+		$('#phone_info div.first').addClass('employee-info');
+		$("a.phone_info").css("color","#98cbff");
+		$("a.four").css("color","#00b420");
+		$("#phone_info div.first").css("opacity","1");
+		$("#top-pad80").show();
+	}
+	else if (e.target.id == "email_info" || $(e.target).parents("#email_info").size()) {
+		$('#email_info div.first').addClass('employee-info');
+		$("a.email_info").css("color","#98cbff");
+		$("a.five").css("color","#00b420");
+		$("#email_info div.first").css("opacity","1");
+		$("#top-pad85").show();
+	}
+	else if (e.target.id == "household_info" || $(e.target).parents("#household_info").size()) {
+		$('#household_info div.first').addClass('employee-info');
+		$("a.household_info").css("color","#98cbff");
+		$("#household_info div.first").css("opacity","1");
+	}
+	else {
+		$("#top-pad15").show();
+	}
   });
   
-  // $('#address_info div.first').addClass('employee-info');
-  $("#address_info .floatlabel").focusin(function() {
-      $('#address_info div.first').addClass('employee-info');
-      $("a.address_info").css("color","#98cbff");
-      $("a.three").css("color","#00b420");
-      $("#address_info div.first").css("opacity","1");
-      $("#top-pad").innerHTML="30%";
-
-  });
-  $("#address_info .floatlabel").blur(function() {
-      $("#address_info div.first").css("opacity","0.5");
-  });
-        
-  $("#phone_info .floatlabel").focusin(function() {
-      $('#phone_info div.first').addClass('employee-info');
-      $("a.phone_info").css("color","#98cbff");
-      $("a.four").css("color","#00b420");
-      $("#phone_info div.first").css("opacity","1");
-  });
-  $("#phone_info .floatlabel").blur(function() {
-      $("#phone_info div.first").css("opacity","0.5");
-  });
+  function fade_all() {
+	$("#personal_info div.first").css("opacity","0.5");
+	$("#address_info div.first").css("opacity","0.5");
+	$("#phone_info div.first").css("opacity","0.5");
+	$("#email_info div.first").css("opacity","0.5");
+	$("#household_info div.first").css("opacity","0.5");
+  }
   
-  $("#email_info .floatlabel").focusin(function() {
-      $('#email_info div.first').addClass('employee-info');
-      $("a.email_info").css("color","#98cbff");
-      $("a.five").css("color","#00b420");
-      $("#email_info div.first").css("opacity","1");
-  });
-  $("#email_info .floatlabel").blur(function() {
-      $("#email_info div.first").css("opacity","0.5");
-  });
-
-  $("#household_info .floatlabel").focusin(function() {
-    $('#household_info div.first').addClass('employee-info');
-    $("a.household_info").css("color","#98cbff");
-    $("#household_info div.first").css("opacity","1");
-  });
-  $("#household_info .floatlabel").blur(function() {
-      $("#household_info div.first").css("opacity","0.5");
-  });
+  function hide_all() {
+	$("#top-pad15").hide(); $("#top-pad30").hide();
+    $("#top-pad80").hide(); $("#top-pad85").hide();
+  }
 
   $("#dependent_ul .floatlabel").focusin(function() {
     $('.house').css("opacity","0.5");
@@ -370,29 +373,8 @@ $(document).ready(function () {
   });
   $("#dependent_ul .floatlabel").blur(function() {
     $(this).closest('.house').css("opacity","0.5");
-      // $("#dependent_ul div.first").css("opacity","0.5");
   });
-  
-  $("#address_info .floatlabel").focusin(function() {
-          $("#top-pad15").hide();
-          $("#top-pad30").show();
-          $("#top-pad80").hide();
-          $("#top-pad85").hide();
-  });  
-
-  $("#phone_info .floatlabel").focusin(function() {
-          $("#top-pad15").hide();
-          $("#top-pad30").hide();
-          $("#top-pad80").show();
-          $("#top-pad85").hide();
-  });    
-
-  $("#email_info .floatlabel").focusin(function() {
-          $("#top-pad15").hide();
-          $("#top-pad30").hide();
-          $("#top-pad80").hide();
-          $("#top-pad85").show();
-  });
+  // ----- Finish Focus Effect & Progress -----
   
   //Employee Dependents Page
   $('#dependents_info #top-pad15, #dependents_info #top-pad30, #dependents_info #top-pad80').hide();
