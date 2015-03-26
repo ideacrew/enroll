@@ -228,10 +228,6 @@ describe Family do
 
     context "family is updated" do
 
-      before(:each) do
-        second_person = FactoryGirl.create(:person, :male)
-      end
-
       it "should create coverage_household with the new family member" do
         new_family.save
         second_member = FactoryGirl.create(:family_member, family: new_family, person: second_person)
