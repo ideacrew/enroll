@@ -229,7 +229,6 @@ describe Family do
     context "family is updated" do
 
       it "should create coverage_household with the new family member" do
-        new_family.save
         second_member = FactoryGirl.create(:family_member, family: new_family, person: second_person)
         new_family.family_members.first.person.person_relationships << PersonRelationship.new({kind: 'spouse', relative_id: second_person.id})
 
@@ -241,7 +240,6 @@ describe Family do
       it "should create coverage_household when a family member removed" do
         second_member = FactoryGirl.create(:family_member, family: new_family, person: second_person)
         new_family.family_members.first.person.person_relationships << PersonRelationship.new({kind: 'brother', relative_id: second_person.id})
-        new_family.save
         new_family.family_members.last.delete
 
         expect(new_family.save).to be_truthy
