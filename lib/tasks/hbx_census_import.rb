@@ -21,6 +21,8 @@ class HbxCensusImport
     ees.each do |ee|
       er = EmployerProfile.find_by_fein(ee.fein)
       if er.present?
+        py = er.plan_years.last
+        bg = py.benefit_groups.last
         eefs = EmployerProfile.find_census_families_by_person(ee)
         # TODO: make sure first is the right one
         eef = eefs.first
@@ -37,6 +39,7 @@ class HbxCensusImport
           cee.terminated_on = ee.dot
           objects_to_save << cee
         end
+        bg.try(:employee)
       end
     end
 
