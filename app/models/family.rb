@@ -283,8 +283,11 @@ class Family
   end
 
   def get_household
-    return self.active_household if self.active_household #if active_houshold exists
-    return self.households.build #create a new empty household
+    if active_household
+     active_household  #if active_houshold exists
+    else
+     households.build #create a new empty household
+    end
   end
 
   def create_coverage_households(household)
