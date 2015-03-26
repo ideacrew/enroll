@@ -291,7 +291,7 @@ class Family
 
     household.coverage_households.delete_all #clear any existing
 
-    coverage_household = household.coverage_households.build({submitted_at: self.submitted_at})
+    coverage_household = household.coverage_households.build({submitted_at: submitted_at})
     coverage_household_for_others = nil
 
     family_members.each do |family_member|
@@ -309,13 +309,13 @@ class Family
   end
 
   def create_hbx_enrollments(household)
-    return if self.primary_applicant.nil?
+    return if primary_applicant.nil?
 
     household.hbx_enrollments.delete_all #clear any existing
 
-    policies = Policy.find_by_person(self.primary_applicant.person)
+    policies = Policy.find_by_person(primary_applicant.person)
 
-    policies.each do |policy|
+    policies.map do |policy|
       create_hbx_enrollment(household, policy)
     end
   end
@@ -324,15 +324,16 @@ class Family
     hbx_enrollement = household.hbx_enrollments.build
     hbx_enrollement.policy = policy
     hbx_enrollement.submitted_at = self.submitted_at
+    hbx_enrollement
   end
 
   def valid_relationship?(family_member)
-    return true if self.primary_applicant.nil? #responsible party case
-    return true if self.primary_applicant.person.id == family_member.person.id
+    return true if primary_applicant.nil? #responsible party case
+    return true if primary_applicant.person.id == family_member.person.id
 
     valid_relationships = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter}
 
-    if valid_relationships.include? self.primary_applicant.person.find_relationship_with(family_member.person)
+    if valid_relationships.include? primary_applicant.person.find_relationship_with(family_member.person)
       return true
     else
       return false
