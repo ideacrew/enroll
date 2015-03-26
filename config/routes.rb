@@ -68,6 +68,8 @@ Rails.application.routes.draw do
        get :challenge_identity
      end
    end
+
+  resources :employee_signup_matches, :only => [:new, :create]
  
 
   # Temporary for Generic Form Template
