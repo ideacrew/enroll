@@ -214,7 +214,6 @@ describe Family do
       end
 
 
-
       it "should create a hbx_enrollment" do
         plan = FactoryGirl.create(:directory_plan)
         enrollee = Enrollee.new({person: primary_person, coverage_start_on: Date.today})
@@ -246,6 +245,23 @@ describe Family do
         expect(new_family.active_household.coverage_households.length).to eq(1)
         expect(new_family.active_household.coverage_households.first.coverage_household_members.length).to eq(1)
       end
+
+      context "all family members removed" do
+        it "should have no coverage_household and no hbx_enrollment" do
+
+          #adding a policy, hence a hbx_enrollment
+          plan = FactoryGirl.create(:directory_plan)
+          enrollee = Enrollee.new({person: primary_person, coverage_start_on: Date.today})
+          policy = FactoryGirl.create(:policy, plan: plan, enrollees: [enrollee])
+
+          new_family.family_members.each(&:delete) #delete all family members
+
+          expect(new_family.save).to be_truthy
+          expect(new_family.active_household.coverage_households.blank?).to be_truthy
+          expect(new_family.active_household.hbx_enrollments.blank?).to be_truthy
+        end
+      end
+
     end
   end
 end
