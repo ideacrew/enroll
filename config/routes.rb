@@ -40,6 +40,8 @@ Rails.application.routes.draw do
       get 'dependent_details'
       post 'save_dependents'
       delete 'remove_dependents'
+      
+      get 'select_plan'
     end
     
   end

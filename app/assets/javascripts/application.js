@@ -484,6 +484,18 @@ $(document).ready(function () {
     };
   });
   
+  // Select Plan Page
+  $('#select-plan-container .personal_info').hide();
+  $('#select-plan-container #coverage-back').show();
+  $('#select-plan-container .coverage-options').removeClass('hidden');
+  $('#select-plan-container .coverage-options .arrow-right').show();
+  
+  $('#select-plan-btn1').click(function() {
+    $(".select-plan p.detail").hide();
+    $(this).hide();
+    $(".select-plan-details").show();
+  });
+  
   // Input Masks
   $(".phone_number").mask("(999) 999-9999");
   $(".zip").mask("99999");
