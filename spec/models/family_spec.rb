@@ -178,23 +178,20 @@ describe Family do
     let!(:second_person) { FactoryGirl.create(:person) }
 
     context "family is saved" do
-      let!(:new_family) { FactoryGirl.create(:family) }
+      let!(:new_family) { FactoryGirl.build(:family) }
       let!(:first_primary_member) { FactoryGirl.create(:family_member, :primary, family: new_family, person: primary_person) }
 
       it "should create a household" do
-        new_family.valid?
         expect(new_family.save).to be_truthy
         expect(new_family.households.length).to eq(1)
       end
 
       it "should create a coverage_household" do
-        new_family.valid?
         expect(new_family.save).to be_truthy
         expect(new_family.active_household.coverage_households.length).to eq(1)
       end
 
       it "should create a member in coverage_household" do
-        new_family.valid?
         expect(new_family.save).to be_truthy
         expect(new_family.active_household.coverage_households.first.coverage_household_members.length).to eq(1)
       end
@@ -203,14 +200,12 @@ describe Family do
         let!(:second_member) { FactoryGirl.create(:family_member, family: new_family, person: second_person) }
         it "should create coverage_household with 2 members (self and spouse)" do
           new_family.family_members.first.person.person_relationships << PersonRelationship.new({kind: 'spouse', relative_id: second_person.id})
-          new_family.valid?
           expect(new_family.save).to be_truthy
           expect(new_family.active_household.coverage_households.first.coverage_household_members.length).to eq(2)
         end
 
         it "should create one coverage_household for valid family_member (relationships) and another for the rest " do
           new_family.family_members.first.person.person_relationships << PersonRelationship.new({kind: 'brother', relative_id: second_person.id})
-          new_family.valid?
           expect(new_family.save).to be_truthy
           expect(new_family.active_household.coverage_households.length).to eq(2)
         end
@@ -218,12 +213,10 @@ describe Family do
       end
 
       it "should create a hbx_enrollment" do
-        directory_premium = FactoryGirl.create(:directory_premium)
         plan = FactoryGirl.create(:plan)
         enrollee = Enrollee.new({person: primary_person, coverage_start_on: Date.today})
         policy = FactoryGirl.create(:policy, plan: plan, enrollees: [enrollee])
 
-        new_family.valid?
         expect(new_family.save).to be_truthy
         expect(new_family.active_household.hbx_enrollments.length).to eq(1)
       end
