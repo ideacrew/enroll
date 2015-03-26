@@ -1,14 +1,19 @@
 require "tasks/hbx_employer_monkeypatch"
 
 class HbxEmployerImport
-  attr_reader :employer_file_name, :ignore_file_name
+  attr_reader :employer_file_name, :ignore_file_name, :plan_lookup_file_name
 
-  def initialize(employer_file_name, ignore_file_name)
+  def initialize(employer_file_name, ignore_file_name, plan_lookup_file_name)
     @employer_file_name = employer_file_name
     @ignore_file_name   = ignore_file_name
+    @plan_lookup_file_name = plan_lookup_file_name
   end
 
   def run
+    CSV.foreach(plan_lookup_file_name, headers: true) do |row|
+      PlanLookup.add_from_row(row)
+    end
+
     employers = []
     CSV.foreach(employer_file_name, headers: true) do |row|
       employers << Employer.from_row(row)
@@ -72,22 +77,6 @@ class HbxEmployerImport
   end
 end
 
-Location = Struct.new(
-      :metal_selection, :plan_count, :reference_plan_name,:reference_plan_id,
-      :employee_contribution, :dependent_contribution, :name
-)
-
-Location.class_eval do
-  def self.from_row(*args)
-    if args[2].present?
-      args = args.dup
-      int_indexes = [1,3,4,5]
-      int_indexes.each {|i| args[i] = args[i].to_i}
-      Location.new(*args)
-    end
-  end
-end
-
 Employer = Struct.new(
     :app_response_code, :enroll_type, :complete_date, :user_name,
     :company_external_id, :fein, :dba, :legal_name,
@@ -98,20 +87,8 @@ Employer = Struct.new(
     :address_2, :city, :state, :zip, :carrier_name, :locations,
     :broker_agency_id, :broker_first_name, :broker_last_name, :broker_email,
     :broker_external_id, :broker_npn, :assign_enter_date, :assign_end_date
-)
-
-Employer.class_eval do
+) do
   def self.from_row(row)
-    # columns 25 through 94 contain 10 locations of 7 fields each
-    loc_index = 25
-    loc_fields = 7
-    n_locs = 10
-    locations = (loc_index...(loc_index + (loc_fields * n_locs))).step(loc_fields).flat_map do |base|
-      location_fields = row.fields(base...(base + loc_fields))
-      location = Location.from_row(*location_fields)
-      location.present? ? location : []
-    end
-
     employer = Employer.new()
     employer.app_response_code           = row[0].to_i
     employer.enroll_type                 = row[1]
@@ -149,7 +126,6 @@ Employer.class_eval do
     employer.zip                         = row[23]
     employer.carrier_name                = row[24]
       # Aetna, CareFirst BlueCross BlueShield, Kaiser Permanente UnitedHealthcare
-    employer.locations                   = locations
     employer.broker_agency_id            = row[95].to_i
     employer.broker_first_name           = row[96]
     employer.broker_last_name            = row[97]
@@ -158,6 +134,18 @@ Employer.class_eval do
     employer.broker_npn                  = row[100].to_i
     employer.assign_enter_date           = row[101].to_date_safe
     employer.assign_end_date             = row[102].to_date_safe
+
+    # columns 25 through 94 contain 10 locations of 7 fields each
+    loc_index = 25
+    loc_fields = 7
+    n_locs = 10
+    locations = (loc_index...(loc_index + (loc_fields * n_locs))).step(loc_fields).flat_map do |base|
+      location_fields = [employer] + row.fields(base...(base + loc_fields))
+      location = Location.from_row(*location_fields)
+      location.present? ? location : []
+    end
+    employer.locations                   = locations
+
     employer
   end
 
@@ -199,25 +187,7 @@ Employer.class_eval do
       py.fte_count = census_count
 
       locations.each do |loc|
-        bg = py.benefit_groups.build
-        case new_hire_wait_index
-        when 1
-          bg.effective_on_kind = "date_of_hire"
-          bg.effective_on_offset = 0
-        when 2
-          bg.effective_on_kind = "first_of_month"
-          bg.effective_on_offset = 0
-        when 3
-          bg.effective_on_kind = "first_of_month"
-          bg.effective_on_offset = 30
-        when 4
-          bg.effective_on_kind = "first_of_month"
-          bg.effective_on_offset = 60
-        end
-        # TODO: figure out how to match plans
-        # bg.reference_plan =
-        bg.premium_pct_as_int = loc.employee_contribution
-        bg.title = loc.name
+        bg = loc.create_or_update_benefit_group(py)
       end
 
       # oer.broker_agency_id = broker_agency_id # TODO: fix, this isn't really our broker_agency_id
@@ -226,5 +196,72 @@ Employer.class_eval do
       # TODO: must save here because later rows might be updates to this employer
     end
     o
+  end
+end
+
+Location = Struct.new(:employer,
+      :metal_selection, :plan_count, :reference_plan_name,:reference_plan_id,
+      :employee_contribution, :dependent_contribution, :name
+) do
+  def self.from_row(*args)
+    if args[2].present?
+      args = args.dup
+      int_indexes = [2,4,5,6]
+      int_indexes.each {|i| args[i] = args[i].to_i}
+      Location.new(*args)
+    end
+  end
+
+  def create_or_update_benefit_group(plan_year)
+    bg = plan_year.benefit_groups.build
+    case new_hire_wait_index
+    when 1
+      bg.effective_on_kind = "date_of_hire"
+      bg.effective_on_offset = 0
+    when 2
+      bg.effective_on_kind = "first_of_month"
+      bg.effective_on_offset = 0
+    when 3
+      bg.effective_on_kind = "first_of_month"
+      bg.effective_on_offset = 30
+    when 4
+      bg.effective_on_kind = "first_of_month"
+      bg.effective_on_offset = 60
+    end
+    bg.premium_pct_as_int = loc.employee_contribution
+
+    bg.title = loc.name
+    # TODO: figure out how to match plans
+    bg.reference_plan = nil
+
+    bg
+  end
+end
+
+PlanLookup = Struct.new(:carrier_name, :hios_id, :mapping_id, :display_name, :metal,
+                        :cert_start_on, :cert_end_on, :activation_start_on,
+                        :activation_end_on
+) do
+  def self.add_from_row(row)
+    lookup = PlanLookup.new
+    lookup.carrier_name = row[1]
+    lookup.hios_id = row[2]
+    lookup.mapping_id = row[7]
+    lookup.display_name = row[8]
+    lookup.metal = row[11]
+    lookup.cert_start_on = row[16].to_date_safe
+    lookup.cert_end_on = row[17].to_date_safe
+    lookup.activation_start_on = row[18].to_date_safe
+    lookup.activation_end_on = row[19].to_date_safe
+    lookups[[lookup.carrier_name, lookup.display_name]] = lookup
+  end
+
+  def self.lookup(carrier_name, plan_name)
+  end
+
+  private
+
+  def self.lookups
+    @lookups = {} if @lookups.nil?
   end
 end
