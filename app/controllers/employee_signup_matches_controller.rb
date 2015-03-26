@@ -11,6 +11,11 @@ class EmployeeSignupMatchesController < ApplicationController
       @employee_signup = @service.call(@form)
       # render the correct action here for the
       # 'found person' form
+      if @employee_signup
+        render 'employee_signups/new'
+      else
+        render 'no_match'
+      end
     else
       render 'new'
     end
