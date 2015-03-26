@@ -213,7 +213,7 @@ describe Family do
       end
 
       it "should create a hbx_enrollment" do
-        plan = FactoryGirl.create(:plan)
+        plan = FactoryGirl.create(:directory_plan)
         enrollee = Enrollee.new({person: primary_person, coverage_start_on: Date.today})
         policy = FactoryGirl.create(:policy, plan: plan, enrollees: [enrollee])
 
