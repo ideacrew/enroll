@@ -203,12 +203,9 @@ class Family
   end
 
   def active_household
-
-    household = self.households.detect do |household|
+    households.detect do |household|
       household.is_active?
     end
-
-    return household
   end
 
   def find_irs_group_by_irs_group_id(irs_group_id)
