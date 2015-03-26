@@ -187,7 +187,7 @@ Employer = Struct.new(
       py.fte_count = census_count
 
       locations.each do |loc|
-        bg = loc.create_or_update_benefit_group(py)
+        bg = loc.create_or_update_benefit_group(self, py)
       end
 
       # oer.broker_agency_id = broker_agency_id # TODO: fix, this isn't really our broker_agency_id
@@ -212,9 +212,9 @@ Location = Struct.new(:employer,
     end
   end
 
-  def create_or_update_benefit_group(plan_year)
+  def create_or_update_benefit_group(employer, plan_year)
     bg = plan_year.benefit_groups.build
-    case new_hire_wait_index
+    case employer.new_hire_wait_index
     when 1
       bg.effective_on_kind = "date_of_hire"
       bg.effective_on_offset = 0
@@ -228,11 +228,14 @@ Location = Struct.new(:employer,
       bg.effective_on_kind = "first_of_month"
       bg.effective_on_offset = 60
     end
-    bg.premium_pct_as_int = loc.employee_contribution
+    bg.premium_pct_as_int = employee_contribution
+    bg.employer_max_amt_in_cents = 0
 
-    bg.title = loc.name
+    bg.title = name
     # TODO: figure out how to match plans
     bg.reference_plan = nil
+
+    bg.benefit_list = BenefitGroup.simple_benefit_list(employee_contribution, dependent_contribution, 0)
 
     bg
   end
@@ -242,6 +245,11 @@ PlanLookup = Struct.new(:carrier_name, :hios_id, :mapping_id, :display_name, :me
                         :cert_start_on, :cert_end_on, :activation_start_on,
                         :activation_end_on
 ) do
+
+  def plan
+
+  end
+
   def self.add_from_row(row)
     lookup = PlanLookup.new
     lookup.carrier_name = row[1]
@@ -257,11 +265,13 @@ PlanLookup = Struct.new(:carrier_name, :hios_id, :mapping_id, :display_name, :me
   end
 
   def self.lookup(carrier_name, plan_name)
+    @lookups[[carrier_name, plan_name]]
   end
 
   private
 
   def self.lookups
     @lookups = {} if @lookups.nil?
+    @lookups
   end
 end

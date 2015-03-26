@@ -37,7 +37,7 @@ class BenefitGroup
   embeds_many :elected_plans
 
   validates_presence_of :benefit_list, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
-  :premium_pct_as_int, :employer_max_amt_in_cents#, :reference_plan_id
+    :premium_pct_as_int, :employer_max_amt_in_cents, :reference_plan_id
 
   validates :effective_on_kind,
     allow_blank: false,
@@ -82,8 +82,8 @@ private
     (Rational(amount_in_cents) / Rational(100)).to_f if amount_in_cents
   end
 
-  def self.simple_benefit_list(employee_premium_pct, dependent_premium_pct, employer_max_amt)
-    benefits = [Benefit.new(:employee, employee_premium_pct, employer_max_amt)]
+  def self.simple_benefit_list(employee_premium_pct, dependent_premium_pct, employer_max_amount)
+    benefits = [Benefit.new(:employee, employee_premium_pct, employer_max_amount)]
     PERSONAL_RELATIONSHIP_KINDS.collect do |relationship|
       Benefit.new(relationship, dependent_premium_pct, employer_max_amount)
     end
