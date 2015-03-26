@@ -216,11 +216,15 @@ class Family
 
   def update_household
 
-    return if family_members.length == 0
-
     household = get_household
-    create_hbx_enrollments(household)
-    create_coverage_households(household)
+
+    if family_members.blank?
+      household.coverage_households.delete_all
+      household.hbx_enrollments.delete_all
+    else
+      create_hbx_enrollments(household)
+      create_coverage_households(household)
+    end
   end
 
   private
