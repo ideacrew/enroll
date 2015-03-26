@@ -207,6 +207,14 @@ describe Family do
           expect(new_family.save).to be_truthy
           expect(new_family.active_household.coverage_households.first.coverage_household_members.length).to eq(2)
         end
+
+        it "should create one coverage_household for valid family_member (relationships) and another for the rest " do
+          new_family.family_members.first.person.person_relationships << PersonRelationship.new({kind: 'brother', relative_id: second_person.id})
+          new_family.valid?
+          expect(new_family.save).to be_truthy
+          expect(new_family.active_household.coverage_households.length).to eq(2)
+        end
+
       end
 
       it "should create a hbx_enrollment" do
