@@ -30,7 +30,8 @@ class RegistrationsController < Devise::RegistrationsController
     profile = User::PROFILES
     referer = params["user"]["referer"]
     referer = @@referer.present? ? @@referer : (referer || "")
-    params["user"]["role"] = if referer.include?("employers")
+
+    params["user"]["roles"] = if referer.include?("employers")
         [profile[:employer_profile]]
       elsif referer.include?("brokers")
         [profile[:broker_profile]]
@@ -63,12 +64,12 @@ class RegistrationsController < Devise::RegistrationsController
   protected
 
   def after_sign_up_path_for(user)
-    role, profile = user.role, User::PROFILES
-    if role.include?(profile[:employer_profile])
+    roles, profile = user.roles, User::PROFILES
+    if roles.include?(profile[:employer_profile])
       new_employers_employer_path
-    elsif role.include?(profile[:broker_profile])
+    elsif roles.include?(profile[:broker_profile])
       new_brokers_broker_path
-    elsif role.include?(profile[:employee_profile])
+    elsif roles.include?(profile[:employee_profile])
       new_person_path
     else
       root_path

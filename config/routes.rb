@@ -40,6 +40,8 @@ Rails.application.routes.draw do
       get 'dependent_details'
       post 'save_dependents'
       delete 'remove_dependents'
+      
+      get 'select_plan'
     end
     
   end
@@ -66,6 +68,8 @@ Rails.application.routes.draw do
        get :challenge_identity
      end
    end
+
+  resources :employee_roles, :only => [:new, :create]
  
 
   # Temporary for Generic Form Template

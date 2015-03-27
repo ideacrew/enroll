@@ -5,8 +5,8 @@ class HbxProfile
 
   embedded_in :organization
 
-  HbxName = "DC HealthLink"
-  HbxCmsId = "DC0"
+  Name = "DC HealthLink"
+  CmsId = "DC0"
 
   ## Application-level caching
 
@@ -30,9 +30,16 @@ class HbxProfile
   ## SHOP Market HBX Policies
   # Employer Contribution Strategies
 
+
+  # Maximum number of days an Employer may notify HBX of termination 
+  # may terminate an employee and effective date
   ShopRetroactiveTerminationMaximumInDays = 60
-  ShopEnrollmentPeriodMaximumBeforeEligibilityInDays = 30
-  ShopEnrollmentPeriodMinimumAfterRosterEntryInDays = 30
+
+  # Number of days preceeding effective date that an employee may submit a plan enrollment 
+  ShopMaximumEnrollmentPeriodBeforeEligibilityInDays = 30
+
+  # Minimum number of days an employee may submit a plan, following addition or correction to Employer roster
+  ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30
 
 end
 

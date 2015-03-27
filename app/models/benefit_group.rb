@@ -19,7 +19,7 @@ class BenefitGroup
 
   field :title, type: String, default: ""
 
-  field :benefit_list, type: Array, default: PERSONAL_RELATIONSHIP_KINDS[0...-1]
+  field :benefit_list, type: Array, default: []
   field :effective_on_kind, type: String, default: "date_of_hire"
   field :terminate_on_kind, type: String, default: "end_of_month"
 
@@ -34,10 +34,10 @@ class BenefitGroup
   field :premium_pct_as_int, type: Integer, default: Integer
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
-  #embeds_many :elected_plans
+  embeds_many :elected_plans
 
   validates_presence_of :benefit_list, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
-    :reference_plan_id, :premium_pct_as_int, :employer_max_amt_in_cents
+    :premium_pct_as_int, :employer_max_amt_in_cents, :reference_plan_id
 
   validates :effective_on_kind,
     allow_blank: false,
@@ -82,6 +82,12 @@ private
     (Rational(amount_in_cents) / Rational(100)).to_f if amount_in_cents
   end
 
+  def self.simple_benefit_list(employee_premium_pct, dependent_premium_pct, employer_max_amount)
+    benefits = [Benefit.new(:employee, employee_premium_pct, employer_max_amount)]
+    PERSONAL_RELATIONSHIP_KINDS.collect do |relationship|
+      Benefit.new(relationship, dependent_premium_pct, employer_max_amount)
+    end
+  end
 
 # Non-congressional
 # pick reference plan
@@ -93,5 +99,4 @@ private
 # may be applied toward and other offered plan
 # never pay more than premium per person
 # extra may not be applied toward other members
-
 end

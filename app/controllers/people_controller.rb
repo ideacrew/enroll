@@ -233,6 +233,10 @@ class PeopleController < ApplicationController
     # end
   end
   
+  def select_plan
+    
+  end
+  
 
 private
   def build_nested_models

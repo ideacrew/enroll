@@ -8,6 +8,8 @@ module Forms
     attr_accessor :gender, :ssn, :date_of_birth
     attr_reader :ssn
 
+    attr_accessor :user_id
+
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
     include Validations::USDate.on(:date_of_birth)
@@ -26,7 +28,18 @@ module Forms
       end
     end
 
-    def match_census_employee
+    def match_census_employees
+      EmployerCensus::Employee.where({
+        :dob => dob,
+        :ssn => ssn        
+      })
+    end
+
+    def match_person
+      Person.where({
+        :dob => dob,
+        :ssn => ssn        
+      }).first
     end
   end
 end
