@@ -1,7 +1,8 @@
 class LifeEvent
   include Mongoid::Document
   include Mongoid::Timestamps
-  include Mongoid::Versioning
+
+  embedded_in :hbx_profile
 
   KINDS = %w[add_member drop_member change_benefit terminate_benefit administrative]
   MARKET_KINDS = %w[shop individual]
@@ -26,4 +27,16 @@ class LifeEvent
   field :description, type: String
   field :is_self_attested, type: Mongoid::Boolean
   
+
+
+  class << self
+    def shop_market_events
+      Organization.hbx_profile.life_event.where("market_kind" => "shop").to_a
+    end
+
+    def individual_market_events
+      Organization.hbx_profile.life_event.where("market_kind" => "individual").to_a
+    end
+  end
+
 end

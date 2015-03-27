@@ -78,6 +78,10 @@ class EmployeeRole
     benefit_group.find(self.benefit_group_id) unless benefit_group_id.blank?
   end
 
+  def census_family
+    EmployerCensus::EmployeeFamily.find_by_employee_role(self)
+  end
+
   def is_active?
     self.is_active
   end

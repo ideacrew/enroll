@@ -133,9 +133,21 @@ class EmployerCensus::EmployeeFamily
 
   class << self
     def find_by_employee_role(employee_role)
-      where(employee_role_id: employee_role._id).first
+      organizations = Organization.where("employer_profile.employee_families.employee_role_id" => employee_role._id).to_a
+      return nil if organizations.size != 1
+      organizations.first.employer_profile.employee_families.detect { | family | family.employee_role_id == employee_role._id }
     end
   end
+
+private
+  # Apply business rules for when an enrollment -- outside open enrollment -- is considered timely, including:
+  # Number of days preceeding effective date that an employee may submit a plan enrollment 
+  # Minimum number of days an employee may submit a plan, following addition or correction to Employer roster
+
+  def is_timely_special_enrollment?
+    # Employee has 
+  end
+
 
 end
 

@@ -5,7 +5,7 @@ class Person
 
   GENDER_KINDS = %W(male female)
 
-#  auto_increment :hbx_id, :seed => 9999
+ auto_increment :hbx_id, :seed => 9999
 
   field :hbx_id, type: Integer
   field :name_pfx, type: String
@@ -69,13 +69,16 @@ class Person
 
   before_save :update_full_name
 
-  index({hbx_id: 1}) #, {unique: true})
+  index({hbx_id: 1}, {unique: true})
+
   index({last_name:  1})
   index({first_name: 1})
   index({last_name: 1, first_name: 1})
   index({first_name: 1, last_name: 1})
-  index({ssn: 1}, {sparse: true}) # , unique: true})
+
+  index({ssn: 1}, {sparse: true, unique: true})
   index({dob: 1}, {sparse: true})
+
   index({last_name: 1, dob: 1}, {sparse: true})
 
   # Broker child model indexes
