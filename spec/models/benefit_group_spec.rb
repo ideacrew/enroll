@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe BenefitGroup, type: :model do
-  it { should validate_presence_of :benefit_list }
+  it { should validate_presence_of :relationship_benefits }
   it { should validate_presence_of :effective_on_kind }
   it { should validate_presence_of :terminate_on_kind }
   it { should validate_presence_of :effective_on_offset }

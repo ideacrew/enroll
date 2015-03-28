@@ -71,10 +71,10 @@ module Hbx
     end
 
     def create_employer_organizations
-      employer_organizations = employers.collect(&:create_or_update_employer_organization)
+      self.employer_organizations = employers.collect(&:create_or_update_employer_organization)
     end
 
-    def found_organization_count
+    def found_employer_organization_count
       employers.reduce(0) do |count, employer|
         if Organization.where("fein" => employer.fein).count > 0
           count + 1
@@ -84,7 +84,7 @@ module Hbx
       end
     end
 
-    def new_employer_organizations
+    def new_employer_organizations_count
       employer_organizations.reject(&:persisted?).count
     end
 
@@ -173,7 +173,7 @@ module Hbx
       employer.assign_enter_date           = row["ASSIGN_ENTER_DATE"].to_date_safe
       employer.assign_end_date             = row["ASSIGN_END_DATE"].to_date_safe
 
-      employer.locations = locations_from_row(row)
+      employer.locations = locations_from_row(row, employer)
       employer
     end
 
@@ -193,8 +193,8 @@ module Hbx
     def create_or_update_employer_organization
       # if organization exists compare with existing, and
       # update if this employer is the latest version
-      organization = Organization.where("fein" => fein).first
-      if organization.nil?
+      self.organization = Organization.where("fein" => fein).first
+      if organization.present?
         # TODO: for each updateable field, update if new
       else
         build_organization
@@ -208,7 +208,7 @@ module Hbx
     end
 
     def build_organization
-      organization = Organization.new
+      self.organization = Organization.new
       organization.legal_name = legal_name
       organization.dba = dba
       organization.fein = fein
@@ -216,7 +216,7 @@ module Hbx
     end
 
     def build_office_location
-      ol = organization.office_locations.build
+      ol = OfficeLocation.new(organization: organization)
 
       ola = ol.build_address
       ola.kind = "work"
@@ -232,12 +232,12 @@ module Hbx
     end
 
     def build_employer_profile
-      employer_profile = organization.build_employer_profile
+      self.employer_profile = organization.build_employer_profile
       employer_profile.entity_kind = "c_corporation" # TODO: fix, this should probably come from the data
     end
 
     def build_plan_year
-      plan_year = oer.plan_years.build
+      self.plan_year = employer_profile.plan_years.build
       plan_year.start_on = effective_date
       plan_year.end_on = ((effective_date + 1.year) - 1.day).to_date
       plan_year.open_enrollment_start_on = open_enrollment_start
@@ -263,11 +263,11 @@ module Hbx
 
   Location = Struct.new(
     :employer, :metal_selection, :plan_count, :reference_plan_name,
-    :plan_display_name, :reference_plan_id, :hios, :employee_contribution,
+    :plan_display_name, :reference_plan_id, :hios_id, :employee_contribution,
     :dependent_contribution, :name
   ) do
     def self.from_row(*args)
-      if args[2].present?
+      if args[3].present?
         args = args.dup
         int_indexes = [2,5,7,8]
         int_indexes.each {|i| args[i] = args[i].to_i}
@@ -279,17 +279,14 @@ module Hbx
 
     def create_or_update_benefit_group(employer, plan_year)
       build_benefit_group(employer, plan_year)
-      build_
-      # TODO: figure out how to match plans
-      benefit_group.reference_plan = nil
-
-      benefit_group.benefit_list = BenefitGroup.simple_benefit_list(employee_contribution, dependent_contribution, 0)
-
+      build_benefit_group_plans(employer, plan_year)
+      benefit_group.relationship_benefits =
+        benefit_group.simple_benefit_list(employee_contribution, dependent_contribution, 0)
       benefit_group
     end
 
     def build_benefit_group(employer, plan_year)
-      benefit_group = plan_year.benefit_groups.build
+      self.benefit_group = plan_year.benefit_groups.build
       case employer.new_hire_wait_index
       when 1
         benefit_group.effective_on_kind = "date_of_hire"
@@ -308,6 +305,23 @@ module Hbx
       benefit_group.employer_max_amt_in_cents = 0
       benefit_group.title = name
     end
+
+    def build_benefit_group_plans(employer, plan_year)
+      benefit_group.reference_plan = PlanLookup.find_reference_plan(hios_id, plan_year.start_on.year)
+      build_benefit_group_elected_plans(employer, plan_year)
+    end
+
+    def build_benefit_group_elected_plans(employer, plan_year)
+      reference_plan = benefit_group.reference_plan
+      benefit_group.elected_plans = case
+      when plan_count == 1
+        elected_plans = [reference_plan._id]
+      when metal_selection.present?
+        elected_plans = PlanLookup.find_plans_by_metal_level(metal_selection, reference_plan.active_year)
+      when employer.carrier_name.present?
+        elected_plans = PlanLookup.find_plans_by_carrier(reference_plan.carrier_profile, reference_plan.active_year)
+      end
+    end
   end
 
   PlanLookup = Struct.new(:carrier_name, :hios_id, :mapping_id, :display_name, :metal,
@@ -315,8 +329,34 @@ module Hbx
                           :activation_end_on
   ) do
 
-    def plan
+    def self.find_reference_plan(hios_id, year)
+      key = "#{year} - #{hios_id}"
+      @reference_plans = {} unless @reference_plans
+      if @reference_plans.has_key?(key)
+        @reference_plans[key]
+      else
+        @reference_plans[key] = Plan.shop_market.where(hios_id: hios_id).and(active_year: year).first
+      end
+    end
 
+    def self.find_plans_by_carrier(carrier_profile, year)
+      key = "#{year} - #{carrier_profile._id}"
+      @carrier_plans = {} unless @carrier_plans
+      if @carrier_plans.has_key?(key)
+        @carrier_plans[key]
+      else
+        @carrier_plans[key] = carrier_profile.plans.where(active_year: year).collect(&:_id)
+      end
+    end
+
+    def self.find_plans_by_metal_level(metal_level, year)
+      key = "#{year} - #{metal_level}"
+      @metal_plans = {} unless @metal_plans
+      if @metal_plans.has_key?(key)
+        @metal_plans[key]
+      else
+        @metal_plans[key] = Plan.shop_market.where(metal_level: metal_level).and(active_year: year).collect(&:_id)
+      end
     end
 
     def self.add_from_row(row)

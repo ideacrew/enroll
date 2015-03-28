@@ -19,7 +19,8 @@ class BenefitGroup
 
   field :title, type: String, default: ""
 
-  field :benefit_list, type: Array, default: []
+  embeds_many :relationship_benefits
+
   field :effective_on_kind, type: String, default: "date_of_hire"
   field :terminate_on_kind, type: String, default: "end_of_month"
 
@@ -34,9 +35,10 @@ class BenefitGroup
   field :premium_pct_as_int, type: Integer, default: Integer
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
-  embeds_many :elected_plans
+  # Array of plan_ids
+  field :elected_plans, type: Array, default: []
 
-  validates_presence_of :benefit_list, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
+  validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
     :premium_pct_as_int, :employer_max_amt_in_cents, :reference_plan_id
 
   validates :effective_on_kind,
@@ -73,6 +75,20 @@ class BenefitGroup
     cents_to_dollars(employer_max_amt_in_cents)
   end
 
+  def simple_benefit_list(employee_premium_pct, dependent_premium_pct, employer_max_amount)
+    [
+      RelationshipBenefit.new(benefit_group: self,
+                              relationship: :employee,
+                              premium_pct: employee_premium_pct,
+                              employer_max_amt: employer_max_amount)
+    ] + PERSONAL_RELATIONSHIP_KINDS[1...-1].collect do |relationship|
+      RelationshipBenefit.new(benefit_group: self,
+                              relationship: relationship,
+                              premium_pct: dependent_premium_pct,
+                              employer_max_amt: employer_max_amount)
+    end
+  end
+
 private
   def dollars_to_cents(amount_in_dollars)
     Rational(amount_in_dollars) * Rational(100) if amount_in_dollars
@@ -80,13 +96,6 @@ private
 
   def cents_to_dollars(amount_in_cents)
     (Rational(amount_in_cents) / Rational(100)).to_f if amount_in_cents
-  end
-
-  def self.simple_benefit_list(employee_premium_pct, dependent_premium_pct, employer_max_amount)
-    benefits = [Benefit.new(:employee, employee_premium_pct, employer_max_amount)]
-    PERSONAL_RELATIONSHIP_KINDS.collect do |relationship|
-      Benefit.new(relationship, dependent_premium_pct, employer_max_amount)
-    end
   end
 
 # Non-congressional
