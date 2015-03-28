@@ -10,7 +10,7 @@ class HbxEmployerImport
     @plan_lookup_file_name = plan_lookup_file_name
     @employers = []
     @user_blacklist = []
-    @organizations = []
+    @employer_organizations = []
   end
 
   def run
@@ -70,7 +70,7 @@ class HbxEmployerImport
   end
 
   def create_employer_organizations
-    organizations = employers.collect(&:create_or_update_organization)
+    employer_organizations = employers.collect(&:create_or_update_employer_organization)
   end
 
   def found_organization_count
@@ -84,7 +84,7 @@ class HbxEmployerImport
   end
 
   def new_employer_organizations
-    organizations.reject(&:persisted?).count
+    employer_organizations.reject(&:persisted?).count
   end
 
   def save_employer_organizations
@@ -159,75 +159,104 @@ Employer = Struct.new(
     employer.state                       = row[22]
     employer.zip                         = row[23]
     employer.carrier_name                = row[24]
-    employer.broker_agency_id            = row[95].to_i
-    employer.broker_first_name           = row[96]
-    employer.broker_last_name            = row[97]
-    employer.broker_email                = row[98]
-    employer.broker_external_id          = row[99].to_i
-    employer.broker_npn                  = row[100].to_i
-    employer.assign_enter_date           = row[101].to_date_safe
-    employer.assign_end_date             = row[102].to_date_safe
 
-    # columns 25 through 94 contain 10 locations of 7 fields each
+    # switched to column labels because row numbers changed
+    # the rest should probably be switched to this
+    # but it can wait
+    employer.broker_agency_id            = row["BROKERCOMPANYID"].to_i
+    employer.broker_first_name           = row["AGENT_FIRST_NAME"]
+    employer.broker_last_name            = row["AGENT_LAST_NAME"]
+    employer.broker_email                = row["AGENT_EMAIL"]
+    employer.broker_external_id          = row["AGENT_EXTERNAL_ID"].to_i
+    employer.broker_npn                  = row["AGENT_LICENSE_ID"].to_i
+    employer.assign_enter_date           = row["ASSIGN_ENTER_DATE"].to_date_safe
+    employer.assign_end_date             = row["ASSIGN_END_DATE"].to_date_safe
+
+    employer.locations = locations_from_row(row)
+    employer
+  end
+
+  def self.locations_from_row(row, employer)
     loc_index = 25
     loc_fields = Location.members.count - 1 # employer is artificially injected at the beginning
     n_locs = 10
-    locations = (loc_index...(loc_index + (loc_fields * n_locs))).step(loc_fields).flat_map do |base|
+    (loc_index...(loc_index + (loc_fields * n_locs))).step(loc_fields).flat_map do |base|
       location_fields = [employer] + row.fields(base...(base + loc_fields))
       location = Location.from_row(*location_fields)
       location.present? ? location : []
     end
-    employer.locations = locations
-    employer
   end
 
-  def create_or_update_organization
+  attr_accessor :organization, :employer_profile, :plan_year
+
+  def create_or_update_employer_organization
     # if organization exists compare with existing, and
     # update if this employer is the latest version
-    o = Organization.where("fein" => fein).first
-    if o
+    organization = Organization.where("fein" => fein).first
+    if organization.nil?
       # TODO: for each updateable field, update if new
     else
-      o = Organization.new
-      o.legal_name = legal_name
-      o.dba = dba
-      o.fein = fein
-      o.is_active = true
-
-      ol = o.office_locations.build
-
-      ola = ol.build_address
-      ola.kind = "work"
-      ola.address_1 = address_1
-      ola.address_2 = address_2
-      ola.city = city
-      ola.state = state
-      ola.zip = zip
-
-      olp = ol.build_phone
-      olp.kind = "work"
-      olp.full_phone_number = poc_phone
-
-      oer = o.build_employer_profile
-      oer.entity_kind = "c_corporation" # TODO: fix, this should probably come from the data
-
-      py = oer.plan_years.build
-      py.start_on = effective_date
-      py.end_on = ((effective_date + 1.year) - 1.day).to_date
-      py.open_enrollment_start_on = open_enrollment_start
-      py.open_enrollment_end_on = open_enrollment_end
-      py.fte_count = census_count
-
-      locations.each do |loc|
-        bg = loc.create_or_update_benefit_group(self, py)
-      end
-
-      # oer.broker_agency_id = broker_agency_id # TODO: fix, this isn't really our broker_agency_id
-      # oer.
-
-      # TODO: must save here because later rows might be updates to this employer
+      build_organization
+      build_office_location
+      build_employer_profile
+      build_plan_year
+      build_benefit_groups
+      build_broker
     end
-    o
+    organization
+  end
+
+  def build_organization
+    organization = Organization.new
+    organization.legal_name = legal_name
+    organization.dba = dba
+    organization.fein = fein
+    organization.is_active = true
+  end
+
+  def build_office_location
+    ol = organization.office_locations.build
+
+    ola = ol.build_address
+    ola.kind = "work"
+    ola.address_1 = address_1
+    ola.address_2 = address_2
+    ola.city = city
+    ola.state = state
+    ola.zip = zip
+
+    olp = ol.build_phone
+    olp.kind = "work"
+    olp.full_phone_number = poc_phone
+  end
+
+  def build_employer_profile
+    employer_profile = organization.build_employer_profile
+    employer_profile.entity_kind = "c_corporation" # TODO: fix, this should probably come from the data
+  end
+
+  def build_plan_year
+    plan_year = oer.plan_years.build
+    plan_year.start_on = effective_date
+    plan_year.end_on = ((effective_date + 1.year) - 1.day).to_date
+    plan_year.open_enrollment_start_on = open_enrollment_start
+    plan_year.open_enrollment_end_on = open_enrollment_end
+    plan_year.fte_count = census_count
+  end
+
+  def build_benefit_groups
+    locations.each do |location|
+      build_benefit_group(location, plan_year)
+    end
+  end
+
+  def build_benefit_group(location, plan_year)
+    benefit_group = location.create_or_update_benefit_group(self, plan_year)
+  end
+
+  def build_broker
+    # oer.broker_agency_id = broker_agency_id # TODO: fix, this isn't really our broker_agency_id
+    # oer.
   end
 end
 
@@ -245,32 +274,38 @@ Location = Struct.new(
     end
   end
 
+  attr_accessor :benefit_group
+
   def create_or_update_benefit_group(employer, plan_year)
-    bg = plan_year.benefit_groups.build
+    build_benefit_group(employer, plan_year)
+    build_
+    # TODO: figure out how to match plans
+    benefit_group.reference_plan = nil
+
+    benefit_group.benefit_list = BenefitGroup.simple_benefit_list(employee_contribution, dependent_contribution, 0)
+
+    benefit_group
+  end
+
+  def build_benefit_group(employer, plan_year)
+    benefit_group = plan_year.benefit_groups.build
     case employer.new_hire_wait_index
     when 1
-      bg.effective_on_kind = "date_of_hire"
-      bg.effective_on_offset = 0
+      benefit_group.effective_on_kind = "date_of_hire"
+      benefit_group.effective_on_offset = 0
     when 2
-      bg.effective_on_kind = "first_of_month"
-      bg.effective_on_offset = 0
+      benefit_group.effective_on_kind = "first_of_month"
+      benefit_group.effective_on_offset = 0
     when 3
-      bg.effective_on_kind = "first_of_month"
-      bg.effective_on_offset = 30
+      benefit_group.effective_on_kind = "first_of_month"
+      benefit_group.effective_on_offset = 30
     when 4
-      bg.effective_on_kind = "first_of_month"
-      bg.effective_on_offset = 60
+      benefit_group.effective_on_kind = "first_of_month"
+      benefit_group.effective_on_offset = 60
     end
-    bg.premium_pct_as_int = employee_contribution
-    bg.employer_max_amt_in_cents = 0
-
-    bg.title = name
-    # TODO: figure out how to match plans
-    bg.reference_plan = nil
-
-    bg.benefit_list = BenefitGroup.simple_benefit_list(employee_contribution, dependent_contribution, 0)
-
-    bg
+    benefit_group.premium_pct_as_int = employee_contribution
+    benefit_group.employer_max_amt_in_cents = 0
+    benefit_group.title = name
   end
 end
 
