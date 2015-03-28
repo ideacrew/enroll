@@ -137,7 +137,7 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
 
     context "and the eligibility date is too far in future" do
 
-      pendind "use HbxProfile:ShopMaximumEnrollmentPeriodBeforeEligibilityInDays"
+      pending "use HbxProfile:ShopMaximumEnrollmentPeriodBeforeEligibilityInDays"
       it "should" do 
       end
     end
