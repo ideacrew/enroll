@@ -1,5 +1,5 @@
 require "rails_helper"
-require "tasks/hbx_employer_monkeypatch"
+require "tasks/hbx/employer_monkeypatch"
 
 describe String do
   context "with a date representation" do
