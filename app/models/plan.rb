@@ -73,10 +73,9 @@ class Plan
      message: "%{value} is not a valid market" 
    }
              
-  validates :active_year,
-    length: { minimum: 4, maximum: 4, message: "active year must be four digits" },
-    numericality: { greater_than: 2013, less_than: 2020, message: "active year must fall between 2014..2019" },
-    allow_blank: false
+  validates_inclusion_of :active_year, 
+    in: 2014..(Date.today.year + 3), 
+    message: "%{value} is an invalid active year"
   
   ## Scopes
   # Metal level

@@ -10,10 +10,12 @@ RSpec.describe Plan, type: :model do
   def metal_level; "platinum"; end
   def coverage_kind; "health"; end
   def market; "shop"; end
-
-  def bad_metal_level; "copper"; end
   def ehb; 0.9943; end
 
+  def bad_active_year; (active_year + 4).to_i; end
+  def bad_metal_level; "copper"; end
+
+  def active_year_error_message; "#{bad_active_year} is an invalid active year"; end
   def metal_level_error_message; "#{bad_metal_level} is not a valid metal level kind"; end
 
   it { should validate_presence_of :name }
@@ -77,10 +79,16 @@ RSpec.describe Plan, type: :model do
       it "should fail validation with improper metal_level" do
         expect(Plan.create(**params).errors[:metal_level].any?).to be_true
         expect(Plan.create(**params).errors[:metal_level]).to eq [metal_level_error_message]
-
       end
     end
 
+    context "with invalid active_year" do
+      def params; valid_params.deep_merge({active_year: bad_active_year}); end
+      it "should fail active_year validation" do
+        expect(Plan.create(**params).errors[:active_year].any?).to be_true
+        expect(Plan.create(**params).errors[:active_year]).to eq [active_year_error_message]
+      end
+    end
   end
 end
 
