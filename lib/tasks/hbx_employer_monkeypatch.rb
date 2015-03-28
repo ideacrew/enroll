@@ -21,7 +21,7 @@ String.class_eval do
           date = Date.strptime(self, date_pattern)
         end
       rescue Exception => e
-        puts "There was an error parsing {#{self}} as a date."
+        # puts "There was an error parsing {#{self}} as a date."
       end
     end
     date
