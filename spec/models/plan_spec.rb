@@ -85,6 +85,50 @@ RSpec.describe Plan, type: :model do
 end
 
 RSpec.describe Plan, type: :model do
+  describe "scopes" do
+    def platinum_count; 11; end
+    def gold_count; 7; end
+    def shop_silver_count; 5; end
+    def individual_silver_count; 5; end
+    def bronze_count; 3; end
+    def catastrophic_count; 1; end
+
+    let(:shop_count) { platinum_count + gold_count + shop_silver_count }
+    let(:individual_count) { individual_silver_count + bronze_count + catastrophic_count }
+
+    context "with metal levels created" do
+      before do
+        FactoryGirl.create_list(:plan, platinum_count, metal_level: "platinum", market: "shop")
+        FactoryGirl.create_list(:plan, gold_count, metal_level: "gold", market: "shop")
+        FactoryGirl.create_list(:plan, shop_silver_count, metal_level: "silver", market: "shop")
+        FactoryGirl.create_list(:plan, individual_silver_count, metal_level: "silver", market: "individual")
+        FactoryGirl.create_list(:plan, bronze_count, metal_level: "bronze", market: "individual")
+        FactoryGirl.create_list(:plan, catastrophic_count, metal_level: "catastrophic", market: "individual")
+      end
+
+      it "should return correct counts for each metal scope" do
+        expect(Plan.platinum_metal.count).to eq platinum_count
+        expect(Plan.gold_metal.count).to eq gold_count
+        expect(Plan.silver_metal.count).to eq shop_silver_count + individual_silver_count
+        expect(Plan.bronze_metal.count).to eq bronze_count
+        expect(Plan.catastrophic_metal.count).to eq catastrophic_count
+      end
+
+      it "should return correct counts for each market scope" do
+        expect(Plan.shop_plans.count).to eq shop_count
+        expect(Plan.individual_plans.count).to eq individual_count
+      end
+
+      it "should return correct counts for chained scopes" do
+        expect(Plan.shop_plans.silver_metal.count).to eq shop_silver_count
+        expect(Plan.individual_plans.silver_metal.count).to eq individual_silver_count
+      end
+    end
+  end
+end
+
+
+RSpec.describe Plan, type: :model do
   describe "class methods" do
     describe ".monthly_premium" do
 

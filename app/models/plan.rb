@@ -78,6 +78,19 @@ class Plan
     numericality: { greater_than: 2013, less_than: 2020, message: "active year must fall between 2014..2019" },
     allow_blank: false
   
+  ## Scopes
+  # Metal level
+  scope :platinum_metal,      ->{ where(metal_level: "platinum") }
+  scope :gold_metal,          ->{ where(metal_level: "gold") }
+  scope :silver_metal,        ->{ where(metal_level: "silver") }
+  scope :bronze_metal,        ->{ where(metal_level: "bronze") }
+  scope :catastrophic_metal,  ->{ where(metal_level: "catastrophic") }
+
+  # Marketplace
+  scope :shop_plans,          ->{ where(market: "shop") }
+  scope :individual_plans,    ->{ where(market: "individual") }
+
+
   def metal_level=(new_metal_level)
     write_attribute(:metal_level, new_metal_level.to_s.downcase)
   end
