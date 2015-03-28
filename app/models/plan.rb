@@ -80,15 +80,23 @@ class Plan
   
   ## Scopes
   # Metal level
-  scope :platinum_metal,      ->{ where(metal_level: "platinum") }
-  scope :gold_metal,          ->{ where(metal_level: "gold") }
-  scope :silver_metal,        ->{ where(metal_level: "silver") }
-  scope :bronze_metal,        ->{ where(metal_level: "bronze") }
-  scope :catastrophic_metal,  ->{ where(metal_level: "catastrophic") }
+  scope :platinum_level,      ->{ where(metal_level: "platinum") }
+  scope :gold_level,          ->{ where(metal_level: "gold") }
+  scope :silver_level,        ->{ where(metal_level: "silver") }
+  scope :bronze_level,        ->{ where(metal_level: "bronze") }
+  scope :catastrophic_level,  ->{ where(metal_level: "catastrophic") }
 
   # Marketplace
-  scope :shop_plans,          ->{ where(market: "shop") }
-  scope :individual_plans,    ->{ where(market: "individual") }
+  scope :shop_market,          ->{ where(market: "shop") }
+  scope :individual_market,    ->{ where(market: "individual") }
+
+  # Carriers: use class method (which may be chained)
+  def self.find_by_carrier_profile(carrier_profile)
+    where(carrier_profile_id: carrier_profile._id)
+  end
+
+  # scope :named, ->(name){ where(name: name) }
+  # where(carrier_profile_id: carrier_profile._id)
 
 
   def metal_level=(new_metal_level)
@@ -152,12 +160,6 @@ class Plan
         (table.age == insured_age) && (begin_date >= table.start_on) && (begin_date <= table.end_on)
       end
       plan_premium = premium_table.cost
-    end
-
-
-    def find_by_carrier_profile(carrier_profile)
-      raise ArgumentError("expected CarrierProfile") unless carrier_profile is_a? CarrierProfile
-      where(carrier_profile_id: carrier_profile._id)
     end
 
   end
