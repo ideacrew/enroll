@@ -2,78 +2,112 @@ require "tasks/hbx_employer_monkeypatch"
 
 class HbxEmployerImport
   attr_reader :employer_file_name, :ignore_file_name, :plan_lookup_file_name
+  attr_accessor :employers, :user_blacklist, :employer_organizations
 
   def initialize(employer_file_name, ignore_file_name, plan_lookup_file_name)
     @employer_file_name = employer_file_name
     @ignore_file_name   = ignore_file_name
     @plan_lookup_file_name = plan_lookup_file_name
+    @employers = []
+    @user_blacklist = []
+    @organizations = []
   end
 
   def run
+    load_csv_data
+    puts "Found #{employers.size} employers with #{employers.flat_map(&:locations).size} locations."
+    puts "Found #{user_blacklist.size} usernames to ignore."
+
+    remove_blacklisted_employers
+    puts "Left with #{employers.size} employers with #{employers.flat_map(&:locations).size} locations."
+
+    create_employer_organizations
+    puts "Found #{found_employer_organization_count} organizations."
+    puts "Created #{new_employer_organizations_count} new organizations."
+
+    saved_employer_organization_count = save_employer_organizations
+    puts "Successfully saved #{saved_employer_organization_count} new organizations."
+  end
+
+  def load_csv_data
+    load_plan_lookups
+    load_employers
+    load_user_blacklist
+  end
+
+  def load_plan_lookups
     CSV.foreach(plan_lookup_file_name, headers: true) do |row|
       PlanLookup.add_from_row(row)
     end
+  end
 
-    employers = []
+  def load_employers
     CSV.foreach(employer_file_name, headers: true) do |row|
       employers << Employer.from_row(row)
     end
+    sort_employers
+  end
 
+  def sort_employers
     employers.sort_by! do |employer|
       [employer.fein, employer.user_name, employer.company_external_id, employer.complete_date]
     end
     # TODO: remove this, it is temporary to ensure the latest org instance is first
     employers.reverse!
+  end
 
-    puts "Found #{employers.size} employers with #{employers.flat_map(&:locations).size} locations."
-
-    @ignored_users = []
+  def load_user_blacklist
     CSV.foreach(ignore_file_name, headers: false) do | row |
-      @ignored_users << row[0] if row[0].present?
+      user_blacklist << row[0] if row[0].present?
     end
-    @ignored_users.uniq!
+    user_blacklist.uniq!
+  end
 
-    puts "Found #{@ignored_users.size} usernames to ignore."
-
-    @ignored_users.each do |user|
+  def remove_blacklisted_employers
+    user_blacklist.each do |user|
       employers.delete_if {|employer| employer.user_name == user}
     end
+  end
 
-    puts "Left with #{employers.size} employers with #{employers.flat_map(&:locations).size} locations."
-
+  def create_employer_organizations
     organizations = employers.collect(&:create_or_update_organization)
+  end
 
-    found = employers.select do |employer|
-      Organization.where("fein" => employer.fein).count > 0
+  def found_organization_count
+    employers.reduce(0) do |count, employer|
+      if Organization.where("fein" => employer.fein).count > 0
+        count + 1
+      else
+        count
+      end
     end
+  end
 
-    puts "Found #{found.size} organizations."
+  def new_employer_organizations
+    organizations.reject(&:persisted?).count
+  end
 
-    organizations_to_save = organizations.reject(&:persisted?)
-    puts "Created #{organizations_to_save.size} new organizations."
-
-    n_saved = organizations.reduce(0) do |acc, o|
-      if o.valid? && !o.persisted?
-        o.save
-        if o.persisted?
-          acc + 1
+  def save_employer_organizations
+    employer_organizations.reduce(0) do |count, organization|
+      if organization.valid? && !organization.persisted?
+        organization.save
+        if organization.persisted?
+          count + 1
         else
           # TODO: error saving
-          acc
+          count
         end
       else
-        if o.valid?
-          acc
+        if organization.valid?
+          count
         else
           #TODO: print errors?
           # puts "Error validating new organization:"
           # puts [o, o.office_locations, o.employer_profile, o.errors].collect(&:inspect)
-          acc
+          count
         end
       end
     end
-
-    puts "Successfully saved #{n_saved} new organizations."
   end
 end
 
@@ -125,7 +159,6 @@ Employer = Struct.new(
     employer.state                       = row[22]
     employer.zip                         = row[23]
     employer.carrier_name                = row[24]
-      # Aetna, CareFirst BlueCross BlueShield, Kaiser Permanente UnitedHealthcare
     employer.broker_agency_id            = row[95].to_i
     employer.broker_first_name           = row[96]
     employer.broker_last_name            = row[97]
@@ -137,15 +170,14 @@ Employer = Struct.new(
 
     # columns 25 through 94 contain 10 locations of 7 fields each
     loc_index = 25
-    loc_fields = 7
+    loc_fields = Location.members.count - 1 # employer is artificially injected at the beginning
     n_locs = 10
     locations = (loc_index...(loc_index + (loc_fields * n_locs))).step(loc_fields).flat_map do |base|
       location_fields = [employer] + row.fields(base...(base + loc_fields))
       location = Location.from_row(*location_fields)
       location.present? ? location : []
     end
-    employer.locations                   = locations
-
+    employer.locations = locations
     employer
   end
 
@@ -199,14 +231,15 @@ Employer = Struct.new(
   end
 end
 
-Location = Struct.new(:employer,
-      :metal_selection, :plan_count, :reference_plan_name,:reference_plan_id,
-      :employee_contribution, :dependent_contribution, :name
+Location = Struct.new(
+  :employer, :metal_selection, :plan_count, :reference_plan_name,
+  :plan_display_name, :reference_plan_id, :hios, :employee_contribution,
+  :dependent_contribution, :name
 ) do
   def self.from_row(*args)
     if args[2].present?
       args = args.dup
-      int_indexes = [2,4,5,6]
+      int_indexes = [2,5,7,8]
       int_indexes.each {|i| args[i] = args[i].to_i}
       Location.new(*args)
     end
