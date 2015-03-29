@@ -1,6 +1,6 @@
 require 'csv'
-require 'tasks/hbx/employer_import'
-require 'tasks/hbx/census_import'
+require 'tasks/hbx_import/employer_import'
+require 'tasks/hbx_import/census_import'
 
 namespace :hbx do
   namespace :employers do

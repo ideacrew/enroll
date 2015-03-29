@@ -1,5 +1,5 @@
 require "rails_helper"
-require "tasks/hbx/employer_import"
+require "tasks/hbx_import/employer_import"
 
 describe Hbx::EmployerImport do
 

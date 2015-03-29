@@ -1,6 +1,6 @@
-require "tasks/hbx/employer_monkeypatch"
+require "tasks/hbx_import/employer_monkeypatch"
 
-module Hbx
+module HbxImport
   class EmployerImport
     attr_reader :employer_file_name, :ignore_file_name
     attr_accessor :employers, :user_blacklist, :employer_organizations
