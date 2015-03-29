@@ -2,13 +2,12 @@ require "tasks/hbx/employer_monkeypatch"
 
 module Hbx
   class EmployerImport
-    attr_reader :employer_file_name, :ignore_file_name, :plan_lookup_file_name
+    attr_reader :employer_file_name, :ignore_file_name
     attr_accessor :employers, :user_blacklist, :employer_organizations
 
-    def initialize(employer_file_name, ignore_file_name, plan_lookup_file_name)
+    def initialize(employer_file_name, ignore_file_name)
       @employer_file_name = employer_file_name
       @ignore_file_name   = ignore_file_name
-      @plan_lookup_file_name = plan_lookup_file_name
       @employers = []
       @user_blacklist = []
       @employer_organizations = []
@@ -31,7 +30,7 @@ module Hbx
     end
 
     def load_csv_data
-      load_plan_lookups
+      # load_plan_lookups
       load_employers
       load_user_blacklist
     end
