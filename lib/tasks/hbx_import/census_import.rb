@@ -1,6 +1,6 @@
-require "tasks/hbx/employer_monkeypatch"
+require "tasks/hbx_import/employer_monkeypatch"
 
-module Hbx
+module HbxImport
   class CensusImport
     attr_reader :file_name
 
