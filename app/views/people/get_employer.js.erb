@@ -1,4 +1,7 @@
 $('#employer-info').html("<%= escape_javascript(render 'employers').html_safe %>");
+
+$("#person_id").val("<%= @person.id %>");
+
 var index = 0;
 <% @person.addresses.each do |address| %>
   $("#person_addresses_attributes_"+index+"_address_1").val("<%= address.address_1 %>");

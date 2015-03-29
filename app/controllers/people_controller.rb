@@ -179,7 +179,6 @@ class PeopleController < ApplicationController
       format.html {}
     end
   end
-  
 
   def update
     @person = Person.find(params[:id])
