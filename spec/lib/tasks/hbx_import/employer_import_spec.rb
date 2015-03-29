@@ -1,15 +1,15 @@
 require "rails_helper"
 require "tasks/hbx_import/employer_import"
 
-describe Hbx::EmployerImport do
+describe HbxImport::EmployerImport do
 
 end
 
-describe Hbx::Employer do
+describe HbxImport::Employer do
 end
 
-describe Hbx::Location do
+describe HbxImport::Location do
 end
 
-describe Hbx::PlanLookup do
+describe HbxImport::PlanLookup do
 end
