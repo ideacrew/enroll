@@ -2,7 +2,7 @@ class Products::QhpMaximumOutOfPocket
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embedded_in :qhp
+  embedded_in :qhp_cost_share_variance
 
   # Benefit name
   field :name, type: String   

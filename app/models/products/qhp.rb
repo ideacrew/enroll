@@ -2,12 +2,13 @@ class Products::Qhp
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  field :issuer_hios_id, type: String
+  field :template_version, type: String
+  field :issuer_id, type: String
   field :state_postal_code, type: String
   field :state_postal_name, type: String
   field :market_coverage, type: String
-  field :is_dental_plan_only, type: Boolean
-  field :issuer_tax_id, type: Integer
+  field :dental_plan_only_ind, type: Boolean
+  field :tin, type: Integer
   field :application_id, type: String
 
   # Standard component - 14 chars
@@ -73,18 +74,7 @@ class Products::Qhp
   field :enrollment_payment_url, type: String
   field :plan_brochure, type: String
 
-  ## SBC Scenario
-  field :having_baby_deductable, type: Money
-  field :having_baby_co_payment, type: Money
-  field :having_baby_co_insurance, type: Money
-  field :having_baby_limit, type: Money
-  field :having_diabetes_deductable, type: Money
-  field :having_diabetes_co_payment, type: Money
-  field :having_diabetes_co_insurance, type: Money
-  field :having_diabetes_limit, type: Money
-
-
-  validates_presence_of :issuer_hios_id, :iisuer_id, :state_postal_code,
+  validates_presence_of :issuer_id, :state_postal_code,
                         :standard_component_id, :plan_marketing_name, :hios_product_id, :netwokr_id, 
                         :service_area_id, :formulary_id, :is_new_plan, :plan_type, :metal_level,
                         :unique_plan_design, :qhp_or_non_qhp, :insurance_plan_pregnancy_notice_req_ind, 
@@ -99,22 +89,18 @@ class Products::Qhp
     cascade_callbacks: true,
     validate: true
 
-  embeds_many :qhp_maximum_out_of_pockets,
-    class_name: "Products::QhpMaximumOutOfPocket",
-    cascade_callbacks: true,
-    validate: true
-
   embeds_one :qhp_cost_share_variance,
     class_name: "Products::QhpCostShareVariance",
     cascade_callbacks: true,
     validate: true
 
-  accepts_nested_attributes_for :qhp_benefits, :qhp_maximum_out_of_pockets, :qhp_cost_share_variance
+  accepts_nested_attributes_for :qhp_benefits, :qhp_cost_share_variance
   validates_presence_of :issuer_hios_id, :state_postal_code
 
-  index({"issuer_hios_id._id" => 1})
-  index({"state_postal_code._id" => 1})
-  index({"issuer_tax_id._id" => 1}, {sparse: true})
+  index({"issuer_hios_id" => 1})
+  index({"state_postal_code" => 1})
+  index({"national_network" => 1})
+  index({"tin" => 1}, {sparse: true})
 
   index({"qhp_benefits.benefit_type_code" => 1})
 
