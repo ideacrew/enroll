@@ -36,7 +36,12 @@ class BenefitGroup
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
   # Array of plan_ids
+  # has_and_belongs_to_many :elected_plans, class_name: "Plan"
   field :elected_plans, type: Array, default: []
+
+  # Array of census employee ids
+  # has_and_belongs_to_many :employee_families, class_name: "EmployeeFamily"
+  field :employee_families, type: Array, default: []
 
   validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
     :premium_pct_as_int, :employer_max_amt_in_cents, :reference_plan_id

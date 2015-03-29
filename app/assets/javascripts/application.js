@@ -314,16 +314,18 @@ $(document).ready(function () {
   $("body").click(function(e) {
   	fade_all();
   	hide_all();
+  	update_progress();
   	if (e.target.id == "personal_info" || $(e.target).parents("#personal_info").size()) { 
 		$('#personal_info div.first').addClass('employee-info');
 		$("a.personal_info").css("color","#98cbff");
 		$("#personal_info div.first").css("opacity","1");
+		$("a.three").css("color","#00b420");
 		$("#top-pad15").show();
 	} 
 	else if (e.target.id == "address_info" || $(e.target).parents("#address_info").size()) {
 		$('#address_info div.first').addClass('employee-info');
 		$("a.address_info").css("color","#98cbff");
-		$("a.three").css("color","#00b420");
+		// $("a.three").css("color","#00b420");
 		$("#address_info div.first").css("opacity","1");
 		$("#top-pad").innerHTML="30%";
 		$("#top-pad30").show();
@@ -363,6 +365,29 @@ $(document).ready(function () {
   function hide_all() {
 	$("#top-pad15").hide(); $("#top-pad30").hide();
     $("#top-pad80").hide(); $("#top-pad85").hide();
+  }
+  
+  function update_progress() {
+  	// $("#top-pad15").show();
+//   	
+  	// if (($("#person_addresses_attributes_0_address_1").val().length != 0) && ($("#person_addresses_attributes_0_city").val().length != 0) && 
+  		// ($("#person_addresses_attributes_0_state").val().length != 0) && ($("#person_addresses_attributes_0_county").val().length != 0) &&
+  		// ($("#person_addresses_attributes_0_zip").val().length != 0)) {
+  			// $("a.three").css("color","#00b420");
+  			// $("#top-pad15").hide();
+  			// $("#top-pad30").show();
+  	// }
+  	// else {
+  		// $("a.three").css("color","#999999");
+  	// }
+//   	
+  	// if ($(".phone_number").val().length >=10) {
+  		// $("a.four").css("color","#00b420");
+  		// $("#top-pad80").show();
+  		// alert($(this).val());
+  	// } else {
+  		// $("a.four").css("color","#999999");
+  	// }
   }
 
   $("#dependent_ul .floatlabel").focusin(function() {
@@ -500,5 +525,6 @@ $(document).ready(function () {
   $(".phone_number").mask("(999) 999-9999");
   $(".zip").mask("99999");
   $("#person_ssn").mask("999999999");
+  $(".address-state").mask("**");
   
 });
