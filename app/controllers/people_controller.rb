@@ -222,6 +222,8 @@ class PeopleController < ApplicationController
   
    def show
     @person = Person.find(params[:id])
+    @employer_profile= EmployerProfile.find_all_by_person(@person).first
+
     build_nested_models
   end
 
