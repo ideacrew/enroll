@@ -60,6 +60,10 @@ class BenefitGroup
       message: "%{value} is not a valid effective date offset kind"
     }
 
+  validates_numericality_of :premium_pct_as_int,
+    only_integer: true,
+    greater_than_or_equal_to: 50
+
   # def reference_plan=(new_reference_plan)
   # end
   #

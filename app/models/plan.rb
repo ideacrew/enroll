@@ -32,12 +32,6 @@ class Plan
   embeds_many :premium_tables
   accepts_nested_attributes_for :premium_tables
 
-  embeds_many :benefits
-  accepts_nested_attributes_for :benefits
-
-  embeds_many :plan_benefits
-  accepts_nested_attributes_for :plan_benefits
-  
   index({ hbx_id: 1 })
   index({ coverage_kind: 1 })
   index({ metal_level: 1 })

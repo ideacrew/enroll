@@ -50,7 +50,7 @@ gem "mongoid-enum", '~> 0.2.0'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
-gem 'acapi', git: "git://github.com/dchbx/acapi.git"
+gem 'acapi', git: "git://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
 
 gem 'aasm', '~> 4.0.7'

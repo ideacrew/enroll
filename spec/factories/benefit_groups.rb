@@ -11,7 +11,8 @@ FactoryGirl.define do
     effective_on_kind "date_of_hire"
     terminate_on_kind "end_of_month"
     effective_on_offset 30
-    association :reference_plan, factory: :plan
+    reference_plan_id {FactoryGirl.create(:plan)._id}
+    elected_plans { [ self.reference_plan_id ]}
     premium_pct_as_int 80
     employer_max_amt_in_cents 1000_00
   end
