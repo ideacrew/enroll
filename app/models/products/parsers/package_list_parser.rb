@@ -4,16 +4,11 @@ module Parser
   class PackageListParser
     include HappyMapper
 
-    #register_namespace "xmlns", "http://vo.ffe.cms.hhs.gov"
-    #register_namespace "impl", "http://vo.ffe.cms.hhs.gov"
-    #register_namespace "targetNamespace", "http://vo.ffe.cms.hhs.gov"
-    #register_namespace "xsd", "http://www.w3.org/2001/XMLSchema"
-
     tag 'packagesList'
 
     has_many :packages, Parser::PackageParser, tag: "packages"
 
-    #has_many :benefits, Parser::BenifitsParser, xpath: 'benefitsList/benefits'
+    #has_many :benefits, Parser::BenifitsListParser, xpath: 'benefitsList/benefits'
 
     def to_hash
       {

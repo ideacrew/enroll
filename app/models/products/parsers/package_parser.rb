@@ -1,4 +1,5 @@
 require Rails.root.join('app', 'models', 'products', 'parsers', 'plan_list_parser')
+require Rails.root.join('app', 'models', 'products', 'parsers', 'benefits_list_parser')
 
 module Parser
   class PackageParser
@@ -13,11 +14,12 @@ module Parser
 
     has_one :plans_list, Parser::PlanListParser, tag: "plansList"
 
-    #has_many :benefits, Parser::BenifitsParser, xpath: 'benefitsList/benefits'
+    has_one :benefits_list, Parser::BenefitsListParser, tag: 'benefitsList'
 
     def to_hash
       {
-          plans_list: plans_list.to_hash
+          plans_list: plans_list.to_hash,
+          benefits_list: benefits_list.to_hash
       }
     end
   end
