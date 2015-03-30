@@ -11,18 +11,15 @@
     <nav>
       <%= render 'shared/breadcrumb', crumbs: [
           link_to('People', people_path),
-          'New'
+          @person.full_name
         ]
       %>
     </nav>
   </div>
 </section>
 
-
-
 <section>
   <%= form_for(@person) do |f| %>
-    <%#= f.hidden_field :family_id %>
 
     <%= render 'form', f: f %>
 

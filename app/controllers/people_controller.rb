@@ -198,10 +198,14 @@ class PeopleController < ApplicationController
 
   def create
     santize_person_params
-    @person = Person.new(person_params)
+    @person = Person.find_or_initialize_by(ssn: params[:person][:ssn])
+
+    # person_params
     respond_to do |format|
-      if @person.save
+      if @person.update_attributes(person_params)
         format.html { redirect_to @person, notice: 'Person was successfully created.' }
+        # format.html { redirect_to person_landing_people_path(organization_id: @person.organization_id, person_id: @person), notice: 'Person was successfully created.' }
+
         format.json { render json: @person, status: :created, location: @person }
       else
         build_nested_models
