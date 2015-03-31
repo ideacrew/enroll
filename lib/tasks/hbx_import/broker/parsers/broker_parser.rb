@@ -1,6 +1,7 @@
 require_relative './broker_phone_parser'
 require_relative './broker_email_parser'
 require_relative './broker_address_parser'
+
 module Parser
   class BrokerParser
     include HappyMapper

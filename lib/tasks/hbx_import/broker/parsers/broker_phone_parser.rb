@@ -10,12 +10,12 @@ module Parser
     namespace 'ns1'
 
     element :kind, String, xpath: 'ns1:parameters/ns1:type/ns1:text'
-    element :full_phone_number, String, xpath: 'ns1:parameters/ns1:type/ns1:text'
+    element :full_phone_number, String, xpath: 'ns1:uri'
 
     def to_hash
       {
           kind: kind,
-          full_phone_number: full_phone_number
+          full_phone_number: full_phone_number.split('tel:').last
       }
     end
   end

@@ -10,7 +10,7 @@ module Parser
     namespace 'ns1'
 
     element :kind, String, xpath: 'ns1:parameters/ns1:type/ns1:text'
-    element :address, String, xpath: 'ns1:parameters/ns1:type/ns1:text'
+    element :address, String, xpath: 'ns1:text'
 
     def to_hash
       {
