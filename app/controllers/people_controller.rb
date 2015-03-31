@@ -88,8 +88,9 @@ class PeopleController < ApplicationController
   
   def add_employee_role
     @person = Person.find(params[:person_id])
-    @employer_profile = Organization.find(params[:organization_id]).employer_profile    
-    employer_census_family = @employer_profile.linkable_employee_family_by_person(@person)
+    @employer_profile = Organization.find(params[:organization_id]).employer_profile  
+    employer_census_family = @employer_profile.find_census_families_by_person(@person)
+    # employer_census_family = @employer_profile.linkable_employee_family_by_person(@person)
 
     #calling add_employee_role when linkable employee family present
     if employer_census_family.present? && employer_census_family.person.present?
