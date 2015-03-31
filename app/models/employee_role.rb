@@ -23,6 +23,9 @@ class EmployeeRole
 
   accepts_nested_attributes_for :person
 
+  embeds_one :inbox, as: :recipient
+
+  after_create :create_inbox
   before_save :termination_date_must_follow_hire_date
 
   # hacky fix for nested attributes
@@ -107,6 +110,13 @@ class EmployeeRole
   end
 
 private
+  def create_inbox
+    welcome_subject = "Welcome to DC HealthLink"
+    welcome_body = "DC HealthLink is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    mailbox = Inbox.create(recipient: self)
+    mailbox.messages.create(subject: welcome_subject, body: welcome_body)
+  end
+
   def self.klass
     self.to_s.downcase
   end

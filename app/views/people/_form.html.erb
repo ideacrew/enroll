@@ -38,12 +38,12 @@
     </div>
 
     <div class="clear-fix"></div>
-    <div class="col-md-2 col-md-offset-10 key no-pd-right col-sm-3 col-xs-12 hidden" id="key-section">
-			<!-- <a href="#" class="btn btn-save">Save & Exit</a> -->
-			<%= f.submit "Save & Exit", class: 'btn btn-save' %>
-    	<%= render 'shared/signup_progress' %>
-    </div>
-
+    
     <%= render 'employer_search' %>
+  </div>
+  <div class="col-md-2 col-sm-3 col-xs-12 key no-pd-right hidden" id="key-section">
+      <!-- <a href="#" class="btn btn-save">Save & Exit</a> -->
+      <%= f.submit "Save & Exit", class: 'btn btn-save' %>
+      <%= render 'shared/signup_progress' %>
   </div>
 </div>

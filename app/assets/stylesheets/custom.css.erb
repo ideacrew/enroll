@@ -147,6 +147,10 @@ a:hover, a:focus {
    ========================================================================== */
 
 /* New Person Signup */
+#new_person_wrapper {
+  padding-bottom: 100px;
+}
+
 #new_person .select-plan, .coverage-options {
     display: none;
 }
@@ -872,10 +876,6 @@ a.family{
    personal-page
    ========================================================================== */
 
-#new_person {
-  padding-bottom: 100px;
-}
-
 .panel-body.left {
     padding-bottom: 0;
     padding-left: 45px;
@@ -1106,7 +1106,8 @@ input.floatlabe{
   display: none;
   font-size: 18px;
   position: absolute;
-  top: -70px;
+  top: -72px;
+  right: -120px;
   font-weight: normal;
 }
 .personaol-info-top-row .adderess-select-box {
@@ -1275,14 +1276,6 @@ input.floatlabe{
   }
   .key p {
     min-height: 32px;
-  }
-  .btn-save, .btn-save:hover, .btn-save:focus {
-    margin: 10px 0;
-    background: none repeat scroll 0 0 #00b22d;
-    bottom: 0;
-    color: #fff !important;
-    font-family: "AvenirLTStd-Light";
-    font-size: 18px;
   }
   .disable-btn, .disable-btn:hover, .disable-btn:focus {
     margin-left: 0;
@@ -1496,6 +1489,16 @@ a.list-group-item.results {
   margin-bottom: 27px;
   margin-top: 184px;
   padding-right: 56px;
+}
+
+/* Buttons */
+.btn-save, .btn-save:hover, .btn-save:focus {
+  background: none repeat scroll 0 0 #4d74ff;
+  bottom: 0;
+  color: #fff;
+  font-family: "AvenirLTStd-Light";
+  font-size: 18px;
+  padding: 6px 20px;
 }
 .btn-green {
   background: none repeat scroll 0 0 #00b22d;
@@ -2067,22 +2070,40 @@ a.close-fail{
   top: 5px;
 }
 
-#key-section{
-  position: absolute;
-  top: 50px;
-  right: 0;
+#key-section {
+    right: 0;
+    top: 80px;
 }
-#key-section p{
-  font-size: 18px;
+#key-section p {
+    font-size: 18px;
 }
-#key-section ul{
-  padding-left: 0;
+#key-section ul {
+    padding-left: 20px;
+    position: relative;
 }
-#key-section ul li{
-  list-style-type: none;
+#key-section ul .progress-bottm {
+    background: none repeat scroll 0 0 #fff;
+    border: 1px solid #ccc;
+    height: 98%;
+    left: 0;
+    position: absolute;
+    width: 12px;
 }
-#key-section ul li a{
-  color: #999;
+#key-section ul .progress-top {
+    background: none repeat scroll 0 0 #008c00;
+    border: 1px solid #008c00;
+    height: 36%;
+    left: 0;
+    position: absolute;
+    width: 12px;
+    z-index: 2;
+}
+#key-section ul li {
+    list-style-type: none;
+    margin: 5px 0 0;
+}
+#key-section ul li a {
+    color: #999;
 }
 
 a.close-2{

@@ -85,7 +85,8 @@ $(document).ready(function () {
             
             $('#key-section').removeClass('hidden');
             $('#house_info, #add_info, #top-pad30, #top-pad80, #top-pad85').hide();
-            $('a.one, a.two').css("color", "#00b22d");
+            // $('a.one, a.two').css("color", "#00b22d");
+            $("#employer-info").css("display", "block");
           }
           else
           {
@@ -374,34 +375,35 @@ $(document).ready(function () {
   
   function update_progress() {
 
-    var start_progress = 15;
+    var start_progress = 0;
     var personal_entry = check_personal_entry_progress();
     var address_entry  = check_address_entry_progress();
     var phone_entry    = check_phone_entry_progress();
     var email_entry    = check_email_entry_progress();
 
     if(personal_entry) {
-      start_progress += 15;
+      start_progress += 25;
       $("a.one").css("color","#00b420");
       $("a.two").css("color","#00b420");
     }
 
     if(address_entry) {
-      start_progress += 50;
+      start_progress += 15;
       $("a.three").css("color","#00b420");
     }
 
     if(phone_entry) {
-      start_progress += 5;
+      start_progress += 10;
       $("a.four").css("color","#00b420");
     }
 
     if(email_entry) {
-      start_progress += 1;
+      start_progress += 15;
       $("a.five").css("color","#00b420");
     }
 
     $('#top-pad').html(start_progress + '% Complete');
+    $('.progress-top').css('height', start_progress + '%');
   }
 
   function check_personal_entry_progress() {
@@ -409,22 +411,37 @@ $(document).ready(function () {
     
     if(check_personal_info_exists().length==0 && gender_checked) {
       return true;
+    } else {
+      $("a.one").css('color', '#999'); $("a.two").css('color', '#999');
+      return false;
     }
   }
 
   function check_address_entry_progress() {
     var empty_address = $('#address_info input.required').filter(function() { return $(this).val() === ""; }).length;
     if(empty_address === 0) { return true; }
+    else {
+      $("a.three").css('color', '#999');
+      return false;
+    }
   }
 
   function check_phone_entry_progress() {
-    var empty_phone = $('#phone_info input.required').filter(function() { return $(this).val() === ""; }).length;
+    var empty_phone = $('#phone_info input.required').filter(function() { return ($(this).val() === "" || $(this).val() === "(___) ___-____"); }).length;
     if(empty_phone === 0) { return true; }
+    else {
+      $("a.four").css('color', '#999');
+      return false;
+    }
   }
 
   function check_email_entry_progress() {
     var empty_email = $('#email_info input.required').filter(function() { return $(this).val() === ""; }).length;
     if(empty_email === 0) { return true; }
+    else {
+      $("a.five").css('color', '#999');
+      return false;
+    }
   }
 
   $("#dependent_ul .floatlabel").focusin(function() {
@@ -544,6 +561,12 @@ $(document).ready(function () {
         return $.rails.confirmed(link);
       });
     };
+  });
+
+  // Change Dropdown Address Text
+  $('.address-li').on('click', function(){
+    $("#dropdownMenu1 label").text($(this).text());
+    $('#address_info > .first').attr('id', ($(this).text()));
   });
   
   // Select Plan Page
