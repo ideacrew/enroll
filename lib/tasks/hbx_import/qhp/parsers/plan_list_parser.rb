@@ -1,7 +1,7 @@
-require Rails.root.join('app', 'models', 'products', 'parsers', 'package_list_parser')
+require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_parser')
 
 module Parser
-  class PlanBenefitTemplateParser
+  class PlanListParser
     include HappyMapper
 
     #register_namespace "xmlns", "http://vo.ffe.cms.hhs.gov"
@@ -9,15 +9,15 @@ module Parser
     #register_namespace "targetNamespace", "http://vo.ffe.cms.hhs.gov"
     #register_namespace "xsd", "http://www.w3.org/2001/XMLSchema"
 
-    tag 'planBenefitTemplateVO'
+    tag 'plansList'
 
-    has_one :packages_list, Parser::PackageListParser, :tag => "packagesList"
+    has_many :plans, Parser::PlanParser, tag: "plans"
 
     #has_many :benefits, Parser::BenifitsParser, xpath: 'benefitsList/benefits'
 
     def to_hash
       {
-          packages_list: packages_list.to_hash
+          plans: plans.map(&:to_hash)
       }
     end
   end

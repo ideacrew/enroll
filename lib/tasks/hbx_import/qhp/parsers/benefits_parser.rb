@@ -1,3 +1,4 @@
+
 module Parser
   class BenefitsParser
     include HappyMapper

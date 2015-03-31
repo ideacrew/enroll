@@ -1,4 +1,4 @@
-require Rails.root.join('app', 'models', 'products', 'parsers', 'plan_attributes_parser')
+require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_attributes_parser')
 
 module Parser
   class PlanParser

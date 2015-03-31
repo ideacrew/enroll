@@ -1,4 +1,5 @@
-require Rails.root.join('app', 'models', 'products', 'parsers', 'plan_benefit_template_parser')
+require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_benefit_template_parser')
+
 
 namespace :seed do
   desc "Load the plan data"
