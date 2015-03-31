@@ -85,7 +85,8 @@ $(document).ready(function () {
             
             $('#key-section').removeClass('hidden');
             $('#house_info, #add_info, #top-pad30, #top-pad80, #top-pad85').hide();
-            $('a.one, a.two').css("color", "#00b22d");
+            // $('a.one, a.two').css("color", "#00b22d");
+            $("#employer-info").css("display", "block");
           }
           else
           {
