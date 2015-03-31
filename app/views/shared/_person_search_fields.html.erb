@@ -1,6 +1,6 @@
-<p class="information row">Personal Information</p>
+<p class="information row hidden">Personal Information</p>
 
-<% if action_name == 'new' %><div id="overlay"></div><% end %>
+<!-- <%# if action_name == 'new' %><div id="overlay" class="hidden"></div><%# end %> -->
 <div id="personal_info" class="focus_effect row personal-info-row" style="opacity: 0.5;">
   <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
     <%= hidden_field "people","id" %>
@@ -51,13 +51,10 @@
 </div>
 
 <div class="row search-btn-row">
-  <div class="col-md-8 col-sm-6 col-xs-12 key no-pd">
-    <p class="top-pad">
-      <span>Your personal information is secure.</span>
-      <span><i></i></span>
-    </p>
-  </div>
-  <div class="col-md-2 col-sm-3 col-xs-12 no-pd">
-    <a href="javascript:void(0)" id="search-employer" class="btn btn-search">Search</a>
-  </div>
+	<div class="col-md-10 col-sm-9 col-xs-12 key no-pd">
+		<p class="top-pad">
+			<a href="javascript:void(0)" id="search-employer" class="btn btn-search">Search</a>
+			<span>Your personal information is safe, secured with 64 bit SSL encryption</span>
+		</p>
+	</div>
 </div>
