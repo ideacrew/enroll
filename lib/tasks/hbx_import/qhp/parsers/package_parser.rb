@@ -1,5 +1,5 @@
-require Rails.root.join('app', 'models', 'products', 'parsers', 'plan_list_parser')
-require Rails.root.join('app', 'models', 'products', 'parsers', 'benefits_list_parser')
+require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_list_parser')
+require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'benefits_list_parser')
 
 module Parser
   class PackageParser
