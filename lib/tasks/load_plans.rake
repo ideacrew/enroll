@@ -1,3 +1,5 @@
+require Rails.root.join('app', 'models', 'products', 'parsers', 'plan_benefit_template_parser')
+
 namespace :seed do
   desc "Load the plan data"
   task :plans => :environment do
@@ -11,3 +13,21 @@ namespace :seed do
     end
   end
 end
+
+
+namespace :xml do
+  desc "Import qhp plans from xml files"
+  namespace :import do
+    task :plans, [:dir] => :environment do |task, args|
+      files = Dir.glob(File.join(args.dir, "**", "*.xml"))
+      files.each do |file|
+        puts file
+        xml = Nokogiri::XML(File.open("/Users/CitadelFirm/Downloads/projects/hbx/XML/Aetna/AE_DC_SG_77422_Benefits_ON_v1.xml"))
+        plan_benefit_template_parser = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
+        puts plan_benefit_template_parser.to_hash
+        exit
+      end
+    end
+  end
+end
+
