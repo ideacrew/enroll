@@ -1,58 +1,49 @@
-  <div class="container-fluid no-pd-left">
-    <div class="panel panel-default">
-      <div class="panel-body left">
+<div class="col-md-10 col-sm-12">
 
-		    <%= render 'people/sidebar' %>
+  <%= render 'welcome_msg' if action_name == 'new' %>
 
-        <div class="col-md-10 col-sm-12">
+  <div class="col-md-10 col-sm-9 col-xs-12 no-pd">
 
-          <%= render 'welcome_msg' if action_name == 'new' %>
+    <% if action_name == 'show' %>
+      <% organization = @employer_profile.organization %>
+      <% employee = organization.employee_family_details(@person) %>
+      <% if employee.census_dependents.present? %>
+        <% url = dependent_details_people_path(person_id: @person.id, organization_id: organization.id) %>
+      <% end %>
+      <%= link_to 'Dependent Info', url %>
+    <% end %>
 
-          <div class="col-md-11 col-sm-12 col-xs-12">
+  	<%= render 'shared/error_messages' %>
+  	<%= render 'shared/person_search_fields', f: f %>
+  	
+  	<%= render 'people/no_results' %>
 
-            <% if action_name == 'show' %>
-              <% organization = @employer_profile.organization %>
-              <% employee = organization.employee_family_details(@person) %>
-              <% if employee.census_dependents.present? %>
-                <% url = dependent_details_people_path(person_id: @person.id, organization_id: organization.id) %>
-              <% end %>
-              <%= link_to 'Dependent Info', url %>
-            <% end %>
+   <div id="employer-info" class="row hidden"></div>
 
-          	<%= render 'shared/error_messages' %>
-          	<%= render 'shared/person_search_fields', f: f %>
-          	
-          	<%= render 'people/no_results' %>
+    <%= render 'shared/address_fields', f: f %><br>
+    <%= render 'shared/phone_fields', f: f %><br>
 
-			     <div id="employer-info" class="row hidden"></div>
-			
-            <%= render 'shared/address_fields', f: f %><br>
-            <%= render 'shared/phone_fields', f: f %><br>
-
-            <div id="email_info" class="focus_effect row personaol-info-row">
-              <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
-                <%= render 'shared/email_fields', f: email %>
-              <% end %>
-              <div class="col-md-10 col-sm-10"><div id="email_error"></div></div>
-            </div>
-
-            <div class="focus_effect row personaol-info-row">
-    				<div class="col-md-10 col-sm-9 no-pd"></div>
-    				<div class="col-md-2 col-sm-3 no-pd">
-    					<a href="#" data-method="POST" id="continue-employer" class="btn disable-btn search_continue hidden">Continue</a>
-    				</div>
-            </div>
-
-            <div class="clear-fix"></div>
-            <div class="col-md-2 col-md-offset-10 key no-pd-right col-sm-3 col-xs-12 hidden" id="key-section">
-      				<!-- <a href="#" class="btn btn-save">Save & Exit</a> -->
-      				<%= f.submit "Save & Exit", class: 'btn btn-save' %>
-            	<%= render 'shared/signup_progress' %>
-            </div>
-
-            <%= render 'employer_search' %>
-          </div>
-        </div>
-      </div>
+    <div id="email_info" class="focus_effect row personaol-info-row">
+      <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+        <%= render 'shared/email_fields', f: email %>
+      <% end %>
+      <div class="col-md-10 col-sm-10"><div id="email_error"></div></div>
     </div>
+
+    <div class="focus_effect row personaol-info-row">
+		<div class="col-md-10 col-sm-9 no-pd"></div>
+		<div class="col-md-2 col-sm-3 no-pd">
+			<a href="#" data-method="POST" id="continue-employer" class="btn disable-btn search_continue hidden">Continue</a>
+		</div>
+    </div>
+
+    <div class="clear-fix"></div>
+    <div class="col-md-2 col-md-offset-10 key no-pd-right col-sm-3 col-xs-12 hidden" id="key-section">
+			<!-- <a href="#" class="btn btn-save">Save & Exit</a> -->
+			<%= f.submit "Save & Exit", class: 'btn btn-save' %>
+    	<%= render 'shared/signup_progress' %>
+    </div>
+
+    <%= render 'employer_search' %>
   </div>
+</div>
