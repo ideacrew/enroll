@@ -12,7 +12,7 @@
         <ns1:surname>Cool</ns1:surname>
         <ns1:given>Ellen</ns1:given>
       </ns1:n>
-      <ns1:org>Life Health Home Insurance Group, LLC</ns1:org>
+      <ns1:org>Life Insurance Group, LLC</ns1:org>
       <ns1:adr>
         <ns1:parameters>
           <ns1:type>
@@ -58,7 +58,7 @@
         <ns1:surname>Nicer Jr</ns1:surname>
         <ns1:given>Richard</ns1:given>
       </ns1:n>
-      <ns1:org>Diversified Benefits Agency</ns1:org>
+      <ns1:org>Diversified Agency</ns1:org>
       <ns1:adr>
         <ns1:parameters>
           <ns1:type>
