@@ -14,7 +14,7 @@ module Parser
 
     def to_hash
       {
-          kind: kind,
+          kind: kind.downcase,
           address: address
       }
     end
