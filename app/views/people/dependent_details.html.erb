@@ -1,36 +1,7 @@
-<style>
-.notice {
-  color: #4F8A10;
-  background-color: #DFF2BF;
-  background-image:url('success.png');
-}
-</style>
-
 <div class="container-fluid no-pd-left" id="dependents_info">
   <div class="panel panel-default">
     <div class="panel-body left">
-      <div class="col-sm-2 left-pd" id="sidebar_partial_value">
-        <div class="sidebar list-group text-center" >
-          <div id="dependents_sidebar">
-            <a href="#" class="personal_info list-group-item name hidden">
-            Employer Information
-            </a>
-            <a href="#" class="list-group-item name" style="display:none">
-            Employee Information
-            </a>
-            
-            <a href="javascript:history.go(-1)" class="list-group-item back">
-            	<i class="fa fa-angle-left"></i> Back
-            </a>
-            
-            <a href="#" class="members_info list-group-item name style_s_link">
-            Members
-            <div class="arrow-right"></div>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-10 col-sm-12">
+      <div class="alert">
         <a href="<%= person_landing_people_path(organization_id: params[:organization_id], person_id: params[:person_id])  %>" data-method="POST"> Landing Page</a>
         &nbsp;&nbsp;
         <a href="<%= plan_details_people_path(person_id: params[:person_id], organization_id: params[:organization_id])%>" data-method="POST"> Plan Details</a>
@@ -119,11 +90,12 @@
       </div>
       
       <div class="col-md-10 col-sm-12">
-        <div class="col-md-11 col-sm-12 col-xs-12">
-          <p class="information row">Household Information</p>
+        <div class="col-md-10 col-sm-9 col-xs-12 no-pd">
           
-          <div id="household_info" class="focus_effect row personaol-info-row">
-              <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
+          <div id="house_info" class="focus_effect row personaol-info-row">
+            <p class="information row">Household Information</p>
+
+              <div class="house col-md-12 col-sm-12 col-xs-12 no-pd first">
                   <div class="col-md-6 col-sm-6 no-pd form-group form-group-lg no-pd">
                     <%= text_field_tag :name, "#{@person.first_name} #{@person.middle_name} #{@person.last_name}", class: "required floatlabel form-control", required: true, placeholder: 'NAME' %>
                   </div>
@@ -134,17 +106,17 @@
             </div><br>
             
             <div class="fail-search add-member <%= 'hidden' if !@employee.employee_family.census_dependents.empty? %>" class="row">
-              <div class="col-md-10 col-sm-9 col-xs-12 no-pd">
+              <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
                 <div class="panel panel-default">
                   <div class="panel-body member">
-                    <center>
-                      <div class="fail"><span class="bold">Here's your chance to add family members to your plan.</span> Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</div>
+                      <p class="fail"><span class="bold">Here's your chance to add family members to your plan.</span><br>Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</p>
                       <br>
-                      <% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee.id) %>
-              		  <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
-                      &nbsp; &nbsp;
-                      <a class="text-center btn btn-save">Continue</a>
-                    </center>
+                      <div class="form-inline text-center">
+                        <% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee.id) %>
+                		    <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
+                        &nbsp; &nbsp;
+                        <a class="text-center btn btn-save">Continue</a>
+                      </div>
                   </div>
                 </div>
         	  </div>
@@ -160,15 +132,15 @@
 	      </ul>
       
       <div id="dependent_buttons" class="focus_effect row personaol-info-row <%= 'hidden' if @employee.employee_family.census_dependents.empty? %>">
-        <div class="col-md-10 no-pd col-sm-9 col-xs-12">
+        <div class="col-md-12 no-pd col-sm-12 col-xs-12">
           <% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee.id) %>
           <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
           
           <!-- <a href="<%= plan_details_people_path(person_id: params[:person_id], organization_id: params[:organization_id])%>" data-method="POST" class="text-center btn btn-save pull-right">Continue</a> -->
-          <%= link_to 'Continue', select_plan_people_path, class: 'text-center btn btn-save pull-right' %>
+          <%= link_to 'Continue', select_plan_people_path, class: 'text-center btn btn-green pull-right' %>
         </div>
         
-        <div class="col-md-10 no-pd col-sm-9 col-xs-12 last hidden">
+        <div class="col-md-12 no-pd col-sm-12 col-xs-12 last hidden">
           <%= link_to "Cancel", 'javascript:void(0)', class: 'btn btn-red', id: 'cancel_member' %>
           
           <a class="text-center btn btn-save pull-right" id="save_member">Confirm Member</a>
@@ -176,10 +148,12 @@
       </div>
                 
       <div class="clear-fix"></div>
-      <div class="col-md-2 col-md-offset-10 key no-pd-right col-sm-3 col-xs-12" id="key-section">
-        <a href="#" class="btn btn-save">Save & Exit</a>
-        <%= render 'shared/signup_progress' %>
-      </div>
+        </div>
+        <div class="col-md-2 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
+          <a href="#" class="btn btn-save">Save & Exit</a>
+
+          <input type="hidden" id="initial_progress" value="50">
+          <%= render 'shared/signup_progress' %>
         </div>
       </div>
     </div>

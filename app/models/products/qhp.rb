@@ -95,7 +95,6 @@ class Products::Qhp
     validate: true
 
   accepts_nested_attributes_for :qhp_benefits, :qhp_cost_share_variance
-  validates_presence_of :issuer_id, :state_postal_code
 
   index({"issuer_id" => 1})
   index({"state_postal_code" => 1})

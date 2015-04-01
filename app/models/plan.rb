@@ -137,6 +137,14 @@ class Plan
     given_age
   end
 
+  def reload_premium_cache
+    self.premium_tables.each do |premium|
+      cache_key = [hios_id, active_year, premium.age].join('-')
+      #Rails.cache.write(cache_key, premium.cost)
+      $redis.set(cache_key, premium.cost)
+    end
+  end
+
   class << self
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
       # plan_premium = Plan.and(
@@ -153,6 +161,19 @@ class Plan
         (table.age == insured_age) && (begin_date >= table.start_on) && (begin_date <= table.end_on)
       end
       plan_premium = premium_table.cost
+    end
+    
+    def redis_monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
+      result = []
+      if plan_year.to_s == coverage_begin_date.to_date.year.to_s
+        [insured_age].flatten.each do |age|
+          cache_key = [hios_id, plan_year, age].join('-')
+          cost = $redis.get(cache_key)
+          result << { age: age, cost: cost }
+        end
+
+      end
+      result
     end
 
   end
