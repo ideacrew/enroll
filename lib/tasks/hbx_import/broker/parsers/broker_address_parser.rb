@@ -18,7 +18,7 @@ module Parser
 
     def to_hash
       {
-          kind: kind,
+          kind: kind.downcase,
           street: street,
           locality: locality,
           region: region,
