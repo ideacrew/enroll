@@ -13,8 +13,8 @@ module Parser
     element :full_phone_number, String, xpath: 'ns1:uri'
 
     def to_hash
-      {
-          kind: kind,
+      response = {
+          kind: kind.downcase,
           full_phone_number: full_phone_number.split('tel:').last
       }
     end
