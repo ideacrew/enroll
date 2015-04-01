@@ -8,11 +8,9 @@ module Parser
 
     has_many :packages, Parser::PackageParser, tag: "packages"
 
-    #has_many :benefits, Parser::BenifitsListParser, xpath: 'benefitsList/benefits'
-
     def to_hash
       {
-          packages: packages.map(&:to_hash)
+        packages: packages.map(&:to_hash)
       }
     end
   end

@@ -13,11 +13,9 @@ module Parser
 
     has_one :packages_list, Parser::PackageListParser, :tag => "packagesList"
 
-    #has_many :benefits, Parser::BenifitsParser, xpath: 'benefitsList/benefits'
-
     def to_hash
       {
-          packages_list: packages_list.to_hash
+        packages_list: packages_list.to_hash
       }
     end
   end

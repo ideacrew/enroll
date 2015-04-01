@@ -21,9 +21,9 @@ module Parser
 
     def to_hash
       {
-          header: header.to_hash,
-          plans_list: plans_list.to_hash,
-          benefits_list: benefits_list.to_hash
+        header: header.to_hash,
+        plans_list: plans_list.to_hash,
+        benefits_list: benefits_list.to_hash
       }
     end
   end

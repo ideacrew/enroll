@@ -24,15 +24,15 @@ module Parser
         in_network_tier1_individual: in_network_tier1_individual.gsub(/\n/,'').strip,
         in_network_tier1_family: in_network_tier1_family.gsub(/\n/,'').strip,
         coinsurance_in_network_tier_1: coinsurance_in_network_tier_1.gsub(/\n/,'').strip,
-        in_network_tier_two_individual: in_network_tier_two_individual.gsub(/\n/,'').strip,
-        in_network_tier_two_family: in_network_tier_two_family.gsub(/\n/,'').strip,
-        coinsurance_in_network_tier_2: coinsurance_in_network_tier_2.gsub(/\n/,'').strip,
+        in_network_tier_two_individual: in_network_tier_two_individual.present? ? in_network_tier_two_individual.gsub(/\n/,'').strip : "",
+        in_network_tier_two_family: in_network_tier_two_family.present? ? in_network_tier_two_family.gsub(/\n/,'').strip : "",
+        coinsurance_in_network_tier_2: coinsurance_in_network_tier_2.present? ? coinsurance_in_network_tier_2.gsub(/\n/,'').strip : "",
         out_of_network_individual: out_of_network_individual.gsub(/\n/,'').strip,
         out_of_network_family: out_of_network_family.gsub(/\n/,'').strip,
-        coinsurance_outof_network: coinsurance_outof_network.gsub(/\n/,'').strip,
+        coinsurance_outof_network: coinsurance_outof_network.present? ? coinsurance_outof_network.gsub(/\n/,'').strip : "",
         combined_in_or_out_network_individual: combined_in_or_out_network_individual.gsub(/\n/,'').strip,
         combined_in_or_out_network_family: combined_in_or_out_network_family.gsub(/\n/,'').strip,
-        combined_in_or_out_tier_2: combined_in_or_out_tier_2.gsub(/\n/,'').strip,
+        combined_in_or_out_tier_2: combined_in_or_out_tier_2.present? ? combined_in_or_out_tier_2.gsub(/\n/,'').strip : ""
       }
     end
   end

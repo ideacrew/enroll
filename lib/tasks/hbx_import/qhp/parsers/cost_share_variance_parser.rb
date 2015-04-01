@@ -1,18 +1,13 @@
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','sbc_parser')
-require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','maximum_out_of_pockets_list_parser')
-require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','deductible_list_parser')
-require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','service_visits_list_parser')
+require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','maximum_out_of_pockets_parser')
+require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','deductible_parser')
+require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers','service_visits_parser')
 
 module Parser
   class CostShareVarianceParser
     include HappyMapper
 
     tag 'costShareVariance'
-
-    has_one :sbc, Parser::SbcParser, tag: "sbc"
-    has_one :maximum_out_of_pockets_list, Parser::MaximumOutOfPocketsListParser, tag: "moopList"
-    has_one :deductible_list, Parser::DeductibleListParser, tag: "planDeductibleList"
-    has_one :service_visits_list, Parser::ServiceVisitsListParser, tag: "serviceVisitList"
 
     element :plan_id, String, tag: "planId"
     element :plan_marketing_name, String, tag: "planMarketingName"
@@ -30,10 +25,17 @@ module Parser
     element :default_co_insurance_in_network, String, tag: "defaultCoInsuranceInNetwork"
     element :default_co_insurance_out_of_network, String, tag: "defaultCoInsuranceOutOfNetwork"
 
+    has_one :sbc_attributes, Parser::SbcParser, tag: "sbc"
+    has_many :maximum_out_of_pockets_attributes, Parser::MaximumOutOfPocketsParser, tag: "moop", deep: true
+    has_one :deductible_attributes, Parser::DeductibleParser, tag: "planDeductible", deep:true
+    has_many :service_visits_attributes, Parser::ServiceVisitsParser, tag: "serviceVisit", deep: true
+
     def to_hash
       {
-        sbc: sbc.to_hash,
-        maximum_out_of_pockets_list: maximum_out_of_pockets_list.to_hash,
+        sbc_attributes: sbc_attributes.to_hash,
+        maximum_out_of_pockets_attributes: maximum_out_of_pockets_attributes.map(&:to_hash),
+        deductible_attributes: deductible_attributes.to_hash,
+        service_visits_attributes: service_visits_attributes.map(&:to_hash),
         plan_id: plan_id.gsub(/\n/,'').strip,
         plan_marketing_name: plan_marketing_name.gsub(/\n/,'').strip,
         metal_level: metal_level.gsub(/\n/,'').strip,

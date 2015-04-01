@@ -16,10 +16,10 @@ module Parser
       {
         visit_type: visit_type.gsub(/\n/,'').strip,
         copay_in_network_tier_1: copay_in_network_tier_1.gsub(/\n/,'').strip,
-        copay_in_network_tier_2: copay_in_network_tier_2.gsub(/\n/,'').strip,
+        copay_in_network_tier_2: copay_in_network_tier_2.present? ? copay_in_network_tier_2.gsub(/\n/,'').strip : "",
         copay_out_of_network: copay_out_of_network.gsub(/\n/,'').strip,
         co_insurance_in_network_tier_1: co_insurance_in_network_tier_1.gsub(/\n/,'').strip,
-        co_insurance_in_network_tier_2: co_insurance_in_network_tier_2.gsub(/\n/,'').strip,
+        co_insurance_in_network_tier_2: co_insurance_in_network_tier_2.present? ? co_insurance_in_network_tier_2.gsub(/\n/,'').strip : "",
         co_insurance_out_of_network: co_insurance_out_of_network.gsub(/\n/,'').strip
       }
     end

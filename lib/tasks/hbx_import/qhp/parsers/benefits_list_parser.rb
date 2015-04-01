@@ -13,11 +13,9 @@ module Parser
 
     has_many :benefits, Parser::BenefitsParser, tag: "benefits"
 
-    #has_many :benefits, Parser::BenifitsParser, xpath: 'benefitsList/benefits'
-
     def to_hash
       {
-          benefits: benefits.map(&:to_hash)
+        benefits: benefits.map(&:to_hash)
       }
     end
   end
