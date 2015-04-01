@@ -13,19 +13,24 @@ class Products::QhpCostShareVariance
   field :issuer_actuarial_value, type: Float
   field :av_calculator_output_number, type: Float
 
-  field :medical_and_drug_deductables_integrated, type: Boolean
+  field :medical_and_drug_deductibles_integrated, type: Boolean
   field :medical_and_drug_max_out_of_pocket_integrated, type: Boolean
   field :multiple_provider_tiers, type: Boolean
   field :first_tier_utilization, type: Float
   field :second_tier_utilization, type: Float
 
+  field :default_copay_in_network, type: Money
+  field :default_copay_out_of_network, type: Money
+  field :default_co_insurance_in_network, type: Money
+  field :default_co_insurance_out_of_network, type: Money
+
   ## SBC Scenario
-  field :having_baby_deductable, type: Money
+  field :having_baby_deductible, type: Money
   field :having_baby_co_payment, type: Money
   field :having_baby_co_insurance, type: Money
   field :having_baby_limit, type: Money
-  field :having_diabetes_deductable, type: Money
-  field :having_diabetes_co_payment, type: Money
+  field :having_diabetes_deductible, type: Money
+  field :having_diabetes_copay, type: Money
   field :having_diabetes_co_insurance, type: Money
   field :having_diabetes_limit, type: Money
 

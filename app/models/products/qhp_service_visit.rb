@@ -7,10 +7,10 @@ class Products::QhpServiceVisit
   field :visit_type, type: String
   field :copay_in_network_tier_1, type: Money
   field :copay_in_network_tier_2, type: Money
-  field :copay_out_of_network_tier_1, type: Money
-  field :copay_out_of_network_tier_2, type: Money
-  field :co_insurance_out_of_network_tier_1, type: Money
-  field :co_insurance_out_of_network_tier_2, type: Money
+  field :copay_out_of_network, type: Money
+  field :co_insurance_in_network_tier_1, type: Money
+  field :co_insurance_in_network_tier_2, type: Money
+  field :co_insurance_out_of_network, type: Money
 
 ## Service visit types
 # visit_type: "Maximum Out of Pocket for Medical EHB Benefits"

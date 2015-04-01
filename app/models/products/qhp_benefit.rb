@@ -22,8 +22,8 @@ class Products::QhpBenefit
   field :ehb_variance_reason, type: String
 
   ## Deductable and Out of Pocket Expenses
-  field :subject_to_deductable_tier_1, type: Boolean
-  field :subject_to_deductable_tier_2, type: Boolean
+  field :subject_to_deductible_tier_1, type: Boolean
+  field :subject_to_deductible_tier_2, type: Boolean
   field :excluded_in_network_moop, type: Boolean
   field :excluded_out_of_network_moop, type: Boolean
   
