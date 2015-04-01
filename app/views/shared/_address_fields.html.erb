@@ -1,4 +1,4 @@
-<div id="address_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
+<div id="address_info" class="focus_effect row personaol-info-row">
   <div class="col-md-12 no-pd col-sm-12 col-xs-12 first">
     <div class="row top-row">
       
@@ -19,7 +19,11 @@
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                   <% Address::KINDS.each do |item| %>
                     <% address_text = item.capitalize + "Address" %>
-                    <li role="presentation" data-value="<%= item %>" data-address-text="<%= address_text %>" class="address-li"><a href="javascript:void(0)" role="menuitem"><%= item.humanize %> Address</a></li>
+                    <li role="presentation" data-value="<%= item %>" data-address-text="<%= address_text %>" class="address-li">
+                      <a href="javascript:void(0)"><%= image_tag("delete.png") %></a>
+                      <a href="javascript:void(0)" role="menuitem"><%= item.humanize %> Address</a>
+                      <a href="javascript:void(0)"><%= image_tag("address-close.png") %></a>
+                    </li>
                   <% end %>
                 </ul>
               </div>
@@ -77,7 +81,7 @@
       <div class="new-address-flow">
 	      <div class="col-md-4 col-sm-4 col-xs-12"></div>
 	      <div class="col-md-4 col-sm-4 col-xs-12 text-center">
-	        <h5>Name your new address.</h5>
+	        <h5>Name Your New Address.</h5>
 	        <input type="text" class="form-control address_name" placeholder="i.e. Work, Mailing" onfocus="this.placeholder = ''" onblur="this.placeholder = 'i.e. Work, Mailing'">
 	        <p>
 	          <a href="javascript:void(0);" class="cancel">cancel</a>
