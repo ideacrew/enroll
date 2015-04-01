@@ -8,4 +8,11 @@ class Message
   field :subject, type: String
   field :body, type: String
 
+  validate :message_has_content
+
+private
+  def message_has_content
+    errors.add(:base, "message subject and body cannot be blank") if subject.blank? && body.blank?
+  end
+
 end

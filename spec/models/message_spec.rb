@@ -1,5 +1,40 @@
 require 'rails_helper'
 
 RSpec.describe Message, :type => :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+
+  let (:subject) {"marsha, marsha, marsha"}
+  let (:body) {"she gets all the attention!"}
+
+  describe ".new" do
+    let(:valid_params) do
+      {
+        subject: subject,
+        body: body
+      }
+    end
+
+    context "with no arguments" do
+      let(:params) {{}}
+
+      it "should be invalid" do
+        expect(Message.new(**params).valid?).to be_false
+      end
+    end
+
+    context "with no subject" do
+      let(:params) {valid_params.except(:subject)}
+
+      it "should be valid" do
+        expect(Message.new(**params).valid?).to be_true
+      end
+    end
+
+    context "with no body" do
+      let(:params) {valid_params.except(:body)}
+
+      it "should be valid" do
+        expect(Message.new(**params).valid?).to be_true
+      end
+    end
+  end
 end
