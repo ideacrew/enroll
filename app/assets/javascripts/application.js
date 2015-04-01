@@ -375,22 +375,26 @@ $(document).ready(function () {
   	$("#household_info div.first").css("opacity","0.5");
   }
   
+  update_progress(); //Run on page load for dependent_details page.
   function update_progress() {
 
-    var start_progress = 0;
-    var personal_entry = check_personal_entry_progress();
-    var address_entry  = check_address_entry_progress();
-    var phone_entry    = check_phone_entry_progress();
-    var email_entry    = check_email_entry_progress();
+    var start_progress = $('#initial_progress').length ? parseInt($('#initial_progress').val()) : 0;
+
+    if(start_progress == 0) {
+      var personal_entry = check_personal_entry_progress();
+      var address_entry  = check_address_entry_progress();
+      var phone_entry    = check_phone_entry_progress();
+      var email_entry    = check_email_entry_progress();
+    }
 
     if(personal_entry) {
-      start_progress += 25;
+      start_progress += 20;
       $("a.one").css("color","#00b420");
       $("a.two").css("color","#00b420");
     }
 
     if(address_entry) {
-      start_progress += 15;
+      start_progress += 8;
       $("a.three").css("color","#00b420");
     }
 
@@ -400,14 +404,19 @@ $(document).ready(function () {
     }
 
     if(email_entry) {
-      start_progress += 15;
+      start_progress += 12;
       $("a.five").css("color","#00b420");
     }
+
+    if($('#add_info_clone0').length) {
+      start_progress += 15;
+      $("a.six").css("color","#00b420");
+    } else {$("a.six").css("color","#999");}
 
     $('#top-pad').html(start_progress + '% Complete');
     $('.progress-top').css('height', start_progress + '%');
 
-    if(start_progress >= 65) { $('#continue-employer').removeClass('disabled'); }
+    if(start_progress >= 50) { $('#continue-employer').removeClass('disabled'); }
   }
 
   function check_personal_entry_progress() {

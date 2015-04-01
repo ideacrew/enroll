@@ -106,17 +106,17 @@
             </div><br>
             
             <div class="fail-search add-member <%= 'hidden' if !@employee.employee_family.census_dependents.empty? %>" class="row">
-              <div class="col-md-10 col-sm-9 col-xs-12 no-pd">
+              <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
                 <div class="panel panel-default">
                   <div class="panel-body member">
-                    <center>
-                      <div class="fail"><span class="bold">Here's your chance to add family members to your plan.</span> Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</div>
+                      <p class="fail"><span class="bold">Here's your chance to add family members to your plan.</span><br>Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</p>
                       <br>
-                      <% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee.id) %>
-              		  <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
-                      &nbsp; &nbsp;
-                      <a class="text-center btn btn-save">Continue</a>
-                    </center>
+                      <div class="form-inline text-center">
+                        <% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee.id) %>
+                		    <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
+                        &nbsp; &nbsp;
+                        <a class="text-center btn btn-save">Continue</a>
+                      </div>
                   </div>
                 </div>
         	  </div>
@@ -140,7 +140,7 @@
           <%= link_to 'Continue', select_plan_people_path, class: 'text-center btn btn-green pull-right' %>
         </div>
         
-        <div class="col-md-10 no-pd col-sm-9 col-xs-12 last hidden">
+        <div class="col-md-12 no-pd col-sm-12 col-xs-12 last hidden">
           <%= link_to "Cancel", 'javascript:void(0)', class: 'btn btn-red', id: 'cancel_member' %>
           
           <a class="text-center btn btn-save pull-right" id="save_member">Confirm Member</a>
@@ -151,6 +151,8 @@
         </div>
         <div class="col-md-2 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
           <a href="#" class="btn btn-save">Save & Exit</a>
+
+          <input type="hidden" id="initial_progress" value="50">
           <%= render 'shared/signup_progress' %>
         </div>
       </div>
