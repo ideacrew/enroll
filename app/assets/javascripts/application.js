@@ -513,18 +513,30 @@ $(document).ready(function () {
     $(".new-address-flow").css("display", "block");
   });
   
-  $('.new-address-flow p a.cancel').click(function(){
+  $('.new-address-flow .cancel').click(function(){
     $(".new-address-flow").removeAttr("style");
   });
-  
-  $('.new-address-flow p a.confirm').click(function(){
-    var address_name = $('.address_name').val();
-    if(address_name.length!=0) {
-      var new_option = "<li class='address-li' data-address-text='"+address_name+"Address' data-value='"+address_name+"' role='presentation'><a role='menuitem' href='javascript:void(0)'>"+address_name+"</a></li>";
-      $(".address ul").prepend(new_option);
-      $(".new-address-flow").removeAttr("style");
-    }
+
+  $('.new-address-flow .confirm').click(function(){
+    $(".new-address-flow").removeAttr("style");
+    $("ul.dropdown-menu li:first-child").clone().appendTo(".dropdown ul.dropdown-menu");
+    $("ul.dropdown-menu li:last-child a:nth-child(2)").text($("#add-address").val());
+    if (($("#add-address").val()) !== "") {
+      $("#dropdownMenu1 label").text($("#add-address").val());
+    }else{}
+
+    $('#address_info > .first').attr('id', ($("#add-address").val()));
+    $('#address_info input').val("");
   });
+  
+  // $('.new-address-flow p a.confirm').click(function(){
+  //   var address_name = $('.address_name').val();
+  //   if(address_name.length!=0) {
+  //     var new_option = "<li class='address-li' data-address-text='"+address_name+"Address' data-value='"+address_name+"' role='presentation'><a role='menuitem' href='javascript:void(0)'>"+address_name+"</a></li>";
+  //     $(".address ul").prepend(new_option);
+  //     $(".new-address-flow").removeAttr("style");
+  //   }
+  // });
   
   // Customize Dependent Family Member Delete Confirmation
   $(function() {

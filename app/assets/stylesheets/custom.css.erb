@@ -81,6 +81,37 @@ a:hover, a:focus {
     background: none repeat scroll 0 0 #ccc;
 }
 
+.adderess-select-box + ul {
+    border: 1px solid #bdbbbb;
+    border-radius: 0;
+    left: 0 !important;
+    padding: 0;
+    width: 100%;
+}
+.adderess-select-box + ul li {
+    border-bottom: 1px solid #bdbbbb;
+}
+.adderess-select-box + ul li a {
+    display: inline-block;
+    height: 35px;
+    margin: 0 5px;
+    padding: 10px 0;
+    text-align: center;
+}
+.adderess-select-box + ul li a:nth-child(2) {
+    padding-top: 5px;
+    width: 55%;
+}
+.adderess-select-box + ul li a:last-child {
+    float: right;
+}
+.adderess-select-box + ul li:last-child {
+    border-bottom: medium none;
+}
+.adderess-select-box + ul li:hover {
+    background: none repeat scroll 0 0 #f5f5f5;
+}
+
 /* Flash Messages */
 .alert {
   padding-left: 60px;
@@ -1047,7 +1078,7 @@ input.floatlabe{
   opacity: 1;
 }
 .personaol-info-top-row input {
-  border: 1px solid #999 !important;
+  border: 2px solid #0079c5 !important;
 }
 .form-control:focus {
   background: rgba(220, 234, 241, 1);
@@ -1061,9 +1092,11 @@ input.floatlabe{
 }
 .personaol-info-row .form-group {
   margin-bottom: 0;
+  background: #fff;
 }
 .personaol-info-top-row .form-group {
   margin-bottom: 0;
+  background: #fff;
 }
 .personaol-info-row .border-bottom-none {
   border-bottom: none !important;
@@ -1123,7 +1156,7 @@ input.floatlabe{
   display: block;
 }
 .btn-new-address {
-  background: none;
+  background: #fff;
   border: none !important;
   border-radius: 0;
   color: #616161 !important;
@@ -1180,30 +1213,8 @@ div#house_info > p {
     font-size: 21px;
     margin-bottom: 10px;
 }
-
-.adderess-select-box + ul {
-  border: 1px solid #bdbbbb;
-  border-radius: 0;
-  width: 100%;
-  left: 0 !important;
-}
-.adderess-select-box + ul li a {
-  background: url('<%= asset_path('delete.png') %>') no-repeat 8px center;
-  display: block;
-  padding: 8px 0;
-  text-align: center;
-  border-bottom: 1px solid #bdbbbb;
-}
-.adderess-select-box + ul li:first-child a {
-  background: url('<%= asset_path('delete.png') %>') no-repeat 8px center, url('<%= asset_path('address-close.png') %>') no-repeat 95% center;
-  display: block;
-  background-size: auto auto,auto auto;
-}
-.adderess-select-box + ul li:last-child a {
-  border-bottom: none;
-}
 .dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
-	background: url('<%= asset_path('delete.png') %>') #f5f5f5 no-repeat 8px center;
+  background: none;
 }
 .first {
   border: 1px solid #e3e3e3; 
@@ -1221,7 +1232,8 @@ div#house_info > p {
   border-bottom: 1px solid #e3e3e3; 
 }
 .personaol-info-top-row .top-row, .personaol-info-top-row .middle-row {
-  border-bottom: 1px solid #999; 
+  border-bottom: 1px solid #999;
+  background: #fff;
 }
 .bg-color {
   transition: background-color 0.3s ease-in-out 0s !important;
@@ -2096,14 +2108,18 @@ a.close-2{
   font-size: 16px;
 } 
 #address_info .new-address-flow p a{
+  border: 1px solid red;
+  border-radius: 3px;
   color: red;
   float: left;
   font-size: 16px;
-  margin-top: 2px;
+  margin-top: 6px;
+  padding: 5px 10px;
 }
-#address_info .new-address-flow a:last-child{
-  color: #007bc3;
-  float: right;
+#address_info .new-address-flow a:last-child {
+    border: 1px solid #00b22d;
+    color: #00b22d;
+    float: right;
 }
 #address_info .new-address-flow input[type="text"]::-moz-placeholder{
   font-size: 16px;
@@ -2139,9 +2155,10 @@ a.close-2{
 }
 .employee-info .top-row, .employee-info .middle-row {
   border-color: #007bc3;
+  background: #fff;
 }
 .employee-info label, .employee-info input {
-  color: #007bc3;
+  color: #007bc3 !important;
 }
 
 /*  Home Page css start  */
