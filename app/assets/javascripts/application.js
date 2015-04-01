@@ -71,6 +71,8 @@ $(document).ready(function () {
     if(check_personal_info_exists().length==0 && gender_checked)
     {
       $('.employers-row').html("");
+      $('#personal_info .employee-info').removeClass('require-field');
+
       $.ajax({
         type: "POST",
         url: "/people/match_person.json",
@@ -102,7 +104,7 @@ $(document).ready(function () {
         }
       });  
     } else {
-      $('#personal_info .col-md-10').addClass('require-field');
+      $('#personal_info .employee-info').addClass('require-field');
     }
   }
   

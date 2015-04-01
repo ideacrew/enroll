@@ -1053,11 +1053,8 @@ input.floatlabe{
 .top-row, .middle-row, .bottom-row {
   margin: 0 !important;
 }
-.error {
-  <!-- display: none; -->
-}
 .require-field {
-  border: 1px solid red !important;
+  border: 2px solid red !important;
 }
 .require-field .error {
   display: block;
@@ -1069,7 +1066,7 @@ input.floatlabe{
   font-weight: bold;
   padding: 5px 12px;
   position: absolute;
-  right: -1px;
+  right: -2px;
   text-transform: uppercase;
   top: -31px;
   display: block;
@@ -2038,36 +2035,38 @@ a .arrow-right {
     line-height: 52px;
 }
 
-.fail-search{
-  margin-left: -15px;
-  margin-right: -15px;
-  padding: 20px 0;
+.fail-search {
+    margin-top: 15px;
 }
-.fail-search .panel-default {border-width: 2px;}
-.fail-search .panel-body{
-  padding-top: 30px;
+.fail-search .panel-default {
+    border-width: 2px;
 }
-p.fail{
-  font-size: 18px !important;
-  color: #616161;
-  letter-spacing: 1px;
+.fail-search .panel-body {
+    padding-top: 30px;
 }
-.fail span.bold{
-  font-weight: bold;
+p.fail {
+    color: #616161;
+    font-size: 18px !important;
+    letter-spacing: 1px;
+    text-align: left;
 }
-span.notice{
-  font-size: 36px;
-  position: absolute;
-  left: 20px;
-  color: #b20000;
+p.fail span {
+    display: inline-block;
+    float: left;
 }
-a.close-fail{
-  color: #cecece;
-  font-weight: 300;
-  font-size: 24px;
-  position: absolute;
-  right: 15px;
-  top: 5px;
+span.notice {
+    color: #b20000;
+    font-size: 36px;
+    left: 20px;
+    margin-right: 20px;
+}
+a.close-fail {
+    color: #cecece;
+    font-size: 24px;
+    font-weight: 300;
+    position: absolute;
+    right: 15px;
+    top: 5px;
 }
 
 #key-section {
