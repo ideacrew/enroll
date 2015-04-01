@@ -37,6 +37,14 @@ class Address
     nil #todo
   end
 
+  def to_html
+    if address_2.blank?
+      "#{address_1}<br/>#{city}, #{state} #{zip}<br/>".html_safe
+    else
+      "#{address_1}<br/> #{address_2}<br/> #{city}, #{state} #{zip}<br/>".html_safe
+    end
+  end
+
   def to_s
     city.present? ? city_delim = city + "," : city_delim = city
     line3 = [city_delim, state, zip].reject(&:nil? || empty?).join(' ')
