@@ -406,6 +406,8 @@ $(document).ready(function () {
 
     $('#top-pad').html(start_progress + '% Complete');
     $('.progress-top').css('height', start_progress + '%');
+
+    if(start_progress >= 65) { $('#continue-employer').removeClass('disabled'); }
   }
 
   function check_personal_entry_progress() {
