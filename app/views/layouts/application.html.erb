@@ -22,7 +22,7 @@
 
     <%= render 'layouts/header' %>
 
-    <div class="row content landing main_div <%= controller_name %>" id="wrapper" class="container-fluid">
+    <div class="row content landing <%= controller_name %>">
         <%= render_flash %>
         <%= yield %>
     </div>

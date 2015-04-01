@@ -52,6 +52,10 @@ class BrokerAgencyProfile
     end
   end
 
+  def legal_name
+    organization.legal_name
+  end
+
   def primary_broker_role
     BrokerRole.find(self.primary_broker_role_id) unless primary_broker_role_id.blank?
   end

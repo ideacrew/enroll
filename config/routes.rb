@@ -5,10 +5,12 @@ Rails.application.routes.draw do
 
   # get 'user/index'
 
-  namespace :brokers do
+  namespace :broker_agencies do
     root 'welcome#index'
+    get 'new'
+    get 'my_account'
 
-    resources :broker do
+    resources :broker_profile do
       get 'new'
       get 'my_account'
     end
@@ -17,11 +19,16 @@ Rails.application.routes.draw do
   namespace :employers do
     root 'welcome#index'
 
-    resources :employer do
+    resources :employer_profiles do
       get 'new'
       get 'my_account'
       resources :family
     end
+  end
+
+  resources :employee_roles do
+    get 'new'
+    get 'my_account'
   end
 
   resources :people do
@@ -46,7 +53,7 @@ Rails.application.routes.draw do
     
   end
 
-  resources :employees
+
 
   devise_for :users, :controllers => { registrations: "registrations",
                                         sessions: "sessions" }

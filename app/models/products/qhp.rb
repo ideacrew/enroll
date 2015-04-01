@@ -30,7 +30,7 @@ class Products::Qhp
   field :qhp_or_non_qhp, type: String # on_the_exchange, off_the_exchange, both
   field :insurance_plan_pregnancy_notice_req_ind, type: Boolean
   field :is_specialist_referral_required, type: Boolean
-  field :health_care_specialist_referral_types, type: Array, default: []
+  field :health_care_specialist_referral_type, type: String, default: ""
   field :insurance_plan_benefit_exclusion_text, type: String
 
   field :indian_plan_variation, type: String  # amount per enrollee
@@ -43,7 +43,7 @@ class Products::Qhp
   field :child_only_offering, type: String  # allows_adult_and_child_only, allows_adult_only, allows_child_only
   field :child_only_plan_id, type: String
   field :is_wellness_program_offered, type: Boolean
-  field :is_disease_mgmt_programs_offered, type: Array, default: []
+  field :is_disease_mgmt_programs_offered, type: String, default: ""
 
   ## Stand alone dental
   # Dollar amount
@@ -55,8 +55,8 @@ class Products::Qhp
 
   # 1-10
   field :max_num_days_for_charging_inpatient_copay, type: Integer
-  field :begin_primary_care_deductable__or_coinsurance_after_set_number_of_copays, type: Integer
-  field :begin_primary_care_cost_sharing_after_set_number_of_visits, type: Integer
+  field :begin_primary_care_deductible_or_coinsurance_after_set_number_copays, type: Integer
+  field :begin_primary_care_cost_sharing_after_set_number_visits, type: Integer
 
   ## Plan Dates
   field :plan_effective_date, type: Date
@@ -75,7 +75,7 @@ class Products::Qhp
   field :plan_brochure, type: String
 
   validates_presence_of :issuer_id, :state_postal_code,
-                        :standard_component_id, :plan_marketing_name, :hios_product_id, :netwokr_id, 
+                        :standard_component_id, :plan_marketing_name, :hios_product_id, :network_id, 
                         :service_area_id, :formulary_id, :is_new_plan, :plan_type, :metal_level,
                         :unique_plan_design, :qhp_or_non_qhp, :insurance_plan_pregnancy_notice_req_ind, 
                         :is_specialist_referral_required, :hsa_eligibility, :emp_contribution_amount_for_hsa_or_hra,
@@ -85,7 +85,7 @@ class Products::Qhp
 
 
   embeds_many :qhp_benefits,
-    class_name: "Products::QhpBenefits",
+    class_name: "Products::QhpBenefit",
     cascade_callbacks: true,
     validate: true
 
@@ -95,9 +95,9 @@ class Products::Qhp
     validate: true
 
   accepts_nested_attributes_for :qhp_benefits, :qhp_cost_share_variance
-  validates_presence_of :issuer_hios_id, :state_postal_code
+  validates_presence_of :issuer_id, :state_postal_code
 
-  index({"issuer_hios_id" => 1})
+  index({"issuer_id" => 1})
   index({"state_postal_code" => 1})
   index({"national_network" => 1})
   index({"tin" => 1}, {sparse: true})

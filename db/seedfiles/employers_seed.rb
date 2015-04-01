@@ -8,34 +8,32 @@ broker_agency_1 = BrokerAgencyProfile.last
 
 
 puts "::: Creating Jetsons :::"
-spacely = Organization.new(
+address_00 = Address.new(kind: "work", address_1: "100 Cosmic Way, NW", city: "Washington", state: "DC", zip: "20001")
+phone_00 = Phone.new(kind: "main", area_code: "202", number: "555-1213")
+email_00 = Email.new(kind: "work", address: "info@spacely.com")
+office_location_00 = OfficeLocation.new(is_primary: true, address: address_00, phone: phone_00, email: email_00)
+spacely = Organization.create(
       dba: "Spacely's Sprockets",
       legal_name: "Spacely's Sprockets, Inc",
       fein: 444123456,
-      office_locations: [
-        Address.new(
-            kind: "work",
-            address_1: "100 Cosmic Way, NW",
-            city: "Washington",
-            state: "DC",
-            zip: "20001"
-          )
-      ]
+      office_locations: [office_location_00]
     )
 
-cogswell = Organization.new(
+address_01 = Address.new(kind: "work", address_1: "100 Milky Way, SW", city: "Washington", state: "DC", zip: "20001")
+phone_01 = Phone.new(kind: "main", area_code: "202", number: "555-1214")
+email_01 = Email.new(kind: "work", address: "info@spacely.com")
+office_location_01 = OfficeLocation.new(is_primary: true, address: address_01, phone: phone_01, email: email_01)
+
+address_02 = Address.new(kind: "work", address_1: "311 Venus Pkwy, NW", city: "Washington", state: "DC", zip: "20001")
+phone_02 = Phone.new(kind: "main", area_code: "202", number: "555-1215")
+email_02 = Email.new(kind: "work", address: "info@spacely.com")
+office_location_02 = OfficeLocation.new(is_primary: false, address: address_02, phone: phone_02, email: email_02)
+
+cogswell = Organization.create(
       dba: "Cogswell Cogs",
       legal_name: "Cogswell Cogs, Inc",
       fein: 555123457,
-      office_locations: [
-        Address.new(
-            kind: "work",
-            address_1: "100 Milky Way, SW",
-            city: "Washington",
-            state: "DC",
-            zip: "20001"
-          )
-      ]
+      office_locations: [office_location_01, office_location_02]
     )
 
 jetson_0 = EmployerCensus::EmployeeFamily.new(

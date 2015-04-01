@@ -1,19 +1,11 @@
 <%- model_class = Person -%>
 
-<% content_for :side_nav do %>
-  <ul>
-    <li>Name<br/>Birthday<br/>Gender<br/>Social Security</li>
-  </ul>
-<% end %>
-
-<!-- <section>
-  <div class="col-md-12">
-    <nav>
-      <%#= generate_breadcrumbs([{:name => "People", :path => people_path}, {:name => "New"}]) %>      
-    </nav>
-  </div>
-</section> -->
-
-<%= form_for(@person) do |f| %>
-  <%= render 'form', f: f %>
-<% end %>
+<div class="container-fluid no-pd-left">
+	<div class="panel panel-default">
+  		<div class="panel-body left" id="new_person_wrapper">
+			<%= form_for(@person) do |f| %>
+			  <%= render 'form', f: f %>
+			<% end %>
+		</div>
+	</div>
+</div>

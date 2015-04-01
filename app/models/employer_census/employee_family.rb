@@ -28,8 +28,8 @@ class EmployerCensus::EmployeeFamily
 
   validates_presence_of :census_employee
 
-  scope :active,  ->{ where(:terminated => false) }
-  scope :terminated,      ->{ where(:terminated => true) }
+  default_scope  ->{ where(:terminated => false) }
+  scope :terminated,     ->{ where(:terminated => true) }
 
   scope :linked,     ->{ where(:is_linked => true) }
   scope :unlinked,   ->{ where(:is_linked => false) }
