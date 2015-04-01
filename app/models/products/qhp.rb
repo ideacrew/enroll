@@ -85,7 +85,7 @@ class Products::Qhp
 
 
   embeds_many :qhp_benefits,
-    class_name: "Products::QhpBenefits",
+    class_name: "Products::QhpBenefit",
     cascade_callbacks: true,
     validate: true
 
@@ -95,9 +95,9 @@ class Products::Qhp
     validate: true
 
   accepts_nested_attributes_for :qhp_benefits, :qhp_cost_share_variance
-  validates_presence_of :issuer_hios_id, :state_postal_code
+  validates_presence_of :issuer_id, :state_postal_code
 
-  index({"issuer_hios_id" => 1})
+  index({"issuer_id" => 1})
   index({"state_postal_code" => 1})
   index({"national_network" => 1})
   index({"tin" => 1}, {sparse: true})
