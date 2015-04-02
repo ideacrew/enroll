@@ -77,7 +77,7 @@ class User
   after_create :send_welcome_email
 
   def send_welcome_email
-    send_email(self.email, "Thank you for registering.", "Welcome to the exchange!")
+    UserMailer.welcome(self).deliver_now
     true
   end
 
