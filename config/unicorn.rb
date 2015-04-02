@@ -10,3 +10,8 @@ listen "/tmp/unicorn_enroll.ap.sock"
 worker_processes 20
 timeout 30
 preload_app true
+
+after_fork do
+  Acapi::Requestor.reconnect!
+  Acapi::LocalAmqpPublisher.reconnect!
+end
