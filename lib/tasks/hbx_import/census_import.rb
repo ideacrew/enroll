@@ -14,7 +14,7 @@ module HbxImport
         ees << CensusRecord.from_row(row)
       end
 
-      ees.reject!(&:nil?).sort!.uniq!
+      ees = ees.reject(&:nil?).sort.uniq
 
       puts "Found #{ees.size} unique census records in #{ees.collect(&:fein).uniq.size} employers."
 

@@ -5,29 +5,32 @@ class QhpBuilder
   end
 
   def build_and_save
-    @qhp_array.each do |hash_attributes|
-      @hash_attributes = hash_attributes
+    @qhp_array.each do |plans|
+      @plans = plans
+      plans[:plans_list][:plans].each do |plan|
+        @plan = plan
 
-      @qhp = Products::Qhp.new(qhp_params)
+        @qhp = Products::Qhp.new(qhp_params)
 
-      # Benefits
-      benefits_params.each do |benefit|
-        @qhp.qhp_benefits.build(benefit)
+        # Benefits
+        benefits_params.each do |benefit|
+          @qhp.qhp_benefits.build(benefit)
+        end
+
+        # Cost Share Variance
+        @qhp.build_qhp_cost_share_variance.attributes = cost_share_variance_params
+        @qhp.qhp_cost_share_variance.build_qhp_deductable.attributes = deductible_params
+
+        maximum_out_of_pockets_params.each do |moop|
+          @qhp.qhp_cost_share_variance.qhp_maximum_out_of_pockets.build(moop)
+        end
+
+        service_visits_params.each do |visits|
+          @qhp.qhp_cost_share_variance.qhp_service_visits.build(visits)
+        end
+
+        @qhp.save
       end
-
-      # Cost Share Variance
-      @qhp.build_qhp_cost_share_variance.attributes = cost_share_variance_params
-      @qhp.qhp_cost_share_variance.build_qhp_deductable.attributes = deductible_params
-
-      maximum_out_of_pockets_params.each do |moop|
-        @qhp.qhp_cost_share_variance.qhp_maximum_out_of_pockets.build(moop)
-      end
-
-      service_visits_params.each do |visits|
-        @qhp.qhp_cost_share_variance.qhp_service_visits.build(visits)
-      end
-
-      @qhp.save
     end
   end
 
@@ -52,11 +55,11 @@ class QhpBuilder
   end
 
   def cost_share_variance_list_params
-    plans_params[:cost_share_variance_list_attributes]
+    @plan[:cost_share_variance_list_attributes]
   end
 
   def benefits_params
-    @hash_attributes[:benefits_list][:benefits]
+    @plans[:benefits_list][:benefits]
   end
 
   def qhp_params
@@ -64,15 +67,11 @@ class QhpBuilder
   end
 
   def header_params
-    @hash_attributes[:header]
-  end
-
-  def plans_params
-    @hash_attributes[:plans_list][:plans].first
+    @plans[:header]
   end
 
   def plan_attribute_params
-    plans_params[:plan_attributes]
+    @plan[:plan_attributes]
   end
 
 end
