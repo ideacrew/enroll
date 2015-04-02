@@ -27,7 +27,7 @@ namespace :xml do
         xml = Nokogiri::XML(File.open(args.file))
         plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
         qhp_hash = QhpBuilder.new(plan.to_hash)
-        qhp_hash.build_and_save
+        qhp_hash.run
       #   exit
       # end
     end
