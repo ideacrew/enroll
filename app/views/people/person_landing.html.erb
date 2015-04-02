@@ -36,132 +36,130 @@
               </ul>
               <div class="tab-content" id="myTabContent">
                 <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
-                  <div class="col-md-12 col-sm-12 no-pd">
+                  <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="row landing-row">
                       <div class="col-md-6 col-sm-6 col-xs-12 left-side">
-                        <p class="head">Contact Information</p>
-                        <div class="table-responsive">
-                          <table class="table table-bordered search-table">
-                            <tbody>
-                              <tr>
-                                <td colspan="4">
-                                  <button class="form-control float-label adderess-select-box" type="button">
-                                    <%= @person.first_name %> <%= @person.middle_name %> <%= @person.last_name %>
-                                    <span class="caret"></span>
-                                  </button>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <button class="btn btn-new-address">NEW ADDRESS</button>
-                                </td>
-                                <td colspan="3">
-                                  <button class="form-control float-label adderess-select-box home" type="button" style="float: left; width: 91%;">
-                                    Home Address
-                                    <span class="caret"></span>
-                                  </button>
-                                  <!-- <i class="fa fa-trash" style="font-weight: normal; font-size: 25px; line-height: 35px;"></i> -->
-                                </td>
-                              </tr>
-                              <% @person.addresses.each do |address| %>
-                               <% if address.address_1.present? %>
+                        <div class="row">
+                          <p class="head">
+                            <span>Household</span>
+                            <span>add members</span>
+                          </p>
+                          <div class="table-responsive">
+                            <table class="table table-bordered search-table">
+                              <tbody>
+                                 <tr>
+                                  <td colspan="4">
+                                    <div class="dropdown form-control float-label adderess-select-box text-center">
+                                      <a id="dLabel" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
+                                        <%= @person.first_name %> <%= @person.middle_name %> <%= @person.last_name %>
+                                        <i class="glyphicon glyphicon-menu-down"></i>
+                                      </a>
+                                      <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                        <li><a href="#">Link1</a></li>
+                                        <li><a href="#">Link2</a></li>
+                                        <li><a href="#">Link3</a></li>
+                                      </ul>
+                                    </div>
+                                  </td>
+                                </tr>
                                 <tr>
-                                <td colspan="2">
-                                  <span>ADDRESS LINE 1</span>
-                                  <span><%= address.address_1 %></span>
-                                </td>
-                                <td colspan="2">
-                                  <span>ADDRESS LINE 2</span>
-                                  <span><%= address.address_2 %> </span>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <span>CITY</span>
-                                  <span><%= address.city %> </span>
-                                </td>
-                                <td>
-                                  <span>STATE</span>
-                                  <span><%= address.state %></span>
-                                </td>
-                                <td>
-                                  <span>COUNTRY</span>
-                                  <span><%= address.country_name %></span>
-                                </td>
-                                <td>
-                                  <span>ZIP</span>
-                                  <span><%= address.zip %></span>
-                                </td>
-                              </tr>
-                              <% end %>
-                              <% end %>
-                            </tbody>
-                          </table>
+                                  <td>
+                                    <button class="btn btn-new-address">NEW ADDRESS</button>
+                                  </td>
+                                  <td colspan="3">
+                                    <div class="dropdown form-control float-label adderess-select-box text-center home">
+                                      <a id="dLabel" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
+                                        Home Address
+                                        <i class="glyphicon glyphicon-menu-down"></i>
+                                      </a>
+                                      <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                        <li><a href="#">Link1</a></li>
+                                        <li><a href="#">Link2</a></li>
+                                        <li><a href="#">Link3</a></li>
+                                      </ul>
+                                    </div>
+                                  </td>
+                                </tr>
+                                <%# @person.addresses.each do |address| %>
+                                <% @address = @person.addresses.try(:first) %>
+                                <% if @address.present? %>
+                                  <tr>
+                                    <td colspan="2">
+                                      <span>ADDRESS LINE 1</span>
+                                      <span><%= @address.address_1 %></span>
+                                    </td>
+                                    <td colspan="2">
+                                      <span>ADDRESS LINE 2</span>
+                                      <span><%= @address.address_2 %> </span>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td>
+                                      <span>CITY</span>
+                                      <input type="text">
+                                      <span><%= @address.city %> </span>
+                                    </td>
+                                    <td>
+                                      <span>STATE</span>
+                                      <input type="text">
+                                      <span><%= @address.state %></span>
+                                    </td>
+                                    <td>
+                                      <span>COUNTRY</span>
+                                      <input type="text">
+                                      <span><%= @address.country_name %></span>
+                                    </td>
+                                    <td>
+                                      <span>ZIP</span>
+                                      <input type="text">
+                                      <span><%= @address.zip %></span>
+                                    </td>
+                                  </tr>
+                                <% end %>
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
-                      </div>
-                      <div class="col-md-6 col-sm-6 col-xs-12 right-side">
-                        <p class="head">
-                          <span>Household</span>
-                          <span>add members</span>
-                        </p>
-                        <ul class="list-group">
-                          <% @employee.employee_family.census_dependents.each do |dependent| %>
-                            <li class="list-group-item">
-                            <div class="row">
-                              <div class="col-md-10 col-sm-8 col-xs-8">
-                                  <h4><h4> <%= dependent.first_name %> <%= dependent.last_name %> </h4> </h4>
-                              </div>
-                              <div class="col-md-2 col-sm-4 col-xs-4 text-right">
-                                <a href="#"><%= image_tag 'edit.png' %></a>
-                                <a href="#"><%= image_tag 'member-close.png' %></a>
-                              </div>
-                            </div>
-                          </li>
-                          <% end %>
-                          <button class="btn btn-see-all">See All</button>
-                        </ul>
-                      </div>
-                      <div class="cleafix"></div>
-                    </div>
-
-                    <div class="landing-row row bottom-row">
-                      <div class="col-md-6 col-sm-6 col-xs-12 left-side">
-                        <p class="head">
+                        <div class="row bottom">
+                          <p class="head">
                           <span>Employers & Plans</span>
                           <span>add employer</span>
-                        </p>
-                         <ul class="list-group emp-ul">
-                          <li class="list-group-item">
-                            <div class="row">
-                              <div class="col-md-10 col-sm-12 col-xs-12">
-                                  <h4>Pets.com</h4>
+                          </p>
+                           <ul class="list-group emp-ul">
+                            <li class="list-group-item">
+                              <div class="row">
+                                <div class="col-md-10 col-sm-12 col-xs-12">
+                                    <h4>Pets.com</h4>
+                                </div>
                               </div>
-                            </div>
-                          </li>
-                          <li class="list-group-item">
-                            <div class="row">
-                              <div class="col-md-10 col-sm-12 col-xs-12">
-                                  <h4>Kaiser 300+ Unoiversal</h4>
+                            </li>
+                            <li class="list-group-item">
+                              <div class="row">
+                                <div class="col-md-10 col-sm-12 col-xs-12">
+                                    <h4>Kaiser 300+ Unoiversal</h4>
+                                </div>
                               </div>
-                            </div>
-                          </li>
-                          <li class="list-group-item">
-                            <div class="row">
-                              <div class="col-md-10 col-sm-12 col-xs-12">
-                                  <h4>VSP Premium Eye Family Plan</h4>
+                            </li>
+                            <li class="list-group-item">
+                              <div class="row">
+                                <div class="col-md-10 col-sm-12 col-xs-12">
+                                    <h4>VSP Premium Eye Family Plan</h4>
+                                </div>
                               </div>
-                            </div>
-                          </li>
-                          <li class="list-group-item">
-                            <div class="row">
-                              <div class="col-md-10 col-sm-12 col-xs-12">
-                                  <h4>VSP Premium Eye Family Plan</h4>
+                            </li>
+                            <li class="list-group-item">
+                              <div class="row">
+                                <div class="col-md-10 col-sm-12 col-xs-12">
+                                    <h4>VSP Premium Eye Family Plan</h4>
+                                </div>
                               </div>
-                            </div>
-                          </li>
-                          <button class="btn btn-see-all">See Details</button>
-                        </ul>
+                            </li>
+                            <button class="btn btn-see-all">See Details</button>
+                          </ul>
+                        </div>
                       </div>
+                      
+                      
                       <div class="col-md-6 col-sm-6 col-xs-12 right-side">
                         <p class="head">
                           <span>Life Events</span>
@@ -174,7 +172,7 @@
                                 <h4>"We have a new child in the family"</h4>
                               </div>
                               <div class="col-md-4 col-sm-4 col-xs-12 text-right">
-                                <a href="#">add a new family member</a>
+                                <a href="#">add a family member</a>
                               </div>
                             </div>
                           </li>
@@ -184,7 +182,7 @@
                                 <h4>"I just got married"</h4>
                               </div>
                               <div class="col-md-4 col-sm-4 col-xs-12 text-right">
-                                <a href="#">add a new family member</a>
+                                <a href="#">add a family member</a>
                               </div>
                             </div>
                           </li>
@@ -448,7 +446,7 @@
       <div class="md-content">
         <h3>
           Life Events
-	  <img src="<%= asset_path('autofill-close.png') %>" class="md-close">
+    <img src="<%= asset_path('autofill-close.png') %>" class="md-close">
         </h3>
         <div class="body">
           <input type="text" class="form-control" placeholder="search life events">
