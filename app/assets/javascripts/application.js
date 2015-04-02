@@ -124,29 +124,6 @@ $(document).ready(function () {
       type: "GET",
       data:{id: $("#people_id").val()},
       url: "/people/get_employer.js",
-      success: function (result) {
-
-        if(result) {
-          // $("#key-section").css("display", "block");
-          $("#key-section").removeClass("hidden");
-          $('.search-btn-row').addClass('hidden');
-          $('.employer_info').removeClass('hidden');
-          $('#employer-info').removeClass('hidden');
-          
-          $('#address_info').removeClass('hidden');
-          $('.address_info').removeClass('hidden');
-          $('#phone_info').removeClass('hidden');
-          $('.phone_info').removeClass('hidden');
-          $('#email_info').removeClass('hidden');
-          $('.email_info').removeClass('hidden');
-          $('.search_continue').removeClass('hidden');
-          $("#employer-info").css("display", "block");
-        } else {
-          $('.search_results').removeClass('hidden');
-          $('.employers-row').html("");
-          $('.fail-search').removeClass('hidden');
-        }
-      }
     });
   }
 
@@ -535,14 +512,26 @@ $(document).ready(function () {
 
   $('.new-address-flow .confirm').click(function(){
     $(".new-address-flow").removeAttr("style");
+    var new_address = $("#add-address").val();
     $("ul.dropdown-menu li:first-child").clone().appendTo(".dropdown ul.dropdown-menu");
-    $("ul.dropdown-menu li:last-child a:nth-child(2)").text($("#add-address").val());
+    $("ul.dropdown-menu li:last-child a:nth-child(2)").text(new_address);
+    $("ul.dropdown-menu li:last-child").data('value', new_address.substr(0, new_address.indexOf(' ')).toLowerCase()); //Get First word and lowercase
+    $("ul.dropdown-menu li:last-child").data('address-text', new_address.replace(/ /g,'')) // Remove Whitespace
+
     if (($("#add-address").val()) !== "") {
       $("#dropdownMenu1 label").text($("#add-address").val());
     }else{}
 
     $('#address_info > .first').attr('id', ($("#add-address").val()));
     $('#address_info input').val("");
+  });
+
+  $('.dropdown-menu a.address-close').click(function() {
+    if($("ul.dropdown-menu li").length > 1) {
+      $(this).parent("ul.dropdown-menu li").remove();
+    } else {
+      alert("You cannot remove all addresses.");
+    }
   });
   
   // $('.new-address-flow p a.confirm').click(function(){
