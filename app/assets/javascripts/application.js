@@ -85,10 +85,9 @@ $(document).ready(function () {
             $("#people_id").val(person._id);
             _getEmployers();
             
-            $('#key-section').removeClass('hidden');
-            $('#house_info, #add_info, #top-pad30, #top-pad80, #top-pad85').hide();
+            // $('#key-section').removeClass('hidden');
+            // $('#house_info, #add_info, #top-pad30, #top-pad80, #top-pad85').hide();
             // $('a.one, a.two').css("color", "#00b22d");
-            $("#employer-info").css("display", "block");
           }
           else
           {
@@ -98,7 +97,7 @@ $(document).ready(function () {
           }
 
           //Sidebar Switch - Search Active
-          $('#personal_sidebar').removeClass('hidden');
+          // $('#personal_sidebar').removeClass('hidden');
           //$('#search_sidebar').addClass('hidden');
           $(".overlay-in").css("display", "block");
         }
@@ -110,28 +109,13 @@ $(document).ready(function () {
   
   function _getEmployers()
   {
-    //$('.autofill-initial').addClass('hidden');
-    $("#key-section").css("display", "block");
-
     common_body_style();
     side_bar_link_style();
 
-    $('.search_alert_msg').removeClass('hidden');
-    $('.searching_span').text('Searching');
-    $('.search_alert_msg').addClass('hidden');
+    // $('.search_alert_msg').removeClass('hidden');
+    // $('.searching_span').text('Searching');
+    // $('.search_alert_msg').addClass('hidden');
     getAllEmployers();
-
-    $('.search-btn-row').addClass('hidden');
-    $('.employer_info').removeClass('hidden');
-    $('#employer-info').removeClass('hidden');
-    
-    $('#address_info').removeClass('hidden');
-    $('.address_info').removeClass('hidden');
-    $('#phone_info').removeClass('hidden');
-    $('.phone_info').removeClass('hidden');
-    $('#email_info').removeClass('hidden');
-    $('.email_info').removeClass('hidden');
-    $('.search_continue').removeClass('hidden');
   }
   
   function getAllEmployers()
@@ -139,7 +123,30 @@ $(document).ready(function () {
     $.ajax({
       type: "GET",
       data:{id: $("#people_id").val()},
-      url: "/people/get_employer.js"
+      url: "/people/get_employer.js",
+      success: function (result) {
+
+        if(result) {
+          // $("#key-section").css("display", "block");
+          $("#key-section").removeClass("hidden");
+          $('.search-btn-row').addClass('hidden');
+          $('.employer_info').removeClass('hidden');
+          $('#employer-info').removeClass('hidden');
+          
+          $('#address_info').removeClass('hidden');
+          $('.address_info').removeClass('hidden');
+          $('#phone_info').removeClass('hidden');
+          $('.phone_info').removeClass('hidden');
+          $('#email_info').removeClass('hidden');
+          $('.email_info').removeClass('hidden');
+          $('.search_continue').removeClass('hidden');
+          $("#employer-info").css("display", "block");
+        } else {
+          $('.search_results').removeClass('hidden');
+          $('.employers-row').html("");
+          $('.fail-search').removeClass('hidden');
+        }
+      }
     });
   }
 
