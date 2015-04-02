@@ -11,7 +11,7 @@ worker_processes 20
 timeout 30
 preload_app true
 
-after_fork do
+after_fork do |server, worker|
   Acapi::Requestor.reconnect!
   Acapi::LocalAmqpPublisher.reconnect!
 end
