@@ -77,7 +77,7 @@ class User
   after_create :send_welcome_email
 
   def send_welcome_email
-    email(self.email, "Thank you for registering.", "Welcome to the exchange!")
+    send_email(self.email, "Thank you for registering.", "Welcome to the exchange!")
   end
 
   def has_role?(role_sym)
