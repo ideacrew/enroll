@@ -78,6 +78,7 @@ class User
 
   def send_welcome_email
     send_email(self.email, "Thank you for registering.", "Welcome to the exchange!")
+    true
   end
 
   def has_role?(role_sym)
@@ -88,6 +89,7 @@ class User
     if authentication_token.blank?
       self.authentication_token = generate_authentication_token
     end
+    true
   end
 
   def active_for_authentication?
