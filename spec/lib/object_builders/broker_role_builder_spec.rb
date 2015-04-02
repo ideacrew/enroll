@@ -18,11 +18,11 @@ describe BrokerRoleBuilder do
     expect(@broker_builder.broker.npn).to eq(@broker_hash[:npn])
   end
 
-  it 'create a valid Person object' do
+  it 'creates a valid Person object' do
     expect(@broker_builder.person.valid?).to be_truthy
   end
 
-  it 'create a valid BrokerRole object' do
+  it 'creates a valid BrokerRole object' do
     expect(@broker_builder.person.broker_role.valid?).to be_truthy
   end
 
