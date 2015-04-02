@@ -9,11 +9,11 @@ puts ":::Generating Plans from xml file:::"
 blacklist_plan_names = ["UnitedHealthcare Gold Choice Plus HRA 2000","UnitedHealthcare Platinum Choice Plus HRA 1000","UnitedHealthcare Gold Choice HRA 2000", "UnitedHealthcare Platinum Choice HRA 1000"]
 blacklist_hios_ids = ["41842DC0010070","41842DC0010071","41842DC0040048","41842DC0040049"]
 
-provider_dirs = Dir.glob("#{Rails.root}/public/xml/planxmls/*")
+provider_dirs = Dir.glob("#{Rails.root}/db/data/xml/planxmls/*")
 provider_dirs.each do |directory|
   files = Dir.glob("#{directory}/*")
   provider =  directory
-  provider.slice! "#{Rails.root}/public/xml/planxmls"
+  provider.slice! "#{Rails.root}/db/data/xml/planxmls"
   files.each do |file|
     file_contents = File.read(file)
     PlansParser.parse(file_contents).each do |plan_parse|

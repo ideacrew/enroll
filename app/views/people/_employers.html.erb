@@ -1,48 +1,38 @@
-
 <% if @employer_profile.present? %>	
-		  <div class="col-md-5 col-sm-5 col-xs-12 no-pd">
+		  <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
         <% organization = @employer_profile.organization %>
         <% employee = organization.employee_family_details(@person) %>
 			  <%= render 'shared/employer', organization: organization,employee: employee.census_employee %>
 		  </div>
-      <div class="col-md-2 col-sm-2 col-xs-2">
+      <div class="col-md-2 col-sm-2 col-xs-12">
         <% if employee.census_dependents.present? %>
           <% url = dependent_details_people_path(person_id: @person.id, organization_id: organization.id) %>
         <% else %>
           <% url = plan_details_people_path(person_id: @person.id, organization_id: organization.id) %>
         <% end %>
-        
+
         <input type="hidden" data-url="<%= url %>" class="badge">
-        <!-- <span id="badge" data-url="<%= url %>"  class="badge" style="cursor:pointer"><i></i></span> -->
 			</div>
-		  <div class="col-md-3 col-sm-2 col-xs-12 no-pd text-right">
+		  <div class="col-md-4 col-sm-4 col-xs-12 no-pd text-right">
 			  <p>Not your employer? <a href="#"><u>Click Here</u></a></p>
       </div>
 <% end %>
-<!-- <div class="col-md-3 col-sm-4 col-xs-12 no-pd">
-  <a href="#" data-method="POST" id="continue-employer" class="btn btn-search search_continue">Continue</a>
-</div> -->
- 
-<!-- <div class="col-md-3 col-sm-4 col-xs-12 no-pd text-right">
-  <p>Change Details? <a href="#" class="change_personal_info"><u>Search Again</u></a></p>
-</div> -->
-<script>
 
+<script>
   $(".change_personal_info").click(function(){
     $('.search-btn-row').removeClass('hidden');
     $('#employer-info').html("");
     $(".employer_info").html('');
   });
-// $('.search_continue').hide();
-$(".badge").on('click',function(){
-  $('.badge').removeClass('badge-active');
-  $(".person-search-form").removeClass('person-search-form-active');
-  $(this).toggleClass('badge-active');
-  $(this).closest(".person-search-form").addClass('person-search-form-active');
-  url = $(".badge-active").attr("data-url");
-  $('.search_continue').attr("href",url);
-  // $('.search_continue').show();
-});
+
+  $(".badge").on('click',function(){
+    $('.badge').removeClass('badge-active');
+    $(".person-search-form").removeClass('person-search-form-active');
+    $(this).toggleClass('badge-active');
+    $(this).closest(".person-search-form").addClass('person-search-form-active');
+    url = $(".badge-active").attr("data-url");
+    $('.search_continue').attr("href",url);
+  });
 
 $('.search_continue').on('click', function() {
   $('.search_continue').attr("href",$('.badge').first().attr("data-url"));

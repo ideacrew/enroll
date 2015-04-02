@@ -1,0 +1,27 @@
+<div class="col-md-10 col-sm-12">
+  <h3>Employers</h3>
+    <div class="container-fluid no-pd-left">
+      <div class="col-md-10 col-sm-9 col-xs-12 no-pd">
+
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Rostered EE Ct</th>
+            <th>Broker Agency</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @employer_profiles.each do |er| %>
+            <tr>
+              <td><%= link_to er.legal_name, employers_employer_profile_path(er) %></td>
+              <td><%= er.roster_count %></td>
+              <td><%= er.broker_agency_profile.try(:legal_name) %></td>
+             </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>

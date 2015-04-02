@@ -28,8 +28,8 @@ class EmployerCensus::EmployeeFamily
 
   validates_presence_of :census_employee
 
-  scope :active,  ->{ where(:terminated => false) }
-  scope :terminated,      ->{ where(:terminated => true) }
+  default_scope  ->{ where(:terminated => false) }
+  scope :terminated,     ->{ where(:terminated => true) }
 
   scope :linked,     ->{ where(:is_linked => true) }
   scope :unlinked,   ->{ where(:is_linked => false) }
@@ -65,12 +65,14 @@ class EmployerCensus::EmployeeFamily
   end
 
   def benefit_group=(new_benefit_group)
-    self.benefit_group_id = new_benefit_group._id unless new_benefit_group.blank?
-    self.plan_year = new_benefit_group.plan_year
+    if new_benefit_group.present?
+      self.benefit_group_id = new_benefit_group._id
+      self.plan_year = new_benefit_group.plan_year
+    end
   end
 
   def benefit_group
-    parent.plan_year.benefit_group.find(:plan_year_id => self.benefit_group_id)
+    parent.plan_years.find(plan_year_id).benefit_groups.find(benefit_group_id)
   end
 
   def link_employee_role(new_employee_role)
@@ -133,10 +135,20 @@ class EmployerCensus::EmployeeFamily
 
   class << self
     def find_by_employee_role(employee_role)
-      where(employee_role_id: employee_role._id).first
+      organizations = Organization.where("employer_profile.employee_families.employee_role_id" => employee_role._id).to_a
+      return nil if organizations.size != 1
+      organizations.first.employer_profile.employee_families.detect { | family | family.employee_role_id == employee_role._id }
     end
   end
 
+private
+  # Apply business rules for when an enrollment -- outside open enrollment -- is considered timely, including:
+  # Number of days preceeding effective date that an employee may submit a plan enrollment
+  # Minimum number of days an employee may submit a plan, following addition or correction to Employer roster
+
+  def is_timely_special_enrollment?
+    # Employee has
+  end
 end
 
 class EmployeeFamilyLinkError < StandardError; end

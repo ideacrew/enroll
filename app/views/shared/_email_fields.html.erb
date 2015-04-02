@@ -1,10 +1,15 @@
 <% kind = f.object.kind.upcase %>
 <div class="email">
-	<div class="col-md-5 col-sm-4 no-pd first">
+	<div class="col-md-6 col-sm-6 no-pd first">
 	  <div class="form-group form-group-lg">
-    <%= f.hidden_field :kind %>
+
+	  	<% if kind == 'HOME' %>
+          <% required = "required" %>
+        <% end %>
+
+    	<%= f.hidden_field :kind %>
     
-	  	<%= f.email_field :address, placeholder: "NAME@#{kind}.COM", class: "floatlabel form-control" %>
+	  	<%= f.email_field :address, placeholder: "NAME@#{kind}.COM", class: "floatlabel form-control #{required}" %>
 	  </div>
 	  <%= render 'shared/error_warning' %>
 	</div>

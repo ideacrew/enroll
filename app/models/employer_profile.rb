@@ -63,6 +63,12 @@ class EmployerProfile
     self.organization
   end
 
+
+  # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
+  def roster_count
+    employee_families.count
+  end
+
   # belongs_to broker_agency_profile
   def broker_agency_profile=(new_broker_agency_profile)
     raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a?(BrokerAgencyProfile)

@@ -71,6 +71,8 @@ $(document).ready(function () {
     if(check_personal_info_exists().length==0 && gender_checked)
     {
       $('.employers-row').html("");
+      $('#personal_info .employee-info').removeClass('require-field');
+
       $.ajax({
         type: "POST",
         url: "/people/match_person.json",
@@ -85,7 +87,8 @@ $(document).ready(function () {
             
             $('#key-section').removeClass('hidden');
             $('#house_info, #add_info, #top-pad30, #top-pad80, #top-pad85').hide();
-            $('a.one, a.two').css("color", "#00b22d");
+            // $('a.one, a.two').css("color", "#00b22d");
+            $("#employer-info").css("display", "block");
           }
           else
           {
@@ -101,7 +104,7 @@ $(document).ready(function () {
         }
       });  
     } else {
-      $('#personal_info .col-md-10').addClass('require-field');
+      $('#personal_info .employee-info').addClass('require-field');
     }
   }
   
@@ -175,27 +178,38 @@ $(document).ready(function () {
 
   $('#continue').click(function() {
     $("#overlay").css("display", "none");
-    $(".emp-welcome-msg").css("display", "none");
-    $(".focus_effect").css("opacity", "1");
-    $(".information").css("opacity", "1");
-    $("a.name").css("padding-top", "65px");
-    $(".disable-btn").css("display", "inline-block");
     $(".welcome-msg").css("display", "none");
-    $("a.welcome_msg").css("display", "none");
-    $("a.credential_info, a.name_info, a.tax_info").css("display", "block");
-    $("#tax_info .btn-continue").css("display", "inline-block");
+    $(".information").removeClass('hidden');
+    $("a.name").css("padding-top", "30px");
+    $(".disable-btn").css("display", "inline-block");
     $('.focus_effect:first').addClass('personaol-info-top-row');
     $('.focus_effect:first').removeClass('personaol-info-row');
     $('.sidebar a:first').addClass('style_s_link');
-    $('.sidebar a.credential_info').addClass('style_s_link');
-    // $(".key").css("display", "block");
+    $("#personal_info").css("display", "block");
     $(".search-btn-row").css("display", "block");
-    
-    var check = check_personal_info_exists();
-    if(check.length==0) {
-      //$('.autofill-cloud.autofill-initial').removeClass('hidden');
-    }
+    $(".personal_info").css("display", "block");
+    $(".start").hide();
   });
+
+  // $('#continue').click(function() {
+  //   $("#overlay").css("display", "none");
+  //   $(".emp-welcome-msg").css("display", "none");
+  //   $(".focus_effect").css("opacity", "1");
+  //   $(".information").css("opacity", "1");
+  //   $("a.name").css("padding-top", "65px");
+  //   $(".disable-btn").css("display", "inline-block");
+  //   $(".welcome-msg").css("display", "none");
+  //   $("a.welcome_msg").css("display", "none");
+  //   $("a.credential_info, a.name_info, a.tax_info").css("display", "block");
+  //   $("#tax_info .btn-continue").css("display", "inline-block");
+  //   $('.focus_effect:first').addClass('personaol-info-top-row');
+  //   $('.focus_effect:first').removeClass('personaol-info-row');
+  //   $('.sidebar a:first').addClass('style_s_link');
+  //   $('.sidebar a.credential_info').addClass('style_s_link');
+  //   // $(".key").css("display", "block");
+  //   $(".search-btn-row").css("display", "block");
+
+  // });
 
   $('#personal_info.focus_effect').focusout(function(){
     var tag_id = $(this).attr('id');
@@ -313,56 +327,134 @@ $(document).ready(function () {
   // ----- Focus Effect & Progress -----
   $("body").click(function(e) {
   	fade_all();
-  	hide_all();
+  	update_progress();
   	if (e.target.id == "personal_info" || $(e.target).parents("#personal_info").size()) { 
-		$('#personal_info div.first').addClass('employee-info');
-		$("a.personal_info").css("color","#98cbff");
-		$("#personal_info div.first").css("opacity","1");
-		$("#top-pad15").show();
-	} 
-	else if (e.target.id == "address_info" || $(e.target).parents("#address_info").size()) {
-		$('#address_info div.first').addClass('employee-info');
-		$("a.address_info").css("color","#98cbff");
-		$("a.three").css("color","#00b420");
-		$("#address_info div.first").css("opacity","1");
-		$("#top-pad").innerHTML="30%";
-		$("#top-pad30").show();
-	}
-	else if (e.target.id == "phone_info" || $(e.target).parents("#phone_info").size()) {
-		$('#phone_info div.first').addClass('employee-info');
-		$("a.phone_info").css("color","#98cbff");
-		$("a.four").css("color","#00b420");
-		$("#phone_info div.first").css("opacity","1");
-		$("#top-pad80").show();
-	}
-	else if (e.target.id == "email_info" || $(e.target).parents("#email_info").size()) {
-		$('#email_info div.first').addClass('employee-info');
-		$("a.email_info").css("color","#98cbff");
-		$("a.five").css("color","#00b420");
-		$("#email_info div.first").css("opacity","1");
-		$("#top-pad85").show();
-	}
-	else if (e.target.id == "household_info" || $(e.target).parents("#household_info").size()) {
-		$('#household_info div.first').addClass('employee-info');
-		$("a.household_info").css("color","#98cbff");
-		$("#household_info div.first").css("opacity","1");
-	}
-	else {
-		$("#top-pad15").show();
-	}
+  		$('#personal_info div.first').addClass('employee-info');
+  		$("a.personal_info").css("color","#98cbff");
+  		$("#personal_info div.first").css("opacity","1");
+  		// $("a.three").css("color","#00b420");
+  		// $("#top-pad15").show();
+  	} 
+  	else if (e.target.id == "address_info" || $(e.target).parents("#address_info").size()) {
+  		$('#address_info div.first').addClass('employee-info');
+  		$("a.address_info").css("color","#98cbff");
+  		// $("a.three").css("color","#00b420");
+  		$("#address_info div.first").css("opacity","1");
+  		$("#top-pad").innerHTML="30%";
+  		// $("#top-pad30").show();
+  	}
+  	else if (e.target.id == "phone_info" || $(e.target).parents("#phone_info").size()) {
+  		$('#phone_info div.first').addClass('employee-info');
+  		$("a.phone_info").css("color","#98cbff");
+  		// $("a.four").css("color","#00b420");
+  		$("#phone_info div.first").css("opacity","1");
+  		// $("#top-pad80").show();
+  	}
+  	else if (e.target.id == "email_info" || $(e.target).parents("#email_info").size()) {
+  		$('#email_info div.first').addClass('employee-info');
+  		$("a.email_info").css("color","#98cbff");
+  		// $("a.five").css("color","#00b420");
+  		$("#email_info div.first").css("opacity","1");
+  		// $("#top-pad85").show();
+  	}
+  	else if (e.target.id == "household_info" || $(e.target).parents("#household_info").size()) {
+  		$('#household_info div.first').addClass('employee-info');
+  		$("a.household_info").css("color","#98cbff");
+  		$("#household_info div.first").css("opacity","1");
+  	}
+  	else {
+  		// $("#top-pad15").show();
+  	}
   });
   
   function fade_all() {
-	$("#personal_info div.first").css("opacity","0.5");
-	$("#address_info div.first").css("opacity","0.5");
-	$("#phone_info div.first").css("opacity","0.5");
-	$("#email_info div.first").css("opacity","0.5");
-	$("#household_info div.first").css("opacity","0.5");
+  	$("#personal_info div.first").css("opacity","0.5");
+  	$("#address_info div.first").css("opacity","0.5");
+  	$("#phone_info div.first").css("opacity","0.5");
+  	$("#email_info div.first").css("opacity","0.5");
+  	$("#household_info div.first").css("opacity","0.5");
   }
   
-  function hide_all() {
-	$("#top-pad15").hide(); $("#top-pad30").hide();
-    $("#top-pad80").hide(); $("#top-pad85").hide();
+  update_progress(); //Run on page load for dependent_details page.
+  function update_progress() {
+
+    var start_progress = $('#initial_progress').length ? parseInt($('#initial_progress').val()) : 0;
+
+    if(start_progress == 0) {
+      var personal_entry = check_personal_entry_progress();
+      var address_entry  = check_address_entry_progress();
+      var phone_entry    = check_phone_entry_progress();
+      var email_entry    = check_email_entry_progress();
+    }
+
+    if(personal_entry) {
+      start_progress += 20;
+      $("a.one").css("color","#00b420");
+      $("a.two").css("color","#00b420");
+    }
+
+    if(address_entry) {
+      start_progress += 8;
+      $("a.three").css("color","#00b420");
+    }
+
+    if(phone_entry) {
+      start_progress += 10;
+      $("a.four").css("color","#00b420");
+    }
+
+    if(email_entry) {
+      start_progress += 12;
+      $("a.five").css("color","#00b420");
+    }
+
+    if($('#add_info_clone0').length) {
+      start_progress += 15;
+      $("a.six").css("color","#00b420");
+    } else {$("a.six").css("color","#999");}
+
+    $('#top-pad').html(start_progress + '% Complete');
+    $('.progress-top').css('height', start_progress + '%');
+
+    if(start_progress >= 50) { $('#continue-employer').removeClass('disabled'); }
+  }
+
+  function check_personal_entry_progress() {
+    gender_checked = $("#person_gender_male").prop("checked") || $("#person_gender_female").prop("checked");
+    
+    if(check_personal_info_exists().length==0 && gender_checked) {
+      return true;
+    } else {
+      $("a.one").css('color', '#999'); $("a.two").css('color', '#999');
+      return false;
+    }
+  }
+
+  function check_address_entry_progress() {
+    var empty_address = $('#address_info input.required').filter(function() { return $(this).val() === ""; }).length;
+    if(empty_address === 0) { return true; }
+    else {
+      $("a.three").css('color', '#999');
+      return false;
+    }
+  }
+
+  function check_phone_entry_progress() {
+    var empty_phone = $('#phone_info input.required').filter(function() { return ($(this).val() === "" || $(this).val() === "(___) ___-____"); }).length;
+    if(empty_phone === 0) { return true; }
+    else {
+      $("a.four").css('color', '#999');
+      return false;
+    }
+  }
+
+  function check_email_entry_progress() {
+    var empty_email = $('#email_info input.required').filter(function() { return $(this).val() === ""; }).length;
+    if(empty_email === 0) { return true; }
+    else {
+      $("a.five").css('color', '#999');
+      return false;
+    }
   }
 
   $("#dependent_ul .floatlabel").focusin(function() {
@@ -430,18 +522,30 @@ $(document).ready(function () {
     $(".new-address-flow").css("display", "block");
   });
   
-  $('.new-address-flow p a.cancel').click(function(){
+  $('.new-address-flow .cancel').click(function(){
     $(".new-address-flow").removeAttr("style");
   });
-  
-  $('.new-address-flow p a.confirm').click(function(){
-    var address_name = $('.address_name').val();
-    if(address_name.length!=0) {
-      var new_option = "<li class='address-li' data-address-text='"+address_name+"Address' data-value='"+address_name+"' role='presentation'><a role='menuitem' href='javascript:void(0)'>"+address_name+"</a></li>";
-      $(".address ul").prepend(new_option);
-      $(".new-address-flow").removeAttr("style");
-    }
+
+  $('.new-address-flow .confirm').click(function(){
+    $(".new-address-flow").removeAttr("style");
+    $("ul.dropdown-menu li:first-child").clone().appendTo(".dropdown ul.dropdown-menu");
+    $("ul.dropdown-menu li:last-child a:nth-child(2)").text($("#add-address").val());
+    if (($("#add-address").val()) !== "") {
+      $("#dropdownMenu1 label").text($("#add-address").val());
+    }else{}
+
+    $('#address_info > .first').attr('id', ($("#add-address").val()));
+    $('#address_info input').val("");
   });
+  
+  // $('.new-address-flow p a.confirm').click(function(){
+  //   var address_name = $('.address_name').val();
+  //   if(address_name.length!=0) {
+  //     var new_option = "<li class='address-li' data-address-text='"+address_name+"Address' data-value='"+address_name+"' role='presentation'><a role='menuitem' href='javascript:void(0)'>"+address_name+"</a></li>";
+  //     $(".address ul").prepend(new_option);
+  //     $(".new-address-flow").removeAttr("style");
+  //   }
+  // });
   
   // Customize Dependent Family Member Delete Confirmation
   $(function() {
@@ -483,22 +587,46 @@ $(document).ready(function () {
       });
     };
   });
+
+  // Change Dropdown Address Text
+  $('.address-li').on('click', function(){
+    $("#dropdownMenu1 label").text($(this).text());
+    $('#address_info > .first').attr('id', ($(this).text()));
+  });
   
   // Select Plan Page
-  $('#select-plan-container .personal_info').hide();
-  $('#select-plan-container #coverage-back').show();
-  $('#select-plan-container .coverage-options').removeClass('hidden');
-  $('#select-plan-container .coverage-options .arrow-right').show();
+  // $('#select-plan-container .personal_info').hide();
+  // $('#select-plan-container #coverage-back').show();
+  // $('#select-plan-container .coverage-options').removeClass('hidden');
+  // $('#select-plan-container .coverage-options .arrow-right').show();
   
   $('#select-plan-btn1').click(function() {
     $(".select-plan p.detail").hide();
     $(this).hide();
     $(".select-plan-details").show();
   });
+
+  $(document).on('click', '.select-plan .all-filter', function(){
+    $(".all-filters-row").show();
+  });
+
+  $(document).on('click', '.all-filters-row .apply-btn', function(){
+    $(".all-filters-row").hide();
+    $(".select-plan .tab-content").addClass("selected");
+    $(".selected-plans-row").show();
+    $(".select-plan ul.nav-tabs li:last-child").removeClass("active");
+    $(".select-plan ul.nav-tabs li:first-child").addClass("active");
+  });
+
+  $(document).on('click', '.selected-plans-row .close', function(){
+    $(".select-plan .tab-content").removeClass("selected");
+    $(".selected-plans-row").hide();
+  });
   
   // Input Masks
   $(".phone_number").mask("(999) 999-9999");
   $(".zip").mask("99999");
   $("#person_ssn").mask("999999999");
+  $(".address-state").mask("**");
   
 });

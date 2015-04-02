@@ -416,4 +416,32 @@ describe EmployeeRole, type: :model do
       end
     end
   end
+
+  describe EmployeeRole, "Inbox", type: :model do
+
+    def ssn; "988854321"; end
+    let(:dob) { 27.years.ago.to_date }
+    let(:hired_on) { 10.weeks.ago.to_date }
+    let(:gender) { "male" }
+
+    let(:address) {FactoryGirl.build(:address)}
+    let(:person) {FactoryGirl.create(:person, addresses: [address])}
+    let(:employer_profile) {FactoryGirl.create(:employer_profile)}
+    let(:message_subject) { "Welcome to DC HealthLink" }
+    let(:employee_role) { person.employee_roles.build(person_attributes: { ssn: ssn, dob: dob, gender: gender },
+                                                      employer_profile: employer_profile, hired_on: hired_on) }
+
+    context "when an employee_role is created"
+      before { employee_role.save }
+
+      it "should create an associated inbox" do
+        expect(employee_role.inbox).to_not be_nil
+      end
+
+      it "should add a welcome message to the inbox" do
+        expect(employee_role.inbox.messages.size).to eq 1
+        expect(employee_role.inbox.messages.first.subject).to match /Welcome to DC HealthLink/ 
+      end
+  end
+
 end

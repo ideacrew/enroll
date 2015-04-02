@@ -1,3 +1,7 @@
+require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_benefit_template_parser')
+require Rails.root.join('lib', 'object_builders', 'qhp_builder.rb')
+
+
 namespace :seed do
   desc "Load the plan data"
   task :plans => :environment do
@@ -11,3 +15,22 @@ namespace :seed do
     end
   end
 end
+
+
+namespace :xml do
+  desc "Import qhp plans from xml files"
+  namespace :import do
+    task :plans, [:file] => :environment do |task, args|
+      # files = Dir.glob(File.join(args.dir, "**", "*.xml"))
+      # files.each do |file|
+      # #   puts file
+        xml = Nokogiri::XML(File.open(args.file))
+        plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
+        qhp_hash = QhpBuilder.new(plan.to_hash)
+        qhp_hash.run
+      #   exit
+      # end
+    end
+  end
+end
+

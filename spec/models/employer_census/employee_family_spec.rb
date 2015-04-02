@@ -67,6 +67,45 @@ describe EmployerCensus::EmployeeFamily, type: :model do
   end
 end
 
+describe EmployerCensus::EmployeeFamily, 'class methods' do
+  def employer_profile; FactoryGirl.create(:employer_profile); end
+  def employee_family;  FactoryGirl.create(:employer_census_family, employer_profile: employer_profile); end
+  def census_employee;  employee_family.census_employee; end
+  def employee_role;    FactoryGirl.build(:employee_role, ssn: census_employee.ssn, dob: census_employee.dob); end
+
+  describe ".find_by_employee_role" do
+    context "and there's no matching employee_role in employee_families" do
+      it "should return nil" do
+        expect(EmployerCensus::EmployeeFamily.find_by_employee_role(employee_role)).to be_nil
+      end
+    end
+
+    context "and a matching employee_role exists" do
+      let!(:saved_employee_role) do
+        employee_role.save
+        employee_role
+      end
+
+      context "and employee_role is not linked to census_family" do
+        it "should return nil" do
+          expect(EmployerCensus::EmployeeFamily.find_by_employee_role(saved_employee_role)).to be_nil
+        end
+      end
+
+      context "and employee_role is linked to census_family" do
+        let(:linked_employee_family) { employee_family.link_employee_role(saved_employee_role) }
+
+        it "should return matching EmployeeFamily instance" do
+          expect(linked_employee_family.is_linked?).to be_true
+          # expect(linked_employee_family).to eq ""
+          expect(EmployerCensus::EmployeeFamily.find_by_employee_role(saved_employee_role)).to be_an_instance_of EmployerCensus::EmployeeFamily
+          expect(EmployerCensus::EmployeeFamily.find_by_employee_role(saved_employee_role).census_employee.ssn).to eq employee_role.ssn
+        end
+      end
+    end
+  end
+end
+
 describe EmployerCensus::EmployeeFamily, 'instance methods' do
 
   let(:employer_profile) {FactoryGirl.create(:employer_profile)}
@@ -97,10 +136,15 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
     end
 
     context "and the eligibility date is too far in future" do
+
+      pending "use HbxProfile:ShopMaximumEnrollmentPeriodBeforeEligibilityInDays"
+      it "should" do 
+      end
     end
 
     context "and the special enrollment period has expired" do
 
+      pending "use HbxProfile:ShopMinimumEnrollmentPeriodAfterRosterEntryInDays"
       context "and the employee's roster entry wasn't timely" do
       end
     end

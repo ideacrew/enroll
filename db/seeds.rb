@@ -9,14 +9,14 @@
 puts "Start of seed data"
 puts "*"*80
 
-puts "::: Cleaning Broker Agencies:::"
-Organization.delete_all
-puts "::: Cleaning People :::"
-Person.delete_all
-puts "::: Cleaning Plans :::"
-Plan.delete_all
-
-
+puts "::: Purging Database :::"
+system "rake db:purge"
+# puts "::: Cleaning Broker Agencies:::"
+# Organization.delete_all
+# puts "::: Cleaning People :::"
+# Person.delete_all
+# puts "::: Cleaning Plans :::"
+# Plan.delete_all
 
 # require File.join(File.dirname(__FILE__),'seedfiles', 'carriers')
 # require File.join(File.dirname(__FILE__),'seedfiles', 'premiums')
@@ -26,10 +26,14 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'employers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'carriers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
 
-puts "*"*80
-puts "::: Generating Plans:::"
-system "rake seed:plans"
-require File.join(File.dirname(__FILE__),'seedfiles', 'plan_benefits_seed')
+# puts "*"*80
+# puts "::: Generating Plans:::"
+# system "rake seed:plans"
+# require File.join(File.dirname(__FILE__),'seedfiles', 'plan_benefits_seed')
+
+system "rake seed:plans seed:people seed:families"
+system "rake hbx:employers:add[tmp/employer_export.csv,tmp/users_to_ignore.csv]"
+system "rake hbx:employers:census:add[tmp/census.csv]"
 
 puts "*"*80
 puts "End of Seed Data"

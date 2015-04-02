@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe BenefitGroup, type: :model do
-  it { should validate_presence_of :benefit_list }
+  it { should validate_presence_of :relationship_benefits }
   it { should validate_presence_of :effective_on_kind }
   it { should validate_presence_of :terminate_on_kind }
   it { should validate_presence_of :effective_on_offset }
@@ -11,9 +11,9 @@ describe BenefitGroup, type: :model do
 end
 
 describe BenefitGroup, "instance methods" do
-  let(:employer_profile) {FactoryGirl.create(:employer_profile)}
-  let(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
-  let(:families) do
+  let!(:employer_profile) {FactoryGirl.create(:employer_profile)}
+  let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
+  let!(:families) do
     [1,2].collect do
       FactoryGirl.create(
         :employer_census_family,
@@ -22,8 +22,7 @@ describe BenefitGroup, "instance methods" do
       )
     end.sort_by(&:id)
   end
-  let(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
-  before {[families, benefit_group]}
+  let!(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
 
   context "employee_census_families and benefit_group.employee_families" do
     let(:benefit_group_families) {benefit_group.employee_families.sort_by(&:id)}
@@ -34,20 +33,19 @@ describe BenefitGroup, "instance methods" do
   end
 
   it "should return the reference plan associated with this benefit group" do
-    # pending "required spec missing in: #{__FILE__}"
+    expect(benefit_group.reference_plan).to be_instance_of Plan
   end
 
   it "verifies the reference plan is included in the set of elected_plans" do
-    # pending "required spec missing in: #{__FILE__}"
+    expect do
+      benefit_group.elected_plans.each do |plan_id|
+        expect(Plan.find(plan_id)).to be_instance_of Plan
+      end
+    end.not_to raise_exception
   end
 
   it "verifies premium_pct_as_integer is > 50%" do
-    # pending "required spec missing in: #{__FILE__}"
+    invalid = FactoryGirl.build(:benefit_group, plan_year: plan_year, premium_pct_as_int: 40)
+    expect(invalid.valid?).to be false
   end
-
-  it "verifies that premium_pct_as_integer is > 50%" do
-    # pending "required spec missing in: #{__FILE__}"
-  end
-
-
 end

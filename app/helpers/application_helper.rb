@@ -102,6 +102,13 @@ module ApplicationHelper
     number.to_s.gsub!(/(\d{0,2})(\d{7})$/,"\\1#{delimiter}\\2")
   end
 
+  # Formats a number into a nine-digit US Federal Entity Identification Number string (nn-nnnnnn), hiding all but last 4 digits
+  def number_to_obscured_fein(number)
+    return unless number
+    number[0,5] = "**-***"
+    number
+  end
+
   # Formats a string into HTML, concatenating it with a person glyph
   def prepend_glyph_to_name(name)
     content_tag(:span, raw("&nbsp;"), class: "glyphicon glyphicon-user") + name

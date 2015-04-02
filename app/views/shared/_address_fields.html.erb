@@ -1,5 +1,5 @@
-<div id="address_info" class="focus_effect row personaol-info-row" style="opacity: 0.5;">
-  <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
+<div id="address_info" class="focus_effect row personaol-info-row">
+  <div class="col-md-12 no-pd col-sm-12 col-xs-12 first">
     <div class="row top-row">
       
     <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
@@ -13,13 +13,17 @@
             <div class="col-md-4 col-sm-6 col-xs-12 no-pd">
               <div class="dropdown">
                 <button class="form-control floatlabel adderess-select-box form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
-                  Home Address
+                  <label>Home Address</label>
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                   <% Address::KINDS.each do |item| %>
                     <% address_text = item.capitalize + "Address" %>
-                    <li role="presentation" data-value="<%= item %>" data-address-text="<%= address_text %>" class="address-li"><a href="javascript:void(0)" role="menuitem"><%= item.humanize %></a></li>
+                    <li role="presentation" data-value="<%= item %>" data-address-text="<%= address_text %>" class="address-li">
+                      <a href="javascript:void(0)"><%= image_tag("delete.png") %></a>
+                      <a href="javascript:void(0)" role="menuitem"><%= item.humanize %> Address</a>
+                      <a href="javascript:void(0)"><%= image_tag("address-close.png") %></a>
+                    </li>
                   <% end %>
                 </ul>
               </div>
@@ -45,26 +49,31 @@
     <div style="<%= style %>" class="row middle-row form-group form-group-lg no-pd address-row <%= div_class %>">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
         <%= address.hidden_field :kind %>
-        <%= address.text_field :address_1, placeholder: "ADDRESS LINE 1", class: "floatlabel form-control border-bottom-none border-right-none" %>
+
+        <% if kind == 'home' %>
+          <% required = "required" %>
+        <% end %>
+
+        <%= address.text_field :address_1, placeholder: "ADDRESS LINE 1", class: "floatlabel form-control #{required}" %>
       </div>
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-        <%= address.text_field :address_2, placeholder: "ADDRESS LINE 2", class: "floatlabel form-control border-bottom-none" %>
+        <%= address.text_field :address_2, placeholder: "ADDRESS LINE 2", class: "floatlabel form-control" %>
       </div>
     </div>
 
 
     <div style="<%= style %>" class="row bottom-row address-row <%= div_class %>">
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-          <%= address.text_field :city, placeholder: "CITY", class: "floatlabel form-control" %>
+          <%= address.text_field :city, placeholder: "CITY", class: "floatlabel form-control #{required}" %>
         </div>
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-          <%= address.text_field :state, placeholder: "STATE", class: "floatlabel form-control capital" %>
+          <%= address.text_field :state, placeholder: "STATE", class: "floatlabel form-control capital address-state #{required}" %>
         </div>
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
           <%= address.text_field :county, placeholder: "COUNTY", class: "floatlabel form-control" %>
         </div>
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-          <%= address.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control zip" %>
+          <%= address.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control zip #{required}" %>
         </div>
     </div>
     <% end%>
@@ -72,7 +81,7 @@
       <div class="new-address-flow">
 	      <div class="col-md-4 col-sm-4 col-xs-12"></div>
 	      <div class="col-md-4 col-sm-4 col-xs-12 text-center">
-	        <h5>Name your new address.</h5>
+	        <h5>Name Your New Address.</h5>
 	        <input type="text" class="form-control address_name" placeholder="i.e. Work, Mailing" onfocus="this.placeholder = ''" onblur="this.placeholder = 'i.e. Work, Mailing'">
 	        <p>
 	          <a href="javascript:void(0);" class="cancel">cancel</a>

@@ -15,6 +15,12 @@ class CarrierProfile
   field :shop_health, type: Boolean
   field :shop_dental, type: Boolean
 
+  field :issuer_hios_id, type: String
+  field :issuer_state, type: String, default: "DC"
+  field :market_coverage, type: String, default: "shop (small group)" # or individual
+  field :dental_only_plan, type: Boolean, default: false
+
+
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: false
   delegate :dba, :dba=, to: :organization, allow_nil: true

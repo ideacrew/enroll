@@ -50,7 +50,7 @@ gem "mongoid-enum", '~> 0.2.0'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
-gem 'acapi', git: "git://github.com/dchbx/acapi.git"
+gem 'acapi', git: "git://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
 
 gem 'aasm', '~> 4.0.7'
@@ -60,6 +60,9 @@ gem 'haml'
 gem 'devise', '~> 3.4.1'
 # gem 'devise_ldap_authenticatable', '~> 0.8.1'
 gem 'cancancan', '~> 1.9.2'
+
+# will provide fast group premium plan fetch
+gem 'redis-rails'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -72,6 +75,7 @@ group :development, :test do
   gem 'spring'
 
 # Use Capistrano for deployment
+  gem 'capistrano', '3.3.5'
   gem 'capistrano-rails', '~> 1.1.2'
   gem 'ruby-progressbar', '1.6.0'
 
