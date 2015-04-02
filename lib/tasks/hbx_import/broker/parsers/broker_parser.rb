@@ -21,6 +21,8 @@ module Parser
     element :full_name, String, xpath: 'ns1:vcard/ns1:fn'
     element :exchange_id, String, tag: 'element'
     element :exchange_status, String, tag: 'exchange_status'
+    element :associated_agency_name, String, tag: 'associated_agency_name'
+    element :associated_agency_fein, String, tag: 'associated_agency_fein'
     has_many :phones, Parser::BrokerPhoneParser, xpath: 'ns1:vcard'
     has_many :emails, Parser::BrokerEmailParser, xpath: 'ns1:vcard'
     has_many :addresses, Parser::BrokerAddressParser, xpath: 'ns1:vcard'
