@@ -48,7 +48,7 @@ class PeopleController < ApplicationController
   
   def get_employer
     @person = Person.find(params[:id])
-    @employer_profile= EmployerProfile.find_all_by_person(@person).first
+    @employer_profile = EmployerProfile.find_all_by_person(@person).first
     
     respond_to do |format|
       format.js {}
