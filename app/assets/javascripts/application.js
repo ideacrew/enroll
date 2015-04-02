@@ -85,10 +85,9 @@ $(document).ready(function () {
             $("#people_id").val(person._id);
             _getEmployers();
             
-            $('#key-section').removeClass('hidden');
-            $('#house_info, #add_info, #top-pad30, #top-pad80, #top-pad85').hide();
+            // $('#key-section').removeClass('hidden');
+            // $('#house_info, #add_info, #top-pad30, #top-pad80, #top-pad85').hide();
             // $('a.one, a.two').css("color", "#00b22d");
-            $("#employer-info").css("display", "block");
           }
           else
           {
@@ -98,7 +97,7 @@ $(document).ready(function () {
           }
 
           //Sidebar Switch - Search Active
-          $('#personal_sidebar').removeClass('hidden');
+          // $('#personal_sidebar').removeClass('hidden');
           //$('#search_sidebar').addClass('hidden');
           $(".overlay-in").css("display", "block");
         }
@@ -110,28 +109,13 @@ $(document).ready(function () {
   
   function _getEmployers()
   {
-    //$('.autofill-initial').addClass('hidden');
-    $("#key-section").css("display", "block");
-
     common_body_style();
     side_bar_link_style();
 
-    $('.search_alert_msg').removeClass('hidden');
-    $('.searching_span').text('Searching');
-    $('.search_alert_msg').addClass('hidden');
+    // $('.search_alert_msg').removeClass('hidden');
+    // $('.searching_span').text('Searching');
+    // $('.search_alert_msg').addClass('hidden');
     getAllEmployers();
-
-    $('.search-btn-row').addClass('hidden');
-    $('.employer_info').removeClass('hidden');
-    $('#employer-info').removeClass('hidden');
-    
-    $('#address_info').removeClass('hidden');
-    $('.address_info').removeClass('hidden');
-    $('#phone_info').removeClass('hidden');
-    $('.phone_info').removeClass('hidden');
-    $('#email_info').removeClass('hidden');
-    $('.email_info').removeClass('hidden');
-    $('.search_continue').removeClass('hidden');
   }
   
   function getAllEmployers()
@@ -139,7 +123,7 @@ $(document).ready(function () {
     $.ajax({
       type: "GET",
       data:{id: $("#people_id").val()},
-      url: "/people/get_employer.js"
+      url: "/people/get_employer.js",
     });
   }
 
@@ -528,14 +512,26 @@ $(document).ready(function () {
 
   $('.new-address-flow .confirm').click(function(){
     $(".new-address-flow").removeAttr("style");
+    var new_address = $("#add-address").val();
     $("ul.dropdown-menu li:first-child").clone().appendTo(".dropdown ul.dropdown-menu");
-    $("ul.dropdown-menu li:last-child a:nth-child(2)").text($("#add-address").val());
+    $("ul.dropdown-menu li:last-child a:nth-child(2)").text(new_address);
+    $("ul.dropdown-menu li:last-child").data('value', new_address.substr(0, new_address.indexOf(' ')).toLowerCase()); //Get First word and lowercase
+    $("ul.dropdown-menu li:last-child").data('address-text', new_address.replace(/ /g,'')) // Remove Whitespace
+
     if (($("#add-address").val()) !== "") {
       $("#dropdownMenu1 label").text($("#add-address").val());
     }else{}
 
     $('#address_info > .first').attr('id', ($("#add-address").val()));
     $('#address_info input').val("");
+  });
+
+  $('.dropdown-menu a.address-close').click(function() {
+    if($("ul.dropdown-menu li").length > 1) {
+      $(this).parent("ul.dropdown-menu li").remove();
+    } else {
+      alert("You cannot remove all addresses.");
+    }
   });
   
   // $('.new-address-flow p a.confirm').click(function(){

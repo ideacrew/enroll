@@ -77,7 +77,8 @@ class User
   after_create :send_welcome_email
 
   def send_welcome_email
-    email(self.email, "Thank you for registering.", "Welcome to the exchange!")
+    UserMailer.welcome(self).deliver_now
+    true
   end
 
   def has_role?(role_sym)
@@ -88,6 +89,7 @@ class User
     if authentication_token.blank?
       self.authentication_token = generate_authentication_token
     end
+    true
   end
 
   def active_for_authentication?

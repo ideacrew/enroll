@@ -1,22 +1,20 @@
-<% if @employer_profile.present? %>	
-		  <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
-        <% organization = @employer_profile.organization %>
-        <% employee = organization.employee_family_details(@person) %>
-			  <%= render 'shared/employer', organization: organization,employee: employee.census_employee %>
-		  </div>
-      <div class="col-md-2 col-sm-2 col-xs-12">
-        <% if employee.census_dependents.present? %>
-          <% url = dependent_details_people_path(person_id: @person.id, organization_id: organization.id) %>
-        <% else %>
-          <% url = plan_details_people_path(person_id: @person.id, organization_id: organization.id) %>
-        <% end %>
+<div class="col-md-6 col-sm-6 col-xs-12 no-pd">
+  <% organization = @employer_profile.organization %>
+  <% employee = organization.employee_family_details(@person) %>
+  <%= render 'shared/employer', organization: organization,employee: employee.census_employee %>
+</div>
+<div class="col-md-2 col-sm-2 col-xs-12">
+  <% if employee.census_dependents.present? %>
+    <% url = dependent_details_people_path(person_id: @person.id, organization_id: organization.id) %>
+  <% else %>
+    <% url = plan_details_people_path(person_id: @person.id, organization_id: organization.id) %>
+  <% end %>
 
-        <input type="hidden" data-url="<%= url %>" class="badge">
-			</div>
-		  <div class="col-md-4 col-sm-4 col-xs-12 no-pd text-right">
-			  <p>Not your employer? <a href="#"><u>Click Here</u></a></p>
-      </div>
-<% end %>
+  <input type="hidden" data-url="<%= url %>" class="badge">
+</div>
+<div class="col-md-4 col-sm-4 col-xs-12 no-pd text-right">
+  <p>Not your employer? <a href="#"><u>Click Here</u></a></p>
+</div>
 
 <script>
   $(".change_personal_info").click(function(){
