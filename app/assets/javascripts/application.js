@@ -595,15 +595,32 @@ $(document).ready(function () {
   });
   
   // Select Plan Page
-  $('#select-plan-container .personal_info').hide();
-  $('#select-plan-container #coverage-back').show();
-  $('#select-plan-container .coverage-options').removeClass('hidden');
-  $('#select-plan-container .coverage-options .arrow-right').show();
+  // $('#select-plan-container .personal_info').hide();
+  // $('#select-plan-container #coverage-back').show();
+  // $('#select-plan-container .coverage-options').removeClass('hidden');
+  // $('#select-plan-container .coverage-options .arrow-right').show();
   
   $('#select-plan-btn1').click(function() {
     $(".select-plan p.detail").hide();
     $(this).hide();
     $(".select-plan-details").show();
+  });
+
+  $(document).on('click', '.select-plan .all-filter', function(){
+    $(".all-filters-row").show();
+  });
+
+  $(document).on('click', '.all-filters-row .apply-btn', function(){
+    $(".all-filters-row").hide();
+    $(".select-plan .tab-content").addClass("selected");
+    $(".selected-plans-row").show();
+    $(".select-plan ul.nav-tabs li:last-child").removeClass("active");
+    $(".select-plan ul.nav-tabs li:first-child").addClass("active");
+  });
+
+  $(document).on('click', '.selected-plans-row .close', function(){
+    $(".select-plan .tab-content").removeClass("selected");
+    $(".selected-plans-row").hide();
   });
   
   // Input Masks
