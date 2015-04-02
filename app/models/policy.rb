@@ -58,8 +58,6 @@ class Policy
 
   validates_presence_of :hbx_id, :plan_id, :effective_on, :premium_total_in_cents, :family_premium_in_cents
 
-  before_save :check_for_cancel_or_term
-
   scope :all_active_states,   ->{where(:aasm_state.in => %w[applicant submitted transmitted effectuated])}
   scope :all_inactive_states, ->{where(:aasm_state.in => %w[hbx_canceled hbx_terminated carrier_canceled carrier_terminated])}
 

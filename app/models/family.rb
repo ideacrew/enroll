@@ -6,19 +6,20 @@ class Family
   # include Mongoid::Paranoia
   include AASM
 
+  before_save :update_household
 
   KINDS = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
 
   auto_increment :hbx_assigned_id, seed: 9999
 
-  field :e_case_id, type: String  # Eligibility system foreign key
+  field :e_case_id, type: String # Eligibility system foreign key
   field :e_status_code, type: String
   field :application_type, type: String
-  field :renewal_consent_through_year, type: Integer  # Authorize auto-renewal elibility check through this year (CCYY format)
+  field :renewal_consent_through_year, type: Integer # Authorize auto-renewal elibility check through this year (CCYY format)
 
   field :aasm_state, type: String
-  field :is_active, type: Boolean, default: true   # ApplicationGroup active on the Exchange?
-  field :submitted_at, type: DateTime            # Date application was created on authority system
+  field :is_active, type: Boolean, default: true # ApplicationGroup active on the Exchange?
+  field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
 
   has_and_belongs_to_many :qualifying_life_events
@@ -37,17 +38,17 @@ class Family
   accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
 
   validates :renewal_consent_through_year,
-              numericality: { only_integer: true, inclusion: 2014..2025 },
-              :allow_nil => true
+            numericality: {only_integer: true, inclusion: 2014..2025},
+            :allow_nil => true
 
   validates :e_case_id, uniqueness: true, allow_nil: true
 
-#  validates_inclusion_of :max_renewal_year, :in => 2013..2025, message: "must fall between 2013 and 2030"
+  #  validates_inclusion_of :max_renewal_year, :in => 2013..2025, message: "must fall between 2013 and 2030"
 
-  index({e_case_id:  1})
-  index({is_active:  1})
-  index({aasm_state:  1})
-  index({submitted_at:  1})
+  index({e_case_id: 1})
+  index({is_active: 1})
+  index({aasm_state: 1})
+  index({submitted_at: 1})
   index({"hbx_enrollment.broker_agency_id" => 1}, {sparse: true})
 
   # child model indexes
@@ -68,13 +69,13 @@ class Family
 
   validate :max_one_active_household
 
-  scope :all_with_multiple_family_members, ->{exists({ :'family_members.1' => true })}
-  scope :all_with_household, ->{exists({ :'households.0' => true })}
+  scope :all_with_multiple_family_members, -> { exists({:'family_members.1' => true}) }
+  scope :all_with_household, -> { exists({:'households.0' => true}) }
 
   def no_duplicate_family_members
     family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
       errors.add(:base, "Duplicate family_members for person: #{k}\n" +
-                         "family_members: #{v.inspect}")
+                          "family_members: #{v.inspect}")
     end
   end
 
@@ -152,7 +153,7 @@ class Family
       transitions from: :special_enrollment_period, to: :enrollment_closed
       transitions from: :open_and_special_enrollment_period, to: :open_enrollment_period
       transitions from: :enrollment_closed, to: :enrollment_closed
-     end
+    end
   end
 
   # single SEP with latest end date from list of active SEPs
@@ -167,8 +168,8 @@ class Family
 
   def self.default_search_order
     [
-      ["primary_applicant.name_last", 1],
-      ["primary_applicant.name_first", 1]
+        ["primary_applicant.name_last", 1],
+        ["primary_applicant.name_first", 1]
     ]
   end
 
@@ -178,7 +179,7 @@ class Family
 
   # TODO: should probably go away assuming 1 person should only have 1 family with them as primary
   def self.find_all_by_primary_applicant(person)
-    Family.find_all_by_person(person).select() {|f|f.primary_applicant.person.id.to_s == person.id.to_s}
+    Family.find_all_by_person(person).select() { |f| f.primary_applicant.person.id.to_s == person.id.to_s }
   end
 
   def self.find_all_by_person(person)
@@ -202,12 +203,9 @@ class Family
   end
 
   def active_household
-
-    household = self.households.detect do |household|
+    households.detect do |household|
       household.is_active?
     end
-
-    return household
   end
 
   def find_irs_group_by_irs_group_id(irs_group_id)
@@ -216,7 +214,20 @@ class Family
     end
   end
 
-private
+  def update_household
+
+    household = get_household
+
+    if family_members.blank?
+      household.coverage_households.delete_all
+      household.hbx_enrollments.delete_all
+    else
+      create_hbx_enrollments(household)
+      create_coverage_households(household)
+    end
+  end
+
+  private
 
   # This method will return true only if all the family_members in tax_household_members and coverage_household_members are present in self.family_members
   def integrity_of_family_member_objects
@@ -272,4 +283,64 @@ private
     end
   end
 
+  def get_household
+    if active_household
+     active_household  #if active_houshold exists
+    else
+     households.build #create a new empty household
+    end
+  end
+
+  def create_coverage_households(household)
+
+    household.coverage_households.delete_all #clear any existing
+
+    coverage_household = household.coverage_households.build({submitted_at: submitted_at})
+    coverage_household_for_others = nil
+
+    family_members.each do |family_member|
+      if family_member.is_coverage_applicant
+        if valid_relationship?(family_member)
+          coverage_household_member = coverage_household.coverage_household_members.build
+          coverage_household_member.applicant_id = family_member.id
+        else
+          coverage_household_for_others ||= household.coverage_households.build({submitted_at: self.submitted_at})
+          coverage_household_member = coverage_household_for_others.coverage_household_members.build
+          coverage_household_member.applicant_id = family_member.id
+        end
+      end
+    end
+  end
+
+  def create_hbx_enrollments(household)
+    return if primary_applicant.nil?
+
+    household.hbx_enrollments.delete_all #clear any existing
+
+    policies = Policy.find_by_person(primary_applicant.person)
+
+    policies.map do |policy|
+      create_hbx_enrollment(household, policy)
+    end
+  end
+
+  def create_hbx_enrollment(household, policy)
+    hbx_enrollement = household.hbx_enrollments.build
+    hbx_enrollement.policy = policy
+    hbx_enrollement.submitted_at = self.submitted_at
+    hbx_enrollement
+  end
+
+  def valid_relationship?(family_member)
+    return true if primary_applicant.nil? #responsible party case
+    return true if primary_applicant.person.id == family_member.person.id
+
+    valid_relationships = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter}
+
+    if valid_relationships.include? primary_applicant.person.find_relationship_with(family_member.person)
+      return true
+    else
+      return false
+    end
+  end
 end
