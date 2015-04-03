@@ -166,6 +166,19 @@ class Person
     @is_active
   end
 
+  def find_relationship_with(other_person)
+
+    relationship = person_relationships.detect do |person_relationship|
+      person_relationship.relative_id == other_person.id
+    end
+
+    if relationship
+      return relationship.kind
+    else
+      return nil
+    end
+  end
+
 private
   def update_full_name
     full_name

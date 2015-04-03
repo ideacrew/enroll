@@ -83,4 +83,6 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
 #  config.active_record.dump_schema_after_migration = false
+  config.acapi.publish_amqp_events = true
+  config.acapi.app_id = "enroll"
 end

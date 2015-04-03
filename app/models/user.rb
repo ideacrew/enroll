@@ -1,6 +1,7 @@
 class User
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Acapi::Notifiers
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -73,6 +74,13 @@ class User
 
   before_save :ensure_authentication_token
 
+  after_create :send_welcome_email
+
+  def send_welcome_email
+    UserMailer.welcome(self).deliver_now
+    true
+  end
+
   def has_role?(role_sym)
     roles.any? { |r| r == role_sym }
   end
@@ -81,6 +89,7 @@ class User
     if authentication_token.blank?
       self.authentication_token = generate_authentication_token
     end
+    true
   end
 
   def active_for_authentication?

@@ -36,6 +36,9 @@ class PlanYear
     parent.employee_families.where(:plan_year_id => self.id)
   end
 
+  def employee_participation_percent
+  end
+
   def last_day_of_month(month = Date.today.month, year = Date.today.year)
     Date.civil(year, month, -1)
   end

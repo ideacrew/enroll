@@ -63,10 +63,9 @@ class EmployerProfile
     self.organization
   end
 
-
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
-  def roster_count
-    employee_families.count
+  def roster_size
+    employee_families.size
   end
 
   # belongs_to broker_agency_profile
@@ -91,14 +90,18 @@ class EmployerProfile
     BrokerRole.find(@writing_agent_id) unless @writing_agent_id.blank?
   end
 
-  # has_many employees
-  def employees
-    EmployeeRole.where(employer_id: self._id)
+  # TODO: Benchmark this for efficiency
+  def employee_families_sorted
+    employee_families.order_by(:"census_employee.last_name".asc)
   end
 
   # Strip non-numeric characters
   def fein=(new_fein)
     write_attribute(:fein, new_fein.to_s.gsub(/\D/, ''))
+  end
+
+  def latest_plan_year
+    plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
   def find_plan_year_by_date(coverage_date)
