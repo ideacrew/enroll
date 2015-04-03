@@ -130,7 +130,10 @@ class EnrollmentFactory
     people = Person.match_by_id_info(ssn: ssn)
     case people.count
     when 1
-      return people.first, false
+      person = people.first
+      person.user = user
+      person.save
+      return person, false
     when 0
       return Person.create(
         user: user,
