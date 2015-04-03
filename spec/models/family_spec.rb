@@ -73,6 +73,42 @@ describe Family do
     end
   end
 
+  describe "qualifying life events" do
+    context "family has never had a qualifying life event" do
+      context "and is not under a Special Enrollment Period" do
+        pending "TODO"
+        it "should indicate no active SEPs" do
+          expect().to be_false
+        end
+
+        it "current_life_events should return []" do
+        end
+      end
+    end
+
+    context "family has a past QLE, but Special Enrollment Period has expired" do
+        it "should indicate no active SEPs" do
+        end
+
+        it "current_life_events should return nil" do
+        end
+     end
+
+    context "family has a QLE and is under a SEP" do
+        it "should indicate SEP is active" do
+        end
+
+        it "should return one current_special_enrollment" do
+        end
+
+      context "and the family is under more than one SEP" do
+        it "should return multiple current_special_enrollment" do
+        end
+      end
+
+    end
+  end
+
   describe "large family with multiple employees - The Brady Bunch" do
     include_context "BradyBunch"
     

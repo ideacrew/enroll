@@ -147,20 +147,31 @@ class Plan
 
   class << self
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
-      # plan_premium = Plan.and(
-      #       { active_year: plan_year }, { hios_id: hios_id }, 
-      #       { "premium_tables.age" => insured_age },
-      #       { "premium_tables.start_on" => { "$lte" => coverage_begin_date }}, 
-      #       { "premium_tables.end_on" => { "$gte" => coverage_begin_date }}
-      #     ).only("premium_tables.cost").entries
-      # offset = insured_age - plan_documents.first.premium_tables.first.age
+      result = []
+      if plan_year.to_s == coverage_begin_date.to_date.year.to_s
+        [insured_age].flatten.each do |age|
+          cost = Plan.find_by(active_year: plan_year, hios_id: hios_id)
+          .premium_tables.where(:age => age, :start_on.lte => coverage_begin_date, :end_on.gte => coverage_begin_date)
+          .entries.first.cost
+          result << { age: age, cost: cost }
+        end
+      end
+      result
+    end
 
+    def fetch_monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
       begin_date = Date.parse(coverage_begin_date)
       plan_documents = Plan.and({ active_year: plan_year }, { hios_id: hios_id }).entries
       premium_table = plan_documents.first.premium_tables.detect do |table|
         (table.age == insured_age) && (begin_date >= table.start_on) && (begin_date <= table.end_on)
       end
-      plan_premium = premium_table.cost
+
+      if cost = premium_table.cost
+        cache_key = [hios_id, plan_year, insured_age].join('-')
+        $redis.set(cache_key, cost)
+      else
+        nil
+      end
     end
     
     def redis_monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
@@ -169,14 +180,16 @@ class Plan
         [insured_age].flatten.each do |age|
           cache_key = [hios_id, plan_year, age].join('-')
           cost = $redis.get(cache_key)
-          result << { age: age, cost: cost }
+          if cost.blank?
+            cost = fetch_monthly_premium(plan_year, hios_id, age, coverage_begin_date)
+          end
+          result << { age: age, cost: cost.try(:to_f) }
         end
-
       end
       result
+    rescue => e
+      Rails.logger.error { e.message }
+      []
     end
-
   end
-
-
 end
