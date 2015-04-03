@@ -22,7 +22,8 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
 
-  has_and_belongs_to_many :qualifying_life_events
+  embeds_many :life_events
+  accepts_nested_attributes_for :life_events
 
   # All current and former members of this group
   embeds_many :family_members, cascade_callbacks: true
@@ -81,12 +82,26 @@ class Family
 
   def latest_household
     return households.first if households.size == 1
-    persisted_household = households.select(&:persisted?) - [nil] #remove any nils
-    persisted_household.sort_by(&:submitted_at).last
+    households.order_by(:'submitted_at'.desc).limit(1).only(:households).first
+    # persisted_household = households.select(&:persisted?) - [nil] #remove any nils
+    # persisted_household.sort_by(&:submitted_at).last
   end
 
   def active_family_members
     family_members.find_all { |a| a.is_active? }
+  end
+
+  # Life events trigger special enrollment periods
+  def is_under_special_enrollment_period?
+    return false if life_events.size == 0
+    life_event = life_events.order_by(:'sep_begin_on'.desc).limit(1).only(:life_events).first
+    life_event.is_active?
+  end
+
+  def current_life_events
+    return [] if life_events.size == 0
+    life_events = life_events.order_by(:'sep_begin_on'.desc).only(:life_events)
+    life_events.reduce([]) { |list, event| list << event.is_active? }
   end
 
   def employers
