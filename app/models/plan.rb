@@ -32,6 +32,8 @@ class Plan
   embeds_many :premium_tables
   accepts_nested_attributes_for :premium_tables
 
+  has_one :qhp, class_name: "Products::Qhp"
+
   index({ hbx_id: 1 })
   index({ coverage_kind: 1 })
   index({ metal_level: 1 })

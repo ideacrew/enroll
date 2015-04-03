@@ -16,23 +16,23 @@
     <%end%>
 </table>
 
-<% plans.each do |plan|%>
+<% qhps.each do |qhp|%>
   <table class="table bordered", border = "1", style="width:330px !important;float:left;font-size:11px;" >
     <tr>
-      <th colspan="2"><%= plan.plan_marketing_name.split.first.underscore.humanize %></th>
+      <th colspan="2"><%= qhp.plan_marketing_name.split.first.underscore.humanize %></th>
     </tr>
     <tr>
-      <th colspan="2"><%= plan.plan_marketing_name %></th>
+      <th colspan="2"><%= qhp.plan_marketing_name %></th>
     </tr>
     <tr>
       <th>In Network</th>
       <th>Out of Network</th>
     </tr>
-    <% plan.qhp_cost_share_variance.qhp_service_visits.each do |visit| %>
-      <% if Products::Qhp::VISIT_TYPES.include?(visit.visit_type) %>
+    <% qhp.qhp_benefits.each do |benefit| %>
+      <% if Products::Qhp::VISIT_TYPES.include?(benefit.benefit_type_code) %>
         <tr>
-          <td><%= visit.copay_in_network_tier_1 %></td>
-          <td><%= visit.copay_out_of_network %></td>
+          <td><%= benefit.copay_in_network_tier_1 %></td>
+          <td><%= benefit.copay_out_of_network %></td>
         </tr>
       <% end %>
     <% end %>

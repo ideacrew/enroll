@@ -1,0 +1,54 @@
+<h3> Plan Summary </h3>
+<h4> Plan Name: <%= qhp.plan_marketing_name %></h4>
+<br>
+<table class="table bordered", border = "1", style="width:90%;" >
+  <tr>
+    <th>Services You May Need</th>
+    <th colspan="2">Your cost if you use a </th>
+    <th>Limitations & Exceptions</th>
+  </tr>
+  <tr>
+    <th>&nbsp;</th>
+    <th>Participating Provider</th>
+    <th>Non-Participating Provider</th>
+    <th>&nbsp;</th>
+  </tr>
+  <% qhp.qhp_cost_share_variance.qhp_service_visits.each do |visit| %>
+    <tr>
+      <td><%= visit.visit_type %></td>
+      <td><%= visit.copay_in_network_tier_1 %></td>
+      <td><%= visit.copay_out_of_network %></td>
+      <td><%= visit.find_explanation.present? ? visit.find_explanation : "None" %></td>
+    </tr>
+  <% end %>
+</table>
+
+<br>
+
+<h4> Having a Baby </h4>
+<table class="table bordered", border = "1", style="width:30%;" >
+  <tr>
+    <th>Amount Owed to Providers</th>
+    <th>Plan Pays</th>
+    <th>Patient Pays</th>
+  </tr>
+  <tr>
+    <td>$7,540</td>
+    <td>$5,210</td>
+    <td>$2,330</td>
+  </tr>
+</table>
+
+<h4> Managing Type 2 Diabetes </h4>
+<table class="table bordered", border = "1", style="width:30%;" >
+  <tr>
+    <th>Amount Owed to Providers</th>
+    <th>Plan Pays</th>
+    <th>Patient Pays</th>
+  </tr>
+  <tr>
+    <td>$5,440</td>
+    <td>$3,400</td>
+    <td>$2,000</td>
+  </tr>
+</table>

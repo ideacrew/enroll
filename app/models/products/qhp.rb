@@ -94,6 +94,8 @@ class Products::Qhp
     cascade_callbacks: true,
     validate: true
 
+  belongs_to :plan
+
   accepts_nested_attributes_for :qhp_benefits, :qhp_cost_share_variance
 
   index({"issuer_id" => 1})
