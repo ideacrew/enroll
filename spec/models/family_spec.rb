@@ -73,16 +73,15 @@ describe Family do
     end
   end
 
-  describe "qualifying life events" do
-    context "family has never had a qualifying life event" do
-      context "and is not under a Special Enrollment Period" do
-        pending "TODO"
-        it "should indicate no active SEPs" do
-          expect().to be_false
-        end
+  describe "special enrollment periods" do
+    let!(:family) {FactoryGirl.create(:family)}
 
-        it "current_life_events should return []" do
-        end
+    context "family has never had a special enrollment period" do
+      it "should indicate no active SEPs" do
+        expect(family.is_under_special_enrollment_period).to be_false
+      end
+
+      it "current_special_enrollment_periods should return []" do
       end
     end
 
@@ -90,7 +89,7 @@ describe Family do
         it "should indicate no active SEPs" do
         end
 
-        it "current_life_events should return nil" do
+        it "current_special_enrollment_periods should return nil" do
         end
      end
 
