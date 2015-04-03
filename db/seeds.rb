@@ -31,7 +31,7 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
 # system "rake seed:plans"
 # require File.join(File.dirname(__FILE__),'seedfiles', 'plan_benefits_seed')
 
-system "rake seed:plans seed:people seed:families"
+system "rake seed:plans"
 system "rake hbx:employers:add[tmp/employer_export.csv,tmp/users_to_ignore.csv]"
 system "rake hbx:employers:census:add[tmp/census.csv]"
 
