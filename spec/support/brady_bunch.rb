@@ -21,9 +21,19 @@ module BradyBunch
     let(:jan)    {FactoryGirl.create(:female, first_name: "Jan",    last_name: last_name, dob: 12.years.ago, addresses: [brady_addr.dup], phones: [brady_ph.dup])}
     let(:bobby)  {FactoryGirl.create(:male,   first_name: "Bobby",  last_name: last_name, dob: 8.years.ago,  addresses: [brady_addr.dup], phones: [brady_ph.dup])}
     let(:cindy)  {FactoryGirl.create(:female, first_name: "Cindy",  last_name: last_name, dob: 6.years.ago,  addresses: [brady_addr.dup], phones: [brady_ph.dup])}
+    let(:brady_daughters) {[marcia, jan, cindy]}
+    let(:brady_sons) {[greg, peter, bobby]}
+    let(:brady_children) {brady_sons + brady_daughters}
     let(:bradys) {[mike, carol, greg, marcia, peter, jan, bobby, cindy]}
     let!(:mikes_family) do
-      family = FactoryGirl.create(:family)
+      mike.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "self")
+      mike.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "spouse")
+      brady_children.each do |child|
+        mike.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
+      end
+      mike.save
+
+      family = FactoryGirl.build(:family)
       family.family_members << FactoryGirl.build(:family_member, :primary, person: mike)
       (bradys - [mike]).each do |brady|
         family.family_members << FactoryGirl.build(:family_member, person: brady)
@@ -32,7 +42,14 @@ module BradyBunch
       family
     end
     let!(:carols_family) do
-      family = FactoryGirl.create(:family)
+      carol.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "self")
+      carol.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "spouse")
+      brady_children.each do |child|
+        carol.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
+      end
+      carol.save
+
+      family = FactoryGirl.build(:family)
       family.family_members << FactoryGirl.build(:family_member, :primary, person: carol)
       (bradys - [carol]).each do |brady|
         family.family_members << FactoryGirl.build(:family_member, person: brady)
@@ -44,7 +61,7 @@ module BradyBunch
 
   shared_context "BradyWork" do
     include_context "BradyBunch"
-    
+
     let(:mikes_work_addr) do
       FactoryGirl.build(:address,
         kind: "work",
@@ -79,9 +96,8 @@ module BradyBunch
       )
     end
     let(:mikes_census_family) {FactoryGirl.create(:employer_census_family, employer_profile: mikes_employer, census_employee: mikes_census_employee)}
-    let(:mikes_reference_plan) {FactoryGirl.create(:plan)}
     let(:mikes_benefit_group) {FactoryGirl.build(:benefit_group, plan_year: nil)}
-    let(:mikes_plan_year) {FactoryGirl.create(:plan_year, employer_profile: mikes_employer, benefit_groups: [mikes_benefit_group])}
+    let!(:mikes_plan_year) {FactoryGirl.create(:plan_year, employer_profile: mikes_employer, benefit_groups: [mikes_benefit_group])}
 
     let(:carols_work_addr) do
       FactoryGirl.build(:address,
@@ -117,8 +133,7 @@ module BradyBunch
       )
     end
     let(:carols_census_family) {FactoryGirl.create(:employer_census_family, employer_profile: carols_employer, census_employee: carols_census_employee)}
-    let(:carols_reference_plan) {FactoryGirl.create(:plan)}
     let(:carols_benefit_group) {FactoryGirl.build(:benefit_group, plan_year: nil)}
-    let(:carols_plan_year) {FactoryGirl.create(:plan_year, employer_profile: carols_employer, benefit_groups: [carols_benefit_group])}
+    let!(:carols_plan_year) {FactoryGirl.create(:plan_year, employer_profile: carols_employer, benefit_groups: [carols_benefit_group])}
   end
 end
