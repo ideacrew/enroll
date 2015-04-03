@@ -2,6 +2,14 @@ Rails.application.routes.draw do
 
   # You can have the root of your site routed with "root"
   root 'welcome#index'
+  namespace :products do
+    resources :plans, controller: :qhp do
+      collection do
+        get 'comparison'
+        get 'summary'
+      end
+    end
+  end
 
   # get 'user/index'
 

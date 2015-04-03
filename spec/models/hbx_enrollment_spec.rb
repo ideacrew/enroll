@@ -1,11 +1,7 @@
 require 'rails_helper'
 
 describe HbxEnrollment, type: :model do
-
-  before(:all) do
-    @employer = EmployerProfile.new
-    @hbx_enrollment = HbxEnrollment.new
-  end
+  include_context "BradyBunch"
 
   it 'sets employer_id' do
     @hbx_enrollment.employer_profile=@employer

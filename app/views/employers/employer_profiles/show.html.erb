@@ -22,6 +22,8 @@
             <%= @current_plan_year.pte_count %> /
             <%= @current_plan_year.msp_count %> 
           </dd>
+          <dd>Participation Pct</dd>
+          <dt><%= @current_plan_year.employee_participation_percent %></dt>
           <dt>Open Enroll Start/End</dt>
             <dd>
               <%= format_date @current_plan_year.open_enrollment_start_on %> / 
@@ -36,30 +38,32 @@
         <h4>Benefit Groups</h4>
         <% @benefit_groups.each do |bg| %>
           <dl class="dl-horizontal">
-            <dt>Title</dt>
+            <dt>Benefit Group</dt>
             <dd><%= bg.title %> </dd>
             <dt>Coverage Effective</dt>
             <dd><%= "#{bg.effective_on_kind.humanize} after #{bg.effective_on_offset} days from date of hire" %></dd>
             <dt>Coverage Termination</dt>
             <dd><%= "#{bg.terminate_on_kind.humanize} following last day of employment" %> </dd>
-            <dt>Ref Plan/Metal Level</dt>
-            <dd><%= "#{bg.reference_plan.name} / #{bg.reference_plan.metal_level.titleize}" %></dd>
+            <dt>Ref Plan</dt>
+            <dd><%= "#{bg.reference_plan.name}" %></dd>
+            <dt>Ref Plan Metal Level</dt>
+            <dd><%= "#{bg.reference_plan.metal_level.titleize}" %></dd>
          </dl>
           <h5>Employer Contributions</h5>
           <table class="table table-condensed">
             <thead>
               <tr>
                 <th>Employee Relationship</th>
+                <th>Coverage Offered?</th>
                 <th>Employer Contribution Pct</th>
-                <th>Employer Max</th>
               </tr>
             </thead>
             <tbody>
               <% bg.relationship_benefits.each do |rb| %>
                 <tr>
                   <td><%= rb.relationship.humanize %></td>
+                  <td><%= rb.relationship == 'child_26_and_over' ? "No" : "Yes" %></td>
                   <td><%= number_to_percentage rb.premium_pct, precision: 0 %></td>
-                  <td><%= rb.employer_max_amt %></td>
                  </tr>
               <% end %>
             </tbody>
@@ -69,7 +73,7 @@
 
         <%= link_to "Add Employer Census Family", new_employers_employer_profile_family_path(@employer_profile), class: "btn btn-primary" %> &nbsp;&nbsp;
 
-        <h3>Employer Roster </h3>
+        <h3>Employee Roster</h3>
           <table class="table table-condensed">
             <thead>
           <tr>
@@ -81,7 +85,7 @@
             </thead>
             <tbody>
 
-        <% @employer_profile.employee_families.each do |family| %>
+        <% @employer_profile.employee_families_sorted.each do |family| %>
           <tr>
             <td> <%= link_to name_to_listing(family.census_employee), employers_employer_profile_family_path(@employer_profile.id, family.id) %> </td>
             <td> <%= format_date family.census_employee.dob %> </td>

@@ -24,16 +24,9 @@
 $('input.floatlabel').floatlabel();
 
 $(document).ready(function () {
-  
-  $('#personal_sidebar .address_info').addClass('hidden');
-  $('#personal_sidebar #phone_info').addClass('hidden');
-  $('#personal_sidebar #email_info').addClass('hidden');
-  $('#personal_sidebar .phone_info').addClass('hidden');
-  $('#personal_sidebar .email_info').addClass('hidden');
-  $("#personal_sidebar .save-btn").attr("disabled",true);
-  $(".people #address_info").addClass('hidden');
-  $(".people #phone_info").addClass('hidden');
-  $(".people #email_info").addClass('hidden');
+  $("#new_person #address_info").addClass('hidden');
+  $("#new_person #phone_info").addClass('hidden');
+  $("#new_person #email_info").addClass('hidden');
   
   $(".date-picker, .date_picker").datepicker({
     changeMonth: true,
@@ -141,7 +134,7 @@ $(document).ready(function () {
     $('#email_info').removeClass('hidden');
   });
 
-  $('.focus_effect').click(function(e){
+  $('#new_person .focus_effect').click(function(e){
     var check = check_personal_info_exists();
     active_div_id = $(this).attr('id');
     if( check.length==0 && (!$('.autofill-failed').hasClass('hidden') || $('.autofill-cloud').hasClass('hidden'))) {
@@ -624,5 +617,9 @@ $(document).ready(function () {
   $(".zip").mask("99999");
   $("#person_ssn").mask("999999999");
   $(".address-state").mask("**");
-  
+
+  /* People Account Page */
+  $('#contact-tab').click(function() {
+
+  });
 });

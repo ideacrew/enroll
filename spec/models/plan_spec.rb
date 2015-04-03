@@ -160,28 +160,47 @@ RSpec.describe Plan, type: :model do
   end
 end
 
-
 RSpec.describe Plan, type: :model do
   describe "class methods" do
-    describe ".monthly_premium" do
+    describe "redis_monthly_premium" do
 
-      let(:plan) {FactoryGirl.create(:plan_with_premium_tables)}
-      let(:premium_table) { plan.premium_tables.last }
-      let(:year) { plan.active_year }
-      let(:hios_id) { plan.hios_id }
-      let(:insured_age) { plan.premium_tables.last.age }
-      let(:coverage_begin_date) { "03/01/2015" }
-      let(:premium) { plan.premium_tables.last.cost }
-
-      context "with invalid parameters" do
-        pending "TODO"
+      it "with invalid parameters" do 
+        expect(Plan.redis_monthly_premium(2014, "1234", [], 2014)).to eq []
       end
 
       context "with correct parameters" do
+        before(:each) do
+          @plan = FactoryGirl.create(:plan_with_premium_tables)
+          @premium_table= @plan.premium_tables.last
+          @year= @plan.active_year
+          @hios_id= @plan.hios_id
+          @insured_age= @plan.premium_tables.last.age
+          @coverage_begin_date= "03/01/2015"
+          @premium= @plan.premium_tables.last.cost
 
-        it "should return the correct monthly premium" do
-          # expect(plan.premium_tables.first.inspect).to eq ""
-          expect(Plan.monthly_premium(year, hios_id, insured_age, coverage_begin_date)).to eq premium
+          @plan.premium_tables.create(age: @insured_age+10, cost: @premium+10, start_on: "02/20/2015", end_on: "03/09/2015")
+          @plan.premium_tables.create(age: @insured_age+20, cost: @premium+20, start_on: "02/20/2015", end_on: "03/09/2015")
+          @plan.save
+
+          Plan.all.each do |plan|
+            plan.premium_tables.each do |premium|
+              cache_key = [plan.hios_id, plan.active_year, premium.age].join('-')
+              $redis.set(cache_key, premium.cost)
+            end
+          end
+        end
+
+        it "should return the correct monthly premium with an age" do
+          expect(Plan.redis_monthly_premium(@year, @hios_id, @insured_age, @coverage_begin_date)).to eq [{age: @insured_age, cost: @premium}]
+        end
+
+        it "should return the correct monthly premium with age array" do
+          expect(Plan.redis_monthly_premium(@plan.active_year, @hios_id, [@insured_age, @insured_age+20], @coverage_begin_date)).to eq [{age: @insured_age, cost: @premium}, {age: @insured_age+20, cost: @premium + 20}]
+        end
+
+        it "should return the correct monthly premium with age array(some not store in redis)" do
+          @plan.premium_tables.create(age: @insured_age+30, cost: @premium+30, start_on: "02/20/2015", end_on: "03/09/2015")
+          expect(Plan.redis_monthly_premium(@plan.active_year, @hios_id, [@insured_age, @insured_age+20, @insured_age+30], @coverage_begin_date)).to eq [{age: @insured_age, cost: @premium}, {age: @insured_age+20, cost: @premium + 20}, {age: @insured_age + 30, cost: @premium + 30}]
         end
       end
     end

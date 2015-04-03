@@ -1,5 +1,6 @@
 class QhpBuilder
-  LOGGER = Logger.new("#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log")
+  LOG_PATH = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
+  LOGGER = Logger.new(LOG_PATH)
 
   def initialize(qhp_hash)
     @qhp_hash = qhp_hash
@@ -33,8 +34,11 @@ class QhpBuilder
   end
 
   def show_qhp_stats
+    puts "*"*80
     puts "Total Number of Plans imported from xml: #{@xml_plan_counter}."
     puts "Total Number of Plans Saved to database: #{@success_plan_counter}."
+    puts "Check the log file #{LOG_PATH}"
+    puts "*"*80
     LOGGER.info "\nTotal Number of Plans imported from xml: #{@xml_plan_counter}.\n"
     LOGGER.info "\nTotal Number of Plans Saved to database: #{@success_plan_counter}.\n"
   end
