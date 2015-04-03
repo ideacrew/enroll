@@ -216,9 +216,18 @@
                   <div class="tab-content" id="myTabContent1">
                     <div aria-labelledby="personal-tab" id="personal" class="tab-pane fade in active" role="tabpanel">
                       <div id="personal_info" class="focus_effect row personaol-info-top-row">
-                        <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
-                          <div class="table-responsive">
-                            <%= render 'people/landing_pages/personal' %> 
+                        <div class="col-md-8 no-pd col-sm-8 col-xs-12">
+                          <div class="table-responsive first landing_personal_tab">
+                            <%= render 'people/landing_pages/personal' %>
+                          </div>
+                          <button class="btn btn-default disabled save-btn">Save</button>
+                        </div>
+                        <div class="col-md-3 col-sm-4 col-xs-12">
+                          <div class="life-event-tip">
+                            <h4>Life Events Tip #3</h4>
+                            <p>
+                              There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -233,206 +242,70 @@
                     <div aria-labelledby="family-tab" id="family" class="tab-pane fade landing-row" role="tabpanel">
                       <%= render 'people/landing_pages/family_members' %> 
                     </div>
-                    <div aria-labelledby="contact-tab" id="contact" class="tab-pane fade" role="tabpanel">
+                    
+                    
+                    
+                    
+                    <div aria-labelledby="contact-tab" id="contact" class="tab-pane fade landing_contact_information" role="tabpanel">
                       <div id="address_info" class="focus_effect row personaol-info-top-row">
-                        <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
+                        <div class="col-md-8 no-pd col-sm-12 col-xs-12 first">
                           <div class="row top-row">
-                            <div class="col-md-9 col-sm-9 col-xs-12 form-group form-group-lg no-pd address">
+                            <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd address">
                               <div class="form-group form-group-lg">
-                                <div class="row" style="margin: 0;">
-                                  <div class="col-md-4 col-sm-3 col-xs-12 bg-color"></div>
-                                  <div class="col-md-4 col-sm-6 col-xs-12 no-pd">
+                                <div style="margin: 0;" class="row">
+                                  <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
                                     <div class="dropdown">
-                                      <button class="form-control float-label adderess-select-box form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                                      <button aria-expanded="true" data-toggle="dropdown" id="dropdownMenu1" type="button" class="form-control float-label adderess-select-box form_group_lg dropdown-toggle">
                                         Home Address
-                                        <span class="caret"></span>
+                                        <i class="glyphicon glyphicon-menu-down"></i>
                                       </button>
-                                      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Home Address</a></li>
-                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Work Address</a></li>
-                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Mailing Address</a></li>
+                                      <ul aria-labelledby="dropdownMenu1" role="menu" class="dropdown-menu">
+                                        <li role="presentation"><a href="#" tabindex="-1" role="menuitem">Home Address</a></li>
+                                        <li role="presentation"><a href="#" tabindex="-1" role="menuitem">Work Address</a></li>
+                                        <li role="presentation"><a href="#" tabindex="-1" role="menuitem">Mailing Address</a></li>
                                       </ul>
                                     </div>
                                   </div>
-                                  <div class="col-md-4 col-sm-3 col-xs-12 bg-color"></div>
                                 </div>
                               </div>  
                             </div>
-                            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-                              <button class="btn btn-new-address">NEW ADDRESS</button>
-                              <!-- <button class="btn btn-new-address">NEW ADDRESS</button> -->
-                            </div>
-                            </div>
-                         <%= render 'people/landing_pages/address' %> 
+                          </div>
+                          <%= render 'people/landing_pages/address' %>
+                          
                         <div class="error">
-                            <div class="warning"><i class="fa fa-exclamation-triangle"></i>
-                              All fields Required</div>
+                          <div class="warning"><i class="fa fa-exclamation-triangle"></i>
+                            All fields Required
                           </div>
                         </div>
                       </div>
-                      <br>
-                      <div id="phone_info" class="focus_effect row personaol-info-top-row">
-                         <%= render 'people/landing_pages/phone' %> 
-                      </div>
-                      <br>                      
-                     <div id="email_info" class="focus_effect row personaol-info-top-row">
-                      <% @person.emails.each do |email| %>
-                       <% if email.address.present? %>
-                        <div class="email">
-                          <div class="col-md-10 col-sm-12 no-pd first">
-                            <div class="form-group form-group-lg">
-                              <input type="text" value="<%= email.address %>" class="floatlabel form-control" placeholder="NAME@DOMAIN.COM">
-                            </div>
+                    </div>
+                    <br>
+                    <div id="phone_info" class="focus_effect row personaol-info-top-row">
+                       <%= render 'people/landing_pages/phone' %> 
+                    </div>
+                    <br>
+                    <div id="email_info" class="focus_effect row personaol-info-top-row">
+                      <% email = @person.emails.try(:first) %>
+                      <div class="email">
+                        <div class="col-md-8 col-sm-12 col-xs-12 no-pd first">
+                          <div class="form-group form-group-lg">
+                            <input type="text" value="<%= email.address if email.address.present? %>" class="form-control" placeholder="NAME@DOMAIN.COM">
+                            <span>NAME@DOMAIN.COM</span>
                           </div>
                         </div>
-                        <% end %>
-                        <% end %>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div aria-labelledby="plans-tab" id="plans" class="tab-pane fade" role="tabpanel">
-                  <div class="col-md-12 col-xs-12 col-sm-12">
-                    <h3>Open Access Plus Coverage Summmary</h3>
-                    <h4><b>Account Number:</b> 3209264</h4>
-                    <div class="coverage-table coverage-prevent-table">
-                      <h5 class="heading">Preventive Care</h5>
-                      <div class="table-responsive">
-                        <table class="table">
-                          <thead>
-                            <tr>
-                              <th>Coverages</th>
-                              <th>In-Network</th>
-                              <th>Out-of-Network</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                            </tr>
-                            <tr>
-                              <td>Well Child Care</td>
-                              <td>You pay 0%<br>Plan pays 100%</td>
-                              <td>You pay 20%<br>Plan pays 80%</td>
-                            </tr>
-                            <tr>
-                              <td>Adult Preventive Care</td>
-                              <td>You pay 0%<br>Plan pays 100%</td>
-                              <td>You pay 20%<br>Plan pays 80%</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <div class="coverage-table">
-                      <h5 class="heading">Doctor office visit</h5>
-                      <div class="table-responsive">
-                        <table class="table">
-                          <thead>
-                            <tr>
-                              <th>Coverages</th>
-                              <th>In-Network</th>
-                              <th>Out-of-Network</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>Primary Care Physician</td>
-                              <td>You pay $25</td>
-                              <td>You pay 20%<br>Plan pays 80%</td>
-                            </tr>
-                            <tr>
-                              <td>Speciallist</td>
-                              <td>You pay $40</td>
-                              <td>Does Not Apply</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <div class="coverage-table">
-                      <h5 class="heading">outpatient hospital</h5>
-                      <div class="table-responsive">
-                        <table class="table">
-                          <thead>
-                            <tr>
-                              <th>Coverages</th>
-                              <th>In-Network</th>
-                              <th>Out-of-Network</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>Outpatient Hospital</td>
-                              <td>You pay $150<br>You pay 0%<br>Plan pays 100%</td>
-                              <td>You pay 20%<br>Plan pays 80%</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <div class="coverage-table">
-                      <h5 class="heading">intpatient hospital</h5>
-                      <div class="table-responsive">
-                        <table class="table">
-                          <thead>
-                            <tr>
-                              <th>Coverages</th>
-                              <th>In-Network</th>
-                              <th>Out-of-Network</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>Intpatient Hospital</td>
-                              <td>You pay $250<br>You pay 0%<br>Plan pays 100%</td>
-                              <td>You pay 20%<br>Plan pays 80%</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <div class="coverage-table">
-                      <h5 class="heading">Emergency and urgent care services</h5>
-                      <div class="table-responsive">
-                        <table class="table">
-                          <thead>
-                            <tr>
-                              <th>Coverages</th>
-                              <th>In-Network</th>
-                              <th>Out-of-Network</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>Emergency Room</td>
-                              <td>You pay $150</td>
-                              <td>You pay $150</td>
-                            </tr>
-                            <tr>
-                              <td>Urgent Care</td>
-                              <td>You pay $50</td>
-                              <td>You pay $50</td>
-                            </tr>
-                            <tr>
-                              <td>Ambulance</td>
-                              <td>You pay 0%<br>Plan pays 100%</td>
-                              <td>You pay 0%<br>Plan pays 100%</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <br><br>
-                  </div>
-                </div>
-                <div aria-labelledby="documents-tab" id="documents" class="tab-pane fade" role="tabpanel">
-                </div>
-                <div aria-labelledby="messages-tab" id="messages" class="tab-pane fade" role="tabpanel">
-                </div>
-                <div class="clearfix"></div>
+              </div>
+              <div aria-labelledby="plans-tab" id="plans" class="tab-pane fade" role="tabpanel">
+                <%= render partial: "people/landing_pages/coverage_plans" %>
+              </div>
+              <div aria-labelledby="documents-tab" id="documents" class="tab-pane fade" role="tabpanel">
+              </div>
+              <div aria-labelledby="messages-tab" id="messages" class="tab-pane fade" role="tabpanel">
+              </div>
+              <div class="clearfix"></div>
               </div>
               <div class="clearfix"></div>
             </form >
@@ -489,7 +362,7 @@
                 </div>
               </div>
             </div>
-            <div class="panel panel-default active">
+            <div class="panel panel-default">
               <div id="headingThree" role="tab" class="panel-heading">
                 <h4 class="panel-title">
                   <a aria-controls="collapseThree" aria-expanded="true" href="#collapseThree" data-parent="#accordion" data-toggle="collapse" class="">
@@ -574,6 +447,70 @@
         $(this).toggleClass('active');
         $(this).siblings().removeClass('active');
       });
+
+      $('input,textarea').focus(function(){
+       $(this).removeAttr('placeholder');
+       $(this).removeAttr('value');
+      });
+
+      $(".personal-table input").focusout(function() {
+        if ($(".personal-table input").val() !== ""){
+          $("#personal_info .save-btn").removeClass("disabled");
+          $("#personal_info .vital-information").css("display", "block");
+          $(".personal-table tbody tr:first-child td, table.personal-table").removeAttr("style");
+        }else{}
+      });
+
+      $(".personal-table input").focusin(function() {
+        $(".personal-table tbody tr:first-child td, table.personal-table").css("cssText", "border-color: #00a3d9 !important;");
+      });
+
+      $(document).on('click', '#family .right-side a.edit', function(){
+        $(this).parent().parent(".row").parent(".list-group-item").addClass("edit");
+      });
+
+      $(document).on('click', '#family .right-side a.remove', function(){
+        $(this).closest(".list-group-item").remove();
+      });
+
+      $(document).on('click', '#family .right-side a.cancel', function(){
+        $(this).closest("li.edit").removeClass("edit");
+      });
+
+      $(document).on('click', '#family .right-side a.save', function(){
+        if ($("#family .right-side li.edit input.first-name").val() !== ""){
+          var first = $("#family .right-side li.edit input.first-name").val();
+          var middle = $("#family .right-side li.edit input.middle-name").val();
+          var last = $("#family .right-side li.edit input.last-name").val();
+          $("li.edit h4").text(first + " " + middle + " " + last);
+          $(this).closest("li.edit").removeClass("edit");
+        }else{
+          $(this).closest("li.edit").removeClass("edit");
+        }
+      });
+
+      $("#family .right-side button.new-member").click(function(e){
+        e.preventDefault();
+        $("#family .right-side #add-new-member").css("display", "block");
+      });
+
+      $("#family .right-side #add-new-member a.cancel").click(function(){
+        $("#family .right-side #add-new-member").removeAttr("style");
+      });
+
+      $("#family .right-side #add-new-member a.save").click(function(){
+        if ($("#family .right-side #add-new-member input.first-name").val() !== ""){
+          $("#family .right-side ul li:last-child").clone().appendTo("#family .right-side ul");
+          var first = $("#family .right-side #add-new-member input.first-name").val();
+          var middle = $("#family .right-side #add-new-member input.middle-name").val();
+          var last = $("#family .right-side #add-new-member input.last-name").val();
+          $("#family .right-side ul li:last-child h4").text(first + " " + middle + " " + last);
+          $("#add-new-member").removeAttr("style");
+        }else{
+          $("#family .right-side #add-new-member").removeAttr("style");
+        }
+      });
+     
     </script>
 
 

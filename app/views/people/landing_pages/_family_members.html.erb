@@ -1,5 +1,9 @@
 <div class="right-side">
-  <div class="col-md-10 col-xs-12 col-sm-10 no-pd">
+  <div class="col-md-8 col-xs-12 col-sm-12 no-pd">
+    <div class="row" id="add-new-member">
+      <%= render partial: "people/landing_pages/add_family_member_form" %>
+    </div>
+    <br/>
     <ul class="list-group">
       <% @employee.employee_family.census_dependents.each do |dependent| %>
       <li class="list-group-item">
@@ -7,12 +11,18 @@
           <div class="col-md-10 col-sm-8 col-xs-8">
             <h4> <%= dependent.first_name %> <%= dependent.last_name %> </h4>
           </div>
+          <div class="col-md-2 col-sm-4 col-xs-4 text-right">
+            <a href="#" class="edit"><%= image_tag "edit.png" %></a>
+            <a href="#" class="remove"><%= image_tag "member-close.png" %></a>
+          </div>
+        </div>
+        <div class="row">
+          <%= render partial: "people/landing_pages/add_family_member_form" %>
         </div>
       </li>
       <% end %>
     </ul>
-  </div>
-  <div class="col-md-2 col-xs-12 col-sm-2">
-    <button class="btn">New Member</button>
+    <br>
+    <button class="btn new-member">New Member</button>
   </div>
 </div>

@@ -38,6 +38,15 @@
     font-style: normal;
 }
 
+@font-face {
+  font-family: 'Glyphicons Halflings';
+  src: url('<%= asset_path('glyphicons-halflings-regular.eot') %>');
+  src: url('<%= asset_path('glyphicons-halflings-regular.eot') + '?#iefix' %>'),
+       url('<%= asset_path('glyphicons-halflings-regular.woff') %>') format('woff'),
+       url('<%= asset_path('glyphicons-halflings-regular.ttf') %>') format('truetype'),
+       url('<%= asset_path('glyphicons-halflings-regular.svg') + '#glyphicons_halflingsregular' %>') format('svg');
+}
+
 /* Layout Specifics */
 html {
   position: relative;
@@ -1153,7 +1162,7 @@ p.information{
   top: 4px;
 }
 .key p i{
-  background: url("../img/secure-lock.png") no-repeat;
+  background-image: url('<%= asset_path('secure-lock.png') %>') no-repeat;
   display: block;
   height: 26px;
   width: 20px;
@@ -1767,7 +1776,7 @@ a.list-group-item.confirm {
   font-size: 18px;
 }
 .landing-row .left-side .adderess-select-box.home{
-  background: url("../img/landing-page-delete.png") no-repeat 96% center #fff;
+  background: url("<%= asset_path('landing-page-delete.png') %>") no-repeat 96% center #fff;
   font-size: 16px;
 }
 .landing-row .left-side .adderess-select-box:hover, .landing-row .left-side .adderess-select-box:hover .caret {
@@ -2327,7 +2336,7 @@ a .arrow-right {
 }
 #plans {
   font-family: "AvenirLTStd-Light";
-  padding: 20px 0;
+  padding: 0;
 }
 
 #employer-info .text-right {
@@ -2396,6 +2405,11 @@ a.close-fail {
     width: 12px;
     z-index: 2;
 }
+
+.personal-table tbody tr td {
+    background: none repeat scroll 0 0 #fff;
+}
+
 #key-section ul li {
     list-style-type: none;
     margin: 0;
@@ -3010,7 +3024,7 @@ a.close-2{
 #contact #address_info .adderess-select-box{
   text-align: left;
   font-size: 16px;
-  background: url("../img/landing-page-delete.png") no-repeat 98% center #fff;
+  background: url('<%= asset_path('landing-page-delete.png') %>') no-repeat 98% center #fff;
 }
 #contact #address_info ul.dropdown-menu li a{
   display: block;
@@ -3151,3 +3165,22 @@ a.close-2{
 }
 
 #myTabContent ul.list-group {box-shadow: none;}
+
+.landing_personal_tab.table-responsive.first {
+    opacity: 1 !important;
+}
+
+#contact.landing_contact_information #address_info.focus_effect .form-group {
+  opacity: 1 !important;
+  background: none repeat scroll 0 0 #fff;
+  margin-bottom: 0;
+}
+
+#contact.landing_contact_information .focus_effect div {
+  /*border: 2px solid #005fd6 !important;*/
+  opacity: 1 !important;
+}
+#contact input[type="text"] {
+    font-size: 18px;
+    height: 30px;
+}

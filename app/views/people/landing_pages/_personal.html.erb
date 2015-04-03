@@ -1,48 +1,48 @@
-                            <table class="table search-table personal-table">
-                            <tbody>
-                              <tr>
-                                <td>
-                                  <span>FIRST NAME</span>
-                                  <span><%= @person.first_name %></span>
-                                </td>
-                                <td>
-                                  <span>MIDDLE NAME</span>
-                                  <span><%= @person.middle_name %></span>
-                                </td>
-                                <td>
-                                  <span>LAST NAME</span>
-                                  <span><%= @person.last_name %></span>
-                                </td>
-                                <td>
-                                  <span>SUFFIX</span>
-                                  <span><%= @person.name_sfx %></span>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <span>BIRTHDATE</span>
-                                  <span><%= @person.dob %></span>
-                                </td>
-                                <td>
-                                  <span>SOCIAL SECURITY</span>
-                                  <span><%= @person.ssn %></span>
-                                </td>
-                                <td>
-                                  <div class="radio">
-                                    <label>
-                                      <input type="radio" checked="" value="option1" name="optionsRadios">
-                                      MALE
-                                    </label>
-                                  </div>
-                                </td>
-                                <td>
-                                  <div class="radio">
-                                    <label>
-                                      <input type="radio" value="option1" id="optionsRadios1" name="optionsRadios">
-                                      FEMALE
-                                    </label>
-                                  </div>
-                                </td>
-                              </tr>
-                            </tbody>
-                            </table>
+<table class="table table-bordered search-table personal-table" style="border-color: rgb(0, 163, 217) ! important;">
+  <tbody>
+    <tr>
+      <td>
+        <span>FIRST NAME</span>
+        <span><%= @person.first_name %></span>
+      </td>
+      <td>
+        <span>MIDDLE NAME</span>
+        <span><%= @person.middle_name %></span>
+      </td>
+      <td>
+        <span>LAST NAME</span>
+        <span><%= @person.last_name %></span>
+      </td>
+      <td>
+        <span>SUFFIX</span>
+        <span><%= @person.name_sfx %></span>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span>BIRTHDATE</span>
+        <span><%= @person.dob %></span>
+      </td>
+      <td>
+        <span>SOCIAL SECURITY</span>
+        <span><%= @person.ssn %></span>
+      </td>
+      <td>
+        <div class="radio">
+          <label>
+            <input type="radio" checked="" value="option1" name="optionsRadios">
+            MALE
+          </label>
+        </div>
+      </td>
+      <td>
+        <div class="radio">
+          <label>
+            <input type="radio" value="option1" id="optionsRadios1" name="optionsRadios">
+            FEMALE
+          </label>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
