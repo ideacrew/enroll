@@ -89,12 +89,19 @@ class BenefitGroup
       RelationshipBenefit.new(benefit_group: self,
                               relationship: :employee,
                               premium_pct: employee_premium_pct,
-                              employer_max_amt: employer_max_amount)
+                              employer_max_amt: employer_max_amount,
+                              offered: true),
+      RelationshipBenefit.new(benefit_group: self,
+                              relationship: :child_26_and_over,
+                              premium_pct: employee_premium_pct,
+                              employer_max_amt: employer_max_amount,
+                              offered: false),
     ] + PERSONAL_RELATIONSHIP_KINDS[1...-1].collect do |relationship|
       RelationshipBenefit.new(benefit_group: self,
                               relationship: relationship,
                               premium_pct: dependent_premium_pct,
-                              employer_max_amt: employer_max_amount)
+                              employer_max_amt: employer_max_amount,
+                              offered: true)
     end
   end
 

@@ -7,7 +7,7 @@ FactoryGirl.define do
       FactoryGirl.create(:relationship_benefit, benefit_group: self, relationship: :domestic_partner,           premium_pct: 40, employer_max_amt:  200.00),
       FactoryGirl.create(:relationship_benefit, benefit_group: self, relationship: :child_under_26,             premium_pct: 40, employer_max_amt:  200.00),
       FactoryGirl.create(:relationship_benefit, benefit_group: self, relationship: :disabled_child_26_and_over, premium_pct: 40, employer_max_amt:  200.00),
-      FactoryGirl.create(:relationship_benefit, benefit_group: self, relationship: :child_over_26,              premium_pct:  0, employer_max_amt:    0.00, offered: false),
+      FactoryGirl.create(:relationship_benefit, benefit_group: self, relationship: :child_26_and_over,          premium_pct:  0, employer_max_amt:    0.00, offered: false),
       ] }
     effective_on_kind "date_of_hire"
     terminate_on_kind "end_of_month"
