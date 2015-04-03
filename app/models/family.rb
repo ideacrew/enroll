@@ -22,6 +22,8 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
 
+  field :temporary_is_under_special_enrollment_period, type: Boolean, default: false
+
   has_and_belongs_to_many :qualifying_life_events
 
   # All current and former members of this group
@@ -71,6 +73,10 @@ class Family
 
   scope :all_with_multiple_family_members, -> { exists({:'family_members.1' => true}) }
   scope :all_with_household, -> { exists({:'households.0' => true}) }
+
+  def is_under_special_enrollment_period?
+    temporary_is_under_special_enrollment_period
+  end
 
   def no_duplicate_family_members
     family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
