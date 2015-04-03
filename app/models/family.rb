@@ -25,6 +25,8 @@ class Family
   embeds_many :life_events
   accepts_nested_attributes_for :life_events
 
+  field :temporary_is_under_special_enrollment_period, type: Boolean, default: false
+
   # All current and former members of this group
   embeds_many :family_members, cascade_callbacks: true
   accepts_nested_attributes_for :family_members
@@ -72,6 +74,10 @@ class Family
 
   scope :all_with_multiple_family_members, -> { exists({:'family_members.1' => true}) }
   scope :all_with_household, -> { exists({:'households.0' => true}) }
+
+  def is_under_special_enrollment_period?
+    temporary_is_under_special_enrollment_period
+  end
 
   def no_duplicate_family_members
     family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|

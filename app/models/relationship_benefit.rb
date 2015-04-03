@@ -12,5 +12,4 @@ class RelationshipBenefit
   def offered?
     self.offered
   end
-
 end
