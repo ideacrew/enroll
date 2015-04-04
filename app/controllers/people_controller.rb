@@ -13,34 +13,18 @@ class PeopleController < ApplicationController
   def match_person
     
     @person = Person.new(person_params)
-    employee_family = EmployerProfile.find_census_families_by_person(@person).first
-    # matched_person = Person.match_by_id_info(@person)
+
+    matched_person = Person.match_by_id_info(@person)
     
-    if employee_family.blank?
+    if matched_person.blank?
       # Preexisting Person not found, create new instance and return to complete form entry
       respond_to do |format|
         format.json { render json: { person: @person, matched: false}, status: :ok, location: @person }
       end
     else
       # Matched Person, autofill form with found attributes
-
-      enroll_parms = {}
-      enroll_parms[:user] = @person
-      enroll_parms[:employer_profile] = employee_family.employer_profile
-      enroll_parms[:ssn] = @person.ssn
-      enroll_parms[:last_name] = @person.last_name
-      enroll_parms[:first_name] = @person.first_name
-      enroll_parms[:gender] = @person.gender
-      enroll_parms[:dob] = @person.dob
-      enroll_parms[:name_sfx] = @person.name_sfx
-      enroll_parms[:name_pfx] = @person.name_pfx
-      enroll_parms[:hired_on] = employee_family.census_employee.hired_on
-
-      @employee_role, @family = EnrollmentFactory.add_employee_role(enroll_parms)
-      # add_employee_role
-
       respond_to do |format|
-        # @person = employee_family.census_employee
+        @person = matched_person.first
         build_nested_models
         format.json { render json: { person: @person, matched: true}, status: :ok, location: @person, matched: true }
       end
