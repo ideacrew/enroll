@@ -79,10 +79,6 @@ class Products::QhpServiceVisit
 # visit_type: "Reconstructive Surgery"
 # visit_type: "Clinical Trials"
 # visit_type: "Diabetes Care Management"
-# visit_type: "Prescription Drugs Other"       
-
-  def find_explanation
-    qhp_cost_share_variance.qhp.qhp_benefits.where(benefit_type_code: visit_type).to_a.first.explanation
-  end
+# visit_type: "Prescription Drugs Other"
 
 end

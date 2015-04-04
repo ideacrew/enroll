@@ -13,13 +13,16 @@
     <th>Non-Participating Provider</th>
     <th>&nbsp;</th>
   </tr>
-  <% qhp.qhp_cost_share_variance.qhp_service_visits.each do |visit| %>
-    <tr>
-      <td><%= visit.visit_type %></td>
-      <td><%= visit.copay_in_network_tier_1 %></td>
-      <td><%= visit.copay_out_of_network %></td>
-      <td><%= visit.find_explanation.present? ? visit.find_explanation : "None" %></td>
-    </tr>
+  <% qhp.qhp_benefits.each do |benefit| %>
+    <% deductible = benefit.find_deductible %>
+    <% if deductible.present? %>
+      <tr>
+        <td><%= benefit.benefit_type_code %></td>
+        <td><%= deductible.copay_in_network_tier_1 %></td>
+        <td><%= deductible.copay_out_of_network %></td>
+        <td><%= benefit.explanation.present? ? benefit.explanation : "None" %></td>
+      </tr>
+    <% end %>
   <% end %>
 </table>
 

@@ -29,4 +29,8 @@ class Products::QhpBenefit
 
   # validates_inclusion_of :benefit_type_code, :is_ehb, :is_state_mandate
 
+  def find_deductible
+    qhp.qhp_cost_share_variance.qhp_service_visits.where(visit_type: benefit_type_code).to_a.first
+  end
+
 end
