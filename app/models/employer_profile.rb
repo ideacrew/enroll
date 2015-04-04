@@ -184,7 +184,8 @@ class EmployerProfile
       raise ArgumentError.new("expected Person") unless person.respond_to?(:ssn) && person.respond_to?(:dob)
       return [] if person.ssn.blank? || person.dob.blank?
       Organization.and("employer_profile.employee_families.census_employee.ssn" => person.ssn,
-                       "employer_profile.employee_families.census_employee.dob" => person.dob).to_a
+                       "employer_profile.employee_families.census_employee.dob" => person.dob,
+                       "employer_profile.employee_families.census_employee.linked_at" => nil).to_a
     end
 
   end

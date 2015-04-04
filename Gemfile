@@ -42,6 +42,7 @@ gem 'mongoid-versioning'
 
 gem 'money-rails', '~> 1.3.0'
 gem "mongoid-enum", '~> 0.2.0'
+gem "mongo_session_store-rails4"
 
 ## Add field-level encryption
 # gem 'mongoid-encrypted-fields', '~> 1.3.3'
