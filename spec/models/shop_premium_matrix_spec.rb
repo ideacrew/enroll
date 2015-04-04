@@ -22,12 +22,29 @@ RSpec.describe ShopPremiumMatrix, :type => :model do
     }
   end
 
+  let(:premium_matrix3) do
+    { hbx_enrollment_member_id: 1,
+      relationship: 'child_under_26',
+      age_on_effective_date: 12,
+      employer_max_contribution: 0.00,
+      select_plan_id: 'plan_a',
+      plan_premium_total: 125.30,
+      employee_responsible_amount: 125.30
+    }
+  end
+
   let(:sum_plan) do 
     {
       'plan_b' => {
         'sum_plan_premium_total' => 747.13, 
         'sum_employer_max_contribution' => 586.16,
         'sum_employee_responsible_amount' => 179.57
+      },
+
+      "plan_a" => {
+        "sum_plan_premium_total" => 125.3, 
+        "sum_employer_max_contribution" => 0.0, 
+        "sum_employee_responsible_amount" => 125.3
       }
     }
   end
@@ -53,8 +70,9 @@ RSpec.describe ShopPremiumMatrix, :type => :model do
   end
 
   before do 
-    [premium_matrix, premium_matrix2].each{|pm| ShopPremiumMatrix.new(pm)}
+    [premium_matrix, premium_matrix2, premium_matrix3].each{|pm| ShopPremiumMatrix.new(pm)}
     ShopPremiumMatrix.cache_sum_family(1, 'plan_b')
+    ShopPremiumMatrix.cache_sum_family(1, 'plan_a')
     ShopPremiumMatrix.cache_family_detail(1, 'plan_b')
   end
 
@@ -63,7 +81,7 @@ RSpec.describe ShopPremiumMatrix, :type => :model do
   end
 
   it 'able to cache and fetch family total cost' do
-    expect(ShopPremiumMatrix.fetch_cost(1, ['plan_b'], 'family-total')).to eq sum_plan
+    expect(ShopPremiumMatrix.fetch_cost(1, ['plan_b', 'plan_a'], 'family-total')).to eq sum_plan
   end
 
   it 'able to cache and fetch family total cost' do
