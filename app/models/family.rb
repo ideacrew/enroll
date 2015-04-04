@@ -22,8 +22,8 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
 
-  embeds_many :life_events
-  accepts_nested_attributes_for :life_events
+  embeds_many :special_enrollment_periods
+  accepts_nested_attributes_for :special_enrollment_periods
 
   field :temporary_is_under_special_enrollment_period, type: Boolean, default: false
 
@@ -75,10 +75,6 @@ class Family
   scope :all_with_multiple_family_members, -> { exists({:'family_members.1' => true}) }
   scope :all_with_household, -> { exists({:'households.0' => true}) }
 
-  def is_under_special_enrollment_period?
-    temporary_is_under_special_enrollment_period
-  end
-
   def no_duplicate_family_members
     family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
       errors.add(:base, "Duplicate family_members for person: #{k}\n" +
@@ -97,17 +93,21 @@ class Family
     family_members.find_all { |a| a.is_active? }
   end
 
-  # Life events trigger special enrollment periods
   def is_under_special_enrollment_period?
-    return false if life_events.size == 0
-    life_event = life_events.order_by(:'sep_begin_on'.desc).limit(1).only(:life_events).first
-    life_event.is_active?
+    temporary_is_under_special_enrollment_period
   end
 
-  def current_life_events
-    return [] if life_events.size == 0
-    life_events = life_events.order_by(:'sep_begin_on'.desc).only(:life_events)
-    life_events.reduce([]) { |list, event| list << event.is_active? }
+  # Life events trigger special enrollment periods
+  def is_under_special_enrollment_period?
+    return false if special_enrollment_periods.size == 0
+    sep = special_enrollment_periods.order_by(:begin_on.desc).limit(1).only(:special_enrollment_periods).first
+    sep.is_active?
+  end
+
+  def current_special_enrollment_periods
+    return [] if special_enrollment_periods.size == 0
+    special_enrollment_periods = special_enrollment_periods.order_by(:'sep_begin_on'.desc).only(:special_enrollment_periods)
+    special_enrollment_periods.reduce([]) { |list, event| list << event.is_active? }
   end
 
   def employers
