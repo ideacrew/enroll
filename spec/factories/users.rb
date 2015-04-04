@@ -20,11 +20,11 @@ FactoryGirl.define do
   end
 
   trait :edi_ops do
-    role ["edi_ops"]
+    roles ["edi_ops"]
   end
 
   trait :admin do
-    role ["admin"]
+    roles ["admin"]
   end
 
   factory :invalid_user, traits: [:without_email, :without_password, :without_password_confirmation]

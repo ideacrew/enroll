@@ -1,32 +1,17 @@
 <div class="row content landing">
   	<div class="home">
-    <!-- <% if user_signed_in? %>
-      <li>
-        Welcome <%= current_user.email %> |
-        <%= link_to('Logout', destroy_user_session_path, :method => :delete) %>
-      </li>
-    <% else %>
-      <li>
-        <%= link_to('Login', new_user_session_path)  %>
-      </li>
-    <% end %>
-   -->
     <h1><strong>DC HealthLink Consumer Portal</strong></h1>
     <h3>DC's Online Health Insurance Marketplace</h3>
-    
     <% if user_signed_in? %>
-    <p>
-    	Welcome <%= current_user.email %> |
-        <%= link_to('Logout', destroy_user_session_path, :method => :delete) %>
-    </p>
-    <% else %>
-    <p>
-    	<%= link_to 'Sign In', new_user_session_path, class: 'btn btn-primary' %>
-    	<%= link_to 'Sign Up', new_user_registration_path, class: "btn btn-default"  %>
+      <strong>
+      	Welcome <%= current_user.email %>
+          <%= link_to('Logout', destroy_user_session_path, :method => :delete) %>
+      </strong>
     </p>
     <% end %>
     <p>
-        <%= link_to "Consumer Portal", root_path, class: "btn btn-default" %>
+        <%= link_to "Employee Portal", new_person_path, class: "btn btn-default" %>
+        <%= link_to "Consumer Portal", new_consumer_employee_path, class: "btn btn-default" %>
         <%= link_to "Employer Portal", employers_root_path, class: "btn btn-default" %>
         <%= link_to "Broker Portal", broker_agencies_root_path, class: "btn btn-default" %>
     </p>

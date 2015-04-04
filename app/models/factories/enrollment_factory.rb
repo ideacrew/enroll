@@ -128,11 +128,15 @@ class EnrollmentFactory
   def self.initialize_person(user, name_pfx, first_name, middle_name,
                              last_name, name_sfx, ssn, dob, gender)
     people = Person.match_by_id_info(ssn: ssn)
+    person, is_new = nil, nil
     case people.count
     when 1
-      return people.first, false
+      person = people.first
+      person.user = user
+      person.save
+      person, is_new = person, false
     when 0
-      return Person.create(
+      person, is_new = Person.create(
         user: user,
         name_pfx: name_pfx,
         first_name: first_name,
@@ -147,6 +151,11 @@ class EnrollmentFactory
       # what am I doing here?  More than one person had the same SSN?
       return nil, nil
     end
+    if user.present?
+      user.roles << "Employee"
+      user.save
+    end
+    return person, is_new
   end
 
   def self.initialize_family(person, dependents)
