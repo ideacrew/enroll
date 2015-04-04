@@ -1,5 +1,3 @@
-<%= raise @employer_profile.inspect %>
-
 <% if @employer_profile.present? %>
   $('#employer-info').html("<%= escape_javascript(render 'employers').html_safe %>");
 
