@@ -28,11 +28,12 @@
       <th>In Network</th>
       <th>Out of Network</th>
     </tr>
-    <% qhp.qhp_cost_share_variance.qhp_service_visits.each do |visit| %>
-      <% if Products::Qhp::VISIT_TYPES.include?(visit.visit_type) %>
+    <% qhp.qhp_benefits.each do |benefit| %>
+      <% if Products::Qhp::VISIT_TYPES.include?(benefit.benefit_type_code) %>
+        <% deductible = benefit.find_deductible %>
         <tr>
-          <td><%= visit.copay_in_network_tier_1 %></td>
-          <td><%= visit.copay_out_of_network %></td>
+          <td><%= deductible.copay_in_network_tier_1 %></td>
+          <td><%= deductible.copay_out_of_network %></td>
         </tr>
       <% end %>
     <% end %>
