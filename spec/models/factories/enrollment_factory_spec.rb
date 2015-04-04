@@ -86,6 +86,14 @@ RSpec.describe EnrollmentFactory do
       it "should link the user to the person" do
         expect(@employee_role.person.user).to eq user
       end
+
+      it "should link the person to the user" do
+        expect(user.person).to eq person
+      end
+
+      it "should add the employee role to the user" do
+        expect(user.roles).to include "Employee"
+      end
     end
 
     context "and another employer profile exists with the same employee and dependents in the census" do
