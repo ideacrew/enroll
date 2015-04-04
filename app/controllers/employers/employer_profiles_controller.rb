@@ -2,13 +2,15 @@ class Employers::EmployerProfilesController < ApplicationController
   before_filter :find_employer, only: [:show, :destroy]
 
   def index
-    @employers = EmployerProfile.all.to_a
+    @employer_profiles = EmployerProfile.all.to_a
   end
 
   def my_account
   end
 
   def show
+    @current_plan_year = @employer_profile.plan_years.last
+    @benefit_groups = @current_plan_year.benefit_groups
   end
 
   def new
@@ -31,7 +33,7 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def destroy
-    @employer.destroy
+    @employer_profile.destroy
 
     respond_to do |format|
       format.html { redirect_to employers_employer_index_path, notice: "Employer successfully deleted." }
@@ -42,7 +44,7 @@ class Employers::EmployerProfilesController < ApplicationController
   private
 
   def find_employer
-    @employer = EmployerProfile.find(params[:id])
+    @employer_profile = EmployerProfile.find(params[:id])
   end
 
   def employer_params

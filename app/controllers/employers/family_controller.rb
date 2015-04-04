@@ -32,7 +32,7 @@ class Employers::FamilyController < ApplicationController
   private
 
   def find_employer
-    @employer = EmployerProfile.find params["employer_id"]
+    @employer = EmployerProfile.find params["employer_profile_id"]
   end
 
   def find_family
