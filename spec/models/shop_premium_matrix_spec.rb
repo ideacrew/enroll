@@ -59,7 +59,7 @@ RSpec.describe ShopPremiumMatrix, :type => :model do
   end
 
   after do
-    class ShopPremiumMatrix; @@premium_table = nil; end
+    ShopPremiumMatrix.destroy_all
   end
 
   it 'able to cache and fetch family total cost' do

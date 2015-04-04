@@ -1,4 +1,5 @@
 class ShopPremiumMatrix
+  attr_accessor :premium
   #:hbx_enrollment_member_id, 
   #:relationship,
   #:age_on_effective_date,
@@ -8,7 +9,12 @@ class ShopPremiumMatrix
   #:employee_responsible_amount
   def initialize(premium_matrix) 
     @@premium_table ||= Array.new
+    @premium = premium_matrix
     @@premium_table << premium_matrix
+  end
+
+  def destroy
+    @@premium_table.delete_if{|pm| pm == @premium}
   end
 
 
@@ -61,6 +67,10 @@ class ShopPremiumMatrix
         plan_premium_total: premium_matrix[:plan_premium_total],
         employee_responsible_amount: premium_matrix[:employee_responsible_amount]
       }.to_json)
+    end
+
+    def destroy_all
+      ObjectSpace.each_object(self).to_a.each(&:destroy)
     end
 
     private
