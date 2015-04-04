@@ -49,24 +49,43 @@ RSpec.describe EnrollmentFactory do
     let(:employer_census_families) do
       EmployerProfile.find(employer_profile.id.to_s).employee_families
     end
-    before do
-      @employee_role, @family = EnrollmentFactory.add_employee_role(**params)
+
+    context "and no prior person exists" do
+      before do
+        @employee_role, @family = EnrollmentFactory.add_employee_role(**params)
+      end
+
+      it "should have a family" do
+        expect(@family).to be_a Family
+      end
+
+      it "should be the primary applicant" do
+        expect(@employee_role.person).to eq primary_applicant.person
+      end
+
+      it "should have linked the family" do
+        expect(employee_family.linked_employee_role).to eq @employee_role
+      end
+
+      it "should have all family_members" do
+        expect(@family.family_members.count).to eq (employee_family.census_dependents.count + 1)
+      end
     end
 
-    it "should have a family" do
-      expect(@family).to be_a Family
-    end
+    context "and a prior person exists but is not associated with the user" do
+      let!(:person) do
+        FactoryGirl.create(:person,
+                           valid_person_params.except(:user).merge(dob: dob,
+                                                                   ssn: ssn))
+      end
 
-    it "should be the primary applicant" do
-      expect(@employee_role.person).to eq primary_applicant.person
-    end
+      before do
+        @employee_role, @family = EnrollmentFactory.add_employee_role(**params)
+      end
 
-    it "should have linked the family" do
-      expect(employee_family.linked_employee_role).to eq @employee_role
-    end
-
-    it "should have all family_members" do
-      expect(@family.family_members.count).to eq (employee_family.census_dependents.count + 1)
+      it "should link the user to the person" do
+        expect(@employee_role.person.user).to eq user
+      end
     end
 
     context "and another employer profile exists with the same employee and dependents in the census" do

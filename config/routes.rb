@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
   # You can have the root of your site routed with "root"
   root 'welcome#index'
+
   namespace :products do
     resources :plans, controller: :qhp do
       collection do
@@ -11,12 +12,16 @@ Rails.application.routes.draw do
     end
   end
 
-  # get 'user/index'
+#Route pattern refactor BEGIN
+  namespace :consumer do
+    root 'people#index'
+
+    resources :employee, :controller=>"people" do
+    end
+  end
 
   namespace :broker_agencies do
-    root 'welcome#index'
-    get 'new'
-    get 'my_account'
+    root 'broker_profile#new'
 
     resources :broker_profile do
       get 'new'
@@ -25,7 +30,7 @@ Rails.application.routes.draw do
   end
 
   namespace :employers do
-    root 'welcome#index'
+    root 'employer_profiles#new'
 
     resources :employer_profiles do
       get 'new'
@@ -33,13 +38,14 @@ Rails.application.routes.draw do
       resources :family
     end
   end
+#END
 
-  resources :employee_roles do
+  resources :employee_roles do #TODO Delete
     get 'new'
     get 'my_account'
   end
 
-  resources :people do
+  resources :people do #TODO Delete
     get 'select_employer'
     get 'my_account'
     collection do
@@ -55,20 +61,13 @@ Rails.application.routes.draw do
       get 'dependent_details'
       post 'save_dependents'
       delete 'remove_dependents'
-      
+
       get 'select_plan'
     end
-    
+
   end
 
-
-
-  devise_for :users, :controllers => { registrations: "registrations",
-                                        sessions: "sessions" }
-  # devise_scope :user do
-  #   get "/sign_in" => "devise/sessions#new"
-  #   get "/sign_up" => "devise/registrations#new"
-  # end
+  devise_for :users
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
@@ -76,16 +75,13 @@ Rails.application.routes.draw do
     resources :family_members, only: [:index, :new, :create]
     resources :households
   end
- 
+
   resources :family_members, only: [:show, :edit, :update] do
      member do
        get :link_employee
        get :challenge_identity
      end
    end
-
-  resources :employee_roles, :only => [:new, :create]
- 
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
