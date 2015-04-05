@@ -114,17 +114,26 @@ RSpec.describe Plan, type: :model do
 
     context "with plans loaded" do
       before do
-        FactoryGirl.create_list(:plan, platinum_count, metal_level: "platinum", market: "shop", carrier_profile: carrier_profile_0)
-        FactoryGirl.create_list(:plan, gold_count, metal_level: "gold", market: "shop", carrier_profile: carrier_profile_0)
-        FactoryGirl.create_list(:plan, shop_silver_count, metal_level: "silver", market: "shop", carrier_profile: carrier_profile_1)
-        FactoryGirl.create_list(:plan, individual_silver_count, metal_level: "silver", market: "individual", carrier_profile: carrier_profile_1)
-        FactoryGirl.create_list(:plan, bronze_count, metal_level: "bronze", market: "individual", carrier_profile: carrier_profile_0)
-        FactoryGirl.create_list(:plan, catastrophic_count, metal_level: "catastrophic", market: "individual", carrier_profile: carrier_profile_1)
+        FactoryGirl.create_list(:plan, platinum_count, metal_level: "platinum", market: "shop", plan_type: "ppo", carrier_profile: carrier_profile_0)
+        FactoryGirl.create_list(:plan, gold_count, metal_level: "gold", market: "shop", plan_type: "pos", carrier_profile: carrier_profile_0)
+        FactoryGirl.create_list(:plan, shop_silver_count, metal_level: "silver", plan_type: "ppo", market: "shop", carrier_profile: carrier_profile_1)
+        FactoryGirl.create_list(:plan, individual_silver_count, metal_level: "silver", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1)
+        FactoryGirl.create_list(:plan, bronze_count, metal_level: "bronze", market: "individual", plan_type: "epo", carrier_profile: carrier_profile_0)
+        FactoryGirl.create_list(:plan, catastrophic_count, metal_level: "catastrophic", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1)
       end
 
       context "with no referenced scope" do
         it "should return all loaded plans" do
           expect(Plan.all.count).to eq total_plan_count
+        end
+      end
+
+      context "with referenced plan_type scope of either ppo, hmo, pos, epo" do
+        it "should return all loaded plans" do
+          expect(Plan.ppo_plan.size).to eq shop_silver_count + platinum_count
+          expect(Plan.pos_plan.size).to eq gold_count
+          expect(Plan.hmo_plan.size).to eq individual_silver_count + catastrophic_count
+          expect(Plan.epo_plan.size).to eq bronze_count
         end
       end
 

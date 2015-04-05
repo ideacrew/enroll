@@ -6,6 +6,7 @@ class Plan
   COVERAGE_KINDS = %w[health dental]
   METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental]
   MARKET_KINDS = %w(shop individual)
+  PLAN_TYPE_KINDS = %w[pos hmo epo ppo]
 
 
   field :hbx_id, type: Integer
@@ -32,7 +33,11 @@ class Plan
   embeds_many :premium_tables
   accepts_nested_attributes_for :premium_tables
 
-  has_one :qhp, class_name: "Products::Qhp"
+  # More Attributes from qhp
+  field :plan_type, type: String  # "POS", "HMO", "EPO", "PPO"
+  field :deductible, type: String # Deductible
+  field :nationwide, type: Boolean # Nationwide
+  field :out_of_service_area_coverage, type: Boolean # DC In-Network or not
 
   index({ hbx_id: 1 })
   index({ coverage_kind: 1 })
@@ -80,6 +85,18 @@ class Plan
   scope :silver_level,        ->{ where(metal_level: "silver") }
   scope :bronze_level,        ->{ where(metal_level: "bronze") }
   scope :catastrophic_level,  ->{ where(metal_level: "catastrophic") }
+
+  # Plan Type
+  scope :ppo_plan, ->{ where(plan_type: "ppo") }
+  scope :pos_plan, ->{ where(plan_type: "pos") }
+  scope :hmo_plan, ->{ where(plan_type: "hmo") }
+  scope :epo_plan, ->{ where(plan_type: "epo") }
+
+  # Nationwide ?
+  scope :nationwide, ->{ where(nationwide: "true") }
+
+  # DC In-Network ?
+  scope :dc_in_network, ->{ where(out_of_service_area_coverage: "false") }
 
   # Marketplace
   scope :shop_market,          ->{ where(market: "shop") }

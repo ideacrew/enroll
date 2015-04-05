@@ -74,6 +74,8 @@ class Products::Qhp
   field :enrollment_payment_url, type: String
   field :plan_brochure, type: String
 
+  field :plan_id, type: BSON::ObjectId
+
   validates_presence_of :issuer_id, :state_postal_code,
                         :standard_component_id, :plan_marketing_name, :hios_product_id, :network_id, 
                         :service_area_id, :formulary_id, :is_new_plan, :plan_type, :metal_level,
@@ -94,8 +96,6 @@ class Products::Qhp
     cascade_callbacks: true,
     validate: true
 
-  belongs_to :plan
-
   accepts_nested_attributes_for :qhp_benefits, :qhp_cost_share_variance
 
   index({"issuer_id" => 1})
@@ -104,6 +104,14 @@ class Products::Qhp
   index({"tin" => 1}, {sparse: true})
 
   index({"qhp_benefits.benefit_type_code" => 1})
+
+  def plan=(new_plan)
+    self.plan_id = new_plan.id
+  end
+
+  def plan
+    Plan.find(plan_id) unless plan_id.nil?
+  end
 
   VISIT_TYPES = [
     "Primary Care Visit to Treat an Injury or Illness",

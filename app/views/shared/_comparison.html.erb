@@ -19,7 +19,7 @@
 <% qhps.each do |qhp|%>
   <table class="table bordered", border = "1", style="width:330px !important;float:left;font-size:11px;" >
     <tr>
-      <th colspan="2"><%= qhp.plan_marketing_name.split.first.underscore.humanize %></th>
+      <th colspan="2"><%= qhp.plan.carrier_profile.organization.legal_name %></th>
     </tr>
     <tr>
       <th colspan="2"><%= qhp.plan_marketing_name %></th>

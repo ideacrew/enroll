@@ -45,11 +45,28 @@ class QhpBuilder
 
   def validate_and_persist_qhp
     begin
+      associate_plan_with_qhp
       @qhp.save!
       @success_plan_counter += 1
       LOGGER.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.hios_product_id} \n"
     rescue Exception => e
       LOGGER.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.hios_product_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n ******************** \n"
+    end
+  end
+
+  def associate_plan_with_qhp
+    plan_year = @qhp.plan_effective_date.to_date.year
+    plan = Plan.where(active_year: plan_year, hios_id: /.*#{@qhp.standard_component_id}.*/).to_a.first
+    if plan.present?
+      @qhp.plan = plan
+      plan.update_attributes(
+          plan_type: @qhp.plan_type.downcase,
+          deductible: @qhp.qhp_cost_share_variance.qhp_deductable.in_network_tier_1_individual,
+          nationwide: @qhp.national_network,
+          out_of_service_area_coverage: @qhp.out_of_service_area_coverage
+        )
+    else
+      @qhp.plan = nil
     end
   end
 
