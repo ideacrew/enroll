@@ -33,7 +33,7 @@
     <div class="focus_effect row personaol-info-row">
 		<div class="col-md-10 col-sm-9 no-pd"></div>
 		<div class="col-md-2 col-sm-3 no-pd">
-			<a href="#" data-method="POST" id="continue-employer" class="btn disable-btn search_continue disabled hidden">Continue</a>
+			<a href="#" data-method="GET" id="continue-employer" class="btn disable-btn search_continue disabled hidden">Continue</a>
 		</div>
     </div>
 
@@ -42,7 +42,6 @@
     <%= render 'employer_search' %>
   </div>
   <div class="col-md-2 col-sm-3 col-xs-12 key no-pd-right hidden" id="key-section">
-      <!-- <a href="#" class="btn btn-save">Save & Exit</a> -->
       <%= f.submit "Save & Exit", class: 'btn btn-save' %>
       <%= render 'shared/signup_progress' %>
   </div>
