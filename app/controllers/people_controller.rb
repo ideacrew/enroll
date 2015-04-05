@@ -25,21 +25,12 @@ class PeopleController < ApplicationController
       @employee_role = employee_family.linked_employee_role
 
       respond_to do |format|
-        # @person = employee_family.census_employee
         # build_nested_models
-        format.json { render json: { person: @person, matched: true}, status: :ok, location: @person, matched: true }
+        format.json { render json: { person: @employee_role.person, matched: true}, status: :ok, location: @employee_role.person, matched: true }
       end
     else
       
       # Matched Person, autofill form with found attributes
-      
-      # if employee_family.blank?
-      #   # Preexisting Person not found, create new instance and return to complete form entry
-      #   respond_to do |format|
-      #     format.json { render json: { person: @person, matched: false}, status: :ok, location: @person }
-      #   end
-      # else
-
       enroll_parms = {}
       enroll_parms[:user] = current_user
       enroll_parms[:employer_profile] = employee_family.employer_profile
@@ -53,12 +44,9 @@ class PeopleController < ApplicationController
       enroll_parms[:hired_on] = employee_family.census_employee.hired_on
 
       @employee_role, @family = EnrollmentFactory.add_employee_role(enroll_parms)
-      # add_employee_role
 
       respond_to do |format|
-        # @person = employee_family.census_employee
-        # build_nested_models
-        format.json { render json: { person: @person, matched: true}, status: :ok, location: @person, matched: true }
+        format.json { render json: { person: @employee_role.person, matched: true}, status: :ok, location: @employee_role.person, matched: true }
       end
     end
   end
