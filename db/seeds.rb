@@ -10,7 +10,7 @@ puts "Start of seed data"
 puts "*"*80
 
 puts "::: Purging Database :::"
-system "rake db:purge"
+system "rake db:purge db:mongoid:remove_indexes db:mongoid:create_indexes"
 
 # require File.join(File.dirname(__FILE__),'seedfiles', 'carriers')
 # require File.join(File.dirname(__FILE__),'seedfiles', 'premiums')
@@ -23,8 +23,8 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
 
 system "seed:people seed:families"
-system "rake hbx:employers:add[tmp/employer_export.csv,tmp/users_to_ignore.csv]"
-system "rake hbx:employers:census:add[tmp/census.csv]"
+system "rake hbx:employers:add[db/seedfiles/employers.csv,db/seedfiles/blacklist.csv]"
+system "rake hbx:employers:census:add[db/seedfiles/census.csv]"
 
 # Products::Qhp.delete_all
 
