@@ -1,6 +1,15 @@
 require 'rails_helper'
 
-describe FamilyMember do
+describe FamilyMember, type: :model do
+  context "a family with members exists" do
+    include_context "BradyBunch"
+    let(:family_member_id) {mikes_family.primary_applicant.id}
+
+    it "FamilyMember.find(id) should work" do
+      expect(FamilyMember.find(family_member_id).id.to_s).to eq family_member_id.to_s
+    end
+  end
+
   describe "validation" do
     it { should validate_presence_of :person_id }
     it { should validate_presence_of :is_primary_applicant }
