@@ -24,7 +24,6 @@ class SpecialEnrollmentPeriod
   validates_presence_of :qle_on, :begin_on, :end_on, :effective_on
   validate :end_date_follows_begin_date
 
-  after_initialize :set_sep_dates
   before_create :set_submitted_at
 
   def qualifying_life_event_kind=(new_qualifying_life_event_kind)
@@ -45,7 +44,7 @@ class SpecialEnrollmentPeriod
   end
 
   def set_sep_dates
-    return unless self.qle_on.present? && self.qualifying_life_event_kind.present?
+    return unless self.qle_on.present? && self.qualifying_life_event_kind_id.present?
     set_begin_and_end_on
     set_effective_on
     set_submitted_at
@@ -79,20 +78,11 @@ private
   def end_date_follows_begin_date
     return unless self.end_on.present?
     # Passes validation if end_on == start_date
-    errors.add(:end_on, "end_on cannot preceed start_on date") if self.end_on < @sep_start_on
+    errors.add(:end_on, "end_on cannot preceed begin_on date") if self.end_on < self.begin_on
   end
 
   def set_submitted_at
     self.submitted_at ||= Time.now
   end
-
-  # def activate_household_sep
-  #   sep_period = start_date..end_date
-  #   return unless sep_period.include?(Date.today)
-  #   return if household.special_enrollment_periods.any? { |sep| sep.end_date > self.end_date }
-
-  #   self.reason == "open_enrollment_start" ? household.open_enrollment : household.special_enrollment
-  # end
-
 
 end

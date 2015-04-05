@@ -1,5 +1,6 @@
 FactoryGirl.define do
-  factory :family do
-
+  factory :hbx_profile do
+    
   end
+
 end

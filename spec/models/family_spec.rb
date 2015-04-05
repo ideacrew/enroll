@@ -74,38 +74,81 @@ describe Family do
   end
 
   describe "special enrollment periods" do
-    let!(:family) {FactoryGirl.create(:family)}
+    include_context "BradyBunch"
+
+    let(:family) { mikes_family }
+    let(:current_sep) { FactoryGirl.build(:special_enrollment_period) }
+    let(:another_current_sep) { FactoryGirl.build(:special_enrollment_period, qle_on: 4.days.ago.to_date) }
+    let(:expired_sep) { FactoryGirl.build(:special_enrollment_period, :expired) }
 
     context "family has never had a special enrollment period" do
       it "should indicate no active SEPs" do
-        expect(family.is_under_special_enrollment_period).to be_false
+        expect(family.is_under_special_enrollment_period?).to be_false
       end
 
       it "current_special_enrollment_periods should return []" do
+        expect(family.current_special_enrollment_periods).to eq []
       end
     end
 
     context "family has a past QLE, but Special Enrollment Period has expired" do
-        it "should indicate no active SEPs" do
-        end
-
-        it "current_special_enrollment_periods should return nil" do
-        end
-     end
-
-    context "family has a QLE and is under a SEP" do
-        it "should indicate SEP is active" do
-        end
-
-        it "should return one current_special_enrollment" do
-        end
-
-      context "and the family is under more than one SEP" do
-        it "should return multiple current_special_enrollment" do
-        end
+      before do
+        family.special_enrollment_periods << expired_sep
+        family.save
       end
 
+      it "should have the SEP instance" do
+        expect(family.special_enrollment_periods.size).to eq 1
+      end
+
+      it "should return a SEP class" do
+          expect(family.special_enrollment_periods.first).to be_a SpecialEnrollmentPeriod
+      end
+
+      it "should indicate no active SEPs" do
+        expect(family.is_under_special_enrollment_period?).to be_false
+      end
+
+      it "current_special_enrollment_periods should return []" do
+        expect(family.current_special_enrollment_periods).to eq []
+      end
     end
+
+    context "family has a QLE and is under a SEP" do
+      before do
+        family.special_enrollment_periods << current_sep
+        family.save
+      end
+
+      it "should indicate SEP is active" do
+        expect(family.is_under_special_enrollment_period?).to be_true
+      end
+
+      it "should return one current_special_enrollment" do
+        expect(family.current_special_enrollment_periods.size).to eq 1
+        expect(family.current_special_enrollment_periods.first).to eq current_sep
+      end
+
+      context "and the family is under more than one SEP" do
+        before do
+          family.special_enrollment_periods << another_current_sep
+          family.save
+        end
+        it "should return multiple current_special_enrollment" do
+          expect(family.current_special_enrollment_periods.size).to eq 2
+        end
+      end
+    end
+
+    pending "TODO"
+    context "attempt to add new SEP with same QLE and date as existing SEP" do
+      before do
+      end
+
+      it "should not save as a duplicate" do
+      end
+    end
+
   end
 
   describe "large family with multiple employees - The Brady Bunch" do
@@ -210,7 +253,7 @@ describe "update_household callback" do
 
 
       it "should create a hbx_enrollment" do
-        plan = FactoryGirl.create(:directory_plan)
+        plan = FactoryGirl.create(:plan)
         enrollee = Enrollee.new({person: primary_person, coverage_start_on: Date.today})
         policy = FactoryGirl.create(:policy, plan: plan, enrollees: [enrollee])
 
@@ -245,7 +288,7 @@ describe "update_household callback" do
         it "should have no coverage_household and no hbx_enrollment" do
 
           #adding a policy, hence a hbx_enrollment
-          plan = FactoryGirl.create(:directory_plan)
+          plan = FactoryGirl.create(:plan)
           enrollee = Enrollee.new({person: primary_person, coverage_start_on: Date.today})
           policy = FactoryGirl.create(:policy, plan: plan, enrollees: [enrollee])
 

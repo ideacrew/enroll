@@ -25,8 +25,6 @@ class Family
   embeds_many :special_enrollment_periods
   accepts_nested_attributes_for :special_enrollment_periods
 
-  field :temporary_is_under_special_enrollment_period, type: Boolean, default: false
-
   # All current and former members of this group
   embeds_many :family_members, cascade_callbacks: true
   accepts_nested_attributes_for :family_members
@@ -93,10 +91,6 @@ class Family
     family_members.find_all { |a| a.is_active? }
   end
 
-  def is_under_special_enrollment_period?
-    temporary_is_under_special_enrollment_period
-  end
-
   # Life events trigger special enrollment periods
   def is_under_special_enrollment_period?
     return false if special_enrollment_periods.size == 0
@@ -106,8 +100,8 @@ class Family
 
   def current_special_enrollment_periods
     return [] if special_enrollment_periods.size == 0
-    special_enrollment_periods = special_enrollment_periods.order_by(:'sep_begin_on'.desc).only(:special_enrollment_periods)
-    special_enrollment_periods.reduce([]) { |list, event| list << event.is_active? }
+    seps = special_enrollment_periods.order_by(:begin_on.desc).only(:special_enrollment_periods)
+    seps.reduce([]) { |list, event| list << event if event.is_active?; list }
   end
 
   def employers
