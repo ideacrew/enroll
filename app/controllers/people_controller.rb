@@ -262,7 +262,8 @@ class PeopleController < ApplicationController
     @organization = find_organization(params[:organization_id])
     @benefit_group = find_benefit_group(@person, @organization)
     @plans = @benefit_group.elected_plans
-    @premium_matrix = ShopPremiumMatrix.new({}) # placeholder, not properly intialized
+    @hbx_enrollment = new_hbx_enrollment(@person, @organization, @benefit_group)
+    @premium_matrix = get_shop_premium_matrix(hbx_enrollment)
   end
 
 
@@ -286,6 +287,28 @@ private
   def find_benefit_group(person, organization)
     organization.employer_profile.latest_plan_year.benefit_groups.first
     # person.employee_roles.first.benefit_group
+  end
+
+  def new_hbx_enrollment(person, organization, benefit_group)
+    HbxEnrollment.new_from(employer_profile: organization.employer_profile,
+                           coverage_household: person.family.households.first.coverage_households.first,
+                           benefit_group: benefit_group)
+  end
+
+  def get_shop_premium_matrix(hbx_enrollment)
+    # TODO: finish
+    hbx_enrollment.hbx_enrollment_members.collect() do |member|
+      premium_matrix = {
+        "hbx_enrollment_member_id"=> member.id,
+        "relationship"=> hbx_enrollment.family.primary_applicant.person.find_relationship_with(member.person),
+        "age_on_effective_date"=>50,
+        "employer_max_contribution"=>370.43,
+        "select_plan_id"=>"plan_b",
+        "plan_premium_total"=>550.0,
+        "employee_responsible_amount"=>179.57
+      }
+      ShopPremiumMatrix.new({})
+    end
   end
 
   def build_nested_models
