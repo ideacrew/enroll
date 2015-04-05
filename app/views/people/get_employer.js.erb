@@ -1,4 +1,4 @@
-<% if @employer_profile.present? %> 
+<% if @employer_profile.present? %>
   $('#employer-info').html("<%= escape_javascript(render 'employers').html_safe %>");
 
   $("#key-section").removeClass("hidden");

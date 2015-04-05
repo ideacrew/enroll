@@ -82,6 +82,7 @@ class EnrollmentFactory
         name_pfx: nil, first_name:, middle_name: nil, last_name:, name_sfx: nil,
         ssn:, dob:, gender:, hired_on:
     )
+
     person, person_new = initialize_person(user, name_pfx, first_name, middle_name,
                                            last_name, name_sfx, ssn, dob, gender)
 
