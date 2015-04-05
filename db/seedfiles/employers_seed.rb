@@ -38,7 +38,7 @@ cogswell = Organization.create(
 
 jetson_0 = EmployerCensus::EmployeeFamily.new(
     census_employee: EmployerCensus::Employee.new(
-        last_name: "Jetson", first_name: "George", dob: "04/01/1974", ssn: 987654321, hired_on: "03/20/2015", 
+        last_name: "Jetson", first_name: "George", dob: "04/01/1974", ssn: 987654321, hired_on: "03/20/2015",
         email: Email.new(kind: "work", address: "dan.thomas@dc.gov")
       ),
     census_dependents: [
@@ -159,7 +159,7 @@ org_1 = Organization.new(
 
 org_1_jetson = EmployerCensus::EmployeeFamily.new(
     census_employee: EmployerCensus::Employee.new(
-        last_name: "Doe", first_name: "John", dob: "01/12/1980", ssn: "111222331", hired_on: "03/20/2015", 
+        last_name: "Doe", first_name: "John", dob: "01/12/1980", ssn: "111222331", hired_on: "03/20/2015",
         email: Email.new(kind: "work", address: "john.doe@example.com")
       ),
     census_dependents: [
@@ -230,7 +230,7 @@ org_2 = Organization.new(
 
 org_2_jetson = EmployerCensus::EmployeeFamily.new(
     census_employee: EmployerCensus::Employee.new(
-        last_name: "Johnson", first_name: "Patricia", dob: "01/12/1980", ssn: "311222331", hired_on: "03/20/2015", 
+        last_name: "Johnson", first_name: "Patricia", dob: "01/12/1980", ssn: "311222331", hired_on: "03/20/2015",
         email: Email.new(kind: "work", address: "patricia.johnson@example.com")
       ),
     census_dependents: [
@@ -287,5 +287,5 @@ org_2_benefit_group.relationship_benefits.build(
   )
 org_2.save!
 
-puts "Employers seed complete"
+puts "::: Employers seed complete :::"
 puts "*"*80
