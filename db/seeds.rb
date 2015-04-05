@@ -28,18 +28,18 @@ system "rake hbx:employers:census:add[tmp/census.csv]"
 
 # Products::Qhp.delete_all
 
-# rake xml:import:plans['tmp/AE_DC_IVL_77422_Benefits__v1.xml']
-# rake xml:import:plans['tmp/AE_DC_SG_73987_Benefits_ON_v2.xml']
-# rake xml:import:plans['tmp/AE_DC_SG_77422_Benefits_ON_v1.xml']
-# rake xml:import:plans['tmp/HIX_DC_Individual_78079_GHMSI_v1.xml']
-# rake xml:import:plans['tmp/HIX_DC_Individual_86052_CFBC_v1.xml']
-# rake xml:import:plans['tmp/HIX_DC_Small Group_78079_GHMSI_v1.xml']
-# rake xml:import:plans['tmp/HIX_DC_Small Group_86052_CFBC_v1.xml']
-# rake xml:import:plans['tmp/KP DC Individual Plan and Benefits Template_9-18-2014.xml']
-# rake xml:import:plans['tmp/KP DC SHOP Plan and Benefit Template_09182014.xml']
-# rake xml:import:plans['tmp/dc_21066_uhcma_shop_pbt_10232014_final_marketingnameupdates.xml']
-# rake xml:import:plans['tmp/dc_41842_uhic_shop_both_pbt_10232014_marketingnameupdates.xml']
-# rake xml:import:plans['tmp/dc_75753_on_shop_oci_pbt_planreview_mktname_10232014_final.xml']
+# rake xml:plans['tmp/AE_DC_IVL_77422_Benefits__v1.xml']
+# rake xml:plans['tmp/AE_DC_SG_73987_Benefits_ON_v2.xml']
+# rake xml:plans['tmp/AE_DC_SG_77422_Benefits_ON_v1.xml']
+# rake xml:plans['tmp/HIX_DC_Individual_78079_GHMSI_v1.xml']
+# rake xml:plans['tmp/HIX_DC_Individual_86052_CFBC_v1.xml']
+# rake xml:plans['tmp/HIX_DC_Small Group_78079_GHMSI_v1.xml']
+# rake xml:plans['tmp/HIX_DC_Small Group_86052_CFBC_v1.xml']
+# rake xml:plans['tmp/KP DC Individual Plan and Benefits Template_9-18-2014.xml']
+# rake xml:plans['tmp/KP DC SHOP Plan and Benefit Template_09182014.xml']
+# rake xml:plans['tmp/dc_21066_uhcma_shop_pbt_10232014_final_marketingnameupdates.xml']
+# rake xml:plans['tmp/dc_41842_uhic_shop_both_pbt_10232014_marketingnameupdates.xml']
+# rake xml:plans['tmp/dc_75753_on_shop_oci_pbt_planreview_mktname_10232014_final.xml']
 
 
 
