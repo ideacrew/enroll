@@ -37,8 +37,12 @@ describe BenefitGroup, "instance methods" do
   end
 
   it "verifies the reference plan is included in the set of elected_plans" do
+    expect(benefit_group.elected_plan_ids).to include(benefit_group.reference_plan_id)
+  end
+
+  it "verifies each elected plan is a plan" do
     expect do
-      benefit_group.elected_plans.each do |plan_id|
+      benefit_group.elected_plan_ids.each do |plan_id|
         expect(Plan.find(plan_id)).to be_instance_of Plan
       end
     end.not_to raise_exception

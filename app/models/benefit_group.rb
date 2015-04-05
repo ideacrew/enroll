@@ -36,8 +36,7 @@ class BenefitGroup
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
   # Array of plan_ids
-  # has_and_belongs_to_many :elected_plans, class_name: "Plan"
-  field :elected_plans, type: Array, default: []
+  field :elected_plan_ids, type: Array, default: []
 
   # Array of census employee ids
   # has_and_belongs_to_many :employee_families, class_name: "EmployeeFamily"
@@ -67,9 +66,19 @@ class BenefitGroup
   def reference_plan=(new_reference_plan)
     self.reference_plan_id = new_reference_plan.id
   end
-  
+
   def reference_plan
     Plan.find(reference_plan_id) unless reference_plan_id.nil?
+  end
+
+  def elected_plans
+    elected_plan_ids.reduce([]) do |plans, plan_id|
+      begin
+        plans << Plan.find(plan_id)
+      rescue
+        plans
+      end
+    end
   end
 
   # belongs_to association (traverse the model)

@@ -307,18 +307,18 @@ module HbxImport
 
     def build_benefit_group_plans(employer, plan_year)
       benefit_group.reference_plan = PlanLookup.find_reference_plan(hios_id, plan_year.start_on.year)
-      build_benefit_group_elected_plans(employer, plan_year)
+      build_benefit_group_elected_plan_ids(employer, plan_year)
     end
 
-    def build_benefit_group_elected_plans(employer, plan_year)
+    def build_benefit_group_elected_plan_ids(employer, plan_year)
       reference_plan = benefit_group.reference_plan
-      benefit_group.elected_plans = case
+      benefit_group.elected_plan_ids = case
       when plan_count == 1
-        elected_plans = [reference_plan._id]
+        elected_plan_ids = [reference_plan._id]
       when metal_selection.present?
-        elected_plans = PlanLookup.find_plans_by_metal_level(metal_selection, reference_plan.active_year)
+        elected_plan_ids = PlanLookup.find_plans_by_metal_level(metal_selection, reference_plan.active_year)
       when employer.carrier_name.present?
-        elected_plans = PlanLookup.find_plans_by_carrier(reference_plan.carrier_profile, reference_plan.active_year)
+        elected_plan_ids = PlanLookup.find_plans_by_carrier(reference_plan.carrier_profile, reference_plan.active_year)
       end
     end
   end

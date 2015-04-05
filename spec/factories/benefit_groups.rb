@@ -13,7 +13,7 @@ FactoryGirl.define do
     terminate_on_kind "end_of_month"
     effective_on_offset 30
     reference_plan_id {FactoryGirl.create(:plan)._id}
-    elected_plans { [ self.reference_plan_id ]}
+    elected_plan_ids { [ self.reference_plan_id ]}
     premium_pct_as_int 80
     employer_max_amt_in_cents 1000_00
   end
