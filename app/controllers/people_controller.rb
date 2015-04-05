@@ -58,14 +58,6 @@ class PeopleController < ApplicationController
   def match_employer
   end
 
-  def person_lading
-    @person = Person.find(params[:person_id])
-    @employer = Organization.find(params[:organization_id])
-    employee_family = Organization.find(@employer.id).employee_family_details(@person)
-    @employee = employee_family.census_employee
-    build_nested_models
-  end
-
   def link_employer
   end
 
@@ -191,14 +183,9 @@ class PeopleController < ApplicationController
 
   def person_landing
     @person = Person.find(params[:person_id])
-    if params[:organization_id].to_i != 0
-      @employer = Organization.find(params[:organization_id])
-      employee_family = Organization.find(@employer.id).employee_family_details(@person)
-      @employee = employee_family.census_employee
-    else
-      @employee = @person
-    end
-    build_nested_models
+    @family = @person.primary_family
+    @employee_roles = @person.employee_roles
+
     respond_to do |format|
       format.js {}
       format.html {}

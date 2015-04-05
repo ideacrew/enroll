@@ -136,7 +136,7 @@
                             <li class="list-group-item">
                               <div class="row">
                                 <div class="col-md-10 col-sm-12 col-xs-12">
-                                    <h4>Kaiser 300+ Unoiversal</h4>
+                                    <h4>Kaiser 300+ Universal</h4>
                                 </div>
                               </div>
                             </li>
@@ -235,12 +235,12 @@
 
                     <div aria-labelledby="employer-tab" id="employer" class="tab-pane fade" role="tabpanel">
                       <div class="emp-info">
-                       <%= render 'people/landing_pages/employer' %> 
+                       <%#= render 'people/landing_pages/employer' %> 
                       </div>
                     </div>
                     
                     <div aria-labelledby="family-tab" id="family" class="tab-pane fade landing-row" role="tabpanel">
-                      <%= render 'people/landing_pages/family_members' %> 
+                      <%#= render 'people/landing_pages/family_members' %> 
                     </div>
                     
                     
@@ -289,7 +289,7 @@
                       <div class="email">
                         <div class="col-md-8 col-sm-12 col-xs-12 no-pd first">
                           <div class="form-group form-group-lg">
-                            <input type="text" value="<%= email.address if email.address.present? %>" class="form-control" placeholder="NAME@DOMAIN.COM">
+                            <input type="text" value="<%#= email.address if @person.email.address.present? %>" class="form-control" placeholder="NAME@DOMAIN.COM">
                             <span>NAME@DOMAIN.COM</span>
                           </div>
                         </div>
