@@ -1,0 +1,51 @@
+<!-- Plan first row start -->
+<div class="plan-row">
+	<div class="row">
+		<div class="col-md-8 col-sm-9 col-xs-12">
+			<p>
+			<span><%= plan.name %></span>
+			</p>
+			<p><%= plan.carrier_profile.dba %></p>
+		</div>
+		<div class="col-md-2 col-sm-2 col-xs-6">
+			<label>
+				<input type="checkbox">
+				Compare
+			</label>
+		</div>
+		<div class="col-md-2 col-sm-2 col-xs-6">
+			<h2>$149</h2>
+			<p>monthly</p>
+		</div>
+	</div><!-- Plan first row end -->
+	<!-- Plan details row start -->
+	<div class="row plan-details">
+		<div class="col-md-6 col-sm-12 col-xs-12">
+			<div class="row">
+				<div class="col-md-3 col-sm-3 col-xs-6 no-pd-right">
+					<p>Type</p>
+					<strong><%= plan.plan_type ? plan.plan_type.upcase : ""%></strong>
+				</div>
+				<div class="col-md-3 col-sm-3 col-xs-6 no-pd-right">
+					<p>Level</p>
+					<strong><%= plan.metal_level %></strong>
+				</div>
+				<div class="col-md-3 col-sm-3 col-xs-6 no-pd">
+					<p>Network</p>
+					<strong><%= plan.nationwide ? "Nationwide" : "DC Area Network" %></strong>
+				</div>
+				<div class="col-md-3 col-sm-3 col-xs-6 no-pd">
+					<p>Deductible</p>
+					<strong><%= plan.deductible %></strong>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-2 col-sm-2 col-xs-12"></div>
+		<div class="col-md-2 col-sm-4 col-xs-12">
+			<button class="btn btn-default details-btn">Details</button>
+		</div>
+		<div class="col-md-2 col-sm-4 col-xs-12">
+			<button class="btn btn-primary select-btn">Select</button>
+		</div>
+	</div>
+</div><!-- Plan details row end -->

@@ -7,10 +7,11 @@ module MailDelivery
     end
 
     def deliver!(mail)
-      recipient = mail.to.first
       subject = mail.subject
       body = mail.body.raw_source
-      send_email_html(recipient, subject, body)
+      mail.to.each do |recipient|
+        send_email_html(recipient, subject, body)
+      end
     end
   end
 end
