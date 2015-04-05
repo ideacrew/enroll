@@ -1,106 +1,145 @@
-<div class="col-md-10 col-sm-12">
-  <h3><%= @employer_profile.legal_name %></h3>
-    <div class="col-md-offset-1">
-        <% @employer_profile.organization.office_locations.each do |loc| %>
-          <address>
-            <%= loc.address.to_html %>
-            <%= loc.phone.to_s %>
-          </address>
-        <% end %>
+<div class="container-fluid no-pd-left">          
+  <div class="panel panel-default" style="border:none; box-shadow: none;">
+    <div class="row tab-row">
+      <ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
+        <li class="active" role="presentation">
+          <a aria-expanded="true" aria-controls="home" data-toggle="tab" role="tab" id="home-tab" href="#home">
+            <span class="home-icon" title="Home"></span>
+          </a>
+        </li>
+        <li role="presentation">
+          <a aria-expanded="true" aria-controls="profile" data-toggle="tab" role="tab" id="profile-tab" href="#profile">
+            <span class="hidden-xs">Profile</span>
+            <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Profile"></span>
+          </a>
+        </li>
+        <li role="presentation">
+          <a aria-controls="employees" data-toggle="tab" id="employees-tab" role="tab" href="#employees">
+            <span class="hidden-xs">Employees</span>
+            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Employees"></span>
+          </a>
+        </li>
+        <li role="presentation">
+          <a aria-controls="benefits" data-toggle="tab" id="benefits-tab" role="tab" href="#benefits">
+            <span class="hidden-xs">Benefits</span>
+            <span class="glyphicon glyphicon-file hidden-md hidden-sm hidden-lg" title="Benefits"></span>
+          </a>
+        </li>
+        <li role="presentation">
+          <a aria-controls="documents" data-toggle="tab" id="documents-tab" role="tab" href="#documents">
+            <span class="hidden-xs">Documents</span>
+            <span class="glyphicon glyphicon-file hidden-md hidden-sm hidden-lg" title="Documents"></span>
+          </a>
+        </li>
+        <li role="presentation">
+          <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox">
+            <span class="hidden-xs">Inbox</span>
+            <span class="glyphicon glyphicon-envelope hidden-md hidden-sm hidden-lg" title="Inbox"></span>
+            <span class="badge">1</span>
+          </a>
+        </li>
+      </ul>
+
+
+      <div class="tab-content" id="myTabContent">
+        <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+
+            <div class="row landing-row">
+              <div class="col-md-6 col-sm-6 col-xs-12 left-side">
+                <p class="head">
+                  <span><%= @employer_profile.legal_name %></span>
+                  <span></span>
+                </p>
+                <% @employer_profile.organization.office_locations.each do |loc| %>
+                  <address>
+                    <%= loc.address.to_html %>
+                    <%= loc.phone.to_s %>
+                  </address>
+                <% end %>
+              </div>
+
+              <div class="col-md-6 col-sm-6 col-xs-12 right-side">
+                <p class="head">
+                  <span>Enrollment</span>
+                  <span></span>
+                </p>
+                <dl class="dl-horizontal">
+                  <dt>Plan Year</dt>
+                  <dd><%= @current_plan_year.start_on.to_date.year %></dd>
+                  <dt>Plan Year Start</dt>
+                  <dd><%= format_date @current_plan_year.start_on %></dd>
+                  <dt>Open Enroll Start/End</dt>
+                    <dd>
+                      <%= format_date @current_plan_year.open_enrollment_start_on %> / 
+                      <%= format_date @current_plan_year.open_enrollment_end_on %>
+                    </dd>
+                  <dt>Full Time Employees</dt>
+                  <dd> <%= @current_plan_year.fte_count %></dd>
+                  <dt>Participation Pct</dt>
+                  <dd>100%</dd>
+                  <dt><%= @current_plan_year.employee_participation_percent %></dt>
+                </dl>
+              </div>
+            </div>
+
+            <div class="row landing-row">
+              <div class="col-md-6 col-sm-6 col-xs-12 left-side">
+                <p class="head">
+                  <span>Company Details</span>
+                  <span></span>
+                </p>
+                <p>
+                  FEIN <%= number_to_obscured_fein @employer_profile.fein %><br/>
+                  Entity Kind <%= @employer_profile.entity_kind.to_s.titleize %>
+                </p>
+              </div>
+
+              <div class="col-md-6 col-sm-6 col-xs-12 right-side">
+                <p class="head">
+                  <span>Broker</span>
+                  <span></span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div aria-labelledby="profile-tab" id="profile" class="tab-pane fade" role="tabpanel">
+          <div class="submenu">
+            <ul role="tablist" class="nav nav-tabs" id="myTab1">
+              <li class="active" role="presentation"><a aria-expanded="true" aria-controls="personal" data-toggle="tab" role="tab" id="personal-tab" href="#personal">Company Information</a></li>
+              <li role="presentation"><a aria-controls="contact" data-toggle="tab" id="contact-tab" role="tab" href="#contact">Contacts</a></li>
+              <li role="presentation"><a aria-controls="employer" data-toggle="tab" id="employer-tab" role="tab" href="#employer">Broker</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div aria-labelledby="employees-tab" id="employees" class="tab-pane fade" role="tabpanel">
+          <div class="col-md-10 col-sm-12">
+            <%= render partial: "employers/employer_profiles/my_account/employee_families" %>
+          </div>
+        </div>
+
+        <div aria-labelledby="benefits-tab" id="benefits" class="tab-pane fade" role="tabpanel">
+          <div class="col-md-10 col-sm-12">
+            <%= render partial: "employers/employer_profiles/my_account/benefits" %>
+          </div>
+        </div>
+
+        <div aria-labelledby="documents-tab" id="documents" class="tab-pane fade" role="tabpanel">
+          <div class="col-md-10 col-sm-12">
+            <%#= render partial: "employers/employer_profiles/my_account/documents" %>
+          </div>
+        </div>
+
+        <div aria-labelledby="inbox-tab" id="inbox" class="tab-pane fade" role="tabpanel">
+          <div class="col-md-10 col-sm-12">
+            <%#= render partial: "employers/employer_profiles/my_account/inbox" %>
+          </div>
+        </div>
+
+      </div>
     </div>
-        <dl class="dl-horizontal">
-          <dt>FEIN</dt>
-          <dd><%= number_to_obscured_fein @employer_profile.fein %></dd>
-          <dt>Entity Kind</dt>
-          <dd><%= @employer_profile.entity_kind.to_s.titleize %></dd>
-        </dl>
-        <h4>Plan Year <%= @current_plan_year.start_on.to_date.year %></h4>
-        <dl class="dl-horizontal">
-          <dt>FTE/PTE/MSP Count</dt>
-          <dd>
-            <%= @current_plan_year.fte_count %> /
-            <%= @current_plan_year.pte_count %> /
-            <%= @current_plan_year.msp_count %> 
-          </dd>
-          <dt>Participation Pct</dt>
-          <dd></dd>
-          <dt><%= @current_plan_year.employee_participation_percent %></dt>
-          <dt>Open Enroll Start/End</dt>
-            <dd>
-              <%= format_date @current_plan_year.open_enrollment_start_on %> / 
-              <%= format_date @current_plan_year.open_enrollment_end_on %>
-            </dd>
-          <dt>Plan Year Start/End</dt>
-          <dd>
-            <%= format_date @current_plan_year.start_on %> / 
-            <%= format_date @current_plan_year.end_on %>
-          </dd>
-        </dl>
-        <h4>Benefit Groups</h4>
-        <% @benefit_groups.each do |bg| %>
-          <dl class="dl-horizontal">
-            <dt>Benefit Group</dt>
-            <dd><%= bg.title %> </dd>
-            <dt>Coverage Effective</dt>
-            <dd><%= "#{bg.effective_on_kind.humanize} after #{bg.effective_on_offset} days from date of hire" %></dd>
-            <dt>Coverage Termination</dt>
-            <dd><%= "#{bg.terminate_on_kind.humanize} following last day of employment" %> </dd>
-            <dt>Ref Plan</dt>
-            <dd><%= "#{bg.reference_plan.name}" %></dd>
-            <dt>Ref Plan Metal Level</dt>
-            <dd><%= "#{bg.reference_plan.metal_level.titleize}" %></dd>
-         </dl>
-          <h5>Employer Contributions</h5>
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th>Employee Relationship</th>
-                <th>Coverage Offered?</th>
-                <th>Employer Contribution Pct</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% bg.relationship_benefits.each do |rb| %>
-                <tr>
-                  <td><%= rb.relationship.humanize %></td>
-                  <td><%= rb.relationship == 'child_26_and_over' ? "No" : "Yes" %></td>
-                  <td><%= number_to_percentage rb.premium_pct, precision: 0 %></td>
-                 </tr>
-              <% end %>
-            </tbody>
-          </table>
-
-        <% end %>
-
-        <%= link_to "Add Employer Census Family", new_employers_employer_profile_family_path(@employer_profile), class: "btn btn-primary" %> &nbsp;&nbsp;
-
-        <h3>Employee Roster</h3>
-          <table class="table table-condensed">
-            <thead>
-          <tr>
-            <th> Employee Name </th>
-            <th> DOB </th>
-            <th> Hire Date </th>
-            <th>  </th>
-          </tr>
-            </thead>
-            <tbody>
-
-        <% @employer_profile.employee_families_sorted.each do |family| %>
-          <tr>
-            <td> <%= link_to name_to_listing(family.census_employee), employers_employer_profile_family_path(@employer_profile.id, family.id) %> </td>
-            <td> <%= format_date family.census_employee.dob %> </td>
-            <td> <%= format_date family.census_employee.hired_on %> </td>
-            <td> <%= link_to "Delete", employers_employer_profile_family_path(@employer_profile.id, family.id), confirm: "Are you sure you want to delete this family?", method: :delete %> </td>
-          </tr>
-        <% end %>
-            </tbody>
-          </table>
-  
-        <hr/>
-        <%= link_to "Back", employers_employer_profiles_path %> &nbsp;&nbsp;
-        <%= link_to 'Destroy',  @employers_employer_profile,  method: :delete, confirm: 'Are you sure?' %>
-
-
-
   </div>
+</div>
