@@ -24,7 +24,7 @@
 			<div class="row">
 				<div class="col-md-3 col-sm-3 col-xs-6 no-pd-right">
 					<p>Type</p>
-					<strong><%= plan.plan_type %></strong>
+					<strong><%= plan.plan_type ? plan.plan_type.upcase : ""%></strong>
 				</div>
 				<div class="col-md-3 col-sm-3 col-xs-6 no-pd-right">
 					<p>Level</p>
@@ -36,7 +36,7 @@
 				</div>
 				<div class="col-md-3 col-sm-3 col-xs-6 no-pd">
 					<p>Deductible</p>
-					<strong>$<%= plan.deductible %></strong>
+					<strong><%= plan.deductible %></strong>
 				</div>
 			</div>
 		</div>
