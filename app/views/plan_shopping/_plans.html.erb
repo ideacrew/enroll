@@ -1,0 +1,54 @@
+<div class="container-fluid no-pd-left">
+	<div class="panel panel-default">
+		<div class="panel-body left" id="select-plan-container">
+			<div class="col-md-10 col-sm-12">
+				<div class="col-md-10 col-sm-9 col-xs-12 no-pd">
+					<div class="row select-plan">
+						<div class="col-md-12 col-md-sm-12 col-xs-12">
+							<p class="information row">Select a Plan.</p>
+							<p class="detail">
+							<span>Selecting a plan can feel tricky.</span> 
+							If you need help don't be afraid to ask for help. You can reach DCHBX support at 555-555-5555 ext 1. Click continue to see the covergae options your employer has available.
+							</p>
+							<a id="select-plan-btn1" class="text-center btn btn-save">Continue</a>
+						</div>
+
+						<div class="col-md-12 col-sm-12 col-xs-12 select-plan-details">
+							<section>
+							<div role="tabpanel">
+
+								<%= render "plan_shopping/plan_filters" %>
+
+								<!-- Selected Plans section start -->
+								<div class="selected-plans-row row">
+									<p class="text-right">
+									<a class="close" href="#"><%= image_tag "dropdown-option-close.png" %></a>
+									</p>
+									<h3>Blue Cross / Blue Shield Preferred 500, A Multi State Plan for Complete Coverage</h3>
+									<h3>Kaiser Preferred Family Plan</h3>
+									<button class="btn default-btn outline-btn">Compare</button>
+								</div><!-- Selected Plans section end -->
+
+
+
+								<!-- Tab panes -->
+								<div class="tab-content">
+									<div role="tabpanel" class="tab-pane active" id="all-plans">
+										<% @plans.each do |plan| %>
+											<%= render "plan_shopping/plan_details", :plan => plan %>
+										<% end %>
+									</div>
+								</div>
+							</div>
+							</section>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-2 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
+					<%= submit_tag "Save & Exit", class: 'btn btn-save' %>
+					<%= render 'shared/signup_progress' %>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
