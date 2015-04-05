@@ -72,13 +72,7 @@ class BenefitGroup
   end
 
   def elected_plans
-    elected_plan_ids.reduce([]) do |plans, plan_id|
-      begin
-        plans << Plan.find(plan_id)
-      rescue
-        plans
-      end
-    end
+    Plan.where(:id => {"$in" => elected_plan_ids})
   end
 
   # belongs_to association (traverse the model)
