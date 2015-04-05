@@ -86,12 +86,13 @@
             <div class="row landing-row">
               <div class="col-md-6 col-sm-6 col-xs-12 left-side">
                 <p class="head">
-                  <span>Company Details</span>
+                  <span>Invoices and Payments</span>
                   <span></span>
                 </p>
                 <p>
-                  FEIN <%= number_to_obscured_fein @employer_profile.fein %><br/>
-                  Entity Kind <%= @employer_profile.entity_kind.to_s.titleize %>
+                  Invoice Date <%= format_date Date.today.beginning_of_month %><br/>
+                  Balance Due $0.00<br/>
+                  <%= link_to "Pay now online", "#" %>
                 </p>
               </div>
 
@@ -99,6 +100,11 @@
                 <p class="head">
                   <span>Broker</span>
                   <span></span>
+                </p>
+                <p>
+                  Agency<br/>
+                  Writing Agent<br/>
+                  Contact Info
                 </p>
               </div>
             </div>
