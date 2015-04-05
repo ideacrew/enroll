@@ -108,10 +108,6 @@ class Family
     hbx_enrollments.inject([]) { |em, e| p << e.employer unless e.employer.blank? } || []
   end
 
-  def policies
-    hbx_enrollments.inject([]) { |p, e| p << e.policy unless e.policy.blank? } || []
-  end
-
   def brokers
     hbx_enrollments.inject([]) { |b, e| b << e.broker_role unless e.broker_role.blank? } || []
   end
@@ -235,9 +231,7 @@ class Family
 
     if family_members.blank?
       household.coverage_households.delete_all
-      household.hbx_enrollments.delete_all
     else
-      create_hbx_enrollments(household)
       create_coverage_households(household)
     end
   end
@@ -325,25 +319,6 @@ class Family
         end
       end
     end
-  end
-
-  def create_hbx_enrollments(household)
-    return if primary_applicant.nil?
-
-    household.hbx_enrollments.delete_all #clear any existing
-
-    policies = Policy.find_by_person(primary_applicant.person)
-
-    policies.map do |policy|
-      create_hbx_enrollment(household, policy)
-    end
-  end
-
-  def create_hbx_enrollment(household, policy)
-    hbx_enrollement = household.hbx_enrollments.build
-    hbx_enrollement.policy = policy
-    hbx_enrollement.submitted_at = self.submitted_at
-    hbx_enrollement
   end
 
   def valid_relationship?(family_member)
