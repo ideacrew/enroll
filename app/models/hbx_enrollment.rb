@@ -11,20 +11,19 @@ class HbxEnrollment
 
   embedded_in :household
 
-  field :enrollment_group_id, type: String
+  field :coverage_household_id, type: String
   field :kind, type: String
-
-  field :policy_id, type: String
 
   field :elected_premium_credit, type: Money, default: 0.0
   field :applied_premium_credit, type: Money, default: 0.0
 
-  field :plan_id, type: BSON::ObjectId
   field :effective_on, type: Date
   field :terminated_on, type: Date
 
+  field :plan_id, type: BSON::ObjectId
   field :broker_agency_id, type: BSON::ObjectId
   field :writing_agent_id, type: BSON::ObjectId
+  field :employer_profile_id, type: BSON::ObjectId
 
   field :submitted_at, type: DateTime
 
@@ -41,20 +40,12 @@ class HbxEnrollment
   accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
 
   validates :kind,
-    					presence: true,
-    					allow_blank: false,
-    					allow_nil:   false,
-    					inclusion: {in: Kinds, message: "%{value} is not a valid enrollment type"}
+            presence: true,
+            allow_blank: false,
+            allow_nil:   false,
+            inclusion: {in: Kinds, message: "%{value} is not a valid enrollment type"}
 
-
-  def policy=(new_policy)
-    return unless new_policy.is_a? Policy
-    self.policy_id = new_policy._id
-  end
-
-  def policy
-    Policy.find(self.policy_id) unless self.policy_id.blank?
-  end
+  # validate :
 
   aasm do
     state :applying, initial: true
@@ -79,12 +70,11 @@ class HbxEnrollment
   end
 
   def employer_profile=(employer_instance)
-    return unless employer_instance.is_a? EmployerProfile
-    self.employer_id = employer_instance._id
+    self.employer_profile_id = employer_instance._id if employer_instance.is_a? EmployerProfile
   end
 
   def employer_profile
-    Employer.find(self.employer_id) unless self.employer_id.blank?
+    Employer.find(self.employer_profile_id) unless self.employer_profile_id.blank?
   end
 
   def broker_agency_profile=(new_broker_agency)
@@ -99,5 +89,20 @@ class HbxEnrollment
 
   def has_broker_agency?
     broker_agency_id.present?
+  end
+
+  def self.new_from(employer_profile: nil, coverage_household:, benefit_group:)
+    enrollment = HbxEnrollment.new
+    enrollment.household = coverage_household.household
+    enrollment.kind = "employer_sponsored" if employer_profile.present?
+    enrollment.employer_profile = employer_profile
+    enrollment.effective_on = benefit_group.plan_year.start_on
+    coverage_household.coverage_household_members.each do |coverage_member|
+      enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
+      enrollment_member.eligibility_date = enrollment.effective_on
+      enrollment_member.coverage_start_on = enrollment.effective_on
+      enrollment.hbx_enrollment_members << enrollment_member
+    end
+    enrollment
   end
 end

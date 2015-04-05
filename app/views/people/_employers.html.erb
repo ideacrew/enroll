@@ -7,7 +7,7 @@
   <% if employee.census_dependents.present? %>
     <% url = dependent_details_people_path(person_id: @person.id, organization_id: organization.id) %>
   <% else %>
-    <% url = plan_details_people_path(person_id: @person.id, organization_id: organization.id) %>
+    <% url = select_plan_people_path(person_id: @person.id, organization_id: organization.id) %>
   <% end %>
 
   <input type="hidden" data-url="<%= url %>" class="badge">
@@ -38,7 +38,7 @@ $('.search_continue').on('click', function() {
 /*$('.search_continue').on('click',function(){
       person_id = $(".badge-active").attr("person-id");
       employer_id = $(".badge-active").attr("employer-id");
-      window.location.href  = 
+      window.location.href  =
       $.ajax({
         type: "POST",
         url: "/people/person_landing.js",
