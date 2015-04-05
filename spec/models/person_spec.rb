@@ -137,7 +137,32 @@ describe Person, type: :model do
 
 end
 
-## Class methods
+describe Person, "class methods" do
+
+  context "no employee_roles are present" do
+    it "should not find any employee_roles" do
+      expect(Person.employee_roles.size).to eq 0
+    end
+  end
+
+  context "employee_roles are present" do
+    let(:employee_count) { 11 }
+
+    before do
+      FactoryGirl.create_list(:employee_role, employee_count)
+    end
+
+    it "should find a matching number of employee_roles" do
+      expect(Person.employee_roles.size).to eq employee_count
+    end
+
+    it "and returned values should be employee_roles" do
+      expect((Person.employee_roles).first).to be_a EmployeeRole
+    end
+  end
+
+end
+
 describe Person, '.match_by_id_info' do
   let(:p0) { Person.create!(first_name: "Jack",   last_name: "Bruce",   dob: "1943-05-14", ssn: "517994321") }
   let(:p1) { Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654") }
