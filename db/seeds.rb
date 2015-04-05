@@ -22,7 +22,7 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'carriers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
 
-system "seed:people seed:families"
+system "rake seed:people seed:families"
 system "rake hbx:employers:add[db/seedfiles/employers.csv,db/seedfiles/blacklist.csv]"
 system "rake hbx:employers:census:add[db/seedfiles/census.csv]"
 
