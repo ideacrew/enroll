@@ -1,190 +1,3 @@
-puts "*"*80
-puts "::: Cleaning LifeEvents :::"
-Employer.delete_all
-
-LifeEvent.create!(
-    title: "I've started a new job", 
-    kind: "add",
-    reason: " ",
-    edi_code: "28-INITIAL ENROLLMENT", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 10,
-    description: "Enroll due to becoming newly eligibile"
-  )
-
-
-LifeEvent.create!(
-    title: "I've married", 
-    kind: "add",
-    reason: " ",
-    edi_code: "32-MARRIAGE", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 15,
-    description: "Enroll or add a family member because of marriage"
-  )
-
-LifeEvent.create!(
-    title: "I've entered into a legal domestic partnership", 
-    kind: "add",
-    reason: " ",
-    edi_code: "33-ENTERING DOMESTIC PARTNERSHIP", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 20,
-    description: "Enroll or add a family member due to a new domestic partnership"
-  )
-
-LifeEvent.create!(
-    title: "I've had a baby", 
-    kind: "add",
-    reason: " ",
-    edi_code: "02-BIRTH", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 25,
-    description: "Enroll or add a family member due to birth"
-  )
-
-LifeEvent.create!(
-    title: "I've adopted a child", 
-    kind: "add",
-    reason: " ",
-    edi_code: "05-ADOPTION", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 30,
-    description: "Enroll or add a family member due to adoption"
-  )
-
-LifeEvent.create!(
-    title: "Myself or a family member has lost other coverage", 
-    kind: "add",
-    reason: " ",
-    edi_code: "33-LOST ACCESS TO MEC", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 35,
-    description: "Enroll or add a family member due to loss of eligibility for other coverage"
-  )
-
-LifeEvent.create!(
-    title: "divorce", 
-    kind: "drop",
-    reason: " ",
-    edi_code: "01-DIVORCE", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 40,
-    description: "Remove a family member due to divorce"
-  )
-
-LifeEvent.create!(
-    title: "death", 
-    kind: "drop",
-    reason: " ",
-    edi_code: "03-DEATH", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 45,
-    description: "Remove a family member due to death"
-  )
-
-LifeEvent.create!(
-    title: "child_age_off", 
-    kind: "drop",
-    reason: "child_age_off",
-    edi_code: "33-CHILD AGE OFF", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 50,
-    description: "Remove a child who is no longer eligible due to turning age 26"
-  )
-
-LifeEvent.create!(
-    title: "drop_self_due_to_new_eligibility", 
-    kind: "drop",
-    reason: "terminate_benefit",
-    edi_code: "07-TERMINATION OF BENEFITS", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 55,
-    description: "Drop coverage for myself or family member due to new eligibility for other coverage"
-  )
-
-LifeEvent.create!(
-    title: "drop_family_member_due_to_new_elgibility", 
-    kind: "drop",
-    reason: "drop_family_member_due_to_new_elgibility",
-    edi_code: "07-TERMINATION OF BENEFITS", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 60,
-    description: "Drop coverage for a family member due to their new eligibility for other coverage"
-  )
-
-LifeEvent.create!(
-    title: "I've moved", 
-    kind: "administrative",
-    reason: "relocate",
-    edi_code: "43-CHANGE OF LOCATION", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: false, 
-    ordinal_position: 65,
-    description: "Drop coverage due to a permanent move outside of my current plan's service area"
-  )
-
-LifeEvent.create!(
-    title: "exceptional_circumstances", 
-    kind: "administrative",
-    reason: "exceptional_circumstances",
-    edi_code: "EX-EXCEPTIONAL CIRCUMSTANCES", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: false, 
-    ordinal_position: 70,
-    description: "Enroll due to an inadvertent or erroneous enrollment or another exceptional circumstance"
-  )
-
-LifeEvent.create!(
-    title: "contract_violation", 
-    kind: "administrative",
-    reason: "contract_violation",
-    edi_code: "33-CONTRACT VIOLATION", 
-    market_kind: "shop", 
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: false, 
-    ordinal_position: 75,
-    description: "Enroll due to contract violation"
-  )
-
 
 LifeEvent.create!(
   title: "Open enrollment",
@@ -192,9 +5,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "Initial Enrollment",
-  valid_examples: [],
-  invalid_examples: [],
-  effective_on_kind: :date_range,
+  coverage_effective_on_kind: :date_range,
   coverage_offset_kind: 15,
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: ["11-01-2015".."01-31-2016"],
@@ -211,20 +22,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [
-      "Loss of coverage from a job or family member’s job",
-      "Aging off of a parent’s plan",
-      "No longer qualifying for Medicaid",
-      "Expiration of a pre-ACA individual market plan",
-      "Expiration of COBRA benefits"
-    ],
-  invalid_examples: [
-      "Loss of employer coverage due to failure to sign up or pay",
-      "Loss of coverage under another DCHL plan due to failure to pay",
-      "Dropping COBRA coverage",
-      "Other voluntary termination of coverage"
-    ],
-    effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: :first_of_month,
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
@@ -241,13 +39,9 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [
-      "Consumer selects plan before end of the month before coverage ends."
-    ],
-  invalid_examples: [],
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: :first_of_month,
   post_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60, # "60 days before the day of the loss of coverage",
@@ -261,14 +55,7 @@ LifeEvent.create!(
   title: "Adding a person to household",
   title: "I had a baby",
   description: "Household adds a member due to marriage, birth, adoption, placement for adoption, or placement in foster care",
-    effective_on_kind: ,
-  valid_examples: [
-      "Birth, adoption, placement for adoption, or placement in foster care of a child",
-      "Marriage"
-    ],
-  invalid_examples: [
-    "A consumer’s unmarried partner moves in with the consumer"
-  ],
+  coverage_effective_on_kind: "",
   coverage_offset_kind: :date_of_event,
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -283,15 +70,8 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-    effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: :date_of_event,
-  valid_examples: [
-      "Birth, adoption, placement for adoption, or placement in foster care of a child",
-      "Marriage"
-    ],
-  invalid_examples: [
-    "A consumer’s unmarried partner moves in with the consumer"
-  ],
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
   post_event_pre_event_sep_in_days: 0,
@@ -305,14 +85,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [
-      "Birth, adoption, placement for adoption, or placement in foster care of a child",
-      "Marriage"
-    ],
-  invalid_examples: [
-    "A consumer’s unmarried partner moves in with the consumer"
-  ],
-    effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: :date_of_event,
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -326,15 +99,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [
-    "Permanent move to DC"
-  ],
-  invalid_examples: [
-    "Temporary move to DC",
-    "Moving from one address in DC to another address in DC",
-    "Traveling and then returning to DC if consumer was a DC resident while traveling"
-  ],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: :date_of_event,
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -349,17 +114,10 @@ LifeEvent.create!(
 LifeEvent.create!(
   title: "Change in APTC/CSR",
   description: "Consumer has a change in circumstances that makes him or her newly eligible or ineligible for APTC changes eligibility for CSR. Only applies to those already enrolled in a QHP.",
-  valid_examples: [
-    "A QHP enrollee has a change that results in a change in the amount of CSRA QHP enrollee has a change that results in gaining or losing APTC",
-    "A QHP enrollee has a change that does not change amount of APTC or CSR",
-    "A QHP enrollee has a change that changes the amount of APTC but not CSR",
-    "Someone who is not enrolled in a QHP has a change in circumstances that makes him or her eligible for a QHP"
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  ],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -373,17 +131,10 @@ LifeEvent.create!(
 LifeEvent.create!(
   title: "Change in immigration status",
   description: "Consumer gains status a citizen, national, or lawfully present immigrant",
-  valid_examples: [
-    "Becoming a US citizen",
-    "Becoming a legal permanent resident",
-    "Gaining Deferred Action for Childhood Arrivals status (DACA, which is not a lawfully present immigration status)",
-    "Renewing a VISA (staying lawfully present)"
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  ],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -400,9 +151,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -416,17 +165,10 @@ LifeEvent.create!(
 LifeEvent.create!(
   title: "Erroneous enrollment, HBX/HHS",
   description: "Enrollment or non-enrollment in QHP unintentional, inadvertent, or erroneous and is result of error, misrepresentation, or inaction by an agent of HBX or HHS",
-  valid_examples: [
-    "Consumer was not able to enroll due to error messages",
-    "CSR took an action that caused consumer to miss open enrollment"
-  ],
-  invalid_examples: [
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-    "Consumer enrolled but did not pay premium after receiving an invoice"
-  ],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -440,17 +182,10 @@ LifeEvent.create!(
 LifeEvent.create!(
   title: "Erroneous enrollment, QHP issuer",
   description: "Enrollment or non-enrollment in QHP unintentional, inadvertent, or erroneous and is result of error, misrepresentation, or inaction by an agent of a QHP issuer (as determined by DISB)",
-  valid_examples: [
-    "Carrier representative gave misinformation about plan, and the consumer acted on this information and enrolled in the plan"
-    ],
-  invalid_examples: [
-    "Consumer enrolled but did not pay premium after receiving an invoice",
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-    "Consumer picked the wrong plan"
-  ],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -464,17 +199,10 @@ LifeEvent.create!(
 LifeEvent.create!(
   title: "Misconduct of non-Exchange entity providing enrollment assistance",
   description: "Consumer was not enrolled, was enrolled in the wrong plan, or was eligible for but did not receive APTC or CSR due to misconduct by a non-Exchange entity providing enrollment assistance",
-  valid_examples: [
-    "Assister enrolled consumer in a plan other than the plan the consumer told the assister he or she wanted to enroll in"
-    ],
-  invalid_examples: [
-    "Consumer enrolled but did not pay premium after receiving an invoice",
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-    "Consumer picked the wrong plan"
-    ],
-    effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -488,16 +216,10 @@ LifeEvent.create!(
 LifeEvent.create!(
   title: "QHP violated its contract",
   description: "The QHP the person enrolled in substantially violated a material provision of its contract with the consumer",
-  valid_examples: [
-    "Consumer paid premium, but plan never provided coverage or card"
-    ],
-  invalid_examples: [
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-    "Customer doesn’t like the coverage provided by the plan"
-  ],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -511,39 +233,27 @@ LifeEvent.create!(
 LifeEvent.create!(
   title: "Found ineligible for Medicaid after open enrollment ended",
   description: "Consumer had pending Medicaid eligibility at the end of open enrollment, but was found ineligible after open enrollment.",
-  valid_examples: [
-    "Applicant had pending eligibility for Medicaid, but provided documents showing income over the Medicaid threshold and was determined ineligible"
-    ],
-  invalid_examples: [
-    kind: :add_member,
-    market_kind: :individual,
-    edi_reason: "",
-    "Applicant was determined ineligible for Medicaid due to failure to provide verification documents in a timely manner"
-    ],
-    effective_on_kind: ,
-    coverage_offset_kind: "",
-    pre_event_pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 0,
-    post_event_pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 60,
-    is_self_attested: true,
-    event_kind: "",
-    start_of_sep: "Date consumer received notice of Medicaid ineligibility",
-    coverage_effective_date: "Regular effective date")
+  kind: :add_member,
+  market_kind: :individual,
+  edi_reason: "",
+  coverage_effective_on_kind: "",
+  coverage_offset_kind: "",
+  pre_event_pre_event_sep_in_days: 0,
+  post_event_sep_in_days: 0,
+  post_event_pre_event_sep_in_days: 0,
+  post_event_sep_in_days: 60,
+  is_self_attested: true,
+  event_kind: "",
+  start_of_sep: "Date consumer received notice of Medicaid ineligibility",
+  coverage_effective_date: "Regular effective date")
 
 LifeEvent.create!(
   title: "Consumer’s employer applied to SHOP exchange but was found ineligible",
   description: "Consumer did not enroll in a QHP because consumer’s employer was applying to provide coverage through SHOP during open enrollment. Consumer’s employer was found ineligible to participate in SHOP after the end of open enrollment",
-  valid_examples: [
-    "Employer applied in March of 2014 for SHOP exchange. Employer did not meet minimum participation requirements for SHOP and was found ineligible in April of 2014"
-    ],
-  invalid_examples: [
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-    "Employer applied to participate in SHOP exchange after individual open enrollment has ended and is found ineligible"
-    ],
-    effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -557,16 +267,10 @@ LifeEvent.create!(
 LifeEvent.create!(
   title: "Exceptional circumstance due to a natural disaster",
   description: "(HBX)   A natural disaster prevented consumer from enrolling during open enrollment or an SEP",
-  valid_examples: [
-    "Earthquake",
-    "Massive flooding",
-    "Hurricane"
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-    ],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -580,15 +284,10 @@ LifeEvent.create!(
 LifeEvent.create!(
   title: "Exceptional circumstance due to medical emergency",
   description: "A serious medical condition prevented consumer from enrolling during open enrollment or an SEP",
-  valid_examples: [
-    "Unexpected hospitalization",
-    "Temporary cognitive disability"
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  ],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -605,9 +304,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -624,9 +321,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -643,9 +338,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 30,
@@ -662,9 +355,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -681,9 +372,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: :first_of_month,
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -700,9 +389,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: :first_of_month,
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -719,9 +406,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -738,9 +423,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: :first_of_month,
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
@@ -757,9 +440,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: "",
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -776,9 +457,7 @@ LifeEvent.create!(
   kind: :add_member,
   market_kind: :individual,
   edi_reason: "",
-  valid_examples: [],
-  invalid_examples: [],
-  effective_on_kind: ,
+  coverage_effective_on_kind: "",
   coverage_offset_kind: :date_range,
   pre_event_pre_event_sep_in_days: 0,
   post_event_sep_in_days: 0,
@@ -788,6 +467,3 @@ LifeEvent.create!(
   event_kind: "",
   start_of_sep: "Date reported",   
   coverage_effective_date: "Regular effective date")
-
-puts "::: LifeEvents Complete :::"
-puts "*"*80

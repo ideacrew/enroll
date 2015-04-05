@@ -22,10 +22,8 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
 
-  embeds_many :life_events
-  accepts_nested_attributes_for :life_events
-
-  field :temporary_is_under_special_enrollment_period, type: Boolean, default: false
+  embeds_many :special_enrollment_periods
+  accepts_nested_attributes_for :special_enrollment_periods
 
   # All current and former members of this group
   embeds_many :family_members, cascade_callbacks: true
@@ -75,10 +73,6 @@ class Family
   scope :all_with_multiple_family_members, -> { exists({:'family_members.1' => true}) }
   scope :all_with_household, -> { exists({:'households.0' => true}) }
 
-  def is_under_special_enrollment_period?
-    temporary_is_under_special_enrollment_period
-  end
-
   def no_duplicate_family_members
     family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
       errors.add(:base, "Duplicate family_members for person: #{k}\n" +
@@ -99,23 +93,19 @@ class Family
 
   # Life events trigger special enrollment periods
   def is_under_special_enrollment_period?
-    return false if life_events.size == 0
-    life_event = life_events.order_by(:'sep_begin_on'.desc).limit(1).only(:life_events).first
-    life_event.is_active?
+    return false if special_enrollment_periods.size == 0
+    sep = special_enrollment_periods.order_by(:begin_on.desc).limit(1).only(:special_enrollment_periods).first
+    sep.is_active?
   end
 
-  def current_life_events
-    return [] if life_events.size == 0
-    life_events = life_events.order_by(:'sep_begin_on'.desc).only(:life_events)
-    life_events.reduce([]) { |list, event| list << event.is_active? }
+  def current_special_enrollment_periods
+    return [] if special_enrollment_periods.size == 0
+    seps = special_enrollment_periods.order_by(:begin_on.desc).only(:special_enrollment_periods)
+    seps.reduce([]) { |list, event| list << event if event.is_active?; list }
   end
 
   def employers
     hbx_enrollments.inject([]) { |em, e| p << e.employer unless e.employer.blank? } || []
-  end
-
-  def policies
-    hbx_enrollments.inject([]) { |p, e| p << e.policy unless e.policy.blank? } || []
   end
 
   def brokers
@@ -241,9 +231,7 @@ class Family
 
     if family_members.blank?
       household.coverage_households.delete_all
-      household.hbx_enrollments.delete_all
     else
-      create_hbx_enrollments(household)
       create_coverage_households(household)
     end
   end
@@ -331,25 +319,6 @@ class Family
         end
       end
     end
-  end
-
-  def create_hbx_enrollments(household)
-    return if primary_applicant.nil?
-
-    household.hbx_enrollments.delete_all #clear any existing
-
-    policies = Policy.find_by_person(primary_applicant.person)
-
-    policies.map do |policy|
-      create_hbx_enrollment(household, policy)
-    end
-  end
-
-  def create_hbx_enrollment(household, policy)
-    hbx_enrollement = household.hbx_enrollments.build
-    hbx_enrollement.policy = policy
-    hbx_enrollement.submitted_at = self.submitted_at
-    hbx_enrollement
   end
 
   def valid_relationship?(family_member)

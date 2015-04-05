@@ -43,3 +43,4 @@ db/seedfiles/*.yml
 .DS_Store
 __MACOSX
 .project
+tags

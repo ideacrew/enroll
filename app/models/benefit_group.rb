@@ -28,8 +28,8 @@ class BenefitGroup
   field :effective_on_offset, type: Integer, default: 0
 
   # Non-congressional
-  belongs_to :reference_plan, class_name: "Plan"
-  # field :reference_plan_id, type: BSON::ObjectId
+  # belongs_to :reference_plan, class_name: "Plan"
+  field :reference_plan_id, type: BSON::ObjectId
 
   # Employer contribution amount as percentage of reference plan premium
   field :premium_pct_as_int, type: Integer, default: Integer
@@ -64,11 +64,13 @@ class BenefitGroup
     only_integer: true,
     greater_than_or_equal_to: 50
 
-  # def reference_plan=(new_reference_plan)
-  # end
-  #
-  # def reference_plan
-  # end
+  def reference_plan=(new_reference_plan)
+    self.reference_plan_id = new_reference_plan.id
+  end
+  
+  def reference_plan
+    Plan.find(reference_plan_id) unless reference_plan_id.nil?
+  end
 
   # belongs_to association (traverse the model)
   def employee_families

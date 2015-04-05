@@ -1,6 +1,6 @@
 puts "*"*80
 
-puts "::: Seeding Employers :::"
+puts "::: Generating Employers seed data :::"
 
 # Retrieve Brokers
 broker_agency_0 = BrokerAgencyProfile.first
@@ -61,108 +61,231 @@ jetson_1 = EmployerCensus::EmployeeFamily.new(
       )
     )
 
-spacely.create_employer_profile(
-    entity_kind: "s_corporation", 
+spacely_employer_profile = spacely.create_employer_profile(
+    entity_kind: "s_corporation",
     broker_agency_profile: broker_agency_0,
     employee_families: [jetson_0]
   )
 
-cogswell.create_employer_profile(
-    entity_kind: "s_corporation", 
+spacely_plan_year = spacely_employer_profile.plan_years.build(
+    start_on: 0.days.ago.beginning_of_year.to_date,
+    end_on: 0.days.ago.end_of_year.to_date,
+    open_enrollment_start_on: (0.days.ago.beginning_of_year.to_date - 2.months).beginning_of_month,
+    open_enrollment_end_on: (0.days.ago.beginning_of_year.to_date - 2.months).end_of_month,
+    fte_count: 3,
+    pte_count: 2
+  )
+
+spacely_plan = Plan.create(
+    active_year: 2015,
+    hios_id: "123523",
+    name: "BlueChoice 123 Silver 100",
+    coverage_kind: "health",
+    metal_level: "silver",
+    market: "shop",
+    carrier_profile_id: CarrierProfile.new.id
+  )
+
+spacely_benefit_group = spacely_plan_year.benefit_groups.build(
+    effective_on_kind:  "date_of_hire",
+    terminate_on_kind:  "end_of_month",
+    effective_on_offset:  30,
+    premium_pct_as_int:   80,
+    employer_max_amt_in_cents:  1000_00,
+    reference_plan: spacely_plan
+  )
+
+spacely_benefit_group.relationship_benefits.build(
+    relationship: "employee",
+    premium_pct: 60,
+    employer_max_amt: 1000.00
+  )
+spacely.save!
+
+cogswell_employer_profile = cogswell.create_employer_profile(
+    entity_kind: "s_corporation",
     broker_agency_profile: broker_agency_1,
     employee_families: [jetson_1]
   )
 
+cogswell_plan_year = cogswell_employer_profile.plan_years.build(
+    start_on: 0.days.ago.beginning_of_year.to_date,
+    end_on: 0.days.ago.end_of_year.to_date,
+    open_enrollment_start_on: (0.days.ago.beginning_of_year.to_date - 2.months).beginning_of_month,
+    open_enrollment_end_on: (0.days.ago.beginning_of_year.to_date - 2.months).end_of_month,
+    fte_count: 30,
+    pte_count: 21
+  )
+
+cogswell_plan = Plan.create(
+    active_year: 2015,
+    hios_id: "120523",
+    name: "United 123 Silver 900",
+    coverage_kind: "health",
+    metal_level: "bronze",
+    market: "shop",
+    carrier_profile_id: CarrierProfile.new.id
+  )
+
+cogswell_benefit_group = cogswell_plan_year.benefit_groups.build(
+    effective_on_kind:  "date_of_hire",
+    terminate_on_kind:  "end_of_month",
+    effective_on_offset:  30,
+    premium_pct_as_int:   80,
+    employer_max_amt_in_cents:  1000_00,
+    reference_plan: cogswell_plan
+  )
+
+cogswell_benefit_group.relationship_benefits.build(
+    relationship: "employee",
+    premium_pct: 80,
+    employer_max_amt: 500.00
+  )
+cogswell.save!
 
 puts "::: Creating addresses for office location :::"
 # Employer addresses
-employer_address_1 = Address.new(kind: "mailing", address_1: "13025 Elm Tree CT", address_2: "Suite 300", city: "Herndon", state: "VA", county: "Fairfax", zip: "20172", country_name: "USA")
-employer_address_2 = Address.new(kind: "work", address_1: "320 W Illinois St", address_2: "suite 180", city: "Chicago", state: "IL", county: "Chicago", zip: "60654", country_name: "USA")
-employer_address_3 = Address.new(kind: "home", address_1: "43 Russells Way", address_2: "Suite 23", city: "Westford", state: "MA", county: "", zip: "01886", country_name: "USA")
-employer_address_4 = Address.new(kind: "home", address_1: "20178 E Hampden PL", address_2: "Suite 45", city: "Aurora", state: "CO", county: "", zip: "80013", country_name: "USA")
-employer_address_5 = Address.new(kind: "work", address_1: "1010 Potomac Rd", address_2: "APT 102", city: "Atlanta", state: "GA", county: "Fulton", zip: "30338", country_name: "USA")
+org_1_add = Address.new(kind: "work", address_1: "823 Cosmic Way, NW", city: "Washington", state: "DC", zip: "20001")
+org_1_phone = Phone.new(kind: "main", area_code: "802", number: "123-1213")
+org_1_email = Email.new(kind: "work", address: "info@organization1.com")
+org_1_off_loc = OfficeLocation.new(is_primary: true, address: org_1_add, phone: org_1_phone, email: org_1_email)
 
-puts "::: Generating Employers :::"
-# Employer creation
-organization_1 = Organization.new(fein: "897897897", dba: "1234", legal_name: "Global Systems", office_locations: [employer_address_1])
-organization_2 = Organization.new(fein: "397897897", dba: "3434", legal_name: "Technology Solutions Inc", office_locations:[employer_address_2])
-organization_3 = Organization.new(fein: "597897897", dba: "9034", legal_name: "Futurewave Systems Inc", office_locations:[employer_address_3])
-organization_4 = Organization.new(fein: "797897897", dba: "8934", legal_name: "Primus Software Corporation", office_locations:[employer_address_4])
-organization_5 = Organization.new(fein: "997897897", dba: "5634", legal_name: "OneCare", is_active: false, office_locations:[employer_address_5])
+org_1 = Organization.new(
+      dba: "1234",
+      legal_name: "Global Systems",
+      fein: 978978971,
+      office_locations: [org_1_off_loc]
+    )
 
-employer_1 = organization_1.create_employer_profile(entity_kind: "c_corporation", broker_agency_profile: broker_agency_0)
-employer_2 = organization_2.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_0)
-employer_3 = organization_3.create_employer_profile(entity_kind: "s_corporation", broker_agency_profile: broker_agency_0)
-employer_4 = organization_4.create_employer_profile(entity_kind: "tax_exempt_organization", broker_agency_profile: broker_agency_1)
-employer_5 = organization_5.create_employer_profile(entity_kind: "partnership")
+org_1_jetson = EmployerCensus::EmployeeFamily.new(
+    census_employee: EmployerCensus::Employee.new(
+        last_name: "Doe", first_name: "John", dob: "01/12/1980", ssn: "111222331", hired_on: "03/20/2015", 
+        email: Email.new(kind: "work", address: "john.doe@example.com")
+      ),
+    census_dependents: [
+      EmployerCensus::Dependent.new(
+        last_name: "Doe", first_name: "Matt", dob: "01/12/2011", ssn: "022233311", employee_relationship: "child_under_26"
+        ),
+      EmployerCensus::Dependent.new(
+        last_name: "Doe", first_name: "Jessica", dob: "03/12/1985", ssn: "021233311", employee_relationship: "spouse"
+        ),
+      EmployerCensus::Dependent.new(
+        last_name: "Doe", first_name: "Caroline", dob: "04/01/2008", ssn: "021233321", employee_relationship: "child_under_26"
+        )
+    ]
+  )
 
-puts "::: Created 5 Employers :::"
+org_1_employer = org_1.create_employer_profile(
+    entity_kind: "s_corporation",
+    broker_agency_profile: broker_agency_1,
+    employee_families: [org_1_jetson]
+  )
 
-# Employee Addresses
-address_0 = Address.new(kind: "home", address_1: "1225 I St, NW", address_2: "Apt A7", city: "Washington", state: "DC", county: "Fairfax", zip: "20004", country_name: "USA")
-address_1 = Address.new(kind: "work", address_1: "145 I45 St", address_2: "suite 200", city: "Washington", state: "DC", county: "Fairfax", zip: "20004", country_name: "USA")
-address_2 = Address.new(kind: "home", address_1: "1 North State St", address_2: "suite 100", city: "Chicago", state: "IL", county: "chicago", zip: "60654", country_name: "USA")
-address_3 = Address.new(kind: "mailing", address_1: "4900 USAA BLVD", address_2: "", city: "San Antonio", state: "TX", county: "Buxton", zip: "78240", country_name: "USA")
-address_4 = Address.new(kind: "work", address_1: "1 Clear Crk", address_2: "", city: "Irvine", state: "CA", county: "Irvine", zip: "92620", country_name: "USA")
-address_5 = Address.new(kind: "home", address_1: "15 Darlington", address_2: "suite 998", city: "Irvine", state: "CA", county: "Irvine", zip: "92620", country_name: "USA")
+org_1_plan_year = org_1_employer.plan_years.build(
+    start_on: 0.days.ago.beginning_of_year.to_date,
+    end_on: 0.days.ago.end_of_year.to_date,
+    open_enrollment_start_on: (0.days.ago.beginning_of_year.to_date - 2.months).beginning_of_month,
+    open_enrollment_end_on: (0.days.ago.beginning_of_year.to_date - 2.months).end_of_month,
+    fte_count: 12,
+    pte_count: 1
+  )
 
-# Employee and Dependents Creation
-employee_0 = EmployerCensus::Employee.new(first_name: "Guy", last_name: "Noir", dob: "01/12/1950", gender: "male", employee_relationship: "self", hired_on: "01/01/2014", ssn: "011222331", address: address_0)
-employee_1 = EmployerCensus::Employee.new(first_name: "John", last_name: "Doe", dob: "01/12/1980", gender: "male", employee_relationship: "self", hired_on: "01/01/2014", ssn: "111222331", address: address_1)
-dependent_1_1 = EmployerCensus::Dependent.new(first_name: "Matt", last_name: "Doe", dob: "01/12/2011", gender: "male", employee_relationship: "child_under_26", ssn: "022233311")
-dependent_1_2 = EmployerCensus::Dependent.new(first_name: "Jessica", last_name: "Doe", dob: "02/12/1982", gender: "female", employee_relationship: "spouse", ssn: "021233311")
-dependent_1_3 = EmployerCensus::Dependent.new(first_name: "Caroline", last_name: "Doe", dob: "02/12/2010", gender: "female", employee_relationship: "child_under_26", ssn: "021233321")
+org_1_plan = Plan.create(
+    active_year: 2015,
+    hios_id: "191503",
+    name: "Aetna 123 Silver 900",
+    coverage_kind: "health",
+    metal_level: "silver",
+    market: "shop",
+    carrier_profile_id: CarrierProfile.new.id
+  )
 
-# Employee Family Creation
-family_0 = organization_1.employer_profile.employee_families.new
-family_0.census_employee = employee_0
-family_0.census_dependents = [dependent_1_1, dependent_1_2]
-family_0.save!
+org_1_benefit_group = org_1_plan_year.benefit_groups.build(
+    effective_on_kind:  "date_of_hire",
+    terminate_on_kind:  "end_of_month",
+    effective_on_offset:  30,
+    premium_pct_as_int:   80,
+    employer_max_amt_in_cents:  500_00,
+    reference_plan: org_1_plan
+  )
 
-family_1 = organization_1.employer_profile.employee_families.new
-family_1.census_employee = employee_1
-family_1.census_dependents = [dependent_1_1, dependent_1_2, dependent_1_3]
-family_1.save!
+org_1_benefit_group.relationship_benefits.build(
+    relationship: "employee",
+    premium_pct: 85,
+    employer_max_amt: 300.00
+  )
+org_1.save!
 
-#to check multiple employers for person creation added below snippet
-family_11 = organization_2.employer_profile.employee_families.new
-family_11.census_employee = employee_1
-family_11.census_dependents = [dependent_1_1, dependent_1_2]
-family_11.save!
+org_2_add = Address.new(kind: "work", address_1: "823 Cosmic Way, NW", city: "Washington", state: "DC", zip: "20001")
+org_2_phone = Phone.new(kind: "main", area_code: "802", number: "123-1213")
+org_2_email = Email.new(kind: "work", address: "info@organization1.com")
+org_2_off_loc = OfficeLocation.new(is_primary: true, address: org_2_add, phone: org_2_phone, email: org_2_email)
 
-employee_2 = EmployerCensus::Employee.new(first_name: "Melaine", last_name: "Roger", dob: "01/15/1975", gender: "male", employee_relationship: "self", hired_on: "12/01/2012", ssn: "011142233", address: address_2)
-dependent_2_1 = EmployerCensus::Dependent.new(first_name: "Martina", last_name: "Roger", dob: "01/31/2011", gender: "female", employee_relationship: "child_under_26", ssn: "022233314")
-dependent_2_2 = EmployerCensus::Dependent.new(first_name: "Monica", last_name: "Roger", dob: "02/09/1983", gender: "female", employee_relationship: "spouse", ssn: "021233331")
-dependent_2_3 = EmployerCensus::Dependent.new(first_name: "Caroline", last_name: "Roger", dob: "04/12/2010", gender: "female", employee_relationship: "child_under_26", ssn: "021233921")
+org_2 = Organization.new(
+      dba: "3434",
+      legal_name: "Technology Solutions Inc.",
+      fein: 397897897,
+      office_locations: [org_2_off_loc]
+    )
 
-family_2 = organization_2.employer_profile.employee_families.new
-family_2.census_employee = employee_2
-family_2.census_dependents = [dependent_2_1, dependent_2_2, dependent_2_3]
-family_2.save!
+org_2_jetson = EmployerCensus::EmployeeFamily.new(
+    census_employee: EmployerCensus::Employee.new(
+        last_name: "Johnson", first_name: "Patricia", dob: "01/12/1980", ssn: "311222331", hired_on: "03/20/2015", 
+        email: Email.new(kind: "work", address: "patricia.johnson@example.com")
+      ),
+    census_dependents: [
+      EmployerCensus::Dependent.new(
+        last_name: "Johnson", first_name: "Matt", dob: "01/12/2011", ssn: "422233311", employee_relationship: "child_under_26"
+        ),
+      EmployerCensus::Dependent.new(
+        last_name: "Johnson", first_name: "Mark", dob: "03/12/1978", ssn: "521233311", employee_relationship: "spouse"
+        ),
+      EmployerCensus::Dependent.new(
+        last_name: "Johnson", first_name: "Caroline", dob: "04/01/2008", ssn: "621233321", employee_relationship: "child_under_26"
+        )
+    ]
+  )
 
-employee_3 = EmployerCensus::Employee.new(first_name: "Kareena", last_name: "Johnson", dob: "01/15/1978", gender: "female", employee_relationship: "self", hired_on: "04/01/2011", ssn: "015142233", address: address_3)
-dependent_3_1 = EmployerCensus::Dependent.new(first_name: "Melissa", last_name: "Johnson", dob: "12/31/2011", gender: "female", employee_relationship: "child_under_26", ssn: "022233313")
-dependent_3_2 = EmployerCensus::Dependent.new(first_name: "Martin", last_name: "Johnson", dob: "02/19/1972", gender: "male", employee_relationship: "spouse", ssn: "081235331")
-dependent_3_3 = EmployerCensus::Dependent.new(first_name: "Frazier", last_name: "Johnson", dob: "04/16/2010", gender: "male", employee_relationship: "child_under_26", ssn: "021243926")
+org_2_employer_profile = org_2.create_employer_profile(
+    entity_kind: "c_corporation",
+    broker_agency_profile: broker_agency_1,
+    employee_families: [org_2_jetson]
+  )
 
-family_3 = organization_3.employer_profile.employee_families.new
-family_3.census_employee = employee_3
-family_3.census_dependents = [dependent_3_1, dependent_3_2, dependent_3_3]
-family_3.save!
+org_2_plan_year = org_2_employer_profile.plan_years.build(
+    start_on: 0.days.ago.beginning_of_year.to_date,
+    end_on: 0.days.ago.end_of_year.to_date,
+    open_enrollment_start_on: (0.days.ago.beginning_of_year.to_date - 2.months).beginning_of_month,
+    open_enrollment_end_on: (0.days.ago.beginning_of_year.to_date - 2.months).end_of_month,
+    fte_count: 12,
+    pte_count: 1
+  )
 
-employee_4 = EmployerCensus::Employee.new(first_name: "Mario", last_name: "Gomez", dob: "01/25/1968", gender: "male", employee_relationship: "self", hired_on: "02/02/2011", ssn: "015142293", address: address_4)
-dependent_4_1 = EmployerCensus::Dependent.new(first_name: "Paula", last_name: "Gomez", dob: "12/29/2010", gender: "female", employee_relationship: "child_under_26", ssn: "022233303")
-dependent_4_2 = EmployerCensus::Dependent.new(first_name: "Martina", last_name: "Gomez", dob: "02/19/1982", gender: "female", employee_relationship: "spouse", ssn: "081235339")
-dependent_4_3 = EmployerCensus::Dependent.new(first_name: "Rafael", last_name: "Gomez", dob: "04/16/2012", gender: "male", employee_relationship: "child_under_26", ssn: "021243926")
+org_2_plan = Plan.create(
+    active_year: 2015,
+    hios_id: "194303",
+    name: "Aetna 8913 Silver 900",
+    coverage_kind: "health",
+    metal_level: "gold",
+    market: "shop",
+    carrier_profile_id: CarrierProfile.new.id
+  )
 
-family_4 = organization_4.employer_profile.employee_families.new
-family_4.census_employee = employee_4
-family_4.census_dependents = [dependent_4_1, dependent_4_2, dependent_4_3]
-family_4.save!
+org_2_benefit_group = org_2_plan_year.benefit_groups.build(
+    effective_on_kind:  "date_of_hire",
+    terminate_on_kind:  "end_of_month",
+    effective_on_offset:  30,
+    premium_pct_as_int:   70,
+    employer_max_amt_in_cents:  500_00,
+    reference_plan: org_2_plan
+  )
 
-employee_5 = EmployerCensus::Employee.new(first_name: "Martina", last_name: "Williams", dob: "01/25/1990", gender: "female", employee_relationship: "self", hired_on: "02/02/2014", ssn: "015148093", address: address_5)
+org_2_benefit_group.relationship_benefits.build(
+    relationship: "employee",
+    premium_pct: 65,
+    employer_max_amt: 100.00
+  )
+org_2.save!
 
-family_5 = organization_5.employer_profile.employee_families.new
-family_5.census_employee = employee_5
-family_5.save!
+puts "Employers seed complete"
 puts "*"*80

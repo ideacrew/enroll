@@ -11,10 +11,10 @@ class Employers::FamilyController < ApplicationController
     params.permit!
     @family = EmployerCensus::EmployeeFamily.new
     @family.attributes = params["employer_census_employee_family"]
-    @employer.employee_families << @family
-    if @employer.save
+    @employer_profile.employee_families << @family
+    if @employer_profile.save
       flash.notice = "Employer Census Family is successfully created."
-      redirect_to employers_employer_path(@employer)
+      redirect_to employers_employer_profiles_path(@employer_profile)
     else
       render action: "new"
     end
@@ -23,7 +23,7 @@ class Employers::FamilyController < ApplicationController
   def destroy
     @family.destroy
     flash.notice = "Successfully Deleted Employer Census Family."
-    redirect_to employers_employer_path(@employer)
+    redirect_to employers_employer_profiles_path(@employer_profile)
   end
 
   def show
@@ -32,11 +32,11 @@ class Employers::FamilyController < ApplicationController
   private
 
   def find_employer
-    @employer = EmployerProfile.find params["employer_id"]
+    @employer_profile = EmployerProfile.find params["employer_profile_id"]
   end
 
   def find_family
-    @family = @employer.employee_families.where(id: params["id"]).to_a.first
+    @family = @employer_profile.employee_families.where(id: params["id"]).to_a.first
   end
 
   def build_family
