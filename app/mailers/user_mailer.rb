@@ -5,4 +5,10 @@ class UserMailer < ApplicationMailer
       format.text
     end
   end
+
+  def plan_shopping_completed(user, hbx_enrollment)
+    mail({to: user.email, subject: "DCHealthLink Confirmation"}) do |format|
+      format.html { render "plan_shopping_completed", :user => user, :enrollment => hbx_enrollment }
+    end
+  end
 end 
