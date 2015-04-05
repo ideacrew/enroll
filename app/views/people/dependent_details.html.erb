@@ -61,29 +61,29 @@
               <label>Phone</label>
             </div>
           </div>
-          <% address = @employee.address %>
+          <%# address = @employee.address %>
           <div class="row middle-row form-group form-group-lg no-pd address-row">
             <div class="col-md-6 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               <label>Address</label>
-              <input type="text" value="<%= address.address_1 %>" class="form-control" >
+              <input type="text" value="<%#= address.address_1 %>" class="form-control" >
             </div>
             <div class="col-md-6 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
               <label>Address2</label>
-              <input type="text" value="<%= address.address_2 %>" class="form-control" >
+              <input type="text" value="<%#= address.address_2 %>" class="form-control" >
             </div>
           </div>
           
               <div class="row middle-row form-group form-group-lg no-pd address-row">
             <div class="col-md-6 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               <label>City</label>
-              <input type="text" value="<%= address.city %>" class="form-control" >
+              <input type="text" value="<%#= address.city %>" class="form-control" >
             </div>
             <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
              <label>State</label>
           </div>
             <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
               <label>Zip</label>
-              <input type="text" value="<%= address.zip %>" class="form-control" >
+              <input type="text" value="<%#= address.zip %>" class="form-control" >
             </div>
           </div>
         </div>

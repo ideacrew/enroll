@@ -100,7 +100,6 @@ class PeopleController < ApplicationController
   
   def dependent_details
     add_employee_role
-    raise @employee_role.inspect
     @employer_profile = @employee_role.employer_profile
     @employer = @employer_profile.organization
     @person = @employee_role.person
