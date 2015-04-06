@@ -38,15 +38,6 @@
     font-style: normal;
 }
 
-@font-face {
-  font-family: 'Glyphicons Halflings';
-  src: url('<%= asset_path('glyphicons-halflings-regular.eot') %>');
-  src: url('<%= asset_path('glyphicons-halflings-regular.eot') + '?#iefix' %>'),
-       url('<%= asset_path('glyphicons-halflings-regular.woff') %>') format('woff'),
-       url('<%= asset_path('glyphicons-halflings-regular.ttf') %>') format('truetype'),
-       url('<%= asset_path('glyphicons-halflings-regular.svg') + '#glyphicons_halflingsregular' %>') format('svg');
-}
-
 /* Layout Specifics */
 html {
   position: relative;
@@ -1760,10 +1751,10 @@ a.list-group-item.confirm {
 /*.landing-row .table-responsive { 
   opacity: 0.25;
 }*/
-.landing-row .table-responsive table tbody tr td {
+.landing-row .table-responsive table {
   opacity: 0.45;
 }
-.landing-row .table-responsive table tr td:hover {
+.landing-row .table-responsive table:hover {
   opacity: 1;
 }
 .landing-row .left-side .adderess-select-box {

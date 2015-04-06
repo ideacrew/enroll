@@ -60,8 +60,6 @@
                                       </a>
                                       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                                         <li><a href="#">Link1</a></li>
-                                        <li><a href="#">Link2</a></li>
-                                        <li><a href="#">Link3</a></li>
                                       </ul>
                                     </div>
                                   </td>
@@ -70,17 +68,20 @@
                                   <td>
                                     <button class="btn btn-new-address">NEW ADDRESS</button>
                                   </td>
+                                  <% @addresses = @person.addresses %>
                                   <td colspan="3">
                                     <div class="dropdown form-control float-label adderess-select-box text-center home">
                                       <a id="dLabel" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
-                                        Home Address
+                                        <%= @addresses.try(:first).try(:kind) %>
                                         <i class="glyphicon glyphicon-menu-down"></i>
                                       </a>
-                                      <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                                        <li><a href="#">Link1</a></li>
-                                        <li><a href="#">Link2</a></li>
-                                        <li><a href="#">Link3</a></li>
-                                      </ul>
+                                      <% if @addresses.present? %>
+                                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                          <% @addresses.each do |address| %>
+                                            <li><a href="#"><%= address.kind %></a></li>
+                                          <% end %>
+                                        </ul>
+                                      <% end %>
                                     </div>
                                   </td>
                                 </tr>
@@ -90,33 +91,29 @@
                                   <tr>
                                     <td colspan="2">
                                       <span>ADDRESS LINE 1</span>
-                                      <span><%= @address.address_1 %></span>
+                                      <input type="text" value="<%= @address.address_1 %>">
                                     </td>
                                     <td colspan="2">
                                       <span>ADDRESS LINE 2</span>
-                                      <span><%= @address.address_2 %> </span>
+                                      <input type="text" value="<%= @address.address_2 %>">
                                     </td>
                                   </tr>
                                   <tr>
                                     <td>
                                       <span>CITY</span>
-                                      <input type="text">
-                                      <span><%= @address.city %> </span>
+                                      <input type="text" value="<%= @address.city %>">
                                     </td>
                                     <td>
                                       <span>STATE</span>
-                                      <input type="text">
-                                      <span><%= @address.state %></span>
+                                      <input type="text" value="<%= @address.state %>">
                                     </td>
                                     <td>
                                       <span>COUNTRY</span>
-                                      <input type="text">
-                                      <span><%= @address.country_name %></span>
+                                      <input type="text" value="<%= @address.country_name %>">
                                     </td>
                                     <td>
                                       <span>ZIP</span>
-                                      <input type="text">
-                                      <span><%= @address.zip %></span>
+                                      <input type="text" value="<%= @address.zip %>">
                                     </td>
                                   </tr>
                                 <% end %>
@@ -124,8 +121,6 @@
                             </table>
                           </div>
                         </div>
-
-
                         <div class="row bottom">
                           <p class="head">
                           <span>Employers & Plans</span>
@@ -141,28 +136,7 @@
                                 </div>
                               </div>
                             </li>
-                            <li class="list-group-item">
-                              <div class="row">
-                                <div class="col-md-10 col-sm-12 col-xs-12">
-                                    <h4>Kaiser 300+ Universal</h4>
-                                </div>
-                              </div>
-                            </li>
-                            <li class="list-group-item">
-                              <div class="row">
-                                <div class="col-md-10 col-sm-12 col-xs-12">
-                                    <h4>VSP Premium Eye Family Plan</h4>
-                                </div>
-                              </div>
-                            </li>
-                            <li class="list-group-item">
-                              <div class="row">
-                                <div class="col-md-10 col-sm-12 col-xs-12">
-                                    <h4>VSP Premium Eye Family Plan</h4>
-                                </div>
-                              </div>
-                            </li>
-                            <button class="btn btn-see-all">See Details</button>
+                            <button class="btn btn-see-all see-plan-details">See Details</button>
                           </ul>
                         </div>
                       </div>
@@ -457,10 +431,10 @@
         $(this).siblings().removeClass('active');
       });
 
-      $('input,textarea').focus(function(){
-       $(this).removeAttr('placeholder');
-       $(this).removeAttr('value');
-      });
+      //$('input,textarea').focus(function(){
+      // $(this).removeAttr('placeholder');
+      // $(this).removeAttr('value');
+      //});
 
       $(".personal-table input").focusout(function() {
         if ($(".personal-table input").val() !== ""){
@@ -520,6 +494,10 @@
         }
       });
      
+      $('.see-plan-details').click(function(e){
+        e.preventDefault();
+        $('#plans-tab').click();
+      });
     </script>
 
 

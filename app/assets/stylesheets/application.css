@@ -13,7 +13,7 @@
  *= require jquery-ui
  *= require bootstrap-theme
  *= require font-awesome
- *= require bootstrap
+ *= require bootstrap.min
  *= require component
  *= require style
  *= require custom
