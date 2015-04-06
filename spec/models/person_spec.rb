@@ -230,6 +230,24 @@ describe Person, '#addresses' do
   describe "large family with multiple employees - The Brady Bunch" do
     include_context "BradyBunch"
 
+    context "a person" do
+      it "should know its age today" do
+        expect(greg.age_on(Date.today)).to eq gregs_age
+      end
+
+      it "should know its age on a given date" do
+        expect(greg.age_on(18.months.ago.to_date)).to eq (gregs_age - 2)
+      end
+
+      it "should know its age yesterday" do
+        expect(greg.age_on(Date.today.advance(days: -1))).to eq (gregs_age - 1)
+      end
+
+      it "should know its age tomorrow" do
+        expect(greg.age_on(1.day.from_now.to_date)).to eq gregs_age
+      end
+    end
+
     context "Person#primary_family" do
       context "on Mike" do
         let(:find) {mike.primary_family}

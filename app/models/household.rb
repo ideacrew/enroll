@@ -23,10 +23,10 @@ class Household
 
   embeds_many :hbx_enrollments
   accepts_nested_attributes_for :hbx_enrollments
-  
+
   embeds_many :tax_households
   accepts_nested_attributes_for :tax_households
-  
+
   embeds_many :coverage_households
   accepts_nested_attributes_for :coverage_households
 
@@ -118,4 +118,22 @@ class Household
     true
   end
 
+  def new_hbx_enrollment_from(employer_profile: nil, coverage_household: nil, benefit_group:)
+    coverage_household = latest_coverage_household unless coverage_household.present?
+    HbxEnrollment.new_from(
+      employer_profile: employer_profile,
+      coverage_household: coverage_household,
+      benefit_group: benefit_group,
+    )
+  end
+
+  def create_hbx_enrollment_from(employer_profile: nil, coverage_household: nil, benefit_group:)
+    enrollment = new_hbx_enrollment_from(
+      employer_profile: employer_profile,
+      coverage_household: coverage_household,
+      benefit_group: benefit_group,
+    )
+    enrollment.save
+    enrollment
+  end
 end
