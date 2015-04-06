@@ -55,29 +55,29 @@ class Plan
 
   validates :coverage_kind,
    allow_blank: false,
-   inclusion: { 
-     in: COVERAGE_KINDS, 
-     message: "%{value} is not a valid coverage kind" 
+   inclusion: {
+     in: COVERAGE_KINDS,
+     message: "%{value} is not a valid coverage kind"
   }
-             
+
   validates :metal_level,
    allow_blank: false,
-   inclusion: { 
-     in: METAL_LEVEL_KINDS, 
-     message: "%{value} is not a valid metal level kind" 
+   inclusion: {
+     in: METAL_LEVEL_KINDS,
+     message: "%{value} is not a valid metal level kind"
   }
 
   validates :market,
    allow_blank: false,
-   inclusion: { 
-     in: MARKET_KINDS, 
-     message: "%{value} is not a valid market" 
+   inclusion: {
+     in: MARKET_KINDS,
+     message: "%{value} is not a valid market"
    }
-             
-  validates_inclusion_of :active_year, 
-    in: 2014..(Date.today.year + 3), 
+
+  validates_inclusion_of :active_year,
+    in: 2014..(Date.today.year + 3),
     message: "%{value} is an invalid active year"
-  
+
   ## Scopes
   # Metal level
   scope :platinum_level,      ->{ where(metal_level: "platinum") }
@@ -164,6 +164,14 @@ class Plan
     end
   end
 
+  def premium_for(schedule_date, age)
+    bound_age = bound_age(age)
+    self.premium_tables.detect do |pt|
+      pt.age == bound_age &&
+        (pt.start_on <= schedule_date) && (pt.end_on >= schedule_date)
+    end.cost
+  end
+
   class << self
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
       result = []
@@ -192,7 +200,7 @@ class Plan
         nil
       end
     end
-    
+
     def redis_monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
       result = []
       if plan_year.to_s == coverage_begin_date.to_date.year.to_s
