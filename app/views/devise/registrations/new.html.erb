@@ -3,7 +3,7 @@
 	<div class="container signin">
         <div class="col-md-3 col-sm-2 col-xs-12"></div>
         <div class="col-md-6 col-sm-8 col-xs-12">
-          <h1>Sign up</h1>
+          <h1>Create account</h1>
           
           <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
 		      <%= devise_error_messages! %>
@@ -28,7 +28,7 @@
 		        </div>
 		
 		        <div class="actions">
-		          <%= f.submit "Sign up", class: "btn btn-primary btn-lg" %>
+		          <%= f.submit "Create account", class: "btn btn-primary btn-lg" %>
 		          
 		          <%#= render "devise/shared/links" %>
 		        </div>
