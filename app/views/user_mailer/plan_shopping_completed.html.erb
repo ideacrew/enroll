@@ -167,8 +167,8 @@
                                         <span style=
                                           "color: rgb(51, 51, 51); line-height: 130%;">
                                           Congratulations
-                                          Homer
-                                          Simpson,<br />
+					  <%= enrollment.subscriber.family_member.person.full_name %>
+                                          ,<br />
                                           <br />
                                           You and the
                                           following
@@ -178,10 +178,7 @@
                                           in</span>
                                         <span style=
                                           "color: rgb(51, 51, 51); line-height: 130%;">
-                                          CareFirst
-                                          BlueChoice Plus
-                                          Silver
-                                          $2,500:<br />
+					  <%= plan.name %><br />
                                           <br />
                                   </span></span></span></span>
 
@@ -191,51 +188,23 @@
                                     cellspacing="0"
                                     style=
                                     "width: 100%; border-color: #aaa; border-collapse: collapse;">
-                                    <tbody>
-                                      <tr>
+				    <tbody>
+				        <% enrollment.hbx_enrollment_members.each do |member| %>
+					
+					    <tr>
+
                                         <td style="text-decoration: none; padding: 2px 6px; line-height: 130%; color: rgb(51, 51, 51); border-color: #aaa;">
                                           <span style="font-family: arial, helvetica, sans-serif; line-height: 130%;">
                                             <span style="font-size: 16px; line-height: 130%;">
                                               <span style="color: rgb(51, 51, 51); line-height: 130%;">
-                                                Marge
-                                                Simpson</span></span></span></td>
+						      <%= member.person.full_name %></span></span></span></td>
 
                                         <td style="text-align: right; text-decoration: none; padding: 2px 6px; line-height: 130%; color: rgb(51, 51, 51); border-color: #aaa;">
                                           <span style="font-family: arial, helvetica, sans-serif; line-height: 130%;">
                                             <span style="font-size: 16px; line-height: 130%;">
-                                              <span style="color: rgb(51, 51, 51); line-height: 130%;">
-                                                38</span></span></span></td>
+						    <span style="color: rgb(51, 51, 51); line-height: 130%;"><%= number_to_currency(plan.premium_for(member)) %></span></span></span></td>
                                       </tr>
-
-                                      <tr>
-                                        <td style="text-decoration: none; padding: 2px 6px; line-height: 130%; color: rgb(51, 51, 51); border-color: #aaa;">
-                                          <span style="font-family: arial, helvetica, sans-serif; line-height: 130%;">
-                                            <span style="font-size: 16px; line-height: 130%;">
-                                              <span style="color: rgb(51, 51, 51); line-height: 130%;">
-                                                Bart
-                                                Simpson</span></span></span></td>
-
-                                        <td style="text-align: right; text-decoration: none; padding: 2px 6px; line-height: 130%; color: rgb(51, 51, 51); border-color: #aaa;">
-                                          <span style="font-family: arial, helvetica, sans-serif; line-height: 130%;">
-                                            <span style="font-size: 16px; line-height: 130%;">
-                                              <span style="color: rgb(51, 51, 51); line-height: 130%;">
-                                                12</span></span></span></td>
-                                      </tr>
-
-                                      <tr>
-                                        <td style="text-decoration: none; padding: 2px 6px; line-height: 130%; color: rgb(51, 51, 51); border-color: #aaa;">
-                                          <span style="font-family: arial, helvetica, sans-serif; line-height: 130%;">
-                                            <span style="font-size: 16px; line-height: 130%;">
-                                              <span style="color: rgb(51, 51, 51); line-height: 130%;">
-                                                Lisa
-                                                Simpson</span></span></span></td>
-
-                                        <td style="text-align: right; text-decoration: none; padding: 2px 6px; line-height: 130%; color: rgb(51, 51, 51); border-color: #aaa;">
-                                          <span style="font-family: arial, helvetica, sans-serif; line-height: 130%;">
-                                            <span style="font-size: 16px; line-height: 130%;">
-                                              <span style="color: rgb(51, 51, 51); line-height: 130%;">
-                                                10</span></span></span></td>
-                                      </tr>
+                                      <% end %>
                                     </tbody>
                                         </table><span style="font-family: arial, helvetica, sans-serif; line-height: 130%;"><span style="font-size: 16px; line-height: 130%;"><span style="color: rgb(51, 51, 51); line-height: 130%;"><br />
 
@@ -248,20 +217,19 @@
                                         from your pay,
                                         is:
                                         <span style="font-size: 18px; line-height: 130%;">
-                                          <strong>$123.99</strong></span><br />
+						<strong><%=number_to_currency(plan.total_employee_cost) %></strong></span><br />
 
                                         <br />
                                         Additionally
                                         your employer
                                         pays
                                         <strong><span style="font-size: 18px; line-height: 130%;">
-                                            $199.02</span></strong>
-                                        USD<br />
+							<%= number_to_currency(plan.total_employer_contribution) %></span></strong><br />
                                         <br />
                                         Your coverage
                                         start date is:
                                         <strong><span style="font-size: 18px; line-height: 130%;">
-                                            01/01/2016</span></strong><br />
+							<%= enrollment.effective_on.strftime("%m/%d/%Y") %></span></strong><br />
                                     </span></span><br />
 
                                     <span style=

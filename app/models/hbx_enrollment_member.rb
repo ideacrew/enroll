@@ -30,6 +30,9 @@ class HbxEnrollmentMember
     end
   end
 
+  def person
+    family_member.person
+  end
 
   def age_on_effective_date
     person = Caches::CustomCache.lookup(Person, "person_age", family_member.person_id) { family_member.person }
