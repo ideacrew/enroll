@@ -5,7 +5,7 @@ class Person
 
   GENDER_KINDS = %W(male female)
 
- auto_increment :hbx_id, :seed => 9999
+  auto_increment :hbx_id, :seed => 9999
 
   field :hbx_id, type: Integer
   field :name_pfx, type: String
@@ -108,16 +108,6 @@ class Person
   scope :active,   ->{ where(is_active: true) }
   scope :inactive, ->{ where(is_active: false) }
 
-  # Find all employee_roles.  Since person has_many employee_roles, person may show up
-  # employee_role.person may not be unique in returned set
-  def self.employee_roles
-    people = exists(:'employee_roles.0' => true).entries
-    emp = people.reduce([]) do |list, person|
-      list << person.employee_roles.each { |ee| ee }
-    end
-    emp.flatten
-  end
-
   # Strip non-numeric chars from ssn
   # SSN validation rules, see: http://www.ssa.gov/employer/randomizationfaqs.html#a0=12
   def ssn=(new_ssn)
@@ -154,7 +144,26 @@ class Person
     Family.find_all_by_person(self)
   end
 
+  def age_on(date)
+    age = date.year - dob.year
+    if date.month < dob.month or (date.month == dob.month and date.day < dob.day)
+      age - 1
+    else
+      age
+    end
+  end
+
  class << self
+
+   # Find all employee_roles.  Since person has_many employee_roles, person may show up
+   # employee_role.person may not be unique in returned set
+   def employee_roles
+     people = exists(:'employee_roles.0' => true).entries
+     emp = people.reduce([]) do |list, person|
+       list << person.employee_roles.each { |ee| ee }
+     end
+     emp.flatten
+   end
 
   # Return an instance list of active People who match identifying information criteria
   def match_by_id_info(options)
