@@ -23,16 +23,6 @@
 
 $('input.floatlabel').floatlabel();
 
-function hidePlanTabs() {
-  $(".all-filters-row").hide();
-  $("ul[role='tablist'] li[role='presentation']").each(function(idx, ele) {
-    $(ele).removeClass("active");
-  });
-  $(".tab-pane").each(function(idx, ele) {
-    $(ele).removeClass("active");
-    $(ele).hide();
-  });
-}
 
 $(document).ready(function () {
   $("#new_person #address_info").addClass('hidden');
@@ -623,10 +613,6 @@ $(document).ready(function () {
     $(".selected-plans-row").hide();
   });
 
-  $(".tab-pane").each(function(ele) {
-    $(ele).hide();
-  });
-  
   // Input Masks
   $(".phone_number").mask("(999) 999-9999");
   $(".zip").mask("99999");
@@ -638,11 +624,4 @@ $(document).ready(function () {
 
   });
 
-  $("a[role='tab'][data-toggle='tab']").click(function() {
-    hidePlanTabs();
-    $(this).parent().addClass("active");
-    var eleId = $(this).attr("href");
-    $(eleId).addClass("active");
-    $(eleId).show();
-  });
 });

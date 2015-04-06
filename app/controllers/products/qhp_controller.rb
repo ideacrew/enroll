@@ -1,7 +1,9 @@
 class Products::QhpController < ApplicationController
 
   def comparison
-    @qhps = Products::Qhp.where(:standard_component_id.in => params[:standard_component_ids]).to_a
+    params.permit("standard_component_ids")
+    found_params = params["standard_component_ids"].map { |str| str[0..13] }
+    @qhps = Products::Qhp.where(:standard_component_id.in => found_params)
     respond_to do |format|
       format.html
       format.js
