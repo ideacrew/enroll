@@ -55,8 +55,8 @@ puts "*"*80
 # rake xml:plans['tmp/AE_DC_SG_77422_Benefits_ON_v1.xml']
 # rake xml:plans['tmp/HIX_DC_Individual_78079_GHMSI_v1.xml']
 # rake xml:plans['tmp/HIX_DC_Individual_86052_CFBC_v1.xml']
-system("rake xml:plans['XML/CareFirst/HIX_DC_Small Group_78079_GHMSI_v1.xml']")
-system("rake xml:plans['XML/CareFirst/HIX_DC_Small Group_86052_CFBC_v1.xml']")
+system("rake xml:plans['db/seedfiles/plan_xmls/CareFirst/HIX_DC_Small Group_78079_GHMSI_v1.xml']")
+system("rake xml:plans['db/seedfiles/plan_xmls/CareFirst/HIX_DC_Small Group_86052_CFBC_v1.xml']")
 # rake xml:plans['tmp/KP DC Individual Plan and Benefits Template_9-18-2014.xml']
 # rake xml:plans['tmp/KP DC SHOP Plan and Benefit Template_09182014.xml']
 # rake xml:plans['tmp/dc_21066_uhcma_shop_pbt_10232014_final_marketingnameupdates.xml']
