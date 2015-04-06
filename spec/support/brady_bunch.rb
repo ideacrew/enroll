@@ -69,6 +69,8 @@ module BradyBunch
       family.save
       family
     end
+    let(:mikes_coverage_household) {mikes_family.households.first.coverage_households.first}
+    let(:carols_coverage_household) {carols_family.households.first.coverage_households.first}
   end
 
   shared_context "BradyWork" do
