@@ -304,53 +304,53 @@ $(document).ready(function () {
   
   // ----- Focus Effect & Progress -----
   $("body").click(function(e) {
-  	fade_all();
-  	update_progress();
-  	if (e.target.id == "personal_info" || $(e.target).parents("#personal_info").size()) { 
-  		$('#personal_info div.first').addClass('employee-info');
-  		$("a.personal_info").css("color","#98cbff");
-  		$("#personal_info div.first").css("opacity","1");
-  		// $("a.three").css("color","#00b420");
-  		// $("#top-pad15").show();
-  	} 
-  	else if (e.target.id == "address_info" || $(e.target).parents("#address_info").size()) {
-  		$('#address_info div.first').addClass('employee-info');
-  		$("a.address_info").css("color","#98cbff");
-  		// $("a.three").css("color","#00b420");
-  		$("#address_info div.first").css("opacity","1");
-  		$("#top-pad").innerHTML="30%";
-  		// $("#top-pad30").show();
-  	}
-  	else if (e.target.id == "phone_info" || $(e.target).parents("#phone_info").size()) {
-  		$('#phone_info div.first').addClass('employee-info');
-  		$("a.phone_info").css("color","#98cbff");
-  		// $("a.four").css("color","#00b420");
-  		$("#phone_info div.first").css("opacity","1");
-  		// $("#top-pad80").show();
-  	}
-  	else if (e.target.id == "email_info" || $(e.target).parents("#email_info").size()) {
-  		$('#email_info div.first').addClass('employee-info');
-  		$("a.email_info").css("color","#98cbff");
-  		// $("a.five").css("color","#00b420");
-  		$("#email_info div.first").css("opacity","1");
-  		// $("#top-pad85").show();
-  	}
-  	else if (e.target.id == "household_info" || $(e.target).parents("#household_info").size()) {
-  		$('#household_info div.first').addClass('employee-info');
-  		$("a.household_info").css("color","#98cbff");
-  		$("#household_info div.first").css("opacity","1");
-  	}
-  	else {
-  		// $("#top-pad15").show();
-  	}
+    fade_all();
+    update_progress();
+    if (e.target.id == "personal_info" || $(e.target).parents("#personal_info").size()) { 
+      $('#personal_info div.first').addClass('employee-info');
+      $("a.personal_info").css("color","#98cbff");
+      $("#personal_info div.first").css("opacity","1");
+      // $("a.three").css("color","#00b420");
+      // $("#top-pad15").show();
+    } 
+    else if (e.target.id == "address_info" || $(e.target).parents("#address_info").size()) {
+      $('#address_info div.first').addClass('employee-info');
+      $("a.address_info").css("color","#98cbff");
+      // $("a.three").css("color","#00b420");
+      $("#address_info div.first").css("opacity","1");
+      $("#top-pad").innerHTML="30%";
+      // $("#top-pad30").show();
+    }
+    else if (e.target.id == "phone_info" || $(e.target).parents("#phone_info").size()) {
+      $('#phone_info div.first').addClass('employee-info');
+      $("a.phone_info").css("color","#98cbff");
+      // $("a.four").css("color","#00b420");
+      $("#phone_info div.first").css("opacity","1");
+      // $("#top-pad80").show();
+    }
+    else if (e.target.id == "email_info" || $(e.target).parents("#email_info").size()) {
+      $('#email_info div.first').addClass('employee-info');
+      $("a.email_info").css("color","#98cbff");
+      // $("a.five").css("color","#00b420");
+      $("#email_info div.first").css("opacity","1");
+      // $("#top-pad85").show();
+    }
+    else if (e.target.id == "household_info" || $(e.target).parents("#household_info").size()) {
+      $('#household_info div.first').addClass('employee-info');
+      $("a.household_info").css("color","#98cbff");
+      $("#household_info div.first").css("opacity","1");
+    }
+    else {
+      // $("#top-pad15").show();
+    }
   });
   
   function fade_all() {
-  	$("#personal_info div.first").css("opacity","0.5");
-  	$("#address_info div.first").css("opacity","0.5");
-  	$("#phone_info div.first").css("opacity","0.5");
-  	$("#email_info div.first").css("opacity","0.5");
-  	$("#household_info div.first").css("opacity","0.5");
+    $("#personal_info div.first").css("opacity","0.5");
+    $("#address_info div.first").css("opacity","0.5");
+    $("#phone_info div.first").css("opacity","0.5");
+    $("#email_info div.first").css("opacity","0.5");
+    $("#household_info div.first").css("opacity","0.5");
   }
   
   update_progress(); //Run on page load for dependent_details page.
@@ -363,32 +363,32 @@ $(document).ready(function () {
       var address_entry  = check_address_entry_progress();
       var phone_entry    = check_phone_entry_progress();
       var email_entry    = check_email_entry_progress();
+      
     }
 
     if(personal_entry) {
-      start_progress += 20;
-      $("a.one").css("color","#00b420");
-      $("a.two").css("color","#00b420");
+      start_progress = 20;
+      $("a.one, a.two").css("color","#00b420");
     }
 
     if(address_entry) {
-      start_progress += 8;
-      $("a.three").css("color","#00b420");
+      start_progress = 28;
+      $("a.one, a.two, a.three").css("color","#00b420");
     }
 
     if(phone_entry) {
-      start_progress += 10;
-      $("a.four").css("color","#00b420");
+      start_progress = 38;
+      $("a.one, a.two, a.three, a.four").css("color","#00b420");
     }
 
     if(email_entry) {
-      start_progress += 12;
-      $("a.five").css("color","#00b420");
+      start_progress = 50;
+      $("a.one, a.two, a.three, a.four, a.five").css("color","#00b420");
     }
 
     if($('#add_info_clone0').length) {
-      start_progress += 15;
-      $("a.six").css("color","#00b420");
+      start_progress = 65;
+      $("a.one, a.two, a.three, a.four, a.five, a.six").css("color","#00b420");
     } else {$("a.six").css("color","#999");}
 
     $('#top-pad').html(start_progress + '% Complete');
