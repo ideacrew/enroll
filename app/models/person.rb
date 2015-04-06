@@ -108,6 +108,16 @@ class Person
   scope :active,   ->{ where(is_active: true) }
   scope :inactive, ->{ where(is_active: false) }
 
+  # Find all employee_roles.  Since person has_many employee_roles, person may show up
+  # employee_role.person may not be unique in returned set
+  def self.employee_roles
+    people = exists(:'employee_roles.0' => true).entries
+    emp = people.reduce([]) do |list, person|
+      list << person.employee_roles.each { |ee| ee }
+    end
+    emp.flatten
+  end
+
   # Strip non-numeric chars from ssn
   # SSN validation rules, see: http://www.ssa.gov/employer/randomizationfaqs.html#a0=12
   def ssn=(new_ssn)
@@ -144,8 +154,10 @@ class Person
     Family.find_all_by_person(self)
   end
 
+ class << self
+
   # Return an instance list of active People who match identifying information criteria
-  def self.match_by_id_info(options)
+  def match_by_id_info(options)
     ssn = options[:ssn]
     dob = options[:dob]
     last_name = options[:last_name]
@@ -157,6 +169,8 @@ class Person
     matches.concat Person.where(last_name: last_name).active.and(dob: dob).to_a unless (dob.blank? || last_name.blank?)
     matches.uniq
   end
+
+end
 
   def dob_to_string
     @dob.blank? ? "" : @dob.strftime("%Y%m%d")

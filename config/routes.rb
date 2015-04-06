@@ -48,13 +48,13 @@ Rails.application.routes.draw do
   resources :people do #TODO Delete
     get 'select_employer'
     get 'my_account'
+    get 'person_landing'
+
     collection do
       get 'plans_converson'
       post 'match_person'
       get 'get_employer'
       post 'person_confirm'
-      post 'person_landing'
-      get 'person_landing'
       post 'plan_details'
       post 'dependent_details'
       post 'add_dependents'
