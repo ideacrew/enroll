@@ -301,7 +301,7 @@ private
       premium_matrix = {
         "hbx_enrollment_member_id"=> member.id,
         "relationship"=> hbx_enrollment.family.primary_applicant.person.find_relationship_with(member.person),
-        "age_on_effective_date"=>50,
+        "age_on_effective_date"=> member.person.age_on(hbx_enrollment.effective_on),
         "employer_max_contribution"=>370.43,
         "select_plan_id"=>"plan_b",
         "plan_premium_total"=>550.0,
