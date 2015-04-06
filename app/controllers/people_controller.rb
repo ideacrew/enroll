@@ -54,6 +54,49 @@ class PeopleController < ApplicationController
     end
   end
 
+  def register_employee_dependents
+    @family = Family.find(params[:id])
+    @employee_role = EmployeeRole.find(params[:id])
+
+    @family.updated_by = current_user.email unless current_user.nil?
+    @employee_role.updated_by = current_user.email unless current_user.nil?
+
+    # May need person init code here
+    if (@family.update_attributes(@family) && @employee_role.update_attributes(@employee_role))
+      @person = @employee_role.person
+
+      if params[:commit].downcase.include?('continue')
+        @organization = @employee_role.employer_profile.organization
+        @employee_role = EmployeeRole.find(params[:employee_role])
+
+        redirect_to select_plan_people_path
+      end
+
+      if params[:commit].downcase.include?('exit')
+        # Logout of session
+      else
+        redirect_to select_plan_people(@person)
+      end
+    else
+      render new, :error => "Please complete all required fields"
+    end
+
+    @family.family_members
+    @person.updated_by = current_user.email unless current_user.nil?
+
+    respond_to do |format|
+      if @person.update_attributes(person_params)
+        format.html { redirect_to @person, notice: 'Person was successfully updated.' }
+        format.json { head :no_content }
+      else
+        build_nested_models
+        format.html { render action: "show" }
+        format.json { render json: @person.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+
   # Uses identifying information to return one or more for matches in employer census
   def match_employer
   end
@@ -85,9 +128,6 @@ class PeopleController < ApplicationController
       format.js {}
     end
   end
-
-
-
 
   def plan_details
     #add_employee_role
