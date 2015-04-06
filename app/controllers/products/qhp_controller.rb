@@ -1,8 +1,11 @@
 class Products::QhpController < ApplicationController
 
   def comparison
-    random_ids = Products::Qhp.pluck(:id).shuffle[0..2]
-    @qhps = Products::Qhp.where(:_id.in => random_ids).to_a
+    @qhps = Products::Qhp.where(:standard_component_id.in => params[:standard_component_ids]).to_a
+    respond_to do |format|
+      format.html
+      format.js
+    end
   end
 
   def summary
