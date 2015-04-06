@@ -86,6 +86,9 @@ class PeopleController < ApplicationController
     end
   end
 
+
+
+
   def plan_details
     #add_employee_role
   end
@@ -202,7 +205,7 @@ class PeopleController < ApplicationController
   def update
     @person = Person.find(params[:id])
     @person.updated_by = current_user.email unless current_user.nil?
-    santize_person_params
+    sanitize_person_params
     respond_to do |format|
       if @person.update_attributes(person_params)
         format.html { redirect_to @person, notice: 'Person was successfully updated.' }
@@ -216,7 +219,7 @@ class PeopleController < ApplicationController
   end
 
   def create
-    santize_person_params
+    sanitize_person_params
     @person = Person.find_or_initialize_by(ssn: params[:person][:ssn])
 
     # person_params
@@ -303,7 +306,7 @@ private
     end
   end
 
-  def santize_person_params
+  def sanitize_person_params
     person_params["addresses_attributes"].each do |key, address|
       if address["city"].blank? && address["zip"].blank? && address["address_1"].blank?
         person_params["addresses_attributes"].delete("#{key}")
@@ -317,7 +320,7 @@ private
     end
 
     person_params["emails_attributes"].each do |key, phone|
-      if phone["address"].blank?
+      if email["address"].blank?
         person_params["emails_attributes"].delete("#{key}")
       end
     end
