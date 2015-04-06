@@ -62,7 +62,7 @@
 					</div>
 				</div>
 				<div class="col-md-2 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
-					<%= submit_tag "Save & Exit", class: 'btn btn-save' %>
+					<%= link_to "Save & Exit", person_person_landing_path(@person), { :class => "btn btn-save" } %>
 					<%= render 'shared/signup_progress' %>
 					<a href="#" class="btn btn-default" style="display: none;" data-uri="<%= comparison_products_plans_path %>" id="compare-selected-plans-link">Compare Selected Plans</a>
 				</div>
