@@ -80,20 +80,6 @@ class PeopleController < ApplicationController
     else
       render new, :error => "Please complete all required fields"
     end
-
-    @family.family_members
-    @person.updated_by = current_user.email unless current_user.nil?
-
-    respond_to do |format|
-      if @person.update_attributes(person_params)
-        format.html { redirect_to @person, notice: 'Person was successfully updated.' }
-        format.json { head :no_content }
-      else
-        build_nested_models
-        format.html { render action: "show" }
-        format.json { render json: @person.errors, status: :unprocessable_entity }
-      end
-    end
   end
 
 
@@ -311,6 +297,11 @@ class PeopleController < ApplicationController
     @plans = @benefit_group.elected_plans.entries.collect() do |plan|
       PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
     end
+  end
+
+  def enroll_family
+    @hbx_enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
+
   end
 
 
