@@ -17,24 +17,39 @@
 							<section>
 							<div role="tabpanel">
 
+
+								<ul class="nav nav-tabs" role="tablist">
+									<li role="presentation" class="active"><a href="#all-plans" aria-controls="all-plans" role="tab" data-toggle="tab">All Plans</a></li>
+									<li role="presentation"><a href="#hmo-plans" aria-controls="hmo-plans" role="tab" data-toggle="tab">HMO Plans</a></li>
+									<li role="presentation"><a href="#ppo-plans" aria-controls="ppo-plans" role="tab" data-toggle="tab">PPO Plans</a></li>
+									<li role="presentation"><a href="#pos-plans" aria-controls="pos-plans" role="tab" data-toggle="tab">POS Plans</a></li>
+									<li class="pull-right all-filter" role="presentation"><a href="#" role="tab" data-toggle="tab">All Filters</a></li>
+								</ul>
+
 								<%= render "plan_shopping/plan_filters" %>
-
-								<!-- Selected Plans section start -->
-								<div class="selected-plans-row row">
-									<p class="text-right">
-									<a class="close" href="#"><%= image_tag "dropdown-option-close.png" %></a>
-									</p>
-									<h3>Blue Cross / Blue Shield Preferred 500, A Multi State Plan for Complete Coverage</h3>
-									<h3>Kaiser Preferred Family Plan</h3>
-									<button class="btn default-btn outline-btn">Compare</button>
-								</div><!-- Selected Plans section end -->
-
-
 
 								<!-- Tab panes -->
 								<div class="tab-content">
 									<div role="tabpanel" class="tab-pane active" id="all-plans">
 										<% @plans.each do |plan| %>
+											<%= render "plan_shopping/plan_details", :plan => plan %>
+										<% end %>
+									</div>
+
+									<div role="tabpanel" class="tab-pane active" id="hmo-plans">
+										<% @plans.select { |pl| pl.plan_type && (pl.plan_type.downcase == "hmo") }.each do |plan| %>
+											<%= render "plan_shopping/plan_details", :plan => plan %>
+										<% end %>
+									</div>
+
+									<div role="tabpanel" class="tab-pane active" id="ppo-plans">
+										<% @plans.select { |pl| pl.plan_type && (pl.plan_type.downcase == "ppo") }.each do |plan| %>
+											<%= render "plan_shopping/plan_details", :plan => plan %>
+										<% end %>
+									</div>
+
+									<div role="tabpanel" class="tab-pane active" id="pos-plans">
+										<% @plans.select { |pl| pl.plan_type && (pl.plan_type.downcase == "pos") }.each do |plan| %>
 											<%= render "plan_shopping/plan_details", :plan => plan %>
 										<% end %>
 									</div>
