@@ -74,7 +74,7 @@ class HbxEnrollment
   end
 
   def employer_profile
-    Employer.find(self.employer_profile_id) unless self.employer_profile_id.blank?
+    EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
   end
 
   def broker_agency_profile=(new_broker_agency)

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Family do
+describe Family, type: :model do
 
   let(:p0) { Person.create!(first_name: "Dan", last_name: "Aurbach") }
   let(:p1) { Person.create!(first_name: "Patrick", last_name: "Carney") }
@@ -154,6 +154,12 @@ describe Family do
   describe "large family with multiple employees - The Brady Bunch" do
     include_context "BradyBunch"
 
+    let(:family_member_id) {mikes_family.primary_applicant.id}
+
+    it "should be possible to find the family_member from a family_member_id" do
+      expect(Family.find_family_member(family_member_id).id.to_s).to eq family_member_id.to_s
+    end
+
     context "Family.find_by_primary_applicant" do
       context "on Mike" do
         let(:find) {Family.find_by_primary_applicant(mike)}
@@ -250,16 +256,6 @@ describe "update_household callback" do
           expect(new_family.active_household.coverage_households.length).to eq(2)
         end
       end
-
-
-      it "should create a hbx_enrollment" do
-        plan = FactoryGirl.create(:plan)
-        enrollee = Enrollee.new({person: primary_person, coverage_start_on: Date.today})
-        policy = FactoryGirl.create(:policy, plan: plan, enrollees: [enrollee])
-
-        expect(new_family.save).to be_truthy
-        expect(new_family.active_household.hbx_enrollments.length).to eq(1)
-      end
     end
 
 
@@ -289,8 +285,8 @@ describe "update_household callback" do
 
           #adding a policy, hence a hbx_enrollment
           plan = FactoryGirl.create(:plan)
-          enrollee = Enrollee.new({person: primary_person, coverage_start_on: Date.today})
-          policy = FactoryGirl.create(:policy, plan: plan, enrollees: [enrollee])
+          # enrollee = Enrollee.new({person: primary_person, coverage_start_on: Date.today})
+          # policy = FactoryGirl.create(:policy, plan: plan, enrollees: [enrollee])
 
           new_family.family_members.each(&:delete) #delete all family members
 

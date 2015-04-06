@@ -70,4 +70,7 @@ class FamilyMember
     self.is_active
   end
 
+  def self.find(family_member_id)
+    Family.find_family_member(family_member_id)
+  end
 end

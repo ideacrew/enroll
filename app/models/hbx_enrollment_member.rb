@@ -15,15 +15,19 @@ class HbxEnrollmentMember
   field :coverage_start_on, type: Date
   field :coverage_end_on, type: Date
 
-  validates_presence_of :applicant_id, :is_subscriber, :eligibility_date, :premium_amount,
+  validates_presence_of :applicant_id, :is_subscriber, :eligibility_date,# :premium_amount,
     :coverage_start_on
 
   validate :end_date_gt_start_date
 
   def family
-    return nil unless hbx_enrollment
-    hbx_enrollment.family
+    hbx_enrollment.family if hbx_enrollment.present?
   end
+
+  def family_member
+    FamilyMember.find(applicant_id)
+  end
+
 
   def age_on_effective_date(dob)
     return unless @coverage_start_on.present?
@@ -41,6 +45,13 @@ class HbxEnrollmentMember
 
   def is_subscriber?
     self.is_subscriber
+  end
+
+  def self.new_from(coverage_household_member:)
+    new(
+      applicant_id: coverage_household_member.applicant_id,
+      is_subscriber: coverage_household_member.is_subscriber
+    )
   end
 
 private

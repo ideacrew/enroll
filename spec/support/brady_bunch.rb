@@ -1,5 +1,9 @@
 module BradyBunch
   shared_context "BradyBunch" do
+    def dob(num_years)
+      Date.today - num_years.years
+    end
+
     let(:brady_addr) do
       FactoryGirl.build(:address,
         kind: "home",
@@ -13,14 +17,22 @@ module BradyBunch
     end
     let(:brady_ph) {FactoryGirl.build(:phone, kind: "home", area_code: "202", number: "7620799", extension: nil)}
     let(:last_name) {"Brady"}
-    let(:mike)   {FactoryGirl.create(:male,   first_name: "Mike",   last_name: last_name, dob: 40.years.ago, addresses: [brady_addr.dup], phones: [brady_ph.dup])}
-    let(:carol)  {FactoryGirl.create(:female, first_name: "Carol",  last_name: last_name, dob: 35.years.ago, addresses: [brady_addr.dup], phones: [brady_ph.dup])}
-    let(:greg)   {FactoryGirl.create(:male,   first_name: "Greg",   last_name: last_name, dob: 17.years.ago, addresses: [brady_addr.dup], phones: [brady_ph.dup])}
-    let(:marcia) {FactoryGirl.create(:female, first_name: "Marcia", last_name: last_name, dob: 16.years.ago, addresses: [brady_addr.dup], phones: [brady_ph.dup])}
-    let(:peter)  {FactoryGirl.create(:male,   first_name: "Peter",  last_name: last_name, dob: 14.years.ago, addresses: [brady_addr.dup], phones: [brady_ph.dup])}
-    let(:jan)    {FactoryGirl.create(:female, first_name: "Jan",    last_name: last_name, dob: 12.years.ago, addresses: [brady_addr.dup], phones: [brady_ph.dup])}
-    let(:bobby)  {FactoryGirl.create(:male,   first_name: "Bobby",  last_name: last_name, dob: 8.years.ago,  addresses: [brady_addr.dup], phones: [brady_ph.dup])}
-    let(:cindy)  {FactoryGirl.create(:female, first_name: "Cindy",  last_name: last_name, dob: 6.years.ago,  addresses: [brady_addr.dup], phones: [brady_ph.dup])}
+    let(:mikes_age)   {40}
+    let(:carols_age)  {35}
+    let(:gregs_age)   {17}
+    let(:marcias_age) {16}
+    let(:peters_age)  {14}
+    let(:jans_age)    {12}
+    let(:bobbys_age)  {8}
+    let(:cindys_age)  {6}
+    let(:mike)   {FactoryGirl.create(:male,   first_name: "Mike",   last_name: last_name, dob: dob(mikes_age),   addresses: [brady_addr.dup], phones: [brady_ph.dup])}
+    let(:carol)  {FactoryGirl.create(:female, first_name: "Carol",  last_name: last_name, dob: dob(carols_age),  addresses: [brady_addr.dup], phones: [brady_ph.dup])}
+    let(:greg)   {FactoryGirl.create(:male,   first_name: "Greg",   last_name: last_name, dob: dob(gregs_age),   addresses: [brady_addr.dup], phones: [brady_ph.dup])}
+    let(:marcia) {FactoryGirl.create(:female, first_name: "Marcia", last_name: last_name, dob: dob(marcias_age), addresses: [brady_addr.dup], phones: [brady_ph.dup])}
+    let(:peter)  {FactoryGirl.create(:male,   first_name: "Peter",  last_name: last_name, dob: dob(peters_age),  addresses: [brady_addr.dup], phones: [brady_ph.dup])}
+    let(:jan)    {FactoryGirl.create(:female, first_name: "Jan",    last_name: last_name, dob: dob(jans_age),    addresses: [brady_addr.dup], phones: [brady_ph.dup])}
+    let(:bobby)  {FactoryGirl.create(:male,   first_name: "Bobby",  last_name: last_name, dob: dob(bobbys_age),  addresses: [brady_addr.dup], phones: [brady_ph.dup])}
+    let(:cindy)  {FactoryGirl.create(:female, first_name: "Cindy",  last_name: last_name, dob: dob(cindys_age),  addresses: [brady_addr.dup], phones: [brady_ph.dup])}
     let(:brady_daughters) {[marcia, jan, cindy]}
     let(:brady_sons) {[greg, peter, bobby]}
     let(:brady_children) {brady_sons + brady_daughters}
@@ -57,6 +69,8 @@ module BradyBunch
       family.save
       family
     end
+    let(:mikes_coverage_household) {mikes_family.households.first.coverage_households.first}
+    let(:carols_coverage_household) {carols_family.households.first.coverage_households.first}
   end
 
   shared_context "BradyWork" do

@@ -53,6 +53,8 @@ class Family
   index({"hbx_enrollment.broker_agency_id" => 1}, {sparse: true})
 
   # child model indexes
+
+  index({"family_member._id" => 1}, { unique: true, sparse: true })
   index({"family_member.person_id" => 1})
   index({"family_member.broker_role_id" => 1})
   index({"family_member.is_primary_applicant" => 1})
@@ -195,6 +197,11 @@ class Family
 
   def self.find_all_by_person(person)
     Family.where("family_members.person_id" => person.id)
+  end
+
+  def self.find_family_member(family_member_id)
+    family = Family.where("family_members._id" => family_member_id).first
+    family.family_members.detect { |member| member._id == family_member_id }
   end
 
   def people_relationship_map

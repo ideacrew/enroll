@@ -265,7 +265,8 @@ class PeopleController < ApplicationController
     @organization = find_organization(params[:organization_id])
     @benefit_group = find_benefit_group(@person, @organization)
     @plans = @benefit_group.elected_plans
-    @premium_matrix = ShopPremiumMatrix.new({}) # placeholder, not properly intialized
+    # @hbx_enrollment = new_hbx_enrollment(@person, @organization, @benefit_group)
+    # @premium_matrix = get_shop_premium_matrix(hbx_enrollment, @benefit_group)
   end
 
 
@@ -290,6 +291,39 @@ private
     organization.employer_profile.latest_plan_year.benefit_groups.first
     # person.employee_roles.first.benefit_group
   end
+
+  def new_hbx_enrollment(person, organization, benefit_group)
+    HbxEnrollment.new_from(employer_profile: organization.employer_profile,
+                           coverage_household: person.family.households.first.coverage_households.first,
+                           benefit_group: benefit_group)
+  end
+
+  # def get_shop_premium_matrix(hbx_enrollment, benefit_group)
+  #   m = ShopPremiumMatrix.new(members, plans)
+  #   m.lookup(member, plan) => {total_cost_for_member: $, employer_cost_for_member: $, employee_cost_for_member: $}
+  #   m.lookup([plan]) => {total_cost_for_all_members: $, employer_cost_for_all_members: $, employee_cost_for_all_members: $}
+  #   m.lookup(plans) => {
+  #     plan1_id => {total_cost_for_all_members: $, employer_cost_for_all_members: $, employee_cost_for_all_members: $},
+  #     plan2_id => {total_cost_for_all_members: $, employer_cost_for_all_members: $, employee_cost_for_all_members: $},
+  #     plan3_id => {total_cost_for_all_members: $, employer_cost_for_all_members: $, employee_cost_for_all_members: $},
+  #   }
+  #
+  #   # TODO: finish
+  #   hbx_enrollment.hbx_enrollment_members.flatmap([]) do |matrices, member|
+  #     matrices + benefit_group.elected_plans.collect do |plan|
+  #       premium_matrix = {
+  #         "hbx_enrollment_member_id" => member.id,
+  #         "relationship" => hbx_enrollment.family.primary_applicant.person.find_relationship_with(member.person),
+  #         "age_on_effective_date" => member.person.age_on(hbx_enrollment.effective_on),
+  #         "employer_max_contribution" => member.max_employer_contribution,
+  #         "select_plan_id" => plan.id.to_s,
+  #         "plan_premium_total" => 550.0,
+  #         "employee_responsible_amount" => 179.57
+  #       }
+  #       ShopPremiumMatrix.new({})
+  #     end
+  #   end
+  # end
 
   def build_nested_models
 
