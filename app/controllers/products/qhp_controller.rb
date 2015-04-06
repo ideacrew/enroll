@@ -6,7 +6,7 @@ class Products::QhpController < ApplicationController
   end
 
   def summary
-    random_ids = Products::Qhp.pluck(:id).shuffle[1]
-    @qhp = Products::Qhp.where(:_id => random_ids).to_a.first
+    sc_id = params[:standard_component_id][0..13]
+    @qhp = Products::Qhp.where(standard_component_id: sc_id).to_a.first
   end
 end
