@@ -33,7 +33,7 @@
         </div>
       </div>
                         
-     <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+     <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd delete_address">
     <%= link_to image_tag('delete.png'), 'javascript:void(0)', class: 'close-2' %>
     </div>
   </div>
@@ -79,17 +79,17 @@
     <% end%>
       <%= render 'shared/error_warning' %>
       <div class="new-address-flow">
-	      <div class="col-md-4 col-sm-4 col-xs-12"></div>
-	      <div class="col-md-4 col-sm-4 col-xs-12 text-center">
-	        <h5>Name Your New Address.</h5>
+        <div class="col-md-4 col-sm-4 col-xs-12"></div>
+        <div class="col-md-4 col-sm-4 col-xs-12 text-center">
+          <h5>Name Your New Address.</h5>
           <input id="add-address" type="text" class="form-control address_name" placeholder="i.e. Work, Mailing" onfocus="this.placeholder = ''" onblur="this.placeholder = 'i.e. Work, Mailing'">
-	        <p>
-	          <a href="javascript:void(0);" class="cancel">cancel</a>
-	          <a href="javascript:void(0);" class="confirm">confirm</a>
-	        </p>
-	      </div>
-    	</div>
-  	</div>
+          <p>
+            <a href="javascript:void(0);" class="cancel">cancel</a>
+            <a href="javascript:void(0);" class="confirm">confirm</a>
+          </p>
+        </div>
+      </div>
+    </div>
 
-	<div class="col-md-2 key col-sm-3 col-xs-12"></div>
+  <div class="col-md-2 key col-sm-3 col-xs-12"></div>
 </div>
