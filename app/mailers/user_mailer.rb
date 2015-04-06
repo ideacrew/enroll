@@ -6,9 +6,9 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def plan_shopping_completed(user, hbx_enrollment)
+  def plan_shopping_completed(user, hbx_enrollment, plan_decorator)
     mail({to: user.email, subject: "DCHealthLink Confirmation"}) do |format|
-      format.html { render "plan_shopping_completed", :user => user, :enrollment => hbx_enrollment }
+      format.html { render "plan_shopping_completed", :user => user, :enrollment => hbx_enrollment, :plan => plan_decorator }
     end
   end
 end 

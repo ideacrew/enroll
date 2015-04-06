@@ -44,7 +44,9 @@
 			<%= link_to "Details", summary_products_plans_path({:standard_component_id => plan.hios_id}), {:class => "btn btn-default details-btn", :remote => true} %>
 		</div>
 		<div class="col-md-2 col-sm-4 col-xs-12">
-			<button class="btn btn-primary select-btn">Select</button>
+			<%= link_to("Select", 
+															checkout_plan_shopping_path({:id => @person.id, :plan_id => plan.id, :organization_id => params[:organization_id]}),
+															{:class => "btn btn-primary select-btn", :method => :post}) %>
 		</div>
 	</div>
 </div><!-- Plan details row end -->
