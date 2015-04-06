@@ -25,19 +25,23 @@ class HbxEnrollmentMember
   end
 
   def family_member
-    FamilyMember.find(applicant_id)
+    self.hbx_enrollment.household.family.family_members.detect do |fm|
+      fm.id == applicant_id
+    end
   end
 
 
-  def age_on_effective_date(dob)
-    return unless @coverage_start_on.present?
-    age = @coverage_start_on.year - dob.year
+  def age_on_effective_date
+    person = Caches::CustomCache.lookup(Person, "person_age", family_member.person_id) { family_member.person }
+    dob = person.dob
+    return unless coverage_start_on.present?
+    age = coverage_start_on.year - dob.year
 
     # Shave off one year if coverage starts before birthday
-    if @coverage_start_on.month == dob.month
-      age -= 1 if @coverage_start_on.day < dob.day
+    if coverage_start_on.month == dob.month
+      age -= 1 if coverage_start_on.day < dob.day
     else
-      age -= 1 if @coverage_start_on.month < dob.month
+      age -= 1 if coverage_start_on.month < dob.month
     end
 
     age

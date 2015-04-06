@@ -72,6 +72,7 @@ class BenefitGroup
   end
 
   def elected_plans
+    @elected_plans ||=
     Plan.where(:id => {"$in" => elected_plan_ids})
   end
 
@@ -87,6 +88,10 @@ class BenefitGroup
 
   def premium_in_dollars
     cents_to_dollars(employer_max_amt_in_cents)
+  end
+
+  def relationship_benefit_for(relationship)
+    relationship_benefits.where(relationship: relationship).first
   end
 
   def simple_benefit_list(employee_premium_pct, dependent_premium_pct, employer_max_amount)

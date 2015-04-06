@@ -24,6 +24,7 @@ class HbxEnrollment
   field :broker_agency_id, type: BSON::ObjectId
   field :writing_agent_id, type: BSON::ObjectId
   field :employer_profile_id, type: BSON::ObjectId
+  field :benefit_group_id, type: BSON::ObjectId
 
   field :submitted_at, type: DateTime
 
@@ -46,6 +47,8 @@ class HbxEnrollment
             inclusion: {in: Kinds, message: "%{value} is not a valid enrollment type"}
 
   # validate :
+
+  after_save :update_shop_premium_matrix
 
   aasm do
     state :applying, initial: true
@@ -87,6 +90,14 @@ class HbxEnrollment
     parent.broker_agency.find(self.broker_agency_id)
   end
 
+  def benefit_group=(benefit_group)
+    self.benefit_group_id = benefit_group._id if benefit_group.is_a? BenefitGroup
+  end
+
+  def benefit_group
+    BenefitGroup.find(self.benefit_group_id) unless self.benefit_group_id.blank?
+  end
+
   def has_broker_agency?
     broker_agency_id.present?
   end
@@ -97,6 +108,7 @@ class HbxEnrollment
     enrollment.kind = "employer_sponsored" if employer_profile.present?
     enrollment.employer_profile = employer_profile
     enrollment.effective_on = benefit_group.plan_year.start_on
+    enrollment.benefit_group = benefit_group
     coverage_household.coverage_household_members.each do |coverage_member|
       enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
       enrollment_member.eligibility_date = enrollment.effective_on
@@ -104,5 +116,21 @@ class HbxEnrollment
       enrollment.hbx_enrollment_members << enrollment_member
     end
     enrollment
+  end
+
+  def self.create_from(employer_profile: nil, coverage_household:, benefit_group:)
+    enrollment = self.new_from(
+      employer_profile: employer_profile,
+      coverage_household: coverage_household,
+      benefit_group: benefit_group
+    )
+    enrollment.save
+    enrollment
+  end
+
+  private
+
+  def update_shop_premium_matrix
+    ShopPremiumMatrix.cache_from(self, hbx_enrollment_members, benefit_group.elected_plans)
   end
 end

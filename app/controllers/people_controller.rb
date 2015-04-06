@@ -262,11 +262,15 @@ class PeopleController < ApplicationController
 
   def select_plan
     @person = find_person(params[:person_id])
+    Caches::CustomCache.allocate(Person, "person_age", { @person.id => @person })
+    Caches::MongoidCache.allocate(CarrierProfile)
     @organization = find_organization(params[:organization_id])
     @benefit_group = find_benefit_group(@person, @organization)
-    @plans = @benefit_group.elected_plans
-    # @hbx_enrollment = new_hbx_enrollment(@person, @organization, @benefit_group)
-    # @premium_matrix = get_shop_premium_matrix(hbx_enrollment, @benefit_group)
+    @hbx_enrollment = new_hbx_enrollment(@person, @organization, @benefit_group)
+    @reference_plan = @benefit_group.reference_plan
+    @plans = @benefit_group.elected_plans.entries.collect() do |plan|
+      PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
+    end
   end
 
 
@@ -294,7 +298,7 @@ private
 
   def new_hbx_enrollment(person, organization, benefit_group)
     HbxEnrollment.new_from(employer_profile: organization.employer_profile,
-                           coverage_household: person.family.households.first.coverage_households.first,
+                           coverage_household: person.primary_family.households.first.coverage_households.first,
                            benefit_group: benefit_group)
   end
 

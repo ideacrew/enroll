@@ -5,7 +5,7 @@
 			<p>
 			<span><%= plan.name %></span>
 			</p>
-			<p><%= plan.carrier_profile.dba %></p>
+			<p><%= (Caches::MongoidCache.lookup(CarrierProfile, plan.carrier_profile_id) { plan.carrier_profile} ).dba %></p>
 		</div>
 		<div class="col-md-2 col-sm-2 col-xs-6">
 			<label>
@@ -13,7 +13,7 @@
 			</label>
 		</div>
 		<div class="col-md-2 col-sm-2 col-xs-6">
-			<h2>$149</h2>
+			<h2><%= plan.total_employee_cost %></h2>
 			<p>monthly</p>
 		</div>
 	</div><!-- Plan first row end -->
