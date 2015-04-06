@@ -1,44 +1,48 @@
-<div class="container-fluid no-pd-left">          
-        <div class="panel panel-default" style="border:none; box-shadow: none;">
-          <div class="row tab-row">
-            <form>
-              <ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
-                <li class="active" role="presentation">
-                  <a aria-expanded="true" aria-controls="home" data-toggle="tab" role="tab" id="home-tab" href="#home">
-                    <span class="home-icon" title="Home"></span>
-                  </a>
-                </li>
-                <li role="presentation">
-                  <a aria-expanded="true" aria-controls="profile" data-toggle="tab" role="tab" id="profile-tab" href="#profile">
-                    <span class="hidden-xs">Profile</span>
-                    <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Profile"></span>
-                  </a>
-                </li>
-                <li role="presentation">
-                  <a aria-controls="plans" data-toggle="tab" id="plans-tab" role="tab" href="#plans">
-                    <span class="hidden-xs">Plans</span>
-                    <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Plans"></span>
-                  </a>
-                </li>
-                <li role="presentation">
-                  <a aria-controls="documents" data-toggle="tab" id="documents-tab" role="tab" href="#documents">
-                    <span class="hidden-xs">Documents</span>
-                    <span class="glyphicon glyphicon-file hidden-md hidden-sm hidden-lg" title="Documents"></span>
-                  </a>
-                </li>
-                <li role="presentation">
-                  <a aria-controls="messages" data-toggle="tab" id="messages-tab" role="tab" href="#messages">
-                    <span class="hidden-xs">Messages</span>
-                    <span class="glyphicon glyphicon-envelope hidden-md hidden-sm hidden-lg" title="Messages"></span>
-                    <span class="badge">27</span>
-                  </a>
-                </li>
-              </ul>
-              <div class="tab-content" id="myTabContent">
-                <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
-                  <div class="col-md-12 col-sm-12 col-xs-12">
+<div class="container-fluid no-pd-left">
+  <div class="panel panel-default" style="border:none; box-shadow: none;">
+    <div class="row tab-row">
+      <form>
+
+        <ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
+          <li class="active" role="presentation">
+            <a aria-expanded="true" aria-controls="home" data-toggle="tab" role="tab" id="home-tab" href="#home">
+              <span class="home-icon" title="Home"></span>
+            </a>
+          </li>
+          <li role="presentation">
+            <a aria-expanded="true" aria-controls="profile" data-toggle="tab" role="tab" id="profile-tab" href="#profile">
+              <span class="hidden-xs">Profile</span>
+              <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Profile"></span>
+            </a>
+          </li>
+          <li role="presentation">
+            <a aria-controls="plans" data-toggle="tab" id="plans-tab" role="tab" href="#plans">
+              <span class="hidden-xs">Plans</span>
+              <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Plans"></span>
+            </a>
+          </li>
+          <li role="presentation">
+            <a aria-controls="documents" data-toggle="tab" id="documents-tab" role="tab" href="#documents">
+              <span class="hidden-xs">Documents</span>
+              <span class="glyphicon glyphicon-file hidden-md hidden-sm hidden-lg" title="Documents"></span>
+            </a>
+          </li>
+          <li role="presentation">
+            <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox">
+              <span class="hidden-xs">Inbox</span>
+              <span class="glyphicon glyphicon-envelope hidden-md hidden-sm hidden-lg" title="Inbox"></span>
+              <span class="badge">27</span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+          <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+
                     <div class="row landing-row">
                       <div class="col-md-6 col-sm-6 col-xs-12 left-side">
+
                         <div class="row">
                           <p class="head">
                             <span>Household</span>
@@ -120,16 +124,20 @@
                             </table>
                           </div>
                         </div>
+
+
                         <div class="row bottom">
                           <p class="head">
                           <span>Employers & Plans</span>
                           <span>add employer</span>
                           </p>
+                          <%#= render partial: "employers/employer_profiles/my_account/benefits" %>
+
                            <ul class="list-group emp-ul">
                             <li class="list-group-item">
                               <div class="row">
                                 <div class="col-md-10 col-sm-12 col-xs-12">
-                                    <h4>Pets.com</h4>
+                                  <h4><%= @employer_profile.legal_name %></h4>
                                 </div>
                               </div>
                             </li>
@@ -202,8 +210,8 @@
                       <div class="cleafix"></div>
                     </div>
                   </div>
-                <div class="clearfix"></div>
                 </div>
+
                 <div aria-labelledby="profile-tab" id="profile" class="tab-pane fade" role="tabpanel">
                   <div class="submenu">
                     <ul role="tablist" class="nav nav-tabs" id="myTab1">
@@ -298,6 +306,7 @@
                   </div>
                 </div>
               </div>
+
               <div aria-labelledby="plans-tab" id="plans" class="tab-pane fade" role="tabpanel">
                 <%= render partial: "people/landing_pages/coverage_plans" %>
               </div>
