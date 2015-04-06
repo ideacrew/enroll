@@ -372,34 +372,40 @@ $(document).ready(function () {
     }
 
     if(address_entry) {
-      start_progress = 28;
-      $("a.one, a.two, a.three").css("color","#00b420");
+      start_progress += 8;
+      $("a.three").css("color","#00b420");
     }
 
     if(phone_entry) {
-      start_progress = 38;
-      $("a.one, a.two, a.three, a.four").css("color","#00b420");
+      start_progress += 10;
+      $("a.four").css("color","#00b420");
     }
 
     if(email_entry) {
-      start_progress = 50;
-      $("a.one, a.two, a.three, a.four, a.five").css("color","#00b420");
+      start_progress += 12;
+      $("a.five").css("color","#00b420");
     }
 
     if($('#add_info_clone0').length) {
-      start_progress = 65;
-      $("a.one, a.two, a.three, a.four, a.five, a.six").css("color","#00b420");
+      start_progress += 15;
+      $("a.six").css("color","#00b420");
     } else {$("a.six").css("color","#999");}
 
     $('#top-pad').html(start_progress + '% Complete');
     $('.progress-top').css('height', start_progress + '%');
 
-    if(start_progress >= 50) { $('#continue-employer').removeClass('disabled'); }
+    if(start_progress >= 50) {
+      $('#continue-employer').removeClass('disabled');
+    } else {
+      $('#continue-employer').addClass('disabled');
+    }
   }
 
   function check_personal_entry_progress() {
     gender_checked = $("#person_gender_male").prop("checked") || $("#person_gender_female").prop("checked");
-    
+    if(gender_checked==undefined) {
+      return true;
+    }
     if(check_personal_info_exists().length==0 && gender_checked) {
       return true;
     } else {
