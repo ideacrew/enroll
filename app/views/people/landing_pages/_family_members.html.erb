@@ -4,12 +4,12 @@
       <%#= render partial: "people/landing_pages/add_family_member_form" %>
       <%#= render 'dependent', dependent: @family_members.new,employer: @employer_profile,person: @person,employee: @employee %>
     </div>
-    <div class="row">
-    <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-        <%= link_to "Cancel", 'javascript:void(0)', class: '', id: 'cancel_member' %>
-        <a class="text-center btn btn-save pull-right" id="save_member">Confirm Member</a>
+    <div class="row add-member-buttons hidden ">
+      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+          <%= link_to "Cancel", 'javascript:void(0)', class: '', id: 'cancel_member' %>
+          <a class="text-center btn btn-save pull-right" id="save_member">Confirm Member</a>
+        </div>
       </div>
-    </div>
     <br/>
     <ul class="list-group">
 
