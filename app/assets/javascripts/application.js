@@ -55,23 +55,7 @@ $(document).ready(function () {
   });
 
 
-/* QLE Marriage Date Validator */
-// $.validator.addMethod('daterange', function(value, element) {
-//   if (this.optional(element)) {
-//       return true;
-//   }
-
-//   var startDate = Date.parse('2013-10-01'),
-//       endDate = Date.parse(new Date()),
-//       enteredDate = Date.parse(value);
-
-//   if (isNan(enteredDate)) {
-//       return false;
-//   }
-
-//   return ((startDate <= enteredDate) && (enteredDate <= endDate));
-// });
-
+  /* QLE Marriage Date Validator */
   $('#date_married').focusin(function() {
     $('#date_married').removeClass('input-error');
   });
@@ -86,7 +70,7 @@ $(document).ready(function () {
 
   function check_marriage_date() {
     var date_value = $('#date_married').val();
-    if(date_value == "" || isNaN(Date.parse(date_value))) { return false; }
+    if(date_value == "" || isNaN(Date.parse(date_value)) || Date.parse(date_value) > Date.parse(new Date())) { return false; }
     return true;
   }
 
@@ -97,6 +81,8 @@ $(document).ready(function () {
       url: "/people/check_qle_marriage_date.js"
     });
   }
+  
+  /* Match Person */
   $('#search-employer').click(function() {
     match_person();
   });
