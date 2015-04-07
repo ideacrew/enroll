@@ -31,7 +31,7 @@
 		  	<div class="row bottom-row top-row-2">
 			    <div class="col-md-3 col-sm-3 no-pd">
 			      <div class="form-group form-group-lg">
-			          <%= f.text_field :dob, class: "required date_picker home floatlabel form-control", required: true, value: f.object.dob.try(:strftime, "%m/%d/%Y"), placeholder: "DATE OF BIRTH" %>
+              <%= f.text_field :dob, class: "required date_picker home floatlabel form-control", required: true, value: f.object.dob.try(:strftime, "%m/%d/%Y"), placeholder: "DATE OF BIRTH", id: "employer_census_dependent_dob_#{dependent.id}" %>
 			      </div>
 			    </div>
 			    
