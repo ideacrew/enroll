@@ -13,9 +13,9 @@
     <br/>
     <ul class="list-group">
       <!-- @person.employee_roles.first.id -->
-      <% @employee.employee_family.census_dependents.each do |dependent| %>
-        <%= render "dependent", dependent: dependent,employer: @employer,person: @person,employee: @employee %>
-      <% end %>
+      <%# @employee.employee_family.census_dependents.each do |dependent| %>
+        <%#= render "dependent", dependent: dependent,employer: @employer,person: @person,employee: @employee %>
+      <%# end %>
 
       <% @family_members.each do |dependent| %>
       <li class="list-group-item">
