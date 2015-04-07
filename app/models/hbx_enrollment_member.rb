@@ -35,7 +35,7 @@ class HbxEnrollmentMember
   end
 
   def age_on_effective_date
-    person = Caches::CustomCache.lookup(Person, "person_age", family_member.person_id) { family_member.person }
+    person = Rails.cache.fetch("hbx_enrollment_member/person_age/#{family_member.person_id}") { family_member.person }
     dob = person.dob
     return unless coverage_start_on.present?
     age = coverage_start_on.year - dob.year

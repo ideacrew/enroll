@@ -309,7 +309,6 @@ class PeopleController < ApplicationController
 
   def select_plan
     @person = find_person(params[:person_id])
-    Caches::CustomCache.allocate(Person, "person_age", { @person.id => @person })
     Caches::MongoidCache.allocate(CarrierProfile)
     @organization = find_organization(params[:organization_id])
     @benefit_group = find_benefit_group(@person, @organization)
