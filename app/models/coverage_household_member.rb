@@ -10,8 +10,11 @@ class CoverageHouseholdMember
   include BelongsToFamilyMember
 
   def family
-    return nil unless coverage_household
-    coverage_household.family
+    coverage_household.family if coverage_household.present?
+  end
+
+  def applicant
+    family.family_members.find(applicant_id) if applicant_id.present?
   end
 
   def is_subscriber?
