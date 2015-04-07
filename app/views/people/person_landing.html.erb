@@ -171,10 +171,14 @@
                                             <p>
                                               Getting married is an big step. It also a qualified life event that creates a special enrollment period. Start this step by telling us when you got married and then continue to "Add a Family Member" to select a plan for you and your new spouse.
                                             </p>
+                                            <div class="error">
+                                              <div class="warning"><i class="fa fa-exclamation-triangle"></i>All fields Required</div>
+                                            </div>
                                             <div class="text-center">
-                                                <input type="text" class="form-control input-lg date_married" id="date_married" placeholder="Date you were married i.e. 4/01/2015">
+                                                <input type="text" class="form-control input-lg" id="date_married" placeholder="Date you were married i.e. 4/01/2015">
                                                 <br/>
-                                                <%= link_to 'Submit', 'javascript:void(0);', class: "btn btn-success btn-lg", id: "qle_marriage_submit" %>
+                                                <% add_member_url = add_dependents_people_path(person_id: @person.id, organization_id: @employer_profile.organization.id, employee_id: @person.employee_roles.first.id) %>
+                                                <%= link_to 'Submit', add_member_url, method: :post, class: "btn btn-success btn-lg", id: "qle_marriage_submit", remote: true %>
                                             </div>
                                           </div>
                                           <div class="success-info hidden">

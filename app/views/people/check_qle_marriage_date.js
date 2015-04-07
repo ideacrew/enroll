@@ -14,7 +14,6 @@ $('.add_success').click(function(){
 
 $('.add_new_family_member').click();
 
-
 $('.marriage_back').click(function() {
   $('#qle_marriage_form .initial-info').removeClass('hidden');
   $('#qle_marriage_form .error-info').addClass('hidden');
