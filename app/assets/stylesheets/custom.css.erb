@@ -1054,9 +1054,15 @@ h5.active a{
   color: #fff;
   position: relative;
 }
-.list-group a{
-  padding-top: 50px;
-  padding-bottom: 50px;
+.list-group a {
+  border-radius: 0;
+  background-color: #027ac3 !important;
+  /*font-size: 22px;*/
+  /*line-height: 24px;*/
+  font-family: 'AvenirLTStd-Medium';
+  /*font-weight: bold;*/
+ /* padding-top: 50px;
+  padding-bottom: 50px;*/
 }
 .list-group a.active{
   padding-top: 65px;
@@ -1206,14 +1212,7 @@ input.floatlabe{
   color: #616161;
   background-color: #e3e3e3 !important;
 }
-.list-group a {
-  border-radius: 0 !important;
-  background-color: #027ac3 !important;
-  font-size: 22px;
-  line-height: 24px;
-  font-family: 'AvenirLTStd-Medium';
-  font-weight: bold;
-}
+
 .form-control::-moz-placeholder {
   color: #ccc;
   opacity: 1;
@@ -1876,10 +1875,9 @@ a.list-group-item.confirm {
 }
 .landing-row .right-side .list-group a {
   background: none !important;
-  padding: 0 !important;
+  padding: 0;
   color: #007bc3;
   display: inline-block !important;
-  font-size: 14px;
   text-align: center;
 }
 .btn-see-all {
@@ -1965,7 +1963,7 @@ a.wdfull {
     border: 2px solid #3064ff !important;
 }
 .tab-pane .landing-row .right-side .list-group .list-group-item.panel .btn-success {
-    background: #238c00;
+    background: #238c00 !important;
     color: #ffffff;
     border-color: #238c00;
     display: inline-block;
@@ -1981,7 +1979,7 @@ a.wdfull {
     border-radius: 3px;
 }
 .tab-pane .landing-row .right-side .list-group .list-group-item.panel .btn-blue-2 {
-    background: #0080ff;
+    background: #0080ff !important;
     color: #fff;
     border-color: #0074e8;
     display: inline-block;
@@ -2432,7 +2430,6 @@ a .arrow-right {
 }
 .tab-pane .landing-row .right-side .btn {
   background: #bfdef0;
-  border-radius: 0;
   color: #fff;
   display: block;
   padding: 10px 22px;

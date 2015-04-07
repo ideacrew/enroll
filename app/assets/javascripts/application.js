@@ -86,7 +86,7 @@ $(document).ready(function () {
 
   function check_marriage_date() {
     var date_value = $('#date_married').val();
-    if(date_value == "") { return false; }
+    if(date_value == "" || isNaN(Date.parse(date_value))) { return false; }
     return true;
   }
 
@@ -100,16 +100,6 @@ $(document).ready(function () {
       //   alert('hi');
       // }
     });
-
-    // $.ajax({
-    //   type: "POST",
-    //   url: "/people/qle_marriage_date.json",
-    //   data: $('#qle_marriage_form').serialize(),
-    //   success: function (result) {
-    //     alert('hi');
-    //   }
-    // });
-    // return true;
   }
 
   $('#search-employer').click(function() {
