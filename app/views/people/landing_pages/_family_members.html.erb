@@ -6,16 +6,16 @@
     </div>
     <div class="row">
     <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-        <%= link_to "Cancel", 'javascript:void(0)', class: 'btn btn-red', id: 'cancel_member' %>
+        <%= link_to "Cancel", 'javascript:void(0)', class: '', id: 'cancel_member' %>
         <a class="text-center btn btn-save pull-right" id="save_member">Confirm Member</a>
       </div>
     </div>
     <br/>
     <ul class="list-group">
-      <!-- @person.employee_roles.first.id -->
+
       <%# @employee.employee_family.census_dependents.each do |dependent| %>
         <%#= render "dependent", dependent: dependent,employer: @employer,person: @person,employee: @employee %>
-      <%# end %>
+      <%#  end %>
 
       <% @family_members.each do |dependent| %>
       <li class="list-group-item">
