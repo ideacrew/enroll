@@ -81,6 +81,14 @@ class BenefitGroup
     plan_year.employer_profile.employee_families.to_a
   end
 
+  def effective_on_for(date_of_hire)
+    case effective_on_kind
+    when "date_of_hire"
+      date_of_hire_effective_on_for(date_of_hire)
+    when "first_of_month"
+      first_of_month_effective_on_for(date_of_hire)
+    end
+  end
 
   def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
     employer_max_amt_in_cents = dollars_to_cents(new_employer_max_amt_in_cents)
@@ -122,6 +130,14 @@ private
 
   def cents_to_dollars(amount_in_cents)
     (Rational(amount_in_cents) / Rational(100)).to_f if amount_in_cents
+  end
+
+  def date_of_hire_effective_on_for(date_of_hire)
+    [plan_year.start_on, date_of_hire].max
+  end
+
+  def first_of_month_effective_on_for(date_of_hire)
+    [plan_year.start_on, (date_of_hire + effective_on_offset.days).beginning_of_month].max
   end
 
 # Non-congressional
