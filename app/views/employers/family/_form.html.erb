@@ -46,7 +46,7 @@
                     </div>
                 </div><br>
 
-                <%= employee.fields_for @family.census_employee.address, errors: {}, fieldset: false do |address|  %>
+                <%= employee.fields_for :address, @family.census_employee.address, errors: {}, fieldset: false do |address|  %>
                   <div id="address_info" class="focus_effect row personaol-info-row">
                     <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
                       <%= render 'address_fields', f: address %>
@@ -54,16 +54,16 @@
                   </div>
                 <% end %><br>
 
-                <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |dependent|  %>
-                  <div class='form-inputs'>
-                    <div id="dependent_info" class="focus_effect row personaol-info-row">
-                      <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
+                <div id="dependent_info" class="focus_effect row personaol-info-row">
+                  <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
+                    <div class='form-inputs'>
+                      <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |dependent|  %>
                         <%= render 'census_dependent_fields', f: dependent %>
-                      </div>
-                    </div><br>
+                      <% end %>
                       <%= link_to_add_fields "Add Dependent", f, :census_dependents %>
+                    </div>
                   </div>
-                <% end %>
+                </div>
             <% end %>
 
           <div id="key-section" class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
