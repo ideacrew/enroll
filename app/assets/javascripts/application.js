@@ -662,7 +662,7 @@ $(document).ready(function () {
   $('#home-tab').click(function() {
     $('.people li.panel').removeClass('active');
     $('.people li.panel').removeClass('active-list');
-    $('#collapse1').removeClass('in');
+    $('#accordion .collapse').removeClass('in');
   });
 
   $('.people li.panel').click(function(){
