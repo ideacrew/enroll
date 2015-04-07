@@ -118,6 +118,14 @@ class Person
     write_attribute(:gender, new_gender.to_s.downcase)
   end
 
+  def date_of_birth
+    self.dob.blank? ? nil : self.dob.strftime("%m/%d/%Y")
+  end
+
+  def date_of_birth=(val)
+    self.dob = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
+  end
+
   # def dob=(new_dob)
   #   bday = DateTime.strptime(new_dob, "%m-%d-%Y").to_date
   #   write_attribute(:dob, bday)

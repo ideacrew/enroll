@@ -31,8 +31,8 @@ class PeopleController < ApplicationController
 
   # Uses identifying information to return single pre-existing Person instance if already in DB
   def match_person
-
     @person = Person.new(person_params)
+#    raise @person.dob.inspect
     @employee_family = EmployerProfile.find_census_families_by_person(@person).first
     # matched_person = Person.match_by_id_info(@person)
 
