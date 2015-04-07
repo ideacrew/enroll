@@ -152,17 +152,18 @@
                           <% if @qualifying_life_events %> 
                             <% @qualifying_life_events.each_with_index do |qle, index| %>
                               <li class="list-group-item panel panel-default">
-                                <div class="row panel-heading" role="tab" id="heading<%= index %>">
-                                  <a class="wdfull" data-toggle="collapse" data-parent="#accordion" href="#collapse<%= index %>" aria-expanded="true" aria-controls="collapse<%= index %>">
+                                <div class="row panel-heading" role="tab" id="heading1">
+                                  <a class="wdfull" data-toggle="collapse" data-parent="#accordion" href="#collapse<%= index %>" aria-expanded="true" aria-controls="collapse1">
                                     <div class="col-md-8 col-sm-8 col-xs-12">
                                       <h4 class="text-left"><%= qle.title.humanize %></h4>
                                     </div>
                                     <div class="col-md-4 col-sm-4 col-xs-12">
-                                      <h5 class="text-right"><%= qle.kind %></h5>
+                                      <h5 class="text-right"><%= qle.kind unless qle.edi_code == '32-MARRIAGE' %></h5>
                                     </div>
                                   </a>
+                                </div>
 
-                                  <div id="collapse<%= index %>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading<%= index %>">
+                                  <div id="collapse<%= index %>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading1">
                                     <div class="panel-body">
                                       <% if qle.edi_code == '32-MARRIAGE' %>
                                         <div id="qle_marriage_form">
@@ -188,7 +189,6 @@
                                       <% end %>
                                     </div>
                                   </div>
-                                </div>
                               </li>
                             <% end %>
                           <% end %>
