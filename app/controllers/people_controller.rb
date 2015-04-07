@@ -9,6 +9,26 @@ class PeopleController < ApplicationController
     # render action: "new", layout: "form"
   end
 
+  def check_qle_marriage_date
+    date_married = Date.parse(params[:date_val])
+    start_date = Date.parse('01/10/2013')
+    end_date = Date.today
+
+    if start_date <= date_married && date_married <= end_date
+      # Qualifed
+      @qualified_date = true
+    else
+      # Not Qualified
+      @qualified_date = false
+    end
+
+    # else {
+    #   var startDate = Date.parse('2013-10-01'), endDate = Date.parse(new Date()), enteredDate = Date.parse(date_value);
+      
+    #   return ((startDate <= enteredDate) && (enteredDate <= endDate));
+    # }
+  end
+
   # Uses identifying information to return single pre-existing Person instance if already in DB
   def match_person
 
@@ -301,9 +321,7 @@ class PeopleController < ApplicationController
 
   def enroll_family
     @hbx_enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
-
   end
-
 
 private
   def find_person(id)

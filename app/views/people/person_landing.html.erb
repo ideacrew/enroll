@@ -147,22 +147,45 @@
                           <span>Life Events</span>
                           <span></span>
                         </p>
-                         <ul class="list-group">
+                          <ul class="list-group panel panel-default panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                           <%# @all_qles = get_all_qualifying_life_events %>
                           <% if @qualifying_life_events %> 
-                            <% @qualifying_life_events.each do |qle| %>
-                              <li class="list-group-item">
-                                <div class="row">
-                                  <div class="col-md-8 col-sm-8 col-xs-12">
-                                    <h4><%= qle.title.humanize %></h4>
-                                  </div>
-                                  <div class="col-md-4 col-sm-4 col-xs-12 text-right">
-                                    <a href="#">Add</a>
+                            <% @qualifying_life_events.each_with_index do |qle, index| %>
+                              <li class="list-group-item panel panel-default">
+                                <div class="row panel-heading" role="tab" id="heading<%= index %>">
+                                  <a class="wdfull" data-toggle="collapse" data-parent="#accordion" href="#collapse<%= index %>" aria-expanded="true" aria-controls="collapse<%= index %>">
+                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                      <h4 class="text-left"><%= qle.title.humanize %></h4>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                      <h5 class="text-right"><%= qle.kind %></h5>
+                                    </div>
+                                  </a>
+
+                                  <div id="collapse<%= index %>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading<%= index %>">
+                                    <div class="panel-body">
+                                      <% if qle.edi_code == '32-MARRIAGE' %>
+                                        <div id="qle_marriage_form">
+                                          <p>
+                                            Getting married is an big step. It also a qualified life event that creates a special enrollment period. Start this step by telling us when you got married and then continue to "Add a Family Member" to select a plan for you and your new spouse.
+                                          </p>
+                                          <div class="text-center">
+                                              <input type="text" class="form-control input-lg daterange" id="date_married" placeholder="Date you were married i.e. 4/01/2015">
+                                              <br/>
+                                              <%= link_to 'Submit', 'javascript:void(0);', class: "btn btn-success btn-lg", id: "qle_marriage_submit" %>
+                                              <%#= submit_tag 'Submit', class: "btn btn-success btn-lg", id: "qle_marriage_submit" %>
+                                          </div>
+                                        </div>
+                                      <% else %>
+                                        <%= qle.description %>
+                                      <% end %>
+                                    </div>
                                   </div>
                                 </div>
                               </li>
                             <% end %>
                           <% end %>
+
                          <button class="btn btn-see-all md-trigger" data-modal="modal-3">See All</button>
                         </ul>
                       </div>

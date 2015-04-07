@@ -63,6 +63,7 @@ Rails.application.routes.draw do
       delete 'remove_dependents'
       get 'select_plan'
       post 'select_plan'
+      get 'check_qle_marriage_date'
     end
 
   end

@@ -1859,6 +1859,7 @@ a.list-group-item.confirm {
 .landing-row .right-side .list-group .list-group-item:nth-child(2) {
   border-top: 1px solid #ffffff;
 }
+
 .landing-row .right-side .list-group .list-group-item {
   color: #007bc3;
   font-size: 14px;
@@ -1901,6 +1902,117 @@ a.list-group-item.confirm {
 }
 .landing-row.bottom-row .left-side, .landing-row.bottom-row .right-side {
   padding-top: 0;
+}
+
+/* STYLE FOR ACCORDION - QLE flow */
+.panel-group .panel {
+    border-radius: 0px;
+}
+.panel-group .panel .list-group-item {
+    border-radius: 0px;
+}
+a.wdfull {
+    width: 100%;
+}
+.list-group-item .panel-heading {
+    padding: 0px;
+}
+.list-group-item .panel-heading h5 {
+    font-weight: bold;
+    font-style: italic;
+}
+.list-group.panel-group .panel+.panel {
+    margin-top: -1px;
+}
+.panel .landing-row .right-side .list-group .list-group-item {
+    padding-bottom: 0px;
+}
+.panel.active-list {
+    border: 1px solid #000 !important;
+    color: #000 !Important;
+    opacity: 1px !important;
+}
+.tab-pane .landing-row .right-side .list-group .panel.active-list h4, .tab-pane .landing-row .right-side .list-group .panel.active-list h5 {
+    color: #000;
+}
+.landing-row .right-side .list-group .list-group-item.panel.active-list {
+    opacity: 1;
+}
+.landing-row .right-side .list-group .list-group-item.panel.active-list:hover {
+    border: 1px solid #000 !important;
+    color: #000 !Important;
+}
+.tab-pane .landing-row .right-side .list-group .list-group-item.panel input.input-lg {
+    background: #fff;
+    border: 1px solid #ccc !important;
+    margin-top: 10px;
+    width: 60%;
+    text-align: center;
+    display: inline-block;
+    border-radius: 3px;
+}
+.tab-pane .landing-row .right-side .list-group .list-group-item.panel input.input-lg.input-error {
+    background: #fff;
+    border: 2px solid #b60c0c !important;
+    margin-top: 10px;
+    width: 60%;
+    color: #b20101;
+    text-align: center;
+    display: inline-block;
+    border-radius: 3px;
+}
+.tab-pane .landing-row .right-side .list-group .list-group-item.panel input.input-lg:focus {
+    border: 2px solid #3064ff !important;
+}
+.tab-pane .landing-row .right-side .list-group .list-group-item.panel .btn-success {
+    background: #238c00;
+    color: #ffffff;
+    border-color: #238c00;
+    display: inline-block;
+    margin-top: 10px;
+    border-radius: 3px;
+}
+.tab-pane .landing-row .right-side .list-group .list-group-item.panel .btn-disabled {
+    background: #ccc;
+    color: #fff;
+    border-color: #ccc;
+    display: inline-block;
+    margin-top: 10px;
+    border-radius: 3px;
+}
+.tab-pane .landing-row .right-side .list-group .list-group-item.panel .btn-blue-2 {
+    background: #0080ff;
+    color: #fff;
+    border-color: #0074e8;
+    display: inline-block;
+    margin-top: 10px;
+    border-radius: 3px;
+}
+p.error-text {
+    text-align: center;
+    color: #b20101;
+    font-size: 16px;
+}
+p.success-text {
+    text-align: center;
+    color: #238c00;
+    font-size: 16px;
+}
+
+.panel-default > .panel-heading {background-image: none;}
+.panel-body {
+  border-top: 1px solid #ddd;
+}
+
+.tab-pane .landing-row .right-side .list-group .list-group-item.panel input.input-lg.input-error {
+    background: none repeat scroll 0 0 #fff;
+    border: 2px solid #b60c0c !important;
+    border-radius: 3px;
+    color: #b20101;
+    display: inline-block;
+    margin-top: 10px;
+    text-align: center;
+    width: 60%;
 }
 
 

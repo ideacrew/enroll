@@ -54,6 +54,64 @@ $(document).ready(function () {
     side_bar_link_style();
   });
 
+
+/* QLE Marriage Date Validator */
+// $.validator.addMethod('daterange', function(value, element) {
+//   if (this.optional(element)) {
+//       return true;
+//   }
+
+//   var startDate = Date.parse('2013-10-01'),
+//       endDate = Date.parse(new Date()),
+//       enteredDate = Date.parse(value);
+
+//   if (isNan(enteredDate)) {
+//       return false;
+//   }
+
+//   return ((startDate <= enteredDate) && (enteredDate <= endDate));
+// });
+
+  $('#date_married').focusin(function() {
+    $('#date_married').removeClass('input-error');
+  });
+
+  $('#qle_marriage_submit').click(function() {
+    if(check_marriage_date()) {
+      get_qle_marriage_date();
+    } else {
+      $('#date_married').addClass('input-error');
+    }
+  });
+
+  function check_marriage_date() {
+    var date_value = $('#date_married').val();
+    if(date_value == "") { return false; }
+    return true;
+  }
+
+  function get_qle_marriage_date() {
+    $.ajax({
+      type: "GET",
+      data:{date_val: $("#date_married").val()},
+      url: "/people/check_qle_marriage_date.js"
+      // success: function (result) {
+      //   // body...
+      //   alert('hi');
+      // }
+    });
+
+    // $.ajax({
+    //   type: "POST",
+    //   url: "/people/qle_marriage_date.json",
+    //   data: $('#qle_marriage_form').serialize(),
+    //   success: function (result) {
+    //     alert('hi');
+    //   }
+    // });
+    // return true;
+  }
+
   $('#search-employer').click(function() {
     match_person();
   });
@@ -628,6 +686,11 @@ $(document).ready(function () {
   /* People Account Page */
   $('#contact-tab').click(function() {
 
+  });
+
+  $('.people li.panel').click(function(){
+    $('li').removeClass('active-list');
+    $(this).addClass("active-list")
   });
 
 });
