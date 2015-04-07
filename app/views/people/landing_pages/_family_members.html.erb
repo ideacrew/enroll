@@ -1,10 +1,22 @@
 <div class="right-side">
   <div class="col-md-8 col-xs-12 col-sm-12 no-pd">
-    <div class="row" id="add-new-member">
-      <%= render partial: "people/landing_pages/add_family_member_form" %>
+    <div class="row" id="dependent_ul">
+      <%#= render partial: "people/landing_pages/add_family_member_form" %>
+      <%#= render 'dependent', dependent: @family_members.new,employer: @employer_profile,person: @person,employee: @employee %>
     </div>
+    <div class="row add-member-buttons hidden ">
+      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+          <%= link_to "Cancel", 'javascript:void(0)', class: '', id: 'cancel_member' %>
+          <a class="text-center btn btn-save pull-right" id="save_member">Confirm Member</a>
+        </div>
+      </div>
     <br/>
     <ul class="list-group">
+
+      <%# @employee.employee_family.census_dependents.each do |dependent| %>
+        <%#= render "dependent", dependent: dependent,employer: @employer,person: @person,employee: @employee %>
+      <%#  end %>
+
       <% @family_members.each do |dependent| %>
       <li class="list-group-item">
         <div class="row">

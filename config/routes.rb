@@ -1,5 +1,12 @@
 Rails.application.routes.draw do
 
+  # FIXME: Do this properly later
+  resource :plan_shopping do
+    member do
+      post 'checkout'
+    end
+  end
+
   # You can have the root of your site routed with "root"
   root 'welcome#index'
 

@@ -64,6 +64,11 @@ class HbxEnrollment
     self.is_active
   end
 
+  # FIXME: Not even close to correct
+  def subscriber
+    hbx_enrollment_members.first
+  end
+
   def family
     household.family if household.present?
   end
@@ -107,7 +112,9 @@ class HbxEnrollment
     enrollment.household = coverage_household.household
     enrollment.kind = "employer_sponsored" if employer_profile.present?
     enrollment.employer_profile = employer_profile
-    enrollment.effective_on = benefit_group.plan_year.start_on
+    # FIX ME: simplest possible calculation, is also wrong
+    enrollment.effective_on = Date.today.next_month.at_beginning_of_month
+    # benefit_group.plan_year.start_on
     enrollment.benefit_group = benefit_group
     coverage_household.coverage_household_members.each do |coverage_member|
       enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)

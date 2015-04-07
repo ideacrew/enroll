@@ -18,6 +18,8 @@ class EmployerCensus::Member
   embedded_in :family, class_name: "EmployerCensus::Family"
 
   embeds_one :address
+  accepts_nested_attributes_for :address, reject_if: :all_blank, allow_destroy: true
+
   embeds_one :email
 
   validates_presence_of :first_name, :last_name, :dob, :employee_relationship
@@ -48,5 +50,12 @@ class EmployerCensus::Member
     self.dob.blank? ? "" : self.dob.strftime("%Y%m%d")
   end
 
+  def date_of_birth
+    self.dob.blank? ? nil : self.dob.strftime("%m/%d/%Y")
+  end
+
+  def date_of_birth=(val)
+    self.dob = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
+  end
 
 end

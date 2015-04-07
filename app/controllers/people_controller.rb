@@ -218,7 +218,6 @@ class PeopleController < ApplicationController
     employee_family = Organization.find(@employer.id).employee_family_details(@person)
     @dependent = employee_family.census_dependents.where(_id: params[:id]).first
     if !@dependent.nil?
-      fail
       @family_member_id = @dependent._id
       @dependent.destroy
     else
@@ -309,7 +308,6 @@ class PeopleController < ApplicationController
 
   def select_plan
     @person = find_person(params[:person_id])
-    Caches::CustomCache.allocate(Person, "person_age", { @person.id => @person })
     Caches::MongoidCache.allocate(CarrierProfile)
     @organization = find_organization(params[:organization_id])
     @benefit_group = find_benefit_group(@person, @organization)

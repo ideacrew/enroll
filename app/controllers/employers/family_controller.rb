@@ -26,9 +26,7 @@ class Employers::FamilyController < ApplicationController
   end
 
   def update
-    params.permit!
-    @family.attributes = params["employer_census_employee_family"]
-    if @employer_profile.save
+    if @family.update_attributes(census_employee_params)
       flash.notice = "Employer Census Family is successfully updated."
       redirect_to employers_employer_profile_path(@employer_profile)
     else
@@ -46,6 +44,18 @@ class Employers::FamilyController < ApplicationController
   end
 
   private
+
+  def census_employee_params
+    params.require(:employer_census_employee_family).permit(:id, :employer_profile_id,
+      :census_employee_attributes => [
+          :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on,
+          :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
+        ],
+      :census_dependents_attributes => [
+          :id, :first_name, :last_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy
+        ]
+      )
+  end
 
   def find_employer
     @employer_profile = EmployerProfile.find params["employer_profile_id"]

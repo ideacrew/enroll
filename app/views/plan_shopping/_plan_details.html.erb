@@ -1,20 +1,22 @@
 <!-- Plan first row start -->
 <div class="plan-row">
 	<div class="row">
-		<div class="col-md-8 col-sm-9 col-xs-12">
+		<div class="col-md-6 col-sm-9 col-xs-12">
 			<p>
 			<span><%= plan.name %></span>
 			</p>
 			<p><%= (Caches::MongoidCache.lookup(CarrierProfile, plan.carrier_profile_id) { plan.carrier_profile} ).dba %></p>
 		</div>
 		<div class="col-md-2 col-sm-2 col-xs-6">
-			<label>
-			<input type="checkbox" class="select-plan-for-comparison" data-hios-id="<%= plan.hios_id %>" data-plan-year="<%= plan.active_year %>"></input>Compare
-			</label>
+			<p><%= number_to_currency(plan.total_premium) %></p>
+			<p>premium</p>
+		</div>
+		<div class="col-md-2 col-sm-2 col-xs-6">
+			<p><%= number_to_currency(plan.total_employer_contribution) %></p><p>employer</p>
 		</div>
 		<div class="col-md-2 col-sm-2 col-xs-6">
 			<h2><%= number_to_currency(plan.total_employee_cost) %></h2>
-			<p>monthly</p>
+			<p><strong>your cost</strong></p>
 		</div>
 	</div><!-- Plan first row end -->
 	<!-- Plan details row start -->
@@ -39,12 +41,18 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-md-2 col-sm-2 col-xs-12"></div>
+		<div class="col-md-2 col-sm-2 col-xs-12">
+			<label>
+				<input type="checkbox" class="select-plan-for-comparison" data-hios-id="<%= plan.hios_id %>" data-plan-year="<%= plan.active_year %>"></input><strong>Compare</strong>
+			</label>
+		</div>
 		<div class="col-md-2 col-sm-4 col-xs-12">
 			<%= link_to "Details", summary_products_plans_path({:standard_component_id => plan.hios_id}), {:class => "btn btn-default details-btn", :remote => true} %>
 		</div>
 		<div class="col-md-2 col-sm-4 col-xs-12">
-			<button class="btn btn-primary select-btn">Select</button>
+			<%= link_to("Select", 
+															checkout_plan_shopping_path({:id => @person.id, :plan_id => plan.id, :organization_id => params[:organization_id]}),
+															{:class => "btn btn-primary select-btn", :method => :post}) %>
 		</div>
 	</div>
 </div><!-- Plan details row end -->

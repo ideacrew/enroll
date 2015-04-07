@@ -10,10 +10,10 @@
 
 $('.add_success').click(function(){
   $('#family-tab').click();
+  $('.add-member-buttons').removeClass('hidden');
 });
 
 $('.add_new_family_member').click();
-
 
 $('.marriage_back').click(function() {
   $('#qle_marriage_form .initial-info').removeClass('hidden');
