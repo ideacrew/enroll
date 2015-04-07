@@ -13,17 +13,17 @@
     <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd middle-row">
       <a class="remove" href="#"><%=image_tag "landing-page-delete.png" %></a>
       <span>Employer Name</span>
-      <input class="form-control" type="text" value="<%= @employer.legal_name %>">
+      <input class="form-control" type="text" value="<%= @employer_profile.legal_name %>">
     </div>
     <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd middle-row">
       <div class="row">
         <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
           <span>Hire Date</span>
-          <input class="form-control" type="text" placeholder="March 30, 2013" value="<%= @employee.hired_on.strftime("%b %d, %Y") %>">
+          <input class="form-control" type="text" placeholder="March 30, 2013" value="<%= @employee_roles.first.hired_on.strftime("%b %d, %Y") %>">
         </div>
         <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
           <span>Eligible For Coverage</span>
-          <input class="form-control" type="text" placeholder="March 30, 2014" value="<%= @employee.hired_on.strftime("%b %d, %Y") %>">
+          <input class="form-control" type="text" placeholder="March 30, 2014" value="<%= @employee_roles.first.hired_on.strftime("%b %d, %Y") %>">
         </div>
       </div>
     </div>
