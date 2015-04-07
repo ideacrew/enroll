@@ -677,5 +677,9 @@ $(document).ready(function () {
     $('li').removeClass('active-list');
     $(this).addClass("active-list")
   });
-
+  
+  $('.employer_ok').click(function(e){
+    e.preventDefault();
+    $('.new-employer-alert').remove();
+    })
 });
