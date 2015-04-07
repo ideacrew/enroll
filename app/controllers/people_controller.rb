@@ -24,7 +24,7 @@ class PeopleController < ApplicationController
 
     # else {
     #   var startDate = Date.parse('2013-10-01'), endDate = Date.parse(new Date()), enteredDate = Date.parse(date_value);
-      
+
     #   return ((startDate <= enteredDate) && (enteredDate <= endDate));
     # }
   end
@@ -144,9 +144,9 @@ class PeopleController < ApplicationController
     @employer_profile = @employee_role.employer_profile
     @employer = @employer_profile.organization
     @person = @employee_role.person
-    @employee = @employer_profile.find_employee_by_person(@person)
-    employee_family = Organization.find(@employer.id).employee_family_details(@person)
-    @employee = employee_family.census_employee
+    # @employee = @employer_profile.find_employee_by_person(@person)
+    # employee_family = Organization.find(@employer.id).employee_family_details(@person)
+    # @employee = employee_family.census_employee
     build_nested_models
   end
 
@@ -156,7 +156,7 @@ class PeopleController < ApplicationController
     employer_census_family = @employer_profile.linkable_employee_family_by_person(@person)
 
     #calling add_employee_role when linkable employee family present
-    if employer_census_family.present? && employer_census_family.person.present?
+    if employer_census_family.present?
       enroll_parms = {}
       enroll_parms[:user] = current_user
       enroll_parms[:employer_profile] = @employer_profile
@@ -172,16 +172,16 @@ class PeopleController < ApplicationController
       @employee_role, @family = EnrollmentFactory.add_employee_role(enroll_parms)
     else
       @employee_role = @person.employee_roles.first
+      @family = @person.primary_family
     end
-
   end
 
   def add_dependents
     @person = Person.find(params[:person_id])
     @employer = Organization.find(params[:organization_id])
-    employee_family = Organization.find(@employer.id).employee_family_details(@person)
-    @employee = employee_family.census_employee
-    @dependent = EmployerCensus::Dependent.new
+    # employee_family = Organization.find(@employer.id).employee_family_details(@person)
+    @employee = @person.employee_roles.first
+    @dependent = FamilyMember.new(family: @person.primary_family)
   end
 
   def save_dependents

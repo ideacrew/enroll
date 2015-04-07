@@ -6,7 +6,7 @@
         &nbsp;&nbsp;
         <a href="<%= plan_details_people_path(person_id: params[:person_id], organization_id: params[:organization_id])%>" data-method="POST"> Plan Details</a>
       </div>
-      
+
       <div class="col-md-10 col-sm-12 hide">
         <p class="information row" style="opacity: 1;"> Employer Information</p>
         <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
@@ -15,53 +15,53 @@
       </div>
       <div class="col-md-10 col-sm-12" style="display:none">
         <p class="information row" style="opacity: 1;"> Employee Information</p>
-        
+
         <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
           <div class="row top-row form-group form-group-lg no-pd">
             <div class="col-md-5 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               <div class="form-group">
               <label>First Name</label>
-              <input type="text" value="<%= @employee.first_name %>" class="form-control" >
+              <input type="text" value="<%= @person.first_name %>" class="form-control" >
             </div>
             </div>
             <div class="col-md-2 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               <div class="form-group">
              <label>M.I</label>
-             <input type="text" value="<%= @employee.middle_name %>" class="form-control" >
+             <input type="text" value="<%= @person.middle_name %>" class="form-control" >
             </div>
           </div>
             <div class="col-md-5 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
               <div class="form-group">
               <label>Last Name</label>
-              <input type="text" value="<%= @employee.last_name %>" class="form-control" >
+              <input type="text" value="<%= @person.last_name %>" class="form-control" >
             </div>
           </div>
           </div>
           <div class="row middle-row form-group form-group-lg no-pd address-row">
             <div class="col-md-4 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               <label>SSN</label>
-              <input type="text" value="<%= @employee.ssn %>" class="form-control" >
+              <input type="text" value="<%= @person.ssn %>" class="form-control" >
             </div>
             <div class="col-md-4 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
              <label>DOB</label>
-            <input type="text" value="<%= @employee.dob %>" class="form-control" >
+            <input type="text" value="<%= @person.dob %>" class="form-control" >
             </div>
             <div class="col-md-4 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
               <label>Gender</label>
-              <input type="text" value="<%= @employee.gender %>" class="form-control" >
+              <input type="text" value="<%= @person.gender %>" class="form-control" >
             </div>
           </div>
-          
+
           <div class="row middle-row form-group form-group-lg no-pd address-row">
             <div class="col-md-6 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               <label>Email</label>
-              <input type="text" value="<%= @employee.email %>" class="form-control" >
+              <input type="text" value="<%= @person.emails.first %>" class="form-control" >
             </div>
             <div class="col-md-6 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
               <label>Phone</label>
             </div>
           </div>
-          <%# address = @employee.address %>
+          <%# address = @employee_role.address %>
           <div class="row middle-row form-group form-group-lg no-pd address-row">
             <div class="col-md-6 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               <label>Address</label>
@@ -72,7 +72,7 @@
               <input type="text" value="<%#= address.address_2 %>" class="form-control" >
             </div>
           </div>
-          
+
               <div class="row middle-row form-group form-group-lg no-pd address-row">
             <div class="col-md-6 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               <label>City</label>
@@ -88,10 +88,10 @@
           </div>
         </div>
       </div>
-      
+
       <div class="col-md-10 col-sm-12">
         <div class="col-md-10 col-sm-9 col-xs-12 no-pd">
-          
+
           <div id="house_info" class="focus_effect row personaol-info-row">
             <p class="information row">Household Information</p>
 
@@ -104,15 +104,15 @@
                   </div>
               </div>
             </div><br>
-            
-            <div class="fail-search add-member <%= 'hidden' if !@employee.employee_family.census_dependents.empty? %>" class="row">
+
+            <div class="fail-search add-member <%= 'hidden' if !@family.family_members.empty? %>" class="row">
               <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
                 <div class="panel panel-default">
                   <div class="panel-body member">
                       <p class="fail"><span class="bold">Here's your chance to add family members to your plan.</span><br>Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</p>
                       <br>
                       <div class="form-inline text-center">
-                        <% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee.id) %>
+                        <% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee_role.id) %>
                 		    <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
                         &nbsp; &nbsp;
                         <a class="text-center btn btn-save">Continue</a>
@@ -122,31 +122,31 @@
         	  </div>
             </div>
             <div class="clear-fix"></div>
-            
+
       		<ul class="" id="dependent_ul">
-		        <% @employee.employee_family.census_dependents.each do |dependent| %>
-		          <%= render "dependent", dependent: dependent,employer: @employer,person: @person,employee: @employee %>
+		        <% @family.family_members.reject(&:is_primary_applicant).each do |dependent| %>
+		          <%= render "dependent", dependent: dependent,employer: @employer,person: @person,employee: @employee_role %>
 		        <% end %>
-	       
+
 	        	<input type="hidden" id="last_member" value="">
 	      </ul>
-      
-      <div id="dependent_buttons" class="focus_effect row personaol-info-row <%= 'hidden' if @employee.employee_family.census_dependents.empty? %>">
+
+      <div id="dependent_buttons" class="focus_effect row personaol-info-row <%= 'hidden' if @family.family_members.empty? %>">
         <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-          <% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee.id) %>
+          <% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee_role.id) %>
           <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
-          
+
           <!-- <a href="<%= plan_details_people_path(person_id: params[:person_id], organization_id: params[:organization_id])%>" data-method="POST" class="text-center btn btn-save pull-right">Continue</a> -->
           <%= link_to 'Continue', select_plan_people_path(person_id: params[:person_id], organization_id: params[:organization_id]), class: 'text-center btn btn-green pull-right' %>
         </div>
-        
+
         <div class="col-md-12 no-pd col-sm-12 col-xs-12 last hidden">
           <%= link_to "Cancel", 'javascript:void(0)', class: 'btn btn-red', id: 'cancel_member' %>
-          
+
           <a class="text-center btn btn-save pull-right" id="save_member">Confirm Member</a>
         </div>
       </div>
-                
+
       <div class="clear-fix"></div>
         </div>
         <div class="col-md-2 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
