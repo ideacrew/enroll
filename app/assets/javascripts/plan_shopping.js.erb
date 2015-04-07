@@ -52,7 +52,7 @@ function doPlanComparison(action_uri) {
 }
 
 $(function() {
-	$("a[role='tab'][data-toggle='tab']").click(function() {
+	$("#select-plan-container a[role='tab'][data-toggle='tab']").click(function() {
 		hidePlanTabs();
 		$(this).parent().addClass("active");
 		var eleId = $(this).attr("href");

@@ -165,17 +165,7 @@
                                   <div id="collapse<%= index %>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading<%= index %>">
                                     <div class="panel-body">
                                       <% if qle.edi_code == '32-MARRIAGE' %>
-                                        <div id="qle_marriage_form">
-                                          <p>
-                                            Getting married is an big step. It also a qualified life event that creates a special enrollment period. Start this step by telling us when you got married and then continue to "Add a Family Member" to select a plan for you and your new spouse.
-                                          </p>
-                                          <div class="text-center">
-                                              <input type="text" class="form-control input-lg daterange" id="date_married" placeholder="Date you were married i.e. 4/01/2015">
-                                              <br/>
-                                              <%= link_to 'Submit', 'javascript:void(0);', class: "btn btn-success btn-lg", id: "qle_marriage_submit" %>
-                                              <%#= submit_tag 'Submit', class: "btn btn-success btn-lg", id: "qle_marriage_submit" %>
-                                          </div>
-                                        </div>
+                                        <div id="qle_marriage_form"></div>
                                       <% else %>
                                         <%= qle.description %>
                                       <% end %>
@@ -506,6 +496,7 @@
         e.preventDefault();
         $('#plans-tab').click();
       });
+
     </script>
 
 
