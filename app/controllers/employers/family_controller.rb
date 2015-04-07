@@ -37,7 +37,7 @@ class Employers::FamilyController < ApplicationController
   def destroy
     @family.destroy
     flash.notice = "Successfully Deleted Employer Census Family."
-    redirect_to employers_employer_profiles_path(@employer_profile)
+    redirect_to employers_employer_profile_path(@employer_profile)
   end
 
   def show
