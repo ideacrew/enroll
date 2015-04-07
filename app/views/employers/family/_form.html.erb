@@ -19,7 +19,12 @@
             </div>
           <% end %>
 
-          <p class="information row">Add New Family</p>
+          <% if @family.persisted? %>
+             <% page_title = "Update Family" %>
+          <% else %>
+             <% page_title = "Add New Family" %>
+          <%end%>
+          <p class="information row"><%= page_title%></p>
                 <!-- <div id="overlay"></div> -->
 
           <%= f.fields_for :census_employee, errors: {}, fieldset: false do |employee|  %>
@@ -28,7 +33,12 @@
                     <%= render 'member_fields', f: employee %>
                   </div>
                   <div class="col-md-2 key no-pd-right col-sm-3 col-xs-12" id="key-section">
-                    <%= f.submit "Create Family", class: "btn btn-save" %>
+                    <% if @family.persisted? %>
+                       <% button_label ="Update Family" %>
+                    <% else %>
+                       <% button_label ="Create Family" %>
+                    <%end%>
+                    <%= f.submit button_label, class: "btn btn-save" %>
                         <p class="top-pad">
                           <span>Your personal information is secure</span>
                           <span><i></i></span>
@@ -36,7 +46,7 @@
                     </div>
                 </div><br>
 
-                <%= employee.fields_for :address, errors: {}, fieldset: false do |address|  %>
+                <%= employee.fields_for @family.census_employee.address, errors: {}, fieldset: false do |address|  %>
                   <div id="address_info" class="focus_effect row personaol-info-row">
                     <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
                       <%= render 'address_fields', f: address %>

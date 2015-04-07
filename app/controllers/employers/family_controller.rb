@@ -1,7 +1,7 @@
 class Employers::FamilyController < ApplicationController
 
-  before_filter :find_employer
-  before_filter :find_family, only: [:destroy, :show]
+  before_action :find_employer
+  before_action :find_family, only: [:destroy, :show, :edit, :update]
 
   def new
     @family = build_family
@@ -14,9 +14,25 @@ class Employers::FamilyController < ApplicationController
     @employer_profile.employee_families << @family
     if @employer_profile.save
       flash.notice = "Employer Census Family is successfully created."
-      redirect_to employers_employer_profiles_path(@employer_profile)
+      redirect_to employers_employer_profile_path(@employer_profile)
     else
       render action: "new"
+    end
+  end
+
+  def edit
+    @family.census_employee.build_address unless @family.census_employee.address.present?
+    @family.census_dependents.build unless @family.census_dependents.present?
+  end
+
+  def update
+    params.permit!
+    @family.attributes = params["employer_census_employee_family"]
+    if @employer_profile.save
+      flash.notice = "Employer Census Family is successfully updated."
+      redirect_to employers_employer_profile_path(@employer_profile)
+    else
+      render action: "edit"
     end
   end
 
