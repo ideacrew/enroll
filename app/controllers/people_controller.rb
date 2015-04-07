@@ -218,7 +218,6 @@ class PeopleController < ApplicationController
     employee_family = Organization.find(@employer.id).employee_family_details(@person)
     @dependent = employee_family.census_dependents.where(_id: params[:id]).first
     if !@dependent.nil?
-      fail
       @family_member_id = @dependent._id
       @dependent.destroy
     else
