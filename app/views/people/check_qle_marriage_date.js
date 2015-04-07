@@ -10,6 +10,7 @@
 
 $('.add_success').click(function(){
   $('#family-tab').click();
+  $('.add-member-buttons').removeClass('hidden');
 });
 
 $('.add_new_family_member').click();
