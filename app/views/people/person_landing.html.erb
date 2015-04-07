@@ -166,14 +166,21 @@
                                     <div class="panel-body">
                                       <% if qle.edi_code == '32-MARRIAGE' %>
                                         <div id="qle_marriage_form">
-                                          <p>
-                                            Getting married is an big step. It also a qualified life event that creates a special enrollment period. Start this step by telling us when you got married and then continue to "Add a Family Member" to select a plan for you and your new spouse.
-                                          </p>
-                                          <div class="text-center">
-                                              <input type="text" class="form-control input-lg daterange" id="date_married" placeholder="Date you were married i.e. 4/01/2015">
-                                              <br/>
-                                              <%= link_to 'Submit', 'javascript:void(0);', class: "btn btn-success btn-lg", id: "qle_marriage_submit" %>
-                                              <%#= submit_tag 'Submit', class: "btn btn-success btn-lg", id: "qle_marriage_submit" %>
+                                          <div class="initial-info">
+                                            <p>
+                                              Getting married is an big step. It also a qualified life event that creates a special enrollment period. Start this step by telling us when you got married and then continue to "Add a Family Member" to select a plan for you and your new spouse.
+                                            </p>
+                                            <div class="text-center">
+                                                <input type="text" class="form-control input-lg date_married" id="date_married" placeholder="Date you were married i.e. 4/01/2015">
+                                                <br/>
+                                                <%= link_to 'Submit', 'javascript:void(0);', class: "btn btn-success btn-lg", id: "qle_marriage_submit" %>
+                                            </div>
+                                          </div>
+                                          <div class="success-info hidden">
+                                            <p class="success-text"><strong>Success!</strong> You have created a special enrollment period.<br>Click continue go to the add your new family member and select your plan.</p><div class="text-center"><a id="profile-tab" href="#profile" role="tab" data-toggle="tab" aria-controls="profile" aria-expanded="true" class="btn btn-blue-2 btn-lg add_success">Continue</a></div>
+                                          </div>
+                                          <div class="error-info hidden">
+                                            <p class="error-text">The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact DCHBX support 1-800-555-1212 option 1</p><div class="text-center"><a href="#" class="btn btn-blue-2 btn-lg marriage_back">Back</a></div>
                                           </div>
                                         </div>
                                       <% else %>
@@ -225,12 +232,12 @@
 
                     <div aria-labelledby="employer-tab" id="employer" class="tab-pane fade" role="tabpanel">
                       <div class="emp-info">
-                       <%= render 'people/landing_pages/employer' %> 
+                       <%#= render 'people/landing_pages/employer' %> 
                       </div>
                     </div>
                     
                     <div aria-labelledby="family-tab" id="family" class="tab-pane fade landing-row" role="tabpanel">
-                      <%= render 'people/landing_pages/family_members' %> 
+                      <%#= render 'people/landing_pages/family_members' %> 
                     </div>
                     
                     
@@ -506,7 +513,7 @@
         e.preventDefault();
         $('#plans-tab').click();
       });
-      
+
     </script>
 
 

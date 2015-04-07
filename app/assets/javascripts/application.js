@@ -95,13 +95,8 @@ $(document).ready(function () {
       type: "GET",
       data:{date_val: $("#date_married").val()},
       url: "/people/check_qle_marriage_date.js"
-      // success: function (result) {
-      //   // body...
-      //   alert('hi');
-      // }
     });
   }
-
   $('#search-employer').click(function() {
     match_person();
   });

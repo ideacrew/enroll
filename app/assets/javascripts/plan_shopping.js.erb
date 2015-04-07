@@ -52,13 +52,13 @@ function doPlanComparison(action_uri) {
 }
 
 $(function() {
-  $("#select-plan-container a[role='tab'][data-toggle='tab']").click(function() {
-    hidePlanTabs();
-    $(this).parent().addClass("active");
-    var eleId = $(this).attr("href");
-    $(eleId).addClass("active");
-    $(eleId).show();
-  });
+	$("#select-plan-container a[role='tab'][data-toggle='tab']").click(function() {
+		hidePlanTabs();
+		$(this).parent().addClass("active");
+		var eleId = $(this).attr("href");
+		$(eleId).addClass("active");
+		$(eleId).show();
+	});
 
   $(".select-plan-for-comparison").change(function() {
     maybeAddComparisonPlan(this);
