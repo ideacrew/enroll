@@ -48,5 +48,12 @@ class EmployerCensus::Member
     self.dob.blank? ? "" : self.dob.strftime("%Y%m%d")
   end
 
+  def date_of_birth
+    self.dob.blank? ? nil : self.dob.strftime("%m/%d/%Y")
+  end
+
+  def date_of_birth=(val)
+    self.dob = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
+  end
 
 end
