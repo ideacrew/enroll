@@ -1,22 +1,22 @@
 class HbxProfile
   include Mongoid::Document
   include Mongoid::Timestamps
-  include Mongoid::Timestamps
 
   embedded_in :organization
+  embeds_many :enrollment_periods
+
+  field :markets, type: Array, default: []
 
   Name = "DC HealthLink"
   CmsId = "DC0"
 
   ## Application-level caching
 
-  # Directory::Carrier
+  ## Carriers
   # hbx_id, hbx_carrier_id, name, abbrev, 
 
-  # Directory::Plan
+  ## Plans & Premiums
   # hbx_id, hbx_plan_id, hbx_carrier_id, hios_id, year, quarter, name, abbrev, market, type, metal_level, pdf
-
-  # Directory::Premium
 
   ## Cross-reference ID Directory
   # Person
@@ -24,7 +24,7 @@ class HbxProfile
   # BrokerAgency
   # Policy
 
-  ## IVL Market HBX Policies
+  ## HBX Policies for IVL Market
   # Open Enrollment periods
 
   ## SHOP Market HBX Policies
