@@ -243,6 +243,10 @@ class Family
     end
   end
 
+  def dependents
+    family_members.reject(&:is_primary_applicant)
+  end
+
   private
 
   # This method will return true only if all the family_members in tax_household_members and coverage_household_members are present in self.family_members

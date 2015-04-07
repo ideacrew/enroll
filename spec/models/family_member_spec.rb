@@ -8,6 +8,16 @@ describe FamilyMember, type: :model do
     it "FamilyMember.find(id) should work" do
       expect(FamilyMember.find(family_member_id).id.to_s).to eq family_member_id.to_s
     end
+
+    it "should be possible to find the primary_relationship" do
+      mikes_family.dependents.each do |dependent|
+        if brady_children.include?(dependent.person)
+          expect(dependent.primary_relationship).to eq "child"
+        else
+          expect(dependent.primary_relationship).to eq "spouse"
+        end
+      end
+    end
   end
 
   describe "validation" do

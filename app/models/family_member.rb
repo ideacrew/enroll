@@ -24,6 +24,12 @@ class FamilyMember
   embeds_many :comments, cascade_callbacks: true
   accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
 
+  delegate :first_name, to: :person, allow_nil: true
+  delegate :last_name, to: :person, allow_nil: true
+  delegate :middle_name, to: :person, allow_nil: true
+  delegate :dob, to: :person, allow_nil: true
+  delegate :ssn, to: :person, allow_nil: true
+  delegate :gender, to: :person, allow_nil: true
 
   validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
 
@@ -68,6 +74,10 @@ class FamilyMember
 
   def is_active?
     self.is_active
+  end
+
+  def primary_relationship
+    family.primary_applicant.person.find_relationship_with(person) unless person.blank?
   end
 
   def self.find(family_member_id)
