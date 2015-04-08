@@ -1,11 +1,9 @@
 <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
-  <% organization = @employer_profile.organization %>
-  <% employee = organization.employee_family_details(@person) %>
-  <%= render 'shared/employer', organization: organization,employee: employee.census_employee %>
+  <%= render 'shared/employer', employer: @employer_profile, employee: @census_family.census_employee, effective_on: @effective_on %>
 </div>
 <div class="col-md-2 col-sm-2 col-xs-12">
   <%-# if employee.census_dependents.present? %>
-    <% url = dependent_details_people_path(person_id: @person.id, organization_id: organization.id) %>
+    <% url = dependent_details_people_path(person_id: @person.id, organization_id: @employer_profile.organization.id) %>
   <%-# else %>
     <%-# url = select_plan_people_path(person_id: @person.id, organization_id: organization.id) %>
   <%-# end %>
