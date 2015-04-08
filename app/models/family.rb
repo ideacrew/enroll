@@ -323,6 +323,7 @@ class Family
         if valid_relationship?(family_member)
           coverage_household_member = coverage_household.coverage_household_members.build
           coverage_household_member.applicant_id = family_member.id
+          coverage_household_member.is_subscriber = family_member.is_primary_applicant
         else
           coverage_household_for_others ||= household.coverage_households.build({submitted_at: self.submitted_at})
           coverage_household_member = coverage_household_for_others.coverage_household_members.build
