@@ -27,6 +27,7 @@ class FamilyMember
   delegate :first_name, to: :person, allow_nil: true
   delegate :last_name, to: :person, allow_nil: true
   delegate :middle_name, to: :person, allow_nil: true
+  delegate :full_name, to: :person, allow_nil: true
   delegate :dob, to: :person, allow_nil: true
   delegate :ssn, to: :person, allow_nil: true
   delegate :gender, to: :person, allow_nil: true
