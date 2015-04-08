@@ -21,6 +21,10 @@ describe HbxEnrollmentMember, type: :model do
       it "should have a family member" do
         expect(family_member_ids).to include(enrollment_member.family_member._id)
       end
+
+      it "should know its relationship to the subscriber" do
+        expect(enrollment_member.primary_relationship).to eq enrollment_member.family_member.primary_relationship
+      end
     end
   end
 end

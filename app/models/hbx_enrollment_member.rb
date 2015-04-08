@@ -30,6 +30,10 @@ class HbxEnrollmentMember
     end
   end
 
+  def primary_relationship
+    family_member.primary_relationship
+  end
+
   def person
     family_member.person
   end
