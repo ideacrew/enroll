@@ -46,10 +46,6 @@ class HbxEnrollment
             allow_nil:   false,
             inclusion: {in: Kinds, message: "%{value} is not a valid enrollment type"}
 
-  # validate :
-
-  after_save :update_shop_premium_matrix
-
   aasm do
     state :applying, initial: true
     state :submitted
@@ -133,11 +129,5 @@ class HbxEnrollment
     )
     enrollment.save
     enrollment
-  end
-
-  private
-
-  def update_shop_premium_matrix
-    ShopPremiumMatrix.cache_from(self, hbx_enrollment_members, benefit_group.elected_plans)
   end
 end
