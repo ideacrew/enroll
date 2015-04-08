@@ -80,4 +80,12 @@ $(function() {
     var base_url = $(this).attr("data-uri");
     doPlanComparison(base_url);
   });
+
+  $(".all-filters-row .apply-btn").on('click', function() {
+	  $(".all-filters-row").hide();
+	  //    $(".select-plan .tab-content").addClass("selected");
+	  $(".selected-plans-row").show();
+	  $(".select-plan ul.nav-tabs li:last-child").removeClass("active");
+	  $(".select-plan ul.nav-tabs li:first-child").addClass("active");
+  });
 });

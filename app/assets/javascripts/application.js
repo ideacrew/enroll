@@ -652,14 +652,6 @@ $(document).ready(function () {
     $(".all-filters-row").show();
   });
 
-  $(document).on('click', '.all-filters-row .apply-btn', function(){
-    $(".all-filters-row").hide();
-//    $(".select-plan .tab-content").addClass("selected");
-    $(".selected-plans-row").show();
-    $(".select-plan ul.nav-tabs li:last-child").removeClass("active");
-    $(".select-plan ul.nav-tabs li:first-child").addClass("active");
-  });
-
   $(document).on('click', '.selected-plans-row .close', function(){
     $(".select-plan .tab-content").removeClass("selected");
     $(".selected-plans-row").hide();
