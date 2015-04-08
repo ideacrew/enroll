@@ -375,7 +375,10 @@ $(document).ready(function () {
   });
   
   function fade_all() {
-    $("#personal_info div.first").css("opacity","0.5");
+    
+    if(!$("#address_info").hasClass('hidden')) {
+      $("#personal_info div.first").css("opacity","0.5");
+    }
     $("#address_info div.first").css("opacity","0.5");
     $("#phone_info div.first").css("opacity","0.5");
     $("#email_info div.first").css("opacity","0.5");
