@@ -521,6 +521,20 @@ $(document).ready(function () {
       }, 1000);
   });
   
+  $('#email_info input').focusout(function() {
+    var email = $(this).val();
+    if(email=="") {
+      return;
+    }
+    if(timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+    }
+    timeout = setTimeout(function() {
+      check_email(email);
+      }, 1000);
+  });
+  
   function check_email(email) { 
     var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if(!re.test(email)) {
