@@ -653,7 +653,16 @@ $(document).ready(function () {
   $(".zip").mask("99999");
   $("#person_ssn").mask("999999999");
   $(".address-state").mask("**");
-
+  
+  $("#person_ssn").focusout(function( event ) {
+    if(!$.isNumeric($(this).val())) {
+      $("[for='person_ssn']").css('display', 'none');
+      $("[for='person_ssn']").css('opacity', 0);
+    } else {
+      $("[for='person_ssn']").css('display', 'block');
+      $("[for='person_ssn']").css('opacity', 1);
+    }
+  });
   /* People Account Page */
   $('#contact-tab').click(function() {
 
