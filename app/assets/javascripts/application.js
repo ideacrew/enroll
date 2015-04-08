@@ -504,7 +504,7 @@ $(document).ready(function () {
   });
   
   $('#save_member').click(function() {
-    $('#new_employer_census_dependent:last').submit();
+    $('.new_family_member:last').submit();
   });
   
   // Email validation after 1 seconds of stopping typing

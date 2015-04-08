@@ -188,22 +188,32 @@ class PeopleController < ApplicationController
   end
 
   def save_dependents
-    new_dependent = EmployerCensus::Dependent.new(dependent_params)
+    #new_dependent = EmployerCensus::Dependent.new(dependent_params)
     @person = Person.find(params[:person])
     @employer = Organization.find(params[:employer])
-    employee_family = Organization.find(@employer.id).employee_family_details(@person)
-    @dependent = employee_family.census_dependents.where(id: new_dependent.id).first
+    family = @person.primary_family
+    #person = Person.new()
+    member = Person.new(dependent_params)
+    new_dependent = FamilyMember.new(id: params[:family_member][:id], person: member)
+    #employee_family = Organization.find(@employer.id).employee_family_details(@person)
+    #@dependent = employee_family.census_dependents.where(id: new_dependent.id).first
+    @dependent = family.family_members.where(_id: new_dependent.id).first
     if @dependent.blank?
-      @dependent = employee_family.census_dependents.build(params[:employer_census_dependent])
+      #@dependent = employee_family.census_dependents.build(params[:employer_census_dependent])
+      #@dependent = family.family_members.build(dependent_params)
+      @dependent = family.family_members.new(id: params[:family_member][:id], person: member)
       respond_to do |format|
-        if @dependent.save
+        if member.save and @dependent.save
+          @person.person_relationships.create(kind: params[:family_member][:primary_relationship], relative_id: member.id)
           format.js { flash.now[:notice] = "Family Member Added." }
         else
           format.js { flash.now[:error_msg] = "Error in Family Member Addition." }
         end
       end
     else
-      if @dependent.update_attributes(params[:employer_census_dependent])
+      #relationship = @person.person_relationships.where(relative_id: member)
+      #@dependent.person.update_attributes(dependent_params) and 
+      if @dependent.update_attributes(dependent_params)
         respond_to do |format|
           format.js { flash.now[:notice] = "Family Member Updated." }
         end
@@ -218,11 +228,15 @@ class PeopleController < ApplicationController
   def remove_dependents
     @person = Person.find(params[:person_id])
     @employer = Organization.find(params[:organization_id])
-    employee_family = Organization.find(@employer.id).employee_family_details(@person)
-    @dependent = employee_family.census_dependents.where(_id: params[:id]).first
+    @family = @person.primary_family
+    @dependent = @family.family_members.where(_id: params[:id]).first
+    #employee_family = Organization.find(@employer.id).employee_family_details(@person)
+   # @dependent = employee_family.census_dependents.where(_id: params[:id]).first
     if !@dependent.nil?
       @family_member_id = @dependent._id
+      #@dependent.person.destroy
       @dependent.destroy
+      @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
     else
       fail
       @family_member_id = params[:id]
@@ -421,7 +435,7 @@ private
   end
 
   def dependent_params
-    params.require(:employer_census_dependent).permit!
+    params.require(:family_member).reject{|k, v| k == "id" or k =="primary_relationship"}.permit!
   end
 
 end
