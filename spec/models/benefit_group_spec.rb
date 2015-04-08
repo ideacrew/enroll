@@ -34,14 +34,17 @@ describe BenefitGroup, type: :model do
             day = 15
             (0..11).each do |month_offset|
               date = (start_plan_year + 14.days) + month_offset.months
-              expected_effective = (date + benefit_group.effective_on_offset.days).beginning_of_month
+              expected_effective = (date + benefit_group.effective_on_offset.days).beginning_of_month.next_month
               expect(benefit_group.effective_on_for(date)).to eq expected_effective
             end
             date_of_hire = Date.new(2015, 1, 1)
             expected_effective = start_plan_year
             expect(benefit_group.effective_on_for(date_of_hire)).to eq expected_effective
-            date_of_hire = Date.new(2015, 1, 31)
+            date_of_hire = Date.new(2015, 1, 15)
             expected_effective = Date.new(2015, 3, 1)
+            expect(benefit_group.effective_on_for(date_of_hire)).to eq expected_effective
+            date_of_hire = Date.new(2015, 1, 31)
+            expected_effective = Date.new(2015, 4, 1)
             expect(benefit_group.effective_on_for(date_of_hire)).to eq expected_effective
           end
         end
@@ -55,7 +58,7 @@ describe BenefitGroup, type: :model do
             day = 15
             (0..11).each do |month_offset|
               date = (start_plan_year + 0.days) + month_offset.months
-              expected_effective = (date + benefit_group.effective_on_offset.days).beginning_of_month
+              expected_effective = (date + benefit_group.effective_on_offset.days).beginning_of_month.next_month
               expect(benefit_group.effective_on_for(date)).to eq expected_effective
             end
             date_of_hire = Date.new(2010, 01, 01)
