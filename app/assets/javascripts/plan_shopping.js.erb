@@ -3,10 +3,12 @@ function hidePlanTabs() {
   $("ul[role='tablist'] li[role='presentation']").each(function(idx, ele) {
     $(ele).removeClass("active");
   });
+/*
   $(".tab-pane").each(function(idx, ele) {
     $(ele).removeClass("active");
     $(ele).hide();
-  });
+    });
+    */
 }
 
 var plansToCompareArray = new Array();
@@ -55,9 +57,19 @@ $(function() {
 	$("#select-plan-container a[role='tab'][data-toggle='tab']").click(function() {
 		hidePlanTabs();
 		$(this).parent().addClass("active");
-		var eleId = $(this).attr("href");
-		$(eleId).addClass("active");
-		$(eleId).show();
+		var attr = $(this).attr("data-plan-category-filter");
+		if (typeof attr !== typeof undefined && attr !== false) {
+		  if (attr == "all") {
+			  $(".plan-row").show();
+		  } else {
+			  $(".plan-row").hide();
+			  var qstring = ".plan-row[data-plan-category='" + attr + "']";
+			  $(qstring).show();
+		  }
+		}
+//		var eleId = $(this).attr("href");
+//		$(eleId).addClass("active");
+//		$(eleId).show();
 	});
 
   $(".select-plan-for-comparison").change(function() {

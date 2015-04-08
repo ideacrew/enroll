@@ -21,10 +21,10 @@
 
 
 								<ul class="nav nav-tabs" role="tablist">
-									<li role="presentation" class="active"><a href="#all-plans" aria-controls="all-plans" role="tab" data-toggle="tab">All Plans</a></li>
-									<li role="presentation"><a href="#hmo-plans" aria-controls="hmo-plans" role="tab" data-toggle="tab">HMO Plans</a></li>
-									<li role="presentation"><a href="#ppo-plans" aria-controls="ppo-plans" role="tab" data-toggle="tab">PPO Plans</a></li>
-									<li role="presentation"><a href="#pos-plans" aria-controls="pos-plans" role="tab" data-toggle="tab">POS Plans</a></li>
+									<li role="presentation" class="active"><a data-plan-category-filter="all" href="#" aria-controls="all-plans" role="tab" data-toggle="tab">All Plans</a></li>
+									<li role="presentation"><a href="#" data-plan-category-filter="hmo" aria-controls="hmo-plans" role="tab" data-toggle="tab">HMO Plans</a></li>
+									<li role="presentation"><a href="#" data-plan-category-filter="ppo" aria-controls="ppo-plans" role="tab" data-toggle="tab">PPO Plans</a></li>
+									<li role="presentation"><a href="#" data-plan-category-filter="pos" aria-controls="pos-plans" role="tab" data-toggle="tab">POS Plans</a></li>
 									<li class="pull-right all-filter" role="presentation"><a href="#" role="tab" data-toggle="tab">All Filters</a></li>
 								</ul>
 
@@ -38,23 +38,6 @@
 										<% end %>
 									</div>
 
-									<div role="tabpanel" class="tab-pane active" id="hmo-plans">
-										<% @plans.select { |pl| pl.plan_type && (pl.plan_type.downcase == "hmo") }.each do |plan| %>
-											<%= render "plan_shopping/plan_details", :plan => plan %>
-										<% end %>
-									</div>
-
-									<div role="tabpanel" class="tab-pane active" id="ppo-plans">
-										<% @plans.select { |pl| pl.plan_type && (pl.plan_type.downcase == "ppo") }.each do |plan| %>
-											<%= render "plan_shopping/plan_details", :plan => plan %>
-										<% end %>
-									</div>
-
-									<div role="tabpanel" class="tab-pane active" id="pos-plans">
-										<% @plans.select { |pl| pl.plan_type && (pl.plan_type.downcase == "pos") }.each do |plan| %>
-											<%= render "plan_shopping/plan_details", :plan => plan %>
-										<% end %>
-									</div>
 								</div>
 							</div>
 							</section>
