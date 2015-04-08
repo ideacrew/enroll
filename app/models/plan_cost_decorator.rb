@@ -20,10 +20,50 @@ class PlanCostDecorator < SimpleDelegator
     member.age_on_effective_date
   end
 
+  def benefit_relationship(person_relationship)
+    {
+      "head of household" => nil,
+      "spouse" => "spouse",
+      "ex-spouse" => "spouse",
+      "cousin" => nil,
+      "ward" => "child_under_26",
+      "trustee" => "child_under_26",
+      "annuitant" => nil,
+      "other relationship" => nil,
+      "other relative" => nil,
+      "self" => "employee",
+      "parent" => nil,
+      "grandparent" => nil,
+      "aunt_or_uncle" => nil,
+      "nephew_or_niece" => nil,
+      "father_or_mother_in_law" => nil,
+      "daughter_or_son_in_law" => nil,
+      "brother_or_sister_in_law" => nil,
+      "adopted_child" => "child_under_26",
+      "stepparent" => nil,
+      "foster_child" => "child_under_26",
+      "sibling" => nil,
+      "stepchild" => "child_under_26",
+      "sponsored_dependent" => "child_under_26",
+      "dependent_of_a_minor_dependent" => nil,
+      "guardian" => nil,
+      "court_appointed_guardian" => nil,
+      "collateral_dependent" => "child_under_26",
+      "life_partner" => "domestic_partner",
+      "child" => "child_under_26",
+      "grandchild" => nil,
+      "unrelated" => nil,
+      "great_grandparent" => nil,
+      "great_grandchild" => nil,
+    }[person_relationship]
+  end
+
   def relationship(member)
-    # TODO: commented implementation returns relationships that do not match relationship_benefit relationships
-    # member.family.primary_applicant.find_relationship_with(member.family_member)
-    "employee"
+    if member.is_subscriber?
+      "employee"
+    else
+      benefit_relationship(member.primary_relationship)
+    end
   end
 
   def employer_contribution_percent(member)
