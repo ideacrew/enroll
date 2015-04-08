@@ -11,46 +11,62 @@ function hidePlanTabs() {
     */
 }
 
+function applyPlanFilters() {
+	var selectedPlanTypes = [];
+	var spCheckboxes = $('input.plan-type-selection-filter:checked');
+	if (spCheckboxes.size() > 0) {
+		$(".plan-row").hide();
+		spCheckboxes.each(function(idx, ele) {
+			var ptName = $(ele).attr("data-plan-category-filter");
+			var qstring = ".plan-row[data-plan-category='" + ptName + "']";
+			$(qstring).show();
+
+		});
+	} else {
+		$(".plan-row").show();
+	}
+}
+
 var plansToCompareArray = new Array();
 
 function maybeAddComparisonPlan(cb) {
-  var new_plan = $(cb).attr("data-hios-id");
-  var is_checked = $(cb).prop("checked");
-  if (is_checked) {
-    if (plansToCompareArray.length > 2) {
-      var removed_id = plansToCompareArray.shift();
-      var lookup_string = "input[data-hios-id='" +
-        removed_id + "'].select-plan-for-comparison";
-      $(lookup_string).each(function(idx, ele) {
-        $(ele).attr("checked", false);
-      });
-    }
-    plansToCompareArray.push(new_plan);
-  } else {
-    var tmpArray = [];
-    for (var i = 0; i < plansToCompareArray.length; i++) {
-      if (plansToCompareArray[i] != new_plan) {
-        tmpArray.push(plansToCompareArray[i]);
-      }
-    }
-    plansToCompareArray = tmpArray;
-  }
-  if (plansToCompareArray.length > 1) {
-    $("#compare-selected-plans-link").show();
-  } else {
-    $("#compare-selected-plans-link").hide();
-  }
+	var new_plan = $(cb).attr("data-hios-id");
+	var is_checked = $(cb).prop("checked");
+	if (is_checked) {
+		if (plansToCompareArray.length > 2) {
+			var removed_id = plansToCompareArray.shift();
+			var lookup_string = "input[data-hios-id='" +
+				removed_id + "'].select-plan-for-comparison";
+			$(lookup_string).each(function(idx, ele) {
+				$(ele).attr("checked", false);
+			});
+		}
+		plansToCompareArray.push(new_plan);
+	} else {
+		var tmpArray = [];
+		for (var i = 0; i < plansToCompareArray.length; i++) {
+			if (plansToCompareArray[i] != new_plan) {
+				tmpArray.push(plansToCompareArray[i]);
+			}
+		}
+		plansToCompareArray = tmpArray;
+	}
+	if (plansToCompareArray.length > 1) {
+		$("#compare-selected-plans-link").show();
+	} else {
+		$("#compare-selected-plans-link").hide();
+	}
 }
 
 function doPlanComparison(action_uri) {
-  $.ajax({
-    type: "GET",
-    url: action_uri,
-    dataType: 'script',
-    data: {
-      "standard_component_ids": plansToCompareArray
-    }
-  });
+	$.ajax({
+		type: "GET",
+	url: action_uri,
+	dataType: 'script',
+	data: {
+		"standard_component_ids": plansToCompareArray
+	}
+	});
 }
 
 $(function() {
@@ -59,33 +75,31 @@ $(function() {
 		$(this).parent().addClass("active");
 		var attr = $(this).attr("data-plan-category-filter");
 		if (typeof attr !== typeof undefined && attr !== false) {
-		  if (attr == "all") {
-			  $(".plan-row").show();
-		  } else {
-			  $(".plan-row").hide();
-			  var qstring = ".plan-row[data-plan-category='" + attr + "']";
-			  $(qstring).show();
-		  }
+			if (attr == "all") {
+				$(".plan-row").show();
+			} else {
+				$(".plan-row").hide();
+				var qstring = ".plan-row[data-plan-category='" + attr + "']";
+				$(qstring).show();
+			}
 		}
-//		var eleId = $(this).attr("href");
-//		$(eleId).addClass("active");
-//		$(eleId).show();
 	});
 
-  $(".select-plan-for-comparison").change(function() {
-    maybeAddComparisonPlan(this);
-  });
+	$(".select-plan-for-comparison").change(function() {
+		maybeAddComparisonPlan(this);
+	});
 
-  $("#compare-selected-plans-link").click(function() {
-    var base_url = $(this).attr("data-uri");
-    doPlanComparison(base_url);
-  });
+	$("#compare-selected-plans-link").click(function() {
+		var base_url = $(this).attr("data-uri");
+		doPlanComparison(base_url);
+	});
 
-  $(".all-filters-row .apply-btn").on('click', function() {
-	  $(".all-filters-row").hide();
-	  //    $(".select-plan .tab-content").addClass("selected");
-	  $(".selected-plans-row").show();
-	  $(".select-plan ul.nav-tabs li:last-child").removeClass("active");
-	  $(".select-plan ul.nav-tabs li:first-child").addClass("active");
-  });
+	$(".all-filters-row .apply-btn").on('click', function() {
+		$(".all-filters-row").hide();
+		//    $(".select-plan .tab-content").addClass("selected");
+		$(".selected-plans-row").show();
+		$(".select-plan ul.nav-tabs li:last-child").removeClass("active");
+		$(".select-plan ul.nav-tabs li:first-child").addClass("active");
+		applyPlanFilters();
+	});
 });
