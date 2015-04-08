@@ -1,15 +1,15 @@
 <div class="right-side">
   <div class="col-md-8 col-xs-12 col-sm-12 no-pd">
-    <div class="row" id="dependent_ul">
+    <div class="" id="dependent_ul">
       <%#= render partial: "people/landing_pages/add_family_member_form" %>
       <%#= render 'dependent', dependent: @family_members.new,employer: @employer_profile,person: @person,employee: @employee %>
     </div>
-    <div class="row add-member-buttons hidden ">
+<!--<div class="row add-member-buttons hidden ">
       <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-          <%= link_to "Cancel", 'javascript:void(0)', class: '', id: 'cancel_member' %>
+          <%= link_to "Cancel", 'javascript:void(0)', class: 'btn btn-red', id: 'cancel_member' %>
           <a class="text-center btn btn-save pull-right" id="save_member">Confirm Member</a>
         </div>
-      </div>
+      </div> -->
     <br/>
     <ul class="list-group">
 
@@ -18,7 +18,7 @@
       <%#  end %>
 
       <% @family_members.each do |dependent| %>
-      <li class="list-group-item">
+      <li class="list-group-item family_members_list">
         <div class="row">
           <div class="col-md-10 col-sm-8 col-xs-8">
             <h4> <%= dependent.person.first_name %> <%= dependent.person.last_name %> </h4>
