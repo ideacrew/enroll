@@ -1,7 +1,7 @@
 class EmployerCensus::EmployeeFamily
-
   include Mongoid::Document
   include Mongoid::Timestamps
+  include AASM
 
   embedded_in :employer_profile
 
@@ -12,6 +12,7 @@ class EmployerCensus::EmployeeFamily
   field :employee_role_id, type: BSON::ObjectId
   field :linked_at, type: DateTime
 
+  field :aasm_state, type: String
   field :terminated, type: Boolean, default: false
 
   embeds_one :census_employee,
@@ -28,11 +29,11 @@ class EmployerCensus::EmployeeFamily
 
   validates_presence_of :census_employee
 
-  default_scope  ->{ where(:terminated => false) }
-  scope :terminated,     ->{ where(:terminated => true) }
+  default_scope       ->{ where(:terminated => false) }
+  scope :terminated,  ->{ where(:terminated => true) }
 
-  scope :linked,     ->{ where(:is_linked => true) }
-  scope :unlinked,   ->{ where(:is_linked => false) }
+  scope :linked,      ->{ where(:is_linked => true) }
+  scope :unlinked,    ->{ where(:is_linked => false) }
 
   # Initialize a new, refreshed instance for rehires via deep copy
   def replicate_for_rehire
@@ -140,6 +141,28 @@ class EmployerCensus::EmployeeFamily
       organizations.first.employer_profile.employee_families.detect { | family | family.employee_role_id == employee_role._id }
     end
   end
+
+
+  # Workflow for automatic approval
+  aasm do
+    state :eligible, initial: true
+    state :enrolled
+    state :coverage_waived
+    state :employment_terminated
+
+    event :enroll do
+      transitions from: [:eligible, :coverage_waived], to: [:enrolled]
+    end
+
+    event :waive_coverage do
+      transitions from: [:eligible, :enrolled], to: [:coverage_waived]
+    end
+
+    event :terminate_employment do
+      transitions from: [:eligible, :enrolled, :coverage_waived], to: [:employment_terminated]
+    end
+  end
+
 
 private
   # Apply business rules for when an enrollment -- outside open enrollment -- is considered timely, including:
