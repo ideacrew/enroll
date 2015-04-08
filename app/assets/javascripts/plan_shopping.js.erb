@@ -3,28 +3,26 @@ function hidePlanTabs() {
   $("ul[role='tablist'] li[role='presentation']").each(function(idx, ele) {
     $(ele).removeClass("active");
   });
-/*
-  $(".tab-pane").each(function(idx, ele) {
-    $(ele).removeClass("active");
-    $(ele).hide();
-    });
-    */
 }
 
-function applyPlanFilters() {
+function applyPlanFilterCBs(cbKlass, cbFilterKlass, planValueTag) {
 	var selectedPlanTypes = [];
-	var spCheckboxes = $('input.plan-type-selection-filter:checked');
+	var spCheckboxes = $('input.' + cbKlass + ':checked');
 	if (spCheckboxes.size() > 0) {
 		$(".plan-row").hide();
 		spCheckboxes.each(function(idx, ele) {
-			var ptName = $(ele).attr("data-plan-category-filter");
-			var qstring = ".plan-row[data-plan-category='" + ptName + "']";
+			var ptName = $(ele).attr(cbFilterKlass);
+			var qstring = ".plan-row[" + planValueTag  + "='" + ptName + "']";
 			$(qstring).show();
 
 		});
 	} else {
 		$(".plan-row").show();
 	}
+}
+
+function applyPlanFilters() {
+	applyPlanFilterCBs("plan-type-selection-filter", "data-plan-category-filter", "data-plan-category");
 }
 
 var plansToCompareArray = new Array();
@@ -96,10 +94,6 @@ $(function() {
 
 	$(".all-filters-row .apply-btn").on('click', function() {
 		$(".all-filters-row").hide();
-		//    $(".select-plan .tab-content").addClass("selected");
-		$(".selected-plans-row").show();
-		$(".select-plan ul.nav-tabs li:last-child").removeClass("active");
-		$(".select-plan ul.nav-tabs li:first-child").addClass("active");
 		applyPlanFilters();
 	});
 });
