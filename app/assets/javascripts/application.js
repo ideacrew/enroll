@@ -619,10 +619,10 @@ $(document).ready(function () {
       });
 
       $('#family .remove').click(function() {
-        current_element = $(this).closest("#family");
+        current_element = $(this).closest("#family .family_members_list");
         message = 'Remove ' + current_element.find('#family_member_first_name').val() + ' ' + current_element.find('#family_member_middle_name').val() + ' ' + current_element.find('#family_member_last_name').val();
 
-        $(this).closest("#family").find("#remove_confirm")
+        $(this).closest("#family .family_members_list").find("#remove_confirm")
           .html(message + '? <a href="javascript:void(0);" class="btn remove_dependent cancel">' + (link.data('cancel')) + '</a> <a class="btn remove_dependent confirm" href="javascript:void(0);">' + (link.data('ok')) + '</a>')
           .removeClass('hidden');
       });

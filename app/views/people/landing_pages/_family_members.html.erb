@@ -28,7 +28,7 @@
           <div class="col-md-2 col-sm-4 col-xs-4 text-right">
             <a href="javascript:void(0);" class="edit"><%= image_tag "edit.png" %></a>
 
-            <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: @person.id, organization_id: @employer_profile.id) %>
+            <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: @person.id, organization_id: @employer_profile.organization.id) %>
             <%= link_to (image_tag "member-close.png"), remove_url, class: 'remove', :method => :delete, :remote => true, data: {confirm: "Remove #{dependent.full_name}", ok: 'yes', cancel: 'no'} %>
 
             <!-- <a href="#" class="remove"><%= image_tag "member-close.png" %></a> -->
@@ -37,7 +37,7 @@
         </div>
         <div class="row">
           <ul id="dependent_ul">
-            <%= render 'people/landing_pages/add_family_member_form', dependent: dependent, employer: @employer_profile, person: @person, employee: @person.employee_roles.first %>
+            <%= render 'people/landing_pages/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
           </ul>
           <%#= render partial: "people/landing_pages/add_family_member_form" %>
         </div>
