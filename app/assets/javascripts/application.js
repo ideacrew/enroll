@@ -673,24 +673,4 @@ $(document).ready(function () {
       $("[for='person_ssn']").css('opacity', 1);
     }
   });
-  /* People Account Page */
-  $('#contact-tab').click(function() {
-
-  });
-
-  $('#home-tab').click(function() {
-    $('.people li.panel').removeClass('active');
-    $('.people li.panel').removeClass('active-list');
-    $('#accordion .collapse').removeClass('in');
-  });
-
-  $('.people li.panel').click(function(){
-    $('li').removeClass('active-list');
-    $(this).addClass("active-list")
-  });
-  
-  $('.employer_ok').click(function(e){
-    e.preventDefault();
-    $('.new-employer-alert').remove();
-    })
 });

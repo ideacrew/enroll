@@ -3158,9 +3158,7 @@ a.close-2{
   margin-bottom: 0;
   background: #fff;
 }
-#employer .emp-info .middle-row:not(:last-child), #family .middle-row:not(:last-child) {
-  border-bottom: 1px solid #999; 
-}
+
 #employer .emp-info .first{
   border: 1px solid #999;
 }
@@ -3225,17 +3223,25 @@ a.close-2{
 #family .right-side li.edit, #family .right-side li.edit:hover{
   padding: 0;
   opacity: 1;
-  border: #cdcdcd solid 2px !important;
+  border: #cdcdcd solid 1px !important;
   position: relative;
   z-index: 999;
 }
-#family .right-side li > .row:nth-child(2),
- #family .right-side li.edit > .row:first-child{
+#family .right-side li.edit .first {
+  border-left: none;
+  border-right: none;
+}
+#family .right-side li > .row:nth-child(2) {
   display: none;
 }
 #family .right-side li.edit > .row:nth-child(2){
   display: block;
 }
+
+#family .right-side li.edit > .row:first-child{
+  padding: 12.8px 0;
+}
+
 #family .right-side #add-new-member{
   border: #cdcdcd solid 2px;
   display: none; 
@@ -3295,4 +3301,32 @@ a.close-2{
 .landing .landing-row button.btn.btn-see-all  {border-radius: 3px;}
 .list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
   text-shadow: none;
+}
+
+.panel .landing-row .right-side .list-group .list-group-item.family_members_list {padding: 12.8px 0;}
+.tab-pane .landing-row .right-side .btn.btn-red {
+  background-color: #8c0000;
+  color: #fff;
+  float: left;
+  width: 90px;
+}
+
+#add-new-member .form-control.active-floatlabel, #family li.family_members_list .form-control.active-floatlabel{
+  padding-top: 24px;
+  -webkit-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+  height: 48px !important;
+  font-size: 16px !important;
+}
+
+#add-new-member .label-floatlabel , #family li.family_members_list .label-floatlabel{
+  position: absolute;
+  top: 0px; left: 8px;
+  display: block;
+  opacity: 1;
+  font-size: 11px;
+  font-weight: bold;
+  color: #0079c6;
+  -webkit-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
 }

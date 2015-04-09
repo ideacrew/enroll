@@ -418,115 +418,99 @@
     </div>
     <div class="md-overlay"></div><!-- the overlay element -->
 
-    <script>
-      $(".adderess-select-box").focusin(function() {
-        $(".bg-color").css({
-          "background-color": "rgba(220, 234, 241, 1)", 
-          "height": "46px", 
-        });
+   <script>
+    $(".adderess-select-box").focusin(function() {
+      $(".bg-color").css({
+        "background-color": "rgba(220, 234, 241, 1)", 
+        "height": "46px", 
       });
-      
-      $(".adderess-select-box").focusout(function() {
-        $(".bg-color").css({
-          "background-color": "rgba(255, 255, 255, 1)", 
-          "height": "46px", 
-        });
+    });
+        
+    $(".adderess-select-box").focusout(function() {
+      $(".bg-color").css({
+        "background-color": "rgba(255, 255, 255, 1)", 
+        "height": "46px", 
       });
+    });
 
-      $(document).on("click", ".heading", function(){
-        $(this).closest('div').find(".table-responsive").slideToggle("slow");
-      });
+    $(document).on("click", ".heading", function(){
+      $(this).closest('div').find(".table-responsive").slideToggle("slow");
+    });
 
-      // $( ".landing-row .left-side .search-table tbody tr td" ).hover(function() {
-      //   $( ".landing-row .left-side .search-table span" ).css("color", "#666 !important");
-      // });
+    $('.md-trigger').click(function(e){
+      e.preventDefault();
+    });
 
-      $('.md-trigger').click(function(e){
-       e.preventDefault();
-      });
+    $('.event-accordion .panel').click(function () {
+      $(this).toggleClass('active');
+      $(this).siblings().removeClass('active');
+    });
 
-      $('.event-accordion .panel').click(function () {
-        $(this).toggleClass('active');
-        $(this).siblings().removeClass('active');
-      });
+    $(".personal-table input").focusout(function() {
+      if ($(".personal-table input").val() !== ""){
+        $("#personal_info .save-btn").removeClass("disabled");
+        $("#personal_info .vital-information").css("display", "block");
+        $(".personal-table tbody tr:first-child td, table.personal-table").removeAttr("style");
+      }
+    });
 
-      //$('input,textarea').focus(function(){
-      // $(this).removeAttr('placeholder');
-      // $(this).removeAttr('value');
-      //});
+    $(".personal-table input").focusin(function() {
+      $(".personal-table tbody tr:first-child td, table.personal-table").css("cssText", "border-color: #00a3d9 !important;");
+    });
 
-      $(".personal-table input").focusout(function() {
-        if ($(".personal-table input").val() !== ""){
-          $("#personal_info .save-btn").removeClass("disabled");
-          $("#personal_info .vital-information").css("display", "block");
-          $(".personal-table tbody tr:first-child td, table.personal-table").removeAttr("style");
-        }else{}
-      });
+    $(document).on('click', '#family .right-side a.edit', function(){
+      $(this).parent().parent(".row").parent(".list-group-item").addClass("edit");
+    });
 
-      $(".personal-table input").focusin(function() {
-        $(".personal-table tbody tr:first-child td, table.personal-table").css("cssText", "border-color: #00a3d9 !important;");
-      });
+    $(document).on('click', '#family .right-side a.remove', function(){
+      $(this).closest(".list-group-item").remove();
+    });
 
-      $(document).on('click', '#family .right-side a.edit', function(){
-        $(this).parent().parent(".row").parent(".list-group-item").addClass("edit");
-      });
+    $(document).on('click', '#family .right-side a.cancel', function(){
+      $(this).closest("li.edit").removeClass("edit");
+    });
 
-      $(document).on('click', '#family .right-side a.remove', function(){
-        $(this).closest(".list-group-item").remove();
-      });
+    $(document).on('click', '#family .right-side a.save', function(){
+      if ($("#family .right-side li.edit input.first-name").val() !== ""){
+        var first = $("#family .right-side li.edit input.first-name").val();
+        var middle = $("#family .right-side li.edit input.middle-name").val();
+        var last = $("#family .right-side li.edit input.last-name").val();
+        // $("li.edit h4").text(first + " " + middle + " " + last);
+        
+        // $(this).closest("li.edit").removeClass("edit");
+        $(this).closest("form").submit();
+      } else {
+        // $(this).closest("li.edit").removeClass("edit");
+      }
+    });
 
-      $(document).on('click', '#family .right-side a.cancel', function(){
-        $(this).closest("li.edit").removeClass("edit");
-      });
+    $("#family .right-side button.new-member").click(function(e){
+      e.preventDefault();
+      $("#family .right-side #add-new-member").css("display", "block");
+    });
 
-      $(document).on('click', '#family .right-side a.save', function(){
-        if ($("#family .right-side li.edit input.first-name").val() !== ""){
-          var first = $("#family .right-side li.edit input.first-name").val();
-          var middle = $("#family .right-side li.edit input.middle-name").val();
-          var last = $("#family .right-side li.edit input.last-name").val();
-          $("li.edit h4").text(first + " " + middle + " " + last);
-          $(this).closest("li.edit").removeClass("edit");
-        }else{
-          $(this).closest("li.edit").removeClass("edit");
-        }
-      });
+    $("#family .right-side #add-new-member a.cancel").click(function(){
+      $("#family .right-side #add-new-member").removeAttr("style");
+    });
 
-      $("#family .right-side button.new-member").click(function(e){
-        e.preventDefault();
-        $("#family .right-side #add-new-member").css("display", "block");
-      });
+    // $("#family .right-side #add-new-member a.save").click(function(){
+    //   if ($("#family .right-side #add-new-member input.first-name").val() !== ""){
+    //     $("#family .right-side ul li:last-child").clone().appendTo("#family .right-side ul");
+    //     var first = $("#family .right-side #add-new-member input.first-name").val();
+    //     var middle = $("#family .right-side #add-new-member input.middle-name").val();
+    //     var last = $("#family .right-side #add-new-member input.last-name").val();
+    //     // $("#family .right-side ul li:last-child h4").text(first + " " + middle + " " + last);
+    //     $("#add-new-member").removeAttr("style");
+    //   } else {
+    //     $("#family .right-side #add-new-member").removeAttr("style");
+    //   }
+    // });
+       
+    $('.see-plan-details').click(function(e){
+      e.preventDefault();
+      $('#plans-tab').click();
+    });
 
-      $("#family .right-side #add-new-member a.cancel").click(function(){
-        $("#family .right-side #add-new-member").removeAttr("style");
-      });
-
-      $("#family .right-side #add-new-member a.save").click(function(){
-        if ($("#family .right-side #add-new-member input.first-name").val() !== ""){
-          $("#family .right-side ul li:last-child").clone().appendTo("#family .right-side ul");
-          var first = $("#family .right-side #add-new-member input.first-name").val();
-          var middle = $("#family .right-side #add-new-member input.middle-name").val();
-          var last = $("#family .right-side #add-new-member input.last-name").val();
-          $("#family .right-side ul li:last-child h4").text(first + " " + middle + " " + last);
-          $("#add-new-member").removeAttr("style");
-        }else{
-          $("#family .right-side #add-new-member").removeAttr("style");
-        }
-      });
-     
-      $('.see-plan-details').click(function(e){
-        e.preventDefault();
-        $('#plans-tab').click();
-      });
-
-    </script>
-
-
-    <!-- classie.js by @desandro: https://github.com/desandro/classie -->
-    
-
-    <!-- for the blur effect -->
-    <!-- by @derSchepp https://github.com/Schepp/CSS-Filters-Polyfill -->
-    <script>
-      // this is important for IEs
-      var polyfilter_scriptpath = '/js/';
-    </script>
+    // this is important for IEs
+    var polyfilter_scriptpath = '/js/';
+   </script>
