@@ -61,7 +61,6 @@ Rails.application.routes.draw do
     get 'person_landing'
 
     collection do
-      get 'plans_converson'
       post 'match_person'
       get 'get_employer'
       post 'person_confirm'
