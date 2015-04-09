@@ -493,6 +493,7 @@ $(document).ready(function () {
     $("#dependent_buttons").removeClass('hidden');
     $("#dependent_buttons div:first").addClass('hidden');
     $('#dependent_buttons div:last').removeClass('hidden');
+    $('.add-member-buttons').removeClass('hidden');
   });
   
   $('#cancel_member').click(function() {
