@@ -1,21 +1,16 @@
 <div class="right-side">
   <div class="col-md-8 col-xs-12 col-sm-12 no-pd">
-    <div class="" id="dependent_ul">
-      <%#= render partial: "people/landing_pages/add_family_member_form" %>
-      <%#= render 'dependent', dependent: @family_members.new,employer: @employer_profile,person: @person,employee: @employee %>
-    </div>
-<!--<div class="row add-member-buttons hidden ">
+    <div class="" id="dependent_ul"></div>
+    
+    <div class="row add-member-buttons hidden ">
       <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-          <%= link_to "Cancel", 'javascript:void(0)', class: 'btn btn-red', id: 'cancel_member' %>
-          <a class="text-center btn btn-save pull-right" id="save_member">Confirm Member</a>
-        </div>
-      </div> -->
+        <%= link_to "Cancel", 'javascript:void(0)', class: 'btn btn-red', id: 'cancel_member' %>
+        <a class="text-center btn btn-save pull-right" id="save_member">Confirm Member</a>
+      </div>
+    </div>
+
     <br/>
     <ul class="list-group">
-
-      <%# @employee.employee_family.census_dependents.each do |dependent| %>
-        <%#= render "dependent", dependent: dependent,employer: @employer,person: @person,employee: @employee %>
-      <%#  end %>
 
       <% @family_members.each do |dependent| %>
       <li class="list-group-item family_members_list">
@@ -24,17 +19,23 @@
             <h4> <%= dependent.person.first_name %> <%= dependent.person.last_name %> </h4>
           </div>
           <div class="col-md-2 col-sm-4 col-xs-4 text-right">
-            <a href="#" class="edit"><%= image_tag "edit.png" %></a>
-            <a href="#" class="remove"><%= image_tag "member-close.png" %></a>
+            <a href="javascript:void(0);" class="edit"><%= image_tag "edit.png" %></a>
+
+            <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: @person.id, organization_id: @employer_profile.organization.id) %>
+            <%= link_to (image_tag "member-close.png"), remove_url, class: 'remove', :method => :delete, :remote => true, data: {confirm: "Remove #{dependent.full_name}", ok: 'yes', cancel: 'no'} %>
           </div>
+          <div id="remove_confirm" class="hidden"></div>
         </div>
         <div class="row">
-          <%= render partial: "people/landing_pages/add_family_member_form" %>
+          <ul id="dependent_ul">
+            <%= render 'people/landing_pages/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
+          </ul>
         </div>
       </li>
       <% end %>
     </ul>
     <br>
-    <button class="btn new-member add_new_family_member">New Member</button>
+    <% add_member_url = add_dependents_people_path(person_id: @person.id, organization_id: @employer_profile.organization.id, employee_id: @person.employee_roles.first.id) %>
+    <%= link_to "New Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
   </div>
 </div>

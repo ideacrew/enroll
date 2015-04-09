@@ -42,7 +42,10 @@ Rails.application.routes.draw do
     resources :employer_profiles do
       get 'new'
       get 'my_account'
-      resources :family
+      resources :family do
+        get 'delink'
+        get 'terminate'
+      end
     end
   end
 #END
@@ -58,7 +61,6 @@ Rails.application.routes.draw do
     get 'person_landing'
 
     collection do
-      get 'plans_converson'
       post 'match_person'
       get 'get_employer'
       post 'person_confirm'

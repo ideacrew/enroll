@@ -23,7 +23,6 @@
 
 $('input.floatlabel').floatlabel();
 
-
 $(document).ready(function () {
   $("#new_person #address_info").addClass('hidden');
   $("#new_person #phone_info").addClass('hidden');
@@ -493,6 +492,7 @@ $(document).ready(function () {
     $("#dependent_buttons").removeClass('hidden');
     $("#dependent_buttons div:first").addClass('hidden');
     $('#dependent_buttons div:last').removeClass('hidden');
+    $('.add-member-buttons').removeClass('hidden');
   });
   
   $('#cancel_member').click(function() {
@@ -607,7 +607,8 @@ $(document).ready(function () {
 
       $('.close-2').on('click', function() {
         current_element = $(this).closest("div.house");
-        message = 'Remove ' + current_element.find('#employer_census_dependent_first_name').val() + ' ' + current_element.find('#employer_census_dependent_middle_name').val() + ' ' + current_element.find('#employer_census_dependent_last_name').val();
+        message = $(this).attr('data-confirm');
+        //message = 'Remove ' + current_element.find('#employer_census_dependent_first_name').val() + ' ' + current_element.find('#employer_census_dependent_middle_name').val() + ' ' + current_element.find('#employer_census_dependent_last_name').val();
         
         $('.house').css("opacity","0.5");
         $(this).closest("div.house").css('border', '1px solid red');        
@@ -615,6 +616,15 @@ $(document).ready(function () {
         $(this).closest("div.house").find("#remove_confirm")
           .html('<div>' + message + '?</div><a href="javascript:void(0);" class="btn remove_dependent cancel">' + (link.data('cancel')) + '</a> <a class="btn remove_dependent confirm" href="javascript:void(0);">' + (link.data('ok')) + '</a>')
           .removeClass('hidden'); 
+      });
+
+      $('#family .remove').click(function() {
+        current_element = $(this).closest("#family .family_members_list");
+        message = 'Remove ' + current_element.find('#family_member_first_name').val() + ' ' + current_element.find('#family_member_middle_name').val() + ' ' + current_element.find('#family_member_last_name').val();
+
+        $(this).closest("#family .family_members_list").find("#remove_confirm")
+          .html(message + '? <a href="javascript:void(0);" class="btn remove_dependent cancel">' + (link.data('cancel')) + '</a> <a class="btn remove_dependent confirm" href="javascript:void(0);">' + (link.data('ok')) + '</a>')
+          .removeClass('hidden');
       });
       
       $('.remove_dependent').on('click', function() {
@@ -672,24 +682,4 @@ $(document).ready(function () {
       $("[for='person_ssn']").css('opacity', 1);
     }
   });
-  /* People Account Page */
-  $('#contact-tab').click(function() {
-
-  });
-
-  $('#home-tab').click(function() {
-    $('.people li.panel').removeClass('active');
-    $('.people li.panel').removeClass('active-list');
-    $('#accordion .collapse').removeClass('in');
-  });
-
-  $('.people li.panel').click(function(){
-    $('li').removeClass('active-list');
-    $(this).addClass("active-list")
-  });
-  
-  $('.employer_ok').click(function(e){
-    e.preventDefault();
-    $('.new-employer-alert').remove();
-    })
 });
