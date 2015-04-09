@@ -23,7 +23,6 @@
 
 $('input.floatlabel').floatlabel();
 
-
 $(document).ready(function () {
   $("#new_person #address_info").addClass('hidden');
   $("#new_person #phone_info").addClass('hidden');
@@ -616,6 +615,15 @@ $(document).ready(function () {
         $(this).closest("div.house").find("#remove_confirm")
           .html('<div>' + message + '?</div><a href="javascript:void(0);" class="btn remove_dependent cancel">' + (link.data('cancel')) + '</a> <a class="btn remove_dependent confirm" href="javascript:void(0);">' + (link.data('ok')) + '</a>')
           .removeClass('hidden'); 
+      });
+
+      $('#family .remove').click(function() {
+        current_element = $(this).closest("#family");
+        message = 'Remove ' + current_element.find('#family_member_first_name').val() + ' ' + current_element.find('#family_member_middle_name').val() + ' ' + current_element.find('#family_member_last_name').val();
+
+        $(this).closest("#family").find("#remove_confirm")
+          .html(message + '? <a href="javascript:void(0);" class="btn remove_dependent cancel">' + (link.data('cancel')) + '</a> <a class="btn remove_dependent confirm" href="javascript:void(0);">' + (link.data('ok')) + '</a>')
+          .removeClass('hidden');
       });
       
       $('.remove_dependent').on('click', function() {
