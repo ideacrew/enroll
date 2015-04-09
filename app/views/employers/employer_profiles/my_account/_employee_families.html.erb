@@ -22,18 +22,14 @@
         <td><%= format_date family.census_employee.hired_on %> </td>
         <td><%= family.aasm_state %></td>
         <td><%= boolean_to_human family.is_linked? %></td>
-        <td> 
-          <%= link_to "Edit", edit_employers_employer_profile_family_path(@employer_profile.id, family.id), 
+        <td>
+          <%= link_to "Edit", edit_employers_employer_profile_family_path(@employer_profile.id, family.id),
               class: "btn btn-sm btn-primary" %>
-          <% if family.is_linked? %>
-            <%= link_to "Delink", "#", class: "btn btn-sm btn-default" %>
-          <% else %>
-            <%= link_to "Delink", "#", class: "btn btn-sm btn-default", disabled: true %>
-          <% end %>
+          <%= link_to "Delink", "#", class: "btn btn-sm btn-default", disabled: !family.is_linked? %>
           <%= link_to "Terminate", "#", class: "btn btn-sm btn-warning" %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
-  
+
