@@ -59,7 +59,9 @@
                                         <i class="glyphicon glyphicon-menu-down"></i>
                                       </a>
                                       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                                        <li><a href="#">Link1</a></li>
+                                        <% get_dependents(@family, @person).each do |dependents |%>
+                                          <li><a href="#"><%= dependents.full_name %></a></li>
+                                        <% end %>
                                       </ul>
                                     </div>
                                   </td>

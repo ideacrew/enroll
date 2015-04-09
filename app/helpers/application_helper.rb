@@ -202,4 +202,11 @@ module ApplicationHelper
   def devise_mapping
     @devise_mapping ||= Devise.mappings[:user]
   end
+  
+  def get_dependents(family, person)
+    list = []
+    family_members = @family.family_members
+    family_members.each {|f| list << f.person if f.person.ssn != person.ssn } if family_members.present?
+    return list
+  end
 end
