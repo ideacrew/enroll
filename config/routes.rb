@@ -42,7 +42,9 @@ Rails.application.routes.draw do
     resources :employer_profiles do
       get 'new'
       get 'my_account'
-      resources :family
+      resources :family do
+        get 'delink'
+      end
     end
   end
 #END
