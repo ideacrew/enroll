@@ -1,7 +1,7 @@
 class Employers::FamilyController < ApplicationController
 
   before_action :find_employer
-  before_action :set_family_id, only: [:delink]
+  before_action :set_family_id, only: [:delink, :terminate]
   before_action :find_family, only: [:destroy, :show, :edit, :update]
 
   def new
@@ -45,6 +45,11 @@ class Employers::FamilyController < ApplicationController
     @family.delink_employee_role
     @family.save!
     flash.notice = "Successfully delinked family."
+    redirect_to employers_employer_profile_path(@employer_profile)
+  end
+
+  def terminate
+    # TO DO -> Terminate functionality
     redirect_to employers_employer_profile_path(@employer_profile)
   end
 

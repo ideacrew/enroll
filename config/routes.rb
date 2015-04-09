@@ -44,6 +44,7 @@ Rails.application.routes.draw do
       get 'my_account'
       resources :family do
         get 'delink'
+        get 'terminate'
       end
     end
   end
