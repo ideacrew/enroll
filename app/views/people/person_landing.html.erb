@@ -101,7 +101,7 @@
                                     </td>
                                   </tr>
                                   <tr>
-                                    <td>
+                                    <td colspan="2">
                                       <span>CITY</span>
                                       <input type="text" value="<%= @address.city %>">
                                     </td>
@@ -109,10 +109,7 @@
                                       <span>STATE</span>
                                       <input type="text" value="<%= @address.state %>">
                                     </td>
-                                    <td>
-                                      <span>COUNTRY</span>
-                                      <input type="text" value="<%= @address.country_name %>">
-                                    </td>
+                                   
                                     <td>
                                       <span>ZIP</span>
                                       <input type="text" value="<%= @address.zip %>">
@@ -239,7 +236,7 @@
 
                     <div aria-labelledby="employer-tab" id="employer" class="tab-pane fade" role="tabpanel">
                       <div class="emp-info">
-                       <%#= render 'people/landing_pages/employer' %> 
+                       <%= render 'people/landing_pages/employer' %> 
                       </div>
                     </div>
                     

@@ -1,5 +1,4 @@
 <div class="col-md-8 no-pd col-sm-12 col-xs-12">
-
   <div class="row new-employer-alert" style="display: block;">
     <div class="col-md-7 no-pd col-sm-10 col-xs-12">
       <p>This section contains information about your employer. If you have changed employers you can add a new employer here.</p>
@@ -8,25 +7,30 @@
       <button class="btn btn-default ok-btn employer_ok">Ok</button>
     </div>
   </div>
-
-  <div class="row first">
-    <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd middle-row">
-      <a class="remove" href="#"><%=image_tag "landing-page-delete.png" %></a>
-      <span>Employer Name</span>
-      <input class="form-control" type="text" value="<%= @employer_profile.legal_name %>">
-    </div>
-    <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd middle-row">
-      <div class="row">
-        <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
-          <span>Hire Date</span>
-          <input class="form-control" type="text" placeholder="March 30, 2013" value="<%= @employee_roles.first.hired_on.strftime("%b %d, %Y") %>">
-        </div>
-        <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
-          <span>Eligible For Coverage</span>
-          <input class="form-control" type="text" placeholder="March 30, 2014" value="<%= @employee_roles.first.hired_on.strftime("%b %d, %Y") %>">
-        </div>
-      </div>
-    </div>
-  </div>
-  <button class="btn btn-default save-btn disabled">New Employer</button>
+  
+  <table class="table table-bordered search-table personal-table" style="border: 2px solid rgb(0, 163, 217) ! important;">
+    <tbody>
+      <tr>
+        <td colspan="4">
+          <span class="label_style">Employer Name</span>
+          <span class="text_style"><%= @employer_profile.legal_name %></span>
+        </td>
+        
+      </tr>
+      <tr>
+        <td colspan="2">
+          <span class="label_style">Hire Date</span>
+          <span class="text_style"><%= @employee_roles.first.hired_on.strftime("%b %d, %Y") %></span>
+        </td>
+        <td colspan="2">
+          <span class="label_style">Eligible For Coverage</span>
+          <span class="text_style"><%= @employee_roles.first.hired_on.strftime("%b %d, %Y") %></span>
+        </td>
+        
+      </tr>
+    </tbody>
+  </table>
+  
+  <br/>
+  <button class="btn btn-blue">New Employer</button>
 </div>
