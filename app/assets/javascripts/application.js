@@ -197,26 +197,6 @@ $(document).ready(function () {
     $(".start").hide();
   });
 
-  // $('#continue').click(function() {
-  //   $("#overlay").css("display", "none");
-  //   $(".emp-welcome-msg").css("display", "none");
-  //   $(".focus_effect").css("opacity", "1");
-  //   $(".information").css("opacity", "1");
-  //   $("a.name").css("padding-top", "65px");
-  //   $(".disable-btn").css("display", "inline-block");
-  //   $(".welcome-msg").css("display", "none");
-  //   $("a.welcome_msg").css("display", "none");
-  //   $("a.credential_info, a.name_info, a.tax_info").css("display", "block");
-  //   $("#tax_info .btn-continue").css("display", "inline-block");
-  //   $('.focus_effect:first').addClass('personaol-info-top-row');
-  //   $('.focus_effect:first').removeClass('personaol-info-row');
-  //   $('.sidebar a:first').addClass('style_s_link');
-  //   $('.sidebar a.credential_info').addClass('style_s_link');
-  //   // $(".key").css("display", "block");
-  //   $(".search-btn-row").css("display", "block");
-
-  // });
-
   $('#personal_info.focus_effect').focusout(function(){
     var tag_id = $(this).attr('id');
     var has_class = $(this).hasClass('personaol-info-top-row');
@@ -230,7 +210,6 @@ $(document).ready(function () {
   });
 
   $('span.close').click(function(){
-    //$('.autofill-cloud').addClass('hidden');
     common_body_style();
     side_bar_link_style();
   });
@@ -253,6 +232,12 @@ $(document).ready(function () {
   function check_personal_info_exists()
   {
     var check = $('#personal_info input[required]').filter(function() { return this.value == ""; });
+    return check;
+  }
+
+  function check_dependent_info_exists()
+  {
+    var check = $('#new_family_member input[required]').filter(function() { return this.value == ""; });
     return check;
   }
 
@@ -508,9 +493,18 @@ $(document).ready(function () {
   });
   
   // Email validation after 1 seconds of stopping typing
-  var timeout;
   $('#email_info input').keyup(function() {
-    var email = $(this).val();
+    call_email_check(this);
+  });
+  
+  $('#email_info input').focusout(function() {
+    call_email_check(this);
+  });
+
+  function call_email_check(email) {
+    var timeout;
+    var email = $(email).val();
+
     if(timeout) {
         clearTimeout(timeout);
         timeout = null;
@@ -518,26 +512,12 @@ $(document).ready(function () {
 
     timeout = setTimeout(function() {
       check_email(email);
-      }, 1000);
-  });
+    }, 1000);
+  }
   
-  $('#email_info input').focusout(function() {
-    var email = $(this).val();
-    if(email=="") {
-      return;
-    }
-    if(timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-    }
-    timeout = setTimeout(function() {
-      check_email(email);
-      }, 1000);
-  });
-  
-  function check_email(email) { 
+  function check_email(email) {
     var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if(!re.test(email)) {
+    if(email != "" && !re.test(email)) {
       $('#email_error').text('Enter a valid email address. ( e.g. name@domain.com )');
       $('#email_info .email .first').addClass('field_error');
     } else {
@@ -608,14 +588,16 @@ $(document).ready(function () {
       $('.close-2').on('click', function() {
         current_element = $(this).closest("div.house");
         message = $(this).attr('data-confirm');
-        //message = 'Remove ' + current_element.find('#employer_census_dependent_first_name').val() + ' ' + current_element.find('#employer_census_dependent_middle_name').val() + ' ' + current_element.find('#employer_census_dependent_last_name').val();
-        
-        $('.house').css("opacity","0.5");
-        $(this).closest("div.house").css('border', '1px solid red');        
-        $(this).closest('div.house').css("opacity","1.0");
-        $(this).closest("div.house").find("#remove_confirm")
-          .html('<div>' + message + '?</div><a href="javascript:void(0);" class="btn remove_dependent cancel">' + (link.data('cancel')) + '</a> <a class="btn remove_dependent confirm" href="javascript:void(0);">' + (link.data('ok')) + '</a>')
-          .removeClass('hidden'); 
+        if(message.trim() == 'Remove') {
+          $('#cancel_member').click();
+        } else {
+          // $('.house').css("opacity","0.5");
+          $(this).closest("div.house").css('border', '1px solid red');        
+          $(this).closest('div.house').css("opacity","1.0");
+          $(this).closest("div.house").find("#remove_confirm")
+            .html('<div>' + message + '?</div><a href="javascript:void(0);" class="btn remove_dependent cancel">' + (link.data('cancel')) + '</a> <a class="btn remove_dependent confirm" href="javascript:void(0);">' + (link.data('ok')) + '</a>')
+            .removeClass('hidden');
+        }
       });
 
       $('#family .remove').click(function() {
@@ -680,6 +662,14 @@ $(document).ready(function () {
     } else {
       $("[for='person_ssn']").css('display', 'block');
       $("[for='person_ssn']").css('opacity', 1);
+    }
+  });
+
+  $('#dependent_buttons #save_member').click(function() {
+    if(check_dependent_info_exists().length==0) {
+      $('#add_info .employee-info').last().removeClass('require-field');
+    } else {
+      $('#add_info .employee-info').last().addClass('require-field');
     }
   });
 });

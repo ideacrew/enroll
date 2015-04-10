@@ -201,7 +201,7 @@ class PeopleController < ApplicationController
           family.households.first.coverage_households.first.coverage_household_members.find_or_create_by(applicant_id: params[:family_member][:id])
           format.js { flash.now[:notice] = "Family Member Added." }
         else
-          format.js { flash.now[:error_msg] = "Error in Family Member Addition." }
+          format.js { flash.now[:error_msg] = "Error in Family Member Addition. #{member.errors.full_messages}" }
         end
       end
     else
@@ -211,7 +211,7 @@ class PeopleController < ApplicationController
         end
       else
         respond_to do |format|
-          format.js { flash.now[:error_msg] = "Error in Family Member Edit." }
+          format.js { flash.now[:error_msg] = "Error in Family Member Edit. #{member.errors.full_messages}" }
         end
       end
     end
@@ -401,7 +401,7 @@ private
       end
     end
 
-    person_params["emails_attributes"].each do |key, phone|
+    person_params["emails_attributes"].each do |key, email|
       if email["address"].blank?
         person_params["emails_attributes"].delete("#{key}")
       end
