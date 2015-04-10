@@ -139,7 +139,7 @@
           <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
 
           <!-- <a href="<%= plan_details_people_path(person_id: params[:person_id], organization_id: params[:organization_id])%>" data-method="POST" class="text-center btn btn-save pull-right">Continue</a> -->
-          <%= link_to 'Continue', select_plan_people_path(person_id: params[:person_id], organization_id: params[:organization_id]), class: 'text-center btn btn-green pull-right' %>
+          <%= link_to 'Continue', select_plan_people_path(person_id: params[:person_id], organization_id: params[:organization_id]), class: 'btn btn-green pull-right' %>
         </div>
 
         <div class="col-md-12 no-pd col-sm-12 col-xs-12 last hidden">
