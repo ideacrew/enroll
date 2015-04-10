@@ -373,7 +373,7 @@ a.btn.add{
 }
 
 /* Buttons */
-/*.btn {font-size: 18px;padding: 6px 20px;}*/
+.btn {font-size: 18px;padding: 6px 20px;font-family: "AvenirLTStd-Light";}
 
 .btn-save, .btn-save:hover, .btn-save:focus {
   background: none repeat scroll 0 0 #4d74ff;
@@ -2449,8 +2449,25 @@ a .arrow-right {
 }
 
 .fail-search {
+    background: none repeat scroll 0 0 #ffffff;
+    border-radius: 2px;
+    box-shadow: 0 0 5px #ddd;
+    float: left;
+    padding: 20px 15px 15px;
     margin-top: 15px;
 }
+
+.fail-search .error-text {
+    color: #777777;
+    font-size: 17px;
+    font-weight: 200;
+}
+
+.fail-search .error-text strong {
+    color: #000;
+    font-weight: 400;
+}
+
 .fail-search .panel-default {
     border-width: 2px;
 }
@@ -2521,7 +2538,6 @@ a.close-fail {
 }
 #key-section ul li a {
     color: #999;
-    font-size: 13px;
 }
 
 #key-section ul li:nth-child(8), #key-section ul li:nth-child(9), #key-section ul li:nth-child(10) {

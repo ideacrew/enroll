@@ -1,15 +1,13 @@
-<div class="fail-search hidden" class="row">
-  <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
-    <div class="panel panel-default">
-      <div class="panel-body text-center no_results_alert">
-        <a href="#" class="close-fail"><i class="fa fa-times"></i></a>
-        <p class="fail">
-          <span class="notice"><i class="fa fa-exclamation-triangle"></i></span>
-          <span>
-            <b>No Employer plan found.</b> Check your personal information and try again <strong>OR</strong><br>contact DCHBX phone support: 1-800-555-1212 option 1.
-          </span>
-        </p>
-      </div>
-    </div>
+<div class="fail-search hidden notification-error-wrapper">
+  <div class="col-md-1 col-sm-1 col-xs-1 no-pd">
+      <span class="notice">
+          <i class="fa fa-exclamation-triangle"></i>
+        </span>
+  </div>
+  <div class="col-md-10 col-sm-10 col-xs-10 no-pd error-text">
+      <strong>No employer plan found.</strong> Check your personal information and try again OR contact DCHBX phone support: 1-800-555-1212 option 1.<p></p>
+  </div>
+  <div class="col-md-1 col-sm-1 col-xs-1 no-pd">
+      <a class="close-fail" href="#"><%= image_tag 'member-close.png' %></a>
   </div>
 </div>
