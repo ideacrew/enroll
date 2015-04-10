@@ -1,6 +1,7 @@
 class FamilyMember
   include Mongoid::Document
   include Mongoid::Timestamps
+  include MongoidSupport::AssociationProxies
 
   embedded_in :family
 
@@ -34,18 +35,11 @@ class FamilyMember
 
   validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
 
+  associated_with_one :person, :person_id, "Person"
+
   def parent
     raise "undefined parent family" unless family
     self.family
-  end
-
-  def person=(new_person)
-    return unless new_person.is_a? Person
-    self.person_id = new_person._id
-  end
-
-  def person
-    Person.find(self.person_id) unless self.person_id.blank?
   end
 
   def households
