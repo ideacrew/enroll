@@ -695,8 +695,6 @@ ul.social li a span i{
 @media only screen and (max-width: 992px) {
   .btn-blue{
     margin-top: 30px;
-    display: block;
-    width: 100%;
   }
   .list-group{
     display: none;
@@ -730,8 +728,6 @@ ul.social li a span i{
     margin-bottom: 15px;
   }
   .btn-blue{
-    display: block;
-    width: 100%;
     margin-top: 15px;
   }
 /*  .dropdown-menu{
@@ -754,10 +750,12 @@ ul.social li a span i{
   #key-section {
     position: relative !important;
     top: 0px !important;
-    margin: 0 -15px !important;
+    margin: 0 -15px;
   }
   .disable-btn, .disable-btn:hover, .disable-btn:focus{
-    top: -25px !important;
+    top: -18px !important;
+    right: 0 !important;
+    z-index: 999;
   }
   span.notice{
     font-size: 23px !important;
@@ -1310,7 +1308,7 @@ input.floatlabe{
   display: none;
   position: absolute;
   top: -72px;
-  right: -120px;
+  right: -130px;
   font-weight: normal;
 }
 .personaol-info-top-row .adderess-select-box {
@@ -1423,9 +1421,6 @@ div#house_info > p {
   .welcome-msg p {
     letter-spacing: 0;
   }
-  .panel-body.left {
-    padding-left: 0px !important;
-  }
   .key p {
     font-size: 11px;
     width: 197px;
@@ -1435,14 +1430,11 @@ div#house_info > p {
     width: 175px;
   }
   .disable-btn, .disable-btn:hover, .disable-btn:focus {
-    margin-bottom: 20px;
+    margin-top: 16px;
   }
   #email_info {
     margin-bottom: 15px !important;
   }
-  /*.adderess-select-box + ul {
-    left: 27%;
-  }*/
 }
 
 @media (min-width: 300px) and (max-width: 1200px) {
@@ -1469,6 +1461,10 @@ div#house_info > p {
 @media (min-width: 400px) and (max-width: 767px) {
   .adderess-select-box + .dropdown-menu {
     left: 29%;
+  }
+
+  #key-section {
+    margin: 0;
   }
 }
 
