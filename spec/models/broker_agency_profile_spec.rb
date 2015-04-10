@@ -23,7 +23,7 @@ RSpec.describe BrokerAgencyProfile, type: :model do
   describe ".new" do
 
     let(:valid_params) do
-      { 
+      {
         organization: organization,
         market_kind: market_kind,
         primary_broker_role_id: primary_broker_role_id
@@ -32,12 +32,12 @@ RSpec.describe BrokerAgencyProfile, type: :model do
 
     context "with no arguments" do
       let(:params) {{}}
-       
+
       it "should not save" do
-        expect(BrokerAgencyProfile.new(**params).save).to be_false
+        expect(BrokerAgencyProfile.new(**params).save).to be_falsey
       end
     end
-    
+
     context "with no organization" do
       let(:params) {valid_params.except(:organization)}
 
@@ -50,7 +50,7 @@ RSpec.describe BrokerAgencyProfile, type: :model do
       let(:params) {valid_params.except(:market_kind)}
 
       it "should fail validation" do
-        expect(BrokerAgencyProfile.create(**params).errors[:market_kind].any?).to be_true
+        expect(BrokerAgencyProfile.create(**params).errors[:market_kind].any?).to be_truthy
       end
     end
 
@@ -64,18 +64,18 @@ RSpec.describe BrokerAgencyProfile, type: :model do
 
     context "with no primary_broker" do
       let(:params) {valid_params.except(:primary_broker_role_id)}
-    
+
       it "should fail validation" do
-        expect(BrokerAgencyProfile.create(**params).errors[:primary_broker_role_id].any?).to be_true
+        expect(BrokerAgencyProfile.create(**params).errors[:primary_broker_role_id].any?).to be_truthy
       end
     end
 
     context "with all valid arguments" do
       let(:params) {valid_params}
       let(:broker_agency_profile) {BrokerAgencyProfile.new(**params)}
-       
+
       it "should save" do
-        expect(broker_agency_profile.save!).to be_true
+        expect(broker_agency_profile.save!).to be_truthy
       end
 
       context "and it is saved" do

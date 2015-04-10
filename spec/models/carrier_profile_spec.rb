@@ -15,7 +15,7 @@ RSpec.describe CarrierProfile, :type => :model do
   describe ".new" do
 
     let(:valid_params) do
-      { 
+      {
         organization: organization,
         abbrev: abbrev
       }
@@ -32,9 +32,9 @@ RSpec.describe CarrierProfile, :type => :model do
     context "with all valid arguments" do
       let(:params) {valid_params}
       let(:carrier_profile) {CarrierProfile.new(**params)}
-       
+
       it "should save" do
-        expect(carrier_profile.save).to be_true
+        expect(carrier_profile.save).to be_truthy
       end
       context "and it is saved" do
         before do
@@ -53,7 +53,7 @@ RSpec.describe CarrierProfile, :type => :model do
     let(:abbrev) {"uhc"}
 
     let(:valid_params) do
-      { 
+      {
         organization: organization,
         abbrev: abbrev
       }

@@ -34,14 +34,14 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
     context "SEP is active as of this date" do
       it "#is_active? should return true" do
-        expect(sep_first_of_month.is_active?).to be_true
+        expect(sep_first_of_month.is_active?).to be_truthy
       end
     end
 
     context "SEP occured in the past, and is no longer active" do
 
       it "#is_active? should return false" do
-        expect(sep_expired.is_active?).to be_false
+        expect(sep_expired.is_active?).to be_falsey
       end
     end
   end

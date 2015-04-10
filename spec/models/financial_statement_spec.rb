@@ -131,7 +131,7 @@ end
 
   it "should check for benifits in current year" do
 
-    expect(@financial_statement.is_receiving_benefit?).to be_true
+    expect(@financial_statement.is_receiving_benefit?).to be_truthy
   end
 
 end

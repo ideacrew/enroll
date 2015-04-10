@@ -15,7 +15,7 @@ describe BrokerRole, type: :model do
 
   describe ".new" do
     let(:valid_params) do
-      { 
+      {
         person: saved_person,
         npn: npn0,
         provider_kind: provider_kind
@@ -26,7 +26,7 @@ describe BrokerRole, type: :model do
       let(:params) {{}}
 
       it "should not save" do
-        expect(BrokerRole.new(**params).save).to be_false
+        expect(BrokerRole.new(**params).save).to be_falsey
       end
     end
 
@@ -42,7 +42,7 @@ describe BrokerRole, type: :model do
       let(:params) {valid_params.except(:npn)}
 
       it "should fail validation" do
-        expect(BrokerRole.create(**params).errors[:npn].any?).to be_true
+        expect(BrokerRole.create(**params).errors[:npn].any?).to be_truthy
       end
     end
 
@@ -50,7 +50,7 @@ describe BrokerRole, type: :model do
       let(:params) {valid_params.except(:provider_kind)}
 
       it "should fail validation" do
-        expect(BrokerRole.create(**params).errors[:provider_kind].any?).to be_true
+        expect(BrokerRole.create(**params).errors[:provider_kind].any?).to be_truthy
       end
     end
 
@@ -58,7 +58,7 @@ describe BrokerRole, type: :model do
       let(:broker_role) {saved_person.build_broker_role(valid_params)}
 
       it "should save" do
-        expect(broker_role.save).to be_true
+        expect(broker_role.save).to be_truthy
       end
 
       context "and it is saved" do
@@ -76,7 +76,7 @@ describe BrokerRole, type: :model do
       let(:params) {valid_params}
 
       it "should raise" do
-        expect(BrokerRole.with(safe: true).create(**params)).to be_true
+        expect(BrokerRole.with(safe: true).create(**params)).to be_truthy
 
         ## TODO: Change this to proper Error when Mongoid is coerced into raising it
         # expect{BrokerRole.with(safe: true).create(**params)}.to raise_error(Mongoid::Errors::NoParent)
@@ -153,8 +153,8 @@ describe BrokerRole, type: :model do
     end
 
     it '#has_broker_agency_profile? is true when agency is assigned' do
-      expect(BrokerRole.new(broker_agency_profile: nil).has_broker_agency_profile?).to be_false
-      expect(BrokerRole.new(broker_agency_profile: ba).has_broker_agency_profile?).to be_true
+      expect(BrokerRole.new(broker_agency_profile: nil).has_broker_agency_profile?).to be_falsey
+      expect(BrokerRole.new(broker_agency_profile: ba).has_broker_agency_profile?).to be_truthy
     end
 
     # TODO

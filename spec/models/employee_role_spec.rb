@@ -50,7 +50,7 @@ describe EmployeeRole, type: :model do
       end
 
       it "should save" do
-        expect(employee_role.save).to be_true
+        expect(employee_role.save).to be_truthy
       end
 
       context "and it is saved" do
@@ -440,7 +440,7 @@ describe EmployeeRole, type: :model do
 
       it "should add a welcome message to the inbox" do
         expect(employee_role.inbox.messages.size).to eq 1
-        expect(employee_role.inbox.messages.first.subject).to match /Welcome to DC HealthLink/ 
+        expect(employee_role.inbox.messages.first.subject).to match /Welcome to DC HealthLink/
       end
   end
 

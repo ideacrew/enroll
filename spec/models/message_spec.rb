@@ -21,7 +21,7 @@ RSpec.describe Message, :type => :model do
       end
 
       it "should be invalid" do
-        expect(Message.new(**params).valid?).to be_false
+        expect(Message.new(**params).valid?).to be_falsey
       end
     end
 
@@ -29,7 +29,7 @@ RSpec.describe Message, :type => :model do
       let(:params) {valid_params.except(:subject)}
 
       it "should be valid" do
-        expect(Message.new(**params).valid?).to be_true
+        expect(Message.new(**params).valid?).to be_truthy
       end
     end
 
@@ -37,7 +37,7 @@ RSpec.describe Message, :type => :model do
       let(:params) {valid_params.except(:body)}
 
       it "should be valid" do
-        expect(Message.new(**params).valid?).to be_true
+        expect(Message.new(**params).valid?).to be_truthy
       end
     end
   end

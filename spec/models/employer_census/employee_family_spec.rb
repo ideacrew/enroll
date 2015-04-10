@@ -22,7 +22,7 @@ describe EmployerCensus::EmployeeFamily, type: :model do
       let(:params) {{}}
 
       it "should not save" do
-        expect(EmployerCensus::EmployeeFamily.new(**params).save).to be_false
+        expect(EmployerCensus::EmployeeFamily.new(**params).save).to be_falsey
       end
     end
 
@@ -38,7 +38,7 @@ describe EmployerCensus::EmployeeFamily, type: :model do
       let(:params) {valid_params.except(:census_employee)}
 
       it "should fail validation" do
-        expect(EmployerCensus::EmployeeFamily.create(**params).errors[:census_employee].any?).to be_true
+        expect(EmployerCensus::EmployeeFamily.create(**params).errors[:census_employee].any?).to be_truthy
       end
     end
 
@@ -47,7 +47,7 @@ describe EmployerCensus::EmployeeFamily, type: :model do
       let(:census_family) {EmployerCensus::EmployeeFamily.new(**params)}
 
       it "should successfully save" do
-        expect(census_family.save).to be_true
+        expect(census_family.save).to be_truthy
       end
 
       context "and it is saved" do
@@ -56,11 +56,11 @@ describe EmployerCensus::EmployeeFamily, type: :model do
         end
 
         it "should not be linked" do
-          expect(census_family.is_linked?).to be_false
+          expect(census_family.is_linked?).to be_falsey
         end
 
         it "should be linkable" do
-          expect(census_family.is_linkable?).to be_true
+          expect(census_family.is_linkable?).to be_truthy
         end
       end
     end
@@ -96,7 +96,7 @@ describe EmployerCensus::EmployeeFamily, 'class methods' do
         let(:linked_employee_family) { employee_family.link_employee_role(saved_employee_role) }
 
         it "should return matching EmployeeFamily instance" do
-          expect(linked_employee_family.is_linked?).to be_true
+          expect(linked_employee_family.is_linked?).to be_truthy
           # expect(linked_employee_family).to eq ""
           expect(EmployerCensus::EmployeeFamily.find_by_employee_role(saved_employee_role)).to be_an_instance_of EmployerCensus::EmployeeFamily
           expect(EmployerCensus::EmployeeFamily.find_by_employee_role(saved_employee_role).census_employee.ssn).to eq employee_role.ssn
@@ -138,7 +138,7 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
     context "and the eligibility date is too far in future" do
 
       pending "use HbxProfile:ShopMaximumEnrollmentPeriodBeforeEligibilityInDays"
-      it "should" do 
+      it "should" do
       end
     end
 
@@ -156,8 +156,8 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
 
       pending "fix employee_role belongs_to association"
       it 'should link to the employee' do
-        expect(census_family.is_linked?).to be_true
-        expect(census_family.is_linkable?).to be_false
+        expect(census_family.is_linked?).to be_truthy
+        expect(census_family.is_linkable?).to be_falsey
         expect(census_family.employee_role_id).to eq employee_role.id
         # expect(employee_role.census_family.employee_role).to eq employee_role
       end
@@ -178,7 +178,7 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
   #     end
 
   #     it "should make it linkable" do
-  #       expect(census_family.delink_employee_role.is_linkable?).to be_true
+  #       expect(census_family.delink_employee_role.is_linkable?).to be_truthy
   #     end
   #   end
   # end
@@ -207,14 +207,14 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
       context "user role is HBX admin" do
         pending "add HBX admin role authorization to override"
         it "should terminate employee" do
-          expect(census_family.terminate(valid_termination_date).is_terminated?).to be_true
+          expect(census_family.terminate(valid_termination_date).is_terminated?).to be_truthy
         end
       end
     end
 
     context "termination date is valid for retro terms" do
       it "should return terminated employee" do
-        expect(census_family.terminate(valid_termination_date).is_terminated?).to be_true
+        expect(census_family.terminate(valid_termination_date).is_terminated?).to be_truthy
       end
     end
   end
