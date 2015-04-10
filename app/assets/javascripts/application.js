@@ -88,7 +88,7 @@ $(document).ready(function () {
   
   function match_person()
   {
-    gender_checked = $("#person_gender_male").prop("checked") || $("#person_gender_female").prop("checked");
+    gender_checked = $("#family_member_gender_male").prop("checked") || $("#family_member_gender_female").prop("checked");
     
     if(check_personal_info_exists().length==0 && gender_checked)
     {
@@ -253,6 +253,12 @@ $(document).ready(function () {
   function check_personal_info_exists()
   {
     var check = $('#personal_info input[required]').filter(function() { return this.value == ""; });
+    return check;
+  }
+
+  function check_dependent_info_exists()
+  {
+    var check = $('#new_family_member input[required]').filter(function() { return this.value == ""; });
     return check;
   }
 
@@ -675,6 +681,15 @@ $(document).ready(function () {
     } else {
       $("[for='person_ssn']").css('display', 'block');
       $("[for='person_ssn']").css('opacity', 1);
+    }
+  });
+
+  $('#dependent_buttons #save_member').click(function() {
+
+    if(check_dependent_info_exists().length==0) {
+      $('#add_info .employee-info').last().removeClass('require-field');
+    } else {
+      $('#add_info .employee-info').last().addClass('require-field');
     }
   });
 });
