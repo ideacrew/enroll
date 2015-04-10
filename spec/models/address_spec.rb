@@ -110,7 +110,16 @@ describe Address, "with proper validations" do
 end
 
 describe 'view helpers/presenters' do
-  let(:address) { FactoryGirl.build :address }
+  let(:address) {
+     Address.new(
+       address_1: "An address line 1",
+       address_2: "An address line 2",
+       city: "A City",
+       state: "CA",
+       zip: "21222"
+     )
+  }
+
   describe '#to_s' do
     it 'returns a string with a formated address' do
       line_one = address.address_1
@@ -158,7 +167,15 @@ describe '#clean_fields' do
 end
 
 describe '#matches?' do
-  let(:address) { FactoryGirl.build :address }
+  let(:address) {
+     Address.new(
+       address_1: "An address line 1",
+       address_2: "An address line 2",
+       city: "A City",
+       state: "CA",
+       zip: "21222"
+     )
+  }
 
   context 'addresses are the same' do
     let(:second_address) { address.clone }
