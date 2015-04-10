@@ -399,7 +399,7 @@ private
       end
     end
 
-    person_params["emails_attributes"].each do |key, phone|
+    person_params["emails_attributes"].each do |key, email|
       if email["address"].blank?
         person_params["emails_attributes"].delete("#{key}")
       end
