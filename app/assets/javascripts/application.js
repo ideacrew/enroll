@@ -508,9 +508,18 @@ $(document).ready(function () {
   });
   
   // Email validation after 1 seconds of stopping typing
-  var timeout;
   $('#email_info input').keyup(function() {
-    var email = $(this).val();
+    call_email_check(this);
+  });
+  
+  $('#email_info input').focusout(function() {
+    call_email_check(this);
+  });
+
+  function call_email_check(email) {
+    var timeout;
+    var email = $(email).val();
+
     if(timeout) {
         clearTimeout(timeout);
         timeout = null;
@@ -518,26 +527,12 @@ $(document).ready(function () {
 
     timeout = setTimeout(function() {
       check_email(email);
-      }, 1000);
-  });
+    }, 1000);
+  }
   
-  $('#email_info input').focusout(function() {
-    var email = $(this).val();
-    if(email=="") {
-      return;
-    }
-    if(timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-    }
-    timeout = setTimeout(function() {
-      check_email(email);
-      }, 1000);
-  });
-  
-  function check_email(email) { 
+  function check_email(email) {
     var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if(!re.test(email)) {
+    if(email != "" && !re.test(email)) {
       $('#email_error').text('Enter a valid email address. ( e.g. name@domain.com )');
       $('#email_info .email .first').addClass('field_error');
     } else {
