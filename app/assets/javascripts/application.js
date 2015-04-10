@@ -609,14 +609,18 @@ $(document).ready(function () {
       $('.close-2').on('click', function() {
         current_element = $(this).closest("div.house");
         message = $(this).attr('data-confirm');
-        //message = 'Remove ' + current_element.find('#employer_census_dependent_first_name').val() + ' ' + current_element.find('#employer_census_dependent_middle_name').val() + ' ' + current_element.find('#employer_census_dependent_last_name').val();
-        
-        $('.house').css("opacity","0.5");
-        $(this).closest("div.house").css('border', '1px solid red');        
-        $(this).closest('div.house').css("opacity","1.0");
-        $(this).closest("div.house").find("#remove_confirm")
-          .html('<div>' + message + '?</div><a href="javascript:void(0);" class="btn remove_dependent cancel">' + (link.data('cancel')) + '</a> <a class="btn remove_dependent confirm" href="javascript:void(0);">' + (link.data('ok')) + '</a>')
-          .removeClass('hidden'); 
+        if(message.trim() == 'Remove') {
+          $('#cancel_member').click();
+        } else {
+          //message = 'Remove ' + current_element.find('#employer_census_dependent_first_name').val() + ' ' + current_element.find('#employer_census_dependent_middle_name').val() + ' ' + current_element.find('#employer_census_dependent_last_name').val();
+          
+          $('.house').css("opacity","0.5");
+          $(this).closest("div.house").css('border', '1px solid red');        
+          $(this).closest('div.house').css("opacity","1.0");
+          $(this).closest("div.house").find("#remove_confirm")
+            .html('<div>' + message + '?</div><a href="javascript:void(0);" class="btn remove_dependent cancel">' + (link.data('cancel')) + '</a> <a class="btn remove_dependent confirm" href="javascript:void(0);">' + (link.data('ok')) + '</a>')
+            .removeClass('hidden'); 
+        }
       });
 
       $('#family .remove').click(function() {
