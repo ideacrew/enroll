@@ -165,17 +165,13 @@ describe Person, "class methods" do
 
     let(:employee_count) { 11 }
 
-    before(:each) do
-      FactoryGirl.create_list(:employee_role, 11)
-    end
-
     it "should find a matching number of employee_roles" do
+      FactoryGirl.create_list(:employee_role, 11)
       expect(Person.employee_roles.count).to eq employee_count
+      expect((Person.employee_roles).first).to be_a EmployeeRole
+      DatabaseCleaner.clean
     end
 
-    it "and returned values should be employee_roles" do
-      expect((Person.employee_roles).first).to be_a EmployeeRole
-    end
   end
 
 end
@@ -245,82 +241,82 @@ describe Person, '#addresses' do
     expect(person.addresses.first.kind).to eq "home"
     expect(person.addresses.first.city).to eq "Washington"
   end
+end
 
-  describe "large family with multiple employees - The Brady Bunch" do
-    include_context "BradyBunch"
+describe Person, "large family with multiple employees - The Brady Bunch" do
+  include_context "BradyBunch"
 
-    context "a person" do
-      it "should know its age today" do
-        expect(greg.age_on(Date.today)).to eq gregs_age
-      end
+  context "a person" do
+    it "should know its age today" do
+      expect(greg.age_on(Date.today)).to eq gregs_age
+    end
 
-      it "should know its age on a given date" do
-        expect(greg.age_on(18.months.ago.to_date)).to eq (gregs_age - 2)
-      end
+    it "should know its age on a given date" do
+      expect(greg.age_on(18.months.ago.to_date)).to eq (gregs_age - 2)
+    end
 
-      it "should know its age yesterday" do
-        expect(greg.age_on(Date.today.advance(days: -1))).to eq (gregs_age - 1)
-      end
+    it "should know its age yesterday" do
+      expect(greg.age_on(Date.today.advance(days: -1))).to eq (gregs_age - 1)
+    end
 
-      it "should know its age tomorrow" do
-        expect(greg.age_on(1.day.from_now.to_date)).to eq gregs_age
+    it "should know its age tomorrow" do
+      expect(greg.age_on(1.day.from_now.to_date)).to eq gregs_age
+    end
+  end
+
+  context "Person#primary_family" do
+    context "on Mike" do
+      let(:find) {mike.primary_family}
+      it "should find Mike's family" do
+        expect(find.id.to_s).to eq mikes_family.id.to_s
       end
     end
 
-    context "Person#primary_family" do
-      context "on Mike" do
-        let(:find) {mike.primary_family}
-        it "should find Mike's family" do
-          expect(find.id.to_s).to eq mikes_family.id.to_s
-        end
+    context "on Carol" do
+      let(:find) {carol.primary_family}
+      it "should find Carol's family" do
+        expect(find.id.to_s).to eq carols_family.id.to_s
       end
+    end
+  end
 
-      context "on Carol" do
-        let(:find) {carol.primary_family}
-        it "should find Carol's family" do
-          expect(find.id.to_s).to eq carols_family.id.to_s
-        end
+  context "Person#families" do
+    context "on Mike" do
+      let(:find) {mike.families.collect(&:id)}
+      it "should find two families" do
+        expect(find.count).to be 2
+      end
+      it "should find Mike's family" do
+        expect(find).to include mikes_family.id
+      end
+      it "should find Carol's family" do
+        expect(find).to include carols_family.id
       end
     end
 
-    context "Person#families" do
-      context "on Mike" do
-        let(:find) {mike.families.collect(&:id)}
-        it "should find two families" do
-          expect(find.count).to be 2
-        end
-        it "should find Mike's family" do
-          expect(find).to include mikes_family.id
-        end
-        it "should find Carol's family" do
-          expect(find).to include carols_family.id
-        end
+    context "on Carol" do
+      let(:find) {carol.families.collect(&:id)}
+      it "should find two families" do
+        expect(find.count).to be 2
       end
-
-      context "on Carol" do
-        let(:find) {carol.families.collect(&:id)}
-        it "should find two families" do
-          expect(find.count).to be 2
-        end
-        it "should find Mike's family" do
-          expect(find).to include mikes_family.id
-        end
-        it "should find Carol's family" do
-          expect(find).to include carols_family.id
-        end
+      it "should find Mike's family" do
+        expect(find).to include mikes_family.id
       end
+      it "should find Carol's family" do
+        expect(find).to include carols_family.id
+      end
+    end
 
-      context "on Greg" do
-        let(:find) {greg.families.collect(&:id)}
-        it "should find two families" do
-          expect(find.count).to be 2
-        end
-        it "should find Mike's family" do
-          expect(find).to include mikes_family.id
-        end
-        it "should find Carol's family" do
-          expect(find).to include carols_family.id
-        end
+    context "on Greg" do
+      let(:find) {greg.families.collect(&:id)}
+      it "should find two families" do
+        expect(find.count).to be 2
+      end
+      it "should find Mike's family" do
+        expect(find).to include mikes_family.id
+      end
+      it "should find Carol's family" do
+        expect(find).to include carols_family.id
       end
     end
   end
