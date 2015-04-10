@@ -167,23 +167,20 @@ class Person
    # employee_role.person may not be unique in returned set
    def employee_roles
      people = exists(:'employee_roles.0' => true).entries
-     emp = people.reduce([]) do |list, person|
-       list << person.employee_roles.each { |ee| ee }
-     end
-     emp.flatten
+     people.flat_map(&:employee_roles)
    end
 
   # Return an instance list of active People who match identifying information criteria
   def match_by_id_info(options)
-    ssn = options[:ssn]
-    dob = options[:dob]
+    ssn_query = options[:ssn]
+    dob_query = options[:dob]
     last_name = options[:last_name]
 
-    raise ArgumentError, "must provide an ssn, last_name/dob or both" if (ssn.blank? && (dob.blank? || last_name.blank?))
+    raise ArgumentError, "must provide an ssn, last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank?))
 
-    matches = []
-    matches.concat Person.where(ssn: ssn).active.to_a unless ssn.blank?
-    matches.concat Person.where(last_name: last_name).active.and(dob: dob).to_a unless (dob.blank? || last_name.blank?)
+    matches = Array.new
+    matches.concat Person.active.where(ssn: ssn_query).to_a unless ssn_query.blank?
+    matches.concat Person.where(last_name: last_name, dob: dob_query).active.to_a unless (dob_query.blank? || last_name.blank?)
     matches.uniq
   end
 

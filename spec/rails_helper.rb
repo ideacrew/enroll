@@ -43,7 +43,13 @@ RSpec.configure do |config|
     DatabaseCleaner[:mongoid, {:connection => :db_name}]
   end
 
-  config.around(:each) do |example|
+  config.around(:example, :type => :model) do |example|
+    DatabaseCleaner.cleaning do
+      example.run
+    end
+  end
+
+  config.around(:example, :type => :controller) do |example|
     DatabaseCleaner.cleaning do
       example.run
     end
