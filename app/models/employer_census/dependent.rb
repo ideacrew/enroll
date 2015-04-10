@@ -8,8 +8,8 @@ class EmployerCensus::Dependent < EmployerCensus::Member
             presence: true,
             allow_blank: false,
             allow_nil:   false,
-            inclusion: { 
-              in: EMPLOYEE_RELATIONSHIP_KINDS, 
+            inclusion: {
+              in: EMPLOYEE_RELATIONSHIP_KINDS,
               message: "'%{value}' is not a valid employee relationship"
             }
 
