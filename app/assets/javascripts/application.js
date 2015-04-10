@@ -88,7 +88,7 @@ $(document).ready(function () {
   
   function match_person()
   {
-    gender_checked = $("#family_member_gender_male").prop("checked") || $("#family_member_gender_female").prop("checked");
+    gender_checked = $("#person_gender_male").prop("checked") || $("#person_gender_female").prop("checked");
     
     if(check_personal_info_exists().length==0 && gender_checked)
     {
@@ -197,26 +197,6 @@ $(document).ready(function () {
     $(".start").hide();
   });
 
-  // $('#continue').click(function() {
-  //   $("#overlay").css("display", "none");
-  //   $(".emp-welcome-msg").css("display", "none");
-  //   $(".focus_effect").css("opacity", "1");
-  //   $(".information").css("opacity", "1");
-  //   $("a.name").css("padding-top", "65px");
-  //   $(".disable-btn").css("display", "inline-block");
-  //   $(".welcome-msg").css("display", "none");
-  //   $("a.welcome_msg").css("display", "none");
-  //   $("a.credential_info, a.name_info, a.tax_info").css("display", "block");
-  //   $("#tax_info .btn-continue").css("display", "inline-block");
-  //   $('.focus_effect:first').addClass('personaol-info-top-row');
-  //   $('.focus_effect:first').removeClass('personaol-info-row');
-  //   $('.sidebar a:first').addClass('style_s_link');
-  //   $('.sidebar a.credential_info').addClass('style_s_link');
-  //   // $(".key").css("display", "block");
-  //   $(".search-btn-row").css("display", "block");
-
-  // });
-
   $('#personal_info.focus_effect').focusout(function(){
     var tag_id = $(this).attr('id');
     var has_class = $(this).hasClass('personaol-info-top-row');
@@ -230,7 +210,6 @@ $(document).ready(function () {
   });
 
   $('span.close').click(function(){
-    //$('.autofill-cloud').addClass('hidden');
     common_body_style();
     side_bar_link_style();
   });
