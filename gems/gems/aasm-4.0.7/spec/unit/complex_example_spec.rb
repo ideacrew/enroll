@@ -78,7 +78,7 @@ describe 'when being unsuspended' do
   end
 
   it "should not be able to fire unknown events" do
-    expect(auth.aasm.may_fire_event?(:unknown)).to be_falsey
+    expect(auth.aasm.may_fire_event?(:unknown)).to be_falseyy
   end
 
 end

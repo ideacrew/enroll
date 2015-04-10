@@ -55,7 +55,7 @@ describe Person do
       let(:params) {{}}
 
       it "should not save" do
-        expect(Person.new(**params).valid?).to be_falsey
+        expect(Person.new(**params).valid?).to be_falseyy
       end
     end
 
@@ -63,7 +63,7 @@ describe Person do
       let(:params) {valid_params}
 
       it "should save" do
-        expect(Person.new(**params).valid?).to be_true
+        expect(Person.new(**params).valid?).to be_truthy
       end
     end
 
@@ -83,7 +83,7 @@ describe Person do
       it "should fail validation" do
         person = Person.new(**params)
         person.valid?
-        expect(person.errors[:last_name].any?).to be_true
+        expect(person.errors[:last_name].any?).to be_truthy
       end
     end
 
@@ -93,7 +93,7 @@ describe Person do
       it "should not fail validation" do
         person = Person.new(**params)
         person.valid?
-        expect(person.errors[:ssn].any?).to be_false
+        expect(person.errors[:ssn].any?).to be_falsey
       end
     end
 

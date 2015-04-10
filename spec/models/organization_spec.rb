@@ -66,7 +66,7 @@ RSpec.describe Organization, type: :model do
       let(:params) {{}}
 
       it "should not save" do
-        expect(Organization.new(**params).save).to be_false
+        expect(Organization.new(**params).save).to be_falsey
       end
     end
 
@@ -74,7 +74,7 @@ RSpec.describe Organization, type: :model do
       let(:params) {valid_params}
 
       it "should save" do
-        expect(Organization.new(**params).save).to be_true
+        expect(Organization.new(**params).save).to be_truthy
       end
     end
 
@@ -82,7 +82,7 @@ RSpec.describe Organization, type: :model do
       let(:params) {valid_params.except(:legal_name)}
 
       it "should fail validation" do
-        expect(Organization.create(**params).errors[:legal_name].any?).to be_true
+        expect(Organization.create(**params).errors[:legal_name].any?).to be_truthy
       end
     end
 
@@ -90,7 +90,7 @@ RSpec.describe Organization, type: :model do
       let(:params) {valid_params.except(:fein)}
 
       it "should fail validation" do
-        expect(Organization.create(**params).errors[:fein].any?).to be_true
+        expect(Organization.create(**params).errors[:fein].any?).to be_truthy
       end
     end
 
@@ -98,7 +98,7 @@ RSpec.describe Organization, type: :model do
       let(:params) {valid_params.except(:office_locations)}
 
       it "should fail validation" do
-        expect(Organization.create(**params).errors[:office_locations].any?).to be_true
+        expect(Organization.create(**params).errors[:office_locations].any?).to be_truthy
       end
     end
 

@@ -19,7 +19,7 @@ describe Email do
       context 'when empty' do
         let(:params){valid_params.deep_merge!({kind: ""})}
         it 'is invalid' do
-          expect(Email.create(**params).errors[:kind].any?).to be_true
+          expect(Email.create(**params).errors[:kind].any?).to be_truthy
           expect(Email.create(**params).errors[:kind]).to eq ["Choose a type", " is not a valid email type"]
         end
       end
@@ -27,7 +27,7 @@ describe Email do
       context "when invalid" do
         let(:params){valid_params.deep_merge!(kind: "fake")}
         it 'is invalid' do
-          expect(Email.create(**params).errors[:kind].any?).to be_true
+          expect(Email.create(**params).errors[:kind].any?).to be_truthy
           expect(Email.create(**params).errors[:kind]).to eq ["fake is not a valid email type"]
         end
       end
@@ -39,7 +39,7 @@ describe Email do
           it 'is valid' do
             params.deep_merge!({kind: type, address: "#{type}@#{type}.com"})
             record = Email.create(**params)
-            expect(record).to be_true
+            expect(record).to be_truthy
             expect(record.errors.messages.size).to eq 0
           end
         end
@@ -52,7 +52,7 @@ describe Email do
         let(:params){valid_params.deep_merge!({address: ""})}
         it "should give an error" do
           record = Email.create(**params)
-          expect(record.errors[:address].any?).to be_true
+          expect(record.errors[:address].any?).to be_truthy
           expect(record.errors[:address]).to eq ["is invalid", "can't be blank"]
         end
       end
@@ -61,7 +61,7 @@ describe Email do
         let(:params){valid_params.deep_merge!({address: "invalid@invalid"})}
         it "should give an error" do
           record = Email.create(**params)
-          expect(record.errors[:address].any?).to be_true
+          expect(record.errors[:address].any?).to be_truthy
           expect(record.errors[:address]).to eq ["is invalid"]
         end
       end
@@ -69,7 +69,7 @@ describe Email do
       context "when adding already email present" do
         let(:params) {valid_params}
         it "should not throw an error" do
-          expect(Email.create(**params).valid?).to be_true
+          expect(Email.create(**params).valid?).to be_truthy
         end
       end
     end
@@ -92,7 +92,7 @@ describe Email do
     context 'emails are the same' do
       let(:other_email) { email.clone }
       it 'returns true' do
-        expect(email.match(other_email)).to be_true
+        expect(email.match(other_email)).to be_truthy
       end
     end
 

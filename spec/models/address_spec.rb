@@ -26,35 +26,35 @@ describe Address, "with proper validations" do
   context "with no arguments" do
     let(:address_params) { {} }
     it "should not be valid" do
-      expect(subject.valid?).to be_false
+      expect(subject.valid?).to be_falsey
     end
   end
 
   context "with empty address kind" do
     let(:address_kind) { nil }
     it "is not a valid address kind" do
-      expect(subject.errors[:kind].any?).to be_true
+      expect(subject.errors[:kind].any?).to be_truthy
     end
   end
 
   context "with no address_1" do
     let(:address_1) { nil }
     it "is not a valid address kind" do
-      expect(subject.errors[:address_1].any?).to be_true
+      expect(subject.errors[:address_1].any?).to be_truthy
     end
   end
 
   context "with no city" do
     let(:city) { nil }
     it "is not a valid address" do
-      expect(subject.errors[:city].any?).to be_true
+      expect(subject.errors[:city].any?).to be_truthy
     end
   end
 
   context "with no state" do
     let(:state) { nil }
     it "is not valid address" do
-      expect(subject.errors[:state].any?).to be_true
+      expect(subject.errors[:state].any?).to be_truthy
     end
   end
 
@@ -62,14 +62,14 @@ describe Address, "with proper validations" do
     let(:zip) { nil }
 
     it "is empty" do
-      expect(subject.errors[:zip].any?).to be_true
+      expect(subject.errors[:zip].any?).to be_truthy
     end
   end
 
   context "with an invalid zip" do
     let(:zip) { "123-24" }
     it "is not valid with invalid code" do
-      expect(subject.errors[:zip].any?).to be_true
+      expect(subject.errors[:zip].any?).to be_truthy
     end
   end
 
@@ -78,7 +78,7 @@ describe Address, "with proper validations" do
     let(:address_kind) { "fake" }
 
     it "is with unrecognized value" do
-      expect(subject.errors[:kind].any?).to be_true
+      expect(subject.errors[:kind].any?).to be_truthy
     end
   end
 
@@ -100,8 +100,8 @@ describe Address, "with proper validations" do
           params.deep_merge!({kind: type})
           address = Address.new(**params)
           person.addresses << address
-          expect(address.errors[:kind].any?).to be_false
-          expect(address.valid?).to be_true
+          expect(address.errors[:kind].any?).to be_falsey
+          expect(address.valid?).to be_truthy
         end
       end
     end
@@ -180,13 +180,13 @@ describe '#matches?' do
   context 'addresses are the same' do
     let(:second_address) { address.clone }
     it 'returns true' do
-      expect(address.matches?(second_address)).to be_true
+      expect(address.matches?(second_address)).to be_truthy
     end
 
     context 'mismatched case' do
       before { second_address.address_1.upcase! }
       it 'returns true' do
-        expect(address.matches?(second_address)).to be_true
+        expect(address.matches?(second_address)).to be_truthy
       end
     end
   end
@@ -198,7 +198,7 @@ describe '#matches?' do
       a
     end
     it 'returns false' do
-      expect(address.matches?(second_address)).to be_false
+      expect(address.matches?(second_address)).to be_falsey
     end
   end
 end

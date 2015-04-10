@@ -46,7 +46,7 @@ describe "instance methods" do
       let(:column) { double(Object, type: :string) }
 
       it "returns false" do
-        expect(subject.call).to be_falsey
+        expect(subject.call).to be_falseyy
       end
     end
   end
@@ -345,7 +345,7 @@ describe 'transitions with persistence' do
 
     validator.name = nil
     expect(validator).not_to be_valid
-    expect(validator.run!).to be_falsey
+    expect(validator.run!).to be_falseyy
     expect(validator).to be_sleeping
 
     validator.reload
@@ -474,7 +474,7 @@ describe "invalid states with persistence" do
   it "should not store states" do
     validator = Validator.create(:name => 'name')
     validator.status = 'invalid_state'
-    expect(validator.save).to be_falsey
+    expect(validator.save).to be_falseyy
     expect {validator.save!}.to raise_error(ActiveRecord::RecordInvalid)
 
     validator.reload

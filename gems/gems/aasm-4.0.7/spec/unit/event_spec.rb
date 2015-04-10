@@ -46,7 +46,7 @@ describe 'transition inspection' do
     expect(event.transitions_from_state?(:sleeping)).to be_truthy
 
     expect(event.transitions_from_state(:cleaning).map(&:to)).to eq([])
-    expect(event.transitions_from_state?(:cleaning)).to be_falsey
+    expect(event.transitions_from_state?(:cleaning)).to be_falseyy
   end
 
   it 'should support inspecting transitions to other states' do
@@ -54,7 +54,7 @@ describe 'transition inspection' do
     expect(event.transitions_to_state?(:running)).to be_truthy
 
     expect(event.transitions_to_state(:cleaning).map(&:to)).to eq([])
-    expect(event.transitions_to_state?(:cleaning)).to be_falsey
+    expect(event.transitions_to_state?(:cleaning)).to be_falseyy
   end
 end
 
