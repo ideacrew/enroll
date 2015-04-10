@@ -55,7 +55,6 @@ RSpec.configure do |config|
     end
   end
 
-  config.include LegacySpec
   config.include Devise::TestHelpers, :type => :controller
   config.extend ControllerMacros, :type => :controller #real logins for integration testing
   config.include ControllerHelpers, :type => :controller #stubbed logins for unit testing

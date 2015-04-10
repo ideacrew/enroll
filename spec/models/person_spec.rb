@@ -55,7 +55,7 @@ describe Person do
       let(:params) {{}}
 
       it "should not save" do
-        expect(Person.new(**params).valid?).to be_falseyy
+        expect(Person.new(**params).valid?).to be_falsey
       end
     end
 

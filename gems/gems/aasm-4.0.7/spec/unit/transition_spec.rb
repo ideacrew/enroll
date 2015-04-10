@@ -10,13 +10,13 @@ describe 'transitions' do
 
   it 'should not raise an exception when not whiny' do
     silencer = Silencer.new
-    expect(silencer.smile!).to be_falseyy
+    expect(silencer.smile!).to be_falsey
     expect(silencer).to be_silent
   end
 
   it 'should not raise an exception when superclass not whiny' do
     sub = SubClassing.new
-    expect(sub.smile!).to be_falseyy
+    expect(sub.smile!).to be_falsey
     expect(sub).to be_silent
   end
 
