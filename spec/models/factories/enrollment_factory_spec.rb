@@ -171,6 +171,10 @@ RSpec.describe EnrollmentFactory do
         @second_employee_role, @second_family = EnrollmentFactory.add_employee_role(**@second_params)
       end
 
+      after(:all) do
+        DatabaseCleaner.clean
+      end
+
       it "should still have a findable person" do
         people = Person.match_by_id_info(ssn: ssn)
         expect(people.count).to eq 1
