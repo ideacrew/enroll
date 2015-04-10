@@ -144,16 +144,31 @@ RSpec.describe EnrollmentFactory do
     end
 
     context "and another employer profile exists with the same employee and dependents in the census" do
-      let(:second_employee_family) do
+#      let(:second_employee_family) do
+      before(:all) do
+        @user = FactoryGirl.create(:user)
+        employee_family = FactoryGirl.create(:employer_census_family_with_dependents)
+        employer_profile = employee_family.employer_profile
+        census_employee = employee_family.census_employee
+        valid_person_params = {
+          user: @user,
+          first_name: census_employee.first_name,
+          last_name: census_employee.last_name,
+        }
+        valid_employee_params = {
+          ssn: census_employee.ssn,
+          gender: census_employee.gender,
+          dob: census_employee.dob,
+          hired_on: census_employee.hired_on
+        }
+        valid_params = { employer_profile: employer_profile }.merge(valid_person_params).merge(valid_employee_params) 
         dependents = employee_family.census_dependents.collect(&:dup)
         employee = census_employee.dup
-        FactoryGirl.create(:employer_census_family, census_employee: employee, census_dependents: dependents)
-      end
-      let(:second_employer_profile) {second_employee_family.employer_profile}
-      let(:second_census_employee) {second_employee_family.census_employee}
-      let(:second_params) {valid_params.merge(employer_profile: second_employer_profile)}
-      before do
-        @second_employee_role, @second_family = EnrollmentFactory.add_employee_role(**second_params)
+        second_employee_family = FactoryGirl.create(:employer_census_family, census_employee: employee, census_dependents: dependents)
+        second_employer_profile = second_employee_family.employer_profile
+        second_census_employee = second_employee_family.census_employee
+        @second_params = valid_params.merge(employer_profile: second_employer_profile)
+        @second_employee_role, @second_family = EnrollmentFactory.add_employee_role(**@second_params)
       end
 
       it "should still have a findable person" do
