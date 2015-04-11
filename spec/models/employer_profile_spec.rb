@@ -22,7 +22,7 @@ RSpec.describe EmployerProfile, :type => :model do
     context "with no arguments" do
       def params; {}; end
       it "should not save" do
-        expect(EmployerProfile.new(**params).save).to be_false
+        expect(EmployerProfile.new(**params).save).to be_falsey
       end
     end
 
@@ -31,7 +31,7 @@ RSpec.describe EmployerProfile, :type => :model do
       def employer_profile; EmployerProfile.new(**params); end
 
       it "should save" do
-        expect(employer_profile.save).to be_true
+        expect(employer_profile.save).to be_truthy
       end
 
       context "and it is saved" do
@@ -51,14 +51,14 @@ RSpec.describe EmployerProfile, :type => :model do
       def params; valid_params.except(:entity_kind); end
 
       it "should fail validation " do
-        expect(EmployerProfile.create(**params).errors[:entity_kind].any?).to be_true
+        expect(EmployerProfile.create(**params).errors[:entity_kind].any?).to be_truthy
       end
     end
 
     context "with improper entity_kind" do
       def params; valid_params.deep_merge({entity_kind: bad_entity_kind}); end
       it "should fail validation with improper entity_kind" do
-        expect(EmployerProfile.create(**params).errors[:entity_kind].any?).to be_true
+        expect(EmployerProfile.create(**params).errors[:entity_kind].any?).to be_truthy
         expect(EmployerProfile.create(**params).errors[:entity_kind]).to eq [entity_kind_error_message]
 
       end

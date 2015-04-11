@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Person, type: :model do
+describe Person do
 
   it { should validate_presence_of :first_name }
   it { should validate_presence_of :last_name }
@@ -19,7 +19,7 @@ describe Person, type: :model do
     }
   end
 
-  describe ".create" do
+  describe ".create", type: :model do
     context "with valid arguments" do
       let(:params) {valid_params}
       let(:person) {Person.create(**params)}
@@ -55,7 +55,7 @@ describe Person, type: :model do
       let(:params) {{}}
 
       it "should not save" do
-        expect(Person.new(**params).save).to be_false
+        expect(Person.new(**params).valid?).to be_falsey
       end
     end
 
@@ -63,7 +63,7 @@ describe Person, type: :model do
       let(:params) {valid_params}
 
       it "should save" do
-        expect(Person.new(**params).save).to be_true
+        expect(Person.new(**params).valid?).to be_truthy
       end
     end
 
@@ -71,7 +71,9 @@ describe Person, type: :model do
       let(:params) {valid_params.except(:first_name)}
 
       it "should fail validation" do
-        expect(Person.create(**params).errors[:first_name].any?).to be_true
+        person = Person.new(**params)
+        person.valid?
+        expect(person.errors[:first_name].any?).to be_truthy
       end
     end
 
@@ -79,7 +81,9 @@ describe Person, type: :model do
       let(:params) {valid_params.except(:last_name)}
 
       it "should fail validation" do
-        expect(Person.create(**params).errors[:last_name].any?).to be_true
+        person = Person.new(**params)
+        person.valid?
+        expect(person.errors[:last_name].any?).to be_truthy
       end
     end
 
@@ -87,7 +91,9 @@ describe Person, type: :model do
       let(:params) {valid_params.except(:ssn)}
 
       it "should not fail validation" do
-        expect(Person.create(**params).errors[:ssn].any?).to be_false
+        person = Person.new(**params)
+        person.valid?
+        expect(person.errors[:ssn].any?).to be_falsey
       end
     end
 
@@ -95,7 +101,9 @@ describe Person, type: :model do
       let(:params) {valid_params.deep_merge({gender: "abc"})}
 
       it "should fail validation" do
-        expect(Person.create(**params).errors[:gender]).to eq ["abc is not a valid gender"]
+        person = Person.new(**params)
+        person.valid?
+        expect(person.errors[:gender]).to eq ["abc is not a valid gender"]
       end
     end
 
@@ -103,7 +111,9 @@ describe Person, type: :model do
       let(:params) {valid_params.deep_merge({ssn: "123345"})}
 
       it "should fail validation" do
-        expect(Person.create(**params).errors[:ssn]).to eq ["SSN must be 9 digits"]
+        person = Person.new(**params)
+        person.valid?
+        expect(person.errors[:ssn]).to eq ["SSN must be 9 digits"]
       end
     end
 
@@ -112,7 +122,9 @@ describe Person, type: :model do
         let(:params) {valid_params.deep_merge({dob: Date.today + 1})}
 
         it "should fail validation" do
-          expect(Person.create(**params).errors[:dob].size).to eq 1
+          person = Person.new(**params)
+          person.valid?
+          expect(person.errors[:dob].size).to eq 1
         end
       end
 
@@ -120,7 +132,9 @@ describe Person, type: :model do
         let(:params) {valid_params.deep_merge({date_of_death: Date.today + 1})}
 
         it "should fail validation" do
-          expect(Person.create(**params).errors[:date_of_death].size).to eq 1
+          person = Person.new(**params)
+          person.valid?
+          expect(person.errors[:date_of_death].size).to eq 1
         end
       end
 
@@ -128,7 +142,9 @@ describe Person, type: :model do
         let(:params) {valid_params.deep_merge({date_of_death: Date.today - 10, dob: Date.today - 1})}
 
         it "should fail validation" do
-          expect(Person.create(**params).errors[:date_of_death].size).to eq 1
+          person = Person.new(**params)
+          person.valid?
+          expect(person.errors[:date_of_death].size).to eq 1
         end
       end
     end
@@ -146,46 +162,45 @@ describe Person, "class methods" do
   end
 
   context "employee_roles are present" do
+
     let(:employee_count) { 11 }
 
-    before do
-      FactoryGirl.create_list(:employee_role, employee_count)
-    end
-
     it "should find a matching number of employee_roles" do
-      expect(Person.employee_roles.size).to eq employee_count
+      FactoryGirl.create_list(:employee_role, 11)
+      expect(Person.employee_roles.count).to eq employee_count
+      expect((Person.employee_roles).first).to be_a EmployeeRole
+      DatabaseCleaner.clean
     end
 
-    it "and returned values should be employee_roles" do
-      expect((Person.employee_roles).first).to be_a EmployeeRole
-    end
   end
 
 end
 
 describe Person, '.match_by_id_info' do
-  let(:p0) { Person.create!(first_name: "Jack",   last_name: "Bruce",   dob: "1943-05-14", ssn: "517994321") }
-  let(:p1) { Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654") }
-  let(:p2) { Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345") }
+  before(:each) do
+    @p0 = Person.create!(first_name: "Jack",   last_name: "Bruce",   dob: "1943-05-14", ssn: "517994321")
+    @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
+    @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
+  end
+
+  after(:each) do
+    DatabaseCleaner.clean
+  end
 
   it 'matches by last_name and dob' do
-    expect(Person.match_by_id_info(last_name: p0.last_name, dob: p0.dob)).to eq [p0]
+    expect(Person.match_by_id_info(last_name: @p0.last_name, dob: @p0.dob)).to eq [@p0]
   end
 
   it 'matches by ssn' do
-    expect(Person.match_by_id_info(ssn: p1.ssn)).to eq [p1]
+    expect(Person.match_by_id_info(ssn: @p1.ssn)).to eq [@p1]
   end
 
   it 'matches by ssn, last_name and dob' do
-    expect(Person.match_by_id_info(last_name: p2.last_name, dob: p2.dob, ssn: p2.ssn)).to eq [p2]
-  end
-
-  it 'matches multiple records' do
-    expect(Person.match_by_id_info(last_name: p2.last_name, dob: p2.dob, ssn: p0.ssn).size).to eq 2
+    expect(Person.match_by_id_info(last_name: @p2.last_name, dob: @p2.dob, ssn: @p2.ssn)).to eq [@p2]
   end
 
   it 'not match last_name and dob if not on same record' do
-    expect(Person.match_by_id_info(last_name: p0.last_name, dob: p1.dob).size).to eq 0
+    expect(Person.match_by_id_info(last_name: @p0.last_name, dob: @p1.dob).size).to eq 0
   end
 
   it 'returns empty array for non-matches' do
@@ -193,7 +208,7 @@ describe Person, '.match_by_id_info' do
   end
 end
 
-describe Person, '.active' do
+describe Person, '.active', :type => :model do
   it 'new person defaults to is_active' do
     expect(Person.create!(first_name: "eric", last_name: "Clapton").is_active).to eq true
   end
@@ -215,7 +230,7 @@ describe Person, '#addresses' do
     expect(person.errors[:addresses].any?).to eq true
   end
 
-  it 'persists associated address' do
+  it 'persists associated address', type: :model do
     # setup
     person = FactoryGirl.build(:person)
     addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
@@ -226,82 +241,82 @@ describe Person, '#addresses' do
     expect(person.addresses.first.kind).to eq "home"
     expect(person.addresses.first.city).to eq "Washington"
   end
+end
 
-  describe "large family with multiple employees - The Brady Bunch" do
-    include_context "BradyBunch"
+describe Person, "large family with multiple employees - The Brady Bunch" do
+  include_context "BradyBunch"
 
-    context "a person" do
-      it "should know its age today" do
-        expect(greg.age_on(Date.today)).to eq gregs_age
-      end
+  context "a person" do
+    it "should know its age today" do
+      expect(greg.age_on(Date.today)).to eq gregs_age
+    end
 
-      it "should know its age on a given date" do
-        expect(greg.age_on(18.months.ago.to_date)).to eq (gregs_age - 2)
-      end
+    it "should know its age on a given date" do
+      expect(greg.age_on(18.months.ago.to_date)).to eq (gregs_age - 2)
+    end
 
-      it "should know its age yesterday" do
-        expect(greg.age_on(Date.today.advance(days: -1))).to eq (gregs_age - 1)
-      end
+    it "should know its age yesterday" do
+      expect(greg.age_on(Date.today.advance(days: -1))).to eq (gregs_age - 1)
+    end
 
-      it "should know its age tomorrow" do
-        expect(greg.age_on(1.day.from_now.to_date)).to eq gregs_age
+    it "should know its age tomorrow" do
+      expect(greg.age_on(1.day.from_now.to_date)).to eq gregs_age
+    end
+  end
+
+  context "Person#primary_family" do
+    context "on Mike" do
+      let(:find) {mike.primary_family}
+      it "should find Mike's family" do
+        expect(find.id.to_s).to eq mikes_family.id.to_s
       end
     end
 
-    context "Person#primary_family" do
-      context "on Mike" do
-        let(:find) {mike.primary_family}
-        it "should find Mike's family" do
-          expect(find.id.to_s).to eq mikes_family.id.to_s
-        end
+    context "on Carol" do
+      let(:find) {carol.primary_family}
+      it "should find Carol's family" do
+        expect(find.id.to_s).to eq carols_family.id.to_s
       end
+    end
+  end
 
-      context "on Carol" do
-        let(:find) {carol.primary_family}
-        it "should find Carol's family" do
-          expect(find.id.to_s).to eq carols_family.id.to_s
-        end
+  context "Person#families" do
+    context "on Mike" do
+      let(:find) {mike.families.collect(&:id)}
+      it "should find two families" do
+        expect(find.count).to be 2
+      end
+      it "should find Mike's family" do
+        expect(find).to include mikes_family.id
+      end
+      it "should find Carol's family" do
+        expect(find).to include carols_family.id
       end
     end
 
-    context "Person#families" do
-      context "on Mike" do
-        let(:find) {mike.families.collect(&:id)}
-        it "should find two families" do
-          expect(find.count).to be 2
-        end
-        it "should find Mike's family" do
-          expect(find).to include mikes_family.id
-        end
-        it "should find Carol's family" do
-          expect(find).to include carols_family.id
-        end
+    context "on Carol" do
+      let(:find) {carol.families.collect(&:id)}
+      it "should find two families" do
+        expect(find.count).to be 2
       end
-
-      context "on Carol" do
-        let(:find) {carol.families.collect(&:id)}
-        it "should find two families" do
-          expect(find.count).to be 2
-        end
-        it "should find Mike's family" do
-          expect(find).to include mikes_family.id
-        end
-        it "should find Carol's family" do
-          expect(find).to include carols_family.id
-        end
+      it "should find Mike's family" do
+        expect(find).to include mikes_family.id
       end
+      it "should find Carol's family" do
+        expect(find).to include carols_family.id
+      end
+    end
 
-      context "on Greg" do
-        let(:find) {greg.families.collect(&:id)}
-        it "should find two families" do
-          expect(find.count).to be 2
-        end
-        it "should find Mike's family" do
-          expect(find).to include mikes_family.id
-        end
-        it "should find Carol's family" do
-          expect(find).to include carols_family.id
-        end
+    context "on Greg" do
+      let(:find) {greg.families.collect(&:id)}
+      it "should find two families" do
+        expect(find.count).to be 2
+      end
+      it "should find Mike's family" do
+        expect(find).to include mikes_family.id
+      end
+      it "should find Carol's family" do
+        expect(find).to include carols_family.id
       end
     end
   end

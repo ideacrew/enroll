@@ -43,15 +43,21 @@ RSpec.configure do |config|
     DatabaseCleaner[:mongoid, {:connection => :db_name}]
   end
 
-  config.around(:each) do |example|
+  config.around(:example, :type => :model) do |example|
     DatabaseCleaner.cleaning do
       example.run
     end
   end
 
-  config.include LegacySpec
+  config.around(:example, :type => :controller) do |example|
+    DatabaseCleaner.cleaning do
+      example.run
+    end
+  end
+
   config.include Devise::TestHelpers, :type => :controller
-  config.extend ControllerMacros, :type => :controller
+  config.extend ControllerMacros, :type => :controller #real logins for integration testing
+  config.include ControllerHelpers, :type => :controller #stubbed logins for unit testing
   config.include FactoryGirl::Syntax::Methods
 
   config.infer_spec_type_from_file_location!

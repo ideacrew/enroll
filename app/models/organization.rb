@@ -79,4 +79,9 @@ class Organization
     return Organization.where(id: id).where(:"employer_profile.employee_families.census_employee.ssn" => person.ssn).last.employer_profile.employee_families.last
   end
 
+  # Strip non-numeric characters
+  def fein=(new_fein)
+    write_attribute(:fein, new_fein.to_s.gsub(/\D/, ''))
+  end
+
 end

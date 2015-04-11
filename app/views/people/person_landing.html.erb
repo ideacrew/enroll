@@ -1,8 +1,6 @@
 <div class="container-fluid no-pd-left">
   <div class="panel panel-default" style="border:none; box-shadow: none;">
     <div class="row tab-row">
-      <form>
-
         <ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
           <li class="active" role="presentation">
             <a aria-expanded="true" aria-controls="home" data-toggle="tab" role="tab" id="home-tab" href="#home">
@@ -59,7 +57,9 @@
                                         <i class="glyphicon glyphicon-menu-down"></i>
                                       </a>
                                       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                                        <li><a href="#">Link1</a></li>
+                                        <% get_dependents(@family, @person).each do |dependents |%>
+                                          <li><a href="#"><%= dependents.full_name %></a></li>
+                                        <% end %>
                                       </ul>
                                     </div>
                                   </td>
@@ -99,7 +99,7 @@
                                     </td>
                                   </tr>
                                   <tr>
-                                    <td>
+                                    <td colspan="2">
                                       <span>CITY</span>
                                       <input type="text" value="<%= @address.city %>">
                                     </td>
@@ -107,10 +107,7 @@
                                       <span>STATE</span>
                                       <input type="text" value="<%= @address.state %>">
                                     </td>
-                                    <td>
-                                      <span>COUNTRY</span>
-                                      <input type="text" value="<%= @address.country_name %>">
-                                    </td>
+                                   
                                     <td>
                                       <span>ZIP</span>
                                       <input type="text" value="<%= @address.zip %>">
@@ -237,7 +234,7 @@
 
                     <div aria-labelledby="employer-tab" id="employer" class="tab-pane fade" role="tabpanel">
                       <div class="emp-info">
-                       <%#= render 'people/landing_pages/employer' %> 
+                       <%= render 'people/landing_pages/employer' %> 
                       </div>
                     </div>
                     
@@ -311,7 +308,6 @@
               <div class="clearfix"></div>
               </div>
               <div class="clearfix"></div>
-            </form >
           </div>
         </div>
       </div>
@@ -473,12 +469,6 @@
 
     $(document).on('click', '#family .right-side a.save', function(){
       if ($("#family .right-side li.edit input.first-name").val() !== ""){
-        var first = $("#family .right-side li.edit input.first-name").val();
-        var middle = $("#family .right-side li.edit input.middle-name").val();
-        var last = $("#family .right-side li.edit input.last-name").val();
-        // $("li.edit h4").text(first + " " + middle + " " + last);
-        
-        // $(this).closest("li.edit").removeClass("edit");
         $(this).closest("form").submit();
       } else {
         // $(this).closest("li.edit").removeClass("edit");

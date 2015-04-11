@@ -90,7 +90,7 @@
       </div>
 
       <div class="col-md-10 col-sm-12">
-        <div class="col-md-10 col-sm-9 col-xs-12 no-pd">
+        <div class="col-md-9 col-sm-9 col-xs-12 no-pd">
 
           <div id="house_info" class="focus_effect row personaol-info-row">
             <p class="information row">Household Information</p>
@@ -139,19 +139,19 @@
           <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
 
           <!-- <a href="<%= plan_details_people_path(person_id: params[:person_id], organization_id: params[:organization_id])%>" data-method="POST" class="text-center btn btn-save pull-right">Continue</a> -->
-          <%= link_to 'Continue', select_plan_people_path(person_id: params[:person_id], organization_id: params[:organization_id]), class: 'text-center btn btn-green pull-right' %>
+          <%= link_to 'Continue', select_plan_people_path(person_id: params[:person_id], organization_id: params[:organization_id]), class: 'btn btn-green pull-right' %>
         </div>
 
         <div class="col-md-12 no-pd col-sm-12 col-xs-12 last hidden">
           <%= link_to "Cancel", 'javascript:void(0)', class: 'btn btn-red', id: 'cancel_member' %>
 
-          <a class="text-center btn btn-save pull-right" id="save_member">Confirm Member</a>
+          <a class="btn btn-save pull-right" id="save_member">Confirm Member</a>
         </div>
       </div>
 
       <div class="clear-fix"></div>
         </div>
-        <div class="col-md-2 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
+        <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
           <a href="#" class="btn btn-save">Save & Exit</a>
 
           <input type="hidden" id="initial_progress" value="50">

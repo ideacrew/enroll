@@ -14,7 +14,7 @@ RSpec.describe OfficeLocation, :type => :model do
   describe ".new" do
 
     let(:valid_params) do
-      { 
+      {
         organization: organization,
         address: address,
         phone: phone,
@@ -25,9 +25,9 @@ RSpec.describe OfficeLocation, :type => :model do
 
     context "with no arguments" do
       let(:params) {{}}
-       
+
       it "should not save" do
-        expect(OfficeLocation.new(**params).save).to be_false
+        expect(OfficeLocation.new(**params).save).to be_falsey
       end
     end
 
@@ -35,7 +35,7 @@ RSpec.describe OfficeLocation, :type => :model do
       let(:params) {valid_params}
 
       it "should save" do
-        expect(OfficeLocation.new(**params).save).to be_true
+        expect(OfficeLocation.new(**params).save).to be_truthy
       end
     end
 
@@ -43,7 +43,7 @@ RSpec.describe OfficeLocation, :type => :model do
       let(:params) {valid_params.except(:address)}
 
       it "should fail validation" do
-        expect(OfficeLocation.create(**params).errors[:address].any?).to be_true
+        expect(OfficeLocation.create(**params).errors[:address].any?).to be_truthy
       end
     end
 
@@ -51,7 +51,7 @@ RSpec.describe OfficeLocation, :type => :model do
       let(:params) {valid_params.except(:phone)}
 
       it "should fail validation" do
-        expect(OfficeLocation.create(**params).errors[:phone].any?).to be_true
+        expect(OfficeLocation.create(**params).errors[:phone].any?).to be_truthy
       end
     end
 

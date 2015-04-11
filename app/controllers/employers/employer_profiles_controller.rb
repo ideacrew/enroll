@@ -14,21 +14,19 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def new
-    @employer = EmployerProfile.new
+    @organization = build_employer_profile
   end
 
   def create
-    params["employer"]["entity_kind"] = EmployerProfile::ENTITY_KINDS.sample # temp hack for getting employer creation working.
-    @employer = EmployerProfile.new(employer_params)
-
-    respond_to do |format|
-      if @employer.save
-        format.html { redirect_to employers_employer_index_path, notice: 'Employer was successfully created.' }
-        format.json { render json: @employer, status: :created, location: @employer }
-      else
-        format.html { render action: "new" }
-        format.json { render json: @employer.errors, status: :unprocessable_entity }
-      end
+    params.permit!
+    employer_profile = EmployerProfile.new
+    @organization = employer_profile.build_organization
+    @organization.attributes = params["organization"]
+    if @organization.save
+      flash.notice = 'Employer successfully created.'
+      redirect_to employers_employer_profiles_path
+    else
+      render action: "new"
     end
   end
 
@@ -49,5 +47,15 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def employer_params
     params.require(:employer).permit(:legal_name, :fein, :entity_kind)
+  end
+
+  def build_employer_profile
+    employer_profile = EmployerProfile.new
+    organization = employer_profile.build_organization
+    organization.office_locations.build
+    organization.office_locations.first.build_address
+    organization.office_locations.first.build_email
+    organization.office_locations.first.build_phone
+    organization
   end
 end

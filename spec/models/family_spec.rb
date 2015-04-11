@@ -111,7 +111,7 @@ describe Family, type: :model do
 
     context "family has never had a special enrollment period" do
       it "should indicate no active SEPs" do
-        expect(family.is_under_special_enrollment_period?).to be_false
+        expect(family.is_under_special_enrollment_period?).to be_falsey
       end
 
       it "current_special_enrollment_periods should return []" do
@@ -134,7 +134,7 @@ describe Family, type: :model do
       end
 
       it "should indicate no active SEPs" do
-        expect(family.is_under_special_enrollment_period?).to be_false
+        expect(family.is_under_special_enrollment_period?).to be_falsey
       end
 
       it "current_special_enrollment_periods should return []" do
@@ -149,7 +149,7 @@ describe Family, type: :model do
       end
 
       it "should indicate SEP is active" do
-        expect(family.is_under_special_enrollment_period?).to be_true
+        expect(family.is_under_special_enrollment_period?).to be_truthy
       end
 
       it "should return one current_special_enrollment" do

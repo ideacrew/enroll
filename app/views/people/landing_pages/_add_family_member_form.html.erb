@@ -1,4 +1,4 @@
-<li id="add_member_list_<%= dependent.id %>" style="padding: 0;border-radius: 0;border: none;margin-bottom: 20px;">
+<li id="add_member_list_<%= dependent.id %>">
   <div id="add_info" class=" focus_effect row personaol-info-row">
     <div id="add_info_clone0">
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd first">
@@ -7,7 +7,7 @@
           <div class="row top-row top-row-2">
               <div class="col-md-4 col-sm-4 no-pd">
                 <div class="form-group form-group-lg">
-                    <%= f.text_field :first_name, value: dependent.first_name,class: "home floatlabel form-control", required: true, placeholder: "FIRST NAME" %>
+                    <%= f.text_field :first_name, value: dependent.first_name,class: "home floatlabel form-control", placeholder: "FIRST NAME", required: true %>
                 </div>
               </div>
 

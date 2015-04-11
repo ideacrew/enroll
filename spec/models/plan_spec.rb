@@ -39,7 +39,7 @@ RSpec.describe Plan, type: :model do
     context "with no arguments" do
       def params; {}; end
       it "should not save" do
-        expect(Plan.new(**params).save).to be_false
+        expect(Plan.new(**params).save).to be_falsey
       end
     end
 
@@ -49,7 +49,7 @@ RSpec.describe Plan, type: :model do
 
       it "should save" do
         # expect(plan.inspect).to be_nil
-        expect(plan.save).to be_true
+        expect(plan.save).to be_truthy
       end
 
       context "and it is saved" do
@@ -70,14 +70,14 @@ RSpec.describe Plan, type: :model do
       def params; valid_params.except(:metal_level); end
 
       it "should fail validation " do
-        expect(Plan.create(**params).errors[:metal_level].any?).to be_true
+        expect(Plan.create(**params).errors[:metal_level].any?).to be_truthy
       end
     end
 
     context "with improper metal_level" do
       def params; valid_params.deep_merge({metal_level: bad_metal_level}); end
       it "should fail validation with improper metal_level" do
-        expect(Plan.create(**params).errors[:metal_level].any?).to be_true
+        expect(Plan.create(**params).errors[:metal_level].any?).to be_truthy
         expect(Plan.create(**params).errors[:metal_level]).to eq [metal_level_error_message]
       end
     end
@@ -85,7 +85,7 @@ RSpec.describe Plan, type: :model do
     context "with invalid active_year" do
       def params; valid_params.deep_merge({active_year: bad_active_year}); end
       it "should fail active_year validation" do
-        expect(Plan.create(**params).errors[:active_year].any?).to be_true
+        expect(Plan.create(**params).errors[:active_year].any?).to be_truthy
         expect(Plan.create(**params).errors[:active_year]).to eq [active_year_error_message]
       end
     end
@@ -173,7 +173,7 @@ RSpec.describe Plan, type: :model do
   describe "class methods" do
     describe "redis_monthly_premium" do
 
-      it "with invalid parameters" do 
+      it "with invalid parameters" do
         expect(Plan.redis_monthly_premium(2014, "1234", [], 2014)).to eq []
       end
 

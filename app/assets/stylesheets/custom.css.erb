@@ -256,10 +256,6 @@ a:hover, a:focus {
 }
 
 #new_person a.btn-search {
-    background: none repeat scroll 0 0 #238c00;
-    color: #fff;
-    font-family: "AvenirLTStd-Light";
-    font-size: 18px;
     margin: 0;
     padding: 6px 30px;
 }
@@ -296,7 +292,7 @@ p.information {
 }
 
 #new_person .employee-info {
-    border: 2px solid #005fd6 !important;
+    border: 2px solid #005fd6;
     opacity: 0.5;
 }
 #new_person .employee-info .top-row {
@@ -304,6 +300,9 @@ p.information {
 }
 #new_person .employee-info label, .employee-info input {
     color: #007bc3 !important;
+}
+.require-field .required {
+  background-color: #ffeeee;
 }
 /* End New Person Signup */
 
@@ -329,14 +328,9 @@ p.information {
     text-decoration: underline;
 }
 .welcome-msg .btn-continue {
-    background: none repeat scroll 0 0 #238c00;
-    bottom: 0;
-    color: #fff;
-    float: left;
-    font-family: "AvenirLTStd-Light";
-    font-size: 18px;
-    margin-top: 20px;
-    padding: 6px 20px;
+  float: left;
+  margin-top: 20px;
+  padding: 6px 20px;
 }
 
 span.red{
@@ -370,36 +364,30 @@ a.btn.add{
 }
 
 /* Buttons */
-/*.btn {font-size: 18px;padding: 6px 20px;}*/
+.btn {color: #fff;font-size: 18px;padding: 6px 20px;font-family: "AvenirLTStd-Light";}
+.btn:hover, .btn:focus {color: #fff;}
 
 .btn-save, .btn-save:hover, .btn-save:focus {
   background: none repeat scroll 0 0 #4d74ff;
-  color: #fff;
 }
 .btn-green {
-  background: none repeat scroll 0 0 #00b22d;
-  color: #fff;
+  background: none repeat scroll 0 0 #008c00;
 }
 
 .btn-gray {
   background: none repeat scroll 0 0 #00b22d;
-  color: #fff;
 }
 .btn-blue{
-  color: #fff;
   background-color: #008ecd;
 }
 .btn-blue:hover, .btn-blue:active, .btn-blue:focus{
   background-color: #008ecd;
-  color: #ffffff;
 }
 .btn-red {
-  color: #fff;
   background-color: #8c0000;
 }
 .btn-red:hover, .btn-red:active, .btn-red:focus{
   background-color: #8c0000;
-  color: #ffffff;
 }
 .btn-small {
   font-size: 12px;
@@ -644,18 +632,6 @@ ul.social li a span i{
 .panel-middle a.no-pd{
   padding-left: 0 !important;
 }
-.btn-blue{
-  color: #ffffff !important;
-  background-color: #008ecd;
-  font-style: 18px !important;
-  font-weight: 500 !important;
-  padding-left: 60px !important;
-  padding-right: 60px !important;
-  border: 0 !important;
-}
-
-
-
 
 /* ==========================================================================
    1200px
@@ -719,8 +695,6 @@ ul.social li a span i{
 @media only screen and (max-width: 992px) {
   .btn-blue{
     margin-top: 30px;
-    display: block;
-    width: 100%;
   }
   .list-group{
     display: none;
@@ -754,8 +728,6 @@ ul.social li a span i{
     margin-bottom: 15px;
   }
   .btn-blue{
-    display: block;
-    width: 100%;
     margin-top: 15px;
   }
 /*  .dropdown-menu{
@@ -778,10 +750,12 @@ ul.social li a span i{
   #key-section {
     position: relative !important;
     top: 0px !important;
-    margin: 0 -15px !important;
+    margin: 0 -15px;
   }
   .disable-btn, .disable-btn:hover, .disable-btn:focus{
-    top: -25px !important;
+    top: -18px !important;
+    right: 0 !important;
+    z-index: 999;
   }
   span.notice{
     font-size: 23px !important;
@@ -1282,6 +1256,9 @@ input.floatlabe{
 .top-row, .middle-row, .bottom-row {
   margin: 0 !important;
 }
+.error {
+  display: none;
+}
 .require-field {
   border: 2px solid red !important;
 }
@@ -1325,15 +1302,13 @@ input.floatlabe{
 #email_info .email:nth-child(2) > .first, #email_info .email:nth-child(2) > .field_error {border-left: none !important;}
 
 .disable-btn, .disable-btn:hover, .disable-btn:focus {
-  background: #00b22d;
-  color: #fff;
+  background: #008c00;
   margin-left: 10px;
   margin-top: 30px;
   display: none;
-  font-size: 18px;
   position: absolute;
   top: -72px;
-  right: -120px;
+  right: -130px;
   font-weight: normal;
 }
 .personaol-info-top-row .adderess-select-box {
@@ -1446,9 +1421,6 @@ div#house_info > p {
   .welcome-msg p {
     letter-spacing: 0;
   }
-  .panel-body.left {
-    padding-left: 0px !important;
-  }
   .key p {
     font-size: 11px;
     width: 197px;
@@ -1458,14 +1430,11 @@ div#house_info > p {
     width: 175px;
   }
   .disable-btn, .disable-btn:hover, .disable-btn:focus {
-    margin-bottom: 20px;
+    margin-top: 16px;
   }
   #email_info {
     margin-bottom: 15px !important;
   }
-  /*.adderess-select-box + ul {
-    left: 27%;
-  }*/
 }
 
 @media (min-width: 300px) and (max-width: 1200px) {
@@ -1492,6 +1461,10 @@ div#house_info > p {
 @media (min-width: 400px) and (max-width: 767px) {
   .adderess-select-box + .dropdown-menu {
     left: 29%;
+  }
+
+  #key-section {
+    margin: 0;
   }
 }
 
@@ -1879,6 +1852,9 @@ a.list-group-item.confirm {
   color: #007bc3;
   display: inline-block !important;
   text-align: center;
+}
+.landing-row .right-side .list-group a.btn {
+  padding: 10px 16px;
 }
 .btn-see-all {
   background: none repeat scroll 0 0 #bfdef0;
@@ -2446,8 +2422,25 @@ a .arrow-right {
 }
 
 .fail-search {
+    background: none repeat scroll 0 0 #ffffff;
+    border-radius: 2px;
+    box-shadow: 0 0 5px #ddd;
+    float: left;
+    padding: 20px 15px 15px;
     margin-top: 15px;
 }
+
+.fail-search .error-text {
+    color: #777777;
+    font-size: 17px;
+    font-weight: 200;
+}
+
+.fail-search .error-text strong {
+    color: #000;
+    font-weight: 400;
+}
+
 .fail-search .panel-default {
     border-width: 2px;
 }
@@ -2518,7 +2511,6 @@ a.close-fail {
 }
 #key-section ul li a {
     color: #999;
-    font-size: 13px;
 }
 
 #key-section ul li:nth-child(8), #key-section ul li:nth-child(9), #key-section ul li:nth-child(10) {
@@ -2553,7 +2545,7 @@ a.close-2{
   transition: all 0.3s ease-in-out 0s;
 }
 .field_error {
-  border: 1px solid red !important;
+  border: 2px solid red !important;
 }
 #email_error, .field_error.employee-info label, .field_error.employee-info input {
   color: red !important;
@@ -2576,6 +2568,9 @@ a.close-2{
   color: red;
 }
 
+#remove_confirm a.confirm {
+  color: black;
+}
 /* New address flow start */
 
 
@@ -3223,7 +3218,7 @@ a.close-2{
   margin-top: 8px;
 }
 #family #remove_confirm {
-  padding: 0;
+  padding: 12px;
 }
 #family #remove_confirm .confirm {
   color: #00AA00;

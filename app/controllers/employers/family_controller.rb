@@ -13,7 +13,7 @@ class Employers::FamilyController < ApplicationController
     @family = EmployerCensus::EmployeeFamily.new
     @family.attributes = params["employer_census_employee_family"]
     @employer_profile.employee_families << @family
-    if @employer_profile.save!
+    if @employer_profile.save
       flash.notice = "Employer Census Family is successfully created."
       redirect_to employers_employer_profile_path(@employer_profile)
     else
@@ -27,7 +27,7 @@ class Employers::FamilyController < ApplicationController
   end
 
   def update
-    if @family.update_attributes(census_employee_params)
+    if @family.update_attributes(census_family_params)
       flash.notice = "Employer Census Family is successfully updated."
       redirect_to employers_employer_profile_path(@employer_profile)
     else
@@ -49,7 +49,11 @@ class Employers::FamilyController < ApplicationController
   end
 
   def terminate
-    # TO DO -> Terminate functionality
+    # last_day_of_work = param[:employer_census_employee_family][:census_employee_attributes][:terminated_on]
+    last_day_of_work = "03/03/2015".to_date
+    @family.terminate(last_day_of_work)
+    @family.save!
+    flash.notice = "Successfully terminated employee."
     redirect_to employers_employer_profile_path(@employer_profile)
   end
 
@@ -58,10 +62,10 @@ class Employers::FamilyController < ApplicationController
 
   private
 
-  def census_employee_params
+  def census_family_params
     params.require(:employer_census_employee_family).permit(:id, :employer_profile_id,
       :census_employee_attributes => [
-          :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on,
+          :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :terminated_on,
           :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
         ],
       :census_dependents_attributes => [
