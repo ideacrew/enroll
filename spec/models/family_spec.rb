@@ -73,6 +73,34 @@ describe Family, type: :model do
     end
   end
 
+## TODO: Add method
+# describe HbxEnrollment, "#is_enrollable?", type: :model do
+#   context "employer_profile is under open enrollment period" do
+#     it "should return true" do
+#     end
+#
+#     context "and employee_role is under Special Enrollment Period" do
+#       it "should return true" do
+#       end
+#     end
+#   end
+#
+#   context "employee_role is under Special Enrollment Period" do
+#     it "should return true" do
+#     end
+#   end
+#
+#   context "outside employer_profile open enrollment" do
+#     it "should return false" do
+#     end
+#   end
+#
+#   context "employee_role is not under SEP" do
+#     it "should return false" do
+#     end
+#   end
+# end
+
   describe "special enrollment periods" do
     include_context "BradyBunch"
 
