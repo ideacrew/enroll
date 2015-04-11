@@ -1,7 +1,102 @@
 <%- model_class = EmployerProfile -%>
 
+<!-- <section> -->
+  <%#= form_for @employer, url: {action: "create"} do |f| %>
+    <%#= render 'form', f: f %>
+  <%# end %>
+<!-- </section> -->
+
 <section>
-  <%= form_for @employer, url: {action: "create"} do |f| %>
-    <%= render 'form', f: f %>
+  <%= form_for @organization, url: {action: "create"} do |f| %>
+    <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp|  %>
+      <h4> Employer information</h4>
+      <div class="phone col-md-10 col-sm-9 col-xs-12 no-pd first">
+        <div class="row top-row">
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%= emp.text_field :fein, class: "floatlabel form-control", required: true, placeholder: 'FEIN*' %>
+          </div>
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%= emp.text_field :dba, class: "floatlabel form-control", required: true, placeholder: 'DBA' %>
+          </div>
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%= emp.text_field :legal_name, class: "floatlabel form-control", required: true, placeholder: 'LEGAL NAME' %>
+          </div>
+          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+            <%= emp.text_field :entity_kind, class: "floatlabel form-control", required: true, placeholder: 'ENTITY KIND' %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location| %>
+      <%= office_location.fields_for :address, errors: {}, fieldset: false do |address| %>
+        <div class="address col-md-10 col-sm-9 col-xs-12 no-pd first">
+          <div class="row top-row">
+            <h4> Address </h4>
+            <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <%= address.text_field :kind, class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <%= address.text_field :address_1, class: "floatlabel form-control", required: true, placeholder: 'ADDRESS LINE 1' %>
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <%= address.text_field :address_2, class: "floatlabel form-control", required: true, placeholder: 'ADDRESS LINE 2' %>
+            </div>
+          </div>
+          <div class="row top-row">
+            <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <%= address.text_field :city, class: "floatlabel form-control", required: true, placeholder: 'CITY' %>
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <%= address.text_field :state, class: "floatlabel form-control", required: true, placeholder: 'STATE' %>
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <%= address.text_field :zip, class: "floatlabel form-control", required: true, placeholder: 'ZIP' %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <%= office_location.fields_for :phone, errors: {}, fieldset: false do |phone| %>
+        <div class="phone col-md-10 col-sm-9 col-xs-12 no-pd first">
+          <div class="row top-row">
+            <h4> Phone </h4>
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%= phone.text_field :kind, class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%= phone.text_field :area_code, class: "floatlabel form-control", required: true, placeholder: 'AREA CODE' %>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%= phone.text_field :number, class: "floatlabel form-control", required: true, placeholder: 'NUMBER' %>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%= phone.text_field :extension, class: "floatlabel form-control", required: true, placeholder: 'EXTENSION' %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <%= office_location.fields_for :email, errors: {}, fieldset: false do |email| %>
+        <div class="phone col-md-10 col-sm-9 col-xs-12 no-pd first">
+          <div class="row top-row">
+            <h4> Email </h4>
+            <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+              <%= email.text_field :kind, class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+              <%= email.text_field :address, class: "floatlabel form-control", required: true, placeholder: 'EMAIL ADDRESS' %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+    <br>
+
+    <div class="phone col-md-10 col-sm-9 col-xs-12 no-pd first">
+      <div class="row top-row">
+        <%= f.submit "Create", class: "btn btn-save" %>
+      </div>
+    </div>
+
   <% end %>
 </section>

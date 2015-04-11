@@ -13,7 +13,7 @@ class Employers::FamilyController < ApplicationController
     @family = EmployerCensus::EmployeeFamily.new
     @family.attributes = params["employer_census_employee_family"]
     @employer_profile.employee_families << @family
-    if @employer_profile.save!
+    if @employer_profile.save
       flash.notice = "Employer Census Family is successfully created."
       redirect_to employers_employer_profile_path(@employer_profile)
     else
