@@ -19,8 +19,8 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def create
     params.permit!
-    employer_profile = EmployerProfile.new
-    @organization = employer_profile.build_organization
+    @organization = Organization.new
+    @organization.build_employer_profile
     @organization.attributes = params["organization"]
     if @organization.save
       flash.notice = 'Employer successfully created.'
@@ -50,8 +50,8 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def build_employer_profile
-    employer_profile = EmployerProfile.new
-    organization = employer_profile.build_organization
+    organization = Organization.new
+    organization.build_employer_profile
     organization.office_locations.build
     organization.office_locations.first.build_address
     organization.office_locations.first.build_email
