@@ -1,38 +1,7 @@
 <div class="container-fluid no-pd-left">
   <div class="panel panel-default" style="border:none; box-shadow: none;">
     <div class="row tab-row">
-        <ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
-          <li class="active" role="presentation">
-            <a aria-expanded="true" aria-controls="home" data-toggle="tab" role="tab" id="home-tab" href="#home">
-              <span class="home-icon" title="Home"></span>
-            </a>
-          </li>
-          <li role="presentation">
-            <a aria-expanded="true" aria-controls="profile" data-toggle="tab" role="tab" id="profile-tab" href="#profile">
-              <span class="hidden-xs">Profile</span>
-              <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Profile"></span>
-            </a>
-          </li>
-          <li role="presentation">
-            <a aria-controls="plans" data-toggle="tab" id="plans-tab" role="tab" href="#plans">
-              <span class="hidden-xs">Plans</span>
-              <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Plans"></span>
-            </a>
-          </li>
-          <li role="presentation">
-            <a aria-controls="documents" data-toggle="tab" id="documents-tab" role="tab" href="#documents">
-              <span class="hidden-xs">Documents</span>
-              <span class="glyphicon glyphicon-file hidden-md hidden-sm hidden-lg" title="Documents"></span>
-            </a>
-          </li>
-          <li role="presentation">
-            <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox">
-              <span class="hidden-xs">Inbox</span>
-              <span class="glyphicon glyphicon-envelope hidden-md hidden-sm hidden-lg" title="Inbox"></span>
-              <span class="badge">27</span>
-            </a>
-          </li>
-        </ul>
+        <%= render 'people/landing_pages/menu' %>
 
         <div class="tab-content" id="myTabContent">
           <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
@@ -205,10 +174,10 @@
                 <div aria-labelledby="profile-tab" id="profile" class="tab-pane fade" role="tabpanel">
                   <div class="submenu">
                     <ul role="tablist" class="nav nav-tabs" id="myTab1">
-                      <li class="active" role="presentation"><a aria-expanded="true" aria-controls="personal" data-toggle="tab" role="tab" id="personal-tab" href="#personal">Personal</a></li>
-                      <li role="presentation"><a aria-controls="employer" data-toggle="tab" id="employer-tab" role="tab" href="#employer">Employer</a></li>
-                      <li role="presentation"><a aria-controls="family" data-toggle="tab" id="family-tab" role="tab" href="#family">Family Members</a></li>
-                      <li role="presentation"><a aria-controls="contact" data-toggle="tab" id="contact-tab" role="tab" href="#contact">Contact Information</a></li>
+                      <li class="active" role="presentation"><a aria-expanded="true" aria-controls="personal" data-toggle="tab" role="tab" id="personal-tab" href="#personal">&nbsp;&nbsp;Personal</a></li>
+                      <li role="presentation"><a aria-controls="employer" data-toggle="tab" id="employer-tab" role="tab" href="#employer">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Employer</a></li>
+                      <li role="presentation"><a aria-controls="family" data-toggle="tab" id="family-tab" role="tab" href="#family">&nbsp;Family Members</a></li>
+                      <li role="presentation"><a aria-controls="contact" data-toggle="tab" id="contact-tab" role="tab" href="#contact">&nbsp;Contact Information</a></li>
                     </ul>
                   </div>
                   <div class="tab-content" id="myTabContent1">
@@ -470,9 +439,7 @@
     $(document).on('click', '#family .right-side a.save', function(){
       if ($("#family .right-side li.edit input.first-name").val() !== ""){
         $(this).closest("form").submit();
-      } else {
-        // $(this).closest("li.edit").removeClass("edit");
-      }
+      } else {}
     });
 
     $("#family .right-side button.new-member").click(function(e){
@@ -483,19 +450,6 @@
     $("#family .right-side #add-new-member a.cancel").click(function(){
       $("#family .right-side #add-new-member").removeAttr("style");
     });
-
-    // $("#family .right-side #add-new-member a.save").click(function(){
-    //   if ($("#family .right-side #add-new-member input.first-name").val() !== ""){
-    //     $("#family .right-side ul li:last-child").clone().appendTo("#family .right-side ul");
-    //     var first = $("#family .right-side #add-new-member input.first-name").val();
-    //     var middle = $("#family .right-side #add-new-member input.middle-name").val();
-    //     var last = $("#family .right-side #add-new-member input.last-name").val();
-    //     // $("#family .right-side ul li:last-child h4").text(first + " " + middle + " " + last);
-    //     $("#add-new-member").removeAttr("style");
-    //   } else {
-    //     $("#family .right-side #add-new-member").removeAttr("style");
-    //   }
-    // });
        
     $('.see-plan-details').click(function(e){
       e.preventDefault();
