@@ -677,3 +677,12 @@ $(document).ready(function () {
     $(this).css('opacity', 1);
   });
 });
+
+$(document).ready(function () {
+  $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").click(function(){
+    $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").addClass('focus_none');
+    $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").removeClass('add_focus');
+    $(this).removeClass('focus_none');
+    $(this).addClass('add_focus');
+  });
+});

@@ -48,3 +48,43 @@
     background: none repeat scroll 0 0 #fff;
     border-bottom: 1px solid #999;
 }
+
+#contact.landing_contact_information #dropdownMenu1 {
+   text-align: center;
+   color: #007bc3 !important;
+   font-weight: bold !important;
+}
+
+#contact.landing_contact_information input[type="text"] {
+    height: 46px !important;
+    color: #007bc3 !important;
+}
+
+#contact.landing_contact_information label {
+    color: #007bc3 !important;
+}
+
+a.new-address-btn {
+    color: #bbb;
+    display: inline-block;
+    font-family: "lato","AvenirLTStd-Light";
+    font-size: 12px;
+    padding: 15px 0;
+    text-transform: uppercase;
+}
+
+#contact .add_focus {
+  border: 2px solid rgb(0, 163, 217) !important;
+  opacity: 1 !important;
+}
+
+#contact .focus_none {
+  opacity: 0.5 !important;
+}
+
+#contact.landing_contact_information #email_info .email div{
+  border-right: 1px solid #999;
+}
+#contact.landing_contact_information #email_info .email .employee-info.field_error{
+  border: 2px solid red !important;
+}
