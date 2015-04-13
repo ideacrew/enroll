@@ -13,7 +13,7 @@
     <ul class="list-group">
 
       <% @family_members.each do |dependent| %>
-      <li class="list-group-item family_members_list">
+      <li class="list-group-item family_members_list" id="family_member_<%= dependent.id %>">
         <div class="row">
           <div class="col-md-10 col-sm-8 col-xs-8">
             <h4> <%= dependent.person.first_name %> <%= dependent.person.last_name %> </h4>
@@ -31,6 +31,8 @@
             <%= render 'people/landing_pages/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
           </ul>
         </div>
+
+        <div class="dependent_notice_div_<%= dependent.id %>"></div>
       </li>
       <% end %>
     </ul>
