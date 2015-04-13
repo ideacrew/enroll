@@ -1,4 +1,4 @@
-<div class="col-md-8 no-pd col-sm-12 col-xs-12">
+<div class="col-md-12 no-pd col-sm-12 col-xs-12">
   <div class="row new-employer-alert" style="display: block;">
     <div class="col-md-7 no-pd col-sm-10 col-xs-12">
       <p>This section contains information about your employer. If you have changed employers you can add a new employer here.</p>
@@ -8,29 +8,24 @@
     </div>
   </div>
   
-  <table class="table table-bordered search-table personal-table" style="border: 2px solid rgb(0, 163, 217) ! important;">
-    <tbody>
-      <tr>
-        <td colspan="4">
-          <span class="label_style">Employer Name</span>
-          <span class="text_style"><%= @employer_profile.legal_name %></span>
-        </td>
-        
-      </tr>
-      <tr>
-        <td colspan="2">
-          <span class="label_style">Hire Date</span>
-          <span class="text_style"><%= @employee_roles.first.hired_on.strftime("%b %d, %Y") %></span>
-        </td>
-        <td colspan="2">
-          <span class="label_style">Eligible For Coverage</span>
-          <span class="text_style"><%= @employee_roles.first.hired_on.strftime("%b %d, %Y") %></span>
-        </td>
-        
-      </tr>
-    </tbody>
-  </table>
-  
-  <br/>
+  <div class="col-md-12 no-pd col-sm-12 col-xs-12 first" style="border: 2px solid rgb(0, 163, 217) ! important; opacity: 0.5;">
+    <div class="row top-row">
+      <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+        <input type="text" id="first-name" class="floatlabel form-control" placeholder="EMPLOYER NAME" value="<%= @employer_profile.legal_name %>">
+        <a class="remove" href="#">
+          <%=image_tag "delete.png"%>
+        </a>
+      </div>
+    </div>
+    <div class="row bottom-row form-group form-group-lg no-pd">
+      <div class="col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+        <input type="text" id="first-name" class="floatlabel form-control" placeholder="HIRE DATE" value="<%= @employee_roles.first.hired_on.strftime("%b %d, %Y") %>">  
+      </div>
+      <div class="col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+        <input type="text" id="first-name" class="floatlabel form-control" placeholder="ELIGIBLE FOR COVERAGE" value="<%= @employee_roles.first.hired_on.strftime("%b %d, %Y") %>">  
+      </div>
+    </div>
+  </div>
+  <br/><br/><br/><br/><br/>
   <button class="btn btn-blue">New Employer</button>
 </div>

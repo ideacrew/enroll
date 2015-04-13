@@ -672,4 +672,8 @@ $(document).ready(function () {
       $('#add_info .employee-info').last().addClass('require-field');
     }
   });
+  
+  $('#employer .landing_personal_tab .first').focusin(function(){
+    $(this).css('opacity', 1);
+  });
 });
