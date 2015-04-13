@@ -37,7 +37,7 @@
 
             <div class="col-md-3 col-sm-3 no-pd">
               <div class="form-group form-group-lg">
-                  <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control", required: true, placeholder: "SOCIAL SECURITY" %>
+                  <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", required: true, placeholder: "SOCIAL SECURITY" %>
               </div>
             </div>
 
@@ -92,4 +92,5 @@
         slideInput: false
    });
    $('.house').addClass('employee-info');
+   $(".mask-ssn").mask("999999999");
 </script>
