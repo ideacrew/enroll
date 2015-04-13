@@ -35,8 +35,8 @@ class ApplicationController < ActionController::Base
  protected
 
   def require_login
-    session[:portal] = url_for(params)
     unless current_user
+      session[:portal] = url_for(params)
       redirect_to new_user_session_url
     end
   end
