@@ -1,48 +1,47 @@
-<table class="table table-bordered search-table personal-table" style="border-color: rgb(0, 163, 217) ! important;">
-  <tbody>
-    <tr>
-      <td>
-        <span>FIRST NAME</span>
-        <span><%= @person.first_name %></span>
-      </td>
-      <td>
-        <span>MIDDLE NAME</span>
-        <span><%= @person.middle_name %></span>
-      </td>
-      <td>
-        <span>LAST NAME</span>
-        <span><%= @person.last_name %></span>
-      </td>
-      <td>
-        <span>SUFFIX</span>
-        <span><%= @person.name_sfx %></span>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <span>BIRTHDATE</span>
-        <span><%= @person.dob %></span>
-      </td>
-      <td>
-        <span>SOCIAL SECURITY</span>
-        <span><%= @person.ssn %></span>
-      </td>
-      <td>
-        <div class="radio">
+<%= form_for @person do |f|%>
+  <div class="col-md-12 no-pd col-sm-12 col-xs-12 first">
+    <div class="row top-row">
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%=f.text_field :first_name, id: "first-name", class: "floatlabel form-control", placeholder: "FIRST NAME" %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%=f.text_field :middle_name, class: "floatlabel form-control", placeholder: "MIDDLE NAME" %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%=f.text_field :last_name, class: "floatlabel form-control", placeholder: "LAST NAME" %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%=f.text_field :name_sfx, class: "floatlabel form-control", placeholder: "SUFFIX" %>
+      </div>
+    </div>
+    <div class="row bottom-row form-group form-group-lg no-pd">
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%=f.text_field :dob, class: "date_picker floatlabel form-control", placeholder: "BIRTHDATE" %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%=f.text_field :ssn, class: "number floatlabel form-control", placeholder: "SOCIAL SECURITY", id: "person_ssn", title: "8 digits" %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
           <label>
-            <input type="radio" checked="" value="option1" name="optionsRadios">
-            MALE
+            <%= f.radio_button :gender, "female", class: "required floatlabel"  %>
+            <span>MALE</span>
           </label>
         </div>
-      </td>
-      <td>
-        <div class="radio">
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
           <label>
-            <input type="radio" value="option1" id="optionsRadios1" name="optionsRadios">
-            FEMALE
+            <%= f.radio_button :gender, "female", class: "required floatlabel"  %>
+            <span>FEMALE</span>
           </label>
         </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
+      </div>
+    </div>
+    <div class="error">
+      <div class="warning"><i class="fa fa-exclamation-triangle"></i>
+        All fields Required</div>
+    </div>
+    <div class="overlay-in"></div>
+  </div>
+<% end %>
