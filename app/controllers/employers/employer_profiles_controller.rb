@@ -55,7 +55,7 @@ class Employers::EmployerProfilesController < ApplicationController
           :benefit_groups_attributes => [ :title, :reference_plan_id, :effective_on_offset,
             :premium_pct_as_int, :employer_max_amt_in_cents,
             :relationship_benefits_attributes => [
-              :relationship, :premium_pct, :employer_max_amt, :offered
+              :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
             ]
           ]
         ]
