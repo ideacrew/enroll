@@ -21,10 +21,7 @@ class Employers::EmployerProfilesController < ApplicationController
     params.permit!
     @organization = Organization.new
     @organization.build_employer_profile
-    @organization.attributes = params["organization"]
-    # Temp Hack for end_on and open_enrollment_end_on
-    @organization.employer_profile.plan_years.first.end_on = 0.days.ago.end_of_year.to_date
-    @organization.employer_profile.plan_years.first.open_enrollment_end_on = (0.days.ago.beginning_of_year.to_date - 2.months).end_of_month
+    @organization.attributes = format_date_params(params)["organization"]
     if @organization.save
       flash.notice = 'Employer successfully created.'
       redirect_to employers_employer_profiles_path
@@ -63,5 +60,20 @@ class Employers::EmployerProfilesController < ApplicationController
     office_location.build_phone
     office_location.build_email
     organization
+  end
+
+  def format_date_params(params)
+    params[:organization][:employer_profile_attributes][:plan_years_attributes].each do |k, item|
+      ["start_on", "end_on", "open_enrollment_start_on", "open_enrollment_end_on"].each do |key|
+        unless item[key].include?("-")
+          params[:organization][:employer_profile_attributes][:plan_years_attributes][k][key] = Date.strptime(item[key], '%m/%d/%Y').to_s(:db)
+        end
+      end
+    end
+
+    params
+  rescue => e
+    puts e
+    params
   end
 end
