@@ -248,6 +248,8 @@ class PeopleController < ApplicationController
     @qualifying_life_events = QualifyingLifeEventKind.all
     @hbx_enrollments = @family.latest_household.hbx_enrollments
 
+    build_nested_models
+
     respond_to do |format|
       format.js {}
       format.html {}
@@ -272,7 +274,7 @@ class PeopleController < ApplicationController
 
   def create
     sanitize_person_params
-    @person = Person.find_or_initialize_by(ssn: params[:person][:ssn])
+    @person = Person.find_or_initialize_by(ssn: params[:person][:ssn], date_of_birth: params[:person][:dob])
 
     # person_params
     respond_to do |format|

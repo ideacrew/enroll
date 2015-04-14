@@ -20,14 +20,14 @@
                               <tbody>
                                  <tr>
                                   <td colspan="4">
-                                    <div class="dropdown form-control float-label adderess-select-box text-center">
+                                    <div class="dropdown form-control person-select">
                                       <a id="dLabel" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
                                         <%= @person.first_name %> <%= @person.middle_name %> <%= @person.last_name %>
                                         <i class="glyphicon glyphicon-menu-down"></i>
                                       </a>
                                       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                                         <% get_dependents(@family, @person).each do |dependents |%>
-                                          <li><a href="#"><%= dependents.full_name %></a></li>
+                                          <li><%= link_to dependents.full_name, 'javascript:;' %></li>
                                         <% end %>
                                       </ul>
                                     </div>
