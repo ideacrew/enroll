@@ -623,11 +623,9 @@ $(document).ready(function () {
     $(this).css('opacity', 1);
   });
 
-  // $('.required').closest('div').append('<div class="required-icon"><div class="text">*</div></div>');
-  $('.required').tooltip({
-    placement: 'right',
-    title: 'Required field'
-  });
+  $('.required').tooltip({placement: 'right', title: 'Required field'});
+  $('input[type="radio"]').tooltip('disable');
+
 });
 
 $(document).ready(function () {
