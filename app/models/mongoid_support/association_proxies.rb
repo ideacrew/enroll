@@ -9,12 +9,17 @@ module MongoidSupport
         kls = kls_name
         class_eval(<<-RUBYCODE)
           def #{attr_name}
+            return @__proxy_value_for_#{attr_name} if @__proxy_value_for_#{attr_name}
             return nil if self.#{key_name}.blank?
             #{kls}.find(self.#{key_name})
           end
 
           def #{attr_name}=(val)
-            self.#{key_name} = val.id
+            @__proxy_value_for_#{attr_name} = val
+            if !val.nil?
+              self.#{key_name} = val.id
+            end
+            val
           end
         RUBYCODE
       end
