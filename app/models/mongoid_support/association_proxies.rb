@@ -11,12 +11,14 @@ module MongoidSupport
           def #{attr_name}
             return @__proxy_value_for_#{attr_name} if @__proxy_value_for_#{attr_name}
             return nil if self.#{key_name}.blank?
-            #{kls}.find(self.#{key_name})
+            @__proxy_value_for_#{attr_name} ||= #{kls}.find(self.#{key_name})
           end
 
           def #{attr_name}=(val)
             @__proxy_value_for_#{attr_name} = val
-            if !val.nil?
+            if val.nil?
+              self.#{key_name} = nil
+            else
               self.#{key_name} = val.id
             end
             val
