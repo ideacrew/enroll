@@ -598,6 +598,7 @@ $(document).ready(function () {
   $(".phone_number").mask("(999) 999-9999");
   $(".zip").mask("99999");
   $("#person_ssn").mask("999999999");
+  $(".person_ssn").mask("999999999");
   $(".address-state").mask("**");
   
   $("#person_ssn").focusout(function( event ) {
