@@ -19,7 +19,8 @@ class BenefitGroup
 
   field :title, type: String, default: ""
 
-  embeds_many :relationship_benefits
+  embeds_many :relationship_benefits, cascade_callbacks: true
+  accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
 
   field :effective_on_kind, type: String, default: "date_of_hire"
   field :terminate_on_kind, type: String, default: "end_of_month"

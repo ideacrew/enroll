@@ -20,7 +20,8 @@ class PlanYear
   # Number of Medicare second payers
   field :msp_count, type: Integer, default: 0
 
-  embeds_many :benefit_groups
+  embeds_many :benefit_groups, cascade_callbacks: true
+  accepts_nested_attributes_for :benefit_groups, reject_if: :all_blank, allow_destroy: true
 
   validates_presence_of :start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on
 

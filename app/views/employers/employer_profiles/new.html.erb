@@ -6,26 +6,34 @@
   <%# end %>
 <!-- </section> -->
 
+<% if @organization.errors.any? %>
+  <div class="alert alert-error">
+    <h4><%= pluralize(@organization.errors.size, "error") %> prohibited this person from being saved:</h4>
+    <ul>
+      <% @organization.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
 <section>
   <%= form_for @organization, url: {action: "create"} do |f| %>
     <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp|  %>
-      <h4> Employer information</h4>
-      <div class="phone col-md-10 col-sm-9 col-xs-12 no-pd first">
-        <div class="row top-row">
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%= emp.text_field :fein, class: "floatlabel form-control", required: true, placeholder: 'FEIN*' %>
-          </div>
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%= emp.text_field :dba, class: "floatlabel form-control", required: true, placeholder: 'DBA' %>
-          </div>
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%= emp.text_field :legal_name, class: "floatlabel form-control", required: true, placeholder: 'LEGAL NAME' %>
-          </div>
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%= emp.text_field :entity_kind, class: "floatlabel form-control", required: true, placeholder: 'ENTITY KIND' %>
-          </div>
-        </div>
-      </div>
+      <%= render "shared/employer_profile_fields", f: emp %>
+
+      <%= emp.fields_for :plan_years, errors: {}, fieldset: false do |plan_year|  %>
+        <%= render "shared/plan_year_fields", f: plan_year %>
+        <%= plan_year.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
+
+          <%= render "shared/benefit_group_fields", f: bg %>
+
+          <%= bg.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
+            <%= render "shared/relationship_benefit_fields", f: rb %>
+          <% end %>
+
+        <% end %>
+      <% end %>
     <% end %>
     <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location| %>
       <%= office_location.fields_for :address, errors: {}, fieldset: false do |address| %>
@@ -33,7 +41,7 @@
           <div class="row top-row">
             <h4> Address </h4>
             <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-              <%= address.text_field :kind, class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
+              Kind: <%= address.select :kind, options_for_select(Address::KINDS),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
             </div>
             <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
               <%= address.text_field :address_1, class: "floatlabel form-control", required: true, placeholder: 'ADDRESS LINE 1' %>
@@ -61,7 +69,7 @@
           <div class="row top-row">
             <h4> Phone </h4>
             <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-              <%= phone.text_field :kind, class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
+            Kind:   <%= phone.select :kind, options_for_select(Phone::KINDS),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
             </div>
             <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               <%= phone.text_field :area_code, class: "floatlabel form-control", required: true, placeholder: 'AREA CODE' %>
@@ -81,7 +89,7 @@
           <div class="row top-row">
             <h4> Email </h4>
             <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-              <%= email.text_field :kind, class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
+              Kind: <%= email.select :kind,options_for_select(Email::KINDS),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
             </div>
             <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
               <%= email.text_field :address, class: "floatlabel form-control", required: true, placeholder: 'EMAIL ADDRESS' %>
