@@ -87,22 +87,21 @@ module BradyBunch
         zip: "20011"
       )
     end
-    let(:mikes_work_ph) {FactoryGirl.build(:phone, kind: "home", area_code: "202", number: "5069292", extension: nil)}
+    let(:mikes_work_phone) {FactoryGirl.build(:phone, kind: "home", area_code: "202", number: "5069292", extension: nil)}
     let(:mikes_office_location) do
       FactoryGirl.build(:office_location,
                         address: mikes_work_addr,
                         phone: mikes_work_phone
       )
     end
-    let(:mikes_employer) {FactoryGirl.build(:employer_profile)}
     let(:mikes_organization) do
       FactoryGirl.create(:organization,
                          legal_name: "Mike's Architects Limited",
                          dba: "MAL",
-                         office_locations: [mikes_office_location],
-                         employer_profile: mikes_employer,
+                         office_locations: [mikes_office_location]
       )
     end
+    let!(:mikes_employer) {FactoryGirl.build(:employer_profile, organization: mikes_organization)}
     let(:mikes_census_employee) do
       FactoryGirl.build(:employer_census_employee,
                         first_name: mike.first_name,  last_name: mike.last_name,
