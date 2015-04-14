@@ -22,7 +22,7 @@
             <a href="javascript:void(0);" class="edit" data-id="<%= dependent.id %>"><%= image_tag "edit.png" %></a>
 
             <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: @person.id, organization_id: @employer_profile.organization.id) %>
-            <%= link_to (image_tag "member-close.png"), remove_url, class: 'remove', :method => :delete, :remote => true, data: {confirm: "Remove #{dependent.full_name.strip}? ", ok: 'yes', cancel: 'no'},  'data-id': "#{dependent.id}" %>
+            <%= link_to (image_tag "member-close.png"), remove_url, class: 'remove', :method => :delete, :remote => true, data: {confirm: "Remove #{dependent.full_name.strip}? ", ok: 'yes', cancel: 'no', id: '#{dependent.id}'} %>
           </div>
           <div id="remove_confirm" class="hidden"></div>
         </div>
