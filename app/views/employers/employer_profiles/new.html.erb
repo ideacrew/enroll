@@ -28,9 +28,14 @@
 
           <%= render "shared/benefit_group_fields", f: bg %>
 
-          <%= bg.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
-            <%= render "shared/relationship_benefit_fields", f: rb %>
-          <% end %>
+          <div class='form-inputs'>
+            <%= bg.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
+              <%= render "shared/relationship_benefit_fields", f: rb %>
+            <% end %>
+            <div style="float:left;">
+              <%= link_to_add_fields "Add Relationship Benefit", bg, :relationship_benefits%>
+            </div>
+          </div>
 
         <% end %>
       <% end %>
