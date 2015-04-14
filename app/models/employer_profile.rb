@@ -95,11 +95,6 @@ class EmployerProfile
     employee_families.order_by(:"census_employee.last_name".asc)
   end
 
-  # Strip non-numeric characters
-  def fein=(new_fein)
-    write_attribute(:fein, new_fein.to_s.gsub(/\D/, ''))
-  end
-
   def latest_plan_year
     plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end

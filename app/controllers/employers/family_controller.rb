@@ -1,7 +1,7 @@
 class Employers::FamilyController < ApplicationController
 
   before_action :find_employer
-  before_action :set_family_id, only: [:delink, :terminate]
+  before_action :set_family_id, only: [:delink, :terminate, :rehire]
   before_action :find_family, only: [:destroy, :show, :edit, :update]
 
   def new
@@ -13,7 +13,7 @@ class Employers::FamilyController < ApplicationController
     @family = EmployerCensus::EmployeeFamily.new
     @family.attributes = params["employer_census_employee_family"]
     @employer_profile.employee_families << @family
-    if @employer_profile.save!
+    if @employer_profile.save
       flash.notice = "Employer Census Family is successfully created."
       redirect_to employers_employer_profile_path(@employer_profile)
     else
@@ -55,6 +55,9 @@ class Employers::FamilyController < ApplicationController
     @family.save!
     flash.notice = "Successfully terminated employee."
     redirect_to employers_employer_profile_path(@employer_profile)
+  end
+
+  def rehire
   end
 
   def show

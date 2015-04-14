@@ -19,6 +19,7 @@
 //= require classie
 //= require modalEffects
 //= require maskedinput
+//= require override_confirm
 //= require_tree .
 
 $('input.floatlabel').floatlabel();
@@ -486,6 +487,8 @@ $(document).ready(function () {
     
     var last_dependent = '$("#add_member_list_' + $('#last_member').val() + '")';
     $("#add_member_list_" + $('#last_member').val()).remove();
+    $("#family #add_member_list_" + $('#family_member_id').val()).remove();
+    $('.add-member-buttons').addClass('hidden');
   });
   
   $('#save_member').click(function() {
@@ -568,59 +571,6 @@ $(document).ready(function () {
   //     $(".new-address-flow").removeAttr("style");
   //   }
   // });
-  
-  // Customize Dependent Family Member Delete Confirmation
-  $(function() {
-    $.rails.allowAction = function(link) {
-      if (!link.attr('data-confirm')) {
-        return true;
-      }
-      $.rails.showConfirmDialog(link);
-      return false;
-    };
-    $.rails.confirmed = function(link) {
-      link.removeAttr('data-confirm');
-      return link.trigger('click.rails');
-    };
-    return $.rails.showConfirmDialog = function(link) {
-      var current_element, message;
-
-      $('.close-2').on('click', function() {
-        current_element = $(this).closest("div.house");
-        message = $(this).attr('data-confirm');
-        if(message.trim() == 'Remove') {
-          $('#cancel_member').click();
-        } else {
-          // $('.house').css("opacity","0.5");
-          $(this).closest("div.house").css('border', '1px solid red');        
-          $(this).closest('div.house').css("opacity","1.0");
-          $(this).closest("div.house").find("#remove_confirm")
-            .html('<div>' + message + '?</div><a href="javascript:void(0);" class="btn remove_dependent cancel">' + (link.data('cancel')) + '</a> <a class="btn remove_dependent confirm" href="javascript:void(0);">' + (link.data('ok')) + '</a>')
-            .removeClass('hidden');
-        }
-      });
-
-      $('#family .remove').click(function() {
-        current_element = $(this).closest("#family .family_members_list");
-        message = 'Remove ' + current_element.find('#family_member_first_name').val() + ' ' + current_element.find('#family_member_middle_name').val() + ' ' + current_element.find('#family_member_last_name').val();
-
-        $(this).closest("#family .family_members_list").find("#remove_confirm")
-          .html(message + '? <a href="javascript:void(0);" class="btn remove_dependent cancel">' + (link.data('cancel')) + '</a> <a class="btn remove_dependent confirm" href="javascript:void(0);">' + (link.data('ok')) + '</a>')
-          .removeClass('hidden');
-      });
-      
-      $('.remove_dependent').on('click', function() {
-        $(this).closest("div.house").css('border-color', '#007bc3');
-        $(this).closest("#remove_confirm")
-          .addClass('hidden')
-          .html('');
-      });
-      
-      return $('#remove_confirm .confirm').on('click', function() {
-        return $.rails.confirmed(link);
-      });
-    };
-  });
 
   // Change Dropdown Address Text
   $('.address-li').on('click', function(){
@@ -629,11 +579,6 @@ $(document).ready(function () {
   });
   
   // Select Plan Page
-  // $('#select-plan-container .personal_info').hide();
-  // $('#select-plan-container #coverage-back').show();
-  // $('#select-plan-container .coverage-options').removeClass('hidden');
-  // $('#select-plan-container .coverage-options .arrow-right').show();
-  
   $('#select-plan-btn1').click(function() {
     $(".select-plan p.detail").hide();
     $(this).hide();
@@ -653,6 +598,7 @@ $(document).ready(function () {
   $(".phone_number").mask("(999) 999-9999");
   $(".zip").mask("99999");
   $("#person_ssn").mask("999999999");
+  $(".person_ssn").mask("999999999");
   $(".address-state").mask("**");
   
   $("#person_ssn").focusout(function( event ) {
@@ -671,5 +617,22 @@ $(document).ready(function () {
     } else {
       $('#add_info .employee-info').last().addClass('require-field');
     }
+  });
+  
+  $('#employer .landing_personal_tab .first').focusin(function(){
+    $(this).css('opacity', 1);
+  });
+
+  $('.required').tooltip({placement: 'right', title: 'Required field'});
+  $('input[type="radio"]').tooltip('disable');
+
+});
+
+$(document).ready(function () {
+  $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").click(function(){
+    $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").addClass('focus_none');
+    $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").removeClass('add_focus');
+    $(this).removeClass('focus_none');
+    $(this).addClass('add_focus');
   });
 });

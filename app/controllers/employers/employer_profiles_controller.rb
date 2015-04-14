@@ -14,21 +14,21 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def new
-    @employer = EmployerProfile.new
+    @organization = build_employer_profile
   end
 
   def create
-    params["employer"]["entity_kind"] = EmployerProfile::ENTITY_KINDS.sample # temp hack for getting employer creation working.
-    @employer = EmployerProfile.new(employer_params)
-
-    respond_to do |format|
-      if @employer.save
-        format.html { redirect_to employers_employer_index_path, notice: 'Employer was successfully created.' }
-        format.json { render json: @employer, status: :created, location: @employer }
-      else
-        format.html { render action: "new" }
-        format.json { render json: @employer.errors, status: :unprocessable_entity }
-      end
+    @organization = Organization.new
+    @organization.build_employer_profile
+    @organization.attributes = employer_profile_params
+    # Temp Hack for end_on and open_enrollment_end_on
+    @organization.employer_profile.plan_years.first.end_on = 0.days.ago.end_of_year.to_date
+    @organization.employer_profile.plan_years.first.open_enrollment_end_on = (0.days.ago.beginning_of_year.to_date - 2.months).end_of_month
+    if @organization.save
+      flash.notice = 'Employer successfully created.'
+      redirect_to employers_employer_profiles_path
+    else
+      render action: "new"
     end
   end
 
@@ -47,7 +47,37 @@ class Employers::EmployerProfilesController < ApplicationController
     @employer_profile = EmployerProfile.find(params[:id])
   end
 
-  def employer_params
-    params.require(:employer).permit(:legal_name, :fein, :entity_kind)
+  def employer_profile_params
+    params.require(:organization).permit(
+      :employer_profile_attributes => [ :entity_kind, :dba, :fein, :legal_name,
+        :plan_years_attributes => [ :start_on, :end_on, :fte_count, :pte_count, :msp_count,
+          :open_enrollment_start_on, :open_enrollment_end_on,
+          :benefit_groups_attributes => [ :title, :reference_plan_id, :effective_on_offset,
+            :premium_pct_as_int, :employer_max_amt_in_cents,
+            :relationship_benefits_attributes => [
+              :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
+            ]
+          ]
+        ]
+      ],
+      :office_locations_attributes => [
+        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
+        :phone_attributes => [:kind, :area_code, :number, :extension],
+        :email_attributes => [:kind, :address]
+      ]
+    )
+  end
+
+  def build_employer_profile
+    organization = Organization.new
+    organization.build_employer_profile
+    plan_year = organization.employer_profile.plan_years.build
+    benefit_groups = plan_year.benefit_groups.build
+    relationship_benefits = benefit_groups.relationship_benefits.build
+    office_location = organization.office_locations.build
+    office_location.build_address
+    office_location.build_phone
+    office_location.build_email
+    organization
   end
 end

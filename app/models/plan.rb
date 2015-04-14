@@ -102,6 +102,8 @@ class Plan
   scope :shop_market,          ->{ where(market: "shop") }
   scope :individual_market,    ->{ where(market: "individual") }
 
+  scope :by_active_year, -> {where(active_year: Time.now.year)}
+
   # Carriers: use class method (which may be chained)
   def self.find_by_carrier_profile(carrier_profile)
     where(carrier_profile_id: carrier_profile._id)

@@ -9,8 +9,8 @@
     <div class="col-md-8 col-sm-8 col-xs-12 form-group form-group-lg no-pd address">
         <div class="form-group form-group-lg">
           <div class="row" style="margin: 0;">
-            <div class="col-md-4 col-sm-3 col-xs-0 floatlabel"></div>
-            <div class="col-md-4 col-sm-6 col-xs-12 no-pd">
+            <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+            <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
               <div class="dropdown">
                 <button class="form-control floatlabel adderess-select-box form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
                   <label>Home Address</label>
@@ -28,7 +28,7 @@
                 </ul>
               </div>
             </div>
-            <div class="col-md-4 col-sm-3 col-xs-0 floatlabel"></div>
+            <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
           </div>
         </div>
       </div>
@@ -37,10 +37,10 @@
     <%= link_to image_tag('delete.png'), 'javascript:void(0)', class: 'close-2' %>
     </div>
   </div>
-
     <%= f.fields_for :addresses, errors: {}, fieldset: true do |address|  %>
      <%= address.hidden_field :_destroy %>
      <% kind = address.object.kind %>
+
      <% style = "" %>
      <% div_class = kind+"-div" %>
      <% if kind != 'home' %>
@@ -63,16 +63,13 @@
 
 
     <div style="<%= style %>" class="row bottom-row address-row <%= div_class %>">
-        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <%= address.text_field :city, placeholder: "CITY", class: "floatlabel form-control #{required}" %>
         </div>
-        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <%= address.text_field :state, placeholder: "STATE", class: "floatlabel form-control capital address-state #{required}" %>
         </div>
-        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-          <%= address.text_field :county, placeholder: "COUNTY", class: "floatlabel form-control" %>
-        </div>
-        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <%= address.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control zip #{required}" %>
         </div>
     </div>

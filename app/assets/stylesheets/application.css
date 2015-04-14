@@ -17,5 +17,6 @@
  *= require component
  *= require style
  *= require custom
+ *= require styles
  *= require_self
  */

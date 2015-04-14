@@ -52,11 +52,6 @@ body {
   background-size: cover;
 }
 
-a:hover, a:focus {
-  outline: none;
-  text-decoration: none;
-}
-
 /* ==========================================================================
    content / form
    ========================================================================== */
@@ -635,17 +630,6 @@ a.family{
 .panel.grey{
   background-color: #f4f4f4;
 }
-.input-lg, .form-group-lg .form-control{
-  border-radius: 0;
-  /*padding: 22px 12px;*/
-  border: none !important;
-  font-size: 14px;
-  font-weight: 300;
-  font-family: 'AvenirLTStd-Light';
-  padding-bottom: 8px;
-  padding-left: 10px;
-  padding-right: 10px; 
-}
 .form-control:focus{
   border-color: #e3e3e3;
   box-shadow: none !important;
@@ -658,13 +642,6 @@ a.family{
   background-color: #ffffff;
   border: 1px solid #e0dede;
   color: #616161;
-}
-.address .dropdown button{
-  color: #616161;
-  padding-top: 12px;
-  padding-bottom: 12px;
-  border: 1px solid #e0dede;
-  border-radius: 0px;
 }
 select option{
   color: #616161;
@@ -725,31 +702,8 @@ input.floatlabe{
   width: 100%;
   line-height: 22px;
 }
-.more{
-  border-radius: 0;
-}
-.more:hover{
-  color: #616161;
-  background-color: #e3e3e3 !important;
-}
 .personaol-info-top-row input {
   border: 1px solid #999 !important;
-}
-.form-control:focus {
-  background: rgba(220, 234, 241, 1);
-}
-.form-control {
-  transition: border-color 0.3s ease-in-out 0s, box-shadow 0.3s ease-in-out 0s, background 0.3s ease-in-out 0s !important;
-  box-shadow: none;
-}
-.personaol-info-top-row .radio {
-  border: 1px solid #999;
-}
-.personaol-info-row .form-group {
-  margin-bottom: 0;
-}
-.personaol-info-top-row .form-group {
-  margin-bottom: 0;
 }
 .row.check {
   width: 100.1%;
@@ -757,9 +711,6 @@ input.floatlabe{
 .row.check .radio {
   border-bottom: none !important;
   height: 46px; 
-}
-.adderess-select-box {
-  color: #ccc;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) { 
@@ -800,9 +751,6 @@ input.floatlabe{
   padding-top: 20px;
 }
 
-.personaol-info-top-row .adderess-select-box {
-  border-color: #999 !important;
-}
 .personaol-info-row input[type="text"] {
   font-size: 14px;
   color: #616161;
@@ -885,21 +833,6 @@ input.floatlabe{
     width: 72%;
   }
 }
-
-@media (min-width: 300px) and (max-width: 400px) {
-  .adderess-select-box + .dropdown-menu {
-    left: 0;
-  }
-}
-
-@media (min-width: 400px) and (max-width: 767px) {
-  .adderess-select-box + .dropdown-menu {
-    left: 29%;
-  }
-}
-
-
-
 
 /** Search page css Start **/
 .search-row {
@@ -1403,11 +1336,12 @@ a .arrow-right {
 }
 
 /*** Profile page css ***/
-
+/*
 .tab-row {
   margin: 0;
   font-family: "AvenirLTStd-Light";
 }
+*/
 .top-menu {
   background: #00698c;
   border: none;
@@ -1471,42 +1405,6 @@ a .arrow-right {
 .top-menu > li > a:focus, .top-menu > li > a:hover {
   color: #fff;
   background: none !important;
-}
-.tab-row #myTabContent .row {
-  margin: 0;
-}
-.tab-row #myTabContent .submenu {
-  background: #00a3d9;
-  width: 100%;
-  padding: 0 100px;
-}
-.tab-row #myTabContent .submenu ul {
-  border: none;
-}
-.tab-row #myTabContent .submenu ul li a {
-  border-radius: 0 !important;
-  border: none !important;
-  font-size: 16px;
-  color: #fff;
-  padding: 20px 50px;
-}
-.tab-row #myTabContent .submenu ul li:first-child a {
-  padding-left: 0;
-}
-.tab-row #myTabContent .submenu ul li.active a {
-  background: none !important;
-  color: #fff !important;
-  font-weight: bold;
-}
-.tab-row #myTabContent .submenu ul li a:focus, .tab-row #myTabContent .submenu ul li a:hover {
-  color: #fff;
-  background: none !important;
-}
-.tab-row #myTabContent #myTabContent1 {
-  padding: 0 100px;
-}
-.tab-row #myTabContent1 .tab-pane {
-  padding-top: 35px;
 }
 .personal-table {
   margin-bottom: 0;
@@ -1787,7 +1685,7 @@ a .arrow-right {
 .alert.custom_flash {margin-bottom: 0;}
 
  #employer .emp-info input[type="text"], #family input[type="text"]{
-  height: 46px !important;
+  height: 48px !important;
 }
 
 .modal-dialog {
@@ -1873,10 +1771,6 @@ label.gender_label span {
   font-weight: bold;
   margin-top: 0;
   font-size: 22px;
-}
-
-.tab-row #profile .submenu ul li a[role='tab'] {
-  padding: 20px 18px;
 }
 
 span.label_style {font-size: 10px !important;}

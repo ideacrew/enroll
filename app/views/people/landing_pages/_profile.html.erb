@@ -89,9 +89,13 @@
     <div role="tabpanel" class="tab-pane" id="contact">
       <%= render 'shared/address_fields', f: f %><br>
       <%= render 'shared/phone_fields', f: f %><br>
-      <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
-        <%= render 'shared/email_fields', f: email %>
-      <% end %>
+
+      <div id="email_info" class="focus_effect row personaol-info-row">
+        <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+          <%= render 'shared/email_fields', f: email %>
+        <% end %>
+        <div class="col-md-10 col-sm-10"><div id="email_error"></div></div>
+      </div>
     </div>
   </div>
 <% end %>

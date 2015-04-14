@@ -2,30 +2,21 @@
 <% if address.present? %>
   <div class="row middle-row form-group form-group-lg no-pd">
     <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-      <input type="text" value="<%= address.address_1 %>" class="form-control">
-      <span>ADDRESS LINE 1</span>
+      <input type="text" value="<%= address.address_1 %>" class="floatlabel form-control" placeholder="ADDRESS LINE 1">
     </div>
     <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-      <input type="text" value="<%= address.address_2 %>" class="form-control">
-      <span>ADDRESS LINE 2</span>
+      <input type="text" value="<%= address.address_2 %>" class="floatlabel form-control" placeholder="ADDRESS LINE 2">
     </div>
   </div>
   <div class="row bottom-row">
-    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <input type="text" value="<%= address.city %>" class="form-control">
-      <span>CITY</span>
+    <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+      <input type="text" value="<%= address.city %>" class="floatlabel form-control" placeholder="CITY">
     </div>
-    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <input type="text" value="<%= address.state %>" class="form-control">
-      <span>STATE</span>
+    <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+      <input type="text" value="<%= address.state %>" class="floatlabel form-control" placeholder="STATE">
     </div>
-    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <input type="text" value="<%= address.country_name %>" class="form-control">
-      <span>COUNTRY</span>
-    </div>
-    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <input type="text" value="<%= address.zip %>" class="form-control">
-      <span>ZIP</span>
+    <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+      <input type="text" value="<%= address.zip %>" class="floatlabel form-control" placeholder="ZIP">
     </div>
   </div>
 <% end %>                     

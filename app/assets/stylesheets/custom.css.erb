@@ -291,6 +291,8 @@ p.information {
     width: 210px;
 }
 
+#new_person .required_fields_notice {display: block !important;}
+
 #new_person .employee-info {
     border: 2px solid #005fd6;
     opacity: 0.5;
@@ -303,6 +305,58 @@ p.information {
 }
 .require-field .required {
   background-color: #ffeeee;
+}
+
+/*.required-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin: -0.25em 0.25em 0em;
+    background-color: #E8E8E8;
+    border-color: #E8E8E8;
+    padding: 0.5em 0.8em;
+    color: rgba(0, 0, 0, 0.65);
+    text-transform: uppercase;
+    font-weight: normal;
+    border-radius: 0.325em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-transition: background 0.1s linear;
+    -moz-transition: background 0.1s linear;
+    transition: background 0.1s linear;
+    font-size: 75%;
+}*/
+.required-icon {
+    position: absolute;
+    top: 0em;
+    left: 0em;
+    z-index: 10;
+    margin: 0em;
+    width: 30px;
+    height: 30px;
+    padding: 0em;
+    text-align: center;
+    -webkit-transition: color 0.2s ease;
+    -moz-transition: color 0.2s ease;
+    transition: color 0.2s ease;
+}
+/*
+.required-icon:after {
+    position: absolute;
+    content: "";
+    z-index: -1;
+    width: 0em;
+    height: 0em;
+    -webkit-transition: border-color 0.2s ease;
+    -moz-transition: border-color 0.2s ease;
+    transition: border-color 0.2s ease;
+}*/
+
+.required-icon .text {
+  color: #007bc3;
+  font-size: 18px;
+  margin: -2px 0 0 -18px;
 }
 /* End New Person Signup */
 
@@ -364,8 +418,10 @@ a.btn.add{
 }
 
 /* Buttons */
-.btn {color: #fff;font-size: 18px;padding: 6px 20px;font-family: "AvenirLTStd-Light";}
+.btn {color: #fff;font-size: 14px;padding: 6px 20px;font-family: "AvenirLTStd-Light";}
 .btn:hover, .btn:focus {color: #fff;}
+.btn-default {color: #333;}
+.btn-default:hover, .btn-default:focus {color: #444;}
 
 .btn-save, .btn-save:hover, .btn-save:focus {
   background: none repeat scroll 0 0 #4d74ff;
@@ -1308,7 +1364,7 @@ input.floatlabe{
   display: none;
   position: absolute;
   top: -72px;
-  right: -130px;
+  right: -112px;
   font-weight: normal;
 }
 .personaol-info-top-row .adderess-select-box {
@@ -1364,108 +1420,6 @@ div#house_info > p {
   right: 31px;
   top: 209px;
   cursor: pointer;
-}
-
-@media (min-width: 300px) and (max-width: 767px) {
-  
-  .radio label, .checkbox label {
-    padding-left: 20px;
-  }
-  .check .col-md-4:last-child .radio label {
-    padding-left: 13px;
-  }
-  .check .col-md-4:last-child .radio label input {
-    margin-left: -14px;
-  }
-  .welcome-msg p {
-    margin: 0 0 40px 20px;
-  }
-  .key {
-    padding-left: 0 !important;
-  }
-  .key p {
-    min-height: 32px;
-  }
-  .disable-btn, .disable-btn:hover, .disable-btn:focus {
-    margin-left: 0;
-    margin-bottom: 10px;
-  }
-  .panel-body.left {
-    margin-right: 0;
-    padding-left: 15px !important;
-  }
-  .welcome-msg .btn-continue {
-    margin-left: 20px;
-  }
-  .bg-color {
-    height: 0 !important;
-  }
-  .less-opacity {
-    display: none;
-  }
-  p.information {
-    margin-bottom: 27px;
-  }
-  #address_info {
-    margin-top: 14px;
-  }
-  #phone_info {
-    margin-top: 10px;
-  }
-  #email_info {
-    margin-top: 12px;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1200px) {
-  .welcome-msg p {
-    letter-spacing: 0;
-  }
-  .key p {
-    font-size: 11px;
-    width: 197px;
-    margin-top: 23px;
-  }
-  .key span:first-child {
-    width: 175px;
-  }
-  .disable-btn, .disable-btn:hover, .disable-btn:focus {
-    margin-top: 16px;
-  }
-  #email_info {
-    margin-bottom: 15px !important;
-  }
-}
-
-@media (min-width: 300px) and (max-width: 1200px) {
-  .autofill-cloud {
-    display: none;
-  } 
-}
-
-@media (min-width: 1201px) and (max-width: 1556px) {
-  .autofill-cloud.autofill-initial, .autofill-cloud.autofill-failed {
-    width: 232px;
-  }
-  .autofill-cloud.autofill-initial .btn-cancel {
-    width: 72%;
-  }
-}
-
-@media (min-width: 300px) and (max-width: 400px) {
-  .adderess-select-box + .dropdown-menu {
-    left: 0;
-  }
-}
-
-@media (min-width: 400px) and (max-width: 767px) {
-  .adderess-select-box + .dropdown-menu {
-    left: 29%;
-  }
-
-  #key-section {
-    margin: 0;
-  }
 }
 
 /** Search page css Start **/
@@ -1729,22 +1683,6 @@ a.list-group-item.confirm {
 .landing-row .table-responsive table:hover {
   opacity: 1;
 }
-.landing-row .left-side .adderess-select-box {
-  border: none;
-  border-radius: 0;
-  color: #007bc3;
-  padding-bottom: 0;
-  padding-top: 0;
-  height: 52px; 
-  font-size: 18px;
-}
-.landing-row .left-side .adderess-select-box.home{
-  background: url("<%= asset_path('landing-page-delete.png') %>") no-repeat 96% center #fff;
-  font-size: 16px;
-}
-.landing-row .left-side .adderess-select-box:hover, .landing-row .left-side .adderess-select-box:hover .caret {
-  color: #666 !important;
-}
 .landing-row .left-side .search-table {
   border: 1px solid #bfdfff !important;
 }
@@ -1788,15 +1726,6 @@ a.list-group-item.confirm {
 }
 .landing-row .left-side .search-table span:last-child {
   font-size: 16px;
-}
-.landing-row .left-side .btn-new-address {
-  height: 52px;
-  line-height: 22px;
-  font-size: 12px;
-  color: #007bc3 !important;
-}
-.landing-row .left-side .btn-new-address:hover {
-  color: #666 !important;
 }
 .landing-row .right-side {
   padding-top: 40px;
@@ -3110,7 +3039,7 @@ a.close-2{
 }
 
 
-/* New Css for Accout page */
+/* Css for Accout page */
 #home .search-table input[type="text"]{
   border: none !important;
   padding: 5px 10px;
@@ -3218,7 +3147,7 @@ a.close-2{
   margin-top: 8px;
 }
 #family #remove_confirm {
-  padding: 12px;
+  padding: 0;
 }
 #family #remove_confirm .confirm {
   color: #00AA00;
@@ -3323,7 +3252,7 @@ a.close-2{
   -webkit-transition: all 0.1s ease-in-out;
   transition: all 0.1s ease-in-out;
   height: 48px !important;
-  font-size: 16px !important;
+  font-size: 14px !important;
 }
 
 #add-new-member .label-floatlabel , #family li.family_members_list .label-floatlabel{
@@ -3336,4 +3265,169 @@ a.close-2{
   color: #0079c6;
   -webkit-transition: all 0.1s ease-in-out;
   transition: all 0.1s ease-in-out;
+}
+
+.tab-row #myTabContent .row {
+    margin: 0;
+}
+.tab-row #myTabContent .submenu {
+    background: none repeat scroll 0 0 #00a3d9;
+    padding: 0 100px;
+    width: 100%;
+}
+.tab-row #myTabContent .submenu ul {
+    border: medium none;
+}
+.tab-row #myTabContent .submenu ul li a {
+    border: medium none !important;
+    border-radius: 0 !important;
+    color: #fff;
+    font-family: "lato","AvenirLTStd-Light";
+    font-size: 16px;
+    font-weight: lighter;
+    padding: 20px 18px;
+}
+.tab-row #myTabContent .submenu ul li.active a {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0) !important;
+    color: #fff !important;
+    font-weight: bold;
+}
+.tab-row #myTabContent .submenu ul li a:focus, .tab-row #myTabContent .submenu ul li a:hover {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0) !important;
+    color: #fff;
+}
+.tab-row #myTabContent #myTabContent1 {
+    padding: 0 100px;
+}
+.tab-row #myTabContent1 .tab-pane {
+    padding-top: 25px;
+}
+
+.person-select {
+  font-size: 18px;
+  height: 50px;
+  padding: 12px;
+  text-align: center;
+}
+
+.person-select .dropdown-menu {
+  border-radius: 0;
+  padding: 6px;
+  text-align: center;
+  width: 100%;
+}
+
+@media (min-width: 300px) and (max-width: 767px) {
+  
+  .radio label, .checkbox label {
+    padding-left: 20px;
+  }
+  .check .col-md-4:last-child .radio label {
+    padding-left: 13px;
+  }
+  .check .col-md-4:last-child .radio label input {
+    margin-left: -14px;
+  }
+  .welcome-msg p {
+    margin: 0 0 40px 20px;
+  }
+  .key {
+    padding-left: 0 !important;
+  }
+  .key p {
+    min-height: 32px;
+  }
+  .disable-btn, .disable-btn:hover, .disable-btn:focus {
+    margin-left: 0;
+    margin-bottom: 10px;
+  }
+  .panel-body.left {
+    margin-right: 0;
+    padding-left: 15px !important;
+  }
+  .welcome-msg .btn-continue {
+    margin-left: 20px;
+  }
+  .bg-color {
+    height: 0 !important;
+  }
+  .less-opacity {
+    display: none;
+  }
+  p.information {
+    margin-bottom: 27px;
+  }
+  #address_info {
+    margin-top: 14px;
+  }
+  #phone_info {
+    margin-top: 10px;
+  }
+  #email_info {
+    margin-top: 12px;
+  }
+  .tab-row #myTabContent .submenu {
+    padding: 0;
+  }
+  .tab-row #myTabContent #myTabContent1 {
+    padding: 0 5px 20px;
+  }
+  .tab-row #myTabContent .submenu ul li a {
+    padding: 20px 0;
+    font-size: 14px;
+  }
+  .tab-row #myTabContent .submenu ul li:nth-child(1) a, .tab-row #myTabContent .submenu ul li:nth-child(3) a {
+    border-right: 1px solid #bbb !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+  .welcome-msg p {
+    letter-spacing: 0;
+  }
+  .key p {
+    font-size: 11px;
+    width: 197px;
+    margin-top: 23px;
+  }
+  .key span:first-child {
+    width: 175px;
+  }
+  .disable-btn, .disable-btn:hover, .disable-btn:focus {
+    margin-top: 16px;
+  }
+  #email_info {
+    margin-bottom: 15px !important;
+  }
+}
+
+@media (min-width: 300px) and (max-width: 1200px) {
+  .autofill-cloud {
+    display: none;
+  } 
+}
+
+@media (min-width: 1201px) and (max-width: 1556px) {
+  .autofill-cloud.autofill-initial, .autofill-cloud.autofill-failed {
+    width: 232px;
+  }
+  .autofill-cloud.autofill-initial .btn-cancel {
+    width: 72%;
+  }
+}
+
+@media (min-width: 300px) and (max-width: 400px) {
+  .adderess-select-box + .dropdown-menu {
+    left: 0;
+  }
+}
+
+@media (min-width: 400px) and (max-width: 767px) {
+  .adderess-select-box + .dropdown-menu {
+    left: 29%;
+  }
+
+  #key-section {
+    margin: 0;
+  }
 }

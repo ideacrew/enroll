@@ -45,6 +45,7 @@ Rails.application.routes.draw do
       resources :family do
         get 'delink'
         get 'terminate'
+        get 'rehire'
       end
     end
   end
