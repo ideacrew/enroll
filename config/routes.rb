@@ -21,9 +21,9 @@ Rails.application.routes.draw do
 
 #Route pattern refactor BEGIN
   namespace :consumer do
-    root 'people#index'
+    root 'employer_roles#show'
 
-    resources :employee, :controller=>"people" do
+    resources :employee, :controller=>"employee_roles" do
     end
   end
 
