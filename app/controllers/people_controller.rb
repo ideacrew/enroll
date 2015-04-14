@@ -237,7 +237,7 @@ class PeopleController < ApplicationController
     #TODO fix me!! fix me!!
     @person = Person.find(params[:person_id])
     @family = @person.primary_family
-    @family_members = @family.family_members
+    @family_members = @family.family_members if @family.present?
     @employee_roles = @person.employee_roles
     @employer_profile = @employee_roles.first.employer_profile if @employee_roles.present?
     @current_plan_year = @employer_profile.latest_plan_year if @employer_profile.present?

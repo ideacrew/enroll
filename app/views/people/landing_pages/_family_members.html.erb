@@ -11,29 +11,30 @@
 
     <br/>
     <ul class="list-group">
+      <% if @family_members.present? %>
+        <% @family_members.each do |dependent| %>
+          <li class="list-group-item family_members_list" id="family_member_<%= dependent.id %>">
+            <div class="row">
+              <div class="col-md-10 col-sm-8 col-xs-8">
+                <h4> <%= dependent.person.first_name %> <%= dependent.person.last_name %> </h4>
+              </div>
+              <div class="col-md-2 col-sm-4 col-xs-4 text-right">
+                <a href="javascript:void(0);" class="edit" data-id="<%= dependent.id %>"><%= image_tag "edit.png" %></a>
 
-      <% @family_members.each do |dependent| %>
-      <li class="list-group-item family_members_list" id="family_member_<%= dependent.id %>">
-        <div class="row">
-          <div class="col-md-10 col-sm-8 col-xs-8">
-            <h4> <%= dependent.person.first_name %> <%= dependent.person.last_name %> </h4>
-          </div>
-          <div class="col-md-2 col-sm-4 col-xs-4 text-right">
-            <a href="javascript:void(0);" class="edit" data-id="<%= dependent.id %>"><%= image_tag "edit.png" %></a>
+                <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: @person.id, organization_id: @employer_profile.organization.id) %>
+                <%= link_to (image_tag "member-close.png"), remove_url, class: 'remove', :method => :delete, :remote => true, data: {confirm: "Remove #{dependent.full_name.strip}? ", ok: 'yes', cancel: 'no', id: '#{dependent.id}'} %>
+              </div>
+              <div id="remove_confirm" class="hidden"></div>
+            </div>
+            <div class="row">
+              <ul id="dependent_ul">
+                <%= render 'people/landing_pages/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
+              </ul>
+            </div>
 
-            <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: @person.id, organization_id: @employer_profile.organization.id) %>
-            <%= link_to (image_tag "member-close.png"), remove_url, class: 'remove', :method => :delete, :remote => true, data: {confirm: "Remove #{dependent.full_name.strip}? ", ok: 'yes', cancel: 'no', id: '#{dependent.id}'} %>
-          </div>
-          <div id="remove_confirm" class="hidden"></div>
-        </div>
-        <div class="row">
-          <ul id="dependent_ul">
-            <%= render 'people/landing_pages/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
-          </ul>
-        </div>
-
-        <div class="dependent_notice_div_<%= dependent.id %>"></div>
-      </li>
+            <div class="dependent_notice_div_<%= dependent.id %>"></div>
+          </li>
+        <% end %>
       <% end %>
     </ul>
     <br>
