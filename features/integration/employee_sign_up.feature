@@ -7,7 +7,7 @@ Feature: Employee Sign Up
     Given I do not exist as a user
     And I have an existing employee record
     And I have an existing person record
-    When I go to the employee signup page
+    When I go to the employee account creation page
     When I enter my new account information
     Then I should be logged in
     When I go to register as an employee

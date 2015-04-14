@@ -94,6 +94,7 @@ end
 
 group :test do
   gem 'mongoid-rspec'
+  gem 'watir'
 end
 
 group :production do
