@@ -2,7 +2,7 @@
   <div class="row top-row">
     <h4> Relationship Benefits </h4>
     <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      Relationship: <%= f.select :relationship, options_for_select(BenefitGroup::PERSONAL_RELATIONSHIP_KINDS), class: "floatlabel form-control", required: true, placeholder: 'RELATIONSHIP' %>
+      Relationship: <%= f.select :relationship, options_for_select(BenefitGroup::PERSONAL_RELATIONSHIP_KINDS.map{|r| [r.to_s.humanize, r.to_s] }), class: "floatlabel form-control", required: true, placeholder: 'RELATIONSHIP' %>
     </div>
     <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
       <%= f.text_field :premium_pct, class: "floatlabel form-control", required: true, placeholder: 'PREMIUM PERCENTAGE' %>
