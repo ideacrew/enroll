@@ -622,6 +622,12 @@ $(document).ready(function () {
   $('#employer .landing_personal_tab .first').focusin(function(){
     $(this).css('opacity', 1);
   });
+
+  // $('.required').closest('div').append('<div class="required-icon"><div class="text">*</div></div>');
+  $('.required').tooltip({
+    placement: 'right',
+    title: 'Required field'
+  });
 });
 
 $(document).ready(function () {
