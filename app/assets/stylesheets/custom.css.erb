@@ -291,6 +291,8 @@ p.information {
     width: 210px;
 }
 
+#new_person .required_fields_notice {display: block !important;}
+
 #new_person .employee-info {
     border: 2px solid #005fd6;
     opacity: 0.5;
@@ -303,6 +305,58 @@ p.information {
 }
 .require-field .required {
   background-color: #ffeeee;
+}
+
+/*.required-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin: -0.25em 0.25em 0em;
+    background-color: #E8E8E8;
+    border-color: #E8E8E8;
+    padding: 0.5em 0.8em;
+    color: rgba(0, 0, 0, 0.65);
+    text-transform: uppercase;
+    font-weight: normal;
+    border-radius: 0.325em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-transition: background 0.1s linear;
+    -moz-transition: background 0.1s linear;
+    transition: background 0.1s linear;
+    font-size: 75%;
+}*/
+.required-icon {
+    position: absolute;
+    top: 0em;
+    left: 0em;
+    z-index: 10;
+    margin: 0em;
+    width: 30px;
+    height: 30px;
+    padding: 0em;
+    text-align: center;
+    -webkit-transition: color 0.2s ease;
+    -moz-transition: color 0.2s ease;
+    transition: color 0.2s ease;
+}
+/*
+.required-icon:after {
+    position: absolute;
+    content: "";
+    z-index: -1;
+    width: 0em;
+    height: 0em;
+    -webkit-transition: border-color 0.2s ease;
+    -moz-transition: border-color 0.2s ease;
+    transition: border-color 0.2s ease;
+}*/
+
+.required-icon .text {
+  color: #007bc3;
+  font-size: 18px;
+  margin: -2px 0 0 -18px;
 }
 /* End New Person Signup */
 
@@ -1310,7 +1364,7 @@ input.floatlabe{
   display: none;
   position: absolute;
   top: -72px;
-  right: -130px;
+  right: -112px;
   font-weight: normal;
 }
 .personaol-info-top-row .adderess-select-box {
@@ -1629,22 +1683,6 @@ a.list-group-item.confirm {
 .landing-row .table-responsive table:hover {
   opacity: 1;
 }
-.landing-row .left-side .adderess-select-box {
-  border: none;
-  border-radius: 0;
-  color: #007bc3;
-  padding-bottom: 0;
-  padding-top: 0;
-  height: 52px; 
-  font-size: 18px;
-}
-.landing-row .left-side .adderess-select-box.home{
-  background: url("<%= asset_path('landing-page-delete.png') %>") no-repeat 96% center #fff;
-  font-size: 16px;
-}
-.landing-row .left-side .adderess-select-box:hover, .landing-row .left-side .adderess-select-box:hover .caret {
-  color: #666 !important;
-}
 .landing-row .left-side .search-table {
   border: 1px solid #bfdfff !important;
 }
@@ -1688,15 +1726,6 @@ a.list-group-item.confirm {
 }
 .landing-row .left-side .search-table span:last-child {
   font-size: 16px;
-}
-.landing-row .left-side .btn-new-address {
-  height: 52px;
-  line-height: 22px;
-  font-size: 12px;
-  color: #007bc3 !important;
-}
-.landing-row .left-side .btn-new-address:hover {
-  color: #666 !important;
 }
 .landing-row .right-side {
   padding-top: 40px;
@@ -3010,7 +3039,7 @@ a.close-2{
 }
 
 
-/* New Css for Accout page */
+/* Css for Accout page */
 #home .search-table input[type="text"]{
   border: none !important;
   padding: 5px 10px;
@@ -3118,7 +3147,7 @@ a.close-2{
   margin-top: 8px;
 }
 #family #remove_confirm {
-  padding: 12px;
+  padding: 0;
 }
 #family #remove_confirm .confirm {
   color: #00AA00;
@@ -3223,7 +3252,7 @@ a.close-2{
   -webkit-transition: all 0.1s ease-in-out;
   transition: all 0.1s ease-in-out;
   height: 48px !important;
-  font-size: 16px !important;
+  font-size: 14px !important;
 }
 
 #add-new-member .label-floatlabel , #family li.family_members_list .label-floatlabel{
@@ -3272,6 +3301,20 @@ a.close-2{
 }
 .tab-row #myTabContent1 .tab-pane {
     padding-top: 25px;
+}
+
+.person-select {
+  font-size: 18px;
+  height: 50px;
+  padding: 12px;
+  text-align: center;
+}
+
+.person-select .dropdown-menu {
+  border-radius: 0;
+  padding: 6px;
+  text-align: center;
+  width: 100%;
 }
 
 @media (min-width: 300px) and (max-width: 767px) {

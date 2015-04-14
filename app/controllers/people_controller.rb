@@ -198,7 +198,6 @@ class PeopleController < ApplicationController
       respond_to do |format|
         if member.save and @dependent.save
           @person.person_relationships.create(kind: params[:family_member][:primary_relationship], relative_id: member.id)
-          family.households.first.coverage_households.first.coverage_household_members.find_or_create_by(applicant_id: params[:family_member][:id])
           format.js { flash.now[:notice] = "Family Member Added." }
         else
           format.js { flash.now[:error_msg] = "Error in Family Member Addition. #{member.errors.full_messages}" }
@@ -226,7 +225,6 @@ class PeopleController < ApplicationController
       @family_member_id = @dependent._id
       @dependent.destroy
       @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
-      @family.households.first.coverage_households.first.coverage_household_members.where(applicant_id: params[:id]).destroy_all
     else
       @family_member_id = params[:id]
     end
@@ -247,6 +245,8 @@ class PeopleController < ApplicationController
     @benefit_group = @current_plan_year.benefit_groups.first if @current_plan_year.present?
     @qualifying_life_events = QualifyingLifeEventKind.all
     @hbx_enrollments = @family.latest_household.hbx_enrollments
+
+    build_nested_models
 
     respond_to do |format|
       format.js {}
@@ -272,7 +272,7 @@ class PeopleController < ApplicationController
 
   def create
     sanitize_person_params
-    @person = Person.find_or_initialize_by(ssn: params[:person][:ssn])
+    @person = Person.find_or_initialize_by(ssn: params[:person][:ssn], date_of_birth: params[:person][:dob])
 
     # person_params
     respond_to do |format|

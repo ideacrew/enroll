@@ -487,6 +487,8 @@ $(document).ready(function () {
     
     var last_dependent = '$("#add_member_list_' + $('#last_member').val() + '")';
     $("#add_member_list_" + $('#last_member').val()).remove();
+    $("#family #add_member_list_" + $('#family_member_id').val()).remove();
+    $('.add-member-buttons').addClass('hidden');
   });
   
   $('#save_member').click(function() {
@@ -596,6 +598,7 @@ $(document).ready(function () {
   $(".phone_number").mask("(999) 999-9999");
   $(".zip").mask("99999");
   $("#person_ssn").mask("999999999");
+  $(".person_ssn").mask("999999999");
   $(".address-state").mask("**");
   
   $("#person_ssn").focusout(function( event ) {
@@ -619,6 +622,10 @@ $(document).ready(function () {
   $('#employer .landing_personal_tab .first').focusin(function(){
     $(this).css('opacity', 1);
   });
+
+  $('.required').tooltip({placement: 'right', title: 'Required field'});
+  $('input[type="radio"]').tooltip('disable');
+
 });
 
 $(document).ready(function () {

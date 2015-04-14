@@ -18,10 +18,9 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def create
-    params.permit!
     @organization = Organization.new
     @organization.build_employer_profile
-    @organization.attributes = format_date_params(params)["organization"]
+    @organization.attributes = employer_profile_params
     if @organization.save
       flash.notice = 'Employer successfully created.'
       redirect_to employers_employer_profiles_path
@@ -45,8 +44,26 @@ class Employers::EmployerProfilesController < ApplicationController
     @employer_profile = EmployerProfile.find(params[:id])
   end
 
-  def employer_params
-    params.require(:employer).permit(:legal_name, :fein, :entity_kind)
+  def employer_profile_params
+    new_params = format_date_params(params)
+    new_params.require(:organization).permit(
+      :employer_profile_attributes => [ :entity_kind, :dba, :fein, :legal_name,
+        :plan_years_attributes => [ :start_on, :end_on, :fte_count, :pte_count, :msp_count,
+          :open_enrollment_start_on, :open_enrollment_end_on,
+          :benefit_groups_attributes => [ :title, :reference_plan_id, :effective_on_offset,
+            :premium_pct_as_int, :employer_max_amt_in_cents,
+            :relationship_benefits_attributes => [
+              :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
+            ]
+          ]
+        ]
+      ],
+      :office_locations_attributes => [
+        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
+        :phone_attributes => [:kind, :area_code, :number, :extension],
+        :email_attributes => [:kind, :address]
+      ]
+    )
   end
 
   def build_employer_profile

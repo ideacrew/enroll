@@ -58,7 +58,7 @@
                   <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
                     <div class='form-inputs'>
                       <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |dependent|  %>
-                        <%= render 'census_dependent_fields', f: dependent %>
+                        <%= render 'shared/census_dependent_fields', f: dependent %>
                       <% end %>
                       <%= link_to_add_fields "Add Dependent", f, :census_dependents %>
                     </div>
