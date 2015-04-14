@@ -88,3 +88,13 @@ a.new-address-btn {
 #contact.landing_contact_information #email_info .email .employee-info.field_error{
   border: 2px solid red !important;
 }
+
+#family li.family_members_list input[type="text"] {
+    padding-top: 10px;
+    color: #007bc3 !important;
+}
+#family li.family_members_list label {
+    color: #007bc3 !important;
+}
+
+.list-group-item.family_members_list.edit.add_border {border: 2px solid rgb(0, 163, 217) !important;}
