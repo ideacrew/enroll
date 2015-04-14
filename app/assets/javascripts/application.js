@@ -487,6 +487,8 @@ $(document).ready(function () {
     
     var last_dependent = '$("#add_member_list_' + $('#last_member').val() + '")';
     $("#add_member_list_" + $('#last_member').val()).remove();
+    $("#family #add_member_list_" + $('#family_member_id').val()).remove();
+    $('.add-member-buttons').addClass('hidden');
   });
   
   $('#save_member').click(function() {

@@ -394,6 +394,7 @@
 
     $(document).on('click', '#family .right-side a.edit', function(){
       $(this).parent().parent(".row").parent(".list-group-item").addClass("edit");
+      $("#family_member_"+ $(this).data('id')).attr("style", "border: 2px solid #007bc3 !important");
     });
 
     $(document).on('click', '#family .right-side a.remove', function(){
@@ -402,6 +403,7 @@
 
     $(document).on('click', '#family .right-side a.cancel', function(){
       $(this).closest("li.edit").removeClass("edit");
+      $("#family_member_"+ $(this).data('id')).attr("style", "");
     });
 
     $(document).on('click', '#family .right-side a.save', function(){
