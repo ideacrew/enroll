@@ -223,13 +223,18 @@ class PeopleController < ApplicationController
     @dependent = @family.family_members.where(_id: params[:id]).first
     if !@dependent.nil?
       @family_member_id = @dependent._id
-      @dependent.destroy
-      @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
+      if !@dependent.is_primary_applicant
+        @dependent.destroy
+        @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
+        @flash = "Family Member Removed"
+      else
+        @flash = "Primary member can not be deleted"
+      end
     else
       @family_member_id = params[:id]
     end
     respond_to do |format|
-      format.js { flash.now[:notice] = "Family Member Removed" }
+      format.js { flash.now[:notice] = @flash }
     end
   end
 
