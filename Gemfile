@@ -86,17 +86,17 @@ group :development, :test do
   gem 'capistrano-rails', '~> 1.1.2'
   gem 'ruby-progressbar', '1.6.0'
 
-  gem 'rspec-rails', '~> 3.1.0'
   # gem 'mongoid-rspec' # causes issue: irb: warn: can't alias context from irb_context
+end
+
+group :test do
+  gem 'rspec-rails', '~> 3.1.0'
+  gem 'mongoid-rspec'
+  gem 'watir'
   gem 'cucumber-rails', '~> 1.4.2', :require => false
   gem 'factory_girl_rails', "~> 4.0"
   gem 'database_cleaner', '1.3.0'
   gem 'shoulda-matchers', require: false
-end
-
-group :test do
-  gem 'mongoid-rspec'
-  gem 'watir'
 end
 
 group :production do
