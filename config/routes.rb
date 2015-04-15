@@ -7,8 +7,6 @@ Rails.application.routes.draw do
     end
   end
 
-  # You can have the root of your site routed with "root"
-  root 'welcome#index'
 
   namespace :products do
     resources :plans, controller: :qhp do
@@ -24,6 +22,9 @@ Rails.application.routes.draw do
     root 'employer_roles#show'
 
     resources :employee, :controller=>"employee_roles" do
+      collection do
+        get 'welcome'
+      end
     end
   end
 
@@ -153,4 +154,7 @@ Rails.application.routes.draw do
   #     # (app/controllers/admin/products_controller.rb)
   #     resources :products
   #   end
+  #
+  # You can have the root of your site routed with "root"
+  root 'welcome#index'
 end
