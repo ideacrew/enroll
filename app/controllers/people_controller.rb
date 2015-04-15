@@ -31,7 +31,8 @@ class PeopleController < ApplicationController
   # Uses identifying information to return single pre-existing Person instance if already in DB
   def match_person
     @person = Person.new(person_params)
-#    raise @person.dob.inspect
+
+    # raise @person.dob.inspect
     @employee_family = EmployerProfile.find_census_families_by_person(@person).first
     # matched_person = Person.match_by_id_info(@person)
 
@@ -41,6 +42,7 @@ class PeopleController < ApplicationController
         format.json { render json: { person: @person, matched: false}, status: :ok, location: @person }
       end
     elsif @employee_family.is_linked?
+      
       @employee_role = @employee_family.linked_employee_role
 
       respond_to do |format|
@@ -49,7 +51,6 @@ class PeopleController < ApplicationController
         format.json { render json: { person: @employee_role.person, matched: true}, status: :ok, location: @employee_role.person, matched: true }
       end
     else
-
       # Matched Person, autofill form with found attributes
       enroll_parms = {}
       enroll_parms[:user] = current_user
@@ -260,6 +261,7 @@ class PeopleController < ApplicationController
   end
 
   def update
+    fail
     @person = Person.find(params[:id])
     @person.updated_by = current_user.email unless current_user.nil?
     sanitize_person_params
@@ -276,6 +278,7 @@ class PeopleController < ApplicationController
   end
 
   def create
+    fail
     sanitize_person_params
     @person = Person.find_or_initialize_by(ssn: params[:person][:ssn], date_of_birth: params[:person][:dob])
 

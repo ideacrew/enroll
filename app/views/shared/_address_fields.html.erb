@@ -37,6 +37,8 @@
     <%= link_to image_tag('delete.png'), 'javascript:void(0)', class: 'close-2' %>
     </div>
   </div>
+
+  <%= f.object.addresses %>
     <%= f.fields_for :addresses, errors: {}, fieldset: true do |address|  %>
      <%= address.hidden_field :_destroy %>
      <% kind = address.object.kind %>

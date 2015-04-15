@@ -7,7 +7,7 @@ $(document).ready(function () {
   });
 
   $('#dependent_ul .close-2').click(function() {
-    var current_element = $(this).closest("div.house");
+    var current_element = $(this).closest("#dependent_ul .house");
     var confirm_buttons = 'double_row';
     override_confirmation( $(this), current_element, confirm_buttons, 'div.house' );
   });

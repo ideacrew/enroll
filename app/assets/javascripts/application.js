@@ -623,7 +623,7 @@ $(document).ready(function () {
     $(this).css('opacity', 1);
   });
 
-  $('.required').tooltip({placement: 'right', title: 'Required field'});
+  $('#new_person .required').tooltip({placement: 'right', title: 'Required field'});
   $('input[type="radio"]').tooltip('disable');
 
 });
