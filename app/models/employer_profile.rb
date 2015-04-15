@@ -95,6 +95,10 @@ class EmployerProfile
     employee_families.order_by(:"census_employee.last_name".asc)
   end
 
+  def unscoped_employee_families_sorted
+    employee_families.unscoped.order_by(:"census_employee.last_name".asc)
+  end
+
   def latest_plan_year
     plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
