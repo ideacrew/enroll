@@ -5,48 +5,48 @@
   <div class="col-md-12 no-pd col-sm-12 col-xs-12 first employee-info">
     <%= hidden_field "people","id" %>
     
-	<div class="row top-row">
-	  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-	    <%= f.text_field :first_name, class: "required floatlabel form-control", required: true, placeholder: 'FIRST NAME' %>
-	  </div>
-	  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-	    <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'MIDDLE NAME' %>
-	  </div>
-	  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-	    <%= f.text_field :last_name, class: "required floatlabel form-control", required: true, placeholder: 'LAST NAME' %>
-	  </div>
-	  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-	    <%= f.text_field :name_sfx, class: "floatlabel form-control", placeholder: 'SUFFIX' %>
-	  </div>
-	</div>
-	
-	<div class="row bottom-row form-group form-group-lg no-pd">
-	  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-	    <%= f.text_field :date_of_birth, start_year: Date.today.year - 110, end_year: Date.today.year, placeholder: "BIRTHDATE",
-		    class: "required date_picker floatlabel form-control", required: true %>
-	  </div>
-	  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-	    <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", value: number_to_ssn(f.object.ssn), required: true %>
-	  </div>
-	  <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
-	    <div class="radio skinned-form-controls skinned-form-controls-mac">
-	      <label>
-	        <%= f.radio_button :gender, "male", required: true, checked: true, class: "required floatlabel" %>
-	        <span>Male</span>
-	      </label>
-	    </div>
-	  </div>
-	  <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
-	    <div class="radio skinned-form-controls skinned-form-controls-mac">
-	      <label>
-	        <%= f.radio_button :gender, "female", class: "required floatlabel"  %>
-	        <span>Female</span>
-	      </label>
-	    </div>
-	  </div>
-	</div>
+  <div class="row top-row">
+    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :first_name, class: "required floatlabel form-control", required: true, placeholder: 'FIRST NAME' %>
+    </div>
+    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'MIDDLE NAME' %>
+    </div>
+    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :last_name, class: "required floatlabel form-control", required: true, placeholder: 'LAST NAME' %>
+    </div>
+    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :name_sfx, class: "floatlabel form-control", placeholder: 'SUFFIX' %>
+    </div>
+  </div>
+  
+  <div class="row bottom-row form-group form-group-lg no-pd">
+    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :date_of_birth, start_year: Date.today.year - 110, end_year: Date.today.year, placeholder: "BIRTHDATE",
+        class: "required date_picker floatlabel form-control", required: true %>
+    </div>
+    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", value: number_to_ssn(f.object.ssn), required: true %>
+    </div>
+    <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <label>
+          <%= f.radio_button :gender, "male", required: true, checked: true, class: "required floatlabel" %>
+          <span>Male</span>
+        </label>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <label>
+          <%= f.radio_button :gender, "female", class: "required floatlabel"  %>
+          <span>Female</span>
+        </label>
+      </div>
+    </div>
+  </div>
 
-	<div class="error">
+  <div class="error">
         <div class="warning"><i class="fa fa-exclamation-triangle"></i>
           All fields Required</div>
     </div>
@@ -56,10 +56,10 @@
 </div>
 
 <div class="row search-btn-row">
-	<div class="col-md-10 col-sm-9 col-xs-12 key no-pd">
-		<p class="top-pad">
-			<a href="javascript:void(0)" id="search-employer" class="btn btn-green btn-search">Search</a>
-			<span>Your personal information is safe, secured with 64 bit SSL encryption.</span>
-		</p>
-	</div>
+  <div class="col-md-10 col-sm-9 col-xs-12 key no-pd">
+    <p class="top-pad">
+      <a href="javascript:void(0)" id="search-employer" class="btn btn-green btn-search">Search</a>
+      <span>Your personal information is safe, secured with 64 bit SSL encryption.</span>
+    </p>
+  </div>
 </div>
