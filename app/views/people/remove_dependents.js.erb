@@ -4,5 +4,5 @@
   $("#dependent_buttons div:first").removeClass('hidden');
   $('#dependent_buttons div:last').addClass('hidden');
 <% else %>
-  $(".flash_message").html('<p>Primary member can not be deleted.</p>');
+  $(".flash_message").html('<p>Primary member can not be deleted.</p>').delay(3200).fadeOut(300);
 <% end %>
