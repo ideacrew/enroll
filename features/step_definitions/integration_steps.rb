@@ -32,18 +32,16 @@ Then(/^I should be logged in$/) do
 end
 
 When(/^I go to register as an employee$/) do
-  @browser.goto("http://localhost:3000/people/new")
-  sleep(3)
+  expect(@browser.a(:text => "Continue").visible?).to be_truthy
+  @browser.a(:text => "Continue").click
+  sleep(2)
 end
 
 Then(/^I should see the employee search page$/) do
-  expect(@browser.a(:text => "Continue").visible?).to be_truthy
+  expect(@browser.text_field(:name => "person[first_name]").visible?).to be_truthy
 end
 
 When(/^I enter the identifying info of my existing person$/) do
-  @browser.a(:text => "Continue").click
-  sleep(1)
-  expect(@browser.text_field(:name => "person[first_name]").visible?).to be_truthy
   @browser.text_field(:name => "person[first_name]").set("Jonathan")
   @browser.text_field(:name => "person[last_name]").set("Hall")
   @browser.text_field(:name => "person[date_of_birth]").set("10/12/1983")
