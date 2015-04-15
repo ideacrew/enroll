@@ -1,22 +1,36 @@
-<% address = @person.addresses.try(:first) %>  
-<% if address.present? %>
-  <div class="row middle-row form-group form-group-lg no-pd">
+<%= f.fields_for :addresses, errors: {}, fieldset: true do |address|  %>
+  <%= address.hidden_field :_destroy %>
+  <% kind = address.object.kind %>
+  <% style = "" %>
+  <% div_class = kind+"-div" %>
+  <% if kind != 'home' %>
+    <% style="display:none;" %>
+  <% end %>
+  <div style="<%= style %>" class="row middle-row form-group form-group-lg no-pd address-row <%= div_class %>">
     <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-      <input type="text" value="<%= address.address_1 %>" class="floatlabel form-control" placeholder="ADDRESS LINE 1">
+      <%= address.hidden_field :kind %>
+
+      <% if kind == 'home' %>
+        <% required = "required" %>
+      <% end %>
+
+      <%= address.text_field :address_1, placeholder: "ADDRESS LINE 1", class: "floatlabel form-control #{required}" %>
     </div>
     <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-      <input type="text" value="<%= address.address_2 %>" class="floatlabel form-control" placeholder="ADDRESS LINE 2">
+      <%= address.text_field :address_2, placeholder: "ADDRESS LINE 2", class: "floatlabel form-control" %>
     </div>
   </div>
-  <div class="row bottom-row">
+
+
+  <div style="<%= style %>" class="row bottom-row address-row <%= div_class %>">
     <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <input type="text" value="<%= address.city %>" class="floatlabel form-control" placeholder="CITY">
+      <%= address.text_field :city, placeholder: "CITY", class: "floatlabel form-control #{required}" %>
     </div>
     <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <input type="text" value="<%= address.state %>" class="floatlabel form-control" placeholder="STATE">
+      <%= address.text_field :state, placeholder: "STATE", class: "floatlabel form-control capital address-state #{required}" %>
     </div>
     <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <input type="text" value="<%= address.zip %>" class="floatlabel form-control" placeholder="ZIP">
+      <%= address.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control zip #{required}" %>
     </div>
   </div>
-<% end %>                     
+<% end%>
