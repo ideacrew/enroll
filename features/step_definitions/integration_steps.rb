@@ -1,7 +1,7 @@
 require 'watir'
 
 Before "@watir" do
-  @browser = Watir::Browser.new :chrome, :switches => []
+  @browser = Watir::Browser.new :chrome
 end
 
 After "@watir" do
