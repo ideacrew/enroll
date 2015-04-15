@@ -1,5 +1,8 @@
-$(".dependent_notice_div_<%= @family_member_id %>").closest("li").html('Family Member Removed.').delay(3200).fadeOut(300);
-
-$("#dependent_buttons").removeClass('hidden');
-$("#dependent_buttons div:first").removeClass('hidden');
-$('#dependent_buttons div:last').addClass('hidden');
+<% if !@dependent.is_primary_applicant %>
+  $(".dependent_notice_div_<%= @family_member_id %>").closest("li").html('<p class="text-center">Family Member Removed.</p>').delay(3200).fadeOut(300);
+  $("#dependent_buttons").removeClass('hidden');
+  $("#dependent_buttons div:first").removeClass('hidden');
+  $('#dependent_buttons div:last').addClass('hidden');
+<% else %>
+  $(".flash_message").html('<p>Primary member can not be deleted.</p>').delay(3200).fadeOut(300);
+<% end %>

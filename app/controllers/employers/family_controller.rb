@@ -58,6 +58,7 @@ class Employers::FamilyController < ApplicationController
   end
 
   def rehire
+    redirect_to employers_employer_profile_path(@employer_profile)
   end
 
   def show

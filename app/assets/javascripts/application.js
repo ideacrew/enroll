@@ -18,7 +18,7 @@
 //= require turbolinks
 //= require classie
 //= require modalEffects
-//= require maskedinput
+//= require jquery.mask
 //= require override_confirm
 //= require_tree .
 
@@ -599,7 +599,7 @@ $(document).ready(function () {
   $(".zip").mask("99999");
   $("#person_ssn").mask("999999999");
   $(".person_ssn").mask("999999999");
-  $(".address-state").mask("**");
+  $(".address-state").mask("AA");
   
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
@@ -623,7 +623,7 @@ $(document).ready(function () {
     $(this).css('opacity', 1);
   });
 
-  $('.required').tooltip({placement: 'right', title: 'Required field'});
+  $('#new_person .required').tooltip({placement: 'right', title: 'Required field'});
   $('input[type="radio"]').tooltip('disable');
 
 });
@@ -634,5 +634,17 @@ $(document).ready(function () {
     $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").removeClass('add_focus');
     $(this).removeClass('focus_none');
     $(this).addClass('add_focus');
+  });
+
+  $('.member_address_links').click(function(){
+    var member_id = $(this).data('id');
+    $.ajax({
+      url: '/people/'+member_id+'/get_member',
+      type: 'GET',
+      success: function(response){
+        $('#member_address_area').html(response);
+      }
+    });
+    $('#dLabel').html($(this).text()+"<i class='glyphicon glyphicon-menu-down'></i>");
   });
 });

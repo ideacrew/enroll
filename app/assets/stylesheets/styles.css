@@ -82,13 +82,6 @@ a.new-address-btn {
   opacity: 0.5 !important;
 }
 
-#contact.landing_contact_information #email_info .email div{
-  border-right: 1px solid #999;
-}
-#contact.landing_contact_information #email_info .email .employee-info.field_error{
-  border: 2px solid red !important;
-}
-
 #family li.family_members_list input[type="text"] {
     padding-top: 10px;
     color: #007bc3 !important;
@@ -98,3 +91,9 @@ a.new-address-btn {
 }
 
 .list-group-item.family_members_list.edit.add_border {border: 2px solid rgb(0, 163, 217) !important;}
+
+.flash_message p {
+  font-size: 17px;
+  text-align: center;
+  text-transform: none;
+}

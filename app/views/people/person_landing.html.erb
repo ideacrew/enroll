@@ -23,11 +23,11 @@
                                     <div class="dropdown form-control person-select">
                                       <a id="dLabel" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
                                         <%= @person.first_name %> <%= @person.middle_name %> <%= @person.last_name %>
-                                        <i class="glyphicon glyphicon-menu-down"></i>
+                                        <i class='glyphicon glyphicon-menu-down'></i>
                                       </a>
                                       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                                         <% get_dependents(@family, @person).each do |dependents |%>
-                                          <li><%= link_to dependents.full_name, 'javascript:;' %></li>
+                                          <li><%= link_to dependents.full_name, 'javascript:;', class: "member_address_links", 'data-id': dependents.id.to_s %></li>
                                         <% end %>
                                       </ul>
                                     </div>
@@ -36,9 +36,9 @@
 
                                 <tr>
                                   <td>
-                                    <%= form_for(@person) do |f| %>
-                                      <%= render 'shared/address_fields', f: f %>
-                                    <% end %>
+                                    <div id="member_address_area">
+                                      <%= render partial: 'people/landing_pages/member_address', locals: {person: @person} %>
+                                    </div>
                                   </td>
                                 </tr>
                               </tbody>
@@ -172,65 +172,20 @@
                     </div>
                     
                     <div aria-labelledby="contact-tab" id="contact" class="tab-pane fade landing_contact_information" role="tabpanel">
-                      <div id="address_info" class="row personaol-info-top-row">
-                        <div class="col-md-8 no-pd col-sm-12 col-xs-12 first add_focus">
-                          <div class="row top-row">
-                            <div class="col-md-2 col-sm-2 col-xs-12">
-                              <a class="new-address-btn" href="#">NEW ADDRESS</a>
-                            </div>
-                            <div class="col-md-8 col-sm-8 col-xs-12 form-group form-group-lg no-pd address">
-                              <div class="col-md-3 col-sm-3 col-xs-12"></div>
-                              <div class="col-md-6 col-sm-6 col-xs-12">
-                                <div class="form-group form-group-lg">
-                                  <div style="margin: 0;" class="row">
-                                    <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
-                                      <div class="dropdown">
-                                        <button aria-expanded="true" data-toggle="dropdown" id="dropdownMenu1" type="button" class="form-control float-label form_group_lg dropdown-toggle">
-                                          Home Address
-                                          <i class="glyphicon glyphicon-menu-down"></i>
-                                        </button>
-                                        <ul aria-labelledby="dropdownMenu1" role="menu" class="dropdown-menu">
-                                          <li role="presentation"><a href="#" tabindex="-1" role="menuitem">Home Address</a></li>
-                                          <li role="presentation"><a href="#" tabindex="-1" role="menuitem">Work Address</a></li>
-                                          <li role="presentation"><a href="#" tabindex="-1" role="menuitem">Mailing Address</a></li>
-                                        </ul>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>  
-                              </div>
-                              <div class="col-md-3 col-sm-3 col-xs-12"></div>
-                            </div>
-                            <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd delete_address">
-                              <a href="javascript:void(0)" class="close-2">
-                                <%=image_tag "delete.png" %>
-                              </a>
-                            </div>
+                      <div class="col-md-8 col-sm-8 col-xs-12 no-pd">
+                        <%= form_for(@person) do |f| %>
+                          <%= render 'shared/address_fields', f: f %><br>
+                          <%= render 'shared/phone_fields', f: f %><br>
+
+                          <div id="email_info" class="focus_effect row personaol-info-row">
+                            <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+                              <%= render 'shared/email_fields', f: email %>
+                            <% end %>
+                            <div class="col-md-10 col-sm-10"><div id="email_error"></div></div>
                           </div>
-                          <%= render 'people/landing_pages/address' %>
-                          
-                        <div class="error">
-                          <div class="warning"><i class="fa fa-exclamation-triangle"></i>
-                            All fields Required
-                          </div>
-                        </div>
+
+                        <% end %>
                       </div>
-                    </div>
-                    <br>
-                    <div id="phone_info" class="row personaol-info-top-row">
-                       <%= render 'people/landing_pages/phone' %> 
-                    </div>
-                    <br>
-                    <div id="email_info" class="row personaol-info-top-row">
-                      <% email = @person.emails.try(:first) %>
-                      <div class="email">
-                        <div class="col-md-8 col-sm-12 col-xs-12 no-pd first focus_none">
-                          <div class="form-group form-group-lg">
-                            <input type="text" value="<%#= email.address if @person.email.address.present? %>" class="floatlabel form-control" placeholder="NAME@DOMAIN.COM">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -352,86 +307,86 @@
     </div>
     <div class="md-overlay"></div><!-- the overlay element -->
 
-   <script>
-    $(".adderess-select-box").focusin(function() {
-      $(".bg-color").css({
-        "background-color": "rgba(220, 234, 241, 1)", 
-        "height": "46px", 
-      });
+<script>
+  $(".adderess-select-box").focusin(function() {
+    $(".bg-color").css({
+      "background-color": "rgba(220, 234, 241, 1)", 
+      "height": "46px", 
     });
-        
-    $(".adderess-select-box").focusout(function() {
-      $(".bg-color").css({
-        "background-color": "rgba(255, 255, 255, 1)", 
-        "height": "46px", 
-      });
+  });
+      
+  $(".adderess-select-box").focusout(function() {
+    $(".bg-color").css({
+      "background-color": "rgba(255, 255, 255, 1)", 
+      "height": "46px", 
     });
+  });
 
-    $(document).on("click", ".heading", function(){
-      $(this).closest('div').find(".table-responsive").slideToggle("slow");
-    });
+  $(document).on("click", ".heading", function(){
+    $(this).closest('div').find(".table-responsive").slideToggle("slow");
+  });
 
-    $('.md-trigger').click(function(e){
-      e.preventDefault();
-    });
+  $('.md-trigger').click(function(e){
+    e.preventDefault();
+  });
 
-    $('.event-accordion .panel').click(function () {
-      $(this).toggleClass('active');
-      $(this).siblings().removeClass('active');
-    });
+  $('.event-accordion .panel').click(function () {
+    $(this).toggleClass('active');
+    $(this).siblings().removeClass('active');
+  });
 
-    $(".personal-table input").focusout(function() {
-      if ($(".personal-table input").val() !== ""){
-        $("#personal_info .save-btn").removeClass("disabled");
-        $("#personal_info .vital-information").css("display", "block");
-        $(".personal-table tbody tr:first-child td, table.personal-table").removeAttr("style");
-      }
-    });
+  $(".personal-table input").focusout(function() {
+    if ($(".personal-table input").val() !== ""){
+      $("#personal_info .save-btn").removeClass("disabled");
+      $("#personal_info .vital-information").css("display", "block");
+      $(".personal-table tbody tr:first-child td, table.personal-table").removeAttr("style");
+    }
+  });
 
-    $(".personal-table input").focusin(function() {
-      $(".personal-table tbody tr:first-child td, table.personal-table").css("cssText", "border-color: #00a3d9 !important;");
-    });
+  $(".personal-table input").focusin(function() {
+    $(".personal-table tbody tr:first-child td, table.personal-table").css("cssText", "border-color: #00a3d9 !important;");
+  });
 
-    $(document).on('click', '#family .right-side a.edit', function(){
-      $(this).parent().parent(".row").parent(".list-group-item").addClass("edit");
-      $("#family_member_"+ $(this).data('id')).attr("style", "border: 2px solid #007bc3 !important");
-    });
+  $(document).on('click', '#family .right-side a.edit', function(){
+    $(this).parent().parent(".row").parent(".list-group-item").addClass("edit");
+    $("#family_member_"+ $(this).data('id')).attr("style", "border: 2px solid #007bc3 !important");
+  });
 
-    $(document).on('click', '#family .right-side a.remove', function(){
-      $(this).closest(".list-group-item").remove();
-    });
+  $(document).on('click', '#family .right-side a.remove', function(){
+    $(this).closest(".list-group-item").remove();
+  });
 
-    $(document).on('click', '#family .right-side a.cancel', function(){
-      $(this).closest("li.edit").removeClass("edit");
-      $("#family_member_"+ $(this).data('id')).attr("style", "");
-    });
+  $(document).on('click', '#family .right-side a.cancel', function(){
+    $(this).closest("li.edit").removeClass("edit");
+    $("#family_member_"+ $(this).data('id')).attr("style", "");
+  });
 
-    $(document).on('click', '#family .right-side a.save', function(){
-      if ($("#family .right-side li.edit input.first-name").val() !== ""){
-        $(this).closest("form").submit();
-      } else {}
-    });
+  $(document).on('click', '#family .right-side a.save', function(){
+    if ($("#family .right-side li.edit input.first-name").val() !== ""){
+      $(this).closest("form").submit();
+    } else {}
+  });
 
-    $("#family .right-side button.new-member").click(function(e){
-      e.preventDefault();
-      $("#family .right-side #add-new-member").css("display", "block");
-    });
+  $("#family .right-side button.new-member").click(function(e){
+    e.preventDefault();
+    $("#family .right-side #add-new-member").css("display", "block");
+  });
 
-    $("#family .right-side #add-new-member a.cancel").click(function(){
-      $("#family .right-side #add-new-member").removeAttr("style");
-    });
-       
-    $('.see-plan-details').click(function(e){
-      e.preventDefault();
-      $('#plans-tab').click();
-    });
+  $("#family .right-side #add-new-member a.cancel").click(function(){
+    $("#family .right-side #add-new-member").removeAttr("style");
+  });
+     
+  $('.see-plan-details').click(function(e){
+    e.preventDefault();
+    $('#plans-tab').click();
+  });
 
-    $('.add-member').click(function(e){
-      e.preventDefault();
-      $('#profile-tab').click();
-      $('#family-tab').click();
-    });
+  $('.add-member').click(function(e){
+    e.preventDefault();
+    $('#profile-tab').click();
+    $('#family-tab').click();
+  });
 
-    // this is important for IEs
-    var polyfilter_scriptpath = '/js/';
-   </script>
+  // this is important for IEs
+  var polyfilter_scriptpath = '/js/';
+</script>
