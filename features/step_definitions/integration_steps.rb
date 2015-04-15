@@ -12,32 +12,34 @@ end
 When(/^I go to the employee account creation page$/) do
   @browser = Watir::Browser.new :chrome, :switches => []
   @browser.goto("http://localhost:3000/")
-  sleep(3)
+  Watir::Wait.until(10) { @browser.a(:text => "Employee Portal").present? }
+  sleep(1)
   @browser.a(:text => "Employee Portal").click
-  sleep(3)
+  Watir::Wait.until(10) { @browser.a(:text => "Create account").present? }
+  sleep(1)
   @browser.a(:text => "Create account").click
-  sleep(3)
 end
 
 When(/^I enter my new account information$/) do
+  Watir::Wait.until(10) { @browser.text_field(:name => "user[password_confirmation]").present? }
   @browser.text_field(:name => "user[email]").set("trey.evans@dc.gov")
   @browser.text_field(:name => "user[password]").set("12345678")
   @browser.text_field(:name => "user[password_confirmation]").set("12345678")
   @browser.input(:value => "Create account").click
-  sleep(3)
 end
 
 Then(/^I should be logged in$/) do
+  Watir::Wait.until { @browser.element(:text => /Welcome! You have signed up successfully./).present? }
   expect(@browser.element(:text => /Welcome! You have signed up successfully./).visible?).to be_truthy
 end
 
 When(/^I go to register as an employee$/) do
   expect(@browser.a(:text => "Continue").visible?).to be_truthy
   @browser.a(:text => "Continue").click
-  sleep(2)
 end
 
 Then(/^I should see the employee search page$/) do
+  Watir::Wait.until { @browser.text_field(:name => "person[first_name]").present? }
   expect(@browser.text_field(:name => "person[first_name]").visible?).to be_truthy
 end
 
