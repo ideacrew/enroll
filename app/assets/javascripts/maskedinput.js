@@ -303,7 +303,7 @@ $.fn.extend({
             moveCaret;
 
           focusText = input.val();
-          pos = checkVal();
+          //pos = checkVal();
           
           caretTimeoutId = setTimeout(function(){
             writeBuffer();
