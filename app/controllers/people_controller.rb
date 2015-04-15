@@ -32,7 +32,6 @@ class PeopleController < ApplicationController
   def match_person
     @person = Person.new(person_params)
 
-    # raise @person.dob.inspect
     @employee_family = EmployerProfile.find_census_families_by_person(@person).first
     # matched_person = Person.match_by_id_info(@person)
 
@@ -261,7 +260,6 @@ class PeopleController < ApplicationController
   end
 
   def update
-    fail
     @person = Person.find(params[:id])
     @person.updated_by = current_user.email unless current_user.nil?
     sanitize_person_params
@@ -278,9 +276,13 @@ class PeopleController < ApplicationController
   end
 
   def create
-    fail
-    sanitize_person_params
+    sanitize_person_params    
     @person = Person.find_or_initialize_by(ssn: params[:person][:ssn], date_of_birth: params[:person][:dob])
+    
+    # Delete old sub documents
+    @person.addresses.each {|address| address.delete}
+    @person.phones.each {|phone| phone.delete}
+    @person.emails.each {|email| email.delete}
 
     # person_params
     respond_to do |format|
