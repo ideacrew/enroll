@@ -327,6 +327,11 @@ class PeopleController < ApplicationController
     @hbx_enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
   end
 
+  def get_member
+    member = find_person(params[:id])
+    render partial: 'people/landing_pages/member_address', locals: {person: member}
+  end
+
 private
   def find_person(id)
     begin

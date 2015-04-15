@@ -76,6 +76,10 @@ Rails.application.routes.draw do
       get 'check_qle_marriage_date'
     end
 
+    member do
+      get 'get_member'
+    end
+
   end
 
   devise_for :users

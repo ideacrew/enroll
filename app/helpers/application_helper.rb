@@ -204,9 +204,9 @@ module ApplicationHelper
   end
   
   def get_dependents(family, person)
-    list = []
-    family_members = @family.family_members
-    family_members.each {|f| list << f.person if f.person.ssn != person.ssn } if family_members.present?
-    return list
+    members_list = []
+    family_members = family.family_members
+    family_members.each {|f| members_list << f.person } if family_members.present?
+    return members_list
   end
 end

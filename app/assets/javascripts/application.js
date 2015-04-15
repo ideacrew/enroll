@@ -635,4 +635,16 @@ $(document).ready(function () {
     $(this).removeClass('focus_none');
     $(this).addClass('add_focus');
   });
+
+  $('.member_address_links').click(function(){
+    var member_id = $(this).data('id');
+    $.ajax({
+      url: '/people/'+member_id+'/get_member',
+      type: 'GET',
+      success: function(response){
+        $('#member_address_area').html(response);
+      }
+    });
+    $('#dLabel').html($(this).text()+"<i class='glyphicon glyphicon-menu-down'></i>");
+  });
 });
