@@ -183,7 +183,7 @@ $(document).ready(function () {
     }
   });
 
-  $('#continue').click(function() {
+/*  $('#continue').click(function() {
     $("#overlay").css("display", "none");
     $(".welcome-msg").css("display", "none");
     $(".information").removeClass('hidden');
@@ -196,7 +196,7 @@ $(document).ready(function () {
     $(".search-btn-row").css("display", "block");
     $(".personal_info").css("display", "block");
     $(".start").hide();
-  });
+  });*/
 
   $('#personal_info.focus_effect').focusout(function(){
     var tag_id = $(this).attr('id');
