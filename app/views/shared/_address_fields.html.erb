@@ -37,6 +37,7 @@
     <%= link_to image_tag('delete.png'), 'javascript:void(0)', class: 'close-2' %>
     </div>
   </div>
+
     <%= f.fields_for :addresses, errors: {}, fieldset: true do |address|  %>
      <%= address.hidden_field :_destroy %>
      <% kind = address.object.kind %>
@@ -70,7 +71,7 @@
           <%= address.text_field :state, placeholder: "STATE", class: "floatlabel form-control capital address-state #{required}" %>
         </div>
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-          <%= address.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control zip #{required}" %>
+          <%= address.text_field :zip, placeholder: "ZIP", class: "number floatlabel form-control zip #{required}" %>
         </div>
     </div>
     <% end%>

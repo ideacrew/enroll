@@ -31,7 +31,7 @@ class PeopleController < ApplicationController
   # Uses identifying information to return single pre-existing Person instance if already in DB
   def match_person
     @person = Person.new(person_params)
-#    raise @person.dob.inspect
+
     @employee_family = EmployerProfile.find_census_families_by_person(@person).first
     # matched_person = Person.match_by_id_info(@person)
 
@@ -41,6 +41,7 @@ class PeopleController < ApplicationController
         format.json { render json: { person: @person, matched: false}, status: :ok, location: @person }
       end
     elsif @employee_family.is_linked?
+      
       @employee_role = @employee_family.linked_employee_role
 
       respond_to do |format|
@@ -49,7 +50,6 @@ class PeopleController < ApplicationController
         format.json { render json: { person: @employee_role.person, matched: true}, status: :ok, location: @employee_role.person, matched: true }
       end
     else
-
       # Matched Person, autofill form with found attributes
       enroll_parms = {}
       enroll_parms[:user] = current_user
@@ -223,13 +223,18 @@ class PeopleController < ApplicationController
     @dependent = @family.family_members.where(_id: params[:id]).first
     if !@dependent.nil?
       @family_member_id = @dependent._id
-      @dependent.destroy
-      @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
+      if !@dependent.is_primary_applicant
+        @dependent.destroy
+        @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
+        @flash = "Family Member Removed"
+      else
+        @flash = "Primary member can not be deleted"
+      end
     else
       @family_member_id = params[:id]
     end
     respond_to do |format|
-      format.js { flash.now[:notice] = "Family Member Removed" }
+      format.js { flash.now[:notice] = @flash }
     end
   end
 
@@ -271,8 +276,13 @@ class PeopleController < ApplicationController
   end
 
   def create
-    sanitize_person_params
+    sanitize_person_params    
     @person = Person.find_or_initialize_by(ssn: params[:person][:ssn], date_of_birth: params[:person][:dob])
+    
+    # Delete old sub documents
+    @person.addresses.each {|address| address.delete}
+    @person.phones.each {|phone| phone.delete}
+    @person.emails.each {|email| email.delete}
 
     # person_params
     respond_to do |format|

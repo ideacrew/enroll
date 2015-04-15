@@ -98,3 +98,9 @@ a.new-address-btn {
 }
 
 .list-group-item.family_members_list.edit.add_border {border: 2px solid rgb(0, 163, 217) !important;}
+
+.flash_message p {
+  font-size: 17px;
+  text-align: center;
+  text-transform: none;
+}

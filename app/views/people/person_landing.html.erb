@@ -185,14 +185,17 @@
                                   <div style="margin: 0;" class="row">
                                     <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
                                       <div class="dropdown">
-                                        <button aria-expanded="true" data-toggle="dropdown" id="dropdownMenu1" type="button" class="form-control float-label form_group_lg dropdown-toggle">
-                                          Home Address
+                                        <button aria-expanded="true" data-toggle="dropdown" id="dropdownMenu1" type="button" class="form-control floatlabel form_group_lg dropdown-toggle">
+                                          <label>Home Address</label>
                                           <i class="glyphicon glyphicon-menu-down"></i>
                                         </button>
                                         <ul aria-labelledby="dropdownMenu1" role="menu" class="dropdown-menu">
-                                          <li role="presentation"><a href="#" tabindex="-1" role="menuitem">Home Address</a></li>
-                                          <li role="presentation"><a href="#" tabindex="-1" role="menuitem">Work Address</a></li>
-                                          <li role="presentation"><a href="#" tabindex="-1" role="menuitem">Mailing Address</a></li>
+                                          <% Address::KINDS.each do |item| %>
+                                            <% address_text = item.capitalize + "Address" %>
+                                            <li role="presentation" data-value="<%= item %>" data-address-text="<%= address_text %>" class="address-li">
+                                              <a href="javascript:;" tabindex="-1" role="menuitem"><%= item.humanize %> Address</a>
+                                            </li>
+                                          <% end %>
                                         </ul>
                                       </div>
                                     </div>
@@ -207,7 +210,10 @@
                               </a>
                             </div>
                           </div>
-                          <%= render 'people/landing_pages/address' %>
+                          <%= form_for @person, html: {id: 'contact_information_form'} do |f| %>
+                            <%= render 'people/landing_pages/address', f: f %>
+                          <% end %>
+                          
                           
                         <div class="error">
                           <div class="warning"><i class="fa fa-exclamation-triangle"></i>
@@ -352,86 +358,86 @@
     </div>
     <div class="md-overlay"></div><!-- the overlay element -->
 
-   <script>
-    $(".adderess-select-box").focusin(function() {
-      $(".bg-color").css({
-        "background-color": "rgba(220, 234, 241, 1)", 
-        "height": "46px", 
-      });
+<script>
+  $(".adderess-select-box").focusin(function() {
+    $(".bg-color").css({
+      "background-color": "rgba(220, 234, 241, 1)", 
+      "height": "46px", 
     });
-        
-    $(".adderess-select-box").focusout(function() {
-      $(".bg-color").css({
-        "background-color": "rgba(255, 255, 255, 1)", 
-        "height": "46px", 
-      });
+  });
+      
+  $(".adderess-select-box").focusout(function() {
+    $(".bg-color").css({
+      "background-color": "rgba(255, 255, 255, 1)", 
+      "height": "46px", 
     });
+  });
 
-    $(document).on("click", ".heading", function(){
-      $(this).closest('div').find(".table-responsive").slideToggle("slow");
-    });
+  $(document).on("click", ".heading", function(){
+    $(this).closest('div').find(".table-responsive").slideToggle("slow");
+  });
 
-    $('.md-trigger').click(function(e){
-      e.preventDefault();
-    });
+  $('.md-trigger').click(function(e){
+    e.preventDefault();
+  });
 
-    $('.event-accordion .panel').click(function () {
-      $(this).toggleClass('active');
-      $(this).siblings().removeClass('active');
-    });
+  $('.event-accordion .panel').click(function () {
+    $(this).toggleClass('active');
+    $(this).siblings().removeClass('active');
+  });
 
-    $(".personal-table input").focusout(function() {
-      if ($(".personal-table input").val() !== ""){
-        $("#personal_info .save-btn").removeClass("disabled");
-        $("#personal_info .vital-information").css("display", "block");
-        $(".personal-table tbody tr:first-child td, table.personal-table").removeAttr("style");
-      }
-    });
+  $(".personal-table input").focusout(function() {
+    if ($(".personal-table input").val() !== ""){
+      $("#personal_info .save-btn").removeClass("disabled");
+      $("#personal_info .vital-information").css("display", "block");
+      $(".personal-table tbody tr:first-child td, table.personal-table").removeAttr("style");
+    }
+  });
 
-    $(".personal-table input").focusin(function() {
-      $(".personal-table tbody tr:first-child td, table.personal-table").css("cssText", "border-color: #00a3d9 !important;");
-    });
+  $(".personal-table input").focusin(function() {
+    $(".personal-table tbody tr:first-child td, table.personal-table").css("cssText", "border-color: #00a3d9 !important;");
+  });
 
-    $(document).on('click', '#family .right-side a.edit', function(){
-      $(this).parent().parent(".row").parent(".list-group-item").addClass("edit");
-      $("#family_member_"+ $(this).data('id')).attr("style", "border: 2px solid #007bc3 !important");
-    });
+  $(document).on('click', '#family .right-side a.edit', function(){
+    $(this).parent().parent(".row").parent(".list-group-item").addClass("edit");
+    $("#family_member_"+ $(this).data('id')).attr("style", "border: 2px solid #007bc3 !important");
+  });
 
-    $(document).on('click', '#family .right-side a.remove', function(){
-      $(this).closest(".list-group-item").remove();
-    });
+  $(document).on('click', '#family .right-side a.remove', function(){
+    $(this).closest(".list-group-item").remove();
+  });
 
-    $(document).on('click', '#family .right-side a.cancel', function(){
-      $(this).closest("li.edit").removeClass("edit");
-      $("#family_member_"+ $(this).data('id')).attr("style", "");
-    });
+  $(document).on('click', '#family .right-side a.cancel', function(){
+    $(this).closest("li.edit").removeClass("edit");
+    $("#family_member_"+ $(this).data('id')).attr("style", "");
+  });
 
-    $(document).on('click', '#family .right-side a.save', function(){
-      if ($("#family .right-side li.edit input.first-name").val() !== ""){
-        $(this).closest("form").submit();
-      } else {}
-    });
+  $(document).on('click', '#family .right-side a.save', function(){
+    if ($("#family .right-side li.edit input.first-name").val() !== ""){
+      $(this).closest("form").submit();
+    } else {}
+  });
 
-    $("#family .right-side button.new-member").click(function(e){
-      e.preventDefault();
-      $("#family .right-side #add-new-member").css("display", "block");
-    });
+  $("#family .right-side button.new-member").click(function(e){
+    e.preventDefault();
+    $("#family .right-side #add-new-member").css("display", "block");
+  });
 
-    $("#family .right-side #add-new-member a.cancel").click(function(){
-      $("#family .right-side #add-new-member").removeAttr("style");
-    });
-       
-    $('.see-plan-details').click(function(e){
-      e.preventDefault();
-      $('#plans-tab').click();
-    });
+  $("#family .right-side #add-new-member a.cancel").click(function(){
+    $("#family .right-side #add-new-member").removeAttr("style");
+  });
+     
+  $('.see-plan-details').click(function(e){
+    e.preventDefault();
+    $('#plans-tab').click();
+  });
 
-    $('.add-member').click(function(e){
-      e.preventDefault();
-      $('#profile-tab').click();
-      $('#family-tab').click();
-    });
+  $('.add-member').click(function(e){
+    e.preventDefault();
+    $('#profile-tab').click();
+    $('#family-tab').click();
+  });
 
-    // this is important for IEs
-    var polyfilter_scriptpath = '/js/';
-   </script>
+  // this is important for IEs
+  var polyfilter_scriptpath = '/js/';
+</script>

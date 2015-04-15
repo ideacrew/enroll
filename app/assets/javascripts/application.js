@@ -18,7 +18,7 @@
 //= require turbolinks
 //= require classie
 //= require modalEffects
-//= require maskedinput
+//= require jquery.mask
 //= require override_confirm
 //= require_tree .
 
@@ -599,7 +599,7 @@ $(document).ready(function () {
   $(".zip").mask("99999");
   $("#person_ssn").mask("999999999");
   $(".person_ssn").mask("999999999");
-  $(".address-state").mask("**");
+  $(".address-state").mask("AA");
   
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
@@ -623,7 +623,7 @@ $(document).ready(function () {
     $(this).css('opacity', 1);
   });
 
-  $('.required').tooltip({placement: 'right', title: 'Required field'});
+  $('#new_person .required').tooltip({placement: 'right', title: 'Required field'});
   $('input[type="radio"]').tooltip('disable');
 
 });
