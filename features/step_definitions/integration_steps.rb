@@ -1,5 +1,13 @@
 require 'watir'
 
+Before "@watir" do
+  @browser = Watir::Browser.new :chrome, :switches => []
+end
+
+After "@watir" do
+  @browser.close
+end
+
 Given(/^I do not exist as a user$/) do
 end
 
@@ -10,7 +18,6 @@ Given(/^I have an existing person record$/) do
 end
 
 When(/^I go to the employee account creation page$/) do
-  @browser = Watir::Browser.new :chrome, :switches => []
   @browser.goto("http://localhost:3000/")
   Watir::Wait.until(10) { @browser.a(:text => "Employee Portal").present? }
   sleep(1)
