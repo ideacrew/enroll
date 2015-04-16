@@ -7,7 +7,6 @@ $(document).ready(function () {
   });
 
   $('#dependent_ul').on('click', '.close-2', function(e) {
-    // e.preventDefault();
     var unsaved_member = $('#last_member').val().trim();
 
     if( unsaved_member != "") {

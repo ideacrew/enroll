@@ -27,9 +27,17 @@
               <div id="remove_confirm" class="hidden"></div>
             </div>
             <div class="row">
-              <ul id="dependent_ul">
-                <%= render 'people/landing_pages/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
+              <ul class="" id="dependent_ul">
+                  <% @family.family_members.reject(&:is_primary_applicant).each do |dependent| %>
+                    <%= render "dependent", dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
+                  <% end %>
+
+                  <input type="hidden" id="last_member" value="">
               </ul>
+              <!-- <ul id="dependent_ul">
+                <%#= render 'people/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
+                <%#= render 'people/landing_pages/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
+              </ul> -->
             </div>
 
             <div class="dependent_notice_div_<%= dependent.id %>"></div>
