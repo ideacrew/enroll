@@ -2,7 +2,9 @@ class Employers::EmployerProfilesController < ApplicationController
   before_filter :find_employer, only: [:show, :destroy]
 
   def index
-    @employer_profiles = Kaminari.paginate_array(EmployerProfile.all.to_a).page params[:page]
+    @organizations = Organization.exists(employer_profile: true).order_by([:legal_name]).page params[:page]
+    @employer_profiles = @organizations.map {|o| o.employer_profile}
+    #@employer_profiles = Kaminari.paginate_array(EmployerProfile.all.to_a).page params[:page]
   end
 
   def my_account
