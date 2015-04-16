@@ -1,5 +1,14 @@
 <div class="col-md-10 col-sm-12">
   <h3>Employers</h3>
+
+<form class="form-inline" action="/employers/employer_profiles" method='get'>
+  <div class="form-group">
+    <label for="name">Name</label>
+    <input type="text" class="form-control" id="name" name='name' value="<%= params[:name] %>">
+  </div>
+  <button type="submit" class="btn btn-default">Search</button>
+</form>
+
   <div class="container-fluid no-pd-left">
     <div class="col-md-10 col-sm-9 col-xs-12 no-pd">
 
@@ -24,7 +33,7 @@
 
     </div>
   </div>
-<%= paginate @employer_profiles %>
+<%= paginate @organizations %>
 </div>
 
 <%= link_to "New Employer Profile", new_employers_employer_profile_path %>

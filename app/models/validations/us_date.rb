@@ -7,7 +7,7 @@ module Validations
           def __valid_US_date_property_#{prop_name}
             d_value = #{prop_name}
             begin
-              Date.strptime("%m/%d/%Y", #{prop_name})
+              Date.strptime(d_value, "%m/%d/%Y")
             rescue
               errors.add(:#{prop_name}, "invalid date: " + d_value.to_s)
             end

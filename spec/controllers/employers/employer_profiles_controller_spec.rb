@@ -35,8 +35,35 @@ RSpec.describe Employers::EmployerProfilesController, :type => :controller do
       expect(Organization.count).to eq (org_count + 1)
       expect(controller.flash.now[:notice]).to eq "Employer successfully created." 
     end
-
-    it "create failure" do
-    end
   end
+
+  describe "GET index" do
+    login_user 
+    include_context "BradyWork"
+
+    it "returns http success" do 
+      get :index
+      expect(response).to have_http_status(:success)
+    end
+
+    it "returns results with name search" do
+      mikes_organization
+      mikes_employer
+      og = FactoryGirl.create(:organization, :legal_name => "ss corp bb")
+      ep = FactoryGirl.create(:employer_profile, :organization => og)
+
+      get :index, name: "corp"
+      expect(assigns(:employer_profiles)).to eq [ep]
+    end
+
+    it "returns results success" do
+      Organization.destroy_all
+      og = FactoryGirl.create(:organization, :legal_name => "ss corp bb")
+      ep = FactoryGirl.create(:employer_profile, :organization => og)
+      FactoryGirl.create(:organization)
+
+      get :index
+      expect(assigns(:employer_profiles)).to eq [ep]
+    end
+  end 
 end

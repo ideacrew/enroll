@@ -1,6 +1,20 @@
 require 'rails_helper'
 
 RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
+  describe "GET search" do
+    login_user
+
+    before(:each) do
+      get :search
+    end
+
+    it "renders the 'welcome' template" do
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("search")
+      expect(assigns[:person]).to be_a(Forms::ConsumerIdentity)
+    end
+  end
+
   describe "GET welcome" do
     login_user
 
