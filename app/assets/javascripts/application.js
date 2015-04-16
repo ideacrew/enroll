@@ -623,9 +623,17 @@ $(document).ready(function () {
     $(this).css('opacity', 1);
   });
 
-  $('#new_person .required').tooltip({placement: 'right', title: 'Required field'});
-  $('input[type="radio"]').tooltip('disable');
-
+  $('#search-employer').click(function(){
+    $('input[type="radio"]').tooltip('disable');
+    $('#personal_info .required').each(function(i, obj){
+      if($(obj).val() == '')
+        $(obj).tooltip({placement: 'right', title: 'Required field'}).tooltip('show');
+    })
+    $('#personal_info .required').bind('mouseenter focusin', function(){
+      $(this).tooltip('show').tooltip('hide');
+    });
+  });
+ 
 });
 
 $(document).ready(function () {

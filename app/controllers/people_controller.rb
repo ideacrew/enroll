@@ -198,6 +198,7 @@ class PeopleController < ApplicationController
       respond_to do |format|
         if member.save and @dependent.save
           @person.person_relationships.create(kind: params[:family_member][:primary_relationship], relative_id: member.id)
+          family.households.first.coverage_households.first.coverage_household_members.find_or_create_by(applicant_id: params[:family_member][:id])
           format.js { flash.now[:notice] = "Family Member Added." }
         else
           format.js { flash.now[:error_msg] = "Error in Family Member Addition. #{member.errors.full_messages}" }
@@ -226,6 +227,7 @@ class PeopleController < ApplicationController
       if !@dependent.is_primary_applicant
         @dependent.destroy
         @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
+        @family.households.first.coverage_households.first.coverage_household_members.where(applicant_id: params[:id]).destroy_all
         @flash = "Family Member Removed"
       else
         @flash = "Primary member can not be deleted"

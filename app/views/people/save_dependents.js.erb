@@ -15,4 +15,5 @@ html = "<div><center>"
 html = html + "</center></div>"
 
 $(".dependent_notice_div_<%= @dependent.id %>").html(html).delay(3200).fadeOut(300);
-$('#add_member_list_<%= @dependent.id %> .close-2').attr('data-confirm', 'Remove <%= @dependent.full_name %>');
+$('#add_member_list_<%= @dependent.id %> .close-2').attr('data-confirm', 'Remove <%= @dependent.full_name %>?');
+$("#last_member").val('');
