@@ -625,11 +625,11 @@ $(document).ready(function () {
 
   $('#search-employer').click(function(){
     $('input[type="radio"]').tooltip('disable');
-    $('#new_person .required').each(function(i, obj){
+    $('#personal_info .required').each(function(i, obj){
       if($(obj).val() == '')
         $(obj).tooltip({placement: 'right', title: 'Required field'}).tooltip('show');
     })
-    $('#new_person .required').bind('mouseenter focusin', function(){
+    $('#personal_info .required').bind('mouseenter focusin', function(){
       $(this).tooltip('show').tooltip('hide');
     });
   });
