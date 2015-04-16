@@ -14,7 +14,7 @@ class Employers::FamilyController < ApplicationController
     @family.attributes = params["employer_census_employee_family"]
     @employer_profile.employee_families << @family
     if @employer_profile.save
-      flash.notice = "Employer Census Family is successfully created."
+      flash[:notice] = "Employer Census Family is successfully created."
       redirect_to employers_employer_profile_path(@employer_profile)
     else
       render action: "new"
@@ -28,7 +28,7 @@ class Employers::FamilyController < ApplicationController
 
   def update
     if @family.update_attributes(census_family_params)
-      flash.notice = "Employer Census Family is successfully updated."
+      flash[:notice] = "Employer Census Family is successfully updated."
       redirect_to employers_employer_profile_path(@employer_profile)
     else
       render action: "edit"
@@ -37,27 +37,36 @@ class Employers::FamilyController < ApplicationController
 
   def destroy
     @family.destroy
-    flash.notice = "Successfully Deleted Employer Census Family."
+    flash[:notice] = "Successfully Deleted Employer Census Family."
     redirect_to employers_employer_profile_path(@employer_profile)
   end
 
   def delink
     @family.delink_employee_role
     @family.save!
-    flash.notice = "Successfully delinked family."
+    flash[:notice] = "Successfully delinked family."
     redirect_to employers_employer_profile_path(@employer_profile)
   end
 
   def terminate
-    # last_day_of_work = param[:employer_census_employee_family][:census_employee_attributes][:terminated_on]
-    last_day_of_work = "03/03/2015".to_date
+    # last_day_of_work = params[:employer_census_employee_family][:census_employee_attributes][:terminated_on]
+    last_day_of_work = 15.days.ago.to_date
     @family.terminate(last_day_of_work)
     @family.save!
-    flash.notice = "Successfully terminated employee."
+    flash[:notice] = "Successfully terminated family."
     redirect_to employers_employer_profile_path(@employer_profile)
   end
 
   def rehire
+    new_family = @family.replicate_for_rehire
+    # new_family.census_employee.hired_on = params[:employer_census_employee_family][:census_employee_attributes][:terminated_on]
+    new_family.census_employee.hired_on = 1.day.ago.to_date
+    @employer_profile.employee_families << new_family
+    if @employer_profile.save
+      flash[:notice] = "Successfully rehired family."
+    else
+      flash[:error] = "Error during rehire."
+    end
     redirect_to employers_employer_profile_path(@employer_profile)
   end
 
@@ -83,7 +92,7 @@ class Employers::FamilyController < ApplicationController
   end
 
   def find_family
-    @family = @employer_profile.employee_families.where(id: params["id"]).to_a.first
+    @family = EmployerCensus::EmployeeFamily.find params["id"]
   end
 
   def set_family_id

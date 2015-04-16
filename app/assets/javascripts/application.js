@@ -183,7 +183,7 @@ $(document).ready(function () {
     }
   });
 
-  $('#continue').click(function() {
+/*  $('#continue').click(function() {
     $("#overlay").css("display", "none");
     $(".welcome-msg").css("display", "none");
     $(".information").removeClass('hidden');
@@ -196,7 +196,7 @@ $(document).ready(function () {
     $(".search-btn-row").css("display", "block");
     $(".personal_info").css("display", "block");
     $(".start").hide();
-  });
+  });*/
 
   $('#personal_info.focus_effect').focusout(function(){
     var tag_id = $(this).attr('id');
@@ -623,9 +623,17 @@ $(document).ready(function () {
     $(this).css('opacity', 1);
   });
 
-  $('#new_person .required').tooltip({placement: 'right', title: 'Required field'});
-  $('input[type="radio"]').tooltip('disable');
-
+  $('#search-employer').click(function(){
+    $('input[type="radio"]').tooltip('disable');
+    $('#personal_info .required').each(function(i, obj){
+      if($(obj).val() == '')
+        $(obj).tooltip({placement: 'right', title: 'Required field'}).tooltip('show');
+    })
+    $('#personal_info .required').bind('mouseenter focusin', function(){
+      $(this).tooltip('show').tooltip('hide');
+    });
+  });
+ 
 });
 
 $(document).ready(function () {
@@ -634,5 +642,17 @@ $(document).ready(function () {
     $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").removeClass('add_focus');
     $(this).removeClass('focus_none');
     $(this).addClass('add_focus');
+  });
+
+  $('.member_address_links').click(function(){
+    var member_id = $(this).data('id');
+    $.ajax({
+      url: '/people/'+member_id+'/get_member',
+      type: 'GET',
+      success: function(response){
+        $('#member_address_area').html(response);
+      }
+    });
+    $('#dLabel').html($(this).text()+"<i class='glyphicon glyphicon-menu-down'></i>");
   });
 });

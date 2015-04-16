@@ -5,10 +5,16 @@
 
 <div class="btn-group" data-toggle="buttons">
   <label class="btn btn-primary">
-    <input type="radio" name="options" id="terminated_no" autocomplete="off" checked> Active
+    <input type="radio" name="options" id="family_all" autocomplete="off"> All
   </label>
   <label class="btn btn-primary active">
-    <input type="radio" name="options" id="terminated_yes" autocomplete="off" > In-active
+    <input type="radio" name="options" id="terminated_no" autocomplete="off" checked> Active
+  </label>
+  <label class="btn btn-primary">
+    <input type="radio" name="options" id="family_waived" autocomplete="off"> Waived
+  </label>
+  <label class="btn btn-primary">
+    <input type="radio" name="options" id="terminated_yes" autocomplete="off" > Terminated
   </label>
 </div>
 
@@ -25,8 +31,8 @@
     </tr>
   </thead>
   <tbody>
-    <% @employer_profile.unscoped_employee_families_sorted.each do |family| %>
-      <tr class=<%="terminated_#{family.terminated}"%>>
+    <% @employer_profile.employee_families_sorted.each do |family| %>
+      <tr class=<%="terminated_#{family.is_terminated?}"%>>
         <td> <%= link_to name_to_listing(family.census_employee), employers_employer_profile_family_path(@employer_profile.id, family.id) %> </td>
         <td><%= number_to_obscured_ssn family.census_employee.ssn %></td>
         <td><%= format_date family.census_employee.dob %> </td>
@@ -34,12 +40,11 @@
         <td><%= family.aasm_state %></td>
         <td><%= boolean_to_human family.is_linked? %></td>
         <td>
-          <%= link_to "Edit", edit_employers_employer_profile_family_path(@employer_profile.id, family.id),
-              class: "btn btn-sm btn-primary" %>
-          <%= link_to "Delink", employers_employer_profile_family_delink_path(@employer_profile.id, family.id), class: "btn btn-sm btn-default", disabled: !family.is_linked? %>
-          <% if family.terminated %>
+          <% if family.is_terminated? %>
             <%= link_to "Rehire", employers_employer_profile_family_rehire_path(@employer_profile.id, family.id), class: "btn btn-sm btn-success" %>
           <% else %>
+            <%= link_to "Edit", edit_employers_employer_profile_family_path(@employer_profile.id, family.id),class: "btn btn-sm btn-primary" %>
+            <%= link_to "Delink", employers_employer_profile_family_delink_path(@employer_profile.id, family.id), class: "btn btn-sm btn-default", disabled: !family.is_linked? %>
             <%= link_to "Terminate", employers_employer_profile_family_terminate_path(@employer_profile.id, family.id), class: "btn btn-sm btn-warning" %>
           <% end %>
         </td>

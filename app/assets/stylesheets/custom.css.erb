@@ -236,9 +236,11 @@ a:hover, a:focus {
 #new_person .select-plan, .coverage-options {
     display: none;
 }
+/*
 #new_person #personal_info, #new_person .search-btn-row {
     display: none;
 }
+*/
 #new_person #employer-info {
     color: #999;
     display: none;
@@ -293,14 +295,17 @@ p.information {
 
 #new_person .required_fields_notice {display: block !important;}
 
-#new_person .employee-info {
+#new_person .employee-info,
+#contact .employee-info {
     border: 2px solid #005fd6;
     opacity: 0.5;
 }
-#new_person .employee-info .top-row {
+#new_person .employee-info .top-row,
+#contact .employee-info .top-row {
     border-color: #007bc3 !important;
 }
-#new_person .employee-info label, .employee-info input {
+#new_person .employee-info label, .employee-info input,
+#contact .employee-info label {
     color: #007bc3 !important;
 }
 .require-field .required {
@@ -2208,9 +2213,12 @@ a .arrow-right {
   margin-top: 184px;
   padding-right: 56px;
 }
+
+/*
 .search-btn-row {
   display: none;
 }
+*/
 
 /* hide the real form element by opacity: 0 and position: absolute - display: block and visibility: hidden do not work because then form elements cannot get the focus and actually get checked or unchecked */
 .skinned-form-controls input[type="checkbox"],
@@ -2563,15 +2571,17 @@ a.close-2{
   }
 }
 
-#new_person .first.employee-info {
+#new_person .first.employee-info, #contact .first.employee-info {
   border-color: #007bc3;
   opacity: 0.5;
 }
-#new_person .employee-info .top-row, #new_person .employee-info .middle-row {
+#new_person .employee-info .top-row, #new_person .employee-info .middle-row,
+#contact .employee-info .top-row, #contact .employee-info .middle-row {
   border-color: #007bc3;
   background: #fff;
 }
-#new_person .employee-info label, #new_person .employee-info input {
+#new_person .employee-info label, #new_person .employee-info input,
+#contact .employee-info label, #contact .employee-info input {
   color: #007bc3 !important;
 }
 
@@ -3041,22 +3051,9 @@ a.close-2{
 
 /* Css for Accout page */
 #home .search-table input[type="text"]{
-  border: none !important;
-  padding: 5px 10px;
-  width: 100%;
-}
-#contact #address_info .adderess-select-box{
-  text-align: left;
-  font-size: 16px;
-  background: url('<%= asset_path('landing-page-delete.png') %>') no-repeat 98% center #fff;
-}
-#contact #address_info ul.dropdown-menu li a{
-  display: block;
-  float: left;
-  margin: 0;
-  padding-left: 10px;
-  text-align: left;
-  width: 100%;
+  /*border: none;*/
+  /*padding: 5px 10px;*/
+  /*width: 100%;*/
 }
 #home .landing-row .search-table .adderess-select-box > a{
   padding-top: 14px;

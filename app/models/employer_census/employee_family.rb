@@ -35,6 +35,8 @@ class EmployerCensus::EmployeeFamily
   scope :linked,      ->{ where(:is_linked => true) }
   scope :unlinked,    ->{ where(:is_linked => false) }
 
+  scope :order_by_last_name, -> { order(:"census_employee.last_name".asc) }
+
   # Initialize a new, refreshed instance for rehires via deep copy
   def replicate_for_rehire
     new_family = self.dup
@@ -42,12 +44,12 @@ class EmployerCensus::EmployeeFamily
     new_family.terminated = false
 
     if self.census_employee.present?
-      new_family.census_employee = self.census_employee
+      # new_family.census_employee = self.census_employee
       new_family.census_employee.hired_on = nil
       new_family.census_employee.terminated_on = nil
     end
 
-    new_family.census_dependents = self.census_dependents unless self.census_dependents.blank?
+    # new_family.census_dependents = self.census_dependents unless self.census_dependents.blank?
     new_family
   end
 
@@ -138,7 +140,12 @@ class EmployerCensus::EmployeeFamily
     def find_by_employee_role(employee_role)
       organizations = Organization.where("employer_profile.employee_families.employee_role_id" => employee_role._id).to_a
       return nil if organizations.size != 1
-      organizations.first.employer_profile.employee_families.detect { | family | family.employee_role_id == employee_role._id }
+      organizations.first.employer_profile.employee_families.unscoped.detect { | family | family.employee_role_id == employee_role._id }
+    end
+
+    def find(id)
+      organizations = Organization.where("employer_profile.employee_families._id" => BSON::ObjectId.from_string(id))
+      organizations.size > 0 ? organizations.first.employer_profile.employee_families.unscoped.detect { |family| family._id.to_s == id} : nil
     end
   end
 

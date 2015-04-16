@@ -1,3 +1,4 @@
+@watir
 Feature: Employee Sign Up
   In order to get access to the site
   As an employee

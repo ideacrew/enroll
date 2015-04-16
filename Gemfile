@@ -81,22 +81,22 @@ group :development, :test do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
 
-# Use Capistrano for deployment
+  # Use Capistrano for deployment
   gem 'capistrano', '3.3.5'
   gem 'capistrano-rails', '~> 1.1.2'
   gem 'ruby-progressbar', '1.6.0'
 
+  # Keep these in Development and Test environments for access by rails generators 
   gem 'rspec-rails', '~> 3.1.0'
-  # gem 'mongoid-rspec' # causes issue: irb: warn: can't alias context from irb_context
-  gem 'cucumber-rails', '~> 1.4.2', :require => false
   gem 'factory_girl_rails', "~> 4.0"
-  gem 'database_cleaner', '1.3.0'
-  gem 'shoulda-matchers', require: false
 end
 
 group :test do
   gem 'mongoid-rspec'
   gem 'watir'
+  gem 'cucumber-rails', '~> 1.4.2', :require => false
+  gem 'database_cleaner', '1.3.0'
+  gem 'shoulda-matchers', require: false
 end
 
 group :production do

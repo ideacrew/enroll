@@ -92,11 +92,7 @@ class EmployerProfile
 
   # TODO: Benchmark this for efficiency
   def employee_families_sorted
-    employee_families.order_by(:"census_employee.last_name".asc)
-  end
-
-  def unscoped_employee_families_sorted
-    employee_families.unscoped.order_by(:"census_employee.last_name".asc)
+    employee_families.unscoped.order_by_last_name
   end
 
   def latest_plan_year
