@@ -16,4 +16,14 @@ $(document).ready(function () {
 		$('.new-employer-alert').remove();
 	});
 
+
+	// Go to latest clicked tab.
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		localStorage.setItem('lastTab', $(e.target).attr('id'));
+	});
+
+	var lastTab = localStorage.getItem('lastTab');
+	if (lastTab) {
+	  $('#'+lastTab).tab('show');
+	}
 });
