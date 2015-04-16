@@ -24,6 +24,7 @@ Rails.application.routes.draw do
     resources :employee, :controller=>"employee_roles" do
       collection do
         get 'welcome'
+        get 'search'
       end
     end
   end
