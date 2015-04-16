@@ -1,4 +1,4 @@
-<li id="add_member_list_<%= dependent.id %>" style="padding: 0;border-radius: 0;border: none;margin-bottom: 20px;">
+<li id="add_member_list_<%= dependent.id %>" class="dependent_list" style="padding: 0;border-radius: 0;border: none;margin-bottom: 20px;">
   <div id="add_info" class=" focus_effect row personaol-info-row">
     <div id="add_info_clone0">
     <div class="house col-md-12 col-sm-12 col-xs-12 no-pd first">
@@ -81,16 +81,16 @@
       </div>
     </div>
   </div>
+  <script type="text/javascript" charset="utf-8">
+    $(".date-picker, .date_picker").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()
+     });
+     $('.floatlabel').floatlabel({
+          slideInput: false
+     });
+     $('.house').addClass('employee-info');
+     $(".mask-ssn").mask("999999999");
+  </script>
 </li>
-<script type="text/javascript" charset="utf-8">
-  $(".date-picker, .date_picker").datepicker({
-      changeMonth: true,
-      changeYear: true,
-      yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()
-   });
-   $('.floatlabel').floatlabel({
-        slideInput: false
-   });
-   $('.house').addClass('employee-info');
-   $(".mask-ssn").mask("999999999");
-</script>
