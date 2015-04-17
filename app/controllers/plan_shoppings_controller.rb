@@ -10,7 +10,15 @@ class PlanShoppingsController < ApplicationController
     @plan = PlanCostDecorator.new(@plan, @hbx_enrollment, @benefit_group, @reference_plan)
     UserMailer.plan_shopping_completed(current_user, @hbx_enrollment, @plan).deliver_now
 
-    redirect_to person_person_landing_path(@person)
+    redirect_to thankyou_plan_shopping_path(id: @person)
+    #redirect_to person_person_landing_path(@person)
+  end
+
+  def thankyou
+    @person = find_person(params[:id])
+    respond_to do |format| 
+      format.html { render 'plan_shopping/thankyou.html.erb' }
+    end
   end
 
   def find_person(id)

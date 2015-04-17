@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   resource :plan_shopping do
     member do
       post 'checkout'
+      get 'thankyou'
     end
   end
 
