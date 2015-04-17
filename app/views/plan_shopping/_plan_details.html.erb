@@ -1,5 +1,7 @@
 <!-- Plan first row start -->
-<div class="plan-row" data-plan-category="<%= plan.plan_type ? plan.plan_type.downcase : "" %>">
+<div class="plan-row"
+	data-plan-category="<%= plan.plan_type ? plan.plan_type.downcase : "" %>"
+	data-plan-metal-level="<%= plan.metal_level.downcase %>">
   <div class="row">
     <div class="col-md-6 col-sm-9 col-xs-12">
       <p>

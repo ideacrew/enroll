@@ -5,24 +5,38 @@ function hidePlanTabs() {
   });
 }
 
+function combineAllPlanSelectors(planSelectors) {
+	var selectors = [];
+	var baseSelector = $(".plan-row");
+	var combinedSelectors = baseSelector;
+        combinedSelectors.hide();
+		for (var i = 0; i < planSelectors.length; i++) {
+			combinedSelectors = combinedSelectors.filter(planSelectors[i]);
+		}
+	combinedSelectors.show();
+}
+
 function applyPlanFilterCBs(cbKlass, cbFilterKlass, planValueTag) {
 	var selectedPlanTypes = [];
 	var spCheckboxes = $('input.' + cbKlass + ':checked');
 	if (spCheckboxes.size() > 0) {
-		$(".plan-row").hide();
 		spCheckboxes.each(function(idx, ele) {
 			var ptName = $(ele).attr(cbFilterKlass);
-			var qstring = ".plan-row[" + planValueTag  + "='" + ptName + "']";
-			$(qstring).show();
-
+			var qstring = "[" + planValueTag  + "='" + ptName + "']";
+                        selectedPlanTypes.push(qstring);
 		});
+                return $(selectedPlanTypes.join(", "));
 	} else {
-		$(".plan-row").show();
+		return $("[" + planValueTag + "]");
 	}
 }
 
 function applyPlanFilters() {
-	applyPlanFilterCBs("plan-type-selection-filter", "data-plan-category-filter", "data-plan-category");
+	var all_selectors = [ 
+	  applyPlanFilterCBs("plan-type-selection-filter", "data-plan-category-filter", "data-plan-category"),
+	  applyPlanFilterCBs("plan-metal-level-selection-filter", "data-plan-metal-level-filter", "data-plan-metal-level")
+	];
+        combineAllPlanSelectors(all_selectors);
 }
 
 var plansToCompareArray = new Array();
