@@ -41,5 +41,9 @@ module Forms
         :ssn => ssn        
       }).first
     end
+
+    def persisted?
+      false
+    end
   end
 end

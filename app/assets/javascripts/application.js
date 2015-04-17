@@ -25,10 +25,7 @@
 $('input.floatlabel').floatlabel();
 
 $(document).ready(function () {
-  $("#new_person #address_info").addClass('hidden');
-  $("#new_person #phone_info").addClass('hidden');
-  $("#new_person #email_info").addClass('hidden');
-  
+
   $(".date-picker, .date_picker").datepicker({
     changeMonth: true,
     changeYear: true,
@@ -82,76 +79,7 @@ $(document).ready(function () {
     });
   }
   
-  /* Match Person */
-  $('#search-employer').click(function() {
-    match_person();
-  });
-  
-  function match_person()
-  {
-    gender_checked = $("#person_gender_male").prop("checked") || $("#person_gender_female").prop("checked");
-    
-    if(check_personal_info_exists().length==0 && gender_checked)
-    {
-      $('.employers-row').html("");
-      $('#personal_info .employee-info').removeClass('require-field');
-
-      $.ajax({
-        type: "POST",
-        url: "/people/match_person.json",
-        data: $('#new_person').serialize(),
-        success: function (result) {
-          // result.person gives person info to populate
-          if(result.matched == true)
-          {
-            person = result.person;
-            $("#people_id").val(person._id);
-            _getEmployers();
-            
-            // $('#key-section').removeClass('hidden');
-            // $('#house_info, #add_info, #top-pad30, #top-pad80, #top-pad85').hide();
-            // $('a.one, a.two').css("color", "#00b22d");
-          }
-          else
-          {
-            $('.search_results').removeClass('hidden');
-            $('.employers-row').html("");
-            $('.fail-search').removeClass('hidden');
-          }
-
-          //Sidebar Switch - Search Active
-          // $('#personal_sidebar').removeClass('hidden');
-          //$('#search_sidebar').addClass('hidden');
-          $(".overlay-in").css("display", "block");
-        }
-      });  
-    } else {
-      $('#personal_info .employee-info').addClass('require-field');
-    }
-  }
-  
-  function _getEmployers()
-  {
-    common_body_style();
-    side_bar_link_style();
-
-    // $('.search_alert_msg').removeClass('hidden');
-    // $('.searching_span').text('Searching');
-    // $('.search_alert_msg').addClass('hidden');
-    getAllEmployers();
-  }
-  
-  function getAllEmployers()
-  {
-    $.ajax({
-      type: "GET",
-      data:{id: $("#people_id").val()},
-      url: "/people/get_employer.js",
-    });
-  }
-
   // People/new Page
-
   $('.back').click(function() {
     //Sidebar Switch - Personal Active
     $('#personal_sidebar').removeClass('hidden');
@@ -164,17 +92,17 @@ $(document).ready(function () {
     $('#email_info').removeClass('hidden');
   });
 
-  $('#new_person .focus_effect').click(function(e){
+  $('.focus_effect').click(function(e){
     var check = check_personal_info_exists();
     active_div_id = $(this).attr('id');
     if( check.length==0 && (!$('.autofill-failed').hasClass('hidden') || $('.autofill-cloud').hasClass('hidden'))) {
-      $('.focus_effect').removeClass('personaol-info-top-row');
-      $('.focus_effect').removeClass('personaol-info-row');
-      $('.focus_effect').addClass('personaol-info-row');
-      $(this).addClass('personaol-info-top-row');
+      $('.focus_effect').removeClass('personal-info-top-row');
+      $('.focus_effect').removeClass('personal-info-row');
+      $('.focus_effect').addClass('personal-info-row');
+      $(this).addClass('personal-info-top-row');
       $('.sidebar a').removeClass('style_s_link');
       $('.sidebar a.'+active_div_id).addClass('style_s_link');
-      $(this).removeClass('personaol-info-row');
+      $(this).removeClass('personal-info-row');
     }
     if(active_div_id!='personal_info') {
       if(check.length!=0) {
@@ -183,24 +111,9 @@ $(document).ready(function () {
     }
   });
 
-/*  $('#continue').click(function() {
-    $("#overlay").css("display", "none");
-    $(".welcome-msg").css("display", "none");
-    $(".information").removeClass('hidden');
-    $("a.name").css("padding-top", "30px");
-    $(".disable-btn").css("display", "inline-block");
-    $('.focus_effect:first').addClass('personaol-info-top-row');
-    $('.focus_effect:first').removeClass('personaol-info-row');
-    $('.sidebar a:first').addClass('style_s_link');
-    $("#personal_info").css("display", "block");
-    $(".search-btn-row").css("display", "block");
-    $(".personal_info").css("display", "block");
-    $(".start").hide();
-  });*/
-
   $('#personal_info.focus_effect').focusout(function(){
     var tag_id = $(this).attr('id');
-    var has_class = $(this).hasClass('personaol-info-top-row');
+    var has_class = $(this).hasClass('personal-info-top-row');
     var check = check_personal_info_exists();
     if(check.length!=0 && !has_class) {
       $('#personal_info .col-md-10').addClass('require-field');
@@ -224,10 +137,10 @@ $(document).ready(function () {
   function common_body_style()
   {
 
-    $('#personal_info').addClass('personaol-info-row');
-    $('.focus_effect').removeClass('personaol-info-top-row');
-    $('#address_info').addClass('personaol-info-top-row');
-    $('#address_info').removeClass('personaol-info-row');
+    $('#personal_info').addClass('personal-info-row');
+    $('.focus_effect').removeClass('personal-info-top-row');
+    $('#address_info').addClass('personal-info-top-row');
+    $('#address_info').removeClass('personal-info-row');
   }
 
   function check_personal_info_exists()
@@ -300,19 +213,6 @@ $(document).ready(function () {
   
   $(".close-fail").click(function() {
     $(".fail-search").addClass('hidden');
-    // $("#overlay").css("display", "none");
-    // $(".welcome-msg").css("display", "none");
-    // $(".information").css("opacity", "1");
-    // $("a.name").css("padding-top", "30px");
-    // $(".disable-btn").css("display", "inline-block");
-    // $('.focus_effect:first').addClass('personaol-info-top-row');
-    // $('.focus_effect:first').removeClass('personaol-info-row');
-    // $('.sidebar a:first').addClass('style_s_link');
-    // $("#personal_info").css("opacity", "1");
-    // $(".search-btn-row").css("display", "block");
-    // $(".disable-btn, #key-section").hide();
-    // $('.personal_info').addClass('style_s_link');
-    // $("#personal_info .first").removeClass('employee-info');
     $(".overlay-in").css("display", "none");
   });
   
@@ -324,39 +224,29 @@ $(document).ready(function () {
       $('#personal_info div.first').addClass('employee-info');
       $("a.personal_info").css("color","#98cbff");
       $("#personal_info div.first").css("opacity","1");
-      // $("a.three").css("color","#00b420");
-      // $("#top-pad15").show();
     } 
     else if (e.target.id == "address_info" || $(e.target).parents("#address_info").size()) {
       $('#address_info div.first').addClass('employee-info');
       $("a.address_info").css("color","#98cbff");
-      // $("a.three").css("color","#00b420");
       $("#address_info div.first").css("opacity","1");
       $("#top-pad").innerHTML="30%";
-      // $("#top-pad30").show();
     }
     else if (e.target.id == "phone_info" || $(e.target).parents("#phone_info").size()) {
       $('#phone_info div.first').addClass('employee-info');
       $("a.phone_info").css("color","#98cbff");
-      // $("a.four").css("color","#00b420");
       $("#phone_info div.first").css("opacity","1");
-      // $("#top-pad80").show();
     }
     else if (e.target.id == "email_info" || $(e.target).parents("#email_info").size()) {
       $('#email_info div.first').addClass('employee-info');
       $("a.email_info").css("color","#98cbff");
-      // $("a.five").css("color","#00b420");
       $("#email_info div.first").css("opacity","1");
-      // $("#top-pad85").show();
     }
     else if (e.target.id == "household_info" || $(e.target).parents("#household_info").size()) {
       $('#household_info div.first').addClass('employee-info');
       $("a.household_info").css("color","#98cbff");
       $("#household_info div.first").css("opacity","1");
     }
-    else {
-      // $("#top-pad15").show();
-    }
+    else {}
   });
   
   function fade_all() {
@@ -483,6 +373,7 @@ $(document).ready(function () {
   
   $('#cancel_member').click(function() {
     $("#dependent_buttons div:first").removeClass('hidden');
+    $(".add_member").removeClass('hidden');
     $('#dependent_buttons div:last').addClass('hidden');
     
     var last_dependent = '$("#add_member_list_' + $('#last_member').val() + '")';
@@ -563,15 +454,6 @@ $(document).ready(function () {
     }
   });
   
-  // $('.new-address-flow p a.confirm').click(function(){
-  //   var address_name = $('.address_name').val();
-  //   if(address_name.length!=0) {
-  //     var new_option = "<li class='address-li' data-address-text='"+address_name+"Address' data-value='"+address_name+"' role='presentation'><a role='menuitem' href='javascript:void(0)'>"+address_name+"</a></li>";
-  //     $(".address ul").prepend(new_option);
-  //     $(".new-address-flow").removeAttr("style");
-  //   }
-  // });
-
   // Change Dropdown Address Text
   $('.address-li').on('click', function(){
     $("#dropdownMenu1 label").text($(this).text());
@@ -623,13 +505,13 @@ $(document).ready(function () {
     $(this).css('opacity', 1);
   });
 
-  $('#search-employer').click(function(){
+  $('#search-employer,#save_member').click(function(){
     $('input[type="radio"]').tooltip('disable');
-    $('#personal_info .required').each(function(i, obj){
+    $('.required-tooltip .required').each(function(i, obj){
       if($(obj).val() == '')
         $(obj).tooltip({placement: 'right', title: 'Required field'}).tooltip('show');
     })
-    $('#personal_info .required').bind('mouseenter focusin', function(){
+    $('.required-tooltip .required').bind('mouseenter focusin', function(){
       $(this).tooltip('show').tooltip('hide');
     });
   });

@@ -293,19 +293,19 @@ p.information {
     width: 210px;
 }
 
-#new_person .required_fields_notice {display: block !important;}
 
-#new_person .employee-info,
-#contact .employee-info {
+.personal-info-row .first.employee-info {
+  border: 2px solid #e3e3e3;
+}
+.personal-info-top-row .required_fields_notice {display: block !important;}
+.personal-info-top-row .first.employee-info {
     border: 2px solid #005fd6;
     opacity: 0.5;
 }
-#new_person .employee-info .top-row,
-#contact .employee-info .top-row {
+.personal-info-top-row .employee-info .top-row {
     border-color: #007bc3 !important;
 }
-#new_person .employee-info label, .employee-info input,
-#contact .employee-info label {
+.personal-info-top-row .employee-info label, .employee-info input {
     color: #007bc3 !important;
 }
 .require-field .required {
@@ -1256,7 +1256,7 @@ input.floatlabe{
   color: #ccc;
   opacity: 1;
 }
-.personaol-info-top-row input {
+.personal-info-top-row input {
   border: 2px solid #0079c5 !important;
   border-radius: 0;
 }
@@ -1267,33 +1267,33 @@ input.floatlabe{
   transition: border-color 0.3s ease-in-out 0s, box-shadow 0.3s ease-in-out 0s, background 0.3s ease-in-out 0s !important;
   box-shadow: none;
 }
-.personaol-info-top-row .radio {
+.personal-info-top-row .radio {
   border: 1px solid #999;
 }
-.personaol-info-row .form-group {
+.personal-info-row .form-group {
   margin-bottom: 0;
   background: #fff;
 }
-.personaol-info-top-row .form-group {
+.personal-info-top-row .form-group {
   margin-bottom: 0;
   background: #fff;
 }
-.personaol-info-row .border-bottom-none {
+.personal-info-row .border-bottom-none {
   border-bottom: none !important;
 }
-.personaol-info-row .border-right-none {
+.personal-info-row .border-right-none {
   border-right: none !important;
 }
-.personaol-info-row .border-left-none {
+.personal-info-row .border-left-none {
   border-left: none !important;
 }
-.personaol-info-top-row .border-bottom-none {
+.personal-info-top-row .border-bottom-none {
   border-bottom: none !important;
 }
-.personaol-info-top-row .border-right-none {
+.personal-info-top-row .border-right-none {
   border-right: none !important;
 }
-.personaol-info-top-row .border-left-none {
+.personal-info-top-row .border-left-none {
   border-left: none !important;
 }
 .row.check {
@@ -1366,16 +1366,16 @@ input.floatlabe{
   background: #008c00;
   margin-left: 10px;
   margin-top: 30px;
-  display: none;
+/*  display: none;*/
   position: absolute;
   top: -72px;
   right: -112px;
   font-weight: normal;
 }
-.personaol-info-top-row .adderess-select-box {
+.personal-info-top-row .adderess-select-box {
   border-color: #999 !important;
 }
-.personaol-info-row input[type="text"] {
+.personal-info-row input[type="text"] {
   font-size: 14px;
   color: #616161;
   padding-bottom: 7px; 
@@ -1406,13 +1406,13 @@ div#house_info > p {
   -ms-transition: border-color 0.3s ease-in-out 0s !important;
 }
 
-.personaol-info-top-row .first {
+.personal-info-top-row .first {
   border: 1px solid #999; 
 }
-.personaol-info-row .top-row, .personaol-info-row .middle-row {
+.personal-info-row .top-row, .personal-info-row .middle-row {
   border-bottom: 1px solid #e3e3e3; 
 }
-.personaol-info-top-row .top-row, .personaol-info-top-row .middle-row {
+.personal-info-top-row .top-row, .personal-info-top-row .middle-row {
   border-bottom: 1px solid #999;
   background: #fff;
 }
@@ -1562,7 +1562,7 @@ div#house_info > p {
   .result-row .right h6 {
     margin: 30px 0 27px;
   }
-  .personaol-info-top-row .name-row .border-right-none {
+  .personal-info-top-row .name-row .border-right-none {
     border-color: #999 !important;
   }  
 
@@ -2050,16 +2050,16 @@ p.success-text {
   padding: 6px 40px;
   display: none;
 }
-.employer-section .personaol-info-top-row .form-control::-moz-placeholder {
+.employer-section .personal-info-top-row .form-control::-moz-placeholder {
   color: #a1a1a1;
 }
-.employer-section .personaol-info-top-row .form-control:-ms-input-placeholder {
+.employer-section .personal-info-top-row .form-control:-ms-input-placeholder {
   color: #a1a1a1;
 }
-.employer-section .personaol-info-top-row .form-control:-webkit-input-placeholder {
+.employer-section .personal-info-top-row .form-control:-webkit-input-placeholder {
   color: #a1a1a1;
 }
-.employer-section .personaol-info-top-row .form-control:-o-input-placeholder {
+.employer-section .personal-info-top-row .form-control:-o-input-placeholder {
   color: #a1a1a1;
 }
 .emp-sidebar a.style_s_link{
@@ -2091,7 +2091,7 @@ a .arrow-right {
 .plan-selection {
   color: #ccc;
 }
-.personaol-info-top-row .plan-selection {
+.personal-info-top-row .plan-selection {
   color: #bbb;
 }
 .plan-selection + ul {
@@ -2472,7 +2472,17 @@ a.close-2{
 .adderess-select-box:focus {
   background: none;
 }
+
 .dropdown-menu {padding: 0;}
+#bs-example-navbar-collapse-1 .dropdown-menu {
+  padding: 5px 0;
+}
+
+#bs-example-navbar-collapse-1 .dropdown-menu > li > a:hover, #bs-example-navbar-collapse-1 .dropdown-menu > li > a:focus {
+    background-color: #f5f5f5;
+    color: #262626;
+    text-decoration: none;
+}
 
 #email_error {
   left: 10px;
@@ -2571,17 +2581,15 @@ a.close-2{
   }
 }
 
-#new_person .first.employee-info, #contact .first.employee-info {
+.personal-info-top-row .first.employee-info {
   border-color: #007bc3;
   opacity: 0.5;
 }
-#new_person .employee-info .top-row, #new_person .employee-info .middle-row,
-#contact .employee-info .top-row, #contact .employee-info .middle-row {
+.personal-info-top-row .employee-info .top-row, .personal-info-top-row .employee-info .middle-row {
   border-color: #007bc3;
   background: #fff;
 }
-#new_person .employee-info label, #new_person .employee-info input,
-#contact .employee-info label, #contact .employee-info input {
+.personal-info-top-row .employee-info label, .personal-info-top-row .employee-info input {
   color: #007bc3 !important;
 }
 
