@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
   describe "GET search" do
-    login_user
 
     before(:each) do
+      sign_in
       get :search
     end
 
@@ -16,9 +16,9 @@ RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
   end
 
   describe "GET welcome" do
-    login_user
 
     before(:each) do
+      sign_in
       get :welcome
     end
 
