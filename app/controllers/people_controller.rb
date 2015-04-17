@@ -28,51 +28,6 @@ class PeopleController < ApplicationController
     # }
   end
 
-  # Uses identifying information to return single pre-existing Person instance if already in DB
-  def match_person
-    @person = Person.new(person_params)
-
-    @employee_family = EmployerProfile.find_census_families_by_person(@person).first
-    # matched_person = Person.match_by_id_info(@person)
-
-    if @employee_family.blank?
-      # Preexisting Person not found, create new instance and return to complete form entry
-      respond_to do |format|
-        format.json { render json: { person: @person, matched: false}, status: :ok, location: @person }
-      end
-    elsif @employee_family.is_linked?
-      
-      @employee_role = @employee_family.linked_employee_role
-
-      respond_to do |format|
-        # @person = @employee_role.person
-        # build_nested_models
-        format.json { render json: { person: @employee_role.person, matched: true}, status: :ok, location: @employee_role.person, matched: true }
-      end
-    else
-      # Matched Person, autofill form with found attributes
-      enroll_parms = {}
-      enroll_parms[:user] = current_user
-      enroll_parms[:employer_profile] = @employee_family.employer_profile
-      enroll_parms[:ssn] = @person.ssn
-      enroll_parms[:last_name] = @person.last_name
-      enroll_parms[:first_name] = @person.first_name
-      enroll_parms[:gender] = @person.gender
-      enroll_parms[:dob] = @person.dob
-      enroll_parms[:name_sfx] = @person.name_sfx
-      enroll_parms[:name_pfx] = @person.name_pfx
-      enroll_parms[:hired_on] = @employee_family.census_employee.hired_on
-
-      @employee_role, @family = EnrollmentFactory.add_employee_role(enroll_parms)
-
-      respond_to do |format|
-        # @person = @employee_role.person
-        # build_nested_models
-        format.json { render json: { person: @employee_role.person, matched: true}, status: :ok, location: @employee_role.person, matched: true }
-      end
-    end
-  end
-
   def register_employee_dependents
     @family = Family.find(params[:id])
     @employee_role = EmployeeRole.find(params[:id])
@@ -107,19 +62,6 @@ class PeopleController < ApplicationController
   end
 
   def link_employer
-  end
-
-  def get_employer
-    @person = Person.find(params[:id])
-    build_nested_models
-    @employer_profile = EmployerProfile.find_all_by_person(@person).first
-    @benefit_group = @employer_profile.latest_plan_year.benefit_groups.first
-    @census_family = EmployerProfile.find_census_families_by_person(@person).first
-    @effective_on = @benefit_group.effective_on_for(@census_family.census_employee.hired_on)
-
-    respond_to do |format|
-      format.js {}
-    end
   end
 
   def person_confirm
