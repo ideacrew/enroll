@@ -1,6 +1,6 @@
 module Services
   class EmployeeSignupMatch
-    def initialize(form_factory = Factories::EmployeeSignup)
+    def initialize(form_factory = Factories::MatchedEmployee)
       @form_factory = form_factory.new
     end
 

@@ -32,19 +32,19 @@ class Consumer::EmployeeRolesController < ApplicationController
 
   private
 
-  	  def build_nested_models
+  def build_nested_models
 
-	    ["home","mobile","work","fax"].each do |kind|
-	       @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
-	    end
+    ["home","mobile","work","fax"].each do |kind|
+      @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
+    end
 
-	    Address::KINDS.each do |kind|
-	      @person.addresses.build(kind: kind) if @person.addresses.select{|address| address.kind == kind}.blank?
-	    end
+    Address::KINDS.each do |kind|
+      @person.addresses.build(kind: kind) if @person.addresses.select{|address| address.kind == kind}.blank?
+    end
 
-	    ["home","work"].each do |kind|
-	       @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
-	    end
-	  end
+    ["home","work"].each do |kind|
+      @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
+    end
+  end
 
 end

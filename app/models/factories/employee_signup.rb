@@ -60,7 +60,7 @@ module Factories
     end
 
     def copy_emails(form, person)
-
+      
     end
   end
 end
