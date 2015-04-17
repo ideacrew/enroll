@@ -39,6 +39,7 @@ class EmployerCensus::EmployeeFamily
 
   # Initialize a new, refreshed instance for rehires via deep copy
   def replicate_for_rehire
+    return nil if is_active?  # if user clicks on rehire again after creating an active family.
     new_family = self.dup
     new_family.delink_employee_role
     new_family.terminated = false
@@ -51,6 +52,11 @@ class EmployerCensus::EmployeeFamily
 
     # new_family.census_dependents = self.census_dependents unless self.census_dependents.blank?
     new_family
+  end
+
+# A family that is in active state.
+  def is_active?
+    EmployerProfile.find_census_families_by_person(census_employee).present?
   end
 
   def parent
