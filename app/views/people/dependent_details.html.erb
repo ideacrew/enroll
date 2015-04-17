@@ -92,7 +92,7 @@
       <div class="col-md-10 col-sm-12">
         <div class="col-md-9 col-sm-9 col-xs-12 no-pd">
 
-          <div id="house_info" class="focus_effect row personaol-info-row">
+          <div id="house_info" class="focus_effect row personal-info-row">
             <p class="information row">Household Information</p>
 
               <div class="house col-md-12 col-sm-12 col-xs-12 no-pd first">
@@ -133,7 +133,7 @@
             <input type="hidden" id="last_member" value="">
         </ul>
 
-      <div id="dependent_buttons" class="focus_effect row personaol-info-row <%= 'hidden' if @family.family_members.empty? %>">
+      <div id="dependent_buttons" class="focus_effect row personal-info-row <%= 'hidden' if @family.family_members.empty? %>">
         <div class="col-md-12 no-pd col-sm-12 col-xs-12">
           <% add_member_url = add_dependents_people_path(person_id: params[:person_id], organization_id: params[:organization_id], employee_id: @employee_role.id) %>
           <%= link_to "Add Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>

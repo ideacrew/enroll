@@ -271,6 +271,7 @@ class PeopleController < ApplicationController
     @person.emails.each {|email| email.delete}
 
     @person.updated_by = current_user.email unless current_user.nil?
+    # fail
     respond_to do |format|
       if @person.update_attributes(person_params)
         format.html { redirect_to consumer_employee_path(@person), notice: 'Person was successfully updated.' }

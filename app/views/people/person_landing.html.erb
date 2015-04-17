@@ -139,7 +139,7 @@
                   </div>
                   <div class="tab-content" id="myTabContent1">
                     <div aria-labelledby="personal-tab" id="personal" class="tab-pane fade in active" role="tabpanel">
-                      <div id="personal_info" class="focus_effect row personaol-info-top-row">
+                      <div id="personal_info" class="focus_effect row personal-info-top-row">
                         <div class="col-md-8 no-pd col-sm-8 col-xs-12">
                           <div class="table-responsive first landing_personal_tab">
                             <%= render 'people/landing_pages/personal' %>
@@ -177,7 +177,7 @@
                           <%= render 'shared/address_fields', f: f %><br>
                           <%= render 'shared/phone_fields', f: f %><br>
 
-                          <div id="email_info" class="focus_effect row personaol-info-row">
+                          <div id="email_info" class="focus_effect row personal-info-row">
                             <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
                               <%= render 'shared/email_fields', f: email %>
                             <% end %>

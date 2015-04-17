@@ -217,7 +217,7 @@
                   </div>
                   <div class="tab-content" id="myTabContent1">
                     <div aria-labelledby="personal-tab" id="personal" class="tab-pane fade in active" role="tabpanel">
-                      <div id="personal_info" class="focus_effect row personaol-info-top-row">
+                      <div id="personal_info" class="focus_effect row personal-info-top-row">
                         <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
                           <div class="table-responsive">
                             <%= render 'people/landing_pages/personal' %> 
@@ -236,7 +236,7 @@
                       <%= render 'people/landing_pages/family_members' %> 
                     </div>
                     <div aria-labelledby="contact-tab" id="contact" class="tab-pane fade" role="tabpanel">
-                      <div id="address_info" class="focus_effect row personaol-info-top-row">
+                      <div id="address_info" class="focus_effect row personal-info-top-row">
                         <div class="col-md-10 no-pd col-sm-12 col-xs-12 first">
                           <div class="row top-row">
                             <div class="col-md-9 col-sm-9 col-xs-12 form-group form-group-lg no-pd address">
@@ -273,11 +273,11 @@
                         </div>
                       </div>
                       <br>
-                      <div id="phone_info" class="focus_effect row personaol-info-top-row">
+                      <div id="phone_info" class="focus_effect row personal-info-top-row">
                          <%= render 'people/landing_pages/phone' %> 
                       </div>
                       <br>                      
-                     <div id="email_info" class="focus_effect row personaol-info-top-row">
+                     <div id="email_info" class="focus_effect row personal-info-top-row">
                       <% @person.emails.each do |email| %>
                        <% if email.address.present? %>
                         <div class="email">

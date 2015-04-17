@@ -168,13 +168,13 @@ $(document).ready(function () {
     var check = check_personal_info_exists();
     active_div_id = $(this).attr('id');
     if( check.length==0 && (!$('.autofill-failed').hasClass('hidden') || $('.autofill-cloud').hasClass('hidden'))) {
-      $('.focus_effect').removeClass('personaol-info-top-row');
-      $('.focus_effect').removeClass('personaol-info-row');
-      $('.focus_effect').addClass('personaol-info-row');
-      $(this).addClass('personaol-info-top-row');
+      $('.focus_effect').removeClass('personal-info-top-row');
+      $('.focus_effect').removeClass('personal-info-row');
+      $('.focus_effect').addClass('personal-info-row');
+      $(this).addClass('personal-info-top-row');
       $('.sidebar a').removeClass('style_s_link');
       $('.sidebar a.'+active_div_id).addClass('style_s_link');
-      $(this).removeClass('personaol-info-row');
+      $(this).removeClass('personal-info-row');
     }
     if(active_div_id!='personal_info') {
       if(check.length!=0) {
@@ -189,8 +189,8 @@ $(document).ready(function () {
     $(".information").removeClass('hidden');
     $("a.name").css("padding-top", "30px");
     $(".disable-btn").css("display", "inline-block");
-    $('.focus_effect:first').addClass('personaol-info-top-row');
-    $('.focus_effect:first').removeClass('personaol-info-row');
+    $('.focus_effect:first').addClass('personal-info-top-row');
+    $('.focus_effect:first').removeClass('personal-info-row');
     $('.sidebar a:first').addClass('style_s_link');
     $("#personal_info").css("display", "block");
     $(".search-btn-row").css("display", "block");
@@ -200,7 +200,7 @@ $(document).ready(function () {
 
   $('#personal_info.focus_effect').focusout(function(){
     var tag_id = $(this).attr('id');
-    var has_class = $(this).hasClass('personaol-info-top-row');
+    var has_class = $(this).hasClass('personal-info-top-row');
     var check = check_personal_info_exists();
     if(check.length!=0 && !has_class) {
       $('#personal_info .col-md-10').addClass('require-field');
@@ -224,10 +224,10 @@ $(document).ready(function () {
   function common_body_style()
   {
 
-    $('#personal_info').addClass('personaol-info-row');
-    $('.focus_effect').removeClass('personaol-info-top-row');
-    $('#address_info').addClass('personaol-info-top-row');
-    $('#address_info').removeClass('personaol-info-row');
+    $('#personal_info').addClass('personal-info-row');
+    $('.focus_effect').removeClass('personal-info-top-row');
+    $('#address_info').addClass('personal-info-top-row');
+    $('#address_info').removeClass('personal-info-row');
   }
 
   function check_personal_info_exists()
@@ -305,8 +305,8 @@ $(document).ready(function () {
     // $(".information").css("opacity", "1");
     // $("a.name").css("padding-top", "30px");
     // $(".disable-btn").css("display", "inline-block");
-    // $('.focus_effect:first').addClass('personaol-info-top-row');
-    // $('.focus_effect:first').removeClass('personaol-info-row');
+    // $('.focus_effect:first').addClass('personal-info-top-row');
+    // $('.focus_effect:first').removeClass('personal-info-row');
     // $('.sidebar a:first').addClass('style_s_link');
     // $("#personal_info").css("opacity", "1");
     // $(".search-btn-row").css("display", "block");
