@@ -19,6 +19,10 @@ describe Forms::ConsumerIdentity do
 end
 
 describe Forms::ConsumerIdentity, "asked to match a census employee" do
+  let(:fake_org) { instance_double("Organization", :employer_profile => fake_employer) }
+  let(:fake_employer) { instance_double("EmployerProfile", :employee_families => [employee_family]) }
+  let(:employee_family) { instance_double("EmployerCensus::EmployeeFamily", :census_employee => census_employee) }
+  let(:census_employee) { instance_double("EmployerCensus::Employee", :ssn => "123456789", :dob => Date.new(2012,10,12) ) }
 
   subject { 
     Forms::ConsumerIdentity.new({
@@ -32,16 +36,14 @@ describe Forms::ConsumerIdentity, "asked to match a census employee" do
     :ssn => "123456789"
   } }
 
-  let(:census_employees) { [double] }
-
   it "should return nothing if that employee does not exist" do
-    allow(EmployerCensus::Employee).to receive(:where).and_return([])
+    allow(Organization).to receive(:where).and_return([])
     expect(subject.match_census_employees).to be_empty
   end
 
   it "should return the census employee when one is matched by dob and ssn" do
-    allow(EmployerCensus::Employee).to receive(:where).with(search_params).and_return(census_employees)
-    expect(subject.match_census_employees).to eq census_employees
+    allow(Organization).to receive(:where).and_return([fake_org])
+    expect(subject.match_census_employees).to eq [census_employee]
   end
 
 end

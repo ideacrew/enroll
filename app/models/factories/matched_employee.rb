@@ -10,9 +10,9 @@ module Factories
         build_address_from_employee(person_form, roster_employee)
       end
       person_form.user_id = consumer_identity.user_id
-      populate_identity_properties(person_form, ci)
+      populate_identity_properties(person_form, consumer_identity)
       build_nested_models(person_form)
-      build_employee_role(person_form, census_employee)
+      build_employee_role(person_form, roster_employee)
       person_form
     end
 
@@ -53,8 +53,8 @@ module Factories
       emp_family = census_employee.employee_family
       emp_role = EmployeeRole.new
       copy_properties(
+        census_employee,
         emp_role,
-        person,
         [:hired_on, :terminated_on]
       )
       copy_properties(
@@ -64,12 +64,12 @@ module Factories
       )
       emp_role.employer_profile_id = emp_family.employer_profile.id
       emp_role.census_family_id = emp_family.id
-      person.employee_roles << emp_role
+      person.employee_roles.new(emp_role.attributes)
     end
 
     def build_address_from_employee(person_form, census_employee)
       if census_employee.address.present?
-        person_form.addresses << census_employee.address
+        person_form.addresses.new(census_employee.address.attributes)
       end
     end
   end

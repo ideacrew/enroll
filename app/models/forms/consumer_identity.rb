@@ -29,10 +29,21 @@ module Forms
     end
 
     def match_census_employees
-      EmployerCensus::Employee.where({
-        :dob => dob,
-        :ssn => ssn        
+      census_employees = []
+      employers = Organization.where({
+        "employer_profile.employee_families" =>  { "$elemMatch" => { 
+           "census_employee.dob" => dob,
+           "census_employee.ssn" => ssn } }
       })
+      employers.each do |emp|
+        emp.employer_profile.employee_families.each do |ef|
+           ce = ef.census_employee
+           if (ce.ssn == ssn) && (ce.dob == dob)
+             census_employees << ce
+           end
+        end
+      end
+      census_employees
     end
 
     def match_person
