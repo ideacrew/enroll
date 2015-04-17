@@ -1,4 +1,4 @@
-<% if controller_name == 'sessions' || controller_name == 'welcome' || controller_name == 'registrations' || (signed_in? && (controller_name == 'employees' || controller_name == 'family' || controller_name == 'people')) %>
+<% if controller_name == 'sessions' || controller_name == 'welcome' || controller_name == 'registrations'  || controller_name == 'employee_roles' || (signed_in? && (controller_name == 'employees' || controller_name == 'family' || controller_name == 'people')) %>
   <nav role="navigation" class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -18,7 +18,19 @@
             <li><p>Click anywhere in this area to <a href="#">ask a question</a> or <a href="#">start a search</a></p></li>
             <!-- <li class="social pull-right border nav"><a href="#"><img src="img/nav.png" alt=""></a></li> -->
             <li class="social pull-right border"><a href="#"><%= image_tag 'chat.png' %></a></li>
-            <li class="social pull-right border aktif"><a href="#"><%= image_tag 'user.png' %></a></li>
+
+            <li class="social pull-right border aktif dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= image_tag 'user.png' %></a>
+
+              <% if signed_in? %>
+              <ul class="dropdown-menu">
+                <li><%= link_to "Profile", consumer_employee_path(@person) unless (@person.nil? || @person.new_record?) %></li>
+                <li class="divider"></li>
+                <li><%= link_to "Sign out", destroy_user_session_path, method: "delete" %></li>
+              </ul>
+              <% end %>
+            </li>
+
             <li class="social pull-right"><a href="#"><%= image_tag 'search.png' %></a></li>
           </ul>
         </div><!-- /.navbar-collapse -->

@@ -11,4 +11,11 @@ class Consumer::EmployeeRolesController < ApplicationController
     @person = Person.new
   end
 
+  def show
+  	@person = Person.find(params[:id])
+  	# @employer_profile= EmployerProfile.find_all_by_person(@person).first
+
+    # build_nested_models
+  end
+
 end
