@@ -483,6 +483,7 @@ $(document).ready(function () {
   
   $('#cancel_member').click(function() {
     $("#dependent_buttons div:first").removeClass('hidden');
+    $(".add_member").removeClass('hidden');
     $('#dependent_buttons div:last').addClass('hidden');
     
     var last_dependent = '$("#add_member_list_' + $('#last_member').val() + '")';
