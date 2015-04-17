@@ -623,13 +623,13 @@ $(document).ready(function () {
     $(this).css('opacity', 1);
   });
 
-  $('#search-employer').click(function(){
+  $('#search-employer,#save_member').click(function(){
     $('input[type="radio"]').tooltip('disable');
-    $('#personal_info .required').each(function(i, obj){
+    $('.required-tooltip .required').each(function(i, obj){
       if($(obj).val() == '')
         $(obj).tooltip({placement: 'right', title: 'Required field'}).tooltip('show');
     })
-    $('#personal_info .required').bind('mouseenter focusin', function(){
+    $('.required-tooltip .required').bind('mouseenter focusin', function(){
       $(this).tooltip('show').tooltip('hide');
     });
   });
