@@ -19,14 +19,16 @@ Rails.application.routes.draw do
 
 #Route pattern refactor BEGIN
   namespace :consumer do
-    root 'employer_roles#show'
 
     resources :employee, :controller=>"employee_roles" do
+
       collection do
+        post :match
         get 'welcome'
         get 'search'
       end
     end
+    root 'employer_roles#show'
   end
 
   namespace :broker_agencies do
