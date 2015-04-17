@@ -1,6 +1,18 @@
 require 'rails_helper'
 
 RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
+  describe "POST match" do
+    before(:each) do
+      sign_in 
+      post :match
+    end
+
+    it "renders the 'welcome' template" do
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("match")
+    end
+  end
+
   describe "GET search" do
 
     before(:each) do
