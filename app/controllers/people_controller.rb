@@ -263,16 +263,23 @@ class PeopleController < ApplicationController
   end
 
   def update
-    @person = Person.find(params[:id])
-    @person.updated_by = current_user.email unless current_user.nil?
     sanitize_person_params
+    @person = Person.find(params[:id])
+
+    # Delete old sub documents
+    @person.addresses.each {|address| address.delete}
+    @person.phones.each {|phone| phone.delete}
+    @person.emails.each {|email| email.delete}
+
+    @person.updated_by = current_user.email unless current_user.nil?
     respond_to do |format|
       if @person.update_attributes(person_params)
-        format.html { redirect_to @person, notice: 'Person was successfully updated.' }
+        format.html { redirect_to consumer_employee_path(@person), notice: 'Person was successfully updated.' }
         format.json { head :no_content }
       else
         build_nested_models
         format.html { render action: "show" }
+        # format.html { redirect_to edit_consumer_employee_path(@person) }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end
     end
@@ -290,9 +297,7 @@ class PeopleController < ApplicationController
     # person_params
     respond_to do |format|
       if @person.update_attributes(person_params)
-        format.html { redirect_to @person, notice: 'Person was successfully created.' }
-        # format.html { redirect_to person_landing_people_path(organization_id: @person.organization_id, person_id: @person), notice: 'Person was successfully created.' }
-
+        format.html { redirect_to consumer_employee_path(@person), notice: 'Person was successfully created.' }
         format.json { render json: @person, status: :created, location: @person }
       else
         build_nested_models

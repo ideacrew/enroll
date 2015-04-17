@@ -11,4 +11,31 @@ class Consumer::EmployeeRolesController < ApplicationController
     @person = Person.new
   end
 
+  def show
+  	@person = Person.find(params[:id])
+    build_nested_models
+  end
+
+  def edit
+  	@person = Person.find(params[:id])
+    build_nested_models
+  end
+
+  private
+
+  	  def build_nested_models
+
+	    ["home","mobile","work","fax"].each do |kind|
+	       @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
+	    end
+
+	    Address::KINDS.each do |kind|
+	      @person.addresses.build(kind: kind) if @person.addresses.select{|address| address.kind == kind}.blank?
+	    end
+
+	    ["home","work"].each do |kind|
+	       @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
+	    end
+	  end
+
 end

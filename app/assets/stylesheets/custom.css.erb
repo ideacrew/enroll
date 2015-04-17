@@ -293,19 +293,19 @@ p.information {
     width: 210px;
 }
 
-#new_person .required_fields_notice {display: block !important;}
 
-#new_person .employee-info,
-#contact .employee-info {
+.personaol-info-row .first.employee-info {
+  border: 2px solid #e3e3e3;
+}
+.personaol-info-top-row .required_fields_notice {display: block !important;}
+.personaol-info-top-row .first.employee-info {
     border: 2px solid #005fd6;
     opacity: 0.5;
 }
-#new_person .employee-info .top-row,
-#contact .employee-info .top-row {
+.personaol-info-top-row .employee-info .top-row {
     border-color: #007bc3 !important;
 }
-#new_person .employee-info label, .employee-info input,
-#contact .employee-info label {
+.personaol-info-top-row .employee-info label, .employee-info input {
     color: #007bc3 !important;
 }
 .require-field .required {
@@ -2472,7 +2472,17 @@ a.close-2{
 .adderess-select-box:focus {
   background: none;
 }
+
 .dropdown-menu {padding: 0;}
+#bs-example-navbar-collapse-1 .dropdown-menu {
+  padding: 5px 0;
+}
+
+#bs-example-navbar-collapse-1 .dropdown-menu > li > a:hover, #bs-example-navbar-collapse-1 .dropdown-menu > li > a:focus {
+    background-color: #f5f5f5;
+    color: #262626;
+    text-decoration: none;
+}
 
 #email_error {
   left: 10px;
@@ -2571,17 +2581,15 @@ a.close-2{
   }
 }
 
-#new_person .first.employee-info, #contact .first.employee-info {
+.personaol-info-top-row .first.employee-info {
   border-color: #007bc3;
   opacity: 0.5;
 }
-#new_person .employee-info .top-row, #new_person .employee-info .middle-row,
-#contact .employee-info .top-row, #contact .employee-info .middle-row {
+.personaol-info-top-row .employee-info .top-row, .personaol-info-top-row .employee-info .middle-row {
   border-color: #007bc3;
   background: #fff;
 }
-#new_person .employee-info label, #new_person .employee-info input,
-#contact .employee-info label, #contact .employee-info input {
+.personaol-info-top-row .employee-info label, .personaol-info-top-row .employee-info input {
   color: #007bc3 !important;
 }
 

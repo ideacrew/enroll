@@ -98,7 +98,7 @@ $(document).ready(function () {
     $('#email_info').removeClass('hidden');
   });
 
-  $('#new_person .focus_effect').click(function(e){
+  $('.focus_effect').click(function(e){
     var check = check_personal_info_exists();
     active_div_id = $(this).attr('id');
     if( check.length==0 && (!$('.autofill-failed').hasClass('hidden') || $('.autofill-cloud').hasClass('hidden'))) {
@@ -375,6 +375,7 @@ $(document).ready(function () {
   
   $('#cancel_member').click(function() {
     $("#dependent_buttons div:first").removeClass('hidden');
+    $(".add_member").removeClass('hidden');
     $('#dependent_buttons div:last').addClass('hidden');
     
     var last_dependent = '$("#add_member_list_' + $('#last_member').val() + '")';
@@ -515,13 +516,13 @@ $(document).ready(function () {
     $(this).css('opacity', 1);
   });
 
-  $('#search-employer').click(function(){
+  $('#search-employer,#save_member').click(function(){
     $('input[type="radio"]').tooltip('disable');
-    $('#personal_info .required').each(function(i, obj){
+    $('.required-tooltip .required').each(function(i, obj){
       if($(obj).val() == '')
         $(obj).tooltip({placement: 'right', title: 'Required field'}).tooltip('show');
     })
-    $('#personal_info .required').bind('mouseenter focusin', function(){
+    $('.required-tooltip .required').bind('mouseenter focusin', function(){
       $(this).tooltip('show').tooltip('hide');
     });
   });
