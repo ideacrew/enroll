@@ -25,9 +25,9 @@
 $('input.floatlabel').floatlabel();
 
 $(document).ready(function () {
-  $("#new_person #address_info").addClass('hidden');
-  $("#new_person #phone_info").addClass('hidden');
-  $("#new_person #email_info").addClass('hidden');
+//  $("#new_person #address_info").addClass('hidden');
+//  $("#new_person #phone_info").addClass('hidden');
+//  $("#new_person #email_info").addClass('hidden');
   
   $(".date-picker, .date_picker").datepicker({
     changeMonth: true,
@@ -82,73 +82,7 @@ $(document).ready(function () {
     });
   }
   
-  /* Match Person */
-  $('#search-employer').click(function() {
-    match_person();
-  });
   
-  function match_person()
-  {
-    gender_checked = $("#person_gender_male").prop("checked") || $("#person_gender_female").prop("checked");
-    
-    if(check_personal_info_exists().length==0 && gender_checked)
-    {
-      $('.employers-row').html("");
-      $('#personal_info .employee-info').removeClass('require-field');
-
-      $.ajax({
-        type: "POST",
-        url: "/people/match_person.json",
-        data: $('#new_person').serialize(),
-        success: function (result) {
-          // result.person gives person info to populate
-          if(result.matched == true)
-          {
-            person = result.person;
-            $("#people_id").val(person._id);
-            _getEmployers();
-            
-            // $('#key-section').removeClass('hidden');
-            // $('#house_info, #add_info, #top-pad30, #top-pad80, #top-pad85').hide();
-            // $('a.one, a.two').css("color", "#00b22d");
-          }
-          else
-          {
-            $('.search_results').removeClass('hidden');
-            $('.employers-row').html("");
-            $('.fail-search').removeClass('hidden');
-          }
-
-          //Sidebar Switch - Search Active
-          // $('#personal_sidebar').removeClass('hidden');
-          //$('#search_sidebar').addClass('hidden');
-          $(".overlay-in").css("display", "block");
-        }
-      });  
-    } else {
-      $('#personal_info .employee-info').addClass('require-field');
-    }
-  }
-  
-  function _getEmployers()
-  {
-    common_body_style();
-    side_bar_link_style();
-
-    // $('.search_alert_msg').removeClass('hidden');
-    // $('.searching_span').text('Searching');
-    // $('.search_alert_msg').addClass('hidden');
-    getAllEmployers();
-  }
-  
-  function getAllEmployers()
-  {
-    $.ajax({
-      type: "GET",
-      data:{id: $("#people_id").val()},
-      url: "/people/get_employer.js",
-    });
-  }
 
   // People/new Page
 
@@ -183,21 +117,6 @@ $(document).ready(function () {
     }
   });
 
-/*  $('#continue').click(function() {
-    $("#overlay").css("display", "none");
-    $(".welcome-msg").css("display", "none");
-    $(".information").removeClass('hidden');
-    $("a.name").css("padding-top", "30px");
-    $(".disable-btn").css("display", "inline-block");
-    $('.focus_effect:first').addClass('personaol-info-top-row');
-    $('.focus_effect:first').removeClass('personaol-info-row');
-    $('.sidebar a:first').addClass('style_s_link');
-    $("#personal_info").css("display", "block");
-    $(".search-btn-row").css("display", "block");
-    $(".personal_info").css("display", "block");
-    $(".start").hide();
-  });*/
-
   $('#personal_info.focus_effect').focusout(function(){
     var tag_id = $(this).attr('id');
     var has_class = $(this).hasClass('personaol-info-top-row');
@@ -214,33 +133,6 @@ $(document).ready(function () {
     common_body_style();
     side_bar_link_style();
   });
-
-  function side_bar_link_style()
-  {
-    $('.sidebar a').removeClass('style_s_link');
-    $('.sidebar a.address_info').addClass('style_s_link');
-  }
-
-  function common_body_style()
-  {
-
-    $('#personal_info').addClass('personaol-info-row');
-    $('.focus_effect').removeClass('personaol-info-top-row');
-    $('#address_info').addClass('personaol-info-top-row');
-    $('#address_info').removeClass('personaol-info-row');
-  }
-
-  function check_personal_info_exists()
-  {
-    var check = $('#personal_info input[required]').filter(function() { return this.value == ""; });
-    return check;
-  }
-
-  function check_dependent_info_exists()
-  {
-    var check = $('#new_family_member input[required]').filter(function() { return this.value == ""; });
-    return check;
-  }
 
   $(".adderess-select-box").focusin(function() {
     $(".bg-color").css({
