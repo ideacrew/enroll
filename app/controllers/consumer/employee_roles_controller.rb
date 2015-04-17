@@ -21,6 +21,10 @@ class Consumer::EmployeeRolesController < ApplicationController
     build_nested_models
   end
 
+  def match
+
+  end
+
   private
 
   	  def build_nested_models

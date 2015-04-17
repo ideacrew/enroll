@@ -111,6 +111,7 @@ class PeopleController < ApplicationController
 
   def get_employer
     @person = Person.find(params[:id])
+    build_nested_models
     @employer_profile = EmployerProfile.find_all_by_person(@person).first
     @benefit_group = @employer_profile.latest_plan_year.benefit_groups.first
     @census_family = EmployerProfile.find_census_families_by_person(@person).first
