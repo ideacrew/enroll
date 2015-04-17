@@ -3,6 +3,8 @@ class Organization
   include Mongoid::Timestamps
   include Mongoid::Versioning
 
+  extend Mongorder
+
   auto_increment :hbx_id, type: Integer
 
   # Registered legal name
@@ -84,4 +86,16 @@ class Organization
     write_attribute(:fein, new_fein.to_s.gsub(/\D/, ''))
   end
 
+  def self.default_search_order
+    [[:legal_name, 1]]
+  end
+
+  def self.search_hash(s_rex)
+    search_rex = Regexp.compile(Regexp.escape(s_rex), true)
+    {
+      "$or" => ([
+        {"legal_name" => search_rex}
+      ])
+    }
+  end
 end

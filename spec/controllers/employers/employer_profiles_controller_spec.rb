@@ -52,7 +52,7 @@ RSpec.describe Employers::EmployerProfilesController, :type => :controller do
       og = FactoryGirl.create(:organization, :legal_name => "ss corp bb")
       ep = FactoryGirl.create(:employer_profile, :organization => og)
 
-      get :index, name: "corp"
+      get :index, q: "corp"
       expect(assigns(:employer_profiles)).to eq [ep]
     end
 
