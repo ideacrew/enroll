@@ -97,9 +97,10 @@ describe EmployerCensus::EmployeeFamily, 'class methods' do
 
         it "should return matching EmployeeFamily instance" do
           expect(linked_employee_family.is_linked?).to be_truthy
+          linked_employee_family.save
           # expect(linked_employee_family).to eq ""
           expect(EmployerCensus::EmployeeFamily.find_by_employee_role(saved_employee_role)).to be_an_instance_of EmployerCensus::EmployeeFamily
-          expect(EmployerCensus::EmployeeFamily.find_by_employee_role(saved_employee_role).census_employee.ssn).to eq employee_role.ssn
+          expect(EmployerCensus::EmployeeFamily.find_by_employee_role(saved_employee_role).census_employee.ssn.to_i).to eq employee_role.ssn.to_i-1
         end
       end
     end
@@ -151,15 +152,15 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
 
     context "with a valid employee" do
       before do
+        employer_profile.employee_families = [census_family]
         census_family.link_employee_role(employee_role)
       end
 
-      pending "fix employee_role belongs_to association"
       it 'should link to the employee' do
         expect(census_family.is_linked?).to be_truthy
         expect(census_family.is_linkable?).to be_falsey
         expect(census_family.employee_role_id).to eq employee_role.id
-        # expect(employee_role.census_family.employee_role).to eq employee_role
+        expect(employer_profile.employee_families.first.employee_role_id).to eq employee_role._id
       end
     end
   end
@@ -260,6 +261,13 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
       expect(ditto.census_employee.hired_on).to be_nil
       expect(ditto.census_employee.terminated_on).to be_nil
       expect(ditto.census_employee.address).to eq ee.address
+
+      ditto.census_employee.hired_on = 1.year.ago
+      er.employee_families = [ditto]
+      er.save
+
+      ditto1 = family.replicate_for_rehire
+      expect(ditto1).to be_nil
     end
   end
 end
