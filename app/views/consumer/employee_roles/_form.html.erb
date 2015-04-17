@@ -1,9 +1,8 @@
 <div class="col-md-10 col-sm-12">
-  <%#= render 'welcome_msg' %>
+  <div class="col-md-9 col-sm-9">
 
-  <p class="information row hidden">Personal Information</p>
-
-    <%= render 'shared/person_search_fields', f: f %>
+    <%= render 'shared/error_messages' %>
+    <%= render 'shared/person_search_fields', f: f %><br>
     <%= render 'shared/address_fields', f: f %><br>
     <%= render 'shared/phone_fields', f: f %><br>
 
@@ -12,5 +11,10 @@
         <%= render 'shared/email_fields', f: email %>
       <% end %>
       <div class="col-md-10 col-sm-10"><div id="email_error"></div></div>
-    </div>
+    </div><br><br>
+  </div>
+
+  <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
+    <%= f.submit "Save & Exit", class: 'btn btn-save' %>
+  </div>
 </div>

@@ -164,7 +164,7 @@ $(document).ready(function () {
     $('#email_info').removeClass('hidden');
   });
 
-  $('#new_person .focus_effect').click(function(e){
+  $('.focus_effect').click(function(e){
     var check = check_personal_info_exists();
     active_div_id = $(this).attr('id');
     if( check.length==0 && (!$('.autofill-failed').hasClass('hidden') || $('.autofill-cloud').hasClass('hidden'))) {

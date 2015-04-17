@@ -24,8 +24,13 @@
 
               <% if signed_in? %>
               <ul class="dropdown-menu">
-                <li><%= link_to "Profile", consumer_employee_path(@person) unless (@person.nil? || @person.new_record?) %></li>
-                <li class="divider"></li>
+                <% unless @person.nil? %>
+                  <% unless @person.new_record? %>
+                    <li><%= link_to "Profile", consumer_employee_path(@person) %></li>
+                    <li><%= link_to "My Account", person_person_landing_path(@person) %></li>
+                    <li class="divider"></li>
+                  <% end %>
+                <% end %>
                 <li><%= link_to "Sign out", destroy_user_session_path, method: "delete" %></li>
               </ul>
               <% end %>
