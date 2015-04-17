@@ -2,14 +2,31 @@ require 'rails_helper'
 
 RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
   describe "POST match" do
+    let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
+    let(:mock_person) { instance_double("Forms::ConsumerIdentity", :valid? => validation_result) }
+
     before(:each) do
       sign_in 
-      post :match
+      allow(Forms::ConsumerIdentity).to receive(:new).with(person_parameters).and_return(mock_person)
+      post :match, :person => person_parameters
+    end
+    context "given valid parameters" do
+      let(:validation_result) { true }
+
+      it "renders the 'match' template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("match")
+        expect(assigns[:person]).to eq mock_person
+      end
     end
 
-    it "renders the 'welcome' template" do
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template("match")
+    context "given invalid parameters" do
+      let(:validation_result) { false }
+      it "renders the 'match' template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("search")
+        expect(assigns[:person]).to eq mock_person
+      end
     end
   end
 
@@ -20,7 +37,7 @@ RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
       get :search
     end
 
-    it "renders the 'welcome' template" do
+    it "renders the 'search' template" do
       expect(response).to have_http_status(:success)
       expect(response).to render_template("search")
       expect(assigns[:person]).to be_a(Forms::ConsumerIdentity)

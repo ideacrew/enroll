@@ -22,7 +22,12 @@ class Consumer::EmployeeRolesController < ApplicationController
   end
 
   def match
-
+    @person = Forms::ConsumerIdentity.new(params.require(:person))
+    if @person.valid?
+      render 'match'
+    else
+      render 'search'
+    end
   end
 
   private
