@@ -25,10 +25,7 @@
 $('input.floatlabel').floatlabel();
 
 $(document).ready(function () {
-//  $("#new_person #address_info").addClass('hidden');
-//  $("#new_person #phone_info").addClass('hidden');
-//  $("#new_person #email_info").addClass('hidden');
-  
+
   $(".date-picker, .date_picker").datepicker({
     changeMonth: true,
     changeYear: true,
@@ -82,10 +79,7 @@ $(document).ready(function () {
     });
   }
   
-  
-
   // People/new Page
-
   $('.back').click(function() {
     //Sidebar Switch - Personal Active
     $('#personal_sidebar').removeClass('hidden');
@@ -102,13 +96,13 @@ $(document).ready(function () {
     var check = check_personal_info_exists();
     active_div_id = $(this).attr('id');
     if( check.length==0 && (!$('.autofill-failed').hasClass('hidden') || $('.autofill-cloud').hasClass('hidden'))) {
-      $('.focus_effect').removeClass('personaol-info-top-row');
-      $('.focus_effect').removeClass('personaol-info-row');
-      $('.focus_effect').addClass('personaol-info-row');
-      $(this).addClass('personaol-info-top-row');
+      $('.focus_effect').removeClass('personal-info-top-row');
+      $('.focus_effect').removeClass('personal-info-row');
+      $('.focus_effect').addClass('personal-info-row');
+      $(this).addClass('personal-info-top-row');
       $('.sidebar a').removeClass('style_s_link');
       $('.sidebar a.'+active_div_id).addClass('style_s_link');
-      $(this).removeClass('personaol-info-row');
+      $(this).removeClass('personal-info-row');
     }
     if(active_div_id!='personal_info') {
       if(check.length!=0) {
@@ -119,7 +113,7 @@ $(document).ready(function () {
 
   $('#personal_info.focus_effect').focusout(function(){
     var tag_id = $(this).attr('id');
-    var has_class = $(this).hasClass('personaol-info-top-row');
+    var has_class = $(this).hasClass('personal-info-top-row');
     var check = check_personal_info_exists();
     if(check.length!=0 && !has_class) {
       $('#personal_info .col-md-10').addClass('require-field');
@@ -133,6 +127,33 @@ $(document).ready(function () {
     common_body_style();
     side_bar_link_style();
   });
+
+  function side_bar_link_style()
+  {
+    $('.sidebar a').removeClass('style_s_link');
+    $('.sidebar a.address_info').addClass('style_s_link');
+  }
+
+  function common_body_style()
+  {
+
+    $('#personal_info').addClass('personal-info-row');
+    $('.focus_effect').removeClass('personal-info-top-row');
+    $('#address_info').addClass('personal-info-top-row');
+    $('#address_info').removeClass('personal-info-row');
+  }
+
+  function check_personal_info_exists()
+  {
+    var check = $('#personal_info input[required]').filter(function() { return this.value == ""; });
+    return check;
+  }
+
+  function check_dependent_info_exists()
+  {
+    var check = $('#new_family_member input[required]').filter(function() { return this.value == ""; });
+    return check;
+  }
 
   $(".adderess-select-box").focusin(function() {
     $(".bg-color").css({
@@ -192,19 +213,6 @@ $(document).ready(function () {
   
   $(".close-fail").click(function() {
     $(".fail-search").addClass('hidden');
-    // $("#overlay").css("display", "none");
-    // $(".welcome-msg").css("display", "none");
-    // $(".information").css("opacity", "1");
-    // $("a.name").css("padding-top", "30px");
-    // $(".disable-btn").css("display", "inline-block");
-    // $('.focus_effect:first').addClass('personaol-info-top-row');
-    // $('.focus_effect:first').removeClass('personaol-info-row');
-    // $('.sidebar a:first').addClass('style_s_link');
-    // $("#personal_info").css("opacity", "1");
-    // $(".search-btn-row").css("display", "block");
-    // $(".disable-btn, #key-section").hide();
-    // $('.personal_info').addClass('style_s_link');
-    // $("#personal_info .first").removeClass('employee-info');
     $(".overlay-in").css("display", "none");
   });
   
@@ -216,39 +224,29 @@ $(document).ready(function () {
       $('#personal_info div.first').addClass('employee-info');
       $("a.personal_info").css("color","#98cbff");
       $("#personal_info div.first").css("opacity","1");
-      // $("a.three").css("color","#00b420");
-      // $("#top-pad15").show();
     } 
     else if (e.target.id == "address_info" || $(e.target).parents("#address_info").size()) {
       $('#address_info div.first').addClass('employee-info');
       $("a.address_info").css("color","#98cbff");
-      // $("a.three").css("color","#00b420");
       $("#address_info div.first").css("opacity","1");
       $("#top-pad").innerHTML="30%";
-      // $("#top-pad30").show();
     }
     else if (e.target.id == "phone_info" || $(e.target).parents("#phone_info").size()) {
       $('#phone_info div.first').addClass('employee-info');
       $("a.phone_info").css("color","#98cbff");
-      // $("a.four").css("color","#00b420");
       $("#phone_info div.first").css("opacity","1");
-      // $("#top-pad80").show();
     }
     else if (e.target.id == "email_info" || $(e.target).parents("#email_info").size()) {
       $('#email_info div.first').addClass('employee-info');
       $("a.email_info").css("color","#98cbff");
-      // $("a.five").css("color","#00b420");
       $("#email_info div.first").css("opacity","1");
-      // $("#top-pad85").show();
     }
     else if (e.target.id == "household_info" || $(e.target).parents("#household_info").size()) {
       $('#household_info div.first').addClass('employee-info');
       $("a.household_info").css("color","#98cbff");
       $("#household_info div.first").css("opacity","1");
     }
-    else {
-      // $("#top-pad15").show();
-    }
+    else {}
   });
   
   function fade_all() {
@@ -456,15 +454,6 @@ $(document).ready(function () {
     }
   });
   
-  // $('.new-address-flow p a.confirm').click(function(){
-  //   var address_name = $('.address_name').val();
-  //   if(address_name.length!=0) {
-  //     var new_option = "<li class='address-li' data-address-text='"+address_name+"Address' data-value='"+address_name+"' role='presentation'><a role='menuitem' href='javascript:void(0)'>"+address_name+"</a></li>";
-  //     $(".address ul").prepend(new_option);
-  //     $(".new-address-flow").removeAttr("style");
-  //   }
-  // });
-
   // Change Dropdown Address Text
   $('.address-li').on('click', function(){
     $("#dropdownMenu1 label").text($(this).text());

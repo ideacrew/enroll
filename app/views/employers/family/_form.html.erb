@@ -28,7 +28,7 @@
                 <!-- <div id="overlay"></div> -->
 
           <%= f.fields_for :census_employee, errors: {}, fieldset: false do |employee|  %>
-            <div id="employer_info" class="focus_effect row personaol-info-row">
+            <div id="employer_info" class="focus_effect row personal-info-row">
               <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
                     <%= render 'member_fields', f: employee %>
                   </div>
@@ -47,14 +47,14 @@
                 </div><br>
 
                 <%= employee.fields_for :address, @family.census_employee.address, errors: {}, fieldset: false do |address|  %>
-                  <div id="address_info" class="focus_effect row personaol-info-row">
+                  <div id="address_info" class="focus_effect row personal-info-row">
                     <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
                       <%= render 'address_fields', f: address %>
                     </div>
                   </div>
                 <% end %><br>
 
-                <div id="dependent_info" class="focus_effect row personaol-info-row">
+                <div id="dependent_info" class="focus_effect row personal-info-row">
                   <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
                     <div class='form-inputs'>
                       <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |dependent|  %>
