@@ -29,7 +29,7 @@ describe Services::EmployeeSignupMatch do
 
     it "should match that roster entry" do
       allow(signup_builder).to receive(:build).with(consumer_identity, census_employee, nil).and_return(built_form)
-      expect(subject.call(consumer_identity)).to eq built_form
+      expect(subject.call(consumer_identity)).to eq [census_employee, built_form]
     end
 
     describe "with a matching person" do
@@ -38,7 +38,7 @@ describe Services::EmployeeSignupMatch do
 
       it "should match the person as well" do
         allow(signup_builder).to receive(:build).with(consumer_identity, census_employee, matched_person).and_return(built_form)
-        expect(subject.call(consumer_identity)).to eq built_form
+        expect(subject.call(consumer_identity)).to eq [census_employee, built_form]
       end
     end
   end

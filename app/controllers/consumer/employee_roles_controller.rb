@@ -22,9 +22,20 @@ class Consumer::EmployeeRolesController < ApplicationController
   end
 
   def match
-    @person = Forms::ConsumerIdentity.new(params.require(:person))
-    if @person.valid?
-      render 'match'
+    @consumer_identity = Forms::ConsumerIdentity.new(params.require(:person))
+    service = Services::EmployeeSignupMatch.new
+    if @consumer_identity.valid?
+      found_information = service.call(@consumer_identity)
+      if found_information.nil?
+        render 'no_match'
+      else
+        @census_employee, @person = found_information
+        @census_family = @census_employee.employee_family
+        @benefit_group = @census_family.benefit_group
+        @employer_profile = @census_family.employer_profile
+        @effective_on = @benefit_group.effective_on_for(@census_employee.hired_on)
+        render 'match'
+      end
     else
       render 'search'
     end

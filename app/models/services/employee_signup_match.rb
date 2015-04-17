@@ -9,7 +9,7 @@ module Services
       return nil if found_employees.empty?
       linkable_employees = found_employees.select { |fe| fe.is_linkable? }
       return nil if linkable_employees.empty?
-      @form_factory.build(consumer_identity, linkable_employees.first, consumer_identity.match_person)
+      [linkable_employees.first, @form_factory.build(consumer_identity, linkable_employees.first, consumer_identity.match_person)]
     end
   end
 end
