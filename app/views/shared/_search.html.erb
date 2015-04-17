@@ -1,0 +1,7 @@
+<%= form_tag url, { method: :get, class: "form form-inline", role: "search"} do %>
+  <div class="form-group">
+    <%= label_tag :q, "Search term", {class: "sr-only"} %>
+    <%= text_field_tag :q, q, {placeholder: placeholder, class: "form-control"} %>
+    <%= submit_tag "Search", { class: "btn btn-primary" } %>
+  </div>
+<% end %>
