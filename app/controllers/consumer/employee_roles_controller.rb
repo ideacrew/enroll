@@ -1,10 +1,13 @@
 class Consumer::EmployeeRolesController < ApplicationController
-
   def welcome
   end
 
   def search
     @person = Forms::ConsumerIdentity.new
+    respond_to do |format|
+      format.html
+      format.js
+    end
   end
 
   def match

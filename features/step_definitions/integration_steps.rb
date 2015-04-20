@@ -5,7 +5,7 @@ Before "@watir" do
 end
 
 After "@watir" do
-#  @browser.close
+  @browser.close
 end
 
 Given(/^I do not exist as a user$/) do
@@ -69,7 +69,7 @@ When(/^I complete the matched employee form$/) do
   @browser.text_field(:name => "person[phones_attributes][0][full_phone_number]").set("5555555555")
   @browser.text_field(:name => "person[emails_attributes][0][address]").set("jhall@gmail.com")
   @browser.text_field(:name => "person[emails_attributes][1][address]").click
-  @browser.a(:id => "continue-employer").click
+#  @browser.a(:id => "continue-employer").click
   sleep(5)
 end
 
