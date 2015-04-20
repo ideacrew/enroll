@@ -5,44 +5,35 @@ class Household
 
   embedded_in :family
 
-  before_validation :set_effective_start_date
-  before_validation :set_effective_end_date #, :if => lambda {|household| household.effective_end_date.blank? } # set_effective_start_date should be done before this
-  before_validation :reset_is_active_for_previous
-  before_validation :set_submitted_at #, :if => lambda {|household| household.submitted_at.blank? }
-
   # field :e_pdc_id, type: String  # Eligibility system PDC foreign key
 
   # embedded belongs_to :irs_group association
   field :irs_group_id, type: BSON::ObjectId
-
-  field :is_active, type: Boolean, default: true
-  field :effective_start_date, type: Date, default: Date.new(2014,1,1)
-  field :effective_end_date, type: Date
-
+  field :effective_starting_on, type: Date, default: Date.new(2014,1,1)
+  field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
+  field :is_active, type: Boolean, default: true
 
   embeds_many :hbx_enrollments
-  accepts_nested_attributes_for :hbx_enrollments
-
   embeds_many :tax_households
-  accepts_nested_attributes_for :tax_households
-
   embeds_many :coverage_households
-  accepts_nested_attributes_for :coverage_households
 
-  embeds_many :comments
-  accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :hbx_enrollments, :tax_households, :coverage_households
 
-  validates :effective_start_date, presence: true
+  before_validation :set_effective_starting_on
+  before_validation :set_effective_ending_on #, :if => lambda {|household| household.effective_ending_on.blank? } # set_effective_starting_on should be done before this
+  before_validation :reset_is_active_for_previous
+  before_validation :set_submitted_at #, :if => lambda {|household| household.submitted_at.blank? }
 
-  #validate :effective_end_date_gt_effective_start_date
+  validates :effective_starting_on, presence: true
+  #validate :effective_ending_on_gt_effective_starting_on
 
-  def effective_end_date_gt_effective_start_date
+  def effective_ending_on_gt_effective_starting_on
 
-    return if effective_end_date.nil?
-    return if effective_start_date.nil?
+    return if effective_ending_on.nil?
+    return if effective_starting_on.nil?
 
-      if effective_end_date < effective_start_date
+      if effective_ending_on < effective_starting_on
         self.errors.add(:base, "The effective end date should be earlier or equal to effective start date")
       end
   end
@@ -83,15 +74,15 @@ class Household
     (th_applicant_ids + ch_applicant_ids + hbxe_applicant_ids).distinct
   end
 
-  # This will set the effective_end_date of previously active household to 1 day
-  # before start of the current household's effective_start_date
-  def set_effective_end_date
-    return true unless self.effective_start_date
+  # This will set the effective_ending_on of previously active household to 1 day
+  # before start of the current household's effective_starting_on
+  def set_effective_ending_on
+    return true unless self.effective_starting_on
 
     latest_household = self.family.latest_household
     return true if self == latest_household
 
-    latest_household.effective_end_date = self.effective_start_date - 1.day
+    latest_household.effective_ending_on = self.effective_starting_on - 1.day
     true
   end
 
@@ -111,10 +102,10 @@ class Household
     true
   end
 
-  def set_effective_start_date
-    return true unless self.effective_start_date.blank?
+  def set_effective_starting_on
+    return true unless self.effective_starting_on.blank?
 
-    self.effective_start_date =  parent.submitted_at
+    self.effective_starting_on =  parent.submitted_at
     true
   end
 

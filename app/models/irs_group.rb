@@ -4,17 +4,14 @@ class IrsGroup
 
   embedded_in :family
 
-  before_save :set_effective_start_date
-  before_save :set_effective_end_date
-
   auto_increment :hbx_assigned_id, seed: 1000000000000000 #The 16digit IrsGroup identifier as required by IRS
 
-  field :effective_start_date, type: Date
-  field :effective_end_date, type: Date
+  field :effective_starting_on, type: Date
+  field :effective_ending_on, type: Date
   field :is_active, type: Boolean, default: true
-
-  embeds_many :comments
-  accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
+  
+  before_save :set_effective_starting_on
+  before_save :set_effective_end_on
 
   def parent
     raise "undefined parent ApplicationGroup" unless family?
@@ -30,12 +27,12 @@ class IrsGroup
     self.is_active
   end
 
-  private
-  def set_effective_start_date
-    self.effective_start_date = family.active_household.effective_start_date if family.active_household
+private
+  def set_effective_starting_on
+    self.effective_starting_on = family.active_household.effective_starting_on if family.active_household
   end
 
-  def set_effective_end_date
-    self.effective_end_date = family.active_household.effective_end_date if family.active_household
+  def set_effective_end_on
+    self.effective_ending_on = family.active_household.effective_ending_on if family.active_household
   end
 end

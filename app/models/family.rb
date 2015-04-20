@@ -3,7 +3,8 @@ class Family
   include Mongoid::Timestamps
   include Mongoid::Versioning
 
-  KINDS = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
+  Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
+  ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter}
 
   auto_increment :hbx_assigned_id, seed: 9999
 
@@ -12,12 +13,12 @@ class Family
   field :application_type, type: String
   field :renewal_consent_through_year, type: Integer # Authorize auto-renewal elibility check through this year (CCYY format)
 
-  field :aasm_state, type: String
   field :is_active, type: Boolean, default: true # ApplicationGroup active on the Exchange?
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
 
   # All current and former members of this group
+  belongs_to  :person
   embeds_many :family_members, cascade_callbacks: true
   embeds_many :special_enrollment_periods, cascade_callbacks: true
   embeds_many :irs_groups, cascade_callbacks: true
@@ -25,9 +26,9 @@ class Family
 
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups, :households
 
+  index({person_id: 1})
   index({e_case_id: 1}, { unique: true, sparse: true })
   index({is_active: 1})
-  index({aasm_state: 1})
   index({submitted_at: 1})
 
   # child model indexes
@@ -104,6 +105,13 @@ class Family
     family_members.detect { |a| a.is_consent_applicant? }
   end
 
+  def add_family_member(new_person)
+
+  end
+
+  def remove_family_member(person)
+  end
+
   def find_family_member_by_person(person)
     family_members.detect { |a| a.person_id == person._id }
   end
@@ -134,6 +142,13 @@ class Family
     self.is_active
   end
 
+  def initialize_from_employee_role(new_employee_role)
+    set_family_attributes
+    initialize_irs_group
+    initialize_household
+    initialize_family_members_and_coverage_households(new_employee_role.person)
+  end
+
   class << self
     def default_search_order
       [
@@ -142,9 +157,31 @@ class Family
       ]
     end
 
+    def find_or_initialize_by_employee_role(new_employee_role)
+      existing_family = Family.find_by_employee_role(new_employee_role)
+
+      if existing_family.present?
+        existing_family
+      else
+        family = Family.new
+        family.initialize_from_employee_role(new_employee_role)
+
+        family.save
+        family
+      end
+    end
+
     # TODO: should probably go away assuming 1 person should only have 1 family with them as primary
     def find_all_by_primary_applicant(person)
       Family.find_all_by_person(person).select() { |f| f.primary_applicant.person.id.to_s == person.id.to_s }
+    end
+
+    def find_by_primary_family_member(person)
+      find_all_by_primary_applicant(person).first
+    end
+
+    def find_by_employee_role(employee_role)
+      find_all_by_primary_applicant(employee_role.person).first
     end
 
     def find_by_primary_applicant(person)
@@ -166,6 +203,37 @@ class Family
   end
 
 private
+  def set_family_attributes
+    self.submitted_at = DateTime.current
+  end
+
+  def initialize_irs_group
+    irs_groups.build(effective_starting_on: Date.current)
+  end
+
+  def initialize_household
+    households.build(irs_group: irs_groups.first, effective_starting_on: irs_groups.first.effective_starting_on, submitted_at: DateTime.current)
+  end
+
+  def initialize_family_members_and_coverage_households(primary_person)
+    time_stamp = DateTime.current
+    primary_coverage_household = households.first.coverage_households.build(is_immediate_family: true, submitted_at: time_stamp)
+
+    family_member = family_members.build(person: primary_person, is_primary_applicant: true)
+    primary_coverage_household.coverage_household_members.build(family_member: family_member, is_subscriber: true)
+
+    primary_person.person_relationships.each do |kin|
+      family_member = family_members.build(person: kin.relative)
+
+      if ImmediateFamily.include? kin.kind.to_s.downcase
+        primary_coverage_household.coverage_household_members.build(family_member: family_member)
+      else
+        secondary_coverage_household ||= households.first.coverage_households.build(is_immediate_family: false, submitted_at: time_stamp)
+        secondary_coverage_household.coverage_household_members.build(family_member: family_member)
+      end
+    end 
+  end 
+
   def update_household
     household = get_household
 
@@ -236,26 +304,29 @@ private
     if active_household
      active_household  #if active_houshold exists
     else
-     households.build #create a new empty household
+     initialize_irs_group
+     initialize_household 
+     # households.build(submitted_at: DateTime.current) #create a new empty household
     end
   end
 
   def create_coverage_households(household)
+    time_stamp ||= DateTime.current
     household.coverage_households.delete_all #clear any existing
 
-    coverage_household = household.coverage_households.build({submitted_at: submitted_at})
+    coverage_household = household.coverage_households.build(submitted_at: self.submitted_at)
     coverage_household_for_others = nil
 
     family_members.each do |family_member|
-      if family_member.is_coverage_applicant
+      if family_member.is_coverage_applicant?
         if valid_relationship?(family_member)
           coverage_household_member = coverage_household.coverage_household_members.build
-          coverage_household_member.applicant_id = family_member.id
+          coverage_household_member.family_member = family_member
           coverage_household_member.is_subscriber = family_member.is_primary_applicant
         else
           coverage_household_for_others ||= household.coverage_households.build({submitted_at: self.submitted_at})
           coverage_household_member = coverage_household_for_others.coverage_household_members.build
-          coverage_household_member.applicant_id = family_member.id
+          coverage_household_member.family_member = family_member
         end
       end
     end
@@ -265,9 +336,7 @@ private
     return true if primary_applicant.nil? #responsible party case
     return true if primary_applicant.person.id == family_member.person.id
 
-    valid_relationships = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter}
-
-    if valid_relationships.include? primary_applicant.person.find_relationship_with(family_member.person)
+    if ImmediateFamily.include? primary_applicant.person.find_relationship_with(family_member.person)
       return true
     else
       return false

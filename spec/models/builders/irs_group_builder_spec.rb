@@ -4,8 +4,8 @@ require 'builders/irs_group_builder'
 describe IrsGroupBuilder do
 
   before(:each) do
-    @family = Family.new({submitted_at:DateTime.now})
-    @family.households.build({is_active:true})
+    @family = Family.new({submitted_at: DateTime.current})
+    @family.households.build({is_active: true})
     @irs_group_builder = IrsGroupBuilder.new(@family)
   end
 
@@ -34,7 +34,7 @@ describe IrsGroupBuilder do
     it 'retains IrsGroup of previously active household and assigns it to current household' do
       irs_group = @irs_group_builder.build
       @irs_group_builder.save
-      @family.households.build({is_active:true})
+      @family.households.build({is_active: true})
       @family.save
       @irs_group_builder = IrsGroupBuilder.new(@family)
       irs_group2 = @irs_group_builder.update

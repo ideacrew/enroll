@@ -7,6 +7,12 @@ class CoverageHousehold
 
   embedded_in :household
 
+  # all coverage_household members are immediate relations
+  field :is_immediate_family, type: Boolean
+
+  # coverage household includes immediate relations with non-QHP eligibility determination 
+  field :is_determination_split_household, type: Boolean, default: false
+
   field :submitted_at, type: DateTime
 
   embeds_many :coverage_household_members
@@ -19,7 +25,7 @@ class CoverageHousehold
 
   def presence_of_coverage_household_members
     if self.coverage_household_members.size == 0
-      self.errors.add(:base, "Should have atleast one coverage_household_member")
+      self.errors.add(:base, "Should have at least one coverage_household_member")
     end
   end
 
