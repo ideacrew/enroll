@@ -30,7 +30,7 @@ describe FamilyMember, type: :model do
   let(:p1) {Person.create!(first_name: "Patrick", last_name: "Carney")}
   let(:ag) {Family.create()}
   let(:family_member_params) {
-    {person: p0,
+    { person: p0,
       is_primary_applicant: true,
       is_coverage_applicant: true,
       is_consent_applicant: true,
@@ -57,9 +57,7 @@ describe FamilyMember, type: :model do
     end
 
     it "without person" do
-      family_member = FamilyMember.new(**family_member_params)
-      family_member.person= nil
-      expect(family_member.person).to eq p0
+      expect(FamilyMember.new(**family_member_params.except(:person)).valid?).to be_falsey
     end
   end
 
