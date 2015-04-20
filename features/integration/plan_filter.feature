@@ -1,8 +1,5 @@
 @watir
-Feature: Employee Sign Up
-  In order to get access to the site
-  As an employee
-  I need to create an account and match an existing record
+Feature: Filter in Plan Selection Page
 
 Scenario: New employee with existing person
   Given I do not exist as a user
@@ -15,3 +12,11 @@ Scenario: New employee with existing person
   Then I should see the employee search page
   When I enter the identifying info of my existing person
   Then I should see the matched employee record form
+  When I enter the personal infomation of my existing person
+  Then I should see the matched household information
+  When I enter household information
+  Then I should see the plan selection page
+  When I enter filter in plan selection page
+  Then I should see the filter results
+  When I enter combind filter in plan selection page
+  Then I should see the combind filter results

@@ -1,5 +1,4 @@
-
-def create_usermodel
+def create_visitor
   @visitor ||= { :name => "Testy McUserton", :email => "example@example.com",
     :password => "changeme", :password_confirmation => "changeme" }
 end
@@ -47,6 +46,14 @@ end
 ### GIVEN ###
 Given /^I am not logged in$/ do
   visit '/users/sign_out'
+end
+
+When(/^I go to home page$/) do
+  visit '/' 
+end
+
+Then(/^I should see "(.*?)"$/) do |arg1| 
+  page.should have_content(arg1)
 end
 
 Given /^I am logged in$/ do
