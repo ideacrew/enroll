@@ -65,7 +65,10 @@ module Factories
       emp_role.census_family_id = emp_family.id
       assigned_emp_role = person.employee_roles.new(emp_role.attributes)
       person_wrapper = Forms::EmployeeRole.new(person)
+      person_wrapper.employer_profile_id = emp_family.employer_profile.id
       person_wrapper.employee_role_id = assigned_emp_role.id
+      person_wrapper.census_family_id = emp_family.id
+      person_wrapper.census_employee_id = census_employee.id
       person_wrapper
     end
 
