@@ -40,4 +40,21 @@ class Consumer::EmployeeRolesController < ApplicationController
       end
     end
   end
+
+  def create
+    @person = Forms::EmployeeRole.from_parameters(params.require(:person))
+    if @person.save
+      redirect_to dependent_details_people_path(:person_id => @person.id, :organization_id => @person.organization_id)
+    else
+      @employer_profile = @person.employer_profile
+      @benefit_group = @person.benefit_group
+      @census_family = @person.census_family
+      @census_employee = @person.census_employee
+      @effective_on = @benefit_group.effective_on_for(@census_employee.hired_on)
+      respond_to do |format|
+        format.html { render "match" }
+        format.js { render "match" }
+      end
+    end
+  end
 end
