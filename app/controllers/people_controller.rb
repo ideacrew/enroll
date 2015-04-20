@@ -208,6 +208,8 @@ class PeopleController < ApplicationController
     sanitize_person_params
     @person = Person.find(params[:id])
 
+    make_new_person_params @person
+
     # Delete old sub documents
     @person.addresses.each {|address| address.delete}
     @person.phones.each {|phone| phone.delete}
@@ -373,6 +375,31 @@ private
     end
   end
 
+  def make_new_person_params person
+
+    # Delete old sub documents
+    person.addresses.each {|address| address.delete}
+    person.phones.each {|phone| phone.delete}
+    person.emails.each {|email| email.delete}
+
+    person_params["addresses_attributes"].each do |key, address|
+      if address.has_key?('id')
+        address.delete('id')
+      end
+    end
+
+    person_params["phones_attributes"].each do |key, phone|
+      if phone.has_key?('id')
+        phone.delete('id')
+      end
+    end
+
+    person_params["emails_attributes"].each do |key, email|
+      if email.has_key?('id')
+        email.delete('id')
+      end
+    end
+  end
 
   def person_params
     params.require(:person).permit!
