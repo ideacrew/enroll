@@ -15,3 +15,5 @@ Feature: Employee Sign Up
     Then I should see the employee search page
     When I enter the identifying info of my existing person
     Then I should see the matched employee record form
+    When I complete the matched employee form
+    Then I should see the dependents page

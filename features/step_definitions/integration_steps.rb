@@ -5,7 +5,7 @@ Before "@watir" do
 end
 
 After "@watir" do
-  @browser.close
+#  @browser.close
 end
 
 Given(/^I do not exist as a user$/) do
@@ -57,10 +57,22 @@ When(/^I enter the identifying info of my existing person$/) do
   @browser.p(:text=> /Personal Information/).click
   @browser.text_field(:name => "person[ssn]").set("722991234")
   sleep(2)
-  @browser.a(:text => "Search").click
+  @browser.input(:value => "Search", :type => "submit").click
   sleep(3)
 end
 
 Then(/^I should see the matched employee record form$/) do
   expect(@browser.div(:text => /Employer : Acme Inc\./).visible?).to be_truthy
+end
+
+When(/^I complete the matched employee form$/) do
+  @browser.text_field(:name => "person[phones_attributes][0][full_phone_number]").set("5555555555")
+  @browser.text_field(:name => "person[emails_attributes][0][address]").set("jhall@gmail.com")
+  @browser.text_field(:name => "person[emails_attributes][1][address]").click
+  @browser.a(:id => "continue-employer").click
+  sleep(5)
+end
+
+Then(/^I should see the dependents page$/) do
+    pending # express the regexp above with the code you wish you had
 end
