@@ -11,7 +11,9 @@
       <%#= link_to 'Dependent Info', url %>
     <%# end %>
 
-    <div class="hidden">
+    <div class="hidden"> 
+    <% f.hidden_field :employee_role_id %>
+    <% f.hidden_field :census_family_id %>
     <%= f.fields_for :employee_roles do |er| %>
       <%= er.hidden_field :id %>
       <%= er.hidden_field :employer_profile_id %>

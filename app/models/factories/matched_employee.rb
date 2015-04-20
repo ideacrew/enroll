@@ -12,8 +12,7 @@ module Factories
       person_form.user_id = consumer_identity.user_id
       populate_identity_properties(person_form, consumer_identity)
       build_nested_models(person_form)
-      build_employee_role(person_form, roster_employee)
-      person_form
+      build_employee_role_and_assign(person_form, roster_employee)
     end
 
     def populate_identity_properties(person, ci)
@@ -49,7 +48,7 @@ module Factories
       end
     end
 
-    def build_employee_role(person, census_employee)
+    def build_employee_role_and_assign(person, census_employee)
       emp_family = census_employee.employee_family
       emp_role = EmployeeRole.new
       copy_properties(
@@ -64,7 +63,10 @@ module Factories
       )
       emp_role.employer_profile_id = emp_family.employer_profile.id
       emp_role.census_family_id = emp_family.id
-      person.employee_roles.new(emp_role.attributes)
+      assigned_emp_role = person.employee_roles.new(emp_role.attributes)
+      person_wrapper = Forms::EmployeeRole.new(person)
+      person_wrapper.employee_role_id = assigned_emp_role.id
+      person_wrapper
     end
 
     def build_address_from_employee(person_form, census_employee)
