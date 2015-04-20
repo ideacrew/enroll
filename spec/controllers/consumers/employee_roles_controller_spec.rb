@@ -1,6 +1,57 @@
 require 'rails_helper'
 
 RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
+  describe "PUT update" do
+    let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
+    let(:organization_id) { "1234324234" }
+    let(:person_id) { "4324324234" }
+    let(:benefit_group) { double }
+    let(:census_employee) { double(:hired_on => "whatever" ) }
+    let(:census_family) { double }
+    let(:employer_profile) { double }
+    let(:effective_date) { double }
+    let(:person_id) { "5234234" }
+    let(:role_form) {
+      double(
+             :organization_id => organization_id,
+             :benefit_group => benefit_group,
+             :census_employee => census_employee,
+             :census_family => census_family,
+             :employer_profile => employer_profile,
+             :id => person_id)
+    }
+
+    before(:each) do
+      sign_in
+      allow(Forms::EmployeeRole).to receive(:find).with(person_id).and_return(role_form)
+      allow(benefit_group).to receive(:effective_on_for).with("whatever").and_return(effective_date)
+      allow(role_form).to receive(:update_attributes).with(person_parameters).and_return(save_result)
+      put :update, :person => person_parameters, :id => person_id
+    end
+
+    describe "given valid person parameters" do
+      let(:save_result) { true }
+
+      it "should redirect to dependent_details" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("dependent_details")
+      end
+    end
+
+    describe "given invalid person parameters" do
+      let(:save_result) { false }
+
+      it "should render match" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("match")
+        expect(assigns(:person)).to eq role_form
+        expect(assigns[:effective_on]).to eq effective_date
+        expect(assigns[:benefit_group]).to eq benefit_group
+        expect(assigns[:census_family]).to eq census_family
+        expect(assigns[:employer_profile]).to eq employer_profile
+      end
+    end
+  end
   describe "POST create" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:organization_id) { "1234324234" }
@@ -31,8 +82,8 @@ RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
       let(:save_result) { true }
 
       it "should redirect to dependent_details" do
-        expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(dependent_details_people_path(:person_id => person_id, :organization_id => organization_id))
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("dependent_details")
       end
     end
 

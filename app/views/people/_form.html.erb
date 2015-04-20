@@ -12,18 +12,13 @@
     <%# end %>
 
     <div class="hidden"> 
-    <% f.hidden_field :employee_role_id %>
-    <% f.hidden_field :employer_profile_id %>
-    <% f.hidden_field :census_employee_id %>
-    <% f.hidden_field :census_family_id %>
-    <%= f.fields_for :employee_roles do |er| %>
-      <%= er.hidden_field :id %>
-      <%= er.hidden_field :employer_profile_id %>
-      <%= er.hidden_field :census_family_id %>
-      <%= er.hidden_field :benefit_group_id %>
-      <%= er.hidden_field :hired_on %>
-      <%= er.hidden_field :terminated_on %>
-    <% end %>
+    <%= f.hidden_field :census_family_id %>
+    <%= f.hidden_field :census_employee_id %>
+    <%= f.hidden_field :employer_profile_id %>
+    <%= f.hidden_field :organization_id %>
+    <%= f.hidden_field :hired_on %>
+    <%= f.hidden_field :terminated_on %>
+    <%= f.hidden_field :benefit_group_id %>
     </div>
   	<%= render 'shared/error_messages' %>
   	<%= render 'shared/person_search_fields', f: f %>

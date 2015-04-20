@@ -50,32 +50,29 @@ module Factories
 
     def build_employee_role_and_assign(person, census_employee)
       emp_family = census_employee.employee_family
-      emp_role = EmployeeRole.new
-      copy_properties(
-        census_employee,
-        emp_role,
-        [:hired_on, :terminated_on]
-      )
-      copy_properties(
-        emp_family, 
-        emp_role,
-        [:benefit_group_id]
-      )
-      emp_role.employer_profile_id = emp_family.employer_profile.id
-      emp_role.census_family_id = emp_family.id
-      assigned_emp_role = person.employee_roles.new(emp_role.attributes)
       person_wrapper = Forms::EmployeeRole.new(person)
-      person_wrapper.organization_id = emp_family.employer_profile.organization.id
+      person_wrapper.hired_on = census_employee.hired_on
+      person_wrapper.terminated_on = census_employee.terminated_on
+      person_wrapper.benefit_group_id = emp_family.benefit_group_id
       person_wrapper.employer_profile_id = emp_family.employer_profile.id
-      person_wrapper.employee_role_id = assigned_emp_role.id
       person_wrapper.census_family_id = emp_family.id
+      person_wrapper.organization_id = emp_family.employer_profile.organization.id
       person_wrapper.census_employee_id = census_employee.id
       person_wrapper
     end
 
     def build_address_from_employee(person_form, census_employee)
       if census_employee.address.present?
-        person_form.addresses.new(census_employee.address.attributes)
+        # Because it hates us so much, mongoid will copy over all of the
+        # attributes unless we tell it don't do that.
+        ca = census_employee.address
+        person_form.address.new({
+          :address_1 => ca.address_1,
+          :address_2 => ca.address_2,
+          :city => ca.city,
+          :state => ca.state,
+          :zip => ca.zip
+        })
       end
     end
   end

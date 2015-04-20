@@ -4,7 +4,7 @@ class EmployeeRole
 
   EMPLOYMENT_STATUS_KINDS   = ["active", "full-time", "part-time", "retired", "terminated"]
 
-  embedded_in :person
+  embedded_in :person, :inverse_of => :employee_role
 
   field :employer_profile_id, type: BSON::ObjectId
   field :census_family_id, type: BSON::ObjectId

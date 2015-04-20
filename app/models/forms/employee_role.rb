@@ -1,17 +1,13 @@
 module Forms
   class EmployeeRole < SimpleDelegator
-    attr_accessor :employee_role_id
-    attr_accessor :census_employee_id
-    attr_accessor :census_family_id
-    attr_accessor :employer_profile_id
-    attr_accessor :organization_id
-
     WRAPPED_ATTRIBUTES = [
-      "employee_role_id",
       "census_employee_id",
       "census_family_id",
       "employer_profile_id",
-      "organization_id"
+      "organization_id",
+      "hired_on",
+      "terminated_on",
+      "benefit_group_id"
     ]
 
     attr_accessor(*WRAPPED_ATTRIBUTES)
@@ -45,6 +41,32 @@ module Forms
     def assign_attributes(options = {})
       options.each_pair do |k, v|
         self.send("#{k}=", v)
+      end
+    end
+
+    def save
+     super.tap do |val|
+       if val
+         add_employee_role(__getobj__, for_wrapper)
+       end
+     end
+    end
+
+    def add_employee_role(person_record, attrs)
+      emp_attrs = attrs.dup.reject { |k,v| ["organization_id","census_employee_id"].include?(k.to_s) }
+      person_record.employee_roles << ::EmployeeRole.new(emp_attrs)
+    end
+
+    def update_attributes(opts = {})
+      for_wrapper, for_person = self.class.clean_attributes(opts)
+      assign_attributes(for_wrapper)
+      for_person.each_pair do |k,v|
+        __getobj__.write_attribute(k, v)
+      end
+      __getobj__.save.tap do |val|
+        if val
+          add_employee_role(__getobj__, for_wrapper)
+        end
       end
     end
 
