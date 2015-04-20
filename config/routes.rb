@@ -8,7 +8,6 @@ Rails.application.routes.draw do
     end
   end
 
-
   namespace :products do
     resources :plans, controller: :qhp do
       collection do
@@ -18,9 +17,7 @@ Rails.application.routes.draw do
     end
   end
 
-#Route pattern refactor BEGIN
   namespace :consumer do
-
     resources :employee, :controller=>"employee_roles" do
 
       collection do
@@ -53,12 +50,6 @@ Rails.application.routes.draw do
         get 'rehire'
       end
     end
-  end
-#END
-
-  resources :employee_roles do #TODO Delete
-    get 'new'
-    get 'my_account'
   end
 
   resources :people do #TODO Delete
