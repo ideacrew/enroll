@@ -1,12 +1,12 @@
 require 'watir'
 
 Before "@watir" do
-  load Rails.root + "db/seeds.rb"
+#  load Rails.root + "db/seeds.rb"
   @browser = Watir::Browser.new :chrome
 end
 
 After "@watir" do
-  @browser.close
+#  @browser.close
 end
 
 Given(/^I do not exist as a user$/) do
@@ -64,6 +64,7 @@ end
 
 Then(/^I should see the matched employee record form$/) do
   expect(@browser.div(:text => /Employer : Acme Inc\./).visible?).to be_truthy
+  raise "BAIL HOMIE"
 end
 
 When(/^I enter the personal infomation of my existing person$/) do

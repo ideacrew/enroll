@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe Forms::ConsumerIdentity do
+describe Forms::EmployeeCandidate do
     it "should have error on dob" do
       subject.valid?
       expect(subject.errors).to include(:date_of_birth)
@@ -18,14 +18,14 @@ describe Forms::ConsumerIdentity do
     end
 end
 
-describe Forms::ConsumerIdentity, "asked to match a census employee" do
+describe Forms::EmployeeCandidate, "asked to match a census employee" do
   let(:fake_org) { instance_double("Organization", :employer_profile => fake_employer) }
   let(:fake_employer) { instance_double("EmployerProfile", :employee_families => [employee_family]) }
-  let(:employee_family) { instance_double("EmployerCensus::EmployeeFamily", :census_employee => census_employee) }
+  let(:employee_family) { instance_double("EmployerCensus::EmployeeFamily", :census_employee => census_employee, :linked_at => nil) }
   let(:census_employee) { instance_double("EmployerCensus::Employee", :ssn => "123456789", :dob => Date.new(2012,10,12) ) }
 
   subject { 
-    Forms::ConsumerIdentity.new({
+    Forms::EmployeeCandidate.new({
       :date_of_birth => "10/12/2012",
       :ssn => "123-45-6789"
     })
@@ -48,10 +48,10 @@ describe Forms::ConsumerIdentity, "asked to match a census employee" do
 
 end
 
-describe Forms::ConsumerIdentity, "asked to match a person" do
+describe Forms::EmployeeCandidate, "asked to match a person" do
 
   subject { 
-    Forms::ConsumerIdentity.new({
+    Forms::EmployeeCandidate.new({
       :date_of_birth => "10/12/2012",
       :ssn => "123-45-6789"
     })
