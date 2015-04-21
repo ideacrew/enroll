@@ -73,6 +73,15 @@ describe EmployerCensus::EmployeeFamily, 'class methods' do
   def census_employee;  employee_family.census_employee; end
   def employee_role;    FactoryGirl.build(:employee_role, ssn: census_employee.ssn, dob: census_employee.dob); end
 
+  describe ".id" do
+    it "should return nil if no census family present " do
+      expect(EmployerCensus::EmployeeFamily.find(EmployerCensus::EmployeeFamily.new.id)).to be_nil
+    end
+    it "should return census family object" do
+      expect(EmployerCensus::EmployeeFamily.find(employee_family.id)).to be_an_instance_of EmployerCensus::EmployeeFamily
+    end
+  end
+
   describe ".find_by_employee_role" do
     context "and there's no matching employee_role in employee_families" do
       it "should return nil" do
@@ -112,6 +121,7 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
   let(:employer_profile) {FactoryGirl.create(:employer_profile)}
   let(:employee_role) {FactoryGirl.build(:employee_role)}
   let(:census_family) {FactoryGirl.build(:employer_census_family)}
+  let(:census_employee) { census_family.census_employee }
 
   describe '#link_employee_role' do
 
@@ -224,6 +234,9 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
     let(:benefit_group) {FactoryGirl.create(:benefit_group)}
 
     it 'sets benefit_group' do
+      census_family.benefit_group = benefit_group
+      expect(census_family.benefit_group_id).to eq benefit_group.id
+      expect(census_family.plan_year_id).to eq benefit_group.plan_year.id
     end
 
     it 'gets benefit_group' do
@@ -234,40 +247,45 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
     let(:plan_year) {FactoryGirl.create(:plan_year)}
 
     it 'sets plan_year' do
+      census_family.plan_year = plan_year
+      expect(census_family.plan_year_id).to eq plan_year.id
     end
 
     it 'gets plan_year' do
+      census_family.plan_year = plan_year
+      census_family.employer_profile.plan_years = [plan_year]
+      expect(census_family.plan_year).to be_an_instance_of PlanYear
+      expect(census_family.plan_year_id).to eq census_family.employer_profile.plan_years.first.id
     end
   end
 
   describe '#replicate_for_rehire' do
-    it 'copies this family to new instance' do
-      # user - FactoryGirl.create(:user)
-      er = FactoryGirl.create(:employer_profile)
-      ee = FactoryGirl.build(:employer_census_employee)
-      ee.address = FactoryGirl.build(:address)
-
-      family = er.employee_families.build(census_employee: ee)
-      # family.link(user)
-      family.census_employee.hired_on = Date.today - 1.year
-      family.census_employee.terminated_on = Date.today - 10.days
-      ditto = family.replicate_for_rehire
-
+    it 'copies the family to new instance if the employee is rehired.' do
+      census_family.census_employee.hired_on = Date.today - 1.year
+      census_family.census_employee.terminated_on = Date.today - 10.days
+      census_family.terminated = true
+      ditto = census_family.replicate_for_rehire
       expect(ditto).to be_an_instance_of EmployerCensus::EmployeeFamily
       expect(ditto.employee_role_id).to be_nil
+      expect(ditto.is_active?).to eq false
       expect(ditto.is_linked?).to eq false
 
-      expect(ditto.census_employee).to eq ee
+      expect(ditto.census_employee).to eq census_employee
       expect(ditto.census_employee.hired_on).to be_nil
       expect(ditto.census_employee.terminated_on).to be_nil
-      expect(ditto.census_employee.address).to eq ee.address
+      expect(ditto.census_employee.address).to eq census_employee.address
+    end
 
+    it "does not copy if the employee is already present." do
+      ditto = census_family.replicate_for_rehire
       ditto.census_employee.hired_on = 1.year.ago
-      er.employee_families = [ditto]
-      er.save
+      employer_profile.employee_families = [ditto]
+      employer_profile.save
 
-      ditto1 = family.replicate_for_rehire
-      expect(ditto1).to be_nil
+      ditto_1 = census_family.replicate_for_rehire
+      expect(census_family.is_active?).to eq true
+      expect(ditto_1).to be_nil
+      # expect{census_family.replicate_for_rehire}.to raise_error("EmployerCensus::EmployeeFamily instance is already active")
     end
   end
 end

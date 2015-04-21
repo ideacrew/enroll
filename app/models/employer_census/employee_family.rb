@@ -69,7 +69,7 @@ class EmployerCensus::EmployeeFamily
   end
 
   def plan_year
-    return if plan_year.blank?
+    return if plan_year_id.blank?
     parent.plan_years.find(self.plan_year_id)
   end
 
@@ -151,7 +151,7 @@ class EmployerCensus::EmployeeFamily
 
     def find(id)
       organizations = Organization.where("employer_profile.employee_families._id" => BSON::ObjectId.from_string(id))
-      organizations.size > 0 ? organizations.first.employer_profile.employee_families.unscoped.detect { |family| family._id.to_s == id} : nil
+      organizations.size > 0 ? organizations.first.employer_profile.employee_families.unscoped.detect { |family| family._id.to_s == id.to_s} : nil
     end
   end
 
