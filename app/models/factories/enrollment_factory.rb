@@ -78,6 +78,12 @@ class EnrollmentFactory
 
   end
 
+  # Fix this method to utilize the following:
+  # needs:
+  #   an object that responds to the names and gender methods
+  #   employee_family
+  #   user
+
   def self.add_employee_role(user: nil, employer_profile:,
         name_pfx: nil, first_name:, middle_name: nil, last_name:, name_sfx: nil,
         ssn:, dob:, gender:, hired_on:

@@ -1,5 +1,5 @@
 module Forms
-  class ConsumerIdentity
+  class EmployeeCandidate
     include ActiveModel::Model
     include ActiveModel::Validations
 

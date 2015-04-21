@@ -3,7 +3,7 @@ class Consumer::EmployeeRolesController < ApplicationController
   end
 
   def search
-    @person = Forms::ConsumerIdentity.new
+    @person = Forms::EmployeeCandidate.new
     respond_to do |format|
       format.html
       format.js
@@ -11,12 +11,12 @@ class Consumer::EmployeeRolesController < ApplicationController
   end
 
   def match
-    @consumer_identity = Forms::ConsumerIdentity.new(params.require(:person))
+    @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person))
     service = Services::EmployeeSignupMatch.new
-    if @consumer_identity.valid?
-      found_information = service.call(@consumer_identity)
+    if @employee_candidate.valid?
+      found_information = service.call(@employee_candidate)
       if found_information.nil?
-        @person = @consumer_identity
+        @person = @employee_candidate
         respond_to do |format|
           format.js { render 'no_match' }
           format.html { render 'no_match' }
@@ -33,7 +33,7 @@ class Consumer::EmployeeRolesController < ApplicationController
         end
       end
     else
-      @person = @consumer_identity
+      @person = @employee_candidate
       respond_to do |format|
         format.js { render 'search' }
         format.html { render 'search' }

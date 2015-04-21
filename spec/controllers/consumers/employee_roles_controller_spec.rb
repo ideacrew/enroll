@@ -104,7 +104,7 @@ RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
 
   describe "POST match" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
-    let(:mock_consumer_identity) { instance_double("Forms::ConsumerIdentity", :valid? => validation_result) }
+    let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result) }
     let(:mock_service) { instance_double("Services::EmployeeSignupMatch") }
     let(:hired_on) { double }
     let(:mock_census_employee) { instance_double("EmployerCensus::Employee", :employee_family => mock_census_family, :hired_on => hired_on) }
@@ -117,9 +117,9 @@ RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
 
     before(:each) do
       sign_in 
-      allow(Forms::ConsumerIdentity).to receive(:new).with(person_parameters).and_return(mock_consumer_identity)
+      allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters).and_return(mock_employee_candidate)
       allow(Services::EmployeeSignupMatch).to receive(:new).and_return(mock_service)
-      allow(mock_service).to receive(:call).with(mock_consumer_identity).and_return(found_models)
+      allow(mock_service).to receive(:call).with(mock_employee_candidate).and_return(found_models)
       allow(mock_benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
       post :match, :person => person_parameters
     end
@@ -129,7 +129,7 @@ RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
       it "renders the 'search' template" do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("search")
-        expect(assigns[:consumer_identity]).to eq mock_consumer_identity
+        expect(assigns[:employee_candidate]).to eq mock_employee_candidate
       end
     end
 
@@ -140,7 +140,7 @@ RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
         it "renders the 'no_match' template" do
           expect(response).to have_http_status(:success)
           expect(response).to render_template("no_match")
-          expect(assigns[:consumer_identity]).to eq mock_consumer_identity
+          expect(assigns[:employee_candidate]).to eq mock_employee_candidate
         end
 
         context "that find a matching employee" do
@@ -149,7 +149,7 @@ RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
           it "renders the 'match' template" do
             expect(response).to have_http_status(:success)
             expect(response).to render_template("match")
-            expect(assigns[:consumer_identity]).to eq mock_consumer_identity
+            expect(assigns[:employee_candidate]).to eq mock_employee_candidate
             expect(assigns[:effective_on]).to eq effective_date
             expect(assigns[:benefit_group]).to eq mock_benefit_group
             expect(assigns[:census_family]).to eq mock_census_family
@@ -170,7 +170,7 @@ RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
     it "renders the 'search' template" do
       expect(response).to have_http_status(:success)
       expect(response).to render_template("search")
-      expect(assigns[:person]).to be_a(Forms::ConsumerIdentity)
+      expect(assigns[:person]).to be_a(Forms::EmployeeCandidate)
     end
   end
 
