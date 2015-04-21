@@ -244,7 +244,7 @@ describe EmployerCensus::EmployeeFamily, 'instance methods' do
   end
 
   describe '#plan_year' do
-    let(:plan_year) {FactoryGirl.create(:plan_year)}
+    let(:plan_year) {FactoryGirl.build(:plan_year)}
 
     it 'sets plan_year' do
       census_family.plan_year = plan_year
