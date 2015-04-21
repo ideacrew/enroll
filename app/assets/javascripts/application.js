@@ -22,19 +22,19 @@
 //= require override_confirm
 //= require_tree .
 
-$('input.floatlabel').floatlabel();
-
 $(document).ready(function () {
 
-  $(".date-picker, .date_picker").datepicker({
-    changeMonth: true,
-    changeYear: true,
-    yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()
+  $(document).on("focus", "[class~='date-picker']", function(e){
+    $(this).datepicker({ 
+      changeMonth: true,
+      changeYear: true,
+      yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()
     });
-  $('.floatlabel').floatlabel({
-      slideInput: false
   });
 
+  $('input.floatlabel').floatlabel({
+    slideInput: false
+  });
   
   $(".address-li").on('click',function(){
     $(".address-span").html($(this).data("address-text"));
@@ -480,6 +480,7 @@ $(document).ready(function () {
   $("#person_ssn").mask("999999999");
   $(".person_ssn").mask("999999999");
   $(".address-state").mask("AA");
+  $(".mask-ssn").mask("999999999");
   
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {

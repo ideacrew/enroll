@@ -1,5 +1,5 @@
-<li id="add_member_list_<%= dependent.id %>" class="dependent_list" style="padding: 0;border-radius: 0;border: none;margin-bottom: 20px;">
-  <div id="add_info<%= dependent.id %>" class="focus_effect row personal-info-row">
+<li id="add_member_list_<%= dependent.id %>" class="dependent_list">
+  <div id="add_info_<%= dependent.id %>" class="focus_effect row personal-info-row">
     <%= form_for dependent, :remote => true, method: :post,:url => {action: "save_dependents"} do |f| %>
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd first">
         <div class="dependent_notice_div_<%= dependent.id%>"></div>
@@ -20,11 +20,12 @@
                 <div class="form-group form-group-lg">
                     <%= f.text_field :last_name, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "LAST NAME" %>
                     <div class="text-right">
+                      <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: person.id, organization_id: employer) %>
                       <% if dependent.new_record? %>
-                        <%= link_to (image_tag "member-close.png"), 'javascript:;', class: 'close-1' %>
+                        <%= hidden_field_tag 'family_member_remove_url', remove_url %>
+                        <%= link_to (image_tag "member-close.png"), 'javascript:;', class: 'close close-1', method: :delete, remote: true,  data: {ok: 'yes', cancel: 'no'} %>
                       <% else %>
-                        <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: person.id, organization_id: employer) %>
-                        <%= link_to (image_tag "member-close.png"), remove_url, class: 'close-2', :method => :delete, :remote => true, data: {confirm: "Remove #{dependent.full_name}?", ok: 'yes', cancel: 'no'} %>
+                        <%= link_to (image_tag "member-close.png"), remove_url, class: 'close close-2', :method => :delete, :remote => true, data: {confirm: "Remove #{dependent.full_name}?", ok: 'yes', cancel: 'no'} %>
                       <% end %>
                     </div>
                 </div>
@@ -34,7 +35,7 @@
             <div class="row bottom-row top-row-2">
               <div class="col-md-3 col-sm-3 no-pd">
                 <div class="form-group form-group-lg">
-                    <%= f.text_field :dob, class: "required date_picker home floatlabel form-control", required: true, value: dependent.dob.try(:strftime, "%m/%d/%Y"), placeholder: "DATE OF BIRTH", id: "family_member_dob_#{dependent.id}" %>
+                    <%= f.text_field :dob, class: "required date-picker home floatlabel form-control", required: true, value: dependent.dob.try(:strftime, "%m/%d/%Y"), placeholder: "DATE OF BIRTH", id: "family_member_dob_#{dependent.id}" %>
                 </div>
               </div>
 
@@ -77,23 +78,15 @@
         </div>
 
         <div class="clearfix"></div>
-        <div id="add_info_buttons<%= dependent.id %>" class="hidden" style="padding-top: 20px;">
+        <div id="add_info_buttons_<%= dependent.id %>" class="hidden" style="padding-top: 20px;">
           <%= link_to "Cancel", 'javascript:void(0)', class: 'btn btn-red', id: 'cancel_member' %>
           <%= f.submit 'Confirm Member', class: "btn btn-save pull-right"  %>
         </div>
       <% end %>
   </div>
-  <script type="text/javascript" charset="utf-8">
-    $(".date-picker, .date_picker").datepicker({
-        changeMonth: true,
-        changeYear: true,
-        yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()
-     });
+  <script>
      $('.floatlabel').floatlabel({
           slideInput: false
      });
-     $('.house').addClass('employee-info');
-     $(".mask-ssn").mask("999999999");
   </script>
-
 </li>
