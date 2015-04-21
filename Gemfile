@@ -99,6 +99,7 @@ group :test do
   gem 'cucumber-rails', '~> 1.4.2', :require => false
   gem 'database_cleaner', '1.3.0'
   gem 'shoulda-matchers', require: false
+  gem 'headless'
 end
 
 group :production do

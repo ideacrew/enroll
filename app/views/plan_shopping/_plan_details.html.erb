@@ -1,7 +1,10 @@
 <!-- Plan first row start -->
 <div class="plan-row"
 	data-plan-category="<%= plan.plan_type ? plan.plan_type.downcase : "" %>"
-	data-plan-metal-level="<%= plan.metal_level.downcase %>">
+  data-plan-metal-level="<%= plan.metal_level.downcase %>"
+  data-plan-metal-network="<%= plan.nationwide ? "nationwide" : "dc area network" %>"
+  data-plan-metal-premium="<%= plan.total_premium %>"
+  data-plan-metal-deductible="<%= plan.deductible %>">
   <div class="row">
     <div class="col-md-6 col-sm-9 col-xs-12">
       <p>

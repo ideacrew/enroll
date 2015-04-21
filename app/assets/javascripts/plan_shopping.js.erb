@@ -6,37 +6,54 @@ function hidePlanTabs() {
 }
 
 function combineAllPlanSelectors(planSelectors) {
-	var selectors = [];
-	var baseSelector = $(".plan-row");
-	var combinedSelectors = baseSelector;
-        combinedSelectors.hide();
-		for (var i = 0; i < planSelectors.length; i++) {
-			combinedSelectors = combinedSelectors.filter(planSelectors[i]);
-		}
-	combinedSelectors.show();
+  var selectors = [];
+  var baseSelector = $(".plan-row");
+  var combinedSelectors = baseSelector;
+  combinedSelectors.hide();
+  for (var i = 0; i < planSelectors.length; i++) {
+    combinedSelectors = combinedSelectors.filter(planSelectors[i]);
+  }
+  combinedSelectors = filterPlanByRange("premium", combinedSelectors);
+  combinedSelectors = filterPlanByRange("deductible", combinedSelectors);
+  combinedSelectors.show();
+}
+
+function filterPlanByRange(type, combinedSelectors) {
+  var from = parseFloat($("input.plan-metal-"+type+"-from-selection-filter").val().replace(/[^\d\.]/g,''));
+  var to= parseFloat($("input.plan-metal-"+type+"-to-selection-filter").val().replace(/[^\d\.]/g,''));
+  if (isNaN(from) || isNaN(to)){
+    return combinedSelectors;
+  } else {
+    var selectors = combinedSelectors.filter(function(){
+      var premium = parseFloat($(this).data("plan-metal-"+type).toString().replace(/[^\d\.]/g,''));
+      return (premium >= from && premium <= to);
+    });
+    return selectors;
+  }
 }
 
 function applyPlanFilterCBs(cbKlass, cbFilterKlass, planValueTag) {
-	var selectedPlanTypes = [];
-	var spCheckboxes = $('input.' + cbKlass + ':checked');
-	if (spCheckboxes.size() > 0) {
-		spCheckboxes.each(function(idx, ele) {
-			var ptName = $(ele).attr(cbFilterKlass);
-			var qstring = "[" + planValueTag  + "='" + ptName + "']";
-                        selectedPlanTypes.push(qstring);
-		});
-                return $(selectedPlanTypes.join(", "));
-	} else {
-		return $("[" + planValueTag + "]");
-	}
+  var selectedPlanTypes = [];
+  var spCheckboxes = $('input.' + cbKlass + ':checked');
+  if (spCheckboxes.size() > 0) {
+    spCheckboxes.each(function(idx, ele) {
+      var ptName = $(ele).attr(cbFilterKlass);
+      var qstring = "[" + planValueTag  + "='" + ptName + "']";
+      selectedPlanTypes.push(qstring);
+    });
+    return $(selectedPlanTypes.join(", "));
+  } else {
+    return $("[" + planValueTag + "]");
+  }
 }
 
 function applyPlanFilters() {
-	var all_selectors = [ 
-	  applyPlanFilterCBs("plan-type-selection-filter", "data-plan-category-filter", "data-plan-category"),
-	  applyPlanFilterCBs("plan-metal-level-selection-filter", "data-plan-metal-level-filter", "data-plan-metal-level")
-	];
-        combineAllPlanSelectors(all_selectors);
+  var all_selectors = [ 
+    applyPlanFilterCBs("plan-type-selection-filter", "data-plan-category-filter", "data-plan-category"),
+    applyPlanFilterCBs("plan-metal-level-selection-filter", "data-plan-metal-level-filter", "data-plan-metal-level"),
+    applyPlanFilterCBs("plan-metal-network-selection-filter", "data-plan-metal-network-filter", "data-plan-metal-network")
+  ];
+  combineAllPlanSelectors(all_selectors);
 }
 
 var plansToCompareArray = new Array();
