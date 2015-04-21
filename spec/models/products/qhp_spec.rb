@@ -26,4 +26,17 @@ describe Products::Qhp, :type => :model do
   it { should validate_presence_of :national_network }
   it { should validate_presence_of :summary_benefit_and_coverage_url }
 
+  let(:plan){ FactoryGirl.create(:plan) }
+  let(:qhp) { FactoryGirl.build(:products_qhp) }
+
+  it "should set plan_id" do
+    qhp.plan = plan
+    expect(qhp.plan_id).to eq plan.id
+  end
+
+  it "should get the plan" do
+    qhp.plan = plan
+    expect(qhp.plan).to be_an_instance_of Plan
+    expect(qhp.plan.id).to eq qhp.plan_id
+  end
 end
