@@ -12,8 +12,8 @@ After "@watir" do
   @headless.destroy
 end
 
-# Given(/^I do not exist as a user$/) do
-# end
+Given(/^I do not exist as a user$/) do
+end
 
 Given(/^I have an existing employee record$/) do
 end
@@ -32,8 +32,7 @@ When(/^I go to the employee account creation page$/) do
 end
 
 When(/^I enter my new account information$/) do
-  Watir::Wait.until(10) { @browser.text_field(:name => "user[password_confirmation]").present? }
-  User.delete_all
+  Watir::Wait.until(30) { @browser.text_field(:name => "user[password_confirmation]").present? }
   @browser.text_field(:name => "user[email]").set("trey.evans#{rand(100)}@dc.gov")
   @browser.text_field(:name => "user[password]").set("12345678")
   @browser.text_field(:name => "user[password_confirmation]").set("12345678")
@@ -75,7 +74,7 @@ When(/^I enter the personal infomation of my existing person$/) do
   @browser.text_field(:name => "person[emails_attributes][0][address]").set("aa@home.com")
   @browser.text_field(:name => "person[emails_attributes][1][address]").click
   sleep(2)
-  @browser.a(:text => "Continue").click
+  @browser.input(:id => "continue-employer").click
 end
 
 Then(/^I should see the matched household information$/) do
@@ -87,13 +86,13 @@ When(/^I enter household information$/) do
 end
 
 Then(/^I should see the plan selection page$/) do
-  Watir::Wait.until { @browser.p(:text => "Select a Plan.").present? }
+  Watir::Wait.until(30) { @browser.p(:text => "Select a Plan.").present? }
   expect(@browser.span(:text => /Selecting a plan can feel tricky/).visible?).to be_truthy
 end
 
 When(/^I enter filter in plan selection page$/) do
   @browser.a(:id => "select-plan-btn1", :text => "Continue").click
-  Watir::Wait.until { @browser.a(:text => "All Filters").present? }
+  Watir::Wait.until(30) { @browser.a(:text => "All Filters").present? }
   @browser.a(:text => "All Filters").click
   @browser.checkboxes(:class => "plan-type-selection-filter").first.set(true)
   @browser.button(:class => "apply-btn", :text => "Apply").click
