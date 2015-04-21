@@ -211,7 +211,7 @@ $(document).ready(function () {
     $('#broker_info').removeClass('hidden');
   });
   
-  $(".close-fail").click(function() {
+  $(document).on('click', '.close-fail', function() {
     $(".fail-search").addClass('hidden');
     $(".overlay-in").css("display", "none");
   });

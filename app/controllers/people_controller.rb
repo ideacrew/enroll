@@ -231,7 +231,7 @@ class PeopleController < ApplicationController
   end
 
   def create
-    sanitize_person_params    
+    sanitize_person_params
     @person = Person.find_or_initialize_by(ssn: params[:person][:ssn], date_of_birth: params[:person][:dob])
     
     # Delete old sub documents

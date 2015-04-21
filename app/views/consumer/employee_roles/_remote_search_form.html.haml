@@ -3,3 +3,5 @@
     = render 'shared/error_messages'
     = form_for @person, { :as => :person, :url => match_consumer_employee_index_path, :remote => true } do |f|
       = render 'search_fields', f: f
+
+      #person_details_wrapper
