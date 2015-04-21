@@ -5,7 +5,7 @@ Before "@watir" do
 end
 
 After "@watir" do
-#  @browser.close
+  @browser.close
 end
 
 Given(/^I do not exist as a user$/) do
