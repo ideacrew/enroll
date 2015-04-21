@@ -6,7 +6,7 @@ class IrsGroupBuilder
       @family = application_group
     else
       @family = Family.find(application_group)
-    end
+    end 
   end
 
   def build
@@ -20,14 +20,14 @@ class IrsGroupBuilder
   end
 
   def update
-    assign_exisiting_irs_group_to_new_household
+    assign_existing_irs_group_to_new_household
     @irs_group = @family.active_household.irs_group
   end
 
 
   # if by updating the family we have created a new household,
   # then we should take the Irs Group from previously active household and assign it to the newly active household
-  def assign_exisiting_irs_group_to_new_household
+  def assign_existing_irs_group_to_new_household
     all_households = @family.households.sort_by(&:submitted_at)
     previous_household, current_household = all_households[all_households.length-2, all_households.length]
 

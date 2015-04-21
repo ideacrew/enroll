@@ -12,8 +12,7 @@ module Factories
       person_form.user_id = consumer_identity.user_id
       populate_identity_properties(person_form, consumer_identity)
       build_nested_models(person_form)
-      build_employee_role(person_form, roster_employee)
-      person_form
+      build_employee_role_and_assign(person_form, roster_employee)
     end
 
     def populate_identity_properties(person, ci)
@@ -49,27 +48,31 @@ module Factories
       end
     end
 
-    def build_employee_role(person, census_employee)
+    def build_employee_role_and_assign(person, census_employee)
       emp_family = census_employee.employee_family
-      emp_role = EmployeeRole.new
-      copy_properties(
-        census_employee,
-        emp_role,
-        [:hired_on, :terminated_on]
-      )
-      copy_properties(
-        emp_family, 
-        emp_role,
-        [:benefit_group_id]
-      )
-      emp_role.employer_profile_id = emp_family.employer_profile.id
-      emp_role.census_family_id = emp_family.id
-      person.employee_roles.new(emp_role.attributes)
+      person_wrapper = Forms::EmployeeRole.new(person)
+      person_wrapper.hired_on = census_employee.hired_on
+      person_wrapper.terminated_on = census_employee.terminated_on
+      person_wrapper.benefit_group_id = emp_family.benefit_group_id
+      person_wrapper.employer_profile_id = emp_family.employer_profile.id
+      person_wrapper.census_family_id = emp_family.id
+      person_wrapper.organization_id = emp_family.employer_profile.organization.id
+      person_wrapper.census_employee_id = census_employee.id
+      person_wrapper
     end
 
     def build_address_from_employee(person_form, census_employee)
       if census_employee.address.present?
-        person_form.addresses.new(census_employee.address.attributes)
+        # Because it hates us so much, mongoid will copy over all of the
+        # attributes unless we tell it don't do that.
+        ca = census_employee.address
+        person_form.address.new({
+          :address_1 => ca.address_1,
+          :address_2 => ca.address_2,
+          :city => ca.city,
+          :state => ca.state,
+          :zip => ca.zip
+        })
       end
     end
   end

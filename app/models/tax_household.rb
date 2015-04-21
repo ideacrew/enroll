@@ -13,8 +13,8 @@ class TaxHousehold
   field :allocated_aptc_in_cents, type: Integer, default: 0
   field :is_eligibility_determined, type: Boolean, default: false
 
-  field :effective_start_date, type: Date
-  field :effective_end_date, type: Date
+  field :effective_starting_on, type: Date
+  field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
 
   embeds_many :tax_household_members

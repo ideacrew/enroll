@@ -246,7 +246,7 @@ describe Family, type: :model do
     end
   end
 
-describe "update_household callback" do
+  describe "update_household callback" do
     let!(:primary_person) { FactoryGirl.create(:person, :male) }
     let!(:second_person) { FactoryGirl.create(:person) }
     let!(:new_family) { FactoryGirl.build(:family) }
@@ -325,4 +325,91 @@ describe "update_household callback" do
       end
     end
   end
+end
+
+
+describe Family, ".find_or_initialize_by_employee_role:", type: :model do
+
+  let(:submitted_at)  { DateTime.current}
+  let(:spouse)        { FactoryGirl.create(:person, last_name: "richards", first_name: "denise") }
+  let(:child)         { FactoryGirl.create(:person, last_name: "sheen", first_name: "sam") }
+  let(:grandpa)       { FactoryGirl.create(:person, last_name: "sheen", first_name: "martin") }
+
+  let(:married_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"),
+                                 PersonRelationship.new(relative: child, kind: "child")] }
+  let(:family_relationships)  {  married_relationships <<
+                                 PersonRelationship.new(relative: grandpa, kind: "grandparent") }
+
+  let(:single_dude)   { FactoryGirl.create(:person, last_name: "sheen", first_name: "tigerblood") }
+  let(:married_dude)  { FactoryGirl.create(:person, last_name: "sheen", first_name: "chuck",
+                                            person_relationships: married_relationships ) }
+  let(:family_dude)   { FactoryGirl.create(:person, last_name: "sheen", first_name: "charles",
+                                            person_relationships: family_relationships ) }
+
+  let(:single_employee_role)    { FactoryGirl.create(:employee_role, person: single_dude) }
+  let(:married_employee_role)   { FactoryGirl.create(:employee_role, person: married_dude) }
+  let(:family_employee_role)    { FactoryGirl.create(:employee_role, person: family_dude) }
+
+  let(:single_family)          { Family.find_or_initialize_by_employee_role(single_employee_role) }
+  let(:married_family)         { Family.find_or_initialize_by_employee_role(married_employee_role) }
+  let(:large_family)           { Family.find_or_initialize_by_employee_role(family_employee_role) }
+
+
+  context "when no families exist" do
+    context "and employee is single" do
+
+      it "should set attributes on family model" do
+        expect(single_family.submitted_at).to_not be_nil
+      end
+
+      it "should create one family_member with set attributes" do
+        expect(single_family.family_members.size).to eq 1
+        expect(single_family.family_members.first.is_primary_applicant).to eq true
+        expect(single_family.family_members.first.is_coverage_applicant).to eq true
+        expect(single_family.family_members.first.person).to eq single_employee_role.person
+      end
+
+      it "and create a household and associated IRS group" do
+        expect(single_family.irs_groups.size).to eq 1
+        expect(single_family.households.size).to eq 1
+        expect(single_family.households.first.irs_group).to eq single_family.irs_groups.first
+      end
+
+      it "and create a coverage_household with one family_member" do
+        expect(single_family.households.first.coverage_households.size).to eq 1
+        expect(single_family.households.first.coverage_households.first.coverage_household_members.first.family_member).to eq single_family.family_members.first
+        # expect(single_family.households.first.coverage_households.first.coverage_household_members.where(family_member_id: single_family.family_members[0]._id)).not_to be_nil
+      end
+    end
+
+    context "and employee has spouse and child" do
+      it "should create one coverage_household with all family members" do
+        expect(married_family.households.first.coverage_households.size).to eq 1
+      end
+
+      it "should have all family_members as coverage_household_members" do
+        expect(married_family.family_members.size).to eq 3
+        expect(married_family.households.first.coverage_households.first.coverage_household_members.size).to eq 3
+
+        expect(married_family.households.first.coverage_households.first.coverage_household_members.where(family_member_id: married_family.family_members[0]._id)).not_to be_nil
+        expect(married_family.households.first.coverage_households.first.coverage_household_members.where(family_member_id: married_family.family_members[1]._id)).not_to be_nil
+        expect(married_family.households.first.coverage_households.first.coverage_household_members.where(family_member_id: married_family.family_members[2]._id)).not_to be_nil
+      end
+    end
+
+    context "and family members include extended family" do
+      it "should create two coverage households, one with immediate family and the other with extennded family" do
+        expect(large_family.households.first.coverage_households.size).to eq 2
+      end
+    end
+  end
+
+  context "family already exists with employee_role as primary_family_member" do
+    let(:existing_primary_member) {existing}
+    let(:existing_family) { FactoryGirl.create(:family)}
+
+    it "should return the family for this employee_role" do
+    end
+  end
+
 end

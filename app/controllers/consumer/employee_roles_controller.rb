@@ -1,10 +1,13 @@
 class Consumer::EmployeeRolesController < ApplicationController
-
   def welcome
   end
 
   def search
     @person = Forms::ConsumerIdentity.new
+    respond_to do |format|
+      format.html
+      format.js
+    end
   end
 
   def match
@@ -34,6 +37,46 @@ class Consumer::EmployeeRolesController < ApplicationController
       respond_to do |format|
         format.js { render 'search' }
         format.html { render 'search' }
+      end
+    end
+  end
+
+  def create
+    @person = Forms::EmployeeRole.from_parameters(params.require(:person))
+    if @person.save
+      respond_to do |format|
+        format.html { render "dependent_details" }
+        format.js { render "dependent_details" }
+      end
+    else
+      @employer_profile = @person.employer_profile
+      @benefit_group = @person.benefit_group
+      @census_family = @person.census_family
+      @census_employee = @person.census_employee
+      @effective_on = @benefit_group.effective_on_for(@census_employee.hired_on)
+      respond_to do |format|
+        format.html { render "match" }
+        format.js { render "match" }
+      end
+    end
+  end
+
+  def update
+    @person = Forms::EmployeeRole.find(params.require(:id))
+    if @person.update_attributes(params.require(:person))
+      respond_to do |format|
+        format.html { render "dependent_details" }
+        format.js { render "dependent_details" }
+      end
+    else
+      @employer_profile = @person.employer_profile
+      @benefit_group = @person.benefit_group
+      @census_family = @person.census_family
+      @census_employee = @person.census_employee
+      @effective_on = @benefit_group.effective_on_for(@census_employee.hired_on)
+      respond_to do |format|
+        format.html { render "match" }
+        format.js { render "match" }
       end
     end
   end

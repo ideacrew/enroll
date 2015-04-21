@@ -12,8 +12,8 @@ describe IrsGroup do
 
   it 'should set effective start and end date' do
     @irs_group_builder.save
-    expect(@irs_group.effective_start_date).to eq(@family.active_household.effective_start_date)
-    expect(@irs_group.effective_end_date).to eq(@family.active_household.effective_end_date)
+    expect(@irs_group.effective_starting_on).to eq(@family.active_household.effective_starting_on)
+    expect(@irs_group.effective_ending_on).to eq(@family.active_household.effective_ending_on)
   end
 
   it 'should set a 16 digit hbx_assigned_id' do

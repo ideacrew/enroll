@@ -3,8 +3,8 @@ FactoryGirl.define do
     family
     irs_group_id
     is_active true
-    effective_start_date
-    effective_end_date
+    effective_starting_on
+    effective_ending_on
     submitted_at
     hbx_enrollments
     tax_households

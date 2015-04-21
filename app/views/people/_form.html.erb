@@ -11,6 +11,15 @@
       <%#= link_to 'Dependent Info', url %>
     <%# end %>
 
+    <div class="hidden"> 
+    <%= f.hidden_field :census_family_id %>
+    <%= f.hidden_field :census_employee_id %>
+    <%= f.hidden_field :employer_profile_id %>
+    <%= f.hidden_field :organization_id %>
+    <%= f.hidden_field :hired_on %>
+    <%= f.hidden_field :terminated_on %>
+    <%= f.hidden_field :benefit_group_id %>
+    </div>
   	<%= render 'shared/error_messages' %>
   	<%= render 'shared/person_search_fields', f: f %>
   	
@@ -31,7 +40,7 @@
     <div class="focus_effect row personal-info-row">
 		<div class="col-md-10 col-sm-9 no-pd"></div>
 		<div class="col-md-2 col-sm-3 no-pd">
-			<a href="#" data-method="GET" id="continue-employer" class="btn disable-btn search_continue disabled">Continue</a>
+			<%= f.submit "Continue", :class => "btn disable-btn search_continue disabled", :id => "continue-employer" %>
 		</div>
     </div>
 

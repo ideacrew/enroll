@@ -4,16 +4,16 @@ class PersonRelationship
 
   embedded_in :person
 
-  MALE_RELATIONSHIPS_LIST   = %W(father grandfather grandson uncle nephew adopted\ child stepparent
+  MaleRelationships   = %W(father grandfather grandson uncle nephew adopted\ child stepparent
                               foster\ child son-in-law brother-in-law father-in-law brother ward
                               stepson child sponsored\ dependent dependent\ of\ a\ minor\ dependent
                               guardian court\ appointed\ guardian collateral\ dependent life\ partner)
 
-  FEMALE_RELATIONSHIPS_LIST = %W(mother grandmother granddaughter aunt niece adopted\ child stepparent
+  FemaleRelationships = %W(mother grandmother granddaughter aunt niece adopted\ child stepparent
                               foster\ child daughter-in-law sister-in-law mother-in-law sister ward
                               stepdaughter child sponsored\ dependent dependent\ of\ a\ minor\ dependent
                               guardian court\ appointed\ guardian collateral\ dependent life\ partner)
-  RELATIONSHIPS_LIST = [
+  Relationships = [
     "parent",
     "grandparent",
     "aunt_or_uncle",
@@ -44,7 +44,7 @@ class PersonRelationship
     "great_grandchild"
   ]
 
-  INVERSE_MAP = {
+  InverseMap = {
     "child" => "parent",
     "parent" => "child",
     "grandparent" => "grandchild",
@@ -76,9 +76,9 @@ class PersonRelationship
     "adopted_child" => "parent"
   }
 
-  SYMMETRICAL_RELATIONSHIPS_LIST = %W[head\ of\ household spouse ex-spouse cousin ward trustee annuitant other\ relationship other\ relative self]
+  SymmetricalRelationships = %W[head\ of\ household spouse ex-spouse cousin ward trustee annuitant other\ relationship other\ relative self]
 
-  KINDS = SYMMETRICAL_RELATIONSHIPS_LIST | RELATIONSHIPS_LIST
+  Kinds = SymmetricalRelationships | Relationships
 
   field :relative_id, type: BSON::ObjectId
   field :kind, type: String
@@ -88,16 +88,16 @@ class PersonRelationship
             presence: true,
             allow_blank: false,
             allow_nil:   false,
-            inclusion: {in: KINDS, message: "%{value} is not a valid person relationship"}
+            inclusion: {in: Kinds, message: "%{value} is not a valid person relationship"}
 
   def parent
     raise "undefined parent class: Person" unless person?
     self.person
   end
 
-  def relative=(person_instance)
-    return unless person_instance.is_a? Person
-    self.relative_id = person_instance._id
+  def relative=(new_person)
+    return unless new_person.is_a? Person
+    self.relative_id = new_person._id
   end
 
   def relative
@@ -105,7 +105,7 @@ class PersonRelationship
   end
 
   def invert_relationship
-    self.kind = INVERSE_MAP[self.kind]
+    self.kind = InverseMap[self.kind]
     self
   end
 end
