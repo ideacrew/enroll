@@ -33,12 +33,13 @@ module Forms
       employers = Organization.where({
         "employer_profile.employee_families" =>  { "$elemMatch" => { 
            "census_employee.dob" => dob,
-           "census_employee.ssn" => ssn } }
+           "census_employee.ssn" => ssn,
+           "linked_at" => nil} }
       })
       employers.each do |emp|
         emp.employer_profile.employee_families.each do |ef|
            ce = ef.census_employee
-           if (ce.ssn == ssn) && (ce.dob == dob)
+           if (ce.ssn == ssn) && (ce.dob == dob) && (ef.linked_at.blank?)
              census_employees << ce
            end
         end

@@ -166,7 +166,7 @@ class Family
         family = Family.new
         family.initialize_from_employee_role(new_employee_role)
 
-        family.save
+        family.save!
         family
       end
     end

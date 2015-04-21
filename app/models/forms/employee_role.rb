@@ -1,3 +1,5 @@
+require 'factories/enrollment_factory'
+
 module Forms
   class EmployeeRole < SimpleDelegator
     WRAPPED_ATTRIBUTES = [
@@ -54,7 +56,10 @@ module Forms
 
     def add_employee_role(person_record, attrs)
       emp_attrs = attrs.dup.reject { |k,v| ["organization_id","census_employee_id"].include?(k.to_s) }
-      person_record.employee_roles << ::EmployeeRole.new(emp_attrs)
+      emp_role = ::EmployeeRole.new(emp_attrs)
+      person_record.employee_roles << emp_role
+      census_family.link_employee_role(emp_role)
+      Family.find_or_initialize_by_employee_role(emp_role)
     end
 
     def update_attributes(opts = {})
@@ -83,7 +88,7 @@ module Forms
     end
 
     def census_family
-      @census_family ||= @employer_profile.employer_families.detect { |cf| cf.id == census_family_id}
+      @census_family ||= employer_profile.employee_families.detect { |cf| cf.id.to_s == census_family_id.to_s}
     end
 
     def census_employee
