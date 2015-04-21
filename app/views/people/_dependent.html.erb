@@ -1,85 +1,87 @@
 <li id="add_member_list_<%= dependent.id %>" class="dependent_list" style="padding: 0;border-radius: 0;border: none;margin-bottom: 20px;">
-  <div id="add_info" class="focus_effect row personal-info-row required-tooltip">
-    <div id="add_info_clone0">
-    <div class="house col-md-12 col-sm-12 col-xs-12 no-pd first">
-      <div class="dependent_notice_div_<%= dependent.id%>"></div>
-      <%= form_for dependent, :remote => true, method: :post,:url => {action: "save_dependents"} do |f| %>
-        <div class="row top-row top-row-2">
-            <div class="col-md-4 col-sm-4 no-pd">
-              <div class="form-group form-group-lg">
-                  <%= f.text_field :first_name, value: dependent.first_name,class: "home required floatlabel form-control", required: true, placeholder: "FIRST NAME" %>
+  <div id="add_info<%= dependent.id %>" class="focus_effect row personal-info-row">
+    <%= form_for dependent, :remote => true, method: :post,:url => {action: "save_dependents"} do |f| %>
+      <div class="house col-md-12 col-sm-12 col-xs-12 no-pd first">
+        <div class="dependent_notice_div_<%= dependent.id%>"></div>
+          <div class="row top-row top-row-2">
+              <div class="col-md-4 col-sm-4 no-pd">
+                <div class="form-group form-group-lg">
+                    <%= f.text_field :first_name, value: dependent.first_name,class: "home required floatlabel form-control", required: true, placeholder: "FIRST NAME" %>
+                </div>
+              </div>
+
+              <div class="col-md-4 col-sm-4 no-pd">
+                <div class="form-group form-group-lg">
+                    <%= f.text_field :middle_name, value: dependent.middle_name, class: "home floatlabel form-control", placeholder: "MIDDLE NAME"%>
+                </div>
+              </div>
+
+              <div class="col-md-4 col-sm-4 no-pd">
+                <div class="form-group form-group-lg">
+                    <%= f.text_field :last_name, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "LAST NAME" %>
+                    <div class="text-right">
+                      <% if dependent.new_record? %>
+                        <%= link_to (image_tag "member-close.png"), 'javascript:;', class: 'close-1' %>
+                      <% else %>
+                        <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: person.id, organization_id: employer) %>
+                        <%= link_to (image_tag "member-close.png"), remove_url, class: 'close-2', :method => :delete, :remote => true, data: {confirm: "Remove #{dependent.full_name}?", ok: 'yes', cancel: 'no'} %>
+                      <% end %>
+                    </div>
+                </div>
               </div>
             </div>
 
-            <div class="col-md-4 col-sm-4 no-pd">
-              <div class="form-group form-group-lg">
-                  <%= f.text_field :middle_name, value: dependent.middle_name, class: "home floatlabel form-control", placeholder: "MIDDLE NAME"%>
+            <div class="row bottom-row top-row-2">
+              <div class="col-md-3 col-sm-3 no-pd">
+                <div class="form-group form-group-lg">
+                    <%= f.text_field :dob, class: "required date_picker home floatlabel form-control", required: true, value: dependent.dob.try(:strftime, "%m/%d/%Y"), placeholder: "DATE OF BIRTH", id: "family_member_dob_#{dependent.id}" %>
+                </div>
               </div>
-            </div>
 
-            <div class="col-md-4 col-sm-4 no-pd">
-              <div class="form-group form-group-lg">
-                  <%= f.text_field :last_name, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "LAST NAME" %>
-                  <div class="text-right">
-                    <% remove_url = remove_dependents_people_path(id: dependent.id, person_id: person.id, organization_id: employer) %>
-                    <%= link_to (image_tag "member-close.png"), remove_url, class: 'close-2', :method => :delete, :remote => true, data: {confirm: "Remove #{dependent.full_name}?", ok: 'yes', cancel: 'no'} %>
+              <div class="col-md-3 col-sm-3 no-pd">
+                <div class="form-group form-group-lg">
+                    <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", required: true, placeholder: "SOCIAL SECURITY" %>
+                </div>
+              </div>
+
+              <div class="col-md-2 col-sm-2 no-pd">
+                <div class="form-group form-group-lg">
+                  <%= f.text_field :primary_relationship, class: "required home floatlabel form-control", required: true, placeholder: "RELATION" %>
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-4 no-pd">
+                <div class="col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+                  <div class="radio skinned-form-controls skinned-form-controls-mac">
+                    <label>
+                      <%= f.radio_button :gender, "male", checked: true, class: "required floatlabel" %>
+                      <span>Male</span>
+                    </label>
                   </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="row bottom-row top-row-2">
-            <div class="col-md-3 col-sm-3 no-pd">
-              <div class="form-group form-group-lg">
-                  <%= f.text_field :dob, class: "required date_picker home floatlabel form-control", required: true, value: dependent.dob.try(:strftime, "%m/%d/%Y"), placeholder: "DATE OF BIRTH", id: "family_member_dob_#{dependent.id}" %>
-              </div>
-            </div>
-
-            <div class="col-md-3 col-sm-3 no-pd">
-              <div class="form-group form-group-lg">
-                  <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", required: true, placeholder: "SOCIAL SECURITY" %>
-              </div>
-            </div>
-
-            <div class="col-md-2 col-sm-2 no-pd">
-              <div class="form-group form-group-lg">
-                <%= f.text_field :primary_relationship, class: "required home floatlabel form-control", required: true, placeholder: "RELATION" %>
-              </div>
-            </div>
-            <div class="col-md-4 col-sm-4 no-pd">
-              <div class="col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-                <div class="radio skinned-form-controls skinned-form-controls-mac">
-                  <label>
-                    <%= f.radio_button :gender, "male", checked: true, class: "required floatlabel" %>
-                    <span>Male</span>
-                  </label>
                 </div>
+                <div class="col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+                  <div class="radio skinned-form-controls skinned-form-controls-mac">
+                    <label>
+                      <%= f.radio_button :gender, "female", class: "required floatlabel"  %>
+                      <span>Female</span>
+                    </label>
+                  </div>
+                </div>              
               </div>
-              <div class="col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-                <div class="radio skinned-form-controls skinned-form-controls-mac">
-                  <label>
-                    <%= f.radio_button :gender, "female", class: "required floatlabel"  %>
-                    <span>Female</span>
-                  </label>
-                </div>
-              </div>              
             </div>
-          </div>
 
-          <div class="error">
-            <div class="warning">
-              <i class="fa fa-exclamation-triangle"></i>All fields Required
-            </div>
-          </div>
+            <%= f.hidden_field :id, :value => dependent.id %>
+            <%= hidden_field_tag :person, :id, value: person.id %>
+            <%= hidden_field_tag :employer, :id, value: employer.id %>
+            <%= hidden_field_tag :employee, :id, value: employee.id %>
+          <div id="remove_confirm" class="hidden"></div>
+        </div>
 
-          <%= f.hidden_field :id, :value => dependent.id %>
-          <%= hidden_field_tag :person, :id, value: person.id %>
-          <%= hidden_field_tag :employer, :id, value: employer.id %>
-          <%= hidden_field_tag :employee, :id, value: employee.id %>
-        <% end %>
-        <div id="remove_confirm" class="hidden"></div>
-      </div>
-    </div>
+        <div class="clearfix"></div>
+        <div id="add_info_buttons<%= dependent.id %>" class="hidden" style="padding-top: 20px;">
+          <%= link_to "Cancel", 'javascript:void(0)', class: 'btn btn-red', id: 'cancel_member' %>
+          <%= f.submit 'Confirm Member', class: "btn btn-save pull-right"  %>
+        </div>
+      <% end %>
   </div>
   <script type="text/javascript" charset="utf-8">
     $(".date-picker, .date_picker").datepicker({
@@ -93,4 +95,5 @@
      $('.house').addClass('employee-info');
      $(".mask-ssn").mask("999999999");
   </script>
+
 </li>

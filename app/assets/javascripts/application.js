@@ -370,16 +370,14 @@ $(document).ready(function () {
     $('#dependent_buttons div:last').removeClass('hidden');
     $('.add-member-buttons').removeClass('hidden');
   });
+
+  $(document).on('click', '.close-1', function() {
+    $('#cancel_member').click();
+  });
   
-  $('#cancel_member').click(function() {
-    $("#dependent_buttons div:first").removeClass('hidden');
-    $(".add_member").removeClass('hidden');
-    $('#dependent_buttons div:last').addClass('hidden');
-    
-    var last_dependent = '$("#add_member_list_' + $('#last_member').val() + '")';
-    $("#add_member_list_" + $('#last_member').val()).remove();
-    $("#family #add_member_list_" + $('#family_member_id').val()).remove();
-    $('.add-member-buttons').addClass('hidden');
+  $(document).on('click', '#cancel_member', function() {
+    $("#dependent_buttons").removeClass('hidden');
+    $(".dependent_list:last").addClass('hidden');
   });
   
   $('#save_member').click(function() {

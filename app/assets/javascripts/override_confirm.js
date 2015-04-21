@@ -6,17 +6,10 @@ $(document).ready(function () {
     override_confirmation( $(this), current_element, confirm_buttons, '#family .family_members_list' );    
   });
 
-  $('#dependent_ul').on('click', '.close-2', function(e) {
-    var unsaved_member = $('#last_member').val().trim();
-
-    if( unsaved_member != "") {
-      $('#cancel_member').click();
-      $('#last_member').val('');
-    } else {
-      var current_element = $(this).closest(".dependent_list .house");
-      var confirm_buttons = 'double_row';
-      override_confirmation( $(this), current_element, confirm_buttons, 'div.house' );
-    }
+  $('#dependent_ul').on('click', '.close-2', function() {
+    var current_element = $(this).closest(".dependent_list .house");
+    var confirm_buttons = 'double_row';
+    override_confirmation( $(this), current_element, confirm_buttons, 'div.house' );
   });
 
   // Overrides javascript default confirm modal
