@@ -36,6 +36,7 @@ RSpec.describe OfficeLocation, :type => :model do
 
       it "should save" do
         expect(OfficeLocation.new(**params).save).to be_truthy
+        expect(OfficeLocation.new(**params).is_primary?).to be_truthy
       end
     end
 
