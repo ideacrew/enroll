@@ -1,15 +1,11 @@
 require 'watir'
-require 'headless'
 
 Before "@watir" do
-  @headless = Headless.new
-  @headless.start
-  @browser = Watir::Browser.new :ff 
+  @browser = Watir::Browser.new :chrome
 end
 
 After "@watir" do
-  @browser.close
-  @headless.destroy
+#  @browser.close
 end
 
 Given(/^I do not exist as a user$/) do
