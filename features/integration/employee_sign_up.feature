@@ -17,3 +17,5 @@ Feature: Employee Sign Up
     Then I should see the matched employee record form
     When I complete the matched employee form
     Then I should see the dependents page
+    When I click continue on the dependents page
+    Then I should see the plan shopping page

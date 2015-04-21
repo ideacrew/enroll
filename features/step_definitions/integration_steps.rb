@@ -131,3 +131,12 @@ end
 Then(/^I should see the dependents page$/) do
   expect(@browser.p(:text => /Household Information/).visible?).to be_truthy
 end
+
+When(/^I click continue on the dependents page$/) do
+  @browser.a(:text => "Continue", :href => /people\/select_plan/).click
+  sleep(5)
+end
+
+Then(/^I should see the plan shopping page$/) do
+    pending 
+end
