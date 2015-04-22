@@ -1,12 +1,12 @@
 require 'watir'
 
 Before "@watir" do
-#  load Rails.root + "db/seeds.rb"
+  load Rails.root + "db/seeds.rb"
   @browser = Watir::Browser.new :chrome
 end
 
 After "@watir" do
-#  @browser.close
+  @browser.close
 end
 
 Given(/^I do not exist as a user$/) do
@@ -140,5 +140,5 @@ When(/^I click continue on the dependents page$/) do
 end
 
 Then(/^I should see the plan shopping page$/) do
-    pending 
+    pending
 end
