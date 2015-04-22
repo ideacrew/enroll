@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'factories/enrollment_factory'
 
-RSpec.describe EnrollmentFactory do
+RSpec.describe EnrollmentFactory, :kind => :model do
   let(:employer_profile_without_family) {FactoryGirl.create(:employer_profile)}
   let(:employee_family) {FactoryGirl.create(:employer_census_family)}
   let(:employer_profile) {employee_family.employer_profile}

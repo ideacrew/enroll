@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe BrokerRole, type: :model do
+describe BrokerRole, kind: :model do
 
   let(:address) {FactoryGirl.build(:address)}
   let(:saved_person) {FactoryGirl.create(:person, addresses: [address])}

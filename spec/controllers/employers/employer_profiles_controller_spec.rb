@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Employers::EmployerProfilesController, :type => :controller do
+RSpec.describe Employers::EmployerProfilesController, :kind => :controller do
   describe "create employer" do
     login_user 
     include_context "BradyWork"

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Organization, type: :model do
+RSpec.describe Organization, kind: :model do
   it { should validate_presence_of :legal_name }
   it { should validate_presence_of :fein }
   it { should validate_presence_of :office_locations }

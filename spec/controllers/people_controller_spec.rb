@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe PeopleController, :type => :controller do
+RSpec.describe PeopleController, :kind => :controller do
   describe "family members" do 
     login_user
     include_context "BradyBunch" 

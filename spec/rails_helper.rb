@@ -37,19 +37,13 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
 
-  config.before(:suite) do
-    DatabaseCleaner.strategy = :truncation
-    DatabaseCleaner.clean_with(:truncation)
-    DatabaseCleaner[:mongoid, {:connection => :db_name}]
-  end
-
-  config.around(:example, :type => :model) do |example|
+  config.around(:example, :kind => :model) do |example|
     DatabaseCleaner.cleaning do
       example.run
     end
   end
 
-  config.around(:example, :type => :controller) do |example|
+  config.around(:example, :kind => :controller) do |example|
     DatabaseCleaner.cleaning do
       example.run
     end

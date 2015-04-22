@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe EmployerProfile, :type => :model do
+RSpec.describe EmployerProfile, :kind => :model do
 
   it { should validate_presence_of :entity_kind }
 

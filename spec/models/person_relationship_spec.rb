@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 
-describe PersonRelationship, type: :model do
+describe PersonRelationship, kind: :model do
   it { should validate_presence_of :relative_id }
   it { should validate_presence_of :kind }
 
