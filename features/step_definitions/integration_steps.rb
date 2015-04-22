@@ -64,7 +64,7 @@ end
 
 Then(/^I should see the matched employee record form$/) do
   expect(@browser.div(:text => /Employer : Acme Inc\./).visible?).to be_truthy
-  raise "BAIL HOMIE"
+  #raise "BAIL HOMIE"
 end
 
 When(/^I enter the personal infomation of my existing person$/) do
@@ -76,7 +76,8 @@ When(/^I enter the personal infomation of my existing person$/) do
 end
 
 Then(/^I should see the matched household information$/) do
-  expect(@browser.div(:text => /Household Information/).visible?).to be_truthy
+  Watir::Wait.until(30) { @browser.p(:text => "Household Information").present? }
+  expect(@browser.p(:text => /Household Information/).visible?).to be_truthy
 end
 
 When(/^I enter household information$/) do
