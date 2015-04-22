@@ -1,3 +1,4 @@
+@watir
 Feature: Create Employer
   In order to offer health and dental insurance benefits to my employees, employers must create and manage an account on the HBX for their organization.  Such organizations are referred to as an Employer
   An Employer Representative 
@@ -11,14 +12,15 @@ Feature: Create Employer
         And I should see an initial form to enter information about my Employer and myself
 
     Scenario: Employer Representative has previously signed up on HBX
-      Given I have signed up previously through consumer, broker agency or previous visit to the Employer portal
-      When I visit the Employer portal
-        And I sign in with valid user data
-      Then I should see a successful sign up message
+      Given I have signed up previously through consumer, broker agency or previous visit to the Employer portal with email "example@example.com"
+      When I visit the Employer portal to sign in
+        And I sign in with valid user data with email example@example.com and password "12345678"
+      Then I should see a successful sign in message
         And I should see an initial form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone
         And I should see a second fieldset to enter my name and email
         And My user data from existing the fieldset values are prefilled using data from my existing account
 
+    @wip
     Scenario: Employer Representative provides a valid FEIN
       Given I complete the Employer initial form with a valid FEIN
       When I submit the form
@@ -30,7 +32,7 @@ Feature: Create Employer
         And My Employer Role is set as the Employer administrator
         And My Employer's FEIN is linked to my Employer Reprsentative Role
         And I see my Employer's landing page
-
+    @wip
     Scenario: Employer Representative  provides an unrecognized FEIN 
       Given I complete the Employer initial form with an invalid FEIN
       When I submit the form
