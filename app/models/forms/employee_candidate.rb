@@ -3,8 +3,7 @@ module Forms
     include ActiveModel::Model
     include ActiveModel::Validations
 
-    attr_accessor :first_name, :middle_name, :last_name
-    attr_accessor :name_pfx, :name_sfx
+    include PeopleNames
     attr_accessor :gender, :ssn, :date_of_birth
     attr_reader :ssn
 
