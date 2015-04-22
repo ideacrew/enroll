@@ -1,7 +1,7 @@
 require 'watir'
+load Rails.root + "db/seeds.rb"
 
 Before "@watir" do
-  load Rails.root + "db/seeds.rb"
   @browser = Watir::Browser.new :chrome
 end
 
