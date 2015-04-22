@@ -1,13 +1,3 @@
-require 'watir'
-
-Before "@watir" do
-  @browser = Watir::Browser.new :chrome
-end
-
-After "@watir" do
-  @browser.close
-end
-
 Given(/^I haven't signed up as an HBX user$/) do
 end
 
