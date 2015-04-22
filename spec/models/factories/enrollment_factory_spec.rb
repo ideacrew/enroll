@@ -51,15 +51,11 @@ RSpec.describe EnrollmentFactory do
     end
 
     context "and no prior person exists" do
-      #before do
-      #  @employee_role, @family = EnrollmentFactory.add_employee_role(**params)
-      #end
-
-      after(:all) do
+      after do
         DatabaseCleaner.clean
       end
 
-      before(:all) do
+      before do
         @user = FactoryGirl.create(:user)
         @employee_family = FactoryGirl.create(:employer_census_family_with_dependents)
         employer_profile = @employee_family.employer_profile
@@ -77,7 +73,7 @@ RSpec.describe EnrollmentFactory do
         }
         valid_params = { employer_profile: employer_profile }.merge(
          valid_person_params
-        ).merge(valid_employee_params) 
+        ).merge(valid_employee_params)
         params = valid_params
         @employee_role, @family = EnrollmentFactory.add_employee_role(**params)
         @primary_applicant = @family.primary_applicant
@@ -91,7 +87,7 @@ RSpec.describe EnrollmentFactory do
         expect(@employee_role.person).to eq @primary_applicant.person
       end
 
-      it "should have linked the family" do
+      it "should have linked the family foobar" do
         expect(@employee_family.linked_employee_role).to eq @employee_role
       end
 
@@ -118,7 +114,7 @@ RSpec.describe EnrollmentFactory do
           dob: census_employee.dob,
           hired_on: census_employee.hired_on
         }
-        valid_params = { employer_profile: employer_profile }.merge(valid_person_params).merge(valid_employee_params) 
+        valid_params = { employer_profile: employer_profile }.merge(valid_person_params).merge(valid_employee_params)
         params = valid_params
         @person = FactoryGirl.create(:person,
                                       valid_person_params.except(:user).merge(dob: census_employee.dob,
@@ -145,7 +141,7 @@ RSpec.describe EnrollmentFactory do
 
     context "and another employer profile exists with the same employee and dependents in the census" do
 #      let(:second_employee_family) do
-      before(:all) do
+      before do
         @user = FactoryGirl.create(:user)
         employee_family = FactoryGirl.create(:employer_census_family_with_dependents)
         employer_profile = employee_family.employer_profile
@@ -155,13 +151,14 @@ RSpec.describe EnrollmentFactory do
           first_name: census_employee.first_name,
           last_name: census_employee.last_name,
         }
+        @ssn = census_employee.ssn
         valid_employee_params = {
-          ssn: census_employee.ssn,
+          ssn: @ssn,
           gender: census_employee.gender,
           dob: census_employee.dob,
           hired_on: census_employee.hired_on
         }
-        valid_params = { employer_profile: employer_profile }.merge(valid_person_params).merge(valid_employee_params) 
+        valid_params = { employer_profile: employer_profile }.merge(valid_person_params).merge(valid_employee_params)
         dependents = employee_family.census_dependents.collect(&:dup)
         employee = census_employee.dup
         second_employee_family = FactoryGirl.create(:employer_census_family, census_employee: employee, census_dependents: dependents)
@@ -171,12 +168,12 @@ RSpec.describe EnrollmentFactory do
         @second_employee_role, @second_family = EnrollmentFactory.add_employee_role(**@second_params)
       end
 
-      after(:all) do
+      after do
         DatabaseCleaner.clean
       end
 
       it "should still have a findable person" do
-        people = Person.match_by_id_info(ssn: ssn)
+        people = Person.match_by_id_info(ssn: @ssn)
         expect(people.count).to eq 1
         expect(people.first).to be_a Person
       end
