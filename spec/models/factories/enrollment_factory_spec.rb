@@ -51,10 +51,6 @@ RSpec.describe EnrollmentFactory, :kind => :model do
     end
 
     context "and no prior person exists" do
-      after do
-        DatabaseCleaner.clean
-      end
-
       before do
         @user = FactoryGirl.create(:user)
         @employee_family = FactoryGirl.create(:employer_census_family_with_dependents)
@@ -98,7 +94,7 @@ RSpec.describe EnrollmentFactory, :kind => :model do
 
     context "and a prior person exists but is not associated with the user" do
 
-      before(:all) do
+      before do
         @user = FactoryGirl.create(:user)
         employee_family = FactoryGirl.create(:employer_census_family_with_dependents)
         employer_profile = employee_family.employer_profile
@@ -120,10 +116,6 @@ RSpec.describe EnrollmentFactory, :kind => :model do
                                       valid_person_params.except(:user).merge(dob: census_employee.dob,
                                                                               ssn: census_employee.ssn))
           @employee_role, @family = EnrollmentFactory.add_employee_role(**params)
-      end
-
-      after(:all) do
-        DatabaseCleaner.clean
       end
 
       it "should link the user to the person" do
@@ -166,10 +158,6 @@ RSpec.describe EnrollmentFactory, :kind => :model do
         second_census_employee = second_employee_family.census_employee
         @second_params = valid_params.merge(employer_profile: second_employer_profile)
         @second_employee_role, @second_family = EnrollmentFactory.add_employee_role(**@second_params)
-      end
-
-      after do
-        DatabaseCleaner.clean
       end
 
       it "should still have a findable person" do
