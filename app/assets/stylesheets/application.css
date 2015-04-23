@@ -18,5 +18,7 @@
  *= require style
  *= require custom
  *= require styles
+ *= require selectric
+ *= require responsive
  *= require_self
  */
