@@ -18,7 +18,16 @@ Feature: Create Employer
       Then I should see a successful sign in message
         And I should see an initial form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone
         And I should see a second fieldset to enter my name and email
-        And My user data from existing the fieldset values are prefilled using data from my existing account
+        # And My user data from existing the fieldset values are prefilled using data from my existing account
+        And I should see a successful creation message
+      When I click on an employer in the employer list
+      Then I should see the employer information
+      When I click on the Employees tab
+      Then I should see the employee family roster
+        And It should default to active tab
+      When I click on add employee button
+      Then I should see a form to enter information about employee, address and dependents
+        And I should see a green success message
 
     @wip
     Scenario: Employer Representative provides a valid FEIN
