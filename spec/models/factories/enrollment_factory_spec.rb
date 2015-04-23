@@ -19,7 +19,7 @@ describe EnrollmentFactory, "starting with unlinked employee_family and employee
     :employer_profile => employer_profile
   }) }
 
-  let(:employee_role) { 
+  let(:employee_role) {
     EmployeeRole.new
   }
 
@@ -30,16 +30,31 @@ describe EnrollmentFactory, "starting with unlinked employee_family and employee
       EnrollmentFactory.link_employee_family(census_family, employee_role, @linked_at)
     end
 
-    it "should set the right properties on the census_family" do
+    it "should set employee role id on the census_family" do
       expect(census_family.employee_role_id).to eq employee_role.id
-      expect(census_family.linked_at).to eq @linked_at
     end
 
-    it "should set the correct properties on the employee_role" do
+    it "should set linked at on the census_family" do
+      expect(census_family.linked_at).to eq @linked_at.localtime
+    end
+
+    it "should set employer profile id on the employee_role" do
       expect(employee_role.employer_profile_id).to eq employer_profile.id
+    end
+
+    it "should set benefit group id on the employee_role" do
       expect(employee_role.benefit_group_id).to eq benefit_group_id
+    end
+
+    it "should set census family id on the employee_role" do
       expect(employee_role.census_family_id).to eq census_family.id
+    end
+
+    it "should set hired on on the employee_role" do
       expect(employee_role.hired_on).to eq hired_on
+    end
+
+    it "should set terminated on on the employee_role" do
       expect(employee_role.terminated_on).to eq terminated_on
     end
   end
