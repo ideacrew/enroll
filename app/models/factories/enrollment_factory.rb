@@ -113,7 +113,7 @@ class EnrollmentFactory
       nil
     end
 
-    employer_census_family.link_employee_role(role)
+    self.link_employee_family(employer_census_family, role)
 
     # Add 'self' to personal relationship need detailed implementation
     # person.person_relationships << PersonRelationhip.new()
