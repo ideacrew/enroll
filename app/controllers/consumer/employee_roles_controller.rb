@@ -64,6 +64,7 @@ class Consumer::EmployeeRolesController < ApplicationController
   def update
     @person = Forms::EmployeeRole.find(params.require(:id))
     if @person.update_attributes(params.require(:person))
+      @person.primary_family.households.first.coverage_households.first.coverage_household_members.update(applicant_id: params.require(:id))
       respond_to do |format|
         format.html { render "dependent_details" }
         format.js { render "dependent_details" }
