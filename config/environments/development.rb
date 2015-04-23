@@ -1,3 +1,4 @@
+require "acapi/subscribers/edi"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -39,6 +40,7 @@ Rails.application.configure do
 
   config.acapi.publish_amqp_events = :log
   config.acapi.app_id = "enroll"
+  config.acapi.add_subscription(Acapi::Subscribers::Edi)
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 end

@@ -4,8 +4,69 @@
       <div class="row text-center">
         <div class="col-md-12 col-sm-12 no-pd col-xs-12 text-left">
           <h4><strong>Thank you</strong></h4>
+          <%= @enrollment.subscriber.family_member.person.full_name %>
+          ,<br /><br />
+          <span>You and the following dependents have successfully enrolled in</span>
+          <span style="color: rgb(51, 51, 51); line-height: 130%;">
+            <%= @plan.name %><br /><br />
+          </span>
+
+          <table class="table table-bordered">
+            <tbody>
+              <% @enrollment.hbx_enrollment_members.each do |member| %>
+                <tr>
+                  <td><%= member.person.full_name %></td>
+                  <td><%= number_to_currency(@plan.premium_for(member)) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+
           <p>
+            Your monthly total family premium, which will be deducted by your employer from your pay, is:
+            <strong><%=number_to_currency(@plan.total_employee_cost || 0) %></strong>
           </p>
+
+          <p>
+            Additionally your employer pays
+            <strong>
+              <%= number_to_currency(@plan.total_employer_contribution) %>
+            </strong>
+          </p>
+
+          <p>
+            Your coverage start date is:
+            <strong>
+              <%= @enrollment.effective_on.strftime("%m/%d/%Y") %>
+            </strong>
+          </p>
+
+          <span style=
+            "font-size: 16px; line-height: 130%;">
+            Thank you for
+            your
+            order.<br /></span><br />
+
+          <span style=
+            "font-size: 16px; line-height: 130%;">
+            DC Health
+            Link<br />
+            PHONE:
+            855-532-5465
+            (855-532-LINK)<br />
+
+            TTY/TDD
+            711-1-532-5465<br />
+
+            Monday-Saturday
+            8:00am -
+            8:00pm<br />
+            E-Mail:
+            info@dchealthlink.com</span><br />
+          </span><br />
+          <span style=
+            "font-size: 14px; font-family: Arial, Helvetica, sans-serif; color: rgb(51, 51, 51); line-height: 130%;">
+          </span>
         </div>
         <%= link_to "Continue", person_person_landing_path(@person), :class => "btn btn-green btn-continue" %>
       </div>
