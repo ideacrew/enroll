@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe HbxEnrollmentMember, type: :model do
+describe HbxEnrollmentMember, dbclean: :after_each do
   context "an hbx_enrollment with members exists" do
     include_context "BradyWork"
 

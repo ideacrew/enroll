@@ -1,7 +1,51 @@
 require 'rails_helper'
 require 'factories/enrollment_factory'
 
-RSpec.describe EnrollmentFactory, :kind => :model do
+describe EnrollmentFactory, "starting with unlinked employee_family and employee_role" do
+  let(:benefit_group_id) { "2468" }
+  let(:hired_on) { Date.new(2015,1,15) }
+  let(:terminated_on) { Date.new(2015,3,25) }
+
+  let(:employer_profile) { EmployerProfile.new }
+
+  let(:census_employee) { EmployerCensus::Employee.new({
+    :hired_on => hired_on,
+    :terminated_on => terminated_on
+  }) }
+
+  let(:census_family) { EmployerCensus::EmployeeFamily.new({
+    :census_employee => census_employee,
+    :benefit_group_id => benefit_group_id,
+    :employer_profile => employer_profile
+  }) }
+
+  let(:employee_role) { 
+    EmployeeRole.new
+  }
+
+  describe "After performing the link" do
+
+    before(:each) do
+      @linked_at = Time.now
+      EnrollmentFactory.link_employee_family(census_family, employee_role, @linked_at)
+    end
+
+    it "should set the right properties on the census_family" do
+      expect(census_family.employee_role_id).to eq employee_role.id
+      expect(census_family.linked_at).to eq @linked_at
+    end
+
+    it "should set the correct properties on the employee_role" do
+      expect(employee_role.employer_profile_id).to eq employer_profile.id
+      expect(employee_role.benefit_group_id).to eq benefit_group_id
+      expect(employee_role.census_family_id).to eq census_family.id
+      expect(employee_role.hired_on).to eq hired_on
+      expect(employee_role.terminated_on).to eq terminated_on
+    end
+  end
+end
+
+RSpec.describe EnrollmentFactory, :dbclean => :after_each do
   let(:employer_profile_without_family) {FactoryGirl.create(:employer_profile)}
   let(:employee_family) {FactoryGirl.create(:employer_census_family)}
   let(:employer_profile) {employee_family.employer_profile}
@@ -68,7 +112,7 @@ RSpec.describe EnrollmentFactory, :kind => :model do
           hired_on: census_employee.hired_on
         }
         valid_params = { employer_profile: employer_profile }.merge(
-         valid_person_params
+          valid_person_params
         ).merge(valid_employee_params)
         params = valid_params
         @employee_role, @family = EnrollmentFactory.add_employee_role(**params)
@@ -113,9 +157,9 @@ RSpec.describe EnrollmentFactory, :kind => :model do
         valid_params = { employer_profile: employer_profile }.merge(valid_person_params).merge(valid_employee_params)
         params = valid_params
         @person = FactoryGirl.create(:person,
-                                      valid_person_params.except(:user).merge(dob: census_employee.dob,
-                                                                              ssn: census_employee.ssn))
-          @employee_role, @family = EnrollmentFactory.add_employee_role(**params)
+                                     valid_person_params.except(:user).merge(dob: census_employee.dob,
+                                                                             ssn: census_employee.ssn))
+        @employee_role, @family = EnrollmentFactory.add_employee_role(**params)
       end
 
       it "should link the user to the person" do
@@ -132,7 +176,7 @@ RSpec.describe EnrollmentFactory, :kind => :model do
     end
 
     context "and another employer profile exists with the same employee and dependents in the census" do
-#      let(:second_employee_family) do
+      #      let(:second_employee_family) do
       before do
         @user = FactoryGirl.create(:user)
         employee_family = FactoryGirl.create(:employer_census_family_with_dependents)

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
+RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
   describe "PUT update" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:organization_id) { "1234324234" }

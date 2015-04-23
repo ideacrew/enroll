@@ -36,17 +36,18 @@ RSpec.configure do |config|
   #
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
-
-  config.around(:example, :kind => :model) do |example|
-    DatabaseCleaner.cleaning do
-      example.run
-    end
+  config.after(:suite, :dbclean => :after_all) do
+    DatabaseCleaner.clean
   end
 
-  config.around(:example, :kind => :controller) do |example|
-    DatabaseCleaner.cleaning do
-      example.run
-    end
+  config.after(:example, :dbclean => :after_each) do
+    DatabaseCleaner.clean
+  end
+
+  config.around(:example, :dbclean => :around_each) do |example|
+    DatabaseCleaner.clean
+    example.run
+    DatabaseCleaner.clean
   end
 
   config.include Devise::TestHelpers, :type => :controller

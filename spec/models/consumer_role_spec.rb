@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe ConsumerRole, kind: :model do
+describe ConsumerRole, dbclean: :after_each do
   it { should delegate_method(:hbx_id).to :person }
   it { should delegate_method(:ssn).to :person }
   it { should delegate_method(:dob).to :person }

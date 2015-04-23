@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe HbxEnrollment, type: :model do
+describe HbxEnrollment, dbclean: :after_each do
   include_context "BradyWork"
 
   context "is created from an employer_profile, benefit_group, and coverage_household" do

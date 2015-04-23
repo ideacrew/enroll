@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Plan, kind: :model do
+RSpec.describe Plan, dbclean: :after_each do
   def carrier_profile; FactoryGirl.create(:carrier_profile); end
 
   def name; "BlueChoice Silver $2,000"; end
@@ -92,7 +92,7 @@ RSpec.describe Plan, kind: :model do
   end
 end
 
-RSpec.describe Plan, kind: :model do
+RSpec.describe Plan, dbclean: :after_each do
   describe "scopes" do
     def platinum_count; 11; end
     def gold_count; 7; end
@@ -169,7 +169,7 @@ RSpec.describe Plan, kind: :model do
   end
 end
 
-RSpec.describe Plan, kind: :model do
+RSpec.describe Plan, dbclean: :after_each do
   describe "class methods" do
     describe "redis_monthly_premium" do
 

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe FamiliesController, :kind => :controller do
+RSpec.describe FamiliesController, :dbclean => :after_each do
   let(:person) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789" )}
 
   let(:valid_params) do

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe EmployeeRole, kind: :model do
+describe EmployeeRole, dbclean: :after_each do
   it { should delegate_method(:hbx_id).to :person }
   it { should delegate_method(:ssn).to :person }
   it { should delegate_method(:dob).to :person }
@@ -250,7 +250,7 @@ describe EmployeeRole, kind: :model do
   # end
 end
 
-describe EmployeeRole, kind: :model do
+describe EmployeeRole, dbclean: :after_each do
   let(:person_created_at) { 10.minutes.ago }
   let(:person_updated_at) { 8.minutes.ago }
   let(:employee_role_created_at) { 9.minutes.ago }

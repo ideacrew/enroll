@@ -19,7 +19,7 @@ describe Person do
     }
   end
 
-  describe ".create", kind: :model do
+  describe ".create", dbclean: :after_each do
     context "with valid arguments" do
       let(:params) {valid_params}
       let(:person) {Person.create(**params)}
@@ -213,7 +213,7 @@ describe Person, '.match_by_id_info' do
   end
 end
 
-describe Person, '.active', :kind => :model do
+describe Person, '.active', :dbclean => :after_each do
   it 'new person defaults to is_active' do
     expect(Person.create!(first_name: "eric", last_name: "Clapton").is_active).to eq true
   end
@@ -235,7 +235,7 @@ describe Person, '#addresses' do
     expect(person.errors[:addresses].any?).to eq true
   end
 
-  it 'persists associated address', kind: :model do
+  it 'persists associated address', dbclean: :after_each do
     # setup
     person = FactoryGirl.build(:person)
     addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})
