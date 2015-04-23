@@ -155,7 +155,7 @@ Then(/^I should see a form to enter information about employee, address and depe
   Watir::Wait.until(30) { @browser.input(value: "Create Family").visible? }
   sleep(1)
   expect(@browser.input(value: "Create Family").visible?).to be_truthy
-  # Employee
+  # Census Employee
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][first_name]").set("John")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][middle_name]").set("K")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][last_name]").set("Doe")
@@ -164,13 +164,13 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][ssn]").set("786120965")
   @browser.radio(id: "employer_census_employee_family_census_employee_attributes_gender_male").set
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][hired_on]").set("10/10/2014")
-  #Address
+  # Address
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][address_1]").set("1026 potomac")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][address_2]").set("apt abc")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][city]").set("alpharetta")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][state]").set("GA")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][zip]").set("30228")
-  # Dependents
+  # Census Dependents
   @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][first_name]").set("Mary")
   @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][last_name]").set("Doe")
   @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][name_sfx]").set("Jr")
@@ -180,12 +180,71 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.input(value: "Create Family").click
 end
 
-
-And(/^I should see a green success message$/) do
+And(/^I should see employer census family created success message$/) do
   sleep(1)
   Watir::Wait.until(30) {  @browser.text.include?("Employer Census Family is successfully created.") }
   expect(@browser.a(text: "John K Doe Jr").visible?).to be_truthy
   expect(@browser.a(text: "Edit").visible?).to be_truthy
   expect(@browser.a(text: "Terminate").visible?).to be_truthy
   expect(@browser.a(text: "Delink").visible?).to be_truthy
+end
+
+When(/^I click on Edit family button for a census family$/) do
+  sleep(1)
+  Watir::Wait.until(30) { @browser.a(text: "Edit").visible? }
+  @browser.a(text: "Edit").click
+end
+
+Then(/^I should see a form to update the contents of the census employee$/) do
+  sleep(1)
+  Watir::Wait.until(30) { @browser.input(value: "Update Family").visible? }
+  expect(@browser.input(value: "Update Family").visible?).to be_truthy
+  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][first_name]").set("Patrick")
+  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][state]").set("VA")
+  @browser.input(value: "Update Family").click
+end
+
+And(/^I should see employer census family updated success message$/) do
+  sleep(1)
+  Watir::Wait.until(30) {  @browser.text.include?("Employer Census Family is successfully updated.") }
+  expect(@browser.a(text: "Patrick K Doe Jr").visible?).to be_truthy
+end
+
+When(/^I click on terminate button for a census family$/) do
+  sleep(1)
+  Watir::Wait.until(30) { @browser.a(text: "Terminate").visible? }
+  @browser.a(text: "Terminate").click
+  sleep(1)
+  expect(@browser.a(text: "Patrick K Doe Jr").visible?).to be_falsey
+end
+
+Then(/^The census family should be terminated and move to terminated tab$/) do
+  @browser.radio(id: "terminated_yes").fire_event("onclick")
+  sleep(1)
+  expect(@browser.a(text: "Patrick K Doe Jr").visible?).to be_truthy
+  expect(@browser.a(text: "Rehire").visible?).to be_truthy
+end
+
+And(/^I should see the census family is successfully terminated message$/) do
+  sleep(1)
+  Watir::Wait.until(30) {  @browser.text.include?("Successfully terminated family.") }
+end
+
+When(/^I click on Rehire button for a census family on terminated tab$/) do
+  sleep(1)
+  Watir::Wait.until(30) { @browser.a(text: "Rehire").visible? }
+  @browser.a(text: "Rehire").click
+end
+
+Then(/^A new instance of the census family should be created$/) do
+  sleep(1)
+  @browser.radio(id: "terminated_no").fire_event("onclick")
+  sleep(1)
+  expect(@browser.text.include?("Patrick K Doe Jr")).to be_truthy
+  expect(@browser.a(text: "Terminate").visible?).to be_truthy
+end
+
+And(/^I should see the census family is successfully rehired message$/) do
+  sleep(1)
+  Watir::Wait.until(30) {  @browser.text.include?("Successfully rehired family.") }
 end

@@ -27,7 +27,17 @@ Feature: Create Employer
         And It should default to active tab
       When I click on add employee button
       Then I should see a form to enter information about employee, address and dependents
-        And I should see a green success message
+        And I should see employer census family created success message
+      When I click on Edit family button for a census family
+      Then I should see a form to update the contents of the census employee
+        And I should see employer census family updated success message
+      When I click on terminate button for a census family
+      Then The census family should be terminated and move to terminated tab
+        And I should see the census family is successfully terminated message
+      When I click on Rehire button for a census family on terminated tab
+      Then A new instance of the census family should be created
+        And I should see the census family is successfully rehired message
+
 
     @wip
     Scenario: Employer Representative provides a valid FEIN

@@ -54,9 +54,9 @@ class EmployerCensus::EmployeeFamily
     new_family
   end
 
-# A family that is in active state.
+# A family that is in active state. find_census_families_by_person returns [nil] if not present, so using compact
   def is_active?
-    EmployerProfile.find_census_families_by_person(census_employee).present?
+    EmployerProfile.find_census_families_by_person(census_employee).compact.present?
   end
 
   def parent
