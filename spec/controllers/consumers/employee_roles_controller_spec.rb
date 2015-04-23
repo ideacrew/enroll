@@ -61,7 +61,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     let(:employer_profile) { double }
     let(:census_employee) { instance_double("EmployerCensus::Employee", :hired_on => hired_on ) }
     let(:census_family) { instance_double("EmployerCensus::EmployeeFamily", :census_employee => census_employee, :employer_profile => employer_profile) }
-    let(:employee_role) { instance_double("EmployeeRole", :benefit_group => benefit_group, :census_family => census_family, :person => person) }
+    let(:employee_role) { instance_double("EmployeeRole", :benefit_group => benefit_group, :census_family => census_family, :person => person, :id => "212342345") }
     let(:effective_date) { double }
     let(:employment_relationship) {
       instance_double("Forms::EmploymentRelationship", {

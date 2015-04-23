@@ -10,6 +10,7 @@
       <%# end %>
       <%#= link_to 'Dependent Info', url %>
     <%# end %>
+    <%= f.hidden_field :employee_role_id %>
 
   	<%= render "shared/error_messages", object: f.object %>
   	<%= render 'shared/person_search_fields', f: f %>

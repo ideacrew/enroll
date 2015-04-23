@@ -41,7 +41,7 @@ class Consumer::EmployeeRolesController < ApplicationController
   def create
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
     @employee_role, @family = EnrollmentFactory.construct_employee_role(current_user, @employment_relationship.employee_family, @employment_relationship)
-    @person = @employee_role.person
+    @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     @benefit_group = @employee_role.benefit_group
     @census_family = @employee_role.census_family
     @employer_profile = @census_family.employer_profile
@@ -55,19 +55,20 @@ class Consumer::EmployeeRolesController < ApplicationController
   end
 
   def update
-    @person = EmployeeRole.find(params.require(:id))
-    if @person.update_attributes(params.require(:person))
-      @person.primary_family.households.first.coverage_households.first.coverage_household_members.update(applicant_id: params.require(:id))
+    @person = Forms::EmployeeRole.find(params.require(:id))
+    if @person.update_attributes(params.require(:person).permit(*person_parameters_list))
       respond_to do |format|
         format.html { render "dependent_details" }
         format.js { render "dependent_details" }
       end
     else
-      @employer_profile = @person.employer_profile
-      @benefit_group = @person.benefit_group
-      @census_family = @person.census_family
-      @census_employee = @person.census_employee
+      @employee_role = @person.employee_role
+      @employer_profile = @employee_role.employer_profile
+      @benefit_group = @employee_role.benefit_group
+      @census_family = @employee_role.census_family
+      @census_employee = @census_family.census_employee
       @effective_on = @benefit_group.effective_on_for(@census_employee.hired_on)
+      build_nested_models
       respond_to do |format|
         format.html { render "edit" }
         format.js { render "edit" }
@@ -87,5 +88,22 @@ class Consumer::EmployeeRolesController < ApplicationController
     ["home","work"].each do |kind|
       @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
     end
+  end
+
+  def person_parameters_list
+    [
+      :employee_role_id,
+      :addresses_attributes,
+      :phones_attributes,
+      :email_attributes,
+      :first_name,
+      :last_name,
+      :middle_name,
+      :name_pfx,
+      :name_sfx,
+      :date_of_birth,
+      :ssn,
+      :gender
+    ]
   end
 end
