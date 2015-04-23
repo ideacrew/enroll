@@ -19,9 +19,8 @@
     <%= f.hidden_field :hired_on %>
     <%= f.hidden_field :terminated_on %>
     <%= f.hidden_field :benefit_group_id %>
-    <%#= f.hidden_field :applicant_id %>
     </div>
-  	<%= render 'shared/error_messages' %>
+  	<%= render "shared/error_messages", object: f.object %>
   	<%= render 'shared/person_search_fields', f: f %>
   	
   	<%= render 'people/no_results' %>

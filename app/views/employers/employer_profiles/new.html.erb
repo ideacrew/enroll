@@ -7,17 +7,8 @@
 
       <%= form_for @organization, url: {action: "create"} do |f| %>
 
-        <% if @organization.errors.any? %>
-          <div class="alert alert-error">
-            <h4><%= pluralize(@organization.errors.size, "error") %> prohibited this person from being saved:</h4>
-            <ul>
-              <% @organization.errors.full_messages.each do |msg| %>
-                <li><%= msg %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-
+        <%= render "shared/error_messages", object: f.object %>
+        
         <div class="col-md-12 col-sm-12 col-xs-12">
           <div class="row landing-row">
             <div class="col-md-8 col-sm-8 col-xs-12 left-side">
