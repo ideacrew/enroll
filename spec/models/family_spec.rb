@@ -383,11 +383,11 @@ describe Family, ".find_or_initialize_by_employee_role:", type: :model do
     end
 
     context "and employee has spouse and child" do
-      it "should create one coverage_household with all family members" do
+      it "creates one coverage_household with all family members" do
         expect(married_family.households.first.coverage_households.size).to eq 1
       end
 
-      it "should have all family_members as coverage_household_members" do
+      it "and all family_members are members of this coverage_household" do
         expect(married_family.family_members.size).to eq 3
         expect(married_family.households.first.coverage_households.first.coverage_household_members.size).to eq 3
 
@@ -397,10 +397,25 @@ describe Family, ".find_or_initialize_by_employee_role:", type: :model do
       end
     end
 
-    context "and family members include extended family" do
-      it "should create two coverage households, one with immediate family and the other with extennded family" do
+    context "and family includes extended family relationships" do
+      before do
+        immediate_family_coverage_household = large_family.households.first.coverage_households.find(:is_immediate_family => true)
+        extended_family_coverage_household =  large_family.households.first.coverage_households.find(:is_immediate_family => false)
+      end
+
+      it "creates two coverage households" do
         expect(large_family.households.first.coverage_households.size).to eq 2
       end
+
+      it "and immediate family is in one coverage household" do
+        expect(immediate_family_coverage_household.coverage_household_members.size).to eq 3
+      end
+
+      it "and extended family is in a second coverage household" do
+        expect(extended_family_coverage_household.coverage_household_members.size).to eq 1
+        # expect(extended_family_coverage_household.coverage_household_members.first.).to eq 1
+      end
+
     end
   end
 
