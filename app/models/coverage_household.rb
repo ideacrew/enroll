@@ -15,7 +15,7 @@ class CoverageHousehold
 
   field :submitted_at, type: DateTime
 
-  embeds_many :coverage_household_members
+  embeds_many :coverage_household_members, cascade_callbacks: true
   accepts_nested_attributes_for :coverage_household_members
 
   validate :presence_of_coverage_household_members
