@@ -15,6 +15,7 @@
 //= require jquery-ui
 //= require jquery_ujs
 //= require bootstrap.min
+//= require jquery.selectric.min
 //= require turbolinks
 //= require classie
 //= require modalEffects
@@ -23,6 +24,10 @@
 //= require_tree .
 
 $(document).ready(function () {
+
+  $(function(){
+    $('select').selectric();
+  });
 
   $(document).on("focus", "[class~='date-picker']", function(e){
     $(this).datepicker({ 

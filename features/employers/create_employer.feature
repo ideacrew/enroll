@@ -18,7 +18,26 @@ Feature: Create Employer
       Then I should see a successful sign in message
         And I should see an initial form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone
         And I should see a second fieldset to enter my name and email
-        And My user data from existing the fieldset values are prefilled using data from my existing account
+        # And My user data from existing the fieldset values are prefilled using data from my existing account
+        And I should see a successful creation message
+      When I click on an employer in the employer list
+      Then I should see the employer information
+      When I click on the Employees tab
+      Then I should see the employee family roster
+        And It should default to active tab
+      When I click on add employee button
+      Then I should see a form to enter information about employee, address and dependents
+        And I should see employer census family created success message
+      When I click on Edit family button for a census family
+      Then I should see a form to update the contents of the census employee
+        And I should see employer census family updated success message
+      When I click on terminate button for a census family
+      Then The census family should be terminated and move to terminated tab
+        And I should see the census family is successfully terminated message
+      When I click on Rehire button for a census family on terminated tab
+      Then A new instance of the census family should be created
+        And I should see the census family is successfully rehired message
+
 
     @wip
     Scenario: Employer Representative provides a valid FEIN

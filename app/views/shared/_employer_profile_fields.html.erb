@@ -1,17 +1,17 @@
 <h4> Employer information</h4>
-<div class="phone col-md-10 col-sm-9 col-xs-12 no-pd first">
-  <div class="row top-row">
-    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :fein, class: "floatlabel form-control", required: true, placeholder: 'FEIN*' %>
-    </div>
-    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :dba, class: "floatlabel form-control", required: true, placeholder: 'DBA' %>
-    </div>
-    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :legal_name, class: "floatlabel form-control", required: true, placeholder: 'LEGAL NAME' %>
-    </div>
-    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      Entity Kind: <%= f.select :entity_kind, options_for_select(EmployerProfile::ENTITY_KINDS), class: "floatlabel form-control", required: true, placeholder: 'ENTITY KIND' %>
-    </div>
+<div class="row top-row personal-info-top-row">
+  <div class="col-md-12 no-pd first employee-info">
+  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :fein, class: "floatlabel form-control", required: true, placeholder: 'FEIN*' %>
+  </div>
+  <div class="col-md-3 col-sm-3 col-xs-12 form-group-lg no-pd">
+    <%= f.text_field :dba, class: "floatlabel form-control", required: true, placeholder: 'DBA' %>
+  </div>
+  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.text_field :legal_name, class: "floatlabel form-control", required: true, placeholder: 'LEGAL NAME' %>
+  </div>
+  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.select(:entity_kind, options_for_select(EmployerProfile::ENTITY_KINDS), {}, { :class => ''} ) %>
+  </div>
   </div>
 </div>
