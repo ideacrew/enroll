@@ -1,59 +1,55 @@
 require 'rails_helper'
 
-describe Family, type: :model do
+describe Family, "provided basic values" do
+  after(:context) do
+    DatabaseCleaner.clean
+  end
+  before(:context) do
+      @now = DateTime.now.utc
+      p0, p1 = Person.create!([
+        {first_name: "Dan", last_name: "Aurbach"},
+        {first_name: "Patrick", last_name: "Carney"}
+      ])
+      @a0 = FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: p0)
+      @a1 = FamilyMember.new(person: p1)
+      new_family = Family.create!(
+          e_case_id: "6754632abc",
+          renewal_consent_through_year: 2017,
+          family_members: [@a0, @a1],
+          submitted_at: @now,
+          is_active: true,
+          updated_by: "rspec"
+      )
+     @family = Family.find(new_family.id)
+  end
+
+  it "sets and gets all basic model fields" do
+    expect(@family.e_case_id).to eql("6754632abc")
+    expect(@family.is_active).to eql(true)
+    expect(@family.renewal_consent_through_year).to eql(2017)
+    expect(@family.submitted_at.to_s).to eq(@now.to_s)
+    expect(@family.updated_by).to eql("rspec")
+  end
+
+  it "saves family members" do
+    expect(@family.family_members.size).to eq 2
+    expect(@family.primary_applicant.id).to eql(@a0.id)
+    expect(@family.primary_applicant.person.first_name).to eql("Dan")
+    expect(@family.consent_applicant.person.last_name).to eql("Aurbach")
+  end
+end
+
+describe Family do
 
   let(:p0) { Person.create!(first_name: "Dan", last_name: "Aurbach") }
   let(:p1) { Person.create!(first_name: "Patrick", last_name: "Carney") }
   let(:a0) { family_member = FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true);
-  family_member.person=p0;
-  family_member }
+             family_member.person=p0;
+             family_member }
   let(:a1) { family_member = FamilyMember.new();
-  family_member.person=p1;
-  family_member }
+             family_member.person=p1;
+             family_member }
 
-  describe "instantiates object." do
-    it "sets and gets all basic model fields" do
-      now = DateTime.now.utc
-      ag = Family.new(
-          e_case_id: "6754632abc",
-          renewal_consent_through_year: 2017,
-          family_members: [a0, a1],
-          submitted_at: now,
-          is_active: true,
-          updated_by: "rspec"
-      )
-
-      expect(ag.e_case_id).to eql("6754632abc")
-      expect(ag.is_active).to eql(true)
-      expect(ag.renewal_consent_through_year).to eql(2017)
-      expect(ag.submitted_at.to_s).to eql(now.to_s)
-      expect(ag.updated_by).to eql("rspec")
-
-      expect(ag.family_members.size).to eql(2)
-      expect(ag.primary_applicant.id).to eql(a0.id)
-      expect(ag.primary_applicant.person.first_name).to eql("Dan")
-      expect(ag.consent_applicant.person.last_name).to eql("Aurbach")
-    end
-  end
-
-  describe "manages embedded associations." do
-
-    it "sets family_members" do
-
-
-      family = Family.create!(
-          e_case_id: "6754632abc",
-          renewal_consent_through_year: 2017,
-          submitted_at: Date.today,
-          family_members: [a0, a1],
-          irs_groups: [IrsGroup.new()]
-      );
-
-      expect(family.family_members.size).to eql(2)
-
-    end
-
-  end
 
   describe "one family exists" do
     let!(:primary_person) {FactoryGirl.create(:person)}
@@ -68,38 +64,38 @@ describe Family, type: :model do
       let!(:second_dependent_member) {FactoryGirl.build(:family_member, family: second_family, person: dependent_person)}
 
       it "second family should be valid" do
-        expect(second_family.valid?).to be
+        expect(second_family.valid?).to be_truthy
       end
     end
   end
 
-## TODO: Add method
-# describe HbxEnrollment, "#is_enrollable?", type: :model do
-#   context "employer_profile is under open enrollment period" do
-#     it "should return true" do
-#     end
-#
-#     context "and employee_role is under Special Enrollment Period" do
-#       it "should return true" do
-#       end
-#     end
-#   end
-#
-#   context "employee_role is under Special Enrollment Period" do
-#     it "should return true" do
-#     end
-#   end
-#
-#   context "outside employer_profile open enrollment" do
-#     it "should return false" do
-#     end
-#   end
-#
-#   context "employee_role is not under SEP" do
-#     it "should return false" do
-#     end
-#   end
-# end
+  ## TODO: Add method
+  # describe HbxEnrollment, "#is_enrollable?", type: :model do
+  #   context "employer_profile is under open enrollment period" do
+  #     it "should return true" do
+  #     end
+  #
+  #     context "and employee_role is under Special Enrollment Period" do
+  #       it "should return true" do
+  #       end
+  #     end
+  #   end
+  #
+  #   context "employee_role is under Special Enrollment Period" do
+  #     it "should return true" do
+  #     end
+  #   end
+  #
+  #   context "outside employer_profile open enrollment" do
+  #     it "should return false" do
+  #     end
+  #   end
+  #
+  #   context "employee_role is not under SEP" do
+  #     it "should return false" do
+  #     end
+  #   end
+  # end
 
   describe "special enrollment periods" do
     include_context "BradyBunch"
@@ -130,7 +126,7 @@ describe Family, type: :model do
       end
 
       it "should return a SEP class" do
-          expect(family.special_enrollment_periods.first).to be_a SpecialEnrollmentPeriod
+        expect(family.special_enrollment_periods.first).to be_a SpecialEnrollmentPeriod
       end
 
       it "should indicate no active SEPs" do
@@ -342,9 +338,9 @@ describe Family, ".find_or_initialize_by_employee_role:", type: :model do
 
   let(:single_dude)   { FactoryGirl.create(:person, last_name: "sheen", first_name: "tigerblood") }
   let(:married_dude)  { FactoryGirl.create(:person, last_name: "sheen", first_name: "chuck",
-                                            person_relationships: married_relationships ) }
+                                           person_relationships: married_relationships ) }
   let(:family_dude)   { FactoryGirl.create(:person, last_name: "sheen", first_name: "charles",
-                                            person_relationships: family_relationships ) }
+                                           person_relationships: family_relationships ) }
 
   let(:single_employee_role)    { FactoryGirl.create(:employee_role, person: single_dude) }
   let(:married_employee_role)   { FactoryGirl.create(:employee_role, person: married_dude) }
@@ -378,7 +374,6 @@ describe Family, ".find_or_initialize_by_employee_role:", type: :model do
       it "and create a coverage_household with one family_member" do
         expect(single_family.households.first.coverage_households.size).to eq 1
         expect(single_family.households.first.coverage_households.first.coverage_household_members.first.family_member).to eq single_family.family_members.first
-        # expect(single_family.households.first.coverage_households.first.coverage_household_members.where(family_member_id: single_family.family_members[0]._id)).not_to be_nil
       end
     end
 
@@ -408,8 +403,7 @@ describe Family, ".find_or_initialize_by_employee_role:", type: :model do
     let(:existing_primary_member) {existing}
     let(:existing_family) { FactoryGirl.create(:family)}
 
-    it "should return the family for this employee_role" do
-    end
+    it "should return the family for this employee_role" 
   end
 
 end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe BrokerRole, type: :model do
+describe BrokerRole, dbclean: :after_each do
 
   let(:address) {FactoryGirl.build(:address)}
   let(:saved_person) {FactoryGirl.create(:person, addresses: [address])}
@@ -85,12 +85,7 @@ describe BrokerRole, type: :model do
   end
 
 
-  # Class methods
-  describe BrokerRole, '.new', :type => :model do
-
-  end
-
-  describe BrokerRole, '.find', :type => :model do
+  describe BrokerRole, '.find', :dbclean => :after_each do
     it 'returns Broker instance for the specified ID' do
       b0 = BrokerRole.create(person: person0, npn: npn0, provider_kind: provider_kind)
 
@@ -99,7 +94,7 @@ describe BrokerRole, type: :model do
     end
   end
 
-  describe BrokerRole, '.all', :type => :model do
+  describe BrokerRole, '.all', :dbclean => :after_each do
     it 'returns all Broker instances' do
       b0 = BrokerRole.create(person: person0, npn: npn0, provider_kind: provider_kind)
       b1 = BrokerRole.create(person: person1, npn: npn1, provider_kind: provider_kind)
@@ -110,7 +105,7 @@ describe BrokerRole, type: :model do
     end
   end
 
-  describe BrokerRole, '.find_by_npn', :type => :model do
+  describe BrokerRole, '.find_by_npn', :dbclean => :after_each do
     it 'returns Broker instance for the specified National Producer Number' do
       b0 = BrokerRole.create(person: person0, npn: npn0, provider_kind: provider_kind)
       b1 = BrokerRole.create(person: person1, npn: npn1, provider_kind: provider_kind)
@@ -120,7 +115,7 @@ describe BrokerRole, type: :model do
   end
 
 
-  describe BrokerRole, '.find_by_broker_agency_profile', :type => :model do
+  describe BrokerRole, '.find_by_broker_agency_profile', :dbclean => :after_each do
     let(:ba) {FactoryGirl.create(:broker_agency_profile)}
 
     it 'returns Broker instance for the specified National Producer Number' do
@@ -133,7 +128,7 @@ describe BrokerRole, type: :model do
   end
 
 
-  describe BrokerRole, '.all', :type => :model do
+  describe BrokerRole, '.all', :dbclean => :after_each do
     it 'returns all Broker instances' do
       b0 = BrokerRole.create(person: person0, npn: npn0, provider_kind: provider_kind)
       b1 = BrokerRole.create(person: person1, npn: npn1, provider_kind: provider_kind)
@@ -145,7 +140,7 @@ describe BrokerRole, type: :model do
   end
 
   # Instance methods
-  describe BrokerRole, :type => :model do
+  describe BrokerRole, :dbclean => :after_each do
     let(:ba) {FactoryGirl.create(:broker_agency_profile)}
 
     it '#broker_agency_profile sets agency' do

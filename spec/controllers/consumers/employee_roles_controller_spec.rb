@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
+RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
   describe "PUT update" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:organization_id) { "1234324234" }
@@ -105,22 +105,15 @@ RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
   describe "POST match" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result) }
-    let(:mock_service) { instance_double("Services::EmployeeSignupMatch") }
     let(:hired_on) { double }
-    let(:mock_census_employee) { instance_double("EmployerCensus::Employee", :employee_family => mock_census_family, :hired_on => hired_on) }
-    let(:mock_person) { instance_double("Person") }
-    let(:mock_benefit_group) { instance_double("BenefitGroup") }
-    let(:mock_census_family) { instance_double("EmployerCensus::EmployeeFamily", :benefit_group => mock_benefit_group, :employer_profile => mock_employer_profile) }
-    let(:mock_employer_profile) { instance_double("EmployerProfile") }
-    let(:effective_date) { double }
-    let(:found_models) { nil }
+    let(:found_families) { [] }
+    let(:employment_relationships) { double }
 
     before(:each) do
       sign_in 
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters).and_return(mock_employee_candidate)
-      allow(Services::EmployeeSignupMatch).to receive(:new).and_return(mock_service)
-      allow(mock_service).to receive(:call).with(mock_employee_candidate).and_return(found_models)
-      allow(mock_benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
+      allow(EmployerProfile).to receive(:find_census_families_by_person).with(mock_employee_candidate).and_return(found_families)
+      allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, found_families).and_return(employment_relationships)
       post :match, :person => person_parameters
     end
 
@@ -144,16 +137,13 @@ RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
         end
 
         context "that find a matching employee" do
-          let(:found_models) { [mock_census_employee, mock_person] }
+          let(:found_families) { [instance_double("EmployerCensus::EmployeeFamily")]} 
 
           it "renders the 'match' template" do
             expect(response).to have_http_status(:success)
             expect(response).to render_template("match")
             expect(assigns[:employee_candidate]).to eq mock_employee_candidate
-            expect(assigns[:effective_on]).to eq effective_date
-            expect(assigns[:benefit_group]).to eq mock_benefit_group
-            expect(assigns[:census_family]).to eq mock_census_family
-            expect(assigns[:employer_profile]).to eq mock_employer_profile
+            expect(assigns[:employment_relationships]).to eq employment_relationships
           end
         end
       end

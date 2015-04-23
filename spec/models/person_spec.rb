@@ -19,7 +19,7 @@ describe Person do
     }
   end
 
-  describe ".create", type: :model do
+  describe ".create", dbclean: :after_each do
     context "with valid arguments" do
       let(:params) {valid_params}
       let(:person) {Person.create(**params)}
@@ -154,7 +154,6 @@ describe Person do
 end
 
 describe Person, "class methods" do
-
   context "no employee_roles are present" do
     it "should not find any employee_roles" do
       expect(Person.employee_roles.size).to eq 0
@@ -162,11 +161,17 @@ describe Person, "class methods" do
   end
 
   context "employee_roles are present" do
+    before(:all) do
+      FactoryGirl.create_list(:employee_role, 11)
+    end
+
+    after(:all) do
+      DatabaseCleaner.clean
+    end
 
     let(:employee_count) { 11 }
 
     it "should find a matching number of employee_roles" do
-      FactoryGirl.create_list(:employee_role, 11)
       expect(Person.employee_roles.count).to eq employee_count
       expect((Person.employee_roles).first).to be_a EmployeeRole
       DatabaseCleaner.clean
@@ -177,13 +182,13 @@ describe Person, "class methods" do
 end
 
 describe Person, '.match_by_id_info' do
-  before(:each) do
+  before(:all) do
     @p0 = Person.create!(first_name: "Jack",   last_name: "Bruce",   dob: "1943-05-14", ssn: "517994321")
     @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
     @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
   end
 
-  after(:each) do
+  after(:all) do
     DatabaseCleaner.clean
   end
 
@@ -208,7 +213,7 @@ describe Person, '.match_by_id_info' do
   end
 end
 
-describe Person, '.active', :type => :model do
+describe Person, '.active', :dbclean => :after_each do
   it 'new person defaults to is_active' do
     expect(Person.create!(first_name: "eric", last_name: "Clapton").is_active).to eq true
   end
@@ -230,7 +235,7 @@ describe Person, '#addresses' do
     expect(person.errors[:addresses].any?).to eq true
   end
 
-  it 'persists associated address', type: :model do
+  it 'persists associated address', dbclean: :after_each do
     # setup
     person = FactoryGirl.build(:person)
     addresses = person.addresses.build({kind: "home", address_1: "441 4th ST, NW", city: "Washington", state: "DC", zip: "20001"})

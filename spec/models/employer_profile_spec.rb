@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe EmployerProfile, :type => :model do
+RSpec.describe EmployerProfile, :dbclean => :after_each do
 
   it { should validate_presence_of :entity_kind }
 
@@ -67,7 +67,7 @@ RSpec.describe EmployerProfile, :type => :model do
   end
 end
 
-describe EmployerProfile, "Class methods", type: :model do
+describe EmployerProfile, "Class methods", dbclean: :after_each do
   def ee0; FactoryGirl.build(:employer_census_employee, ssn: "369851245", dob: 32.years.ago.to_date); end
   def ee1; FactoryGirl.build(:employer_census_employee, ssn: "258741239", dob: 42.years.ago.to_date); end
 
