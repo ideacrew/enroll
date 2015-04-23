@@ -519,6 +519,9 @@ $(document).ready(function () {
       $(this).tooltip('show').tooltip('hide');
     });
   });
+
+  $(".floatlabel, .selectric-wrapper").focusin(function() { $(this).closest('.employee-info').css("opacity","1") });
+  $(".floatlabel, .selectric-wrapper").blur(function() { $(this).closest('.employee-info').css("opacity","0.5") });
  
 });
 

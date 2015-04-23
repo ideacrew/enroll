@@ -1,3 +1,14 @@
+@media(max-width: 500px){
+  #address_info .new-address-flow{
+    padding-top: 40%;
+  }
+}
+@media(min-width: 501px) and (max-width: 767px){
+  #address_info .new-address-flow{
+    padding-top: 20%;
+  }
+}
+
 @media (min-width: 300px) and (max-width: 767px) {
   
   .radio label, .checkbox label {
