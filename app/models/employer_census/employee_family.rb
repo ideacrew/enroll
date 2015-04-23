@@ -16,7 +16,8 @@ class EmployerCensus::EmployeeFamily
   field :terminated, type: Boolean, default: false
 
   delegate :id, to: :employer_profile, prefix: true
-  delegate :hired_on, :terminated_on, :ssn, :dob, to: :census_employee
+  delegate :ssn, :dob, to: :census_employee, prefix: true
+  delegate :hired_on, :terminated_on, to: :census_employee
 
   embeds_one :census_employee,
     class_name: "EmployerCensus::Employee",

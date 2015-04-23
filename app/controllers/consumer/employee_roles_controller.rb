@@ -1,3 +1,5 @@
+require 'factories/enrollment_factory'
+
 class Consumer::EmployeeRolesController < ApplicationController
   def welcome
   end
@@ -38,12 +40,14 @@ class Consumer::EmployeeRolesController < ApplicationController
 
   def create
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
-    @employee_role, @family = EnrollmentFactory.add_employee_role(@employment_relationship, @employment_relationship.employee_family, current_user)
-    @person = @employee_role
-    @benefit_group = @person.benefit_group
-    @census_family = @person.census_family
-    @census_employee = @person.census_employee
+    @employee_role, @family = EnrollmentFactory.construct_employee_role(current_user, @employment_relationship.employee_family, @employment_relationship)
+    @person = @employee_role.person
+    @benefit_group = @employee_role.benefit_group
+    @census_family = @employee_role.census_family
+    @employer_profile = @census_family.employer_profile
+    @census_employee = @employee_role.census_family.census_employee
     @effective_on = @benefit_group.effective_on_for(@census_employee.hired_on)
+    build_nested_models
     respond_to do |format|
       format.js { render "edit" }
       format.html { render "edit" }
@@ -68,6 +72,20 @@ class Consumer::EmployeeRolesController < ApplicationController
         format.html { render "edit" }
         format.js { render "edit" }
       end
+    end
+  end
+
+  def build_nested_models
+    ["home","mobile","work","fax"].each do |kind|
+      @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
+    end
+
+    Address::KINDS.each do |kind|
+      @person.addresses.build(kind: kind) if @person.addresses.select{|address| address.kind == kind}.blank?
+    end
+
+    ["home","work"].each do |kind|
+      @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
     end
   end
 end

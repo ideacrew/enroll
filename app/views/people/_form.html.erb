@@ -11,15 +11,6 @@
       <%#= link_to 'Dependent Info', url %>
     <%# end %>
 
-    <div class="hidden"> 
-    <%= f.hidden_field :census_family_id %>
-    <%= f.hidden_field :census_employee_id %>
-    <%= f.hidden_field :employer_profile_id %>
-    <%= f.hidden_field :organization_id %>
-    <%= f.hidden_field :hired_on %>
-    <%= f.hidden_field :terminated_on %>
-    <%= f.hidden_field :benefit_group_id %>
-    </div>
   	<%= render "shared/error_messages", object: f.object %>
   	<%= render 'shared/person_search_fields', f: f %>
   	

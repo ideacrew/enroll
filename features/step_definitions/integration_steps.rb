@@ -63,8 +63,9 @@ When(/^I enter the identifying info of my existing person$/) do
 end
 
 Then(/^I should see the matched employee record form$/) do
-  expect(@browser.div(:text => /Employer : Acme Inc\./).visible?).to be_truthy
-  #raise "BAIL HOMIE"
+  expect(@browser.dd(:text => /Acme Inc\./).visible?).to be_truthy
+  @browser.input(:value => /This is my employer/).click
+  sleep(5)
 end
 
 When(/^I enter the personal infomation of my existing person$/) do
