@@ -62,12 +62,10 @@ describe FamilyMember, type: :model do
   end
 
   context "broker" do
-    let(:person) {create(:person)}
-    let(:broker_role) {person.create_broker_role(npn: "aaaa", provider_kind: "broker")}
-    let(:person2) {create(:person)}
-    let(:broker_role2) {person.create_broker_role(npn: "bbb", provider_kind: "broker")}
+    let(:broker_role)   {FactoryGirl.create(:broker_role)}
+    let(:broker_role2)  {FactoryGirl.create(:broker_role)}
 
-    it "with brokerrole" do
+    it "with broker_role" do
       family_member = ag.family_members.create(**family_member_params)
       family_member.broker= broker_role
       expect(family_member.broker).to eq broker_role
@@ -76,12 +74,10 @@ describe FamilyMember, type: :model do
     it "without broker_role" do
       family_member = ag.family_members.create(**family_member_params)
       family_member.broker = broker_role
-      family_member.save
+      expect(family_member.broker).to eq broker_role
 
       family_member.broker = broker_role2
-      family_member.save
-
-      expect(family_member.broker).to eq broker_role
+      expect(family_member.broker).to eq broker_role2
     end
   end
 
