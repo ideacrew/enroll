@@ -20,3 +20,5 @@ Scenario: New employee with existing person
   Then I should see the filter results
   When I enter combind filter in plan selection page
   Then I should see the combind filter results
+  When I select a plan in plan selection page
+  Then I should see the plan thankyou page
