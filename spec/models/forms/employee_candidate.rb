@@ -3,18 +3,18 @@ require "rails_helper"
 describe Forms::EmployeeCandidate do
     it "should have error on dob" do
       subject.valid?
-      expect(subject.errors).to include(:date_of_birth)
+      expect(subject).to have_errors_on(:date_of_birth)
     end
 
     it "should have errors on the missing names" do
       subject.valid?
-      expect(subject.errors).to include(:last_name)
-      expect(subject.errors).to include(:first_name)
+      expect(subject).to have_errors_on(:last_name)
+      expect(subject).to have_errors_on(:first_name)
     end
 
     it "should have errors on the ssn" do
       subject.valid?
-      expect(subject.errors).to include(:ssn)
+      expect(subject).to have_errors_on(:ssn)
     end
 end
 
