@@ -18,7 +18,7 @@ class CoverageHousehold
   embeds_many :coverage_household_members, cascade_callbacks: true
   accepts_nested_attributes_for :coverage_household_members
 
-  validates_inclusion_of :is_immediate_family
+  validates_presence_of :is_immediate_family
   validate :presence_of_coverage_household_members
 
   def family
