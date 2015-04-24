@@ -1,15 +1,23 @@
-<div class="employee-welocome">
+<div class="employee-welcome">
   <div class="row welcome-msg">
     <div class="col-md-9 col-sm-11 col-xs-12 no-pd">
       <div class="row text-center">
         <div class="col-md-12 col-sm-12 no-pd col-xs-12 text-left">
-          <h4><strong>Welcome to DCHBX</strong></h4>
+          <h4><strong>Let's Get You Signed Up for Health Care!</strong></h4>
           <p>
-            Let's get signed up for health care. To start this process we will need some personal information to find your employer created records. By using this site you acknowledge that your have read and agree with the privacy policy and terms of use found here: <a href="#">DCHBX Privacy Policy &amp; Terms of Use.</a>
+            To start this process, we will need some personal information to access your employer-offered benefits.<br/><br/>
+
+              Be prepared to provide names, dates-of-birth, and social security numbers for you and enrolling family members.  We will also need ways to contact you: address, telephone and email.
           </p>
+      <br/>
+          <p> Ready?  Click button below to continue</p>
+	<%= link_to "Continue", search_consumer_employee_index_path, :remote => true, :class => "btn btn-lg btn-primary btn-block btn-green btn-continue" %>
         </div>
-	<%= link_to "Continue", search_consumer_employee_index_path, :remote => true, :class => "btn btn-green btn-continue" %>
       </div>
+      <br/>
+      <p><small>
+        By using this site, you acknowledge that your have read and agree with the privacy policy and terms of use found here: <a href="#">DCHBX Privacy Policy &amp; Terms of Use.</a>
+      </small></p>
     </div>
   </div>
 </div>
