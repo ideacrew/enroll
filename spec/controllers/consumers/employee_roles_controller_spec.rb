@@ -1,6 +1,7 @@
 require 'rails_helper'
+require 'factories/enrollment_factory'
 
-RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
+RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
   describe "PUT update" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:organization_id) { "1234324234" }
@@ -53,74 +54,68 @@ RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
     end
   end
   describe "POST create" do
-    let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
-    let(:organization_id) { "1234324234" }
-    let(:person_id) { "4324324234" }
-    let(:benefit_group) { double }
-    let(:census_employee) { double(:hired_on => "whatever" ) }
-    let(:census_family) { double }
+    let(:person) { Person.new }
+    let(:hired_on) { double }
+    let(:family) { double }
+    let(:benefit_group) { instance_double("BenefitGroup") }
     let(:employer_profile) { double }
+    let(:census_employee) { instance_double("EmployerCensus::Employee", :hired_on => hired_on ) }
+    let(:census_family) { instance_double("EmployerCensus::EmployeeFamily", :census_employee => census_employee, :employer_profile => employer_profile) }
+    let(:employee_role) { instance_double("EmployeeRole", :benefit_group => benefit_group, :census_family => census_family, :person => person, :id => "212342345") }
     let(:effective_date) { double }
-    let(:role_form) {
-      double(:save => save_result,
-             :organization_id => organization_id,
-             :benefit_group => benefit_group,
-             :census_employee => census_employee,
-             :census_family => census_family,
-             :employer_profile => employer_profile,
-             :id => person_id)
+    let(:employment_relationship) {
+      instance_double("Forms::EmploymentRelationship", {
+             :employee_family => census_family
+      } )
     }
+    let(:employment_relationship_properties) { { :skllkjasdfjksd => "a3r123rvf" } }
+    let(:user) { double }
 
-    before(:each) do
-      sign_in
-      allow(Forms::EmployeeRole).to receive(:from_parameters).with(person_parameters).and_return(role_form)
-      allow(benefit_group).to receive(:effective_on_for).with("whatever").and_return(effective_date)
-      post :create, :person => person_parameters
+    before :each do
+      allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
+      allow(EnrollmentFactory).to receive(:construct_employee_role).with(user, census_family, employment_relationship).and_return([employee_role, family])
+      allow(benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
+      sign_in(user)
+      post :create, :employment_relationship => employment_relationship_properties
     end
 
-    describe "given valid person parameters" do
-      let(:save_result) { true }
-
-      it "should redirect to dependent_details" do
-        expect(response).to have_http_status(:success)
-        expect(response).to render_template("dependent_details")
-      end
+    it "should render the edit template" do
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("edit")
     end
 
-    describe "given invalid person parameters" do
-      let(:save_result) { false }
+    it "should assign the employee_role" do
+      expect(assigns(:employee_role)).to eq employee_role
+    end
 
-      it "should render match" do
-        expect(response).to have_http_status(:success)
-        expect(response).to render_template("match")
-        expect(assigns(:person)).to eq role_form
-        expect(assigns[:effective_on]).to eq effective_date
-        expect(assigns[:benefit_group]).to eq benefit_group
-        expect(assigns[:census_family]).to eq census_family
-        expect(assigns[:employer_profile]).to eq employer_profile
-      end
+    it "should assign the person" do
+      expect(assigns(:person)).to eq person
+    end
+
+    it "should assign the family" do
+      expect(assigns(:family)).to eq family
+    end
+
+    it "should assign the 9 billion other properties required by the legacy template" do
+      expect(assigns(:census_family)).to eq census_family
+      expect(assigns(:benefit_group)).to eq benefit_group
+      expect(assigns(:census_employee)).to eq census_employee
+      expect(assigns(:effective_on)).to eq effective_date
     end
   end
 
   describe "POST match" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result) }
-    let(:mock_service) { instance_double("Services::EmployeeSignupMatch") }
     let(:hired_on) { double }
-    let(:mock_census_employee) { instance_double("EmployerCensus::Employee", :employee_family => mock_census_family, :hired_on => hired_on) }
-    let(:mock_person) { instance_double("Person") }
-    let(:mock_benefit_group) { instance_double("BenefitGroup") }
-    let(:mock_census_family) { instance_double("EmployerCensus::EmployeeFamily", :benefit_group => mock_benefit_group, :employer_profile => mock_employer_profile) }
-    let(:mock_employer_profile) { instance_double("EmployerProfile") }
-    let(:effective_date) { double }
-    let(:found_models) { nil }
+    let(:found_families) { [] }
+    let(:employment_relationships) { double }
 
     before(:each) do
       sign_in 
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters).and_return(mock_employee_candidate)
-      allow(Services::EmployeeSignupMatch).to receive(:new).and_return(mock_service)
-      allow(mock_service).to receive(:call).with(mock_employee_candidate).and_return(found_models)
-      allow(mock_benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
+      allow(EmployerProfile).to receive(:find_census_families_by_person).with(mock_employee_candidate).and_return(found_families)
+      allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, found_families).and_return(employment_relationships)
       post :match, :person => person_parameters
     end
 
@@ -144,16 +139,13 @@ RSpec.describe Consumer::EmployeeRolesController, :type => :controller do
         end
 
         context "that find a matching employee" do
-          let(:found_models) { [mock_census_employee, mock_person] }
+          let(:found_families) { [instance_double("EmployerCensus::EmployeeFamily")]} 
 
           it "renders the 'match' template" do
             expect(response).to have_http_status(:success)
             expect(response).to render_template("match")
             expect(assigns[:employee_candidate]).to eq mock_employee_candidate
-            expect(assigns[:effective_on]).to eq effective_date
-            expect(assigns[:benefit_group]).to eq mock_benefit_group
-            expect(assigns[:census_family]).to eq mock_census_family
-            expect(assigns[:employer_profile]).to eq mock_employer_profile
+            expect(assigns[:employment_relationships]).to eq employment_relationships
           end
         end
       end

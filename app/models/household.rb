@@ -16,7 +16,7 @@ class Household
 
   embeds_many :hbx_enrollments
   embeds_many :tax_households
-  embeds_many :coverage_households
+  embeds_many :coverage_households, cascade_callbacks: true
 
   accepts_nested_attributes_for :hbx_enrollments, :tax_households, :coverage_households
 

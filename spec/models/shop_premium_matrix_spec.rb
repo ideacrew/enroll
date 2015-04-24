@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe ShopPremiumMatrix, type: :model do
+describe ShopPremiumMatrix, dbclean: :after_each do
   context "when no data has been loaded" do
     include_context "BradyWork"
 

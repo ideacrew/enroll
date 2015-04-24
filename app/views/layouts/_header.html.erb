@@ -1,45 +1,40 @@
-<% if controller_name == 'sessions' || controller_name == 'welcome' || controller_name == 'registrations'  || controller_name == 'employee_roles' || (signed_in? && (controller_name == 'employees' || controller_name == 'family' || controller_name == 'people')) %>
-  <nav role="navigation" class="navbar navbar-default navbar-fixed-top">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button data-target="#bs-example-navbar-collapse-1" data-toggle="collapse" class="navbar-toggle" type="button">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-        </div>
+<nav role="navigation" class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button data-target="#bs-example-navbar-collapse-1" data-toggle="collapse" class="navbar-toggle" type="button">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </div>
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div id="bs-example-navbar-collapse-1" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <a href="#" class="pull-left"><%= image_tag 'logo_small.png' %></a>
-            <li><p>Click anywhere in this area to <a href="#">ask a question</a> or <a href="#">start a search</a></p></li>
-            <!-- <li class="social pull-right border nav"><a href="#"><img src="img/nav.png" alt=""></a></li> -->
-            <li class="social pull-right border"><a href="#"><%= image_tag 'chat.png' %></a></li>
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div id="bs-example-navbar-collapse-1" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <a href="#" class="pull-left"><%= image_tag 'logo_small.png' %></a>
+          <li><p>Click anywhere in this area to <a href="#">ask a question</a> or <a href="#">start a search</a></p></li>
+          <!-- <li class="social pull-right border nav"><a href="#"><img src="img/nav.png" alt=""></a></li> -->
+          <li class="social pull-right border"><a href="#"><%= image_tag 'chat.png' %></a></li>
 
-            <li class="social pull-right border aktif dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= image_tag 'user.png' %></a>
+          <li class="social pull-right border aktif dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= image_tag 'user.png' %></a>
 
-              <% if signed_in? %>
-              <ul class="dropdown-menu">
-                <% unless @person.nil? %>
-                  <% if @person.persisted? %>
-                    <li><%= link_to "Profile", consumer_employee_path(@person) %></li>
-                    <li><%= link_to "My Account", person_person_landing_path(@person) %></li>
-                    <li class="divider"></li>
-                  <% end %>
-                <% end %>
-                <li><%= link_to "Sign out", destroy_user_session_path, method: "delete" %></li>
-              </ul>
+            <% if signed_in? %>
+            <ul class="dropdown-menu">
+              <% unless @person.nil? || @person.persisted? %>
+                  <li><%= link_to "Profile", consumer_employee_path(@person) %></li>
+                  <li><%= link_to "My Account", person_person_landing_path(@person) %></li>
+                  <li class="divider"></li>
               <% end %>
-            </li>
+              <li><%= link_to "Sign out", destroy_user_session_path, method: "delete" %></li>
+            </ul>
+            <% end %>
+          </li>
 
-            <li class="social pull-right"><a href="#"><%= image_tag 'search.png' %></a></li>
-          </ul>
-        </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
-  </nav>
-<% else %>
-<% end %>
+          <li class="social pull-right"><a href="#"><%= image_tag 'search.png' %></a></li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>

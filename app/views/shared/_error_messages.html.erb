@@ -1,10 +1,10 @@
-<% if @person.errors.any? %>
-  <div class="alert alert-error">
-    <h4><%= pluralize(@person.errors.count, "error") %> prohibited this person from being saved:</h4>
-    <ul>
-      <% @person.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-    </ul>
-  </div>
+<% if object.errors.any? %>
+	<div class="alert alert-danger">
+		<h4><%= pluralize(object.errors.size, "error") %> prohibited this <%= object.class.name %> from being saved:</h4>
+		<ul>
+			<% object.errors.full_messages.each do |msg| %>
+				<li><%= msg %></li>
+			<% end %>
+		</ul>
+	</div>
 <% end %>

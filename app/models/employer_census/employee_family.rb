@@ -15,6 +15,10 @@ class EmployerCensus::EmployeeFamily
   field :aasm_state, type: String
   field :terminated, type: Boolean, default: false
 
+  delegate :id, to: :employer_profile, prefix: true
+  delegate :ssn, :dob, to: :census_employee, prefix: true
+  delegate :hired_on, :terminated_on, to: :census_employee
+
   embeds_one :census_employee,
     class_name: "EmployerCensus::Employee",
     cascade_callbacks: true,
@@ -54,9 +58,9 @@ class EmployerCensus::EmployeeFamily
     new_family
   end
 
-# A family that is in active state.
+# A family that is in active state. find_census_families_by_person returns [nil] if not present, so using compact
   def is_active?
-    EmployerProfile.find_census_families_by_person(census_employee).present?
+    EmployerProfile.find_census_families_by_person(census_employee).compact.present?
   end
 
   def parent
@@ -84,12 +88,13 @@ class EmployerCensus::EmployeeFamily
     parent.plan_years.find(plan_year_id).benefit_groups.find(benefit_group_id)
   end
 
-  def link_employee_role(new_employee_role)
+  def link_employee_role(employee_role, linked_at = Time.now)
     raise EmployeeFamilyLinkError, "already linked to an employee role" if is_linked?
     raise EmployeeFamilyLinkError, "invalid to link a terminated employee" if is_terminated?
 
-    self.employee_role_id = new_employee_role._id
-    self.linked_at = Time.now
+    self.employee_role_id = employee_role._id
+    self.linked_at = linked_at
+    employee_role.census_family_id = _id
     self
   end
 

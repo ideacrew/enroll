@@ -1,30 +1,32 @@
-<div class="address col-md-10 col-sm-9 col-xs-12 no-pd first">
-  <div class="row top-row">
-    <h4> Plan Year </h4>
-    <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :start_on, class: "date-picker floatlabel form-control", required: true, placeholder: 'START ON' %>
+<h4>Plan Year</h4>
+<div class="row personal-info-top-row">
+  <div class="col-md-12 no-pd first employee-info">
+    <div class="row top-row">
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :start_on, class: "date-picker floatlabel form-control", required: true, placeholder: 'START ON' %>
+      </div>
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :end_on, class: "date-picker floatlabel form-control", required: true, placeholder: 'END ON' %>
+      </div>
     </div>
-    <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :end_on, class: "date-picker floatlabel form-control", required: true, placeholder: 'END ON' %>
+    <div class="row top-row">
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :open_enrollment_start_on, class: "date-picker floatlabel form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE' %>
+      </div>
+      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :open_enrollment_end_on, class: "date-picker floatlabel form-control", required: true, placeholder: 'OPEN ENROLLMENT END DATE' %>
+      </div>
     </div>
-  </div>
-  <div class="row top-row">
-    <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :open_enrollment_start_on, class: "date-picker floatlabel form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE' %>
-    </div>
-    <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :open_enrollment_end_on, class: "date-picker floatlabel form-control", required: true, placeholder: 'OPEN ENROLLMENT END DATE' %>
-    </div>
-  </div>
-  <div class="row top-row">
-    <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :fte_count, class: "floatlabel form-control", required: true, placeholder: 'FULL TIME EMPLOYEES' %>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :pte_count, class: "floatlabel form-control", required: true, placeholder: 'PART TIME EMPLOYEES' %>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :msp_count, class: "floatlabel form-control", required: true, placeholder: 'MEDICARE SECOND PAYERS' %>
+    <div class="row bottom-row">
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :fte_count, class: "floatlabel form-control", required: true, placeholder: 'FULL TIME EMPLOYEES' %>
+      </div>
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :pte_count, class: "floatlabel form-control", required: true, placeholder: 'PART TIME EMPLOYEES' %>
+      </div>
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :msp_count, class: "floatlabel form-control", required: true, placeholder: 'MEDICARE SECOND PAYERS' %>
+      </div>
     </div>
   </div>
 </div>
