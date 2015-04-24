@@ -63,10 +63,10 @@ class Consumer::EmployeeRolesController < ApplicationController
       end
     else
       @employee_role = @person.employee_role
-      @employer_profile = @employee_role.employer_profile
-      @benefit_group = @employee_role.benefit_group
-      @census_family = @employee_role.census_family
-      @census_employee = @census_family.census_employee
+      @employer_profile = @person.employer_profile
+      @benefit_group = @person.benefit_group
+      @census_family = @person.census_family
+      @census_employee = @person.census_employee
       @effective_on = @benefit_group.effective_on_for(@census_employee.hired_on)
       build_nested_models
       respond_to do |format|

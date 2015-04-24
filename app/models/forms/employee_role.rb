@@ -37,6 +37,10 @@ module Forms
       super(for_person)
     end
 
+    def benefit_group
+      @benefit_group ||= employee_role.benefit_group
+    end
+
     def organization_id
       organization.id
     end
@@ -47,6 +51,14 @@ module Forms
 
     def employer_profile
       @employer_profile ||= self.employee_role.employer_profile
+    end
+
+    def census_employee
+      @census_employee ||= census_family.census_employee
+    end
+
+    def census_family
+      @census_family ||= employee_role.census_family
     end
 
     def employee_role

@@ -3,28 +3,26 @@ require 'factories/enrollment_factory'
 
 RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
   describe "PUT update" do
-    let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
+    let(:employee_role_id) { "123455555" }
+    let(:person_parameters) { { :first_name => "SOMDFINKETHING", :employee_role_id => employee_role_id} }
     let(:organization_id) { "1234324234" }
     let(:person_id) { "4324324234" }
     let(:benefit_group) { double }
     let(:census_employee) { double(:hired_on => "whatever" ) }
-    let(:census_family) { double }
     let(:employer_profile) { double }
+    let(:census_family) { double(:census_employee => census_employee) }
     let(:effective_date) { double }
     let(:person_id) { "5234234" }
+    let(:employee_role) { double(:id => employee_role_id, :employer_profile => employer_profile, :benefit_group => benefit_group, :census_family => census_family) }
+    let(:person) { Person.new }
     let(:role_form) {
-      double(
-             :organization_id => organization_id,
-             :benefit_group => benefit_group,
-             :census_employee => census_employee,
-             :census_family => census_family,
-             :employer_profile => employer_profile,
-             :id => person_id)
+      Forms::EmployeeRole.new(person, employee_role)
     }
 
     before(:each) do
       sign_in
       allow(Forms::EmployeeRole).to receive(:find).with(person_id).and_return(role_form)
+      allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(benefit_group).to receive(:effective_on_for).with("whatever").and_return(effective_date)
       allow(role_form).to receive(:update_attributes).with(person_parameters).and_return(save_result)
       put :update, :person => person_parameters, :id => person_id
@@ -44,7 +42,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
 
       it "should render match" do
         expect(response).to have_http_status(:success)
-        expect(response).to render_template("match")
+        expect(response).to render_template("edit")
         expect(assigns(:person)).to eq role_form
         expect(assigns[:effective_on]).to eq effective_date
         expect(assigns[:benefit_group]).to eq benefit_group
