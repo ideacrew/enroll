@@ -4,9 +4,6 @@
 
 
 <div class="btn-group" data-toggle="buttons">
-  <label class="btn btn-primary">
-    <input type="radio" name="options" id="family_all" autocomplete="off"> All
-  </label>
   <label class="btn btn-primary active">
     <input type="radio" name="options" id="terminated_no" autocomplete="off" checked> Active
   </label>
@@ -15,6 +12,9 @@
   </label>
   <label class="btn btn-primary">
     <input type="radio" name="options" id="terminated_yes" autocomplete="off" > Terminated
+  </label>
+  <label class="btn btn-primary">
+    <input type="radio" name="options" id="family_all" autocomplete="off"> All
   </label>
 </div>
 
@@ -41,7 +41,7 @@
         <td><%= boolean_to_human family.is_linked? %></td>
         <td>
           <% if family.is_terminated? %>
-            <%= link_to "Rehire", employers_employer_profile_family_rehire_path(@employer_profile.id, family.id), class: "btn btn-sm btn-success" %>
+            <%= link_to "Rehire", employers_employer_profile_family_rehire_path(@employer_profile.id, family.id), class: "btn btn-sm btn-primary" %>
           <% else %>
             <%= link_to "Edit", edit_employers_employer_profile_family_path(@employer_profile.id, family.id),class: "btn btn-sm btn-primary" %>
             <%= link_to "Delink", employers_employer_profile_family_delink_path(@employer_profile.id, family.id), class: "btn btn-sm btn-default", disabled: !family.is_linked? %>
