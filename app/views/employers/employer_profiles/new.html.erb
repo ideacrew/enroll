@@ -8,35 +8,12 @@
       <%= form_for @organization, url: {action: "create"} do |f| %>
 
         <%= render "shared/error_messages", object: f.object %>
-        
+
         <div class="col-md-12 col-sm-12 col-xs-12">
           <div class="row landing-row">
             <div class="col-md-8 col-sm-8 col-xs-12 left-side">
               <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp|  %>
                 <%= render "shared/employer_profile_fields", f: emp %><br>
-
-                <%= emp.fields_for :plan_years, errors: {}, fieldset: false do |plan_year|  %>
-                  <%= render "shared/plan_year_fields", f: plan_year %><br>
-
-                  <%= plan_year.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
-                    <%= render "shared/benefit_group_fields", f: bg %><br>
-
-                    <div class='form-inputs'>
-                      <%= bg.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
-                        <%= render "shared/relationship_benefit_fields", f: rb %><br>
-                      <% end %>
-
-                      <div>
-                        <%= f.hidden_field :_destroy %>
-                        <%= link_to 'Delete'.html_safe, '#', class: "btn btn-red remove_fields" %>
-                        <%#= link_to 'Add Relationship Benefit', '#', class: 'btn btn-green pull-right' %>
-                        <%= link_to_add_fields "Add Relationship Benefit", bg, :relationship_benefits %>
-                      </div>
-                    </div><br>
-
-                  <% end %>
-                <% end %>
-
               <% end %>
 
               <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location| %>
