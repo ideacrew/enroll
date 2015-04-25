@@ -83,6 +83,18 @@ class EnrollmentFactory
   #   an object that responds to the names and gender methods
   #   employee_family
   #   user
+  def self.construct_employee_role(user, employer_census_family, person_details)
+    person, person_new = initialize_person(
+      user, person_details.name_pfx, person_details.first_name,
+      person_details.middle_name, person_details.last_name,
+      person_details.name_sfx, employer_census_family.census_employee_ssn,
+      employer_census_family.census_employee_dob, person_details.gender
+      )
+    self.build_employee_role(
+      person, person_new, employer_census_family.employer_profile,
+      employer_census_family, employer_census_family.hired_on
+      )
+  end
 
   def self.add_employee_role(user: nil, employer_profile:,
         name_pfx: nil, first_name:, middle_name: nil, last_name:, name_sfx: nil,
@@ -96,6 +108,25 @@ class EnrollmentFactory
 
     raise ArgumentError.new("employee_family does not exist for provided person details") unless employer_census_family.present?
 
+    self.build_employee_role(
+      person, person_new, employer_profile, employer_census_family, hired_on
+      )
+  end
+
+  def self.link_employee_family(census_family, employee_role, linked_at = Time.now)
+    census_family.link_employee_role(employee_role, linked_at)
+    [:employer_profile_id,
+     :benefit_group_id,
+     :hired_on,
+     :terminated_on,
+    ].each do |property|
+      employee_role.send("#{property}=", census_family.send(property))
+    end
+  end
+
+  private
+
+  def self.build_employee_role(person, person_new, employer_profile, employer_census_family, hired_on)
     # Return instance if this role already exists
     roles = person.employee_roles.where(
         "employer_profile_id" => employer_profile.id.to_s,
@@ -113,7 +144,7 @@ class EnrollmentFactory
       nil
     end
 
-    employer_census_family.link_employee_role(role)
+    self.link_employee_family(employer_census_family, role)
 
     # Add 'self' to personal relationship need detailed implementation
     # person.person_relationships << PersonRelationhip.new()
@@ -129,8 +160,6 @@ class EnrollmentFactory
     end
     return role, family
   end
-
-  private
 
   def self.initialize_person(user, name_pfx, first_name, middle_name,
                              last_name, name_sfx, ssn, dob, gender)

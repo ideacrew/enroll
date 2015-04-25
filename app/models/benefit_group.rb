@@ -124,7 +124,26 @@ class BenefitGroup
     end
   end
 
-private
+  def self.find(id)
+    orgs = Organization.where({
+      "employer_profile.plan_years.benefit_groups._id" => id
+    })
+    found_value = catch(:found_benefit_group) do 
+      orgs.each do |org|
+        org.employer_profile.plan_years.each do |py|
+          py.benefit_groups.each do |bg|
+            if bg.id == id
+              throw :found_benefit_group, bg
+            end
+          end
+        end
+      end
+      raise Mongoid::Errors::DocumentNotFound, "BenefitGroup #{id}"
+    end
+    return found_value
+  end
+
+  private
   def dollars_to_cents(amount_in_dollars)
     Rational(amount_in_dollars) * Rational(100) if amount_in_dollars
   end
@@ -141,14 +160,14 @@ private
     [plan_year.start_on, (date_of_hire + effective_on_offset.days).beginning_of_month.next_month].max
   end
 
-# Non-congressional
-# pick reference plan
-# two pctages
-# toward employee
-# toward each dependent type
+  # Non-congressional
+  # pick reference plan
+  # two pctages
+  # toward employee
+  # toward each dependent type
 
-# member level premium in reference plan, apply pctage by type, calc $$ amount.
-# may be applied toward and other offered plan
-# never pay more than premium per person
-# extra may not be applied toward other members
+  # member level premium in reference plan, apply pctage by type, calc $$ amount.
+  # may be applied toward and other offered plan
+  # never pay more than premium per person
+  # extra may not be applied toward other members
 end

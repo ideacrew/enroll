@@ -78,7 +78,7 @@ class EmployeeRole
   end
 
   def benefit_group
-    benefit_group.find(self.benefit_group_id) unless benefit_group_id.blank?
+    BenefitGroup.find(self.benefit_group_id) unless benefit_group_id.blank?
   end
 
   def census_family

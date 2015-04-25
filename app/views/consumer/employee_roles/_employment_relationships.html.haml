@@ -3,7 +3,7 @@
     %p If you don't see your employer listed below, click here for help.
 
 - @employment_relationships.each do |emp_relationship|
-  = form_for(emp_relationship, :url => consumer_employee_index_path, :method => :post, :remote => true) do |f|
+  = form_for(emp_relationship, :url => consumer_employee_index_path, :as => :employment_relationship, :method => :post, :remote => true) do |f|
     .row
       .col-md-6.col-sm-6.col-xs-12
         %dl.dl-horizontal
