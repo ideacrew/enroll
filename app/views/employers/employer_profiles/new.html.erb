@@ -29,8 +29,8 @@
                       <div>
                         <%= f.hidden_field :_destroy %>
                         <%= link_to 'Delete'.html_safe, '#', class: "btn btn-red remove_fields" %>
-                        <%= link_to 'Add Relationship Benefit', '#', class: 'btn btn-green pull-right' %>
-                        <%#= link_to_add_fields "Add Relationship Benefit", bg, :relationship_benefits %>
+                        <%#= link_to 'Add Relationship Benefit', '#', class: 'btn btn-green pull-right' %>
+                        <%= link_to_add_fields "Add Relationship Benefit", bg, :relationship_benefits %>
                       </div>
                     </div><br>
 
@@ -49,7 +49,7 @@
                       <div class="row top-row">
                         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
                           <!-- Kind:  -->
-                          <%= address.select :kind, options_for_select(Address::KINDS),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
+                          <%= address.select :kind, options_for_select(Address::KINDS.map {|a| [a.to_s.humanize, a.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
                         </div>
                         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
                           <%= address.text_field :address_1, class: "floatlabel form-control", required: true, placeholder: 'ADDRESS LINE 1' %>
@@ -80,7 +80,7 @@
                     <div class="col-md-12 no-pd first employee-info">
                       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
                         <!-- Kind:    -->
-                        <%= phone.select :kind, options_for_select(Phone::KINDS),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
+                        <%= phone.select :kind, options_for_select(Phone::KINDS.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
                       </div>
                       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
                         <%= phone.text_field :area_code, class: "floatlabel form-control", required: true, placeholder: 'AREA CODE' %>
@@ -102,7 +102,7 @@
                     <div class="col-md-12 no-pd first employee-info">
                       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
                         <!-- Kind:  -->
-                        <%= email.select :kind,options_for_select(Email::KINDS),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
+                        <%= email.select :kind,options_for_select(Email::KINDS.map {|e| [e.to_s.humanize, e.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
                       </div>
                       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
                         <%= email.text_field :address, class: "floatlabel form-control", required: true, placeholder: 'EMAIL ADDRESS' %>
