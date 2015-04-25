@@ -1,0 +1,33 @@
+<%- model_class = EmployerProfile -%>
+<div class="container-fluid no-pd-left">
+  <div class="panel panel-default" style="border:none; box-shadow: none;">
+    <div class="row tab-row">
+      <%= render 'employer_menu' %>
+
+      <%= form_for @plan_year, url: create_plan_year_employers_employer_profile_path do |f| %>
+        <%= render "shared/plan_year_fields", f: f %><br>
+
+        <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
+          <%= render "shared/benefit_group_fields", f: bg %><br>
+
+          <div class='form-inputs'>
+            <%= bg.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
+              <%= render "shared/relationship_benefit_fields", f: rb %><br>
+            <% end %>
+
+            <div>
+              <%#= f.hidden_field :_destroy %>
+              <%= link_to 'Delete'.html_safe, '#', class: "btn btn-red remove_fields" %>
+              <%#= link_to 'Add Relationship Benefit', '#', class: 'btn btn-green pull-right' %>
+              <%= link_to_add_fields "Add Relationship Benefit", bg, :relationship_benefits %>
+            </div>
+          </div><br>
+
+        <% end %>
+        <div class="row top-row">
+          <%= f.submit "Create Plan Year", class: "btn btn-save" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

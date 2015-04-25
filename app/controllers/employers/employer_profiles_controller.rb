@@ -1,5 +1,5 @@
 class Employers::EmployerProfilesController < ApplicationController
-  before_filter :find_employer, only: [:show, :destroy]
+  before_filter :find_employer, only: [:show, :destroy, :new_plan_year, :create_plan_year]
 
   def index
     @q = params[:q]
@@ -24,7 +24,7 @@ class Employers::EmployerProfilesController < ApplicationController
     @organization.build_employer_profile
     @organization.attributes = employer_profile_params
     if @organization.save
-      flash.notice = 'Employer successfully created.'
+      flash[:notice] = 'Employer successfully created.'
       redirect_to employers_employer_profiles_path
     else
       render action: "new"
@@ -40,26 +40,30 @@ class Employers::EmployerProfilesController < ApplicationController
     end
   end
 
+  def new_plan_year
+    @plan_year = build_plan_year
+  end
+
+  def create_plan_year
+    @employer_profile.plan_years.build(plan_year_params)
+    if @employer_profile.save
+      flash[:notice] = "Plan Year successfully created."
+      redirect_to employers_employer_profile_path(@employer_profile)
+    else
+      render action: "new_plan_year"
+    end
+  end
+
   private
 
   def find_employer
-    @employer_profile = EmployerProfile.find(params[:id])
+    id = params[:id] || params[:employer_profile_id]
+    @employer_profile = EmployerProfile.find(id)
   end
 
   def employer_profile_params
-    new_params = format_date_params(params)
-    new_params.require(:organization).permit(
-      :employer_profile_attributes => [ :entity_kind, :dba, :fein, :legal_name,
-        :plan_years_attributes => [ :start_on, :end_on, :fte_count, :pte_count, :msp_count,
-          :open_enrollment_start_on, :open_enrollment_end_on,
-          :benefit_groups_attributes => [ :title, :reference_plan_id, :effective_on_offset,
-            :premium_pct_as_int, :employer_max_amt_in_cents,
-            :relationship_benefits_attributes => [
-              :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
-            ]
-          ]
-        ]
-      ],
+    params.require(:organization).permit(
+      :employer_profile_attributes => [ :entity_kind, :dba, :fein, :legal_name],
       :office_locations_attributes => [
         :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
         :phone_attributes => [:kind, :area_code, :number, :extension],
@@ -68,12 +72,23 @@ class Employers::EmployerProfilesController < ApplicationController
     )
   end
 
+  def plan_year_params
+    new_params = format_date_params(params)
+    new_params.require(:plan_year).permit(
+      :start_on, :end_on, :fte_count, :pte_count, :msp_count,
+      :open_enrollment_start_on, :open_enrollment_end_on,
+      :benefit_groups_attributes => [ :title, :reference_plan_id, :effective_on_offset,
+        :premium_pct_as_int, :employer_max_amt_in_cents, :_destroy,
+        :relationship_benefits_attributes => [
+          :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
+        ]
+      ]
+    )
+  end
+
   def build_employer_profile
     organization = Organization.new
     organization.build_employer_profile
-    plan_year = organization.employer_profile.plan_years.build
-    benefit_groups = plan_year.benefit_groups.build
-    relationship_benefits = benefit_groups.relationship_benefits.build
     office_location = organization.office_locations.build
     office_location.build_address
     office_location.build_phone
@@ -81,13 +96,16 @@ class Employers::EmployerProfilesController < ApplicationController
     organization
   end
 
+  def build_plan_year
+    plan_year = PlanYear.new
+    benefit_groups = plan_year.benefit_groups.build
+    relationship_benefits = benefit_groups.relationship_benefits.build
+    plan_year
+  end
+
   def format_date_params(params)
-    params[:organization][:employer_profile_attributes][:plan_years_attributes].each do |k, item|
-      ["start_on", "end_on", "open_enrollment_start_on", "open_enrollment_end_on"].each do |key|
-        unless item[key].include?("-")
-          params[:organization][:employer_profile_attributes][:plan_years_attributes][k][key] = Date.strptime(item[key], '%m/%d/%Y').to_s(:db)
-        end
-      end
+    ["start_on", "end_on", "open_enrollment_start_on", "open_enrollment_end_on"].each do |key|
+      params["plan_year"][key] = Date.strptime(params["plan_year"][key], '%m/%d/%Y').to_s(:db)
     end
 
     params
