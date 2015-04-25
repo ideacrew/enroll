@@ -3,20 +3,21 @@
     <div class="col-md-9 col-sm-11 col-xs-12 no-pd">
       <div class="row text-center">
         <div class="col-md-12 col-sm-12 no-pd col-xs-12 text-left">
-          <h4><strong>Let's Get You Signed Up for Health Care!</strong></h4>
+          <h4><strong><%= t('welcome.title') %></strong></h4>
           <p>
-            To start this process, we will need some personal information to access your employer-offered benefits.<br/><br/>
-
-              Be prepared to provide names, dates-of-birth, and social security numbers for you and enrolling family members.  We will also need ways to contact you: address, telephone and email.
+            <%= t('welcome.paragraph1') %>
+            <br/><br/>
+            <%= t('welcome.paragraph2') %>
           </p>
-      <br/>
-          <p> Ready?  Click button below to continue</p>
-	<%= link_to "Continue", search_consumer_employee_index_path, :remote => true, :class => "btn btn-lg btn-primary btn-block btn-green btn-continue" %>
+          <br/>
+          <p><%= t('welcome.paragraph3') %></p>
+	        <%= link_to t('button.continue'), search_consumer_employee_index_path, :remote => true, :class => "btn btn-lg btn-primary btn-block btn-green btn-continue" %>
         </div>
       </div>
       <br/>
       <p><small>
-        By using this site, you acknowledge that your have read and agree with the privacy policy and terms of use found here: <a href="#">DCHBX Privacy Policy &amp; Terms of Use.</a>
+        <%= t('welcome.notice') %>
+        <a href="#"><%= t('welcome.link') %></a>
       </small></p>
     </div>
   </div>
