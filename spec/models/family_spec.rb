@@ -56,16 +56,59 @@ describe Family, type: :model, dbclean: :after_each do
             family.save
           end
 
-          it "all the added people are family members" do
+          it "all the added people are represented as family members" do
             expect(family.family_members.size).to eq 2            
           end
 
-          it "has the correct primary applicant" do
+          it "the correct person is primary applicant" do
             expect(family.primary_applicant.person).to eq person
           end
 
-          it "has the correct consent applicant" do
+          it "the correct person is consent applicant" do
             expect(family.consent_applicant.person).to eq person
+          end
+
+          context "and the person added is not related to the primary applicant" do
+            let(:alice) { FactoryGirl.create(:person, first_name: "alice") }
+            let(:non_family_member) { FamilyMember.new, person: alice) }
+
+            before do
+              family.family_members << non_family_member
+            end
+
+            it "should not be valid" do
+              expect(family.errors[:family_members].any?).to be_truthy
+            end
+           
+          end
+
+          context "and one of the same family members is added again" do
+            before do
+              family.family_members << family_member_spouse.dup
+            end
+
+            it "should not be valid" do
+              expect(family.errors[:family_members].any?).to be_truthy
+            end
+          end
+
+          context "and a second primary applicant is added" do
+            let(:bob) do
+              p = FactoryGirl.create(:person, first_name: "Bob")
+              person.person_relationships << PersonRelationship.new(relative: p, kind: "child")
+              p
+            end
+
+            let(:family_member_child) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: bob) }
+
+            before do
+              family.family_members << family_member_child
+              family.valid?
+            end
+
+            it "should not be valid" do
+              expect(family.errors[:family_members].any?).to be_truthy
+            end
           end
 
           context "and another family is created with same members" do
@@ -99,7 +142,12 @@ describe Family, type: :model, dbclean: :after_each do
     end
   end
 
-# 
+  context "after it's persisted" do
+    context "when you add a family member" do
+
+    end
+
+  end
 
   ## TODO: Add method
   # describe HbxEnrollment, "#is_enrollable?", type: :model do
