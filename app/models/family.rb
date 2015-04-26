@@ -105,11 +105,31 @@ class Family
     family_members.detect { |a| a.is_consent_applicant? }
   end
 
-  def add_family_member(new_person)
+  def add_family_member(new_family_member, **opts)
+    is_primary_applicant = opts[:is_primary_applicant] || false
+    is_coverage_applicant    = opts[:is_coverage_applicant]    || true
+    is_consent_applicant     = opts[:is_consent_applicant]     || false
 
+    family_member = family_members.build(
+        person: new_family_member, 
+        is_primary_applicant: is_primary_applicant,
+        is_coverage_applicant: is_coverage_applicant,
+        is_consent_applicant: is_consent_applicant
+      )
+
+    # active_household.add_household_coverage_member(family_member)
+
+    family_member
   end
 
   def remove_family_member(person)
+    family_member = find_family_member_by_person(person)
+    if family_member.present?
+      family_member.is_active = false
+      # active_household.remove_family_member(family_member)
+    end
+    
+    family_member
   end
 
   def find_family_member_by_person(person)

@@ -1,45 +1,79 @@
 require 'rails_helper'
 
-describe Family, "provided basic values" do
-  after(:context) do
-    DatabaseCleaner.clean
-  end
-  before(:context) do
-      @now = DateTime.now.utc
-      p0, p1 = Person.create!([
-        {first_name: "Dan", last_name: "Aurbach"},
-        {first_name: "Patrick", last_name: "Carney"}
-      ])
-      @a0 = FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: p0)
-      @a1 = FamilyMember.new(person: p1)
-      new_family = Family.create!(
-          e_case_id: "6754632abc",
-          renewal_consent_through_year: 2017,
-          family_members: [@a0, @a1],
-          submitted_at: @now,
-          is_active: true,
-          updated_by: "rspec"
-      )
-     @family = Family.find(new_family.id)
+describe Family, type: :model, dbclean: :after_each do
+
+  let(:spouse)  { FactoryGirl.create(:person)}
+  let(:person) do
+    p = FactoryGirl.build(:person)
+    p.person_relationships.build(relative: spouse, kind: "spouse")
+    p.save
+    p
   end
 
-  it "sets and gets all basic model fields" do
-    expect(@family.e_case_id).to eql("6754632abc")
-    expect(@family.is_active).to eql(true)
-    expect(@family.renewal_consent_through_year).to eql(2017)
-    expect(@family.submitted_at.to_s).to eq(@now.to_s)
-    expect(@family.updated_by).to eql("rspec")
-  end
+  let(:family_member_person) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: person) }
+  let(:family_member_spouse) { FamilyMember.new(person: spouse) }
 
-  it "saves family members" do
-    expect(@family.family_members.size).to eq 2
-    expect(@family.primary_applicant.id).to eql(@a0.id)
-    expect(@family.primary_applicant.person.first_name).to eql("Dan")
-    expect(@family.consent_applicant.person.last_name).to eql("Aurbach")
+  context "when built" do
+    context "with valid parameters" do
+      let(:now) { DateTime.current }
+      let(:user)  { "rspec@dchealthlink.com" }
+      let(:curam_id) { "6754632abc" }
+      let(:e_case_id) { curam_id }
+      let(:renewal_consent_through_year) { 2017 }
+      let(:submitted_at) { now }
+      let(:updated_by) { user }
+
+      let(:valid_params) do
+        {
+          e_case_id: e_case_id,
+          renewal_consent_through_year: renewal_consent_through_year,
+          submitted_at: submitted_at,
+          updated_by: updated_by
+        }
+      end
+
+      let(:params)  { valid_params }
+      let(:family)  { Family.new(**params) }
+
+      it "is will persist" do
+        expect(family.save).to be_truthy
+      end
+
+      context "and it is persisted" do
+        let!(:saved_family) do
+          f = family
+          f.save
+          f
+        end
+
+        it "should be findable" do
+          expect(Family.find(saved_family.id).id.to_s).to eq saved_family.id.to_s
+        end
+
+        context "and family members are added" do
+          before do
+            family.family_members = [family_member_person, family_member_spouse]
+          end
+
+          it "all the added people are family members" do
+            expect(family.family_members.size).to eq 2            
+          end
+
+          it "has the correct primary applicant" do
+            expect(family.primary_applicant.person).to eq person
+          end
+
+          it "has the correct consent applicant" do
+            expect(family.consent_applicant.person).to eq person
+          end
+        end
+      end
+    end
+
   end
 end
 
-describe Family do
+describe Family, type: :model, dbclean: :after_each do
 
   let(:p0) { Person.create!(first_name: "Dan", last_name: "Aurbach") }
   let(:p1) { Person.create!(first_name: "Patrick", last_name: "Carney") }
@@ -71,7 +105,7 @@ describe Family do
 
   ## TODO: Add method
   # describe HbxEnrollment, "#is_enrollable?", type: :model do
-  #   context "employer_profile is under open enrollment period" do
+  #   context "family is under open enrollment period" do
   #     it "should return true" do
   #     end
   #
@@ -86,7 +120,7 @@ describe Family do
   #     end
   #   end
   #
-  #   context "outside employer_profile open enrollment" do
+  #   context "outside family open enrollment" do
   #     it "should return false" do
   #     end
   #   end
@@ -246,23 +280,18 @@ describe Family do
     let!(:primary_person) { FactoryGirl.create(:person, :male) }
     let!(:second_person) { FactoryGirl.create(:person) }
     let!(:new_family) { FactoryGirl.build(:family) }
-    let!(:first_primary_member) { FactoryGirl.create(:family_member, :primary, family: new_family, person: primary_person) }
+    let!(:first_primary_member) { FactoryGirl.build(:family_member, :primary, family: new_family, person: primary_person) }
 
     context "family is saved" do
-
-
       it "should create a household" do
-        expect(new_family.save).to be_truthy
         expect(new_family.households.length).to eq(1)
       end
 
       it "should create a coverage_household" do
-        expect(new_family.save).to be_truthy
         expect(new_family.active_household.coverage_households.length).to eq(1)
       end
 
       it "should create a member in coverage_household" do
-        expect(new_family.save).to be_truthy
         expect(new_family.active_household.coverage_households.first.coverage_household_members.length).to eq(1)
       end
 
@@ -270,13 +299,11 @@ describe Family do
         let!(:second_member) { FactoryGirl.create(:family_member, family: new_family, person: second_person) }
         it "should create coverage_household with 2 members (self and spouse)" do
           new_family.family_members.first.person.person_relationships << PersonRelationship.new({kind: 'spouse', relative_id: second_person.id})
-          expect(new_family.save).to be_truthy
           expect(new_family.active_household.coverage_households.first.coverage_household_members.length).to eq(2)
         end
 
         it "should create one coverage_household for valid family_member (relationships) and another for the rest " do
           new_family.family_members.first.person.person_relationships << PersonRelationship.new({kind: 'brother', relative_id: second_person.id})
-          expect(new_family.save).to be_truthy
           expect(new_family.active_household.coverage_households.length).to eq(2)
         end
       end
@@ -324,7 +351,7 @@ describe Family do
 end
 
 
-describe Family, ".find_or_initialize_by_employee_role:", type: :model do
+describe Family, ".find_or_initialize_by_employee_role:", type: :model, dbclean: :after_each do
 
   let(:submitted_at)  { DateTime.current}
   let(:spouse)        { FactoryGirl.create(:person, last_name: "richards", first_name: "denise") }
@@ -393,20 +420,18 @@ describe Family, ".find_or_initialize_by_employee_role:", type: :model do
     end
 
     context "and family includes extended family relationships" do
-      before do
-        immediate_family_coverage_household = large_family.households.first.coverage_households.find(:is_immediate_family => true)
-        extended_family_coverage_household =  large_family.households.first.coverage_households.find(:is_immediate_family => false)
-      end
 
       it "creates two coverage households" do
         expect(large_family.households.first.coverage_households.size).to eq 2
       end
 
       it "and immediate family is in one coverage household" do
+        immediate_family_coverage_household = large_family.households.first.coverage_households.where(:is_immediate_family => true).first
         expect(immediate_family_coverage_household.coverage_household_members.size).to eq 3
       end
 
       it "and extended family is in a second coverage household" do
+        extended_family_coverage_household =  large_family.households.first.coverage_households.where(:is_immediate_family => false).first
         expect(extended_family_coverage_household.coverage_household_members.size).to eq 1
         # expect(extended_family_coverage_household.coverage_household_members.first.).to eq 1
       end
