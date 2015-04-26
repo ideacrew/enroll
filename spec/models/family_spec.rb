@@ -53,6 +53,7 @@ describe Family, type: :model, dbclean: :after_each do
         context "and family members are added" do
           before do
             family.family_members = [family_member_person, family_member_spouse]
+            family.save
           end
 
           it "all the added people are family members" do
@@ -66,42 +67,39 @@ describe Family, type: :model, dbclean: :after_each do
           it "has the correct consent applicant" do
             expect(family.consent_applicant.person).to eq person
           end
+
+          context "and another family is created with same members" do
+
+            context "and the primary applicant is the same person" do
+              let(:second_family) { Family.new }
+              before do
+                second_family.family_members = [family_member_person.dup, family_member_spouse.dup]
+              end
+
+              it "should not be valid" do
+                expect(second_family.valid?).to be_falsey
+              end
+            end
+
+            context "and the primary applicant is not the same person" do
+              let(:second_family) { Family.new }
+              let(:second_family_member_person) { FamilyMember.new(person: person) }
+              let(:second_family_member_spouse) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: spouse) }
+              before do
+                second_family.family_members = [second_family_member_person, second_family_member_spouse]
+              end
+
+              it "should be valid" do
+                expect(second_family.valid?).to be_truthy
+              end
+            end
+          end
         end
       end
     end
-
   end
-end
 
-describe Family, type: :model, dbclean: :after_each do
-
-  let(:p0) { Person.create!(first_name: "Dan", last_name: "Aurbach") }
-  let(:p1) { Person.create!(first_name: "Patrick", last_name: "Carney") }
-  let(:a0) { family_member = FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true);
-             family_member.person=p0;
-             family_member }
-  let(:a1) { family_member = FamilyMember.new();
-             family_member.person=p1;
-             family_member }
-
-
-  describe "one family exists" do
-    let!(:primary_person) {FactoryGirl.create(:person)}
-    let!(:dependent_person) {FactoryGirl.create(:person)}
-    let!(:first_family) {FactoryGirl.create(:family)}
-    let!(:first_primary_member) {FactoryGirl.create(:family_member, :primary, family: first_family, person: primary_person)}
-    let!(:first_dependent_member) {FactoryGirl.create(:family_member, family: first_family, person: dependent_person)}
-
-    context "and a second family is built" do
-      let!(:second_family) {FactoryGirl.build(:family)}
-      let!(:second_primary_member) {FactoryGirl.build(:family_member, :primary, family: second_family, person: primary_person)}
-      let!(:second_dependent_member) {FactoryGirl.build(:family_member, family: second_family, person: dependent_person)}
-
-      it "second family should be valid" do
-        expect(second_family.valid?).to be_truthy
-      end
-    end
-  end
+# 
 
   ## TODO: Add method
   # describe HbxEnrollment, "#is_enrollable?", type: :model do
