@@ -35,8 +35,20 @@ describe Family, type: :model, dbclean: :after_each do
       let(:params)  { valid_params }
       let(:family)  { Family.new(**params) }
 
-      it "is will persist" do
+      it "will persist" do
         expect(family.save).to be_truthy
+      end
+
+      context "and the primary applicant is missing" do
+        pending 
+
+        # before do
+        #   family.family_members = [family_member_spouse]
+        # end
+
+        # it "should not be valid" do
+        #   expect(family.errors[:family_members].any?).to be_truthy
+        # end
       end
 
       context "and it is persisted" do
@@ -70,7 +82,7 @@ describe Family, type: :model, dbclean: :after_each do
 
           context "and the person added is not related to the primary applicant" do
             let(:alice) { FactoryGirl.create(:person, first_name: "alice") }
-            let(:non_family_member) { FamilyMember.new, person: alice) }
+            let(:non_family_member) { FamilyMember.new(person: alice) }
 
             before do
               family.family_members << non_family_member
@@ -79,7 +91,10 @@ describe Family, type: :model, dbclean: :after_each do
             it "should not be valid" do
               expect(family.errors[:family_members].any?).to be_truthy
             end
-           
+
+            context "and the person is a responsible party" do
+              pending "to be added for IVL market"
+            end
           end
 
           context "and one of the same family members is added again" do
