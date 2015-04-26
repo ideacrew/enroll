@@ -49,10 +49,12 @@ class Family
 
   validates :e_case_id, uniqueness: true, allow_nil: true
 
-  validate :no_duplicate_family_members
-  validate :integrity_of_family_member_objects
-  validate :max_one_primary_applicant
-  validate :max_one_active_household
+  # validate :no_duplicate_family_members
+  # validate :integrity_of_family_member_objects
+  # validate :max_one_primary_applicant
+  # validate :max_one_active_household
+
+  after_initialize :build_household
 
   before_save :update_household
 
@@ -223,6 +225,16 @@ class Family
   end
 
 private
+  def build_household
+    self.households.build(submitted_at: DateTime.current, effective_starting_on: Date.current) if households.size == 0
+  end
+
+  def single_primary_family_member
+    list = family_members.reduce([]) {|list, family_member| list << family_member if family_member.is_primary_family_member? }
+    self.errors.add(:family_members, "must provide one primary family member") if list.size == 0
+    self.errors.add(:family_members, "may not have more than one primary family member") if list.size > 1
+  end
+
   def set_family_attributes
     self.submitted_at = DateTime.current
   end

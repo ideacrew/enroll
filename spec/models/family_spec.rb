@@ -35,8 +35,8 @@ describe Family, type: :model, dbclean: :after_each do
       let(:params)  { valid_params }
       let(:family)  { Family.new(**params) }
 
-      it "will persist" do
-        expect(family.save).to be_truthy
+      it "should have a household" do
+        expect(family.households.size).to eq 1
       end
 
       context "and the primary applicant is missing" do
@@ -49,6 +49,10 @@ describe Family, type: :model, dbclean: :after_each do
         # it "should not be valid" do
         #   expect(family.errors[:family_members].any?).to be_truthy
         # end
+      end
+
+      it "is persistable" do
+        expect(family.save).to be_truthy
       end
 
       context "and it is persisted" do
@@ -158,7 +162,11 @@ describe Family, type: :model, dbclean: :after_each do
   end
 
   context "after it's persisted" do
+    include_context "BradyBunch"
+
     context "when you add a family member" do
+      it "there is a corresponding coverage household member" do
+      end
 
     end
 
