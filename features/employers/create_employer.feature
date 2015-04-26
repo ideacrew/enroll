@@ -37,6 +37,10 @@ Feature: Create Employer
       When I click on Rehire button for a census family on terminated tab
       Then A new instance of the census family should be created
         And I should see the census family is successfully rehired message
+      When I go to the benefits tab I should see plan year information
+        And I should see a button to create new plan year
+        And I should be able to add information about plan year, benefits and relationship benefits
+        And I should see a success message after clicking on create plan year button
 
 
     @wip
