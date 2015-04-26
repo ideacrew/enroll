@@ -1,3 +1,4 @@
+<%= link_to "Add Plan Year", new_plan_year_employers_employer_profile_path(@employer_profile), class: "btn btn-primary" %>
 <% if @current_plan_year.present? %>
   <h4>Plan Year <%= @current_plan_year.start_on.to_date.year %></h4>
   <dl class="dl-horizontal">
