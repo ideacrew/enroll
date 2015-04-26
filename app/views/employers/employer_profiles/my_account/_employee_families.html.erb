@@ -22,8 +22,8 @@
   <thead>
     <tr>
       <th>Employee Name</th>
-      <th>SSN</th>
-      <th>DOB</th>
+      <th><abbr title="Social Security Number">SSN</abbr></th>
+      <th><abbr title="Date of Birth">DOB</abbr></th>
       <th>Hire Date</th>
       <th>Status</th>
       <th>Linked?</th>
@@ -41,11 +41,11 @@
         <td><%= boolean_to_human family.is_linked? %></td>
         <td>
           <% if family.is_terminated? %>
-            <%= link_to "Rehire", employers_employer_profile_family_rehire_path(@employer_profile.id, family.id), class: "btn btn-sm btn-primary" %>
+            <%= link_to "Rehire", employers_employer_profile_family_rehire_path(@employer_profile.id, family.id), class: "btn btn-xs btn-primary" %>
           <% else %>
-            <%= link_to "Edit", edit_employers_employer_profile_family_path(@employer_profile.id, family.id),class: "btn btn-sm btn-primary" %>
-            <%= link_to "Delink", employers_employer_profile_family_delink_path(@employer_profile.id, family.id), class: "btn btn-sm btn-default", disabled: !family.is_linked? %>
-            <%= link_to "Terminate", employers_employer_profile_family_terminate_path(@employer_profile.id, family.id), class: "btn btn-sm btn-warning" %>
+            <%= link_to "Edit", edit_employers_employer_profile_family_path(@employer_profile.id, family.id), class: "btn btn-xs btn-primary" %>
+            <%= link_to "Delink", employers_employer_profile_family_delink_path(@employer_profile.id, family.id), class: "btn btn-xs btn-default", disabled: !family.is_linked? %>
+            <%= link_to "Terminate", employers_employer_profile_family_terminate_path(@employer_profile.id, family.id), class: "btn btn-lg btn-warning" %>
           <% end %>
         </td>
       </tr>
