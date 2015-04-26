@@ -56,7 +56,7 @@ class Family
 
   after_initialize :build_household
 
-  before_save :update_household
+  # before_save :update_household
 
   scope :all_with_multiple_family_members, -> { exists({:'family_members.1' => true}) }
   scope :all_with_household, -> { exists({:'households.0' => true}) }
@@ -107,20 +107,21 @@ class Family
     family_members.detect { |a| a.is_consent_applicant? }
   end
 
-  def add_family_member(new_family_member, **opts)
-    is_primary_applicant = opts[:is_primary_applicant] || false
-    is_coverage_applicant    = opts[:is_coverage_applicant]    || true
-    is_consent_applicant     = opts[:is_consent_applicant]     || false
+  def add_family_member(person, **opts)
+    raise ArgumentError.new("expected Person") unless person.is_a? Person
+
+    is_primary_applicant     = opts[:is_primary_applicant]  || false
+    is_coverage_applicant    = opts[:is_coverage_applicant] || true
+    is_consent_applicant     = opts[:is_consent_applicant]  || false
 
     family_member = family_members.build(
-        person: new_family_member, 
+        person: person, 
         is_primary_applicant: is_primary_applicant,
         is_coverage_applicant: is_coverage_applicant,
         is_consent_applicant: is_consent_applicant
       )
 
-    # active_household.add_household_coverage_member(family_member)
-
+    active_household.add_household_coverage_member(family_member)
     family_member
   end
 
@@ -139,13 +140,11 @@ class Family
   end
 
   def person_is_family_member?(person)
-    return true unless find_family_member_by_person(person).blank?
+    find_family_member_by_person(person).present?
   end
 
   def active_household
-    households.detect do |household|
-      household.is_active?
-    end
+    households.detect { |household| household.is_active? }
   end
 
   def dependents

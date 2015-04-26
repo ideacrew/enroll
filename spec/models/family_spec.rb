@@ -165,7 +165,10 @@ describe Family, type: :model, dbclean: :after_each do
     include_context "BradyBunch"
 
     context "when you add a family member" do
+
       it "there is a corresponding coverage household member" do
+        covered_bradys = carols_family.households.first.immediate_family_coverage_household.coverage_household_members.collect(){|m| m.family_member.person.full_name}
+        expect(covered_bradys).to contain_exactly(*bradys.collect(&:full_name))
       end
 
     end
