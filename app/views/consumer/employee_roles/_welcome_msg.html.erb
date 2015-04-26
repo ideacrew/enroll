@@ -1,48 +1,25 @@
 <div class="col-md-12 col-sm-12">
   <div class="jumbotron">
-    <h1>Welcome Employee<br/>
-    <small>Let's Get You Signed Up for Health Care!</small></h1>
+    <h1>
+      <%= t('welcome.title') %>
+      <br/>
+      <small><%= t('welcome.subtitle') %></small></h1>
     <p class="text-justify">
-      To start this process, we'll need some personal information for you to gain access to your employer-sponsored benefits.
+      <%= t('welcome.paragraph1') %>
     </p>
     <p class="text-justify">
-      Be prepared to provide names, dates-of-birth, and social security numbers for you and enrolling family members.  Also, tell us how to contact you: address, telephone and email.
+      <%= t('welcome.paragraph2') %>
     </p>
     <p class="text-justify">
-      Based on this family information, you may browse plans offered by your employer, compare coverage and costs, and then enroll in a plan that best meets your budget and needs.
+      <%= t('welcome.paragraph3') %>
     </p>
-    <p> Ready?  Click the button below to continue.</p>
+    <p><%= t('welcome.paragraph4') %></p>
     <div class="col-md-offset-3 col-md-6">
-      <%= link_to "Continue", search_consumer_employee_index_path, :remote => true, :class => "btn btn-lg btn-primary btn-block btn-continue" %>
+      <%= link_to t('button.continue'), search_consumer_employee_index_path, :remote => true, :class => "btn btn-lg btn-primary btn-block btn-continue" %>
       <br/>
       <p class="text-center"><small>
-      By using this site, you acknowledge that your have read and agree with the privacy policy and terms of use found here: <a href="#">DCHBX Privacy Policy &amp; Terms of Use.</a>
-      </small></p>
-    </div>
-  </div>
-</div>
-<hr/>
-<div class="employee-welcome">
-  <div class="row welcome-msg">
-    <div class="col-md-9 col-sm-11 col-xs-12 no-pd">
-      <div class="row text-center">
-        <div class="col-md-12 col-sm-12 no-pd col-xs-12 text-left">
-          <h4><strong>Let's Get You Signed Up for Health Care!</strong></h4>
-          <p>
-            To start this process, we'll need some personal information for you to gain access to your employer-sponsored benefits.
-            <br/><br/>
-            Be prepared to provide names, dates-of-birth, and social security numbers for you and enrolling family members.  Also, tell how to contact you: address, telephone and email.
-            <br/><br/>
-            With completed family information, you may browse plans offered by your employer, compare coverage and costs, and then enroll in a plan that best meets your budget and needs.
-          </p>
-      <br/>
-          <p> Ready?  Click the button below to continue</p>
-	<%= link_to "Continue", search_consumer_employee_index_path, :remote => true, :class => "btn btn-lg btn-primary btn-block btn-continue" %>
-        </div>
-      </div>
-      <br/>
-      <p><small>
-        By using this site, you acknowledge that your have read and agree with the privacy policy and terms of use found here: <a href="#">DCHBX Privacy Policy &amp; Terms of Use.</a>
+          <%= t('welcome.notice') %>
+          <a href="#"><%= t('welcome.link') %></a>
       </small></p>
     </div>
   </div>

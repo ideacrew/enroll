@@ -8,6 +8,9 @@ class User
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
+  # for i18L
+  field :preferred_language, type: String, default: "en"
+
   ## Enable Admin approval
   ## Seed: https://github.com/plataformatec/devise/wiki/How-To%3a-Require-admin-to-activate-account-before-sign_in
   field :approved, type: Boolean, default: true

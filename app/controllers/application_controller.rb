@@ -10,6 +10,9 @@ class ApplicationController < ActionController::Base
   ## Devise filters
   before_filter :authenticate_user_from_token!
   before_filter :authenticate_me!
+  
+  # for i18L
+  before_action :set_locale
 
   # before_action do
   #   resource = controller_name.singularize.to_sym
@@ -31,8 +34,25 @@ class ApplicationController < ActionController::Base
   end
 
   private
+  def set_locale
+    requested_locale = params[:locale] || user_preferred_language || extract_locale_from_accept_language_header || I18n.default_locale
+    requested_locale = I18n.default_locale unless I18n.available_locales.include? requested_locale.try(:to_sym)
+    I18n.locale = requested_locale
+  end 
 
- protected
+  def extract_locale_from_accept_language_header
+    if request.end['HTTP_ACCEPT_LANGUAGE']
+      request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first
+    else
+      nil
+    end
+  end
+
+  def user_preferred_language
+    current_user.try(:preferred_language)
+  end
+
+  protected
 
   def require_login
     unless current_user

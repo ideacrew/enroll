@@ -1,0 +1,12 @@
+es:
+  button:
+    continue: "Continuar"
+  welcome:
+    title: "Empleado de bienvenida"
+    subtitle: "Consigamos estás registrado para el Cuidado de la Salud!"
+    paragraph1: "Para iniciar este proceso, necesitaremos algunos datos personales para acceder a sus beneficios por el empleador ofrece."
+    paragraph2: "Esté preparado para proporcionar los nombres, fechas de nacimiento y números de seguro social para usted y matricular a miembros de la familia. También necesitaremos formas de contactar con usted: dirección, teléfono y correo electrónico."
+    paragraph3: "En base a esta información de la familia, es posible navegar por los planes ofrecidos por su empleador, comparar la cobertura y los costos, y luego inscribirse en un plan que mejor se adapte a su presupuesto y necesidades."
+    paragraph4: "¿Listo? Haga clic en el botón de abajo para continuar"
+    notice: "Al utilizar este sitio, usted reconoce que ha leído y acepto la política de privacidad y condiciones de uso se encuentra aquí:"
+    link: "DCHBX política de privacidad & Condiciones de uso."
