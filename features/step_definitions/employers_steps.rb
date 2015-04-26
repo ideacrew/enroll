@@ -61,26 +61,26 @@ And(/^I should see an initial form with a fieldset for Employer information, inc
   @browser.text_field(name: "organization[employer_profile_attributes][fein]").set("678123089")
   @browser.text_field(name: "organization[employer_profile_attributes][dba]").set("test")
   @browser.text_field(name: "organization[employer_profile_attributes][legal_name]").set("True First Inc")
-  @browser.select_list(name: "organization[employer_profile_attributes][entity_kind]").select_value("s_corporation")
+  @browser.select_list(id: "organization_employer_profile_attributes_entity_kind").option(text: "c_corporation")
   #Plan Year
-  @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][start_on]").set("01/01/2015")
-  @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][end_on]").set("12/31/2015")
-  @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][open_enrollment_start_on]").set("11/01/2014")
-  @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][open_enrollment_end_on]").set("11/30/2014")
-  @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][fte_count]").set("35")
-  @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][pte_count]").set("15")
-  @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][msp_count]").set("3")
-  # Benefit Group
-  @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][title]").set("Silver PPO Group")
-  @browser.select_list(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][reference_plan_id]").select_value(Plan.all.first.id.to_s)
-  @browser.select_list(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][effective_on_offset]").select_value(30)
-  @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][premium_pct_as_int]").set(53)
-  @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
-  # Relationship Benefit
-  @browser.select_list(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][relationship_benefits_attributes][0][relationship]").select_value("employee")
-  @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
-  @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][relationship_benefits_attributes][0][employer_max_amt]").set(120)
-  @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][relationship_benefits_attributes][0][offered]").set("yes")
+  # @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][start_on]").set("01/01/2015")
+  # @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][end_on]").set("12/31/2015")
+  # @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][open_enrollment_start_on]").set("11/01/2014")
+  # @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][open_enrollment_end_on]").set("11/30/2014")
+  # @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][fte_count]").set("35")
+  # @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][pte_count]").set("15")
+  # @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][msp_count]").set("3")
+  # # Benefit Group
+  # @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][title]").set("Silver PPO Group")
+  # @browser.select_list(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][reference_plan_id]").select_value(Plan.all.first.id.to_s)
+  # @browser.select_list(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][effective_on_offset]").select_value(30)
+  # @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][premium_pct_as_int]").set(53)
+  # @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
+  # # Relationship Benefit
+  # @browser.select_list(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][relationship_benefits_attributes][0][relationship]").select_value("employee")
+  # @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
+  # @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][relationship_benefits_attributes][0][employer_max_amt]").set(120)
+  # @browser.text_field(name: "organization[employer_profile_attributes][plan_years_attributes][0][benefit_groups_attributes][0][relationship_benefits_attributes][0][offered]").set("yes")
 
 end
 
@@ -120,8 +120,8 @@ Then(/^I should see the employer information$/) do
   sleep(1)
   expect(@browser.text.include?("True First Inc")).to be_truthy
   expect(@browser.text.include?("13101 elm tree dr\nxyz\nDunwoody, GA 30027\n(303) 123-0981 x 1231")).to be_truthy
-  expect(@browser.text.include?("Enrollment\nPlan Year\n2015\nPlan Year Start\n01-01-2015\nOpen Enroll Start/End\n11-01-2014 / 11-30-2014\nFull Time Employees\n35\nParticipation Pct\n100%")).to be_truthy
-  expect(@browser.text.include?("Company Details\nFEIN **-***3089\nEntity Kind S Corporation")).to be_truthy
+  expect(@browser.text.include?("Enrollment\nNo Plan Years Found")).to be_truthy
+  expect(@browser.text.include?("Company Details\nFEIN **-***3089\nEntity Kind C Corporation")).to be_truthy
 end
 
 When(/^I click on the Employees tab$/) do
