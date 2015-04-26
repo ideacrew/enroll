@@ -65,20 +65,24 @@
                   <span></span>
                 </p>
                 <dl class="dl-horizontal">
+                  <% if @current_plan_year.present? %>
                   <dt>Plan Year</dt>
-                  <dd><%= @current_plan_year.start_on.to_date.year %></dd>
-                  <dt>Plan Year Start</dt>
-                  <dd><%= format_date @current_plan_year.start_on %></dd>
-                  <dt>Open Enroll Start/End</dt>
-                    <dd>
-                      <%= format_date @current_plan_year.open_enrollment_start_on %> / 
-                      <%= format_date @current_plan_year.open_enrollment_end_on %>
-                    </dd>
-                  <dt>Full Time Employees</dt>
-                  <dd> <%= @current_plan_year.fte_count %></dd>
-                  <dt>Participation Pct</dt>
-                  <dd>100%</dd>
-                  <dt><%= @current_plan_year.employee_participation_percent %></dt>
+                    <dd><%= @current_plan_year.start_on.to_date.year %></dd>
+                    <dt>Plan Year Start</dt>
+                    <dd><%= format_date @current_plan_year.start_on %></dd>
+                    <dt>Open Enroll Start/End</dt>
+                      <dd>
+                        <%= format_date @current_plan_year.open_enrollment_start_on %> / 
+                        <%= format_date @current_plan_year.open_enrollment_end_on %>
+                      </dd>
+                    <dt>Full Time Employees</dt>
+                    <dd> <%= @current_plan_year.fte_count %></dd>
+                    <dt>Participation Pct</dt>
+                    <dd>100%</dd>
+                    <dt><%= @current_plan_year.employee_participation_percent %></dt>
+                  <% else %>
+                   No Plan Years Found
+                  <% end %>
                 </dl>
               </div>
             </div>

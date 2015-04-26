@@ -1,23 +1,25 @@
-<div class="employee-welcome">
-  <div class="row welcome-msg">
-    <div class="col-md-9 col-sm-11 col-xs-12 no-pd">
-      <div class="row text-center">
-        <div class="col-md-12 col-sm-12 no-pd col-xs-12 text-left">
-          <h4><strong><%= t('welcome.title') %></strong></h4>
-          <p>
-            <%= t('welcome.paragraph1') %>
-            <br/><br/>
-            <%= t('welcome.paragraph2') %>
-          </p>
-          <br/>
-          <p><%= t('welcome.paragraph3') %></p>
-	        <%= link_to t('button.continue'), search_consumer_employee_index_path, :remote => true, :class => "btn btn-lg btn-primary btn-block btn-green btn-continue" %>
-        </div>
-      </div>
+<div class="col-md-12 col-sm-12">
+  <div class="jumbotron">
+    <h1>
+      <%= t('welcome.title') %>
       <br/>
-      <p><small>
-        <%= t('welcome.notice') %>
-        <a href="#"><%= t('welcome.link') %></a>
+      <small><%= t('welcome.subtitle') %></small></h1>
+    <p class="text-justify">
+      <%= t('welcome.paragraph1') %>
+    </p>
+    <p class="text-justify">
+      <%= t('welcome.paragraph2') %>
+    </p>
+    <p class="text-justify">
+      <%= t('welcome.paragraph3') %>
+    </p>
+    <p><%= t('welcome.paragraph4') %></p>
+    <div class="col-md-offset-3 col-md-6">
+      <%= link_to t('button.continue'), search_consumer_employee_index_path, :remote => true, :class => "btn btn-lg btn-primary btn-block btn-continue" %>
+      <br/>
+      <p class="text-center"><small>
+          <%= t('welcome.notice') %>
+          <a href="#"><%= t('welcome.link') %></a>
       </small></p>
     </div>
   </div>
