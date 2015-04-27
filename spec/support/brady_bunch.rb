@@ -101,12 +101,12 @@ module BradyBunch
                          office_locations: [mikes_office_location]
       )
     end
+    let(:mikes_hired_on) {1.year.ago.beginning_of_year.to_date}
     let!(:mikes_employer) {FactoryGirl.build(:employer_profile, organization: mikes_organization)}
-    let(:mikes_hire_date)  { 1.year.ago.beginning_of_year.to_date }
     let(:mikes_census_employee) do
       FactoryGirl.build(:employer_census_employee,
                         first_name: mike.first_name,  last_name: mike.last_name,
-                        dob: mike.dob, address: mike.address, hired_on: mikes_hire_date
+                        dob: mike.dob, address: mike.address, hired_on: mikes_hired_on
       )
     end
     let(:mikes_census_family) {FactoryGirl.create(:employer_census_family, employer_profile: mikes_employer, census_employee: mikes_census_employee)}
@@ -131,21 +131,20 @@ module BradyBunch
                         phone: carols_work_phone
       )
     end
+    let(:carols_hired_on) {1.year.ago.beginning_of_year.to_date}
     let(:carols_employer) {FactoryGirl.build(:employer_profile)}
-    let(:carols_hire_date)  { 1.year.ago.beginning_of_year.to_date }
     let(:carols_organization) do
       FactoryGirl.create(:organization,
                          legal_name: "Care Real S Tates",
                          dba: "CRST",
                          office_locations: [carols_office_location],
-                         employer_profile: carols_employer,
-                         hire_date: carols_date_of_hire
+                         employer_profile: carols_employer
       )
     end
     let(:carols_census_employee) do
       FactoryGirl.build(:employer_census_employee,
                         first_name: carol.first_name,  last_name: carol.last_name,
-                        dob: carol.dob, address: carol.address
+                        dob: carol.dob, address: carol.address, hired_on: carols_hired_on
       )
     end
     let(:carols_census_family) {FactoryGirl.create(:employer_census_family, employer_profile: carols_employer, census_employee: carols_census_employee)}
