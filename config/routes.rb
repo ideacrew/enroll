@@ -44,10 +44,7 @@ Rails.application.routes.draw do
     resources :employer_profiles do
       get 'new'
       get 'my_account'
-      member do
-        get 'new_plan_year'
-        post 'create_plan_year'
-      end
+      resources :plan_years
       resources :family do
         get 'delink'
         get 'terminate'
