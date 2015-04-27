@@ -65,7 +65,7 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
 
   describe "where the same family member existed previously" do
     let(:previous_family_member) { existing_family_member }
-    let(:existing_family_member) { instance_double(::FamilyMember, :id => existing_family_member_id) }
+    let(:existing_family_member) { instance_double(::FamilyMember, :id => existing_family_member_id, :save! => true) }
 
     it "should use that family member's id" do
       allow(existing_family_member).to receive(:reactivate!).with(relationship)
@@ -82,7 +82,7 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
   describe "that matches an existing person" do
     let(:existing_person) { instance_double("Person") }
     let(:new_family_member_id) { double }
-    let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id) }
+    let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save! => true) }
 
     it "should create a family member for that person" do
       expect(family).to receive(:relate_new_member).with(existing_person, relationship).and_return(new_family_member)
@@ -93,7 +93,7 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
 
   describe "for a new person" do
     let(:new_family_member_id) { double }
-    let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id) }
+    let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save! => true) }
     let(:new_person) { double }
 
     it "should create a new person" do
@@ -130,10 +130,10 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
     }
   }
   let(:person) { double }
-  let(:family_member) { instance_double("FamilyMember",
+  let(:family_member) { instance_double(::FamilyMember,
                                         person_properties.merge({
                                         :family => family,
-                                        :family_id => family_id, :person => person})) }
+                                        :family_id => family_id, :person => person, :save! => true})) }
 
   let(:update_attributes) { person_properties.merge(:family_id => family_id, :relationship => relationship) }
 

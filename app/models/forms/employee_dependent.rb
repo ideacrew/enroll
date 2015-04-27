@@ -24,16 +24,19 @@ module Forms
       if existing_inactive_family_member
         self.id = existing_inactive_family_member.id
         existing_inactive_family_member.reactivate!(self.relationship)
+        existing_inactive_family_member.save!
         return true
       end
       existing_person = Person.match_existing_person(self)
       if existing_person
         family_member = family.relate_new_member(existing_person, self.relationship)
+        family_member.save!
         self.id = family_member.id
         return true
       end
       person = Person.create!(extract_person_params)
       family_member = family.relate_new_member(person, self.relationship)
+      family_member.save!
       self.id = family_member.id
       return true
     end
@@ -91,6 +94,7 @@ module Forms
       return false unless valid?
       return false unless family_member.person.update_attributes(extract_person_params)
       family_member.update_relationship(relationship)
+      family_member.save!
     end
   end
 end
