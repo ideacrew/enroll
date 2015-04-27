@@ -34,11 +34,18 @@ module Forms
         self.id = family_member.id
         return true
       end
-      person = Person.create!(extract_person_params)
+      person = Person.new(extract_person_params)
+      return false unless try_create_person(person)
       family_member = family.relate_new_member(person, self.relationship)
       family_member.save!
       self.id = family_member.id
       true
+    end
+
+    def try_create_person(person)
+      person.save.tap do
+        bubble_person_errors(person)
+      end
     end
 
     def extract_person_params
@@ -89,10 +96,24 @@ module Forms
       end
     end
 
+    def bubble_person_errors(person)
+      if person.errors.has_key?(:ssn)
+        person.errors.get(:ssn).each do |err|
+          self.errors.add(:ssn, err)
+        end
+      end
+    end
+
+    def try_update_person(person)
+      person.update_attributes(extract_person_params).tap do
+        bubble_person_errors(person)
+      end
+    end
+
     def update_attributes(attr)
       assign_attributes(attr)
       return false unless valid?
-      return false unless family_member.person.update_attributes(extract_person_params)
+      return false unless try_update_person(family_member.person)
       family_member.update_relationship(relationship)
       family_member.save!
       true

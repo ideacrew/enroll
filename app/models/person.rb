@@ -209,7 +209,7 @@ end
 
   def self.match_existing_person(personish)
     return nil if personish.ssn.blank?
-    match_by_id_info(:ssn => personish.ssn, :dob => personish.dob)
+    Person.where(:ssn => personish.ssn, :dob => personish.dob).first
   end
 
 private
