@@ -11,7 +11,7 @@ FactoryGirl.define do
       ] }
     effective_on_kind "date_of_hire"
     terminate_on_kind "end_of_month"
-    effective_on_offset 30
+    effective_on_offset 0
     reference_plan_id {FactoryGirl.create(:plan)._id}
     elected_plan_ids { [ self.reference_plan_id ]}
     premium_pct_as_int 80
