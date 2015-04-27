@@ -172,7 +172,21 @@ class Family
   end
 
   def find_matching_inactive_member(personish)
-
+    inactive_members = family_members.reject(&:is_active)
+    return nil if inactive_members.blank?
+    if !personish.ssn.blank?
+      inactive_members.detect { |mem| mem.person.ssn == personish.ssn }
+    else
+      return nil if personish.dob.blank?
+      search_dob = personish.dob.strftime("%m/%d/%Y")
+      inactive_members.detect do |mem|
+        mp = mem.person
+        mem_dob = mem.dob.blank? ? nil : mem.dob.strftime("%m/%d/%Y")
+        (personish.last_name.downcase.strip == mp.last_name.downcase.strip) &&
+          (personish.first_name.downcase.strip == mp.first_name.downcase.strip) &&
+          (search_dob == mem_dob)
+      end
+    end
   end
 
   class << self

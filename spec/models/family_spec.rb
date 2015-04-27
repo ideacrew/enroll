@@ -444,12 +444,39 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
 end
 
 describe Family, "given an inactive member" do
-  describe "given search criteria for that member which matches" do
-    it "should find the member"
+  let(:ssn) { double }
+  let(:dependent) {
+    double(:id => "123456", :ssn => ssn, :last_name => last_name, :first_name => first_name, :dob => dob)
+  }
+  let(:last_name) { "A LAST NAME" }
+  let(:first_name) { "A FIRST NAME" }
+  let(:dob) { Date.new(2012,3,15) }
+  let(:criteria) { double(:ssn => ssn) }
+  let(:inactive_family_member) { FamilyMember.new(:is_active => false, :person => dependent) }
+
+  subject { Family.new(family_members: [inactive_family_member]) }
+
+  describe "given search which matches by ssn" do
+    let(:criteria) { double(:ssn => ssn) }
+
+    it "should find the member" do
+      expect(subject.find_matching_inactive_member(criteria)).to eq inactive_family_member
+    end
+  end
+
+  describe "given search which matches by first, last, and dob" do
+    let(:criteria) { double(:ssn => nil, :first_name => first_name, :last_name => last_name, :dob => dob) }
+    it "should find the member" do
+      expect(subject.find_matching_inactive_member(criteria)).to eq inactive_family_member
+    end
   end
 
   describe "given search criteria for that member which does not match" do
-    it "should not find the member"
+    let(:criteria) { double(:ssn => "123456789") }
+
+    it "should not find the member" do
+      expect(subject.find_matching_inactive_member(criteria)).to eq nil
+    end
   end
 end
 
