@@ -77,7 +77,20 @@ module Forms
     end
 
     def family_member
-      FamilyMember.find(id)
+      @family_member = FamilyMember.find(id)
+    end
+
+    def assign_attributes(atts)
+      atts.each_pair do |k, v|
+        self.send("#{k}=".to_sym, v)
+      end
+    end
+
+    def update_attributes(attr)
+      assign_attributes(attr)
+      return false unless valid?
+      return false unless family_member.person.update_attributes(extract_person_params)
+      family_member.update_relationship(relationship)
     end
   end
 end

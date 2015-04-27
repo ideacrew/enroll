@@ -138,3 +138,9 @@ end
 describe FamilyMember, "which is inactive" do
   it "can be reactivated with a specified relationship"
 end
+
+describe FamilyMember, "given a relationship to update" do
+  it "should do nothing if the relationship is the same"
+
+  it "should update the relationship if different"
+end

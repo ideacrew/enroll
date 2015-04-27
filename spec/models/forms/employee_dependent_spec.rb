@@ -115,21 +115,33 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
   let(:family_member_id) { double }
   let(:family_id) { double }
   let(:family) { instance_double("Family", :id => family_id) }
+  let(:date_of_birth) { "06/09/2007" }
+  let(:relationship) { "spouse" }
+  let(:person_properties) {
+    {
+      :first_name => "aaa",
+      :last_name => "bbb",
+      :middle_name => "ccc",
+      :name_pfx => "ddd",
+      :name_sfx => "eee",
+      :ssn => "123456778",
+      :gender => "male",
+      :date_of_birth => date_of_birth
+    }
+  }
+  let(:person) { double }
   let(:family_member) { instance_double("FamilyMember",
-                                        :last_name => "",                  
-                                        :first_name => "",                  
-                                        :middle_name => "",                  
-                                        :name_pfx => "",                  
-                                        :name_sfx => "",                  
-                                        :date_of_birth => "",                  
-                                        :ssn => "",                  
-                                        :gender => "",                  
+                                        person_properties.merge({
                                         :family => family,
-                                        :family_id => family_id) }
+                                        :family_id => family_id, :person => person})) }
+
+  let(:update_attributes) { person_properties.merge(:family_id => family_id, :relationship => relationship) }
+
   subject { Forms::EmployeeDependent.new({ :id => family_member_id }) }
 
   before(:each) do
     allow(FamilyMember).to receive(:find).with(family_member_id).and_return(family_member)
+    allow(subject).to receive(:valid?).and_return(true)
   end
 
   it "should be considered persisted" do
@@ -152,8 +164,16 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
   end
 
   describe "when updated" do
-    it "should update the relationship of the dependent"
+    it "should update the relationship of the dependent" do
+      allow(person).to receive(:update_attributes).with(person_properties).and_return(true)
+      expect(family_member).to receive(:update_relationship).with(relationship) 
+      subject.update_attributes(update_attributes)
+    end
 
-    it "should update the attributes of the person"
+    it "should update the attributes of the person" do
+      expect(person).to receive(:update_attributes).with(person_properties)
+      allow(family_member).to receive(:update_relationship).with(relationship) 
+      subject.update_attributes(update_attributes)
+    end
   end
 end
