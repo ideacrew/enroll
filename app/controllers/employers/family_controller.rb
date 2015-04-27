@@ -44,11 +44,22 @@ class Employers::FamilyController < ApplicationController
 
   def terminate
     # last_day_of_work = params[:employer_census_employee_family][:census_employee_attributes][:terminated_on]
-    last_day_of_work = 15.days.ago.to_date
-    @family.terminate(last_day_of_work)
-    @family.save!
+    termination_date = params["termination_date"]
+    if termination_date.present?
+      termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
+    else
+      termination_date = ""
+    end
+    last_day_of_work = termination_date
+    if termination_date.present?
+      @family.terminate(last_day_of_work)
+      @family.save!
+    end
     flash[:notice] = "Successfully terminated family."
-    redirect_to employers_employer_profile_path(@employer_profile)
+    respond_to do |format|
+      format.js { render text: "Success" }
+      format.all { redirect_to employers_employer_profile_path(@employer_profile) }
+    end
   end
 
   def rehire
