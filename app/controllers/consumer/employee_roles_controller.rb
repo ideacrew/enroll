@@ -1,6 +1,8 @@
 require 'factories/enrollment_factory'
 
 class Consumer::EmployeeRolesController < ApplicationController
+  before_action :check_employee_role, only: [:new, :welcome]
+
   def welcome
   end
 
@@ -106,4 +108,11 @@ class Consumer::EmployeeRolesController < ApplicationController
       :gender
     ]
   end
+
+  private
+    def check_employee_role
+      if current_user.has_employee_role?
+        redirect_to person_my_account_path(current_user.person)
+      end
+    end
 end
