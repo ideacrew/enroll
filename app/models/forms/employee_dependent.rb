@@ -38,7 +38,7 @@ module Forms
       family_member = family.relate_new_member(person, self.relationship)
       family_member.save!
       self.id = family_member.id
-      return true
+      true
     end
 
     def extract_person_params
@@ -95,6 +95,7 @@ module Forms
       return false unless family_member.person.update_attributes(extract_person_params)
       family_member.update_relationship(relationship)
       family_member.save!
+      true
     end
   end
 end
