@@ -6,6 +6,9 @@ require "action_mailer/railtie"
 require "rails/test_unit/railtie"
 require "sprockets/railtie" # Uncomment this line for Rails 3.1+
 
+# Configure fallbacks for mongoid errors:
+require "i18n/backend/fallbacks"
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -27,5 +30,8 @@ module Enroll
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     # config.active_record.raise_in_transactional_callbacks = true
+
+    I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+    config.i18n.fallbacks = {'es' => 'en'}
   end
 end
