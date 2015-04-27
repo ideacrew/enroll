@@ -41,9 +41,23 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
   let(:existing_family_member) { nil }
   let(:existing_person) { nil }
 
-  subject { Forms::EmployeeDependent.new({:family_id => family_id, :ssn => ssn, :date_of_birth => date_of_birth, :relationship => relationship }) }
+  let(:person_properties) {
+    {
+      :first_name => "aaa",
+      :last_name => "bbb",
+      :middle_name => "ccc",
+      :name_pfx => "ddd",
+      :name_sfx => "eee",
+      :ssn => "123456778",
+      :gender => "male",
+      :date_of_birth => date_of_birth
+    }
+  }
+
+  subject { Forms::EmployeeDependent.new(person_properties.merge({:family_id => family_id, :relationship => relationship })) }
 
   before(:each) do
+    allow(subject).to receive(:valid?).and_return(true)
     allow(Family).to receive(:find).with(family_id).and_return(family)
     allow(family).to receive(:find_matching_inactive_member).with(subject).and_return(existing_family_member)
     allow(Person).to receive(:match_existing_person).with(subject).and_return(existing_person)
@@ -72,6 +86,25 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
 
     it "should create a family member for that person" do
       expect(family).to receive(:relate_new_member).with(existing_person, relationship).and_return(new_family_member)
+      subject.save
+      expect(subject.id).to eq new_family_member_id
+    end
+  end
+
+  describe "for a new person" do
+    let(:new_family_member_id) { double }
+    let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id) }
+    let(:new_person) { double }
+
+    it "should create a new person" do
+      expect(Person).to receive(:create!).with(person_properties).and_return(new_person)
+      allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
+      subject.save
+    end
+
+    it "should create a new family member" do
+      allow(Person).to receive(:create!).with(person_properties).and_return(new_person)
+      allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
       subject.save
       expect(subject.id).to eq new_family_member_id
     end
@@ -116,5 +149,11 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
     it "should have the existing family" do
       expect(@found_form.family).to eq family
     end
+  end
+
+  describe "when updated" do
+    it "should update the relationship of the dependent"
+
+    it "should update the attributes of the person"
   end
 end

@@ -19,17 +19,36 @@ module Forms
     validates_inclusion_of :relationship, :in => ::PersonRelationship::Relationships, :allow_blank => nil
 
     def save
+      return false unless valid?
       existing_inactive_family_member = family.find_matching_inactive_member(self)
       if existing_inactive_family_member
         self.id = existing_inactive_family_member.id
         existing_inactive_family_member.reactivate!(self.relationship)
-        return
+        return true
       end
       existing_person = Person.match_existing_person(self)
       if existing_person
         family_member = family.relate_new_member(existing_person, self.relationship)
         self.id = family_member.id
+        return true
       end
+      person = Person.create!(extract_person_params)
+      family_member = family.relate_new_member(person, self.relationship)
+      self.id = family_member.id
+      return true
+    end
+
+    def extract_person_params
+      {
+        :first_name => first_name,
+        :last_name => last_name,
+        :middle_name => middle_name,
+        :name_pfx => name_pfx,
+        :name_sfx => name_sfx,
+        :gender => gender,
+        :date_of_birth => date_of_birth,
+        :ssn => ssn
+      }
     end
 
     def persisted?
