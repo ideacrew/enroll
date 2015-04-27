@@ -45,10 +45,52 @@
           <% else %>
             <%= link_to "Edit", edit_employers_employer_profile_family_path(@employer_profile.id, family.id), class: "btn btn-xs btn-primary" %>
             <%= link_to "Delink", employers_employer_profile_family_delink_path(@employer_profile.id, family.id), class: "btn btn-xs btn-default", disabled: !family.is_linked? %>
-            <%= link_to "Terminate", employers_employer_profile_family_terminate_path(@employer_profile.id, family.id), class: "btn btn-lg btn-warning" %>
+            <%#= link_to "Terminate", employers_employer_profile_family_terminate_path(@employer_profile.id, family.id), class: "btn btn-lg btn-warning", data: { confirm: "Are you sure?"} %>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Terminate</button>
+            <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                      <button aria-label="Close" data-dismiss="modal" class="close" type="button"><span aria-hidden="true">×</span></button>
+                      <h4 id="mySmallModalLabel" class="modal-title">Delete Confirmation<a href="#mySmallModalLabel" class="anchorjs-link"><span class="anchorjs-icon"></span></a></h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label for="recipient-name" class="control-label">Add Termination Date:</label>
+                        <input type="text" class="employee_<%= @employer_profile.id %> form-control date-picker" id="termination_date">
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                      <a href="javascript:;" data-link="<%= employers_employer_profile_family_terminate_path(@employer_profile.id, family.id) %>" id="employee_<%= @employer_profile.id %>" class="btn btn-primary delete_confirm">Confirm</a>
+                    </div>
+                  </div>
+              </div>
+            </div>
           <% end %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
+<script>
+  $(document).ready(function(){
+    $('.delete_confirm').click(function(){
+      var termination_date = $('.'+ $(this).attr('id')).val();
+      var link_to_delete = $(this).data('link');
+      $.ajax({
+        type: 'get',
+        datatype : 'js',
+        url: link_to_delete,
+        data: {termination_date: termination_date},
+        success: function(response){
+          window.location.reload();
+        },
+        error: function(response){
+          window.location.reload();
+        }
+      });
+    });
+  });
+</script>
