@@ -455,6 +455,26 @@ end
 
 describe Family, "with a primary applicant" do
   describe "given a new person and relationship to make to the primary applicant" do
-    it "should relate the person and create the family member"
+    let(:primary_person_id) { double }
+    let(:primary_applicant) { double(:person_relationships => [], :id => primary_person_id) }
+    let(:relationship) { double }
+    let(:employee_role) { double(:person => primary_applicant) }
+    let(:dependent_id) { double }
+    let(:dependent) { double(:id => dependent_id) }
+
+    subject { 
+      fam = Family.new 
+      fam.build_from_employee_role(employee_role)
+      fam
+    }
+
+    before(:each) do
+      allow(primary_applicant).to receive(:ensure_relationship_with).with(dependent, "spouse")
+      allow(primary_applicant).to receive(:find_relationship_with).with(dependent).and_return(nil)
+    end
+
+    it "should relate the person and create the family member" do
+      subject.relate_new_member(dependent, "spouse")
+    end
   end
 end

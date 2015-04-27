@@ -140,7 +140,20 @@ describe FamilyMember, "which is inactive" do
 end
 
 describe FamilyMember, "given a relationship to update" do
-  it "should do nothing if the relationship is the same"
+  let(:family) { Family.new }
+  let(:primary_applicant_person) { double }
+  let(:relationship) { "spouse" }
+  let(:person) { double(:id => "12345")  }
+  subject { FamilyMember.new(:family => family, :person => person) }
+
+  before(:each) do 
+    allow(family).to receive(:primary_applicant_person).and_return(primary_applicant_person)
+    allow(primary_applicant_person).to receive(:find_relationship_with).with(person).and_return(relationship)
+  end
+
+  it "should do nothing if the relationship is the same" do
+    subject.update_relationship(relationship)
+  end
 
   it "should update the relationship if different"
 end

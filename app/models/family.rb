@@ -114,8 +114,13 @@ class Family
     self
   end
 
+  def relate_new_member(person, relationship)
+    primary_applicant_person.ensure_relationship_with(person, relationship)
+    add_family_member(person)
+  end
+
   def add_family_member(person, **opts)
-    raise ArgumentError.new("expected Person") unless person.is_a? Person
+#    raise ArgumentError.new("expected Person") unless person.is_a? Person
 
     is_primary_applicant     = opts[:is_primary_applicant]  || false
     is_coverage_applicant    = opts[:is_coverage_applicant] || true
@@ -223,10 +228,6 @@ class Family
     end
   end
 
-  def relate_new_member(person, relationship)
-
-  end
-
 private
   def build_household
     if households.size == 0
@@ -239,6 +240,11 @@ private
     single_primary_family_member
     all_family_member_relations_defined
     single_active_household
+  end
+
+  def primary_applicant_person
+    return nil unless primary_applicant.present?
+    primary_applicant.person
   end
 
   def single_primary_family_member
