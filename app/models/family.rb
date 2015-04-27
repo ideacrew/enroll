@@ -48,18 +48,11 @@ class Family
             :allow_nil => true
 
   validates :e_case_id, uniqueness: true, allow_nil: true
-
-  # validate :no_duplicate_family_members
-  # validate :integrity_of_family_member_objects
-  # validate :max_one_primary_applicant
-  # validate :max_one_active_household
+  validate :family_integrity
 
   after_initialize :build_household
 
-  # before_save :update_household
-
   scope :all_with_multiple_family_members, -> { exists({:'family_members.1' => true}) }
-  scope :all_with_household, -> { exists({:'households.0' => true}) }
 
   def latest_household
     return households.first if households.size == 1
@@ -68,8 +61,24 @@ class Family
     # persisted_household.sort_by(&:submitted_at).last
   end
 
+  def primary_family_member
+    family_members.detect { |family_member| family_member.is_primary_applicant? && family_member.is_active? }
+  end
+
+  def primary_applicant
+    primary_family_member
+  end
+
+  def consent_applicant
+    family_members.detect { |family_member| family_member.is_consent_applicant? && family_member.is_active? }
+  end
+
   def active_family_members
-    family_members.find_all { |a| a.is_active? }
+    family_members.find_all { |family_member| family_member.is_active? }
+  end
+
+  def find_family_member_by_person(person)
+    family_members.detect { |family_member| family_member.person_id == person._id }
   end
 
   # Life events trigger special enrollment periods
@@ -85,26 +94,24 @@ class Family
     seps.reduce([]) { |list, event| list << event if event.is_active?; list }
   end
 
-  # single SEP with latest end date from list of active SEPs
-  def current_sep
-    active_seps.max { |sep| sep.end_date }
-  end
-
   # List of SEPs active for this Application Group today, or passed date
   def active_seps(day = Date.today)
     special_enrollment_periods.find_all { |sep| (sep.start_date..sep.end_date).include?(day) }
+  end
+
+  # single SEP with latest end date from list of active SEPs
+  def current_sep
+    active_seps.max { |sep| sep.end_date }
   end
 
   def active_broker_roles
     active_household.hbx_enrollments.reduce([]) { |b, e| b << e.broker_role if e.is_active? && !e.broker_role.blank? } || []
   end
 
-  def primary_applicant
-    family_members.detect { |a| a.is_primary_applicant? }
-  end
-
-  def consent_applicant
-    family_members.detect { |a| a.is_consent_applicant? }
+  def build_from_employee_role(employee_role)
+    add_family_member(employee_role.person, is_primary_applicant: true)
+    employee_role.person.person_relationships.each { |kin| add_family_member(kin.relative) }
+    self
   end
 
   def add_family_member(person, **opts)
@@ -135,10 +142,6 @@ class Family
     family_member
   end
 
-  def find_family_member_by_person(person)
-    family_members.detect { |a| a.person_id == person._id }
-  end
-
   def person_is_family_member?(person)
     find_family_member_by_person(person).present?
   end
@@ -163,13 +166,6 @@ class Family
     self.is_active
   end
 
-  def initialize_from_employee_role(new_employee_role)
-    set_family_attributes
-    initialize_irs_group
-    initialize_household
-    initialize_family_members_and_coverage_households(new_employee_role.person)
-  end
-
   class << self
     def default_search_order
       [
@@ -178,14 +174,14 @@ class Family
       ]
     end
 
-    def find_or_initialize_by_employee_role(new_employee_role)
+    def find_or_build_from_employee_role(new_employee_role)
       existing_family = Family.find_by_employee_role(new_employee_role)
 
       if existing_family.present?
         existing_family
       else
         family = Family.new
-        family.initialize_from_employee_role(new_employee_role)
+        family.build_from_employee_role(new_employee_role)
 
         family.save!
         family
@@ -225,54 +221,41 @@ class Family
 
 private
   def build_household
-    self.households.build(submitted_at: DateTime.current, effective_starting_on: Date.current) if households.size == 0
+    if households.size == 0
+      irs_group = initialize_irs_group
+      initialize_household(irs_group)
+    end
+  end
+
+  def family_integrity
+    single_primary_family_member
+    all_family_member_relations_defined
+    single_active_household
   end
 
   def single_primary_family_member
-    list = family_members.reduce([]) {|list, family_member| list << family_member if family_member.is_primary_family_member? }
-    self.errors.add(:family_members, "must provide one primary family member") if list.size == 0
+    list = family_members.reduce([]) { |list, family_member| list << family_member if family_member.is_primary_applicant?; list }
+    self.errors.add(:family_members, "one family member must be primary family member") if list.size == 0
     self.errors.add(:family_members, "may not have more than one primary family member") if list.size > 1
   end
 
-  def set_family_attributes
-    self.submitted_at = DateTime.current
+  def all_family_member_relations_defined
+    undefined_relations = family_members.reduce([]) { |list, family_member| list << family_member if family_member.primary_relationship.blank?; list }
+    errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations.size > 1
+  end
+
+  def single_active_household
+    list = households.reduce([]) { |list, household| list << household if household.is_active?; list }
+    self.errors.add(:households, "one household must be active") if list.size == 0
+    self.errors.add(:households, "may not have more than one active household") if list.size > 1
   end
 
   def initialize_irs_group
     irs_groups.build(effective_starting_on: Date.current)
   end
 
-  def initialize_household
-    households.build(irs_group: irs_groups.first, effective_starting_on: irs_groups.first.effective_starting_on, submitted_at: DateTime.current)
-  end
-
-  def initialize_family_members_and_coverage_households(primary_person)
-    time_stamp = DateTime.current
-    primary_coverage_household = households.first.coverage_households.build(is_immediate_family: true, submitted_at: time_stamp)
-
-    family_member = family_members.build(person: primary_person, is_primary_applicant: true)
-    primary_coverage_household.coverage_household_members.build(family_member: family_member, is_subscriber: true)
-
-    primary_person.person_relationships.each do |kin|
-      family_member = family_members.build(person: kin.relative)
-
-      if ImmediateFamily.include? kin.kind.to_s.downcase
-        primary_coverage_household.coverage_household_members.build(family_member: family_member)
-      else
-        secondary_coverage_household ||= households.first.coverage_households.build(is_immediate_family: false, submitted_at: time_stamp)
-        secondary_coverage_household.coverage_household_members.build(family_member: family_member)
-      end
-    end 
-  end 
-
-  def update_household
-    household = get_household
-
-    if family_members.blank?
-      household.coverage_households.delete_all
-    else
-      create_coverage_households(household)
-    end
+  def initialize_household(irs_group)
+    households.build(irs_group: irs_group, effective_starting_on: irs_group.effective_starting_on, submitted_at: DateTime.current)
   end
 
   def no_duplicate_family_members
@@ -296,72 +279,11 @@ private
     base_set.uniq.sort == test_set.uniq.sort
   end
 
-  def max_one_primary_applicant
-    primary_applicants = self.family_members.select do |applicant|
-      applicant.is_primary_applicant == true
-    end
-
-    if primary_applicants.size > 1
-      self.errors.add(:base, "Multiple primary applicants")
-      return false
-    else
-      return true
-    end
-  end
-
   def reset_active_household(new_household)
     households.each do |household|
       household.is_active = false
     end
     new_household.is_active = true
-  end
-
-  def max_one_active_household
-    return true if self.households.blank?
-
-    active_households = self.households.select do |household|
-      household.is_active?
-    end
-
-    if active_households.size > 1
-      self.errors.add(:base, "Multiple active households")
-      return false
-    else
-      return true
-    end
-  end
-
-  def get_household
-    if active_household
-     active_household  #if active_houshold exists
-    else
-     initialize_irs_group
-     initialize_household 
-     # households.build(submitted_at: DateTime.current) #create a new empty household
-    end
-  end
-
-  def create_coverage_households(household)
-    time_stamp ||= DateTime.current
-    household.coverage_households.delete_all #clear any existing
-
-    coverage_household = household.coverage_households.build(submitted_at: self.submitted_at)
-    coverage_household_for_others = nil
-
-    family_members.each do |family_member|
-      if family_member.is_coverage_applicant?
-        if valid_relationship?(family_member)
-          coverage_household_member = coverage_household.coverage_household_members.build
-          coverage_household_member.family_member = family_member
-          coverage_household_member.applicant_id = family_member.id
-          coverage_household_member.is_subscriber = family_member.is_primary_applicant
-        else
-          coverage_household_for_others ||= household.coverage_households.build({submitted_at: self.submitted_at})
-          coverage_household_member = coverage_household_for_others.coverage_household_members.build
-          coverage_household_member.family_member = family_member
-        end
-      end
-    end
   end
 
   def valid_relationship?(family_member)
