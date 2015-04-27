@@ -110,7 +110,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     let(:employment_relationships) { double }
 
     before(:each) do
-      sign_in 
+      sign_in
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters).and_return(mock_employee_candidate)
       allow(EmployerProfile).to receive(:find_census_families_by_person).with(mock_employee_candidate).and_return(found_families)
       allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, found_families).and_return(employment_relationships)
@@ -137,7 +137,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
         end
 
         context "that find a matching employee" do
-          let(:found_families) { [instance_double("EmployerCensus::EmployeeFamily")]} 
+          let(:found_families) { [instance_double("EmployerCensus::EmployeeFamily")]}
 
           it "renders the 'match' template" do
             expect(response).to have_http_status(:success)
@@ -165,15 +165,25 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
   end
 
   describe "GET welcome" do
+    let(:user) { double("user") }
+    let(:person) { double("person")}
 
-    before(:each) do
-      sign_in
+    it "renders the 'welcome' template when user has no employee role" do
+      allow(user).to receive(:has_employee_role?).and_return(false)
+      sign_in(user)
       get :welcome
-    end
-
-    it "renders the 'welcome' template" do
       expect(response).to have_http_status(:success)
       expect(response).to render_template("welcome")
     end
+
+    it "renders the 'my account' template when user has employee role" do
+      allow(user).to receive(:has_employee_role?).and_return(true)
+      allow(user).to receive(:person).and_return(person)
+      sign_in(user)
+      get :welcome
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(person_my_account_path(person))
+    end
+
   end
 end
