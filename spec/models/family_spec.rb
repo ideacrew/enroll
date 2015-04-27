@@ -442,3 +442,19 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
   end
 
 end
+
+describe Family, "given an inactive member" do
+  describe "given search criteria for that member which matches" do
+    it "should find the member"
+  end
+
+  describe "given search criteria for that member which does not match" do
+    it "should not find the member"
+  end
+end
+
+describe Family, "with a primary applicant" do
+  describe "given a new person and relationship to make to the primary applicant" do
+    it "should relate the person and create the family member"
+  end
+end

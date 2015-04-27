@@ -207,6 +207,10 @@ end
     end
   end
 
+  def self.match_existing_person(personish)
+
+  end
+
 private
   def update_full_name
     full_name

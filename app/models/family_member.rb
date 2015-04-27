@@ -25,10 +25,15 @@ class FamilyMember
   embeds_many :comments, cascade_callbacks: true
   accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
 
+  delegate :id, to: :family, prefix: true
+
   delegate :first_name, to: :person, allow_nil: true
   delegate :last_name, to: :person, allow_nil: true
   delegate :middle_name, to: :person, allow_nil: true
   delegate :full_name, to: :person, allow_nil: true
+  delegate :name_pfx, to: :person, allow_nil: true
+  delegate :name_sfx, to: :person, allow_nil: true
+  delegate :date_of_birth, to: :person, allow_nil: true
   delegate :dob, to: :person, allow_nil: true
   delegate :ssn, to: :person, allow_nil: true
   delegate :gender, to: :person, allow_nil: true
@@ -77,6 +82,10 @@ class FamilyMember
     else
       family.primary_applicant.person.find_relationship_with(person) unless family.primary_applicant.blank? || person.blank?
     end
+  end
+
+  def reactivate!(relationship)
+
   end
 
   def self.find(family_member_id)

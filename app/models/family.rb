@@ -166,6 +166,10 @@ class Family
     self.is_active
   end
 
+  def find_matching_inactive_member(personish)
+
+  end
+
   class << self
     def default_search_order
       [
@@ -217,6 +221,10 @@ class Family
     def find_by_case_id(case_id)
       where({"e_case_id" => case_id}).first
     end
+  end
+
+  def relate_new_member(person, relationship)
+
   end
 
 private

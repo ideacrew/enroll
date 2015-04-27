@@ -367,3 +367,7 @@ describe Person, '#families' do
   it 'returns families where the person is present' do
   end
 end
+
+describe Person, "given an existing person" do
+  it "should find that person when given matching criteria"
+end

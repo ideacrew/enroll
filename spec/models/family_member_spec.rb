@@ -134,3 +134,7 @@ describe FamilyMember, type: :model do
     end
   end
 end
+
+describe FamilyMember, "which is inactive" do
+  it "can be reactivated with a specified relationship"
+end
