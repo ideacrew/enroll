@@ -3,13 +3,15 @@ class Household
   include Mongoid::Timestamps
   include HasFamilyMembers
 
+  ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter}
+
   embedded_in :family
 
   # field :e_pdc_id, type: String  # Eligibility system PDC foreign key
 
   # embedded belongs_to :irs_group association
   field :irs_group_id, type: BSON::ObjectId
-  field :effective_starting_on, type: Date, default: Date.new(2014,1,1)
+  field :effective_starting_on, type: Date
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
   field :is_active, type: Boolean, default: true
@@ -28,6 +30,41 @@ class Household
   validates :effective_starting_on, presence: true
   #validate :effective_ending_on_gt_effective_starting_on
 
+  # after_build :build_irs_group
+
+
+  def add_household_coverage_member(family_member)
+    # OPTIMIZE
+    # binding.pry
+    if ImmediateFamily.include?(family_member.primary_relationship)
+      immediate_family_coverage_household.coverage_household_members.build(
+          family_member: family_member, 
+          is_subscriber: family_member.is_primary_applicant?
+        )
+    else
+      extended_family_coverage_household.coverage_household_members.build(
+          family_member: family_member, 
+          is_subscriber: family_member.is_primary_applicant?
+        )
+    end
+  end
+
+  def immediate_family_coverage_household
+    ch = coverage_households.detect { |hh| hh.is_immediate_family? }
+    ch ||= coverage_households.build(is_immediate_family: true)
+  end
+
+  def extended_family_coverage_household
+    ch = coverage_households.detect { |hh| !hh.is_immediate_family? }
+    ch ||= coverage_households.build(is_immediate_family: false)
+  end
+
+  # def determination_split_coverage_household
+  #   hh = coverage_household.find_or_initialize_by(is_determination_split_household: true)
+  #   hh.submitted_at ||= DateTime.current
+  #   hh
+  # end
+
   def effective_ending_on_gt_effective_starting_on
 
     return if effective_ending_on.nil?
@@ -43,9 +80,9 @@ class Household
     self.family
   end
 
-  def irs_group=(irs_instance)
-    return unless irs_instance.is_a? IrsGroup
-    self.irs_group_id = irs_instance._id
+  def irs_group=(new_irs_group)
+    return unless new_irs_group.is_a? IrsGroup
+    self.irs_group_id = new_irs_group._id
   end
 
   def irs_group

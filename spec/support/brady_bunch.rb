@@ -46,9 +46,9 @@ module BradyBunch
       mike.save
 
       family = FactoryGirl.build(:family)
-      family.family_members << FactoryGirl.build(:family_member, :primary, person: mike)
+      family.add_family_member(mike, is_primary_applicant: true)
       (bradys - [mike]).each do |brady|
-        family.family_members << FactoryGirl.build(:family_member, person: brady)
+        family.add_family_member(brady)
       end
       family.save
       family
@@ -62,9 +62,9 @@ module BradyBunch
       carol.save
 
       family = FactoryGirl.build(:family)
-      family.family_members << FactoryGirl.build(:family_member, :primary, person: carol)
+      family.add_family_member(carol, is_primary_applicant: true)
       (bradys - [carol]).each do |brady|
-        family.family_members << FactoryGirl.build(:family_member, person: brady)
+        family.add_family_member(brady)
       end
       family.save
       family
@@ -102,10 +102,11 @@ module BradyBunch
       )
     end
     let!(:mikes_employer) {FactoryGirl.build(:employer_profile, organization: mikes_organization)}
+    let(:mikes_hire_date)  { 1.year.ago.beginning_of_year.to_date }
     let(:mikes_census_employee) do
       FactoryGirl.build(:employer_census_employee,
                         first_name: mike.first_name,  last_name: mike.last_name,
-                        dob: mike.dob, address: mike.address
+                        dob: mike.dob, address: mike.address, hired_on: mikes_hire_date
       )
     end
     let(:mikes_census_family) {FactoryGirl.create(:employer_census_family, employer_profile: mikes_employer, census_employee: mikes_census_employee)}
@@ -131,12 +132,14 @@ module BradyBunch
       )
     end
     let(:carols_employer) {FactoryGirl.build(:employer_profile)}
+    let(:carols_hire_date)  { 1.year.ago.beginning_of_year.to_date }
     let(:carols_organization) do
       FactoryGirl.create(:organization,
                          legal_name: "Care Real S Tates",
                          dba: "CRST",
                          office_locations: [carols_office_location],
                          employer_profile: carols_employer,
+                         hire_date: carols_date_of_hire
       )
     end
     let(:carols_census_employee) do

@@ -2,11 +2,10 @@ en:
   button:
     continue: "Continue"
   welcome:
-    title: "Welcome Employee"
-    subtitle: "Let's Get You Signed Up for Health Care!"
-    paragraph1: "To start this process, we'll need some personal information for you to gain access to your employer-sponsored benefits."
-    paragraph2: "Be prepared to provide names, dates-of-birth, and social security numbers for you and enrolling family members.  Also, tell us how to contact you: address, telephone and email."
-    paragraph3: "Based on this family information, you may browse plans offered by your employer, compare coverage and costs, and then enroll in a plan that best meets your budget and needs."
-    paragraph4: "Ready?  Click the button below to continue."
+    title: "Employee Coverage"
+    subtitle: "Enroll in just a few simple steps"
+    paragraph1: "To start, access your employer-sponsored benefits by providing basic information about you and enrolling family members: names, dates-of-birth, and social security numbers.  Also, tell us best ways to contact you: address, telephone and email."
+    paragraph2: "Next, browse plans offered by your employer, compare alternative benefits and costs, and then enroll in a plan that best fits your budget and needs."
+    paragraph3: "Ready?  Click the button to continue."
     notice: "By using this site, you acknowledge that your have read and agree with the privacy policy and terms of use found here: "
     link: "DCHBX Privacy Policy & Terms of Use."

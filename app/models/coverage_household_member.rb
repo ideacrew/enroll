@@ -5,7 +5,6 @@ class CoverageHouseholdMember
   embedded_in :coverage_household
 
   field :family_member_id, type: BSON::ObjectId
-  field :applicant_id, type: BSON::ObjectId
   field :is_subscriber, type: Boolean, default: false
 
   include BelongsToFamilyMember
@@ -15,9 +14,7 @@ class CoverageHouseholdMember
   end
 
   def family_member=(new_family_member)
-    if coverage_household && (coverage_household.coverage_household_members.where(family_member_id: new_family_member._id) == [])
-      self.family_member_id = new_family_member._id
-    end
+    self.family_member_id = new_family_member._id
   end
 
   def family_member
