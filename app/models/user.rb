@@ -88,6 +88,18 @@ class User
     roles.any? { |r| r == role_sym }
   end
 
+  def has_employee_role?
+    has_role?(:employee)
+  end
+
+  def has_employer_role?
+    has_role?(:employer)
+  end
+
+  def has_broker_role?
+    has_role?(:broker)
+  end
+
   def ensure_authentication_token
     if authentication_token.blank?
       self.authentication_token = generate_authentication_token

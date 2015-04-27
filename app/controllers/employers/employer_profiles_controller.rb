@@ -1,5 +1,6 @@
 class Employers::EmployerProfilesController < ApplicationController
-  before_filter :find_employer, only: [:show, :destroy]
+  before_action :find_employer, only: [:show, :destroy]
+  before_action :check_employer_role, only: [:new, :welcome]
 
   def index
     @q = params[:q]
@@ -42,30 +43,35 @@ class Employers::EmployerProfilesController < ApplicationController
 
   private
 
-  def find_employer
-    id = params[:id] || params[:employer_profile_id]
-    @employer_profile = EmployerProfile.find(id)
-  end
+    def check_employer_role
+      if current_user.has_employer_role?
+        redirect_to employers_employer_profile_my_account(current_user.person.employer_contact)
+      end
+    end
 
-  def employer_profile_params
-    params.require(:organization).permit(
-      :employer_profile_attributes => [ :entity_kind, :dba, :fein, :legal_name],
-      :office_locations_attributes => [
-        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
-        :phone_attributes => [:kind, :area_code, :number, :extension],
-        :email_attributes => [:kind, :address]
-      ]
-    )
-  end
+    def find_employer
+      id = params[:id] || params[:employer_profile_id]
+      @employer_profile = EmployerProfile.find(id)
+    end
 
-  def build_employer_profile
-    organization = Organization.new
-    organization.build_employer_profile
-    office_location = organization.office_locations.build
-    office_location.build_address
-    office_location.build_phone
-    office_location.build_email
-    organization
-  end
+    def employer_profile_params
+      params.require(:organization).permit(
+        :employer_profile_attributes => [ :entity_kind, :dba, :fein, :legal_name],
+        :office_locations_attributes => [
+          :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
+          :phone_attributes => [:kind, :area_code, :number, :extension],
+          :email_attributes => [:kind, :address]
+        ]
+      )
+    end
 
+    def build_employer_profile
+      organization = Organization.new
+      organization.build_employer_profile
+      office_location = organization.office_locations.build
+      office_location.build_address
+      office_location.build_phone
+      office_location.build_email
+      organization
+    end
 end
