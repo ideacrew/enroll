@@ -72,7 +72,11 @@ class FamilyMember
   end
 
   def primary_relationship
-    family.primary_applicant.person.find_relationship_with(person) unless person.blank?
+    if is_primary_applicant?
+      "self"
+    else
+      family.primary_applicant.person.find_relationship_with(person) unless family.primary_applicant.blank? || person.blank?
+    end
   end
 
   def self.find(family_member_id)

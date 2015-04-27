@@ -35,56 +35,60 @@ describe Family, type: :model, dbclean: :after_each do
       let(:params)  { valid_params }
       let(:family)  { Family.new(**params) }
 
-      it "should have a household" do
-        expect(family.households.size).to eq 1
-      end
-
       context "and the primary applicant is missing" do
-        pending 
-
-        # before do
-        #   family.family_members = [family_member_spouse]
-        # end
-
-        # it "should not be valid" do
-        #   expect(family.errors[:family_members].any?).to be_truthy
-        # end
-      end
-
-      it "is persistable" do
-        expect(family.save).to be_truthy
-      end
-
-      context "and it is persisted" do
-        let!(:saved_family) do
-          f = family
-          f.save
-          f
+        before do
+          family.family_members = [family_member_spouse]
+          family.valid?
         end
 
-        it "should be findable" do
-          expect(Family.find(saved_family.id).id.to_s).to eq saved_family.id.to_s
+        it "should not be valid" do
+          expect(family.errors[:family_members].any?).to be_truthy
+        end
+      end
+
+      context "and primary applicant and family members are added" do
+        before do
+          family.family_members = [family_member_person, family_member_spouse]
+          family.save
         end
 
-        context "and family members are added" do
-          before do
-            family.family_members = [family_member_person, family_member_spouse]
-            family.save
+        it "all the added people are represented as family members" do
+          expect(family.family_members.size).to eq 2            
+        end
+
+        it "the correct person is primary applicant" do
+          expect(family.primary_applicant.person).to eq person
+        end
+
+        it "the correct person is consent applicant" do
+          expect(family.consent_applicant.person).to eq person
+        end
+
+        it "has an irs group" do
+          expect(family.irs_groups.size).to eq 1
+        end
+
+        it "has a household that is associated with irs group" do
+          expect(family.households.size).to eq 1
+          expect(family.households.first.irs_group).to eq family.irs_groups.first
+        end
+
+        it "is persistable" do
+          expect(family.save).to be_truthy
+        end
+
+        context "and it is persisted" do
+          let!(:saved_family) do
+            f = family
+            f.save
+            f
           end
 
-          it "all the added people are represented as family members" do
-            expect(family.family_members.size).to eq 2            
+          it "should be findable" do
+            expect(Family.find(saved_family.id).id.to_s).to eq saved_family.id.to_s
           end
 
-          it "the correct person is primary applicant" do
-            expect(family.primary_applicant.person).to eq person
-          end
-
-          it "the correct person is consent applicant" do
-            expect(family.consent_applicant.person).to eq person
-          end
-
-          context "and the person added is not related to the primary applicant" do
+          context "and one of the family members is not related to the primary applicant" do
             let(:alice) { FactoryGirl.create(:person, first_name: "alice") }
             let(:non_family_member) { FamilyMember.new(person: alice) }
 
@@ -96,7 +100,7 @@ describe Family, type: :model, dbclean: :after_each do
               expect(family.errors[:family_members].any?).to be_truthy
             end
 
-            context "and the person is a responsible party" do
+            context "and the non-related person is a responsible party" do
               pending "to be added for IVL market"
             end
           end
@@ -165,14 +169,11 @@ describe Family, type: :model, dbclean: :after_each do
     include_context "BradyBunch"
 
     context "when you add a family member" do
-
       it "there is a corresponding coverage household member" do
         covered_bradys = carols_family.households.first.immediate_family_coverage_household.coverage_household_members.collect(){|m| m.family_member.person.full_name}
         expect(covered_bradys).to contain_exactly(*bradys.collect(&:full_name))
       end
-
     end
-
   end
 
   ## TODO: Add method
@@ -278,7 +279,6 @@ describe Family, type: :model, dbclean: :after_each do
       it "should not save as a duplicate" do
       end
     end
-
   end
 
   describe "large family with multiple employees - The Brady Bunch" do
@@ -347,83 +347,10 @@ describe Family, type: :model, dbclean: :after_each do
       end
     end
   end
-
-  describe "update_household callback" do
-    let!(:primary_person) { FactoryGirl.create(:person, :male) }
-    let!(:second_person) { FactoryGirl.create(:person) }
-    let!(:new_family) { FactoryGirl.build(:family) }
-    let!(:first_primary_member) { FactoryGirl.build(:family_member, :primary, family: new_family, person: primary_person) }
-
-    context "family is saved" do
-      it "should create a household" do
-        expect(new_family.households.length).to eq(1)
-      end
-
-      it "should create a coverage_household" do
-        expect(new_family.active_household.coverage_households.length).to eq(1)
-      end
-
-      it "should create a member in coverage_household" do
-        expect(new_family.active_household.coverage_households.first.coverage_household_members.length).to eq(1)
-      end
-
-      context "family has multiple family members" do
-        let!(:second_member) { FactoryGirl.create(:family_member, family: new_family, person: second_person) }
-        it "should create coverage_household with 2 members (self and spouse)" do
-          new_family.family_members.first.person.person_relationships << PersonRelationship.new({kind: 'spouse', relative_id: second_person.id})
-          expect(new_family.active_household.coverage_households.first.coverage_household_members.length).to eq(2)
-        end
-
-        it "should create one coverage_household for valid family_member (relationships) and another for the rest " do
-          new_family.family_members.first.person.person_relationships << PersonRelationship.new({kind: 'brother', relative_id: second_person.id})
-          expect(new_family.active_household.coverage_households.length).to eq(2)
-        end
-      end
-    end
-
-
-    context "family is updated" do
-
-      it "should create coverage_household with the new family member" do
-        second_member = FactoryGirl.create(:family_member, family: new_family, person: second_person)
-        new_family.family_members.first.person.person_relationships << PersonRelationship.new({kind: 'spouse', relative_id: second_person.id})
-
-        expect(new_family.save).to be_truthy
-        expect(new_family.active_household.coverage_households.length).to eq(1)
-        expect(new_family.active_household.coverage_households.first.coverage_household_members.length).to eq(2)
-      end
-
-      it "should create coverage_household when a family member removed" do
-        second_member = FactoryGirl.create(:family_member, family: new_family, person: second_person)
-        new_family.family_members.first.person.person_relationships << PersonRelationship.new({kind: 'brother', relative_id: second_person.id})
-        new_family.family_members.last.delete
-
-        expect(new_family.save).to be_truthy
-        expect(new_family.active_household.coverage_households.length).to eq(1)
-        expect(new_family.active_household.coverage_households.first.coverage_household_members.length).to eq(1)
-      end
-
-      context "all family members removed" do
-        it "should have no coverage_household and no hbx_enrollment" do
-
-          #adding a policy, hence a hbx_enrollment
-          plan = FactoryGirl.create(:plan)
-          # enrollee = Enrollee.new({person: primary_person, coverage_start_on: Date.today})
-          # policy = FactoryGirl.create(:policy, plan: plan, enrollees: [enrollee])
-
-          new_family.family_members.each(&:delete) #delete all family members
-
-          expect(new_family.save).to be_truthy
-          expect(new_family.active_household.coverage_households.blank?).to be_truthy
-          expect(new_family.active_household.hbx_enrollments.blank?).to be_truthy
-        end
-      end
-    end
-  end
 end
 
 
-describe Family, ".find_or_initialize_by_employee_role:", type: :model, dbclean: :after_each do
+describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :after_each do
 
   let(:submitted_at)  { DateTime.current}
   let(:spouse)        { FactoryGirl.create(:person, last_name: "richards", first_name: "denise") }
@@ -445,17 +372,13 @@ describe Family, ".find_or_initialize_by_employee_role:", type: :model, dbclean:
   let(:married_employee_role)   { FactoryGirl.create(:employee_role, person: married_dude) }
   let(:family_employee_role)    { FactoryGirl.create(:employee_role, person: family_dude) }
 
-  let(:single_family)          { Family.find_or_initialize_by_employee_role(single_employee_role) }
-  let(:married_family)         { Family.find_or_initialize_by_employee_role(married_employee_role) }
-  let(:large_family)           { Family.find_or_initialize_by_employee_role(family_employee_role) }
+  let(:single_family)          { Family.find_or_build_from_employee_role(single_employee_role) }
+  let(:married_family)         { Family.find_or_build_from_employee_role(married_employee_role) }
+  let(:large_family)           { Family.find_or_build_from_employee_role(family_employee_role) }
 
 
   context "when no families exist" do
     context "and employee is single" do
-
-      it "should set attributes on family model" do
-        expect(single_family.submitted_at).to_not be_nil
-      end
 
       it "should create one family_member with set attributes" do
         expect(single_family.family_members.size).to eq 1
