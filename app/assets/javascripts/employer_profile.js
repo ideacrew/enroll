@@ -34,7 +34,7 @@ $(function() {
   
   $(document).ready(function(){
     $('.delete_confirm').click(function(){
-      var element_id = $(this).attr('id');
+      //var element_id = $(this).attr('id');
       var termination_date = $(this).siblings().val();
       var link_to_delete = $(this).data('link');
       $.ajax({
@@ -44,7 +44,8 @@ $(function() {
         data: {termination_date: termination_date},
         success: function(response){
           if(response=="true") {
-            $('.'+element_id).remove();
+            //$('.'+element_id).remove();
+            window.location.reload();
           } else {
             
           }
