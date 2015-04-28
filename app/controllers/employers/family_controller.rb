@@ -53,12 +53,20 @@ class Employers::FamilyController < ApplicationController
     last_day_of_work = termination_date
     if termination_date.present?
       @family.terminate(last_day_of_work)
-      @family.save!
+      @fa = @family.save!
     end
-    flash[:notice] = "Successfully terminated family."
     respond_to do |format|
-      format.js { render text: "Success" }
-      format.all { redirect_to employers_employer_profile_path(@employer_profile) }
+      format.js { 
+        if termination_date.present? and @fa
+          render text: true
+        else
+          render text: false
+        end
+      }
+      format.all {
+        flash[:notice] = "Successfully terminated family."
+        redirect_to employers_employer_profile_path(@employer_profile)
+      }
     end
   end
 
