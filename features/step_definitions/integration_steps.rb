@@ -1,12 +1,12 @@
 require 'watir'
-load Rails.root + "db/seeds.rb"
+# load Rails.root + "db/seeds.rb"
 
 Before "@watir" do
   @browser = Watir::Browser.new :chrome
 end
 
 After "@watir" do
-  @browser.close
+ @browser.close
 end
 
 Given(/^I do not exist as a user$/) do
@@ -58,7 +58,7 @@ When(/^I enter the identifying info of my existing person$/) do
   @browser.p(:text=> /Personal Information/).click
   @browser.text_field(:name => "person[ssn]").set("722991234")
   sleep(2)
-  @browser.input(:value => "Search", :type => "submit").click
+  @browser.input(:value => "Search Employers", :type => "submit").click
   sleep(3)
 end
 
