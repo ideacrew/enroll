@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  resources :translations
+
   # FIXME: Do this properly later
   resource :plan_shopping do
     member do
