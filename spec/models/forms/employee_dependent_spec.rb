@@ -94,16 +94,16 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
   describe "for a new person" do
     let(:new_family_member_id) { double }
     let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save! => true) }
-    let(:new_person) { double }
+    let(:new_person) { double(:save => true, :errors => double(:has_key? => false)) }
 
     it "should create a new person" do
-      expect(Person).to receive(:create!).with(person_properties).and_return(new_person)
+      expect(Person).to receive(:new).with(person_properties).and_return(new_person)
       allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
       subject.save
     end
 
     it "should create a new family member" do
-      allow(Person).to receive(:create!).with(person_properties).and_return(new_person)
+      allow(Person).to receive(:new).with(person_properties).and_return(new_person)
       allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
       subject.save
       expect(subject.id).to eq new_family_member_id
@@ -129,7 +129,7 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
       :date_of_birth => date_of_birth
     }
   }
-  let(:person) { double }
+  let(:person) { double(:errors => double(:has_key? => false)) }
   let(:family_member) { instance_double(::FamilyMember,
                                         person_properties.merge({
                                         :family => family,
