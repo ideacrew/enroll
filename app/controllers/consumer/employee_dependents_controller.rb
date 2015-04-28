@@ -7,5 +7,26 @@ class Consumer::EmployeeDependentsController < ApplicationController
   def new
     @person = current_user.person
     @dependent = Forms::EmployeeDependent.new(:family_id => params.require(:family_id))
+    respond_to do |format|
+      format.html
+      format.js
+    end
+  end
+
+  def create
+    @person = current_user.person
+    @dependent = Forms::EmployeeDependent.new(params.require(:dependent))
+
+    if @dependent.save
+      respond_to do |format|
+        format.html { render 'show' }
+        format.js { render 'show' }
+      end
+    else
+      respond_to do |format|
+        format.html { render 'new' }
+        format.js { render 'new' }
+      end
+    end
   end
 end

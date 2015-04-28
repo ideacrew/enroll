@@ -376,9 +376,10 @@ $(document).ready(function () {
     $('.add-member-buttons').removeClass('hidden');
   });
 
+  /*
   $(document).on('click', '.close-1', function() {
     $('#cancel_member').click();
-  });
+  });*/
   
   $(document).on('click', '#cancel_member', function() {
     $("#dependent_buttons").removeClass('hidden');
