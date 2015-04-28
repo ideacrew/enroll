@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   end
 
   namespace :consumer do
+    resources :employee_dependents, :only => [:index]
     resources :employee, :controller=>"employee_roles" do
 
       collection do

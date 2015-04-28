@@ -79,6 +79,8 @@ class User
 
   after_create :send_welcome_email
 
+  delegate :primary_family, to: :person, allow_nil: true
+
   def send_welcome_email
     UserMailer.welcome(self).deliver_now
     true
