@@ -1,4 +1,3 @@
-<% plan_year = @employer_profile.plan_years.present? ? @employer_profile.plan_years.last : @plan_year %>
-<%= form_for plan_year, url: employers_employer_profile_plan_years_path do |f| %>
+<%= form_for @plan_year, url: employers_employer_profile_plan_years_path do |f| %>
   <%= render 'form', f: f %>
 <% end %>

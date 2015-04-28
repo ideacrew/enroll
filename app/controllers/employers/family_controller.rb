@@ -53,30 +53,49 @@ class Employers::FamilyController < ApplicationController
     last_day_of_work = termination_date
     if termination_date.present?
       @family.terminate(last_day_of_work)
-      @family.save!
+      @fa = @family.save!
     end
-    flash[:notice] = "Successfully terminated family."
     respond_to do |format|
-      format.js { render text: "Success" }
-      format.all { redirect_to employers_employer_profile_path(@employer_profile) }
+      format.js { 
+        if termination_date.present? and @fa
+          render text: true
+        else
+          render text: false
+        end
+      }
+      format.all {
+        flash[:notice] = "Successfully terminated family."
+        redirect_to employers_employer_profile_path(@employer_profile)
+      }
     end
   end
 
   def rehire
-    new_family = @family.replicate_for_rehire
-    if new_family.present? # not an active family, then it is ready for rehire.#
-      # new_family.census_employee.hired_on = params[:employer_census_employee_family][:census_employee_attributes][:terminated_on]
-      new_family.census_employee.hired_on = 1.day.ago.to_date
-      @employer_profile.employee_families << new_family
-      if @employer_profile.save
-        flash[:notice] = "Successfully rehired family."
-      else
-        flash[:error] = "Error during rehire."
-      end
-    else # active family, dont replicate for rehire, just return error
-      flash[:error] = "Family is already active."
+    rehiring_date = params["rehiring_date"]
+    if rehiring_date.present?
+      rehiring_date = DateTime.strptime(rehiring_date, '%m/%d/%Y').try(:to_date)
+    else
+      rehiring_date = ""
     end
-    redirect_to employers_employer_profile_path(@employer_profile)
+    @rehiring_date = rehiring_date
+    if @rehiring_date.present?
+      new_family = @family.replicate_for_rehire
+      if new_family.present? # not an active family, then it is ready for rehire.#
+        # new_family.census_employee.hired_on = params[:employer_census_employee_family][:census_employee_attributes][:terminated_on]
+        new_family.census_employee.hired_on = 1.day.ago.to_date
+        @employer_profile.employee_families << new_family
+        if @employer_profile.save
+          flash[:notice] = "Successfully rehired family."
+        else
+          flash[:error] = "Error during rehire."
+        end
+      else # active family, dont replicate for rehire, just return error
+        flash[:error] = "Family is already active."
+      end
+    else
+      flash[:error] = "Please enter rehiring date"
+    end
+    #redirect_to employers_employer_profile_path(@employer_profile)
   end
 
   def show

@@ -177,10 +177,7 @@ class Plan
   class << self
     # Grouping plans by carrier name
     def group_by_carrier_name
-      grouped_plans = by_active_year.group_by { |pl| pl.carrier_profile.organization.legal_name }
-      grouped_plans.keys.sort.reduce([]) do |result, carrier_name|
-        grouped_plans[carrier_name].each { |gp| result << gp }
-      end
+      by_active_year.group_by { |pl| pl.carrier_profile.organization.legal_name }
     end
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
