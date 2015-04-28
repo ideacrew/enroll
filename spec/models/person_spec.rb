@@ -367,3 +367,15 @@ describe Person, '#families' do
   it 'returns families where the person is present' do
   end
 end
+
+describe Person, "with no relationship to a dependent" do
+  describe "after ensure_relationship_with" do
+    it "should have the new relationship"
+  end
+end
+
+describe Person, "with an existing relationship to a dependent" do
+  describe "after ensure_relationship_with a different type of relationship" do
+    it "should correct the existing relationship"
+  end
+end

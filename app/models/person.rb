@@ -212,6 +212,10 @@ end
     Person.where(:ssn => personish.ssn, :dob => personish.dob).first
   end
 
+  def ensure_relationship_with(person, relationship)
+
+  end
+
 private
   def update_full_name
     full_name

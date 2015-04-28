@@ -483,7 +483,7 @@ end
 describe Family, "with a primary applicant" do
   describe "given a new person and relationship to make to the primary applicant" do
     let(:primary_person_id) { double }
-    let(:primary_applicant) { double(:person_relationships => [], :id => primary_person_id) }
+    let(:primary_applicant) { instance_double(Person, :person_relationships => [], :id => primary_person_id) }
     let(:relationship) { double }
     let(:employee_role) { double(:person => primary_applicant) }
     let(:dependent_id) { double }
