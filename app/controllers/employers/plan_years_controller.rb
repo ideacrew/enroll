@@ -6,7 +6,9 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def create
-    @employer_profile.plan_years.build(plan_year_params)
+    @plan_year = PlanYear.new
+    @plan_year.attributes = plan_year_params
+    @employer_profile.plan_years << @plan_year
     if @employer_profile.save
       flash[:notice] = "Plan Year successfully created."
       redirect_to employers_employer_profile_path(@employer_profile)
