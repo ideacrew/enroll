@@ -29,4 +29,16 @@ class Consumer::EmployeeDependentsController < ApplicationController
       end
     end
   end
+
+  def destroy
+    @family = current_user.primary_family
+    @person = current_user.person
+    @dependent = Forms::EmployeeDependent.find(params.require(:id))
+    @dependent.destroy!
+
+    respond_to do |format|
+      format.html { render 'index' }
+      format.js { render 'destroyed' }
+    end
+  end
 end

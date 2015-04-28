@@ -20,7 +20,7 @@ Rails.application.routes.draw do
   end
 
   namespace :consumer do
-    resources :employee_dependents, :only => [:index, :new]
+    resources :employee_dependents, :only => [:index, :new, :create, :destroy]
     resources :employee, :controller=>"employee_roles" do
 
       collection do

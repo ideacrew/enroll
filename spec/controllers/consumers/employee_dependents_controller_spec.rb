@@ -2,10 +2,11 @@ require 'rails_helper'
 require 'factories/enrollment_factory'
 
 RSpec.describe Consumer::EmployeeDependentsController do
+  let(:user) { instance_double("User", :primary_family => family, :person => person) }
+  let(:family) { double }
+  let(:person) { double }
+
   describe "GET index" do
-    let(:user) { instance_double("User", :primary_family => family, :person => person) }
-    let(:family) { double }
-    let(:person) { double }
 
     before(:each) do
       sign_in(user)
@@ -27,9 +28,6 @@ RSpec.describe Consumer::EmployeeDependentsController do
   end
 
   describe "GET new" do
-    let(:user) { instance_double("User", :person => person) }
-    let(:family) { double }
-    let(:person) { double }
     let(:family_id) { "addbedddedtotallyafamiyid" }
     let(:dependent) { double }
 
@@ -50,12 +48,10 @@ RSpec.describe Consumer::EmployeeDependentsController do
   end
 
   describe "POST create" do
-    let(:user) { instance_double("User", :person => person) }
-    let(:person) { double }
     let(:dependent_properties) { { :family_id => "saldjfalkdjf"} }
     let(:dependent) { double }
     let(:save_result) { false }
-    
+
     before :each do
       sign_in(user)
       allow(Forms::EmployeeDependent).to receive(:new).with(dependent_properties).and_return(dependent)
@@ -85,6 +81,29 @@ RSpec.describe Consumer::EmployeeDependentsController do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")
       end
+    end
+
+  end
+
+  describe "DELETE destroy" do
+    let(:dependent) { double }
+    let(:dependent_id) { "234dlfjadsklfj" }
+
+    before :each do
+      sign_in(user)
+      allow(Forms::EmployeeDependent).to receive(:find).with(dependent_id).and_return(dependent)
+    end
+
+    it "should destroy the dependent" do
+      expect(dependent).to receive(:destroy!)
+      delete :destroy, :id => dependent_id
+    end
+
+    it "should render the index template" do
+      allow(dependent).to receive(:destroy!)
+      delete :destroy, :id => dependent_id
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("index")
     end
 
   end
