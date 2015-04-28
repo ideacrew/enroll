@@ -127,4 +127,33 @@ RSpec.describe Consumer::EmployeeDependentsController do
     end
   end
 
+  describe "PUT update" do
+    let(:dependent) { double }
+    let(:dependent_id) { "234dlfjadsklfj" }
+    let(:dependent_properties) { { "first_name" => "lkjdfkajdf" } }
+    let(:update_result) { false }
+
+    before(:each) do
+      sign_in(user)
+      allow(Forms::EmployeeDependent).to receive(:find).with(dependent_id).and_return(dependent)
+      allow(dependent).to receive(:update_attributes).with(dependent_properties).and_return(update_result)
+      put :update, :id => dependent_id, :dependent => dependent_properties
+    end
+
+    describe "with an invalid dependent" do
+      it "should render the edit template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("edit")
+      end
+    end
+
+    describe "with a valid dependent" do
+      let(:update_result) { true }
+      it "should render the show template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("show")
+      end
+    end
+    
+  end
 end

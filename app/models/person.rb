@@ -213,7 +213,17 @@ end
   end
 
   def ensure_relationship_with(person, relationship)
-
+    existing_relationship = self.person_relationships.detect do |rel|
+      rel.relative_id.to_s == person.id.to_s
+    end
+    if existing_relationship
+      existing_relationship.update_attributes(:kind => relationship)
+    else
+      self.person_relationships << PersonRelationship.new({
+        :kind => relationship,
+        :relative_id => person.id
+      })
+    end
   end
 
 private

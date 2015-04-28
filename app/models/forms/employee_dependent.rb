@@ -67,6 +67,7 @@ module Forms
 
     def destroy!
       family.remove_family_member(family_member.person)
+      family.save!
     end
 
     def family
@@ -76,12 +77,13 @@ module Forms
     def self.find(family_member_id)
       found_family_member = FamilyMember.find(family_member_id)
       self.new({
+        :relationship => found_family_member.primary_relationship,
         :id => family_member_id,
         :family => found_family_member.family,
         :family_id => found_family_member.family_id,
         :first_name => found_family_member.first_name,
-        :last_name => found_family_member.first_name,
-        :middle_name => found_family_member.first_name,
+        :last_name => found_family_member.last_name,
+        :middle_name => found_family_member.middle_name,
         :name_pfx => found_family_member.name_pfx,
         :name_sfx => found_family_member.name_sfx,
         :date_of_birth => found_family_member.date_of_birth,

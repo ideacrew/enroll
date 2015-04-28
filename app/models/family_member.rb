@@ -90,7 +90,7 @@ class FamilyMember
 
   def reactivate!(relationship)
     family.primary_applicant_person.ensure_relationship_with(person, relationship)
-    self.add_family_member(person)
+    family.add_family_member(person)
   end
 
   def update_relationship(relationship)
