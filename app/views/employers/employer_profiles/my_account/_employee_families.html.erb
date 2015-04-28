@@ -47,7 +47,7 @@
               <td><%= boolean_to_human family.is_linked? %></td>
               <td>
                 <% if family.is_terminated? %>
-                  <%= link_to (employers_employer_profile_family_rehire_path(@employer_profile.id, family.id)), class: "btn btn-green-2" do %>
+                  <%= link_to ('javascript:;'), class: "show_confirm btn btn-green-2", id: "show_confirm_#{family.id}" do %>
                     <span class="hidden-xs hidden-sm visible-md visible-lg">Rehire</span>
                     <span class="glyphicon glyphicon-pencil hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
                   <% end %>
@@ -69,7 +69,17 @@
                 <% end %>
               </td>
             </tr>
-            <% if !family.is_terminated? %>
+            <% if family.is_terminated? %>
+              <tr class="unbrd  rehire_<%= family.id %>">
+                <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= family.id %>">
+                  <div class="confirm-terminate">
+                      <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker"><br/>
+                      <a href="javascript:;" data-link="<%= employers_employer_profile_family_rehire_path(@employer_profile.id, family.id) %>" class="rehire_confirm" id="rehire_<%= family.id %>"><strong>Submit</strong></a>
+                  </div>
+                  <b><%=image_tag "enter_date_rehire.png", alt: "Enter date to rehire.", width: "300", height: "" %></b>
+                </td>
+              </tr>
+            <% else %>
               <tr class="unbrd  remove_<%= family.id %>">
                 <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= family.id %>">
                   <div class="confirm-terminate">
@@ -87,8 +97,3 @@
   </div>    
   <div class="cleafix"></div>
 </div>
-
-
-<script>  
-  
-</script>

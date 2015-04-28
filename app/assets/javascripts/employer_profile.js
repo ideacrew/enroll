@@ -54,6 +54,18 @@ $(function() {
         }
       });
     });
+    
+    $('.rehire_confirm').click(function(){
+      var element_id = $(this).attr('id');
+      var rehiring_date = $(this).siblings().val();
+      var link_to_delete = $(this).data('link');
+      $.ajax({
+        type: 'get',
+        datatype : 'js',
+        url: link_to_delete,
+        data: {rehiring_date: rehiring_date}
+      });
+    });
   });
   
 })
