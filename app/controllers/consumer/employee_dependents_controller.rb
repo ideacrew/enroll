@@ -41,4 +41,15 @@ class Consumer::EmployeeDependentsController < ApplicationController
       format.js { render 'destroyed' }
     end
   end
+
+  def edit
+    @family = current_user.primary_family
+    @person = current_user.person
+    @dependent = Forms::EmployeeDependent.find(params.require(:id))
+
+    respond_to do |format|
+      format.html
+      format.js
+    end
+  end
 end

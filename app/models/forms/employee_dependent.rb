@@ -65,6 +65,10 @@ module Forms
       !id.blank?
     end
 
+    def destroy!
+      family.remove_family_member(family_member.person)
+    end
+
     def family
       @family ||= Family.find(family_id)
     end

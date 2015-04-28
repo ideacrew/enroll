@@ -23,7 +23,7 @@
 			    <% if !dependent.persisted? %>
 				    <a href="#" class="close close-1 remove-new-employee-dependent" data-target="#new_employee_dependent_form"><%= image_tag "member-close.png" %></a>
                       <% else %>
-                        <%= link_to (image_tag "member-close.png"), remove_url, class: 'close close-2', :method => :delete, :remote => true, data: {confirm: "Remove #{dependent.full_name}?", ok: 'yes', cancel: 'no'} %>
+                        <%= link_to (image_tag "member-close.png"), consumer_employee_dependent_path(dependent), class: 'close close-2', :method => :delete, :remote => true, data: {confirm: "Remove dependent?", ok: 'yes', cancel: 'no'} %>
                       <% end %>
                     </div>
                 </div>
