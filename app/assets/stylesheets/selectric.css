@@ -189,3 +189,7 @@
 .selectric-items .selectric-group li {
   padding-left: 25px;
 }
+
+.carrier-select .selectric-wrapper {
+  display: none;
+}
