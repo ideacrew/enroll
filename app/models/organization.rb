@@ -24,6 +24,8 @@ class Organization
   # User or Person ID who created/updated
   field :updated_by, type: BSON::ObjectId
 
+  default_scope -> {order("legal_name ASC")}
+
   embeds_many :office_locations, cascade_callbacks: true, validate: true
 
   embeds_one :employer_profile, cascade_callbacks: true, validate: true
