@@ -21,8 +21,9 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
 
     before(:each) do
       sign_in
-      allow(Forms::EmployeeRole).to receive(:find).with(person_id).and_return(role_form)
+      allow(Person).to receive(:find).with(person_id).and_return(person)
       allow(person).to receive(:employee_roles).and_return([employee_role])
+      allow(Forms::EmployeeRole).to receive(:new).with(person, employee_role).and_return(role_form)
       allow(benefit_group).to receive(:effective_on_for).with("whatever").and_return(effective_date)
       allow(role_form).to receive(:update_attributes).with(person_parameters).and_return(save_result)
       put :update, :person => person_parameters, :id => person_id
@@ -40,7 +41,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     describe "given invalid person parameters" do
       let(:save_result) { false }
 
-      it "should render match" do
+      it "should render edit" do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
         expect(assigns(:person)).to eq role_form
