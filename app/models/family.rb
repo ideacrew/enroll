@@ -254,6 +254,7 @@ private
     single_primary_family_member
     all_family_member_relations_defined
     single_active_household
+    no_duplicate_family_members
   end
 
   def primary_applicant_person
@@ -268,8 +269,12 @@ private
   end
 
   def all_family_member_relations_defined
-    undefined_relations = family_members.reduce([]) { |list, family_member| list << family_member if family_member.primary_relationship.blank?; list }
-    errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations.size > 1
+    return unless primary_family_member.present? && primary_family_member.person.present?
+    primary_member_id = primary_family_member.id
+    primary_person = primary_family_member.person
+    other_family_members = family_members.select { |fm| (fm.id.to_s != primary_member_id.to_s) && !fm.person_id.blank? }
+    undefined_relations = other_family_members.any? { |fm| primary_person.find_relationship_with(fm.person).blank? } 
+    errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations
   end
 
   def single_active_household
@@ -288,7 +293,7 @@ private
 
   def no_duplicate_family_members
     family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
-      errors.add(:base, "Duplicate family_members for person: #{k}\n" +
+      errors.add(:family_members, "Duplicate family_members for person: #{k}\n" +
                           "family_members: #{v.inspect}")
     end
   end

@@ -94,6 +94,7 @@ describe Family, type: :model, dbclean: :after_each do
 
             before do
               family.family_members << non_family_member
+              family.valid?
             end
 
             it "should not be valid" do
@@ -108,6 +109,7 @@ describe Family, type: :model, dbclean: :after_each do
           context "and one of the same family members is added again" do
             before do
               family.family_members << family_member_spouse.dup
+              family.valid?
             end
 
             it "should not be valid" do
