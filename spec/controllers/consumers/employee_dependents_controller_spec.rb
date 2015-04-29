@@ -156,4 +156,16 @@ RSpec.describe Consumer::EmployeeDependentsController do
     end
     
   end
+
+  describe "GET group_selection" do 
+    before(:each) do
+      sign_in(user)
+      get :group_selection
+    end
+    
+    it "should render the group_selection template" do
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("group_selection")
+    end
+  end
 end

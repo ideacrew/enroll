@@ -20,7 +20,12 @@ Rails.application.routes.draw do
   end
 
   namespace :consumer do
-    resources :employee_dependents
+    resources :employee_dependents do
+      collection do
+        get :group_selection
+      end
+    end
+
     resources :employee, :controller=>"employee_roles" do
 
       collection do
