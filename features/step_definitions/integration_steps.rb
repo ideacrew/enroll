@@ -6,7 +6,7 @@ Before "@watir" do
 end
 
 After "@watir" do
- @browser.close
+ # @browser.close
 end
 
 Given(/^I do not exist as a user$/) do
@@ -81,6 +81,16 @@ Then(/^I should see the dependents page$/) do
 end
 
 When(/^I click continue on the dependents page$/) do
+  @browser.a(:text => "Continue", :href => /consumer\/employee_dependents\/group_selection/).click
+  sleep(5)
+end
+
+Then(/^I should see the group selection page$/) do
+  Watir::Wait.until(30) { @browser.a(:text => "Continue", :href => /people\/select_plan/).present? }
+  sleep(1)
+end
+
+When(/^I click continue on the group selection page$/) do
   @browser.a(:text => "Continue", :href => /people\/select_plan/).click
   sleep(5)
 end

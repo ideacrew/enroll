@@ -18,4 +18,6 @@ Feature: Employee Sign Up
     When I complete the matched employee form
     Then I should see the dependents page
     When I click continue on the dependents page
+    Then I should see the group selection page
+    When I click continue on the group selection page
     Then I should see the plan shopping page

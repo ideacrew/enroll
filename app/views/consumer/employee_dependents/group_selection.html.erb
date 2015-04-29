@@ -1,0 +1,3 @@
+<%= link_to 'Continue', select_plan_people_path(person_id: params[:person_id], organization_id: params[:organization_id]), class: 'btn btn-green pull-left' %>
+&nbsp;&nbsp;
+<%= link_to 'My Account', person_my_account_path(current_user.person), class: 'btn btn-green' %>
