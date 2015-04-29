@@ -11,6 +11,9 @@ class Employers::EmployerProfilesController < ApplicationController
   def welcome
   end
 
+  def search
+  end
+
   def my_account
   end
 
