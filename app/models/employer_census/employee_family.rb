@@ -89,7 +89,7 @@ class EmployerCensus::EmployeeFamily
   end
 
   def link_employee_role(employee_role, linked_at = Time.now)
-    raise EmployeeFamilyLinkError, "already linked to an employee role" if is_linked?
+    #raise EmployeeFamilyLinkError, "already linked to an employee role" if is_linked?
     raise EmployeeFamilyLinkError, "invalid to link a terminated employee" if is_terminated?
 
     self.employee_role_id = employee_role._id

@@ -77,9 +77,9 @@
 		<% if !dependent.persisted? %>
 			<a href="#" class="btn btn-red remove-new-employee-dependent" data-target="#new_employee_dependent_form">Cancel</a>
 		<% else %>
-			<%= link_to "Cancel", consumer_employee_dependent_path(dependent), class: 'btn btn-red', :remote => true %>
+			<%= link_to "Cancel", consumer_employee_dependent_path(dependent), class: 'btn btn-danger', :remote => true %>
 		<% end %>
-		<%= f.submit 'Confirm Member', class: "btn btn-save pull-right"  %>
+		<%= f.submit 'Confirm Member', class: "btn btn-primary pull-right"  %>
 	</div>
 <% end %>
   </div>
