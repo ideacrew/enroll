@@ -1,10 +1,12 @@
 <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd carrier-select">
-  <% carriers = Organization.all.map{|o|o.carrier_profile}.compact%>
+  <% carriers = Organization.all.map{|o|o.carrier_profile}.compact %>
   <div class="btn-group" data-toggle="buttons">
     <% carriers.each do |carrier|%>
-      <label class="btn btn-primary carrier" data-carrier="selectric-carrier-<%= carrier.id %>">
-        <input type="radio" name="carrier" id="<%= carrier._id %>" autocomplete="off"> <%= carrier.legal_name %></input>
-    </label>
+      <% if carrier.plans.present? %>
+        <label class="btn btn-primary carrier" data-carrier="selectric-carrier-<%= carrier.id %>">
+          <input type="radio" name="carrier" id="<%= carrier._id %>" autocomplete="off"> <%= carrier.legal_name %></input>
+        </label>
+      <% end %>
     <% end %>
   </div>
   <% carriers.each do |carrier| %>

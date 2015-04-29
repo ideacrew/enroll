@@ -39,6 +39,8 @@ class Plan
   field :nationwide, type: Boolean # Nationwide
   field :out_of_service_area_coverage, type: Boolean # DC In-Network or not
 
+  default_scope -> {order("name ASC")}
+
   index({ hbx_id: 1 })
   index({ coverage_kind: 1 })
   index({ metal_level: 1 })

@@ -52,6 +52,10 @@ Rails.application.routes.draw do
     resources :employer_profiles do
       get 'new'
       get 'my_account'
+      collection do
+        get 'welcome'
+        get 'search'
+      end
       resources :plan_years
       resources :family do
         get 'delink'

@@ -191,7 +191,6 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
     end
 
     context "and another employer profile exists with the same employee and dependents in the census" do
-      #      let(:second_employee_family) do
       before do
         @user = FactoryGirl.create(:user)
         employee_family = FactoryGirl.create(:employer_census_family_with_dependents)
@@ -210,6 +209,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
           hired_on: census_employee.hired_on
         }
         valid_params = { employer_profile: employer_profile }.merge(valid_person_params).merge(valid_employee_params)
+        @first_employee_role, @first_family = EnrollmentFactory.add_employee_role(**params)
         dependents = employee_family.census_dependents.collect(&:dup)
         employee = census_employee.dup
         second_employee_family = FactoryGirl.create(:employer_census_family, census_employee: employee, census_dependents: dependents)
@@ -237,8 +237,8 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
         expect(@second_employee_role.valid?).to be
       end
 
-      it "second employee role should be valid" do
-        expect(@second_family.valid?).to be
+      it "second family should be the first family" do
+        expect(@second_family).to eq @first_family
       end
     end
   end

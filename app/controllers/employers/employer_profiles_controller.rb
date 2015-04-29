@@ -8,6 +8,12 @@ class Employers::EmployerProfilesController < ApplicationController
     @employer_profiles = @organizations.map {|o| o.employer_profile}
   end
 
+  def welcome
+  end
+
+  def search
+  end
+
   def my_account
   end
 
