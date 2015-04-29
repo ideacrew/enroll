@@ -96,5 +96,25 @@ When(/^I click continue on the group selection page$/) do
 end
 
 Then(/^I should see the plan shopping page$/) do
-    pending
+  expect(@browser.p(:text => /Select a Plan/).visible?).to be_truthy
+end
+
+When(/^I select a plan on the plan shopping page$/) do
+    @browser.a(:text => "Continue").click
+    sleep(2)
+    @browser.a(:text => "Select").click
+    sleep(5)
+end
+
+Then(/^I should see the coverage summary page$/) do
+   expect(@browser.p(:text => /Your monthly total family premium/).visible?).to be_truthy
+end
+
+When(/^I confirm on the coverage summary page$/) do
+   @browser.a(:text => "Continue").click
+   sleep(5)
+end
+
+Then(/^I should see the "my account" page$/) do
+  expect(@browser.span(:text => "Household").visible?).to be_truthy
 end
