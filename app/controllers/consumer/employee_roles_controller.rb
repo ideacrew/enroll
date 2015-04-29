@@ -1,5 +1,3 @@
-require 'factories/enrollment_factory'
-
 class Consumer::EmployeeRolesController < ApplicationController
   before_action :check_employee_role, only: [:new, :welcome]
 
@@ -42,7 +40,7 @@ class Consumer::EmployeeRolesController < ApplicationController
 
   def create
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
-    @employee_role, @family = EnrollmentFactory.construct_employee_role(current_user, @employment_relationship.employee_family, @employment_relationship)
+    @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(current_user, @employment_relationship.employee_family, @employment_relationship)
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     @benefit_group = @employee_role.benefit_group
     @census_family = @employee_role.census_family

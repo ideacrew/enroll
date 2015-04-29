@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'factories/enrollment_factory'
 
 RSpec.describe Consumer::EmployeeDependentsController do
   let(:user) { instance_double("User", :primary_family => family, :person => person) }
@@ -154,15 +153,15 @@ RSpec.describe Consumer::EmployeeDependentsController do
         expect(response).to render_template("show")
       end
     end
-    
+
   end
 
-  describe "GET group_selection" do 
+  describe "GET group_selection" do
     before(:each) do
       sign_in(user)
       get :group_selection
     end
-    
+
     it "should render the group_selection template" do
       expect(response).to have_http_status(:success)
       expect(response).to render_template("group_selection")
