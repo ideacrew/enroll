@@ -91,6 +91,8 @@ Rails.application.routes.draw do
 
   end
 
+  get 'hbx_admin', to: 'hbx#welcome'
+
   devise_for :users
 
   resources :families do
