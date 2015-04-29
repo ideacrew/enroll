@@ -100,7 +100,6 @@ class EnrollmentFactory
         name_pfx: nil, first_name:, middle_name: nil, last_name:, name_sfx: nil,
         ssn:, dob:, gender:, hired_on:
     )
-
     person, person_new = initialize_person(user, name_pfx, first_name, middle_name,
                                            last_name, name_sfx, ssn, dob, gender)
 
@@ -200,33 +199,44 @@ class EnrollmentFactory
     applicant = family.primary_applicant
     applicant = initialize_primary_applicant(family, person) if applicant.blank?
     dependents.each do |dependent|
-      initialize_dependent(family, dependent)
+      initialize_dependent(family, person, dependent)
     end
     return family, applicant
   end
 
   def self.initialize_primary_applicant(family, person)
-    family.family_members.build(
-      person_id: person.id,
-      is_primary_applicant: true,
-      is_coverage_applicant: true)
+    person.ensure_relationship_with(person, "self")
+    person.save
+    family.add_family_member(person, is_primary_applicant: true)
   end
 
-  def self.initialize_dependent(family, dependent)
+  def self.initialize_dependent(family, primary, dependent)
     person, new_person = initialize_person(nil, nil, dependent.first_name,
                                dependent.middle_name, dependent.last_name,
                                dependent.name_sfx, dependent.ssn,
                                dependent.dob, dependent.gender)
+    relationship = person_relationship_for(dependent.employee_relationship)
+    primary.ensure_relationship_with(person, relationship)
     members = family.family_members.where(person_id: person.id)
     case members.count
     when 0
-      family.family_members.build(person_id: person.id,
-                                  is_primary_applicant: false,
-                                  is_coverage_applicant: true)
+      family.add_family_member(person)
     when 1
-      members.first
+      family.remove_family_member(person)
+      family.add_family_member(person)
     else
       # what am I doing here?  The same person was in the family twice?
+    end
+  end
+
+  def self.person_relationship_for(census_relationship)
+    case census_relationship
+    when "spouse"
+      "spouse"
+    when "domestic_parter"
+      "life_partner"
+    when "child_under_26", "child_26_and_over", "disabled_child_26_and_over"
+      "child"
     end
   end
 
