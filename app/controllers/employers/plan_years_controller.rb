@@ -6,10 +6,8 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def create
-    @plan_year = PlanYear.new
-    @plan_year.attributes = plan_year_params
-    @employer_profile.plan_years << @plan_year
-    if @employer_profile.save
+    @plan_year = @employer_profile.plan_years.new(plan_year_params)
+    if @plan_year.save
       flash[:notice] = "Plan Year successfully created."
       redirect_to employers_employer_profile_path(@employer_profile)
     else
@@ -20,7 +18,8 @@ class Employers::PlanYearsController < ApplicationController
   private
 
   def find_employer
-    id = params[:id] || params[:employer_profile_id]
+    id_params = params.permit(:id, :employer_profile_id)
+    id = id_params[:id] || id_params[:employer_profile_id]
     @employer_profile = EmployerProfile.find(id)
   end
 
@@ -37,11 +36,11 @@ class Employers::PlanYearsController < ApplicationController
       :start_on, :end_on, :fte_count, :pte_count, :msp_count,
       :open_enrollment_start_on, :open_enrollment_end_on,
       :benefit_groups_attributes => [ :title, :reference_plan_id, :effective_on_offset,
-        :premium_pct_as_int, :employer_max_amt_in_cents, :_destroy,
-        :relationship_benefits_attributes => [
-          :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
-        ]
-      ]
+                                      :premium_pct_as_int, :employer_max_amt_in_cents, :_destroy,
+                                      :relationship_benefits_attributes => [
+                                        :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
+                                      ]
+    ]
     )
   end
 

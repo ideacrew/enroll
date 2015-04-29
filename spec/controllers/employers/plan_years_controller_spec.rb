@@ -1,44 +1,107 @@
 require 'rails_helper'
 
-RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
-  describe "create" do
-    login_user
-    include_context "BradyWork"
-    let(:employer_profile) { mikes_employer }
-    let(:plan_year) { mikes_plan_year }
-    let(:benefit_group) { mikes_benefit_group }
-    let(:relationship_benefit) { FactoryGirl.build(:relationship_benefit) }
+RSpec.describe Employers::PlanYearsController do
+  let(:employer_profile_id) { "abecreded" }
+  let(:plan_year_proxy) { double }
+  let(:employer_profile) { double(:plan_years => plan_year_proxy) }
 
-    context "create" do
-      before do
-        relationship_benefit_params = relationship_benefit.attributes.to_hash
-        benefit_group_params = benefit_group.attributes.to_hash
-        benefit_group_params[:relationship_benefits_attributes] = {"0" => relationship_benefit_params}
-        @plan_year_params = plan_year.attributes.to_hash
-        @plan_year_params[:benefit_groups_attributes] = {"0" => benefit_group_params}
-        @plan_year_params.deep_merge!({ start_on: "01/01/2015",
-                                        end_on: "12/31/2015",
-                                        open_enrollment_start_on: "11/01/2014",
-                                        open_enrollment_end_on: "11/30/2014"
-                                      })
+  describe "GET new" do
+
+    before :each do
+      sign_in
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      get :new, :employer_profile_id => employer_profile_id
+    end
+
+    it "should be a success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should render the new template" do
+      expect(response).to render_template("new")
+    end
+
+  end
+
+  describe "POST create" do
+    let(:save_result) { false }
+    let(:plan_year) { double }
+    let(:relationship_benefits_attributes) {
+      { "0" => {
+         :relationship => "spouse",
+         :premium_pct => "0.66",
+         :employer_max_amt => "123.45",
+         :offered => "false"
+      } }
+    }
+    let(:benefit_groups_attributes) {
+      { "0" => {
+         :title => "My benefit group",
+         :reference_plan_id => "rp_id", 
+         :effective_on_offset => "e_on_offset",                      
+        :premium_pct_as_int => "66",
+        :employer_max_amt_in_cents => "2232",
+        :relationship_benefits_attributes => relationship_benefits_attributes
+      } }
+    }
+
+    let(:plan_year_params) {
+      {
+           :start_on => "2015-01-01",
+           :end_on => "2015-12-31",
+           :fte_count => "1",
+           :pte_count => "3",
+           :msp_count => "5",       
+           :open_enrollment_start_on => "2014-12-01",
+           :open_enrollment_end_on => "2014-12-15",
+           :benefit_groups_attributes => benefit_groups_attributes
+      }
+    }
+
+    let(:plan_year_request_params) {
+      {
+           :start_on => "01/01/2015",
+           :end_on => "12/31/2015",
+           :fte_count => 1,
+           :pte_count => 3,
+           :msp_count => 5,       
+           :open_enrollment_start_on => "12/01/2014",
+           :open_enrollment_end_on => "12/15/2014",
+           :benefit_groups_attributes => benefit_groups_attributes
+      }
+    }
+
+    before :each do
+      sign_in
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(plan_year_proxy).to receive(:new).with(plan_year_params).and_return(plan_year)
+      allow(plan_year).to receive(:save).and_return(save_result)
+      post :create, :employer_profile_id => employer_profile_id, :plan_year => plan_year_request_params
+    end
+
+    describe "with an invalid plan year" do
+      it "should be a success" do
+        expect(response).to have_http_status(:success)
       end
 
-      it "should create a new plan year with valid params" do
-        post :create, plan_year: @plan_year_params, employer_profile_id: employer_profile.id
-        expect(employer_profile.plan_years.size).to eq (1)
-      end
-
-      it "should not create a new plan year with invalid params" do
-        @plan_year_params[:benefit_groups_attributes]["0"]["premium_pct_as_int"] = 30
-        post :create, plan_year: @plan_year_params, employer_profile_id: employer_profile.id
+      it "should render the new template" do
         expect(response).to render_template("new")
+      end
+
+      it "should assign the new plan year" do
+        expect(assigns(:plan_year)).to eq plan_year
       end
     end
 
-    context "new" do
-      it "should initialize new plan year object" do
-        get :new, employer_profile_id: employer_profile.id
-        expect(response).to render_template("new")
+    describe "with a valid plan year" do
+      let(:save_result) { true }
+
+      it "should assign the new plan year" do
+        expect(assigns(:plan_year)).to eq plan_year
+      end
+
+      it "should be a redirect" do
+        expect(response).to have_http_status(:redirect)
       end
     end
 
