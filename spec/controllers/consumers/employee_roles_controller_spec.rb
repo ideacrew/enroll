@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'factories/enrollment_factory'
 
 RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
   describe "PUT update" do
@@ -72,7 +71,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
 
     before :each do
       allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
-      allow(EnrollmentFactory).to receive(:construct_employee_role).with(user, census_family, employment_relationship).and_return([employee_role, family])
+      allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_family, employment_relationship).and_return([employee_role, family])
       allow(benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
       sign_in(user)
       post :create, :employment_relationship => employment_relationship_properties

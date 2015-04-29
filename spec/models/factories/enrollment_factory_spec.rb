@@ -1,7 +1,6 @@
 require 'rails_helper'
-require 'factories/enrollment_factory'
 
-describe EnrollmentFactory, "starting with unlinked employee_family and employee_role" do
+describe Factories::EnrollmentFactory, "starting with unlinked employee_family and employee_role" do
   let(:benefit_group_id) { "2468" }
   let(:hired_on) { Date.new(2015,1,15) }
   let(:terminated_on) { Date.new(2015,3,25) }
@@ -27,7 +26,7 @@ describe EnrollmentFactory, "starting with unlinked employee_family and employee
 
     before(:each) do
       @linked_at = Time.now
-      EnrollmentFactory.link_employee_family(census_family, employee_role, @linked_at)
+      Factories::EnrollmentFactory.link_employee_family(census_family, employee_role, @linked_at)
     end
 
     it "should set employee role id on the census_family" do
@@ -60,7 +59,7 @@ describe EnrollmentFactory, "starting with unlinked employee_family and employee
   end
 end
 
-RSpec.describe EnrollmentFactory, :dbclean => :after_each do
+RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
   let(:employer_profile_without_family) {FactoryGirl.create(:employer_profile)}
   let(:employee_family) {FactoryGirl.create(:employer_census_family)}
   let(:employer_profile) {employee_family.employer_profile}
@@ -130,7 +129,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
           valid_person_params
         ).merge(valid_employee_params)
         params = valid_params
-        @employee_role, @family = EnrollmentFactory.add_employee_role(**params)
+        @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
         @primary_applicant = @family.primary_applicant
       end
 
@@ -174,7 +173,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
         @person = FactoryGirl.create(:person,
                                      valid_person_params.except(:user).merge(dob: census_employee.dob,
                                                                              ssn: census_employee.ssn))
-        @employee_role, @family = EnrollmentFactory.add_employee_role(**params)
+        @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
       end
 
       it "should link the user to the person" do
@@ -209,14 +208,14 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
           hired_on: census_employee.hired_on
         }
         valid_params = { employer_profile: employer_profile }.merge(valid_person_params).merge(valid_employee_params)
-        @first_employee_role, @first_family = EnrollmentFactory.add_employee_role(**params)
+        @first_employee_role, @first_family = Factories::EnrollmentFactory.add_employee_role(**params)
         dependents = employee_family.census_dependents.collect(&:dup)
         employee = census_employee.dup
         second_employee_family = FactoryGirl.create(:employer_census_family, census_employee: employee, census_dependents: dependents)
         second_employer_profile = second_employee_family.employer_profile
         second_census_employee = second_employee_family.census_employee
         @second_params = valid_params.merge(employer_profile: second_employer_profile)
-        @second_employee_role, @second_family = EnrollmentFactory.add_employee_role(**@second_params)
+        @second_employee_role, @second_family = Factories::EnrollmentFactory.add_employee_role(**@second_params)
       end
 
       it "should still have a findable person" do
@@ -253,7 +252,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
         let(:params) {valid_params}
 
         it "should not raise" do
-          expect{EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
+          expect{Factories::EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
         end
 
         context "successfully created" do
@@ -261,7 +260,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
           let(:employer_census_families) do
             EmployerProfile.find(employer_profile.id.to_s).employee_families
           end
-          before {@employee_role, @family = EnrollmentFactory.add_employee_role(**params)}
+          before {@employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)}
 
           it "should return the existing employee" do
             expect(@employee_role.id.to_s).to eq employee.id.to_s
@@ -278,7 +277,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
       let(:params) {{}}
 
       it "should raise" do
-        expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
@@ -286,7 +285,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
       let(:params) {valid_params.except(:user)}
 
       it 'should not raise' do
-        expect{EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
+        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
       end
     end
 
@@ -294,7 +293,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
       let(:params) {valid_params.except(:employer_profile)}
 
       it 'should raise' do
-        expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
@@ -302,7 +301,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
       let(:params) {valid_params.except(:first_name)}
 
       it 'should raise' do
-        expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
@@ -310,7 +309,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
       let(:params) {valid_params.except(:last_name)}
 
       it 'should raise' do
-        expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
@@ -318,7 +317,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
       let(:params) {valid_params.except(:ssn)}
 
       it 'should raise' do
-        expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
@@ -326,7 +325,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
       let(:params) {valid_params.except(:gender)}
 
       it 'should raise' do
-        expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
@@ -334,7 +333,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
       let(:params) {valid_params.except(:dob)}
 
       it 'should raise' do
-        expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
@@ -342,7 +341,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
       let(:params) {valid_params.except(:hired_on)}
 
       it 'should raise' do
-        expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
@@ -350,7 +349,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
       let(:params) {valid_params.merge(employer_profile: employer_profile_without_family)}
 
       it "should raise" do
-        expect{EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
@@ -358,7 +357,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
       let(:params) {valid_params}
 
       it "should not raise" do
-        expect{EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
+        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
       end
 
       context "successfully created" do
@@ -367,7 +366,7 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
           EmployerProfile.find(employer_profile.id.to_s).employee_families
         end
         before do
-          @employee_role, @family = EnrollmentFactory.add_employee_role(**params)
+          @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
         end
 
         it "should have a family" do
@@ -407,42 +406,42 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
     context "with no arguments" do
       let(:params) {{}}
       it "should raise" do
-        expect{EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
     context "with no is_incarcerated" do
       let(:params) {valid_params.except(:new_is_incarcerated)}
       it "should raise" do
-        expect{EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
     context "with no is_applicant" do
       let(:params) {valid_params.except(:new_is_applicant)}
       it "should raise" do
-        expect{EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
     context "with no is_state_resident" do
       let(:params) {valid_params.except(:new_is_state_resident)}
       it "should raise" do
-        expect{EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
     context "with no citizen_status" do
       let(:params) {valid_params.except(:new_citizen_status)}
       it "should raise" do
-        expect{EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_consumer_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
     context "with all required data" do
       let(:params) {valid_params}
       it "should not raise" do
-        expect{EnrollmentFactory.add_consumer_role(**params)}.not_to raise_error
+        expect{Factories::EnrollmentFactory.add_consumer_role(**params)}.not_to raise_error
       end
     end
 
@@ -475,35 +474,35 @@ RSpec.describe EnrollmentFactory, :dbclean => :after_each do
     context "with no arguments" do
       let(:params) {{}}
       it "should raise" do
-        expect{EnrollmentFactory.add_broker_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_broker_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
     context "with all required data" do
       let(:params) {valid_params}
       it "should not raise" do
-        expect{EnrollmentFactory.add_broker_role(**params)}.not_to raise_error
+        expect{Factories::EnrollmentFactory.add_broker_role(**params)}.not_to raise_error
       end
     end
 
     context "with no npn" do
       let(:params) {valid_params.except(:new_npn)}
       it "should raise" do
-        expect{EnrollmentFactory.add_broker_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_broker_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
     context "with no kind" do
       let(:params) {valid_params.except(:new_kind)}
       it "should raise" do
-        expect{EnrollmentFactory.add_broker_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_broker_role(**params)}.to raise_error(ArgumentError)
       end
     end
 
     context "with no mailing address" do
       let(:params) {valid_params.except(:new_mailing_address)}
       it "should raise" do
-        expect{EnrollmentFactory.add_broker_role(**params)}.to raise_error(ArgumentError)
+        expect{Factories::EnrollmentFactory.add_broker_role(**params)}.to raise_error(ArgumentError)
       end
     end
 

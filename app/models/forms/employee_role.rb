@@ -1,5 +1,3 @@
-require 'factories/enrollment_factory'
-
 module Forms
   class EmployeeRole < SimpleDelegator
     WRAPPED_ATTRIBUTES = [
