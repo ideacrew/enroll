@@ -230,11 +230,9 @@ a:hover, a:focus {
 #new_person .select-plan, .coverage-options {
     display: none;
 }
-/*
-#new_person #personal_info, #new_person .search-btn-row {
-    display: none;
+.search_continue {
+  margin: 14px 0 0;
 }
-*/
 #new_person #employer-info {
     color: #999;
     display: none;
@@ -804,11 +802,6 @@ ul.social li a span i{
     top: 0px !important;
     margin: 0 -15px;
   }
-  .disable-btn, .disable-btn:hover, .disable-btn:focus{
-    top: -18px !important;
-    right: 0 !important;
-    z-index: 999;
-  }
   span.notice{
     font-size: 23px !important;
     left: 17px !important;
@@ -1352,16 +1345,6 @@ input.floatlabe{
 #email_info .email:first-child > .first, #email_info .email:nth-child(1) > .field_error {border-right: none !important;}
 #email_info .email:nth-child(2) > .first, #email_info .email:nth-child(2) > .field_error {border-left: none !important;}
 
-.disable-btn, .disable-btn:hover, .disable-btn:focus {
-  background: #008c00;
-  margin-left: 10px;
-  margin-top: 30px;
-/*  display: none;*/
-  position: absolute;
-  top: -72px;
-  right: -112px;
-  font-weight: normal;
-}
 .personal-info-top-row .adderess-select-box {
   border-color: #999 !important;
 }
@@ -1388,7 +1371,7 @@ div#house_info > p {
   background: none;
 }
 .first {
-  border: 1px solid #e3e3e3; 
+  border: 2px solid #e3e3e3; 
   transition: border-color 0.3s ease-in-out 0s !important;
   -moz-transition: border-color 0.3s ease-in-out 0s !important;
   -webkit-transition: border-color 0.3s ease-in-out 0s !important;
@@ -1397,13 +1380,13 @@ div#house_info > p {
 }
 
 .personal-info-top-row .first {
-  border: 1px solid #999; 
+  border: 2px solid #007bc3;
 }
 .personal-info-row .top-row, .personal-info-row .middle-row {
   border-bottom: 1px solid #e3e3e3; 
 }
 .personal-info-top-row .top-row, .personal-info-top-row .middle-row {
-  border-bottom: 1px solid #999;
+  border-bottom: 1px solid #007bc3;
   background: #fff;
 }
 .bg-color {
@@ -3779,12 +3762,6 @@ a.close-2{
   top: 13px;
   right: 10px;
 }
-.top-row-2{
-  border-bottom: 0 !important;
-}
-.house-2{
-  border-bottom: 0 !important;
-}
 
 
 /* New address flow start */
@@ -5585,13 +5562,6 @@ table.table-wrapper tr td a.btn-default {
     .welcome-msg .btn-continue {
         width: 100%;
     }
-    .disable-btn, .disable-btn:hover, .disable-btn:focus {
-        margin-left: 0;
-        left: 0;
-        margin-bottom: 10px;
-        width: 100%;
-        margin-top: 50px;
-    }
     .btn-save.blue, .member-continue-btn {
         width: 100%;
     }
@@ -5647,13 +5617,6 @@ table.table-wrapper tr td a.btn-default {
     }
     .welcome-msg .btn-continue {
         width: 100%;
-    }
-    .disable-btn, .disable-btn:hover, .disable-btn:focus {
-        margin-left: 0;
-        left: 0;
-        margin-bottom: 10px;
-        width: 100%;
-        margin-top: 50px;
     }
     .btn-save.blue, .member-continue-btn {
         width: 100%;

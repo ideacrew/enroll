@@ -97,36 +97,28 @@ $(document).ready(function () {
     $('#email_info').removeClass('hidden');
   });
 
-  $('.focus_effect').click(function(e){
-    var check = check_personal_info_exists();
-    active_div_id = $(this).attr('id');
-    if( check.length==0 && (!$('.autofill-failed').hasClass('hidden') || $('.autofill-cloud').hasClass('hidden'))) {
-      $('.focus_effect').removeClass('personal-info-top-row');
-      $('.focus_effect').removeClass('personal-info-row');
-      $('.focus_effect').addClass('personal-info-row');
-      $(this).addClass('personal-info-top-row');
-      $('.sidebar a').removeClass('style_s_link');
-      $('.sidebar a.'+active_div_id).addClass('style_s_link');
-      $(this).removeClass('personal-info-row');
-    }
-    if(active_div_id!='personal_info') {
-      if(check.length!=0) {
-        $('#personal_info .col-md-10').addClass('require-field');
-      }
-    }
+  $(document).on('click', '.focus_effect', function() {
+    update_info_row($(this), 'focus_in');
   });
 
-  $('#personal_info.focus_effect').focusout(function(){
-    var tag_id = $(this).attr('id');
-    var has_class = $(this).hasClass('personal-info-top-row');
-    var check = check_personal_info_exists();
-    if(check.length!=0 && !has_class) {
-      $('#personal_info .col-md-10').addClass('require-field');
+  $(document).on('focusout', '.focus_effect', function() {
+    update_info_row($(this), 'focus_out');
+  });
+
+  function update_info_row(element, evt) {
+    var check = check_info_exists($(element).attr('id'));
+
+    if((evt == 'focus_in' && check.length>0) || (evt == 'focus_out' && check.length == 0)) {
+      $('.focus_effect').removeClass('personal-info-top-row');
+      $('.focus_effect').addClass('personal-info-row');
+      $(element).addClass('personal-info-top-row');
+      $(element).removeClass('personal-info-row');
     }
     else {
-      $('#personal_info .col-md-10').removeClass('require-field');
+      $(element).removeClass('personal-info-top-row');
+      $(element).addClass('personal-info-row');
     }
-  });
+  }
 
   $('span.close').click(function(){
     common_body_style();
@@ -141,22 +133,14 @@ $(document).ready(function () {
 
   function common_body_style()
   {
-
     $('#personal_info').addClass('personal-info-row');
     $('.focus_effect').removeClass('personal-info-top-row');
     $('#address_info').addClass('personal-info-top-row');
     $('#address_info').removeClass('personal-info-row');
   }
 
-  function check_personal_info_exists()
-  {
-    var check = $('#personal_info input[required]').filter(function() { return this.value == ""; });
-    return check;
-  }
-
-  function check_dependent_info_exists()
-  {
-    var check = $('#new_family_member input[required]').filter(function() { return this.value == ""; });
+  function check_info_exists(id) {
+    var check = $('#' + id + ' input[required]').filter(function() { return this.value == ""; });
     return check;
   }
 
@@ -226,28 +210,28 @@ $(document).ready(function () {
     fade_all();
     update_progress();
     if (e.target.id == "personal_info" || $(e.target).parents("#personal_info").size()) { 
-      $('#personal_info div.first').addClass('employee-info');
+      // $('#personal_info div.first').addClass('employee-info');
       $("a.personal_info").css("color","#98cbff");
       $("#personal_info div.first").css("opacity","1");
     } 
     else if (e.target.id == "address_info" || $(e.target).parents("#address_info").size()) {
-      $('#address_info div.first').addClass('employee-info');
+      // $('#address_info div.first').addClass('employee-info');
       $("a.address_info").css("color","#98cbff");
       $("#address_info div.first").css("opacity","1");
-      $("#top-pad").innerHTML="30%";
+      // $("#top-pad").innerHTML="30%";
     }
     else if (e.target.id == "phone_info" || $(e.target).parents("#phone_info").size()) {
-      $('#phone_info div.first').addClass('employee-info');
+      // $('#phone_info div.first').addClass('employee-info');
       $("a.phone_info").css("color","#98cbff");
       $("#phone_info div.first").css("opacity","1");
     }
     else if (e.target.id == "email_info" || $(e.target).parents("#email_info").size()) {
-      $('#email_info div.first').addClass('employee-info');
+      // $('#email_info div.first').addClass('employee-info');
       $("a.email_info").css("color","#98cbff");
       $("#email_info div.first").css("opacity","1");
     }
     else if (e.target.id == "household_info" || $(e.target).parents("#household_info").size()) {
-      $('#household_info div.first').addClass('employee-info');
+      // $('#household_info div.first').addClass('employee-info');
       $("a.household_info").css("color","#98cbff");
       $("#household_info div.first").css("opacity","1");
     }
@@ -352,16 +336,6 @@ $(document).ready(function () {
       return false;
     }
   }
-
-  $("#dependent_ul .floatlabel").focusin(function() {
-    $('.house').css("opacity","0.5");
-    $(this).closest('.house').addClass('employee-info');
-    $("a.dependent_ul").css("color","#98cbff");
-    $(this).closest('.house').css("opacity","1");
-  });
-  $("#dependent_ul .floatlabel").blur(function() {
-    $(this).closest('.house').css("opacity","0.5");
-  });
   // ----- Finish Focus Effect & Progress -----
   
   //Employee Dependents Page
@@ -375,11 +349,6 @@ $(document).ready(function () {
     $('#dependent_buttons div:last').removeClass('hidden');
     $('.add-member-buttons').removeClass('hidden');
   });
-
-  /*
-  $(document).on('click', '.close-1', function() {
-    $('#cancel_member').click();
-  });*/
   
   $(document).on('click', '#cancel_member', function() {
     $("#dependent_buttons").removeClass('hidden');
@@ -498,13 +467,13 @@ $(document).ready(function () {
     }
   });
 
-  $('#dependent_buttons #save_member').click(function() {
-    if(check_dependent_info_exists().length==0) {
-      $('#add_info .employee-info').last().removeClass('require-field');
-    } else {
-      $('#add_info .employee-info').last().addClass('require-field');
-    }
-  });
+  // $('#dependent_buttons #save_member').click(function() {
+  //   if(check_dependent_info_exists().length==0) {
+  //     $('#add_info .employee-info').last().removeClass('require-field');
+  //   } else {
+  //     $('#add_info .employee-info').last().addClass('require-field');
+  //   }
+  // });
   
   $('#employer .landing_personal_tab .first').focusin(function(){
     $(this).css('opacity', 1);
