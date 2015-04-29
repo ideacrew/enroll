@@ -251,6 +251,7 @@ private
   end
 
   def family_integrity
+    only_one_active_primary_family
     single_primary_family_member
     all_family_member_relations_defined
     single_active_household
@@ -260,6 +261,22 @@ private
   def primary_applicant_person
     return nil unless primary_applicant.present?
     primary_applicant.person
+  end
+
+  def only_one_active_primary_family
+    return unless primary_family_member.present? && primary_family_member.person.present?
+    families_with_same_primary = Family.where(
+      "family_members" => {
+        "$elemMatch" => {
+          "is_primary_applicant" => true,
+          "person_id" => BSON::ObjectId.from_string(primary_family_member.person_id.to_s)
+        }
+      },
+      "is_active" => true
+    )
+    if (families_with_same_primary.any? { |fam| fam.id.to_s != self.id.to_s })
+      self.errors.add(:base, "has another active family with the same primary applicant")
+    end
   end
 
   def single_primary_family_member
