@@ -57,7 +57,9 @@ class Consumer::EmployeeRolesController < ApplicationController
   end
 
   def update
-    @person = Forms::EmployeeRole.find(params.require(:id))
+    #@person = Forms::EmployeeRole.find(params.require(:id))
+    person = Person.find(params.require(:id))
+    @person = Forms::EmployeeRole.new(person, person.employee_roles.first)
     if @person.update_attributes(params.require(:person).permit(*person_parameters_list))
       respond_to do |format|
         format.html { render "dependent_details" }
