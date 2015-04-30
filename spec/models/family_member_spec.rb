@@ -21,7 +21,12 @@ end
 
 describe FamilyMember, dbclean: :after_each do
   context "a family with members exists" do
-    include_context "BradyBunch"
+    include_context "BradyBunchAfterAll"
+
+    before :each do
+      create_brady_families
+    end
+
     let(:family_member_id) {mikes_family.primary_applicant.id}
 
     it "FamilyMember.find(id) should work" do
