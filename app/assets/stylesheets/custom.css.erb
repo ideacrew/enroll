@@ -1065,57 +1065,6 @@ h5.active a{
   color: #fff;
   position: relative;
 }
-.list-group a {
-  border-radius: 0;
-  background-color: #027ac3 !important;
-  /*font-size: 22px;*/
-  /*line-height: 24px;*/
-  font-family: 'AvenirLTStd-Medium';
-  /*font-weight: bold;*/
- /* padding-top: 50px;
-  padding-bottom: 50px;*/
-}
-.list-group a.active{
-  padding-top: 65px;
-  padding-bottom: 65px;
-  border-top-right-radius: 0;
-  font-weight: 500;
-}
-.list-group a.name {
-  padding-top: 72px;
-  padding-bottom: 0;
-  border-top-right-radius: 0;
-  color: #fff;
-  border-color: #337ab7;
-  font-family: 'AvenirLTStd-Medium';
-  font-weight: bold;
-}
-.list-group a.address{
-  padding-top: 55px;
-  padding-bottom: 55px;
-  background-color: #337ab7;
-  border-color: #337ab7;
-  color: #ffffff;
-  font-weight: 300;
-  font-weight: bold;
-}
-.list-group a.phone{
-  padding-top: 56px;
-  padding-bottom: 48px;
-  background-color: #337ab7;
-  border-color: #337ab7;
-  color: #ffffff;
-  font-weight: bold;
-}
-.list-group a.email{
-  padding-top: 54px;
-  padding-bottom: 53px;
-  background-color: #337ab7;
-  border-color: #337ab7;
-  color: #ffffff;
-  border-bottom-right-radius: 0px;
-  font-weight: bold;
-}
 .list-group{
   margin-bottom: 0;
 }
@@ -1745,16 +1694,6 @@ a.list-group-item.confirm {
   margin: 0;
   line-height: 27px;
 }
-.landing-row .right-side .list-group a {
-  background: none !important;
-  padding: 0;
-  color: #007bc3;
-  display: inline-block !important;
-  text-align: center;
-}
-.landing-row .right-side .list-group a.btn {
-  padding: 10px 16px;
-}
 .btn-see-all {
   background: none repeat scroll 0 0 #bfdef0;
   border-radius: 0;
@@ -2303,17 +2242,9 @@ a .arrow-right {
 .tab-pane .landing-row .right-side .list-group .list-group-item h4 {
   color: #007bc3;
 }
-.tab-pane .landing-row .right-side .list-group .list-group-item h4:hover, .tab-pane .landing-row .right-side .list-group .list-group-item a:hover {
+.tab-pane .landing-row .right-side .list-group .list-group-item h4:hover {
   color: #666;
 }
-/*
-.tab-pane .landing-row .right-side .btn {
-  background: #bfdef0;
-  color: #fff;
-  /*display: block;*/
-  padding: 10px 22px;
-}
-*/
 #plans {
   font-family: "AvenirLTStd-Light";
   padding: 0;
@@ -2372,35 +2303,6 @@ a.close-fail {
     position: absolute;
     right: 15px;
     top: 5px;
-}
-
-#key-section {
-    right: 0;
-    top: 80px;
-}
-#key-section p {
-    font-size: 18px;
-}
-#key-section ul {
-    padding-left: 20px;
-    position: relative;
-}
-#key-section ul .progress-bottm {
-    background: none repeat scroll 0 0 #fff;
-    border: 1px solid #ccc;
-    height: 98%;
-    left: 0;
-    position: absolute;
-    width: 12px;
-}
-#key-section ul .progress-top {
-    background: none repeat scroll 0 0 #008c00;
-    border: 1px solid #008c00;
-    height: 36%;
-    left: 0;
-    position: absolute;
-    width: 12px;
-    z-index: 2;
 }
 
 .personal-table tbody tr td {
@@ -2632,8 +2534,9 @@ a.close-1, a.close-2{
   margin-top: 20px;
   padding: 6px 20px;
 }
-.select-plan-details{
+.select-plan-details {
   display: none;
+  margin-top: 20px;
 }
 .select-plan-details ul.nav-tabs{
   margin: 6px 0 0;
@@ -3178,13 +3081,6 @@ a.close-1, a.close-2{
 }
 
 .panel .landing-row .right-side .list-group .list-group-item.family_members_list {padding: 12.8px 0;}
-.tab-pane .landing-row .right-side .btn.btn-red {
-  background-color: #8c0000;
-  color: #fff;
-  float: left;
-  width: 90px;
-}
-
 #add-new-member .form-control.active-floatlabel, #family li.family_members_list .form-control.active-floatlabel{
   padding-top: 24px;
   -webkit-transition: all 0.1s ease-in-out;
@@ -3284,23 +3180,6 @@ a.close-1, a.close-2{
 }
 .tab-pane .landing-row .right-side .list-group .list-group-item h4 {
   color: #6fb7ff;
-}
-/*.tab-pane .landing-row .right-side .list-group .list-group-item h4:hover, .tab-pane .landing-row .right-side .list-group .list-group-item a:hover {
-  color: #0080ff;
-}*/
-.tab-pane .landing-row .right-side .btn {
-  background: none repeat scroll 0 0 #73b9ff;
-  border-radius: 0.2em;
-  color: #fff !important;
-  display: block;
-  margin: 0 auto;
-  padding: 10px 0;
-  position: relative;
-  top: -20px;
-  width: 18%;
-}
-.tab-pane .landing-row .right-side .btn:hover {
-  background: none repeat scroll 0 0 #0080ff;
 }
 #plans {
   font-family: "AvenirLTStd-Light";
@@ -3663,10 +3542,9 @@ a.close-fail:hover{
     color: #000;
 }
 
-#key-section{
-  /*position: absolute;*/
-  top: 75px;
+#key-section {
   right: 0;
+  top: 46px;
 }
 #key-section p{
   font-size: 18px;
