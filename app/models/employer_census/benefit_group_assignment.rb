@@ -8,7 +8,7 @@ class EmployerCensus::BenefitGroupAssignment
   field :benefit_group_id, type: BSON::ObjectId
   field :start_on, type: Date
   field :end_on, type: Date
-  field :is_active, type: Boolean
+  field :is_active, type: Boolean, default: true
 
   validates_presence_of :benefit_group_id, :start_on
   # validate :model_integrity
