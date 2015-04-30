@@ -45,7 +45,7 @@ class User
     broker: "Broker",
     undocumented_consumer: "Undocumented Consumer",
     qhp_consumer: "QHP Consumer",
-    hbx_employee: "HBX Employee",
+    hbx: "HBX",
     system_service: "System Service",
     web_service: "Web Service"
   }
@@ -79,6 +79,8 @@ class User
 
   after_create :send_welcome_email
 
+  delegate :primary_family, to: :person, allow_nil: true
+
   def send_welcome_email
     UserMailer.welcome(self).deliver_now
     true
@@ -98,6 +100,10 @@ class User
 
   def has_broker_role?
     has_role?(:broker)
+  end
+
+  def has_hbx_role?
+    has_role?(:hbx)
   end
 
   def ensure_authentication_token

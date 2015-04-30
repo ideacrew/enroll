@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  resources :translations
+
   # FIXME: Do this properly later
   resource :plan_shopping do
     member do
@@ -18,6 +20,12 @@ Rails.application.routes.draw do
   end
 
   namespace :consumer do
+    resources :employee_dependents do
+      collection do
+        get :group_selection
+      end
+    end
+
     resources :employee, :controller=>"employee_roles" do
 
       collection do
@@ -44,6 +52,11 @@ Rails.application.routes.draw do
     resources :employer_profiles do
       get 'new'
       get 'my_account'
+      collection do
+        post 'match'
+        get 'welcome'
+        get 'search'
+      end
       resources :plan_years
       resources :family do
         get 'delink'
@@ -78,6 +91,8 @@ Rails.application.routes.draw do
     end
 
   end
+
+  get 'hbx_admin', to: 'hbx#welcome'
 
   devise_for :users
 

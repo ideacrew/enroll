@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'factories/enrollment_factory'
 
 RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
   describe "PUT update" do
@@ -21,8 +20,9 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
 
     before(:each) do
       sign_in
-      allow(Forms::EmployeeRole).to receive(:find).with(person_id).and_return(role_form)
+      allow(Person).to receive(:find).with(person_id).and_return(person)
       allow(person).to receive(:employee_roles).and_return([employee_role])
+      allow(Forms::EmployeeRole).to receive(:new).with(person, employee_role).and_return(role_form)
       allow(benefit_group).to receive(:effective_on_for).with("whatever").and_return(effective_date)
       allow(role_form).to receive(:update_attributes).with(person_parameters).and_return(save_result)
       put :update, :person => person_parameters, :id => person_id
@@ -40,7 +40,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     describe "given invalid person parameters" do
       let(:save_result) { false }
 
-      it "should render match" do
+      it "should render edit" do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
         expect(assigns(:person)).to eq role_form
@@ -71,7 +71,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
 
     before :each do
       allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
-      allow(EnrollmentFactory).to receive(:construct_employee_role).with(user, census_family, employment_relationship).and_return([employee_role, family])
+      allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_family, employment_relationship).and_return([employee_role, family])
       allow(benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
       sign_in(user)
       post :create, :employment_relationship => employment_relationship_properties
@@ -110,7 +110,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     let(:employment_relationships) { double }
 
     before(:each) do
-      sign_in 
+      sign_in
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters).and_return(mock_employee_candidate)
       allow(EmployerProfile).to receive(:find_census_families_by_person).with(mock_employee_candidate).and_return(found_families)
       allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, found_families).and_return(employment_relationships)
@@ -137,7 +137,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
         end
 
         context "that find a matching employee" do
-          let(:found_families) { [instance_double("EmployerCensus::EmployeeFamily")]} 
+          let(:found_families) { [instance_double("EmployerCensus::EmployeeFamily")]}
 
           it "renders the 'match' template" do
             expect(response).to have_http_status(:success)
@@ -165,15 +165,25 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
   end
 
   describe "GET welcome" do
+    let(:user) { double("user") }
+    let(:person) { double("person")}
 
-    before(:each) do
-      sign_in
+    it "renders the 'welcome' template when user has no employee role" do
+      allow(user).to receive(:has_employee_role?).and_return(false)
+      sign_in(user)
       get :welcome
-    end
-
-    it "renders the 'welcome' template" do
       expect(response).to have_http_status(:success)
       expect(response).to render_template("welcome")
     end
+
+    it "renders the 'my account' template when user has employee role" do
+      allow(user).to receive(:has_employee_role?).and_return(true)
+      allow(user).to receive(:person).and_return(person)
+      sign_in(user)
+      get :welcome
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(person_my_account_path(person))
+    end
+
   end
 end

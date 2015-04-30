@@ -233,8 +233,8 @@ class Family
     end
 
     def find_family_member(family_member_id)
-      family = Family.where("family_members._id" => family_member_id).first
-      family.family_members.detect { |member| member._id == family_member_id }
+      family = Family.where("family_members._id" => BSON::ObjectId.from_string(family_member_id)).first
+      family.family_members.detect { |member| member._id.to_s == family_member_id.to_s }
     end
 
     def find_by_case_id(case_id)
@@ -251,14 +251,32 @@ private
   end
 
   def family_integrity
+    only_one_active_primary_family
     single_primary_family_member
     all_family_member_relations_defined
     single_active_household
+    no_duplicate_family_members
   end
 
   def primary_applicant_person
     return nil unless primary_applicant.present?
     primary_applicant.person
+  end
+
+  def only_one_active_primary_family
+    return unless primary_family_member.present? && primary_family_member.person.present?
+    families_with_same_primary = Family.where(
+      "family_members" => {
+        "$elemMatch" => {
+          "is_primary_applicant" => true,
+          "person_id" => BSON::ObjectId.from_string(primary_family_member.person_id.to_s)
+        }
+      },
+      "is_active" => true
+    )
+    if (families_with_same_primary.any? { |fam| fam.id.to_s != self.id.to_s })
+      self.errors.add(:base, "has another active family with the same primary applicant")
+    end
   end
 
   def single_primary_family_member
@@ -268,8 +286,12 @@ private
   end
 
   def all_family_member_relations_defined
-    undefined_relations = family_members.reduce([]) { |list, family_member| list << family_member if family_member.primary_relationship.blank?; list }
-    errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations.size > 1
+    return unless primary_family_member.present? && primary_family_member.person.present?
+    primary_member_id = primary_family_member.id
+    primary_person = primary_family_member.person
+    other_family_members = family_members.select { |fm| (fm.id.to_s != primary_member_id.to_s) && fm.person.present? }
+    undefined_relations = other_family_members.any? { |fm| primary_person.find_relationship_with(fm.person).blank? } 
+    errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations
   end
 
   def single_active_household
@@ -288,7 +310,7 @@ private
 
   def no_duplicate_family_members
     family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
-      errors.add(:base, "Duplicate family_members for person: #{k}\n" +
+      errors.add(:family_members, "Duplicate family_members for person: #{k}\n" +
                           "family_members: #{v.inspect}")
     end
   end

@@ -248,8 +248,8 @@ describe Person, '#addresses' do
   end
 end
 
-describe Person, "large family with multiple employees - The Brady Bunch" do
-  include_context "BradyBunch"
+describe Person, "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
+  include_context "BradyBunchAfterAll"
 
   context "a person" do
     it "should know its age today" do
@@ -365,5 +365,17 @@ end
 
 describe Person, '#families' do
   it 'returns families where the person is present' do
+  end
+end
+
+describe Person, "with no relationship to a dependent" do
+  describe "after ensure_relationship_with" do
+    it "should have the new relationship"
+  end
+end
+
+describe Person, "with an existing relationship to a dependent" do
+  describe "after ensure_relationship_with a different type of relationship" do
+    it "should correct the existing relationship"
   end
 end

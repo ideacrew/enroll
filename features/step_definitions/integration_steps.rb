@@ -1,12 +1,12 @@
 require 'watir'
-load Rails.root + "db/seeds.rb"
+# load Rails.root + "db/seeds.rb"
 
 Before "@watir" do
   @browser = Watir::Browser.new :chrome
 end
 
 After "@watir" do
-  @browser.close
+ # @browser.close
 end
 
 Given(/^I do not exist as a user$/) do
@@ -58,7 +58,7 @@ When(/^I enter the identifying info of my existing person$/) do
   @browser.p(:text=> /Personal Information/).click
   @browser.text_field(:name => "person[ssn]").set("722991234")
   sleep(2)
-  @browser.input(:value => "Search", :type => "submit").click
+  @browser.input(:value => "Search Employers", :type => "submit").click
   sleep(3)
 end
 
@@ -81,10 +81,40 @@ Then(/^I should see the dependents page$/) do
 end
 
 When(/^I click continue on the dependents page$/) do
+  @browser.a(:text => "Continue", :href => /consumer\/employee_dependents\/group_selection/).click
+  sleep(5)
+end
+
+Then(/^I should see the group selection page$/) do
+  Watir::Wait.until(30) { @browser.a(:text => "Continue", :href => /people\/select_plan/).present? }
+  sleep(1)
+end
+
+When(/^I click continue on the group selection page$/) do
   @browser.a(:text => "Continue", :href => /people\/select_plan/).click
   sleep(5)
 end
 
 Then(/^I should see the plan shopping page$/) do
-    pending
+  expect(@browser.p(:text => /Select a Plan/).visible?).to be_truthy
+end
+
+When(/^I select a plan on the plan shopping page$/) do
+    @browser.a(:text => "Continue").click
+    sleep(2)
+    @browser.a(:text => "Select").click
+    sleep(5)
+end
+
+Then(/^I should see the coverage summary page$/) do
+   expect(@browser.p(:text => /Your monthly total family premium/).visible?).to be_truthy
+end
+
+When(/^I confirm on the coverage summary page$/) do
+   @browser.a(:text => "Continue").click
+   sleep(5)
+end
+
+Then(/^I should see the "my account" page$/) do
+  expect(@browser.span(:text => "Household").visible?).to be_truthy
 end

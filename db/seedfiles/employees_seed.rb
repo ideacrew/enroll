@@ -1,5 +1,3 @@
-require 'factories/enrollment_factory'
-
 puts "*"*80
 puts "::: Creating Employee Roles:::"
 
@@ -23,7 +21,7 @@ employer_profiles.select(&:employee_families).each do |employer_profile|
       dob: census_employee.dob,
       hired_on: census_employee.hired_on
     }
-    employee, family = EnrollmentFactory.add_employee_role(**params)
+    employee, family = Factories::EnrollmentFactory.add_employee_role(**params)
 
     employee.person.addresses << census_employee.address
     employee.person.save

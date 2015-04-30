@@ -94,6 +94,7 @@ describe Family, type: :model, dbclean: :after_each do
 
             before do
               family.family_members << non_family_member
+              family.valid?
             end
 
             it "should not be valid" do
@@ -108,6 +109,7 @@ describe Family, type: :model, dbclean: :after_each do
           context "and one of the same family members is added again" do
             before do
               family.family_members << family_member_spouse.dup
+              family.valid?
             end
 
             it "should not be valid" do
@@ -149,9 +151,11 @@ describe Family, type: :model, dbclean: :after_each do
 
             context "and the primary applicant is not the same person" do
               let(:second_family) { Family.new }
-              let(:second_family_member_person) { FamilyMember.new(person: person) }
               let(:second_family_member_spouse) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: spouse) }
+              let(:second_family_member_person) { FamilyMember.new(person: person) }
+
               before do
+                spouse.person_relationships.build(:relative_id => person.id, :kind => "spouse")
                 second_family.family_members = [second_family_member_person, second_family_member_spouse]
               end
 
@@ -281,72 +285,6 @@ describe Family, type: :model, dbclean: :after_each do
     end
   end
 
-  describe "large family with multiple employees - The Brady Bunch" do
-    include_context "BradyBunch"
-
-    let(:family_member_id) {mikes_family.primary_applicant.id}
-
-    it "should be possible to find the family_member from a family_member_id" do
-      expect(Family.find_family_member(family_member_id).id.to_s).to eq family_member_id.to_s
-    end
-
-    context "Family.find_by_primary_applicant" do
-      context "on Mike" do
-        let(:find) {Family.find_by_primary_applicant(mike)}
-        it "should find Mike's family" do
-          expect(find.id.to_s).to eq mikes_family.id.to_s
-        end
-      end
-
-      context "on Carol" do
-        let(:find) {Family.find_by_primary_applicant(carol)}
-        it "should find Carol's family" do
-          expect(find.id.to_s).to eq carols_family.id.to_s
-        end
-      end
-    end
-
-    context "Family.find_by_person" do
-      context "on Mike" do
-        let(:find) {Family.find_all_by_person(mike).collect(&:id)}
-        it "should find two families" do
-          expect(find.count).to be 2
-        end
-        it "should find Mike's family" do
-          expect(find).to include mikes_family.id
-        end
-        it "should find Carol's family" do
-          expect(find).to include carols_family.id
-        end
-      end
-
-      context "on Carol" do
-        let(:find) {Family.find_all_by_person(carol).collect(&:id)}
-        it "should find two families" do
-          expect(find.count).to be 2
-        end
-        it "should find Mike's family" do
-          expect(find).to include mikes_family.id
-        end
-        it "should find Carol's family" do
-          expect(find).to include carols_family.id
-        end
-      end
-
-      context "on Greg" do
-        let(:find) {Family.find_all_by_person(greg).collect(&:id)}
-        it "should find two families" do
-          expect(find.count).to be 2
-        end
-        it "should find Mike's family" do
-          expect(find).to include mikes_family.id
-        end
-        it "should find Carol's family" do
-          expect(find).to include carols_family.id
-        end
-      end
-    end
-  end
 end
 
 
@@ -483,7 +421,7 @@ end
 describe Family, "with a primary applicant" do
   describe "given a new person and relationship to make to the primary applicant" do
     let(:primary_person_id) { double }
-    let(:primary_applicant) { double(:person_relationships => [], :id => primary_person_id) }
+    let(:primary_applicant) { instance_double(Person, :person_relationships => [], :id => primary_person_id) }
     let(:relationship) { double }
     let(:employee_role) { double(:person => primary_applicant) }
     let(:dependent_id) { double }
@@ -502,6 +440,73 @@ describe Family, "with a primary applicant" do
 
     it "should relate the person and create the family member" do
       subject.relate_new_member(dependent, "spouse")
+    end
+  end
+end
+
+describe Family, "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
+  include_context "BradyBunchAfterAll"
+
+  let(:family_member_id) {mikes_family.primary_applicant.id}
+
+  it "should be possible to find the family_member from a family_member_id" do
+    expect(Family.find_family_member(family_member_id).id.to_s).to eq family_member_id.to_s
+  end
+
+  context "Family.find_by_primary_applicant" do
+    context "on Mike" do
+      let(:find) {Family.find_by_primary_applicant(mike)}
+      it "should find Mike's family" do
+        expect(find.id.to_s).to eq mikes_family.id.to_s
+      end
+    end
+
+    context "on Carol" do
+      let(:find) {Family.find_by_primary_applicant(carol)}
+      it "should find Carol's family" do
+        expect(find.id.to_s).to eq carols_family.id.to_s
+      end
+    end
+  end
+
+  context "Family.find_by_person" do
+    context "on Mike" do
+      let(:find) {Family.find_all_by_person(mike).collect(&:id)}
+      it "should find two families" do
+        expect(find.count).to be 2
+      end
+      it "should find Mike's family" do
+        expect(find).to include mikes_family.id
+      end
+      it "should find Carol's family" do
+        expect(find).to include carols_family.id
+      end
+    end
+
+    context "on Carol" do
+      let(:find) {Family.find_all_by_person(carol).collect(&:id)}
+      it "should find two families" do
+        expect(find.count).to be 2
+      end
+      it "should find Mike's family" do
+        expect(find).to include mikes_family.id
+      end
+      it "should find Carol's family" do
+        expect(find).to include carols_family.id
+      end
+    end
+
+    context "on Greg" do
+      let(:find) {Family.find_all_by_person(greg).collect(&:id)}
+      it "should find two families" do
+        expect(find.count).to be 2
+      end
+      it "should find Mike's family" do
+        expect(find).to include mikes_family.id
+      end
+      it "should find Carol's family" do
+        expect(find).to include carols_family.id
+      end
     end
   end
 end

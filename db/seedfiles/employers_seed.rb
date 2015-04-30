@@ -83,7 +83,7 @@ spacely_plan = Plan.create(
     coverage_kind: "health",
     metal_level: "silver",
     market: "shop",
-    carrier_profile_id: CarrierProfile.new.id
+    carrier_profile_id: CarrierProfile.last.id
   )
 
 spacely_benefit_group = spacely_plan_year.benefit_groups.build(
@@ -124,7 +124,7 @@ cogswell_plan = Plan.create(
     coverage_kind: "health",
     metal_level: "bronze",
     market: "shop",
-    carrier_profile_id: CarrierProfile.new.id
+    carrier_profile_id: CarrierProfile.first.id
   )
 
 cogswell_benefit_group = cogswell_plan_year.benefit_groups.build(
@@ -193,11 +193,11 @@ org_1_plan_year = org_1_employer.plan_years.build(
 org_1_plan = Plan.create(
     active_year: 2015,
     hios_id: "191503",
-    name: "Aetna 123 Silver 900",
+    name: "UHC 123 Silver 900",
     coverage_kind: "health",
     metal_level: "silver",
     market: "shop",
-    carrier_profile_id: CarrierProfile.new.id
+    carrier_profile_id: CarrierProfile.last.id
   )
 
 org_1_benefit_group = org_1_plan_year.benefit_groups.build(
@@ -268,7 +268,7 @@ org_2_plan = Plan.create(
     coverage_kind: "health",
     metal_level: "gold",
     market: "shop",
-    carrier_profile_id: CarrierProfile.new.id
+    carrier_profile_id: CarrierProfile.first.id
   )
 
 org_2_benefit_group = org_2_plan_year.benefit_groups.build(

@@ -1,96 +1,99 @@
-<%= link_to "Add Employee", new_employers_employer_profile_family_path(@employer_profile), class: "btn btn-primary" %> &nbsp;&nbsp;
-
-<h3>Employee Roster</h3>
-
-
-<div class="btn-group" data-toggle="buttons">
-  <label class="btn btn-primary active">
-    <input type="radio" name="options" id="terminated_no" autocomplete="off" checked> Active
-  </label>
-  <label class="btn btn-primary">
-    <input type="radio" name="options" id="family_waived" autocomplete="off"> Waived
-  </label>
-  <label class="btn btn-primary">
-    <input type="radio" name="options" id="terminated_yes" autocomplete="off" > Terminated
-  </label>
-  <label class="btn btn-primary">
-    <input type="radio" name="options" id="family_all" autocomplete="off"> All
-  </label>
-</div>
-
-<table class="table">
-  <thead>
-    <tr>
-      <th>Employee Name</th>
-      <th><abbr title="Social Security Number">SSN</abbr></th>
-      <th><abbr title="Date of Birth">DOB</abbr></th>
-      <th>Hire Date</th>
-      <th>Status</th>
-      <th>Linked?</th>
-      <th>&nbsp;</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @employer_profile.employee_families_sorted.each do |family| %>
-      <tr class=<%="terminated_#{family.is_terminated?}"%>>
-        <td> <%= link_to name_to_listing(family.census_employee), employers_employer_profile_family_path(@employer_profile.id, family.id) %> </td>
-        <td><%= number_to_obscured_ssn family.census_employee.ssn %></td>
-        <td><%= format_date family.census_employee.dob %> </td>
-        <td><%= format_date family.census_employee.hired_on %> </td>
-        <td><%= family.aasm_state %></td>
-        <td><%= boolean_to_human family.is_linked? %></td>
-        <td>
-          <% if family.is_terminated? %>
-            <%= link_to "Rehire", employers_employer_profile_family_rehire_path(@employer_profile.id, family.id), class: "btn btn-xs btn-primary" %>
-          <% else %>
-            <%= link_to "Edit", edit_employers_employer_profile_family_path(@employer_profile.id, family.id), class: "btn btn-xs btn-primary" %>
-            <%= link_to "Delink", employers_employer_profile_family_delink_path(@employer_profile.id, family.id), class: "btn btn-xs btn-default", disabled: !family.is_linked? %>
-            <%#= link_to "Terminate", employers_employer_profile_family_terminate_path(@employer_profile.id, family.id), class: "btn btn-lg btn-warning", data: { confirm: "Are you sure?"} %>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Terminate</button>
-            <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-              <div class="modal-dialog modal-sm">
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                      <button aria-label="Close" data-dismiss="modal" class="close" type="button"><span aria-hidden="true">×</span></button>
-                      <h4 id="mySmallModalLabel" class="modal-title">Delete Confirmation<a href="#mySmallModalLabel" class="anchorjs-link"><span class="anchorjs-icon"></span></a></h4>
-                    </div>
-                    <div class="modal-body">
-                      <div class="form-group">
-                        <label for="recipient-name" class="control-label">Add Termination Date:</label>
-                        <input type="text" class="employee_<%= @employer_profile.id %> form-control date-picker" id="termination_date">
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                      <a href="javascript:;" data-link="<%= employers_employer_profile_family_terminate_path(@employer_profile.id, family.id) %>" id="employee_<%= @employer_profile.id %>" class="btn btn-primary delete_confirm">Confirm</a>
-                    </div>
+<div class="row landing-row">
+  <div class="col-md-12 col-sm-12 col-xs-12 col-gn-top">
+    <div class="head-title head">
+      <span class="pull-left">Employee Roster</span>
+      <div class="btn-wrapper">
+        <%= link_to "Add Employee", new_employers_employer_profile_family_path(@employer_profile), class: "btn btn-default save-btn btn-blue-save" %>
+        <div class="btn-group" role="group" aria-label="">
+          <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-default active">
+              <input type="radio" name="options" id="terminated_no" autocomplete="off" checked> Active
+            </label>
+            <label class="btn btn-default">
+              <input type="radio" name="options" id="family_waived" autocomplete="off"> Waived
+            </label>
+            <label class="btn btn-default">
+              <input type="radio" name="options" id="terminated_yes" autocomplete="off" > Terminated
+            </label>
+            <label class="btn btn-default">
+              <input type="radio" name="options" id="family_all" autocomplete="off"> All
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="cleafix"></div>
+    </div>
+    <div class="table-responsive" style="overflow-y: hidden;">
+      <table class="table table-wrapper" style="opacity: 1;">
+        <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>SSN</th>
+                <th>DDB</th>
+                <th>Hire Date</th>
+                <th>Status</th>
+                <th>Linked?</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+          <% @employer_profile.employee_families_sorted.each do |family| %>
+            <tr class="terminated_<%= family.is_terminated? %> remove_<%= family.id %>">
+              <td> <%= link_to name_to_listing(family.census_employee), employers_employer_profile_family_path(@employer_profile.id, family.id) %> </td>
+              <td><%= number_to_obscured_ssn family.census_employee.ssn %></td>
+              <td><%= format_date family.census_employee.dob %> </td>
+              <td><%= format_date family.census_employee.hired_on %> </td>
+              <td><%= family.aasm_state %></td>
+              <td><%= boolean_to_human family.is_linked? %></td>
+              <td>
+                <% if family.is_terminated? %>
+                  <%= link_to ('javascript:;'), class: "show_confirm btn btn-green-2", id: "show_confirm_#{family.id}" do %>
+                    <span class="hidden-xs hidden-sm visible-md visible-lg">Rehire</span>
+                    <span class="glyphicon glyphicon-pencil hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
+                  <% end %>
+                <% else %>
+                  <%= link_to (edit_employers_employer_profile_family_path(@employer_profile.id, family.id)), class: "btn btn-green-2" do %>
+                    <span class="hidden-xs hidden-sm visible-md visible-lg">Edit</span>
+                    <span class="glyphicon glyphicon-pencil hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
+                  <% end %>
+                  
+                  <%= link_to (employers_employer_profile_family_delink_path(@employer_profile.id, family.id)), class: "btn btn-default", disabled: !family.is_linked? do %>
+                    <span class="hidden-xs hidden-sm visible-md visible-lg">Delink</span>
+                    <span class="glyphicon glyphicon-sort-by-attributes-alt hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
+                  <% end %>
+                  
+                  <%= link_to ('javascript:;'), class: "btn btn-red show_confirm", id: "show_confirm_#{family.id}" do %>
+                    <span class="hidden-xs hidden-sm visible-md visible-lg">Terminate</span>
+                    <span class="glyphicon glyphicon-trash hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
+                  <% end %>
+                <% end %>
+              </td>
+            </tr>
+            <% if family.is_terminated? %>
+              <tr class="unbrd  rehire_<%= family.id %>">
+                <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= family.id %>">
+                  <div class="confirm-terminate">
+                      <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker"><br/>
+                      <a href="javascript:;" data-link="<%= employers_employer_profile_family_rehire_path(@employer_profile.id, family.id) %>" class="rehire_confirm" id="rehire_<%= family.id %>"><strong>Submit</strong></a>
                   </div>
-              </div>
-            </div>
+                  <b><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></b>
+                </td>
+              </tr>
+            <% else %>
+              <tr class="unbrd  remove_<%= family.id %>">
+                <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= family.id %>">
+                  <div class="confirm-terminate">
+                      <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker"><br/>
+                      <a href="javascript:;" data-link="<%= employers_employer_profile_family_terminate_path(@employer_profile.id, family.id) %>" class="delete_confirm" id="remove_<%= family.id %>"><strong>Submit</strong></a>
+                  </div>
+                  <%=image_tag "enter_date_termination.png", width: "300", height: "" %>
+                </td>
+              </tr>
+            <% end %>
           <% end %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-<script>
-  $(document).ready(function(){
-    $('.delete_confirm').click(function(){
-      var termination_date = $('.'+ $(this).attr('id')).val();
-      var link_to_delete = $(this).data('link');
-      $.ajax({
-        type: 'get',
-        datatype : 'js',
-        url: link_to_delete,
-        data: {termination_date: termination_date},
-        success: function(response){
-          window.location.reload();
-        },
-        error: function(response){
-          window.location.reload();
-        }
-      });
-    });
-  });
-</script>
+        </tbody>
+      </table>
+    </div>
+  </div>    
+  <div class="cleafix"></div>
+</div>

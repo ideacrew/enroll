@@ -127,4 +127,9 @@ $(function() {
 		$(".all-filters-row").hide();
 		applyPlanFilters();
 	});
+
+  $(".carrier").on('click', function(){
+    $(".carrier-select .selectric-wrapper").hide();
+    $("." + $(this).attr('data-carrier')).show();
+  });
 });

@@ -39,6 +39,8 @@ class Plan
   field :nationwide, type: Boolean # Nationwide
   field :out_of_service_area_coverage, type: Boolean # DC In-Network or not
 
+  default_scope -> {order("name ASC")}
+
   index({ hbx_id: 1 })
   index({ coverage_kind: 1 })
   index({ metal_level: 1 })
@@ -158,14 +160,6 @@ class Plan
     given_age
   end
 
-  def reload_premium_cache
-    self.premium_tables.each do |premium|
-      cache_key = [hios_id, active_year, premium.age].join('-')
-      #Rails.cache.write(cache_key, premium.cost)
-      $redis.set(cache_key, premium.cost)
-    end
-  end
-
   def premium_for(schedule_date, age)
     bound_age = bound_age(age)
     self.premium_tables.detect do |pt|
@@ -177,10 +171,7 @@ class Plan
   class << self
     # Grouping plans by carrier name
     def group_by_carrier_name
-      grouped_plans = by_active_year.group_by { |pl| pl.carrier_profile.organization.legal_name }
-      grouped_plans.keys.sort.reduce([]) do |result, carrier_name|
-        grouped_plans[carrier_name].each { |gp| result << gp }
-      end
+      by_active_year.group_by { |pl| pl.carrier_profile.organization.legal_name }
     end
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
@@ -196,37 +187,5 @@ class Plan
       result
     end
 
-    def fetch_monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
-      begin_date = Date.parse(coverage_begin_date)
-      plan_documents = Plan.and({ active_year: plan_year }, { hios_id: hios_id }).entries
-      premium_table = plan_documents.first.premium_tables.detect do |table|
-        (table.age == insured_age) && (begin_date >= table.start_on) && (begin_date <= table.end_on)
-      end
-
-      if cost = premium_table.cost
-        cache_key = [hios_id, plan_year, insured_age].join('-')
-        $redis.set(cache_key, cost)
-      else
-        nil
-      end
-    end
-
-    def redis_monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
-      result = []
-      if plan_year.to_s == coverage_begin_date.to_date.year.to_s
-        [insured_age].flatten.each do |age|
-          cache_key = [hios_id, plan_year, age].join('-')
-          cost = $redis.get(cache_key)
-          if cost.blank?
-            cost = fetch_monthly_premium(plan_year, hios_id, age, coverage_begin_date)
-          end
-          result << { age: age, cost: cost.try(:to_f) }
-        end
-      end
-      result
-    rescue => e
-      Rails.logger.error { e.message }
-      []
-    end
   end
 end

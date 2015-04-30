@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe BrokerAgencyProfile, type: :model do
+RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
   it { should validate_presence_of :market_kind }
   it { should validate_presence_of :primary_broker_role_id }
 
