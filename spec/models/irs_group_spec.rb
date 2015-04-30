@@ -1,23 +1,21 @@
 require 'rails_helper'
-require 'builders/irs_group_builder'
 
 describe IrsGroup do
-
-  before(:each) do
-    @family = Family.new({submitted_at:DateTime.now})
-    @family.households.build({is_active:true})
-    @irs_group_builder = IrsGroupBuilder.new(@family)
-    @irs_group = @irs_group_builder.build
+  let(:person) {FactoryGirl.create(:person)}
+  let(:family) do
+    family = Family.new
+    family.add_family_member(person, is_primary_applicant: true)
+    family.save
+    family
   end
+  let(:irs_group) {family.active_household.irs_group}
 
   it 'should set effective start and end date' do
-    @irs_group_builder.save
-    expect(@irs_group.effective_starting_on).to eq(@family.active_household.effective_starting_on)
-    expect(@irs_group.effective_ending_on).to eq(@family.active_household.effective_ending_on)
+    expect(irs_group.effective_starting_on).to eq(family.active_household.effective_starting_on)
+    expect(irs_group.effective_ending_on).to eq(family.active_household.effective_ending_on)
   end
 
   it 'should set a 16 digit hbx_assigned_id' do
-    @irs_group_builder.save
-    expect(@irs_group.hbx_assigned_id.to_s.length).to eq(16)
+    expect(irs_group.hbx_assigned_id.to_s).to match /\d+{16}/
   end
 end
