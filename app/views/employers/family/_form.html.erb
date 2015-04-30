@@ -24,7 +24,7 @@
           <% else %>
              <% page_title = "Add New Family" %>
           <%end%>
-          <p class="information row"><%= page_title%></p>
+          <h3><%= page_title%></h3>
                 <!-- <div id="overlay"></div> -->
 
           <%= f.fields_for :census_employee, errors: {}, fieldset: false do |employee|  %>

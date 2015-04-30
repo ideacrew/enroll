@@ -452,16 +452,16 @@ $(document).ready(function () {
     $(this).css('opacity', 1);
   });
 
-  $('#search-employer,#save_member').click(function(){
-    $('input[type="radio"]').tooltip('disable');
-    $('.required-tooltip .required').each(function(i, obj){
-      if($(obj).val() == '')
-        $(obj).tooltip({placement: 'right', title: 'Required field'}).tooltip('show');
-    })
-    $('.required-tooltip .required').bind('mouseenter focusin', function(){
-      $(this).tooltip('show').tooltip('hide');
-    });
-  });
+  // $('#search-employer,#save_member').click(function(){
+  //   $('input[type="radio"]').tooltip('disable');
+  //   $('.required-tooltip .required').each(function(i, obj){
+  //     if($(obj).val() == '')
+  //       $(obj).tooltip({placement: 'right', title: 'Required field'}).tooltip('show');
+  //   })
+  //   $('.required-tooltip .required').bind('mouseenter focusin', function(){
+  //     $(this).tooltip('show').tooltip('hide');
+  //   });
+  // });
 
   $(".floatlabel, .selectric-wrapper").focusin(function() { $(this).closest('.employee-info').css("opacity","1") });
   $(".floatlabel, .selectric-wrapper").blur(function() { $(this).closest('.employee-info').css("opacity","0.5") });
