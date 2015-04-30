@@ -60,7 +60,7 @@ class HbxEnrollmentMember
 
   def self.new_from(coverage_household_member:)
     new(
-      applicant_id: coverage_household_member.applicant_id,
+      applicant_id: coverage_household_member.family_member_id,
       is_subscriber: coverage_household_member.is_subscriber
     )
   end

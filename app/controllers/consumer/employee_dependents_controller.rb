@@ -81,4 +81,8 @@ class Consumer::EmployeeDependentsController < ApplicationController
       end
     end
   end
+
+  def group_selection
+
+  end
 end

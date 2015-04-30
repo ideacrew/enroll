@@ -94,6 +94,7 @@ describe Family, type: :model, dbclean: :after_each do
 
             before do
               family.family_members << non_family_member
+              family.valid?
             end
 
             it "should not be valid" do
@@ -108,6 +109,7 @@ describe Family, type: :model, dbclean: :after_each do
           context "and one of the same family members is added again" do
             before do
               family.family_members << family_member_spouse.dup
+              family.valid?
             end
 
             it "should not be valid" do
@@ -149,9 +151,11 @@ describe Family, type: :model, dbclean: :after_each do
 
             context "and the primary applicant is not the same person" do
               let(:second_family) { Family.new }
-              let(:second_family_member_person) { FamilyMember.new(person: person) }
               let(:second_family_member_spouse) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: spouse) }
+              let(:second_family_member_person) { FamilyMember.new(person: person) }
+
               before do
+                spouse.person_relationships.build(:relative_id => person.id, :kind => "spouse")
                 second_family.family_members = [second_family_member_person, second_family_member_spouse]
               end
 

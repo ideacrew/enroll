@@ -1,2 +1,0 @@
-module Employers::PlanYearsHelper
-end

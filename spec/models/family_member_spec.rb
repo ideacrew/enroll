@@ -1,6 +1,25 @@
 require 'rails_helper'
 
-describe FamilyMember, type: :model do
+describe FamilyMember do
+  subject { FamilyMember.new(:is_primary_applicant => nil, :is_coverage_applicant => nil) }
+
+  before(:each) do
+    subject.valid?
+  end
+
+  it "should validate the presence of a person" do
+    expect(subject).to have_errors_on(:person_id)
+  end
+  it "should validate the presence of is_primary_applicant" do
+    expect(subject).to have_errors_on(:is_primary_applicant)
+  end
+  it "should validate the presence of is_coverage_applicant" do
+    expect(subject).to have_errors_on(:is_coverage_applicant)
+  end
+
+end
+
+describe FamilyMember, dbclean: :after_each do
   context "a family with members exists" do
     include_context "BradyBunch"
     let(:family_member_id) {mikes_family.primary_applicant.id}
@@ -20,17 +39,19 @@ describe FamilyMember, type: :model do
     end
   end
 
-  describe "validation" do
-    it { should validate_presence_of :person_id }
-    it { should validate_presence_of :is_primary_applicant }
-    it { should validate_presence_of :is_coverage_applicant }
-  end
-
   let(:p0) {Person.create!(first_name: "Dan", last_name: "Aurbach")}
   let(:p1) {Person.create!(first_name: "Patrick", last_name: "Carney")}
-  let(:ag) {Family.create()}
+  let(:ag) { 
+    fam = Family.new
+    fam.family_members.build(
+      :person => p0,
+      :is_primary_applicant => true
+    )
+    fam.save!
+    fam
+  }
   let(:family_member_params) {
-    { person: p0,
+    { person: p1,
       is_primary_applicant: true,
       is_coverage_applicant: true,
       is_consent_applicant: true,
@@ -108,9 +129,6 @@ describe FamilyMember, type: :model do
       expect(family_member.errors[:comments].any?).to eq false
       expect(family_member.comments.size).to eq 1
     end
-  end
-
-  describe "indexes specified fields" do
   end
 
   describe "instantiates object." do

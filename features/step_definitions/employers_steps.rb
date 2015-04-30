@@ -49,9 +49,14 @@ And(/^I sign in with valid user data with email (.+) and password (.+)$/) do |em
   @browser.input(value: "Sign in").click
 end
 
-Then(/^I should see a successful sign in message$/) do
+Then(/^I should see a welcome page with successful sign in message$/) do
   Watir::Wait.until(30) { @browser.text.include?("Signed in successfully.") }
   expect(@browser.text.include?("Signed in successfully.")).to be_truthy
+  sleep(1)
+  expect(@browser.a(text: "Continue").visible?).to be_truthy
+  @browser.a(text: "Continue").click
+  sleep(1)
+  expect(@browser.text.include?("Personal Information")).to be_truthy
 end
 
 And(/^I should see an initial form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do

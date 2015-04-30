@@ -3,8 +3,10 @@ class Employers::EmployerProfilesController < ApplicationController
   before_action :check_employer_role, only: [:new, :welcome]
 
   def index
-    @q = params[:q]
-    @organizations = Organization.search(@q).exists(employer_profile: true).page params[:page]
+    @q = params.permit(:q)[:q]
+    page_string = params.permit(:page)[:page]
+    page_no = page_string.blank? ? nil : page_string.to_i
+    @organizations = Organization.search(@q).exists(employer_profile: true).page page_no
     @employer_profiles = @organizations.map {|o| o.employer_profile}
   end
 
@@ -12,6 +14,11 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def search
+    @employer_profile = Forms::EmployerCandidate.new
+    respond_to do |format|
+      format.html
+      format.js
+    end
   end
 
   def my_account
@@ -56,7 +63,8 @@ class Employers::EmployerProfilesController < ApplicationController
     end
 
     def find_employer
-      id = params[:id] || params[:employer_profile_id]
+      id_params = params.permit(:id, :employer_profile_id)
+      id = id_params[:id] || id_params[:employer_profile_id]
       @employer_profile = EmployerProfile.find(id)
     end
 

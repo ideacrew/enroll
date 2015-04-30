@@ -13,6 +13,7 @@
           <div class="row landing-row">
             <div class="col-md-8 col-sm-8 col-xs-12 left-side">
               <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp|  %>
+                <h4> Employer information</h4>
                 <%= render "shared/employer_profile_fields", f: emp %><br>
               <% end %>
 

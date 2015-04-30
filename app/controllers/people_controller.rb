@@ -1,5 +1,3 @@
-require 'factories/enrollment_factory'
-
 class PeopleController < ApplicationController
 
   def new
@@ -114,7 +112,7 @@ class PeopleController < ApplicationController
       enroll_parms[:name_pfx] = @person.name_pfx
       enroll_parms[:hired_on] = params[:hired_on]
 
-      @employee_role, @family = EnrollmentFactory.add_employee_role(enroll_parms)
+      @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(enroll_parms)
     else
       @employee_role = @person.employee_roles.first
       @family = @person.primary_family
@@ -233,7 +231,7 @@ class PeopleController < ApplicationController
   def create
     sanitize_person_params
     @person = Person.find_or_initialize_by(ssn: params[:person][:ssn], date_of_birth: params[:person][:dob])
-    
+
     # Delete old sub documents
     @person.addresses.each {|address| address.delete}
     @person.phones.each {|phone| phone.delete}

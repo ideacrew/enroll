@@ -126,11 +126,6 @@ class Person
     self.dob = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
   end
 
-  # def dob=(new_dob)
-  #   bday = DateTime.strptime(new_dob, "%m-%d-%Y").to_date
-  #   write_attribute(:dob, bday)
-  # end
-
   def primary_family
     Family.find_by_primary_applicant(self)
   end
@@ -138,18 +133,9 @@ class Person
   def families
     Family.find_all_by_person(self)
   end
-
 
   def full_name
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
-  end
-
-  def primary_family
-    Family.find_by_primary_applicant(self)
-  end
-
-  def families
-    Family.find_all_by_person(self)
   end
 
   def age_on(date)
