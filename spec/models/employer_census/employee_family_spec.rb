@@ -102,7 +102,17 @@ describe EmployerCensus::EmployeeFamily, 'class methods' do
       end
 
       context "and employee_role is linked to census_family" do
-        let(:linked_employee_family) { employee_family.link_employee_role(saved_employee_role) }
+        let(:benefit_group)             { FactoryGirl.create(:benefit_group)}
+        let(:benefit_group_assignment)  { EmployerCensus::BenefitGroupAssignment.new(
+                                            benefit_group: benefit_group, 
+                                            start_on: Date.current - 45.days
+                                          ) }
+        let(:linked_employee_family) do
+          lf = employee_family
+          lf.add_benefit_group_assignment(benefit_group_assignment)
+          lf.link_employee_role(saved_employee_role)
+          lf
+        end
 
         it "should return matching EmployeeFamily instance" do
           expect(linked_employee_family.is_linked?).to be_truthy
@@ -123,19 +133,17 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:' do
   let(:census_family)               { FactoryGirl.build(:employer_census_family) }
   let(:census_employee)             { census_family.census_employee }
 
+  let(:benefit_group_1)             { FactoryGirl.create(:benefit_group)}
+  let(:benefit_group_assignment_1)  { EmployerCensus::BenefitGroupAssignment.new(
+                                        benefit_group: benefit_group_1, 
+                                        start_on: Date.current - 45.days
+                                      ) }
 
   context 'a valid employee family exists in the employer census' do
-
     context 'and a benefit group assignment is requested' do
-      let(:benefit_group_1)             { FactoryGirl.create(:benefit_group)}
-      let(:benefit_group_assignment_1)  { EmployerCensus::BenefitGroupAssignment.new(
-                                            benefit_group: benefit_group_1, 
-                                            start_on: Date.current - 45.days
-                                          ) }
-
       context "and the employee isn't assigned to another benefit group" do
         before do
-          census_family.add_benefit_group_assignment = benefit_group_assignment_1
+          census_family.add_benefit_group_assignment(benefit_group_assignment_1)
         end
 
         it "should add a new benefit group assignment" do
@@ -160,8 +168,8 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:' do
                                             ) }
 
         before do
-          census_family.add_benefit_group_assignment = benefit_group_assignment_1
-          census_family.add_benefit_group_assignment = benefit_group_assignment_2
+          census_family.add_benefit_group_assignment(benefit_group_assignment_1)
+          census_family.add_benefit_group_assignment(benefit_group_assignment_2)
         end
 
         it "should add the new benefit group assignment" do
@@ -169,7 +177,7 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:' do
         end
 
         it "should inactivate the prior benefit group assignment and set the end date" do
-          expect(census_family.inactive_benefit_group_assignments.first.is_active?).to eq false
+          expect(census_family.inactive_benefit_group_assignments.first.is_active?).to be_falsey
           expect(census_family.inactive_benefit_group_assignments.first.end_on).to eq end_on
         end
 
@@ -188,6 +196,7 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:' do
       context "and the employee is already linked to an employee_role" do
         before do
           census_family.save
+          census_family.add_benefit_group_assignment(benefit_group_assignment_1)
           census_family.link_employee_role(employee_role)
         end
 
@@ -198,6 +207,7 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:' do
 
       context "and the employee is terminated" do
         before do
+          census_family.add_benefit_group_assignment(benefit_group_assignment_1)
           census_family.terminate(Date.today)
         end
 
@@ -206,23 +216,29 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:' do
         end
       end
 
-      context "and the eligibility date is too far in future" do
-
-        pending "use HbxProfile:ShopMaximumEnrollmentPeriodBeforeEligibilityInDays"
-        it "should" do
+      context "and the benefit group assignment is missing" do
+        it "should raise and error" do
+          expect{census_family.link_employee_role(employee_role)}.to raise_error(EmployeeFamilyLinkError)
         end
       end
 
-      context "and the employee isn't under any special enrollment period" do
+      ## These should prevent enrollment, not ability to link
+      # context "and the eligibility date is too far in future" do
+      #   pending "use HbxProfile:ShopMaximumEnrollmentPeriodBeforeEligibilityInDays"
+      #   it "should raise an error" do
+      #   end
+      # end
 
-        pending "use HbxProfile:ShopMinimumEnrollmentPeriodAfterRosterEntryInDays"
-        context "and the employee's roster entry wasn't timely" do
-        end
-      end
+      # context "and the employee isn't under any special enrollment period" do
+      #   pending "use HbxProfile:ShopMinimumEnrollmentPeriodAfterRosterEntryInDays"
+      #   context "and the employee's roster entry wasn't timely" do
+      #   end
+      # end
 
       context "with a valid employee" do
         before do
           employer_profile.employee_families = [census_family]
+          census_family.add_benefit_group_assignment(benefit_group_assignment_1)
           census_family.link_employee_role(employee_role)
         end
 

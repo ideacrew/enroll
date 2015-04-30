@@ -47,7 +47,7 @@ class EmployerCensus::EmployeeFamily
 
   scope :order_by_last_name, -> { order(:"census_employee.last_name".asc) }
 
-  def add_benefit_group_assignment=(new_benefit_group_assignment)
+  def add_benefit_group_assignment(new_benefit_group_assignment)
     raise ArgumentError, "expected valid BenefitGroupAssignment" unless new_benefit_group_assignment.valid?
     if active_benefit_group_assignment.present?
       retired_assignment = active_benefit_group_assignment
@@ -116,6 +116,7 @@ class EmployerCensus::EmployeeFamily
   def link_employee_role(employee_role, linked_at = Time.now)
     raise EmployeeFamilyLinkError, "already linked to an employee role" if is_linked?
     raise EmployeeFamilyLinkError, "invalid to link a terminated employee" if is_terminated?
+    raise EmployeeFamilyLinkError, "must assign a benefit group" unless active_benefit_group_assignment.present?
 
     self.employee_role_id = employee_role._id
     self.linked_at = linked_at
