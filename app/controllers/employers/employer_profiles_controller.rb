@@ -14,6 +14,11 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def search
+    @employer_profile = Forms::EmployerCandidate.new
+    respond_to do |format|
+      format.html
+      format.js
+    end
   end
 
   def my_account

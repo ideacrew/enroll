@@ -53,6 +53,7 @@ Rails.application.routes.draw do
       get 'new'
       get 'my_account'
       collection do
+        post 'match'
         get 'welcome'
         get 'search'
       end
