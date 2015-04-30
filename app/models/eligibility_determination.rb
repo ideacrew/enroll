@@ -9,15 +9,15 @@ class EligibilityDetermination
 
   # Premium tax credit assistance eligibility.
   # Available to household with income between 100% and 400% of the Federal Poverty Level (FPL)
-  field :max_aptc_in_cents, type: Integer, default: 0
+  field :max_aptc, type: Money, default: 0.00
 
   # Cost-sharing reduction assistance eligibility for co-pays, etc.
   # Available to households with income between 100-250% of FPL and enrolled in Silver plan.
   field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
 
-  field :determination_date, type: DateTime
+  field :determined_on, type: DateTime
 
-  validates_presence_of :determination_date, :max_aptc_in_cents, :csr_percent_as_integer
+  validates_presence_of :determined_on, :max_aptc, :csr_percent_as_integer
 
   include HasFamilyMembers
 
@@ -33,14 +33,6 @@ class EligibilityDetermination
 
   def benchmark_plan
     Plan.find(self.benchmark_plan_id) unless self.benchmark_plan_id.blank?
-  end
-
-  def max_aptc_in_dollars=(dollars)
-    self.max_aptc_in_cents = Rational(dollars) * Rational(100)
-  end
-
-  def max_aptc_in_dollars
-    (Rational(max_aptc_in_cents) / Rational(100)).to_f if max_aptc_in_cents
   end
 
   def csr_percent=(value)
