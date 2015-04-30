@@ -1,17 +1,50 @@
 require 'rails_helper'
 
+describe EmployeeRole do
+  before :each do
+    subject.valid?
+  end
+
+  [:hired_on, :dob, :gender, :ssn, :employer_profile_id].each do |property|
+    it "should require #{property}" do
+      expect(subject).to have_errors_on(property)
+    end
+  end
+
+end
+
+describe EmployeeRole, "given a person" do
+  let(:hbx_id) { 555553443 }
+  let(:ssn) { "012345678" }
+  let(:dob) { Date.new(2009, 2, 5) }
+  let(:gender) { "female" }
+
+  let(:person) { Person.new(
+    :hbx_id => hbx_id,
+    :ssn => ssn,
+    :dob => dob,
+    :gender => gender
+  )}
+  subject { EmployeeRole.new(:person => person) }
+
+  it "should have access to dob" do
+    expect(subject.dob).to eq dob
+  end
+
+  it "should have access to gender" do
+    expect(subject.gender).to eq gender
+  end
+
+  it "should have access to ssn" do
+    expect(subject.ssn).to eq ssn
+  end
+  it "should have access to hbx_id" do
+    expect(subject.hbx_id).to eq hbx_id
+  end
+
+end
+
 describe EmployeeRole, dbclean: :after_each do
-  it { should delegate_method(:hbx_id).to :person }
-  it { should delegate_method(:ssn).to :person }
-  it { should delegate_method(:dob).to :person }
-  it { should delegate_method(:gender).to :person }
-
-  it { should validate_presence_of :ssn }
-  it { should validate_presence_of :dob }
-  it { should validate_presence_of :gender }
-  it { should validate_presence_of :employer_profile_id }
-  it { should validate_presence_of :hired_on }
-
   let(:ssn) {"987654321"}
   let(:dob) { 36.years.ago.to_date }
   let(:gender) {"female"}
@@ -75,65 +108,6 @@ describe EmployeeRole, dbclean: :after_each do
 
       it "should have an error on employer_profile_id" do
         expect(employee_role.errors[:employer_profile_id].any?).to be true
-      end
-    end
-
-    context "with no hired_on" do
-      let(:params) {valid_params.except(:hired_on)}
-      let(:employee_role) {saved_person.employee_roles.build(params)}
-      before() {employee_role.valid?}
-
-      it "should not be valid" do
-        expect(employee_role.valid?).to be false
-      end
-
-      it "should have an error on hired_on" do
-        expect(employee_role.errors[:hired_on].any?).to be true
-      end
-    end
-
-    context "with no ssn" do
-      let(:person_params) {valid_person_attributes.except(:ssn)}
-      let(:params) {valid_params.merge(person_attributes: person_params)}
-      let(:employee_role) {saved_person.employee_roles.build(params)}
-      before() {employee_role.valid?}
-
-      it "should not be valid" do
-        expect(employee_role.valid?).to be false
-      end
-
-      it "should have an error on ssn" do
-        expect(employee_role.errors[:ssn].any?).to be true
-      end
-    end
-
-    context "with no gender" do
-      let(:person_params) {valid_person_attributes.except(:gender)}
-      let(:params) {valid_params.merge(person_attributes: person_params)}
-      let(:employee_role) {saved_person.employee_roles.build(params)}
-      before() {employee_role.valid?}
-
-      it "should not be valid" do
-        expect(employee_role.valid?).to be false
-      end
-
-      it "should have an error on gender" do
-        expect(employee_role.errors[:gender].any?).to be true
-      end
-    end
-
-    context "with no dob" do
-      let(:employee_role) do
-        FactoryGirl.build(:employee_role, dob: nil)
-      end
-      before() {employee_role.valid?}
-
-      it "should not be valid" do
-        expect(employee_role.valid?).to be false
-      end
-
-      it "should have an error on dob" do
-        expect(employee_role.errors[:dob].any?).to be true
       end
     end
   end
@@ -233,21 +207,6 @@ describe EmployeeRole, dbclean: :after_each do
     expect(employee_role.errors.messages.size).to eq 0
     expect(employee_role.save).to eq true
   end
-  # it "updates instance timestamps" do
-  #   er = FactoryGirl.build(:employer_profile)
-  #   ee = FactoryGirl.build(:employee_role)
-  #   pn = Person.create(first_name: "Ginger", last_name: "Baker")
-  #   # ee = Employee_role.new(ssn: "345907654", dob: Date.today - 40.years, gender: "male", employer_profile: er, date_of_hire: Date.today)
-  #   ee = FactoryGirl.build(:employee_role)
-  #   pn.employees << ee
-  #   pn.valid?
-  #   expect(ee.errors.messages.inspect).to eq 0
-  #   expect(pn.save).to eq true
-  #   expect(ee.created_at).to eq ee.updated_at
-  #   employee_role.date_of_termination = Date.today
-  #   expect(ee.save).to eq true
-  #   expect(ee.created_at).not_to eq ee.updated_at
-  # end
 end
 
 describe EmployeeRole, dbclean: :after_each do
