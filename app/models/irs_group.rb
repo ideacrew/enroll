@@ -4,12 +4,12 @@ class IrsGroup
 
   embedded_in :family
 
-  auto_increment :hbx_assigned_id, seed: 1000000000000000 #The 16digit IrsGroup identifier as required by IRS
+  auto_increment :hbx_assigned_id, seed: 1_000_000_000_000_000 #The 16digit IrsGroup identifier as required by IRS
 
   field :effective_starting_on, type: Date
   field :effective_ending_on, type: Date
   field :is_active, type: Boolean, default: true
-  
+
   before_save :set_effective_starting_on
   before_save :set_effective_end_on
 
