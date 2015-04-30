@@ -248,8 +248,8 @@ describe Person, '#addresses' do
   end
 end
 
-describe Person, "large family with multiple employees - The Brady Bunch" do
-  include_context "BradyBunch"
+describe Person, "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
+  include_context "BradyBunchAfterAll"
 
   context "a person" do
     it "should know its age today" do
