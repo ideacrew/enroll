@@ -185,15 +185,16 @@ end
   end
 
   def find_relationship_with(other_person)
-
-    relationship = person_relationships.detect do |person_relationship|
-      person_relationship.relative_id == other_person.id
-    end
-
-    if relationship
-      return relationship.kind
+    if self.id == other_person.id
+      "self"
     else
-      return nil
+      person_relationship_for(other_person).try(:kind)
+    end
+  end
+
+  def person_relationship_for(other_person)
+    person_relationships.detect do |person_relationship|
+      person_relationship.relative_id == other_person.id
     end
   end
 

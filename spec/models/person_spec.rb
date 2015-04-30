@@ -61,9 +61,14 @@ describe Person do
 
     context "with all valid arguments" do
       let(:params) {valid_params}
+      let(:person) {Person.new(**params)}
 
       it "should save" do
-        expect(Person.new(**params).valid?).to be_truthy
+        expect(person.valid?).to be_truthy
+      end
+
+      it "should known its relationship is self" do
+        expect(person.find_relationship_with(person)).to eq "self"
       end
     end
 
