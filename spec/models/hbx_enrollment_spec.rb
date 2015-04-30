@@ -1,13 +1,18 @@
 require 'rails_helper'
 
-describe HbxEnrollment, dbclean: :after_each do
-  include_context "BradyWork"
+describe HbxEnrollment, dbclean: :after_all do
+  include_context "BradyWorkAfterAll"
+
+  before :all do
+    create_brady_census_families
+  end
 
   context "is created from an employer_profile, benefit_group, and coverage_household" do
-    let(:household) {mikes_family.households.first}
-    let(:coverage_household) {household.coverage_households.first}
-    let!(:enrollment) do
-      household.create_hbx_enrollment_from(
+    attr_reader :enrollment, :household, :coverage_household
+    before :all do
+      @household = mikes_family.households.first
+      @coverage_household = household.coverage_households.first
+      @enrollment = household.create_hbx_enrollment_from(
         employer_profile: mikes_employer,
         coverage_household: coverage_household,
         benefit_group: mikes_benefit_group
@@ -31,7 +36,6 @@ describe HbxEnrollment, dbclean: :after_each do
     end
 
     it "should be valid" do
-      # byebug
       expect(enrollment.valid?).to be_truthy
     end
 

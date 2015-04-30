@@ -170,7 +170,11 @@ describe Family, type: :model, dbclean: :after_each do
   end
 
   context "after it's persisted" do
-    include_context "BradyBunch"
+    include_context "BradyBunchAfterAll"
+
+    before(:each) do
+      create_brady_families
+    end
 
     context "when you add a family member" do
       it "there is a corresponding coverage household member" do
@@ -209,7 +213,11 @@ describe Family, type: :model, dbclean: :after_each do
   # end
 
   describe "special enrollment periods" do
-    include_context "BradyBunch"
+    include_context "BradyBunchAfterAll"
+
+    before :each do
+      create_brady_families
+    end
 
     let(:family) { mikes_family }
     let(:current_sep) { FactoryGirl.build(:special_enrollment_period) }
@@ -446,6 +454,10 @@ end
 
 describe Family, "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
   include_context "BradyBunchAfterAll"
+
+  before :all do
+    create_brady_families
+  end
 
   let(:family_member_id) {mikes_family.primary_applicant.id}
 

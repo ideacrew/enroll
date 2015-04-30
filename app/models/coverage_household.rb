@@ -27,7 +27,7 @@ class CoverageHousehold
   end
 
   def applicant_ids
-    coverage_household_members.map(&:applicant_id)
+    coverage_household_members.map(&:family_member_id)
   end
 
 private

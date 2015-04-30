@@ -251,6 +251,10 @@ end
 describe Person, "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
   include_context "BradyBunchAfterAll"
 
+  before :all do
+    create_brady_families
+  end
+
   context "a person" do
     it "should know its age today" do
       expect(greg.age_on(Date.today)).to eq gregs_age

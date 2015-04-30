@@ -2,8 +2,12 @@ class Person
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Versioning
+  include Notify
 
   GENDER_KINDS = %W(male female)
+  IDENTIFYING_INFO_ATTRIBUTES = %w(first_name last_name ssn dob)
+  ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
+  RELATIONSHIP_CHANGE_ATTRIBUTES = %w(person_relationships)
 
   auto_increment :hbx_id, :seed => 9999
 
@@ -210,6 +214,11 @@ end
         :relative_id => person.id
       })
     end
+  end
+
+  before_save :notify_change
+  def notify_change
+    nofity_change_event({"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES}, {"address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
   end
 
 private
