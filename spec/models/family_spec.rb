@@ -216,7 +216,6 @@ end
 
 describe Family do
   let(:family) { Family.new }
-  include_context "BradyBunchAfterAll"
 
   describe "with no special enrollment periods" do
     context "family has never had a special enrollment period" do
