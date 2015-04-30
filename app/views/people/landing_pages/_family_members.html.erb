@@ -39,6 +39,6 @@
     </ul>
     <br>
     <% add_member_url = add_dependents_people_path(person_id: @person.id, organization_id: @employer_profile.organization.id, employee_id: @person.employee_roles.first.id) %>
-    <%= link_to "New Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
+    <%= link_to "New Member", add_member_url, method: :post, class: 'btn btn-primary add_member', :remote => true %>
   </div>
 </div>
