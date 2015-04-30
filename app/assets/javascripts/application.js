@@ -48,15 +48,6 @@ $(document).ready(function () {
     $("."+divtoshow).show();
   });
 
-  // $('.autofill_yes').click(function(){
-  //     });
-
-  // $('.autofill_no').click(function(){
-  //   $('.autofill-cloud').addClass('hidden');
-  //   side_bar_link_style();
-  // });
-
-
   /* QLE Marriage Date Validator */
   $('#date_married').focusin(function() {
     $('#date_married').removeClass('input-error');
@@ -180,47 +171,25 @@ $(document).ready(function () {
   
   // ----- Focus Effect & Progress -----
   $("body").click(function(e) {
-    // fade_all();
     update_progress();
     if (e.target.id == "personal_info" || $(e.target).parents("#personal_info").size()) { 
-      // $('#personal_info div.first').addClass('employee-info');
       $("a.personal_info").css("color","#98cbff");
       $("#personal_info div.first").css("opacity","1");
     } 
     else if (e.target.id == "address_info" || $(e.target).parents("#address_info").size()) {
-      // $('#address_info div.first').addClass('employee-info');
       $("a.address_info").css("color","#98cbff");
-      // $("#address_info div.first").css("opacity","1");
-      // $("#top-pad").innerHTML="30%";
     }
     else if (e.target.id == "phone_info" || $(e.target).parents("#phone_info").size()) {
-      // $('#phone_info div.first').addClass('employee-info');
       $("a.phone_info").css("color","#98cbff");
-      // $("#phone_info div.first").css("opacity","1");
     }
     else if (e.target.id == "email_info" || $(e.target).parents("#email_info").size()) {
-      // $('#email_info div.first').addClass('employee-info');
       $("a.email_info").css("color","#98cbff");
-      // $("#email_info div.first").css("opacity","1");
     }
     else if (e.target.id == "household_info" || $(e.target).parents("#household_info").size()) {
-      // $('#household_info div.first').addClass('employee-info');
       $("a.household_info").css("color","#98cbff");
-      // $("#household_info div.first").css("opacity","1");
     }
     else {}
   });
-  
-  function fade_all() {
-    
-    // if(!$("#address_info").hasClass('hidden')) {
-    //   // $("#personal_info div.first").css("opacity","0.5");
-    // }
-    // $("#address_info div.first").css("opacity","0.5");
-    // $("#phone_info div.first").css("opacity","0.5");
-    // $("#email_info div.first").css("opacity","0.5");
-    // $("#household_info div.first").css("opacity","0.5");
-  }
   
   update_progress(); //Run on page load for dependent_details page.
   function update_progress() {
@@ -232,7 +201,6 @@ $(document).ready(function () {
       var address_entry  = check_address_entry_progress();
       var phone_entry    = check_phone_entry_progress();
       var email_entry    = check_email_entry_progress();
-      
     }
 
     if(personal_entry) {
@@ -439,29 +407,10 @@ $(document).ready(function () {
       $("[for='person_ssn']").css('opacity', 1);
     }
   });
-
-  // $('#dependent_buttons #save_member').click(function() {
-  //   if(check_dependent_info_exists().length==0) {
-  //     $('#add_info .employee-info').last().removeClass('require-field');
-  //   } else {
-  //     $('#add_info .employee-info').last().addClass('require-field');
-  //   }
-  // });
   
   $('#employer .landing_personal_tab .first').focusin(function(){
     $(this).css('opacity', 1);
   });
-
-  // $('#search-employer,#save_member').click(function(){
-  //   $('input[type="radio"]').tooltip('disable');
-  //   $('.required-tooltip .required').each(function(i, obj){
-  //     if($(obj).val() == '')
-  //       $(obj).tooltip({placement: 'right', title: 'Required field'}).tooltip('show');
-  //   })
-  //   $('.required-tooltip .required').bind('mouseenter focusin', function(){
-  //     $(this).tooltip('show').tooltip('hide');
-  //   });
-  // });
 
   $(".floatlabel, .selectric-wrapper").focusin(function() { $(this).closest('.employee-info').css("opacity","1") });
   $(".floatlabel, .selectric-wrapper").blur(function() { $(this).closest('.employee-info').css("opacity","0.5") });
