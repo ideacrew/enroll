@@ -112,6 +112,7 @@ module BradysAfterAll
 
     attr_reader :mikes_benefit_group, :mikes_plan_year, :mikes_census_employee, :mikes_census_family, :mikes_hired_on
     attr_reader :carols_benefit_group, :carols_plan_year, :carols_census_employee, :carols_census_family, :carols_hired_on
+
     def create_brady_census_families
       create_brady_coverage_households
       create_brady_employers
@@ -131,6 +132,17 @@ module BradysAfterAll
                                                     dob: carol.dob, address: carol.addresses.first, hired_on: carols_hired_on
                                                    )
       @carols_census_family = FactoryGirl.create(:employer_census_family, employer_profile: carols_employer, census_employee: carols_census_employee)
+      create_brady_employee_roles
+    end
+
+    def create_brady_employee_roles
+      mike.ssn = "4423445555"
+      EmployeeRole.create!({
+        :person => mike,
+        :employer_profile_id => mikes_employer.id,
+        :benefit_group_id => mikes_benefit_group.id,
+        :hired_on => mikes_hired_on
+      })
     end
 
     attr_reader :mikes_employer, :carols_employer
