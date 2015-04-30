@@ -1,12 +1,5 @@
 module Factories
   class EnrollmentFactory
-
-    attr_accessor :person
-
-    def initialize(person)
-      self.person = person
-    end
-
     def self.add_consumer_role(person:, new_ssn: nil, new_dob: nil, new_gender: nil, new_is_incarcerated:, new_is_applicant:,
                                new_is_state_resident:, new_citizen_status:)
 
