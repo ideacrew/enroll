@@ -120,31 +120,9 @@ module Factories
     private
 
     def self.build_employee_role(person, person_new, employer_profile, employer_census_family, hired_on)
-      # Return instance if this role already exists
-      roles = person.employee_roles.where(
-          "employer_profile_id" => employer_profile.id.to_s,
-          "hired_on" => employer_census_family.census_employee.hired_on
-        )
-
-      role = case roles.count
-      when 0
-        # Assign employee-specifc attributes
-        person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on)
-      when 1
-        roles.first
-      else
-        # What am I doing here?
-        nil
-      end
-
+      role = find_or_build_employee_role(person, employer_profile, employer_census_family, hired_on)
       self.link_employee_family(employer_census_family, role)
-
-      # Add 'self' to personal relationship need detailed implementation
-      # person.person_relationships << PersonRelationhip.new()
-
       family, primary_applicant = self.initialize_family(person, employer_census_family.census_dependents)
-      # TODO: create extra family stuff if in census
-
       saved = save_all_or_delete_new(family, primary_applicant, role)
       if saved
         employer_census_family.save
@@ -161,7 +139,7 @@ module Factories
       case people.count
       when 1
         person = people.first
-        person.user = user
+        person.user = user if user
         person.save
         person, is_new = person, false
       when 0
@@ -187,6 +165,24 @@ module Factories
       return person, is_new
     end
 
+    def self.find_or_build_employee_role(person, employer_profile, employer_census_family, hired_on)
+      roles = person.employee_roles.where(
+          "employer_profile_id" => employer_profile.id.to_s,
+          "hired_on" => employer_census_family.census_employee.hired_on
+        )
+
+      role = case roles.count
+      when 0
+        # Assign employee-specifc attributes
+        person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on)
+      when 1
+        roles.first
+      else
+        # What am I doing here?
+        nil
+      end
+    end
+
     def self.initialize_family(person, dependents)
       family = person.primary_family
       family = Family.new if family.blank?
@@ -199,9 +195,7 @@ module Factories
     end
 
     def self.initialize_primary_applicant(family, person)
-      person.ensure_relationship_with(person, "self")
-      person.save
-      family.add_family_member(person, is_primary_applicant: true)
+      family.add_family_member(person, is_primary_applicant: true) unless family.find_family_member_by_person(person)
     end
 
     def self.initialize_dependent(family, primary, dependent)
@@ -211,16 +205,7 @@ module Factories
                                  dependent.dob, dependent.gender)
       relationship = person_relationship_for(dependent.employee_relationship)
       primary.ensure_relationship_with(person, relationship)
-      members = family.family_members.where(person_id: person.id)
-      case members.count
-      when 0
-        family.add_family_member(person)
-      when 1
-        family.remove_family_member(person)
-        family.add_family_member(person)
-      else
-        # what am I doing here?  The same person was in the family twice?
-      end
+      family.add_family_member(person) unless family.find_family_member_by_person(person)
     end
 
     def self.person_relationship_for(census_relationship)

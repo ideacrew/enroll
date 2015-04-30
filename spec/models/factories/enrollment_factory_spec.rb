@@ -208,13 +208,14 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
           hired_on: census_employee.hired_on
         }
         valid_params = { employer_profile: employer_profile }.merge(valid_person_params).merge(valid_employee_params)
-        @first_employee_role, @first_family = Factories::EnrollmentFactory.add_employee_role(**params)
+        @first_employee_role, @first_family = Factories::EnrollmentFactory.add_employee_role(**valid_params)
+
         dependents = employee_family.census_dependents.collect(&:dup)
         employee = census_employee.dup
         second_employee_family = FactoryGirl.create(:employer_census_family, census_employee: employee, census_dependents: dependents)
         second_employer_profile = second_employee_family.employer_profile
         second_census_employee = second_employee_family.census_employee
-        @second_params = valid_params.merge(employer_profile: second_employer_profile)
+        @second_params = { employer_profile: second_employer_profile }.merge(valid_person_params).merge(valid_employee_params)
         @second_employee_role, @second_family = Factories::EnrollmentFactory.add_employee_role(**@second_params)
       end
 
