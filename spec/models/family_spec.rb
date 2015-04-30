@@ -447,6 +447,10 @@ end
 describe Family, "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
   include_context "BradyBunchAfterAll"
 
+  before :all do
+    create_brady_families
+  end
+
   let(:family_member_id) {mikes_family.primary_applicant.id}
 
   it "should be possible to find the family_member from a family_member_id" do
