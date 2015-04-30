@@ -1,4 +1,5 @@
 $('#new_person_wrapper').html("<%= escape_javascript(render "person_form") %>");
+$('#search-employer').hide();
 
 <% if @employer_profile.present? %>
   $('#employer-info').html("<%= escape_javascript(render 'people/employers').html_safe %>");
