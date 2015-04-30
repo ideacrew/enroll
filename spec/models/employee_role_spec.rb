@@ -376,7 +376,7 @@ describe EmployeeRole, dbclean: :after_each do
     end
   end
 
-  describe EmployeeRole, "Inbox", type: :model do
+  describe EmployeeRole, "Inbox", dbclean: :after_each do
 
     def ssn; "988854321"; end
     let(:dob) { 27.years.ago.to_date }
