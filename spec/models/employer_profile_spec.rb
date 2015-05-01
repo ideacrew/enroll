@@ -91,6 +91,48 @@ describe EmployerProfile, "given several existing employer profiles", :dbclean =
   end
 end
 
+describe EmployerProfile, "given an unlinked, linkable census employee with a family" do
+  let(:census_dob) { Date.new(1983,2,15) }
+  let(:census_ssn) { "123456789" }
+
+  let(:census_employee) { EmployerCensus::Employee.new(
+    :ssn => census_ssn,
+    :dob => census_dob
+  ) }
+  let(:census_family) { 
+    fam = EmployerCensus::EmployeeFamily.new({ :census_employee => census_employee })
+    allow(fam).to receive(:is_linkable?).and_return(true)
+    fam
+  }
+  let(:employer_profile) { EmployerProfile.new(
+    :employee_families => [census_family]
+  )}
+
+  it "should not find the linkable family when given a different ssn" do
+    person = OpenStruct.new({
+      :dob => census_dob,
+      :ssn => "987654321"
+    })
+    expect(employer_profile.linkable_employee_family_by_person(person)).to eq nil
+  end
+
+  it "should not find the linkable family when given a different dob" do
+    person = OpenStruct.new({
+      :dob => Date.new(2012,1,1),
+      :ssn => census_ssn
+    })
+    expect(employer_profile.linkable_employee_family_by_person(person)).to eq nil
+  end
+
+  it "should return the linkable employee when given the same dob and ssn" do
+    person = OpenStruct.new({
+      :dob => census_dob,
+      :ssn => census_ssn
+    })
+    expect(employer_profile.linkable_employee_family_by_person(person)).to eq census_family
+  end
+end
+
 describe EmployerProfile, "Class methods", dbclean: :after_each do
   def ee0; FactoryGirl.build(:employer_census_employee, ssn: "369851245", dob: 32.years.ago.to_date); end
   def ee1; FactoryGirl.build(:employer_census_employee, ssn: "258741239", dob: 42.years.ago.to_date); end
@@ -257,8 +299,6 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     end
   end
 
-  describe ".match_census_employees" do
-  end
 end
 
 describe EmployerProfile, "instance methods" do
@@ -269,19 +309,8 @@ describe EmployerProfile, "instance methods" do
   describe "#linkable_employee_family_by_person" do
     let (:employer_profile) {FactoryGirl.create(:employer_profile)}
 
-    context "with no census_family employees matching SSN" do
-      it "should return nil" do
-        expect(employer_profile.linkable_employee_family_by_person(person)).to be_nil
-      end
-    end
-
     context "with matching census_family employee" do
       let (:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [census_family])}
-
-      it "should return the matching census_family" do
-        expect(employer_profile.linkable_employee_family_by_person(person)).to be_a EmployerCensus::EmployeeFamily
-        expect(employer_profile.linkable_employee_family_by_person(person)).to eq census_family
-      end
 
       context "with employee previously terminated" do
         let (:prior_census_employee) {FactoryGirl.build(:employer_census_employee, ssn: "069851240", terminated_on: Date.today )}

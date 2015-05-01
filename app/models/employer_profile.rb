@@ -111,7 +111,7 @@ class EmployerProfile
   def linkable_employee_family_by_person(person)
     return if employee_families.nil?
 
-    employee_families.detect { |ef| (ef.census_employee.ssn == person.ssn) && (ef.is_linkable?) }
+    employee_families.detect { |ef| (ef.census_employee.ssn == person.ssn) && (ef.census_employee.dob == person.dob) && (ef.is_linkable?) }
   end
 
   def is_active?
