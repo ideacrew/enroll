@@ -123,20 +123,110 @@ describe EmployerCensus::EmployeeFamily, 'class methods', dbclean: :after_each d
   end
 end
 
-describe EmployerCensus::EmployeeFamily, "that exists for an employer and has no assigned benefit group", :dbclean => :after_each do
+describe EmployerCensus::EmployeeFamily, "that exists for an employer and has no assigned benefit group" do
   let(:census_family)               { EmployerCensus::EmployeeFamily.new }
 
-  let(:benefit_group_1)             { FactoryGirl.create(:benefit_group)}
+  let(:benefit_group_1)             { FactoryGirl.build(:benefit_group)}
   let(:benefit_group_assignment_1)  { EmployerCensus::BenefitGroupAssignment.new(
     benefit_group: benefit_group_1, 
     start_on: Date.current - 45.days
   ) }
+  let(:employee_role) { double }
 
   it "should assign a new benefit group when asked" do
     census_family.add_benefit_group_assignment(benefit_group_assignment_1)
     expect(census_family.benefit_group_assignments.size).to eq 1
     expect(census_family.benefit_group_assignments.first.benefit_group).to eq benefit_group_1
     expect(census_family.active_benefit_group_assignment).to eq benefit_group_assignment_1
+  end
+
+  it "should not be linkable" do
+    expect(census_family.is_linkable?).to be_falsey
+  end
+
+  it "should raise an error if you try to link it to an employee_role" do
+    expect{census_family.link_employee_role(employee_role)}.to raise_error(EmployeeFamilyLinkError)
+  end
+end
+
+describe EmployerCensus::EmployeeFamily, 'that exists for an employer and is already assigned a benefit group' do
+  let(:census_employee) { EmployerCensus::Employee.new }
+  let(:census_family)               { 
+    EmployerCensus::EmployeeFamily.new(
+      :census_employee => census_employee
+    )
+  }
+  let(:benefit_group_1)             { FactoryGirl.build(:benefit_group)}
+  let(:benefit_group_assignment_1)  { EmployerCensus::BenefitGroupAssignment.new(
+    benefit_group: benefit_group_1, 
+    start_on: Date.current - 45.days
+  ) }
+        let(:start_on)                    { Date.current - 5.days }
+        let(:end_on)                      { start_on - 1.day }
+        let(:benefit_group_2)             { FactoryGirl.build(:benefit_group)}
+        let(:benefit_group_assignment_2)  { EmployerCensus::BenefitGroupAssignment.new(
+          benefit_group: benefit_group_2, 
+          start_on: start_on
+        ) }
+
+  before :each do
+    census_family.add_benefit_group_assignment(benefit_group_assignment_1)
+  end
+
+  it "should be linkable" do
+    expect(census_family.is_linkable?).to be_truthy
+  end
+
+  describe "after another benefit group is added" do
+    before :each do
+      census_family.add_benefit_group_assignment(benefit_group_assignment_2)
+    end
+
+        it "should add the new benefit group assignment" do
+          expect(census_family.benefit_group_assignments.size).to eq 2
+        end
+
+        it "should inactivate the prior benefit group assignment and set the end date" do
+          expect(census_family.inactive_benefit_group_assignments.first.is_active?).to be_falsey
+          expect(census_family.inactive_benefit_group_assignments.first.end_on).to eq end_on
+          expect(census_family.active_benefit_group_assignment).to eq benefit_group_assignment_2
+        end
+  end
+
+end
+
+describe EmployerCensus::EmployeeFamily, "that is already linked" do
+  let(:census_family) { EmployerCensus::EmployeeFamily.new(:employee_role_id => "WHATEVERDUDE") }
+  let(:employee_role) { double }
+
+  it "should not be linkable" do
+    expect(census_family.is_linkable?).to be_falsey
+  end
+
+  it "should raise an error if you try to link it to an employee_role" do
+    expect{census_family.link_employee_role(employee_role)}.to raise_error(EmployeeFamilyLinkError)
+  end
+end
+
+describe EmployerCensus::EmployeeFamily, "with a terminated employee" do
+  let(:census_employee) { EmployerCensus::Employee.new }
+  let(:census_family) { EmployerCensus::EmployeeFamily.new(:employee_role_id => "WHATEVERDUDE", :census_employee => census_employee) }
+  let(:employee_role) { double }
+
+  before :each do
+    census_family.terminate!(Date.today)
+  end
+
+  it "should be terminated" do
+    expect(census_family.terminated?).to be_truthy
+  end
+
+  it "should not be linkable" do
+    expect(census_family.is_linkable?).to be_falsey
+  end
+
+  it "should raise an error if you try to link it to an employee_role" do
+    expect{census_family.link_employee_role(employee_role)}.to raise_error(EmployeeFamilyLinkError)
   end
 end
 
@@ -145,8 +235,10 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:', dbclean: :after_ea
   let(:employer_profile)            { FactoryGirl.create(:employer_profile) }
   let(:employee_role)               { FactoryGirl.build(:employee_role) }
   let(:census_family)               { EmployerCensus::EmployeeFamily.new(
-    :census_employee => EmployerCensus::Employee.new
-  )}
+    :census_employee => FactoryGirl.build(:employer_census_employee),
+    :terminated => false
+  )
+  } 
   let(:census_employee)             { census_family.census_employee }
 
   let(:benefit_group_1)             { FactoryGirl.create(:benefit_group)}
@@ -156,54 +248,8 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:', dbclean: :after_ea
   ) }
 
   context 'a valid employee family exists in the employer census' do
-    context 'and a benefit group assignment is requested' do
-
-      context "and the employee was previously assigned to another benefit group" do
-        let(:start_on)                    { Date.current - 5.days }
-        let(:end_on)                      { start_on - 1.day }
-        let(:benefit_group_2)             { FactoryGirl.create(:benefit_group)}
-        let(:benefit_group_assignment_2)  { EmployerCensus::BenefitGroupAssignment.new(
-          benefit_group: benefit_group_2, 
-          start_on: start_on
-        ) }
-
-        before do
-          census_family.add_benefit_group_assignment(benefit_group_assignment_1)
-          census_family.add_benefit_group_assignment(benefit_group_assignment_2)
-        end
-
-        it "should add the new benefit group assignment" do
-          expect(census_family.benefit_group_assignments.size).to eq 2
-        end
-
-        it "should inactivate the prior benefit group assignment and set the end date" do
-          expect(census_family.inactive_benefit_group_assignments.first.is_active?).to be_falsey
-          expect(census_family.inactive_benefit_group_assignments.first.end_on).to eq end_on
-        end
-
-        context "and it is successfully assigned" do
-          it "should return the new instance as the active benefit group assignment" do
-            expect(census_family.active_benefit_group_assignment).to eq benefit_group_assignment_2
-          end
-        end
-      end
-
-    end
-
 
     context 'and an employee => employee_role link is requested' do
-
-      context "and the employee is already linked to an employee_role" do
-        before do
-          census_family.save
-          census_family.add_benefit_group_assignment(benefit_group_assignment_1)
-          census_family.link_employee_role(employee_role)
-        end
-
-        it "should raise an error" do
-          expect{census_family.link_employee_role(employee_role)}.to raise_error(EmployeeFamilyLinkError)
-        end
-      end
 
       context "and the employee is terminated" do
         before do
@@ -212,12 +258,6 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:', dbclean: :after_ea
         end
 
         it "should raise an error" do
-          expect{census_family.link_employee_role(employee_role)}.to raise_error(EmployeeFamilyLinkError)
-        end
-      end
-
-      context "and the benefit group assignment is missing" do
-        it "should raise and error" do
           expect{census_family.link_employee_role(employee_role)}.to raise_error(EmployeeFamilyLinkError)
         end
       end
