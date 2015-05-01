@@ -1,12 +1,12 @@
 module Notify
   include Acapi::Notifiers
 
-  def nofity_change_event(attributes={}, relationshop_attributes={})
-    modal_name = self.class.to_s.downcase
-    if self.new_record?
-      notify("acapi.info.events.enrollment.#{modal_name}_created", self.to_xml)
+  def notify_change_event(obj, attributes={}, relationshop_attributes={})
+    modal_name = obj.class.to_s.downcase
+    if obj.new_record?
+      notify("acapi.info.events.enrollment.#{modal_name}_created", obj.to_xml)
     else
-      payload = payload(self, attributes: attributes, relationshop_attributes: relationshop_attributes)
+      payload = payload(obj, attributes: attributes, relationshop_attributes: relationshop_attributes)
       notify("acapi.info.events.enrollment.#{modal_name}_changed", payload.to_xml) if payload.present?
     end
   rescue => e

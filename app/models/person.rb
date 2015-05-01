@@ -219,7 +219,7 @@ end
 
   before_save :notify_change
   def notify_change
-    nofity_change_event({"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES}, {"address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
+    notify_change_event(self, {"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES}, {"address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
   end
 
 private
