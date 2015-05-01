@@ -1,8 +1,8 @@
 <div class="container">
-  <div class="panel panel-default" style="border:none; box-shadow: none;">
-    <div class="row tab-row">
-      <%= render "shared/error_messages", object: f.object %>
-      <%= render "shared/plan_year_fields", f: f %><br>
+    <div class="row">
+      <div class="col-md-9 col-sm-9 col-xs-12">
+        <%= render "shared/error_messages", object: f.object %>
+        <%= render "shared/plan_year_fields", f: f %><br>
 
       <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
         <%= render "shared/benefit_group_fields", f: bg %><br>
@@ -13,17 +13,16 @@
           <% end %>
 
           <div>
-            <%#= f.hidden_field :_destroy %>
+            <%= f.hidden_field :_destroy %>
             <%= link_to 'Delete'.html_safe, '#', class: "btn btn-red remove_fields" %>
-            <%#= link_to 'Add Relationship Benefit', '#', class: 'btn btn-green pull-right' %>
             <%= link_to_add_fields "Add Relationship Benefit", bg, :relationship_benefits %>
           </div>
         </div><br>
 
       <% end %>
       <div class="row top-row">
-        <%= f.submit "Create Plan Year", class: "btn btn-save" %>
+        <%= f.submit "Create Plan Year", class: "btn btn-primary" %>
       </div>
     </div>
   </div>
-</div>
+</div><br>

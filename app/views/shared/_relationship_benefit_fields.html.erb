@@ -1,5 +1,5 @@
-<h4> Relationship Benefits </h4>
-<div class="row personal-info-top-row">
+<h3> Relationship Benefits </h3>
+<div class="row no-buffer personal-info-top-row">
   <div class="col-md-12 no-pd first employee-info">
     <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <%= f.select :relationship, options_for_select(BenefitGroup::PERSONAL_RELATIONSHIP_KINDS.map{|r| [r.to_s.titleize, r.to_s] }), class: "floatlabel form-control", required: true, placeholder: 'RELATIONSHIP' %>
