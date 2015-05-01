@@ -1,26 +1,25 @@
 <%= render 'menu' %>
 
-  <div class="panel panel-default">
-    <div class="tab-row">
-      <div class="tab-content" id="myTabContent">
-        <%= render 'employers/employer_profiles/my_account/home_tab' %>
-        <%= render 'employers/employer_profiles/my_account/profile_tab' %>
-        <%= render partial: "employers/employer_profiles/my_account/employee_families" %>
-        <%= render partial: "employers/employer_profiles/my_account/benefits" %>
-        
-        <div aria-labelledby="documents-tab" id="documents" class="tab-pane" role="tabpanel">
-          <div class="col-md-10 col-sm-12">
-            <%#= render partial: "employers/employer_profiles/my_account/documents" %>
-          </div>
+<div class="panel panel-default">
+  <div class="tab-row">
+    <div class="tab-content" id="myTabContent">
+      <%= render 'employers/employer_profiles/my_account/home_tab' %>
+      <%= render 'employers/employer_profiles/my_account/profile_tab' %>
+      <%= render partial: "employers/employer_profiles/my_account/employee_families" %>
+      <%= render partial: "employers/employer_profiles/my_account/benefits" %>
+      
+      <div aria-labelledby="documents-tab" id="documents" class="tab-pane" role="tabpanel">
+        <div class="col-md-10 col-sm-12">
+          <%#= render partial: "employers/employer_profiles/my_account/documents" %>
         </div>
-
-        <div aria-labelledby="inbox-tab" id="inbox" class="tab-pane" role="tabpanel">
-          <div class="col-md-10 col-sm-12">
-            <%#= render partial: "employers/employer_profiles/my_account/inbox" %>
-          </div>
-        </div>
-
       </div>
+
+      <div aria-labelledby="inbox-tab" id="inbox" class="tab-pane" role="tabpanel">
+        <div class="col-md-10 col-sm-12">
+          <%#= render partial: "employers/employer_profiles/my_account/inbox" %>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
