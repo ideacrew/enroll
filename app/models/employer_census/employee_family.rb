@@ -187,6 +187,11 @@ class EmployerCensus::EmployeeFamily
     end
   end
 
+  def active_benefit_group_id
+    return(nil) unless active_benefit_group_assignment
+    active_benefit_group_assignment.benefit_group_id
+  end
+
 
 private
   # Apply business rules for when an enrollment -- outside open enrollment -- is considered timely, including:
