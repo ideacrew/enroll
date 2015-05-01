@@ -2,7 +2,7 @@ FactoryGirl.define do
   factory :employer_census_family, :class => 'EmployerCensus::EmployeeFamily' do
     employer_profile
     association :census_employee, factory: :employer_census_employee, strategy: :build
-    benefit_group_assignments { [] } #[FactoryGirl.build(:employer_census_benefit_group_assignment)] }
+    benefit_group_assignments { [FactoryGirl.build(:employer_census_benefit_group_assignment)] }
     terminated false
 
     # after :create do |employer_census_family|

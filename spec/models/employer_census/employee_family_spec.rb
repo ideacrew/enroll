@@ -144,7 +144,9 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:', dbclean: :after_ea
 
   let(:employer_profile)            { FactoryGirl.create(:employer_profile) }
   let(:employee_role)               { FactoryGirl.build(:employee_role) }
-  let(:census_family)               { FactoryGirl.build(:employer_census_family) }
+  let(:census_family)               { EmployerCensus::EmployeeFamily.new(
+    :census_employee => EmployerCensus::Employee.new
+  )}
   let(:census_employee)             { census_family.census_employee }
 
   let(:benefit_group_1)             { FactoryGirl.create(:benefit_group)}
