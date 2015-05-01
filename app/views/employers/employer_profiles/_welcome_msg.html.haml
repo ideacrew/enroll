@@ -1,0 +1,21 @@
+.row
+  .col-md-10.col-sm-10
+    %h1
+      = t('welcome.title')
+      %small= t('welcome.subtitle')
+
+    %p.text-justify= t('welcome.paragraph1')
+    %p.text-justify= t('welcome.paragraph2')
+    %p.text-justify= t('welcome.paragraph3')
+    %br
+
+
+.row
+  .col-md-2
+    = link_to t('button.continue'), search_employers_employer_profiles_path, :remote => true, :class => "btn btn-success btn-block btn-continue"
+
+.row.footer
+  .col-md-12
+    %small
+      = t('welcome.notice')
+      = link_to t('welcome.link'), '#'
