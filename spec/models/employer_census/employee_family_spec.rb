@@ -98,7 +98,7 @@ describe EmployerCensus::EmployeeFamily, 'class methods', dbclean: :after_each d
         end
       end
 
-      context "and employee_role is linked to census_family", dbclean: :after_each do
+      context "and employee_role is linked to census_family" do
         let(:benefit_group)             { FactoryGirl.create(:benefit_group)}
         let(:benefit_group_assignment)  { EmployerCensus::BenefitGroupAssignment.new(
                                             benefit_group: benefit_group, 

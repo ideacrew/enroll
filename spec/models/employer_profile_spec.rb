@@ -67,6 +67,30 @@ RSpec.describe EmployerProfile, :dbclean => :after_each do
   end
 end
 
+describe EmployerProfile, "given several existing employer profiles", :dbclean => :after_all do
+  before(:all) do
+    home_office = FactoryGirl.build(:office_location)
+    @er0 = EmployerProfile.new(entity_kind: "partnership")
+    @er1 =  EmployerProfile.new(entity_kind: "partnership")
+    @er2 = EmployerProfile.new(entity_kind: "partnership")
+    @er0.create_organization(legal_name: "huey",  fein: "687654321", office_locations: [home_office])
+    @er1.create_organization(legal_name: "dewey", fein: "587654321", office_locations: [home_office])
+    @er2.create_organization(legal_name: "louie", fein: "487654321", office_locations: [home_office])
+    @no_employer_org = Organization.create!(fein: "123456789", office_locations: [home_office], legal_name: "I AM NOT AN EMPLOYER")
+  end
+
+
+  it "should be able to find those profiles with the .all class method" do
+    expect(EmployerProfile.all).to include(@er0)
+    expect(EmployerProfile.all).to include(@er1)
+    expect(EmployerProfile.all).to include(@er2)
+  end
+
+  it "should not return any organizations which do not have employers" do
+    expect(EmployerProfile.all).not_to include(@no_employer_org)
+  end
+end
+
 describe EmployerProfile, "Class methods", dbclean: :after_each do
   def ee0; FactoryGirl.build(:employer_census_employee, ssn: "369851245", dob: 32.years.ago.to_date); end
   def ee1; FactoryGirl.build(:employer_census_employee, ssn: "258741239", dob: 42.years.ago.to_date); end
@@ -84,20 +108,6 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
   def organization1; er1.create_organization(legal_name: "dewey", fein: "587654321", office_locations: [home_office]); end
   def organization2; er2.create_organization(legal_name: "louie", fein: "487654321", office_locations: [home_office]); end
   before { organization0; organization1; organization2 }
-
-
-  describe ".all" do
-    it "should return an array of with employer_profiles in it" do
-      expect(EmployerProfile.all.first).to be_a EmployerProfile
-    end
-
-    it "should return the right number of employer_profiles" do
-      expect(EmployerProfile.all.size).to eq 3
-    end
-  end
-
-  describe ".find_by_fein" do
-  end
 
   describe '.find_by_broker_agency_profile' do
     let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
@@ -121,9 +131,6 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       expect(employers_with_broker.first).to be_a EmployerProfile
       expect(employers_with_broker.size).to eq 2
     end
-  end
-
-  describe ".find_by_writing_agent" do
   end
 
   describe ".find_census_families_by_person" do
