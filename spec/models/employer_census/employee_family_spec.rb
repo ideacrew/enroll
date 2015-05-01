@@ -4,7 +4,7 @@ require 'rails_helper'
 # terminate employee must set the employee family inactive
 # replicate_for_rehire_for_rehire
 
-describe EmployerCensus::EmployeeFamily, type: :model do
+describe EmployerCensus::EmployeeFamily, type: :model, dbclean: :after_each do
   it { should validate_presence_of :census_employee }
 
   let(:employer_profile) {FactoryGirl.create(:employer_profile)}
@@ -59,15 +59,12 @@ describe EmployerCensus::EmployeeFamily, type: :model do
           expect(census_family.is_linked?).to be_falsey
         end
 
-        it "should be linkable" do
-          expect(census_family.is_linkable?).to be_truthy
-        end
       end
     end
   end
 end
 
-describe EmployerCensus::EmployeeFamily, 'class methods' do
+describe EmployerCensus::EmployeeFamily, 'class methods', dbclean: :after_each do
   def employer_profile; FactoryGirl.create(:employer_profile); end
   def employee_family;  FactoryGirl.create(:employer_census_family, employer_profile: employer_profile); end
   def census_employee;  employee_family.census_employee; end
@@ -101,7 +98,7 @@ describe EmployerCensus::EmployeeFamily, 'class methods' do
         end
       end
 
-      context "and employee_role is linked to census_family" do
+      context "and employee_role is linked to census_family", dbclean: :after_each do
         let(:benefit_group)             { FactoryGirl.create(:benefit_group)}
         let(:benefit_group_assignment)  { EmployerCensus::BenefitGroupAssignment.new(
                                             benefit_group: benefit_group, 
@@ -126,7 +123,7 @@ describe EmployerCensus::EmployeeFamily, 'class methods' do
   end
 end
 
-describe EmployerCensus::EmployeeFamily, 'instance methods:' do
+describe EmployerCensus::EmployeeFamily, 'instance methods:', dbclean: :after_each do
 
   let(:employer_profile)            { FactoryGirl.create(:employer_profile) }
   let(:employee_role)               { FactoryGirl.build(:employee_role) }
@@ -147,6 +144,7 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:' do
         end
 
         it "should add a new benefit group assignment" do
+          byebug
           expect(census_family.benefit_group_assignments.size).to eq 1
           expect(census_family.benefit_group_assignments.first.benefit_group).to eq benefit_group_1
         end

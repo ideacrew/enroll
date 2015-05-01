@@ -16,10 +16,12 @@ class EmployerCensus::BenefitGroupAssignment
   def benefit_group=(new_benefit_group)
     raise ArgumentError("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
     self.benefit_group_id = new_benefit_group._id
+    @benefit_group = new_benefit_group
   end
 
   def benefit_group
-    BenefitGroup.find(self.benefit_group_id) unless benefit_group_id.blank?
+    return @benefit_group if defined? @benefit_group
+    @benefit_group = BenefitGroup.find(self.benefit_group_id) unless benefit_group_id.blank?
   end
 
   def is_active?

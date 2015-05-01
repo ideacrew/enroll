@@ -90,11 +90,12 @@ class EmployerCensus::EmployeeFamily
     self.employer_profile
   end
 
-  def link_employee_role(employee_role, linked_at = Time.now)
+  def link_employee_role(employee_role, linked_at = DateTime.current)
     raise EmployeeFamilyLinkError, "already linked to an employee role" if is_linked?
     raise EmployeeFamilyLinkError, "invalid to link a terminated employee" if is_terminated?
     raise EmployeeFamilyLinkError, "must assign a benefit group" unless active_benefit_group_assignment.present?
 
+    @linked_employee_role = employee_role
     self.employee_role_id = employee_role._id
     self.linked_at = linked_at
     employee_role.census_family_id = _id
@@ -102,10 +103,12 @@ class EmployerCensus::EmployeeFamily
   end
 
   def linked_employee_role
-    EmployeeRole.find(self.employee_role_id) if is_linked?
+    return @linked_employee_role if defined? @linked_employee_role
+    @linked_employee_role = EmployeeRole.find(self.employee_role_id) if is_linked?
   end
 
   def delink_employee_role
+    @linked_employee_role = nil
     self.employee_role_id = nil
     self.linked_at = nil
     self
@@ -116,7 +119,7 @@ class EmployerCensus::EmployeeFamily
   end
 
   def is_linkable?
-    (is_linked? == false) && (is_terminated? == false)
+    (is_linked? == false) && (is_terminated? == false) && active_benefit_group_assignment.present?
   end
 
   def terminate(last_day_of_work)
