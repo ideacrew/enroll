@@ -74,7 +74,7 @@ describe Family, type: :model, dbclean: :after_each do
         end
 
         it "is persistable" do
-          expect(family.save).to be_truthy
+          expect(family.valid?).to be_truthy
         end
 
         context "and it is persisted" do
@@ -170,7 +170,11 @@ describe Family, type: :model, dbclean: :after_each do
   end
 
   context "after it's persisted" do
-    include_context "BradyBunch"
+    include_context "BradyBunchAfterAll"
+
+    before(:each) do
+      create_brady_families
+    end
 
     context "when you add a family member" do
       it "there is a corresponding coverage household member" do
@@ -208,37 +212,13 @@ describe Family, type: :model, dbclean: :after_each do
   #   end
   # end
 
-  describe "special enrollment periods" do
-    include_context "BradyBunch"
+end
 
-    let(:family) { mikes_family }
-    let(:current_sep) { FactoryGirl.build(:special_enrollment_period) }
-    let(:another_current_sep) { FactoryGirl.build(:special_enrollment_period, qle_on: 4.days.ago.to_date) }
-    let(:expired_sep) { FactoryGirl.build(:special_enrollment_period, :expired) }
+describe Family do
+  let(:family) { Family.new }
 
+  describe "with no special enrollment periods" do
     context "family has never had a special enrollment period" do
-      it "should indicate no active SEPs" do
-        expect(family.is_under_special_enrollment_period?).to be_falsey
-      end
-
-      it "current_special_enrollment_periods should return []" do
-        expect(family.current_special_enrollment_periods).to eq []
-      end
-    end
-
-    context "family has a past QLE, but Special Enrollment Period has expired" do
-      before do
-        family.special_enrollment_periods << expired_sep
-        family.save
-      end
-
-      it "should have the SEP instance" do
-        expect(family.special_enrollment_periods.size).to eq 1
-      end
-
-      it "should return a SEP class" do
-        expect(family.special_enrollment_periods.first).to be_a SpecialEnrollmentPeriod
-      end
 
       it "should indicate no active SEPs" do
         expect(family.is_under_special_enrollment_period?).to be_falsey
@@ -246,109 +226,80 @@ describe Family, type: :model, dbclean: :after_each do
 
       it "current_special_enrollment_periods should return []" do
         expect(family.current_special_enrollment_periods).to eq []
-      end
-    end
-
-    context "family has a QLE and is under a SEP" do
-      before do
-        family.special_enrollment_periods << current_sep
-        family.save
-      end
-
-      it "should indicate SEP is active" do
-        expect(family.is_under_special_enrollment_period?).to be_truthy
-      end
-
-      it "should return one current_special_enrollment" do
-        expect(family.current_special_enrollment_periods.size).to eq 1
-        expect(family.current_special_enrollment_periods.first).to eq current_sep
-      end
-
-      context "and the family is under more than one SEP" do
-        before do
-          family.special_enrollment_periods << another_current_sep
-          family.save
-        end
-        it "should return multiple current_special_enrollment" do
-          expect(family.current_special_enrollment_periods.size).to eq 2
-        end
-      end
-    end
-
-    pending "TODO"
-    context "attempt to add new SEP with same QLE and date as existing SEP" do
-      before do
-      end
-
-      it "should not save as a duplicate" do
       end
     end
   end
 
-  describe "large family with multiple employees - The Brady Bunch" do
-    include_context "BradyBunch"
-
-    let(:family_member_id) {mikes_family.primary_applicant.id}
-
-    it "should be possible to find the family_member from a family_member_id" do
-      expect(Family.find_family_member(family_member_id).id.to_s).to eq family_member_id.to_s
+  describe "family has a past QLE, but Special Enrollment Period has expired" do
+    before :each do
+      expired_sep = FactoryGirl.build(:special_enrollment_period, :expired)
+      family.special_enrollment_periods << expired_sep
     end
 
-    context "Family.find_by_primary_applicant" do
-      context "on Mike" do
-        let(:find) {Family.find_by_primary_applicant(mike)}
-        it "should find Mike's family" do
-          expect(find.id.to_s).to eq mikes_family.id.to_s
-        end
-      end
-
-      context "on Carol" do
-        let(:find) {Family.find_by_primary_applicant(carol)}
-        it "should find Carol's family" do
-          expect(find.id.to_s).to eq carols_family.id.to_s
-        end
-      end
+    it "should have the SEP instance" do
+      expect(family.special_enrollment_periods.size).to eq 1
     end
 
-    context "Family.find_by_person" do
-      context "on Mike" do
-        let(:find) {Family.find_all_by_person(mike).collect(&:id)}
-        it "should find two families" do
-          expect(find.count).to be 2
-        end
-        it "should find Mike's family" do
-          expect(find).to include mikes_family.id
-        end
-        it "should find Carol's family" do
-          expect(find).to include carols_family.id
-        end
-      end
+    it "should return a SEP class" do
+      expect(family.special_enrollment_periods.first).to be_a SpecialEnrollmentPeriod
+    end
 
-      context "on Carol" do
-        let(:find) {Family.find_all_by_person(carol).collect(&:id)}
-        it "should find two families" do
-          expect(find.count).to be 2
-        end
-        it "should find Mike's family" do
-          expect(find).to include mikes_family.id
-        end
-        it "should find Carol's family" do
-          expect(find).to include carols_family.id
-        end
-      end
+    it "should indicate no active SEPs" do
+      expect(family.is_under_special_enrollment_period?).to be_falsey
+    end
 
-      context "on Greg" do
-        let(:find) {Family.find_all_by_person(greg).collect(&:id)}
-        it "should find two families" do
-          expect(find.count).to be 2
-        end
-        it "should find Mike's family" do
-          expect(find).to include mikes_family.id
-        end
-        it "should find Carol's family" do
-          expect(find).to include carols_family.id
-        end
+    it "current_special_enrollment_periods should return []" do
+      expect(family.current_special_enrollment_periods).to eq []
+    end
+  end
+  context "family has a QLE and is under a SEP" do
+    before do
+      @current_sep = FactoryGirl.build(:special_enrollment_period) 
+      family.special_enrollment_periods << @current_sep
+    end
+
+    it "should indicate SEP is active" do
+      expect(family.is_under_special_enrollment_period?).to be_truthy
+    end
+
+    it "should return one current_special_enrollment" do
+      expect(family.current_special_enrollment_periods.size).to eq 1
+      expect(family.current_special_enrollment_periods.first).to eq @current_sep
+    end
+   end
+
+    context "and the family is under more than one SEP" do
+      before do
+        current_sep = FactoryGirl.build(:special_enrollment_period) 
+        family.special_enrollment_periods << current_sep
+        another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: 4.days.ago.to_date)
+        family.special_enrollment_periods << another_current_sep
       end
+      it "should return multiple current_special_enrollment" do
+        expect(family.current_special_enrollment_periods.size).to eq 2
+      end
+    end
+end
+
+describe "special enrollment periods" do
+=begin
+  include_context "BradyBunchAfterAll"
+
+  before :each do
+    create_brady_families
+  end
+
+  let(:family) { mikes_family }
+  let(:current_sep) { FactoryGirl.build(:special_enrollment_period) }
+  let(:another_current_sep) { FactoryGirl.build(:special_enrollment_period, qle_on: 4.days.ago.to_date) }
+  let(:expired_sep) { FactoryGirl.build(:special_enrollment_period, :expired) }
+=end
+  pending "TODO"
+  context "attempt to add new SEP with same QLE and date as existing SEP" do
+    before do
+    end
+
+    it "should not save as a duplicate" do
     end
   end
 end
@@ -506,6 +457,77 @@ describe Family, "with a primary applicant" do
 
     it "should relate the person and create the family member" do
       subject.relate_new_member(dependent, "spouse")
+    end
+  end
+end
+
+describe Family, "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
+  include_context "BradyBunchAfterAll"
+
+  before :all do
+    create_brady_families
+  end
+
+  let(:family_member_id) {mikes_family.primary_applicant.id}
+
+  it "should be possible to find the family_member from a family_member_id" do
+    expect(Family.find_family_member(family_member_id).id.to_s).to eq family_member_id.to_s
+  end
+
+  context "Family.find_by_primary_applicant" do
+    context "on Mike" do
+      let(:find) {Family.find_by_primary_applicant(mike)}
+      it "should find Mike's family" do
+        expect(find.id.to_s).to eq mikes_family.id.to_s
+      end
+    end
+
+    context "on Carol" do
+      let(:find) {Family.find_by_primary_applicant(carol)}
+      it "should find Carol's family" do
+        expect(find.id.to_s).to eq carols_family.id.to_s
+      end
+    end
+  end
+
+  context "Family.find_by_person" do
+    context "on Mike" do
+      let(:find) {Family.find_all_by_person(mike).collect(&:id)}
+      it "should find two families" do
+        expect(find.count).to be 2
+      end
+      it "should find Mike's family" do
+        expect(find).to include mikes_family.id
+      end
+      it "should find Carol's family" do
+        expect(find).to include carols_family.id
+      end
+    end
+
+    context "on Carol" do
+      let(:find) {Family.find_all_by_person(carol).collect(&:id)}
+      it "should find two families" do
+        expect(find.count).to be 2
+      end
+      it "should find Mike's family" do
+        expect(find).to include mikes_family.id
+      end
+      it "should find Carol's family" do
+        expect(find).to include carols_family.id
+      end
+    end
+
+    context "on Greg" do
+      let(:find) {Family.find_all_by_person(greg).collect(&:id)}
+      it "should find two families" do
+        expect(find.count).to be 2
+      end
+      it "should find Mike's family" do
+        expect(find).to include mikes_family.id
+      end
+      it "should find Carol's family" do
+        expect(find).to include carols_family.id
+      end
     end
   end
 end

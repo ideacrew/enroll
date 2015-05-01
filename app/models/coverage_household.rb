@@ -21,13 +21,17 @@ class CoverageHousehold
   validates_presence_of :is_immediate_family
   validate :presence_of_coverage_household_members
 
+  def subscriber
+    coverage_household_members.detect(&:is_subscriber)
+  end
+
   def family
     return nil unless household
     household.family
   end
 
   def applicant_ids
-    coverage_household_members.map(&:applicant_id)
+    coverage_household_members.map(&:family_member_id)
   end
 
 private

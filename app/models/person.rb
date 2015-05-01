@@ -2,8 +2,12 @@ class Person
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Versioning
+  include Notify
 
   GENDER_KINDS = %W(male female)
+  IDENTIFYING_INFO_ATTRIBUTES = %w(first_name last_name ssn dob)
+  ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
+  RELATIONSHIP_CHANGE_ATTRIBUTES = %w(person_relationships)
 
   auto_increment :hbx_id, :seed => 9999
 
@@ -181,15 +185,16 @@ end
   end
 
   def find_relationship_with(other_person)
-
-    relationship = person_relationships.detect do |person_relationship|
-      person_relationship.relative_id == other_person.id
-    end
-
-    if relationship
-      return relationship.kind
+    if self.id == other_person.id
+      "self"
     else
-      return nil
+      person_relationship_for(other_person).try(:kind)
+    end
+  end
+
+  def person_relationship_for(other_person)
+    person_relationships.detect do |person_relationship|
+      person_relationship.relative_id == other_person.id
     end
   end
 
@@ -210,6 +215,11 @@ end
         :relative_id => person.id
       })
     end
+  end
+
+  before_save :notify_change
+  def notify_change
+    notify_change_event(self, {"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES}, {"address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
   end
 
 private

@@ -1,24 +1,19 @@
 module BradysAfterAll
   shared_context "BradyBunchAfterAll" do
-    before :all do
-      mikes_coverage_household
-      carols_coverage_household
-    end
-
     def dob(num_years)
       Date.today - num_years.years
     end
 
     def build_brady_address
       FactoryGirl.build(:address,
-        kind: "home",
-        address_1:
-        "4222 Clinton Way",
-        address_2: nil,
-        city: "Washington",
-        state: "DC",
-        zip: "20011"
-      )
+                        kind: "home",
+                        address_1:
+                        "4222 Clinton Way",
+                        address_2: nil,
+                        city: "Washington",
+                        state: "DC",
+                        zip: "20011"
+                       )
     end
 
     def build_brady_phone 
@@ -33,6 +28,8 @@ module BradysAfterAll
       FactoryGirl.create(:male, first_name: name, last_name: "Brady", dob: dob(age), addresses: [build_brady_address], phones: [build_brady_phone])
     end
 
+    attr_reader :mike, :carol
+
     def mikes_age; 40; end
     def carols_age; 35; end
     def gregs_age; 17; end
@@ -41,50 +38,33 @@ module BradysAfterAll
     def jans_age; 12; end
     def bobbys_age; 8; end
     def cindys_age; 6; end
-    def mike 
-      @mike ||= male_brady("Mike", mikes_age)
+
+    attr_reader :mike, :carol, :greg, :marcia, :peter, :jan, :bobby, :cindy
+
+    def create_brady_people
+      @mike = male_brady("Mike", mikes_age)
+      @carol = female_brady("Carol", carols_age)
+      @greg = male_brady("Greg", gregs_age)
+      @marcia = female_brady("Marcia", marcias_age)
+      @peter = male_brady("Peter", peters_age)
+      @jan = female_brady("Jan", jans_age)
+      @bobby = male_brady("Bobby", bobbys_age)
+      @cindy = female_brady("Cindy", cindys_age)
     end
 
-    def carol
-      @carol ||= female_brady("Carol", carols_age)
-    end
-    def greg
-      @greg ||= male_brady("Greg", gregs_age)
+    attr_reader :brady_daughters, :brady_sons, :brady_children, :bradys, :carols_family, :mikes_family
+
+    def create_brady_families
+      create_brady_people
+      @brady_daughters = [marcia, jan, cindy]
+      @brady_sons = [greg, peter, bobby]
+      @brady_children = brady_sons + brady_daughters
+      @bradys = [mike, carol, greg, marcia, peter, jan, bobby, cindy]
+      @mikes_family = create_mikes_family
+      @carols_family = create_carols_family
     end
 
-    def marcia
-      @marcia ||= female_brady("Marcia", marcias_age)
-    end
-
-    def peter
-      @peter ||= male_brady("Peter", peters_age)
-    end
-
-    def jan
-      @jan ||= female_brady("Jan", jans_age)
-    end
-    def bobby
-      @bobby ||= male_brady("Bobby", bobbys_age)
-    end
-
-    def cindy
-      @cindy ||= female_brady("Cindy", cindys_age)
-    end
-
-    def brady_daughters
-      @brady_daughters ||= [marcia, jan, cindy]
-    end
-    def brady_sons
-      @brady_sons ||= [greg, peter, bobby]
-    end
-    def brady_children
-      @brady_children ||= brady_sons + brady_daughters
-    end
-    def bradys
-        @bradys ||= [mike, carol, greg, marcia, peter, jan, bobby, cindy]
-    end
-    def mikes_family
-      return @mikes_family if @mikes_family
+    def create_mikes_family
       mike.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "self")
       mike.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "spouse")
       brady_children.each do |child|
@@ -98,10 +78,10 @@ module BradysAfterAll
         family.add_family_member(brady)
       end
       family.save
-      @mikes_family = family
+      family
     end
-    def carols_family
-      return @carols_family if @carols_family
+
+    def create_carols_family
       carol.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "self")
       carol.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "spouse")
       brady_children.each do |child|
@@ -115,13 +95,120 @@ module BradysAfterAll
         family.add_family_member(brady)
       end
       family.save
-      @carols_family = family
+      family
     end
-    def mikes_coverage_household 
-      @mikes_coverage_household ||= mikes_family.households.first.coverage_households.first
+
+    attr_reader :mikes_coverage_household, :carols_coverage_household
+
+    def create_brady_coverage_households
+      create_brady_families
+      @mikes_coverage_household = mikes_family.households.first.coverage_households.first
+      @carols_coverage_household = carols_family.households.first.coverage_households.first
     end
-    def carols_coverage_household
-        @carols_coverage_household ||= carols_family.households.first.coverage_households.first
+  end
+
+  shared_context "BradyWorkAfterAll" do
+    include_context "BradyBunchAfterAll"
+
+    attr_reader :mikes_benefit_group, :mikes_plan_year, :mikes_census_employee, :mikes_census_family, :mikes_hired_on
+    attr_reader :carols_benefit_group, :carols_plan_year, :carols_census_employee, :carols_census_family, :carols_hired_on
+
+    def create_brady_census_families
+      create_brady_coverage_households
+      create_brady_employers
+      @mikes_benefit_group = FactoryGirl.build(:benefit_group, plan_year: nil)
+      @mikes_plan_year = FactoryGirl.create(:plan_year, employer_profile: mikes_employer, benefit_groups: [mikes_benefit_group])
+      @mikes_hired_on = 1.year.ago.beginning_of_year.to_date
+      @mikes_census_employee = FactoryGirl.build(:employer_census_employee,
+                                                   first_name: mike.first_name,  last_name: mike.last_name,
+                                                   dob: mike.dob, address: mike.addresses.first, hired_on: mikes_hired_on
+                                                  )
+      @mikes_census_family = FactoryGirl.create(:employer_census_family, employer_profile: mikes_employer, census_employee: mikes_census_employee)
+      @carols_hired_on = 1.year.ago.beginning_of_year.to_date
+      @carols_benefit_group = FactoryGirl.build(:benefit_group, plan_year: nil)
+      @carols_plan_year = FactoryGirl.create(:plan_year, employer_profile: carols_employer, benefit_groups: [carols_benefit_group])
+      @carols_census_employee = FactoryGirl.build(:employer_census_employee,
+                                                    first_name: carol.first_name,  last_name: carol.last_name,
+                                                    dob: carol.dob, address: carol.addresses.first, hired_on: carols_hired_on
+                                                   )
+      @carols_census_family = FactoryGirl.create(:employer_census_family, employer_profile: carols_employer, census_employee: carols_census_employee)
+      create_brady_employee_roles
     end
+
+    def create_brady_employee_roles
+      mike.ssn = "4423445555"
+      EmployeeRole.create!({
+        :person => mike,
+        :employer_profile_id => mikes_employer.id,
+        :benefit_group_id => mikes_benefit_group.id,
+        :hired_on => mikes_hired_on
+      })
+    end
+
+    attr_reader :mikes_employer, :carols_employer
+    def create_brady_employers
+      create_brady_work_organizations
+      @mikes_employer = FactoryGirl.build(:employer_profile, organization: mikes_organization)
+      @carols_employer = FactoryGirl.build(:employer_profile)
+    end
+
+    attr_reader :mikes_organization, :carols_organization
+    def create_brady_work_organizations
+      create_brady_office_locations
+      @mikes_organization = FactoryGirl.create(:organization,
+                                                 legal_name: "Mike's Architects Limited",
+                                                 dba: "MAL",
+                                                 office_locations: [mikes_office_location]
+                                                )
+      @carols_organization = FactoryGirl.create(:organization,
+                                                  legal_name: "Care Real S Tates",
+                                                  dba: "CRST",
+                                                  office_locations: [carols_office_location],
+                                                  employer_profile: carols_employer
+                                                 )
+    end
+
+    attr_reader :mikes_office_location, :carols_office_location
+    def create_brady_office_locations
+      create_brady_work_addresses
+      create_brady_work_phones
+      @mikes_office_location = FactoryGirl.build(:office_location,
+                        address: mikes_work_addr,
+                        phone: mikes_work_phone
+                       )
+      @carols_office_location = FactoryGirl.build(:office_location,
+                                                  address: carols_work_addr,
+                                                  phone: carols_work_phone
+                                                 )
+    end
+
+    attr_reader :mikes_work_phone, :carols_work_phone
+    def create_brady_work_phones
+      @mikes_work_phone = FactoryGirl.build(:phone, kind: "home", area_code: "202", number: "5069292", extension: nil)
+      @carols_work_phone = FactoryGirl.build(:phone, kind: "home", area_code: "202", number: "6109987", extension: nil)
+    end
+
+    attr_reader :carols_work_addr, :mikes_work_addr
+    def create_brady_work_addresses
+      @carols_work_addr = FactoryGirl.build(:address,
+                                              kind: "work",
+                                              address_1:
+                                              "1321 Carter Court",
+                                              address_2: nil,
+                                              city: "Washington",
+                                              state: "DC",
+                                              zip: "20011"
+                                             )
+      @mikes_work_addr = FactoryGirl.build(:address,
+                                             kind: "work",
+                                             address_1:
+                                             "6345 Reagan Road",
+                                             address_2: nil,
+                                             city: "Washington",
+                                             state: "DC",
+                                             zip: "20011"
+                                            )
+    end
+
   end
 end

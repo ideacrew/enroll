@@ -61,9 +61,14 @@ describe Person do
 
     context "with all valid arguments" do
       let(:params) {valid_params}
+      let(:person) {Person.new(**params)}
 
       it "should save" do
-        expect(Person.new(**params).valid?).to be_truthy
+        expect(person.valid?).to be_truthy
+      end
+
+      it "should known its relationship is self" do
+        expect(person.find_relationship_with(person)).to eq "self"
       end
     end
 
@@ -248,8 +253,12 @@ describe Person, '#addresses' do
   end
 end
 
-describe Person, "large family with multiple employees - The Brady Bunch" do
-  include_context "BradyBunch"
+describe Person, "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
+  include_context "BradyBunchAfterAll"
+
+  before :all do
+    create_brady_families
+  end
 
   context "a person" do
     it "should know its age today" do
@@ -377,5 +386,26 @@ end
 describe Person, "with an existing relationship to a dependent" do
   describe "after ensure_relationship_with a different type of relationship" do
     it "should correct the existing relationship"
+  end
+end
+
+describe Person, "call notify change event when after save" do
+  before do 
+    extend Notify
+  end
+
+  context "notify change event" do
+    let(:person){FactoryGirl.build(:person)}
+    it "when new record" do
+      expect(person).to receive(:notify_change_event).exactly(1).times
+      person.save
+    end
+
+    it "when change record" do
+      expect(person).to receive(:notify_change_event).exactly(1).times
+      first_name = person.first_name
+      person.first_name = "Test"
+      person.save
+    end
   end
 end

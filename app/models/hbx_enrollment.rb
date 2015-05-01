@@ -103,13 +103,22 @@ class HbxEnrollment
     broker_agency_id.present?
   end
 
+  # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer
+  #       This should probably be done by comparing the hired_on date with todays date.
+  #       Also needs to ignore any that were already terminated before a certain date.
+  def self.calculate_start_date_from(employer_profile, coverage_household, benefit_group)
+    employee_role = coverage_household.subscriber.family_member.person.employee_roles.detect do |e_role|
+      e_role.employer_profile_id.to_s == employer_profile.id.to_s
+    end
+    benefit_group.effective_on_for(employee_role.hired_on)
+  end
+
   def self.new_from(employer_profile: nil, coverage_household:, benefit_group:)
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
     enrollment.kind = "employer_sponsored" if employer_profile.present?
     enrollment.employer_profile = employer_profile
-    # FIX ME: simplest possible calculation, is also wrong
-    enrollment.effective_on = Date.today.next_month.at_beginning_of_month
+    enrollment.effective_on = calculate_start_date_from(employer_profile, coverage_household, benefit_group)
     # benefit_group.plan_year.start_on
     enrollment.benefit_group = benefit_group
     coverage_household.coverage_household_members.each do |coverage_member|
