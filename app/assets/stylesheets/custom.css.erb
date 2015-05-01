@@ -1684,8 +1684,6 @@ a.list-group-item.confirm {
   color: #007bc3;
   font-size: 14px;
   padding: 12.8px 0;
-  opacity: 0.45;
-  border: 1px solid #007bc3;
   margin-bottom: -1px;
   background: #fff;
 }
@@ -3106,8 +3104,6 @@ a.close-1, a.close-2{
 }
 .tab-row #myTabContent .submenu {
     background: none repeat scroll 0 0 #00a3d9;
-    padding: 0 45px;
-    width: 100%;
 }
 .tab-row #myTabContent .submenu ul {
     border: medium none;
@@ -3240,11 +3236,11 @@ a.close-1, a.close-2{
 .emp-ul.list-group .list-group-item {
   border-width: 0 1px 0;
   border-style: none solid none;
-  border-color: #6fb7ff; 
+  border-color: #007bc3; 
   color: #007bc3;
   font-size: 14px;
   margin-bottom: 0;
-  /*opacity: 0.45;*/
+  opacity: 0.75;
   padding: 10px 0;
   border-radius: 0;
   border-top: 1px solid #ffffff;
@@ -3611,6 +3607,74 @@ div#house_info .sidebar-email-field {
 }
 .mrg-top{
   margin-top: 15px;
+}
+
+/* Account Menu */
+
+.top-menu {
+  background: #00698c;
+  border: none;
+  padding: 0 45px;
+}
+.top-menu > li {
+  margin: 0 !important;
+}
+.top-menu > li > a {
+  border-radius: 0 !important;
+  border: none !important;
+  font-size: 18px;
+  color: #bbb;
+  padding: 25px 30px;
+  position: relative;
+}
+.top-menu > li > a .badge {
+  background: #8c0000;
+  position: absolute;
+  right: 18px;
+  top: 36%;
+  border-radius: 100%;
+  padding: 4px 4px 3px 3px;
+}
+.top-menu > li > a span {
+  position: relative;
+  top: 5px;
+}
+.top-menu > li.active > a {
+  background: none !important;
+  color: #fff !important;
+  font-weight: bold;
+  position: relative;
+}
+.home-icon {
+  background: url('<%= asset_path('home-icon-gray.png') %>') no-repeat;
+  display: block;
+  height: 34px;
+  width: 34px;
+  top: 0 !important;
+}
+.top-menu > li.active > a .home-icon, .home-icon:hover, .home-icon:focus {
+  background: url('<%= asset_path('home-icon.png') %>') no-repeat;
+}
+.top-menu > li.active > a:after {
+  top: 100%;
+  left: 40%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-color: rgba(0, 105, 140, 0);
+  border-top-color: #00698c;
+  border-width: 20px;
+  margin-left: -10px;
+}
+.top-menu > li:first-child.active > a:after {
+  display: none;
+}
+.top-menu > li > a:focus, .top-menu > li > a:hover {
+  color: #fff;
+  background: none !important;
 }
 
 /* CUSTOM STYLE */

@@ -1,62 +1,70 @@
-<%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile), class: "btn btn-primary" %>
-<% if @current_plan_year.present? %>
-  <h4>Plan Year <%= @current_plan_year.start_on.to_date.year %></h4>
-  <dl class="dl-horizontal">
-    <dt>FTE/PTE/MSP Count</dt>
-    <dd>
-      <%= @current_plan_year.fte_count %> /
-      <%= @current_plan_year.pte_count %> /
-      <%= @current_plan_year.msp_count %> 
-    </dd>
-    <dt>Participation Pct</dt>
-    <dd></dd>
-    <dt><%= @current_plan_year.employee_participation_percent %></dt>
-    <dt>Open Enroll Start/End</dt>
-      <dd>
-        <%= format_date @current_plan_year.open_enrollment_start_on %> / 
-        <%= format_date @current_plan_year.open_enrollment_end_on %>
-      </dd>
-    <dt>Plan Year Start/End</dt>
-    <dd>
-      <%= format_date @current_plan_year.start_on %> / 
-      <%= format_date @current_plan_year.end_on %>
-    </dd>
-  </dl>
-  <h4>Benefit Groups</h4>
-  <% @benefit_groups.each do |bg| %>
-    <dl class="dl-horizontal">
-      <dt>Benefit Group</dt>
-      <dd><%= bg.title %> </dd>
-      <dt>Coverage Effective</dt>
-      <dd><%= "#{bg.effective_on_kind.humanize} after #{bg.effective_on_offset} days from date of hire" %></dd>
-      <dt>Coverage Termination</dt>
-      <dd><%= "#{bg.terminate_on_kind.humanize} following last day of employment" %> </dd>
-      <dt>Ref Plan</dt>
-      <dd><%= "#{bg.reference_plan.name}" %></dd>
-      <dt>Ref Plan Metal Level</dt>
-      <dd><%= "#{bg.reference_plan.metal_level.titleize}" %></dd>
-   </dl>
-    <h4>Employer Contributions</h4>
-    <table class="table table-condensed">
-      <thead>
-        <tr>
-          <th>Employee Relationship</th>
-          <th>Coverage Offered?</th>
-          <th>Employer Contribution Pct</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% bg.relationship_benefits.each do |rb| %>
-          <tr>
-            <td><%= rb.relationship.humanize %></td>
-            <td><%= rb.relationship == 'child_26_and_over' ? "No" : "Yes" %></td>
-            <td><%= number_to_percentage rb.premium_pct, precision: 0 %></td>
-           </tr>
-        <% end %>
-      </tbody>
-    </table>
+<div aria-labelledby="benefits-tab" id="benefits" class="tab-pane fade" role="tabpanel">
+  <div class="container">
+    <div class="row">
+      <div class="landing-row">
+        <div class="col-md-12 col-sm-12 col-xs-12 col-gn-top">
 
+  <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile), class: "btn btn-primary" %>
+  <% if @current_plan_year.present? %>
+    <h3>Plan Year <%= @current_plan_year.start_on.to_date.year %></h3>
+    <dl class="dl-horizontal">
+      <dt>FTE/PTE/MSP Count</dt>
+      <dd>
+        <%= @current_plan_year.fte_count %> /
+        <%= @current_plan_year.pte_count %> /
+        <%= @current_plan_year.msp_count %> 
+      </dd>
+      <dt>Participation Pct</dt>
+      <dd></dd>
+      <dt><%= @current_plan_year.employee_participation_percent %></dt>
+      <dt>Open Enroll Start/End</dt>
+        <dd>
+          <%= format_date @current_plan_year.open_enrollment_start_on %> / 
+          <%= format_date @current_plan_year.open_enrollment_end_on %>
+        </dd>
+      <dt>Plan Year Start/End</dt>
+      <dd>
+        <%= format_date @current_plan_year.start_on %> / 
+        <%= format_date @current_plan_year.end_on %>
+      </dd>
+    </dl>
+    <h4>Benefit Groups</h4>
+    <% @benefit_groups.each do |bg| %>
+      <dl class="dl-horizontal">
+        <dt>Benefit Group</dt>
+        <dd><%= bg.title %> </dd>
+        <dt>Coverage Effective</dt>
+        <dd><%= "#{bg.effective_on_kind.humanize} after #{bg.effective_on_offset} days from date of hire" %></dd>
+        <dt>Coverage Termination</dt>
+        <dd><%= "#{bg.terminate_on_kind.humanize} following last day of employment" %> </dd>
+        <dt>Ref Plan</dt>
+        <dd><%= "#{bg.reference_plan.name}" %></dd>
+        <dt>Ref Plan Metal Level</dt>
+        <dd><%= "#{bg.reference_plan.metal_level.titleize}" %></dd>
+     </dl>
+      <h4>Employer Contributions</h4>
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th>Employee Relationship</th>
+            <th>Coverage Offered?</th>
+            <th>Employer Contribution Pct</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% bg.relationship_benefits.each do |rb| %>
+            <tr>
+              <td><%= rb.relationship.humanize %></td>
+              <td><%= rb.relationship == 'child_26_and_over' ? "No" : "Yes" %></td>
+              <td><%= number_to_percentage rb.premium_pct, precision: 0 %></td>
+             </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+    <% end %>
+  <% else %>
+    No Plan Years found
   <% end %>
-<% else %>
-  No Plan Years found
-<% end %>
+</div>
+</div></div></div></div>
