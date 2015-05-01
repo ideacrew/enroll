@@ -123,6 +123,23 @@ describe EmployerCensus::EmployeeFamily, 'class methods', dbclean: :after_each d
   end
 end
 
+describe EmployerCensus::EmployeeFamily, "that exists for an employer and has no assigned benefit group", :dbclean => :after_each do
+  let(:census_family)               { EmployerCensus::EmployeeFamily.new }
+
+  let(:benefit_group_1)             { FactoryGirl.create(:benefit_group)}
+  let(:benefit_group_assignment_1)  { EmployerCensus::BenefitGroupAssignment.new(
+    benefit_group: benefit_group_1, 
+    start_on: Date.current - 45.days
+  ) }
+
+  it "should assign a new benefit group when asked" do
+    census_family.add_benefit_group_assignment(benefit_group_assignment_1)
+    expect(census_family.benefit_group_assignments.size).to eq 1
+    expect(census_family.benefit_group_assignments.first.benefit_group).to eq benefit_group_1
+    expect(census_family.active_benefit_group_assignment).to eq benefit_group_assignment_1
+  end
+end
+
 describe EmployerCensus::EmployeeFamily, 'instance methods:', dbclean: :after_each do
 
   let(:employer_profile)            { FactoryGirl.create(:employer_profile) }
@@ -132,38 +149,21 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:', dbclean: :after_ea
 
   let(:benefit_group_1)             { FactoryGirl.create(:benefit_group)}
   let(:benefit_group_assignment_1)  { EmployerCensus::BenefitGroupAssignment.new(
-                                        benefit_group: benefit_group_1, 
-                                        start_on: Date.current - 45.days
-                                      ) }
+    benefit_group: benefit_group_1, 
+    start_on: Date.current - 45.days
+  ) }
 
   context 'a valid employee family exists in the employer census' do
     context 'and a benefit group assignment is requested' do
-      context "and the employee isn't assigned to another benefit group" do
-        before do
-          census_family.add_benefit_group_assignment(benefit_group_assignment_1)
-        end
-
-        it "should add a new benefit group assignment" do
-          byebug
-          expect(census_family.benefit_group_assignments.size).to eq 1
-          expect(census_family.benefit_group_assignments.first.benefit_group).to eq benefit_group_1
-        end
-
-        context "and it is successfully assigned" do
-          it "should return the active benefit group assignment" do
-            expect(census_family.active_benefit_group_assignment).to eq benefit_group_assignment_1
-          end
-        end
-      end
 
       context "and the employee was previously assigned to another benefit group" do
         let(:start_on)                    { Date.current - 5.days }
         let(:end_on)                      { start_on - 1.day }
         let(:benefit_group_2)             { FactoryGirl.create(:benefit_group)}
         let(:benefit_group_assignment_2)  { EmployerCensus::BenefitGroupAssignment.new(
-                                              benefit_group: benefit_group_2, 
-                                              start_on: start_on
-                                            ) }
+          benefit_group: benefit_group_2, 
+          start_on: start_on
+        ) }
 
         before do
           census_family.add_benefit_group_assignment(benefit_group_assignment_1)
