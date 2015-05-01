@@ -312,11 +312,11 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:', dbclean: :after_ea
   # end
 
   describe '#terminate and #terminate!' do
-    let(:valid_termination_date) {Date.today - (maximum_retroactive_termination)}
+    let(:valid_termination_date) {(Date.today - maximum_retroactive_termination).beginning_of_month}
     let(:maximum_retroactive_termination) {HbxProfile::ShopRetroactiveTerminationMaximumInDays}
 
     context "termination date > HBX policy for retro terms" do
-      let(:overdue_termination_date) {Date.today.beginning_of_month - (maximum_retroactive_termination)}
+      let(:overdue_termination_date) { valid_termination_date - 1.day}
 
       context "user role isn't an HBX admin" do
         context "and terminate! is called" do
