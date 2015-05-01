@@ -185,15 +185,16 @@ end
   end
 
   def find_relationship_with(other_person)
-
-    relationship = person_relationships.detect do |person_relationship|
-      person_relationship.relative_id == other_person.id
-    end
-
-    if relationship
-      return relationship.kind
+    if self.id == other_person.id
+      "self"
     else
-      return nil
+      person_relationship_for(other_person).try(:kind)
+    end
+  end
+
+  def person_relationship_for(other_person)
+    person_relationships.detect do |person_relationship|
+      person_relationship.relative_id == other_person.id
     end
   end
 
@@ -218,7 +219,7 @@ end
 
   before_save :notify_change
   def notify_change
-    nofity_change_event({"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES}, {"address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
+    notify_change_event(self, {"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES}, {"address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
   end
 
 private
