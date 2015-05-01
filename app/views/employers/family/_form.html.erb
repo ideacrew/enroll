@@ -17,18 +17,6 @@
           <div class="col-md-9 no-pd col-sm-9 col-xs-12 first">
             <%= render 'member_fields', f: employee %>
           </div>
-          <div class="col-md-3 key col-sm-3 col-xs-12" id="key-section">
-            <% if @family.persisted? %>
-               <% button_label ="Update Family" %>
-            <% else %>
-               <% button_label ="Create Family" %>
-            <%end%>
-            <%= f.submit button_label, class: "btn btn-save" %>
-                <p class="top-pad">
-                  <span>Your personal information is secure</span>
-                  <span><i></i></span>
-                </p>
-            </div>
         </div><br>
 
         <%= employee.fields_for :address, @family.census_employee.address, errors: {}, fieldset: false do |address|  %>
@@ -47,6 +35,17 @@
               <% end %>
               <%= link_to_add_fields "Add Dependent", f, :census_dependents %>
             </div>
+          </div>
+        </div><br>
+
+        <div class="row">
+          <div class="col-md-3 key col-sm-3 col-xs-12">
+            <% if @family.persisted? %>
+               <% button_label ="Update Family" %>
+            <% else %>
+               <% button_label ="Create Family" %>
+            <%end%>
+            <%= f.submit button_label, class: "btn btn-primary" %>
           </div>
         </div>
       <% end %>
