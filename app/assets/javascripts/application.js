@@ -87,7 +87,6 @@ $(document).ready(function () {
   function update_info_row(element, evt) {
 
     var check = check_info_exists($(element).attr('id'));
-    console.log($(element).attr('id'));
 
     if( (evt == 'focus_in') || (check.length == 0 && evt == 'focus_out') ) {
       $('.focus_effect').removeClass('personal-info-top-row');
