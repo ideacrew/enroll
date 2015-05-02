@@ -40,14 +40,14 @@ class User
   field :oim_id, type: String, default: ""
 
   ROLES = {
-    employer: "Employer",
-    employee: "Employee",
-    broker: "Broker",
-    undocumented_consumer: "Undocumented Consumer",
-    qhp_consumer: "QHP Consumer",
-    hbx: "HBX",
-    system_service: "System Service",
-    web_service: "Web Service"
+    employer: "employer",
+    employee: "employee",
+    broker: "broker",
+    undocumented_consumer: "undocumented_consumer",
+    qhp_consumer: "qhp_consumer",
+    hbx: "hbx",
+    system_service: "systems_service",
+    web_service: "web_service"
   }
 
   PROFILES = {

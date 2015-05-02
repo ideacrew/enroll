@@ -159,7 +159,7 @@ module Factories
         return nil, nil
       end
       if user.present?
-        user.roles << "Employee"
+        user.roles << "employee"
         user.save
       end
       return person, is_new
