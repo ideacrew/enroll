@@ -2,6 +2,33 @@ require 'rails_helper'
 
 RSpec.describe Employers::EmployerProfilesController do
 
+  describe "GET new" do
+    let(:user) { double("user")}
+    let(:person) { double("person")}
+
+    it "should render the new template" do
+      allow(user).to receive(:has_employer_role?)
+      sign_in(user)
+      get :new
+      expect(response).to have_http_status(:success)
+    end
+
+  end
+
+  describe "GET search" do
+
+    before(:each) do
+      sign_in
+      get :search
+    end
+
+    it "renders the 'search' template" do
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("search")
+      expect(assigns[:employer_profile]).to be_a(Forms::EmployerCandidate)
+    end
+  end
+
   describe "GET index" do
     let(:organization_search_criteria) { double }
     let(:organization_employer_criteria) { double }

@@ -21,6 +21,31 @@ class Employers::EmployerProfilesController < ApplicationController
     end
   end
 
+  def match
+    @employer_candidate = Forms::EmployerCandidate.new(params.require(:employer_profile))
+    if @employer_candidate.valid?
+      found_employer = @employer_candidate.match_employer
+      if found_employer.present?
+        @employer_profile = found_employer
+        respond_to do |format|
+          format.js { render 'match' }
+          format.html { render 'match' }
+        end
+      else
+        respond_to do |format|
+          format.js { render 'no_match' }
+          format.html { render 'no_match' }
+        end
+      end
+    else
+      @employer_profile = @employer_candidate
+      respond_to do |format|
+        format.js { render 'search' }
+        format.html { render 'search' }
+      end
+    end
+  end
+
   def my_account
   end
 
@@ -34,16 +59,27 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def create
-    @organization = Organization.new
-    @organization.build_employer_profile
-    @organization.attributes = employer_profile_params
-    if @organization.save
-      flash[:notice] = 'Employer successfully created.'
-      redirect_to employers_employer_profiles_path
-    else
-      render action: "new"
+    @person = current_user.build_person
+    @person.build_employer_contact
+    @employer_profile = @person.employer_contact
+    build_nested_models
+    respond_to do |format|
+      format.js { render "edit" }
+      format.html { render "edit" }
     end
   end
+
+  # def create
+  #   @organization = Organization.new
+  #   @organization.build_employer_profile
+  #   @organization.attributes = employer_profile_params
+  #   if @organization.save
+  #     flash[:notice] = 'Employer successfully created.'
+  #     redirect_to employers_employer_profiles_path
+  #   else
+  #     render action: "new"
+  #   end
+  # end
 
   def destroy
     @employer_profile.destroy
@@ -58,7 +94,7 @@ class Employers::EmployerProfilesController < ApplicationController
 
     def check_employer_role
       if current_user.has_employer_role?
-        redirect_to employers_employer_profile_my_account(current_user.person.employer_contact)
+        redirect_to employers_employer_profile_my_account_path(current_user.person.employer_contact)
       end
     end
 
@@ -87,5 +123,19 @@ class Employers::EmployerProfilesController < ApplicationController
       office_location.build_phone
       office_location.build_email
       organization
+    end
+
+    def build_nested_models
+      ["home","mobile","work","fax"].each do |kind|
+        @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
+      end
+
+      Address::KINDS.each do |kind|
+        @person.addresses.build(kind: kind) if @person.addresses.select{|address| address.kind == kind}.blank?
+      end
+
+      ["home","work"].each do |kind|
+        @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
+      end
     end
 end
