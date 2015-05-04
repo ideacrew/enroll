@@ -9,8 +9,8 @@
 		<% ([primary_member] + other_members).each do |fm| %>
 			<li class="list-group-item">
 			<div class="row">
-				<div class="col-md-10 col-sm-12 col-xs-12">
-					<h4><%= fm.person.first_name %> <%= fm.person.middle_name %> <%= fm.person.last_name %></h4>
+				<div class="col-md-12 col-sm-12 col-xs-12">
+					<h4><%= fm.person.first_name %> <%= fm.person.middle_name %> <%= fm.person.last_name %><%= image_tag "edit.png", :class => "pull-right" %></h4>
 				</div>
 			</div>
 			</li>
