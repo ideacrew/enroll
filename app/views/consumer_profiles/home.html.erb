@@ -4,36 +4,7 @@
 			<%= render 'people/landing_pages/menu' %>
 
 			<div class="tab-content" id="myTabContent">
-				<div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
-					<div class="col-md-12 col-sm-12 col-xs-12">
-
-						<div class="row landing-row">
-							<div class="col-md-6 col-sm-6 col-xs-12 left-side">
-								<%= render "home_members" %>
-
-								<div class="row bottom">
-									<p class="head">
-									<span>Employers & Plans</span>
-									<span>add employer</span>
-									</p>
-
-									<ul class="list-group emp-ul">
-										<li class="list-group-item">
-										<div class="row">
-											<div class="col-md-10 col-sm-12 col-xs-12">
-												<h4><%= @employer_profile.legal_name %></h4>
-											</div>
-										</div>
-										</li>
-										<button class="btn btn-see-all see-plan-details">See Details</button>
-									</ul>
-								</div>
-							</div>
-							<%= render 'qles' %> 
-							<div class="cleafix"></div>
-						</div>
-					</div>
-				</div>
+				<%= render "employers_and_plans" %>
 
 				<div aria-labelledby="profile-tab" id="profile" class="tab-pane fade" role="tabpanel">
 					<div class="submenu">
