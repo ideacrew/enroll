@@ -1,43 +1,48 @@
-<fieldset class="row middle-row form-group form-group-lg no-pd">
-  <div class="row middle-row form-group form-group-lg no-pd">
-    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :first_name, class: "floatlabel form-control border-bottom-none", placeholder: 'FIRST NAME' %>
-    </div>
-    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME' %>
-    </div>
-    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :name_sfx, class: "floatlabel form-control", placeholder: 'SUFFIX' %>
-    </div>
-    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.hidden_field :_destroy %>
-      <%= link_to '<span>Delete Dependent</span>'.html_safe, '#', :class => "remove_fields" %>
-    </div>
-  </div>
+<div id="dependent_info" class="row no-buffer focus_effect personal-info-row">
+  <div class="col-md-12 no-pd col-sm-12 col-xs-12 first">
 
-  <div class="row bottom-row">
-    <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :dob, start_year: Date.today.year - 110, end_year: Date.today.year, placeholder: "BIRTHDATE",
-          class: "date-picker floatlabel form-control", value: f.object.dob.try(:strftime, "%m/%d/%Y") %>
-    </div>
-    <div class="col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
-      <div class="radio skinned-form-controls skinned-form-controls-mac">
-        <label>
-          <%= f.radio_button :gender, "male", class: "" %>
-          <span>Male</span>
-        </label>
+    <fieldset>
+    <div class="row middle-row form-group form-group-lg no-pd">
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :first_name, class: "floatlabel form-control border-bottom-none", placeholder: 'FIRST NAME' %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME' %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :name_sfx, class: "floatlabel form-control", placeholder: 'SUFFIX' %>
+      </div>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.hidden_field :_destroy %>
+        <%= link_to '<span>Delete Dependent</span>'.html_safe, '#', :class => "remove_fields" %>
       </div>
     </div>
-    <div class="col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
-      <div class="radio skinned-form-controls skinned-form-controls-mac">
-        <label>
-          <%= f.radio_button :gender, "female",class: ""  %>
-          <span>Female</span>
-        </label>
+
+    <div class="row bottom-row">
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :dob, start_year: Date.today.year - 110, end_year: Date.today.year, placeholder: "BIRTHDATE",
+            class: "date-picker floatlabel form-control", value: f.object.dob.try(:strftime, "%m/%d/%Y") %>
+      </div>
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :employee_relationship, class: "floatlabel form-control", placeholder: 'RELATIONSHIP' %>
+      </div>
+      <div class="col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <label>
+            <%= f.radio_button :gender, "male", class: "" %>
+            <span>Male</span>
+          </label>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <label>
+            <%= f.radio_button :gender, "female",class: ""  %>
+            <span>Female</span>
+          </label>
+        </div>
       </div>
     </div>
-    <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :employee_relationship, class: "floatlabel form-control", placeholder: 'RELATIONSHIP' %>
-    </div>
+    </fieldset>
   </div>
-</fieldset>
+</div>
