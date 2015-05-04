@@ -8,14 +8,15 @@
         <%= render "shared/benefit_group_fields", f: bg %><br>
 
         <div class='form-inputs'>
+          <h3> Relationship Benefits</h3>
           <%= bg.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
             <%= render "shared/relationship_benefit_fields", f: rb %><br>
           <% end %>
 
           <div>
             <%= f.hidden_field :_destroy %>
-            <%= link_to 'Delete'.html_safe, '#', class: "btn btn-red remove_fields" %>
-            <%= link_to_add_fields "Add Relationship Benefit", bg, :relationship_benefits %>
+            <%= link_to 'Delete'.html_safe, 'javascript:;', class: "btn btn-danger remove_fields" %>
+            <%= link_to_add_fields "Add Relationship Benefit", bg, :relationship_benefits, 'pull-right btn btn-success' %>
           </div>
         </div><br>
 
