@@ -11,8 +11,6 @@ class ConsumerProfilesController < ApplicationController
     @qualifying_life_events = QualifyingLifeEventKind.all
     @hbx_enrollments = @family.latest_household.hbx_enrollments
 
-    build_nested_models
-
     respond_to do |format|
       format.html {}
     end
