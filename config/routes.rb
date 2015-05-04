@@ -10,12 +10,6 @@ Rails.application.routes.draw do
     end
   end
 
-  resource :consumer_profiles, :only => [] do
-    collection do
-      get "home"
-    end
-  end
-
   namespace :products do
     resources :plans, controller: :qhp do
       collection do
@@ -33,7 +27,6 @@ Rails.application.routes.draw do
     end
 
     resources :employee, :controller=>"employee_roles" do
-
       collection do
         post :match
         get 'welcome'
