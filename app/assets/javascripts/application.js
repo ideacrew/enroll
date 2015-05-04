@@ -413,6 +413,11 @@ $(document).ready(function () {
 
   $(".floatlabel, .selectric-wrapper").focusin(function() { $(this).closest('.employee-info').css("opacity","1") });
   $(".floatlabel, .selectric-wrapper").blur(function() { $(this).closest('.employee-info').css("opacity","0.5") });
+
+  $(document).on('click', '.return_to_employee_roster', function() {
+    $('#add_employee_action').html('');
+    $('#employee_roster').show();
+  });
  
 });
 

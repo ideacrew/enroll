@@ -5,25 +5,29 @@
 
       - page_title = @family.persisted? ? 'Update Family' : 'Add New Family'
       
-      %h3= page_title
+      .row
+        .col-md-9.no-pd.col-sm-9.col-xs-12
+          %h3.pull-left= page_title
+          %a.pull-right{href: '#', class: 'btn btn-danger return_to_employee_roster'} Cancel
 
-      .col-md-9.no-pd.col-sm-9.col-xs-12
-        = f.fields_for :census_employee, errors: {}, fieldset: false do |employee|
-          = render 'member_fields', f: employee
-          %br
-              
-          = employee.fields_for :address, @family.census_employee.address, errors: {}, fieldset: false do |address|
-            = render 'address_fields', f: address
-          %br
+      .row
+        .col-md-9.no-pd.col-sm-9.col-xs-12
+          = f.fields_for :census_employee, errors: {}, fieldset: false do |employee|
+            = render 'member_fields', f: employee
+            %br
+                
+            = employee.fields_for :address, @family.census_employee.address, errors: {}, fieldset: false do |address|
+              = render 'address_fields', f: address
+            %br
 
-          = f.fields_for :census_dependents, errors: {}, fieldset: false do |dependent|
-            = render 'shared/census_dependent_fields', f: dependent
-          %br
-          = link_to_add_fields "Add Dependent", f, :census_dependents, 'btn btn-success pull-right'
-          %br
-          %br
+            = f.fields_for :census_dependents, errors: {}, fieldset: false do |dependent|
+              = render 'shared/census_dependent_fields', f: dependent
+            %br
+            = link_to_add_fields "Add Dependent", f, :census_dependents, 'btn btn-success pull-right'
+            %br
+            %br
 
-          .row
-            .col-md-3.key.col-sm-3.col-xs-12
-              - button_label = @family.persisted? ? 'Update Family' : 'Create Family'
-              = f.submit button_label, class: "btn btn-primary"
+            .row
+              .col-md-3.key.col-sm-3.col-xs-12
+                - button_label = @family.persisted? ? 'Update Family' : 'Create Family'
+                = f.submit button_label, class: "btn btn-primary"
