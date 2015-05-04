@@ -10,6 +10,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resource :consumer_profiles, :only => [] do
+    collection do
+      get "home"
+    end
+  end
+
   namespace :products do
     resources :plans, controller: :qhp do
       collection do
