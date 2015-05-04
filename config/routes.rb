@@ -76,10 +76,10 @@ Rails.application.routes.draw do
       post 'person_confirm'
       post 'plan_details'
       # post 'dependent_details'
-      # post 'add_dependents'
+      post 'add_dependents' # Still required on my account - REMOVE
       # get 'dependent_details'
       # post 'save_dependents'
-      # delete 'remove_dependents'
+      delete 'remove_dependents' # Still required on my account - REMOVE
       get 'select_plan'
       post 'select_plan'
       get 'check_qle_marriage_date'

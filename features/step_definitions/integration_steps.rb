@@ -1,8 +1,19 @@
 require 'watir'
 # load Rails.root + "db/seeds.rb"
 
+module WatirScreenshots
+  def screenshot(name = nil)
+    shot_count = @screen_count.to_s.rjust(3, "0")
+    f_name = name.nil? ? shot_count : "#{name}_#{shot_count}"
+    @browser.screenshot.save(f_name + ".png")
+    @screen_count = @screen_count + 1
+  end 
+end
+
+
 Before "@watir" do
-  @browser = Watir::Browser.new :chrome
+  extend WatirScreenshots
+  @browser = Watir::Browser.new :chrome, :switches => ["--test-type"]
   @screen_count = 0
 end
 
@@ -23,20 +34,17 @@ When(/^I go to the employee account creation page$/) do
   @browser.goto("http://localhost:3000/")
   Watir::Wait.until(30) { @browser.a(:text => "Employee Portal").present? }
   sleep(1)
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
   @browser.a(:text => "Employee Portal").click
   Watir::Wait.until(30) { @browser.a(:text => "Create account").present? }
   sleep(1)
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
   @browser.a(:text => "Create account").click
 end
 
 When(/^I enter my new account information$/) do
   Watir::Wait.until(30) { @browser.text_field(:name => "user[password_confirmation]").present? }
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
   @browser.text_field(:name => "user[email]").set("trey.evans#{rand(100)}@dc.gov")
   @browser.text_field(:name => "user[password]").set("12345678")
   @browser.text_field(:name => "user[password_confirmation]").set("12345678")
@@ -45,8 +53,7 @@ end
 
 Then(/^I should be logged in$/) do
   Watir::Wait.until(30) { @browser.element(:text => /Welcome! You have signed up successfully./).present? }
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
   expect(@browser.element(:text => /Welcome! You have signed up successfully./).visible?).to be_truthy
 end
 
@@ -57,8 +64,7 @@ end
 
 Then(/^I should see the employee search page$/) do
   Watir::Wait.until { @browser.text_field(:name => "person[first_name]").present? }
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
   expect(@browser.text_field(:name => "person[first_name]").visible?).to be_truthy
 end
 
@@ -69,20 +75,17 @@ When(/^I enter the identifying info of my existing person$/) do
   @browser.p(:text=> /Personal Information/).click
   @browser.text_field(:name => "person[ssn]").set("722991234")
   sleep(2)
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
   @browser.input(:value => "Search Employers", :type => "submit").click
   sleep(3)
 end
 
 Then(/^I should see the matched employee record form$/) do
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
   expect(@browser.dd(:text => /Acme Inc\./).visible?).to be_truthy
   @browser.input(:value => /This is my employer/).click
   sleep(5)
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
 end
 
 When(/^I complete the matched employee form$/) do
@@ -94,8 +97,7 @@ When(/^I complete the matched employee form$/) do
 end
 
 Then(/^I should see the dependents page$/) do
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
   expect(@browser.p(:text => /Household Information/).visible?).to be_truthy
 end
 
@@ -110,8 +112,7 @@ Then(/^I should see the group selection page$/) do
 end
 
 When(/^I click continue on the group selection page$/) do
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
   @browser.a(:text => "Continue", :href => /people\/select_plan/).click
   sleep(5)
 end
@@ -121,21 +122,17 @@ Then(/^I should see the plan shopping page$/) do
 end
 
 When(/^I select a plan on the plan shopping page$/) do
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
   @browser.a(:text => "Continue").click
   sleep(2)
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
   @browser.a(:text => "Select").click
   sleep(5)
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
 end
 
 Then(/^I should see the coverage summary page$/) do
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
   expect(@browser.p(:text => /Your monthly total family premium/).visible?).to be_truthy
 end
 
@@ -145,7 +142,6 @@ When(/^I confirm on the coverage summary page$/) do
 end
 
 Then(/^I should see the "my account" page$/) do
-  @browser.screenshot.save(@screen_count.to_s.rjust(3, "0") + ".png")
-  @screen_count = @screen_count + 1
+  screenshot
   expect(@browser.span(:text => "Household").visible?).to be_truthy
 end
