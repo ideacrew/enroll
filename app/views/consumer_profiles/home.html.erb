@@ -1,73 +1,12 @@
 <div class="container-fluid no-pd-left">
 	<div class="panel panel-default" style="border:none; box-shadow: none;">
 		<div class="row tab-row">
-			<%= render 'people/landing_pages/menu' %>
+			<%= render 'home_menu' %>
 
 			<div class="tab-content" id="myTabContent">
 				<%= render "employers_and_plans" %>
 
-				<div aria-labelledby="profile-tab" id="profile" class="tab-pane fade" role="tabpanel">
-					<div class="submenu">
-						<ul role="tablist" class="nav nav-tabs" id="myTab1">
-							<li class="active" role="presentation"><a aria-expanded="true" aria-controls="personal" data-toggle="tab" role="tab" id="personal-tab" href="#personal">&nbsp;&nbsp;Personal</a></li>
-							<li role="presentation"><a aria-controls="employer" data-toggle="tab" id="employer-tab" role="tab" href="#employer">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Employer</a></li>
-							<li role="presentation"><a aria-controls="family" data-toggle="tab" id="family-tab" role="tab" href="#family">&nbsp;Family Members</a></li>
-							<li role="presentation"><a aria-controls="contact" data-toggle="tab" id="contact-tab" role="tab" href="#contact">&nbsp;Contact Information</a></li>
-						</ul>
-					</div>
-					<div class="tab-content" id="myTabContent1">
-						<div aria-labelledby="personal-tab" id="personal" class="tab-pane fade in active" role="tabpanel">
-							<div id="personal_info" class="focus_effect row personal-info-top-row">
-								<div class="col-md-8 no-pd col-sm-8 col-xs-12">
-									<div class="table-responsive first landing_personal_tab">
-										<%= render 'people/landing_pages/personal' %>
-									</div>
-									<button class="btn btn-default save-btn">Save</button>
-								</div>
-								<div class="col-md-3 col-sm-4 col-xs-12">
-									<div class="life-event-tip">
-										<h4>Life Events Tip #3</h4>
-										<p>
-										There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.
-										</p>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div aria-labelledby="employer-tab" id="employer" class="tab-pane fade" role="tabpanel">
-							<div class="emp-info">
-								<div class="col-md-8 no-pd col-sm-8 col-xs-12">
-									<div class="table-responsive landing_personal_tab">
-										<%= render 'people/landing_pages/employer' %> 
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div aria-labelledby="family-tab" id="family" class="tab-pane fade landing-row" role="tabpanel">
-							<%= render 'people/landing_pages/family_members' %> 
-						</div>
-
-						<div aria-labelledby="contact-tab" id="contact" class="tab-pane fade landing_contact_information" role="tabpanel">
-							<div class="col-md-8 col-sm-8 col-xs-12 no-pd">
-								<%= form_for(@person) do |f| %>
-									<%= render 'shared/address_fields', f: f %><br>
-									<%= render 'shared/phone_fields', f: f %><br>
-
-									<div id="email_info" class="focus_effect row personal-info-row">
-										<%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
-											<%= render 'shared/email_fields', f: email %>
-										<% end %>
-										<div class="col-md-10 col-sm-10"><div id="email_error"></div></div>
-									</div>
-
-								<% end %>
-							</div>
-						</div>
-					</div>
-				</div>
-
+				<%= render "home_profile_pane" %>
 				<div aria-labelledby="plans-tab" id="plans" class="tab-pane fade" role="tabpanel">
 					<%= render partial: "people/landing_pages/coverage_plans" %>
 				</div>
@@ -81,108 +20,105 @@
 		</div>
 	</div>
 </div>
-    </div>
 
-    <!-- <button class="btn btn-success" data-modal="modal-3">modal</button> -->
-    <div class="md-modal md-effect-3" id="modal-3">
-	    <div class="md-content">
-		    <h3>
-			    Life Events
-			    <img src="<%= asset_path('autofill-close.png') %>" class="md-close">
-		    </h3>
-		    <div class="body">
-			    <input type="text" class="form-control" placeholder="search life events">
-			    <ul class="modal-links">
-				    <li class="active"><a href="#">family events</a></li>
-				    <li><a href="#">job events</a></li>
-				    <li><a href="#">tax events</a></li>
-				    <div class="clearfix"></div>
-			    </ul>
-			    <div aria-multiselectable="true" role="tablist" id="accordion" class="panel-group event-accordion">
-				    <div class="panel panel-default">
-					    <div id="headingOne" role="tab" class="panel-heading">
-						    <h4 class="panel-title">
-							    <a aria-controls="collapseOne" aria-expanded="false" href="#collapseOne" data-parent="#accordion" data-toggle="collapse" class="collapsed">
-								    <span>"We have a new child in the family"</span>
-								    <span>add a family member</span>
-								    <div class="clearfix"></div>
-							    </a>
-						    </h4>
-					    </div>
-					    <div aria-labelledby="headingOne" role="tabpanel" class="panel-collapse collapse" id="collapseOne" aria-expanded="false" style="height: 0px;">
-						    <div class="panel-body">
-							    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-						    </div>
-					    </div>
-				    </div>
-				    <div class="panel panel-default">
-					    <div id="headingTwo" role="tab" class="panel-heading">
-						    <h4 class="panel-title">
-							    <a aria-controls="collapseTwo" aria-expanded="false" href="#collapseTwo" data-parent="#accordion" data-toggle="collapse" class="collapsed">
-								    <span>"I just got married"</span>
-								    <span>add a family member</span>
-								    <div class="clearfix"></div>
-							    </a>
-						    </h4>
-					    </div>
-					    <div aria-labelledby="headingTwo" role="tabpanel" class="panel-collapse collapse" id="collapseTwo" aria-expanded="false" style="height: 0px;">
-						    <div class="panel-body">
-							    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-						    </div>
-					    </div>
-				    </div>
-				    <div class="panel panel-default">
-					    <div id="headingThree" role="tab" class="panel-heading">
-						    <h4 class="panel-title">
-							    <a aria-controls="collapseThree" aria-expanded="true" href="#collapseThree" data-parent="#accordion" data-toggle="collapse" class="">
-								    <span>"I changed jobs"</span>
-								    <span>add new employer plan</span>
-								    <div class="clearfix"></div>
-							    </a>
-						    </h4>
-					    </div>
-					    <div aria-labelledby="headingThree" role="tabpanel" class="panel-collapse collapse in" id="collapseThree" aria-expanded="true" style="">
-						    <div class="panel-body">
-							    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-						    </div>
-					    </div>
-				    </div>
-				    <div class="panel panel-default">
-					    <div id="headingFour" role="tab" class="panel-heading">
-						    <h4 class="panel-title">
-							    <a aria-controls="collapseFour" aria-expanded="false" href="#collapseFour" data-parent="#accordion" data-toggle="collapse" class="collapsed">
-								    <span>"I got divorced"</span>
-								    <span>remove family member</span>
-								    <div class="clearfix"></div>
-							    </a>
-						    </h4>
-					    </div>
-					    <div aria-labelledby="headingFour" role="tabpanel" class="panel-collapse collapse" id="collapseFour" aria-expanded="false" style="height: 0px;">
-						    <div class="panel-body">
-							    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-						    </div>
-					    </div>
-				    </div>
-				    <div class="panel panel-default">
-					    <div id="headingFive" role="tab" class="panel-heading">
-						    <h4 class="panel-title">
-							    <a aria-controls="collapseFive" aria-expanded="false" href="#collapseFive" data-parent="#accordion" data-toggle="collapse" class="collapsed">
-								    <span>"I need to add family members to my plan"</span>
-								    <span>add a family member</span>
-								    <div class="clearfix"></div>
-							    </a>
-						    </h4>
-					    </div>
-					    <div aria-labelledby="headingFive" role="tabpanel" class="panel-collapse collapse" id="collapseFive" aria-expanded="false" style="height: 0px;">
-						    <div class="panel-body">
-							    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-						    </div>
-					    </div>
-				    </div>
-			    </div>
-		    </div>
-	    </div>
-    </div>
-    <div class="md-overlay"></div><!-- the overlay element -->
+<div class="md-modal md-effect-3" id="modal-3">
+	<div class="md-content">
+		<h3>
+			Life Events
+			<img src="<%= asset_path('autofill-close.png') %>" class="md-close">
+		</h3>
+		<div class="body">
+			<input type="text" class="form-control" placeholder="search life events">
+			<ul class="modal-links">
+				<li class="active"><a href="#">family events</a></li>
+				<li><a href="#">job events</a></li>
+				<li><a href="#">tax events</a></li>
+				<div class="clearfix"></div>
+			</ul>
+			<div aria-multiselectable="true" role="tablist" id="accordion" class="panel-group event-accordion">
+				<div class="panel panel-default">
+					<div id="headingOne" role="tab" class="panel-heading">
+						<h4 class="panel-title">
+							<a aria-controls="collapseOne" aria-expanded="false" href="#collapseOne" data-parent="#accordion" data-toggle="collapse" class="collapsed">
+								<span>"We have a new child in the family"</span>
+								<span>add a family member</span>
+								<div class="clearfix"></div>
+							</a>
+						</h4>
+					</div>
+					<div aria-labelledby="headingOne" role="tabpanel" class="panel-collapse collapse" id="collapseOne" aria-expanded="false" style="height: 0px;">
+						<div class="panel-body">
+							Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div id="headingTwo" role="tab" class="panel-heading">
+						<h4 class="panel-title">
+							<a aria-controls="collapseTwo" aria-expanded="false" href="#collapseTwo" data-parent="#accordion" data-toggle="collapse" class="collapsed">
+								<span>"I just got married"</span>
+								<span>add a family member</span>
+								<div class="clearfix"></div>
+							</a>
+						</h4>
+					</div>
+					<div aria-labelledby="headingTwo" role="tabpanel" class="panel-collapse collapse" id="collapseTwo" aria-expanded="false" style="height: 0px;">
+						<div class="panel-body">
+							Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div id="headingThree" role="tab" class="panel-heading">
+						<h4 class="panel-title">
+							<a aria-controls="collapseThree" aria-expanded="true" href="#collapseThree" data-parent="#accordion" data-toggle="collapse" class="">
+								<span>"I changed jobs"</span>
+								<span>add new employer plan</span>
+								<div class="clearfix"></div>
+							</a>
+						</h4>
+					</div>
+					<div aria-labelledby="headingThree" role="tabpanel" class="panel-collapse collapse in" id="collapseThree" aria-expanded="true" style="">
+						<div class="panel-body">
+							Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div id="headingFour" role="tab" class="panel-heading">
+						<h4 class="panel-title">
+							<a aria-controls="collapseFour" aria-expanded="false" href="#collapseFour" data-parent="#accordion" data-toggle="collapse" class="collapsed">
+								<span>"I got divorced"</span>
+								<span>remove family member</span>
+								<div class="clearfix"></div>
+							</a>
+						</h4>
+					</div>
+					<div aria-labelledby="headingFour" role="tabpanel" class="panel-collapse collapse" id="collapseFour" aria-expanded="false" style="height: 0px;">
+						<div class="panel-body">
+							Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div id="headingFive" role="tab" class="panel-heading">
+						<h4 class="panel-title">
+							<a aria-controls="collapseFive" aria-expanded="false" href="#collapseFive" data-parent="#accordion" data-toggle="collapse" class="collapsed">
+								<span>"I need to add family members to my plan"</span>
+								<span>add a family member</span>
+								<div class="clearfix"></div>
+							</a>
+						</h4>
+					</div>
+					<div aria-labelledby="headingFive" role="tabpanel" class="panel-collapse collapse" id="collapseFive" aria-expanded="false" style="height: 0px;">
+						<div class="panel-body">
+							Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
+<div class="md-overlay"></div><!-- the overlay element -->
 <%= render "home_js" %>
