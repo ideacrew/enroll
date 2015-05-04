@@ -3,7 +3,7 @@
     <div class="row">
       <div class="landing-row">
         <div class="col-md-12 col-sm-12 col-xs-12 col-gn-top">
-          
+
           <div id="add_employee_action"></div>
 
           <div id="employee_roster">
@@ -59,7 +59,7 @@
                             <span class="glyphicon glyphicon-pencil hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
                           <% end %>
                         <% else %>
-                          <%= link_to (edit_employers_employer_profile_family_path(@employer_profile.id, family.id)), class: "btn btn-green-2" do %>
+                          <%= link_to (edit_employers_employer_profile_family_path(@employer_profile.id, family.id)), class: "btn btn-green-2", remote: true do %>
                             <span class="hidden-xs hidden-sm visible-md visible-lg">Edit</span>
                             <span class="glyphicon glyphicon-pencil hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
                           <% end %>
