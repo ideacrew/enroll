@@ -61,11 +61,13 @@ class Organization
   index({"employer_profile.plan_years.end_date" => 1})
   index({"employer_profile.plan_years.open_enrollment_start_on" => 1})
   index({"employer_profile.plan_years.open_enrollment_end_on" => 1})
+  index({"employer_profile.plan_years.benefit_groups._id" => 1})
 
   index({"employer_profile.employee_families._id" => 1}, { unique: true, sparse: true })
   index({"employer_profile.employee_families.linked_at" => 1}, {sparse: true})
   index({"employer_profile.employee_families.employee_role_id" => 1}, {sparse: true})
   index({"employer_profile.employee_families.terminated" => 1})
+  index({"employer_profile.employee_families.benefit_group_assignments._id" => 1})
   index({"employer_profile.employee_families.census_employee.last_name" => 1})
   index({"employer_profile.employee_families.census_employee.dob" => 1})
   index({"employer_profile.employee_families.census_employee.ssn" => 1})
