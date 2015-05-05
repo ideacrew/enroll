@@ -39,7 +39,13 @@ module HbxImport
             cee.hired_on = ee.doh
             cee.build_email(kind: "work", address: ee.work_email)
             cee.terminated_on = ee.dot
-            eef.benefit_group = bg
+            eef.add_benefit_group_assignment(
+              ::EmployerCensus::BenefitGroupAssignment.new(
+                :benefit_group_id => bg.id,
+                :start_on => py.start_on
+              )
+            )
+            #eef.benefit_group = bg
             bg.employee_families << cee._id
             census_employees_to_save << cee
           end
@@ -57,11 +63,11 @@ module HbxImport
         employee.save
         if employee.valid?
           status[:saved_census_employees] << employee
-          employee.employee_family.benefit_group.save
-          if employee.employee_family.benefit_group.valid?
-            status[:saved_benefit_groups] << employee.employee_family.benefit_group
+          employee.employee_family.active_benefit_group_assignment.save
+          if employee.employee_family.active_benefit_group_assignment.valid?
+            status[:saved_benefit_groups] << employee.employee_family.active_benefit_group_assignment
           else
-            status[:failed_benefit_groups] << employee.employee_family.benefit_group
+            status[:failed_benefit_groups] << employee.employee_family.active_benefit_group_assignment
           end
         else
           status[:failed_census_employees] << employee

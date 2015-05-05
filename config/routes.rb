@@ -27,7 +27,6 @@ Rails.application.routes.draw do
     end
 
     resources :employee, :controller=>"employee_roles" do
-
       collection do
         post :match
         get 'welcome'
@@ -72,15 +71,15 @@ Rails.application.routes.draw do
     get 'person_landing'
 
     collection do
-      post 'match_person'
-      get 'get_employer'
+      # post 'match_person'
+      # get 'get_employer'
       post 'person_confirm'
       post 'plan_details'
-      post 'dependent_details'
-      post 'add_dependents'
-      get 'dependent_details'
-      post 'save_dependents'
-      delete 'remove_dependents'
+      # post 'dependent_details'
+      post 'add_dependents' # Still required on my account - REMOVE
+      # get 'dependent_details'
+      # post 'save_dependents'
+      delete 'remove_dependents' # Still required on my account - REMOVE
       get 'select_plan'
       post 'select_plan'
       get 'check_qle_marriage_date'
@@ -93,6 +92,12 @@ Rails.application.routes.draw do
   end
 
   get 'hbx_admin', to: 'hbx#welcome'
+
+  resources :consumer_profiles, :only => [] do
+    collection do
+      get 'home'
+    end
+  end
 
   devise_for :users
 

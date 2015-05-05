@@ -388,3 +388,24 @@ describe Person, "with an existing relationship to a dependent" do
     it "should correct the existing relationship"
   end
 end
+
+describe Person, "call notify change event when after save" do
+  before do 
+    extend Notify
+  end
+
+  context "notify change event" do
+    let(:person){FactoryGirl.build(:person)}
+    it "when new record" do
+      expect(person).to receive(:notify_change_event).exactly(1).times
+      person.save
+    end
+
+    it "when change record" do
+      expect(person).to receive(:notify_change_event).exactly(1).times
+      first_name = person.first_name
+      person.first_name = "Test"
+      person.save
+    end
+  end
+end

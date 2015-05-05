@@ -12,11 +12,20 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     :terminated_on => terminated_on
   }) }
 
-  let(:census_family) { EmployerCensus::EmployeeFamily.new({
+  let(:benefit_group_assignment) {
+    EmployerCensus::BenefitGroupAssignment.new({
+      :benefit_group_id => benefit_group_id,
+      :start_on => Date.new(2015,1,1)
+    })
+  }
+
+  let(:census_family) { fam = EmployerCensus::EmployeeFamily.new({
     :census_employee => census_employee,
-    :benefit_group_id => benefit_group_id,
     :employer_profile => employer_profile
-  }) }
+  })
+    fam.add_benefit_group_assignment(benefit_group_assignment)
+    fam
+  }
 
   let(:employee_role) {
     EmployeeRole.new

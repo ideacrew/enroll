@@ -5,9 +5,6 @@ class EmployerCensus::EmployeeFamily
 
   embedded_in :employer_profile
 
-  field :plan_year_id, type: BSON::ObjectId
-  field :benefit_group_id, type: BSON::ObjectId
-
   # UserID that connected and timestamp
   field :employee_role_id, type: BSON::ObjectId
   field :linked_at, type: DateTime
@@ -31,6 +28,12 @@ class EmployerCensus::EmployeeFamily
     validate: true
   accepts_nested_attributes_for :census_dependents, reject_if: :all_blank, allow_destroy: true
 
+  embeds_many :benefit_group_assignments,
+    class_name: "EmployerCensus::BenefitGroupAssignment",
+    cascade_callbacks: true,
+    validate: true
+  accepts_nested_attributes_for :benefit_group_assignments, reject_if: :all_blank, allow_destroy: true
+
   validates_presence_of :census_employee
 
   default_scope       ->{ where(:terminated => false) }
@@ -40,6 +43,25 @@ class EmployerCensus::EmployeeFamily
   scope :unlinked,    ->{ where(:is_linked => false) }
 
   scope :order_by_last_name, -> { order(:"census_employee.last_name".asc) }
+
+  def add_benefit_group_assignment(new_benefit_group_assignment)
+    raise ArgumentError, "expected valid BenefitGroupAssignment" unless new_benefit_group_assignment.valid?
+    if active_benefit_group_assignment.present?
+      retired_assignment = active_benefit_group_assignment
+      retired_assignment.end_on = new_benefit_group_assignment.start_on - 1.day
+      retired_assignment.is_active = false
+    end
+
+    benefit_group_assignments << new_benefit_group_assignment
+  end
+
+  def active_benefit_group_assignment
+    benefit_group_assignments.detect { |assignment| assignment.is_active? }
+  end
+
+  def inactive_benefit_group_assignments
+    benefit_group_assignments.reject(&:is_active?)
+  end
 
   # Initialize a new, refreshed instance for rehires via deep copy
   def replicate_for_rehire
@@ -68,30 +90,12 @@ class EmployerCensus::EmployeeFamily
     self.employer_profile
   end
 
-  def plan_year=(new_plan_year)
-    self.plan_year_id = new_plan_year._id unless new_plan_year.blank?
-  end
-
-  def plan_year
-    return if plan_year_id.blank?
-    parent.plan_years.find(self.plan_year_id)
-  end
-
-  def benefit_group=(new_benefit_group)
-    if new_benefit_group.present?
-      self.benefit_group_id = new_benefit_group._id
-      self.plan_year = new_benefit_group.plan_year
-    end
-  end
-
-  def benefit_group
-    parent.plan_years.find(plan_year_id).benefit_groups.find(benefit_group_id)
-  end
-
-  def link_employee_role(employee_role, linked_at = Time.now)
+  def link_employee_role(employee_role, linked_at = DateTime.current)
     raise EmployeeFamilyLinkError, "already linked to an employee role" if is_linked?
     raise EmployeeFamilyLinkError, "invalid to link a terminated employee" if is_terminated?
+    raise EmployeeFamilyLinkError, "must assign a benefit group" unless active_benefit_group_assignment.present?
 
+    @linked_employee_role = employee_role
     self.employee_role_id = employee_role._id
     self.linked_at = linked_at
     employee_role.census_family_id = _id
@@ -99,10 +103,12 @@ class EmployerCensus::EmployeeFamily
   end
 
   def linked_employee_role
-    EmployeeRole.find(self.employee_role_id) if is_linked?
+    return @linked_employee_role if defined? @linked_employee_role
+    @linked_employee_role = EmployeeRole.find(self.employee_role_id) if is_linked?
   end
 
   def delink_employee_role
+    @linked_employee_role = nil
     self.employee_role_id = nil
     self.linked_at = nil
     self
@@ -113,7 +119,7 @@ class EmployerCensus::EmployeeFamily
   end
 
   def is_linkable?
-    (is_linked? == false) && (is_terminated? == false)
+    (is_linked? == false) && (is_terminated? == false) && active_benefit_group_assignment.present?
   end
 
   def terminate(last_day_of_work)
@@ -179,6 +185,11 @@ class EmployerCensus::EmployeeFamily
     event :terminate_employment do
       transitions from: [:eligible, :enrolled, :coverage_waived], to: [:employment_terminated]
     end
+  end
+
+  def active_benefit_group_id
+    return(nil) unless active_benefit_group_assignment
+    active_benefit_group_assignment.benefit_group_id
   end
 
 

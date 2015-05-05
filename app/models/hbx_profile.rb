@@ -42,5 +42,3 @@ class HbxProfile
   ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30
 
 end
-
-class HbxPolicyError < StandardError; end

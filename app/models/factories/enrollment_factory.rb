@@ -109,12 +109,12 @@ module Factories
     def self.link_employee_family(census_family, employee_role, linked_at = Time.now)
       census_family.link_employee_role(employee_role, linked_at)
       [:employer_profile_id,
-       :benefit_group_id,
        :hired_on,
        :terminated_on,
       ].each do |property|
         employee_role.send("#{property}=", census_family.send(property))
       end
+      employee_role.benefit_group_id = census_family.active_benefit_group_id
     end
 
     private

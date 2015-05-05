@@ -41,7 +41,7 @@ class BenefitGroup
 
   # Array of census employee ids
   # has_and_belongs_to_many :employee_families, class_name: "EmployeeFamily"
-  field :employee_families, type: Array, default: []
+  # field :employee_families, type: Array, default: []
 
   validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
     :premium_pct_as_int, :employer_max_amt_in_cents, :reference_plan_id
@@ -66,20 +66,26 @@ class BenefitGroup
 
   def reference_plan=(new_reference_plan)
     self.reference_plan_id = new_reference_plan.id
+    @reference_plan = new_reference_plan
   end
 
   def reference_plan
-    Plan.find(reference_plan_id) unless reference_plan_id.nil?
+    return @reference_plan if defined? @reference_plan
+    @reference_plan = Plan.find(reference_plan_id) unless reference_plan_id.nil?
   end
 
   def elected_plans
-    @elected_plans ||=
-    Plan.where(:id => {"$in" => elected_plan_ids})
+    return @elected_plans if defined? @elected_plans
+    @elected_plans ||= Plan.where(:id => {"$in" => elected_plan_ids})
   end
 
   # belongs_to association (traverse the model)
   def employee_families
-    plan_year.employer_profile.employee_families.to_a
+    ## Optimize -- this is ineffective for large data sets
+    plan_year.employer_profile.employee_families.reduce([]) do |list, ef|
+      list << ef if ef.active_benefit_group_assignment.benefit_group == self
+      list
+    end
   end
 
   def effective_on_for(date_of_hire)
