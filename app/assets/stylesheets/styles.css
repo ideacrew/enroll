@@ -36,19 +36,6 @@
     padding: 6px 25px;
 }
 
-#employer .emp-info label {
-    color: #007bc3 !important;
-}
-#employer .emp-info input[type="text"] {
-    padding-top: 10px;
-    color: #007bc3 !important;
-}
-
-#employer .landing_personal_tab .top-row {
-    background: none repeat scroll 0 0 #fff;
-    border-bottom: 1px solid #999;
-}
-
 #contact.landing_contact_information #dropdownMenu1 {
    text-align: center;
    color: #007bc3 !important;

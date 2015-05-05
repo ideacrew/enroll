@@ -1681,6 +1681,7 @@ a.list-group-item.confirm {
 }
 
 .landing-row .right-side .list-group .list-group-item {
+  border: 1px solid #6fb7ff;
   color: #007bc3;
   font-size: 14px;
   padding: 12.8px 0;
@@ -2923,10 +2924,6 @@ a.close-1, a.close-2{
   margin-bottom: 0;
   background: #fff;
 }
-
-#employer .emp-info .first{
-  border: 1px solid #999;
-}
 #employer .emp-info span{
   color: #00a3d9;
   font-size: 12px;
@@ -3187,7 +3184,7 @@ a.close-1, a.close-2{
   background: #fff;
 }
 .coverage-table .heading {
-  background: url("<%= asset_path "arror-down.png" %>") no-repeat scroll 7px center #009acc;
+  background: url("<%= asset_path 'arror-down.png' %>") no-repeat scroll 7px center #009acc;
   color: #fff;
   display: block;
   font-weight: bold;
@@ -4120,9 +4117,6 @@ a.all-filter:hover{
 }
 #employer .emp-info .middle-row:not(:last-child), #family .middle-row:not(:last-child) {
   border-bottom: 1px solid #999; 
-}
-#employer .emp-info .first{
-  border: 1px solid #999;
 }
 #employer .emp-info span{
   color: #0079c6;
@@ -5082,7 +5076,7 @@ a.new-address-btn:hover {
     position: relative;
 }
 
-#personal_info input.form-control {
+input.form-control {
     padding-top: 22px !important;
 }
 label {
