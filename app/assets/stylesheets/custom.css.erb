@@ -1684,9 +1684,8 @@ a.list-group-item.confirm {
 
 .landing-row .right-side .list-group .list-group-item {
   border: 1px solid #6fb7ff;
-  color: #007bc3;
   font-size: 14px;
-  padding: 12.8px 0;
+  padding: 12px 0;
   margin-bottom: -1px;
   background: #fff;
 }
@@ -1718,6 +1717,17 @@ a.list-group-item.confirm {
 }
 
 /* STYLE FOR ACCORDION - QLE flow */
+.landing-row .right-side .list-group .list-group-item.qle-item {
+  padding-bottom: 0;
+}
+.landing-row .right-side .list-group .list-group-item.qle-item .panel-heading {
+  padding-bottom: 12px;
+}
+.landing-row .right-side .list-group .list-group-item.qle-item .qle-kind a {
+  float: right;
+  font-weight: bold;
+  font-style: italic;
+}
 .panel-group .panel {
     border-radius: 0px;
 }
@@ -1736,9 +1746,6 @@ a.wdfull {
 }
 .list-group.panel-group .panel+.panel {
     margin-top: -1px;
-}
-.panel .landing-row .right-side .list-group .list-group-item {
-    padding-bottom: 0px;
 }
 .panel.active-list {
     border: 1px solid #000 !important;
@@ -1816,18 +1823,6 @@ p.success-text {
 .panel-body {
   border-top: 1px solid #ddd;
 }
-
-.tab-pane .landing-row .right-side .list-group .list-group-item.panel input.input-lg.input-error {
-    background: none repeat scroll 0 0 #fff;
-    border: 2px solid #b60c0c !important;
-    border-radius: 3px;
-    color: #b20101;
-    display: inline-block;
-    margin-top: 10px;
-    text-align: center;
-    width: 60%;
-}
-
 
 @media (min-width: 300px) and (max-width: 767px) {
   .landing-row .table-responsive {
@@ -3013,7 +3008,7 @@ a.close-1, a.close-2{
 }
 
 #family .right-side li.edit > .row:first-child{
-  padding: 12.8px 0;
+  padding: 12px 0;
 }
 
 #family .right-side #add-new-member{
@@ -3077,7 +3072,6 @@ a.close-1, a.close-2{
   text-shadow: none;
 }
 
-.panel .landing-row .right-side .list-group .list-group-item.family_members_list {padding: 12.8px 0;}
 #add-new-member .form-control.active-floatlabel, #family li.family_members_list .form-control.active-floatlabel{
   padding-top: 24px;
   -webkit-transition: all 0.1s ease-in-out;
@@ -4856,9 +4850,6 @@ a.wdfull {
 .list-group.panel-group .panel+.panel {
     margin-top: -1px;
 }
-.panel .landing-row .right-side .list-group .list-group-item {
-    /*padding-bottom: 0px;*/
-}
 .panel.active-list {
     border: 1px solid #000 !important;
     color: #000 !Important;
@@ -5463,6 +5454,21 @@ table.table-wrapper tbody tr.brd-top th, table.table-wrapper tbody tr.brd-top td
 
 #member_address_area #address_info .first {
   border: 1px solid #6fb7ff;
+}
+
+#qle_marriage_form #date_married {
+  border: 2px solid #ccc !important;
+  border-radius: 3px;
+  display: inline-block;
+  width: 60%;
+  padding: 0 10px !important;
+  font-size: 16px !important;
+  text-align: center;
+}
+
+#qle_marriage_form #date_married.input-error {
+    border: 2px solid #b60c0c !important;
+    color: #b20101;
 }
 
 /* Common CSS */
