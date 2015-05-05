@@ -6,7 +6,7 @@
     <br/>
     <ul class="list-group">
       <% if @family_members.present? %>
-        <% @family_members.each do |dependent| %>
+        <% @family_members.reject(&:is_primary_applicant).each do |dependent| %>
           <li class="list-group-item family_members_list" id="family_member_<%= dependent.id %>">
             <div class="row">
               <div class="col-md-10 col-sm-8 col-xs-8">
@@ -21,15 +21,15 @@
               <div id="remove_confirm" class="hidden"></div>
             </div>
             <div class="row">
-              <ul class="" id="dependent_ul">
-                  <% @family.family_members.reject(&:is_primary_applicant).each do |dependent| %>
-                    <%= render "dependent", dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
-                  <% end %>
-              </ul>
-              <!-- <ul id="dependent_ul">
-                <%#= render 'people/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
-                <%#= render 'people/landing_pages/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
+              <!-- <ul class="" id="dependent_ul">
+                <%# @family.family_members.reject(&:is_primary_applicant).each do |dependent| %>
+                  <%#= render "dependent", dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
+                <%# end %>
               </ul> -->
+              <ul id="dependent_ul">
+                <%#= render 'people/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
+                <%= render 'people/landing_pages/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
+              </ul>
             </div>
 
             <div class="dependent_notice_div_<%= dependent.id %>"></div>

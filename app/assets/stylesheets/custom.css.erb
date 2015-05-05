@@ -3002,8 +3002,8 @@ a.close-1, a.close-2{
   z-index: 999;
 }
 #family .right-side li.edit .first {
-  border-left: none;
-  border-right: none;
+  border: none;
+  border-top: 1px solid;
 }
 #family .right-side li > .row:nth-child(2) {
   display: none;
@@ -3601,6 +3601,9 @@ div#house_info .sidebar-email-field {
 #add_info{
   padding-top: 15px;
 }
+#dependent_ul #add_info {
+  padding-top: 0;
+}
 .mrg-top{
   margin-top: 15px;
 }
@@ -4076,19 +4079,6 @@ a.all-filter:hover{
   width: 100%;
     border-radius: 0px;
 }
-#contact #address_info .adderess-select-box{
-  text-align: center;
-  font-size: 16px;
-  /*background: url("../img/landing-page-delete.png") no-repeat 98% center #fff;*/
-}
-#contact #address_info ul.dropdown-menu li a{
-  display: block;
-  float: left;
-  margin: 0;
-  padding-left: 10px;
-  text-align: left;
-  width: 100%;
-}
 #home .landing-row .search-table .adderess-select-box > a{
   padding-top: 14px;
   display: block;
@@ -4195,13 +4185,10 @@ a.all-filter:hover{
   position: relative;
   z-index: 999;
 }
-#family .right-side li > .row:nth-child(2),
+/*#family .right-side li > .row:nth-child(2),
  #family .right-side li.edit > .row:first-child{
   display: none;
-}
-#family .right-side li.edit > .row:nth-child(2){
-  display: block;
-}
+}*/
 #family .right-side #add-new-member{
   border: #999999 solid 1px !important;
   display: none; 
