@@ -25,7 +25,7 @@
               </div>
             </div><br>
 
-            <div class="fail-search add-member <%= 'hidden' if !@family.family_members.empty? %>" class="row">
+            <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>" class="row">
               <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
                 <div class="panel panel-default">
                   <div class="panel-body member">
@@ -43,12 +43,12 @@
             <div class="clear-fix"></div>
 
           <ul class="" id="dependent_ul">
-            <% @family.family_members.reject(&:is_primary_applicant).each do |dependent| %>
+            <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
 	       <%= render "dependent", dependent: dependent, person: @person %>
             <% end %>
         </ul>
 
-      <div id="dependent_buttons" class="focus_effect row personal-info-row <%= 'hidden' if @family.family_members.empty? %>">
+      <div id="dependent_buttons" class="focus_effect row personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
 	      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
 		      <%= link_to "Add Member", new_consumer_employee_dependent_path(:family_id => @family.id), :remote => true, :class => "btn btn-blue" %>
           <%= link_to 'Continue', group_selection_consumer_employee_dependents_path(person_id: params[:person_id], organization_id: params[:organization_id]), class: 'btn btn-green pull-right' %>
