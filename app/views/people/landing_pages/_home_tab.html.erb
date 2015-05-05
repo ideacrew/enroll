@@ -9,35 +9,28 @@
               <span>Household</span>
               <span><%= link_to 'add members', '#profile', class: 'add_success', role: 'tab', data: {toggle: 'tab'}, aria: {controls: 'profile', expanded: 'true'} %></span>
             </p>
-            <div class="table-responsive">
-              <table class="table table-bordered search-table">
-                <tbody>
-                   <tr>
-                    <td colspan="4">
-                      <div class="dropdown person-select">
-                        <a id="dLabel" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
-                          <%= @person.first_name %> <%= @person.middle_name %> <%= @person.last_name %>
-                          <i class='glyphicon glyphicon-menu-down'></i>
-                        </a>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                          <% get_dependents(@family, @person).each do |dependents |%>
-                            <li><%= link_to dependents.full_name, 'javascript:;', class: "member_address_links", data: { id: dependents.id.to_s } %></li>
-                          <% end %>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>
-                      <div id="member_address_area">
-                        <%= render partial: 'people/landing_pages/member_address', locals: {person: @person} %>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="row no-buffer search-table">
+              <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+                <div class="dropdown person-select">
+                  <a id="dLabel" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
+                    <%= @person.first_name %> <%= @person.middle_name %> <%= @person.last_name %>
+                    <i class='glyphicon glyphicon-menu-down'></i>
+                  </a>
+                  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                    <% get_dependents(@family, @person).each do |dependents |%>
+                      <li><%= link_to dependents.full_name, 'javascript:;', class: "member_address_links", data: { id: dependents.id.to_s } %></li>
+                    <% end %>
+                  </ul>
+                </div>
+              </div>
             </div>
+
+            <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+              <div id="member_address_area">
+                <%= render partial: 'people/landing_pages/member_address', locals: {person: @person} %>
+              </div>
+            </div>
+            
           </div>
           <div class="row bottom">
             <p class="head">
