@@ -157,6 +157,12 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       it "should have all family_members" do
         expect(@family.family_members.count).to eq (@employee_family.census_dependents.count + 1)
       end
+
+      it "should set a home email" do
+        email = @employee_role.person.emails.first
+        expect(email.address).to eq @user.email
+        expect(email.kind).to eq "home"
+      end
     end
 
     context "and a prior person exists but is not associated with the user" do

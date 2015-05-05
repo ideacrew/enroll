@@ -1,8 +1,20 @@
 require 'watir'
 # load Rails.root + "db/seeds.rb"
 
+module WatirScreenshots
+  def screenshot(name = nil)
+    shot_count = @screen_count.to_s.rjust(3, "0")
+    f_name = name.nil? ? shot_count : "#{shot_count}_#{name}"
+    @browser.screenshot.save(f_name + ".png")
+    @screen_count = @screen_count + 1
+  end 
+end
+
+
 Before "@watir" do
-  @browser = Watir::Browser.new :chrome
+  extend WatirScreenshots
+  @browser = Watir::Browser.new :chrome, :switches => ["--test-type"]
+  @screen_count = 0
 end
 
 After "@watir" do
@@ -22,14 +34,17 @@ When(/^I go to the employee account creation page$/) do
   @browser.goto("http://localhost:3000/")
   Watir::Wait.until(30) { @browser.a(:text => "Employee Portal").present? }
   sleep(1)
+  screenshot("start")
   @browser.a(:text => "Employee Portal").click
   Watir::Wait.until(30) { @browser.a(:text => "Create account").present? }
   sleep(1)
+  screenshot("employee_portal")
   @browser.a(:text => "Create account").click
 end
 
 When(/^I enter my new account information$/) do
   Watir::Wait.until(30) { @browser.text_field(:name => "user[password_confirmation]").present? }
+  screenshot("create_account")
   @browser.text_field(:name => "user[email]").set("trey.evans#{rand(100)}@dc.gov")
   @browser.text_field(:name => "user[password]").set("12345678")
   @browser.text_field(:name => "user[password_confirmation]").set("12345678")
@@ -38,6 +53,7 @@ end
 
 Then(/^I should be logged in$/) do
   Watir::Wait.until(30) { @browser.element(:text => /Welcome! You have signed up successfully./).present? }
+  screenshot("logged_in_welcome")
   expect(@browser.element(:text => /Welcome! You have signed up successfully./).visible?).to be_truthy
 end
 
@@ -48,6 +64,7 @@ end
 
 Then(/^I should see the employee search page$/) do
   Watir::Wait.until { @browser.text_field(:name => "person[first_name]").present? }
+  screenshot("employer_search")
   expect(@browser.text_field(:name => "person[first_name]").visible?).to be_truthy
 end
 
@@ -58,14 +75,17 @@ When(/^I enter the identifying info of my existing person$/) do
   @browser.p(:text=> /Personal Information/).click
   @browser.text_field(:name => "person[ssn]").set("722991234")
   sleep(2)
+  screenshot("information_entered")
   @browser.input(:value => "Search Employers", :type => "submit").click
   sleep(3)
 end
 
 Then(/^I should see the matched employee record form$/) do
+  screenshot("employer_search_results")
   expect(@browser.dd(:text => /Acme Inc\./).visible?).to be_truthy
   @browser.input(:value => /This is my employer/).click
   sleep(5)
+  screenshot("update_personal_info")
 end
 
 When(/^I complete the matched employee form$/) do
@@ -77,6 +97,7 @@ When(/^I complete the matched employee form$/) do
 end
 
 Then(/^I should see the dependents page$/) do
+  screenshot("dependents_page")
   expect(@browser.p(:text => /Household Information/).visible?).to be_truthy
 end
 
@@ -86,6 +107,7 @@ When(/^I click continue on the dependents page$/) do
 end
 
 Then(/^I should see the group selection page$/) do
+  screenshot("group_selection")
   Watir::Wait.until(30) { @browser.a(:text => "Continue", :href => /people\/select_plan/).present? }
   sleep(1)
 end
@@ -100,21 +122,25 @@ Then(/^I should see the plan shopping page$/) do
 end
 
 When(/^I select a plan on the plan shopping page$/) do
-    @browser.a(:text => "Continue").click
-    sleep(2)
-    @browser.a(:text => "Select").click
-    sleep(5)
+  screenshot("plan_shopping_welcome")
+  @browser.a(:text => "Continue").click
+  sleep(2)
+  screenshot("plan_shopping")
+  @browser.a(:text => "Select").click
+  sleep(5)
 end
 
 Then(/^I should see the coverage summary page$/) do
-   expect(@browser.p(:text => /Your monthly total family premium/).visible?).to be_truthy
+  screenshot("summary_page")
+  expect(@browser.p(:text => /Your monthly total family premium/).visible?).to be_truthy
 end
 
 When(/^I confirm on the coverage summary page$/) do
-   @browser.a(:text => "Continue").click
-   sleep(5)
+  @browser.a(:text => "Continue").click
+  sleep(5)
 end
 
 Then(/^I should see the "my account" page$/) do
+  screenshot("my_account_page")
   expect(@browser.span(:text => "Household").visible?).to be_truthy
 end
