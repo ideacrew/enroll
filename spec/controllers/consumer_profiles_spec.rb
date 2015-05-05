@@ -2,8 +2,17 @@ require "rails_helper"
 
 describe ConsumerProfilesController do
   describe "GET home" do
+    let(:user) { double(:person => person) }
+    let(:person) { double(:primary_family => family, :employee_roles => employee_roles) }
+    let(:family) {
+      double(:family_members => [], :latest_household => latest_household)
+    }
+    let(:employee_roles) { [employee_role] }
+    let(:employee_role) { }
+    let(:latest_household) { double(:hbx_enrollments => []) }
+
     before(:each) do
-      sign_in
+      sign_in(user)
       get :home
     end
 
