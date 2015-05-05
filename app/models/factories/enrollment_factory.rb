@@ -161,6 +161,10 @@ module Factories
       if user.present?
         user.roles << "employee"
         user.save
+        unless person.emails.count > 0
+          person.emails.build(kind: "home", address: user.email)
+          person.save
+        end
       end
       return person, is_new
     end
