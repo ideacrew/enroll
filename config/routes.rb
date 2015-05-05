@@ -52,9 +52,15 @@ Rails.application.routes.draw do
       get 'new'
       get 'my_account'
       collection do
-        post 'match'
         get 'welcome'
         get 'search'
+        post 'match'
+        get 'person_search'
+        post 'person_match'
+        post 'person_create'
+      end
+      member do
+        patch 'person_update'
       end
       resources :plan_years
       resources :family do
