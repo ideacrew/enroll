@@ -1,4 +1,5 @@
 require 'watir'
+require 'pry'
 # load Rails.root + "db/seeds.rb"
 
 module WatirScreenshots
@@ -7,7 +8,7 @@ module WatirScreenshots
     f_name = name.nil? ? shot_count : "#{shot_count}_#{name}"
     @browser.screenshot.save(f_name + ".png")
     @screen_count = @screen_count + 1
-  end 
+  end
 end
 
 
@@ -32,27 +33,28 @@ end
 
 When(/^I go to the employee account creation page$/) do
   @browser.goto("http://localhost:3000/")
-  Watir::Wait.until(30) { @browser.a(:text => "Employee Portal").present? }
+  @browser.a(:text => "Employee Portal").wait_until_present(30)
   sleep(1)
   screenshot("start")
   @browser.a(:text => "Employee Portal").click
-  Watir::Wait.until(30) { @browser.a(:text => "Create account").present? }
+  @browser.a(:text => "Create account").wait_until_present(30)
   sleep(1)
   screenshot("employee_portal")
   @browser.a(:text => "Create account").click
 end
 
 When(/^I enter my new account information$/) do
-  Watir::Wait.until(30) { @browser.text_field(:name => "user[password_confirmation]").present? }
+  @browser.text_field(:name => "user[password_confirmation]").wait_until_present(30)
   screenshot("create_account")
-  @browser.text_field(:name => "user[email]").set("trey.evans#{rand(100)}@dc.gov")
+  @email = "swhite#{rand(100)}@example.com"
+  @browser.text_field(:name => "user[email]").set(@email)
   @browser.text_field(:name => "user[password]").set("12345678")
   @browser.text_field(:name => "user[password_confirmation]").set("12345678")
   @browser.input(:value => "Create account").click
 end
 
 Then(/^I should be logged in$/) do
-  Watir::Wait.until(30) { @browser.element(:text => /Welcome! You have signed up successfully./).present? }
+  @browser.element(:text => /Welcome! You have signed up successfully./).wait_until_present(30)
   screenshot("logged_in_welcome")
   expect(@browser.element(:text => /Welcome! You have signed up successfully./).visible?).to be_truthy
 end
@@ -63,43 +65,73 @@ When(/^I go to register as an employee$/) do
 end
 
 Then(/^I should see the employee search page$/) do
-  Watir::Wait.until { @browser.text_field(:name => "person[first_name]").present? }
+  @browser.text_field(:name => "person[first_name]").wait_until_present(30)
   screenshot("employer_search")
   expect(@browser.text_field(:name => "person[first_name]").visible?).to be_truthy
 end
 
 When(/^I enter the identifying info of my existing person$/) do
-  @browser.text_field(:name => "person[first_name]").set("Jonathan")
-  @browser.text_field(:name => "person[last_name]").set("Hall")
-  @browser.text_field(:name => "person[date_of_birth]").set("10/12/1983")
+  @browser.text_field(:name => "person[first_name]").set("Soren")
+  @browser.text_field(:name => "person[last_name]").set("White")
+  @browser.text_field(:name => "person[date_of_birth]").set("08/13/1979")
   @browser.p(:text=> /Personal Information/).click
-  @browser.text_field(:name => "person[ssn]").set("722991234")
+  @browser.text_field(:name => "person[ssn]").set("670991234")
   sleep(2)
   screenshot("information_entered")
   @browser.input(:value => "Search Employers", :type => "submit").click
-  sleep(3)
 end
 
 Then(/^I should see the matched employee record form$/) do
+  @browser.dd(:text => /Acme Inc\./).wait_until_present(30)
+  sleep(1)
   screenshot("employer_search_results")
   expect(@browser.dd(:text => /Acme Inc\./).visible?).to be_truthy
+end
+
+When(/^I accept the matched employer$/) do
   @browser.input(:value => /This is my employer/).click
-  sleep(5)
+  @browser.input(id: "continue-employer").wait_until_present
+  sleep(1)
   screenshot("update_personal_info")
 end
 
 When(/^I complete the matched employee form$/) do
-  @browser.text_field(:name => "person[phones_attributes][0][full_phone_number]").set("5555555555")
-  @browser.text_field(:name => "person[emails_attributes][0][address]").set("jhall@gmail.com")
+  @browser.text_field(:name => "person[phones_attributes][0][full_phone_number]").set("2025551234")
   @browser.text_field(:name => "person[emails_attributes][1][address]").click
   @browser.input(:id => "continue-employer").click
-  sleep(5)
+  @browser.p(:text => /Household Information/).wait_until_present
 end
 
 Then(/^I should see the dependents page$/) do
+  sleep(1)
   screenshot("dependents_page")
   expect(@browser.p(:text => /Household Information/).visible?).to be_truthy
 end
+
+When(/^I click edit on baby Soren$/) do
+  @browser.a(href: /edit/, index: 2).click
+end
+
+Then(/^I should see the edit dependent form$/) do
+  @browser.input(type: "submit", name: "commit").wait_until_present(30)
+end
+
+When(/^I click delete on baby Soren$/) do
+  @browser.img(alt: "Member close").click
+  @browser.input(type: "submit", name: "commit").wait_while_present(30)
+end
+
+Then(/^I should see (.*) dependents$/) do |n|
+  n = n.to_i
+  expect(@browser.li(class: "dependent_list", index: n)).not_to exist
+  expect(@browser.li(class: "dependent_list", index: n - 1)).to exist
+end
+
+#    When I click Add Member
+#    Then I should see the new dependent form
+#    When I enter the identifying info of my daughter
+#    When I click confirm member
+#    Then I should see 3 dependents
 
 When(/^I click continue on the dependents page$/) do
   @browser.a(:text => "Continue", :href => /consumer\/employee_dependents\/group_selection/).click
@@ -108,7 +140,7 @@ end
 
 Then(/^I should see the group selection page$/) do
   screenshot("group_selection")
-  Watir::Wait.until(30) { @browser.a(:text => "Continue", :href => /people\/select_plan/).present? }
+  @browser.a(:text => "Continue", :href => /people\/select_plan/).wait_until_present(30)
   sleep(1)
 end
 

@@ -48,13 +48,19 @@ Rails.application.routes.draw do
   namespace :employers do
     root 'employer_profiles#new'
 
+    resources :people do
+      collection do
+        get 'search'
+        post 'match'
+      end
+    end
     resources :employer_profiles do
       get 'new'
       get 'my_account'
       collection do
-        post 'match'
         get 'welcome'
         get 'search'
+        post 'match'
       end
       resources :plan_years
       resources :family do

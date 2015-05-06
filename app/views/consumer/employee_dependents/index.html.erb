@@ -18,7 +18,7 @@
         </div>
 
         <div class="row no-buffer">
-          <div class="fail-search add-member <%= 'hidden' if !@family.family_members.empty? %>">
+          <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
             <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
               <p class="fail"><span class="bold">Here's your chance to add family members to your plan.</span><br>Add family members by clicking the "Add Member" button. If you don't need to add more members, or when you are done adding members, click continue.</p>
               <br>
@@ -34,20 +34,19 @@
         <br>
         <div class="row no-buffer">
           <ul class="" id="dependent_ul">
-            <% @family.family_members.reject(&:is_primary_applicant).each do |dependent| %>
+            <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
               <%= render "dependent", dependent: dependent, person: @person %>
             <% end %>
           </ul>
         </div>
 
-        <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.family_members.empty? %>">
-          <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-            <%= link_to "Add Member", new_consumer_employee_dependent_path(:family_id => @family.id), :remote => true, :class => "btn btn-primary" %>
-            <%= link_to 'Continue', select_plan_people_path(person_id: params[:person_id], organization_id: params[:organization_id]), class: 'btn btn-success pull-right' %>
-          </div>
+      <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
+	      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+		      <%= link_to "Add Member", new_consumer_employee_dependent_path(:family_id => @family.id), :remote => true, :class => "btn btn-primary" %>
+          <%= link_to 'Continue', group_selection_consumer_employee_dependents_path(person_id: params[:person_id], organization_id: params[:organization_id]), class: 'btn btn-success pull-right' %>
         </div>
-
       </div>
+    </div>
 
       <div class="col-md-3 col-sm-3 col-xs-12 key" id="key-section">
         <a href="#" class="btn btn-primary">Save & Exit</a>

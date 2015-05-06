@@ -200,7 +200,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       end
 
       it "should add the employee role to the user" do
-        expect(@user.roles).to include "Employee"
+        expect(@user.roles).to include "employee"
       end
     end
 

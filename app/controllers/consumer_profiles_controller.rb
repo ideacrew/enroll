@@ -4,7 +4,7 @@ class ConsumerProfilesController < ApplicationController
     @family = @person.primary_family
     @family_members = @family.family_members if @family.present?
     @employee_roles = @person.employee_roles
-    @employer_profile = @employee_roles.first.employer_profile if @employee_roles.present?
+    @employer_profile = @employee_roles.first.employer_profile if @employee_roles.any?
     @current_plan_year = @employer_profile.latest_plan_year if @employer_profile.present?
     @benefit_groups = @current_plan_year.benefit_groups if @current_plan_year.present?
     @benefit_group = @current_plan_year.benefit_groups.first if @current_plan_year.present?
