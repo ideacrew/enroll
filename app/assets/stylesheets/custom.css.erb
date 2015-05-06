@@ -2435,7 +2435,6 @@ a.close-1, a.close-2{
 }
 
 /*  Home Page css start  */
-
 .welcome .home, .welcome .signin{
   text-align: center;
 }
@@ -2444,6 +2443,22 @@ a.close-1, a.close-2{
   margin-top: 10px;
   color: #616161;
 }
+.home-page {
+  padding-top: 5%;
+  text-align: center;
+}
+.home-page h1, .home-page h3{
+  text-align: center;
+  margin-top: 10px;
+  color: #616161;
+}
+.home-page p button{
+  padding: 7px 30px;
+  margin-top: 20px;
+}
+.home-page p button:not(:first-child){
+  margin-left: 45px;
+}
 .navbar-nav li li{
   display: block;
 }
@@ -2451,8 +2466,11 @@ a.close-1, a.close-2{
   background-color: rgba(0,0,0,0);
 }
 
-@media(max-width: 768px){
+@media(max-width: 767px){
   .home p .btn(:first-child){
+    margin-left: 15px;
+  }
+  .home-page p button:not(:first-child){
     margin-left: 15px;
   }
   .navbar-nav .open .dropdown-menu{
@@ -2469,39 +2487,110 @@ a.close-1, a.close-2{
     background-color: #f5f5f5;
   }
 }
-
 /* Home page css end */
 
 /* Sign In page css start */
+.signin {font-size: 16px;}
+.signin h1 {text-align: center;}
+.signin input.form-control {padding: 0 10px !important;}
+/* Sign In page css end */
 
-.signin form{
-  text-align: left;
+.coverage-options{
+  padding-top: 10px !important;
+  font-family: "AvenirLTStd-black";
 }
-.signin h1{
-  text-align: center;
-  margin-top: 10px;
-  color: #616161;
+.select-plan{
+  margin-top: -20px;
+  font-size: 18px;
+  color: #666;
 }
-.signin form label{
-  font-size: 16px;
-  color: #616161;
-  text-align: left;
+.select-plan p.head{
+  margin-bottom: 30px;
+  font-size: 21px;
+  font-family: "AvenirLTStd-Medium";
+  color: #333;
+  font-weight: normal;  
 }
-.signin input[type="text"], .signin input[type="email"]{
-  height: 40px;
+.select-plan p.detail {
+  color: #999;
+  font-size: 18px;
+  letter-spacing: 1px;
+  margin: 35px 0 0 0;
 }
-.signin input::-moz-placeholder{
-  font-size: 16px;
+.select-plan p.detail span {
+  color: #0079c5;
 }
-.signin .checkbox label{
-  padding-left: 20px;
+.select-plan a.btn-save{
+  margin-top: 20px;
+  padding: 6px 20px;
 }
-.signin p button{
-  padding: 7px 30px;
-  margin-top: 6px;
+
+.fail-search.add-member .form-inline{
+  margin: 25px 0 10px;
 }
-.signin p button.btn-default{
-  color: #616161;
+.fail-search.add-member .form-inline > a:not(:last-child){
+  margin-right: 45px;
+}
+.fail-search.add-member .panel.panel-default{
+  box-shadow: 1px 1px 7px #ddd;
+}
+
+.filter-btn-row{
+  border-bottom: #ddd solid 1px;
+  padding-bottom: 5px;
+}
+a.all-filter{
+  color: #414141;
+  font-family: 'AvenirLTStd-Medium';
+  font-size: 18px;
+}
+a.all-filter:hover{
+  opacity: 0.8;
+  filter: alpha(opacity=0.8);
+}
+.all-filters-row{
+  margin: 20px 0 0;
+  position: relative;
+  display: none;
+}
+.all-filters-row .apply-btn{
+  margin: 0;
+  display: block;
+  padding: 6px 30px;
+  border: #027ac3 solid 1px;
+  font-family: 'AvenirLTStd-Light';
+  font-size: 18px;
+  color: #027ac3;
+  float: right;
+  background: #fff !important;
+}
+.all-filters-row p{
+  font-size: 15px;
+  font-family: 'AvenirLTStd-black';
+  margin-bottom: 6px;
+  color: #333;
+}
+.all-filters-row .all-filters-detail{
+  width: 88%;
+}
+.all-filters-row label{
+  width: 100%;
+  font-size: 14px;
+  font-family: 'AvenirLTStd-Light';
+  font-weight: 300;
+  color: #666;
+}
+.all-filters-row input[type="checkbox"]{
+  margin-right: 10px;
+}
+.all-filters-row label input[type="text"]{
+  margin: 2px 10px 15px;
+  padding: 6px 10px;
+  width: 34%;
+  border: #ccc solid 1px;
+}
+.all-filters-row label input[type="text"]:first-child{
+  margin-left: 0;
 }
 
 /* Select Plan Page */
@@ -3761,196 +3850,6 @@ a.close-2{
   }
 }
 
-/*  Home Page css start  */
-
-.home-page, .signin{
-  padding-top: 5%;
-  text-align: center;
-}
-.home-page h1, .home-page h3{
-  text-align: center;
-  margin-top: 10px;
-  color: #616161;
-}
-.home-page p button{
-  padding: 7px 30px;
-  margin-top: 20px;
-}
-.home-page p button:not(:first-child){
-  margin-left: 45px;
-}
-.navbar-nav li li{
-  display: block;
-}
-.social.aktif.open > a, .social.aktif.open > a:focus{
-  background-color: rgba(0,0,0,0);
-}
-
-@media(max-width: 767px){
-  .home-page p button:not(:first-child){
-    margin-left: 15px;
-  }
-  .navbar-nav .open .dropdown-menu{
-    position: absolute;
-  }
-  .navbar-fixed-top .navbar-collapse.in{
-    overflow: visible;
-  }
-  .navbar-nav .open .dropdown-menu{
-    background-color: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-  }
-  .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover{
-    background-color: #f5f5f5;
-  }
-}
-
-/* Home page css end */
-
-/* Sign In page css start */
-
-.signin form{
-  text-align: left;
-}
-.signin h1{
-  text-align: center;
-  margin-top: 10px;
-  color: #616161;
-}
-.signin form label{
-  font-size: 16px;
-  color: #616161;
-  text-align: left;
-}
-.signin input[type="text"], .signin input[type="email"]{
-  height: 40px;
-}
-.signin input::-moz-placeholder{
-  font-size: 15px;
-}
-.signin .checkbox label{
-  padding-left: 20px;
-}
-.signin p:not(:last-child){
-  text-align: right;
-}
-.signin p:last-child{
-  text-align: center;
-}
-.signin p button{
-  padding: 7px 30px;
-  margin-top: 6px;
-}
-.signin p button.btn-default{
-  color: #616161;
-}
-.signin p:last-child button:not(:first-child){
-  margin-left: 45px;
-}
-@media(max-width: 400px){
-  .signin p:last-child button:not(:first-child){
-    margin-left: 0;
-  }
-}
-
-.coverage-options{
-  padding-top: 10px !important;
-  font-family: "AvenirLTStd-black";
-}
-.select-plan{
-  margin-top: -20px;
-  font-size: 18px;
-  color: #666;
-}
-.select-plan p.head{
-  margin-bottom: 30px;
-  font-size: 21px;
-  font-family: "AvenirLTStd-Medium";
-  color: #333;
-  font-weight: normal;  
-}
-.select-plan p.detail {
-  color: #999;
-  font-size: 18px;
-  letter-spacing: 1px;
-  margin: 35px 0 0 0;
-}
-.select-plan p.detail span {
-  color: #0079c5;
-}
-.select-plan a.btn-save{
-  margin-top: 20px;
-  padding: 6px 20px;
-}
-
-.fail-search.add-member .form-inline{
-  margin: 25px 0 10px;
-}
-.fail-search.add-member .form-inline > a:not(:last-child){
-  margin-right: 45px;
-}
-.fail-search.add-member .panel.panel-default{
-  box-shadow: 1px 1px 7px #ddd;
-}
-
-.filter-btn-row{
-  border-bottom: #ddd solid 1px;
-  padding-bottom: 5px;
-}
-a.all-filter{
-  color: #414141;
-  font-family: 'AvenirLTStd-Medium';
-  font-size: 18px;
-}
-a.all-filter:hover{
-  opacity: 0.8;
-  filter: alpha(opacity=0.8);
-}
-.all-filters-row{
-  margin: 20px 0 0;
-  position: relative;
-  display: none;
-}
-.all-filters-row .apply-btn{
-  margin: 0;
-  display: block;
-  padding: 6px 30px;
-  border: #027ac3 solid 1px;
-  font-family: 'AvenirLTStd-Light';
-  font-size: 18px;
-  color: #027ac3;
-  float: right;
-  background: #fff !important;
-}
-.all-filters-row p{
-  font-size: 15px;
-  font-family: 'AvenirLTStd-black';
-  margin-bottom: 6px;
-  color: #333;
-}
-.all-filters-row .all-filters-detail{
-  width: 88%;
-}
-.all-filters-row label{
-  width: 100%;
-  font-size: 14px;
-  font-family: 'AvenirLTStd-Light';
-  font-weight: 300;
-  color: #666;
-}
-.all-filters-row input[type="checkbox"]{
-  margin-right: 10px;
-}
-.all-filters-row label input[type="text"]{
-  margin: 2px 10px 15px;
-  padding: 6px 10px;
-  width: 34%;
-  border: #ccc solid 1px;
-}
-.all-filters-row label input[type="text"]:first-child{
-  margin-left: 0;
-}
-
 /* Selected plans section start */
 
 .selected-plans-row{
@@ -5054,7 +4953,6 @@ a.new-address-btn:hover {
 .rel {
     position: relative;
 }
-
 input.form-control {
     padding-top: 22px !important;
 }
@@ -5132,9 +5030,6 @@ label.hid {
 }
 .landing-row .left-side .search-table .form-group-lg .form-control {
     height: 52px !important;
-}
-#employer input.form-control {
-    padding-top: 22px !important;
 }
 a.edit {
     width: 100%;
