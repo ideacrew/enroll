@@ -14,39 +14,6 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
 
-  def person_search
-    @person = Forms::EmployeeCandidate.new
-    respond_to do |format|
-      format.html
-      format.js
-    end
-  end
-
-  def person_match
-    @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person))
-    if @employee_candidate.valid?
-      found_person = @employee_candidate.match_person
-      if found_person.present?
-        @person = found_person
-        respond_to do |format|
-          format.js { render 'person_match' }
-          format.html { render 'person_match' }
-        end
-      else
-        respond_to do |format|
-          format.js { render 'no_match' }
-          format.html { render 'no_match' }
-        end
-      end
-    else
-      @person = @employee_candidate
-      respond_to do |format|
-        format.js { render 'person_search' }
-        format.html { render 'person_search' }
-      end
-    end
-  end
-
   def search
     @employer_profile = Forms::EmployerCandidate.new
     respond_to do |format|
@@ -92,56 +59,41 @@ class Employers::EmployerProfilesController < ApplicationController
     @organization = build_employer_profile
   end
 
-  def person_create
-    # binding.pry
-    @person = current_user.person.present? ? current_user.person : current_user.build_person
-    # @person = current_user.person
-    @person.build_employer_contact
-    @employer_profile = @person.employer_contact
-    build_nested_models
-    respond_to do |format|
-      format.js { render "edit" }
-      format.html { render "edit" }
-    end
-  end
-
-  def person_update
-    sanitize_person_params
-    @person = Person.find(params[:id])
-
-    make_new_person_params @person
-
-    # Delete old sub documents
-    @person.addresses.each {|address| address.delete}
-    @person.phones.each {|phone| phone.delete}
-    @person.emails.each {|email| email.delete}
-
-    @person.updated_by = current_user.email unless current_user.nil?
-    # fail
-    respond_to do |format|
-      if @person.update_attributes(person_params)
-        format.html { redirect_to employers_employer_profile_path(@person), notice: 'Person was successfully updated.' }
-        format.json { head :no_content }
+  def create
+    found_employer = EmployerProfile.find_by_fein(params[:employer_profile][:fein])
+    if found_employer.present?
+      @employer_profile = found_employer
+      @organization = @employer_profile.organization
+      build_nested_models
+      respond_to do |format|
+        format.js { render "edit" }
+        format.html { render "edit" }
+      end
+    else
+      @organization = Organization.new
+      @organization.build_employer_profile
+      @organization.attributes = employer_profile_params
+      if @organization.save
+        flash[:notice] = 'Employer successfully created.'
+        redirect_to employers_employer_profiles_path
       else
-        build_nested_models
-        format.html { render action: "show" }
-        # format.html { redirect_to edit_consumer_employee_path(@person) }
-        format.json { render json: @person.errors, status: :unprocessable_entity }
+        render action: "new"
       end
     end
   end
 
-  # def create
-  #   @organization = Organization.new
-  #   @organization.build_employer_profile
-  #   @organization.attributes = employer_profile_params
-  #   if @organization.save
-  #     flash[:notice] = 'Employer successfully created.'
-  #     redirect_to employers_employer_profiles_path
-  #   else
-  #     render action: "new"
-  #   end
-  # end
+  def update
+    @organization = Organization.find(params[:id])
+    @employer_profile = @organization.employer_profile
+    current_user.roles << "employer" unless current_user.roles.include?("employer")
+    current_user.person.employer_contact = @employer_profile
+    if @organization.update_attributes(employer_profile_params) && current_user.save
+      flash[:notice] = 'Employer successfully created.'
+      redirect_to employers_employer_profiles_path
+    else
+      render action: :new
+    end
+  end
 
   def destroy
     @employer_profile.destroy
@@ -177,6 +129,10 @@ class Employers::EmployerProfilesController < ApplicationController
       )
     end
 
+    def employer_params
+      params.require(:employer_profile).permit(:dba, :entity_kind, :fein, :legal_name)
+    end
+
     def build_employer_profile
       organization = Organization.new
       organization.build_employer_profile
@@ -188,67 +144,12 @@ class Employers::EmployerProfilesController < ApplicationController
     end
 
     def build_nested_models
-      ["home","mobile","work","fax"].each do |kind|
-        @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
-      end
-
-      Address::KINDS.each do |kind|
-        @person.addresses.build(kind: kind) if @person.addresses.select{|address| address.kind == kind}.blank?
-      end
-
-      ["home","work"].each do |kind|
-        @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
-      end
-    end
-
-    def sanitize_person_params
-      person_params["addresses_attributes"].each do |key, address|
-        if address["city"].blank? && address["zip"].blank? && address["address_1"].blank?
-          person_params["addresses_attributes"].delete("#{key}")
-        end
-      end
-
-      person_params["phones_attributes"].each do |key, phone|
-        if phone["full_phone_number"].blank?
-          person_params["phones_attributes"].delete("#{key}")
-        end
-      end
-
-      person_params["emails_attributes"].each do |key, email|
-        if email["address"].blank?
-          person_params["emails_attributes"].delete("#{key}")
-        end
-      end
-    end
-
-    def person_params
-      params.require(:person).permit!
-    end
-
-    def make_new_person_params person
-
-      # Delete old sub documents
-      person.addresses.each {|address| address.delete}
-      person.phones.each {|phone| phone.delete}
-      person.emails.each {|email| email.delete}
-
-      person_params["addresses_attributes"].each do |key, address|
-        if address.has_key?('id')
-          address.delete('id')
-        end
-      end
-
-      person_params["phones_attributes"].each do |key, phone|
-        if phone.has_key?('id')
-          phone.delete('id')
-        end
-      end
-
-      person_params["emails_attributes"].each do |key, email|
-        if email.has_key?('id')
-          email.delete('id')
-        end
-      end
+      @organization.office_locations.build unless @organization.office_locations.present?
+      office_location = @organization.office_locations.first
+      office_location.build_address unless office_location.address.present?
+      office_location.build_phone unless office_location.phone.present?
+      office_location.build_email unless office_location.email.present?
+      @organization
     end
 
 end

@@ -4,7 +4,7 @@
   </div>
 </div>
 <% Array(@person).each do |person| %>
-  <%= form_for(person, :url => person_create_employers_employer_profiles_path, :as => :person, :method => :post, :remote => true) do |f| %>
+  <%= form_for(person, :url => employers_people_path, :as => :person, :method => :post, :remote => true) do |f| %>
     <div class="row">
       <div class="col-md-6 col-sm-6 col-xs-12">
         <dl class="dl-horizontal">
