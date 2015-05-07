@@ -2,7 +2,7 @@ class ConsumerProfilesController < ApplicationController
   def home
     @person = current_user.person
     @family = @person.primary_family
-    @family_members = @family.family_members if @family.present?
+    @family_members = @family.active_family_members if @family.present?
     @employee_roles = @person.employee_roles
     @employer_profile = @employee_roles.first.employer_profile if @employee_roles.any?
     @current_plan_year = @employer_profile.latest_plan_year if @employer_profile.present?
