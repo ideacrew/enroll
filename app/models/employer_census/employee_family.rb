@@ -111,7 +111,7 @@ class EmployerCensus::EmployeeFamily
   end
 
   def link_employee_role(employee_role, linked_at = DateTime.current)
-    raise EmployeeFamilyLinkError, "already linked to an employee role" if is_linked?
+    # raise EmployeeFamilyLinkError, "already linked to an employee role" if is_linked?
     raise EmployeeFamilyLinkError, "invalid to link a terminated employee" if is_terminated?
     raise EmployeeFamilyLinkError, "must assign a benefit group" unless active_benefit_group_assignment.present?
 
