@@ -80,7 +80,7 @@ class Person
   index({last_name: 1, first_name: 1})
   index({first_name: 1, last_name: 1})
 
-  index({ssn: 1}, {sparse: true, unique: true})
+  index({ssn: 1}, {sparse: true})
   index({dob: 1}, {sparse: true})
 
   index({last_name: 1, dob: 1}, {sparse: true})
@@ -252,5 +252,4 @@ private
       errors.add(:dob, "date of birth cannot follow date of death")
     end
   end
-
 end

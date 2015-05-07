@@ -1,4 +1,6 @@
 <li id="<%= employee_dependent_form_id(dependent) %>" class="dependent_list">
+  <%= render 'shared/error_messages', :object => dependent %>
+  
   <div id="add_info_<%= dependent.id %>" class="focus_effect row personal-info-row">
 	  <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd first">
@@ -39,7 +41,7 @@
 
               <div class="col-md-3 col-sm-3 no-pd">
                 <div class="form-group form-group-lg">
-                    <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", required: true, placeholder: "SOCIAL SECURITY" %>
+                    <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", placeholder: "SOCIAL SECURITY" %>
                 </div>
               </div>
 
