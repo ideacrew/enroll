@@ -80,7 +80,7 @@ class Person
   index({last_name: 1, first_name: 1})
   index({first_name: 1, last_name: 1})
 
-  index({ssn: 1}, {sparse: true})
+  index({ssn: 1}, {sparse: true, unique: true})
   index({dob: 1}, {sparse: true})
 
   index({last_name: 1, dob: 1}, {sparse: true})
@@ -115,7 +115,12 @@ class Person
   # Strip non-numeric chars from ssn
   # SSN validation rules, see: http://www.ssa.gov/employer/randomizationfaqs.html#a0=12
   def ssn=(new_ssn)
-    write_attribute(:ssn, new_ssn.to_s.gsub(/\D/, ''))
+    ssn_val = new_ssn.to_s.gsub(/\D/, '')
+    if !new_ssn.blank?
+      write_attribute(:ssn, new_ssn.to_s.gsub(/\D/, ''))
+    else
+      unset("ssn")
+    end
   end
 
   def gender=(new_gender)
