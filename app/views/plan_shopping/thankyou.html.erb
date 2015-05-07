@@ -71,5 +71,10 @@
         <%= link_to "Continue", home_consumer_profiles_path, :class => "btn btn-green btn-continue" %>
       </div>
     </div>
+    <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
+	    <%= link_to "Save & Exit", person_person_landing_path(@person), { :class => "btn btn-save" } %>
+	    <input type="hidden" id="initial_progress" value="85">
+	    <%= render 'shared/signup_progress' %>
+    </div>
   </div>
 </div>
