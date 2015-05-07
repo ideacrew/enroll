@@ -111,6 +111,9 @@ class Employers::FamilyController < ApplicationController
         ],
       :census_dependents_attributes => [
           :id, :first_name, :last_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy
+        ],
+      :benefit_group_assignments_attributes => [
+          :id, :start_on, :end_on, :is_active, :benefit_group_id, :_destroy
         ]
       )
   end
@@ -133,6 +136,7 @@ class Employers::FamilyController < ApplicationController
     family.build_census_employee
     family.build_census_employee.build_address
     family.census_dependents.build
+    family.benefit_group_assignments.build
     family
   end
 

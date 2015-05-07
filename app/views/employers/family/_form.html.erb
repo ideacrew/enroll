@@ -64,6 +64,18 @@
                     </div>
                   </div>
                 </div>
+                <br>
+
+                <div id="benefit_group_assignment_info" class="focus_effect row personal-info-row">
+                  <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
+                    <div class='form-inputs'>
+                      <%= f.fields_for :benefit_group_assignments, errors: {}, fieldset: false do |benefit|  %>
+                        <%= render 'shared/benefit_group_assignment_fields', f: benefit %>
+                      <% end %>
+                      <%= link_to_add_fields "Add Benefits", f, :benefit_group_assignments %>
+                    </div>
+                  </div>
+                </div>
             <% end %>
 
           <div id="key-section" class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
