@@ -108,7 +108,7 @@ class Employers::EmployerProfilesController < ApplicationController
     current_user.person.employer_contact = @employer_profile
     if @organization.update_attributes(employer_profile_params) && current_user.save
       flash[:notice] = 'Employer successfully created.'
-      redirect_to employers_employer_profile_my_account_path(@employer_profile)
+      redirect_to employers_employer_profile_path(@employer_profile)
     else
       render action: :new
     end
@@ -127,7 +127,7 @@ class Employers::EmployerProfilesController < ApplicationController
 
     def check_employer_role
       if current_user.has_employer_role?
-        redirect_to employers_employer_profile_my_account_path(current_user.person.get_employer_contact)
+        redirect_to employers_employer_profile_path(current_user.person.get_employer_contact)
       end
     end
 

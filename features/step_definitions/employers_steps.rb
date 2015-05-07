@@ -74,6 +74,10 @@ Then(/^I should see an initial fieldset to enter my name, ssn and dob$/) do
   expect(@browser.button(value: "Search Person").visible?).to be_truthy
   @browser.button(value: "Search Person").fire_event("onclick")
   sleep(1)
+
+end
+
+And(/^My user data from existing the fieldset values are prefilled using data from my existing account$/) do
   @browser.button(value: "This is my info").fire_event("onclick")
   sleep(1)
   @browser.text_field(name: "person[addresses_attributes][0][address_1]").set("12000 Address 1")
@@ -92,8 +96,23 @@ Then(/^I should see an initial fieldset to enter my name, ssn and dob$/) do
   sleep(1)
 end
 
-Then(/^I should see a second form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
-  pending # express the regexp above with the code you wish you had
+And(/^I should see a second form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
+  Watir::Wait.until(30) { @browser.button(value: "Search Employers").present? }
+  org = Organization.first
+  org.build_employer_profile(entity_kind: "partnership")
+  org.save
+
+  expect(@browser.button(value: "Search Employers").visible?).to be_truthy
+  @browser.text_field(name: "employer_profile[fein]").set(org.fein)
+  @browser.text_field(name: "employer_profile[dba]").set("test")
+  @browser.text_field(name: "employer_profile[legal_name]").set(org.legal_name)
+  @browser.select_list(name: "employer_profile[entity_kind]").select_value(org.employer_profile.entity_kind)
+  @browser.button(value: "Search Employers").fire_event("onclick")
+  sleep(1)
+  @browser.button(value: "This is my employer").fire_event("onclick")
+  sleep(1)
+   @browser.button(value: "Create").fire_event("onclick")
+
 end
 
 And(/^I should see an initial form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
@@ -125,13 +144,9 @@ And(/^I should see a second fieldset to enter my name and email$/) do
   @browser.button(name: "commit").click
 end
 
-And(/^My user data from existing the fieldset values are prefilled using data from my existing account$/) do
-  pending
-end
-
 And(/^I should see a successful creation message$/) do
   Watir::Wait.until(30) { @browser.text.include?("Employer successfully created.") }
-  expect(@browser.a(text: "True First Inc").visible?).to be_truthy
+  expect(@browser.text.include?("Employer successfully created.")).to be_truthy
 end
 
 When(/^I click on an employer in the employer list$/) do
