@@ -50,9 +50,7 @@ class Employers::PeopleController < ApplicationController
   end
 
   def create
-    # binding.pry
     @person = current_user.person.present? ? current_user.person : current_user.build_person
-    # @person = current_user.person
     @person.build_employer_contact
     @employer_profile = @person.employer_contact
     build_nested_models

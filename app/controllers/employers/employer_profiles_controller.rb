@@ -26,16 +26,32 @@ class Employers::EmployerProfilesController < ApplicationController
     @employer_candidate = Forms::EmployerCandidate.new(params.require(:employer_profile))
     if @employer_candidate.valid?
       found_employer = @employer_candidate.match_employer
-      if found_employer.present?
-        @employer_profile = found_employer
-        respond_to do |format|
-          format.js { render 'match' }
-          format.html { render 'match' }
+      unless params["create_employer"].present?
+        if found_employer.present?
+          @employer_profile = found_employer
+          respond_to do |format|
+            format.js { render 'match' }
+            format.html { render 'match' }
+          end
+        else
+          respond_to do |format|
+            format.js { render 'no_match' }
+            format.html { render 'no_match' }
+          end
         end
       else
+        params.permit!
+        @organization = Organization.new
+        @employer_profile = @organization.build_employer_profile
+        @employer_profile.attributes = params[:employer_profile]
+        @organization.save(validate: false)
+        office_location = @organization.office_locations.build
+        office_location.build_address
+        office_location.build_phone
+        office_location.build_email
         respond_to do |format|
-          format.js { render 'no_match' }
-          format.html { render 'no_match' }
+          format.js { render "edit" }
+          format.html { render "edit" }
         end
       end
     else
@@ -92,7 +108,7 @@ class Employers::EmployerProfilesController < ApplicationController
     current_user.person.employer_contact = @employer_profile
     if @organization.update_attributes(employer_profile_params) && current_user.save
       flash[:notice] = 'Employer successfully created.'
-      redirect_to employers_employer_profiles_path
+      redirect_to employers_employer_profile_path(@employer_profile)
     else
       render action: :new
     end
@@ -111,7 +127,7 @@ class Employers::EmployerProfilesController < ApplicationController
 
     def check_employer_role
       if current_user.has_employer_role?
-        redirect_to employers_employer_profile_my_account_path(current_user.person.employer_contact)
+        redirect_to employers_employer_profile_path(current_user.person.get_employer_contact)
       end
     end
 
