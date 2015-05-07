@@ -12,8 +12,18 @@
             <div class="alert alert-error">
               <h4><%= pluralize(@family.errors.count, "error") %> prohibited this person from being saved:</h4>
               <ul>
-                <% @family.errors.full_messages.each do |msg| %>
+                <% @family.census_employee.errors.full_messages.each do |msg| %>
                   <li><%= msg %></li>
+                <% end %>
+                <% @family.census_dependents.each do |dep| %>
+                  <% dep.errors.full_messages.each do |msg| %>
+                    <li><%= msg %></li>
+                  <% end %>
+                <% end %>
+                <% @family.benefit_group_assignments.each do |bg| %>
+                  <% bg.errors.full_messages.each do |msg| %>
+                    <li><%= msg %></li>
+                  <% end %>
                 <% end %>
               </ul>
             </div>
