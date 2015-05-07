@@ -15,7 +15,7 @@
         <% end %>
 
         <%= phone.hidden_field :kind %>
-        <%= phone.text_field :full_phone_number, placeholder: "#{kind}", class: "number textfield floatlabel phone_number form-control #{required}" %>
+        <%= phone.text_field :full_phone_number, placeholder: "#{kind}", class: "#{required} number textfield floatlabel phone_number form-control" %>
       </div>
     </div>
     <% if((phone.index == 1) || (phone.index == 3)) %>

@@ -75,9 +75,13 @@ $(document).ready(function () {
     });
   }
   
-  // New Employee Page
+  // personal-info-row focus fields
   $(document).on('click', '.focus_effect', function() {
     update_info_row(this, 'focus_in');
+  });
+
+  $(document).on('focusin', '.focus_effect input', function() {
+    update_info_row(this.closest('.focus_effect'), 'focus_in');
   });
 
   $(document).on('blur', '.focus_effect', function() {
@@ -89,22 +93,33 @@ $(document).ready(function () {
     var check = check_info_exists($(element).attr('id'));
 
     if( (evt == 'focus_in') || (check.length == 0 && evt == 'focus_out') ) {
-      $('.focus_effect').removeClass('personal-info-top-row');
-      $('.focus_effect').addClass('personal-info-row');
+
+      switch_row_class();
+
       $(element).addClass('personal-info-top-row');
       $(element).removeClass('personal-info-row');
       $(element).css("opacity","1");
     }
     else {
-      $('.focus_effect').removeClass('personal-info-top-row');
-      $('.focus_effect').addClass('personal-info-row');
+      switch_row_class();
       $(element).css("opacity","0.5");
     }
   }
 
   function check_info_exists(id) {
-    var check = $('#' + id + ' input[required]').filter(function() { return this.value == ""; });
+    var check = $('#' + id + ' input.required').filter(function() { return this.value == ""; });
     return check;
+  }
+
+  function switch_row_class() {
+    // Remove personal-info-top-row from all focus_effect's whose info doesnot exists
+    $('.focus_effect').each(function() {
+      check = check_info_exists($(this).attr('id'));
+      if(check.length != 0) {
+        $(this).removeClass('personal-info-top-row');
+        $(this).addClass('personal-info-row');
+      }
+    });
   }
 
   $(".adderess-select-box").focusin(function() {

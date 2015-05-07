@@ -1,2 +1,5 @@
 = form_for @person, { :as => :person, :url => match_consumer_employee_index_path, :remote => true } do |f|
  = render 'shared/person_search_fields', f: f
+
+%br
+#person_search_results
