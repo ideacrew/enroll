@@ -14,7 +14,7 @@
     <div class="overlay-in"></div>
   </div>
 </div>
-<div id="no_match_employer_details_wrapper"></div>
+<div id="employer_details_wrapper"></div>
 
 <div class="row search-btn-row">
   <div class="col-md-10 col-sm-9 col-xs-12 key no-pd">
@@ -23,6 +23,12 @@
       <span><i class="fa fa-lock icon-large"></i> Your information is secure.</span>
     </p>
   </div>
+</div>
+
+<div id ="new_employer_button" style="display:none">
+  <p> Please click the following button to create an employer profile.
+    <%= f.submit "Create Employer", name: "create_employer", class: "btn btn-primary btn-search" %>
+  </p>
 </div>
 
 <script>

@@ -26,16 +26,32 @@ class Employers::EmployerProfilesController < ApplicationController
     @employer_candidate = Forms::EmployerCandidate.new(params.require(:employer_profile))
     if @employer_candidate.valid?
       found_employer = @employer_candidate.match_employer
-      if found_employer.present?
-        @employer_profile = found_employer
-        respond_to do |format|
-          format.js { render 'match' }
-          format.html { render 'match' }
+      unless params["create_employer"].present?
+        if found_employer.present?
+          @employer_profile = found_employer
+          respond_to do |format|
+            format.js { render 'match' }
+            format.html { render 'match' }
+          end
+        else
+          respond_to do |format|
+            format.js { render 'no_match' }
+            format.html { render 'no_match' }
+          end
         end
       else
+        params.permit!
+        @organization = Organization.new
+        @employer_profile = @organization.build_employer_profile
+        @employer_profile.attributes = params[:employer_profile]
+        @organization.save(validate: false)
+        office_location = @organization.office_locations.build
+        office_location.build_address
+        office_location.build_phone
+        office_location.build_email
         respond_to do |format|
-          format.js { render 'no_match' }
-          format.html { render 'no_match' }
+          format.js { render "edit" }
+          format.html { render "edit" }
         end
       end
     else
