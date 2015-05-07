@@ -1,13 +1,14 @@
+<h4> Add Dependents </h4>
 <fieldset class="row middle-row form-group form-group-lg no-pd">
   <div class="row middle-row form-group form-group-lg no-pd">
     <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :first_name, class: "floatlabel form-control border-bottom-none", placeholder: 'FIRST NAME' %>
+      <%= f.text_field :first_name, class: "floatlabel form-control border-bottom-none", placeholder: 'FIRST NAME', required: true %>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME' %>
+      <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'SUFFIX' %>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :name_sfx, class: "floatlabel form-control", placeholder: 'SUFFIX' %>
+      <%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME', required: true %>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <%= f.hidden_field :_destroy %>
@@ -18,7 +19,7 @@
   <div class="row bottom-row">
     <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
       <%= f.text_field :dob, start_year: Date.today.year - 110, end_year: Date.today.year, placeholder: "BIRTHDATE",
-          class: "date-picker floatlabel form-control", value: f.object.dob.try(:strftime, "%m/%d/%Y") %>
+          class: "date-picker floatlabel form-control", value: f.object.dob.try(:strftime, "%m/%d/%Y"), required: true %>
     </div>
     <div class="col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
