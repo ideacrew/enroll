@@ -23,7 +23,7 @@
             <div class="row">
               <ul class="" id="dependent_ul">
                   <% @family.family_members.reject(&:is_primary_applicant).each do |dependent| %>
-                    <%= render "dependent", dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
+                    <%= render "people/dependent", dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
                   <% end %>
               </ul>
               <!-- <ul id="dependent_ul">
