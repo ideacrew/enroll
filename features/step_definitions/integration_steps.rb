@@ -4,11 +4,17 @@ require 'pry'
 
 module WatirScreenshots
   def screenshot(name = nil)
-    shot_count = @screen_count.to_s.rjust(3, "0")
-    f_name = name.nil? ? shot_count : "#{shot_count}_#{name}"
-    @browser.screenshot.save(f_name + ".png")
-    @screen_count = @screen_count + 1
+    if @take_screens
+      shot_count = @screen_count.to_s.rjust(3, "0")
+      f_name = name.nil? ? shot_count : "#{shot_count}_#{name}"
+      @browser.screenshot.save(f_name + ".png")
+      @screen_count = @screen_count + 1
+    end
   end
+end
+
+Before "@screenshots" do
+  @take_screens = true
 end
 
 Before "@keep_browser_open" do
@@ -23,6 +29,7 @@ end
 
 After "@watir" do
    @keep_browser_open ? @keep_browser_open = false : @browser.close
+   @take_screens = false if @take_screens
 end
 
 Given(/^I do not exist as a user$/) do
