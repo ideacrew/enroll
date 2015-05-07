@@ -11,6 +11,9 @@ module WatirScreenshots
   end
 end
 
+Before "@keep_browser_open" do
+  @keep_browser_open = true
+end
 
 Before "@watir" do
   extend WatirScreenshots
@@ -19,7 +22,7 @@ Before "@watir" do
 end
 
 After "@watir" do
- # @browser.close
+   @keep_browser_open ? @keep_browser_open = false : @browser.close
 end
 
 Given(/^I do not exist as a user$/) do
