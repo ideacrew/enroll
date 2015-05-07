@@ -28,12 +28,12 @@ class Employers::PeopleController < ApplicationController
           end
         end
       else
-        @person = current_user.instantiate_person
         params.permit!
+        @person = current_user.instantiate_person
         @person.attributes = params[:person]
-        @person.save
         @person.build_employer_contact
         @employer_profile = @person.employer_contact
+        @person.save
         build_nested_models
         respond_to do |format|
           format.js { render "edit" }
