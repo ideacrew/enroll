@@ -5,10 +5,10 @@
     <% end %>
   </li>
   <li role="presentation"<%= menu_tab_class(active_tab, "profile-tab") %>>
-    <a aria-expanded="true" aria-controls="profile" id="profile-tab" href="#">
+   <%= link_to(personal_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "profile", "role" => "tab" ) do  %>
       <span class="hidden-xs">Profile</span>
       <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Profile"></span>
-    </a>
+   <% end %>
   </li>
   <li role="presentation"<%= menu_tab_class(active_tab, "plans-tab") %>>
    <%= link_to(plans_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "plans", "role" => "tab" ) do  %>

@@ -1,7 +1,7 @@
 <div class="row">
 	<p class="head">
 	<span>Household</span>
-	<span><%= link_to 'add members', '#profile', class: 'add_success', role: 'tab', data: {toggle: 'tab'}, aria: {controls: 'profile', expanded: 'true'} %></span>
+	<span><%= link_to "add members", family_consumer_profiles_path, :remote => true %></span>
 	</p>
 	<ul class="list-group emp-ul">
 		<% primary_member = @family.primary_applicant %>
@@ -10,7 +10,7 @@
 			<li class="list-group-item">
 			<div class="row">
 				<div class="col-md-12 col-sm-12 col-xs-12">
-					<h4><%= fm.person.first_name %> <%= fm.person.middle_name %> <%= fm.person.last_name %><%= image_tag "edit.png", :class => "pull-right" %></h4>
+					<h4><%= fm.person.first_name %> <%= fm.person.middle_name %> <%= fm.person.last_name %><%= link_to raw(image_tag "edit.png", :class => "pull-right"), family_consumer_profiles_path, :remote => true %></h4>
 				</div>
 			</div>
 			</li>

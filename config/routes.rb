@@ -102,6 +102,9 @@ Rails.application.routes.draw do
   resources :consumer_profiles, :only => [] do
     collection do
       get 'home'
+      get 'plans'
+      get 'personal'
+      get 'family'
     end
   end
 
