@@ -49,7 +49,7 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(assigns(:employer_profiles)).to eq employer_list
     end
 
-    it "returns http success" do 
+    it "returns http success" do
       expect(response).to have_http_status(:success)
     end
 
@@ -78,7 +78,7 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(assigns(:employer_profiles)).to eq employer_list
     end
 
-    it "returns http success" do 
+    it "returns http success" do
       expect(response).to have_http_status(:success)
     end
 
@@ -99,7 +99,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:email_attributes) { {
       :kind => "email",
       :address => "address"
-    } } 
+    } }
     let(:address_attributes) { {
       :kind => "address kind",
       :address_1 => "address 1",
@@ -132,7 +132,6 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:organization) { double }
 
     before(:each) do
-      pending
       sign_in
       allow(Organization).to receive(:new).and_return(organization)
       allow(organization).to receive(:build_employer_profile)

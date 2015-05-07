@@ -12,18 +12,32 @@ class Employers::PeopleController < ApplicationController
     @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person))
     if @employee_candidate.valid?
       found_person = @employee_candidate.match_person
-      if found_person.present?
-        @person = found_person
-        respond_to do |format|
-          format.js { render 'match' }
-          format.html { render 'match' }
+      unless params["create_person"].present?
+        if found_person.present?
+          @person = found_person
+          respond_to do |format|
+            format.js { render 'match' }
+            format.html { render 'match' }
+          end
+        else
+          @person = Person.new
+          build_nested_models
+          respond_to do |format|
+            format.js { render 'no_match' }
+            format.html { render 'no_match' }
+          end
         end
       else
-        @person = Person.new
+        @person = current_user.instantiate_person
+        params.permit!
+        @person.attributes = params[:person]
+        @person.save
+        @person.build_employer_contact
+        @employer_profile = @person.employer_contact
         build_nested_models
         respond_to do |format|
-          format.js { render 'no_match' }
-          format.html { render 'no_match' }
+          format.js { render "edit" }
+          format.html { render "edit" }
         end
       end
     else

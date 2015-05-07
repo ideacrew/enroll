@@ -1,6 +1,3 @@
 <%= form_for @person, { :as => :person, :url => match_employers_people_path, :remote => true } do |f| %>
   <%= render 'search_fields', f: f %>
 <% end %>
-<div class="overlay-in"></div>
-<div id ="person_details_wrapper"></div>
-<div id ="no_match_new_person_wrapper"></div>

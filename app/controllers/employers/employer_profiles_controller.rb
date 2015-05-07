@@ -60,16 +60,7 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def create
-    found_employer = EmployerProfile.find_by_fein(params[:employer_profile][:fein])
-    if found_employer.present?
-      @employer_profile = found_employer
-      @organization = @employer_profile.organization
-      build_nested_models
-      respond_to do |format|
-        format.js { render "edit" }
-        format.html { render "edit" }
-      end
-    else
+    if params[:organization].present?
       @organization = Organization.new
       @organization.build_employer_profile
       @organization.attributes = employer_profile_params
@@ -78,6 +69,18 @@ class Employers::EmployerProfilesController < ApplicationController
         redirect_to employers_employer_profiles_path
       else
         render action: "new"
+      end
+    else
+      found_employer = EmployerProfile.find_by_fein(params[:employer_profile][:fein])
+      if found_employer.present?
+        @employer_profile = found_employer
+        @organization = @employer_profile.organization
+        build_nested_models
+        respond_to do |format|
+          format.js { render "edit" }
+          format.html { render "edit" }
+        end
+      else
       end
     end
   end
