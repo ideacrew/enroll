@@ -57,14 +57,15 @@ class Consumer::EmployeeRolesController < ApplicationController
   def update
     #@person = Forms::EmployeeRole.find(params.require(:id))
     person = Person.find(params.require(:id))
-    @person = Forms::EmployeeRole.new(person, person.employee_roles.first)
-    if @person.update_attributes(params.require(:person).permit(*person_parameters_list))
+    object_params = params.require(:person).permit(*person_parameters_list)
+    @employee_role = person.employee_roles.detect { |emp_role| emp_role.id.to_s == object_params[:employee_role_id].to_s }
+    @person = Forms::EmployeeRole.new(person, @employee_role)
+    if @person.update_attributes(object_params)
       respond_to do |format|
         format.html { render "dependent_details" }
         format.js { render "dependent_details" }
       end
     else
-      @employee_role = @person.employee_role
       @employer_profile = @person.employer_profile
       @benefit_group = @person.benefit_group
       @census_family = @person.census_family

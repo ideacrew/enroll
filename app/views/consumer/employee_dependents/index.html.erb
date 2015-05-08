@@ -1,12 +1,6 @@
 <div class="container-fluid no-pd-left" id="dependents_info">
   <div class="panel panel-default">
     <div class="panel-body left">
-      <div class="alert">
-        <a href="<%#= person_landing_people_path(organization_id: params[:organization_id], person_id: params[:person_id])  %>" data-method="POST"> Landing Page</a>
-        &nbsp;&nbsp;
-        <a href="<%= plan_details_people_path(person_id: params[:person_id], organization_id: params[:organization_id])%>" data-method="POST"> Plan Details</a>
-      </div>
-
       <div class="col-md-10 col-sm-12">
         <div class="col-md-9 col-sm-9 col-xs-12 no-pd">
 
@@ -51,7 +45,7 @@
       <div id="dependent_buttons" class="focus_effect row personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
 	      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
 		      <%= link_to "Add Member", new_consumer_employee_dependent_path(:family_id => @family.id), :remote => true, :class => "btn btn-blue" %>
-          <%= link_to 'Continue', group_selection_consumer_employee_dependents_path(person_id: params[:person_id], organization_id: params[:organization_id]), class: 'btn btn-green pull-right' %>
+          <%= link_to 'Continue', group_selection_consumer_employee_dependents_path(person_id: @person.id, employee_role_id: @employee_role.id), class: 'btn btn-green pull-right' %>
         </div>
       </div>
 

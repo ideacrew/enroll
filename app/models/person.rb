@@ -72,6 +72,7 @@ class Person
 
 
   before_save :update_full_name
+  before_save :strip_empty_fields
 
   index({hbx_id: 1}, {unique: true})
 
@@ -111,6 +112,12 @@ class Person
 
   scope :active,   ->{ where(is_active: true) }
   scope :inactive, ->{ where(is_active: false) }
+
+  def strip_empty_fields
+    if ssn.blank?
+      unset("ssn")
+    end
+  end
 
   # Strip non-numeric chars from ssn
   # SSN validation rules, see: http://www.ssa.gov/employer/randomizationfaqs.html#a0=12
