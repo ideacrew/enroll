@@ -13,6 +13,8 @@ require "i18n/backend/fallbacks"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+require File.join(File.dirname(__FILE__), "json_log_format")
+
 module Enroll
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
