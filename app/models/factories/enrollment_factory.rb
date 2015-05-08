@@ -189,9 +189,12 @@ module Factories
 
     def self.initialize_family(person, dependents)
       family = person.primary_family
-      family = Family.new if family.blank?
+      family ||= Family.new
       applicant = family.primary_applicant
       applicant = initialize_primary_applicant(family, person) if applicant.blank?
+      person.relatives.each do |related_person|
+        family.add_family_member(related_person)
+      end
       dependents.each do |dependent|
         initialize_dependent(family, person, dependent)
       end

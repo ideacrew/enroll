@@ -239,7 +239,9 @@ end
   end
 
   def relatives
-    person_relationships.map(&:relative)
+    person_relationships.reject do |p_rel|
+      p_rel.relative_id.to_s == self.id.to_s
+    end.map(&:relative)
   end
 
 private
