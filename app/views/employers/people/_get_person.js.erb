@@ -1,6 +1,6 @@
 $('#new_employer_wrapper').html("<%= escape_javascript(render "edit_person_form") %>");
 
-<% if @employer_profile.present? %>
+<% if @person.present? %>
   $('#employer-info').html("");
 
   $("#key-section").removeClass("hidden");

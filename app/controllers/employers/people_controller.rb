@@ -12,14 +12,14 @@ class Employers::PeopleController < ApplicationController
     @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person))
     if @employee_candidate.valid?
       found_person = @employee_candidate.match_person
-      unless params["create_person"].present?
-        if found_person.present?
+      unless params["create_person"].present? # when search button is clicked
+        if found_person.present? #when person is found
           @person = found_person
           respond_to do |format|
             format.js { render 'match' }
             format.html { render 'match' }
           end
-        else
+        else # when there is no person match
           @person = Person.new
           build_nested_models
           respond_to do |format|
@@ -27,12 +27,10 @@ class Employers::PeopleController < ApplicationController
             format.html { render 'no_match' }
           end
         end
-      else
+      else # when create person button clicked
         params.permit!
         @person = current_user.instantiate_person
         @person.attributes = params[:person]
-        @person.build_employer_contact
-        @employer_profile = @person.employer_contact
         @person.save
         build_nested_models
         respond_to do |format|
@@ -40,7 +38,7 @@ class Employers::PeopleController < ApplicationController
           format.html { render "edit" }
         end
       end
-    else
+    else # when person is not valid
       @person = @employee_candidate
       respond_to do |format|
         format.js { render 'search' }
@@ -50,9 +48,7 @@ class Employers::PeopleController < ApplicationController
   end
 
   def create
-    @person = current_user.person.present? ? current_user.person : current_user.build_person
-    @person.build_employer_contact
-    @employer_profile = @person.employer_contact
+    @person = current_user.person
     build_nested_models
     respond_to do |format|
       format.js { render "edit" }
@@ -65,13 +61,9 @@ class Employers::PeopleController < ApplicationController
     @person = Person.find(params[:id])
     make_new_person_params @person
 
-    @person.addresses.each {|address| address.delete}
-    @person.phones.each {|phone| phone.delete}
-    @person.emails.each {|email| email.delete}
-
     @employer_profile = @person.employer_contact.present? ? @person.employer_contact : @person.build_employer_contact
+    @person.updated_by = current_user.email if current_user.present?
 
-    @person.updated_by = current_user.email unless current_user.nil?
     respond_to do |format|
       if @person.update_attributes(params[:person])
         format.js { render "employer_form" }
@@ -79,7 +71,6 @@ class Employers::PeopleController < ApplicationController
       else
         build_nested_models
         format.html { render action: "show" }
-        # format.html { redirect_to edit_consumer_employee_path(@person) }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end
     end
