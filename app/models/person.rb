@@ -238,6 +238,10 @@ end
     notify_change_event(self, {"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES, "address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
   end
 
+  def relatives
+    person_relationships.map(&:relative)
+  end
+
 private
   def update_full_name
     full_name
