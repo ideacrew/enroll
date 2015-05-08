@@ -78,7 +78,7 @@ class Family
   end
 
   def find_family_member_by_person(person)
-    family_members.detect { |family_member| family_member.person_id == person._id }
+    family_members.detect { |family_member| family_member.person_id.to_s == person._id.to_s }
   end
 
   # Life events trigger special enrollment periods
@@ -141,7 +141,7 @@ class Family
     family_member = find_family_member_by_person(person)
     if family_member.present?
       family_member.is_active = false
-      # active_household.remove_family_member(family_member)
+      active_household.remove_family_member(family_member)
     end
     
     family_member

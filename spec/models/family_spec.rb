@@ -1,5 +1,22 @@
 require 'rails_helper'
 
+describe Family, "given a primary applicant and a dependent" do
+  let(:person) { Person.new }
+  let(:dependent) { Person.new }
+  let(:household) { Household.new(:is_active => true) }
+
+  let(:family_member_person) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: person) }
+  let(:family_member_dependent) { FamilyMember.new(person: dependent) }
+
+  subject { Family.new(:households => [household], :family_members => [family_member_person, family_member_dependent]) }
+
+  it "should remove the household member when it removes the dependent" do
+    expect(household).to receive(:remove_family_member).with(family_member_dependent)
+    subject.remove_family_member(dependent)
+  end
+
+end
+
 describe Family, type: :model, dbclean: :after_each do
 
   let(:spouse)  { FactoryGirl.create(:person)}

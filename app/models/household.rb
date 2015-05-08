@@ -164,4 +164,10 @@ class Household
     enrollment.save
     enrollment
   end
+
+  def remove_family_member(member)
+    coverage_households.each do |c_household|
+      c_household.remove_family_member(member)
+    end
+  end
 end

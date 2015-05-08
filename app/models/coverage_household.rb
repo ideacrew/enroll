@@ -34,6 +34,13 @@ class CoverageHousehold
     coverage_household_members.map(&:family_member_id)
   end
 
+  def remove_family_member(member)
+    family_member = coverage_household_members.detect { |ch_member| ch_member.family_member_id.to_s == member.id.to_s }
+    if family_member.present?
+       coverage_household_members.delete(family_member)
+    end
+  end
+
 private
   def presence_of_coverage_household_members
     if self.coverage_household_members.size == 0
