@@ -31,7 +31,7 @@ set :pty, true
 set :linked_files, (fetch(:linked_files, []) | ['config/mongoid.yml', 'config/initializers/devise.rb', 'config/secrets.yml'])
 
 # Default value for linked_dirs is []
-set :linked_dirs, fetch(:linked_dirs, []).push('log', 'pids')
+set :linked_dirs, fetch(:linked_dirs, []).push('log', 'pids', 'eye')
 
 # capistrano/rails setup
 set :assets_roles, [:web, :app]
@@ -46,12 +46,11 @@ namespace :deploy do
   desc 'Restart application'
     task :restart do
       on roles(:app), in: :sequence, wait: 20 do
-        sudo "service unicorn_enroll restart"
+        sudo "service eye_rails restart"
       end
     end
 
     after :publishing, :restart
-
 
     after :restart, :clear_cache do
       on roles(:web), in: :groups, limit: 3, wait: 10 do
