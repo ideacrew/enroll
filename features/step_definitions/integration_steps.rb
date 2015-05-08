@@ -144,18 +144,18 @@ end
 #    Then I should see 3 dependents
 
 When(/^I click continue on the dependents page$/) do
-  @browser.a(:text => "Continue", :href => /consumer\/employee_dependents\/group_selection/).click
+  @browser.a(:text => "Continue", :href => /group_selection\/new/).click
   sleep(5)
 end
 
 Then(/^I should see the group selection page$/) do
   screenshot("group_selection")
-  @browser.a(:text => "Continue", :href => /people\/select_plan/).wait_until_present(30)
+  @browser.form(:action => /group_selection\/create/).wait_until_present(30)
   sleep(1)
 end
 
 When(/^I click continue on the group selection page$/) do
-  @browser.a(:text => "Continue", :href => /people\/select_plan/).click
+  @browser.input(:value=> /Continue/).click
   sleep(5)
 end
 

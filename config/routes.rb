@@ -36,6 +36,11 @@ Rails.application.routes.draw do
     root 'employer_roles#show'
   end
 
+  # used to select which people are going to be covered before plan selection
+  get 'group_selection/new', to: 'group_selection#new'
+  post 'group_selection/new', to: 'group_selection#new'
+  post 'group_selection/create', to: 'group_selection#create'
+
   namespace :broker_agencies do
     root 'broker_profile#new'
 
