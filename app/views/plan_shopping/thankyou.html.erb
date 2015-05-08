@@ -1,21 +1,33 @@
-<div class="employee-welocome">
+<div class="employee-welocome col-md-12">
   <div class="row welcome-msg">
     <div class="col-md-9 col-sm-11 col-xs-12 no-pd">
-      <div class="row text-center">
+      <div class="row text-center" style='padding:20px;'>
         <div class="col-md-12 col-sm-12 no-pd col-xs-12 text-left">
-          <h4><strong>Thank you</strong></h4>
+          <h3><strong>Thank you for your order!</strong></h3>
           <%= @enrollment.subscriber.family_member.person.full_name %>
-          ,<br /><br />
+          ,<br />
           <span>You and the following dependents have successfully enrolled in</span>
           <span style="color: rgb(51, 51, 51); line-height: 130%;">
             <%= @plan.name %><br /><br />
           </span>
 
-          <table class="table table-bordered">
+          <table class="table table-bordered" style="max-width:900px;">
+            <thead>
+              <tr style='border-bottom:1px solid #ddd;'>
+                <th>name</th>
+                <th>gender</th>
+                <th>birthday</th>
+                <th>ssn</th>
+                <th>cost</th>
+              </tr>
+            </thead>
             <tbody>
               <% @enrollment.hbx_enrollment_members.each do |member| %>
-                <tr>
+                <tr style='border-bottom:1px solid #ddd;'>
                   <td><%= member.person.full_name %></td>
+                  <td><%= member.person.try(:gender) %></td>
+                  <td><%= member.person.try(:dob).strftime("%m/%d/%Y") %></td>
+                  <td><%= member.person.try(:ssn) %></td>
                   <td><%= number_to_currency(@plan.premium_for(member)) %></td>
                 </tr>
               <% end %>
@@ -41,14 +53,10 @@
             </strong>
           </p>
 
-          <span style=
-            "font-size: 16px; line-height: 130%;">
-            Thank you for
-            your
-            order.<br /></span><br />
-
-          <span style=
-            "font-size: 16px; line-height: 130%;">
+          <br />
+          <br />
+          
+          <span style="font-size: 14px; line-height: 130%;">
             DC Health
             Link<br />
             PHONE:
