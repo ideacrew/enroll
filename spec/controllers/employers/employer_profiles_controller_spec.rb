@@ -227,7 +227,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
     context "given valid parameters render 'match' template" do
       let(:validation_result) { true }
-      let(:found_employer) { FactoryGirl.create(:person) }
+      let(:found_employer) { FactoryGirl.create(:employer_profile) }
 
       it "renders the 'match' template" do
         expect(response).to have_http_status(:success)

@@ -41,14 +41,10 @@ class Employers::EmployerProfilesController < ApplicationController
         end
       else
         params.permit!
-        @organization = Organization.new
-        @employer_profile = @organization.build_employer_profile
+        build_organization
         @employer_profile.attributes = params[:employer_profile]
         @organization.save(validate: false)
-        office_location = @organization.office_locations.build
-        office_location.build_address
-        office_location.build_phone
-        office_location.build_email
+        build_office_location
         respond_to do |format|
           format.js { render "edit" }
           format.html { render "edit" }
@@ -72,13 +68,12 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def new
-    @organization = build_employer_profile
+    @organization = build_employer_profile_params
   end
 
   def create
     if params[:organization].present?
-      @organization = Organization.new
-      @organization.build_employer_profile
+      build_organization
       @organization.attributes = employer_profile_params
       if @organization.save
         flash[:notice] = 'Employer successfully created.'
@@ -91,7 +86,7 @@ class Employers::EmployerProfilesController < ApplicationController
       if found_employer.present?
         @employer_profile = found_employer
         @organization = @employer_profile.organization
-        build_nested_models
+        build_office_location
         respond_to do |format|
           format.js { render "edit" }
           format.html { render "edit" }
@@ -139,21 +134,17 @@ class Employers::EmployerProfilesController < ApplicationController
       )
     end
 
-    def employer_params
-      params.require(:employer_profile).permit(:dba, :entity_kind, :fein, :legal_name)
+    def build_organization
+      @organization = Organization.new
+      @employer_profile = @organization.build_employer_profile
     end
 
-    def build_employer_profile
-      organization = Organization.new
-      organization.build_employer_profile
-      office_location = organization.office_locations.build
-      office_location.build_address
-      office_location.build_phone
-      office_location.build_email
-      organization
+    def build_employer_profile_params
+      build_organization
+      build_office_location
     end
 
-    def build_nested_models
+    def build_office_location
       @organization.office_locations.build unless @organization.office_locations.present?
       office_location = @organization.office_locations.first
       office_location.build_address unless office_location.address.present?
