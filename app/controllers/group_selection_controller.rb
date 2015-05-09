@@ -13,7 +13,7 @@ class GroupSelectionController < ApplicationController
     hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
       family_member_ids.include? member.applicant_id
     end
-    hbx_enrollment.save
+    hbx_enrollment.save!
     organization = @employee_role.employer_profile.organization
     redirect_to select_plan_people_path(person_id: @person, hbx_enrollment_id: hbx_enrollment, organization_id: organization)
   end
