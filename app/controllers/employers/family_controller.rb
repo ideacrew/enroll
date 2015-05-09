@@ -3,6 +3,7 @@ class Employers::FamilyController < ApplicationController
   before_action :find_employer
   before_action :set_family_id, only: [:delink, :terminate, :rehire]
   before_action :find_family, only: [:destroy, :show, :edit, :update]
+  before_action :check_plan_year, only: [:new]
 
   def new
     @family = build_family
@@ -24,6 +25,7 @@ class Employers::FamilyController < ApplicationController
   def edit
     @family.census_employee.build_address unless @family.census_employee.address.present?
     @family.census_dependents.build unless @family.census_dependents.present?
+    @family.benefit_group_assignments.build unless @family.benefit_group_assignments.present?
   end
 
   def update
@@ -43,7 +45,6 @@ class Employers::FamilyController < ApplicationController
   end
 
   def terminate
-    # last_day_of_work = params[:employer_census_employee_family][:census_employee_attributes][:terminated_on]
     termination_date = params["termination_date"]
     if termination_date.present?
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
@@ -81,7 +82,6 @@ class Employers::FamilyController < ApplicationController
     if @rehiring_date.present?
       new_family = @family.replicate_for_rehire
       if new_family.present? # not an active family, then it is ready for rehire.#
-        # new_family.census_employee.hired_on = params[:employer_census_employee_family][:census_employee_attributes][:terminated_on]
         new_family.census_employee.hired_on = 1.day.ago.to_date
         @employer_profile.employee_families << new_family
         if @employer_profile.save
@@ -138,6 +138,12 @@ class Employers::FamilyController < ApplicationController
     family.census_dependents.build
     family.benefit_group_assignments.build
     family
+  end
+
+  def check_plan_year
+    if @employer_profile.plan_years.empty?
+      redirect_to new_employers_employer_profile_plan_year_path(employer_profile)
+    end
   end
 
 end

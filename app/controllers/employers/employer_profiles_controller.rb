@@ -114,15 +114,6 @@ class Employers::EmployerProfilesController < ApplicationController
     end
   end
 
-  def destroy
-    @employer_profile.destroy
-
-    respond_to do |format|
-      format.html { redirect_to employers_employer_index_path, notice: "Employer successfully deleted." }
-      format.json { head :no_content }
-    end
-  end
-
   private
 
     def check_employer_role
