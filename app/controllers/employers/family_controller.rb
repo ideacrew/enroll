@@ -142,6 +142,7 @@ class Employers::FamilyController < ApplicationController
 
   def check_plan_year
     if @employer_profile.plan_years.empty?
+      flash[:notice] = "Please create a plan year before you create your first census family."
       redirect_to new_employers_employer_profile_plan_year_path(@employer_profile)
     end
   end
