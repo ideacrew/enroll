@@ -7,7 +7,7 @@ module WatirScreenshots
     if @take_screens
       shot_count = @screen_count.to_s.rjust(3, "0")
       f_name = name.nil? ? shot_count : "#{shot_count}_#{name}"
-      @browser.screenshot.save(f_name + ".png")
+      @browser.screenshot.save("tmp/#{f_name}.png")
       @screen_count = @screen_count + 1
     end
   end
