@@ -139,4 +139,24 @@ class HbxEnrollment
     enrollment.save
     enrollment
   end
+
+  def self.find(id)
+    id = BSON::ObjectId.from_string(id) if id.is_a? String
+    families = Family.where({
+      "households.hbx_enrollments._id" => id
+    })
+    found_value = catch(:found) do
+      families.each do |family|
+        family.households.each do |household|
+          household.hbx_enrollments.each do |enrollment|
+            if enrollment.id == id
+              throw :found, enrollment
+            end
+          end
+        end
+      end
+      raise Mongoid::Errors::DocumentNotFound.new(self, id)
+    end
+    return found_value
+  end
 end
