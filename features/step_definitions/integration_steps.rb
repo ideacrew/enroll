@@ -119,7 +119,7 @@ Then(/^I should see the dependents page$/) do
 end
 
 When(/^I click edit on baby Soren$/) do
-  @browser.a(href: /edit/, index: 2).click
+  @browser.span(text: "07/03/2014").as(xpath: "./preceding::a[contains(@href, 'edit')]").last.click
 end
 
 Then(/^I should see the edit dependent form$/) do
