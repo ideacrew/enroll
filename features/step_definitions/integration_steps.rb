@@ -43,18 +43,16 @@ end
 
 When(/^I go to the employee account creation page$/) do
   @browser.goto("http://localhost:3000/")
-  @browser.a(:text => "Employee Portal").wait_until_present(30)
-  sleep(1)
+  @browser.a(:text => "Employee Portal").wait_until_present
   screenshot("start")
   @browser.a(:text => "Employee Portal").click
-  @browser.a(:text => "Create account").wait_until_present(30)
-  sleep(1)
+  @browser.a(:text => "Create account").wait_until_present
   screenshot("employee_portal")
   @browser.a(:text => "Create account").click
 end
 
 When(/^I enter my new account information$/) do
-  @browser.text_field(:name => "user[password_confirmation]").wait_until_present(30)
+  @browser.text_field(:name => "user[password_confirmation]").wait_until_present
   screenshot("create_account")
   @email = "swhite#{rand(100)}@example.com"
   @browser.text_field(:name => "user[email]").set(@email)
@@ -64,7 +62,7 @@ When(/^I enter my new account information$/) do
 end
 
 Then(/^I should be logged in$/) do
-  @browser.element(:text => /Welcome! You have signed up successfully./).wait_until_present(30)
+  @browser.element(:text => /Welcome! You have signed up successfully./).wait_until_present
   screenshot("logged_in_welcome")
   expect(@browser.element(:text => /Welcome! You have signed up successfully./).visible?).to be_truthy
 end
@@ -75,7 +73,7 @@ When(/^I go to register as an employee$/) do
 end
 
 Then(/^I should see the employee search page$/) do
-  @browser.text_field(:name => "person[first_name]").wait_until_present(30)
+  @browser.text_field(:name => "person[first_name]").wait_until_present
   screenshot("employer_search")
   expect(@browser.text_field(:name => "person[first_name]").visible?).to be_truthy
 end
@@ -86,14 +84,12 @@ When(/^I enter the identifying info of my existing person$/) do
   @browser.text_field(:name => "person[date_of_birth]").set("08/13/1979")
   @browser.p(:text=> /Personal Information/).click
   @browser.text_field(:name => "person[ssn]").set("670991234")
-  sleep(2)
   screenshot("information_entered")
   @browser.input(:value => "Search Employers", :type => "submit").click
 end
 
 Then(/^I should see the matched employee record form$/) do
-  @browser.dd(:text => /Acme Inc\./).wait_until_present(30)
-  sleep(1)
+  @browser.dd(:text => /Acme Inc\./).wait_until_present
   screenshot("employer_search_results")
   expect(@browser.dd(:text => /Acme Inc\./).visible?).to be_truthy
 end
@@ -101,7 +97,6 @@ end
 When(/^I accept the matched employer$/) do
   @browser.input(:value => /This is my employer/).click
   @browser.input(id: "continue-employer").wait_until_present
-  sleep(1)
   screenshot("update_personal_info")
 end
 
@@ -109,11 +104,10 @@ When(/^I complete the matched employee form$/) do
   @browser.text_field(:name => "person[phones_attributes][0][full_phone_number]").set("2025551234")
   @browser.text_field(:name => "person[emails_attributes][1][address]").click
   @browser.input(:id => "continue-employer").click
-  @browser.p(:text => /Household Information/).wait_until_present
 end
 
 Then(/^I should see the dependents page$/) do
-  sleep(1)
+  @browser.p(:text => /Household Information/).wait_until_present
   screenshot("dependents_page")
   expect(@browser.p(:text => /Household Information/).visible?).to be_truthy
 end
@@ -123,7 +117,7 @@ When(/^I click edit on baby Soren$/) do
 end
 
 Then(/^I should see the edit dependent form$/) do
-  @browser.input(type: "submit", name: "commit").wait_until_present(30)
+  @browser.input(type: "submit", name: "commit").wait_until_present
 end
 
 When(/^I click delete on baby Soren$/) do
@@ -145,44 +139,48 @@ end
 
 When(/^I click continue on the dependents page$/) do
   @browser.a(:text => "Continue", :href => /group_selection\/new/).click
-  sleep(5)
 end
 
 Then(/^I should see the group selection page$/) do
+  @browser.form(:action => /group_selection\/create/).wait_until_present
   screenshot("group_selection")
-  @browser.form(:action => /group_selection\/create/).wait_until_present(30)
-  sleep(1)
 end
 
 When(/^I click continue on the group selection page$/) do
   @browser.input(:value=> /Continue/).click
-  sleep(5)
 end
 
-Then(/^I should see the plan shopping page$/) do
+Then(/^I should see the plan shopping welcome page$/) do
+  @browser.p(:text => /Select a Plan/).wait_until_present
+  screenshot("plan_shopping_welcome")
   expect(@browser.p(:text => /Select a Plan/).visible?).to be_truthy
 end
 
-When(/^I select a plan on the plan shopping page$/) do
-  screenshot("plan_shopping_welcome")
+When(/^I click continue on the plan shopping welcome page$/) do
   @browser.a(:text => "Continue").click
-  sleep(2)
+end
+
+Then(/^I should see the list of plans$/) do
+  @browser.a(:text => "Select").wait_until_present
   screenshot("plan_shopping")
+end
+
+When(/^I select a plan on the plan shopping page$/) do
   @browser.a(:text => "Select").click
-  sleep(5)
 end
 
 Then(/^I should see the coverage summary page$/) do
+  @browser.p(:text => /Your monthly total family premium/).wait_until_present
   screenshot("summary_page")
   expect(@browser.p(:text => /Your monthly total family premium/).visible?).to be_truthy
 end
 
 When(/^I confirm on the coverage summary page$/) do
   @browser.a(:text => "Continue").click
-  sleep(5)
 end
 
 Then(/^I should see the "my account" page$/) do
+  @browser.span(:text => "Household").wait_until_present
   screenshot("my_account_page")
   expect(@browser.span(:text => "Household").visible?).to be_truthy
 end
