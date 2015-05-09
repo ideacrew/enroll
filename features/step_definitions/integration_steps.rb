@@ -131,6 +131,14 @@ Then(/^I should see (.*) dependents$/) do |n|
   expect(@browser.li(class: "dependent_list", index: n - 1)).to exist
 end
 
+When(/^I click Add Member$/) do
+  @browser.a(text: /Add Member/).click
+end
+
+Then(/^I should see the new dependent form$/) do
+  raise
+end
+
 #    When I click Add Member
 #    Then I should see the new dependent form
 #    When I enter the identifying info of my daughter
