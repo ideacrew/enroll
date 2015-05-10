@@ -120,6 +120,7 @@ describe EmployerCensus::EmployeeFamily, 'class methods', dbclean: :after_each d
           expect(linked_employee_family.is_linked?).to be_truthy
           linked_employee_family.save
           # expect(linked_employee_family).to eq ""
+          expect(linked_employee_family.linked_employee_role).to be_an_instance_of EmployeeRole
           expect(EmployerCensus::EmployeeFamily.find_by_employee_role(saved_employee_role)).to be_an_instance_of EmployerCensus::EmployeeFamily
           expect(EmployerCensus::EmployeeFamily.find_by_employee_role(saved_employee_role).census_employee.ssn.to_i).to eq employee_role.ssn.to_i-1
         end

@@ -103,8 +103,8 @@ class EmployerCensus::EmployeeFamily
   end
 
   def linked_employee_role
-    return @linked_employee_role if defined? @linked_employee_role
-    @linked_employee_role = EmployeeRole.find(self.employee_role_id) if is_linked?
+    # return @linked_employee_role if defined? @linked_employee_role
+    @linked_employee_role ||= EmployeeRole.find(self.employee_role_id) if is_linked?
   end
 
   def delink_employee_role
