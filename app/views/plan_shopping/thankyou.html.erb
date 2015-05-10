@@ -3,7 +3,7 @@
     <div class="col-md-9 col-sm-11 col-xs-12 no-pd">
       <div class="row text-center" style='padding:20px;'>
         <div class="col-md-12 col-sm-12 no-pd col-xs-12 text-left">
-          <h3><strong>Thank you for your order!</strong></h3>
+          <h3><strong>Confirm Your Selection</strong></h3>
           <%= @enrollment.subscriber.family_member.person.full_name %>
           ,<br />
           <span>You and the following dependents have successfully enrolled in</span>
@@ -17,45 +17,44 @@
                 <th>name</th>
                 <th>gender</th>
                 <th>birthday</th>
-                <th>ssn</th>
                 <th>cost</th>
               </tr>
             </thead>
             <tbody>
+              <% total_cost = 0 %>
               <% @enrollment.hbx_enrollment_members.each do |member| %>
                 <tr style='border-bottom:1px solid #ddd;'>
                   <td><%= member.person.full_name %></td>
                   <td><%= member.person.try(:gender) %></td>
                   <td><%= member.person.try(:dob).strftime("%m/%d/%Y") %></td>
-                  <td><%= member.person.try(:ssn) %></td>
                   <td><%= number_to_currency(@plan.premium_for(member)) %></td>
+                  <% total_cost += @plan.premium_for(member) %>
                 </tr>
               <% end %>
+              <tr>
+                <td colspan='3' style='text-align: center;'>total</td>
+                <td><%= number_to_currency(total_cost) %></td>
+              </tr>
             </tbody>
           </table>
 
-          <p>
-            Your monthly total family premium, which will be deducted by your employer from your pay, is:
-            <strong><%=number_to_currency(@plan.total_employee_cost || 0) %></strong>
-          </p>
+          <table class='table' style='width:450px;'>
+            <tr>
+              <td>Additionally your employer pays</td>
+              <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
+            </tr>
+            <tr>
+              <td>Your coverage start date</td>
+              <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
+            </tr>
+            <tr style='font-size:20px'>
+              <td><strong>You pay</strong></td>
+              <td><strong>
+                <%= number_to_currency(@plan.total_employee_cost || 0) %>
+              </strong></td>
+            </tr>
+          </table>
 
-          <p>
-            Additionally your employer pays
-            <strong>
-              <%= number_to_currency(@plan.total_employer_contribution) %>
-            </strong>
-          </p>
-
-          <p>
-            Your coverage start date is:
-            <strong>
-              <%= @enrollment.effective_on.strftime("%m/%d/%Y") %>
-            </strong>
-          </p>
-
-          <br />
-          <br />
-          
           <span style="font-size: 14px; line-height: 130%;">
             DC Health
             Link<br />
