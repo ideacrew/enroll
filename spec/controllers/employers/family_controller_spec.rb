@@ -100,13 +100,31 @@ RSpec.describe Employers::FamilyController do
   end
 
   describe "GET terminate" do
-    it "should be redirect" do
+    before do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(EmployerCensus::EmployeeFamily).to receive(:find).and_return(family)
+    end
+    it "should be redirect" do
       get :terminate, :family_id => family.id, :employer_profile_id => employer_profile_id
       expect(flash[:notice]).to eq "Successfully terminated family."
       expect(response).to be_redirect
+    end
+
+    context "with termination date" do
+      it "should terminate family" do
+        xhr :get, :terminate, :family_id => family.id, :employer_profile_id => employer_profile_id, termination_date: "05/01/2015", :format => :js
+        expect(response).to have_http_status(:success)
+        expect(assigns[:fa]).to eq true
+      end
+    end
+
+    context "with no termination date" do
+      it "should throw error" do
+        xhr :get, :terminate, :family_id => family.id, :employer_profile_id => employer_profile_id, termination_date: "", :format => :js
+        expect(response).to have_http_status(:success)
+        expect(assigns[:fa]).to eq nil
+      end
     end
   end
 

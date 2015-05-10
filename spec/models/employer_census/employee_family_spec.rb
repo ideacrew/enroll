@@ -50,9 +50,14 @@ describe EmployerCensus::EmployeeFamily, type: :model, dbclean: :after_each do
         expect(census_family.save).to be_truthy
       end
 
+
       context "and it is saved" do
         before do
           census_family.save
+        end
+
+        it "should return instance of employerprofile when parent method is called" do
+          expect(census_family.parent).to be_an_instance_of EmployerProfile
         end
 
         it "should not be linked" do
