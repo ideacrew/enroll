@@ -23,7 +23,7 @@ class HbxEnrollment
   field :plan_id, type: BSON::ObjectId
   field :broker_agency_id, type: BSON::ObjectId
   field :writing_agent_id, type: BSON::ObjectId
-  field :employer_profile_id, type: BSON::ObjectId
+  field :employee_role_id, type: BSON::ObjectId
   field :benefit_group_id, type: BSON::ObjectId
 
   field :submitted_at, type: DateTime
@@ -72,12 +72,16 @@ class HbxEnrollment
     hbx_enrollment_members.map(&:applicant_id)
   end
 
-  def employer_profile=(employer_instance)
-    self.employer_profile_id = employer_instance._id if employer_instance.is_a? EmployerProfile
+  def employee_role=(e_role)
+    self.employee_role_id = e_role._id
+  end
+
+  def employee_role
+    EmployeeRole.find(self.employee_role_id)
   end
 
   def employer_profile
-    EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
+    employee_role.employer_profile
   end
 
   def broker_agency_profile=(new_broker_agency)
@@ -111,10 +115,9 @@ class HbxEnrollment
 
   def self.new_from(employee_role: nil, coverage_household:, benefit_group:)
     enrollment = HbxEnrollment.new
-    employer_profile = employee_role.employer_profile
     enrollment.household = coverage_household.household
-    enrollment.kind = "employer_sponsored" if employer_profile.present?
-    enrollment.employer_profile = employer_profile
+    enrollment.kind = "employer_sponsored" if employee_role.present?
+    enrollment.employee_role = employee_role
     enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
     # benefit_group.plan_year.start_on
     enrollment.benefit_group = benefit_group
