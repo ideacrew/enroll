@@ -255,6 +255,13 @@ class EmployerProfile
     end
   end
 
+  def within_open_enrollment_for?(t_date, effective_date)
+    plan_years.any? do |py|
+      py.open_enrollment_contains?(t_date) &&
+        py.coverage_period_contains?(effective_date)
+    end
+  end
+
 private
   def writing_agent_employed_by_broker
     if writing_agent.present? && broker_agency.present?

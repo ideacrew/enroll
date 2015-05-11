@@ -149,6 +149,10 @@ class BenefitGroup
     return found_value
   end
 
+  def within_new_hire_window?(hire_date)
+    false
+  end
+
   private
   def dollars_to_cents(amount_in_dollars)
     Rational(amount_in_dollars) * Rational(100) if amount_in_dollars

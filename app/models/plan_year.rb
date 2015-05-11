@@ -44,6 +44,15 @@ class PlanYear
     Date.civil(year, month, -1)
   end
 
+  def open_enrollment_contains?(date)
+    (open_enrollment_start_on <= date) && (date <= open_enrollment_end_on)
+  end
+
+  def coverage_period_contains?(date)
+    return (start_on <= date) if (end_on.blank?)
+    (start_on <= date) && (date <= end_on)
+  end
+
 private
 
   def open_enrollment_date_checks

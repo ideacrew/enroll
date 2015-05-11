@@ -3,6 +3,7 @@ class HbxEnrollment
   include Mongoid::Timestamps
   include HasFamilyMembers
   include AASM
+  include MongoidSupport::AssociationProxies
 
   # Persists result of a completed plan shopping process
 
@@ -32,6 +33,9 @@ class HbxEnrollment
   field :aasm_state_date, type: Date
   field :updated_by, type: String
   field :is_active, type: Boolean, default: true
+
+  associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
+  associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
 
 
   embeds_many :hbx_enrollment_members
@@ -72,14 +76,6 @@ class HbxEnrollment
     hbx_enrollment_members.map(&:applicant_id)
   end
 
-  def employee_role=(e_role)
-    self.employee_role_id = e_role._id
-  end
-
-  def employee_role
-    EmployeeRole.find(self.employee_role_id)
-  end
-
   def employer_profile
     employee_role.employer_profile
   end
@@ -92,14 +88,6 @@ class HbxEnrollment
   def broker_agency_profile
     return unless has_broker_agency?
     parent.broker_agency.find(self.broker_agency_id)
-  end
-
-  def benefit_group=(benefit_group)
-    self.benefit_group_id = benefit_group._id if benefit_group.is_a? BenefitGroup
-  end
-
-  def benefit_group
-    BenefitGroup.find(self.benefit_group_id) unless self.benefit_group_id.blank?
   end
 
   def has_broker_agency?
@@ -140,8 +128,9 @@ class HbxEnrollment
     enrollment
   end
 
-  def can_complete_shopping?
-    false
+  def can_complete_shopping?(t_date = Date.today)
+    return false unless benefit_group
+    benefit_group.within_new_hire_window?(employee_role.hired_on)
   end
 
   def self.find(id)

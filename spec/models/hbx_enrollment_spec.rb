@@ -1,28 +1,47 @@
 require 'rails_helper'
 
-describe HbxEnrollment, "for an employee who does not currently have a live event enrollment period" do
+describe HbxEnrollment, "for an employee who does not currently have a life event enrollment period" do
+  let(:todays_date) { double }
+  let(:hire_date) { Date.today }
+  let(:effective_on_date) { Date.today.next_month }
+  let(:employer_profile) { EmployerProfile.new }
+  let(:employee_role) { EmployeeRole.new(:hired_on => hire_date, :employer_profile => employer_profile) }
+  let(:benefit_group) { BenefitGroup.new }
 
-  subject { HbxEnrollment.new }
-
-  before :each do
-
-  end
+  subject { HbxEnrollment.new(:employee_role => employee_role, :benefit_group => benefit_group, :effective_on => effective_on_date) }
 
   describe "and the employer is not in open enrollment" do
     describe "and the employee is not shopping within the new-hire window" do
+      before(:each) do
+        allow(benefit_group).to receive(:within_new_hire_window?).with(hire_date).and_return(false)
+        allow(employer_profile).to receive(:within_open_enrollment_for?).with(todays_date, effective_on_date).and_return(false)
+      end
+
       it "should not be able to complete shoppping" do
-        expect(subject.can_complete_shopping?).to be_falsey
+        expect(subject.can_complete_shopping?(todays_date)).to be_falsey
       end
     end
 
     describe "and the employee is shopping within the new-hire window" do
-      it "should be able to complete shoppping"
+      before(:each) do
+        allow(benefit_group).to receive(:within_new_hire_window?).with(hire_date).and_return(true)
+      allow(employer_profile).to receive(:within_open_enrollment_for?).with(todays_date, effective_on_date).and_return(false)
+      end
+
+      it "should be able to complete shoppping" do
+        expect(subject.can_complete_shopping?(todays_date)).to be_truthy
+      end
     end
   end
 
   describe "and the employer is under open enrollment" do
+    before(:each) do
+      allow(benefit_group).to receive(:within_new_hire_window?).with(hire_date).and_return(false)
+      allow(employer_profile).to receive(:within_open_enrollment_for?).with(todays_date, effective_on_date).and_return(true)
+    end
+
     it "should be able to complete shopping" do
-      expect(subject.can_complete_shopping?).to be_falsey
+      expect(subject.can_complete_shopping?(todays_date)).to be_falsey
     end
   end
 end
