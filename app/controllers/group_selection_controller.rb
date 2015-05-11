@@ -5,7 +5,9 @@ class GroupSelectionController < ApplicationController
 
   def create
     initialize_common_vars
-    family_member_ids = params.require(:family_member_ids)
+    family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
+      BSON::ObjectId.from_string(family_member_id)
+    end
     hbx_enrollment = HbxEnrollment.new_from(
       employer_profile: @employee_role.employer_profile,
       coverage_household: @coverage_household,

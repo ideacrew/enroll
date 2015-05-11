@@ -178,13 +178,13 @@ When(/^I select a plan on the plan shopping page$/) do
 end
 
 Then(/^I should see the coverage summary page$/) do
-  @browser.p(:text => /Your monthly total family premium/).wait_until_present
+  @browser.a(href: /\/consumer_profiles\/home/, class: "btn-continue").wait_until_present
   screenshot("summary_page")
-  expect(@browser.p(:text => /Your monthly total family premium/).visible?).to be_truthy
+  expect(@browser.a(href: /\/consumer_profiles\/home/, class: "btn-continue").visible?).to be_truthy
 end
 
 When(/^I confirm on the coverage summary page$/) do
-  @browser.a(:text => "Continue").click
+  @browser.a(:text => "Confirm").click
 end
 
 Then(/^I should see the "my account" page$/) do
