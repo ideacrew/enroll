@@ -1,5 +1,32 @@
 require 'rails_helper'
 
+describe HbxEnrollment, "for an employee who does not currently have a live event enrollment period" do
+
+  subject { HbxEnrollment.new }
+
+  before :each do
+
+  end
+
+  describe "and the employer is not in open enrollment" do
+    describe "and the employee is not shopping within the new-hire window" do
+      it "should not be able to complete shoppping" do
+        expect(subject.can_complete_shopping?).to be_falsey
+      end
+    end
+
+    describe "and the employee is shopping within the new-hire window" do
+      it "should be able to complete shoppping"
+    end
+  end
+
+  describe "and the employer is under open enrollment" do
+    it "should be able to complete shopping" do
+      expect(subject.can_complete_shopping?).to be_falsey
+    end
+  end
+end
+
 describe HbxEnrollment, dbclean: :after_all do
   include_context "BradyWorkAfterAll"
 
@@ -13,7 +40,7 @@ describe HbxEnrollment, dbclean: :after_all do
       @household = mikes_family.households.first
       @coverage_household = household.coverage_households.first
       @enrollment = household.create_hbx_enrollment_from(
-        employer_profile: mikes_employer,
+        employee_role: mikes_employee_role,
         coverage_household: coverage_household,
         benefit_group: mikes_benefit_group
       )

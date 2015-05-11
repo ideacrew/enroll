@@ -9,15 +9,14 @@ class GroupSelectionController < ApplicationController
       BSON::ObjectId.from_string(family_member_id)
     end
     hbx_enrollment = HbxEnrollment.new_from(
-      employer_profile: @employee_role.employer_profile,
+      employee_role: @employee_role,
       coverage_household: @coverage_household,
       benefit_group: find_benefit_group(@employee_role))
     hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
       family_member_ids.include? member.applicant_id
     end
     hbx_enrollment.save!
-    organization = @employee_role.employer_profile.organization
-    redirect_to select_plan_people_path(person_id: @person, hbx_enrollment_id: hbx_enrollment, organization_id: organization)
+    redirect_to select_plan_people_path(person_id: @person, hbx_enrollment_id: hbx_enrollment)
   end
 
   private

@@ -7,7 +7,7 @@ class HbxEnrollment
   # Persists result of a completed plan shopping process
 
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
-  Authority = [:open_enrollment ]
+  Authority = [:open_enrollment]
 
   embedded_in :household
 
@@ -105,19 +105,17 @@ class HbxEnrollment
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer
   #       This should probably be done by comparing the hired_on date with todays date.
   #       Also needs to ignore any that were already terminated before a certain date.
-  def self.calculate_start_date_from(employer_profile, coverage_household, benefit_group)
-    employee_role = coverage_household.subscriber.family_member.person.employee_roles.detect do |e_role|
-      e_role.employer_profile_id.to_s == employer_profile.id.to_s
-    end
+  def self.calculate_start_date_from(employee_role, coverage_household, benefit_group)
     benefit_group.effective_on_for(employee_role.hired_on)
   end
 
-  def self.new_from(employer_profile: nil, coverage_household:, benefit_group:)
+  def self.new_from(employee_role: nil, coverage_household:, benefit_group:)
     enrollment = HbxEnrollment.new
+    employer_profile = employee_role.employer_profile
     enrollment.household = coverage_household.household
     enrollment.kind = "employer_sponsored" if employer_profile.present?
     enrollment.employer_profile = employer_profile
-    enrollment.effective_on = calculate_start_date_from(employer_profile, coverage_household, benefit_group)
+    enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
     # benefit_group.plan_year.start_on
     enrollment.benefit_group = benefit_group
     coverage_household.coverage_household_members.each do |coverage_member|
@@ -129,14 +127,18 @@ class HbxEnrollment
     enrollment
   end
 
-  def self.create_from(employer_profile: nil, coverage_household:, benefit_group:)
+  def self.create_from(employee_role: nil, coverage_household:, benefit_group:)
     enrollment = self.new_from(
-      employer_profile: employer_profile,
+      employee_role: employee_role,
       coverage_household: coverage_household,
       benefit_group: benefit_group
     )
     enrollment.save
     enrollment
+  end
+
+  def can_complete_shopping?
+    false
   end
 
   def self.find(id)
