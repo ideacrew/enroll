@@ -8,7 +8,7 @@
 		<% other_members = @family.active_family_members.reject { |fm| fm.id.to_s == primary_member.id.to_s } %>
 		<% ([primary_member] + other_members).each do |fm| %>
 			<li class="list-group-item">
-			<div class="row">
+			<div class="row no-buffer">
 				<div class="col-md-12 col-sm-12 col-xs-12">
 					<h4><%= fm.person.first_name %> <%= fm.person.middle_name %> <%= fm.person.last_name %><%= link_to raw(image_tag "edit.png", :class => "pull-right"), family_consumer_profiles_path, :remote => true %></h4>
 				</div>

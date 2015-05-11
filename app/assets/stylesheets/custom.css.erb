@@ -3183,13 +3183,13 @@ a.all-filter:hover{
   transition: all 0.1s ease-in-out;
 }
 
-.tab-row #myTabContent .submenu {
+.submenu {
     background: none repeat scroll 0 0 #00a3d9;
 }
-.tab-row #myTabContent .submenu ul {
+.submenu ul {
     border: medium none;
 }
-.tab-row #myTabContent .submenu ul li a {
+.submenu ul li a {
     border: medium none !important;
     border-radius: 0 !important;
     color: #fff;
@@ -3198,12 +3198,12 @@ a.all-filter:hover{
     font-weight: lighter;
     padding: 20px 18px;
 }
-.tab-row #myTabContent .submenu ul li.active a {
+.submenu ul li.active a {
     background: none repeat scroll 0 0 rgba(0, 0, 0, 0) !important;
     color: #fff !important;
     font-weight: bold;
 }
-.tab-row #myTabContent .submenu ul li a:focus, .tab-row #myTabContent .submenu ul li a:hover {
+.submenu ul li a:focus, .submenu ul li a:hover {
     background: none repeat scroll 0 0 rgba(0, 0, 0, 0) !important;
     color: #fff;
 }
@@ -3314,29 +3314,14 @@ a.all-filter:hover{
   border-bottom: 1px solid #009acc;
   border-top: 1px solid #ddd;
 }
-.emp-ul.list-group .list-group-item {
-  border-width: 0 1px 0;
-  border-style: none solid none;
-  border-color: #007bc3; 
-  color: #007bc3;
-  font-size: 14px;
-  margin-bottom: 0;
-  opacity: 0.75;
-  padding: 10px 0;
-  border-radius: 0;
-  border-top: 1px solid #ffffff;
-  border-bottom: 1px solid #ffffff;
-}
 .emp-ul.list-group .list-group-item :hover {
   color: #666;
 }
-.emp-ul.list-group .list-group-item:first-child {
-  border-width: 1px 1px 1px;
-  border-style: solid solid solid;
-  border-color: #6fb7ff; 
-}
-.emp-ul.list-group .list-group-item:nth-child(4) {
-  border-bottom: 1px solid #6fb7ff !important;
+.emp-ul.list-group .list-group-item {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #6fb7ff;
+  border-radius: 0;
 }
 .emp-ul.list-group .list-group-item h4 {
   font-size: 17px;
@@ -3348,13 +3333,13 @@ a.all-filter:hover{
   .top-menu > li > a {
     padding: 40px 20px;
   }
-  .tab-row #myTabContent .submenu ul li:first-child a{
+  .submenu ul li:first-child a{
     padding: 20px 0 20px 60px;
   }
-  .tab-row #myTabContent .submenu ul li a {
+  .submenu ul li a {
     padding: 20px;
   }
-  .tab-row #myTabContent #myTabContent1, .tab-row #myTabContent .submenu {
+  .tab-row #myTabContent #myTabContent1, .submenu {
     padding: 0 80px;
   }
   .top-menu > li > a .badge {
@@ -3386,7 +3371,7 @@ a.all-filter:hover{
   .top-menu > li.active > a:after {
     left: 33%;
   }
-  .tab-row #myTabContent .submenu {
+  .submenu {
     padding: 0;
   }
   .tab-row #myTabContent #myTabContent1 {
@@ -3398,11 +3383,11 @@ a.all-filter:hover{
     width: 50%;
     margin: 0;
   }
-  .tab-row #myTabContent .submenu ul li a {
+  .submenu ul li a {
     padding: 20px 0;
     font-size: 14px;
   }
-  .tab-row #myTabContent .submenu ul li:nth-child(1) a, .tab-row #myTabContent .submenu ul li:nth-child(3) a {
+  .submenu ul li:nth-child(1) a, .submenu ul li:nth-child(3) a {
     border-right: 1px solid #bbb !important;
   }
   .top-menu > li > a .badge {
