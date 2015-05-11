@@ -3,21 +3,19 @@
     <div class="col-md-9 col-sm-11 col-xs-12 no-pd">
       <div class="row text-center" style='padding:20px;'>
         <div class="col-md-12 col-sm-12 no-pd col-xs-12 text-left">
-          <h3><strong>Confirm Your Selection</strong></h3>
-          <%= @enrollment.subscriber.family_member.person.full_name %>
-          ,<br />
-          <span>You and the following dependents have successfully enrolled in</span>
-          <span style="color: rgb(51, 51, 51); line-height: 130%;">
-            <%= @plan.name %><br /><br />
-          </span>
+		<h3><strong>Confirm Your Selection</strong></h3>
+		<p>Below is your current plan selection.  Clicking confirm will enroll you and your family.</p>
+		<h4>You will not be enrolled until you confirm your plan selection.</h4>
+		<h4><%= @plan.name %></h4>
+		<h4>Starting on: <%= @enrollment.effective_on.strftime("%m/%d/%Y") %></h4>
 
-          <table class="table table-bordered" style="max-width:900px;">
+          <table class="table table-bordered table-hover" style="max-width:900px;">
             <thead>
-              <tr style='border-bottom:1px solid #ddd;'>
-                <th>name</th>
-                <th>gender</th>
-                <th>birthday</th>
-                <th>cost</th>
+	       <tr style="border-bottom: 2px solid #dddddd;">
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Birthday</th>
+                <th>Premium</th>
               </tr>
             </thead>
             <tbody>
@@ -32,27 +30,23 @@
                 </tr>
               <% end %>
               <tr>
-                <td colspan='3' style='text-align: center;'>total</td>
+		<td colspan='2'>&nbsp;</td>
+		<td>Total</td>
                 <td><%= number_to_currency(total_cost) %></td>
               </tr>
-            </tbody>
-          </table>
-
-          <table class='table' style='width:450px;'>
             <tr>
-              <td>Additionally your employer pays</td>
-              <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
+		    <td colspan='2'>&nbsp;</td>
+		    <td>Employer Contribution</td>
+              <td>(-<%= number_to_currency(@plan.total_employer_contribution) %>)</td>
             </tr>
-            <tr>
-              <td>Your coverage start date</td>
-              <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
-            </tr>
-            <tr style='font-size:20px'>
-              <td><strong>You pay</strong></td>
+	    <tr style='font-size:20px'>
+		    <td colspan='2'>&nbsp;</td>
+              <td><strong>You Pay</strong></td>
               <td><strong>
                 <%= number_to_currency(@plan.total_employee_cost || 0) %>
               </strong></td>
             </tr>
+            </tbody>
           </table>
 
           <span style="font-size: 14px; line-height: 130%;">
@@ -69,13 +63,10 @@
             8:00am -
             8:00pm<br />
             E-Mail:
-            info@dchealthlink.com</span><br />
-          </span><br />
-          <span style=
-            "font-size: 14px; font-family: Arial, Helvetica, sans-serif; color: rgb(51, 51, 51); line-height: 130%;">
+            info@dchealthlink.com
           </span>
         </div>
-        <%= link_to "Continue", home_consumer_profiles_path, :class => "btn btn-green btn-continue" %>
+        <%= link_to "Confirm", home_consumer_profiles_path, :class => "btn btn-green btn-continue" %>
       </div>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
