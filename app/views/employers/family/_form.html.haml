@@ -4,17 +4,17 @@
       - if @family.errors.any?
         .alert.alert-error
           %h4= "#{pluralize(@family.errors.count, "error")} prohibited this person from being saved:"
-            %ul
-              - @family.census_employee.errors.full_messages.each do |msg|
+          %ul
+            - @family.census_employee.errors.full_messages.each do |msg|
+              %li= msg
+            
+            - @family.census_dependents.each do |dep|
+              - dep.errors.full_messages.each do |msg|
                 %li= msg
-              
-              - @family.census_dependents.each do |dep|
-                - dep.errors.full_messages.each do |msg|
-                  %li= msg
 
-              - @family.benefit_group_assignments.each do |bg|
-                - bg.errors.full_messages.each do |msg|
-                  %li= msg
+            - @family.benefit_group_assignments.each do |bg|
+              - bg.errors.full_messages.each do |msg|
+                %li= msg
 
       - page_title = @family.persisted? ? 'Update Family' : 'Add New Family'
       
