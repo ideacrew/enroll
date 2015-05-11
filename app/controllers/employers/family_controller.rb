@@ -29,7 +29,11 @@ class Employers::FamilyController < ApplicationController
   end
 
   def update
-    if @family.update_attributes(census_family_params)
+    new_params = census_family_params
+    new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new
+    new_benefit_group_assignment.attributes = new_params[:benefit_group_assignments_attributes]["0"]
+    @family.add_benefit_group_assignment(new_benefit_group_assignment)
+    if @family.update_attributes(new_params)
       flash[:notice] = "Employer Census Family is successfully updated."
       redirect_to employers_employer_profile_path(@employer_profile)
     else
@@ -104,26 +108,27 @@ class Employers::FamilyController < ApplicationController
   private
 
   def census_family_params
-    params.require(:employer_census_employee_family).permit(:id, :employer_profile_id,
+    new_params = format_date_params(params)
+    new_params.require(:employer_census_employee_family).permit(:id, :employer_profile_id,
       :census_employee_attributes => [
           :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :terminated_on,
           :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
         ],
       :census_dependents_attributes => [
-          :id, :first_name, :last_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy
+          :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy
         ],
       :benefit_group_assignments_attributes => [
-          :id, :start_on, :end_on, :is_active, :benefit_group_id, :_destroy
+          :id, :start_on, :end_on, :is_active, :benefit_group_id
         ]
       )
   end
 
   def find_employer
-    @employer_profile = EmployerProfile.find params["employer_profile_id"]
+    @employer_profile = EmployerProfile.find(params["employer_profile_id"])
   end
 
   def find_family
-    @family = EmployerCensus::EmployeeFamily.find params["id"]
+    @family = EmployerCensus::EmployeeFamily.find(params["id"])
   end
 
   def set_family_id
@@ -146,5 +151,15 @@ class Employers::FamilyController < ApplicationController
       redirect_to new_employers_employer_profile_plan_year_path(@employer_profile)
     end
   end
+
+    def format_date_params(params)
+      start_on = params[:employer_census_employee_family][:benefit_group_assignments_attributes]["0"][:start_on]
+      params[:employer_census_employee_family][:benefit_group_assignments_attributes]["0"][:start_on] = Date.strptime(start_on, '%m/%d/%Y').to_s(:db)
+
+      params
+    rescue Exception => e
+      puts e
+      params
+    end
 
 end

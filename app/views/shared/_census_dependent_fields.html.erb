@@ -37,7 +37,7 @@
       </div>
     </div>
     <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.select :employee_relationship, options_for_select(EmployerCensus::Dependent::EMPLOYEE_RELATIONSHIP_KINDS.map{|r| [r.to_s.humanize, r.to_s] }), prompt: "SELECT RELATIONSHIP", required: true %>
+      <%= f.select :employee_relationship, options_for_select([["SELECT RELATIONSHIP", ""]] + EmployerCensus::Dependent::EMPLOYEE_RELATIONSHIP_KINDS.map{|r| [r.to_s.humanize, r.to_s] }, selected: f.object.present? ? f.object.employee_relationship : ""), {required: true} %>
     </div>
   </div>
 </fieldset>

@@ -60,6 +60,7 @@ RSpec.describe Employers::FamilyController do
 
   describe "PUT update" do
     before do
+      pending
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(EmployerCensus::EmployeeFamily).to receive(:find).and_return(family)
