@@ -60,9 +60,8 @@ class HbxEnrollment
     self.is_active
   end
 
-  # FIXME: Not even close to correct
   def subscriber
-    hbx_enrollment_members.first
+    hbx_enrollment_members.detect(&:is_subscriber)
   end
 
   def family
