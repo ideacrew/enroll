@@ -263,14 +263,11 @@ class PeopleController < ApplicationController
   end
 
   def select_plan
-    person_id = params.require(:person_id)
-    organization_id = params.require(:organization_id)
     hbx_enrollment_id = params.require(:hbx_enrollment_id)
 
     Caches::MongoidCache.allocate(CarrierProfile)
 
-    @person = find_person(person_id)
-    @organization = find_organization(organization_id)
+    @person = current_user.person
     @hbx_enrollment = find_hbx_enrollment(hbx_enrollment_id)
     @benefit_group = @hbx_enrollment.benefit_group
     @reference_plan = @benefit_group.reference_plan
