@@ -44,7 +44,7 @@
 
       <div id="dependent_buttons" class="focus_effect row personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
 	      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-		      <%= link_to "Add Member", new_consumer_employee_dependent_path(:family_id => @family.id), method: "post", :remote => true, :class => "btn btn-blue" %>
+		      <%= link_to "Add Member", new_consumer_employee_dependent_path(:family_id => @family.id), :remote => true, :class => "btn btn-blue" %>
           <%= link_to 'Continue', group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id), class: 'btn btn-green pull-right' %>
         </div>
       </div>
