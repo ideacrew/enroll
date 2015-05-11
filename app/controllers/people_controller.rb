@@ -263,11 +263,16 @@ class PeopleController < ApplicationController
   end
 
   def select_plan
-    @person = find_person(params[:person_id])
+    person_id = params.require(:person_id)
+    organization_id = params.require(:organization_id)
+    hbx_enrollment_id = params.require(:hbx_enrollment_id)
+
     Caches::MongoidCache.allocate(CarrierProfile)
-    @organization = find_organization(params[:organization_id])
-    @benefit_group = find_benefit_group(@person, @organization)
-    @hbx_enrollment = new_hbx_enrollment(@person, @organization, @benefit_group)
+
+    @person = find_person(person_id)
+    @organization = find_organization(organization_id)
+    @hbx_enrollment = find_hbx_enrollment(hbx_enrollment_id)
+    @benefit_group = @hbx_enrollment.benefit_group
     @reference_plan = @benefit_group.reference_plan
     @plans = @benefit_group.elected_plans.entries.collect() do |plan|
       PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
@@ -284,59 +289,26 @@ class PeopleController < ApplicationController
   end
 
 private
-  def find_person(id)
+  def safe_find(klass, id)
+    puts "finding #{klass} #{id}"
     begin
-      Person.find(id)
+      klass.find(id)
     rescue
       nil
     end
+  end
+
+  def find_person(id)
+    safe_find(Person, id)
   end
 
   def find_organization(id)
-    begin
-      Organization.find(id)
-    rescue
-      nil
-    end
+    safe_find(Organization, id)
   end
 
-  def find_benefit_group(person, organization)
-    organization.employer_profile.latest_plan_year.benefit_groups.first
-    # person.employee_roles.first.benefit_group
+  def find_hbx_enrollment(id)
+    safe_find(HbxEnrollment, id)
   end
-
-  def new_hbx_enrollment(person, organization, benefit_group)
-    HbxEnrollment.new_from(employer_profile: organization.employer_profile,
-                           coverage_household: person.primary_family.households.first.coverage_households.first,
-                           benefit_group: benefit_group)
-  end
-
-  # def get_shop_premium_matrix(hbx_enrollment, benefit_group)
-  #   m = ShopPremiumMatrix.new(members, plans)
-  #   m.lookup(member, plan) => {total_cost_for_member: $, employer_cost_for_member: $, employee_cost_for_member: $}
-  #   m.lookup([plan]) => {total_cost_for_all_members: $, employer_cost_for_all_members: $, employee_cost_for_all_members: $}
-  #   m.lookup(plans) => {
-  #     plan1_id => {total_cost_for_all_members: $, employer_cost_for_all_members: $, employee_cost_for_all_members: $},
-  #     plan2_id => {total_cost_for_all_members: $, employer_cost_for_all_members: $, employee_cost_for_all_members: $},
-  #     plan3_id => {total_cost_for_all_members: $, employer_cost_for_all_members: $, employee_cost_for_all_members: $},
-  #   }
-  #
-  #   # TODO: finish
-  #   hbx_enrollment.hbx_enrollment_members.flatmap([]) do |matrices, member|
-  #     matrices + benefit_group.elected_plans.collect do |plan|
-  #       premium_matrix = {
-  #         "hbx_enrollment_member_id" => member.id,
-  #         "relationship" => hbx_enrollment.family.primary_applicant.person.find_relationship_with(member.person),
-  #         "age_on_effective_date" => member.person.age_on(hbx_enrollment.effective_on),
-  #         "employer_max_contribution" => member.max_employer_contribution,
-  #         "select_plan_id" => plan.id.to_s,
-  #         "plan_premium_total" => 550.0,
-  #         "employee_responsible_amount" => 179.57
-  #       }
-  #       ShopPremiumMatrix.new({})
-  #     end
-  #   end
-  # end
 
   def build_nested_models
 

@@ -7,13 +7,19 @@
     </div>
   </div>
 </div>
-<div id="no_match_employer_details_wrapper"></div>
+<div id="employer_details_wrapper"></div>
 
 <div class="row top-buffer">
   <div class="col-md-12 col-sm-12 col-xs-12">
       <%= f.submit "Search Employers", class: "btn btn-success btn-search" %>
       &nbsp; <span><i class="fa fa-lock icon-large"></i> Your information is secure.</span>
   </div>
+</div>
+
+<div id ="new_employer_button" style="display:none">
+  <p> Please click the following button to create an employer profile.
+    <%= f.submit "Create Employer", name: "create_employer", class: "btn btn-primary btn-search" %>
+  </p>
 </div>
 
 <script>

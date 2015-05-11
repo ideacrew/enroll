@@ -3,13 +3,14 @@ require 'rails_helper'
 RSpec.describe Consumer::EmployeeDependentsController do
   let(:user) { instance_double("User", :primary_family => family, :person => person) }
   let(:family) { double }
-  let(:person) { double }
+  let(:person) { double(:employee_roles => []) }
+  let(:employee_role_id) { "2343" }
 
   describe "GET index" do
 
     before(:each) do
       sign_in(user)
-      get :index
+      get :index, :employee_role_id => employee_role_id
     end
 
     it "renders the 'index' template" do

@@ -2,6 +2,8 @@ class Consumer::EmployeeDependentsController < ApplicationController
   def index
     @family = current_user.primary_family
     @person = current_user.person
+    emp_role_id = params.require(:employee_role_id)
+    @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
   end
 
   def new
@@ -80,9 +82,5 @@ class Consumer::EmployeeDependentsController < ApplicationController
         format.js { render 'edit' }
       end
     end
-  end
-
-  def group_selection
-
   end
 end

@@ -44,15 +44,6 @@ class PlanYear
     Date.civil(year, month, -1)
   end
 
-#  Class Methods
-  class << self
-
-    def find(id)
-      where(id: id).to_a.first
-    end
-
-  end
-
 private
 
   def open_enrollment_date_checks

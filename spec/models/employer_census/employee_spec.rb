@@ -51,6 +51,7 @@ describe EmployerCensus::Employee, '.new', type: :model do
   end
 
   it "checks if employee is_linkable? " do
+    census_employee.save
     expect(census_employee.is_linkable?).to be_truthy
   end
 

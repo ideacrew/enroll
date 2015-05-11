@@ -35,7 +35,7 @@ describe Person do
 
         context "the second person" do
           it "should not be valid" do
-             expect(person2.valid?).to be false
+            expect(person2.valid?).to be false
           end
 
           it "should have an error on ssn" do
@@ -102,7 +102,7 @@ describe Person do
       end
     end
 
-   context "with invalid gender" do
+    context "with invalid gender" do
       let(:params) {valid_params.deep_merge({gender: "abc"})}
 
       it "should fail validation" do
@@ -112,7 +112,56 @@ describe Person do
       end
     end
 
-   context "with invalid ssn" do
+    context 'duplicated key issue' do
+      before do
+        Person.collection.indexes.drop({'ssn' => 1})
+        Person.create_indexes
+      end
+      context "with blank ssn" do
+
+        let(:params) {valid_params.deep_merge({ssn: ""})}
+
+        it "should fail validation" do
+          person = Person.new(**params)
+          person.valid?
+          expect(person.errors[:ssn].any?).to be_falsey
+        end
+
+        it "allow duplicated blank ssn" do 
+          person1 = Person.create(**params)
+          person2 = Person.create(**params)
+          expect(person2.errors[:ssn].any?).to be_falsey
+        end
+      end
+
+      context "with nil ssn" do
+        let(:params) {valid_params.deep_merge({ssn: nil})}
+
+        it "should fail validation" do
+          person = Person.new(**params)
+          person.valid?
+          expect(person.errors[:ssn].any?).to be_falsey
+        end
+
+        it "allow duplicated blank ssn" do 
+          person1 = Person.create(**params)
+          person2 = Person.create(**params)
+          expect(person2.errors[:ssn].any?).to be_falsey
+        end
+      end
+    end
+
+    context "with nil ssn" do
+      let(:params) {valid_params.deep_merge({ssn: ""})}
+
+      it "should fail validation" do
+        person = Person.new(**params)
+        person.valid?
+        expect(person.errors[:ssn].any?).to be_falsey
+      end
+    end
+
+    context "with invalid ssn" do
       let(:params) {valid_params.deep_merge({ssn: "123345"})}
 
       it "should fail validation" do

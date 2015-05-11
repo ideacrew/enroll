@@ -189,9 +189,12 @@ module Factories
 
     def self.initialize_family(person, dependents)
       family = person.primary_family
-      family = Family.new if family.blank?
+      family ||= Family.new
       applicant = family.primary_applicant
-      applicant = initialize_primary_applicant(family, person) if applicant.blank?
+      applicant ||= initialize_primary_applicant(family, person) 
+      person.relatives.each do |related_person|
+        family.add_family_member(related_person)
+      end
       dependents.each do |dependent|
         initialize_dependent(family, person, dependent)
       end
@@ -225,7 +228,7 @@ module Factories
 
     def self.save_all_or_delete_new(*list)
       objects_to_save = list.reject {|o| !o.changed?}
-      num_saved = objects_to_save.count {|o| o.save}
+      num_saved = objects_to_save.count { |o| o.save }
       if num_saved < objects_to_save.count
         objects_to_save.each {|o| o.delete}
         false

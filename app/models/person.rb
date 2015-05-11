@@ -72,6 +72,7 @@ class Person
 
 
   before_save :update_full_name
+  before_save :strip_empty_fields
 
   index({hbx_id: 1}, {unique: true})
 
@@ -112,10 +113,21 @@ class Person
   scope :active,   ->{ where(is_active: true) }
   scope :inactive, ->{ where(is_active: false) }
 
+  def strip_empty_fields
+    if ssn.blank?
+      unset("ssn")
+    end
+  end
+
   # Strip non-numeric chars from ssn
   # SSN validation rules, see: http://www.ssa.gov/employer/randomizationfaqs.html#a0=12
   def ssn=(new_ssn)
-    write_attribute(:ssn, new_ssn.to_s.gsub(/\D/, ''))
+    ssn_val = new_ssn.to_s.gsub(/\D/, '')
+    if !new_ssn.blank?
+      write_attribute(:ssn, new_ssn.to_s.gsub(/\D/, ''))
+    else
+      unset("ssn")
+    end
   end
 
   def gender=(new_gender)
@@ -132,6 +144,10 @@ class Person
 
   def primary_family
     Family.find_by_primary_applicant(self)
+  end
+
+  def get_employer_contact
+    EmployerProfile.find(employer_contact_id) if employer_contact_id.present?
   end
 
   def families
@@ -222,6 +238,12 @@ end
     notify_change_event(self, {"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES, "address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
   end
 
+  def relatives
+    person_relationships.reject do |p_rel|
+      p_rel.relative_id.to_s == self.id.to_s
+    end.map(&:relative)
+  end
+
 private
   def update_full_name
     full_name
@@ -252,5 +274,4 @@ private
       errors.add(:dob, "date of birth cannot follow date of death")
     end
   end
-
 end

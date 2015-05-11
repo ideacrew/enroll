@@ -12,11 +12,36 @@ RSpec.describe Employers::EmployerProfilesController do
       get :new
       expect(response).to have_http_status(:success)
     end
+  end
 
+  describe "GET show" do
+    let(:user) { double("user")}
+    let(:person) { double("person")}
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+
+    it "should render the new template" do
+      allow(user).to receive(:has_employer_role?)
+      sign_in(user)
+      get :show, id: employer_profile.id
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("show")
+      expect(assigns(:current_plan_year)).to eq employer_profile.plan_years.last
+    end
+  end
+
+  describe "GET welcome" do
+    let(:user) { double("user")}
+
+    it "renders the 'welcome' template" do
+      allow(user).to receive(:has_employer_role?)
+      sign_in(user)
+      get :welcome
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("welcome")
+    end
   end
 
   describe "GET search" do
-
     before(:each) do
       sign_in
       get :search
@@ -49,7 +74,7 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(assigns(:employer_profiles)).to eq employer_list
     end
 
-    it "returns http success" do 
+    it "returns http success" do
       expect(response).to have_http_status(:success)
     end
 
@@ -78,7 +103,7 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(assigns(:employer_profiles)).to eq employer_list
     end
 
-    it "returns http success" do 
+    it "returns http success" do
       expect(response).to have_http_status(:success)
     end
 
@@ -99,7 +124,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:email_attributes) { {
       :kind => "email",
       :address => "address"
-    } } 
+    } }
     let(:address_attributes) { {
       :kind => "address kind",
       :address_1 => "address 1",
@@ -132,7 +157,6 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:organization) { double }
 
     before(:each) do
-      pending
       sign_in
       allow(Organization).to receive(:new).and_return(organization)
       allow(organization).to receive(:build_employer_profile)
@@ -166,7 +190,105 @@ RSpec.describe Employers::EmployerProfilesController do
         expect(response).to have_http_status(:redirect)
       end
     end
-
   end
 
+  describe "POST match" do
+    let(:employer_parameters) { { :first_name => "SOMDFINKETHING" } }
+    let(:found_employer) { [] }
+    let(:create_employer_params) { "" }
+    let(:mock_employer_candidate) { instance_double("Forms::EmployerCandidate", :valid? => validation_result) }
+
+    before(:each) do
+      sign_in
+      allow(Forms::EmployerCandidate).to receive(:new).with(employer_parameters).and_return(mock_employer_candidate)
+      allow(mock_employer_candidate).to receive(:match_employer).and_return(found_employer)
+      post :match, :employer_profile => employer_parameters, :create_employer => create_employer_params
+    end
+
+    context "given invalid parameters" do
+      let(:validation_result) { false }
+
+      it "renders the 'search' template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("search")
+        expect(assigns[:employer_profile]).to eq mock_employer_candidate
+      end
+    end
+
+    context "given valid parameters render 'no_match' template" do
+      let(:validation_result) { true }
+
+      it "renders the 'no_match' template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("no_match")
+        expect(assigns[:employer_candidate]).to eq mock_employer_candidate
+      end
+    end
+
+    context "given valid parameters render 'match' template" do
+      let(:validation_result) { true }
+      let(:found_employer) { FactoryGirl.create(:employer_profile) }
+
+      it "renders the 'match' template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("match")
+        expect(assigns[:employer_candidate]).to eq mock_employer_candidate
+        expect(assigns(:employer_profile)).to eq found_employer
+      end
+    end
+
+    context "given valid parameters and create_employer" do
+      let(:employer_parameters) { { :sic_code => "SOMDFINKETHING" } }
+      let(:validation_result) { true }
+      let(:create_employer_params) { true }
+
+      it "renders the 'edit' template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("edit")
+      end
+    end
+  end
+
+  describe "PUT update" do
+    let(:user) { double("user")}
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:organization) { FactoryGirl.create(:organization) }
+    let(:person) { FactoryGirl.create(:person) }
+
+    before do 
+      allow(user).to receive(:has_employer_role?).and_return(true)
+      allow(user).to receive(:roles).and_return(["employer"])
+      allow(user).to receive(:person).and_return(person)
+      allow(Organization).to receive(:find).and_return(organization)
+      allow(organization).to receive(:employer_profile).and_return(employer_profile)
+      allow(controller).to receive(:employer_profile_params).and_return({})
+    end
+
+    it "should redirect" do
+      allow(user).to receive(:save).and_return(true)
+      sign_in(user)
+      put :update, id: organization.id
+      expect(response).to be_redirect
+    end
+
+    it "should render new template" do
+      allow(user).to receive(:save).and_return(false)
+      sign_in(user)
+      put :update, id: organization.id
+      expect(response).to render_template("new")
+    end
+  end
+
+  #describe "DELETE destroy" do
+  #  let(:user) { double("user")}
+  #  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+
+  #  it "should redirect" do
+  #    sign_in(user)
+  #    expect {
+  #      delete :destroy, id: employer_profile.id
+  #    }.to change(EmployerProfile, :count).by(-1)
+  #    expect(response).to be_redirect
+  #  end
+  #end
 end

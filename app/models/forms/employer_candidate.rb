@@ -17,8 +17,5 @@ module Forms
       EmployerProfile.find_by_fein(fein)
     end
 
-    def persisted?
-      false
-    end
   end
 end

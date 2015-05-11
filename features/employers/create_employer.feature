@@ -16,11 +16,11 @@ Feature: Create Employer
       When I visit the Employer portal to sign in
         And I sign in with valid user data with email example@example.com and password "12345678"
       Then I should see a welcome page with successful sign in message
-      #Then i should see fields to search for employer
-        #And I should see an initial form with a fieldset for Employer information, including: legal name, DBA, fein, #entity_kind, broker agency, URL, address, and phone
-        #And I should see a second fieldset to enter my name and email
-        # And My user data from existing the fieldset values are prefilled using data from my existing account
-        #And I should see a successful creation message
+      Then I should see fields to search for person and employer
+        And I should see an initial fieldset to enter my name, ssn and dob
+        And My user data from existing the fieldset values are prefilled using data from my existing account
+        And I should see a second form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone
+        And I should see a successful creation message
       #When I click on an employer in the employer list
       #Then I should see the employer information
       #When I click on the Employees tab

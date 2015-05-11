@@ -1,4 +1,4 @@
-@watir
+@watir @keep_browser_open @screenshots
 Feature: Employee Sign Up
   In order to get access to the site
   As an employee
@@ -30,7 +30,9 @@ Feature: Employee Sign Up
     When I click continue on the dependents page
     Then I should see the group selection page
     When I click continue on the group selection page
-    Then I should see the plan shopping page
+    Then I should see the plan shopping welcome page
+    When I click continue on the plan shopping welcome page
+    Then I should see the list of plans
     When I select a plan on the plan shopping page
     Then I should see the coverage summary page
     When I confirm on the coverage summary page

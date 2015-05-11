@@ -2,53 +2,78 @@
   <div class="employee-welocome">
     <div class="col-md-9 col-sm-11 col-xs-12">
       <div class="col-md-12 col-sm-12 no-pd col-xs-12">
-        <h1><small>Thank you</small> <%= @enrollment.subscriber.family_member.person.full_name.strip %>,</h1>
-        <p>You and the following dependents have successfully enrolled in <strong><%= @plan.name %></strong></p>
 
-        <div class="table-responsive table-border">
-          <table class="table table-wrapper table-condensed">
+          <h3><strong>Confirm Your Selection</strong></h3>
+          <%= @enrollment.subscriber.family_member.person.full_name %>
+          ,<br />
+          <span>You and the following dependents have successfully enrolled in <strong><%= @plan.name %></strong></span>
+          <br><br>
+
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>name</th>
+                <th>gender</th>
+                <th>birthday</th>
+                <th>cost</th>
+              </tr>
+            </thead>
+
             <tbody>
+              <% total_cost = 0 %>
               <% @enrollment.hbx_enrollment_members.each do |member| %>
                 <tr>
-                  <th><%= member.person.full_name %></th>
+                  <td><%= member.person.full_name %></td>
+                  <td><%= member.person.try(:gender) %></td>
+                  <td><%= member.person.try(:dob).strftime("%m/%d/%Y") %></td>
                   <td><%= number_to_currency(@plan.premium_for(member)) %></td>
+                  <% total_cost += @plan.premium_for(member) %>
                 </tr>
               <% end %>
+              <tr>
+                <td colspan='3' style='text-align: center;'>Total</td>
+                <td><%= number_to_currency(total_cost) %></td>
+              </tr>
             </tbody>
           </table>
         </div>
 
-        <h5 class="detail-enrolled">
-          <p>
-            Your monthly total family premium, which will be deducted by your employer from your pay is:
-            <strong><%=number_to_currency(@plan.total_employee_cost || 0) %></strong>
-          </p>
+        <table class='table table-striped'>
+          <tr>
+            <td>Additionally your employer pays</td>
+            <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
+          </tr>
+          <tr>
+            <td>Your coverage start date</td>
+            <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
+          </tr>
+          <tr style='font-size:20px'>
+            <td><strong>You pay</strong></td>
+            <td><strong>
+              <%= number_to_currency(@plan.total_employee_cost || 0) %>
+            </strong></td>
+          </tr>
+        </table>
 
-          <p>
-            Additionally your employer pays
-            <strong>
-              <%= number_to_currency(@plan.total_employer_contribution) %>
-            </strong>
-          </p>
+        <span style="font-size: 14px; line-height: 130%;">
+          DC Health Link<br />
+          PHONE: 855-532-5465 (855-532-LINK)<br />
 
-          <p>
-            Your coverage start date is:
-            <strong>
-              <%= @enrollment.effective_on.strftime("%m/%d/%Y") %>
-            </strong>
-          </p>
-        </h5>
-
-        <br>
-        <p><strong>Thank you for your order.</strong></p><br>
-        <p><strong>DC Health Link<br />
-          PHONE: 855-532-5465, (855-532-LINK)<br />
           TTY/TDD 711-1-532-5465<br />
-          Monday-Saturday 8:00am - 8:00pm<br />
-          E-Mail: info@dchealthlink.com
-        </strong></p>
-      </div>
-      <%= link_to "Continue", person_person_landing_path(@person), :class => "btn btn-success btn-continue" %>
+
+          Monday-Saturday
+          8:00am - 8:00pm<br />
+          E-Mail: info@dchealthlink.com</span><br />
+        </span><br />
+        <%= link_to "Continue", home_consumer_profiles_path, :class => "btn btn-success btn-continue" %>
+
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
+	    <%= link_to "Save & Exit", home_consumer_profiles_path(@person), { :class => "btn btn-primary" } %>
+            <div style="display: none;" id="sup-progress" data-signup-progress="8"></div>
+	    <input type="hidden" id="initial_progress" value="85">
+	    <%= render 'shared/signup_progress' %>
     </div>
   </div>
 </div><br>

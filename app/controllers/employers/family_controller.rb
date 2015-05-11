@@ -3,6 +3,7 @@ class Employers::FamilyController < ApplicationController
   before_action :find_employer
   before_action :set_family_id, only: [:delink, :terminate, :rehire]
   before_action :find_family, only: [:destroy, :show, :edit, :update]
+  before_action :check_plan_year, only: [:new]
 
   def new
     @family = build_family
@@ -24,10 +25,15 @@ class Employers::FamilyController < ApplicationController
   def edit
     @family.census_employee.build_address unless @family.census_employee.address.present?
     @family.census_dependents.build unless @family.census_dependents.present?
+    @family.benefit_group_assignments.build unless @family.benefit_group_assignments.present?
   end
 
   def update
-    if @family.update_attributes(census_family_params)
+    new_params = census_family_params
+    new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new
+    new_benefit_group_assignment.attributes = new_params[:benefit_group_assignments_attributes]["0"]
+    @family.add_benefit_group_assignment(new_benefit_group_assignment)
+    if @family.update_attributes(new_params)
       flash[:notice] = "Employer Census Family is successfully updated."
       redirect_to employers_employer_profile_path(@employer_profile)
     else
@@ -43,7 +49,6 @@ class Employers::FamilyController < ApplicationController
   end
 
   def terminate
-    # last_day_of_work = params[:employer_census_employee_family][:census_employee_attributes][:terminated_on]
     termination_date = params["termination_date"]
     if termination_date.present?
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
@@ -81,7 +86,6 @@ class Employers::FamilyController < ApplicationController
     if @rehiring_date.present?
       new_family = @family.replicate_for_rehire
       if new_family.present? # not an active family, then it is ready for rehire.#
-        # new_family.census_employee.hired_on = params[:employer_census_employee_family][:census_employee_attributes][:terminated_on]
         new_family.census_employee.hired_on = 1.day.ago.to_date
         @employer_profile.employee_families << new_family
         if @employer_profile.save
@@ -104,23 +108,27 @@ class Employers::FamilyController < ApplicationController
   private
 
   def census_family_params
-    params.require(:employer_census_employee_family).permit(:id, :employer_profile_id,
+    new_params = format_date_params(params)
+    new_params.require(:employer_census_employee_family).permit(:id, :employer_profile_id,
       :census_employee_attributes => [
           :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :terminated_on,
           :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
         ],
       :census_dependents_attributes => [
-          :id, :first_name, :last_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy
+          :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy
+        ],
+      :benefit_group_assignments_attributes => [
+          :id, :start_on, :end_on, :is_active, :benefit_group_id
         ]
       )
   end
 
   def find_employer
-    @employer_profile = EmployerProfile.find params["employer_profile_id"]
+    @employer_profile = EmployerProfile.find(params["employer_profile_id"])
   end
 
   def find_family
-    @family = EmployerCensus::EmployeeFamily.find params["id"]
+    @family = EmployerCensus::EmployeeFamily.find(params["id"])
   end
 
   def set_family_id
@@ -133,7 +141,25 @@ class Employers::FamilyController < ApplicationController
     family.build_census_employee
     family.build_census_employee.build_address
     family.census_dependents.build
+    family.benefit_group_assignments.build
     family
   end
+
+  def check_plan_year
+    if @employer_profile.plan_years.empty?
+      flash[:notice] = "Please create a plan year before you create your first census family."
+      redirect_to new_employers_employer_profile_plan_year_path(@employer_profile)
+    end
+  end
+
+    def format_date_params(params)
+      start_on = params[:employer_census_employee_family][:benefit_group_assignments_attributes]["0"][:start_on]
+      params[:employer_census_employee_family][:benefit_group_assignments_attributes]["0"][:start_on] = Date.strptime(start_on, '%m/%d/%Y').to_s(:db)
+
+      params
+    rescue Exception => e
+      puts e
+      params
+    end
 
 end

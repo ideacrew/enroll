@@ -240,7 +240,9 @@ $(document).ready(function () {
     if($('#add_info_clone0').length) {
       start_progress += 15;
       $("a.six").css("color","#00b420");
-    } else {$("a.six").css("color","#999");}
+    } else {
+//	    $("a.six").css("color","#999");
+    }
 
     $('#top-pad').html(start_progress + '% Complete');
     $('.progress-top').css('height', start_progress + '%');

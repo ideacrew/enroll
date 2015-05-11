@@ -2,7 +2,7 @@ class ConsumerProfilesController < ApplicationController
   def home
     @person = current_user.person
     @family = @person.primary_family
-    @family_members = @family.family_members if @family.present?
+    @family_members = @family.active_family_members if @family.present?
     @employee_roles = @person.employee_roles
     @employer_profile = @employee_roles.first.employer_profile if @employee_roles.any?
     @current_plan_year = @employer_profile.latest_plan_year if @employer_profile.present?
@@ -12,7 +12,8 @@ class ConsumerProfilesController < ApplicationController
     @hbx_enrollments = @family.latest_household.hbx_enrollments
 
     respond_to do |format|
-      format.html {}
+      format.html
+      format.js
     end
   end
 
@@ -28,6 +29,33 @@ class ConsumerProfilesController < ApplicationController
 
     ["home","work"].each do |kind|
        @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
+    end
+  end
+
+  def plans
+    respond_to do |format|
+      format.html
+      format.js
+    end
+  end
+
+  def personal
+    @person = current_user.person
+    @family = @person.primary_family
+    @family_members = @family.active_family_members if @family.present?
+    respond_to do |format|
+      format.html
+      format.js
+    end
+  end
+
+  def family
+    @person = current_user.person
+    @family = @person.primary_family
+    @family_members = @family.active_family_members if @family.present?
+    respond_to do |format|
+      format.html
+      format.js
     end
   end
 end
