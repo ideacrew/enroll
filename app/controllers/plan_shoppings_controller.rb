@@ -12,7 +12,7 @@ class PlanShoppingsController < ApplicationController
     notify("acapi.info.events.enrollment.submitted", @hbx_enrollment.to_xml)
 
 #    redirect_to thankyou_plan_shopping_path(id: @person, plan_id: params[:plan_id], organization_id: params[:organization_id])
-    redirect_to home_consumer_profiles
+    redirect_to home_consumer_profiles_path
   end
 
   def thankyou
