@@ -113,6 +113,10 @@ describe BenefitGroup, "instance methods" do
         expect(benefit_group.assignable_to?(roster_family)).to be_falsey
       end
     end
+
+    it "should be valid if both dates fall inside plan year correctly" do
+      expect(benefit_group.assignable_to?(roster_family)).to be_truthy
+    end
   end
 
   it "should return the reference plan associated with this benefit group" do
