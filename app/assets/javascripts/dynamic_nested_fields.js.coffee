@@ -4,7 +4,11 @@ ready = ->
     time = new Date().getTime()
     regexp = new RegExp($(this).data('id'), 'g')
     html = $(this).data('fields').replace(regexp, time)
-    $(this).closest('.form-inputs').find('fieldset:last').after(html)
+    target = $(this).closest('.form-inputs')
+    if $(target).find('fieldset:last').length > 0
+      $(target).find('fieldset:last').after(html)
+    else
+      $(target).prepend(html)
 
     style_select_picker()
     update_delete_buttons()
@@ -13,6 +17,9 @@ ready = ->
     $(this).prev('input[type=hidden').val('1')
     $(this).closest('fieldset').hide()
     event.preventDefault()
+
+  $('#employer_census_employee_family_census_employee_attributes_hired_on').change ->
+    $("#benefit_group_assignment_info input.date-picker").val($(this).val())
 
 style_select_picker = ->
 	$(document).find('select').select2()
