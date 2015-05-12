@@ -36,8 +36,10 @@ module HbxImport
             cee.last_name = ee.last_name
             cee.ssn = ee.ssn
             cee.dob = ee.dob
+            cee.gender = ee.gender
             cee.hired_on = ee.doh
             cee.build_email(kind: "work", address: ee.work_email)
+            cee.build_address(kind: "home",address_1:"830 I St NE",city:"Washington",state:"DC",zip:"20002")
             cee.terminated_on = ee.dot
             eef.add_benefit_group_assignment(
               ::EmployerCensus::BenefitGroupAssignment.new(
@@ -83,7 +85,7 @@ module HbxImport
   CensusRecord = Struct.new(
     :dba, :fein, :first_name, :last_name, :ssn, :dob, :doh, :work_email,
     :person_email, :dot, :individual_external_id, :employee_external_id,
-    :record_start_date, :record_end_date
+    :record_start_date, :record_end_date, :gender
   ) do
     include Comparable
 
@@ -99,7 +101,7 @@ module HbxImport
     def self.from_row(row)
       ee = CensusRecord.new
       %w[itself to_digits itself itself to_digits to_date_safe to_date_safe itself
-         itself to_date_safe itself itself itself itself].each_with_index do |conversion, index|
+         itself to_date_safe itself itself itself itself itself].each_with_index do |conversion, index|
         ee.send("#{ee.members[index]}=", row[index].send(conversion))
       end
       ee = nil if ee.fein.nil? || ee.ssn.nil? || ee.dob.nil? || ee.doh.nil?

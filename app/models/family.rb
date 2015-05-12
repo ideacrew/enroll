@@ -126,6 +126,11 @@ class Family
     is_coverage_applicant    = opts[:is_coverage_applicant] || true
     is_consent_applicant     = opts[:is_consent_applicant]  || false
 
+    existing_family_member = family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
+    if existing_family_member
+      return existing_family_member
+    end
+
     family_member = family_members.build(
         person: person, 
         is_primary_applicant: is_primary_applicant,

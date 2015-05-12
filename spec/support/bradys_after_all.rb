@@ -110,7 +110,7 @@ module BradysAfterAll
   shared_context "BradyWorkAfterAll" do
     include_context "BradyBunchAfterAll"
 
-    attr_reader :mikes_benefit_group, :mikes_plan_year, :mikes_census_employee, :mikes_census_family, :mikes_hired_on
+    attr_reader :mikes_benefit_group, :mikes_plan_year, :mikes_census_employee, :mikes_census_family, :mikes_hired_on, :mikes_employee_role
     attr_reader :carols_benefit_group, :carols_plan_year, :carols_census_employee, :carols_census_family, :carols_hired_on
 
     def create_brady_census_families
@@ -137,7 +137,7 @@ module BradysAfterAll
 
     def create_brady_employee_roles
       mike.ssn = "4423445555"
-      EmployeeRole.create!({
+      @mikes_employee_role = EmployeeRole.create!({
         :person => mike,
         :employer_profile_id => mikes_employer.id,
         :benefit_group_id => mikes_benefit_group.id,

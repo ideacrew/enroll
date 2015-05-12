@@ -146,18 +146,18 @@ class Household
     true
   end
 
-  def new_hbx_enrollment_from(employer_profile: nil, coverage_household: nil, benefit_group:)
+  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group:)
     coverage_household = latest_coverage_household unless coverage_household.present?
     HbxEnrollment.new_from(
-      employer_profile: employer_profile,
+      employee_role: employee_role,
       coverage_household: coverage_household,
       benefit_group: benefit_group,
     )
   end
 
-  def create_hbx_enrollment_from(employer_profile: nil, coverage_household: nil, benefit_group:)
+  def create_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group:)
     enrollment = new_hbx_enrollment_from(
-      employer_profile: employer_profile,
+      employee_role: employee_role,
       coverage_household: coverage_household,
       benefit_group: benefit_group,
     )

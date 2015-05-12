@@ -77,8 +77,8 @@ describe BenefitGroup, "instance methods" do
   let!(:benefit_group_assignment) { FactoryGirl.build(:employer_census_benefit_group_assignment, benefit_group: benefit_group) }
   let!(:families) do
     [1,2].collect do
-      FactoryGirl.create(:employer_census_family, 
-            employer_profile: employer_profile, 
+      FactoryGirl.create(:employer_census_family,
+            employer_profile: employer_profile,
             benefit_group_assignments: [benefit_group_assignment]
           )
     end.sort_by(&:id)
@@ -89,6 +89,33 @@ describe BenefitGroup, "instance methods" do
 
     it "should include the same families" do
       expect(benefit_group_families).to eq families
+    end
+  end
+
+  describe "should check if valid for family" do
+    let(:terminated_on_date) { Date.new(2015, 7, 31) }
+    let(:hired_on_date) { Date.new(2015, 6, 1) }
+    let(:census_employee) { EmployerCensus::Employee.new(:hired_on => hired_on_date, :terminated_on => terminated_on_date) }
+    let(:roster_family) { EmployerCensus::EmployeeFamily.new(:census_employee => census_employee) }
+
+    context "given an invalid terminated and end date combo " do
+       let(:terminated_on_date) { Date.new(2014, 1, 2) }
+
+       it "is not assignable_to an employee fired before it starts" do
+         expect(benefit_group.assignable_to?(roster_family)).to be_falsey
+       end
+     end
+
+    context "given an invalid hired and start date combo" do
+      let(:hired_on_date) { Date.new(2016, 6, 5) }
+
+      it "is not assignable_to an employee hired after it ends" do
+        expect(benefit_group.assignable_to?(roster_family)).to be_falsey
+      end
+    end
+
+    it "should be valid if both dates fall inside plan year correctly" do
+      expect(benefit_group.assignable_to?(roster_family)).to be_truthy
     end
   end
 
