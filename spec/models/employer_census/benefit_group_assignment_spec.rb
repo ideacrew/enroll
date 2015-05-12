@@ -1,5 +1,61 @@
 require 'rails_helper'
 
+
+shared_examples "an assignment that starts when the group starts", :shared => true do
+   it "should be assigned starting on the benefit group start"
+end
+
+shared_examples "an assignment that ends when the group ends", :shared => true do
+      it "should be assigned ending on the benefit group end"
+end
+
+shared_examples "an assignment that starts when the employee is hired", :shared => true do
+      it "should be assigned starting on the hire date"
+end
+
+shared_examples "an assignment that ends when the employee is terminated", :shared => true do
+      it "should be assigned ending on the termination date"
+end
+
+describe EmployerCensus::BenefitGroupAssignment, "given a benefit group" do
+  describe "with an employee having no termination date" do
+    describe "and a hire date before the benefit group" do
+      it_should_behave_like "an assignment that starts when the group starts"
+      it_should_behave_like "an assignment that ends when the group ends"
+    end
+
+    describe "and a hire date during the benefit group" do
+      it_should_behave_like "an assignment that starts when the employee is hired"
+      it_should_behave_like "an assignment that ends when the group ends"
+    end
+  end
+
+  describe "with an employee having a termination date after the benefit group end" do
+    describe "and a hire date before the benefit group" do
+      it_should_behave_like "an assignment that starts when the group starts"
+      it_should_behave_like "an assignment that ends when the group ends"
+    end
+
+    describe "and a hire date during the benefit group" do
+      it_should_behave_like "an assignment that starts when the employee is hired"
+      it_should_behave_like "an assignment that ends when the group ends"
+    end
+  end
+
+  describe "with an employee having a termination date during the benefit group" do
+    describe "and a hire date before the benefit group" do
+      it_should_behave_like "an assignment that starts when the group starts"
+      it_should_behave_like "an assignment that ends when the employee is terminated"
+    end
+
+    describe "and a hire date during the benefit group" do
+      it_should_behave_like "an assignment that starts when the employee is hired"
+      it_should_behave_like "an assignment that ends when the employee is terminated"
+    end
+  end
+
+end
+
 describe EmployerCensus::BenefitGroupAssignment, type: :model do
   it { should validate_presence_of :benefit_group_id }
   it { should validate_presence_of :start_on }

@@ -10,6 +10,11 @@ describe BenefitGroup, type: :model do
   it { should validate_presence_of :employer_max_amt_in_cents }
 end
 
+describe BenefitGroup, "given a start and end date" do
+  it "is not assignable_to an employee fired before it starts"
+  it "is not assignable_to an employee hired after it ends"
+end
+
 describe BenefitGroup, dbclean: :after_each do
   context "an employer profile with families exists" do
     let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
