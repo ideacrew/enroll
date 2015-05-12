@@ -85,6 +85,7 @@ When(/^I enter the identifying info of my existing person$/) do
   @browser.p(:text=> /Personal Information/).click
   @browser.text_field(:name => "person[ssn]").set("670991234")
   screenshot("information_entered")
+  Watir::Wait.until(30) { @browser.input(:value => "Search Employers").present? }
   @browser.input(:value => "Search Employers", :type => "submit").click
 end
 

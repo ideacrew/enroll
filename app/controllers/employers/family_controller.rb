@@ -24,7 +24,7 @@ class Employers::FamilyController < ApplicationController
 
   def edit
     @family.census_employee.build_address unless @family.census_employee.address.present?
-    @family.census_dependents.build unless @family.census_dependents.present?
+    #@family.census_dependents.build unless @family.census_dependents.present?
     @family.benefit_group_assignments.build unless @family.benefit_group_assignments.present?
   end
 
@@ -140,7 +140,7 @@ class Employers::FamilyController < ApplicationController
     family = EmployerCensus::EmployeeFamily.new
     family.build_census_employee
     family.build_census_employee.build_address
-    family.census_dependents.build
+    #family.census_dependents.build
     family.benefit_group_assignments.build
     family
   end

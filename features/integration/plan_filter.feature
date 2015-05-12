@@ -12,7 +12,7 @@ Scenario: New employee with existing person
   Then I should see the employee search page
   When I enter the identifying info of my existing person
   Then I should see the matched employee record form
-  When I enter the personal infomation of my existing person
+  When I click "This is my employer"
   Then I should see the matched household information
   When I enter household information
   Then I should see the plan selection page
