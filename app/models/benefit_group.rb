@@ -88,6 +88,10 @@ class BenefitGroup
     end
   end
 
+  def assigned?
+    employee_families.any?
+  end
+
   def effective_on_for(date_of_hire)
     case effective_on_kind
     when "date_of_hire"
