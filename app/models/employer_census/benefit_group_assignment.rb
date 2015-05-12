@@ -2,7 +2,6 @@ class EmployerCensus::BenefitGroupAssignment
   include Mongoid::Document
   include Mongoid::Timestamps
 
-
   embedded_in :employee_family, class_name: "EmployerCensus::EmployeeFamily", inverse_of: :benefit_group_assignments
 
   field :benefit_group_id, type: BSON::ObjectId
@@ -12,6 +11,12 @@ class EmployerCensus::BenefitGroupAssignment
 
   validates_presence_of :benefit_group_id, :start_on
   # validate :model_integrity
+  
+  def self.new_from_group_and_roster_family(ben_group, family)
+    family.benefit_group_assignments.new(
+    
+    )
+  end
 
   def benefit_group=(new_benefit_group)
     raise ArgumentError("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
