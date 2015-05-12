@@ -104,6 +104,8 @@ end
 When(/^I complete the matched employee form$/) do
   @browser.text_field(:name => "person[phones_attributes][0][full_phone_number]").set("2025551234")
   @browser.text_field(:name => "person[emails_attributes][1][address]").click
+  sleep(1)
+  screenshot("personal_info_complete")
   @browser.input(:id => "continue-employer").click
 end
 
@@ -171,6 +173,7 @@ end
 
 Then(/^I should see the list of plans$/) do
   @browser.a(:text => "Select").wait_until_present
+  sleep(1)
   screenshot("plan_shopping")
 end
 
