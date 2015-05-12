@@ -10,11 +10,6 @@ describe BenefitGroup, type: :model do
   it { should validate_presence_of :employer_max_amt_in_cents }
 end
 
-describe BenefitGroup, "given a start and end date" do
-  it "is not assignable_to an employee fired before it starts"
-  it "is not assignable_to an employee hired after it ends"
-end
-
 describe BenefitGroup, dbclean: :after_each do
   context "an employer profile with families exists" do
     let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
@@ -82,8 +77,8 @@ describe BenefitGroup, "instance methods" do
   let!(:benefit_group_assignment) { FactoryGirl.build(:employer_census_benefit_group_assignment, benefit_group: benefit_group) }
   let!(:families) do
     [1,2].collect do
-      FactoryGirl.create(:employer_census_family, 
-            employer_profile: employer_profile, 
+      FactoryGirl.create(:employer_census_family,
+            employer_profile: employer_profile,
             benefit_group_assignments: [benefit_group_assignment]
           )
     end.sort_by(&:id)
@@ -94,6 +89,29 @@ describe BenefitGroup, "instance methods" do
 
     it "should include the same families" do
       expect(benefit_group_families).to eq families
+    end
+  end
+
+  describe "should check if valid for family" do
+    let(:terminated_on_date) { Date.new(2015, 7, 31) }
+    let(:hired_on_date) { Date.new(2015, 6, 1) }
+    let(:census_employee) { EmployerCensus::Employee.new(:hired_on => hired_on_date, :terminated_on => terminated_on_date) }
+    let(:roster_family) { EmployerCensus::EmployeeFamily.new(:census_employee => census_employee) }
+
+    context "given an invalid terminated and end date combo " do
+       let(:terminated_on_date) { Date.new(2014, 1, 2) }
+
+       it "is not assignable_to an employee fired before it starts" do
+         expect(benefit_group.assignable_to?(roster_family)).to be_falsey
+       end
+     end
+
+    context "given an invalid hired and start date combo" do
+      let(:hired_on_date) { Date.new(2016, 6, 5) }
+
+      it "is not assignable_to an employee hired after it ends" do
+        expect(benefit_group.assignable_to?(roster_family)).to be_falsey
+      end
     end
   end
 
