@@ -38,7 +38,7 @@ class PlanYear
   end
 
   def editable?
-    !benefit_groups.any?(&:aassigned?)
+    !benefit_groups.any?(&:assigned?)
   end
 
   def employee_participation_percent
