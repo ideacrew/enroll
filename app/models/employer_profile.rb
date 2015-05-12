@@ -16,12 +16,6 @@ class EmployerProfile
   # Broker writing_agent credited for enrollment and transmitted on 834
   field :writing_agent_id, type: BSON::ObjectId
 
-  # Payment status
-  field :last_paid_premium_on, type: Date
-  field :last_paid_premium_in_cents, type: Integer
-  field :next_due_premium_on, type: Date
-  field :next_due_premium_in_cents, type: Integer
-
   # Employers terminated for non-payment may re-enroll one additional time
   field :terminated_count, type: Integer, default: 0
   field :terminated_on, type: Date
@@ -38,6 +32,7 @@ class EmployerProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
+  embeds_many :premium_statements
 
   embeds_many :employee_families,
     class_name: "EmployerCensus::EmployeeFamily",
@@ -66,6 +61,11 @@ class EmployerProfile
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
   def roster_size
     employee_families.size
+  end
+
+  def latest_premium_statement
+    return premium_statements.first if premium_statements.size == 1
+    premium_statements.order_by(:'effective_on'.desc).limit(1).only(:premium_statements).first
   end
 
   # belongs_to broker_agency_profile
@@ -182,25 +182,19 @@ class EmployerProfile
                        "employer_profile.employee_families.census_employee.dob" => person.dob,
                        "employer_profile.employee_families.census_employee.linked_at" => nil).to_a
     end
-
   end
-
 
   # Workflow for automatic approval
   aasm do
-    state :applicant, initial: true
-    state :ineligible       # Unable to enroll business per SHOP market regulations (e.g. Sole proprieter)
-    state :registered       # Business information complete, before initial open enrollment period
-    state :enrolling        # Employees registering and plan shopping
-    state :binder_pending   # Initial open enrollment period closed, first premium payment not received/processed
-    state :canceled         # Coverage didn't take effect, as Employer either didn't complete enrollment or pay binder premium
-    state :enrolled         # Enrolled and premium payment up-to-date
-    state :enrolled_renewal_ready  # Annual renewal date is 90 days or less
-    state :enrolled_renewing       #
-    state :enrolled_overdue        # Premium payment 1-29 days past due
-    state :enrolled_late           # Premium payment 30-60 days past due - send notices to employees
-    state :enrolled_suspended      # Premium payment 61-90 - transmit terms to carriers with retro date
-    state :terminated              # Premium payment > 90 days past due (day 91)
+    state :applicant, initial: true 
+    state :ineligible               # Unable to enroll business per SHOP market regulations (e.g. Sole proprieter)
+    state :registered               # Business information complete, before initial open enrollment period
+    state :enrolling                # Employees registering and plan shopping
+    state :canceled                 # Coverage didn't take effect, as Employer either didn't complete enrollment or pay binder premium
+    state :enrolled                 # Enrolled and premium payment up-to-date
+    state :enrolled_renewal_ready   # Annual renewal date is 90 days or less
+    state :enrolled_renewing        #
+    state :terminated               # Premium payment > 90 days past due (day 91)
 
     event :submit do
       transitions from: [:applicant, :ineligible, :terminated], to: [:registered, :ineligible]
