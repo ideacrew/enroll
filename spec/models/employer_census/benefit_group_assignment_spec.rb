@@ -29,16 +29,21 @@ describe EmployerCensus::BenefitGroupAssignment, "given a benefit group" do
   let(:benefit_group_end) { Date.new(2015, 12, 31) }
   let(:census_employee) { EmployerCensus::Employee.new(:hired_on => hired_on_date, :terminated_on => terminated_on_date) }
   let(:roster_family) { EmployerCensus::EmployeeFamily.new(:census_employee => census_employee) }
-  let(:benefit_group) { instance_double("BenefitGroup", :start_on => benefit_group_start, :end_on => benefit_group_end ) }
-  let(:benefit_group_assignment) { 
+  let(:benefit_group) { instance_double("BenefitGroup", :start_on => benefit_group_start, :end_on => benefit_group_end, :id => 1 ) }
+  let(:benefit_group_assignment) {
     EmployerCensus::BenefitGroupAssignment.new_from_group_and_roster_family(benefit_group, roster_family)
   }
 
   describe "with an employee having no termination date" do
     let(:terminated_on_date) { nil }
+    let(:hired_on_date) { Date.new(2014, 6, 5) }
 
     it "should have the correct employee_family" do
       expect(benefit_group_assignment.employee_family).to eq roster_family
+    end
+
+    it "should assign the benefit_group id to the benefit_group_assignment" do
+      expect(benefit_group_assignment.benefit_group_id).to eq benefit_group.id
     end
 
     describe "and a hire date before the benefit group" do
