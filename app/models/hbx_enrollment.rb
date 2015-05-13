@@ -3,11 +3,12 @@ class HbxEnrollment
   include Mongoid::Timestamps
   include HasFamilyMembers
   include AASM
+  include MongoidSupport::AssociationProxies
 
   # Persists result of a completed plan shopping process
 
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
-  Authority = [:open_enrollment ]
+  Authority = [:open_enrollment]
 
   embedded_in :household
 
@@ -23,7 +24,7 @@ class HbxEnrollment
   field :plan_id, type: BSON::ObjectId
   field :broker_agency_id, type: BSON::ObjectId
   field :writing_agent_id, type: BSON::ObjectId
-  field :employer_profile_id, type: BSON::ObjectId
+  field :employee_role_id, type: BSON::ObjectId
   field :benefit_group_id, type: BSON::ObjectId
 
   field :submitted_at, type: DateTime
@@ -32,6 +33,9 @@ class HbxEnrollment
   field :aasm_state_date, type: Date
   field :updated_by, type: String
   field :is_active, type: Boolean, default: true
+
+  associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
+  associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
 
 
   embeds_many :hbx_enrollment_members
@@ -60,9 +64,8 @@ class HbxEnrollment
     self.is_active
   end
 
-  # FIXME: Not even close to correct
   def subscriber
-    hbx_enrollment_members.first
+    hbx_enrollment_members.detect(&:is_subscriber)
   end
 
   def family
@@ -73,12 +76,8 @@ class HbxEnrollment
     hbx_enrollment_members.map(&:applicant_id)
   end
 
-  def employer_profile=(employer_instance)
-    self.employer_profile_id = employer_instance._id if employer_instance.is_a? EmployerProfile
-  end
-
   def employer_profile
-    EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
+    employee_role.employer_profile
   end
 
   def broker_agency_profile=(new_broker_agency)
@@ -91,14 +90,6 @@ class HbxEnrollment
     parent.broker_agency.find(self.broker_agency_id)
   end
 
-  def benefit_group=(benefit_group)
-    self.benefit_group_id = benefit_group._id if benefit_group.is_a? BenefitGroup
-  end
-
-  def benefit_group
-    BenefitGroup.find(self.benefit_group_id) unless self.benefit_group_id.blank?
-  end
-
   def has_broker_agency?
     broker_agency_id.present?
   end
@@ -106,19 +97,16 @@ class HbxEnrollment
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer
   #       This should probably be done by comparing the hired_on date with todays date.
   #       Also needs to ignore any that were already terminated before a certain date.
-  def self.calculate_start_date_from(employer_profile, coverage_household, benefit_group)
-    employee_role = coverage_household.subscriber.family_member.person.employee_roles.detect do |e_role|
-      e_role.employer_profile_id.to_s == employer_profile.id.to_s
-    end
+  def self.calculate_start_date_from(employee_role, coverage_household, benefit_group)
     benefit_group.effective_on_for(employee_role.hired_on)
   end
 
-  def self.new_from(employer_profile: nil, coverage_household:, benefit_group:)
+  def self.new_from(employee_role: nil, coverage_household:, benefit_group:)
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
-    enrollment.kind = "employer_sponsored" if employer_profile.present?
-    enrollment.employer_profile = employer_profile
-    enrollment.effective_on = calculate_start_date_from(employer_profile, coverage_household, benefit_group)
+    enrollment.kind = "employer_sponsored" if employee_role.present?
+    enrollment.employee_role = employee_role
+    enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
     # benefit_group.plan_year.start_on
     enrollment.benefit_group = benefit_group
     coverage_household.coverage_household_members.each do |coverage_member|
@@ -130,14 +118,19 @@ class HbxEnrollment
     enrollment
   end
 
-  def self.create_from(employer_profile: nil, coverage_household:, benefit_group:)
+  def self.create_from(employee_role: nil, coverage_household:, benefit_group:)
     enrollment = self.new_from(
-      employer_profile: employer_profile,
+      employee_role: employee_role,
       coverage_household: coverage_household,
       benefit_group: benefit_group
     )
     enrollment.save
     enrollment
+  end
+
+  def can_complete_shopping?(t_date = Date.today)
+    return false unless benefit_group
+    benefit_group.within_new_hire_window?(employee_role.hired_on)
   end
 
   def self.find(id)

@@ -4,18 +4,18 @@
       <div class="col-md-12 col-sm-12 no-pd col-xs-12">
 
           <h3><strong>Confirm Your Selection</strong></h3>
-          <%= @enrollment.subscriber.family_member.person.full_name %>
-          ,<br />
-          <span>You and the following dependents have successfully enrolled in <strong><%= @plan.name %></strong></span>
-          <br><br>
+          <h4>Below is your current plan selection.  Clicking confirm will enroll you and your family.</h4>
+          <h4>You will not be enrolled until you confirm your plan selection.</h4>
+          <h4><%= @plan.name %></h4>
+          <h4>Starting on: <%= @enrollment.effective_on.strftime("%m/%d/%Y") %></h4>
 
           <table class="table table-striped">
             <thead>
               <tr>
-                <th>name</th>
-                <th>gender</th>
-                <th>birthday</th>
-                <th>cost</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Birthday</th>
+                <th>Premium</th>
               </tr>
             </thead>
 
@@ -58,16 +58,11 @@
         <span style="font-size: 14px; line-height: 130%;">
           DC Health Link<br />
           PHONE: 855-532-5465 (855-532-LINK)<br />
-
           TTY/TDD 711-1-532-5465<br />
-
-          Monday-Saturday
-          8:00am - 8:00pm<br />
+          Monday-Saturday 8:00am - 8:00pm<br />
           E-Mail: info@dchealthlink.com</span><br />
         </span><br />
-        <%= link_to "Continue", home_consumer_profiles_path, :class => "btn btn-success btn-continue" %>
-
-        </div>
+        <%= link_to "Confirm", checkout_plan_shopping_path(:hbx_enrollment_id => @enrollment.id, :plan_id => @plan.id), :class => "btn btn-success btn-continue", :method => :post %>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
 	    <%= link_to "Save & Exit", home_consumer_profiles_path(@person), { :class => "btn btn-primary" } %>

@@ -302,9 +302,25 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
 end
 
 describe EmployerProfile, "instance methods" do
-  let (:census_employee) {FactoryGirl.build(:employer_census_employee, ssn: "069851240", dob: 34.years.ago.to_date)}
-  let (:census_family) {FactoryGirl.build(:employer_census_family, census_employee: census_employee, employer_profile: nil)}
-  let (:person) {Person.new(first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: 34.years.ago.to_date)}
+  let (:census_employee)  { FactoryGirl.build(:employer_census_employee, ssn: "069851240", dob: 34.years.ago.to_date)}
+  let (:census_family)    { FactoryGirl.build(:employer_census_family, census_employee: census_employee, employer_profile: nil)}
+  let (:person)           { Person.new(first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: 34.years.ago.to_date)}
+  let (:premium_statement_1) { FactoryGirl.build(:premium_statement, effective_on: Date.current - 10)}
+  let (:premium_statement_2) { FactoryGirl.build(:premium_statement, effective_on: Date.current - 90)}
+
+  describe "#latest_premium_statement" do
+    let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
+
+    context "employer profile with multiple premium statuses" do
+      before do
+        employer_profile.premium_statements = [premium_statement_1, premium_statement_2]
+      end
+
+      it "should return the premiums status with latest effective on date" do
+        expect(employer_profile.latest_premium_statement).to eq premium_statement_1
+      end
+    end
+  end
 
   describe "#linkable_employee_family_by_person" do
     let (:employer_profile) {FactoryGirl.create(:employer_profile)}

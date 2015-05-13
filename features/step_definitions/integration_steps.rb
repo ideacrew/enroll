@@ -85,6 +85,7 @@ When(/^I enter the identifying info of my existing person$/) do
   @browser.p(:text=> /Personal Information/).click
   @browser.text_field(:name => "person[ssn]").set("670991234")
   screenshot("information_entered")
+  Watir::Wait.until(30) { @browser.input(:value => "Search Employers").present? }
   @browser.input(:value => "Search Employers", :type => "submit").click
 end
 
@@ -103,6 +104,8 @@ end
 When(/^I complete the matched employee form$/) do
   @browser.text_field(:name => "person[phones_attributes][0][full_phone_number]").set("2025551234")
   @browser.text_field(:name => "person[emails_attributes][1][address]").click
+  sleep(1)
+  screenshot("personal_info_complete")
   @browser.input(:id => "continue-employer").click
 end
 
@@ -170,6 +173,7 @@ end
 
 Then(/^I should see the list of plans$/) do
   @browser.a(:text => "Select").wait_until_present
+  sleep(1)
   screenshot("plan_shopping")
 end
 
@@ -178,13 +182,13 @@ When(/^I select a plan on the plan shopping page$/) do
 end
 
 Then(/^I should see the coverage summary page$/) do
-  @browser.p(:text => /Your monthly total family premium/).wait_until_present
+  @browser.a(href: /\/plan_shopping\/checkout/, class: "btn-continue").wait_until_present
   screenshot("summary_page")
-  expect(@browser.p(:text => /Your monthly total family premium/).visible?).to be_truthy
+  expect(@browser.a(href: /\/plan_shopping\/checkout/, class: "btn-continue").visible?).to be_truthy
 end
 
 When(/^I confirm on the coverage summary page$/) do
-  @browser.a(:text => "Continue").click
+  @browser.a(:text => "Confirm").click
 end
 
 Then(/^I should see the "my account" page$/) do

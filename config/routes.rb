@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   resource :plan_shopping do
     member do
       post 'checkout'
-      get 'thankyou'
+      post 'thankyou'
     end
   end
 

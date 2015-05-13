@@ -39,6 +39,8 @@ class BenefitGroup
   # Array of plan_ids
   field :elected_plan_ids, type: Array, default: []
 
+  delegate :start_on, :end_on, to: :plan_year
+
   # Array of census employee ids
   # has_and_belongs_to_many :employee_families, class_name: "EmployeeFamily"
   # field :employee_families, type: Array, default: []
@@ -88,6 +90,14 @@ class BenefitGroup
     end
   end
 
+  def assignable_to?(family)
+    return !(family.terminated_on < start_on || family.hired_on > end_on)
+  end
+
+  def assigned?
+    employee_families.any?
+  end
+
   def effective_on_for(date_of_hire)
     case effective_on_kind
     when "date_of_hire"
@@ -134,7 +144,7 @@ class BenefitGroup
     orgs = Organization.where({
       "employer_profile.plan_years.benefit_groups._id" => id
     })
-    found_value = catch(:found_benefit_group) do 
+    found_value = catch(:found_benefit_group) do
       orgs.each do |org|
         org.employer_profile.plan_years.each do |py|
           py.benefit_groups.each do |bg|
@@ -147,6 +157,10 @@ class BenefitGroup
       raise Mongoid::Errors::DocumentNotFound, "BenefitGroup #{id}"
     end
     return found_value
+  end
+
+  def within_new_hire_window?(hire_date)
+    false
   end
 
   private

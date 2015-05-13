@@ -10,7 +10,7 @@ describe HbxEnrollmentMember, dbclean: :after_all do
       @household = mikes_family.households.first
       @coverage_household = household.coverage_households.first
       @enrollment = household.create_hbx_enrollment_from(
-        employer_profile: mikes_employer,
+        employee_role: mikes_employee_role,
         coverage_household: coverage_household,
         benefit_group: mikes_benefit_group
       )
