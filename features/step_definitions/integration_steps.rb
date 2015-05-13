@@ -149,6 +149,7 @@ When(/^I enter the identifying info of Sorens daughter$/) do
   @browser.text_field(name: 'dependent[date_of_birth]').set('01/15/2011')
   @browser.label(text: /FIRST NAME/).click
   @browser.text_field(name: 'dependent[relationship]').set('child')
+  @browser.input(type: 'radio', value: 'female').click
 end
 
 When(/^I click confirm member$/) do
