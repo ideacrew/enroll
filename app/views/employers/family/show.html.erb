@@ -1,69 +1,83 @@
-<% census_employee = @family.census_employee %>
-<% dependents = @family.census_dependents %>
-<% address = census_employee.address %>
-<% benefit_group_assignments = @family.benefit_group_assignments %>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
 
-<h2> Family Details </h2>
+      <% census_employee = @family.census_employee %>
+      <% dependents = @family.census_dependents %>
+      <% address = census_employee.address %>
+      <% benefit_group_assignments = @family.benefit_group_assignments %>
 
-<h3> Employee Details </h3>
+      <h2> Family Details </h2>
 
-Name: <%= name_to_listing(census_employee) %> <br>
-<!-- Name: <%= census_employee.first_name + " " + census_employee.last_name %> <br> -->
-DOB: <%= format_date census_employee.dob %> <br>
-Hired On: <%= format_date census_employee.hired_on %><br>
+      <div class="row">
+        <div class="col-md-6 col-sm-6 col-xs-12 left-side">
+          <h3> Employee Details </h3>
 
-<h3> Address </h3>
-<% if address.present? %>
-  <%= address.to_s %>
-<% end %>
+          Name: <%= name_to_listing(census_employee) %> <br>
+          DOB: <%= format_date census_employee.dob %> <br>
+          Hired On: <%= format_date census_employee.hired_on %><br>
+        </div>
 
-<h3> Dependents </h3>
+        <div class="col-md-6 col-sm-6 col-xs-12 right-side">
+          <h3> Address </h3>
+          <% if address.present? %>
+            <%= address.to_s %>
+          <% end %>
+        </div>
+      </div>
 
-<% if dependents.present? %>
-  <table border = "1", width= "400">
-    <tr>
-      <th> Name </th>
-      <th> DOB </th>
-      <th> Relationship </th>
-      <th> Gender </th>
-    </tr>
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
 
-    <% dependents.each do |dependent| %>
-      <tr>
-        <td> <%= dependent.first_name + " " + dependent.last_name %> </td>
-        <td> <%= format_date dependent.dob %> </td>
-        <td> <%= dependent.employee_relationship %> </td>
-        <td> <%= dependent.gender %> </td>
-      </tr>
-    <% end %>
-  </table>
-<% else %>
-  No Dependents
-<% end %>
+          <h3> Dependents </h3>
 
-<br>
-<br>
+          <% if dependents.present? %>
+            <table border = "1", width= "400">
+              <tr>
+                <th> Name </th>
+                <th> DOB </th>
+                <th> Relationship </th>
+                <th> Gender </th>
+              </tr>
 
-<% if benefit_group_assignments.present? %>
-  <table border = "1", width= "400">
-    <tr>
-      <th> Name </th>
-      <th> start on </th>
-      <th> end on </th>
-      <th> status </th>
-    </tr>
+              <% dependents.each do |dependent| %>
+                <tr>
+                  <td> <%= dependent.first_name + " " + dependent.last_name %> </td>
+                  <td> <%= format_date dependent.dob %> </td>
+                  <td> <%= dependent.employee_relationship %> </td>
+                  <td> <%= dependent.gender %> </td>
+                </tr>
+              <% end %>
+            </table>
+          <% else %>
+            No Dependents
+          <% end %>
+        </div>
+      </div>
 
-    <% benefit_group_assignments.each do |bga| %>
-      <tr>
-        <td> <%= bga.benefit_group.try(:title) %> </td>
-        <td> <%= format_date bga.start_on %> </td>
-        <td> <%= format_date bga.end_on %> </td>
-        <td> <%= bga.is_active %> </td>
-      </tr>
-    <% end %>
-  </table>
-<% else %>
-  No Benefit Group Assignments
-<% end %>
+      <% if benefit_group_assignments.present? %>
+        <table border = "1", width= "400">
+          <tr>
+            <th> Name </th>
+            <th> start on </th>
+            <th> end on </th>
+            <th> status </th>
+          </tr>
 
-<%= link_to "Back", employers_employer_profile_path(@employer_profile) %>
+          <% benefit_group_assignments.each do |bga| %>
+            <tr>
+              <td> <%= bga.benefit_group.try(:title) %> </td>
+              <td> <%= format_date bga.start_on %> </td>
+              <td> <%= format_date bga.end_on %> </td>
+              <td> <%= bga.is_active %> </td>
+            </tr>
+          <% end %>
+        </table>
+      <% else %>
+        No Benefit Group Assignments
+      <% end %>
+
+      <%= link_to "< Back", employers_employer_profile_path(@employer_profile), class: 'btn btn-primary' %>
+    </div>
+  </div>
+</div>

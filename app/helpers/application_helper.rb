@@ -143,14 +143,14 @@ module ApplicationHelper
     args.map(&:to_s).include?(params[:controller].to_s) ? "dropdown active" : "dropdown"
   end
 
-  def link_to_add_fields(name, f, association)
+  def link_to_add_fields(name, f, association, classes='')
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
     fields = f.fields_for(association, new_object, fieldset: false, child_index: id) do |builder|
       render("shared/" + association.to_s.singularize + "_fields", f: builder)
     end
     link_to(content_tag(:span, raw("&nbsp;"), class: 'fui-plus-circle') + name,
-            '#', class: "add_fields", data: {id: id, fields: fields.gsub("\n", "")})
+            '#', class: "add_fields #{classes}", data: {id: id, fields: fields.gsub("\n", "")})
   end
 
   def render_flash

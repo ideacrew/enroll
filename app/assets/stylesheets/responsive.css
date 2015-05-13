@@ -1,7 +1,8 @@
-@media(max-width: 500px){
-  #address_info .new-address-flow{
-    padding-top: 40%;
-  }
+@media(max-width: 767px){
+  #address_info .new-address-flow{padding-top: 40%;}
+  #key-section {display: none;}
+  #email_info .email:first-child > .first {border-bottom: none !important;}
+  #email_info .email:nth-of-type(2) > .first {border-top: none !important;}
 }
 @media(min-width: 501px) and (max-width: 767px){
   #address_info .new-address-flow{
@@ -48,15 +49,6 @@
   }
   p.information {
     margin-bottom: 27px;
-  }
-  #address_info {
-    margin-top: 14px;
-  }
-  #phone_info {
-    margin-top: 10px;
-  }
-  #email_info {
-    margin-top: 12px;
   }
   .tab-row #myTabContent .submenu {
     padding: 0;
@@ -130,4 +122,300 @@
   #key-section {
     margin: 0;
   }
+}
+
+/* RESPONSIVE CODE */
+
+@media (max-width: 320px) { 
+    .input-lg, .form-group-lg .form-control {
+        border-bottom: 1px solid #ccc;
+    }
+    .welcome-msg p {
+        margin: 0 0 0 20px;
+    }
+    .welcome-msg .btn-continue {
+        width: 100%;
+    }
+    .btn-save.blue, .member-continue-btn {
+        width: 100%;
+    }
+    .tab-pane .landing-row .right-side .list-group .list-group-item h4 {
+        text-align: center;
+    }
+    .right-side ul.list-group li.list-group-item .text-right {
+        text-align: center;
+    }
+    #personal_info .save-btn {
+        width: 100%;
+        padding: 10px 25px;
+    }
+    #personal_info .ok-btn, #employer .emp-info .ok-btn {
+        margin-bottom: 15px;
+    }
+    #employer .emp-info .save-btn {
+        width: 100%;
+    }
+    #family .list-group .list-group-item h4 {
+        text-align: left;
+        font-size: 15px;
+    }
+    #family a.cancel, #family a.save {
+        width: 25%;
+        margin-bottom: 10px;
+    }
+    #add-new-member .text-right {
+        text-align: center;
+    }
+    .head-title .btn-wrapper a {
+      float: left;
+      width: 100%;
+    }
+    .btn-group-vertical>.btn, .btn-group>.btn {
+        width: 50%;
+    }
+    .btn-group, .btn-group-vertical {
+        width: 100%;
+        margin-top: 20px;
+    }
+    .title-dropdown {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) { 
+    #family .right-side .btn.new-member {
+        width: 100%;
+    }
+    .input-lg, .form-group-lg .form-control {
+        border-bottom: 0px solid #ccc;
+    }
+    .welcome-msg .btn-continue {
+        width: 100%;
+    }
+    .btn-save.blue, .member-continue-btn {
+        width: 100%;
+    }
+    .tab-pane .landing-row .right-side .list-group .list-group-item h4 {
+        text-align: center;
+    }
+    .right-side ul.list-group li.list-group-item .text-right {
+        text-align: center;
+    }
+    #personal_info .save-btn {
+        width: 100%;
+        padding: 10px 25px;
+        margin-bottom: 15px;
+    }
+    #personal_info .ok-btn, #employer .emp-info .ok-btn {
+        margin-bottom: 15px;
+    }
+    #employer .emp-info .save-btn {
+        width: 100%;
+    }
+    #family .list-group .list-group-item h4 {
+        text-align: left;
+        font-size: 15px;
+    }
+    #family a.cancel, #family a.save {
+        width: 25%;
+        margin-bottom: 10px;
+    }
+    #add-new-member .text-right {
+        text-align: center;
+    }
+    .head-title .btn-wrapper a {
+      float: left;
+      width: 100%;
+    }
+    .btn-group-vertical>.btn, .btn-group>.btn {
+        width: 100%;
+    }
+    .btn-group, .btn-group-vertical {
+        width: 100%;
+        margin-top: 20px;
+    }
+    .title-dropdown {
+        width: 100%;
+    }
+}
+@media (min-width: 768px) {
+    #family .right-side .btn.new-member {
+        padding: 10px 0px;
+    }
+    #family a.save {
+        padding: 5px 30px;
+    }
+    #family a.cancel, #family a.save {
+        margin: 0 20px;
+    }
+    .input-lg, .form-group-lg .form-control {
+        border-bottom: 0px solid #ccc;
+    }
+    .welcome-msg .btn-continue {
+        width: auto;
+    }
+    .btn-save.blue, .member-continue-btn {
+        width: auto;
+    }
+    .tab-pane .landing-row .right-side .list-group .list-group-item h4 {
+        text-align: left;
+    }
+    .right-side ul.list-group li.list-group-item .text-right {
+        text-align: right;
+    }
+    #personal_info .save-btn {
+        width: auto;
+        padding: 6px 25px;
+        margin-bottom: 15px;
+    }
+    #personal_info .ok-btn, #employer .emp-info .ok-btn {
+        margin-bottom: 0px;
+    }
+    #employer .emp-info .save-btn {
+        width: auto;
+    }
+    #family .list-group .list-group-item h4 {
+        text-align: left;
+        font-size: 18px;
+    }
+    #family a.cancel, #family a.save {
+        width: auto;
+        margin-bottom: 0px;
+    }
+    #add-new-member .text-right {
+        text-align: right;
+    }
+    .btn-group-vertical>.btn, .btn-group>.btn {
+        width: auto;
+    }
+    .btn-group, .btn-group-vertical {
+        width: auto;
+        margin-top: 0px;
+    }
+    .title-dropdown {
+        width: 50%;
+    }
+
+    #email_info .email:first-child > .first {border-right: none !important;}
+    #email_info .email:nth-of-type(2) > .first {border-left: none !important;}
+}
+@media (min-width: 992px) {
+    #family .right-side .btn.new-member {
+      padding: 10px 0px;
+    }
+    #family a.save {
+        padding: 5px 15px;
+    }
+    #family a.cancel, #family a.save {
+        margin: 0 5px;
+    }
+    .input-lg, .form-group-lg .form-control {
+        border-bottom: 0px solid #ccc;
+    }
+    .welcome-msg .btn-continue {
+        width: auto;
+    }
+    .btn-save.blue, .member-continue-btn {
+        width: auto;
+    }
+    .tab-pane .landing-row .right-side .list-group .list-group-item h4 {
+        text-align: left;
+    }
+    .right-side ul.list-group li.list-group-item .text-right {
+        text-align: right;
+    }
+    #personal_info .save-btn {
+        width: auto;
+        padding: 6px 25px;
+        margin-bottom: 0px;
+    }
+    #personal_info .ok-btn, #employer .emp-info .ok-btn {
+        margin-bottom: 0px;
+    }
+    #employer .emp-info .save-btn {
+        width: auto;
+    }
+    #family .list-group .list-group-item h4 {
+        text-align: left;
+        font-size: 18px;
+    }
+    #family a.cancel, #family a.save {
+        width: auto;
+        margin-bottom: 0px;
+    }
+    #add-new-member .text-right {
+        text-align: right;
+    }
+    .head-title .btn-wrapper a {
+        float: none;
+        width: auto;
+    }
+    .btn-group-vertical>.btn, .btn-group>.btn {
+        width: auto;
+    }
+    .btn-group, .btn-group-vertical {
+        width: auto;
+        margin-top: 0px;
+    }
+    .title-dropdown {
+        width: 40%;
+    }
+}
+@media (min-width: 1200px) {
+    #family .right-side .btn.new-member {
+        padding: 10px 0px;
+    }
+    #family a.save {
+        padding: 5px 30px;
+    }
+    #family a.cancel, #family a.save {
+        margin: 0 20px;
+    }
+    .input-lg, .form-group-lg .form-control {
+        border-bottom: 0px solid #ccc;
+    }
+    .welcome-msg .btn-continue {
+        width: auto;
+    }
+    .btn-save.blue, .member-continue-btn {
+        width: auto;
+    }
+    .tab-pane .landing-row .right-side .list-group .list-group-item h4 {
+        text-align: left;
+    }
+    .right-side ul.list-group li.list-group-item .text-right {
+        text-align: right;
+    }
+    #personal_info .save-btn {
+        width: auto;
+        padding: 6px 25px;
+        margin-bottom: 0px;
+    }
+    #personal_info .ok-btn, #employer .emp-info .ok-btn {
+        margin-bottom: 0px;
+    }
+    #employer .emp-info .save-btn {
+        width: auto;
+    }
+    #family .list-group .list-group-item h4 {
+        text-align: left;
+        font-size: 18px;
+    }
+    #family a.cancel, #family a.save {
+        width: auto;
+        margin-bottom: 0px;
+    }
+    #add-new-member .text-right {
+        text-align: right;
+    }
+    .btn-group-vertical>.btn, .btn-group>.btn {
+        width: auto;
+    }
+    .btn-group, .btn-group-vertical {
+        width: auto;
+        margin-top: 0px;
+    }
+    .title-dropdown {
+        width: 40%;
+    }
 }

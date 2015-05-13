@@ -1,8 +1,8 @@
-<h4> Benefit Groups </h4>
-<div class="row personal-info-top-row">
-  <div class="col-md-12 no-pd first employee-info">
+<h3> Benefit Groups </h3>
+<div class="row no-buffer focus_effect personal-info-row">
+  <div class="col-md-12 no-pd first">
     <div class="row top-row">
-      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <%= f.text_field :title, class: "floatlabel form-control", required: true, placeholder: 'TITLE' %>
       </div>
         <!-- Select Plan:  -->
@@ -12,12 +12,14 @@
     <div class="row bottom-row">
       <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
         <!-- Offset :  -->
-        <label class="control-label"> EFFECTIVE ON OFFSET: </label>
+        <%= f.select(:effective_on_offset, options_for_select([["0 (Zero)", 0], ["30 (Thirty)", 30], ["60 (Sixty)", 60]]), {:include_blank => "Select Effective On Offset"}, { :class => ''}) %>
+
+        <!-- <label class="control-label"> EFFECTIVE ON OFFSET: </label>
         <div class="btn-group" data-toggle="buttons">
-          <label class="btn btn-primary active"> <%= f.radio_button :effective_on_offset, 0 %> 0 (Zero) </label>
-          <label class="btn btn-primary"> <%= f.radio_button :effective_on_offset, 30 %> 30 (Thirty) </label>
-          <label class="btn btn-primary"> <%= f.radio_button :effective_on_offset, 60 %> 60 (Sixty) </label>
-        </div>
+          <label class="btn btn-primary active"> <%#= f.radio_button :effective_on_offset, 0 %> 0 (Zero) </label>
+          <label class="btn btn-primary"> <%#= f.radio_button :effective_on_offset, 30 %> 30 (Thirty) </label>
+          <label class="btn btn-primary"> <%#= f.radio_button :effective_on_offset, 60 %> 60 (Sixty) </label>
+        </div> -->
       </div>
       <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
         <%= f.text_field :premium_pct_as_int, class: "floatlabel form-control", required: true, placeholder: 'PREMIUM PERCENTAGE (>=50)' %>

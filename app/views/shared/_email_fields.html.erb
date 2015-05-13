@@ -8,9 +8,7 @@
         <% end %>
 
       <%= f.hidden_field :kind %>
-    
       <%= f.email_field :address, placeholder: "NAME@#{kind}.COM", class: "floatlabel form-control #{required}" %>
     </div>
-    <%= render 'shared/error_warning' %>
   </div>
 </div>

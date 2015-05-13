@@ -1,52 +1,6 @@
-#personal_info label, #personal_info input {
-    color: #007bc3 !important;
-}
-
 .landing.people #personal_info .employee-info .employee-info {
     border: 1px solid #005fd6;
     opacity: 0.5;
-}
-
-
-#personal_info .disabled.save-btn {
-    background: none repeat scroll 0 0 #bbb !important;
-    opacity: 1 !important;
-}
-#personal_info .save-btn {
-    margin-bottom: 0;
-    padding: 6px 25px;
-    width: auto;
-}
-#personal_info .save-btn {
-    margin-bottom: 0;
-    padding: 6px 25px;
-    width: auto;
-}
-#personal_info .save-btn {
-    margin-bottom: 15px;
-    padding: 6px 25px;
-    width: auto;
-}
-#personal_info .save-btn {
-    background: none repeat scroll 0 0 #238c00;
-    border: medium none;
-    border-radius: 2px;
-    color: #fff;
-    margin-top: 20px;
-    padding: 6px 25px;
-}
-
-#employer .emp-info label {
-    color: #007bc3 !important;
-}
-#employer .emp-info input[type="text"] {
-    padding-top: 10px;
-    color: #007bc3 !important;
-}
-
-#employer .landing_personal_tab .top-row {
-    background: none repeat scroll 0 0 #fff;
-    border-bottom: 1px solid #999;
 }
 
 #contact.landing_contact_information #dropdownMenu1 {

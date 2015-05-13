@@ -1,149 +1,25 @@
-<div class="container-fluid no-pd-left">
-  <div class="panel panel-default" style="border:none; box-shadow: none;">
-    <div class="row tab-row">
-      <ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
-        <li class="active" role="presentation">
-          <a aria-expanded="true" aria-controls="home" data-toggle="tab" role="tab" id="home-tab" href="#home">
-            <span class="home-icon" title="Home"></span>
-          </a>
-        </li>
-        <li role="presentation">
-          <a aria-expanded="true" aria-controls="profile" data-toggle="tab" role="tab" id="profile-tab" href="#profile">
-            <span class="hidden-xs">Profile</span>
-            <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Profile"></span>
-          </a>
-        </li>
-        <li role="presentation">
-          <a aria-controls="employees" data-toggle="tab" id="employees-tab" role="tab" href="#employees">
-            <span class="hidden-xs">Employees</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Employees"></span>
-          </a>
-        </li>
-        <li role="presentation">
-          <a aria-controls="benefits" data-toggle="tab" id="benefits-tab" role="tab" href="#benefits">
-            <span class="hidden-xs">Benefits</span>
-            <span class="glyphicon glyphicon-file hidden-md hidden-sm hidden-lg" title="Benefits"></span>
-          </a>
-        </li>
-        <li role="presentation">
-          <a aria-controls="documents" data-toggle="tab" id="documents-tab" role="tab" href="#documents">
-            <span class="hidden-xs">Documents</span>
-            <span class="glyphicon glyphicon-file hidden-md hidden-sm hidden-lg" title="Documents"></span>
-          </a>
-        </li>
-        <li role="presentation">
-          <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox">
-            <span class="hidden-xs">Inbox</span>
-            <span class="glyphicon glyphicon-envelope hidden-md hidden-sm hidden-lg" title="Inbox"></span>
-            <span class="badge">1</span>
-          </a>
-        </li>
-      </ul>
+<%= render 'menu' %>
 
-
-      <div class="tab-content" id="myTabContent">
-        <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
-          <div class="col-md-12 col-sm-12 col-xs-12">
-
-            <div class="row landing-row">
-              <div class="col-md-6 col-sm-6 col-xs-12 left-side">
-                <p class="head">
-                  <span><%= @employer_profile.legal_name %></span>
-                  <span></span>
-                </p>
-                <% @employer_profile.organization.office_locations.each do |loc| %>
-                  <address>
-                    <%= loc.address.to_html %>
-                    <%= loc.phone.to_s %>
-                  </address>
-                <% end %>
-              </div>
-
-              <div class="col-md-6 col-sm-6 col-xs-12 right-side">
-                <p class="head">
-                  <span>Enrollment</span>
-                  <span></span>
-                </p>
-                <dl class="dl-horizontal">
-                  <% if @current_plan_year.present? %>
-                  <dt>Plan Year</dt>
-                    <dd><%= @current_plan_year.start_on.to_date.year %></dd>
-                    <dt>Plan Year Start</dt>
-                    <dd><%= format_date @current_plan_year.start_on %></dd>
-                    <dt>Open Enroll Start/End</dt>
-                      <dd>
-                        <%= format_date @current_plan_year.open_enrollment_start_on %> /
-                        <%= format_date @current_plan_year.open_enrollment_end_on %>
-                      </dd>
-                    <dt>Full Time Employees</dt>
-                    <dd> <%= @current_plan_year.fte_count %></dd>
-                    <dt>Participation Pct</dt>
-                    <dd>100%</dd>
-                    <dt><%= @current_plan_year.employee_participation_percent %></dt>
-                  <% else %>
-                   No Plan Years Found
-                  <% end %>
-                </dl>
-              </div>
-            </div>
-
-            <div class="row landing-row">
-              <div class="col-md-6 col-sm-6 col-xs-12 left-side">
-                <p class="head">
-                  <span>Company Details</span>
-                  <span></span>
-                </p>
-                <p>
-                  FEIN <%= number_to_obscured_fein @employer_profile.fein %><br/>
-                  Entity Kind <%= @employer_profile.entity_kind.to_s.titleize %>
-                </p>
-              </div>
-
-              <div class="col-md-6 col-sm-6 col-xs-12 right-side">
-                <p class="head">
-                  <span>Broker</span>
-                  <span></span>
-                </p>
-              </div>
-            </div>
-          </div>
+<div class="panel panel-default">
+  <div class="tab-row">
+    <div class="tab-content" id="myTabContent">
+      <%= render 'employers/employer_profiles/my_account/home_tab' %>
+      <%= render 'employers/employer_profiles/my_account/profile_tab' %>
+      <%= render partial: "employers/employer_profiles/my_account/employee_families" %>
+      <%= render partial: "employers/employer_profiles/my_account/benefits" %>
+      
+      <div aria-labelledby="documents-tab" id="documents" class="tab-pane" role="tabpanel">
+        <div class="col-md-10 col-sm-12">
+          <%#= render partial: "employers/employer_profiles/my_account/documents" %>
         </div>
-
-        <div aria-labelledby="profile-tab" id="profile" class="tab-pane" role="tabpanel">
-          <div class="submenu">
-            <ul role="tablist" class="nav nav-tabs" id="myTab1">
-              <li class="active" role="presentation"><a aria-expanded="true" aria-controls="personal" data-toggle="tab" role="tab" id="personal-tab" href="#personal">Company Information</a></li>
-              <li role="presentation"><a aria-controls="contact" data-toggle="tab" id="contact-tab" role="tab" href="#contact">Contacts</a></li>
-              <li role="presentation"><a aria-controls="employer" data-toggle="tab" id="employer-tab" role="tab" href="#employer">Broker</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <div aria-labelledby="employees-tab" id="employees" class="tab-pane" role="tabpanel">
-          <div class="col-md-12 col-sm-12">
-            <%= render partial: "employers/employer_profiles/my_account/employee_families" %>
-          </div>
-        </div>
-
-        <div aria-labelledby="benefits-tab" id="benefits" class="tab-pane" role="tabpanel">
-          <div class="col-md-10 col-sm-12">
-            <%= render partial: "employers/employer_profiles/my_account/benefits" %>
-          </div>
-        </div>
-
-        <div aria-labelledby="documents-tab" id="documents" class="tab-pane" role="tabpanel">
-          <div class="col-md-10 col-sm-12">
-            <%#= render partial: "employers/employer_profiles/my_account/documents" %>
-          </div>
-        </div>
-
-        <div aria-labelledby="inbox-tab" id="inbox" class="tab-pane" role="tabpanel">
-          <div class="col-md-10 col-sm-12">
-            <%#= render partial: "employers/employer_profiles/my_account/inbox" %>
-          </div>
-        </div>
-
       </div>
+
+      <div aria-labelledby="inbox-tab" id="inbox" class="tab-pane" role="tabpanel">
+        <div class="col-md-10 col-sm-12">
+          <%#= render partial: "employers/employer_profiles/my_account/inbox" %>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

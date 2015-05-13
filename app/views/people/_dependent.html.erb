@@ -1,5 +1,5 @@
 <li id="add_member_list_<%= dependent.id %>" class="dependent_list">
-  <div id="add_info_<%= dependent.id %>" class="focus_effect row personal-info-row">
+  <div id="add_info_<%= dependent.id %>" class="focus_effect personal-info-row">
     <%= form_for dependent, :remote => true, method: :post,:url => {action: "save_dependents"} do |f| %>
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd first">
         <div class="dependent_notice_div_<%= dependent.id%>"></div>
@@ -79,8 +79,8 @@
 
         <div class="clearfix"></div>
         <div id="add_info_buttons_<%= dependent.id %>" class="hidden" style="padding-top: 20px;">
-          <%= link_to "Cancel", 'javascript:void(0)', class: 'btn btn-red', id: 'cancel_member' %>
-          <%= f.submit 'Confirm Member', class: "btn btn-save pull-right"  %>
+          <%= link_to "Cancel", 'javascript:void(0)', class: 'btn btn-danger', id: 'cancel_member' %>
+          <%= f.submit 'Confirm Member', class: "btn btn-success pull-right"  %>
         </div>
       <% end %>
   </div>
