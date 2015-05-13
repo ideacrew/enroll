@@ -82,7 +82,7 @@ When(/^I enter the identifying info of my existing person$/) do
   @browser.text_field(name: "person[first_name]").set("Soren")
   @browser.text_field(name: "person[last_name]").set("White")
   @browser.text_field(name: "person[date_of_birth]").set("08/13/1979")
-  @browser.p(:text=> /Personal Information/).click
+  @browser.label(:text=> /FIRST NAME/).click
   @browser.text_field(name: "person[ssn]").set("670991234")
   screenshot("information_entered")
   @browser.input(value: "Search Employers").wait_until_present
@@ -110,9 +110,9 @@ When(/^I complete the matched employee form$/) do
 end
 
 Then(/^I should see the dependents page$/) do
-  @browser.p(text: /Household Information/).wait_until_present
+  @browser.a(text: /Add Member/).wait_until_present
   screenshot("dependents_page")
-  expect(@browser.p(text: /Household Information/).visible?).to be_truthy
+  expect(@browser.a(text: /Add Member/).visible?).to be_truthy
 end
 
 When(/^I click edit on baby Soren$/) do
@@ -170,9 +170,9 @@ When(/^I click continue on the group selection page$/) do
 end
 
 Then(/^I should see the plan shopping welcome page$/) do
-  @browser.p(text: /Select a Plan/).wait_until_present
+  @browser.h3(text: /Select a Plan/).wait_until_present
   screenshot("plan_shopping_welcome")
-  expect(@browser.p(text: /Select a Plan/).visible?).to be_truthy
+  expect(@browser.h3(text: /Select a Plan/).visible?).to be_truthy
 end
 
 When(/^I click continue on the plan shopping welcome page$/) do
