@@ -13,8 +13,7 @@ class PremiumStatement
   field :next_premium_amount, type: Money
 
   field :aasm_state, type: String
-  field :prior_aasm_state, type: String
-  field :aasm_change_on, type: Date
+  field :last_aasm_state, type: String
 
   validates_presence_of :effective_on
 
@@ -22,9 +21,14 @@ class PremiumStatement
   end
 
   def persist_state
-    self.prior_aasm_state = aasm_state
+    self.last_aasm_state = aasm.from_state
   end
 
+  def revert_state
+    self.aasm_state = last_aasm_state unless last_aasm_state.blank?
+  end
+
+  ## TODO -- reconcile the need for history via embeds_many with the state machine functionality
   aasm do
     state :binder_pending, initial: true  # Initial open enrollment period closed, first premium payment not received/processed
     state :binder_paid
@@ -48,13 +52,16 @@ class PremiumStatement
     # Premium payment credit received and allocated to account
     event :advance_coverage_period do
       transitions from: :binder_pending, to: :binder_paid
-      transitions from: [:binder_paid, :current, :overdue, :late, :suspended, :terminated], to: :current
+      transitions from: [:binder_paid, :current, :overdue, :late, :suspended, :terminated], to: :current, :after => :persist_state
     end
 
     # Premium payment reversed and account debited
-    event :reverse_coverage_period do
+    event :reverse_coverage_period, :after => :revert_state do
       transitions from: :binder_paid, to: :canceled
-      transitions from: [:current, :overdue, :late, :suspended, :terminated], to: [:overdue, :late, :suspended, :terminated]
+      transitions from: :current, to: :overdue
+      transitions from: :overdue, to: :late
+      transitions from: :late, to: :suspended
+      transitions from: :suspended, to: :terminated
     end
 
     event :cancel_coverage do

@@ -49,14 +49,25 @@ describe EmployerCensus::BenefitGroupAssignment, "given a benefit group" do
     describe "and a hire date before the benefit group" do
       let(:hired_on_date) { Date.new(2014, 6, 5) }
 
-      it_should_behave_like "an assignment that starts when the group starts"
-      it_should_behave_like "an assignment that ends when the group ends"
+      it "an assignment that starts when the group starts" do
+        expect(benefit_group_assignment.start_on).to eq benefit_group_start
+      end
+
+      it "an assignment that ends when the group ends" do
+        expect(benefit_group_assignment.end_on).to eq benefit_group_end
+      end
     end
 
     describe "and a hire date during the benefit group" do
       let(:hired_on_date) { Date.new(2015, 6, 5) }
-      it_should_behave_like "an assignment that starts when the employee is hired"
-      it_should_behave_like "an assignment that ends when the group ends"
+
+      it "an assignment that starts when the employee is hired" do
+        expect(benefit_group_assignment.start_on).to eq hired_on_date 
+      end
+
+      it "an assignment that ends when the group ends" do
+        expect(benefit_group_assignment.end_on).to eq benefit_group_end
+      end
     end
   end
 
@@ -65,14 +76,26 @@ describe EmployerCensus::BenefitGroupAssignment, "given a benefit group" do
 
     describe "and a hire date before the benefit group" do
       let(:hired_on_date) { Date.new(2014, 6, 5) }
-      it_should_behave_like "an assignment that starts when the group starts"
-      it_should_behave_like "an assignment that ends when the group ends"
+
+      it "an assignment that starts when the group starts" do
+        expect(benefit_group_assignment.start_on).to eq benefit_group_start
+      end
+
+      it "an assignment that ends when the group ends" do
+        expect(benefit_group_assignment.end_on).to eq benefit_group_end
+      end
     end
 
     describe "and a hire date during the benefit group" do
       let(:hired_on_date) { Date.new(2015, 6, 5) }
-      it_should_behave_like "an assignment that starts when the employee is hired"
-      it_should_behave_like "an assignment that ends when the group ends"
+
+      it "an assignment that starts when the employee is hired" do
+        expect(benefit_group_assignment.start_on).to eq hired_on_date
+      end
+
+      it "an assignment that ends when the group ends" do
+        expect(benefit_group_assignment.end_on).to eq benefit_group_end
+      end
     end
   end
 
@@ -81,14 +104,26 @@ describe EmployerCensus::BenefitGroupAssignment, "given a benefit group" do
 
     describe "and a hire date before the benefit group" do
       let(:hired_on_date) { Date.new(2014, 6, 5) }
-      it_should_behave_like "an assignment that starts when the group starts"
-      it_should_behave_like "an assignment that ends when the employee is terminated"
+
+      it "an assignment that starts when the group starts" do
+        expect(benefit_group_assignment.start_on).to eq benefit_group_start
+      end
+
+      it "an assignment that ends when the employee is terminated" do
+        expect(benefit_group_assignment.end_on).to eq terminated_on_date
+      end
     end
 
     describe "and a hire date during the benefit group" do
       let(:hired_on_date) { Date.new(2015, 6, 5) }
-      it_should_behave_like "an assignment that starts when the employee is hired"
-      it_should_behave_like "an assignment that ends when the employee is terminated"
+
+      it "an assignment that starts when the employee is hired" do
+        expect(benefit_group_assignment.start_on).to eq hired_on_date
+      end
+
+      it "an assignment that ends when the employee is terminated" do
+        expect(benefit_group_assignment.end_on).to eq terminated_on_date
+      end
     end
   end
 

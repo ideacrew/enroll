@@ -5,6 +5,7 @@
       <% census_employee = @family.census_employee %>
       <% dependents = @family.census_dependents %>
       <% address = census_employee.address %>
+      <% benefit_group_assignments = @family.benefit_group_assignments %>
 
       <h2> Family Details </h2>
 
@@ -54,10 +55,29 @@
         </div>
       </div>
 
-      <br>
-      <br>
+      <% if benefit_group_assignments.present? %>
+        <table border = "1", width= "400">
+          <tr>
+            <th> Name </th>
+            <th> start on </th>
+            <th> end on </th>
+            <th> status </th>
+          </tr>
+
+          <% benefit_group_assignments.each do |bga| %>
+            <tr>
+              <td> <%= bga.benefit_group.try(:title) %> </td>
+              <td> <%= format_date bga.start_on %> </td>
+              <td> <%= format_date bga.end_on %> </td>
+              <td> <%= bga.is_active %> </td>
+            </tr>
+          <% end %>
+        </table>
+      <% else %>
+        No Benefit Group Assignments
+      <% end %>
 
       <%= link_to "< Back", employers_employer_profile_path(@employer_profile), class: 'btn btn-primary' %>
     </div>
   </div>
-</div
+</div>
