@@ -90,8 +90,28 @@ class EmployerCensus::EmployeeFamily
     self.employer_profile
   end
 
+  def plan_year=(new_plan_year)
+    self.plan_year_id = new_plan_year._id unless new_plan_year.blank?
+  end
+
+  def plan_year
+    return if plan_year_id.blank?
+    parent.plan_years.find(self.plan_year_id)
+  end
+
+  def benefit_group=(new_benefit_group)
+    if new_benefit_group.present?
+      self.benefit_group_id = new_benefit_group._id
+      self.plan_year = new_benefit_group.plan_year
+    end
+  end
+
+  def benefit_group
+    parent.plan_years.find(plan_year_id).benefit_groups.find(benefit_group_id)
+  end
+
   def link_employee_role(employee_role, linked_at = DateTime.current)
-    raise EmployeeFamilyLinkError, "already linked to an employee role" if is_linked?
+    # raise EmployeeFamilyLinkError, "already linked to an employee role" if is_linked?
     raise EmployeeFamilyLinkError, "invalid to link a terminated employee" if is_terminated?
     raise EmployeeFamilyLinkError, "must assign a benefit group" unless active_benefit_group_assignment.present?
 

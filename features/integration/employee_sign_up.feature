@@ -22,11 +22,11 @@ Feature: Employee Sign Up
     Then I should see the edit dependent form
     When I click delete on baby Soren
     Then I should see 2 dependents
-#    When I click Add Member
-#    Then I should see the new dependent form
-#    When I enter the identifying info of my daughter
-#    When I click confirm member
-#    Then I should see 3 dependents
+    When I click Add Member
+    Then I should see the new dependent form
+    When I enter the identifying info of Sorens daughter
+    When I click confirm member
+    Then I should see 3 dependents
     When I click continue on the dependents page
     Then I should see the group selection page
     When I click continue on the group selection page

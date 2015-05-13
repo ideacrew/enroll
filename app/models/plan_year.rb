@@ -37,6 +37,10 @@ class PlanYear
     parent.employee_families.where(:plan_year_id => self.id)
   end
 
+  def editable?
+    !benefit_groups.any?(&:assigned?)
+  end
+
   def employee_participation_percent
   end
 
