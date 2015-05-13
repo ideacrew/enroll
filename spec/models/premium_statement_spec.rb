@@ -16,7 +16,7 @@ describe PremiumStatement, dbclean: :after_each do
 
 
   context ".new" do
-    context "with only effective on parameter" do
+    context "with only 'effective on' parameter" do
       let(:params) {{effective_on: Date.current}}
 
       it "should raise" do
@@ -131,6 +131,26 @@ describe PremiumStatement, dbclean: :after_each do
 
               it "should transition to suspended status" do
                 expect(premium_statement.suspended?).to be_truthy
+              end
+
+              context "and a premium in arrears is paid-in-full" do
+                before do
+                  premium_statement.advance_coverage_period
+                end
+
+                it "should transition to current status" do
+                  expect(premium_statement.current?).to be_truthy
+                end
+
+                context "but the premium payment NSFs" do
+                  before do
+                    premium_statement.reverse_coverage_period
+                  end
+
+                  it "should revert to suspended status" do 
+                    expect(premium_statement.aasm_state).to eq "suspended"
+                  end
+                end
               end
 
               context "and a fourth (final) billing period advances without a premium payment" do
