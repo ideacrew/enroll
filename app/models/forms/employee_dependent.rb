@@ -37,7 +37,7 @@ module Forms
       person = Person.new(extract_person_params)
       return false unless try_create_person(person)
       family_member = family.relate_new_member(person, self.relationship)
-      family_member.save!
+      family.save!
       self.id = family_member.id
       true
     end
