@@ -72,6 +72,8 @@ Rails.application.routes.draw do
         get 'delink'
         get 'terminate'
         get 'rehire'
+        get 'benefit_group', on: :member
+        patch 'assignment_benefit_group', on: :member
       end
     end
   end
@@ -89,7 +91,7 @@ Rails.application.routes.draw do
       # post 'dependent_details'
       post 'add_dependents' # Still required on my account - REMOVE
       # get 'dependent_details'
-      # post 'save_dependents'
+      post 'save_dependents'
       delete 'remove_dependents' # Still required on my account - REMOVE
       get 'select_plan'
       post 'select_plan'

@@ -2,7 +2,7 @@ class Employers::FamilyController < ApplicationController
 
   before_action :find_employer
   before_action :set_family_id, only: [:delink, :terminate, :rehire]
-  before_action :find_family, only: [:destroy, :show, :edit, :update]
+  before_action :find_family, only: [:destroy, :show, :edit, :update, :benefit_group, :assignment_benefit_group]
   before_action :check_plan_year, only: [:new]
 
   def new
@@ -24,15 +24,10 @@ class Employers::FamilyController < ApplicationController
 
   def edit
     @family.census_employee.build_address unless @family.census_employee.address.present?
-    #@family.census_dependents.build unless @family.census_dependents.present?
-    @family.benefit_group_assignments.build unless @family.benefit_group_assignments.present?
   end
 
   def update
     new_params = census_family_params
-    new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new
-    new_benefit_group_assignment.attributes = new_params[:benefit_group_assignments_attributes]["0"]
-    @family.add_benefit_group_assignment(new_benefit_group_assignment)
     if @family.update_attributes(new_params)
       flash[:notice] = "Employer Census Family is successfully updated."
       redirect_to employers_employer_profile_path(@employer_profile)
@@ -105,7 +100,30 @@ class Employers::FamilyController < ApplicationController
   def show
   end
 
+  def benefit_group
+    @family.benefit_group_assignments.build unless @family.benefit_group_assignments.present?
+  end
+
+  def assignment_benefit_group
+    benefit_group = @employer_profile.plan_years.first.benefit_groups.find_by(id: benefit_group_id)
+    new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new_from_group_and_roster_family(benefit_group, @family)
+
+    if @family.active_benefit_group_assignment.try(:benefit_group_id) != new_benefit_group_assignment.benefit_group_id
+      @family.add_benefit_group_assignment(new_benefit_group_assignment)
+    end
+
+    if @family.save
+      flash[:notice] = "Assignment benefit group is successfully."
+      redirect_to employers_employer_profile_path(@employer_profile)
+    else
+      render action: "benefit_group"
+    end
+  end
+
   private
+  def benefit_group_id 
+    census_family_params[:benefit_group_assignments_attributes]["0"][:benefit_group_id]
+  end
 
   def census_family_params
     new_params = format_date_params(params)

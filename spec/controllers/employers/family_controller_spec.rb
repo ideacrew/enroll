@@ -60,7 +60,6 @@ RSpec.describe Employers::FamilyController do
 
   describe "PUT update" do
     before do
-      pending
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(EmployerCensus::EmployeeFamily).to receive(:find).and_return(family)
@@ -171,6 +170,43 @@ RSpec.describe Employers::FamilyController do
           expect(flash[:error]).to eq "Error during rehire."
         end
       end
+    end
+  end
+
+  describe "GET benefit_group" do
+    it "should be render benefit_group template" do
+      sign_in
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(EmployerCensus::EmployeeFamily).to receive(:find).and_return(family)
+      post :benefit_group, :id => family.id, :employer_profile_id => employer_profile_id, employer_census_employee_family: {}
+      expect(response).to render_template("benefit_group")
+    end
+  end
+
+  describe "PUT assignment_benefit_group" do
+    let(:benefit_group) {FactoryGirl.create(:benefit_group)}
+    let(:plan_year) {FactoryGirl.create(:plan_year)}
+    before do
+      sign_in
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(employer_profile).to receive(:plan_years).and_return([plan_year])
+      plan_year.benefit_groups << benefit_group
+
+      allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
+      allow(EmployerCensus::EmployeeFamily).to receive(:find).and_return(family)
+      allow(controller).to receive(:census_family_params).and_return({})
+    end
+
+    it "should be redirect when valid" do
+      allow(family).to receive(:save).and_return(true)
+      post :assignment_benefit_group, :id => family.id, :employer_profile_id => employer_profile_id, employer_census_employee_family: {}
+      expect(response).to be_redirect
+    end
+
+    it "should be render benefit_group template when invalid" do
+      allow(family).to receive(:save).and_return(false)
+      post :assignment_benefit_group, :id => family.id, :employer_profile_id => employer_profile_id, employer_census_employee_family: {}
+      expect(response).to render_template("benefit_group")
     end
   end
 end

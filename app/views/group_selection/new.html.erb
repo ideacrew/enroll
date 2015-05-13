@@ -1,10 +1,9 @@
 <div class="container-fluid no-pd-left">
   <div class="panel panel-default">
     <div class="panel-body left">
-      <div class="col-md-10 col-sm-12">
-        <div class="col-md-10 col-sm-12">
-          <p class="information row">Group Selection</p>
-          <p class="information row">Who would you like to cover?</p>
+        <div class="col-md-9 col-sm-9 col-xs-12">
+          <h3>Group Selection</h3>
+          <h3>Who would you like to cover?</h3>
           <%= form_tag(:group_selection_create) do %>
             <%= hidden_field_tag(:person_id, @person.id) %>
             <%= hidden_field_tag(:employee_role_id, @employee_role.id) %>
@@ -15,15 +14,15 @@
                 <%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Date of Birth: #{family_member.dob})") %>
               </div>
             <% end %>
-            <%= submit_tag "Continue", class: 'btn btn-green pull-left' %>
+            <br>
+            <%= submit_tag "Continue", class: 'btn btn-success pull-left' %>
           <% end %>
           &nbsp;&nbsp;
-          <%= link_to 'My Account', person_my_account_path(current_user.person), class: 'btn btn-green' %>
+          <%= link_to 'My Account', person_my_account_path(current_user.person), class: 'btn btn-success' %>
         </div>
-        <div class="clear-fix"></div>
 
-        <div class="col-md-2 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
-          <%= link_to "Save & Exit", home_consumer_profiles_path, { :class => "btn btn-save" } %>
+        <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
+          <%= link_to "Save & Exit", home_consumer_profiles_path, { :class => "btn btn-primary" } %>
           <input type="hidden" id="initial_progress" value="60">
                     <div style="display: none;" id="sup-progress" data-signup-progress="6"></div>
           <%= render 'shared/signup_progress' %>

@@ -1,0 +1,94 @@
+<div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
+  <div class="container">
+    <div class="row">
+      <div class="landing-row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="col-md-6 col-sm-6 col-xs-12 left-side">
+            <div class="row">
+              <p class="head">
+                <span><%= @employer_profile.legal_name %></span>
+                <span></span>
+              </p>
+
+              <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
+                <% @employer_profile.organization.office_locations.each do |loc| %>
+                  <li class="list-group-item">
+                    <div class="row no-buffer">
+                      <div class="col-md-12">
+                          <%= loc.address.to_html %>
+                          <%= loc.phone.to_s %>
+                      </div>
+                    </div>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+
+            <div class="row bottom">
+              <p class="head">
+                <span>Company Details</span>
+                <span></span>
+              </p>
+            
+              <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
+                <li class="list-group-item">
+                  <div class="row no-buffer">
+                    <div class="col-md-12">
+                      FEIN <%= number_to_obscured_fein @employer_profile.fein %><br/>
+                      Entity Kind <%= @employer_profile.entity_kind.to_s.titleize %>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-sm-6 col-xs-12 right-side">
+            <div class="row">
+              <p class="head">
+                <span>Enrollment</span>
+                <span></span>
+              </p>
+
+              <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
+                <% if @current_plan_year.present? %>
+                  <li class="list-group-item">
+                    <div class="row no-buffer">
+                      <div class="col-md-12">
+                        <dl class="dl-horizontal">
+                          <dt>Plan Year</dt>
+                          <dd><%= @current_plan_year.start_on.to_date.year %></dd>
+                          <dt>Plan Year Start</dt>
+                          <dd><%= format_date @current_plan_year.start_on %></dd>
+                          <dt>Open Enroll Start/End</dt>
+                            <dd>
+                              <%= format_date @current_plan_year.open_enrollment_start_on %> / 
+                              <%= format_date @current_plan_year.open_enrollment_end_on %>
+                            </dd>
+                          <dt>Full Time Employees</dt>
+                          <dd> <%= @current_plan_year.fte_count %></dd>
+                          <dt>Participation Pct</dt>
+                          <dd>100%</dd>
+                          <dt><%= @current_plan_year.employee_participation_percent %></dt>
+                        </dl>
+                      </div>
+                    </div>
+                  </li>
+                <% else %>
+                 <li>No Plan Years Found</li>
+                <% end %>
+              </ul>
+            </div>
+
+            <div class="row bottom">
+              <p class="head">
+                <span>Broker</span>
+                <span></span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -6,7 +6,7 @@
     <br/>
     <ul class="list-group">
       <% if @family_members.present? %>
-        <% @family_members.each do |dependent| %>
+        <% @family_members.reject(&:is_primary_applicant).each do |dependent| %>
           <li class="list-group-item family_members_list" id="family_member_<%= dependent.id %>">
             <div class="row">
               <div class="col-md-10 col-sm-8 col-xs-8">
@@ -21,15 +21,9 @@
               <div id="remove_confirm" class="hidden"></div>
             </div>
             <div class="row">
-              <ul class="" id="dependent_ul">
-                  <% @family.family_members.reject(&:is_primary_applicant).each do |dependent| %>
-                    <%= render "people/dependent", dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
-                  <% end %>
+              <ul id="dependent_ul">
+                <%= render 'people/landing_pages/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
               </ul>
-              <!-- <ul id="dependent_ul">
-                <%#= render 'people/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
-                <%#= render 'people/landing_pages/add_family_member_form', dependent: dependent, employer: @employer_profile.organization, person: @person, employee: @person.employee_roles.first %>
-              </ul> -->
             </div>
 
             <div class="dependent_notice_div_<%= dependent.id %>"></div>
@@ -39,6 +33,6 @@
     </ul>
     <br>
     <% add_member_url = add_dependents_people_path(person_id: @person.id, organization_id: @employer_profile.organization.id, employee_id: @person.employee_roles.first.id) %>
-    <%= link_to "New Member", add_member_url, method: :post, class: 'btn btn-blue add_member', :remote => true %>
+    <%= link_to "New Member", add_member_url, method: :post, class: 'btn btn-primary add_member', :remote => true %>
   </div>
 </div>

@@ -1,7 +1,8 @@
 <li id="<%= employee_dependent_form_id(dependent) %>" class="dependent_list">
+  
   <%= render 'shared/error_messages', :object => dependent %>
   
-  <div id="add_info_<%= dependent.id %>" class="focus_effect row personal-info-row">
+  <div id="add_info_<%= dependent.id %>" class="focus_effect personal-info-row">
 	  <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd first">
         <div class="dependent_notice_div_<%= dependent.id%>"></div>
@@ -79,9 +80,9 @@
 		<% if !dependent.persisted? %>
 			<a href="#" class="btn btn-red remove-new-employee-dependent" data-target="#new_employee_dependent_form">Cancel</a>
 		<% else %>
-			<%= link_to "Cancel", consumer_employee_dependent_path(dependent), class: 'btn btn-red', :remote => true %>
+			<%= link_to "Cancel", consumer_employee_dependent_path(dependent), class: 'btn btn-danger', :remote => true %>
 		<% end %>
-		<%= f.submit 'Confirm Member', class: "btn btn-save pull-right"  %>
+		<%= f.submit 'Confirm Member', class: "btn btn-primary pull-right"  %>
 	</div>
 <% end %>
   </div>

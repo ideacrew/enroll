@@ -104,10 +104,13 @@ describe EmployerCensus::EmployeeFamily, 'class methods', dbclean: :after_each d
       end
 
       context "and employee_role is linked to census_family" do
+        let(:start_on) { Date.current - 45.days }
+        let(:end_on) { Date.current }
         let(:benefit_group)             { FactoryGirl.create(:benefit_group)}
         let(:benefit_group_assignment)  { EmployerCensus::BenefitGroupAssignment.new(
                                             benefit_group: benefit_group, 
-                                            start_on: Date.current - 45.days
+                                            start_on: start_on,
+                                            end_on: end_on
                                           ) }
         let(:linked_employee_family) do
           lf = employee_family
@@ -165,14 +168,16 @@ describe EmployerCensus::EmployeeFamily, 'that exists for an employer and is alr
   let(:benefit_group_1)             { FactoryGirl.build(:benefit_group)}
   let(:benefit_group_assignment_1)  { EmployerCensus::BenefitGroupAssignment.new(
     benefit_group: benefit_group_1, 
-    start_on: Date.current - 45.days
+    start_on: start_on,
+    end_on: start_on + 10.days
   ) }
-        let(:start_on)                    { Date.current - 5.days }
-        let(:end_on)                      { start_on - 1.day }
+        let(:start_on)                    { Date.current - 45.days }
+        let(:end_on)                      { start_on + 3.days }
         let(:benefit_group_2)             { FactoryGirl.build(:benefit_group)}
         let(:benefit_group_assignment_2)  { EmployerCensus::BenefitGroupAssignment.new(
           benefit_group: benefit_group_2, 
-          start_on: start_on
+          start_on: start_on + 4.days,
+          end_on: end_on
         ) }
 
   before :each do

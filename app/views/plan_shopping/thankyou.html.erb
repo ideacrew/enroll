@@ -1,27 +1,28 @@
-<div class="employee-welocome col-md-12">
-  <div class="row welcome-msg">
-    <div class="col-md-9 col-sm-11 col-xs-12 no-pd">
-      <div class="row text-center" style='padding:20px;'>
-        <div class="col-md-12 col-sm-12 no-pd col-xs-12 text-left">
-		<h3><strong>Confirm Your Selection</strong></h3>
-		<p>Below is your current plan selection.  Clicking confirm will enroll you and your family.</p>
-		<h4>You will not be enrolled until you confirm your plan selection.</h4>
-		<h4><%= @plan.name %></h4>
-		<h4>Starting on: <%= @enrollment.effective_on.strftime("%m/%d/%Y") %></h4>
+<div class="container">
+  <div class="employee-welocome">
+    <div class="col-md-9 col-sm-11 col-xs-12">
+      <div class="col-md-12 col-sm-12 no-pd col-xs-12">
 
-          <table class="table table-bordered table-hover" style="max-width:900px;">
+          <h3><strong>Confirm Your Selection</strong></h3>
+          <h4>Below is your current plan selection.  Clicking confirm will enroll you and your family.</h4>
+          <h4>You will not be enrolled until you confirm your plan selection.</h4>
+          <h4><%= @plan.name %></h4>
+          <h4>Starting on: <%= @enrollment.effective_on.strftime("%m/%d/%Y") %></h4>
+
+          <table class="table table-striped">
             <thead>
-	       <tr style="border-bottom: 2px solid #dddddd;">
+              <tr>
                 <th>Name</th>
                 <th>Gender</th>
                 <th>Birthday</th>
                 <th>Premium</th>
               </tr>
             </thead>
+
             <tbody>
               <% total_cost = 0 %>
               <% @enrollment.hbx_enrollment_members.each do |member| %>
-                <tr style='border-bottom:1px solid #ddd;'>
+                <tr>
                   <td><%= member.person.full_name %></td>
                   <td><%= member.person.try(:gender) %></td>
                   <td><%= member.person.try(:dob).strftime("%m/%d/%Y") %></td>
@@ -30,50 +31,44 @@
                 </tr>
               <% end %>
               <tr>
-		<td colspan='2'>&nbsp;</td>
-		<td>Total</td>
+                <td colspan='3' style='text-align: center;'>Total</td>
                 <td><%= number_to_currency(total_cost) %></td>
               </tr>
-            <tr>
-		    <td colspan='2'>&nbsp;</td>
-		    <td>Employer Contribution</td>
-              <td>(-<%= number_to_currency(@plan.total_employer_contribution) %>)</td>
-            </tr>
-	    <tr style='font-size:20px'>
-		    <td colspan='2'>&nbsp;</td>
-              <td><strong>You Pay</strong></td>
-              <td><strong>
-                <%= number_to_currency(@plan.total_employee_cost || 0) %>
-              </strong></td>
-            </tr>
             </tbody>
           </table>
-
-          <span style="font-size: 14px; line-height: 130%;">
-            DC Health
-            Link<br />
-            PHONE:
-            855-532-5465
-            (855-532-LINK)<br />
-
-            TTY/TDD
-            711-1-532-5465<br />
-
-            Monday-Saturday
-            8:00am -
-            8:00pm<br />
-            E-Mail:
-            info@dchealthlink.com
-          </span>
         </div>
-	<%= link_to "Confirm", checkout_plan_shopping_path(:hbx_enrollment_id => @enrollment.id, :plan_id => @plan.id), :class => "btn btn-green btn-continue", :method => :post %>
-      </div>
+
+        <table class='table table-striped'>
+          <tr>
+            <td>Additionally your employer pays</td>
+            <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
+          </tr>
+          <tr>
+            <td>Your coverage start date</td>
+            <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
+          </tr>
+          <tr style='font-size:20px'>
+            <td><strong>You pay</strong></td>
+            <td><strong>
+              <%= number_to_currency(@plan.total_employee_cost || 0) %>
+            </strong></td>
+          </tr>
+        </table>
+
+        <span style="font-size: 14px; line-height: 130%;">
+          DC Health Link<br />
+          PHONE: 855-532-5465 (855-532-LINK)<br />
+          TTY/TDD 711-1-532-5465<br />
+          Monday-Saturday 8:00am - 8:00pm<br />
+          E-Mail: info@dchealthlink.com</span><br />
+        </span><br />
+        <%= link_to "Confirm", checkout_plan_shopping_path(:hbx_enrollment_id => @enrollment.id, :plan_id => @plan.id), :class => "btn btn-success btn-continue", :method => :post %>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
-	    <%= link_to "Save & Exit", home_consumer_profiles_path(@person), { :class => "btn btn-save" } %>
+	    <%= link_to "Save & Exit", home_consumer_profiles_path(@person), { :class => "btn btn-primary" } %>
             <div style="display: none;" id="sup-progress" data-signup-progress="8"></div>
 	    <input type="hidden" id="initial_progress" value="85">
 	    <%= render 'shared/signup_progress' %>
     </div>
   </div>
-</div>
+</div><br>
