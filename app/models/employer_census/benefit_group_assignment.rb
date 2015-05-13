@@ -20,6 +20,10 @@ class EmployerCensus::BenefitGroupAssignment
     )
   end
 
+  def overlaps?(other_assignment)
+    (start_on..end_on).overlaps?((other_assignment.start_on..other_assignment.end_on))
+  end
+
   def benefit_group=(new_benefit_group)
     raise ArgumentError("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
     self.benefit_group_id = new_benefit_group._id

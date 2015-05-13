@@ -46,9 +46,11 @@ class EmployerCensus::EmployeeFamily
 
   def add_benefit_group_assignment(new_benefit_group_assignment)
     raise ArgumentError, "expected valid BenefitGroupAssignment" unless new_benefit_group_assignment.valid?
-    if active_benefit_group_assignment.present?
-      retired_assignment = active_benefit_group_assignment
-      retired_assignment.end_on = new_benefit_group_assignment.start_on - 1.day
+    retired_assignment = benefit_group_assignments.detect do |frank|
+      frank.overlaps?(new_benefit_group_assignment)
+    end
+    if retired_assignment
+      retired_assignment.end_on = [new_benefit_group_assignment.start_on - 1.day, retired_assignment.start_on].max
       retired_assignment.is_active = false
     end
 
