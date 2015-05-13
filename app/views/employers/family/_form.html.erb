@@ -75,14 +75,6 @@
                   </div>
                 </div>
                 <br>
-
-                <div id="benefit_group_assignment_info" class="focus_effect row personal-info-row">
-                  <div class="col-md-10 no-pd col-sm-9 col-xs-12 first">
-                    <%= f.fields_for :benefit_group_assignments, @family.active_benefit_group_assignment ,errors: {}, fieldset: false do |benefit_group_assignment|  %>
-                      <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment %>
-                    <% end %>
-                  </div>
-                </div>
             <% end %>
 
           <div id="key-section" class="col-md-2 key no-pd-right col-sm-3 col-xs-12" style="display: none;">
