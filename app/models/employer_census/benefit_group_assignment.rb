@@ -25,7 +25,7 @@ class EmployerCensus::BenefitGroupAssignment
   end
 
   def benefit_group=(new_benefit_group)
-    raise ArgumentError("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
+    raise ArgumentError.new("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
     self.benefit_group_id = new_benefit_group._id
     @benefit_group = new_benefit_group
   end
