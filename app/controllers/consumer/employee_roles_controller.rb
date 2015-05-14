@@ -42,11 +42,6 @@ class Consumer::EmployeeRolesController < ApplicationController
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
     @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(current_user, @employment_relationship.employee_family, @employment_relationship)
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
-    @benefit_group = @employee_role.benefit_group
-    @census_family = @employee_role.census_family
-    @employer_profile = @census_family.employer_profile
-    @census_employee = @employee_role.census_family.census_employee
-    @effective_on = @benefit_group.effective_on_for(@census_employee.hired_on)
     build_nested_models
     respond_to do |format|
       format.js { render "edit" }
@@ -67,10 +62,6 @@ class Consumer::EmployeeRolesController < ApplicationController
       end
     else
       @employer_profile = @person.employer_profile
-      @benefit_group = @person.benefit_group
-      @census_family = @person.census_family
-      @census_employee = @person.census_employee
-      @effective_on = @benefit_group.effective_on_for(@census_employee.hired_on)
       build_nested_models
       respond_to do |format|
         format.html { render "edit" }
