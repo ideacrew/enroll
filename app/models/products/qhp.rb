@@ -106,11 +106,14 @@ class Products::Qhp
   index({"qhp_benefits.benefit_type_code" => 1})
 
   def plan=(new_plan)
-    self.plan_id = new_plan.id
+    raise ArgumentError("expected Plan") unless new_plan.is_a? Plan
+    self.plan_id = new_plan._id
+    @plan = new_plan
   end
 
   def plan
-    Plan.find(plan_id) unless plan_id.nil?
+    return @plan if defined? @plan
+    @plan = Plan.find(plan_id) if plan_id.present?
   end
 
   VISIT_TYPES = [
