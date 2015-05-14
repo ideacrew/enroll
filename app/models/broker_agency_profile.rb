@@ -33,13 +33,15 @@ class BrokerAgencyProfile
   # has_many employers
   def employer_clients
     return unless MARKET_KINDS.except("individual").include?(market_kind)
-    EmployerProfile.find_by_broker_agency_profile(self.id)
+    return @employer_clients if defined? @employer_clients
+    @employer_clients = EmployerProfile.find_by_broker_agency_profile(self.id)
   end
 
   # TODO: has_many families
   def family_clients
     return unless MARKET_KINDS.except("shop").include?(market_kind)
-    Family.find_by_broker_agency_profile(self.id)
+    return @family_clients if defined? @family_clients
+    @family_clients = Family.find_by_broker_agency_profile(self.id)
   end
 
   # has_one primary_broker_role
@@ -57,7 +59,8 @@ class BrokerAgencyProfile
   end
 
   def primary_broker_role
-    BrokerRole.find(self.primary_broker_role_id) unless primary_broker_role_id.blank?
+    return @primary_broker_role if defined? @primary_broker_role
+    @primary_broker_role = BrokerRole.find(self.primary_broker_role_id) unless primary_broker_role_id.blank?
   end
 
   # alias for brokers
@@ -67,7 +70,8 @@ class BrokerAgencyProfile
 
   # has_many brokers
   def brokers
-    BrokerRole.find_by_broker_agency_profile(self)
+    return @broker_role if defined? @broker_role
+    @broker_role = BrokerRole.find_by_broker_agency_profile(self)
   end
 
   def market_kind=(new_market_kind)

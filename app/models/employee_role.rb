@@ -68,7 +68,8 @@ class EmployeeRole
   end
 
   def employer_profile
-    EmployerProfile.find(self.employer_profile_id)
+    return @employer_profile if defined? @employer_profile
+    @employer_profile = EmployerProfile.find(self.employer_profile_id)
   end
 
   # belongs_to BenefitGroup
@@ -78,11 +79,13 @@ class EmployeeRole
   end
 
   def benefit_group
-    BenefitGroup.find(self.benefit_group_id) unless benefit_group_id.blank?
+    return @benefit_group if defined? @benefit_group
+    @benefit_group = BenefitGroup.find(self.benefit_group_id) unless benefit_group_id.blank?
   end
 
   def census_family
-    EmployerCensus::EmployeeFamily.find_by_employee_role(self)
+    return @census_family if defined? @census_family
+    @census_family = EmployerCensus::EmployeeFamily.find_by_employee_role(self)
   end
 
   def is_active?

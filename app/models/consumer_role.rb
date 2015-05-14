@@ -70,7 +70,8 @@ class ConsumerRole
   end
 
   def writing_agent
-    BrokerRole.find(self.writing_agent_id) unless writing_agent_id.blank?
+    return @writing_agent if defined? @writing_agent
+    @writing_agent = BrokerRole.find(self.writing_agent_id) unless writing_agent_id.blank?
   end
 
   # belongs_to BrokerAgencyProfile
@@ -80,11 +81,13 @@ class ConsumerRole
   end
 
   def broker_agency_profile
-    BrokerAgencyProfile.find(self.broker_agency_id) unless broker_agency_id.blank?
+    return @broker_agency_profile if defined? @broker_agency_profile
+    @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_id) unless broker_agency_id.blank?
   end
 
   def families
-    Family.by_consumerRole(self)
+    return @families if defined? @families
+    @families = Family.by_consumerRole(self)
   end
 
   def phone
@@ -108,7 +111,8 @@ class ConsumerRole
   end
 
   def self.find(consumer_role_id)
-    Person.where("consumer_role._id" => consumer_role_id).first.consumer_role unless consumer_role_id.blank?
+    return @person_find if defined? @person_find
+    @person_find = Person.where("consumer_role._id" => consumer_role_id).first.consumer_role unless consumer_role_id.blank?
   end
 
 

@@ -32,7 +32,8 @@ class EligibilityDetermination
   end
 
   def benchmark_plan
-    Plan.find(self.benchmark_plan_id) unless self.benchmark_plan_id.blank?
+    return @benchmark_plan if defined? @benchmark_plan
+    @benchmark_plan = Plan.find(self.benchmark_plan_id) unless self.benchmark_plan_id.blank?
   end
 
   def csr_percent=(value)

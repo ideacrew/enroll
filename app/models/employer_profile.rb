@@ -55,7 +55,8 @@ class EmployerProfile
 
   def parent
     raise "undefined parent Organization" unless organization?
-    self.organization
+    return @organization if defined? @organization
+    @organization = self.organization
   end
 
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
@@ -76,7 +77,8 @@ class EmployerProfile
   end
 
   def broker_agency_profile
-    parent.broker_agency_profile.where(id: @broker_agency_profile_id) unless @broker_agency_profile_id.blank?
+    return @broker_agency_profile if defined? @broker_agency_profile
+    @broker_agency_profile =  parent.broker_agency_profile.where(id: @broker_agency_profile_id) unless @broker_agency_profile_id.blank?
   end
 
   # belongs_to writing agent (broker)
@@ -87,16 +89,19 @@ class EmployerProfile
   end
 
   def writing_agent
-    BrokerRole.find(@writing_agent_id) unless @writing_agent_id.blank?
+    return @writing_agent if defined? @writing_agent
+    @writing_agent = BrokerRole.find(@writing_agent_id) unless @writing_agent_id.blank?
   end
 
   # TODO: Benchmark this for efficiency
   def employee_families_sorted
-    employee_families.unscoped.order_by_last_name
+    return @employee_families_sorted if defined? @employee_families_sorted
+    @employee_families_sorted = employee_families.unscoped.order_by_last_name
   end
 
   def latest_plan_year
-    plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
+    return @latest_plan_year if defined? @latest_plan_year
+    @latest_plan_year = plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
   def find_plan_year_by_date(coverage_date)
