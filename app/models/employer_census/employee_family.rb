@@ -93,12 +93,14 @@ class EmployerCensus::EmployeeFamily
   end
 
   def plan_year=(new_plan_year)
-    self.plan_year_id = new_plan_year._id unless new_plan_year.blank?
+    raise ArgumentError("expected PlanYear") unless new_plan_year.is_a? PlanYear
+    self.plan_year_id = new_plan_year._id
+    @plan_year = new_plan_year
   end
 
   def plan_year
-    return if plan_year_id.blank?
-    parent.plan_years.find(self.plan_year_id)
+    return @plan_year if defined? @plan_year
+    @plan_year = parent.plan_years.find(self.plan_year_id) unless plan_year_id.blank?
   end
 
   def benefit_group=(new_benefit_group)

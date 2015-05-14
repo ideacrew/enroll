@@ -87,7 +87,7 @@ class User
   end
 
   def has_role?(role_sym)
-    roles.any? { |r| r == role_sym }
+    roles.any? { |r| r == role_sym.to_s }
   end
 
   def has_employee_role?
