@@ -49,9 +49,9 @@ Rails.application.routes.draw do
   end
 
   namespace :broker_agencies do
-    root 'broker_profile#new'
+    root 'broker_profiles#new'
 
-    resources :broker_profile do
+    resources :broker_profiles do
       get 'new'
       get 'my_account'
     end
