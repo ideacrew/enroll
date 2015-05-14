@@ -44,6 +44,10 @@ Rails.application.routes.draw do
 
   end
 
+  namespace :hbx do
+    get 'hbx_admin', to: 'hbx#welcome'
+  end
+
   namespace :broker_agencies do
     root 'broker_profile#new'
 
@@ -58,7 +62,6 @@ Rails.application.routes.draw do
   ############################# TO DELETE BELOW ##############################
 
   # FIXME: Do this properly later
-
   namespace :products do
     resources :plans, controller: :qhp do
       collection do
@@ -83,10 +86,6 @@ Rails.application.routes.draw do
       end
     end
     root 'employer_roles#show'
-  end
-
-  namespace :hbx do
-    get 'hbx_admin', to: 'hbx#welcome'
   end
 
   # used to select which people are going to be covered before plan selection
