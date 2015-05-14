@@ -111,7 +111,8 @@ class EmployerCensus::EmployeeFamily
   end
 
   def benefit_group
-    parent.plan_years.find(plan_year_id).benefit_groups.find(benefit_group_id)
+    return @benefit_group if defined? @benefit_group
+    @benefit_group = parent.plan_years.find(plan_year_id).benefit_groups.find(benefit_group_id) if plan_year_id.present? && benefit_group_id.present?
   end
 
   def link_employee_role(employee_role, linked_at = DateTime.current)
@@ -127,8 +128,8 @@ class EmployerCensus::EmployeeFamily
   end
 
   def linked_employee_role
-    # return @linked_employee_role if defined? @linked_employee_role
-    @linked_employee_role ||= EmployeeRole.find(self.employee_role_id) if is_linked?
+    return @linked_employee_role if defined? @linked_employee_role
+    @linked_employee_role = EmployeeRole.find(self.employee_role_id) if is_linked?
   end
 
   def delink_employee_role
