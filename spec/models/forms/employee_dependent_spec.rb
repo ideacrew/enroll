@@ -96,15 +96,18 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
     let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save! => true) }
     let(:new_person) { double(:save => true, :errors => double(:has_key? => false)) }
 
+    before do
+      allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
+      allow(family).to receive(:save!).and_return(true)
+    end
+
     it "should create a new person" do
       expect(Person).to receive(:new).with(person_properties).and_return(new_person)
-      allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
       subject.save
     end
 
     it "should create a new family member" do
       allow(Person).to receive(:new).with(person_properties).and_return(new_person)
-      allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
       subject.save
       expect(subject.id).to eq new_family_member_id
     end
@@ -155,7 +158,7 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
     end
 
     it "should have the correct family_id" do
-      expect(@found_form.family_id).to eq(family_id) 
+      expect(@found_form.family_id).to eq(family_id)
     end
 
     it "should have the existing family" do
@@ -166,13 +169,13 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
   describe "when updated" do
     it "should update the relationship of the dependent" do
       allow(person).to receive(:update_attributes).with(person_properties).and_return(true)
-      expect(family_member).to receive(:update_relationship).with(relationship) 
+      expect(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
 
     it "should update the attributes of the person" do
       expect(person).to receive(:update_attributes).with(person_properties)
-      allow(family_member).to receive(:update_relationship).with(relationship) 
+      allow(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
   end
