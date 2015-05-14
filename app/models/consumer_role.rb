@@ -67,6 +67,7 @@ class ConsumerRole
   def writing_agent=(new_writing_agent)
     raise ArgumentError.new("expected BrokerRole class") unless new_writing_agent.is_a? BrokerRole
     self.new_writing_agent_id = new_writing_agent._id
+    @writing_agent = new_writing_agent
   end
 
   def writing_agent
@@ -78,6 +79,7 @@ class ConsumerRole
   def broker_agency_profile=(new_broker_agency)
     raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency.is_a? BrokerAgencyProfile
     self.broker_agency_id = new_broker_agency._id
+    @broker_agency_profile = new_broker_agency
   end
 
   def broker_agency_profile
@@ -86,8 +88,7 @@ class ConsumerRole
   end
 
   def families
-    return @families if defined? @families
-    @families = Family.by_consumerRole(self)
+    Family.by_consumerRole(self)
   end
 
   def phone

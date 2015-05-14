@@ -15,6 +15,7 @@ class CoverageHouseholdMember
 
   def family_member=(new_family_member)
     self.family_member_id = new_family_member._id
+    @family_member = new_family_member
   end
 
   def family_member
@@ -23,7 +24,7 @@ class CoverageHouseholdMember
   end
 
   def applicant=(new_applicant)
-    family_member = new_applicant
+    @applicant = new_applicant
   end
 
   def applicant

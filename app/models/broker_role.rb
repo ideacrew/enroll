@@ -46,8 +46,8 @@ class BrokerRole
     else
       raise ArgumentError.new("expected BrokerAgencyProfile class") unless new_broker_agency.is_a? BrokerAgencyProfile
       self.broker_agency_profile_id = new_broker_agency._id
+      @broker_agency_profile = new_broker_agency
     end
-    self.broker_agency_profile
   end
 
   def broker_agency_profile

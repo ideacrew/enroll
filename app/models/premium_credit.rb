@@ -15,10 +15,12 @@ class PremiumCredit
   def slcsp=(new_slcsp)
     raise ArgumentError.new("expected Plan class") unless new_slcsp.is_a? Plan
     self.new_slcsp_id = new_slcsp._id
+    @slcsp = new_slcsp
   end
 
   def slcsp
-    Plan.find(self.new_slcsp_id) unless new_slcsp_id.blank?
+    return @slcsp if defined? @slcsp
+    @slcsp = Plan.find(self.new_slcsp_id) unless new_slcsp_id.blank?
   end
 
   def is_voided?

@@ -65,6 +65,7 @@ class EmployeeRole
   def employer_profile=(new_employer)
     raise ArgumentError.new("expected EmployerProfile") unless new_employer.is_a? EmployerProfile
     self.employer_profile_id = new_employer._id
+    @employer_profile = new_employer
   end
 
   def employer_profile
@@ -76,6 +77,7 @@ class EmployeeRole
   def benefit_group=(new_benefit_group)
     raise ArgumentError.new("expected BenefitGroup class") unless new_benefit_group.is_a? BenefitGroup
     self.benefit_group_id = new_benefit_group._id
+    @benefit_group = new_benefit_group
   end
 
   def benefit_group
@@ -84,8 +86,7 @@ class EmployeeRole
   end
 
   def census_family
-    return @census_family if defined? @census_family
-    @census_family = EmployerCensus::EmployeeFamily.find_by_employee_role(self)
+    EmployerCensus::EmployeeFamily.find_by_employee_role(self)
   end
 
   def is_active?

@@ -31,10 +31,12 @@ class SpecialEnrollmentPeriod
     self.qualifying_life_event_kind_id = new_qualifying_life_event_kind._id
     set_sep_dates
     new_qualifying_life_event_kind
+    @qualifying_life_event_kind = new_qualifying_life_event_kind
   end
 
   def qualifying_life_event_kind
-    QualifyingLifeEventKind.find(self.qualifying_life_event_kind_id)
+    return @qualifying_life_event_kind if defined? @qualifying_life_event_kind
+    @qualifying_life_event_kind = QualifyingLifeEventKind.find(self.qualifying_life_event_kind_id)
   end
 
   def qle_on=(new_qle_date)

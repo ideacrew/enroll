@@ -40,14 +40,12 @@ class CarrierProfile
   end
 
   def associated_carrier_profile
-    return @associated_carrier_profile if defined? @associated_carrier_profile
-    @associated_carrier_profile = CarrierProfile.find(self.associated_carrier_profile_id) unless self.associated_carrier_profile_id.blank?
+    CarrierProfile.find(self.associated_carrier_profile_id) unless self.associated_carrier_profile_id.blank?
   end
 
   # has_many Plans
   def plans
-    return @plans if defined? @plans
-    @plans = Plan.where(carrier_profile_id: self._id)
+    Plan.where(carrier_profile_id: self._id)
   end
 
   ## Class methods

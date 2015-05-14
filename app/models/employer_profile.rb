@@ -100,8 +100,7 @@ class EmployerProfile
   end
 
   def latest_plan_year
-    return @latest_plan_year if defined? @latest_plan_year
-    @latest_plan_year = plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
+    plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
   def find_plan_year_by_date(coverage_date)

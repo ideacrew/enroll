@@ -130,27 +130,29 @@ class Plan
     else
       raise ArgumentError.new("expected CarrierProfile ") unless new_carrier_profile.is_a? CarrierProfile
       self.carrier_profile_id = new_carrier_profile._id
+      @carrier_profile = new_carrier_profile
     end
-    self.carrier_profile
   end
 
   def carrier_profile
-    CarrierProfile.find(carrier_profile_id) unless carrier_profile_id.blank?
+    return @carrier_profile if defined? @carrier_profile
+    @carrier_profile = CarrierProfile.find(carrier_profile_id) unless carrier_profile_id.blank?
   end
 
   # has_one renewal_plan
   def renewal_plan=(new_renewal_plan)
-    if renewal_plan.nil?
+    if new_renewal_plan.nil?
       self.renewal_plan_id = nil
     else
-      raise ArgumentError.new("expected Plan ") unless renewal_plan.is_a? Plan
-      self.renewal_plan_id = renewal_plan._id
+      raise ArgumentError.new("expected Plan ") unless new_renewal_plan.is_a? Plan
+      self.renewal_plan_id = new_renewal_plan._id
+      @renewal_plan = new_renewal_plan
     end
-    self.renewal_plan
   end
 
   def renewal_plan
-    find(renewal_plan_id) unless renewal_plan_id.blank?
+    return @renewal_plan if defined? @renewal_plan
+    @renewal_plan = find(renewal_plan_id) unless renewal_plan_id.blank?
   end
 
 
@@ -169,10 +171,6 @@ class Plan
   end
 
   class << self
-    # Grouping plans by carrier name
-    def group_by_carrier_name
-      by_active_year.group_by { |pl| pl.carrier_profile.organization.legal_name }
-    end
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
       result = []

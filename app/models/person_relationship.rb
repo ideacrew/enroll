@@ -96,12 +96,14 @@ class PersonRelationship
   end
 
   def relative=(new_person)
-    return unless new_person.is_a? Person
+    raise ArgumentError("expected Person") unless new_person.is_a? Person
     self.relative_id = new_person._id
+    @relative = new_person
   end
 
   def relative
-    Person.find(self.relative_id) unless self.relative_id.blank?
+    return @relative if defined? @relative
+    @relative = Person.find(self.relative_id) unless self.relative_id.blank?
   end
 
   def invert_relationship

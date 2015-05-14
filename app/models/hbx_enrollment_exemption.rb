@@ -32,10 +32,12 @@ class HbxEnrollmentExemption
   def irs_group=(irs_instance)
     return unless irs_instance.is_a? IrsGroup
     self.irs_group_id = irs_instance._id
+    @irs_group = irs_instance
   end
 
   def irs_group
-    parent.irs_group.find(self.irs_group_id)
+    return @irs_group if defined? @irs_group
+    @irs_group = parent.irs_group.find(self.irs_group_id)
   end
 
 

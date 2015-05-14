@@ -83,10 +83,12 @@ class Household
   def irs_group=(new_irs_group)
     return unless new_irs_group.is_a? IrsGroup
     self.irs_group_id = new_irs_group._id
+    @irs_group = new_irs_group
   end
 
   def irs_group
-    parent.irs_groups.find(self.irs_group_id)
+    return @irs_group if defined? @irs_group
+    @irs_group = parent.irs_groups.find(self.irs_group_id)
   end
 
   def is_active?

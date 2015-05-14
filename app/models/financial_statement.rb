@@ -46,11 +46,13 @@ class FinancialStatement
   def eligibility_determination=(ed_instance)
     return unless ed_instance.is_a? EligibilityDetermination
     self.eligibility_determination_id = ed_instance._id
+    @eligibility_determination = ed_instance
   end
 
   def eligibility_determination
     return nil unless tax_household_member
-    tax_household_member.eligibility_determinations.detect { |elig_d| elig_d._id == self.eligibility_determination_id }
+    return @eligibility_determination if defined? @eligibility_determination
+    @eligibility_determination = tax_household_member.eligibility_determinations.detect { |elig_d| elig_d._id == self.eligibility_determination_id }
   end
 
   # Evaluate if receiving Alternative Benefits this year

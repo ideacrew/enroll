@@ -107,6 +107,7 @@ class EmployerCensus::EmployeeFamily
     if new_benefit_group.present?
       self.benefit_group_id = new_benefit_group._id
       self.plan_year = new_benefit_group.plan_year
+      @benefit_group = new_benefit_group
     end
   end
 

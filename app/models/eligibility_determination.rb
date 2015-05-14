@@ -29,6 +29,7 @@ class EligibilityDetermination
   def benchmark_plan=(benchmark_plan_instance)
     return unless benchmark_plan_instance.is_a? Plan
     self.benchmark_plan_id = benchmark_plan_instance._id
+    @benchmark_plan = benchmark_plan_instance
   end
 
   def benchmark_plan
