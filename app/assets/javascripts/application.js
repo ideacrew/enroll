@@ -458,3 +458,11 @@ $(document).ready(function () {
     $('#dLabel').html($(this).text()+"<i class='glyphicon glyphicon-menu-down'></i>");
   });
 });
+
+$(document).on('page:update', function() {
+  // Change Dropdown Address Text
+  $('.address-li').on('click', function(){
+    $("#dropdownMenu1 label").text($(this).text());
+    $('#address_info > .first').attr('id', ($(this).text()));
+  });
+});

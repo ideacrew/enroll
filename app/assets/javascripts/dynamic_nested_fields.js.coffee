@@ -18,9 +18,6 @@ ready = ->
     $(this).closest('fieldset').hide()
     event.preventDefault()
 
-  $('#employer_census_employee_family_census_employee_attributes_hired_on').change ->
-    $("#benefit_group_assignment_info input.date-picker").val($(this).val())
-
 style_select_picker = ->
 	$(document).find('select').select2()
 
@@ -36,3 +33,4 @@ style_select_picker = ->
 
 $(document).ready(ready)
 $(document).on('page:load', ready)
+$(document).on('page:update', ready)
