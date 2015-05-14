@@ -1,6 +1,58 @@
 Rails.application.routes.draw do
 
+  namespace :insured do
+
+  end
+
+  namespace :employers do
+    root 'employer_profiles#new'
+
+    #TODO REFACTOR
+    resources :people do
+      collection do
+        get 'search'
+        post 'match'
+      end
+    end
+    resources :employer_profiles do
+      get 'new'
+      get 'my_account'
+      collection do
+        get 'welcome'
+        get 'search'
+        post 'match'
+      end
+      resources :plan_years
+      resources :family do
+        get 'delink'
+        get 'terminate'
+        get 'rehire'
+        get 'benefit_group', on: :member
+        patch 'assignment_benefit_group', on: :member
+      end
+    end
+  end
+
+  namespace :hbx do
+    get 'hbx_admin', to: 'hbx#welcome'
+  end
+
+  namespace :carrier do
+
+  end
+
+  namespace :broker_agencies do
+    root 'broker_profile#new'
+
+    resources :broker_profile do
+      get 'new'
+      get 'my_account'
+    end
+  end
+
   resources :translations
+
+############################# TO DELETE BELOW ##############################
 
   # FIXME: Do this properly later
   resource :plan_shopping do
@@ -41,43 +93,6 @@ Rails.application.routes.draw do
   post 'group_selection/new', to: 'group_selection#new'
   post 'group_selection/create', to: 'group_selection#create'
 
-  namespace :broker_agencies do
-    root 'broker_profile#new'
-
-    resources :broker_profile do
-      get 'new'
-      get 'my_account'
-    end
-  end
-
-  namespace :employers do
-    root 'employer_profiles#new'
-
-    resources :people do
-      collection do
-        get 'search'
-        post 'match'
-      end
-    end
-    resources :employer_profiles do
-      get 'new'
-      get 'my_account'
-      collection do
-        get 'welcome'
-        get 'search'
-        post 'match'
-      end
-      resources :plan_years
-      resources :family do
-        get 'delink'
-        get 'terminate'
-        get 'rehire'
-        get 'benefit_group', on: :member
-        patch 'assignment_benefit_group', on: :member
-      end
-    end
-  end
-
   resources :people do #TODO Delete
     get 'select_employer'
     get 'my_account'
@@ -104,8 +119,6 @@ Rails.application.routes.draw do
 
   end
 
-  get 'hbx_admin', to: 'hbx#welcome'
-
   resources :consumer_profiles, :only => [] do
     collection do
       get 'home'
@@ -114,8 +127,6 @@ Rails.application.routes.draw do
       get 'family'
     end
   end
-
-  devise_for :users
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
