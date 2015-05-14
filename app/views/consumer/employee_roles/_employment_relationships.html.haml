@@ -16,10 +16,10 @@
               %dl.dl-horizontal
                 %dt Employer
                 %dd= emp_relationship.employer_name
-                %dt Hired
-                %dd= emp_relationship.hired_on
+                %dt Hired On
+                %dd= format_date emp_relationship.hired_on
                 %dt Eligible for Coverage
-                %dd= emp_relationship.eligible_for_coverage_on
+                %dd= format_date emp_relationship.eligible_for_coverage_on
             .col-md-4.col-sm-4.col-xs-12.text-right
               = f.submit "This is my employer", :class => "btn btn-primary"
               = f.hidden_field :first_name
