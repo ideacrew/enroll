@@ -59,9 +59,15 @@ RSpec.describe Employers::FamilyController do
   end
 
   describe "PUT update" do
+    let(:benefit_group) {FactoryGirl.create(:benefit_group)}
+    let(:plan_year) {FactoryGirl.create(:plan_year)}
     before do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(employer_profile).to receive(:plan_years).and_return([plan_year])
+      plan_year.benefit_groups << benefit_group
+
+      allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
       allow(EmployerCensus::EmployeeFamily).to receive(:find).and_return(family)
       allow(controller).to receive(:census_family_params).and_return({})
     end

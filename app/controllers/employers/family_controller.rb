@@ -24,10 +24,19 @@ class Employers::FamilyController < ApplicationController
 
   def edit
     @family.census_employee.build_address unless @family.census_employee.address.present?
+    @family.benefit_group_assignments.build unless @family.benefit_group_assignments.present?
   end
 
   def update
     new_params = census_family_params
+
+    benefit_group = @employer_profile.plan_years.first.benefit_groups.find_by(id: benefit_group_id)
+    new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new_from_group_and_roster_family(benefit_group, @family)
+
+    if @family.active_benefit_group_assignment.try(:benefit_group_id) != new_benefit_group_assignment.benefit_group_id
+      @family.add_benefit_group_assignment(new_benefit_group_assignment)
+    end
+
     if @family.update_attributes(new_params)
       flash[:notice] = "Employer Census Family is successfully updated."
       redirect_to employers_employer_profile_path(@employer_profile)

@@ -14,7 +14,7 @@ role :db, %w{nginx@10.87.84.25}
 # This can be used to drop a more detailed server definition into the
 # server list. The second argument is a, or duck-types, Hash and is
 # used to set extended properties on the server.
-
+set :branch, 'development'
 #server '.com', user: 'deploy', roles: %w{web app}, my_property: :my_value
 
 

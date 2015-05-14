@@ -96,7 +96,7 @@ class PersonRelationship
   end
 
   def relative=(new_person)
-    raise ArgumentError("expected Person") unless new_person.is_a? Person
+    raise ArgumentError.new("expected Person") unless new_person.is_a? Person
     self.relative_id = new_person._id
     @relative = new_person
   end

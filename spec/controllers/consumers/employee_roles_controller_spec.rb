@@ -44,10 +44,6 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
         expect(assigns(:person)).to eq role_form
-        expect(assigns[:effective_on]).to eq effective_date
-        expect(assigns[:benefit_group]).to eq benefit_group
-        expect(assigns[:census_family]).to eq census_family
-        expect(assigns[:employer_profile]).to eq employer_profile
       end
     end
   end
@@ -94,12 +90,6 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
       expect(assigns(:family)).to eq family
     end
 
-    it "should assign the 9 billion other properties required by the legacy template" do
-      expect(assigns(:census_family)).to eq census_family
-      expect(assigns(:benefit_group)).to eq benefit_group
-      expect(assigns(:census_employee)).to eq census_employee
-      expect(assigns(:effective_on)).to eq effective_date
-    end
   end
 
   describe "POST match" do

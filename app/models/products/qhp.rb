@@ -106,7 +106,7 @@ class Products::Qhp
   index({"qhp_benefits.benefit_type_code" => 1})
 
   def plan=(new_plan)
-    raise ArgumentError("expected Plan") unless new_plan.is_a? Plan
+    raise ArgumentError.new("expected Plan") unless new_plan.is_a? Plan
     self.plan_id = new_plan._id
     @plan = new_plan
   end

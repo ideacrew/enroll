@@ -93,7 +93,7 @@ class EmployerCensus::EmployeeFamily
   end
 
   def plan_year=(new_plan_year)
-    raise ArgumentError("expected PlanYear") unless new_plan_year.is_a? PlanYear
+    raise ArgumentError.new("expected PlanYear") unless new_plan_year.is_a? PlanYear
     self.plan_year_id = new_plan_year._id
     @plan_year = new_plan_year
   end

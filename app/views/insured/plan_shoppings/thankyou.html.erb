@@ -62,7 +62,7 @@
           Monday-Saturday 8:00am - 8:00pm<br />
           E-Mail: info@dchealthlink.com</span><br />
         </span><br />
-        <%= link_to "Confirm", checkout_plan_shopping_path(:hbx_enrollment_id => @enrollment.id, :plan_id => @plan.id), :class => "btn btn-success btn-continue", :method => :post %>
+        <%= link_to "Confirm", checkout_insured_plan_shopping_path(@enrollment, :plan_id => @plan.id), :class => "btn btn-success btn-continue", :method => :post %>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
 	    <%= link_to "Save & Exit", home_consumer_profiles_path(@person), { :class => "btn btn-primary" } %>

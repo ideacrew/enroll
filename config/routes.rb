@@ -1,15 +1,67 @@
 Rails.application.routes.draw do
+  devise_for :users
 
-  resources :translations
-
-  # FIXME: Do this properly later
-  resource :plan_shopping do
-    member do
-      post 'checkout'
-      post 'thankyou'
+  namespace :insured do
+    resources :plan_shoppings, :only => [:show] do
+      member do
+        post 'checkout'
+        post 'thankyou'
+      end
     end
   end
 
+  namespace :employers do
+    root 'employer_profiles#new'
+
+    #TODO REFACTOR
+    resources :people do
+      collection do
+        get 'search'
+        post 'match'
+      end
+    end
+    resources :employer_profiles do
+      get 'new'
+      get 'my_account'
+      collection do
+        get 'welcome'
+        get 'search'
+        post 'match'
+      end
+      resources :plan_years
+      resources :family do
+        get 'delink'
+        get 'terminate'
+        get 'rehire'
+        get 'benefit_group', on: :member
+        patch 'assignment_benefit_group', on: :member
+      end
+    end
+  end
+
+
+  namespace :carrier do
+
+  end
+
+  namespace :hbx do
+    get 'hbx_admin', to: 'hbx#welcome'
+  end
+
+  namespace :broker_agencies do
+    root 'broker_profile#new'
+
+    resources :broker_profile do
+      get 'new'
+      get 'my_account'
+    end
+  end
+
+  resources :translations
+
+  ############################# TO DELETE BELOW ##############################
+
+  # FIXME: Do this properly later
   namespace :products do
     resources :plans, controller: :qhp do
       collection do
@@ -41,43 +93,6 @@ Rails.application.routes.draw do
   post 'group_selection/new', to: 'group_selection#new'
   post 'group_selection/create', to: 'group_selection#create'
 
-  namespace :broker_agencies do
-    root 'broker_profile#new'
-
-    resources :broker_profile do
-      get 'new'
-      get 'my_account'
-    end
-  end
-
-  namespace :employers do
-    root 'employer_profiles#new'
-
-    resources :people do
-      collection do
-        get 'search'
-        post 'match'
-      end
-    end
-    resources :employer_profiles do
-      get 'new'
-      get 'my_account'
-      collection do
-        get 'welcome'
-        get 'search'
-        post 'match'
-      end
-      resources :plan_years
-      resources :family do
-        get 'delink'
-        get 'terminate'
-        get 'rehire'
-        get 'benefit_group', on: :member
-        patch 'assignment_benefit_group', on: :member
-      end
-    end
-  end
-
   resources :people do #TODO Delete
     get 'select_employer'
     get 'my_account'
@@ -93,8 +108,6 @@ Rails.application.routes.draw do
       # get 'dependent_details'
       post 'save_dependents'
       delete 'remove_dependents' # Still required on my account - REMOVE
-      get 'select_plan'
-      post 'select_plan'
       get 'check_qle_marriage_date'
     end
 
@@ -103,8 +116,6 @@ Rails.application.routes.draw do
     end
 
   end
-
-  get 'hbx_admin', to: 'hbx#welcome'
 
   resources :consumer_profiles, :only => [] do
     collection do
@@ -115,8 +126,6 @@ Rails.application.routes.draw do
     end
   end
 
-  devise_for :users
-
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
 
@@ -125,11 +134,11 @@ Rails.application.routes.draw do
   end
 
   resources :family_members, only: [:show, :edit, :update] do
-     member do
-       get :link_employee
-       get :challenge_identity
-     end
-   end
+    member do
+      get :link_employee
+      get :challenge_identity
+    end
+  end
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]

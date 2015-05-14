@@ -1,10 +1,10 @@
-class PlanShoppingsController < ApplicationController 
+class Insured::PlanShoppingsController < ApplicationController 
   include Acapi::Notifiers
 
   def checkout
     @person = current_user.person
     @plan = Plan.find(params.require(:plan_id))
-    @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+    @hbx_enrollment = HbxEnrollment.find(params.require(:id))
     @benefit_group = @hbx_enrollment.benefit_group
     @reference_plan = @benefit_group.reference_plan
     @plan = PlanCostDecorator.new(@plan, @hbx_enrollment, @benefit_group, @reference_plan)
@@ -18,12 +18,26 @@ class PlanShoppingsController < ApplicationController
   def thankyou
     @person = current_user.person
     @plan = Plan.find(params.require(:plan_id))
-    @enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+    @enrollment = HbxEnrollment.find(params.require(:id))
     @benefit_group = @enrollment.benefit_group
     @reference_plan = @benefit_group.reference_plan
     @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     respond_to do |format| 
-      format.html { render 'plan_shopping/thankyou.html.erb' }
+      format.html { render 'thankyou.html.erb' }
+    end
+  end
+
+  def show
+    hbx_enrollment_id = params.require(:id)
+
+    Caches::MongoidCache.allocate(CarrierProfile)
+
+    @person = current_user.person
+    @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
+    @benefit_group = @hbx_enrollment.benefit_group
+    @reference_plan = @benefit_group.reference_plan
+    @plans = @benefit_group.elected_plans.entries.collect() do |plan|
+      PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
     end
   end
 

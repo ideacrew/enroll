@@ -67,7 +67,7 @@ class BenefitGroup
     greater_than_or_equal_to: 50
 
   def reference_plan=(new_reference_plan)
-    raise ArgumentError("expected Plan") unless new_reference_plan.is_a? BenefitGroup
+    raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
     self.reference_plan_id = new_reference_plan.id
     @reference_plan = new_reference_plan
   end
