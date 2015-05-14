@@ -1,4 +1,4 @@
-class HBX::HbxController < ApplicationController
+class Hbx::HbxController < ApplicationController
   before_action :check_hbx_role, only: [:welcome]
 
   def welcome
