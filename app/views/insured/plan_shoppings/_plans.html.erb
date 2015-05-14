@@ -1,4 +1,4 @@
-<%= render "plan_shopping/detail_modal" %>
+<%= render "insured/plan_shoppings/detail_modal" %>
 
 <div class="container">
 	<div id="select_plan_wrapper">
@@ -25,13 +25,13 @@
 								<li class="pull-right all-filter" role="presentation"><a href="#" role="tab" data-toggle="tab">All Filters</a></li>
 							</ul>
 
-							<%= render "plan_shopping/plan_filters" %>
+							<%= render "insured/plan_shoppings/plan_filters" %>
 
 							<!-- Tab panes -->
 							<div class="tab-content">
 								<div role="tabpanel" class="tab-pane active" id="all-plans">
 									<% @plans.each do |plan| %>
-										<%= render "plan_shopping/plan_details", :plan => plan %>
+										<%= render "insured/plan_shoppings/plan_details", :plan => plan %>
 									<% end %>
 								</div>
 							</div>

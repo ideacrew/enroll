@@ -1,7 +1,13 @@
 Rails.application.routes.draw do
+  devise_for :users
 
   namespace :insured do
-
+    resources :plan_shoppings, :only => [:show] do
+      member do
+        post 'checkout'
+        post 'thankyou'
+      end
+    end
   end
 
   namespace :employers do
@@ -33,9 +39,6 @@ Rails.application.routes.draw do
     end
   end
 
-  namespace :hbx do
-    get 'hbx_admin', to: 'hbx#welcome'
-  end
 
   namespace :carrier do
 
@@ -52,15 +55,9 @@ Rails.application.routes.draw do
 
   resources :translations
 
-############################# TO DELETE BELOW ##############################
+  ############################# TO DELETE BELOW ##############################
 
   # FIXME: Do this properly later
-  resource :plan_shopping do
-    member do
-      post 'checkout'
-      post 'thankyou'
-    end
-  end
 
   namespace :products do
     resources :plans, controller: :qhp do
@@ -88,6 +85,10 @@ Rails.application.routes.draw do
     root 'employer_roles#show'
   end
 
+  namespace :hbx do
+    get 'hbx_admin', to: 'hbx#welcome'
+  end
+
   # used to select which people are going to be covered before plan selection
   get 'group_selection/new', to: 'group_selection#new'
   post 'group_selection/new', to: 'group_selection#new'
@@ -108,8 +109,6 @@ Rails.application.routes.draw do
       # get 'dependent_details'
       post 'save_dependents'
       delete 'remove_dependents' # Still required on my account - REMOVE
-      get 'select_plan'
-      post 'select_plan'
       get 'check_qle_marriage_date'
     end
 
@@ -136,11 +135,11 @@ Rails.application.routes.draw do
   end
 
   resources :family_members, only: [:show, :edit, :update] do
-     member do
-       get :link_employee
-       get :challenge_identity
-     end
-   end
+    member do
+      get :link_employee
+      get :challenge_identity
+    end
+  end
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]

@@ -16,7 +16,7 @@ class GroupSelectionController < ApplicationController
       family_member_ids.include? member.applicant_id
     end
     hbx_enrollment.save!
-    redirect_to select_plan_people_path(person_id: @person, hbx_enrollment_id: hbx_enrollment)
+    redirect_to insured_plan_shopping_path(:id => hbx_enrollment)
   end
 
   private
