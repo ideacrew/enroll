@@ -2525,69 +2525,10 @@ a.all-filter:hover{
   opacity: 0.8;
   filter: alpha(opacity=0.8);
 }
-.all-filters-row{
-  margin: 20px 0 0;
-  position: relative;
-  display: none;
-}
-.all-filters-row .apply-btn{
-  margin: 0;
-  display: block;
-  padding: 6px 30px;
-  border: #027ac3 solid 1px;
-  font-family: 'AvenirLTStd-Light';
-  font-size: 18px;
-  color: #027ac3;
-  float: right;
-  background: #fff !important;
-}
-.all-filters-row p{
-  font-size: 15px;
-  font-family: 'AvenirLTStd-black';
-  margin-bottom: 6px;
-  color: #333;
-}
-.all-filters-row .all-filters-detail{
-  width: 88%;
-}
-.all-filters-row label{
-  width: 100%;
-  font-size: 14px;
-  font-family: 'AvenirLTStd-Light';
-  font-weight: 300;
-  color: #666;
-}
-.all-filters-row input[type="checkbox"]{
-  margin-right: 10px;
-}
-.all-filters-row label input[type="text"]{
-  margin: 2px 10px 15px;
-  padding: 6px 10px;
-  width: 34%;
-  border: #ccc solid 1px;
-}
-.all-filters-row label input[type="text"]:first-child{
-  margin-left: 0;
-}
 
 /* Select Plan Page */
-.select-plan{
-  /*margin-top: -20px;*/
-  /*font-size: 18px;*/
-  /*color: #666;*/
-}
-.select-plan p.head{
-  margin-bottom: 30px;
-  font-size: 21px;
-  font-family: "AvenirLTStd-Medium";
-  color: #333;
-  font-weight: normal;  
-}
-.select-plan p.detail {
-  /*color: #999;
-  font-size: 18px;
-  letter-spacing: 1px;
-  margin: 35px 0 0 0;*/
+.select-plan p, .select-plan a, .select-plan h1, .select-plan h3, .select-plan h2 {
+    font-family: "Open Sans",sans-serif;
 }
 .select-plan p.detail span {
   color: #0079c5;
@@ -2600,10 +2541,33 @@ a.all-filter:hover{
   display: none;
   margin-top: 20px;
 }
-.select-plan-details ul.nav-tabs{
-  margin: 6px 0 0;
-  padding: 0;
-  border: none;
+.select-plan-details .plan-row h3 {
+    color: #00b0f0;
+    line-height: 28px;
+    margin: 0 0 5px;
+}
+.select-plan-details .plan-row h3.your_cost {
+    color: #414141;
+    font-size: 38px;
+    margin: 0;
+    font-family: "AvenirLTStd-Light";
+    font-weight: 300;
+}
+.select-plan-details ul {
+    margin: 0;
+    padding: 0;
+}
+.select-plan-details ul li:first-child {
+    margin-left: 0;
+}
+.select-plan-details ul li {
+    color: #7e7e7e;
+    display: block;
+    float: left;
+    font-size: 13px;
+    list-style: outside none none;
+    margin: 0 30px;
+    text-transform: uppercase;
 }
 .select-plan-details ul.nav-tabs > li > a{
   border: none;
@@ -2639,16 +2603,13 @@ a.all-filter:hover{
   margin-top: 20px;
 }
 .select-plan-details .tab-content .plan-row{
-  border: #ccc solid 1px;
-  padding: 15px;
-  margin: 0 0 20px 0;
-  color: #ccc;
-  border-radius: 6px;
-  background: #fff;
+  background: none repeat scroll 0 0 #fff;
+  border: 1px solid #d5d5d5;
+  margin: 15px 0;
+  padding: 30px 25px 25px;
 }
-.select-plan-details .tab-content .plan-row .row{
-  margin: 0;
-  padding: 0;
+.select-plan-details .plan-details {
+  margin: 10px 0 0;
 }
 .select-plan-details .tab-content .plan-row .row:first-child div:nth-child(2) label{
   margin-top: 20px;
@@ -2682,9 +2643,47 @@ a.all-filter:hover{
   color: #333;
 }
 .select-plan-details .tab-content .plan-row label{
-  display: block;
-  text-align: center;
+  font-family: "AvenirLTStd-Light";
+  font-weight: lighter !important;
 }
+.select-plan-details .plan-row input[type="checkbox"] {
+  height: 21px;
+  margin-top: 20px;
+  opacity: 0;
+  position: relative;
+  top: 6px;
+  width: 21px;
+  z-index: 9;
+}
+.select-plan-details .plan-row input[type="checkbox"] + span {
+  background-position: 0 -31px;
+}
+.select-plan-details .plan-row input[type="checkbox"] + span {
+  background-image: url("<%= asset_path('compare-checkbox-img.png') %>");
+  background-repeat: no-repeat;
+  color: #414141;
+  font-size: 13px;
+  left: -30px;
+  padding: 2px 0 5px 30px;
+  position: relative;
+  text-transform: uppercase;
+}
+.select-plan-details .plan-row input[type="checkbox"]:checked + span {
+  background-position: 0 0;
+}
+.select-plan-details .plan-row input[type="checkbox"] + span {
+  background-position: 0 -31px;
+}
+.select-plan-details .plan-row ul li i {
+  font-size: 16px;
+  font-weight: bold;
+  margin-right: 5px;
+}
+.select-plan-details .plan-row ul li.gold i {color: #fabb18;}
+.select-plan-details .plan-row ul li.platinum i {color: #e5e4e2;}
+.select-plan-details .plan-row ul li.silver i {color: #cccccc;}
+.select-plan-details .plan-row ul li.bronze i {color: #cd7f32;}
+
 .plan-row .details-btn, .plan-row .select-btn{
   width: 100%;
   margin: 10px auto 0;
@@ -2706,11 +2705,6 @@ a.all-filter:hover{
   background: #027ac3;
   border: none;
   color: #fff;
-}
-.select-plan-details .tab-content .plan-row .plan-details strong{
-  color: #333;
-  font-size: 13px;
-  font-family: 'AvenirLTStd-Book';
 }
 .select-plan-details .tab-content .plan-row .plan-details p{
   text-transform: uppercase;
@@ -2807,9 +2801,8 @@ a.all-filter:hover{
 }
 
 .all-filters-row{
-  margin: 0;
+  margin: 20px 0 0;
   position: relative;
-  top: -34px;
   display: none;
 }
 .all-filters-row .apply-btn{
@@ -2834,23 +2827,23 @@ a.all-filter:hover{
 }
 .all-filters-row label{
   width: 100%;
-  font-size: 13px;
+  font-size: 14px;
   font-family: 'AvenirLTStd-Light';
-  margin-bottom: 0;
+  font-weight: 300;
+  color: #666;
 }
 .all-filters-row input[type="checkbox"]{
   margin-right: 10px;
 }
 .all-filters-row label input[type="text"]{
   margin: 2px 10px 15px;
-  padding: 6px 10px;
-  width: 30%;
+  padding: 6px 8px;
+  width: 34%;
   border: #ccc solid 1px;
 }
 .all-filters-row label input[type="text"]:first-child{
   margin-left: 0;
 }
-
 
 /* Selected plans section start */
 

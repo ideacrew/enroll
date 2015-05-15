@@ -397,8 +397,12 @@ $(document).ready(function () {
     $(".select-plan-details").show();
   });
 
-  $(document).on('click', '.select-plan .all-filter', function(){
-    $(".all-filters-row").show();
+  // $(document).on('click', '.select-plan .all-filter', function(){
+  //   $(".all-filters-row").show();
+  // });
+
+  $(document).on('click', '.filter-btn-row a.all-filter', function(){
+    $(".all-filters-row").toggle("fast");
   });
 
   $(document).on('click', '.selected-plans-row .close', function(){
