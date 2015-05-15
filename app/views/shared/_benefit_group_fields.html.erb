@@ -12,7 +12,7 @@
     <div class="row bottom-row">
       <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
         <!-- Offset :  -->
-        <%= f.select(:effective_on_offset, options_for_select([["0 (Zero)", 0], ["30 (Thirty)", 30], ["60 (Sixty)", 60]]), {:include_blank => "Select Effective On Offset"}, { :class => ''}) %>
+        <%= f.select(:effective_on_offset, options_for_select([["0 (Zero)", 0], ["30 (Thirty)", 30], ["60 (Sixty)", 60]], selected: 0), {:include_blank => "Select Effective On Offset"}, { :class => ''}) %>
 
         <!-- <label class="control-label"> EFFECTIVE ON OFFSET: </label>
         <div class="btn-group" data-toggle="buttons">

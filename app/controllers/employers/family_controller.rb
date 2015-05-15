@@ -167,7 +167,7 @@ class Employers::FamilyController < ApplicationController
     family = EmployerCensus::EmployeeFamily.new
     family.build_census_employee
     family.build_census_employee.build_address
-    #family.census_dependents.build
+    family.census_dependents.build
     family.benefit_group_assignments.build
     family
   end

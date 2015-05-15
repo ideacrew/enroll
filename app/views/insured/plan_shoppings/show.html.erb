@@ -1,1 +1,51 @@
-<%= render "insured/plan_shoppings/plans" %>
+<%= render "insured/plan_shoppings/detail_modal" %>
+
+<div class="container">
+	<div id="select_plan_wrapper">
+		<div class="row">
+			<div class="col-md-9 col-sm-9 col-xs-12">
+				<h3>Select a Plan.</h3>
+				<div class="select-plan">
+					<section>
+						<p class="detail">
+						<span>Selecting a plan can feel tricky.</span> 
+						If you need help don't be afraid to ask. You can reach DCHBX support at 555-555-5555 ext 1. Click continue to see the covergae options your employer has available.
+						</p><br>
+						<a id="select-plan-btn1" class="btn btn-success">Continue</a>
+					</section>
+
+					<section class="select-plan-details">
+						<div role="tabpanel">
+
+							<ul class="nav nav-tabs" role="tablist">
+								<li role="presentation" class="active"><a data-plan-category-filter="all" href="#" aria-controls="all-plans" role="tab" data-toggle="tab">All Plans</a></li>
+								<li role="presentation"><a href="#" data-plan-category-filter="hmo" aria-controls="hmo-plans" role="tab" data-toggle="tab">HMO Plans</a></li>
+								<li role="presentation"><a href="#" data-plan-category-filter="ppo" aria-controls="ppo-plans" role="tab" data-toggle="tab">PPO Plans</a></li>
+								<li role="presentation"><a href="#" data-plan-category-filter="pos" aria-controls="pos-plans" role="tab" data-toggle="tab">POS Plans</a></li>
+								<li class="pull-right all-filter" role="presentation"><a href="#" role="tab" data-toggle="tab">All Filters</a></li>
+							</ul>
+
+							<%= render "insured/plan_shoppings/plan_filters" %>
+
+							<!-- Tab panes -->
+							<div class="tab-content">
+								<div role="tabpanel" class="tab-pane active" id="all-plans">
+									<% @plans.each do |plan| %>
+										<%= render "insured/plan_shoppings/plan_details", :plan => plan %>
+									<% end %>
+								</div>
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+			<div class="col-md-2 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
+				<%= link_to "Save & Exit", home_consumer_profiles_path, { :class => "btn btn-primary" } %>
+				<input type="hidden" id="initial_progress" value="75">
+				<div style="display: none;" id="sup-progress" data-signup-progress="7"></div>
+				<%= render 'shared/signup_progress' %>
+				<a href="#" class="btn btn-default" style="display: none;" data-uri="<%= comparison_products_plans_path %>" id="compare-selected-plans-link">Compare Selected Plans</a>
+			</div>
+		</div>
+	</div>
+</div>

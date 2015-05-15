@@ -11,7 +11,7 @@
               </p>
 
               <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
-                <% @employer_profile.organization.office_locations.each do |loc| %>
+                <% Array(@employer_profile.organization.office_locations.last).each do |loc| %>
                   <li class="list-group-item">
                     <div class="row no-buffer">
                       <div class="col-md-12">
