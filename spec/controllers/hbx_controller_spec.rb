@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe HbxController, :type => :controller do
+RSpec.describe Hbx::HbxController, :type => :controller do
   let(:user) { double("user")}
 
   describe "GET welcome" do

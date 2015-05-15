@@ -190,9 +190,9 @@ When(/^I select a plan on the plan shopping page$/) do
 end
 
 Then(/^I should see the coverage summary page$/) do
-  @browser.a(href: /\/plan_shopping\/checkout/, class: "btn-continue").wait_until_present
+  @browser.a(href: /plan_shoppings/, class: "btn-continue").wait_until_present
   screenshot("summary_page")
-  expect(@browser.a(href: /\/plan_shopping\/checkout/, class: "btn-continue").visible?).to be_truthy
+  expect(@browser.a(href: /plan_shoppings/, class: "btn-continue").visible?).to be_truthy
 end
 
 When(/^I confirm on the coverage summary page$/) do
