@@ -46,6 +46,7 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'people_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'broker_agencies_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
+require File.join(File.dirname(__FILE__),'seedfiles', 'admins_seed')
 puts "*"*80
 
 # Products::Qhp.delete_all
