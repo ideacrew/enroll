@@ -9,8 +9,6 @@ class Person
   ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
   RELATIONSHIP_CHANGE_ATTRIBUTES = %w(person_relationships)
 
-  auto_increment :hbx_id, :seed => 9999
-
   field :hbx_id, type: Integer
   field :name_pfx, type: String
   field :first_name, type: String
@@ -72,9 +70,10 @@ class Person
 
 
   before_save :update_full_name
+  before_create :generate_hbx_id
   before_save :strip_empty_fields
 
-  index({hbx_id: 1}, {unique: true})
+  index({hbx_id: 1}, {unique: true, sparse: true})
 
   index({last_name:  1})
   index({first_name: 1})
@@ -113,7 +112,15 @@ class Person
   scope :active,   ->{ where(is_active: true) }
   scope :inactive, ->{ where(is_active: false) }
 
+  def generate_hbx_id
+    # TODO: Invoke service to produce hbx ids
+    hbx_id = nil
+  end
+
   def strip_empty_fields
+    if hbx_id.blank?
+      unset("hbx_id")
+    end
     if ssn.blank?
       unset("ssn")
     end
