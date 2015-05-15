@@ -45,6 +45,18 @@
             </tr>
           <% end %>
         <% end %>
+        <tr>
+          <td>Plan Details (PDF)</td>
+          <td colspan="3" class="text-center">
+            <%= link_to '#', class: "download" do %>
+              <i class="glyphicon glyphicon-download-alt"></i> Download
+            <% end %>
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td colspan="3" class="text-center"><%= link_to 'Select Plan', '#', class: 'btn btn-info btn-lg' %></td>
+        </tr>
       </tbody>
     </table>
     
@@ -63,7 +75,8 @@
       </tr>
     </table>
 
-    <h4> Managing Type 2 Diabetes </h4>
+    <br>
+    <h4>Managing Type 2 Diabetes</h4>
     <table class="table table-bordered">
       <tr>
         <th>Amount Owed to Providers</th>
