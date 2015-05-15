@@ -461,6 +461,11 @@ $(document).ready(function () {
     });
     $('#dLabel').html($(this).text()+"<i class='glyphicon glyphicon-menu-down'></i>");
   });
+
+  $(document).on('click', '.all-plans', function() {
+    $("#plan-summary").hide();
+    $("#all-plans").show();
+  });
 });
 
 $(document).on('page:update', function() {

@@ -10,20 +10,22 @@
 						<p class="detail">
 						<span>Selecting a plan can feel tricky.</span> 
 						If you need help don't be afraid to ask. You can reach DCHBX support at 555-555-5555 ext 1. Click continue to see the covergae options your employer has available.
-						</p><br>
+						</p>
 						<a id="select-plan-btn1" class="btn btn-success">Continue</a>
 					</section>
 
 					<section class="select-plan-details">
 
-							<!-- <ul class="nav nav-tabs" role="tablist">
-								<li role="presentation" class="active"><a data-plan-category-filter="all" href="#" aria-controls="all-plans" role="tab" data-toggle="tab">All Plans</a></li>
-								<li role="presentation"><a href="#" data-plan-category-filter="hmo" aria-controls="hmo-plans" role="tab" data-toggle="tab">HMO Plans</a></li>
-								<li role="presentation"><a href="#" data-plan-category-filter="ppo" aria-controls="ppo-plans" role="tab" data-toggle="tab">PPO Plans</a></li>
-								<li role="presentation"><a href="#" data-plan-category-filter="pos" aria-controls="pos-plans" role="tab" data-toggle="tab">POS Plans</a></li>
-								<li class="pull-right all-filter" role="presentation"><a href="#" role="tab" data-toggle="tab">All Filters</a></li>
-							</ul> -->
+						<ul class="family-coverage">
+			                <li>Individual: <span><%= @person.full_name %></span></li>
+			                <li>Dependents: <span>Spouse + 2</span>
+			                <li>Employer: <span>Acme Unlimited, Inc.</span>
+			                <li>Plans: <span><%= @plans.count %></span></li>
+			            </ul>
+			            <div class="clearfix"></div>
 
+			            <div id="plan-summary"></div>
+			            <div id="all-plans">
 							<div class="filter-btn-row">
 		            			<a class="pull-right all-filter" href="#" onclick="return false;">All Filters</a>
 		            			<div class="clearfix"></div>
@@ -39,6 +41,7 @@
 									<% end %>
 								</div>
 							</div>
+						</div>
 					</section>
 				</div>
 			</div>
