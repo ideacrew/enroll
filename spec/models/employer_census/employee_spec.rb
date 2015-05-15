@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe EmployerCensus::Employee, '.new', type: :model do
+describe EmployerCensus::Employee, '.new', dbclean: :after_each do
   it { should validate_presence_of :ssn }
   it { should validate_presence_of :dob }
   it { should validate_presence_of :hired_on }
