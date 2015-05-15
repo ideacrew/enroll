@@ -1,6 +1,6 @@
 class Employers::EmployerProfilesController < ApplicationController
   before_action :find_employer, only: [:show, :destroy]
-  before_action :check_employer_role, only: [:new, :welcome]
+  before_action :check_employer_staff_role, only: [:new, :welcome]
 
   def index
     @q = params.permit(:q)[:q]
@@ -111,8 +111,8 @@ class Employers::EmployerProfilesController < ApplicationController
 
   private
 
-    def check_employer_role
-      if current_user.has_employer_role?
+    def check_employer_staff_role
+      if current_user.has_employer_staff_role?
         redirect_to employers_employer_profile_path(current_user.person.get_employer_contact)
       end
     end
