@@ -109,8 +109,12 @@ class Family
   end
 
   def build_from_employee_role(employee_role)
-    add_family_member(employee_role.person, is_primary_applicant: true)
-    employee_role.person.person_relationships.each { |kin| add_family_member(kin.relative) }
+    build_from_person(employee_role.person)
+  end
+
+  def build_from_person(person)
+    add_family_member(person, is_primary_applicant: true)
+    person.person_relationships.each { |kin| add_family_member(kin.relative) }
     self
   end
 
@@ -121,6 +125,9 @@ class Family
 
   def add_family_member(person, **opts)
 #    raise ArgumentError.new("expected Person") unless person.is_a? Person
+
+
+
 
     is_primary_applicant     = opts[:is_primary_applicant]  || false
     is_coverage_applicant    = opts[:is_coverage_applicant] || true
