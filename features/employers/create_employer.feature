@@ -9,7 +9,8 @@ Feature: Create Employer
       When I visit the Employer portal
         And I sign up with valid user data
       Then I should see a successful sign up message
-        # And I should see an initial form to enter information about my Employer and myself
+        And I should see an initial form to enter information about my Employer and myself
+        And I should see a successful creation message
 
     Scenario: Employer Representative has previously signed up on HBX
       Given I have signed up previously through consumer, broker agency or previous visit to the Employer portal
