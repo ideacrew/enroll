@@ -70,7 +70,7 @@ class Person
 
 
   before_save :update_full_name
-  before_create :generate_hbx_id
+  before_save :generate_hbx_id
   before_save :strip_empty_fields
 
   index({hbx_id: 1}, {sparse:true, unique: true})
@@ -113,18 +113,16 @@ class Person
   scope :inactive, ->{ where(is_active: false) }
 
   def generate_hbx_id
+    if hbx_id.blank?
+      hbx_id = HbxIdGenerator.generate
+    end
     # TODO: Invoke service to produce hbx ids
   end
 
   def strip_empty_fields
-    unset_fields = []
-    if self.hbx_id.blank?
-      unset_fields << "hbx_id"
-    end
     if ssn.blank?
-      unset_fields << "ssn"
+      unset("ssn")
     end
-    unset(*unset_fields)
   end
 
   # Strip non-numeric chars from ssn

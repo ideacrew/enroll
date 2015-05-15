@@ -14,7 +14,7 @@ describe EmployeeRole do
 end
 
 describe EmployeeRole, "given a person" do
-  let(:hbx_id) { 555553443 }
+  let(:hbx_id) { "555553443" }
   let(:ssn) { "012345678" }
   let(:dob) { Date.new(2009, 2, 5) }
   let(:gender) { "female" }

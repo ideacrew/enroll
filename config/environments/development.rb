@@ -43,4 +43,6 @@ Rails.application.configure do
   config.acapi.add_subscription(Acapi::Subscribers::Edi)
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  HbxIdGenerator.slug!
 end
