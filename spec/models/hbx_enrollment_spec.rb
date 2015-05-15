@@ -163,7 +163,7 @@ end
 #     context "correct EDI event is created" do
 #     end
 #
-#     context "correct employee_profile notice is created" do
+#     context "correct employee_role notice is created" do
 #     end
 #
 #   end

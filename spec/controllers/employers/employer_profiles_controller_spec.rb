@@ -7,7 +7,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:person) { double("person")}
 
     it "should render the new template" do
-      allow(user).to receive(:has_employer_role?)
+      allow(user).to receive(:has_employer_staff_role?)
       sign_in(user)
       get :new
       expect(response).to have_http_status(:success)
@@ -20,7 +20,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
 
     it "should render the new template" do
-      allow(user).to receive(:has_employer_role?)
+      allow(user).to receive(:has_employer_staff_role?)
       sign_in(user)
       get :show, id: employer_profile.id
       expect(response).to have_http_status(:success)
@@ -33,7 +33,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:user) { double("user")}
 
     it "renders the 'welcome' template" do
-      allow(user).to receive(:has_employer_role?)
+      allow(user).to receive(:has_employer_staff_role?)
       sign_in(user)
       get :welcome
       expect(response).to have_http_status(:success)
@@ -256,7 +256,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:person) { FactoryGirl.create(:person) }
 
     before do 
-      allow(user).to receive(:has_employer_role?).and_return(true)
+      allow(user).to receive(:has_employer_staff_role?).and_return(true)
       allow(user).to receive(:roles).and_return(["employer"])
       allow(user).to receive(:person).and_return(person)
       allow(Organization).to receive(:find).and_return(organization)

@@ -40,20 +40,21 @@ class User
   field :oim_id, type: String, default: ""
 
   ROLES = {
-    employer: "employer",
     employee: "employee",
+    resident: "resident",
+    consumer: "consumer",
+    employer_staff: "employer_staff",
     broker: "broker",
-    undocumented_consumer: "undocumented_consumer",
-    qhp_consumer: "qhp_consumer",
-    hbx: "hbx",
-    system_service: "systems_service",
+    hbx_staff: "hbx_staff",
+    system_service: "system_service",
     web_service: "web_service"
   }
 
   PROFILES = {
     employer_profile: "employer_profile",
-    broker_profile: "broker_profile",
-    employee_profile: "employee_profile"
+    broker_agency_profile: "broker_agency_profile",
+    hbx_profile: "hbx_profile",
+    carrier_profile: "carrier_profile"
   }
 
   # Enable polymorphic associations
@@ -94,16 +95,16 @@ class User
     has_role?(:employee)
   end
 
-  def has_employer_role?
-    has_role?(:employer)
+  def has_employer_staff_role?
+    has_role?(:employer_staff)
   end
 
   def has_broker_role?
     has_role?(:broker)
   end
 
-  def has_hbx_role?
-    has_role?(:hbx)
+  def has_hbx_staff_role?
+    has_role?(:hbx_staff)
   end
 
   def ensure_authentication_token
