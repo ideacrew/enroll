@@ -1,4 +1,5 @@
 <h4>Benefit Group Assignment</h4>
 <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
   <%= f.select :benefit_group_id, @employer_profile.plan_years.first.benefit_groups.map{|bg| [bg.title, bg.id]}, prompt: "SELECT BENEFIT GROUP", required: true %>
+  <%= f.text_field :start_on, placeholder: "START DATE", class: "required date-picker floatlabel form-control", required: true   %>
 </div>

@@ -5,9 +5,11 @@
 
           <h3>Confirm Your Plan Selection</h3>
           <p>Your current plan selection is displayed below. Click the back button if you want to change your selection. Click confirm to complete your enrollment.</p>
-          <h4>You will not be enrolled until you confirm your plan selection.</h4>
-          <h4><%= @plan.name %></h4>
-          <h4>Starting on: <%= @enrollment.effective_on.strftime("%m/%d/%Y") %></h4>
+          <p>Your enrollment is not complete until you confirm your plan selection below.</p>
+          <p>
+            <strong><%= @plan.name %></strong><br>
+            Starting on : <%= @enrollment.effective_on.strftime("%m/%d/%Y") %>
+          </p>
 
           <table class="table table-striped">
             <thead>
@@ -24,45 +26,36 @@
               <% @enrollment.hbx_enrollment_members.each do |member| %>
                 <tr>
                   <td><%= member.person.full_name %></td>
-                  <td><%= member.person.try(:gender) %></td>
+                  <td><%= member.person.try(:gender).humanize %></td>
                   <td><%= member.person.try(:dob).strftime("%m/%d/%Y") %></td>
                   <td><%= number_to_currency(@plan.premium_for(member)) %></td>
                   <% total_cost += @plan.premium_for(member) %>
                 </tr>
               <% end %>
               <tr>
-                <td colspan='3' style='text-align: center;'>Total</td>
+                <td colspan="3" class="text-right">Total Premium</td>
                 <td><%= number_to_currency(total_cost) %></td>
+              </tr>
+            
+              <tr>
+                <td colspan="3" class="text-right">Additionally your employer pays</td>
+                <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
+              </tr>
+              <tr style='font-size:20px'>
+                <td colspan="3" class="text-right"><strong>You pay</strong></td>
+                <td><strong>
+                  <%= number_to_currency(@plan.total_employee_cost || 0) %>
+                </strong></td>
+              </tr>
+              <tr>
+                <td colspan="3" class="text-right">Your coverage start date</td>
+                <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <table class='table table-striped'>
-          <tr>
-            <td>Additionally your employer pays</td>
-            <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
-          </tr>
-          <tr>
-            <td>Your coverage start date</td>
-            <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
-          </tr>
-          <tr style='font-size:20px'>
-            <td><strong>You pay</strong></td>
-            <td><strong>
-              <%= number_to_currency(@plan.total_employee_cost || 0) %>
-            </strong></td>
-          </tr>
-        </table>
-
-        <span style="font-size: 14px; line-height: 130%;">
-          DC Health Link<br />
-          PHONE: 855-532-5465 (855-532-LINK)<br />
-          TTY/TDD 711-1-532-5465<br />
-          Monday-Saturday 8:00am - 8:00pm<br />
-          E-Mail: info@dchealthlink.com</span><br />
-        </span><br />
-        <%= link_to "Confirm", checkout_insured_plan_shopping_path(@enrollment, :plan_id => @plan.id), :class => "btn btn-success btn-continue", :method => :post %>
+        <%= link_to "Confirm", checkout_insured_plan_shopping_path(@enrollment, :plan_id => @plan.id), :class => "btn btn-primary btn-continue pull-right", :method => :post %>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
 	    <%= link_to "Save & Exit", home_consumer_profiles_path(@person), { :class => "btn btn-primary" } %>
