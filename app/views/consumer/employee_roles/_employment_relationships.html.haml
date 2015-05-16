@@ -14,11 +14,11 @@
           .row
             .col-md-8.col-sm-8.col-xs-12
               %dl.dl-horizontal
-                %dt Employer
+                %dt Employer :
                 %dd= emp_relationship.employer_name
-                %dt Hired On
+                %dt Hired On :
                 %dd= format_date emp_relationship.hired_on
-                %dt Eligible for Coverage
+                %dt Eligible for Coverage :
                 %dd= format_date emp_relationship.eligible_for_coverage_on
             .col-md-4.col-sm-4.col-xs-12.text-right
               = f.submit "This is my employer", :class => "btn btn-primary"

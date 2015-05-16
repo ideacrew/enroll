@@ -1,6 +1,5 @@
 <div class="emp-info">
-    Employer : <%= employer.legal_name %><br>
-
-    Hired : <%= employee.hired_on.strftime("%B %d, %Y") %> <br>
-    Eligible for Coverage : <%= effective_on.strftime("%B %d, %Y") %> <br>
+    <strong>Employer :</strong> <%= employer.legal_name %><br>
+    <strong>Hired :</strong> <%= employee.hired_on.strftime("%m/%d/%Y") %> <br>
+    <strong>Eligible for Coverage :</strong> <%= effective_on.strftime("%m/%d/%Y") %> <br>
 </div>

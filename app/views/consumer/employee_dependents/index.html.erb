@@ -2,7 +2,7 @@
   <div id="dependents_info_wrapper">
     <div class="row">
       <div class="col-md-9 col-sm-9 col-xs-12">
-        <h3>Household Information</h3>
+        <h3>Family Members</h3>
 
         <div class="row no-buffer">
           <div class="col-md-12 col-sm-12 col-xs-12 no-pd first">
@@ -43,7 +43,11 @@
       <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
 	      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
 		      <%= link_to "Add Member", new_consumer_employee_dependent_path(:family_id => @family.id), :remote => true, :class => "btn btn-primary" %>
-          <%= link_to 'Continue', group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id), class: 'btn btn-success pull-right' %>
+          <%= 
+            link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id), class: 'btn btn-primary pull-right' do
+              '<i class="fa fa-user-plus"></i> Continue'.html_safe
+            end
+          %>
         </div>
       </div>
     </div>

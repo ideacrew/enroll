@@ -2,7 +2,7 @@
   <div class="panel panel-default">
     <div class="panel-body left">
         <div class="col-md-9 col-sm-9 col-xs-12">
-          <h3>Group Selection</h3>
+          <h3>Covered Family Members</h3>
           <h3>Who would you like to cover?</h3>
           <%= form_tag(:group_selection_create) do %>
             <%= hidden_field_tag(:person_id, @person.id) %>
@@ -11,14 +11,24 @@
             <% @coverage_household.family_members.each_with_index do |family_member, index| %>
               <div>
                 <%= check_box_tag("family_member_ids[#{index}]", family_member.id, true) %>
-                <%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Date of Birth: #{family_member.dob})") %>
+                <% 
+                  dob = family_member.dob
+                  now = Date.today
+                  age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+                %>
+                <%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(age, 'year')})") %>
               </div>
             <% end %>
+            
             <br>
-            <%= submit_tag "Continue", class: 'btn btn-success pull-left' %>
+            <h3>Select a plan</h3>
+            <p class="text-justify"><%= t('group_selection.select_plan') %></p>
+            <br>
+            
+            <%= submit_tag "Continue", class: 'btn btn-primary pull-left' %>
           <% end %>
           &nbsp;&nbsp;
-          <%= link_to 'My Account', person_my_account_path(current_user.person), class: 'btn btn-success' %>
+          <%= link_to 'My Account', person_my_account_path(current_user.person), class: 'btn btn-primary' %>
         </div>
 
         <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
