@@ -65,6 +65,7 @@ class Employers::EmployerProfilesController < ApplicationController
   def show
     @current_plan_year = @employer_profile.plan_years.last
     @benefit_groups = @current_plan_year.benefit_groups if @current_plan_year.present?
+    @employee_families = @employer_profile.employee_families_sorted.page(params[:employee_families_page]).per(10)
   end
 
   def new
