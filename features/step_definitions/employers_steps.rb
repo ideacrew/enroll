@@ -119,7 +119,7 @@ Then(/^I should see a welcome page with successful sign in message$/) do
 end
 
 Then(/^I should see fields to search for person and employer$/) do
-  sleep(1)
+  sleep(2)
   Watir::Wait.until(30) { @browser.text.include?("Personal Information") }
   screenshot("employer_portal_person_search")
   expect(@browser.text.include?("Personal Information")).to be_truthy
@@ -160,10 +160,10 @@ And(/^My user data from existing the fieldset values are prefilled using data fr
   sleep(1)
 end
 
-And(/^I should see a second form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
+And(/^I should see a form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
   sleep(2)
   Watir::Wait.until(30) { @browser.button(value: "Search Employers").present? }
-  screenshot("employer_portal_employer_search_form")
+  #screenshot("employer_portal_employer_search_form")
   employer_profile = FactoryGirl.create(:employer_profile)
 
   expect(@browser.button(value: "Search Employers").visible?).to be_truthy
