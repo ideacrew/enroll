@@ -390,15 +390,8 @@ $(document).ready(function () {
     $('#address_info > .first').attr('id', ($(this).text()));
   });
   
-  // Select Plan Page
-  $('#select-plan-btn1').click(function() {
-    $(".select-plan p.detail").hide();
-    $(this).hide();
-    $(".select-plan-details").show();
-  });
-
-  $(document).on('click', '.select-plan .all-filter', function(){
-    $(".all-filters-row").show();
+  $(document).on('click', '.filter-btn-row a.all-filter', function(){
+    $(".all-filters-row").toggle("fast");
   });
 
   $(document).on('click', '.selected-plans-row .close', function(){
@@ -409,10 +402,10 @@ $(document).ready(function () {
   // Input Masks
   $(".phone_number").mask("(999) 999-9999");
   $(".zip").mask("99999");
-  $("#person_ssn").mask("999999999");
+  $("#person_ssn").mask("999-99-9999");
   $(".person_ssn").mask("999999999");
   $(".address-state").mask("AA");
-  $(".mask-ssn").mask("999999999");
+  $(".mask-ssn").mask("999-99-9999");
   
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
@@ -456,6 +449,11 @@ $(document).ready(function () {
       }
     });
     $('#dLabel').html($(this).text()+"<i class='glyphicon glyphicon-menu-down'></i>");
+  });
+
+  $(document).on('click', '.all-plans', function() {
+    $("#plan-summary").hide();
+    $("#all-plans").show();
   });
 });
 

@@ -1,2 +1,5 @@
-$("#plan-details-modal-body").html("<%= escape_javascript(render partial: "shared/summary", locals: {qhp: @qhp}) %>");
-$("#plan-details-modal").modal("show");
+// $("#plan-details-modal-body").html("<%= escape_javascript(render partial: "shared/summary", locals: {qhp: @qhp}) %>");
+$("#plan-summary").html("<%= escape_javascript(render partial: "shared/summary", locals: {qhp: @qhp}) %>");
+$("#all-plans").hide();
+$("#plan-summary").show();
+// $("#plan-details-modal").modal("show");

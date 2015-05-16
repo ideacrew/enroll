@@ -1,7 +1,7 @@
 <div class="row">
 	<p class="head">
-	<span>Household</span>
-	<span><%= link_to "add members", family_consumer_profiles_path, :remote => true %></span>
+	<span>Family Members</span>
+	<span><%= link_to "add family members", family_consumer_profiles_path, :remote => true %></span>
 	</p>
 	<ul class="list-group emp-ul">
 		<% primary_member = @family.primary_applicant %>
@@ -10,7 +10,15 @@
 			<li class="list-group-item">
 			<div class="row">
 				<div class="col-md-12 col-sm-12 col-xs-12">
-					<h4><%= fm.person.first_name %> <%= fm.person.middle_name %> <%= fm.person.last_name %><%= link_to raw(image_tag "edit.png", :class => "pull-right"), family_consumer_profiles_path, :remote => true %></h4>
+					<h4>
+						<%= 
+							fm.person.first_name %> <%= fm.person.middle_name %> <%= fm.person.last_name
+
+							link_to family_consumer_profiles_path, remote: true, class: 'pull-right' do
+								'<i class="fa fa-pencil"></i>'.html_safe
+							end
+						%>
+					</h4>
 				</div>
 			</div>
 			</li>

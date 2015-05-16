@@ -21,7 +21,11 @@
 					<label class="static_label label-floatlabel">LAST NAME</label>
 					<span class="field_value floatlabel form-control active-floatlabel"><%= dependent.last_name %></span>
 					<div class="text-right">
-						<%= link_to (image_tag "edit-blue.png"), edit_consumer_employee_dependent_path(dependent), remote: true, class: 'close close-2' %>
+						<%=
+							link_to edit_consumer_employee_dependent_path(dependent), remote: true, class: 'close close-2' do
+								'<i class="fa fa-pencil"></i>'.html_safe
+							end
+						%>
 					</div>
 				</div>
 			</div>
@@ -38,20 +42,20 @@
 			<div class="col-md-3 col-sm-3 no-pd">
 				<div class="form-group form-group-lg">
 					<label class="static_label label-floatlabel">SOCIAL SECURITY</label>
-					<span class="field_value floatlabel form-control active-floatlabel"><%= dependent.ssn %></span>
+					<span class="field_value floatlabel form-control active-floatlabel"><%= "#{dependent.ssn[0..2]}-#{dependent.ssn[3..4]}-#{dependent.ssn[5..9]}" %></span>
 				</div>
 			</div>
 
 			<div class="col-md-3 col-sm-3 no-pd">
 				<div class="form-group form-group-lg">
 					<label class="static_label label-floatlabel">RELATIONSHIP</label>
-					<span class="field_value floatlabel form-control active-floatlabel"><%= dependent.relationship %></span>
+					<span class="field_value floatlabel form-control active-floatlabel"><%= dependent.relationship.humanize %></span>
 				</div>
 			</div>
 			<div class="col-md-3 col-sm-3 no-pd">
 				<div class="form-group form-group-lg">
 					<label class="static_label label-floatlabel">GENDER</label>
-					<span class="field_value floatlabel form-control active-floatlabel"><%= dependent.gender %></span>
+					<span class="field_value floatlabel form-control active-floatlabel"><%= dependent.gender.humanize %></span>
 				</div>
 			</div>
 		</div>
