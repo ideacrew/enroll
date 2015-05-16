@@ -53,7 +53,7 @@ describe Email, :dbclean => :after_each do
         it "should give an error" do
           record = Email.create(**params)
           expect(record.errors[:address].any?).to be_truthy
-          expect(record.errors[:address]).to eq ["is invalid", "can't be blank"]
+          expect(record.errors[:address]).to eq ["is not valid", "can't be blank"]
         end
       end
 
@@ -62,7 +62,7 @@ describe Email, :dbclean => :after_each do
         it "should give an error" do
           record = Email.create(**params)
           expect(record.errors[:address].any?).to be_truthy
-          expect(record.errors[:address]).to eq ["is invalid"]
+          expect(record.errors[:address]).to eq ["is not valid"]
         end
       end
 
