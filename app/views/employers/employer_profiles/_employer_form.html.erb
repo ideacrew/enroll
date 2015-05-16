@@ -5,7 +5,33 @@
 
       <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(@organization), method: :put} do |f| %>
 
-        <%= render "shared/error_messages", object: f.object %>
+        <%#= render "shared/error_messages", object: f.object %>
+        <% if @organization.errors.any? %>
+          <div class="alert alert-error">
+            <h4>
+              <%= "#{pluralize(@organization.errors.size, "error")} prohibited this form from being saved:" %>
+            </h4>
+            <ul>
+              <% office_loc = @organization.office_locations.last %>
+              <% office_loc.phone.errors.full_messages.each do |msg| %>
+                <li>
+                  <%= msg %>
+                </li>
+              <% end %>
+              <% office_loc.address.errors.full_messages.each do |msg| %>
+                <li>
+                  <%= msg %>
+                </li>
+              <% end %>
+              <% office_loc.email.errors.full_messages.each do |msg| %>
+                <li>
+                  <%= msg %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
 
         <div class="col-md-12 col-sm-12 col-xs-12">
           <div class="row landing-row">
