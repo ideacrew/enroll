@@ -65,6 +65,7 @@ class Employers::EmployerProfilesController < ApplicationController
   def show
     @current_plan_year = @employer_profile.plan_years.last
     @benefit_groups = @current_plan_year.benefit_groups if @current_plan_year.present?
+    @employee_families = @employer_profile.employee_families_sorted.page(params[:employee_families_page]).per(10)
   end
 
   def new
@@ -99,13 +100,16 @@ class Employers::EmployerProfilesController < ApplicationController
   def update
     @organization = Organization.find(params[:id])
     @employer_profile = @organization.employer_profile
-    current_user.roles << "employer" unless current_user.roles.include?("employer")
+    current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
     current_user.person.employer_contact = @employer_profile
     if @organization.update_attributes(employer_profile_params) && current_user.save
       flash[:notice] = 'Employer successfully created.'
       redirect_to employers_employer_profile_path(@employer_profile)
     else
-      render action: :new
+      respond_to do |format|
+        format.js { render "edit" }
+        format.html { render "edit" }
+      end
     end
   end
 

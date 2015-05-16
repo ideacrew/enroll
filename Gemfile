@@ -46,7 +46,7 @@ gem 'mongo_session_store-rails4', '~> 6.0.0'
 
 ## Add field-level encryption
 # gem 'mongoid-encrypted-fields', '~> 1.3.3'
-# gem 'symmetric-encryption', '~> 3.6.0'
+gem 'symmetric-encryption', '~> 3.6.0'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
@@ -70,6 +70,7 @@ gem 'kaminari'
 gem 'sprockets' , "~> 2.12.3"
 # for I18n
 gem 'rails-i18n', '~> 4.0.0'
+gem 'mail'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -90,7 +91,7 @@ group :development, :test do
   gem 'capistrano-rails', '~> 1.1.2'
   gem 'ruby-progressbar', '1.6.0'
 
-  # Keep these in Development and Test environments for access by rails generators 
+  # Keep these in Development and Test environments for access by rails generators
   gem 'rspec-rails', '~> 3.1.0'
   gem 'factory_girl_rails', "~> 4.0"
 end

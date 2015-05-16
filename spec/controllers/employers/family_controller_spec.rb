@@ -79,7 +79,7 @@ RSpec.describe Employers::FamilyController do
     end
 
     it "should be render edit template when invalid" do
-      allow(family).to receive(:update_attributes).and_return(false)
+      allow(family).to receive(:save).and_return(false)
       post :update, :id => family.id, :employer_profile_id => employer_profile_id, employer_census_employee_family: {}
       expect(response).to render_template("edit")
     end

@@ -28,9 +28,62 @@ Then(/^I should see a successful sign up message$/) do
 end
 
 And(/^I should see an initial form to enter information about my Employer and myself$/) do
-  expect(@browser.button(name: "commit").visible?).to be_truthy
-  expect(@browser.button.value == "Create").to be_truthy
-  @browser.button(name: "commit").click
+  sleep(1)
+  expect(@browser.a(text: "Continue").visible?).to be_truthy
+  @browser.a(text: "Continue").click
+  sleep(1)
+  @browser.text_field(name: "person[first_name]").set("Doe")
+  @browser.text_field(name: "person[last_name]").set("John")
+  @browser.text_field(name: "person[date_of_birth]").set("11/10/1982")
+  @browser.text_field(name: "person[first_name]").click
+  @browser.text_field(name: "person[ssn]").set("111010999")
+  expect(@browser.button(value: "Search Person").visible?).to be_truthy
+  @browser.button(value: "Search Person").fire_event("onclick")
+  sleep(1)
+  screenshot("employer_portal_person_search_no_match")
+
+  @browser.button(value: "Create Person").fire_event("onclick")
+  sleep(1)
+  @browser.text_field(name: "person[addresses_attributes][0][address_1]").set("100 North Street")
+  @browser.text_field(name: "person[addresses_attributes][0][address_2]").set("Suite 990")
+  @browser.text_field(name: "person[addresses_attributes][0][city]").set("Sterling")
+  @browser.text_field(name: "person[addresses_attributes][0][state]").set("VA")
+  @browser.text_field(name: "person[addresses_attributes][0][zip]").set("20166")
+  @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("6781230986")
+  @browser.text_field(name: "person[phones_attributes][1][full_phone_number]").set("6781230987")
+  @browser.text_field(name: "person[emails_attributes][0][address]").set("john.doe@home.com")
+  @browser.text_field(name: "person[emails_attributes][1][address]").set("john.doe@work.com")
+  @browser.text_field(name: "person[emails_attributes][1][address]").click
+  screenshot("employer_portal_person_data_new")
+  sleep(1)
+  expect(@browser.button(id: "continue-employer").visible?).to be_truthy
+  @browser.button(id: "continue-employer").click
+  sleep(3)
+  @browser.text_field(name: "employer_profile[fein]").set("678121089")
+  @browser.text_field(name: "employer_profile[dba]").set("Systems")
+  @browser.text_field(name: "employer_profile[legal_name]").set("ABC Systems")
+  input_field = @browser.div(:class => 'selectric-wrapper')
+  input_field.click
+  input_field.li(text: "Partnership").click
+  sleep(1)
+  @browser.button(value: "Search Employers").fire_event("onclick")
+  sleep(1)
+  screenshot("employer_portal_employer_search_no_match")
+  sleep(1)
+  @browser.button(value: "Create Employer").fire_event("onclick")
+  sleep(3)
+  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").set("981 North State")
+  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_2]").set("Suite 2a")
+  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Springfield")
+  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][state]").set("VA")
+  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("93833")
+  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("898")
+  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("9990000")
+  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][extension]").set("1111")
+  @browser.text_field(name: "organization[office_locations_attributes][0][email_attributes][address]").set("john.doe.abcsystems@example.com")
+  screenshot("employer_portal_employer_data_new")
+  @browser.button(value: "Create").fire_event("onclick")
+  sleep(1)
 end
 
 Given(/^I have signed up previously through consumer, broker agency or previous visit to the Employer portal$/) do
@@ -66,7 +119,7 @@ Then(/^I should see a welcome page with successful sign in message$/) do
 end
 
 Then(/^I should see fields to search for person and employer$/) do
-  sleep(1)
+  sleep(2)
   Watir::Wait.until(30) { @browser.text.include?("Personal Information") }
   screenshot("employer_portal_person_search")
   expect(@browser.text.include?("Personal Information")).to be_truthy
@@ -107,10 +160,10 @@ And(/^My user data from existing the fieldset values are prefilled using data fr
   sleep(1)
 end
 
-And(/^I should see a second form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
+And(/^I should see a form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
   sleep(2)
   Watir::Wait.until(30) { @browser.button(value: "Search Employers").present? }
-  screenshot("employer_portal_employer_search_form")
+  #screenshot("employer_portal_employer_search_form")
   employer_profile = FactoryGirl.create(:employer_profile)
 
   expect(@browser.button(value: "Search Employers").visible?).to be_truthy
@@ -125,35 +178,6 @@ And(/^I should see a second form with a fieldset for Employer information, inclu
   @browser.button(value: "This is my employer").fire_event("onclick")
   sleep(1)
   @browser.button(value: "Create").fire_event("onclick")
-end
-
-And(/^I should see an initial form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
-  Watir::Wait.until(30) { @browser.text_field(name: "organization[employer_profile_attributes][fein]").present?}
-  sleep(1)
-  # Employer info
-  @browser.text_field(name: "organization[employer_profile_attributes][fein]").set("678123089")
-  @browser.text_field(name: "organization[employer_profile_attributes][dba]").set("test")
-  @browser.text_field(name: "organization[employer_profile_attributes][legal_name]").set("True First Inc")
-  @browser.select_list(id: "organization_employer_profile_attributes_entity_kind").option(text: "c_corporation")
-end
-
-And(/^I should see a second fieldset to enter my name and email$/) do
-  # Address
-  @browser.select_list(name: "organization[office_locations_attributes][0][address_attributes][kind]").select_value("home")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").set("13101 elm tree dr")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_2]").set("xyz")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Dunwoody")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][state]").set("GA")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("30027")
-  #Phone
-  @browser.select_list(name: "organization[office_locations_attributes][0][phone_attributes][kind]").select_value("home")
-  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set(303)
-  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set(1230981)
-  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][extension]").set(1231)
-  # Email
-  @browser.select_list(name: "organization[office_locations_attributes][0][email_attributes][kind]").select_value("home")
-  @browser.text_field(name: "organization[office_locations_attributes][0][email_attributes][address]").set("example1@example.com")
-  @browser.button(name: "commit").click
 end
 
 And(/^I should see a successful creation message$/) do
@@ -222,7 +246,7 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.radio(id: "employer_census_employee_family_census_employee_attributes_gender_male").set
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][hired_on]").set("10/10/2014")
   # Address
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][address_1]").click
+  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][address_1]").set("1026 potomac")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][address_1]").set("1026 potomac")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][address_2]").set("apt abc")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][city]").set("alpharetta")

@@ -17,6 +17,8 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
 
+  before_save :clear_blank_fields
+
   # All current and former members of this group
   belongs_to  :person
   embeds_many :family_members, cascade_callbacks: true
@@ -109,8 +111,12 @@ class Family
   end
 
   def build_from_employee_role(employee_role)
-    add_family_member(employee_role.person, is_primary_applicant: true)
-    employee_role.person.person_relationships.each { |kin| add_family_member(kin.relative) }
+    build_from_person(employee_role.person)
+  end
+
+  def build_from_person(person)
+    add_family_member(person, is_primary_applicant: true)
+    person.person_relationships.each { |kin| add_family_member(kin.relative) }
     self
   end
 
@@ -121,6 +127,9 @@ class Family
 
   def add_family_member(person, **opts)
 #    raise ArgumentError.new("expected Person") unless person.is_a? Person
+
+
+
 
     is_primary_applicant     = opts[:is_primary_applicant]  || false
     is_coverage_applicant    = opts[:is_coverage_applicant] || true
@@ -244,6 +253,12 @@ class Family
 
     def find_by_case_id(case_id)
       where({"e_case_id" => case_id}).first
+    end
+  end
+
+  def clear_blank_fields
+    if e_case_id.blank?
+      unset("e_case_id")
     end
   end
 

@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe Employers::PeopleController do
   describe "GET search" do
     it "renders the 'search' template" do
+      pending
       sign_in
       get :search
       expect(response).to have_http_status(:success)

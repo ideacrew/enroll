@@ -9,17 +9,18 @@ Feature: Create Employer
       When I visit the Employer portal
         And I sign up with valid user data
       Then I should see a successful sign up message
-        # And I should see an initial form to enter information about my Employer and myself
+        And I should see an initial form to enter information about my Employer and myself
+        And I should see a successful creation message
 
     Scenario: Employer Representative has previously signed up on HBX
       Given I have signed up previously through consumer, broker agency or previous visit to the Employer portal
       When I visit the Employer portal to sign in
         And I sign in with valid user data
       Then I should see a welcome page with successful sign in message
-      Then I should see fields to search for person and employer
-        And I should see an initial fieldset to enter my name, ssn and dob
-        And My user data from existing the fieldset values are prefilled using data from my existing account
-        And I should see a second form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone
+      #Then I should see fields to search for person and employer
+        #And I should see an initial fieldset to enter my name, ssn and dob
+        #And My user data from existing the fieldset values are prefilled using data from my existing account
+        And I should see a form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone
         And I should see a successful creation message
       When I go to the benefits tab I should see plan year information
         And I should see a button to create new plan year
