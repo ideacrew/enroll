@@ -1,11 +1,42 @@
 Rails.application.routes.draw do
+
   devise_for :users
+
+  namespace :exchanges do
+    resources :hbx_profiles do
+      root 'hbx_profiles#index'
+
+      # resources :hbx_staff_roles, shallow: true do
+      resources :hbx_staff_roles do
+        # root 'hbx_profiles/hbx_staff_roles#show'
+      end
+    end
+
+    # get 'hbx_profiles', to: 'hbx_profiles#welcome'
+    # get 'hbx_profiles/:id', to: 'hbx_profiles#show', as: "my_account"
+    # get 'hbx_profiles/new'
+    # get 'hbx_profiles/create'
+    # get 'hbx_profiles/update'
+    # get 'hbx_profiles/employer_index'
+    # get 'hbx_profiles/broker_agency_index'
+    # get 'hbx_profiles/insured_index'
+  end
 
   namespace :insured do
     resources :plan_shoppings, :only => [:show] do
       member do
         post 'checkout'
         post 'thankyou'
+      end
+    end
+
+    resources :families do
+      get 'new'
+
+      resources :people do
+        collection do
+          get 'search'
+        end
       end
     end
   end
@@ -39,21 +70,19 @@ Rails.application.routes.draw do
     end
   end
 
-
-  namespace :carrier do
-
-  end
-
-  namespace :hbx do
-    get 'hbx_admin', to: 'hbx#welcome'
+  namespace :carriers do
+    resources :carrier_profiles do
+    end
   end
 
   namespace :broker_agencies do
-    root 'broker_profiles#new'
+    root 'broker_agency_profiles#new'
 
-    resources :broker_profiles do
-      get 'new'
-      get 'my_account'
+    resources :broker_agency_profiles do
+      resources :broker_agency_staff_roles do
+        get 'new'
+        get 'my_account'
+      end
     end
   end
 
@@ -85,7 +114,7 @@ Rails.application.routes.draw do
         get 'search'
       end
     end
-    root 'employer_roles#show'
+    root 'employee_roles#show'
   end
 
   # used to select which people are going to be covered before plan selection
@@ -117,14 +146,14 @@ Rails.application.routes.draw do
 
   end
 
-  resources :consumer_profiles, :only => [] do
-    collection do
-      get 'home'
-      get 'plans'
-      get 'personal'
-      get 'family'
-    end
-  end
+  # resources :consumer_profiles, :only => [] do
+  #   collection do
+  #     get 'home'
+  #     get 'plans'
+  #     get 'personal'
+  #     get 'family'
+  #   end
+  # end
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
