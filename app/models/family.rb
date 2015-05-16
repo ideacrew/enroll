@@ -17,6 +17,8 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
 
+  before_save :clear_blank_fields
+
   # All current and former members of this group
   belongs_to  :person
   embeds_many :family_members, cascade_callbacks: true
@@ -251,6 +253,12 @@ class Family
 
     def find_by_case_id(case_id)
       where({"e_case_id" => case_id}).first
+    end
+  end
+
+  def clear_blank_fields
+    if e_case_id.blank?
+      unset("e_case_id")
     end
   end
 

@@ -20,29 +20,83 @@ namespace :seed do
 
   desc "Load the family data"
   task :families => :environment do
+=begin
     Family.delete_all
-    file = File.open("db/seedfiles/heads_of_families.json")
-    heads_of_family = JSON.load(file.read)
-    file.close
-    families_built = 0
-    Person.each do |person|
-      if heads_of_family.include?(person.id.to_s)
-        Family.new.build_from_person(person).save!
+    if File.exists?("db/seedfiles/heads_of_families.json")
+      puts "Loading families"
+      file = File.open("db/seedfiles/heads_of_families.json")
+      heads_of_family = JSON.load(file.read)
+      file.close
+      puts "Loading #{heads_of_family.length} families"
+      families_built = 0
+      total_families = heads_of_family.length
+      chunk_number = 20
+      chunk = total_families.to_f/(chunk_number.to_f)
+      milestone = chunk
+      Person.each do |person|
+        if heads_of_family.include?(person.id.to_s)
+          Family.new.build_from_person(person).save!
+          families_built = families_built + 1
+          if families_built > milestone
+            milestone = milestone + chunk
+            current_value = ((families_built.to_f/total_families.to_f) * 100.00).round
+            puts "Loaded #{current_value}% of families"
+          end
+        end
+      end
+      puts "Loaded #{families_built} families successfully"
+    end
+=end
+    if File.exists?("db/seedfiles/irs_groups.csv")
+      member_ids = {}
+      family_mappings = {}
+      CSV.foreach("db/seedfiles/irs_groups.csv", :headers => true) do |row|
+        rec = row.to_hash
+        m_id = row['hbx_id']
+        family_mappings[m_id] = rec
+      end
+      member_ids_records = Person.collection.aggregate([{
+       "$project" => { "hbx_id" => 1 }
+      }])
+      member_ids_records.each do |fam|
+        member_ids[fam['hbx_id']] = fam['_id'].to_s
+      end
+      family_props_mappings = {}
+      family_mappings.each_pair do |k, v|
+        mapped_person = member_ids[k]
+        if !mapped_person.nil?
+          family_props_mappings[mapped_person] = v
+        end
+      end
+      primary_applicant_list = Family.all.map do |fam|
+        fam.primary_applicant.person_id.to_s
+      end
+      miss_rate = primary_applicant_list - family_props_mappings.keys
+      puts miss_rate.first
+      puts miss_rate.length
+      families_built = 0
+      total_families = Family.all.length
+      chunk_number = 50
+      chunk = total_families.to_f/(chunk_number.to_f)
+      milestone = chunk
+      Family.all.each do |fam|
+        pa_id = fam.primary_applicant.person_id.to_s
+        if family_props_mappings.has_key?(pa_id)
+          family_props = family_props_mappings[pa_id]
+          irs_group = fam.irs_groups.first
+          irs_group.hbx_assigned_id = family_props['irs_group_id']
+          irs_group.save!
+          fam.e_case_id = family_props['e_case_id']
+          fam.save!
+        end
         families_built = families_built + 1
+        if families_built > milestone
+          milestone = milestone + chunk
+          puts families_built
+          current_value = ((families_built.to_f/total_families.to_f) * 100.00).round
+          puts "Loaded #{current_value}% of families"
+        end
       end
     end
-    puts "Loaded #{families_built} families successfully"
-=begin
-    file = File.open("db/seedfiles/families.json", "r")
-    contents = file.read
-    file.close
-    data = JSON.load(contents)
-    puts "Loading #{data.count} families."
-    num_success = data.reduce(0) do |acc, pd|
-      family = Family.create(pd)
-      family.valid? ? acc + 1 : acc
-    end
-    puts "Loaded #{num_success} families successfully."
-=end
   end
 end
