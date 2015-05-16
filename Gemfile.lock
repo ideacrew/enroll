@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/dchbx/acapi.git
-  revision: 5a359c34f5a43b71293ce5d90338a0bcfcdce4e7
+  revision: d3e84556afac09f175677419fd8d85a3cc38ae05
   branch: development
   specs:
     acapi (0.0.1)
@@ -47,7 +47,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     amq-protocol (1.9.2)
-    animate-rails (1.0.7)
+    animate-rails (1.0.8)
       rails
     arel (6.0.0)
     bcrypt (3.1.10)
@@ -143,7 +143,7 @@ GEM
       factory_girl (~> 4.5.0)
       railties (>= 3.0.0)
     ffi (1.9.8)
-    font-awesome-rails (4.2.0.0)
+    font-awesome-rails (4.3.0.0)
       railties (>= 3.2, < 5.0)
     gherkin (2.12.2)
       multi_json (~> 1.3)
@@ -163,7 +163,7 @@ GEM
     jquery-turbolinks (2.1.0)
       railties (>= 3.1.0)
       turbolinks
-    jquery-ui-rails (5.0.3)
+    jquery-ui-rails (5.0.5)
       railties (>= 3.2.16)
     json (1.8.2)
     kaminari (0.16.3)
@@ -178,15 +178,15 @@ GEM
     less-rails-bootstrap (3.3.1.0)
       less-rails (~> 2.6.0)
     libv8 (3.16.14.7)
-    loofah (2.0.1)
+    loofah (2.0.2)
       nokogiri (>= 1.5.9)
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
     maskedinput-rails (1.3.1.0)
     method_source (0.8.2)
-    mime-types (2.4.3)
+    mime-types (2.5)
     mini_portile (0.6.2)
-    minitest (5.6.0)
+    minitest (5.6.1)
     monetize (1.1.0)
       money (~> 6.5.0)
     money (6.5.1)
@@ -249,7 +249,7 @@ GEM
     pry-stack_explorer (0.4.9.2)
       binding_of_caller (>= 0.7)
       pry (>= 0.9.11)
-    rack (1.6.0)
+    rack (1.6.1)
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (4.2.0)
@@ -337,13 +337,13 @@ GEM
       activesupport (>= 3.0.0)
     sigar (0.7.3)
     slop (3.6.0)
-    spring (1.3.4)
+    spring (1.3.6)
     sprockets (2.12.3)
       hike (~> 1.2)
       multi_json (~> 1.0)
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
-    sprockets-rails (2.2.4)
+    sprockets-rails (2.3.1)
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
@@ -406,7 +406,7 @@ DEPENDENCIES
   devise (~> 3.4.1)
   eye
   factory_girl_rails (~> 4.0)
-  font-awesome-rails (= 4.2.0.0)
+  font-awesome-rails
   haml
   jbuilder (~> 2.0)
   jquery-rails

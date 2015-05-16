@@ -53,7 +53,8 @@
 
 <div class="row top-buffer" id="search-employer">
   <div class="col-md-12 col-sm-12 col-xs-12">
-    <%= f.submit "Search Employers", class: "btn btn-success btn-search" %>
+    <%= f.button '<i class="fa fa-user"></i> Search Employers'.html_safe, type: :submit, class: "btn btn-primary btn-search" %>
+    <%#= f.submit "Search Employers", class: "btn btn-success btn-search" %>
     &nbsp;<span><i class="fa fa-lock icon-large"></i> Your information is secure.</span>
   </div>
 </div>

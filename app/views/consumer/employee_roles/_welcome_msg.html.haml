@@ -1,17 +1,18 @@
 .row
   .col-md-10.col-sm-10
-    %h1
-      = t('welcome.employee.title')
-      %small= t('welcome.employee.subtitle')
+    %h1= t('welcome.employee.title')
+    %h2= t('welcome.employee.subtitle')
 
-    %p.text-justify= t('welcome.employee.paragraph1')
+    %p.text-justify= simple_format(t('welcome.employee.paragraph1'))
     %p.text-justify= t('welcome.employee.paragraph2')
     %p.text-justify= t('welcome.employee.paragraph3')
     %br
 
 .row
   .col-md-2
-    = link_to t('button.continue'), search_consumer_employee_index_path, :remote => true, :class => "btn btn-success btn-block btn-continue"
+    = link_to search_consumer_employee_index_path, remote: true, class: 'btn btn-primary btn-continue' do
+      %i.fa.fa-user-plus
+      = t('button.continue')
 
 .row.footer
   .col-md-12
