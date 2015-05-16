@@ -148,9 +148,9 @@ class Employers::PeopleController < ApplicationController
     if current_user.person.present?
       @employer_profile = Forms::EmployerCandidate.new
       respond_to do |format|
-      format.js { render "employers/employer_profiles/search"}
-      format.html {}
-    end
+        format.js { render "employers/employer_profiles/search"}
+        format.html {}
+     end
     end
   end
 
