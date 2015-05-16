@@ -62,9 +62,9 @@ When(/^I enter my new account information$/) do
 end
 
 Then(/^I should be logged in$/) do
-  @browser.element(text: /Welcome! You have signed up successfully./).wait_until_present
+  @browser.a(href: /consumer.employee.search/).wait_until_present
   screenshot("logged_in_welcome")
-  expect(@browser.element(text: /Welcome! You have signed up successfully./).visible?).to be_truthy
+  expect(@browser.a(href: /consumer.employee.search/).visible?).to be_truthy
 end
 
 When(/^I go to register as an employee$/) do
@@ -85,8 +85,8 @@ When(/^I enter the identifying info of my existing person$/) do
   @browser.label(:text=> /FIRST NAME/).click
   @browser.text_field(name: "person[ssn]").set("670991234")
   screenshot("information_entered")
-  @browser.input(value: "Search Employers").wait_until_present
-  @browser.input(value: "Search Employers", :type => "submit").click
+  @browser.button(value: /Search Employers/).wait_until_present
+  @browser.button(value: /Search Employers/, :type => "submit").click
 end
 
 Then(/^I should see the matched employee record form$/) do
