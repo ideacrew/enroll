@@ -19,12 +19,11 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     })
   }
 
-  let(:census_family) { fam = EmployerCensus::EmployeeFamily.new({
-    :census_employee => census_employee,
-    :employer_profile => employer_profile
-  })
-    fam.add_benefit_group_assignment(benefit_group_assignment)
-    fam
+  let(:census_family) { EmployerCensus::EmployeeFamily.new({
+      :census_employee => census_employee,
+      :employer_profile => employer_profile,
+      :benefit_group_assignments => [benefit_group_assignment]
+    })
   }
 
   let(:employee_role) {
