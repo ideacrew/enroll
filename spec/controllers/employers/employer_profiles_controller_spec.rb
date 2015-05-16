@@ -271,11 +271,11 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(response).to be_redirect
     end
 
-    it "should render new template" do
+    it "should render edit template" do
       allow(user).to receive(:save).and_return(false)
       sign_in(user)
       put :update, id: organization.id
-      expect(response).to render_template("new")
+      expect(response).to render_template("edit")
     end
   end
 
