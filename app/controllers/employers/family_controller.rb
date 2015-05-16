@@ -36,8 +36,9 @@ class Employers::FamilyController < ApplicationController
     if @family.active_benefit_group_assignment.try(:benefit_group_id) != new_benefit_group_assignment.benefit_group_id
       @family.add_benefit_group_assignment(new_benefit_group_assignment)
     end
+    @family.attributes = census_family_params
 
-    if @family.update_attributes(new_params)
+    if @family.save
       flash[:notice] = "Employer Census Family is successfully updated."
       redirect_to employers_employer_profile_path(@employer_profile)
     else

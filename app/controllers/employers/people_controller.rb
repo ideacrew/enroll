@@ -1,5 +1,7 @@
 class Employers::PeopleController < ApplicationController
 
+  before_action :check_person_present, only: [:search]
+
   def search
     @person = Forms::EmployeeCandidate.new
     respond_to do |format|
@@ -140,6 +142,16 @@ class Employers::PeopleController < ApplicationController
 
   def person_params
     params.require(:person).permit!
+  end
+
+  def check_person_present
+    if current_user.person.present?
+      @employer_profile = Forms::EmployerCandidate.new
+      respond_to do |format|
+      format.js { render "employers/employer_profiles/search"}
+      format.html {}
+    end
+    end
   end
 
 end
