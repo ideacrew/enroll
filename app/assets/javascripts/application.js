@@ -465,4 +465,5 @@ $(document).on('page:update', function() {
     $("#dropdownMenu1 label").text($(this).text());
     $('#address_info > .first').attr('id', ($(this).text()));
   });
+  $('select').selectric();
 });
