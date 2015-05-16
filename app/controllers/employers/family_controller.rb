@@ -67,6 +67,7 @@ class Employers::FamilyController < ApplicationController
     respond_to do |format|
       format.js { 
         if termination_date.present? and @fa
+          flash[:notice] = "Successfully terminated family."
           render text: true
         else
           render text: false
