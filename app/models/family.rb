@@ -83,6 +83,35 @@ class Family
     family_members.detect { |family_member| family_member.person_id.to_s == person._id.to_s }
   end
 
+  def is_eligible_to_enroll?
+    enrollment_eligibility_reasons.length > 0
+  end
+
+  def current_enrollment_eligibility_reasons
+    current_special_enrollment_periods.collect do |sep|
+      EnrollmentEligibilityReason.new(sep)
+    end + current_eligible_open_enrollments
+  end
+
+  def is_under_open_enrollment?
+    current_eligibile_open_enrollments.length > 0
+  end
+
+  def current_eligible_open_enrollments
+    return [] unless primary_applicant
+    person = primary_applicant.person
+    return [] unless primary_person
+    employee_role = person.employee_roles.first
+    return [] unless employee_role
+    employer_profile = employee_role.employer_profile
+    return [] unless employer_profile
+    benefit_group = employee_role.benefit_group
+    return [] unless benefit_group
+    return [] if benefit_group.effective_on_for(date_of_hire) > benefit_group.start_on
+    return [] unless employer_profile.enrolling?
+    [EnrollmentEligibilityReason.new(employer_profile)]
+  end
+
   # Life events trigger special enrollment periods
   def is_under_special_enrollment_period?
     return false if special_enrollment_periods.size == 0
@@ -141,7 +170,7 @@ class Family
     end
 
     family_member = family_members.build(
-        person: person, 
+        person: person,
         is_primary_applicant: is_primary_applicant,
         is_coverage_applicant: is_coverage_applicant,
         is_consent_applicant: is_consent_applicant
@@ -157,7 +186,7 @@ class Family
       family_member.is_active = false
       active_household.remove_family_member(family_member)
     end
-    
+
     family_member
   end
 
@@ -310,7 +339,7 @@ private
     primary_member_id = primary_family_member.id
     primary_person = primary_family_member.person
     other_family_members = family_members.select { |fm| (fm.id.to_s != primary_member_id.to_s) && fm.person.present? }
-    undefined_relations = other_family_members.any? { |fm| primary_person.find_relationship_with(fm.person).blank? } 
+    undefined_relations = other_family_members.any? { |fm| primary_person.find_relationship_with(fm.person).blank? }
     errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations
   end
 
