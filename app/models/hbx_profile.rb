@@ -3,12 +3,16 @@ class HbxProfile
   include Mongoid::Timestamps
 
   embedded_in :organization
+  embeds_many :hbx_staff_roles
   embeds_many :enrollment_periods
 
+  field :cms_id, type: String
   field :markets, type: Array, default: []
 
-  Name = "DC HealthLink"
-  CmsId = "DC0"
+  delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
+  delegate :dba, :dba=, to: :organization, allow_nil: true
+  delegate :fein, :fein=, to: :organization, allow_nil: true
+  delegate :entity_kind, :entity_kind=, to: :organization, allow_nil: true
 
   ## Application-level caching
 
