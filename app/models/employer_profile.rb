@@ -96,7 +96,7 @@ class EmployerProfile
   # TODO: Benchmark this for efficiency
   def employee_families_sorted
     return @employee_families_sorted if defined? @employee_families_sorted
-    @employee_families_sorted = employee_families.unscoped.order_by_last_name
+    @employee_families_sorted = employee_families.unscoped.order_by_last_name.order_by_first_name
   end
 
   def latest_plan_year

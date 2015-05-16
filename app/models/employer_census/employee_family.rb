@@ -43,15 +43,13 @@ class EmployerCensus::EmployeeFamily
   scope :unlinked,    ->{ where(:is_linked => false) }
 
   scope :order_by_last_name, -> { order(:"census_employee.last_name".asc) }
+  scope :order_by_first_name, -> { order(:"census_employee.first_name".asc) }
 
   def add_benefit_group_assignment(new_benefit_group_assignment)
     raise ArgumentError, "expected valid BenefitGroupAssignment" unless new_benefit_group_assignment.valid?
-    retired_assignment = benefit_group_assignments.detect do |frank|
-      frank.overlaps?(new_benefit_group_assignment)
-    end
-    if retired_assignment
-      retired_assignment.end_on = [new_benefit_group_assignment.start_on - 1.day, retired_assignment.start_on].max
-      retired_assignment.is_active = false
+    if active_benefit_group_assignment
+      active_benefit_group_assignment.end_on = [new_benefit_group_assignment.start_on - 1.day, active_benefit_group_assignment.start_on].max
+      active_benefit_group_assignment.is_active = false
     end
 
     benefit_group_assignments << new_benefit_group_assignment

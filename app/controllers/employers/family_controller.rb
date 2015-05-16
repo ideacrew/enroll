@@ -10,9 +10,8 @@ class Employers::FamilyController < ApplicationController
   end
 
   def create
-    params.permit!
     @family = EmployerCensus::EmployeeFamily.new
-    @family.attributes = params["employer_census_employee_family"]
+    @family.attributes = census_family_params
     @employer_profile.employee_families << @family
     if @employer_profile.save
       flash[:notice] = "Employer Census Family is successfully created."
@@ -28,17 +27,13 @@ class Employers::FamilyController < ApplicationController
   end
 
   def update
-    new_params = census_family_params
-
-    benefit_group = @employer_profile.plan_years.first.benefit_groups.find_by(id: benefit_group_id)
-    new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new_from_group_and_roster_family(benefit_group, @family)
-
+    new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new
+    new_benefit_group_assignment.attributes = census_family_params[:benefit_group_assignments_attributes]["0"]
     if @family.active_benefit_group_assignment.try(:benefit_group_id) != new_benefit_group_assignment.benefit_group_id
       @family.add_benefit_group_assignment(new_benefit_group_assignment)
     end
-    @family.attributes = census_family_params
 
-    if @family.save
+    if @family.update_attributes(census_family_params)
       flash[:notice] = "Employer Census Family is successfully updated."
       redirect_to employers_employer_profile_path(@employer_profile)
     else
@@ -169,7 +164,8 @@ class Employers::FamilyController < ApplicationController
     family = EmployerCensus::EmployeeFamily.new
     family.build_census_employee
     family.build_census_employee.build_address
-    family.census_dependents.build
+    #Please do not uncomment this line it will create a bllank dependent
+    #family.census_dependents.build
     family.benefit_group_assignments.build
     family
   end

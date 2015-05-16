@@ -57,6 +57,12 @@ class EmployerCensus::BenefitGroupAssignment
     return found_value
   end
 
+  before_validation :initial_start_on_and_end_on
+  def initial_start_on_and_end_on
+    self.start_on = [benefit_group.try(:start_on), employee_family.try(:hired_on)].compact.max
+    self.end_on = [benefit_group.try(:end_on), employee_family.try(:terminated_on)].compact.min
+  end
+
 private
   def model_integrity
     self.errors.add(:benefit_group, "benefit_group required") unless benefit_group.present?
