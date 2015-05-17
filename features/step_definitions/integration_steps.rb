@@ -124,7 +124,7 @@ Then(/^I should see the edit dependent form$/) do
 end
 
 When(/^I click delete on baby Soren$/) do
-  @browser.img(alt: "Member close").click
+  @browser.form(id: 'edit_dependent').a().click
   @browser.input(type: "submit", name: "commit").wait_while_present
 end
 
