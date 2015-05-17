@@ -58,7 +58,7 @@ describe Email, :dbclean => :after_each do
       end
 
       context "when invalid" do
-        let(:params){valid_params.deep_merge!({address: "invalid@invalid"})}
+        let(:params){valid_params.deep_merge!({address: "something invalid"})}
         it "should give an error" do
           record = Email.create(**params)
           expect(record.errors[:address].any?).to be_truthy
