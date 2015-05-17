@@ -253,12 +253,15 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][state]").set("GA")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][zip]").set("30228")
   # Census Dependents
-  @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][first_name]").set("Mary")
-  @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][middle_name]").set("K")
-  @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][last_name]").set("Doe")
-  @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][dob]").set("10/12/2012")
-  @browser.radio(id: "employer_census_employee_family_census_dependents_attributes_0_gender_female").set
-  screenshot("employer_census_new_family_with_data")
+  # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][first_name]").set("Mary")
+  # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][middle_name]").set("K")
+  # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][last_name]").set("Doe")
+  # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][dob]").set("10/12/2012")
+  # @browser.radio(id: "employer_census_employee_family_census_dependents_attributes_0_gender_female").set
+  # screenshot("employer_census_new_family_with_data")
+  # input_field = @browser.divs(:class => 'selectric-wrapper').first
+  # input_field.click
+  # input_field.li(text: "Child under 26").click
   # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][employee_relationship]").set("child_under_26")
   @browser.input(value: "Create Family").click
 end

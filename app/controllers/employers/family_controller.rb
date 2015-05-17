@@ -61,7 +61,7 @@ class Employers::FamilyController < ApplicationController
       @fa = @family.save!
     end
     respond_to do |format|
-      format.js { 
+      format.js {
         if termination_date.present? and @fa
           flash[:notice] = "Successfully terminated family."
           render text: true
@@ -127,7 +127,7 @@ class Employers::FamilyController < ApplicationController
   end
 
   private
-  def benefit_group_id 
+  def benefit_group_id
     census_family_params[:benefit_group_assignments_attributes]["0"][:benefit_group_id]
   end
 
@@ -164,8 +164,6 @@ class Employers::FamilyController < ApplicationController
     family = EmployerCensus::EmployeeFamily.new
     family.build_census_employee
     family.build_census_employee.build_address
-    #Please do not uncomment this line it will create a bllank dependent
-    #family.census_dependents.build
     family.benefit_group_assignments.build
     family
   end
