@@ -48,6 +48,8 @@ $(document).ready(function () {
     $("."+divtoshow).show();
   });
 
+  $('.alert').delay(3200).fadeOut(300); //Fade Alert Box
+
   /* QLE Marriage Date Validator */
   $('#date_married').focusin(function() {
     $('#date_married').removeClass('input-error');

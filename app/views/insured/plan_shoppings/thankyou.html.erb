@@ -58,10 +58,10 @@
         <%= link_to "Confirm", checkout_insured_plan_shopping_path(@enrollment, :plan_id => @plan.id), :class => "btn btn-primary btn-continue pull-right", :method => :post %>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
-	    <%= link_to "Save & Exit", home_consumer_profiles_path(@person), { :class => "btn btn-primary" } %>
-            <div style="display: none;" id="sup-progress" data-signup-progress="8"></div>
+      <div style="display: none;" id="sup-progress" data-signup-progress="8"></div>
 	    <input type="hidden" id="initial_progress" value="85">
 	    <%= render 'shared/signup_progress' %>
+      <%= link_to "Save & Exit", home_consumer_profiles_path(@person), { :class => "btn btn-primary" } %>
     </div>
   </div>
 </div><br>
