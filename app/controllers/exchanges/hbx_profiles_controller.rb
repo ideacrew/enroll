@@ -19,6 +19,12 @@ class Exchanges::HbxProfilesController < ApplicationController
     render "employers/employer_profiles/index"
   end
 
+  def family_index
+    @families = Family.all
+
+    render "insured/families/index"
+  end
+
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show

@@ -8,6 +8,7 @@ Rails.application.routes.draw do
 
       collection do
         get :employer_index
+        get :family_index
       end
 
       # resources :hbx_staff_roles, shallow: true do
