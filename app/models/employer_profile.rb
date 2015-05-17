@@ -190,7 +190,8 @@ class EmployerProfile
 
   # Workflow for automatic approval
   aasm do
-    state :applicant, initial: true 
+    state :enrolling, initial: true 
+    # state :applicant, initial: true 
     state :ineligible               # Unable to enroll business per SHOP market regulations (e.g. Sole proprieter)
     state :registered               # Business information complete, before initial open enrollment period
     state :enrolling                # Employees registering and plan shopping

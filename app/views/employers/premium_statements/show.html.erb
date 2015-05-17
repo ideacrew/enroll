@@ -1,0 +1,74 @@
+
+  <% benefits = [
+    {
+      benefit_type: "health",
+      benefit_name: "High Value 1000",
+      issuer_name: "Aetna",
+      covered_member_count: 5,
+      is_cobra: false,
+      ee_premium_amount: 1212.12,
+      er_premium_amount: 400.03,
+      total_premium_amount: 1612.15
+    },
+    {
+      benefit_type: "dental",
+      benefit_name: "Pearly Whites Advantage",
+      issuer_name: "Aetna",
+      covered_member_count: 5,
+      is_cobra: false,
+      ee_premium_amount: 135.35,
+      er_premium_amount: 0,
+      total_premium_amount: 135.35
+    }
+  ]
+  %>
+
+  <% employee0 = {
+      full_name: "Joe Cool",
+      ssn: "876543211",
+      dob: Date.current - 34.years,
+      hired_on: (Date.current - 90),
+      start_date: (Date.current - 60).beginning_of_month,
+      benefit_group: "2015 Benefits",
+      benefits: benefits.dup
+    }
+  %>
+
+  <% employee1 = {
+      full_name: "Lucy Brown",
+      ssn: "012345678",
+      dob: Date.current - 39.years,
+      hired_on: (Date.current - 90),
+      start_date: (Date.current - 60).beginning_of_month,
+      benefit_group: "2015 Benefits",
+      benefits: benefits.dup
+    }
+  %>
+
+  <% staff = [employee1.dup, employee0.dup, employee0.dup, employee1.dup, employee0.dup, employee0.dup, employee1.dup] %>
+
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Employee</th>
+        <th>SSN</th>
+        <th>DOB</th>
+        <th>Hired</th>
+        <th>Benefit Group</th>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Issuer</th>
+        <th>Covered Ct</th>
+        <th>COBRA?</th>
+        <th>Employer Contribution</th>
+        <th>Employee Premium</th>
+        <th>Total Premium</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% staff.each do |employee| %>
+        <%= render "employee_line_item", ee: employee %>
+      <% end %>      
+    </tbody>
+  </table>
+

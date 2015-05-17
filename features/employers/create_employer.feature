@@ -51,10 +51,10 @@ Feature: Create Employer
       Then I should be logged in
       When I go to register as an employee
       Then I should see the employee search page
-      When I enter the identifying info of my existing person
-      Then I should see the matched employee record form
+      When I enter the identifying information of my existing person
+      Then I should see the matching employee record form
       When I accept the matched employer
-      When I complete the matched employee form
+      When I complete the matching employee form
       Then I should see the dependents page
       When I click Add Member
       Then I should see the new dependent form

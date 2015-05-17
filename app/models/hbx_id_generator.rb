@@ -32,3 +32,9 @@ class HbxIdGenerator
     end
   end
 end
+
+# Fix slug setting on request reload
+unless Rails.env.production?
+  HbxIdGenerator.slug!
+end
+

@@ -1,4 +1,4 @@
-class BrokerAgencies::BrokerProfilesController < ApplicationController
+class BrokerAgencies::BrokerAgencyProfilesController < ApplicationController
   before_action :check_broker_role, only: [:new, :welcome]
 
   def new

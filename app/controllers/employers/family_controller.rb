@@ -12,6 +12,11 @@ class Employers::FamilyController < ApplicationController
   def create
     @family = EmployerCensus::EmployeeFamily.new
     @family.attributes = census_family_params
+
+    benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
+    new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new_from_group_and_roster_family(benefit_group, @family)
+    @family.benefit_group_assignments = new_benefit_group_assignment.to_a
+
     @employer_profile.employee_families << @family
     if @employer_profile.save
       flash[:notice] = "Employer Census Family is successfully created."
@@ -27,8 +32,8 @@ class Employers::FamilyController < ApplicationController
   end
 
   def update
-    new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new
-    new_benefit_group_assignment.attributes = census_family_params[:benefit_group_assignments_attributes]["0"]
+    benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
+    new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new_from_group_and_roster_family(benefit_group, @family)
     if @family.active_benefit_group_assignment.try(:benefit_group_id) != new_benefit_group_assignment.benefit_group_id
       @family.add_benefit_group_assignment(new_benefit_group_assignment)
     end
@@ -127,8 +132,8 @@ class Employers::FamilyController < ApplicationController
   end
 
   private
-  def benefit_group_id
-    census_family_params[:benefit_group_assignments_attributes]["0"][:benefit_group_id]
+  def benefit_group_id 
+    params[:employer_census_employee_family][:benefit_group_assignments_attributes]["0"][:benefit_group_id]
   end
 
   def census_family_params
@@ -140,9 +145,6 @@ class Employers::FamilyController < ApplicationController
         ],
       :census_dependents_attributes => [
           :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy
-        ],
-      :benefit_group_assignments_attributes => [
-          :id, :start_on, :end_on, :is_active, :benefit_group_id
         ]
       )
   end

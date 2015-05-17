@@ -1,0 +1,16 @@
+  <tr>
+    <td <%= "rowspan=#{ee[:benefits].size}" %>><%= ee[:full_name] %></td>
+    <td <%= "rowspan=#{ee[:benefits].size}" %>><%= number_to_obscured_ssn ee[:ssn] %></td>
+    <td <%= "rowspan=#{ee[:benefits].size}" %>><%= format_date ee[:dob] %></td>
+    <td <%= "rowspan=#{ee[:benefits].size}" %>><%= format_date ee[:hired_on] %></td>
+    <td <%= "rowspan=#{ee[:benefits].size}" %>><%= ee[:benefit_group] %></td>
+
+    <%= render "benefit_line_item_detail", b: ee[:benefits].first %>
+
+    <% if ee[:benefits].size > 1 %>
+      <% ee[:benefits].delete_at(0) %>
+      <% ee[:benefits].each do |b| %>
+        <tr><%= render "benefit_line_item_detail", b: b %></tr>
+      <% end %>
+    <% end %>
+  </tr>

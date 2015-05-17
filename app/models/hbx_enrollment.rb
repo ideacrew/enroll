@@ -22,7 +22,7 @@ class HbxEnrollment
   field :terminated_on, type: Date
 
   field :plan_id, type: BSON::ObjectId
-  field :broker_agency_id, type: BSON::ObjectId
+  field :broker_agency_profile_id, type: BSON::ObjectId
   field :writing_agent_id, type: BSON::ObjectId
   field :employee_role_id, type: BSON::ObjectId
   field :benefit_group_id, type: BSON::ObjectId
@@ -80,18 +80,35 @@ class HbxEnrollment
     employee_role.employer_profile
   end
 
-  def broker_agency_profile=(new_broker_agency)
-    return if new_broker_agency.blank?
-    self.broker_agency_id = new_broker._id
+  def plan=(new_plan)
+    raise ArgumentError.new("expected Plan") unless new_plan.is_a? Plan
+    self.plan_id = new_plan._id
+    @plan = new_plan
+  end
+
+  def plan
+    return @plan if defined? @plan
+    @plan = Plan.find(self.plan_id) unless plan_id.blank?
+  end
+
+  def broker_agency_profile=(new_broker_agency_profile)
+    raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a? BrokerAgencyProfile
+    self.broker_agency_profile_id = new_broker_agency_profile._id
+    @broker_agency_profile = new_broker_agency_profile
   end
 
   def broker_agency_profile
-    return unless has_broker_agency?
-    parent.broker_agency.find(self.broker_agency_id)
+    return @broker_agency_profile if defined? @broker_agency_profile
+    @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_profile_id) unless broker_agency_profile_id.blank?
   end
 
-  def has_broker_agency?
-    broker_agency_id.present?
+  def has_broker_agency_profile?
+    broker_agency_profile_id.present?
+  end
+
+  def can_complete_shopping?(t_date = Date.today)
+    return false unless benefit_group
+    benefit_group.within_new_hire_window?(employee_role.hired_on)
   end
 
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer
@@ -126,11 +143,6 @@ class HbxEnrollment
     )
     enrollment.save
     enrollment
-  end
-
-  def can_complete_shopping?(t_date = Date.today)
-    return false unless benefit_group
-    benefit_group.within_new_hire_window?(employee_role.hired_on)
   end
 
   def self.find(id)

@@ -1,0 +1,11 @@
+<% benefits.each do |b| %>
+  <tr>
+    <td><%= b.employer_profile.present? ? "SHOP" : "Individual" %>
+    <td><%= "Issuer placeholder" %>
+    <td><%= b.broker_agency.dba %>
+    <td><%= "Benefit type placeholder" %>
+    <td><%= b.hbx_enrollment_members.size %>
+    <td><%= format_date(b.effective_on) %></td>
+    <td><%= "Status placeholder" %></td>
+  </tr>
+<% end %>
