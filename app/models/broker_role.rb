@@ -17,7 +17,7 @@ class BrokerRole
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
 
-  accepts_nested_attributes_for :person
+#  accepts_nested_attributes_for :person
 
   validates_presence_of :npn, :provider_kind
   validates :npn, uniqueness: true
