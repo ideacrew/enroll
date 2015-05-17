@@ -197,7 +197,7 @@ Then(/^I should see the coverage summary page$/) do
 end
 
 When(/^I confirm on the coverage summary page$/) do
-  @browser.a(text: "Confirm").click
+  @browser.a(href: /insured.plan_shoppings.(.*).checkout/).click
 end
 
 Then(/^I should see the "my account" page$/) do

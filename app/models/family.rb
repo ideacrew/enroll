@@ -84,7 +84,7 @@ class Family
   end
 
   def is_eligible_to_enroll?
-    enrollment_eligibility_reasons.length > 0
+    current_enrollment_eligibility_reasons.length > 0
   end
 
   def current_enrollment_eligibility_reasons
@@ -100,14 +100,14 @@ class Family
   def current_eligible_open_enrollments
     return [] unless primary_applicant
     person = primary_applicant.person
-    return [] unless primary_person
+    return [] unless person
     employee_role = person.employee_roles.first
     return [] unless employee_role
     employer_profile = employee_role.employer_profile
     return [] unless employer_profile
     benefit_group = employee_role.benefit_group
     return [] unless benefit_group
-    return [] if benefit_group.effective_on_for(date_of_hire) > benefit_group.start_on
+    return [] if benefit_group.effective_on_for(employee_role.hired_on) > benefit_group.start_on
     return [] unless employer_profile.enrolling?
     [EnrollmentEligibilityReason.new(employer_profile)]
   end
