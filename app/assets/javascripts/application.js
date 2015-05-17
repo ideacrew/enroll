@@ -462,6 +462,7 @@ $(document).on('page:update', function() {
   $('.address-li').on('click', function(){
     $("#dropdownMenu1 label").text($(this).text());
     $('#address_info > .first').attr('id', ($(this).text()));
+    $('#employer_census_employee_family_census_employee_attributes_address_attributes_kind').val($(this).data('value'));
   });
   $('select').selectric();
 });

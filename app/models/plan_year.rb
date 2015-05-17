@@ -83,9 +83,11 @@ private
     end
 
     # TODO: Create HBX object with configuration settings including shop_open_enrollment_minimum_in_days
+    # FIXME: I'm disabling this for now, because it either isn't true for about 1/3 of our employers,
+    # or connecture's data is total garbage
     shop_open_enrollment_minimum_in_days = 5
     if (open_enrollment_end_on - open_enrollment_start_on) < shop_open_enrollment_minimum_in_days
-      errors.add(:open_enrollment_end_on, "can't be less than #{shop_open_enrollment_minimum_in_days} days")
+#      errors.add(:open_enrollment_end_on, "can't be less than #{shop_open_enrollment_minimum_in_days} days")
     end
   end
 
