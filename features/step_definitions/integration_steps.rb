@@ -104,7 +104,6 @@ end
 When(/^I complete the matched employee form$/) do
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
   @browser.text_field(name: "person[emails_attributes][1][address]").click
-  sleep(1)
   screenshot("personal_info_complete")
   @browser.input(id: "continue-employer").click
 end
@@ -154,6 +153,7 @@ end
 
 When(/^I click confirm member$/) do
   @browser.input(type: 'submit', value: /Confirm Member/).click
+  @browser.input(type: 'submit', value: /Confirm Member/).wait_while_present
 end
 
 When(/^I click continue on the dependents page$/) do
@@ -170,9 +170,11 @@ When(/^I click continue on the group selection page$/) do
 end
 
 Then(/^I should see the plan shopping welcome page$/) do
-  @browser.h3(text: /Select a Plan/).wait_until_present
+  @browser.element(text: /All Filters/i).wait_until_present
+  # @browser.h3(text: /Select a Plan/).wait_until_present
   screenshot("plan_shopping_welcome")
-  expect(@browser.h3(text: /Select a Plan/).visible?).to be_truthy
+  expect(@browser.element(text: /All Filters/i).visible?).to be_truthy
+  # expect(@browser.h3(text: /Select a Plan/).visible?).to be_truthy
 end
 
 When(/^I click continue on the plan shopping welcome page$/) do
@@ -180,13 +182,12 @@ When(/^I click continue on the plan shopping welcome page$/) do
 end
 
 Then(/^I should see the list of plans$/) do
-  @browser.a(text: "Select").wait_until_present
-  sleep(1)
+  @browser.a(text: /Select/).wait_until_present
   screenshot("plan_shopping")
 end
 
 When(/^I select a plan on the plan shopping page$/) do
-  @browser.a(text: "Select").click
+  @browser.a(text: /Select/).click
 end
 
 Then(/^I should see the coverage summary page$/) do
@@ -200,7 +201,7 @@ When(/^I confirm on the coverage summary page$/) do
 end
 
 Then(/^I should see the "my account" page$/) do
-  @browser.span(text: "Household").wait_until_present
+  @browser.element(text: /Life Events/).wait_until_present
   screenshot("my_account_page")
-  expect(@browser.span(text: "Household").visible?).to be_truthy
+  expect(@browser.element(text: /Life Events/).visible?).to be_truthy
 end

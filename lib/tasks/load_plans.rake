@@ -31,3 +31,17 @@ namespace :xml do
   # end
   end
 end
+
+namespace :xml do
+  desc "Import all qhp plans from xml files in a directory"
+  task :serff, [:dir] => :environment do |task, args|
+    files = Dir.glob(File.join(args.dir, "**", "*.xml"))
+    files.each do |file|
+      # #   puts file
+      xml = Nokogiri::XML(File.open(file))
+      plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
+      qhp_hash = QhpBuilder.new(plan.to_hash)
+      qhp_hash.run
+    end
+  end
+end
