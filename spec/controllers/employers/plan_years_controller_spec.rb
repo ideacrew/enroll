@@ -25,7 +25,9 @@ RSpec.describe Employers::PlanYearsController do
 
   describe "POST create" do
     let(:save_result) { false }
-    let(:plan_year) { double }
+    let(:plan) {double(:where => [double(:_id => "test")] )}
+    let(:benefit_group){ double(:reference_plan => double(:carrier_profile => double(:plans => plan)))}
+    let(:plan_year) { double(:benefit_groups => [benefit_group] ) }
     let(:relationship_benefits_attributes) {
       { "0" => {
          :relationship => "spouse",
@@ -75,6 +77,7 @@ RSpec.describe Employers::PlanYearsController do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(plan_year_proxy).to receive(:new).with(plan_year_params).and_return(plan_year)
+      allow(benefit_group).to receive(:elected_plan_ids=).and_return("test")
       allow(plan_year).to receive(:save).and_return(save_result)
       post :create, :employer_profile_id => employer_profile_id, :plan_year => plan_year_request_params
     end
