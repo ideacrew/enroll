@@ -6,15 +6,15 @@ address  = Address.new(kind: "work", address_1: "609 H St", city: "Washington", 
 phone    = Phone.new(kind: "main", area_code: "202", number: "555-9999")
 email    = Email.new(kind: "work", address: "info@hbx.gov")
 office_location= OfficeLocation.new(is_primary: true, address: address, phone: phone, email: email)
+hbx_profile = HbxProfile.new(cms_id: "DC0")
 
 hbx = Organization.create(
       dba: "DCHL",
-      legal_name: "DC HealthLinke",
-      fein: 444123456,
-      office_locations: [office_location]
+      legal_name: "DC HealthLink",
+      fein: 123123456,
+      office_locations: [office_location],
+      hbx_profile: hbx_profile
     )
-
-hbx.build_hbx_profile(cms_id: "DC0")
 
 admin_user    = User.create!(email: "admin@dc.gov", password: "password", password_confirmation: "password", roles: ["hbx_staff"])
 admin_person  = Person.new(first_name: "system", last_name: "admin", user: admin_user)
