@@ -1,0 +1,18 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title"><%= "#{mixed_case b[:benefit_type]} Benefit Summary" %></h3>
+  </div>
+  <div class="panel-body">
+    <dl class="dl-horizontal">
+      <dt>Plan Name</dt> <dd><%= b[:plan_name] %></dd>
+      <dt>Issuer</dt> <dd><%= b[:issuer_name] %></dd>
+      <dt>Plan Type</dt> <dd><%= b[:plan_type].to_s.upcase %></dd>
+      <dt>Metal Level</dt> <dd><%= mixed_case b[:metal_level] %></dd>
+      <dt>Subscriber</dt> <dd><%= b[:subscriber_name] %></dd>
+      <dt>Start Date</dt> <dd><%= format_date b[:start_date] %></dd>
+      <dt>HBX Subscriber ID</dt> <dd><%= b[:subscriber_hbx_id] %></dd>
+      <dt>Carrier Subscriber ID</dt> <dd><%= b[:subscriber_carrier_id] %></dd>
+      <dt>Group ID</dt> <dd><%= b[:group_id] %></dd>
+    </dl>
+  </div>
+</div>

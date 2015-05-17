@@ -23,6 +23,9 @@ Rails.application.routes.draw do
   end
 
   namespace :insured do
+    resources :families, :only => [:show] do
+    end
+
     resources :plan_shoppings, :only => [:show] do
       member do
         post 'checkout'
