@@ -47,6 +47,8 @@ Rails.application.routes.draw do
   namespace :employers do
     root 'employer_profiles#new'
 
+    resources :premium_statements, :only => [:show]
+
     #TODO REFACTOR
     resources :people do
       collection do
