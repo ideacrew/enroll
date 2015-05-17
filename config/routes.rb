@@ -155,14 +155,14 @@ Rails.application.routes.draw do
 
   end
 
-  # resources :consumer_profiles, :only => [] do
-  #   collection do
-  #     get 'home'
-  #     get 'plans'
-  #     get 'personal'
-  #     get 'family'
-  #   end
-  # end
+  resources :consumer_profiles, :only => [] do
+    collection do
+      get 'home'
+      get 'plans'
+      get 'personal'
+      get 'family'
+    end
+  end
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
