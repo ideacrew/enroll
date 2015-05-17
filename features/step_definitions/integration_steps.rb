@@ -62,9 +62,9 @@ When(/^I enter my new account information$/) do
 end
 
 Then(/^I should be logged in$/) do
-  @browser.element(text: /Welcome! You have signed up successfully./).wait_until_present
+  @browser.element(text: /Welcome! Your account has been created./).wait_until_present
   screenshot("logged_in_welcome")
-  expect(@browser.element(text: /Welcome! You have signed up successfully./).visible?).to be_truthy
+  expect(@browser.element(text: /Welcome! Your account has been created./).visible?).to be_truthy
 end
 
 When(/^I go to register as an employee$/) do
@@ -79,20 +79,20 @@ Then(/^I should see the employee search page$/) do
 end
 
 When(/^I enter the identifying info of my existing person$/) do
-  @browser.text_field(name: "person[first_name]").set("Soren")
-  @browser.text_field(name: "person[last_name]").set("White")
-  @browser.text_field(name: "person[date_of_birth]").set("08/13/1979")
+  @browser.text_field(name: "person[first_name]").set("Patrick")
+  @browser.text_field(name: "person[last_name]").set("Doe")
+  @browser.text_field(name: "person[date_of_birth]").set("10/10/1980")
   @browser.label(:text=> /FIRST NAME/).click
-  @browser.text_field(name: "person[ssn]").set("670991234")
+  @browser.text_field(name: "person[ssn]").set("786120965")
   screenshot("information_entered")
-  @browser.input(value: "Search Employers").wait_until_present
-  @browser.input(value: "Search Employers", :type => "submit").click
+  @browser.button(text: "Search Employers").wait_until_present
+  @browser.button(text: "Search Employers").click
 end
 
 Then(/^I should see the matched employee record form$/) do
-  @browser.dd(text: /Acme Inc\./).wait_until_present
+  @browser.dd(text: /Turner Brokers/).wait_until_present
   screenshot("employer_search_results")
-  expect(@browser.dd(text: /Acme Inc\./).visible?).to be_truthy
+  expect(@browser.dd(text: /Turner Brokers/).visible?).to be_truthy
 end
 
 When(/^I accept the matched employer$/) do
@@ -106,7 +106,7 @@ When(/^I complete the matched employee form$/) do
   @browser.text_field(name: "person[emails_attributes][1][address]").click
   sleep(1)
   screenshot("personal_info_complete")
-  @browser.input(id: "continue-employer").click
+  @browser.button(id: "continue-employer").fire_event("onclick")
 end
 
 Then(/^I should see the dependents page$/) do
@@ -116,6 +116,7 @@ Then(/^I should see the dependents page$/) do
 end
 
 When(/^I click edit on baby Soren$/) do
+  binding.pry
   @browser.span(text: "07/03/2014").as(xpath: "./preceding::a[contains(@href, 'edit')]").last.click
 end
 
