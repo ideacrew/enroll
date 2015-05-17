@@ -5,13 +5,23 @@ class Exchanges::HbxProfilesController < ApplicationController
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   def index
-    @hbx_profiles = ::HbxProfile.all
+    @organizations = Organization.exists(hbx_profile: true)
+    @hbx_profiles = @organizations.map {|o| o.hbx_profile}
+  end
+
+  def employer_index
+    @q = params.permit(:q)[:q]
+    page_string = params.permit(:page)[:page]
+    page_no = page_string.blank? ? nil : page_string.to_i
+    @organizations = Organization.search(@q).exists(employer_profile: true).page page_no
+    @employer_profiles = @organizations.map {|o| o.employer_profile}
+
+    render "employers/employer_profiles/index"
   end
 
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show
-    @hbx_profile = HbxProfile.find(params[id])
   end
 
   # GET /exchanges/hbx_profiles/new
@@ -29,8 +39,6 @@ class Exchanges::HbxProfilesController < ApplicationController
   def create
     @organization = Organization.new(organization_params)
     @hbx_profile = @organization.build_hbx_profile(hbx_profile_params.except(:organization))
-
-raise organization_params.inspect.to_s
 
     respond_to do |format|
       if @hbx_profile.save
@@ -70,7 +78,7 @@ raise organization_params.inspect.to_s
 private
   # Use callbacks to share common setup or constraints between actions.
   def set_hbx_profile
-    @hbx_profile = HbxProfile.find(params[:id])
+    @hbx_profile = Organization.exists(hbx_profile: true).where(hbx_profile: params[:id])
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

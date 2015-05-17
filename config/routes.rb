@@ -6,6 +6,10 @@ Rails.application.routes.draw do
     resources :hbx_profiles do
       root 'hbx_profiles#index'
 
+      collection do
+        get :employer_index
+      end
+
       # resources :hbx_staff_roles, shallow: true do
       resources :hbx_staff_roles do
         # root 'hbx_profiles/hbx_staff_roles#show'
@@ -17,7 +21,6 @@ Rails.application.routes.draw do
     # get 'hbx_profiles/new'
     # get 'hbx_profiles/create'
     # get 'hbx_profiles/update'
-    # get 'hbx_profiles/employer_index'
     # get 'hbx_profiles/broker_agency_index'
     # get 'hbx_profiles/insured_index'
   end

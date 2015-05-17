@@ -12,9 +12,9 @@
   <tbody>
     <% @hbx_profiles.each do |hbx_profile| %>
       <tr>
-        <td><%= link_to 'Show', exchanges_hbx_profile %></td>
+        <td><%= link_to hbx_profile.legal_name, exchanges_hbx_profile_path(hbx_profile) %></td>
         <td><%= link_to 'Edit', edit_exchanges_hbx_profile_path(hbx_profile) %></td>
-        <td><%= link_to 'Destroy', hbx_profile, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Destroy', exchanges_hbx_profile_path(hbx_profile), method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
