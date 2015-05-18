@@ -94,6 +94,14 @@ private
     if (open_enrollment_end_on - open_enrollment_start_on) > HbxProfile::ShopOpenEnrollmentMaximumPeriod
      errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{HbxProfile::ShopOpenEnrollmentMaximumPeriod} days")
     end
+
+    if (end_on - start_on) < HbxProfile::ShopPlanYearMinimumPeriod
+     errors.add(:end_on, "plan year period is less than minumum: #{HbxProfile::ShopPlanYearMinimumPeriod} days")
+    end
+
+    if (end_on - start_on) > HbxProfile::ShopPlanYearMaximumPeriod
+     errors.add(:end_on, "plan year period is greater than maximum: #{HbxProfile::ShopPlanYearMaximumPeriod} days")
+    end
   end
 
 end

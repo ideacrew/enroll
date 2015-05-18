@@ -99,8 +99,18 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:plan_year) { PlanYear.new(**valid_params) }
 
     context "and an open enrollment period is specified" do
-      context "and the start date is after the end date" do
+      context "and open enrollment start date is after the end date" do
+        let(:open_enrollment_end_on)    { Date.current }
+        let(:open_enrollment_start_on)  { open_enrollment_end_on + 1 }
+
+        before do
+          plan_year.open_enrollment_start_on = open_enrollment_start_on
+          plan_year.open_enrollment_end_on = open_enrollment_end_on
+        end
+
         it "should fail validation" do
+          expect(plan_year.valid?).to be_falsey
+          expect(plan_year.errors[:open_enrollment_end_on].any?).to be_truthy
         end
       end
 
@@ -137,23 +147,69 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and a plan year start and end is specified" do
-        context "and the start date is after the end date" do
+        context "and the plan year start date is after the end date" do
+          let(:end_on)    { Date.current }
+          let(:start_on)  { end_on + 1 }
+
+          before do
+            plan_year.start_on = start_on
+            plan_year.end_on = end_on
+          end
+
           it "should fail validation" do
+            expect(plan_year.valid?).to be_falsey
+            expect(plan_year.errors[:end_on].any?).to be_truthy
           end
         end
 
         context "and the plan year period is too short" do
+          let(:invalid_length)  { HbxProfile::ShopPlanYearMinimumPeriod - 1 }
+          let(:start_on)  { Date.current.end_of_month + 1 }
+          let(:end_on)    { start_on + invalid_length }
+
+          before do
+            plan_year.start_on = start_on
+            plan_year.end_on = end_on
+          end
+
           it "should fail validation" do
+            expect(plan_year.valid?).to be_falsey
+            expect(plan_year.errors[:end_on].any?).to be_truthy
           end
         end
 
-        context "and the oplan year period is too long" do
+        context "and the plan year period is too long" do
+          let(:invalid_length)  { HbxProfile::ShopPlanYearMaximumPeriod + 1 }
+          let(:start_on)  { Date.current.end_of_month + 1 }
+          let(:end_on)    { start_on + invalid_length }
+
+          before do
+            plan_year.start_on = start_on
+            plan_year.end_on = end_on
+          end
+
           it "should fail validation" do
+            expect(plan_year.valid?).to be_falsey
+            expect(plan_year.errors[:end_on].any?).to be_truthy
           end
         end
 
         context "and the plan year begins before open enrollment ends" do
+          let(:valid_open_enrollment_length)  { HbxProfile::ShopOpenEnrollmentMaximumPeriod }
+          let(:valid_plan_year_length)  { HbxProfile::ShopPlanYearMaximumPeriod + 1 }
+          let(:open_enrollment_start_on)  { Date.current }
+          let(:open_enrollment_end_on)    { open_enrollment_start_on + valid_open_enrollment_length }
+          let(:start_on)  { open_enrollment_start_on - 1 }
+          let(:end_on)    { start_on + valid_plan_year_length }
+
+          before do
+            plan_year.start_on = start_on
+            plan_year.end_on = end_on
+          end
+
           it "should fail validation" do
+            expect(plan_year.valid?).to be_falsey
+            expect(plan_year.errors[:start_on].any?).to be_truthy
           end
         end
       end
