@@ -114,7 +114,7 @@ class Person
 
   def generate_hbx_id
     if hbx_id.blank?
-      # hbx_id = HbxIdGenerator.generate
+      hbx_id = HbxIdGenerator.generate
     end
   end
 
