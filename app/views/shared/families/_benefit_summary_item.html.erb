@@ -1,17 +1,67 @@
-<table class="table table-condensed">
-  <thead>
-    <tr><th colspan="2"><%= "#{mixed_case b[:benefit_type]} Benefit Summary" %></th></tr>
-  </thead>
+<p class="head">
+  <span><%= "#{mixed_case b[:benefit_type]} Benefit Summary" %></span>
+</p>
+<ul class="list-group emp-ul">
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-md-6"><strong>Plan Name</strong></div>
+      <div class="col-md-6"><%= b[:plan_name] %></div>
+    </div>
+  </li>
 
-  <tbody>
-    <tr><th>Plan Name</th>              <td><%= b[:plan_name] %></td></tr>
-    <tr><th>Issuer</th>                 <td><%= b[:issuer_name] %></td></tr>
-    <tr><th>Plan Type</th>              <td><%= b[:plan_type] %></td></tr>
-    <tr><th>Metal Level</th>            <td><%= b[:metal_level] %></td></tr>
-    <tr><th>Subscriber</th>             <td><%= b[:subscriber_name] %></td></tr>
-    <tr><th>Start Date</th>             <td><%= b[:start_date] %></td></tr>
-    <tr><th>HBX Subscriber ID</th>      <td><%= b[:subscriber_hbx_id] %></td></tr>
-    <tr><th>Carrier Subscriber ID</th>  <td><%= b[:subscriber_carrier_id] %></td></tr>
-    <tr><th>Group ID</th>               <td><%= b[:group_id] %></td></tr>
-  </tbody>
-</table>
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-md-6"><strong>Issuer</strong></div>
+      <div class="col-md-6"><%= b[:issuer_name] %></div>
+    </div>
+  </li>
+
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-md-6"><strong>Plan Type</strong></div>
+      <div class="col-md-6"><%= b[:plan_type] %></div>
+    </div>
+  </li>
+
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-md-6"><strong>Metal Level</strong></div>
+      <div class="col-md-6"><%= b[:metal_level] %></div>
+    </div>
+  </li>
+
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-md-6"><strong>Subscriber</strong></div>
+      <div class="col-md-6"><%= b[:subscriber_name] %></div>
+    </div>
+  </li>
+
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-md-6"><strong>Start Date</strong></div>
+      <div class="col-md-6"><%= b[:start_date] %></div>
+    </div>
+  </li>
+
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-md-6"><strong>HBX Subscriber ID</strong></div>
+      <div class="col-md-6"><%= b[:subscriber_hbx_id] %></div>
+    </div>
+  </li>
+
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-md-6"><strong>Carrier Subscriber ID</strong></div>
+      <div class="col-md-6"><%= b[:subscriber_carrier_id] %></div>
+    </div>
+  </li>
+
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-md-6"><strong>Group ID</strong></div>
+      <div class="col-md-6"><%= b[:group_id] %></div>
+    </div>
+  </li>
+</ul>
