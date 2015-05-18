@@ -1,19 +1,19 @@
 <div class="container">
   <div class="col-md-12 col-sm-12 col-xs-12">
-      <h3>Employers</h3>
-        
-      <div class="row no-buffer">
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 search-wp">
-          <%= render 'shared/search', url: employers_employer_profiles_path, q: @q, placeholder: 'Name' %>
-        </div>
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 no-pd">
-          <%= link_to "New Employer Profile", new_employers_employer_profile_path, class: "btn btn-primary pull-right new_emp_button" %>
-        </div>
+    <h3>Employers</h3>
+
+    <div class="row no-buffer">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 search-wp">
+        <%= render 'shared/search', url: employers_employer_profiles_path, q: @q, placeholder: 'Name' %>
       </div>
-      
-      <div class="table-responsive">
-        <table class="table table-wrapper" style="opacity: 1;">
-          <thead>
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 no-pd">
+        <%= link_to "New Employer Profile", new_employers_employer_profile_path, class: "btn btn-primary pull-right new_emp_button" %>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-wrapper" style="opacity: 1;">
+        <thead>
           <tr>
             <th>Name</th>
             <th>Rostered EE Ct</th>
@@ -29,7 +29,8 @@
             </tr>
           <% end %>
         </tbody>
-        </table>
+      </table>
+      <%= paginate @organizations %>
     </div>
   </div>
 </div>
