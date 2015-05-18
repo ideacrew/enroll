@@ -42,11 +42,9 @@
 
       <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
 	      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-		      <%= link_to "Add Member", new_consumer_employee_dependent_path(:family_id => @family.id), :remote => true, :class => "btn btn-primary" %>
+		      <%= link_to '<i class="fa fa-user"></i> Add Member'.html_safe, new_consumer_employee_dependent_path(:family_id => @family.id), :remote => true, :class => "btn btn-primary" %>
           <%= 
-            link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id), class: 'btn btn-primary pull-right' do
-              '<i class="fa fa-user-plus"></i> Continue'.html_safe
-            end
+            link_to '<i class="fa fa-user-plus"></i> Continue'.html_safe, group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id), class: 'btn btn-primary pull-right'
           %>
         </div>
       </div>
@@ -56,7 +54,26 @@
         <div style="display: none;" id="sup-progress" data-signup-progress="5"></div>
         <input type="hidden" id="initial_progress" value="45">
         <%= render 'shared/signup_progress' %>
-        <a href="#" class="btn btn-primary">Save & Exit</a>
+
+        <div class="row">
+          <div class="col-md-12">
+            <%= 
+              link_to '#', class: 'btn btn-primary' do
+                '<i class="fa fa-chevron-left"></i> Back'.html_safe
+              end
+            %> &nbsp;
+            <%#= 
+              link_to '<i class="fa fa-user-plus"></i> Continue'.html_safe, group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id), class: 'btn btn-primary'
+            %>
+          </div>
+        </div><br>
+        <div class="row">
+          <div class="col-md-12">
+            <%= link_to '<i class="fa fa-user"></i> My Account'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %> &nbsp;
+            <%= link_to '<i class="fa fa-floppy-o"></i> Save & Exit'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

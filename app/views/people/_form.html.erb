@@ -13,9 +13,28 @@
     <%= render 'shared/phone_fields', f: f %><br>
     <%= render 'people/employer_search' %>
   </div>
+
   <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right hidden" id="key-section">
-      <%= render 'shared/signup_progress' %>
-      <%= f.submit "Save & Exit", class: 'btn btn-primary' %>
+    <%= render 'shared/signup_progress' %>
+
+    <div class="row">
+      <div class="col-md-12">
+        <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, '#', class: 'btn btn-primary disabled' %> &nbsp;
+        <button type="submit" class="btn btn-primary" id="continue-employer">
+          <i class="fa fa-user-plus"></i> Continue
+        </button>
+        <%#= f.submit "Continue", class: "btn btn-success search_continue disabled", :id => "continue-employer" %>    
+      </div>
+    </div><br>
+    <div class="row">
+      <div class="col-md-12">
+        <%= link_to '<i class="fa fa-user"></i> My Account'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %> &nbsp;
+        <button type="submit" class="btn btn-primary">
+          <i class="fa fa-floppy-o"></i> Save & Exit
+        </button>
+        <%#= f.submit "Save & Exit", class: 'btn btn-primary' %>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -27,9 +46,5 @@
       <% end %>
       <div class="col-md-10 col-sm-10"><div id="email_error"></div></div>
     </div>
-  </div>
-
-  <div class="col-md-3 col-sm-3 col-xs-12">
-      <%= f.submit "Continue", :class => "btn btn-success disable-btn search_continue disabled", :id => "continue-employer" %>
   </div>
 </div>

@@ -82,11 +82,14 @@
         <div class="clearfix"></div>
         <div id="add_info_buttons_<%= dependent.id %>" style="padding-top: 20px;">
 		<% if !dependent.persisted? %>
-			<a href="#" class="btn btn-red remove-new-employee-dependent" data-target="#new_employee_dependent_form">Cancel</a>
+			<a href="#" class="btn btn-danger remove-new-employee-dependent" data-target="#new_employee_dependent_form"><i class="fa fa-times"></i> Cancel</a>
 		<% else %>
-			<%= link_to "Cancel", consumer_employee_dependent_path(dependent), class: 'btn btn-danger', :remote => true %>
+			<%= link_to '<i class="fa fa-times"></i> Cancel'.html_safe, consumer_employee_dependent_path(dependent), class: 'btn btn-danger', :remote => true %>
 		<% end %>
-		<%= f.submit 'Confirm Member', class: "btn btn-primary pull-right"  %>
+    <button type="submit" class="btn btn-primary pull-right">
+      <i class="fa fa-floppy-o"></i> Confirm Member
+    </button>
+		<%#= f.submit '&#xf0c7; Confirm Member'.html_safe, class: "fa btn btn-primary pull-right"  %>
 	</div>
 <% end %>
   </div>
