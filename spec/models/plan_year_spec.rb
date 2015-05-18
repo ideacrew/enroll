@@ -147,8 +147,23 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and a plan year start and end is specified" do
+        context "and the plan year start date isn't first day of month" do
+          let(:start_on)  { Date.current.beginning_of_month + 1 }
+          let(:end_on)    { start_on + HbxProfile::ShopPlanYearMinimumPeriod }
+
+          before do
+            plan_year.start_on = start_on
+            plan_year.end_on = end_on
+          end
+
+          it "should fail validation" do
+            expect(plan_year.valid?).to be_falsey
+            expect(plan_year.errors[:start_on].any?).to be_truthy
+          end
+        end
+
         context "and the plan year start date is after the end date" do
-          let(:end_on)    { Date.current }
+          let(:end_on)    { Date.current.beginning_of_month }
           let(:start_on)  { end_on + 1 }
 
           before do
