@@ -93,7 +93,6 @@ $(document).ready(function () {
   function update_info_row(element, evt) {
 
     var check = check_info_exists($(element).attr('id'));
-
     if( (evt == 'focus_in') || (check.length == 0 && evt == 'focus_out') ) {
 
       switch_row_class();
@@ -188,28 +187,10 @@ $(document).ready(function () {
   // ----- Focus Effect & Progress -----
   $("body").click(function(e) {
     update_progress();
-    if (e.target.id == "personal_info" || $(e.target).parents("#personal_info").size()) { 
-      $("a.personal_info").css("color","#98cbff");
-      $("#personal_info div.first").css("opacity","1");
-    } 
-    else if (e.target.id == "address_info" || $(e.target).parents("#address_info").size()) {
-      $("a.address_info").css("color","#98cbff");
-    }
-    else if (e.target.id == "phone_info" || $(e.target).parents("#phone_info").size()) {
-      $("a.phone_info").css("color","#98cbff");
-    }
-    else if (e.target.id == "email_info" || $(e.target).parents("#email_info").size()) {
-      $("a.email_info").css("color","#98cbff");
-    }
-    else if (e.target.id == "household_info" || $(e.target).parents("#household_info").size()) {
-      $("a.household_info").css("color","#98cbff");
-    }
-    else {}
   });
   
   update_progress(); //Run on page load for dependent_details page.
   function update_progress() {
-
     var start_progress = $('#initial_progress').length ? parseInt($('#initial_progress').val()) : 0;
 
     if(start_progress == 0) {
@@ -220,7 +201,7 @@ $(document).ready(function () {
     }
 
     if(personal_entry) {
-      start_progress = 20;
+      start_progress = 10;
       $("a.one, a.two").css("color","#00b420");
     }
 
@@ -239,9 +220,21 @@ $(document).ready(function () {
       $("a.five").css("color","#00b420");
     }
 
-    if($('#add_info_clone0').length) {
-      start_progress += 15;
+    if($('.dependent_list').length) {
+      start_progress += 5;
       $("a.six").css("color","#00b420");
+    } 
+
+    if($('#family_member_ids_0').length) {
+      $("a.seven").css("color","#00b420");
+    } 
+
+    if($('#all-plans').length) {
+      $("a.eight").css("color","#00b420");
+    } 
+
+    if($('#confirm_plan').length) {
+      $("a.nine").css("color", "#00b420");
     } else {
 //	    $("a.six").css("color","#999");
     }
@@ -249,7 +242,7 @@ $(document).ready(function () {
     $('#top-pad').html(start_progress + '% Complete');
     $('.progress-top').css('height', start_progress + '%');
 
-    if(start_progress >= 50) {
+    if(start_progress >= 40) {
       $('#continue-employer').removeClass('disabled');
     } else {
       $('#continue-employer').addClass('disabled');
@@ -319,38 +312,38 @@ $(document).ready(function () {
   });
   
   // Email validation after 1 seconds of stopping typing
-  $('#email_info input').keyup(function() {
-    call_email_check(this);
-  });
+  // $('#email_info input').keyup(function() {
+  //   call_email_check(this);
+  // });
   
-  $('#email_info input').focusout(function() {
-    call_email_check(this);
-  });
+  // $('#email_info input').focusout(function() {
+  //   call_email_check(this);
+  // });
 
-  function call_email_check(email) {
-    var timeout;
-    var email = $(email).val();
+  // function call_email_check(email) {
+  //   var timeout;
+  //   var email = $(email).val();
 
-    if(timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-    }
+  //   if(timeout) {
+  //       clearTimeout(timeout);
+  //       timeout = null;
+  //   }
 
-    timeout = setTimeout(function() {
-      check_email(email);
-    }, 1000);
-  }
+  //   timeout = setTimeout(function() {
+  //     check_email(email);
+  //   }, 1000);
+  // }
   
-  function check_email(email) {
-    var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if(email != "" && !re.test(email)) {
-      $('#email_error').text('Enter a valid email address. ( e.g. name@domain.com )');
-      $('#email_info .email .first').addClass('field_error');
-    } else {
-      $('#email_error').text('');
-      $('#email_info .email .first').removeClass('field_error');
-    }
-  }
+  // function check_email(email) {
+  //   var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  //   if(email != "" && !re.test(email)) {
+  //     $('#email_error').text('Enter a valid email address. ( e.g. name@domain.com )');
+  //     $('#email_info .email .first').addClass('field_error');
+  //   } else {
+  //     $('#email_error').text('');
+  //     $('#email_info .email .first').removeClass('field_error');
+  //   }
+  // }
   
   // Add new address
   $('.btn-new-address').click(function(e){

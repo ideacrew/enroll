@@ -23,7 +23,6 @@
         <button type="submit" class="btn btn-primary" id="continue-employer">
           <i class="fa fa-user-plus"></i> Continue
         </button>
-        <%#= f.submit "Continue", class: "btn btn-success search_continue disabled", :id => "continue-employer" %>    
       </div>
     </div><br>
     <div class="row">
@@ -32,7 +31,6 @@
         <button type="submit" class="btn btn-primary">
           <i class="fa fa-floppy-o"></i> Save & Exit
         </button>
-        <%#= f.submit "Save & Exit", class: 'btn btn-primary' %>
       </div>
     </div>
   </div>
@@ -44,7 +42,6 @@
       <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
         <%= render 'shared/email_fields', f: email %>
       <% end %>
-      <div class="col-md-10 col-sm-10"><div id="email_error"></div></div>
     </div>
   </div>
 </div>
