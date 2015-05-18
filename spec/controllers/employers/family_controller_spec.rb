@@ -5,6 +5,14 @@ RSpec.describe Employers::FamilyController do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:family) {FactoryGirl.create(:employer_census_family)}
   let(:new_family) {FactoryGirl.build(:employer_census_family)}
+  let(:census_family_params) { {"census_employee_attributes"=>
+    {"first_name"=>"aqzz",
+       "middle_name"=>"",
+       "last_name"=>"White",
+       "dob"=>"05/01/2015",
+       "ssn"=>"123-12-3112",
+       "gender"=>"male",
+       "hired_on"=>"05/02/2015"}} }
 
   describe "GET new" do
     let(:user) { double("user")}
@@ -30,9 +38,15 @@ RSpec.describe Employers::FamilyController do
   end
 
   describe "POST create" do
-    before :each do
+    let(:benefit_group) {FactoryGirl.create(:benefit_group)}
+    let(:plan_year) {FactoryGirl.create(:plan_year)}
+    before do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(BenefitGroup).to receive(:find).and_return(benefit_group)
+
+      allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
+      allow(controller).to receive(:census_family_params).and_return(census_family_params)
     end
 
     it "should be redirect when valid" do
@@ -64,12 +78,9 @@ RSpec.describe Employers::FamilyController do
     before do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(employer_profile).to receive(:plan_years).and_return([plan_year])
-      plan_year.benefit_groups << benefit_group
-
       allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
       allow(EmployerCensus::EmployeeFamily).to receive(:find).and_return(family)
-      allow(controller).to receive(:census_family_params).and_return({})
+      allow(controller).to receive(:census_family_params).and_return(census_family_params)
     end
 
     it "should be redirect when valid" do

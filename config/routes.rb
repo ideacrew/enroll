@@ -4,7 +4,12 @@ Rails.application.routes.draw do
 
   namespace :exchanges do
     resources :hbx_profiles do
-      root 'hbx_profiles#index'
+      root 'hbx_profiles#show'
+
+      collection do
+        get :employer_index
+        get :family_index
+      end
 
       # resources :hbx_staff_roles, shallow: true do
       resources :hbx_staff_roles do
@@ -17,7 +22,6 @@ Rails.application.routes.draw do
     # get 'hbx_profiles/new'
     # get 'hbx_profiles/create'
     # get 'hbx_profiles/update'
-    # get 'hbx_profiles/employer_index'
     # get 'hbx_profiles/broker_agency_index'
     # get 'hbx_profiles/insured_index'
   end
@@ -151,14 +155,14 @@ Rails.application.routes.draw do
 
   end
 
-  # resources :consumer_profiles, :only => [] do
-  #   collection do
-  #     get 'home'
-  #     get 'plans'
-  #     get 'personal'
-  #     get 'family'
-  #   end
-  # end
+  resources :consumer_profiles, :only => [] do
+    collection do
+      get 'home'
+      get 'plans'
+      get 'personal'
+      get 'family'
+    end
+  end
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection

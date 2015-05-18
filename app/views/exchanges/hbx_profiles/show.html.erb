@@ -1,4 +1,12 @@
 <p id="notice"><%= notice %></p>
 
-<%= link_to 'Edit', edit_exchanges_hbx_profile_path(@hbx_profile) %> |
-<%= link_to 'Back', hbx_exchanges_profiles_path %>
+<div class="row content landing">
+  <div class="home">
+    <h1><strong>HBX Admin</strong></h1>
+
+    <h3>
+      <%= link_to "Families", family_index_exchanges_hbx_profiles_path, class: "btn btn-default" %>
+      <%= link_to "Employers", employer_index_exchanges_hbx_profiles_path, class: "btn btn-default" %>
+    </h3>
+  </div>
+</div>

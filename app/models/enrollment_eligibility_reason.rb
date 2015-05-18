@@ -2,7 +2,11 @@ class EnrollmentEligibilityReason
   attr_reader :reason_provider, :date_of_reason
   delegate :type, :reason, to: :reason_provider
 
-  def provider=(new_provider_object, date_of_reason = DateTime.current)
+  def initialize(provider)
+    self.provider = provider
+  end
+
+  def provider=(new_provider_object, date_of_reason = Date.current)
     @provider = ReasonProvider.new(new_provider_object)
   end
 

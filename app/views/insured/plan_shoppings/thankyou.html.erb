@@ -36,7 +36,7 @@
                 <td colspan="3" class="text-right">Total Premium</td>
                 <td><%= number_to_currency(total_cost) %></td>
               </tr>
-            
+
               <tr>
                 <td colspan="3" class="text-right">Additionally your employer pays</td>
                 <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
@@ -55,7 +55,7 @@
           </table>
         </div>
 
-        <%= link_to "Confirm", checkout_insured_plan_shopping_path(@enrollment, :plan_id => @plan.id), :class => "btn btn-primary btn-continue pull-right", :method => :post %>
+        <%= link_to "Purchase", checkout_insured_plan_shopping_path(@enrollment, :plan_id => @plan.id), :class => "btn btn-primary btn-continue pull-right", :method => :post, :disabled => (!@enrollable) %>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
       <div style="display: none;" id="sup-progress" data-signup-progress="8"></div>

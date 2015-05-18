@@ -1,4 +1,4 @@
-class Insured::PlanShoppingsController < ApplicationController 
+class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
 
   def checkout
@@ -22,7 +22,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @benefit_group = @enrollment.benefit_group
     @reference_plan = @benefit_group.reference_plan
     @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
-    respond_to do |format| 
+    @family = @person.primary_family
+    @enrollable = @family.is_eligible_to_enroll?
+    respond_to do |format|
       format.html { render 'thankyou.html.erb' }
     end
   end
