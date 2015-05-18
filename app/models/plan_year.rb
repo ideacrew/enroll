@@ -34,18 +34,15 @@ class PlanYear
 
   # embedded association: has_many :employee_families
   def employee_families
-    parent.employee_families.where(:plan_year_id => self.id)
-  end
-
-  def editable?
-    !benefit_groups.any?(&:assigned?)
+    return @employee_families if defined? @employee_families
+    @employee_families = parent.employee_families.where(:plan_year_id => self.id)
   end
 
   def employee_participation_percent
   end
 
-  def last_day_of_month(month = Date.today.month, year = Date.today.year)
-    Date.civil(year, month, -1)
+  def editable?
+    !benefit_groups.any?(&:assigned?)
   end
 
   def open_enrollment_contains?(date)
@@ -56,7 +53,6 @@ class PlanYear
     return (start_on <= date) if (end_on.blank?)
     (start_on <= date) && (date <= end_on)
   end
-
 
   class << self
     def find(id)
@@ -91,12 +87,12 @@ private
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
     end
 
-    # TODO: Create HBX object with configuration settings including shop_open_enrollment_minimum_in_days
-    # FIXME: I'm disabling this for now, because it either isn't true for about 1/3 of our employers,
-    # or connecture's data is total garbage
-    shop_open_enrollment_minimum_in_days = 5
-    if (open_enrollment_end_on - open_enrollment_start_on) < shop_open_enrollment_minimum_in_days
-#      errors.add(:open_enrollment_end_on, "can't be less than #{shop_open_enrollment_minimum_in_days} days")
+    if (open_enrollment_end_on - open_enrollment_start_on) < HbxProfile::ShopOpenEnrollmentMinimumPeriod
+     errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{HbxProfile::ShopOpenEnrollmentMinimumPeriod} days")
+    end
+
+    if (open_enrollment_end_on - open_enrollment_start_on) > HbxProfile::ShopOpenEnrollmentMaximumPeriod
+     errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{HbxProfile::ShopOpenEnrollmentMaximumPeriod} days")
     end
   end
 

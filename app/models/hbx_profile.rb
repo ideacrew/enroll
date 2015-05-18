@@ -45,4 +45,8 @@ class HbxProfile
   # Minimum number of days an employee may submit a plan, following addition or correction to Employer roster
   ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30
 
+  # Minimum length of open enrollment in days 
+  ShopOpenEnrollmentMinimumPeriod = 1
+  ShopOpenEnrollmentMaximumPeriod = 60
+
 end
