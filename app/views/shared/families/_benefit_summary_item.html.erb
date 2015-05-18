@@ -1,18 +1,17 @@
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title"><%= "#{mixed_case b[:benefit_type]} Benefit Summary" %></h3>
-  </div>
-  <div class="panel-body">
-    <dl class="dl-horizontal">
-      <dt>Plan Name</dt> <dd><%= b[:plan_name] %></dd>
-      <dt>Issuer</dt> <dd><%= b[:issuer_name] %></dd>
-      <dt>Plan Type</dt> <dd><%= b[:plan_type].to_s.upcase %></dd>
-      <dt>Metal Level</dt> <dd><%= mixed_case b[:metal_level] %></dd>
-      <dt>Subscriber</dt> <dd><%= b[:subscriber_name] %></dd>
-      <dt>Start Date</dt> <dd><%= format_date b[:start_date] %></dd>
-      <dt>HBX Subscriber ID</dt> <dd><%= b[:subscriber_hbx_id] %></dd>
-      <dt>Carrier Subscriber ID</dt> <dd><%= b[:subscriber_carrier_id] %></dd>
-      <dt>Group ID</dt> <dd><%= b[:group_id] %></dd>
-    </dl>
-  </div>
-</div>
+<table class="table table-condensed">
+  <thead>
+    <tr><th colspan="2"><%= "#{mixed_case b[:benefit_type]} Benefit Summary" %></th></tr>
+  </thead>
+
+  <tbody>
+    <tr><th>Plan Name</th>              <td><%= b[:plan_name] %></td></tr>
+    <tr><th>Issuer</th>                 <td><%= b[:issuer_name] %></td></tr>
+    <tr><th>Plan Type</th>              <td><%= b[:plan_type] %></td></tr>
+    <tr><th>Metal Level</th>            <td><%= b[:metal_level] %></td></tr>
+    <tr><th>Subscriber</th>             <td><%= b[:subscriber_name] %></td></tr>
+    <tr><th>Start Date</th>             <td><%= b[:start_date] %></td></tr>
+    <tr><th>HBX Subscriber ID</th>      <td><%= b[:subscriber_hbx_id] %></td></tr>
+    <tr><th>Carrier Subscriber ID</th>  <td><%= b[:subscriber_carrier_id] %></td></tr>
+    <tr><th>Group ID</th>               <td><%= b[:group_id] %></td></tr>
+  </tbody>
+</table>

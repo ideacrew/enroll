@@ -1,10 +1,20 @@
-  
-<h4><%= "#{e[:name]} Plan Year #{e[:plan_year]}" %></h4>
-<p><%= link_to "Employer Benefits", "#" %> | <%= link_to "HR Contact", "#" %> </p>
-<% e[:benefits].each do |benefit| %>
-  <div class="row">
-    <div class="col-md-4">
-      <%= render "shared/families/benefit_summary_item", b: benefit %>
-    </div>
-  </div>
-<% end %>
+<ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
+	<li role="presentation">
+		<%= link_to "Employer Benefits", "#" %>
+	</li>
+	<li>
+		<%= link_to "HR Contact", "#" %>
+	</li>
+</ul>
+
+<div class="container">
+	<h3><%= "#{e[:name]} Plan Year #{e[:plan_year]}" %></h3>
+
+	<div class="row">
+		<% e[:benefits].each do |benefit| %>
+		    <div class="col-md-6">
+		      <%= render "shared/families/benefit_summary_item", b: benefit %>
+		    </div>
+		<% end %>
+	</div>
+</div>
