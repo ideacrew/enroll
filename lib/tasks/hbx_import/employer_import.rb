@@ -95,6 +95,11 @@ module HbxImport
             count + 1
           else
             # TODO: error saving
+            puts organization.inspect
+            puts organization.errors.full_messages.inspect
+            unless organization.employer_profile.valid?
+              puts organization.employer_profile.errors.full_messages.inspect
+            end
             count
           end
         else
@@ -104,6 +109,11 @@ module HbxImport
             #TODO: print errors?
             # puts "Error validating new organization:"
             # puts [o, o.office_locations, o.employer_profile, o.errors].collect(&:inspect)
+            puts organization.inspect
+            puts organization.errors.full_messages.inspect
+            unless organization.employer_profile.valid?
+              puts organization.employer_profile.errors.full_messages.inspect
+            end
             count
           end
         end

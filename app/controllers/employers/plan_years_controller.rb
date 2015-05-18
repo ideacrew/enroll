@@ -7,6 +7,9 @@ class Employers::PlanYearsController < ApplicationController
 
   def create
     @plan_year = @employer_profile.plan_years.new(plan_year_params)
+    benefit_group = @plan_year.benefit_groups.first
+    reference_plan = benefit_group.reference_plan
+    benefit_group.elected_plan_ids = reference_plan.carrier_profile.plans.where(active_year: 2015, market: "shop").collect(&:_id)
     if @plan_year.save
       flash[:notice] = "Plan Year successfully created."
       redirect_to employers_employer_profile_path(@employer_profile)

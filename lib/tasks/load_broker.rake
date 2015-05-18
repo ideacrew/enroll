@@ -8,6 +8,7 @@ namespace :xml do
   desc "Import brokers from xml files"
   task :broker, [:file] => :environment do |task, args|
     brokers = []
+    People.where("broker_roles.0" => { "$exists" => true }).delete_all
 
     begin
       xml = Nokogiri::XML(File.open(args.file))

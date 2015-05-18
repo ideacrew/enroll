@@ -4,14 +4,7 @@ Feature: Create Employer
   An Employer Representative
   Should be able to create an Employer account
 
-    Scenario: An Employer Representative has not signed up on the HBX
-      Given I haven't signed up as an HBX user
-      When I visit the Employer portal
-        And I sign up with valid user data
-      Then I should see a successful sign up message
-        And I should see an initial form to enter information about my Employer and myself
-        And I should see a successful creation message
-
+    @wip
     Scenario: Employer Representative has previously signed up on HBX
       Given I have signed up previously through consumer, broker agency or previous visit to the Employer portal
       When I visit the Employer portal to sign in
@@ -21,6 +14,14 @@ Feature: Create Employer
         #And I should see an initial fieldset to enter my name, ssn and dob
         #And My user data from existing the fieldset values are prefilled using data from my existing account
         And I should see a form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone
+        And I should see a successful creation message
+
+    Scenario: An Employer Representative has not signed up on the HBX
+      Given I haven't signed up as an HBX user
+      When I visit the Employer portal
+        And I sign up with valid user data
+      Then I should see a successful sign up message
+        And I should see an initial form to enter information about my Employer and myself
         And I should see a successful creation message
       When I go to the benefits tab I should see plan year information
         And I should see a button to create new plan year
@@ -32,15 +33,43 @@ Feature: Create Employer
       When I click on add employee button
       Then I should see a form to enter information about employee, address and dependents details
         And I should see employer census family created success message
-      #When I click on Edit family button for a census family
-      #Then I should see a form to update the contents of the census employee
-        #And I should see employer census family updated success message
+      When I click on Edit family button for a census family
+      Then I should see a form to update the contents of the census employee
+        And I should see employer census family updated success message
       #When I click on terminate button for a census family
       #Then The census family should be terminated and move to terminated tab
         #And I should see the census family is successfully terminated message
       #When I click on Rehire button for a census family on terminated tab
       #Then A new instance of the census family should be created
         #And I should see the census family is successfully rehired message
+        And I logout from employer portal
+      Given I do not exist as a user
+      And I have an existing employee record
+      And I have an existing person record
+      When I go to the employee account creation page
+      When I enter my new account information
+      Then I should be logged in
+      When I go to register as an employee
+      Then I should see the employee search page
+      When I enter the identifying information of my existing person
+      Then I should see the matching employee record form
+      When I accept the matched employer
+      When I complete the matching employee form
+      Then I should see the dependents page
+      When I click Add Member
+      Then I should see the new dependent form
+      When I enter the identifying info of Sorens daughter
+      When I click confirm member
+      When I click continue on the dependents page
+      Then I should see the group selection page
+      When I click continue on the group selection page
+      Then I should see the plan shopping welcome page
+      Then I should see the list of plans
+      When I select a plan on the plan shopping page
+      Then I should see the coverage summary page
+      When I confirm on the coverage summary page
+      Then I should see the "my account" page
+
 
 
     @wip

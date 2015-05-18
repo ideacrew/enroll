@@ -22,9 +22,9 @@ And(/^I sign up with valid user data$/) do
 end
 
 Then(/^I should see a successful sign up message$/) do
-  Watir::Wait.until(30) { @browser.element(text: /Welcome! You have signed up successfully./).present? }
+  Watir::Wait.until(30) { @browser.element(text: /Welcome! Your account has been created./).present? }
   screenshot("employer_sign_up_welcome")
-  expect(@browser.element(text: /Welcome! You have signed up successfully./).visible?).to be_truthy
+  expect(@browser.element(text: /Welcome! Your account has been created./).visible?).to be_truthy
 end
 
 And(/^I should see an initial form to enter information about my Employer and myself$/) do
@@ -32,6 +32,10 @@ And(/^I should see an initial form to enter information about my Employer and my
   expect(@browser.a(text: "Continue").visible?).to be_truthy
   @browser.a(text: "Continue").click
   sleep(1)
+  plan = FactoryGirl.create(:plan)
+  pt = plan.premium_tables.build(age: 34, start_on: 0.days.ago.beginning_of_year.to_date, end_on: 0.days.ago.end_of_year.to_date, cost: 345.09)
+  pt1 = plan.premium_tables.build(age: 3, start_on: 0.days.ago.beginning_of_year.to_date, end_on: 0.days.ago.end_of_year.to_date, cost: 125.10)
+  plan.save
   @browser.text_field(name: "person[first_name]").set("Doe")
   @browser.text_field(name: "person[last_name]").set("John")
   @browser.text_field(name: "person[date_of_birth]").set("11/10/1982")
@@ -59,9 +63,9 @@ And(/^I should see an initial form to enter information about my Employer and my
   expect(@browser.button(id: "continue-employer").visible?).to be_truthy
   @browser.button(id: "continue-employer").click
   sleep(3)
+  @browser.text_field(name: "employer_profile[legal_name]").set("Turner Agency, Inc")
+  @browser.text_field(name: "employer_profile[dba]").set("Turner Brokers")
   @browser.text_field(name: "employer_profile[fein]").set("678121089")
-  @browser.text_field(name: "employer_profile[dba]").set("Systems")
-  @browser.text_field(name: "employer_profile[legal_name]").set("ABC Systems")
   input_field = @browser.div(:class => 'selectric-wrapper')
   input_field.click
   input_field.li(text: "Partnership").click
@@ -102,7 +106,11 @@ And(/^I sign in with valid user data$/) do
   user = FactoryGirl.create(:user)
   user.build_person(first_name: "John", last_name: "Doe", ssn: "111000999", dob: "10/10/1985")
   user.save
-  FactoryGirl.create(:plan)
+  plan = FactoryGirl.create(:plan)
+  pt = plan.premium_tables.build(age: 34, start_on: 0.days.ago.beginning_of_year.to_date, end_on: 0.days.ago.end_of_year.to_date, cost: 345.09)
+  pt1 = plan.premium_tables.build(age: 3, start_on: 0.days.ago.beginning_of_year.to_date, end_on: 0.days.ago.end_of_year.to_date, cost: 125.10)
+  plan.save
+
   @browser.text_field(name: "user[email]").set(user.email)
   @browser.text_field(name: "user[password]").set(user.password)
   screenshot("employer_portal_sign_in")
@@ -161,17 +169,16 @@ And(/^My user data from existing the fieldset values are prefilled using data fr
 end
 
 And(/^I should see a form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
-  sleep(2)
+  sleep(1)
   Watir::Wait.until(30) { @browser.button(value: "Search Employers").present? }
-  #screenshot("employer_portal_employer_search_form")
-  employer_profile = FactoryGirl.create(:employer_profile)
+  screenshot("employer_portal_employer_search_form")
+  @employer_profile = FactoryGirl.create(:employer_profile)
 
   expect(@browser.button(value: "Search Employers").visible?).to be_truthy
-  @browser.text_field(name: "employer_profile[fein]").set(employer_profile.fein)
-  @browser.text_field(name: "employer_profile[dba]").set(employer_profile.dba)
-  @browser.text_field(name: "employer_profile[legal_name]").set(employer_profile.legal_name)
+  @browser.text_field(name: "employer_profile[legal_name]").set(@employer_profile.legal_name)
+  @browser.text_field(name: "employer_profile[dba]").set(@employer_profile.dba)
+  @browser.text_field(name: "employer_profile[fein]").set(@employer_profile.fein)
   screenshot("employer_portal_employer_search_criteria")
-  # @browser.select_list(name: "employer_profile[entity_kind]").set(org.employer_profile.entity_kind)
   @browser.button(value: "Search Employers").fire_event("onclick")
   sleep(1)
   screenshot("employer_portal_employer_contact_info")
@@ -252,13 +259,19 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][city]").set("alpharetta")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][state]").set("GA")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][zip]").set("30228")
+  input_field = @browser.divs(:class => 'selectric-wrapper').last
+  input_field.click
+  input_field.li(text: "Silver PPO Group").click
   # Census Dependents
-  @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][first_name]").set("Mary")
-  @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][middle_name]").set("K")
-  @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][last_name]").set("Doe")
-  @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][dob]").set("10/12/2012")
-  @browser.radio(id: "employer_census_employee_family_census_dependents_attributes_0_gender_female").set
-  screenshot("employer_census_new_family_with_data")
+  # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][first_name]").set("Mary")
+  # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][middle_name]").set("K")
+  # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][last_name]").set("Doe")
+  # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][dob]").set("10/12/2012")
+  # @browser.radio(id: "employer_census_employee_family_census_dependents_attributes_0_gender_female").set
+  # screenshot("employer_census_new_family_with_data")
+  # input_field = @browser.divs(:class => 'selectric-wrapper').first
+  # input_field.click
+  # input_field.li(text: "Child under 26").click
   # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][employee_relationship]").set("child_under_26")
   @browser.input(value: "Create Family").click
 end
@@ -289,14 +302,24 @@ Then(/^I should see a form to update the contents of the census employee$/) do
   expect(@browser.input(value: "Update Family").visible?).to be_truthy
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][first_name]").set("Patrick")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][state]").set("VA")
+  input_field = @browser.divs(:class => 'selectric-wrapper').last
+  input_field.click
+  input_field.li(text: "Silver PPO Group").click
   @browser.input(value: "Update Family").click
 end
 
 And(/^I should see employer census family updated success message$/) do
-  sleep(1)
+  sleep(2)
   Watir::Wait.until(30) {  @browser.text.include?("Employer Census Family is successfully updated.") }
-  expect(@browser.a(text: "Patrick K Doe Jr").visible?).to be_truthy
+  # expect(@browser.a(text: "Patrick K Doe Jr").visible?).to be_truthy
 end
+
+And(/^I logout from employer portal$/) do
+  @browser.goto("http://localhost:3000/")
+  Watir::Wait.until(30) {  @browser.a(text: "Logout").visible? }
+  @browser.a(text: "Logout").click
+end
+
 
 When(/^I click on terminate button for a census family$/) do
   sleep(1)
@@ -378,6 +401,14 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][employer_max_amt]").set(120)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][offered]").set("true")
+
+  expect(@browser.a(class: "add_fields").visible?).to be_truthy
+  @browser.a(class: "add_fields").click
+  @browser.fieldsets.last.p(class: /label/, text: /Employee/).click
+  @browser.fieldsets.last.li(text:/Child under 26/).click
+  @browser.text_fields(name: /plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+premium_pct/).last.set("15")
+  @browser.text_fields(name: /plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+employer_max_amt/).last.set("51")
+  @browser.text_fields(name: /plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+offered/).last.set("true")
   screenshot("employer_add_plan_year_info")
   @browser.input(value: "Create Plan Year").click
 end

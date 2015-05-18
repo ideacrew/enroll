@@ -4,7 +4,7 @@ Rails.application.routes.draw do
 
   namespace :exchanges do
     resources :hbx_profiles do
-      root 'hbx_profiles#index'
+      root 'hbx_profiles#show'
 
       collection do
         get :employer_index
@@ -155,14 +155,14 @@ Rails.application.routes.draw do
 
   end
 
-  # resources :consumer_profiles, :only => [] do
-  #   collection do
-  #     get 'home'
-  #     get 'plans'
-  #     get 'personal'
-  #     get 'family'
-  #   end
-  # end
+  resources :consumer_profiles, :only => [] do
+    collection do
+      get 'home'
+      get 'plans'
+      get 'personal'
+      get 'family'
+    end
+  end
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
