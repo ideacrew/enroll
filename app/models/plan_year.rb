@@ -57,9 +57,18 @@ class PlanYear
     (start_on <= date) && (date <= end_on)
   end
 
+
+  class << self
+    def find(id)
+      organizations = Organization.where("employer_profile.plan_years._id" => BSON::ObjectId.from_string(id))
+      organizations.size > 0 ? organizations.first.employer_profile.plan_years.unscoped.detect { |py| py._id.to_s == id.to_s} : nil
+    end
+  end
+
 private
 
   def open_enrollment_date_checks
+    return if start_on.blank? || end_on.blank? || open_enrollment_start_on.blank? || open_enrollment_end_on.blank?
     if start_on.day != 1
       errors.add(:start_on, "must be first day of the month")
     end
