@@ -192,6 +192,29 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
+  describe "POST create" do
+    let(:employer_parameters) { { :first_name => "SOMDFINKETHING" } }
+    let(:found_employer) { double("test") }
+    let(:office_locations){[double(address: double("address"), phone: double("phone"), email: double("email"))]}
+    let(:organization) {double(office_locations: office_locations)}
+
+    before(:each) do
+      sign_in
+      allow(EmployerProfile).to receive(:find_by_fein).and_return(found_employer)
+      allow(found_employer).to receive(:organization).and_return(organization)
+      post :create, :employer_profile => employer_parameters
+    end
+
+    context "given valid parameters" do
+      let(:validation_result) { true }
+
+      it "renders the 'edit' template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("edit")
+      end
+    end
+  end
+
   describe "POST match" do
     let(:employer_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:found_employer) { [] }
@@ -255,7 +278,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:organization) { FactoryGirl.create(:organization) }
     let(:person) { FactoryGirl.create(:person) }
 
-    before do 
+    before do
       allow(user).to receive(:has_employer_staff_role?).and_return(true)
       allow(user).to receive(:roles).and_return(["employer"])
       allow(user).to receive(:person).and_return(person)

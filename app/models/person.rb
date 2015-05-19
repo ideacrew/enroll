@@ -114,7 +114,7 @@ class Person
 
   def generate_hbx_id
     if hbx_id.blank?
-      # hbx_id = HbxIdGenerator.generate
+      hbx_id = HbxIdGenerator.generate
     end
   end
 
@@ -198,11 +198,11 @@ class Person
 end
 
   def dob_to_string
-    @dob.blank? ? "" : @dob.strftime("%Y%m%d")
+    dob.blank? ? "" : dob.strftime("%Y%m%d")
   end
 
   def is_active?
-    @is_active
+    is_active
   end
 
   def find_relationship_with(other_person)

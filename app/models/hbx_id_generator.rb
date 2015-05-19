@@ -22,7 +22,8 @@ class HbxIdGenerator
 
   class AmqpSource
     def self.generate
-      JSON.load(Acapi::Requestor.request("sequence.next", {:sequence_name => "member_id"}).stringify_keys[:body]).first
+      request_result = Acapi::Requestor.request("sequence.next", {:sequence_name => "member_id"})
+      JSON.load(request_result.stringify_keys["body"]).first.to_s
     end
   end
 

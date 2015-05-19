@@ -114,20 +114,8 @@ class User
     true
   end
 
-  def active_for_authentication?
-    super && approved?
-  end
-
   def instantiate_person
     self.build_person if self.person.nil?
-  end
-
-  def inactive_message
-    if !approved?
-      :not_approved
-    else
-      super # Use whatever other message
-    end
   end
 
   def self.send_reset_password_instructions(attributes={})
@@ -140,18 +128,11 @@ class User
     recoverable
   end
 
-  def self.find_all_by_approved(appvd_status)
-    where(approved: appvd_status)
-  end
-
   def self.find_by_authentication_token(token)
     where(authentication_token: token).first
   end
 
 protected
-  def send_admin_mail
-    AdminMailer.new_user_waiting_for_approval(self).deliver
-  end
 
 private
   def generate_authentication_token

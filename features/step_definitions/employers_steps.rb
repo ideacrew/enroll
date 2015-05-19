@@ -419,3 +419,32 @@ And(/^I should see a success message after clicking on create plan year button$/
   screenshot("employer_plan_year_success_message")
   Watir::Wait.until(30) {  @browser.text.include?("Plan Year successfully created.") }
 end
+
+When(/^I enter filter in plan selection page$/) do
+  Watir::Wait.until(30) { @browser.a(:text => "All Filters").present? }
+  @browser.a(:text => "All Filters").click
+  @browser.checkboxes(:class => "plan-type-selection-filter").first.set(true)
+  @browser.button(:class => "apply-btn", :text => "Apply").click
+end
+
+When(/^I enter combind filter in plan selection page$/) do
+  @browser.a(:text => "All Filters").click
+  @browser.checkboxes(:class => "plan-type-selection-filter").first.set(false)
+  # Nationwide
+  @browser.checkboxes(:class => "plan-metal-network-selection-filter").last.set(true)
+  # Platinum
+  @browser.checkboxes(:class => "plan-metal-level-selection-filter")[1].set(true)
+  @browser.text_field(:class => "plan-metal-deductible-from-selection-filter").set("")
+  @browser.text_field(:class => "plan-metal-deductible-to-selection-filter").set("")
+  @browser.text_field(:class => "plan-metal-premium-from-selection-filter").set("$460")
+  @browser.text_field(:class => "plan-metal-premium-to-selection-filter").set("$480")
+  @browser.button(:class => "apply-btn", :text => "Apply").click
+end
+
+Then(/^I should see the combind filter results$/) do
+  @browser.divs(:class => "plan-row").select(&:visible?).each do |plan|
+    expect(plan.text.include?("DC Area Network")).to eq true
+    expect(plan.text.include?("Silver")).to eq true
+    expect(plan.p(text: "$470.19").visible?).to eq true
+  end
+end

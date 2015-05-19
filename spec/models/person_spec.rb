@@ -127,7 +127,7 @@ describe Person do
           expect(person.errors[:ssn].any?).to be_falsey
         end
 
-        it "allow duplicated blank ssn" do 
+        it "allow duplicated blank ssn" do
           person1 = Person.create(**params)
           person2 = Person.create(**params)
           expect(person2.errors[:ssn].any?).to be_falsey
@@ -143,7 +143,7 @@ describe Person do
           expect(person.errors[:ssn].any?).to be_falsey
         end
 
-        it "allow duplicated blank ssn" do 
+        it "allow duplicated blank ssn" do
           person1 = Person.create(**params)
           person2 = Person.create(**params)
           expect(person2.errors[:ssn].any?).to be_falsey
@@ -168,6 +168,34 @@ describe Person do
         person = Person.new(**params)
         person.valid?
         expect(person.errors[:ssn]).to eq ["SSN must be 9 digits"]
+      end
+    end
+
+    context "with date of birth" do
+      let(:dob){ 25.years.ago }
+      let(:params) {valid_params.deep_merge({dob: dob})}
+
+      before(:each) do
+        @person = Person.new(**params)
+      end
+
+      it "should get the date of birth" do
+        expect(@person.date_of_birth).to eq dob.strftime("%m/%d/%Y")
+      end
+
+      it "should set the date of birth" do
+        @person.date_of_birth = "01/01/1985"
+        expect(@person.dob.to_s).to eq "1985-01-01"
+      end
+
+      it "should return date of birth as string" do
+        expect(@person.dob_to_string).to eq dob.to_date.to_s.gsub("-","")
+      end
+
+      it "should return if a person is active or not" do
+        expect(@person.is_active?).to eq true
+        @person.is_active = false
+        expect(@person.is_active?).to eq false
       end
     end
 
@@ -439,7 +467,7 @@ describe Person, "with an existing relationship to a dependent" do
 end
 
 describe Person, "call notify change event when after save" do
-  before do 
+  before do
     extend Notify
   end
 

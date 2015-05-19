@@ -65,6 +65,9 @@ Feature: Create Employer
       When I click continue on the group selection page
       Then I should see the plan shopping welcome page
       Then I should see the list of plans
+      When I enter filter in plan selection page
+      When I enter combind filter in plan selection page
+      Then I should see the combind filter results
       When I select a plan on the plan shopping page
       Then I should see the coverage summary page
       When I confirm on the coverage summary page
