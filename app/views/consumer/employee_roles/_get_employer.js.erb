@@ -1,17 +1,13 @@
 $('#new_person_wrapper').html("<%= escape_javascript(render "person_form") %>");
-$('#employer-info').html("<%= escape_javascript(render 'employers').html_safe %>");
 
-$('#search-employer').hide();
 $('#personal_info').addClass('personal-info-top-row');
 $('#personal_info').removeClass('personal-info-row');
 $("#key-section").removeClass("hidden");
 $('.search-btn-row').addClass('hidden');
-$('#employer-info').removeClass('hidden');
 $('#address_info').removeClass('hidden');
 $('#phone_info').removeClass('hidden');
 $('#email_info').removeClass('hidden');
 $('.search_continue').removeClass('hidden');
-$("#employer-info").css("display", "block");
 
 $("#person_id").val("<%= @person.id %>");
 

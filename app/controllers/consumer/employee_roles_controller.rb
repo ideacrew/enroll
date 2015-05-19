@@ -44,8 +44,15 @@ class Consumer::EmployeeRolesController < ApplicationController
     build_nested_models
     respond_to do |format|
       format.js { render "edit" }
-      format.html { render "edit" }
+      format.html { redirect_to :action => "edit", :id => @employee_role.id }
     end
+  end
+
+  def edit
+    @employee_role = EmployeeRole.find(params.require(:id))
+    @person = Forms::EmployeeRole.new(current_user.person, @employee_role)
+    @family = @person.primary_family
+    build_nested_models
   end
 
   def update
@@ -60,7 +67,6 @@ class Consumer::EmployeeRolesController < ApplicationController
         format.js { render "dependent_details" }
       end
     else
-      @employer_profile = @person.employer_profile
       build_nested_models
       respond_to do |format|
         format.html { render "edit" }

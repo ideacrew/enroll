@@ -74,8 +74,8 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     end
 
     it "should render the edit template" do
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template("edit")
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(edit_consumer_employee_path(:id => "212342345"))
     end
 
     it "should assign the employee_role" do
