@@ -33,7 +33,7 @@ class Phone
     allow_blank: false
 
   def blank?
-    [:area_code, :number, :extension].each do |attr|
+    [:full_phone_number, :area_code, :number, :extension].all? do |attr|
       self.send(attr).blank?
     end
   end
