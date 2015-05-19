@@ -22,7 +22,7 @@
 
             <% if signed_in? %>
             <ul class="dropdown-menu">
-              <% if @person.persisted? %>
+              <% if @person.present? && @person.persisted? %>
                   <li><%= link_to "Profile", consumer_employee_path(@person) %></li>
                   <li><%= link_to "My Account", person_person_landing_path(@person) %></li>
                   <li class="divider"></li>
