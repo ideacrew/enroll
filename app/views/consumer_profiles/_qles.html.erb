@@ -19,7 +19,11 @@
 							<h4 class="text-left"><%= qle.title.humanize %></h4>
 						</div>
 						<div class="col-md-4 col-sm-4 col-xs-12 qle-kind">
-	                    	<a href="#"><%= qle.kind unless qle.edi_code == '32-MARRIAGE' %></a>
+	                    	<a href="#"><%= qle.kind unless (qle.edi_code == '32-MARRIAGE' || qle.edi_code == '02-BIRTH' || qle.edi_code == '05-ADOPTION' || qle.edi_code == '07-TERMINATION OF BENEFITS') %></a>
+
+	                    	<% if (qle.edi_code == '02-BIRTH' || qle.edi_code == '05-ADOPTION' || qle.edi_code == '07-TERMINATION OF BENEFITS') %>
+		                    	<%= link_to(qle.kind, family_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "family", "role" => "tab" ) %>
+							<% end %>
 	                    </div>
 					</a>
 				</div>
