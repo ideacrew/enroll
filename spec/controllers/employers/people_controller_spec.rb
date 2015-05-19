@@ -95,16 +95,30 @@ RSpec.describe Employers::PeopleController do
 
   describe "POST update" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING", :last_name => "SOME"} }
-    let(:person) { FactoryGirl.create(:person) }
+    let(:person) { double(:phones => double(:each => double("each")),
+      :addresses => double(:each => double("each")),
+      :emails => double(:each => double("each"))
+     ) }
+    let(:person_id){ "1234"}
+    let(:address_attributes) { double(:address => ["address"])}
+    let(:phone_attributes) { double(:phone => ["phone"])}
+    let(:email_attributes) { double(:email => ["email"])}
+    let(:valid_params){ {
+      id: person_id,
+      person: person_parameters.
+      deep_merge(addresses_attributes: {0 => {"id" => address_attributes}}).
+      deep_merge(phones_attributes: {0 => {"id" => phone_attributes}}).
+      deep_merge(emails_attributes: {0 => {"id" => email_attributes}})
+      } }
     let(:user) { FactoryGirl.create(:user) }
 
     before(:each) do
       sign_in(user)
-      allow(Person).to receive(:find).with(person.id).and_return(person)
+      allow(Person).to receive(:find).with(person_id).and_return(person)
+      allow(person).to receive(:employer_contact).and_return("test")
+      allow(person).to receive(:updated_by=).and_return("test")
       allow(person).to receive(:update_attributes).and_return(save_result)
-      allow(controller).to receive(:sanitize_person_params).and_return(nil)
-      allow(controller).to receive(:make_new_person_params).with(person).and_return(nil)
-      put :update, :person => person_parameters, :id => person.id
+      put :update, valid_params
     end
 
     context "given valid person parameters" do
