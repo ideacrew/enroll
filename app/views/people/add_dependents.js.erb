@@ -1,4 +1,0 @@
-$("#dependent_ul").append("<%= escape_javascript(render 'dependent', dependent: @dependent,employer: @employer,person: @person,employee: @employee).html_safe %>");
-$("#add_member_list_<%= @dependent.id %> .close-2").attr('data-confirm', '');
-$("#dependent_buttons").addClass('hidden');
-$("#add_info_buttons_<%= @dependent.id %>").removeClass('hidden');
