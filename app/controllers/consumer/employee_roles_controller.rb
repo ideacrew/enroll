@@ -30,7 +30,6 @@ class Consumer::EmployeeRolesController < ApplicationController
         end
       end
     else
-      @person = @employee_candidate
       respond_to do |format|
         format.js { render 'search' }
         format.html { render 'search' }
