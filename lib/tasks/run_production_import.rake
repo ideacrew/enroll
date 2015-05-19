@@ -6,6 +6,7 @@ namespace :production do
     Rake::Task["db:mongoid:drop"].invoke
     Rake::Task["db:mongoid:remove_indexes"].invoke
     Rake::Task["db:mongoid:create_indexes"].invoke
+    require File.join(Rails.root, "db/seedfiles/qualifying_life_event_kinds_seed")
     require File.join(Rails.root, "db/seedfiles/carriers_seed")
     Rake::Task["seed:plans"].invoke
     Rake::Task["xml:serff"].invoke("XML")

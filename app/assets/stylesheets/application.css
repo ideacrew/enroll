@@ -11,8 +11,8 @@
  * file per style scope.
  *
  *= require jquery-ui
- *= require bootstrap-theme
  *= require font-awesome
+ *= require bootstrap-theme
  *= require bootstrap.min
  *= require component
  *= require style

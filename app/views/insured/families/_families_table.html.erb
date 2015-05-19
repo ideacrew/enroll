@@ -33,13 +33,13 @@
         <td><%= number_to_obscured_ssn(pp.ssn) %></td>
         <td><%= format_date(pp.dob) %></td>
         <td><%= pp.hbx_id %></td>
-        <td><%= family.active_members.size %></td>
+        <td><%= family.active_family_members.size %></td>
         <% if benefits.size == 0 %>
           <%= content_tag(:td, "None given", class: "text-right") %>
           <%= content_tag(:td, "", colspan: "6") %>
         <% end %>
+      <%= render "insured/families/benefits_table", benefits: benefits %>
       </tr>
-      <%= render "benefits_table", benefits: benefits %>
     <% end %>
   </tbody>
 </table>

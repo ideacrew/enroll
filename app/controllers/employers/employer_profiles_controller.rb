@@ -6,7 +6,7 @@ class Employers::EmployerProfilesController < ApplicationController
     @q = params.permit(:q)[:q]
     page_string = params.permit(:page)[:page]
     page_no = page_string.blank? ? nil : page_string.to_i
-    @organizations = Organization.search(@q).exists(employer_profile: true).page page_no
+    @organizations = Organization.search(@q).exists(employer_profile: true).page(page_no)
     @employer_profiles = @organizations.map {|o| o.employer_profile}
   end
 

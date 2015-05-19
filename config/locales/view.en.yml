@@ -4,11 +4,11 @@ en:
   welcome:
     employee:
         title: "Employee Coverage"
-        subtitle: "Enrolling for healthcare takes just a few simple steps"
-        paragraph1: "First you will need to provide some basic information so you will be able to access benefit plans sponsored by your employer. \n Next, we will need to know how you'd prefer to be contracted.\nThen you will be able to add family members to your enrollment."
-        paragraph2: "You'll be able to browse benefit plans offered by your employer, compare different plans and their costs and then select the coverage that best fits your budget and need."
-        paragraph3: "Let's get started. Click the button to Continue."
-        notice: "By using this site, I acknowledge that I have read and agree with the privacy policy and terms of use found here: "
+        subtitle: "Enroll in just a few simple steps"
+        paragraph1: "To start, access your employer-sponsored benefits by providing basic information about you and enrolling family members: names, dates-of-birth, and social security numbers.  Also, tell us best ways to contact you: address, telephone and email."
+        paragraph2: "Next, browse plans offered by your employer, compare alternative benefits and costs, and then enroll in a plan that best fits your budget and needs."
+        paragraph3: "Ready?  Click the button to continue."
+        notice: "By using this site, you acknowledge that your have read and agree with the privacy policy and terms of use found here: "
         link: "DCHBX Privacy Policy & Terms of Use."
     employer:
         title: "Employer Coverage"
@@ -16,7 +16,5 @@ en:
         paragraph1: "To start, see if your company is already registered."
         paragraph2: ""
         paragraph3: "Ready?  Click the button to continue."
-        notice: "By using this site, I acknowledge that I have read and agree with the privacy policy and terms of use found here: "
+        notice: "By using this site, you acknowledge that your have read and agree with the privacy policy and terms of use found here: "
         link: "DCHBX Privacy Policy & Terms of Use."
-  group_selection:
-    select_plan: "On the following page, you can compare different health coverage plans and select the one that works best for you and your family."
