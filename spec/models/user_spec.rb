@@ -85,5 +85,24 @@ RSpec.describe User, :type => :model do
       end
     end
 
+    context "roles" do
+      let(:params){valid_params.deep_merge({roles: ["employee", "employer_staff", "broker", "hbx_staff"]})}
+      it "should return proper roles" do
+        user = User.new(**params)
+        expect(user.has_employee_role?).to be_truthy
+        expect(user.has_employer_staff_role?).to be_truthy
+        expect(user.has_broker_role?).to be_truthy
+        expect(user.has_hbx_staff_role?).to be_truthy
+      end
+    end
+
+    context "should instantiate person" do
+      let(:params){valid_params}
+      it "should build person" do
+        user = User.new(**params)
+        user.instantiate_person
+        expect(user.person).to be_an_instance_of Person
+      end
+    end
   end
 end
