@@ -32,8 +32,8 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
       let(:save_result) { true }
 
       it "should redirect to dependent_details" do
-        expect(response).to have_http_status(:success)
-        expect(response).to render_template("dependent_details")
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(consumer_employee_dependents_path(:employee_role_id => employee_role_id))
       end
     end
 

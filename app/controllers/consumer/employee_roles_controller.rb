@@ -8,7 +8,6 @@ class Consumer::EmployeeRolesController < ApplicationController
     @person = Forms::EmployeeCandidate.new
     respond_to do |format|
       format.html
-      format.js
     end
   end
 
@@ -19,19 +18,16 @@ class Consumer::EmployeeRolesController < ApplicationController
       found_families = EmployerProfile.find_census_families_by_person(@employee_candidate)
       if found_families.empty?
         respond_to do |format|
-          format.js { render 'no_match' }
           format.html { render 'no_match' }
         end
       else
         @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_families)
         respond_to do |format|
-          format.js { render 'match' }
           format.html { render 'match' }
         end
       end
     else
       respond_to do |format|
-        format.js { render 'search' }
         format.html { render 'search' }
       end
     end
@@ -43,7 +39,6 @@ class Consumer::EmployeeRolesController < ApplicationController
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     build_nested_models
     respond_to do |format|
-      format.js { render "edit" }
       format.html { redirect_to :action => "edit", :id => @employee_role.id }
     end
   end
@@ -63,13 +58,11 @@ class Consumer::EmployeeRolesController < ApplicationController
     if @person.update_attributes(object_params)
       respond_to do |format|
         format.html { redirect_to consumer_employee_dependents_path(employee_role_id: @employee_role.id) }
-        format.js { render "dependent_details" }
       end
     else
       build_nested_models
       respond_to do |format|
         format.html { render "edit" }
-        format.js { render "edit" }
       end
     end
   end
