@@ -2,9 +2,12 @@ require 'rails_helper'
 
 RSpec.describe Employers::PeopleController do
   describe "GET search" do
+    let(:user) { double("user") }
+    let(:person) { double("person")}
+
     it "renders the 'search' template" do
-      pending
-      sign_in
+      allow(user).to receive(:person).and_return(person)
+      sign_in(user)
       get :search
       expect(response).to have_http_status(:success)
       expect(response).to render_template("search")
