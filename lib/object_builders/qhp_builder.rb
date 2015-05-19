@@ -4,7 +4,16 @@ class QhpBuilder
 
   def initialize(qhp_hash)
     @qhp_hash = qhp_hash
-    @qhp_array = qhp_hash[:packages_list][:packages]
+    @qhp_array = []
+    if qhp_hash[:packages_list].present?
+      if qhp_hash[:packages_list][:packages].present?
+        @qhp_array = qhp_hash[:packages_list][:packages]
+      end
+    end
+  end
+
+  def add(qhp_hash)
+    @qhp_array = @qhp_array + qhp_hash[:packages_list][:packages]
   end
 
   def run
