@@ -15,6 +15,30 @@ RSpec.describe Employers::PeopleController do
     end
   end
 
+  describe "POST create" do
+    let(:user) { double("user") }
+    let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
+    let(:phones) {double(:select => double("select")) }
+    let(:addresses) {double(:select => double("select")) }
+    let(:emails) {double(:select => double("select")) }
+    let(:person) { double(:phones => phones, :addresses => addresses, :emails => emails)}
+
+    before(:each) do
+      allow(user).to receive(:person).and_return(person)
+      sign_in(user)
+      post :create, person: person_parameters
+    end
+
+    context "it should create person when create person button is clicked" do
+      let(:validation_result) { true }
+
+      it "should call edit method" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("edit")
+      end
+    end
+  end
+
   describe "POST match" do
     let(:user) { double("user") }
     let(:phones) {double(:select => double("select")) }
@@ -40,7 +64,7 @@ RSpec.describe Employers::PeopleController do
     context "it should create person when create person button is clicked" do
       let(:validation_result) { true }
 
-      it "shoudl call create method" do
+      it "should call edit method" do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
       end
