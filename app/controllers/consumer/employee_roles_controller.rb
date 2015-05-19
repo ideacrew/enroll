@@ -56,14 +56,13 @@ class Consumer::EmployeeRolesController < ApplicationController
   end
 
   def update
-    #@person = Forms::EmployeeRole.find(params.require(:id))
     person = Person.find(params.require(:id))
     object_params = params.require(:person).permit(*person_parameters_list)
     @employee_role = person.employee_roles.detect { |emp_role| emp_role.id.to_s == object_params[:employee_role_id].to_s }
     @person = Forms::EmployeeRole.new(person, @employee_role)
     if @person.update_attributes(object_params)
       respond_to do |format|
-        format.html { render "dependent_details" }
+        format.html { redirect_to consumer_employee_dependents_path(employee_role_id: @employee_role.id) }
         format.js { render "dependent_details" }
       end
     else
@@ -81,7 +80,7 @@ class Consumer::EmployeeRolesController < ApplicationController
     end
 
     Address::KINDS.each do |kind|
-      @person.addresses.build(kind: kind) if @person.addresses.select{|address| address.kind == kind}.blank?
+      @person.addresses.build(kind: kind) if @person.addresses.select{|address| address.kind.to_s.downcase == kind}.blank?
     end
 
     ["home","work"].each do |kind|
@@ -92,9 +91,9 @@ class Consumer::EmployeeRolesController < ApplicationController
   def person_parameters_list
     [
       :employee_role_id,
-      :addresses_attributes,
-      :phones_attributes,
-      :email_attributes,
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
+      { :phones_attributes => [:kind, :full_phone_number] },
+      { :email_attributes => [:kind, :address] },
       :first_name,
       :last_name,
       :middle_name,
