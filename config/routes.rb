@@ -118,7 +118,7 @@ Rails.application.routes.draw do
 
     resources :employee, :controller=>"employee_roles" do
       collection do
-        post :match
+        get :match
         get 'welcome'
         get 'search'
       end
