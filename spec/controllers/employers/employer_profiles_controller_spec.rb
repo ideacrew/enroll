@@ -255,7 +255,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:organization) { FactoryGirl.create(:organization) }
     let(:person) { FactoryGirl.create(:person) }
 
-    before do 
+    before do
       allow(user).to receive(:has_employer_staff_role?).and_return(true)
       allow(user).to receive(:roles).and_return(["employer"])
       allow(user).to receive(:person).and_return(person)
