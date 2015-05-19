@@ -16,6 +16,38 @@ RSpec.describe Employers::PeopleController do
   end
 
   describe "POST match" do
+    let(:user) { double("user") }
+    let(:phones) {double(:select => double("select")) }
+    let(:addresses) {double(:select => double("select")) }
+    let(:emails) {double(:select => double("select")) }
+    let(:person) { double(:phones => phones, :addresses => addresses, :emails => emails)}
+    let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
+    let(:more_params){{:create_person => "create", person: person_parameters}}
+    let(:found_person) { [] }
+    let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result) }
+    let(:save_result) {true}
+
+    before(:each) do
+      allow(user).to receive(:instantiate_person).and_return(person)
+      allow(person).to receive(:attributes=).and_return(person_parameters)
+      allow(person).to receive(:save).and_return(save_result)
+      sign_in(user)
+      allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters).and_return(mock_employee_candidate)
+      allow(mock_employee_candidate).to receive(:match_person).and_return(found_person)
+      post :match, more_params
+    end
+
+    context "it should create person when create person button is clicked" do
+      let(:validation_result) { true }
+
+      it "shoudl call create method" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("edit")
+      end
+    end
+  end
+
+  describe "POST match" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:found_person) { [] }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result) }
