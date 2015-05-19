@@ -52,14 +52,14 @@
 </div>
 
 <div class="row top-buffer" id="search-employer">
-  <div class="col-md-12 col-sm-12 col-xs-12">
-    <%= f.button '<i class="fa fa-user-plus"></i> Search Employers'.html_safe, type: :submit, class: "btn btn-primary btn-search" %>
-    &nbsp;<span><i class="fa fa-lock icon-large"></i> Your information is secure.</span>
-  </div>
+	<div class="col-md-12 col-sm-12 col-xs-12">
+		<%= f.submit("Search Employers", class: "btn btn-primary btn-search") %>
+		&nbsp;<span><i class="fa fa-lock icon-large"></i> Your information is secure.</span>
+	</div>
 </div>
 
 <script>
-  $(document).ready(function(){
-    $('input.floatlabel').floatlabel();
-  });
+	$(document).ready(function(){
+		$('input.floatlabel').floatlabel();
+	});
 </script>
