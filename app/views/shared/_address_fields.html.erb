@@ -49,6 +49,9 @@
      <% end %>
     <div style="<%= style %>" class="row middle-row form-group form-group-lg no-pd address-row <%= div_class %>">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+	<% if address.persisted? %>
+          <%= address.hidden_field :id %>
+	<% end %>
         <%= address.hidden_field :kind %>
 
         <% if kind == 'home' %>
