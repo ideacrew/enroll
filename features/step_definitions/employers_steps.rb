@@ -1,4 +1,5 @@
 Given(/^I haven't signed up as an HBX user$/) do
+  sleep(1)
 end
 
 When(/^I visit the Employer portal$/) do
@@ -298,7 +299,7 @@ end
 
 Then(/^I should see a form to update the contents of the census employee$/) do
   sleep(1)
-  Watir::Wait.until(30) { @browser.input(value: "Update Family").visible? }
+  Watir::Wait.until(30) { @browser.input(value: "Update Family").present? }
   expect(@browser.input(value: "Update Family").visible?).to be_truthy
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][first_name]").set("Patrick")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][state]").set("VA")
@@ -374,12 +375,11 @@ And(/^I should see a button to create new plan year$/) do
   expect(@browser.a(text: "Add Plan Year").visible?).to be_truthy
   screenshot("employer_plan_year")
   @browser.a(text: "Add Plan Year").click
-
 end
 
 And(/^I should be able to add information about plan year, benefits and relationship benefits$/) do
 #Plan Year
-  sleep(1)
+  Watir::Wait.until(10) { @browser.text_field(name: "plan_year[start_on]").present? }
   screenshot("employer_add_plan_year")
   @browser.text_field(name: "plan_year[start_on]").set("01/01/2015")
   @browser.text_field(name: "plan_year[end_on]").set("12/31/2015")
@@ -418,4 +418,33 @@ And(/^I should see a success message after clicking on create plan year button$/
   sleep(1)
   screenshot("employer_plan_year_success_message")
   Watir::Wait.until(30) {  @browser.text.include?("Plan Year successfully created.") }
+end
+
+When(/^I enter filter in plan selection page$/) do
+  Watir::Wait.until(30) { @browser.a(:text => "All Filters").present? }
+  @browser.a(:text => "All Filters").click
+  @browser.checkboxes(:class => "plan-type-selection-filter").first.set(true)
+  @browser.button(:class => "apply-btn", :text => "Apply").click
+end
+
+When(/^I enter combind filter in plan selection page$/) do
+  @browser.a(:text => "All Filters").click
+  @browser.checkboxes(:class => "plan-type-selection-filter").first.set(false)
+  # Nationwide
+  @browser.checkboxes(:class => "plan-metal-network-selection-filter").last.set(true)
+  # Platinum
+  @browser.checkboxes(:class => "plan-metal-level-selection-filter")[1].set(true)
+  @browser.text_field(:class => "plan-metal-deductible-from-selection-filter").set("")
+  @browser.text_field(:class => "plan-metal-deductible-to-selection-filter").set("")
+  @browser.text_field(:class => "plan-metal-premium-from-selection-filter").set("$460")
+  @browser.text_field(:class => "plan-metal-premium-to-selection-filter").set("$480")
+  @browser.button(:class => "apply-btn", :text => "Apply").click
+end
+
+Then(/^I should see the combind filter results$/) do
+  @browser.divs(:class => "plan-row").select(&:visible?).each do |plan|
+    expect(plan.text.include?("DC Area Network")).to eq true
+    expect(plan.text.include?("Silver")).to eq true
+    expect(plan.p(text: "$470.19").visible?).to eq true
+  end
 end

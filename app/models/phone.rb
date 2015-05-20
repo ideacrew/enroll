@@ -32,6 +32,12 @@ class Phone
     inclusion: { in: KINDS, message: "%{value} is not a valid phone type" },
     allow_blank: false
 
+  def blank?
+    [:full_phone_number, :area_code, :number, :extension].all? do |attr|
+      self.send(attr).blank?
+    end
+  end
+
   def save_phone_components
     phone_number = filter_non_numeric(self.full_phone_number).to_s
     if !phone_number.blank?

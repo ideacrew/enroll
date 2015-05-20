@@ -32,8 +32,6 @@
 									<div class="text-center">
 										<input type="text" class="form-control input-lg" id="date_married" placeholder="Date you were married i.e. 4/01/2015">
 										<br/><br/>
-										<% add_member_url = add_dependents_people_path(person_id: @person.id, organization_id: @employer_profile.organization.id, employee_id: @person.employee_roles.first.id) %>
-										<%= link_to 'Submit', add_member_url, method: :post, class: "btn btn-primary btn-lg", id: "qle_marriage_submit", remote: true %>
 									</div>
 								</div>
 								<div class="success-info hidden">

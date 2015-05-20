@@ -37,6 +37,12 @@ class Address
     nil #todo
   end
 
+  def blank?
+    [:city, :state, :zip, :address_1, :address_2].all? do |attr|
+      self.send(attr).blank?
+    end
+  end
+
   def to_html
     if address_2.blank?
       "#{address_1}<br/>#{city}, #{state} #{zip}<br/>".html_safe

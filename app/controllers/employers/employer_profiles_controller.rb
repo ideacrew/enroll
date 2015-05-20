@@ -4,15 +4,16 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def index
     @q = params.permit(:q)[:q]
-    page_string = params.permit(:page)[:page]
-    page_no = page_string.blank? ? nil : page_string.to_i
-    @organizations = Organization.search(@q).exists(employer_profile: true).page(page_no)
+    @orgs = Organization.search(@q).exists(employer_profile: true)
+    @page_alphabets = page_alphabets(@orgs, "legal_name")
+    page_no = cur_page_no(@page_alphabets.first)
+    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+
     @employer_profiles = @organizations.map {|o| o.employer_profile}
   end
 
   def welcome
   end
-
 
   def search
     @employer_profile = Forms::EmployerCandidate.new
@@ -65,7 +66,11 @@ class Employers::EmployerProfilesController < ApplicationController
   def show
     @current_plan_year = @employer_profile.plan_years.last
     @benefit_groups = @current_plan_year.benefit_groups if @current_plan_year.present?
-    @employee_families = @employer_profile.employee_families_sorted.page(params[:employee_families_page]).per(10)
+    @emps = @employer_profile.employee_families_sorted
+
+    @page_alphabets = page_alphabets(@emps, "census_employee.last_name")
+    page_no = cur_page_no(@page_alphabets.first)
+    @employee_families = @emps.where("census_employee.last_name" => /^#{page_no}/i)
   end
 
   def new

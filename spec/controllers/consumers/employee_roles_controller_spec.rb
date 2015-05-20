@@ -32,8 +32,8 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
       let(:save_result) { true }
 
       it "should redirect to dependent_details" do
-        expect(response).to have_http_status(:success)
-        expect(response).to render_template("dependent_details")
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(consumer_employee_dependents_path(:employee_role_id => employee_role_id))
       end
     end
 
@@ -74,8 +74,8 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     end
 
     it "should render the edit template" do
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template("edit")
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(edit_consumer_employee_path(:id => "212342345"))
     end
 
     it "should assign the employee_role" do
@@ -92,7 +92,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
 
   end
 
-  describe "POST match" do
+  describe "GET match" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result) }
     let(:hired_on) { double }
@@ -104,7 +104,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters).and_return(mock_employee_candidate)
       allow(EmployerProfile).to receive(:find_census_families_by_person).with(mock_employee_candidate).and_return(found_families)
       allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, found_families).and_return(employment_relationships)
-      post :match, :person => person_parameters
+      get :match, :person => person_parameters
     end
 
     context "given invalid parameters" do

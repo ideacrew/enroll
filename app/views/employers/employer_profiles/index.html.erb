@@ -30,7 +30,7 @@
           <% end %>
         </tbody>
       </table>
-      <%= paginate @organizations %>
+      <%= render 'shared/alph_paginate', url: employers_employer_profiles_path, alphs: @page_alphabets %>
     </div>
   </div>
 </div>

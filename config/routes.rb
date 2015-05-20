@@ -118,7 +118,7 @@ Rails.application.routes.draw do
 
     resources :employee, :controller=>"employee_roles" do
       collection do
-        post :match
+        get :match
         get 'welcome'
         get 'search'
       end
@@ -137,15 +137,8 @@ Rails.application.routes.draw do
     get 'person_landing'
 
     collection do
-      # post 'match_person'
-      # get 'get_employer'
       post 'person_confirm'
       post 'plan_details'
-      # post 'dependent_details'
-      post 'add_dependents' # Still required on my account - REMOVE
-      # get 'dependent_details'
-      post 'save_dependents'
-      delete 'remove_dependents' # Still required on my account - REMOVE
       get 'check_qle_marriage_date'
     end
 

@@ -222,6 +222,14 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     end
   end
 
+  describe ".find_by_fein" do
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+    it "should return record for matching fein" do
+      employer_profile.save
+      expect(EmployerProfile.find_by_fein(employer_profile.organization.fein)).to be_an_instance_of EmployerProfile
+    end
+  end
+
   describe ".find_census_families_by_person" do
     context "with person not matching ssn" do
       let(:params) do
