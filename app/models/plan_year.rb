@@ -1,6 +1,7 @@
 class PlanYear
   include Mongoid::Document
   include Mongoid::Timestamps
+  include AASM
 
   embedded_in :employer_profile
 
@@ -19,6 +20,8 @@ class PlanYear
 
   # Number of Medicare second payers
   field :msp_count, type: Integer, default: 0
+
+  field :aasm_state, type: String
 
   embeds_many :benefit_groups, cascade_callbacks: true
   accepts_nested_attributes_for :benefit_groups, reject_if: :all_blank, allow_destroy: true
@@ -54,12 +57,37 @@ class PlanYear
     (start_on <= date) && (date <= end_on)
   end
 
+  def register_employer
+    employer_profile.publish_plan_year 
+  end
+
   class << self
     def find(id)
       organizations = Organization.where("employer_profile.plan_years._id" => BSON::ObjectId.from_string(id))
       organizations.size > 0 ? organizations.first.employer_profile.plan_years.unscoped.detect { |py| py._id.to_s == id.to_s} : nil
     end
   end
+
+  aasm do
+    state :draft, initial: true
+    state :published,   :after_enter => :register_employer 
+    state :expired
+
+    event :publish do
+      transitions from: :draft, to: :published
+    end
+
+    event :expire do
+      transitions from: :draft, to: :expired
+      transitions from: :published, to: :expired
+    end
+
+    event :revert do
+      transitions from: :published, to: :draft
+    end
+
+  end
+
 
 private
 
