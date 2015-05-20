@@ -62,6 +62,10 @@ RSpec.describe EmployerProfile, :dbclean => :after_each do
       def params; valid_params; end
       def employer_profile; EmployerProfile.new(**params); end
 
+      it "should initialize employer profile workflow state to applicant" do
+        expect(employer_profile.applicant?).to be_truthy
+      end
+
       it "should save" do
         expect(employer_profile.save).to be_truthy
       end
@@ -86,12 +90,28 @@ RSpec.describe EmployerProfile, :dbclean => :after_each do
         ) 
       }
 
-      it "should be valid and in applicant state" do
+      it "should be valid" do
         expect(employer_profile.valid?).to be_truthy
+      end
+
+      it "and initialized to applicant state" do
         expect(employer_profile.applicant?).to be_truthy
       end
 
-      context "and the application is submitted" do
+      context "and the employer completes registration by publishing plan year" do
+          let(:benefit_group)   { FactoryGirl.create(:benefit_group)}
+          let(:plan_year)       { FactoryGirl.create(:plan_year, 
+                                    employer_profile: employer_profile,
+                                    benefit_groups: [benefit_group]) }
+
+        before do
+          plan_year.publish
+        end
+
+        it "should transition employer profile state to registered" do
+          expect(employer_profile.registered?).to be_truthy
+        end
+
         context "and the employer isn't eligible for ACA SHOP" do
 
           it "workflow should not advance from applicant state" do
