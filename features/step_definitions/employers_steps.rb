@@ -391,7 +391,8 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.text_field(name: "plan_year[msp_count]").set("3")
   # Benefit Group
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
-  @browser.select_list(name: "plan_year[benefit_groups_attributes][0][reference_plan_id]").select_value(Plan.all.first.id.to_s)
+  radio = @browser.div(class: "btn-group")
+  radio.click
   @browser.select_list(id: "plan_year_benefit_groups_attributes_0_effective_on_offset")
   # @browser.radio(id: "plan_year_benefit_groups_attributes_0_effective_on_offset_30").fire_event("onclick")
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][premium_pct_as_int]").set(53)
