@@ -95,6 +95,16 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 
+# At least one non-owner must enroll
+# must owner attest?
+# publish benefit_group
+# 
+# need to limit setup to quarterly rate information
+# grace period?
+# open enrollment end, grace period, etc... get from Jack
+# grace period to 
+
+
   context "a new plan year is initialized" do
     let(:plan_year) { PlanYear.new(**valid_params) }
 
