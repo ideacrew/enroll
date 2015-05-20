@@ -73,4 +73,24 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def cur_page_no(alph="a")
+    page_string = params.permit(:page)[:page]
+    page_string.blank? ? alph : page_string.to_s
+  end
+
+  def page_alphabets(source, field)
+    if fields = field.split(".") and fields.count > 1
+      word_arr = source.map do |s|
+        fields.each do |f|
+          s = s.send(f)
+        end
+        s
+      end
+      word_arr.uniq.collect {|word| word.first}.uniq.sort
+    else
+      source.distinct(field).collect {|word| word.first}.uniq.sort
+    end
+  rescue
+    ("A".."Z").to_a
+  end
 end

@@ -66,7 +66,8 @@ RSpec.describe Employers::EmployerProfilesController do
       sign_in
       allow(Organization).to receive(:search).with(nil).and_return(organization_search_criteria)
       allow(organization_search_criteria).to receive(:exists).with({employer_profile: true}).and_return(organization_employer_criteria)
-      allow(organization_employer_criteria).to receive(:page).with(nil).and_return(criteria_page_results)
+      allow(organization_employer_criteria).to receive(:where).and_return(criteria_page_results)
+      allow(controller).to receive(:page_alphabets).and_return(["A", "B"])
       get :index
     end
 
@@ -95,8 +96,9 @@ RSpec.describe Employers::EmployerProfilesController do
       sign_in
       allow(Organization).to receive(:search).with("A Name").and_return(organization_search_criteria)
       allow(organization_search_criteria).to receive(:exists).with({employer_profile: true}).and_return(organization_employer_criteria)
-      allow(organization_employer_criteria).to receive(:page).with(5).and_return(criteria_page_results)
-      get :index, q: "A Name", page: 5
+      allow(organization_employer_criteria).to receive(:where).and_return(criteria_page_results)
+      allow(controller).to receive(:page_alphabets).and_return(["A", "B"])
+      get :index, q: "A Name", page: "A"
     end
 
     it "assigns the list of employers" do
