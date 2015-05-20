@@ -20,6 +20,9 @@ class Email
   validates :address,
     presence: true
 
+  def blank?
+    address.blank?
+  end
 
   def match(another_email)
     return false if another_email.nil?

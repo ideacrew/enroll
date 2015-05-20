@@ -10,7 +10,7 @@
   .col-md-12.col-sm-12.col-xs-12
     .notification-error-wrapper
       - @employment_relationships.each do |emp_relationship|
-        = form_for(emp_relationship, :url => consumer_employee_index_path, :as => :employment_relationship, :method => :post, :remote => true) do |f|
+        = form_for(emp_relationship, :url => consumer_employee_index_path, :as => :employment_relationship, :method => :post) do |f|
           .row
             .col-md-8.col-sm-8.col-xs-12
               %dl.dl-horizontal

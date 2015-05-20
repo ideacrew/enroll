@@ -82,8 +82,8 @@ class Products::Qhp
                         :unique_plan_design, :qhp_or_non_qhp, :insurance_plan_pregnancy_notice_req_ind, 
                         :is_specialist_referral_required, :hsa_eligibility, :emp_contribution_amount_for_hsa_or_hra,
                         :child_only_offering, :is_wellness_program_offered, :plan_effective_date,
-                        :out_of_country_coverage, :out_of_service_area_coverage, :national_network,
-                        :summary_benefit_and_coverage_url
+                        :out_of_country_coverage, :out_of_service_area_coverage, :national_network #,
+#                        :summary_benefit_and_coverage_url
 
 
   embeds_many :qhp_benefits,
