@@ -4,6 +4,8 @@ class Person
   include Mongoid::Versioning
   include Notify
 
+  extend Mongorder
+
   GENDER_KINDS = %W(male female)
   IDENTIFYING_INFO_ATTRIBUTES = %w(first_name last_name ssn dob)
   ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
@@ -53,7 +55,11 @@ class Person
   embeds_many :emails, cascade_callbacks: true, validate: true
 
   accepts_nested_attributes_for :consumer_role, :responsible_party, :broker_role, :hbx_staff_role,
-    :person_relationships, :employee_roles, :addresses, :phones, :emails
+    :person_relationships, :employee_roles, :phones
+
+  accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| Phone.new(addy).blank? }
+  accepts_nested_attributes_for :addresses, :reject_if => Proc.new { |addy| Address.new(addy).blank? }
+  accepts_nested_attributes_for :emails, :reject_if => Proc.new { |addy| Email.new(addy).blank? }
 
   validates_presence_of :first_name, :last_name
   validate :date_functional_validations
@@ -248,6 +254,30 @@ end
       p_rel.relative_id.to_s == self.id.to_s
     end.map(&:relative)
   end
+
+  def self.default_search_order
+    [[:last_name, 1],[:first_name, 1]]
+  end
+
+ def self.search_hash(s_str)
+   clean_str = s_str.strip
+   s_rex = Regexp.new(Regexp.escape(clean_str), true)
+   additional_exprs = []
+   if clean_str.include?(" ")
+     parts = clean_str.split(" ").compact
+     first_re = Regexp.new(Regexp.escape(parts.first), true)
+     last_re = Regexp.new(Regexp.escape(parts.last), true)
+     additional_exprs << {:first_name => first_re, :last_name => last_re}
+   end
+   {
+     "$or" => ([
+       {"first_name" => s_rex},
+       {"last_name" => s_rex},
+       {"hbx_id" => s_rex},
+       {"ssn" => s_rex}
+     ] + additional_exprs)
+   }
+ end
 
 private
   def update_full_name

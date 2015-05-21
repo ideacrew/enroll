@@ -4,14 +4,30 @@ RSpec.describe EmployerProfile, :dbclean => :after_each do
 
   it { should validate_presence_of :entity_kind }
 
-  def organization; FactoryGirl.create(:organization); end
-  def entity_kind; "partnership"; end
-  def bad_entity_kind; "fraternity"; end
+  let(:entity_kind)     { "partnership" }
+  let(:bad_entity_kind) { "fraternity" }
+  let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
-  def entity_kind_error_message; "#{bad_entity_kind} is not a valid business entity kind"; end
+  let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+  let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
+  let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
 
+  let(:office_location) { OfficeLocation.new(
+        is_primary: true,
+        address: address,
+        phone: phone,
+        email: email
+      )
+    }
+  let(:organization) { Organization.create(
+      legal_name: "Sail Adventures, Inc",
+      dba: "Sail Away",
+      fein: "001223333",
+      office_locations: [office_location]
+      ) 
+    }
 
-  describe ".new" do
+  context ".new" do
     let(:valid_params) do
       {
         organization: organization,
@@ -26,9 +42,29 @@ RSpec.describe EmployerProfile, :dbclean => :after_each do
       end
     end
 
+    context "with no entity_kind" do
+      def params; valid_params.except(:entity_kind); end
+
+      it "should fail validation " do
+        expect(EmployerProfile.create(**params).errors[:entity_kind].any?).to be_truthy
+      end
+    end
+
+    context "with improper entity_kind" do
+      def params; valid_params.deep_merge({entity_kind: bad_entity_kind}); end
+      it "should fail validation with improper entity_kind" do
+        expect(EmployerProfile.create(**params).errors[:entity_kind].any?).to be_truthy
+        expect(EmployerProfile.create(**params).errors[:entity_kind]).to eq [entity_kind_error_message]
+      end
+    end
+
     context "with all valid arguments" do
       def params; valid_params; end
       def employer_profile; EmployerProfile.new(**params); end
+
+      it "should initialize employer profile workflow state to applicant" do
+        expect(employer_profile.applicant?).to be_truthy
+      end
 
       it "should save" do
         expect(employer_profile.save).to be_truthy
@@ -47,27 +83,58 @@ RSpec.describe EmployerProfile, :dbclean => :after_each do
       end
     end
 
-    context "with no entity_kind" do
-      def params; valid_params.except(:entity_kind); end
+    context "a new employer profile is created" do
+      let(:employer_profile)  { EmployerProfile.new(
+          organization: organization,
+          entity_kind: entity_kind,
+        ) 
+      }
 
-      it "should fail validation " do
-        expect(EmployerProfile.create(**params).errors[:entity_kind].any?).to be_truthy
+      it "should be valid" do
+        expect(employer_profile.valid?).to be_truthy
+      end
+
+      it "and initialized to applicant state" do
+        expect(employer_profile.applicant?).to be_truthy
+      end
+
+      context "and the employer completes registration by publishing plan year" do
+          let(:benefit_group)   { FactoryGirl.create(:benefit_group)}
+          let(:plan_year)       { FactoryGirl.create(:plan_year, 
+                                    employer_profile: employer_profile,
+                                    benefit_groups: [benefit_group]) }
+
+        before do
+          plan_year.publish
+        end
+
+        it "should transition employer profile state to registered" do
+          expect(employer_profile.registered?).to be_truthy
+        end
+
+        context "and the employer isn't eligible for ACA SHOP" do
+
+          it "workflow should not advance from applicant state" do
+          end
+        end
+
+        context "and the employer is eligible for ACA SHOP" do
+          context "and the employer hasn't specified a valid open enrollment period" do
+            let(:enrollment_too_short)  {  }
+            let(:enrollment_too_long)   {  }
+            let(:enrollment_too_early)  {  }
+            let(:enrollment_too_late)   {  }
+
+            it "should raise an error" do
+            end
+          end
+        end
       end
     end
-
-    context "with improper entity_kind" do
-      def params; valid_params.deep_merge({entity_kind: bad_entity_kind}); end
-      it "should fail validation with improper entity_kind" do
-        expect(EmployerProfile.create(**params).errors[:entity_kind].any?).to be_truthy
-        expect(EmployerProfile.create(**params).errors[:entity_kind]).to eq [entity_kind_error_message]
-
-      end
-    end
-
   end
 end
 
-describe EmployerProfile, "given several existing employer profiles", :dbclean => :after_all do
+describe EmployerProfile, "given multiple existing employer profiles", :dbclean => :after_all do
   before(:all) do
     home_office = FactoryGirl.build(:office_location)
     @er0 = EmployerProfile.new(entity_kind: "partnership")
@@ -356,7 +423,5 @@ describe EmployerProfile, "instance methods" do
         end
       end
     end
-
   end
-
 end

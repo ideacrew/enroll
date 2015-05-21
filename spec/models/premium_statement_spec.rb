@@ -40,21 +40,25 @@ describe PremiumStatement, dbclean: :after_each do
       end
     end
 
-    context "with all parameters" do
+    context "with all parameters and open enrollment is closed" do
       let(:premium_statement) {employer_profile.premium_statements.build(valid_params)}
+
+      before do
+        employer_profile.aasm_state = "binder_pending"
+      end
 
       it "should initialize with premium binder pending state" do
         expect(premium_statement.binder_pending?).to be_truthy
       end
 
       it "should enable valid state transistions" do
-        expect(premium_statement.may_advance_coverage_period?).to be_truthy
+        expect(premium_statement.may_allocate_binder_payment?).to be_truthy
         expect(premium_statement.may_cancel_coverage?).to be_truthy
       end
 
       it "should not enable invalid state transistions" do
         expect(premium_statement.may_reverse_coverage_period?).to be_falsey
-        expect(premium_statement.may_terminate_coverage?).to be_falsey
+        expect(premium_statement.may_suspend_coverage?).to be_falsey
         expect(premium_statement.may_reinstate_coverage?).to be_falsey
       end
 
@@ -79,8 +83,12 @@ describe PremiumStatement, dbclean: :after_each do
     end
   end
 
-  context "is initialized" do
+  context "is initialized and open enrollment is closed" do
     let(:premium_statement) {employer_profile.premium_statements.build(valid_params)}
+
+    before do
+      employer_profile.aasm_state = "binder_pending"
+    end
 
     context "with a new employer" do
       it "should be ready to receive binder payment" do
@@ -89,7 +97,7 @@ describe PremiumStatement, dbclean: :after_each do
 
       context "and first premium binder is paid" do
         before do
-          premium_statement.advance_coverage_period
+          premium_statement.allocate_binder_payment
         end
 
         it "it should transition to binder paid status" do
@@ -129,8 +137,9 @@ describe PremiumStatement, dbclean: :after_each do
                 premium_statement.advance_billing_period
               end
 
-              it "should transition to suspended status" do
+              it "should transition to suspended status and set parent employer to suspended" do
                 expect(premium_statement.suspended?).to be_truthy
+                expect(premium_statement.employer_profile.suspended?).to be_truthy
               end
 
               context "and a premium in arrears is paid-in-full" do
@@ -138,8 +147,9 @@ describe PremiumStatement, dbclean: :after_each do
                   premium_statement.advance_coverage_period
                 end
 
-                it "should transition to current status" do
+                it "should transition to current status and set parent employer to enrolled" do
                   expect(premium_statement.current?).to be_truthy
+                  expect(premium_statement.employer_profile.enrolled?).to be_truthy
                 end
 
                 context "but the premium payment NSFs" do
@@ -173,8 +183,8 @@ describe PremiumStatement, dbclean: :after_each do
           premium_statement.advance_billing_period
         end
 
-        it "should stay in binder payment pending status" do
-          expect(premium_statement.aasm_state).to eq "binder_pending"
+        it "should cancel coverage for non-payment" do
+          expect(premium_statement.aasm_state).to eq "canceled"
         end
       end
     end

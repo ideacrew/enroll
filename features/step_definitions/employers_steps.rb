@@ -1,4 +1,5 @@
 Given(/^I haven't signed up as an HBX user$/) do
+  sleep(1)
 end
 
 When(/^I visit the Employer portal$/) do
@@ -298,7 +299,7 @@ end
 
 Then(/^I should see a form to update the contents of the census employee$/) do
   sleep(1)
-  Watir::Wait.until(30) { @browser.input(value: "Update Family").visible? }
+  Watir::Wait.until(30) { @browser.input(value: "Update Family").present? }
   expect(@browser.input(value: "Update Family").visible?).to be_truthy
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][first_name]").set("Patrick")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][state]").set("VA")
@@ -374,12 +375,11 @@ And(/^I should see a button to create new plan year$/) do
   expect(@browser.a(text: "Add Plan Year").visible?).to be_truthy
   screenshot("employer_plan_year")
   @browser.a(text: "Add Plan Year").click
-
 end
 
 And(/^I should be able to add information about plan year, benefits and relationship benefits$/) do
 #Plan Year
-  sleep(1)
+  Watir::Wait.until(10) { @browser.text_field(name: "plan_year[start_on]").present? }
   screenshot("employer_add_plan_year")
   @browser.text_field(name: "plan_year[start_on]").set("01/01/2015")
   @browser.text_field(name: "plan_year[end_on]").set("12/31/2015")
@@ -391,7 +391,8 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.text_field(name: "plan_year[msp_count]").set("3")
   # Benefit Group
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
-  @browser.select_list(name: "plan_year[benefit_groups_attributes][0][reference_plan_id]").select_value(Plan.all.first.id.to_s)
+  radio = @browser.div(class: "btn-group")
+  radio.click
   @browser.select_list(id: "plan_year_benefit_groups_attributes_0_effective_on_offset")
   # @browser.radio(id: "plan_year_benefit_groups_attributes_0_effective_on_offset_30").fire_event("onclick")
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][premium_pct_as_int]").set(53)

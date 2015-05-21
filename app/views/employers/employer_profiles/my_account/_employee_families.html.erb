@@ -99,7 +99,7 @@
                 <% end %>
               </tbody>
             </table>
-            <%= paginate @employee_families, :remote => true, :param_name => "employee_families_page" %>
+            <%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true %>
           </div>
         </div>
       </div>

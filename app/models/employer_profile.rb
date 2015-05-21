@@ -188,36 +188,62 @@ class EmployerProfile
     end
   end
 
-  # Workflow for automatic approval
+## anonymous shopping
+# no fein required
+# no SSNs, names, relationships, required
+# build-in geographic rating and tobacco - set defaults
+## Broker tools
+# sample census profiles
+# ability to create library of templates for employer profiles
+
+  # Workflow for self service
   aasm do
-    state :enrolling, initial: true 
-    # state :applicant, initial: true 
-    state :ineligible               # Unable to enroll business per SHOP market regulations (e.g. Sole proprieter)
+    state :applicant, initial: true 
+    state :ineligible               # Unable to enroll business per SHOP market regulations or business isn't DC-based
+    state :ineligible_appealing
     state :registered               # Business information complete, before initial open enrollment period
     state :enrolling                # Employees registering and plan shopping
-    state :canceled                 # Coverage didn't take effect, as Employer either didn't complete enrollment or pay binder premium
-    state :enrolled                 # Enrolled and premium payment up-to-date
     state :enrolled_renewal_ready   # Annual renewal date is 90 days or less
-    state :enrolled_renewing        #
-    state :terminated               # Premium payment > 90 days past due (day 91)
+    state :enrolled_renewing        # 
 
-    event :submit do
-      transitions from: [:applicant, :ineligible, :terminated], to: [:registered, :ineligible]
+    state :binder_pending
+    state :enrolled                 # Enrolled and premium payment up-to-date
+    state :canceled                 # Coverage didn't take effect, as Employer either didn't complete enrollment or pay binder premium
+    state :suspended       # 
+    state :terminated               # Premium payment > 90 days past due (day 91) or voluntarily terminate
+
+    event :publish_plan_year do
+      transitions from: :applicant, to: :registered
+      transitions from: :applicant, to: :ineligible
     end
 
-    event :open_enrollment do
-      transitions from: [:registered, :enrolled_renewing], to: :enrolling
+    event :appeal do
+      transitions from: :ineligible, to: :ineligible_appealing
     end
 
-    event :close_enrollment do
-      transitions from: :enrolling, to: [:binder_pending, :enrolled]
+    # Initiated only by HBX Admin
+    event :appeal_determination do
+      transitions from: :ineligible_appealing, to: :ineligible
+      transitions from: :ineligible_appealing, to: :registered
     end
 
-    event :cancel do
-      transitions from: [:registered, :enrolling, :binder_pending], to: :canceled
+    event :begin_open_enrollment do
+      transitions from: :registered, to: :enrolling
     end
 
-    event :allocate_binder do
+    event :close_open_enrollment do
+      transitions from: :enrolling, to: :binder_pending
+      transitions from: :enrolling, to: :canceled      
+    end
+
+    event :cancel_coverage do
+      transitions from: :registered, to: :canceled
+      transitions from: :enrolling, to: :canceled
+      transitions from: :enrolled, to: :canceled
+      transitions from: :binder_pending, to: :canceled
+    end
+
+    event :enroll do
       transitions from: :binder_pending, to: :enrolled
     end
 
@@ -229,29 +255,24 @@ class EmployerProfile
       transitions from: :enrolled_renewal_ready, to: :enrolled_renewing
     end
 
-    event :premium_paid do
-      transitions from: [:enrolled, :enrolled_overdue, :enrolled_late, :enrolled_suspended], to: :enrolled
+    event :suspend_coverage do
+      transitions from: :enrolled, to: :suspended
     end
 
-    event :premium_overdue do
-      transitions from: [:enrolled, :enrolled_renewal_ready, :enrolled_renewing], to: :enrolled_overdue
+    event :terminate_coverage do
+      transitions from: :suspended, to: :terminated
+      transitions from: :enrolled, to: :terminated
     end
 
-    event :premium_late do
-      transitions from: :enrolled_overdue, to: :enrolled_late
-    end
-
-    event :suspend do
-      transitions from: :enrolled_late, to: :enrolled_suspended
-    end
-
-    event :terminate do
-      transitions from: :enrolled_suspended, to: :terminated
-    end
-
-    event :reinstate do
+    event :reinstate_coverage do
+      transitions from: :suspended, to: :enrolled
       transitions from: :terminated, to: :enrolled
     end
+
+    event :reenroll do
+      transitions from: :terminated, to: :binder_pending
+    end
+
   end
 
   def within_open_enrollment_for?(t_date, effective_date)

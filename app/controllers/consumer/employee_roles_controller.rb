@@ -8,7 +8,6 @@ class Consumer::EmployeeRolesController < ApplicationController
     @person = Forms::EmployeeCandidate.new
     respond_to do |format|
       format.html
-      format.js
     end
   end
 
@@ -19,20 +18,16 @@ class Consumer::EmployeeRolesController < ApplicationController
       found_families = EmployerProfile.find_census_families_by_person(@employee_candidate)
       if found_families.empty?
         respond_to do |format|
-          format.js { render 'no_match' }
           format.html { render 'no_match' }
         end
       else
         @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_families)
         respond_to do |format|
-          format.js { render 'match' }
           format.html { render 'match' }
         end
       end
     else
-      @person = @employee_candidate
       respond_to do |format|
-        format.js { render 'search' }
         format.html { render 'search' }
       end
     end
@@ -44,28 +39,30 @@ class Consumer::EmployeeRolesController < ApplicationController
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     build_nested_models
     respond_to do |format|
-      format.js { render "edit" }
-      format.html { render "edit" }
+      format.html { redirect_to :action => "edit", :id => @employee_role.id }
     end
   end
 
+  def edit
+    @employee_role = EmployeeRole.find(params.require(:id))
+    @person = Forms::EmployeeRole.new(current_user.person, @employee_role)
+    @family = @person.primary_family
+    build_nested_models
+  end
+
   def update
-    #@person = Forms::EmployeeRole.find(params.require(:id))
     person = Person.find(params.require(:id))
     object_params = params.require(:person).permit(*person_parameters_list)
     @employee_role = person.employee_roles.detect { |emp_role| emp_role.id.to_s == object_params[:employee_role_id].to_s }
     @person = Forms::EmployeeRole.new(person, @employee_role)
     if @person.update_attributes(object_params)
       respond_to do |format|
-        format.html { render "dependent_details" }
-        format.js { render "dependent_details" }
+        format.html { redirect_to consumer_employee_dependents_path(employee_role_id: @employee_role.id) }
       end
     else
-      @employer_profile = @person.employer_profile
       build_nested_models
       respond_to do |format|
         format.html { render "edit" }
-        format.js { render "edit" }
       end
     end
   end
@@ -76,7 +73,7 @@ class Consumer::EmployeeRolesController < ApplicationController
     end
 
     Address::KINDS.each do |kind|
-      @person.addresses.build(kind: kind) if @person.addresses.select{|address| address.kind == kind}.blank?
+      @person.addresses.build(kind: kind) if @person.addresses.select{|address| address.kind.to_s.downcase == kind}.blank?
     end
 
     ["home","work"].each do |kind|
@@ -87,9 +84,9 @@ class Consumer::EmployeeRolesController < ApplicationController
   def person_parameters_list
     [
       :employee_role_id,
-      :addresses_attributes,
-      :phones_attributes,
-      :email_attributes,
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
+      { :phones_attributes => [:kind, :full_phone_number] },
+      { :email_attributes => [:kind, :address] },
       :first_name,
       :last_name,
       :middle_name,

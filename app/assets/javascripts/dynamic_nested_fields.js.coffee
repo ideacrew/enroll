@@ -10,16 +10,11 @@ ready = ->
     else
       $(target).prepend(html)
 
-    style_select_picker()
     update_delete_buttons()
 
   $('form').on 'click', '.remove_fields', (event) ->
-    $(this).prev('input[type=hidden').val('1')
-    $(this).closest('fieldset').hide()
+    $(this).closest('fieldset').remove()
     event.preventDefault()
-
-style_select_picker = ->
-	$(document).find('select').select2()
 
 @update_delete_buttons = ->
   nested_fields = $('.form-inputs')

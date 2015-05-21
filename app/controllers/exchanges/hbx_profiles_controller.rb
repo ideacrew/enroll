@@ -20,7 +20,17 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def family_index
-    @families = Family.all
+    @q = params.permit(:q)[:q]
+    page_string = params.permit(:families_page)[:families_page]
+    page_no = page_string.blank? ? nil : page_string.to_i
+    unless @q.present?
+      @families = Family.page page_no
+      @total = Family.count
+    else
+      total_families = Person.search(@q).map(&:families).flatten.uniq
+      @total = total_families.count
+      @families = Kaminari.paginate_array(total_families).page page_no
+    end
 
     render "insured/families/index"
   end
