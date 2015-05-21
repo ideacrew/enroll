@@ -12,6 +12,7 @@ RSpec.describe Exchanges::HbxProfilesController do
     end
 
     it "renders the 'employer index' template" do
+      expect(response).to have_http_status(:success)
       expect(response).to render_template("employers/employer_profiles/index")
     end
   end
@@ -26,6 +27,7 @@ RSpec.describe Exchanges::HbxProfilesController do
     end
 
     it "renders the 'famlies index' template" do
+      expect(response).to have_http_status(:success)
       expect(response).to render_template("insured/families/index")
     end
   end
