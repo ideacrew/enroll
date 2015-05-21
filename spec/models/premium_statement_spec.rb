@@ -14,7 +14,6 @@ describe PremiumStatement, dbclean: :after_each do
     }
   end
 
-
   context ".new" do
     context "with only 'effective on' parameter" do
       let(:params) {{effective_on: Date.current}}
@@ -83,19 +82,29 @@ describe PremiumStatement, dbclean: :after_each do
     end
   end
 
-  context "is initialized and open enrollment is closed" do
+  context "open enrollment has closed" do
     let(:premium_statement) {employer_profile.premium_statements.build(valid_params)}
 
     before do
       employer_profile.aasm_state = "binder_pending"
     end
 
-    context "with a new employer" do
-      it "should be ready to receive binder payment" do
+    context "for a new employer" do
+      it "should be waiting to receive binder payment" do
         expect(premium_statement.binder_pending?).to be_truthy
       end
 
-      context "and first premium binder is paid" do
+      context "doesn't pay the premium binder" do
+        before do
+          premium_statement.advance_billing_period
+        end
+
+        it "coverage should be canceled" do
+          expect(premium_statement.aasm_state).to eq "canceled"
+        end
+      end
+
+      context "pays the binder premium" do
         before do
           premium_statement.allocate_binder_payment
         end
@@ -104,89 +113,95 @@ describe PremiumStatement, dbclean: :after_each do
           expect(premium_statement.binder_paid?).to be_truthy
         end
 
-        context "and binder premium is reversed" do
+        context "and binder premium payment is reversed" do
           before do
             premium_statement.reverse_coverage_period
           end
 
-          it "should cancel coverage for non-payment" do
+          it "coverage should be canceled" do
             expect(premium_statement.aasm_state).to eq "canceled"
+            expect(employer_profile.aasm_state).to eq "canceled"
           end          
         end
+      end
+    end
 
-        context "and the billing period advances without a premium payment" do
-          before do
-            premium_statement.advance_billing_period
-          end
-
-          it "should transition to overdue status" do
-            expect(premium_statement.overdue?).to be_truthy
-          end
-
-          context "and a second billing period advances without a premium payment" do
-            before do
-              premium_statement.advance_billing_period
-            end
-
-            it "should transition to late status" do
-              expect(premium_statement.late?).to be_truthy
-            end
-
-            context "and a third billing period advances without a premium payment" do
-              before do
-                premium_statement.advance_billing_period
-              end
-
-              it "should transition to suspended status and set parent employer to suspended" do
-                expect(premium_statement.suspended?).to be_truthy
-                expect(premium_statement.employer_profile.suspended?).to be_truthy
-              end
-
-              context "and a premium in arrears is paid-in-full" do
-                before do
-                  premium_statement.advance_coverage_period
-                end
-
-                it "should transition to current status and set parent employer to enrolled" do
-                  expect(premium_statement.current?).to be_truthy
-                  expect(premium_statement.employer_profile.enrolled?).to be_truthy
-                end
-
-                context "but the premium payment NSFs" do
-                  before do
-                    premium_statement.reverse_coverage_period
-                  end
-
-                  it "should revert to suspended status" do 
-                    expect(premium_statement.aasm_state).to eq "suspended"
-                  end
-                end
-              end
-
-              context "and a fourth (final) billing period advances without a premium payment" do
-                before do
-                  premium_statement.advance_billing_period
-                end
-
-                it "should transition to terminated status" do
-                  expect(premium_statement.terminated?).to be_truthy
-                end
-              end
-
-            end
-          end
-        end
+    context "for an enrolled employer" do
+      before do
+        employer_profile.aasm_state = "enrolled"
+        premium_statement.aasm_state = "current"
       end
 
-      context "and the first premium binder isn't paid" do
+      context "and the billing period advances without a premium payment" do
         before do
           premium_statement.advance_billing_period
         end
 
-        it "should cancel coverage for non-payment" do
-          expect(premium_statement.aasm_state).to eq "canceled"
+        it "should transition to overdue status" do
+          expect(premium_statement.overdue?).to be_truthy
+        end
+
+        context "and a second billing period advances without a premium payment" do
+          before do
+            premium_statement.advance_billing_period
+          end
+
+          it "should transition to late status" do
+            expect(premium_statement.late?).to be_truthy
+          end
+
+          context "and a third billing period advances without a premium payment" do
+            before do
+              premium_statement.advance_billing_period
+            end
+
+            it "should transition to suspended status and set parent employer to suspended" do
+              expect(premium_statement.suspended?).to be_truthy
+              expect(premium_statement.employer_profile.suspended?).to be_truthy
+            end
+
+            context "and a premium in arrears is paid-in-full" do
+              before do
+                premium_statement.advance_coverage_period
+              end
+
+              it "should transition to current status and set parent employer to enrolled" do
+                expect(premium_statement.current?).to be_truthy
+                expect(premium_statement.employer_profile.enrolled?).to be_truthy
+              end
+
+              context "but the premium payment NSFs" do
+                before do
+                  premium_statement.reverse_coverage_period
+                end
+
+                it "should revert to suspended status" do 
+                  expect(premium_statement.aasm_state).to eq "suspended"
+                end
+
+                it "and reset employer to suspended status" do
+                  expect(premium_statement.employer_profile.enrolled?).to be_truthy
+                end
+              end
+            end
+
+            context "and a fourth (final) billing period advances without a premium payment" do
+              before do
+                premium_statement.advance_billing_period
+              end
+
+              it "should transition self and employer to terminated status" do
+                expect(premium_statement.terminated?).to be_truthy
+                expect(premium_statement.terminated?).to be_truthy
+              end
+            end
+
+          end
         end
       end
     end
+  end
+
+  context "an employer who is terminated" do
   end
 end
