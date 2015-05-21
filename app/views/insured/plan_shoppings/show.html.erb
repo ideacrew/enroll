@@ -18,7 +18,7 @@
 			            <div id="plan-summary"></div>
 			            <div id="all-plans">
 							<div class="filter-btn-row">
-		            			<a class="pull-right all-filter" href="#" onclick="return false;">All Filters</a>
+		            			<a class="pull-right all-filter interaction-click-control-plan-filter" href="#" onclick="return false;">All Filters</a>
 		            			<div class="clearfix"></div>
 				            </div>
 
@@ -44,17 +44,17 @@
 				<div class="row">
 		            <div class="col-md-12">
 		              <%= 
-		                link_to '#', class: 'btn btn-primary', onclick: 'history.go(-1);return false;' do
+		                link_to '#', class: 'btn btn-primary interaction-click-control-employee-back', onclick: 'history.go(-1);return false;' do
 		                  '<i class="fa fa-chevron-left"></i> Back'.html_safe
 		                end
 		              %> &nbsp;
-		              <a href="#" class="btn btn-default" style="display: none;" data-uri="<%= comparison_products_plans_path %>" id="compare-selected-plans-link"><i class="fa fa-list-alt"></i> Compare Selected Plans</a>
+		              <a href="#" class="btn btn-default interaction-click-control-compare-plans" style="display: none;" data-uri="<%= comparison_products_plans_path %>" id="compare-selected-plans-link"><i class="fa fa-list-alt"></i> Compare Selected Plans</a>
 		            </div>
 		        </div><br>
 		        <div class="row">
 		            <div class="col-md-12">
-		              <%= link_to '<i class="fa fa-user"></i> My Account'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %> &nbsp;
-		              <%= link_to '<i class="fa fa-floppy-o"></i> Save & Exit'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %>
+		              <%= link_to '<i class="fa fa-user"></i> My Account'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary interaction-click-control-employee-account' %> &nbsp;
+		              <%= link_to '<i class="fa fa-floppy-o"></i> Save & Exit'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary interaction-click-control-employee-personal-info-save-exit' %>
 		            </div>
 		        </div>
 
