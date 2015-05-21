@@ -9,7 +9,7 @@ stdout_path shared_path + "/log/unicorn.log"
 listen "/tmp/unicorn_enroll.ap.sock"
 worker_processes 20
 timeout 30
-preload_app true
+preload_app false
 
 after_fork do |server, worker|
   Acapi::Requestor.reconnect!
