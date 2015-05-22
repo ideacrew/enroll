@@ -18,17 +18,17 @@
       <div class="row">
         <div class="col-md-12">
           <%= 
-            link_to '#', class: 'btn btn-primary interaction-click-control-employee-back disabled' do
+            link_to '#', class: 'btn btn-primary disabled' do
               '<i class="fa fa-chevron-left"></i> Back'.html_safe
             end
           %> &nbsp;
-          <button type="submit" class="btn btn-primary interaction-click-control-employee-personal-info-continue"><i class="fa fa-user-plus"></i> Continue</button>
+          <button type="submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Continue</button>
         </div>
       </div><br>
       <div class="row">
         <div class="col-md-12">
-          <%= link_to '<i class="fa fa-user"></i> My Account'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary interaction-click-control-employee-account' %> &nbsp;
-          <%= link_to '<i class="fa fa-floppy-o"></i> Save & Exit'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary interaction-click-control-employee-personal-info-save-exit' %>
+          <%= link_to '<i class="fa fa-user"></i> My Account'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %> &nbsp;
+          <%= link_to '<i class="fa fa-floppy-o"></i> Save & Exit'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %>
         </div>
       </div>
   </div>

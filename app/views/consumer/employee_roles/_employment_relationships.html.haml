@@ -3,7 +3,7 @@
   .col-md-12.col-sm-12.col-xs-12
     %p 
       If you don't see your employer listed below, click 
-      = link_to 'here', '#', class: 'interaction-click-control-wrong-employer'
+      = link_to 'here', '#', class: ''
       for help.
 
 .row
@@ -21,7 +21,7 @@
                 %dt Eligible for Coverage :
                 %dd= format_date emp_relationship.eligible_for_coverage_on
             .col-md-4.col-sm-4.col-xs-12.text-right
-              = f.submit "This is my employer", :class => "btn btn-primary interaction-click-control-right-employer"
+              = f.submit "This is my employer", :class => "btn btn-primary"
               = f.hidden_field :first_name
               = f.hidden_field :last_name
               = f.hidden_field :middle_name
