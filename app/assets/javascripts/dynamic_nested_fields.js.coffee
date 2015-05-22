@@ -5,8 +5,8 @@ ready = ->
     regexp = new RegExp($(this).data('id'), 'g')
     html = $(this).data('fields').replace(regexp, time)
     target = $(this).closest('.form-inputs')
-    if $(target).find('fieldset:last').length > 0
-      $(target).find('fieldset:last').after(html)
+    if $(target).children('fieldset:last').length > 0
+      $(target).children('fieldset:last').after(html)
     else
       $(target).prepend(html)
 
@@ -26,6 +26,6 @@ ready = ->
     else
       delete_button.show()
 
-$(document).ready(ready)
+#$(document).ready(ready)
 $(document).on('page:load', ready)
 $(document).on('page:update', ready)

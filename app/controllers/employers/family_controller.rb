@@ -178,8 +178,9 @@ class Employers::FamilyController < ApplicationController
   end
 
     def format_date_params(params)
-      start_on = params[:employer_census_employee_family][:benefit_group_assignments_attributes]["0"][:start_on]
-      params[:employer_census_employee_family][:benefit_group_assignments_attributes]["0"][:start_on] = Date.strptime(start_on, '%m/%d/%Y').to_s(:db)
+      ["dob", "hired_on"].each do |key|
+        params[:employer_census_employee_family][:census_employee_attributes][key] = Date.strptime(params[:employer_census_employee_family][:census_employee_attributes][key], '%m/%d/%Y').to_s(:db)
+      end
 
       params
     rescue Exception => e

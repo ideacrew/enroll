@@ -109,12 +109,16 @@ class PremiumStatement
       transitions from: [:current, :late, :overdue], to: :suspended
     end
 
+    event :reinstate_coverage do
+      transitions from: :suspended, to: :current
+    end
+
     event :terminate_coverage do
       transitions from: :suspended, to: :terminated
     end
 
-    event :reinstate_coverage do
-      transitions from: :suspended, to: :current
+    event :reapply do
+      transitions from: :terminated, to: :binder_pending
     end
 
   end

@@ -32,12 +32,21 @@ $(document).ready(function () {
   semantic_class(); //Calls semantic class on all input fields & buttons (eg. interaction-click-control-continue)
 
   $(document).on("focus", "[class~='date-picker']", function(e){
-    var current_year = (new Date).getFullYear();
-    $(this).datepicker({ 
-      changeMonth: true,
-      changeYear: true,
-      yearRange: parseInt(current_year-110) + ":" + parseInt(current_year + 5)
-    });
+    if ($(this).hasClass('dob-picker') || $(this).hasClass('hire-picker')){
+      $(this).datepicker({ 
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'mm/dd/yy', 
+        maxDate: "+0d"
+      });
+    }else{
+      $(this).datepicker({ 
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'mm/dd/yy', 
+        yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10)
+      });
+    }
   });
 
   $('input.floatlabel').floatlabel({

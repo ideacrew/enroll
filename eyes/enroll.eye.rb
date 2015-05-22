@@ -19,7 +19,7 @@ Eye.application 'eye_enroll' do
   process("unicorn") do
     working_dir BUS_DIRECTORY
     pid_file "pids/unicorn.pid"
-    start_command "bundle exec unicorn_rails -c #{BUS_DIRECTORY}/config/unicorn.rb -E production -D"
+    start_command "bundle exec unicorn -c #{BUS_DIRECTORY}/config/unicorn.rb -E production -D"
     stdall "log/unicorn.log"
 
     # stop signals:
