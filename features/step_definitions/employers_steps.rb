@@ -383,7 +383,6 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][employer_max_amt]").set(120)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][offered]").set("true")
-
   expect(@browser.a(class: "add_fields").visible?).to be_truthy
   @browser.a(class: "add_fields").click
   @browser.fieldsets.last.p(class: /label/, text: /Employee/).click
@@ -402,13 +401,17 @@ end
 
 When(/^I enter filter in plan selection page$/) do
   Watir::Wait.until(30) { @browser.a(:text => "All Filters").present? }
+  @browser.a(:text => "All Filters").wait_until_present
   @browser.a(:text => "All Filters").click
   @browser.checkboxes(:class => "plan-type-selection-filter").first.set(true)
+  @browser.button(:class => "apply-btn", :text => "Apply").wait_until_present
   @browser.button(:class => "apply-btn", :text => "Apply").click
 end
 
-When(/^I enter combind filter in plan selection page$/) do
+When(/^I enter combined filter in plan selection page$/) do
+  @browser.a(:text => "All Filters").wait_until_present
   @browser.a(:text => "All Filters").click
+  @browser.checkboxes(:class => "plan-type-selection-filter").first.wait_until_present
   @browser.checkboxes(:class => "plan-type-selection-filter").first.set(false)
   # Nationwide
   @browser.checkboxes(:class => "plan-metal-network-selection-filter").last.set(true)
@@ -421,7 +424,7 @@ When(/^I enter combind filter in plan selection page$/) do
   @browser.button(:class => "apply-btn", :text => "Apply").click
 end
 
-Then(/^I should see the combind filter results$/) do
+Then(/^I should see the combined filter results$/) do
   @browser.divs(:class => "plan-row").select(&:visible?).each do |plan|
     expect(plan.text.include?("DC Area Network")).to eq true
     expect(plan.text.include?("Silver")).to eq true
