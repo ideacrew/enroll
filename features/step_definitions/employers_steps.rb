@@ -200,7 +200,6 @@ Then(/^I should see the employer information$/) do
 end
 
 When(/^I click on the Employees tab$/) do
-  sleep(1)
   @browser.refresh
   Watir::Wait.until(30) { @browser.text.include?("Employees") }
   @browser.a(text: "Employees").wait_until_present
@@ -395,7 +394,6 @@ And(/^I should be able to add information about plan year, benefits and relation
   screenshot("employer_add_plan_year_info")
   @browser.input(value: "Create Plan Year").click
 end
-
 
 And(/^I should see a success message after clicking on create plan year button$/) do
   Watir::Wait.until(30) {  @browser.text.include?("Plan Year successfully created.") }
