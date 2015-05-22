@@ -1,8 +1,7 @@
 .row
   .col-md-10.col-sm-10
-    %h1
-      = t('welcome.employer.title')
-      %small= t('welcome.employer.subtitle')
+    %h1= t('welcome.employer.title')
+    %h2= t('welcome.employer.subtitle')
 
     %p.text-justify= t('welcome.employer.paragraph1')
     %p.text-justify= t('welcome.employer.paragraph2')
@@ -12,7 +11,7 @@
 
 .row
   .col-md-2
-    = link_to t('button.continue'), search_employers_people_path, :remote => true, :class => "btn btn-success btn-block btn-continue"
+    = link_to "<i class=\"fa fa-user-plus\"></i> #{t('button.continue')}".html_safe, search_employers_people_path, :remote => true, :class => "btn btn-primary btn-continue interaction-click-control-employer-welcome-continue"
 
 .row.footer
   .col-md-12
