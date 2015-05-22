@@ -7,9 +7,10 @@ class Employers::PlanYearsController < ApplicationController
 
   def create
     @plan_year = @employer_profile.plan_years.new(plan_year_params)
-    benefit_group = @plan_year.benefit_groups.first
+    @plan_year.benefit_groups.each do |benefit_group|
     reference_plan = benefit_group.reference_plan
     benefit_group.elected_plan_ids = reference_plan.carrier_profile.plans.where(active_year: 2015, market: "shop").collect(&:_id)
+    end
     if @plan_year.save
       flash[:notice] = "Plan Year successfully created."
       redirect_to employers_employer_profile_path(@employer_profile)
@@ -49,7 +50,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def format_date_params(params)
     ["start_on", "end_on", "open_enrollment_start_on", "open_enrollment_end_on"].each do |key|
-      params["plan_year"][key] = Date.strptime(params["plan_year"][key], '%m/%d/%Y').to_s(:db)
+      params["plan_year"][key] = Date.strptime(params["plan_year"][key], '%m/%d/%Y')
     end
 
     params

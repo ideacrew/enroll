@@ -179,7 +179,7 @@ class Employers::FamilyController < ApplicationController
 
     def format_date_params(params)
       ["dob", "hired_on"].each do |key|
-        params[:employer_census_employee_family][:census_employee_attributes][key] = Date.strptime(params[:employer_census_employee_family][:census_employee_attributes][key], '%m/%d/%Y').to_s(:db)
+        params[:employer_census_employee_family][:census_employee_attributes][key] = Date.strptime(params[:employer_census_employee_family][:census_employee_attributes][key], '%m/%d/%Y')
       end
 
       params
