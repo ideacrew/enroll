@@ -8,7 +8,7 @@ function semantic_class() {
 		}
 	});
 
-	// Adds semantic class to all a, submit
+	// Adds semantic class to all a, submit eg. interaction-click-control-login
 	$('a, button, input[type="submit"]').each(function() {
 
 		if($(this).is('input[type="submit"]')) {
@@ -22,6 +22,7 @@ function semantic_class() {
 		}
 	});
 
+	// Adds semantic class to all radio buttons and check boxes eg. interaction-choice-control-value-male
 	$('input[type="radio"], input[type="checkbox"]').each(function() {
 		var element_id = $.trim($(this).attr('id'));
 
