@@ -30,10 +30,11 @@ $(document).ready(function () {
   });
 
   $(document).on("focus", "[class~='date-picker']", function(e){
+    var current_year = (new Date).getFullYear();
     $(this).datepicker({ 
       changeMonth: true,
       changeYear: true,
-      yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()
+      yearRange: parseInt(current_year-110) + ":" + parseInt(current_year + 5)
     });
   });
 
