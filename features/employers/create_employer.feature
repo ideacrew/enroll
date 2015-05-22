@@ -4,18 +4,6 @@ Feature: Create Employer
   An Employer Representative
   Should be able to create an Employer account
 
-    @wip
-    Scenario: Employer Representative has previously signed up on HBX
-      Given I have signed up previously through consumer, broker agency or previous visit to the Employer portal
-      When I visit the Employer portal to sign in
-        And I sign in with valid user data
-      Then I should see a welcome page with successful sign in message
-      #Then I should see fields to search for person and employer
-        #And I should see an initial fieldset to enter my name, ssn and dob
-        #And My user data from existing the fieldset values are prefilled using data from my existing account
-        And I should see a form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone
-        And I should see a successful creation message
-
     Scenario: An Employer Representative has not signed up on the HBX
       Given I haven't signed up as an HBX user
       When I visit the Employer portal
@@ -73,7 +61,17 @@ Feature: Create Employer
       When I confirm on the coverage summary page
       Then I should see the "my account" page
 
-
+    @wip
+    Scenario: Employer Representative has previously signed up on HBX
+      Given I have signed up previously through consumer, broker agency or previous visit to the Employer portal
+      When I visit the Employer portal to sign in
+        And I sign in with valid user data
+      Then I should see a welcome page with successful sign in message
+      #Then I should see fields to search for person and employer
+        #And I should see an initial fieldset to enter my name, ssn and dob
+        #And My user data from existing the fieldset values are prefilled using data from my existing account
+        And I should see a form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone
+        And I should see a successful creation message
 
     @wip
     Scenario: Employer Representative provides a valid FEIN
