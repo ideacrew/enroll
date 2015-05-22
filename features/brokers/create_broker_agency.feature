@@ -12,13 +12,16 @@ Feature: Create Broker Agency
         And I should see an initial form to enter information about my Broker Agency and myself
 
     Scenario: Broker Representative has previously signed up on HBX
-      Given I have signed up previously through consumer, employer or previous visit to the Broker Agency portal
+      Given I have signed up previously through individual, employee, employer or previous visit to the Broker Agency portal
       When I visit the Broker Agency portal
         And I sign in with valid user data
       Then I should see a successful sign up message
-        And I should see an initial form with a fieldset for Broker Agency information, including: legal name, DBA, fein, entity_kind, market_kind, address, URL, and phone
-        And I should see a second fieldset to enter my name, email and NPN
-        And My user data from existing the fieldset values are prefilled using data from my existing account
+        And I should see an initial form with a fieldset for Broker Agency information, including: legal name, DBA, fein, entity_kind, address, website URL, and phone
+        And I should see a second fieldset to enter Practice Area (Individual, SHOP, Both), Languages Spoken (use ISO standard), Evening/Weekend hours (boolean), Accepting new clients (boolean)
+        And I should see a third fieldset to enter the primary broker's name, email and NPN
+        And I should see a radio button asking if i'm the primary broker
+        And I should see a fourth fieldset to enter my name, email and phone that is only required to complete if i'm not the primary broker
+        And My user data from existing the fieldset values are prefilled using data from my existing Person record
 
     Scenario: Broker Representative provides a valid NPN
       Given I complete the Broker Agency initial form with a valid NPN
