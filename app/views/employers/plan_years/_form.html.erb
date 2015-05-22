@@ -5,6 +5,11 @@
           <div class="alert alert-error">
             <h4><%= pluralize(@plan_year.errors.count, "error") %> prohibited this plan year from being saved:</h4>
             <ul>
+              <% @plan_year.errors.delete(:benefit_groups) %>
+              <% @plan_year.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+
               <% @plan_year.benefit_groups.each do |bg| %>
                 <% bg.errors.full_messages.each do |msg| %>
                   <li><%= msg %></li>
