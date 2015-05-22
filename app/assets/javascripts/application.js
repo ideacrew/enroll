@@ -29,6 +29,8 @@ $(document).ready(function () {
     $('select').selectric();
   });
 
+  semantic_class(); //Calls semantic class on all input fields & buttons
+
   $(document).on("focus", "[class~='date-picker']", function(e){
     var current_year = (new Date).getFullYear();
     $(this).datepicker({ 
