@@ -1,11 +1,65 @@
+<% benefits = [
+	{
+	  benefit_type: "health",
+	  plan_name: "High Value 1000",
+	  issuer_name: "Aetna",
+	  plan_type: "PPO",
+	  subscriber_name: "Joe Cool",
+	  start_date: Date.current - 30,
+	  subscriber_hbx_id: "123456",
+	  subscriber_carrier_id: "987654",
+	  group_id: "1zu3t",
+	  metal_level: "gold"
+	},
+	{
+	  benefit_type: "dental",
+	  plan_name: "Pearly Whites Advantage",
+	  issuer_name: "Aetna",
+	  plan_type: "N/A",
+	  subscriber_name: "Joe Cool",
+	  start_date: (Date.current - 30).beginning_of_month,
+	  subscriber_hbx_id: "123456",
+	  subscriber_carrier_id: "987654",
+	  group_id: "7yt2q",
+	  metal_level: "N/A"
+	}
+	]
+	%>
+
+	<% employer = {
+	  name: "ACME Widgets",
+	  contact: "link to employer HR contact",
+	  plan_year: 2016,
+	  plan_year_start: (Date.current - 90).beginning_of_month,
+	  benefit_group: "link to benefit group",
+	  benefits: benefits
+	}
+%>
+
 <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
 	<div class="container">
 		<div class="row">
-			<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="col-md-12">
 
-				<div class="row landing-row">
-					<div class="col-md-6 col-sm-6 col-xs-12 left-side">
-						<%= render "home_members" %>
+				<div class="row">
+					<div class="col-md-12">
+						<h3>
+							<% primary_member = @family.primary_applicant %>
+							<%= "#{primary_member.first_name} #{primary_member.middle_name} #{primary_member.last_name}" %>
+						</h3>
+						<h4><%= @employer_profile.legal_name %></h4>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-12">
+						<%= render "shared/families/benefit_summary_shop", e: employer %>
+					</div>
+				</div>
+
+				<!-- <div class="row"> -->
+					<!--	<div class="col-md-6 col-sm-6 col-xs-12 left-side">
+						<%#= render "home_members" %>
 
 						<div class="row bottom">
 							<p class="head">
@@ -24,10 +78,10 @@
 								<button class="btn btn-see-all see-plan-details">See Details</button>
 							</ul>
 						</div>
-					</div>
-					<%= render 'qles' %>
-				</div>
+					</div> -->
+				<%= render 'qles' %>
+				<!-- </div> -->
 			</div>
 		</div>
 	</div>
-</div>
+</div><br>

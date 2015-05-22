@@ -1,15 +1,14 @@
 Given(/^I haven't signed up as an HBX user$/) do
-  sleep(1)
 end
 
 When(/^I visit the Employer portal$/) do
   @browser.goto("http://localhost:3000/")
   Watir::Wait.until(30) { @browser.a(text: "Employer Portal").present? }
-  sleep(1)
+  @browser.a(text: "Employer Portal").wait_until_present
   @browser.a(text: "Employer Portal").click
   screenshot("employer_start")
   Watir::Wait.until(30) { @browser.a(text: "Create account").present? }
-  sleep(1)
+  @browser.a(text: "Create account").wait_until_present
   @browser.a(text: "Create account").click
 end
 
@@ -29,10 +28,9 @@ Then(/^I should see a successful sign up message$/) do
 end
 
 And(/^I should see an initial form to enter information about my Employer and myself$/) do
-  sleep(1)
-  expect(@browser.a(text: "Continue").visible?).to be_truthy
+  @browser.a(text: "Continue").wait_until_present
   @browser.a(text: "Continue").click
-  sleep(1)
+  @browser.text_field(name: "person[first_name]").wait_until_present
   plan = FactoryGirl.create(:plan)
   pt = plan.premium_tables.build(age: 34, start_on: 0.days.ago.beginning_of_year.to_date, end_on: 0.days.ago.end_of_year.to_date, cost: 345.09)
   pt1 = plan.premium_tables.build(age: 3, start_on: 0.days.ago.beginning_of_year.to_date, end_on: 0.days.ago.end_of_year.to_date, cost: 125.10)
@@ -44,11 +42,11 @@ And(/^I should see an initial form to enter information about my Employer and my
   @browser.text_field(name: "person[ssn]").set("111010999")
   expect(@browser.button(value: "Search Person").visible?).to be_truthy
   @browser.button(value: "Search Person").fire_event("onclick")
-  sleep(1)
+  @browser.button(value: "Create Person").wait_until_present
   screenshot("employer_portal_person_search_no_match")
 
   @browser.button(value: "Create Person").fire_event("onclick")
-  sleep(1)
+  @browser.text_field(name: "person[addresses_attributes][0][address_1]").wait_until_present
   @browser.text_field(name: "person[addresses_attributes][0][address_1]").set("100 North Street")
   @browser.text_field(name: "person[addresses_attributes][0][address_2]").set("Suite 990")
   @browser.text_field(name: "person[addresses_attributes][0][city]").set("Sterling")
@@ -60,23 +58,22 @@ And(/^I should see an initial form to enter information about my Employer and my
   @browser.text_field(name: "person[emails_attributes][1][address]").set("john.doe@work.com")
   @browser.text_field(name: "person[emails_attributes][1][address]").click
   screenshot("employer_portal_person_data_new")
-  sleep(1)
+  @browser.button(id: "continue-employer").wait_until_present
   expect(@browser.button(id: "continue-employer").visible?).to be_truthy
   @browser.button(id: "continue-employer").click
-  sleep(3)
+  @browser.text_field(name: "employer_profile[legal_name]").wait_until_present
   @browser.text_field(name: "employer_profile[legal_name]").set("Turner Agency, Inc")
   @browser.text_field(name: "employer_profile[dba]").set("Turner Brokers")
   @browser.text_field(name: "employer_profile[fein]").set("678121089")
   input_field = @browser.div(:class => 'selectric-wrapper')
   input_field.click
   input_field.li(text: "Partnership").click
-  sleep(1)
+  @browser.button(value: "Search Employers").wait_until_present
   @browser.button(value: "Search Employers").fire_event("onclick")
-  sleep(1)
   screenshot("employer_portal_employer_search_no_match")
-  sleep(1)
+  @browser.button(value: "Create Employer").wait_until_present
   @browser.button(value: "Create Employer").fire_event("onclick")
-  sleep(3)
+  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").wait_until_present
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").set("981 North State")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_2]").set("Suite 2a")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Springfield")
@@ -88,7 +85,6 @@ And(/^I should see an initial form to enter information about my Employer and my
   @browser.text_field(name: "organization[office_locations_attributes][0][email_attributes][address]").set("john.doe.abcsystems@example.com")
   screenshot("employer_portal_employer_data_new")
   @browser.button(value: "Create").fire_event("onclick")
-  sleep(1)
 end
 
 Given(/^I have signed up previously through consumer, broker agency or previous visit to the Employer portal$/) do
@@ -98,7 +94,7 @@ When(/^I visit the Employer portal to sign in$/) do
   @browser.goto("http://localhost:3000/")
   screenshot("employer_start")
   Watir::Wait.until(30) { @browser.a(text: "Employer Portal").present? }
-  sleep(1)
+  @browser.a(text: "Employer Portal").wait_until_present
   @browser.a(text: "Employer Portal").click
 end
 
@@ -122,20 +118,19 @@ Then(/^I should see a welcome page with successful sign in message$/) do
   Watir::Wait.until(30) { @browser.text.include?("Signed in successfully.") }
   screenshot("employer_portal_sign_in_welcome")
   expect(@browser.text.include?("Signed in successfully.")).to be_truthy
-  sleep(1)
+  @browser.a(text: "Continue").wait_until_present
   expect(@browser.a(text: "Continue").visible?).to be_truthy
   @browser.a(text: "Continue").click
 end
 
 Then(/^I should see fields to search for person and employer$/) do
-  sleep(2)
   Watir::Wait.until(30) { @browser.text.include?("Personal Information") }
   screenshot("employer_portal_person_search")
   expect(@browser.text.include?("Personal Information")).to be_truthy
 end
 
 Then(/^I should see an initial fieldset to enter my name, ssn and dob$/) do
-  sleep(1)
+  @browser.text_field(name: "person[first_name]").wait_until_present
   @browser.text_field(name: "person[first_name]").set("John")
   @browser.text_field(name: "person[last_name]").set("Doe")
   @browser.text_field(name: "person[date_of_birth]").set("10/10/1985")
@@ -147,11 +142,10 @@ Then(/^I should see an initial fieldset to enter my name, ssn and dob$/) do
 end
 
 And(/^My user data from existing the fieldset values are prefilled using data from my existing account$/) do
-  sleep(1)
   Watir::Wait.until(30) { @browser.button(value: "This is my info").visible? }
   screenshot("employer_portal_person_match_form")
   @browser.button(value: "This is my info").fire_event("onclick")
-  sleep(2)
+  @browser.text_field(name: "person[addresses_attributes][0][address_1]").wait_until_present
   @browser.text_field(name: "person[addresses_attributes][0][address_1]").set("12000 Address 1")
   @browser.text_field(name: "person[addresses_attributes][0][address_2]").set("Suite 100")
   @browser.text_field(name: "person[addresses_attributes][0][city]").set("city")
@@ -163,14 +157,13 @@ And(/^My user data from existing the fieldset values are prefilled using data fr
   @browser.text_field(name: "person[emails_attributes][1][address]").set("work@example.com")
   @browser.text_field(name: "person[emails_attributes][1][address]").click
   screenshot("employer_portal_person_data")
-  sleep(1)
+  @browser.button(id: "continue-employer").wait_until_present
   expect(@browser.button(id: "continue-employer").visible?).to be_truthy
   @browser.button(id: "continue-employer").click
-  sleep(1)
 end
 
 And(/^I should see a form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
-  sleep(1)
+  @browser.button(value: "Search Employers").wait_until_present
   Watir::Wait.until(30) { @browser.button(value: "Search Employers").present? }
   screenshot("employer_portal_employer_search_form")
   @employer_profile = FactoryGirl.create(:employer_profile)
@@ -181,10 +174,9 @@ And(/^I should see a form with a fieldset for Employer information, including: l
   @browser.text_field(name: "employer_profile[fein]").set(@employer_profile.fein)
   screenshot("employer_portal_employer_search_criteria")
   @browser.button(value: "Search Employers").fire_event("onclick")
-  sleep(1)
   screenshot("employer_portal_employer_contact_info")
   @browser.button(value: "This is my employer").fire_event("onclick")
-  sleep(1)
+  @browser.button(value: "Create").wait_until_present
   @browser.button(value: "Create").fire_event("onclick")
 end
 
@@ -195,12 +187,12 @@ And(/^I should see a successful creation message$/) do
 end
 
 When(/^I click on an employer in the employer list$/) do
-  sleep(1)
+  @browser.a(text: "True First Inc").wait_until_present
   @browser.a(text: "True First Inc").click
 end
 
 Then(/^I should see the employer information$/) do
-  sleep(3)
+  @browser.text.include?("True First Inc").wait_until_present
   expect(@browser.text.include?("True First Inc")).to be_truthy
   expect(@browser.text.include?("13101 elm tree dr\nxyz\nDunwoody, GA 30027\n(303) 123-0981 x 1231")).to be_truthy
   expect(@browser.text.include?("Enrollment\nNo Plan Years Found")).to be_truthy
@@ -208,23 +200,20 @@ Then(/^I should see the employer information$/) do
 end
 
 When(/^I click on the Employees tab$/) do
-  sleep(1)
   @browser.refresh
-  sleep(1)
   Watir::Wait.until(30) { @browser.text.include?("Employees") }
-  sleep(1)
+  @browser.a(text: "Employees").wait_until_present
   @browser.a(text: "Employees").click
 end
 
 Then(/^I should see the employee family roster$/) do
-  sleep(1)
-  expect(@browser.text.include?("Employee Roster")).to be_truthy
+  @browser.a(text: "Add Employee").wait_until_present
   screenshot("employer_census_family")
   expect(@browser.a(text: "Add Employee").visible?).to be_truthy
 end
 
 And(/^It should default to active tab$/) do
-  sleep(1)
+  @browser.radio(id: "terminated_no").wait_until_present
   expect(@browser.radio(id: "terminated_no").set?).to be_truthy
   expect(@browser.radio(id: "terminated_yes").set?).to be_falsey
   expect(@browser.radio(id: "family_waived").set?).to be_falsey
@@ -233,17 +222,16 @@ end
 
 When(/^I click on add employee button$/) do
   Watir::Wait.until(30) { @browser.a(text: "Add Employee").present? }
-  sleep(1)
+  @browser.a(text: "Add Employee").wait_until_present
   @browser.a(text: "Add Employee").click
 end
 
 Then(/^I should see a form to enter information about employee, address and dependents details$/) do
-  sleep(1)
+  @browser.input(value: "Create Family").wait_until_present
   Watir::Wait.until(30) { @browser.input(value: "Create Family").visible? }
-  sleep(1)
-  expect(@browser.input(value: "Create Family").visible?).to be_truthy
   screenshot("employer_census_new_family")
   # Census Employee
+  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][first_name]").wait_until_present
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][first_name]").set("John")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][middle_name]").set("K")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][last_name]").set("Doe")
@@ -278,13 +266,12 @@ Then(/^I should see a form to enter information about employee, address and depe
 end
 
 And(/^I should see employer census family created success message$/) do
-  sleep(2)
   Watir::Wait.until(30) {  @browser.text.include?("Employer Census Family is successfully created.") }
   screenshot("employer_census_new_family_success_message")
   @browser.refresh
-  sleep(1)
+  @browser.a(text: "Employees").wait_until_present
   @browser.a(text: "Employees").click
-  sleep(1)
+  @browser.a(text: "John K Doe Jr").wait_until_present
   expect(@browser.a(text: "John K Doe Jr").visible?).to be_truthy
   expect(@browser.a(text: "Edit").visible?).to be_truthy
   expect(@browser.a(text: "Terminate").visible?).to be_truthy
@@ -292,13 +279,13 @@ And(/^I should see employer census family created success message$/) do
 end
 
 When(/^I click on Edit family button for a census family$/) do
-  sleep(1)
+  @browser.a(text: "Edit").wait_until_present
   Watir::Wait.until(30) { @browser.a(text: "Edit").visible? }
   @browser.a(text: "Edit").click
 end
 
 Then(/^I should see a form to update the contents of the census employee$/) do
-  sleep(1)
+  @browser.input(value: "Update Family").wait_until_present
   Watir::Wait.until(30) { @browser.input(value: "Update Family").present? }
   expect(@browser.input(value: "Update Family").visible?).to be_truthy
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][first_name]").set("Patrick")
@@ -310,9 +297,7 @@ Then(/^I should see a form to update the contents of the census employee$/) do
 end
 
 And(/^I should see employer census family updated success message$/) do
-  sleep(2)
   Watir::Wait.until(30) {  @browser.text.include?("Employer Census Family is successfully updated.") }
-  # expect(@browser.a(text: "Patrick K Doe Jr").visible?).to be_truthy
 end
 
 And(/^I logout from employer portal$/) do
@@ -323,47 +308,43 @@ end
 
 
 When(/^I click on terminate button for a census family$/) do
-  sleep(1)
+  @browser.a(text: "Terminate").wait_until_present
   Watir::Wait.until(30) { @browser.a(text: "Terminate").visible? }
   @browser.a(text: "Terminate").click
-  sleep(1)
+  @browser.a(text: "Patrick K Doe Jr").wait_until_present
   expect(@browser.a(text: "Patrick K Doe Jr").visible?).to be_falsey
 end
 
 Then(/^The census family should be terminated and move to terminated tab$/) do
   @browser.radio(id: "terminated_yes").fire_event("onclick")
-  sleep(1)
+  @browser.a(text: "Patrick K Doe Jr").wait_until_present
   expect(@browser.a(text: "Patrick K Doe Jr").visible?).to be_truthy
   expect(@browser.a(text: "Rehire").visible?).to be_truthy
 end
 
 And(/^I should see the census family is successfully terminated message$/) do
-  sleep(1)
   Watir::Wait.until(30) {  @browser.text.include?("Successfully terminated family.") }
 end
 
 When(/^I click on Rehire button for a census family on terminated tab$/) do
-  sleep(1)
   Watir::Wait.until(30) { @browser.a(text: "Rehire").visible? }
   @browser.a(text: "Rehire").click
 end
 
 Then(/^A new instance of the census family should be created$/) do
-  sleep(1)
+  @browser.radio(id: "terminated_no").wait_until_present
   @browser.radio(id: "terminated_no").fire_event("onclick")
-  sleep(1)
+  @browser.a(text: "Terminate").wait_until_present
   expect(@browser.text.include?("Patrick K Doe Jr")).to be_truthy
   expect(@browser.a(text: "Terminate").visible?).to be_truthy
 end
 
 And(/^I should see the census family is successfully rehired message$/) do
-  sleep(1)
   Watir::Wait.until(30) {  @browser.text.include?("Successfully rehired family.") }
 end
 
 
 When(/^I go to the benefits tab I should see plan year information$/) do
-  sleep(1)
   Watir::Wait.until(30) { @browser.text.include?("Benefits") }
   expect(@browser.text.include?("Benefits")).to be_truthy
   @browser.a(text: "Benefits").click
@@ -371,7 +352,7 @@ end
 
 
 And(/^I should see a button to create new plan year$/) do
-  sleep(1)
+  @browser.a(text: "Add Plan Year").wait_until_present
   expect(@browser.a(text: "Add Plan Year").visible?).to be_truthy
   screenshot("employer_plan_year")
   @browser.a(text: "Add Plan Year").click
@@ -402,7 +383,6 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][employer_max_amt]").set(120)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][offered]").set("true")
-
   expect(@browser.a(class: "add_fields").visible?).to be_truthy
   @browser.a(class: "add_fields").click
   @browser.fieldsets.last.p(class: /label/, text: /Employee/).click
@@ -414,22 +394,24 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.input(value: "Create Plan Year").click
 end
 
-
 And(/^I should see a success message after clicking on create plan year button$/) do
-  sleep(1)
-  screenshot("employer_plan_year_success_message")
   Watir::Wait.until(30) {  @browser.text.include?("Plan Year successfully created.") }
+  screenshot("employer_plan_year_success_message")
 end
 
 When(/^I enter filter in plan selection page$/) do
   Watir::Wait.until(30) { @browser.a(:text => "All Filters").present? }
+  @browser.a(:text => "All Filters").wait_until_present
   @browser.a(:text => "All Filters").click
   @browser.checkboxes(:class => "plan-type-selection-filter").first.set(true)
+  @browser.button(:class => "apply-btn", :text => "Apply").wait_until_present
   @browser.button(:class => "apply-btn", :text => "Apply").click
 end
 
-When(/^I enter combind filter in plan selection page$/) do
+When(/^I enter combined filter in plan selection page$/) do
+  @browser.a(:text => "All Filters").wait_until_present
   @browser.a(:text => "All Filters").click
+  @browser.checkboxes(:class => "plan-type-selection-filter").first.wait_until_present
   @browser.checkboxes(:class => "plan-type-selection-filter").first.set(false)
   # Nationwide
   @browser.checkboxes(:class => "plan-metal-network-selection-filter").last.set(true)
@@ -442,7 +424,7 @@ When(/^I enter combind filter in plan selection page$/) do
   @browser.button(:class => "apply-btn", :text => "Apply").click
 end
 
-Then(/^I should see the combind filter results$/) do
+Then(/^I should see the combined filter results$/) do
   @browser.divs(:class => "plan-row").select(&:visible?).each do |plan|
     expect(plan.text.include?("DC Area Network")).to eq true
     expect(plan.text.include?("Silver")).to eq true

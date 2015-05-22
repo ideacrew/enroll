@@ -1,18 +1,10 @@
-<div class="col-md-9 col-sm-9 col-xs-12 form-group form-group-lg no-pd carrier-select">
+<div class="col-md-9 col-sm-9 col-xs-12 form-group form-group-lg no-pd">
   <% carriers = Organization.all.map{|o|o.carrier_profile}.compact %>
-  <div class="col-md-7 col-sm-8 col-xs-12 group-buttons">
-    <div class="btn-group" data-toggle="buttons">
-      <% carriers.each do |carrier|%>
-        <% if carrier.plans.present? %>
-          <label class="btn btn-primary carrier" data-carrier="selectric-carrier-<%= carrier.id %>">
-            <input type="radio" name="carrier" id="<%= carrier._id %>" autocomplete="off"> <%= carrier.legal_name %></input>
-          </label>
-        <% end %>
-      <% end %>
-    </div>
+  <div class="col-md-7 col-sm-8 col-xs-12">
+      <%= select_tag 'carrier', options_for_select(carriers.reject{|c| c.plans.blank? }.map{|c| [c.legal_name, c.id]}), class: 'carrier' %>
   </div>
 
-  <div class="no-pd col-md-5 col-sm-4 col-xs-12">
+  <div class="no-pd col-md-5 col-sm-4 col-xs-12 carrier-select">
     <% carriers.each do |carrier| %>
       <%= f.select :reference_plan_id, carrier.plans.map{|plan| [plan.name, plan.id ]}, {}, {class: "carrier-#{carrier.id}"} %>
     <% end %>

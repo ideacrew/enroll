@@ -39,7 +39,6 @@
   </div>
 
   <%= f.fields_for :addresses, errors: {}, fieldset: true, :include_id => false do |address|  %>
-     <%= address.hidden_field :_destroy %>
      <% kind = address.object.kind %>
 
      <% style = "" %>

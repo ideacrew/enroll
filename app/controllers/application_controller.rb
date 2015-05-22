@@ -86,9 +86,9 @@ class ApplicationController < ActionController::Base
         end
         s
       end
-      word_arr.uniq.collect {|word| word.first}.uniq.sort
+      word_arr.uniq.collect {|word| word.first.upcase}.uniq.sort
     else
-      source.distinct(field).collect {|word| word.first}.uniq.sort
+      source.distinct(field).collect {|word| word.first.upcase}.uniq.sort
     end
   rescue
     ("A".."Z").to_a

@@ -37,5 +37,15 @@
     }
   %>
 
-  <%= render "shared/families/benefit_summary_shop", e: employer %>
+<ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
+  <li role="presentation">
+    <%= link_to "Employer Benefits", "#" %>
+  </li>
+  <li>
+    <%= link_to "HR Contact", "#" %>
+  </li>
+</ul>
 
+<div class="container">
+  <%= render "shared/families/benefit_summary_shop", e: employer %>
+</div>

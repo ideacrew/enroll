@@ -230,9 +230,6 @@ a:hover, a:focus {
 #new_person .select-plan, .coverage-options {
     display: none;
 }
-.search_continue {
-  margin: 14px 0 0;
-}
 #new_person #employer-info {
     color: #999;
     display: none;
@@ -891,8 +888,7 @@ ul.social li a span i{
 p.head{
   font-family: 'AvenirLTStd-Light';
   font-weight: 500;
-  color: #bbbbbb;
-  font-size: 14px;
+  font-size: 16px;
 }
 span.edit{
   color: #008ecd;
@@ -1568,17 +1564,11 @@ a.list-group-item.confirm {
   margin-bottom: 20px;
 }
 
-
-
 /*** landing page css start ***/
-
 .landing-row {
-  margin: 0;
   background: #eee;
   min-height: 100px;
   color: #616161;
-}
-.landing-row .left-side {
   padding-top: 40px;
 }
 .landing-row .head {
@@ -1595,9 +1585,6 @@ a.list-group-item.confirm {
   color: #a2a2a2;
   font-size: 14.35px;
 }
-/*.landing-row .table-responsive { 
-  opacity: 0.25;
-}*/
 .landing-row .table-responsive table {
   opacity: 0.45;
 }
@@ -1651,7 +1638,7 @@ a.list-group-item.confirm {
   font-size: 16px;
 }
 .landing-row .right-side {
-  padding-top: 40px;
+  /*padding-top: 40px;*/
 }
 .landing-row .head span {
   display: inline-block;
@@ -2116,12 +2103,6 @@ a .arrow-right {
   padding-right: 56px;
 }
 
-/*
-.search-btn-row {
-  display: none;
-}
-*/
-
 /* hide the real form element by opacity: 0 and position: absolute - display: block and visibility: hidden do not work because then form elements cannot get the focus and actually get checked or unchecked */
 .skinned-form-controls input[type="checkbox"],
 .skinned-form-controls input[type="radio"]
@@ -2227,7 +2208,6 @@ a .arrow-right {
 }
 
 #employer-info {
-  color: #999;
   padding: 10px 0;
 }
 #home .landing-row .bottom{
@@ -2306,19 +2286,6 @@ a.close-fail {
 .personal-table tbody tr td {
     background: none repeat scroll 0 0 #fff;
 }
-
-#key-section ul li {
-    list-style-type: none;
-    margin: 0;
-}
-#key-section ul li a {
-    color: #999;
-}
-
-#key-section ul li:nth-child(8), #key-section ul li:nth-child(9), #key-section ul li:nth-child(10) {
-  padding: 10px 0;
-}
-
 a.close-1, a.close-2{
   position: absolute;
   top: 13px;
@@ -3657,7 +3624,8 @@ a.close-fail:hover{
   list-style-type: none;
   margin: 0;
 }
-#key-section ul li:nth-child(8), #key-section ul li:nth-child(9),
+#key-section ul li:nth-child(8), #key-section ul li:nth-child(9), 
+#key-section ul li:nth-child(10), #key-section ul li:nth-child(11),
  #key-section ul li:last-child{
   margin: 15px 0 0;
 }
@@ -4923,8 +4891,6 @@ table.table-list-wp tbody tr td {
 }
 table.table-list-wp tbody tr.brd td {
     border-top: 1px solid #ddd !important;
-}table.table-wrapper a {
-    color: #337ab7;
 }
 .table-gn-bottom .table-responsive {
     margin-bottom: 0px;
@@ -5016,3 +4982,5 @@ table.table-wrapper tbody tr.brd-top th, table.table-wrapper tbody tr.brd-top td
 .no-pd{padding: 0;}
 .no-pd-right{padding-right: 0;}
 .no-pd-left{padding-left: 0;}
+
+.table-widgets {border: 2px solid #ddd;}

@@ -31,7 +31,7 @@
 
 			<div class="col-md-9 col-sm-12">
 				<div id="dependent_buttons" class="focus_effect personal-info-row">
-					<div class="col-md-12 no-pd col-sm-12 col-xs-12">
+					<div class="col-md-12 no-pd col-sm-12 col-xs-12" id="add-member-btn">
 						<%= 
 							link_to new_consumer_employee_dependent_path(:family_id => @family.id), :remote => true, :class => "btn btn-primary" do
 								'<i class="fa fa-user-plus"></i> Add Member'.html_safe

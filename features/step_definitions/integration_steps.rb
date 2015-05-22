@@ -228,7 +228,8 @@ Then(/^I should see the coverage summary page$/) do
 end
 
 When(/^I confirm on the coverage summary page$/) do
-  @browser.a(href: /insured.plan_shoppings.(.*).checkout/).click
+  @browser.a(href: /insured.plan_shoppings.(.*).checkout/).wait_until_present
+  @browser.a(href: /insured.plan_shoppings.(.*).checkout/).fire_event("onclick")
 end
 
 Then(/^I should see the "my account" page$/) do

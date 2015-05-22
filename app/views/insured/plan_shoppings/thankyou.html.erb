@@ -1,7 +1,7 @@
 <div class="container">
   <div class="employee-welocome">
     <div class="col-md-9 col-sm-11 col-xs-12">
-      <div class="col-md-12 col-sm-12 no-pd col-xs-12">
+      <div class="col-md-12 col-sm-12 no-pd col-xs-12" id="confirm_plan">
 
           <h3>Confirm Your Plan Selection</h3>
           <p>Your current plan selection is displayed below. Click the back button if you want to change your selection. Click confirm to complete your enrollment.</p>
@@ -55,13 +55,29 @@
           </table>
         </div>
 
-        <%= link_to "Purchase", checkout_insured_plan_shopping_path(@enrollment, :plan_id => @plan.id), :class => "btn btn-primary btn-continue pull-right", :method => :post, :disabled => (!@enrollable) %>
+        <%= link_to '<i class="fa fa-shopping-cart"></i>
+ Purchase'.html_safe, checkout_insured_plan_shopping_path(@enrollment, :plan_id => @plan.id), :class => "btn btn-primary btn-continue pull-right", :method => :post, :disabled => (!@enrollable) %>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
-	    <%= link_to "Save & Exit", home_consumer_profiles_path(@person), { :class => "btn btn-primary" } %>
-            <div style="display: none;" id="sup-progress" data-signup-progress="8"></div>
+      <div style="display: none;" id="sup-progress" data-signup-progress="8"></div>
 	    <input type="hidden" id="initial_progress" value="85">
 	    <%= render 'shared/signup_progress' %>
+
+      <div class="row">
+        <div class="col-md-12">
+          <%= 
+            link_to '#', class: 'btn btn-primary' do
+              '<i class="fa fa-chevron-left"></i> Back'.html_safe
+            end
+          %>
+        </div>
+      </div><br>
+      <div class="row">
+        <div class="col-md-12">
+          <%= link_to '<i class="fa fa-user"></i> My Account'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %> &nbsp;
+          <%= link_to '<i class="fa fa-floppy-o"></i> Save & Exit'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %>
+        </div>
+      </div>
     </div>
   </div>
 </div><br>

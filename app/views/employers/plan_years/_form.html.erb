@@ -1,7 +1,24 @@
 <div class="container">
     <div class="row">
       <div class="col-md-9 col-sm-9 col-xs-12">
-        <%= render "shared/error_messages", object: f.object %>
+        <% if @plan_year.errors.any? %>
+          <div class="alert alert-error">
+            <h4><%= pluralize(@plan_year.errors.count, "error") %> prohibited this plan year from being saved:</h4>
+            <ul>
+              <% @plan_year.errors.delete(:benefit_groups) %>
+              <% @plan_year.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+
+              <% @plan_year.benefit_groups.each do |bg| %>
+                <% bg.errors.full_messages.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
         <%= render "shared/plan_year_fields", f: f %><br>
 
       <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
@@ -15,14 +32,14 @@
 
           <div>
             <%= f.hidden_field :_destroy %>
-            <%= link_to 'Delete'.html_safe, 'javascript:;', class: "btn btn-danger remove_fields" %>
-            <%= link_to_add_fields "Add Relationship Benefit", bg, :relationship_benefits, 'pull-right btn btn-success' %>
+            <%= link_to '<i class="fa fa-times"></i> Delete'.html_safe, 'javascript:;', class: "btn btn-danger remove_fields" %>
+            <%= link_to_add_fields '<i class="fa fa-user-plus"></i> Add Relationship Benefit'.html_safe, bg, :relationship_benefits, 'pull-right btn btn-success' %>
           </div>
         </div><br>
 
       <% end %>
       <div class="row top-row">
-        <%= f.submit "Create Plan Year", class: "btn btn-primary" %>
+        <button type="submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Create Plan Year</button>
       </div>
     </div>
   </div>

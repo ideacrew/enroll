@@ -9,7 +9,7 @@
           <div class="head-title head">
             <h3 class="pull-left">Employee Roster</h3>
             <div class="btn-wrapper">
-              <%= link_to "Add Employee", new_employers_employer_profile_family_path(@employer_profile), class: "btn btn-primary", remote: true %>
+              <%= link_to '<i class="fa fa-user-plus"></i> Add Employee'.html_safe, new_employers_employer_profile_family_path(@employer_profile), class: "btn btn-primary", remote: true %>
               <div class="btn-group" role="group" aria-label="">
                 <div class="btn-group" data-toggle="buttons">
                   <label class="btn btn-default active">
@@ -58,20 +58,11 @@
                           <span class="glyphicon glyphicon-pencil hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
                         <% end %>
                       <% else %>
-                        <%= link_to (edit_employers_employer_profile_family_path(@employer_profile.id, family.id)), class: "btn btn-green-2", remote: true do %>
-                          <span class="hidden-xs hidden-sm visible-md visible-lg">Edit</span>
-                          <span class="glyphicon glyphicon-pencil hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
-                        <% end %>
+                        <%= link_to '<i class="fa fa-pencil"></i> Edit'.html_safe, (edit_employers_employer_profile_family_path(@employer_profile.id, family.id)), class: "btn btn-success", remote: true %>
 
-                        <%= link_to (employers_employer_profile_family_delink_path(@employer_profile.id, family.id)), class: "btn btn-default", disabled: !family.is_linked? do %>
-                          <span class="hidden-xs hidden-sm visible-md visible-lg">Delink</span>
-                          <span class="glyphicon glyphicon-sort-by-attributes-alt hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
-                        <% end %>
-
-                        <%= link_to ('javascript:;'), class: "btn btn-red show_confirm", id: "show_confirm_#{family.id}" do %>
-                          <span class="hidden-xs hidden-sm visible-md visible-lg">Terminate</span>
-                          <span class="glyphicon glyphicon-trash hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
-                        <% end %>
+                        <%= link_to '<i class="fa fa-chain-broken"></i> Delink'.html_safe, (employers_employer_profile_family_delink_path(@employer_profile.id, family.id)), class: "btn btn-default", disabled: !family.is_linked? %>
+                          
+                        <%= link_to '<i class="fa fa-times"></i> Terminate'.html_safe, ('javascript:;'), class: "btn btn-danger show_confirm", id: "show_confirm_#{family.id}" %>
                       <% end %>
                     </td>
                   </tr>
