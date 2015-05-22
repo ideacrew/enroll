@@ -30,11 +30,21 @@ $(document).ready(function () {
   });
 
   $(document).on("focus", "[class~='date-picker']", function(e){
-    $(this).datepicker({ 
-      changeMonth: true,
-      changeYear: true,
-      yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()
-    });
+    if ($(this).hasClass('dob-picker') || $(this).hasClass('hire-picker')){
+      $(this).datepicker({ 
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'mm/dd/yy', 
+        maxDate: "+0d"
+      });
+    }else{
+      $(this).datepicker({ 
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'mm/dd/yy', 
+        yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10)
+      });
+    }
   });
 
   $('input.floatlabel').floatlabel({
