@@ -128,8 +128,9 @@ $(function() {
 		applyPlanFilters();
 	});
 
-  $(".carrier").on('click', function(){
-    $(".carrier-select .selectric-wrapper").hide();
-    $("." + $(this).attr('data-carrier')).show();
-  });
+	$('.carrier').on('change', function() {
+		var txt = $(this).val();
+		$(".carrier-select .selectric-wrapper").hide();
+    	$(".selectric-carrier-" + txt).show();
+	});
 });
