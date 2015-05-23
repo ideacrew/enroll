@@ -4,6 +4,7 @@ class EmployerCensus::Employee < EmployerCensus::Member
 
   field :hired_on, type: Date
   field :terminated_on, type: Date
+  field :is_owner, type: Boolean
 
   validates_presence_of :ssn, :dob, :hired_on
 
@@ -15,6 +16,10 @@ class EmployerCensus::Employee < EmployerCensus::Member
   def is_linkable?
     return false if employee_family.blank?
     employee_family.is_linkable?
+  end
+
+  def is_owner?
+    is_owner
   end
 
 end
