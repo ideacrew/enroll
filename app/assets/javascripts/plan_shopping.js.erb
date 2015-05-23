@@ -127,11 +127,11 @@ $(function() {
 		$(".all-filters-row").hide();
 		applyPlanFilters();
 	});
+});
 
-	$('.carrier').on('change', function() {
-    var target = $(this).parents(".form-group");
-		var txt = $(this).val();
-    $(target).find(".carrier-select .selectric-wrapper").hide();
-    $(target).find(".carrier-select .selectric-carrier-" + txt).show();
-	});
+$(document).on("change", ".carrier", function() {
+  var target = $(this).parents(".form-group");
+  var txt = $(this).val();
+  $(target).find(".carrier-select .selectric-wrapper").hide();
+  $(target).find(".carrier-select .selectric-carrier-" + txt).show();
 });

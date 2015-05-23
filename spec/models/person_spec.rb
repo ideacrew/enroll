@@ -185,11 +185,11 @@ describe Person do
 
       it "should set the date of birth" do
         @person.date_of_birth = "01/01/1985"
-        expect(@person.dob.to_s).to eq "1985-01-01"
+        expect(@person.dob.to_s).to eq "01/01/1985"
       end
 
       it "should return date of birth as string" do
-        expect(@person.dob_to_string).to eq dob.to_date.to_s.gsub("-","")
+        expect(@person.dob_to_string).to eq dob.strftime("%Y%m%d")
       end
 
       it "should return if a person is active or not" do

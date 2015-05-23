@@ -42,14 +42,3 @@
   </div><br>
 </fieldset>
 <div class="clear"></div>
-<script>
-  $(function(){
-    $('select').selectric();
-	  $('.carrier').on('change', function() {
-      var target = $(this).parents(".form-group");
-	  	var txt = $(this).val();
-      $(target).find(".carrier-select .selectric-wrapper").hide();
-      $(target).find(".carrier-select .selectric-carrier-" + txt).show();
-	  });
-  });
-</script>
