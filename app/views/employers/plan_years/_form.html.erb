@@ -21,23 +21,13 @@
 
         <%= render "shared/plan_year_fields", f: f %><br>
 
-      <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
-        <%= render "shared/benefit_group_fields", f: bg %><br>
-
         <div class='form-inputs'>
-          <h3> Relationship Benefits</h3>
-          <%= bg.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
-            <%= render "shared/relationship_benefit_fields", f: rb %><br>
+          <h3> Benefit Groups </h3>
+          <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
+            <%= render "shared/benefit_group_fields", f: bg %><br>
           <% end %>
-
-          <div>
-            <%= f.hidden_field :_destroy %>
-            <%= link_to '<i class="fa fa-times"></i> Delete'.html_safe, 'javascript:;', class: "btn btn-danger remove_fields" %>
-            <%= link_to_add_fields '<i class="fa fa-user-plus"></i> Add Relationship Benefit'.html_safe, bg, :relationship_benefits, 'pull-right btn btn-success' %>
-          </div>
-        </div><br>
-
-      <% end %>
+          <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'pull-right btn btn-success' %>
+        </div>
       <div class="row top-row">
         <button type="submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Create Plan Year</button>
       </div>

@@ -9,6 +9,8 @@ ready = ->
       $(target).children('fieldset:last').after(html)
     else
       $(target).prepend(html)
+    $(target).children('fieldset:last').find('select').selectric()
+    $(target).children('fieldset:last').find("input.floatlabel").floatlabel slideInput: false
 
     update_delete_buttons()
 
@@ -26,6 +28,4 @@ ready = ->
     else
       delete_button.show()
 
-#$(document).ready(ready)
-$(document).on('page:load', ready)
 $(document).on('page:update', ready)

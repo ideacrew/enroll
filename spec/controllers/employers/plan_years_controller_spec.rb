@@ -76,7 +76,7 @@ RSpec.describe Employers::PlanYearsController do
     before :each do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(plan_year_proxy).to receive(:new).with(plan_year_params).and_return(plan_year)
+      allow(plan_year_proxy).to receive(:new).and_return(plan_year)
       allow(benefit_group).to receive(:elected_plan_ids=).and_return("test")
       allow(plan_year).to receive(:save).and_return(save_result)
       post :create, :employer_profile_id => employer_profile_id, :plan_year => plan_year_request_params

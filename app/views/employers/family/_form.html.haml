@@ -7,7 +7,7 @@
           %ul
             - @family.census_employee.errors.full_messages.each do |msg|
               %li= msg
-            
+
             - @family.census_dependents.each do |dep|
               - dep.errors.full_messages.each do |msg|
                 %li= msg
@@ -16,8 +16,8 @@
               - bg.errors.full_messages.each do |msg|
                 %li= msg
 
-      - page_title = @family.persisted? ? 'Update Family' : 'Add New Family'
-      
+      - page_title = @family.persisted? ? 'Update Employee' : 'Add New Employee'
+
       .row
         .col-md-9.no-pd.col-sm-9.col-xs-12
           %h3.pull-left= page_title
@@ -27,8 +27,9 @@
         .col-md-9.no-pd.col-sm-9.col-xs-12
           = f.fields_for :census_employee, errors: {}, fieldset: false do |employee|
             = render 'member_fields', f: employee
+            = render 'shared/census_employee_fields', {ff: f, f: employee}
             %br
-                
+
             = employee.fields_for :address, @family.census_employee.address, errors: {}, fieldset: false do |address|
               = render 'address_fields', f: address
             %br
@@ -41,13 +42,7 @@
               %br
               %br
 
-            #benefit_group_assignment_info.focus_effect.row.personal-info-row.no-buffer
-              .col-md-12.no-pd.col-sm-12.col-xs-12.first
-                = f.fields_for :benefit_group_assignments, @family.active_benefit_group_assignment ,errors: {}, fieldset: false do |benefit_group_assignment|
-                  = render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment
-            %br
-
             .row
               .col-md-3.key.col-sm-3.col-xs-12
-                - button_label = @family.persisted? ? 'Update Family' : 'Create Family'
+                - button_label = @family.persisted? ? 'Update Employee' : 'Create Employee'
                 %button.btn.btn-primary{type: 'submit'}= "<i class=\"fa fa-user-plus\"></i> #{button_label}".html_safe

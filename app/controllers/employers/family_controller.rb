@@ -140,7 +140,7 @@ class Employers::FamilyController < ApplicationController
     new_params = format_date_params(params)
     new_params.require(:employer_census_employee_family).permit(:id, :employer_profile_id,
       :census_employee_attributes => [
-          :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :terminated_on,
+          :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :terminated_on, :is_owner,
           :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
         ],
       :census_dependents_attributes => [
@@ -179,7 +179,7 @@ class Employers::FamilyController < ApplicationController
 
     def format_date_params(params)
       ["dob", "hired_on"].each do |key|
-        params[:employer_census_employee_family][:census_employee_attributes][key] = Date.strptime(params[:employer_census_employee_family][:census_employee_attributes][key], '%m/%d/%Y').to_s(:db)
+        params[:employer_census_employee_family][:census_employee_attributes][key] = Date.strptime(params[:employer_census_employee_family][:census_employee_attributes][key], '%m/%d/%Y')
       end
 
       params
