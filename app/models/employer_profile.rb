@@ -193,36 +193,12 @@ class EmployerProfile
     plan_year.revert
   end
 
-  def plan_year_publishable?
-    latest_plan_year.valid?
-  end
-
-  def event_date_valid?
-    is_valid = case aasm.current_event
-      when :begin_open_enrollment
-        Date.current.beginning_of_day >= latest_plan_year.open_enrollment_start_on.beginning_of_day
-      when :end_open_enrollment
-        Date.current.beginning_of_day >= latest_plan_year.open_enrollment_end_on.beginning_of_day
-      else
-        false
-    end
-    is_valid
-  end
-
-  def build_premium_statement
-    self.premium_statements.build(effective_on: Date.current)
-  end
-
-  # TODO add all enrollment rules
-  def enrollment_participation_met?
-    latest_plan_year.fte_count <= HbxProfile::ShopSmallMarketMaximumFteCount
-  end
-
-## anonymous shopping
+## TODO - anonymous shopping
 # no fein required
 # no SSNs, names, relationships, required
 # build-in geographic rating and tobacco - set defaults
-## Broker tools
+
+## TODO - Broker tools
 # sample census profiles
 # ability to create library of templates for employer profiles
 
@@ -327,6 +303,32 @@ class EmployerProfile
   end
 
 private
+  def plan_year_publishable?
+    latest_plan_year.valid?
+  end
+
+  def event_date_valid?
+    is_valid = case aasm.current_event
+      when :begin_open_enrollment
+        Date.current.beginning_of_day >= latest_plan_year.open_enrollment_start_on.beginning_of_day
+      when :end_open_enrollment
+        Date.current.beginning_of_day >= latest_plan_year.open_enrollment_end_on.beginning_of_day
+      else
+        false
+    end
+    is_valid
+  end
+
+  def build_premium_statement
+    self.premium_statements.build(effective_on: Date.current)
+  end
+
+  # TODO add all enrollment rules
+  def enrollment_participation_met?
+    latest_plan_year.fte_count <= HbxProfile::ShopSmallMarketMaximumFteCount
+  end
+
+
   def writing_agent_employed_by_broker
     if writing_agent.present? && broker_agency.present?
       unless broker_agency.writing_agents.detect(writing_agent)

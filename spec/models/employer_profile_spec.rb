@@ -122,8 +122,8 @@ describe EmployerProfile, dbclean: :after_each do
 
           context "and enrollment participation minimum not met" do
             before do
-              employer_profile.end_open_enrollment
               employer_profile.latest_plan_year.fte_count = max_full_time_equivalent_employees + 1
+              employer_profile.end_open_enrollment
             end
 
             it "coverage should be canceled" do
@@ -133,12 +133,12 @@ describe EmployerProfile, dbclean: :after_each do
 
           context "and all enrollment requirements are met" do
             before do
-              employer_profile.end_open_enrollment
               employer_profile.latest_plan_year.fte_count = max_full_time_equivalent_employees
+              employer_profile.end_open_enrollment
             end
 
+            pending "comprehensive definition of enrollment rules"
             it "should comply with all enrollment rules" do
-              pending
             end
 
             it "should initialize a premium statement" do
@@ -152,10 +152,10 @@ describe EmployerProfile, dbclean: :after_each do
 
             context "and employer doesn't post timely binder payment" do
               before do
-
-                # TODO use HBX Profile rules to set payment deadline
+                employer_profile.latest_premium_statement.advance_billing_period
               end
 
+              pending "daily timer that advances billing period on 16th of month"
               it "coverage should be canceled" do
                 expect(employer_profile.canceled?).to be_truthy
               end
