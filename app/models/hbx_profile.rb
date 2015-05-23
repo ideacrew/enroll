@@ -34,6 +34,9 @@ class HbxProfile
   ## SHOP Market HBX Policies
   # Employer Contribution Strategies
 
+  # New hires in initial group that start after enrollment, but prior to coverage effective date.  Don't 
+  # transmit EDI prior to Employer coverage effective date
+
 
   # Maximum number of days an Employer may notify HBX of termination
   # may terminate an employee and effective date
@@ -46,9 +49,45 @@ class HbxProfile
   ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30
 
   # SHOP enrollment-related periods in days 
-  ShopOpenEnrollmentMinimumPeriod = 1
-  ShopOpenEnrollmentMaximumPeriod = 60
-  ShopPlanYearMinimumPeriod = 90
-  ShopPlanYearMaximumPeriod = 365
+  ShopOpenEnrollmentPeriodMinimum = 5
+  ShopOpenEnrollmentPeriodMaximum = 60
+  ShopPlanYearPeriodMinimum = 365 #1.year
+  ShopPlanYearPeriodMaximum = 365 #1.year
+  ShopPlanYearPublishMaximumBeforeEffectiveDate = 90
+
+  # TODO - turn into struct that includes count, plus effective date range
+  ShopSmallMarketMaximumFteCount = 50
+
+  ShopEmployerContributionAmountMinimum = 0.5
+  ShopEnrollmentParticipationMinimum = 2 / 3.0
+  ShopEnrollmentNonFamilyParticipationMinimum = 1
+
+  ShopBinderPaymentDueDayOfMonth = 15
+  ShopOpenEnrollmentEndDueDayOfMonth = 10
+  ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
+  ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
+
+  def shop_schedule_report
+
+  end
+
+
+  # ShopOpenEnrollmentStartMax
+  # EffectiveDate
+
+  # CoverageEffectiveDate - no greater than 3 calendar months max
+  # ApplicationPublished latest date - 5th end_of_day  of preceding month 
+
+  # OpenEnrollment earliest start - 2 calendar months preceding CoverageEffectiveDate
+  # OpenEnrollment min length - 5 days
+  # OpenEnrollment latest start date - 5th of month
+  # OpenEnrollmentLatestEnd -- 10th day of month prior to effective date
+  # BinderPaymentDueDate -- 15th or earliest banking day prior
+
+  # Minimum participation - composition and rate
+  # FTEs -- owner & families doesn't count
+  # 2/3rds and one non-owner or immediate family member enrolled - excluded jan 1
+  # Min contribution amt to employee 50% - excluded jan 1
+  # owner flag added to roster 
 
 end

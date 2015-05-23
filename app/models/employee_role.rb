@@ -102,24 +102,40 @@ class EmployeeRole
     self.is_active
   end
 
-  def self.find(employee_role_id)
-    bson_id = BSON::ObjectId.from_string(employee_role_id)
-    person = Person.where({"employee_roles._id" => bson_id })
-    person.first.employee_roles.detect { |ee| ee.id == bson_id } unless person.size < 1
-  end
+  class << self
+    def klass
+      self.to_s.downcase
+    end
 
-  def self.list(collection)
-    collection.reduce([]) { |elements, person| elements << person.send(klass) }
-  end
+    def find(employee_role_id)
+      bson_id = BSON::ObjectId.from_string(employee_role_id)
+      person = Person.where({"employee_roles._id" => bson_id })
+      person.first.employee_roles.detect { |ee| ee.id == bson_id } unless person.size < 1
+    end
 
-  # TODO; return as chainable Mongoid::Criteria
-  def self.all
-    # criteria = Mongoid::Criteria.new(Person)
-    list Person.exists(klass.to_sym => true)
-  end
+    def find_by_employer_profile(employer_profile)
+      employee_roles = []
+      Person.where("employee_roles.employer_profile_id" => employer_profile.id ).each do |person|
+        person.employee_roles.each do |role|
+          employee_roles << role if role.employer_profile.id == employer_profile.id
+        end
+      end
+      employee_roles
+    end
 
-  def self.first
-    self.all.first
+    def list(collection)
+      collection.reduce([]) { |elements, person| elements << person.send(klass) }
+    end
+
+    # TODO: return as chainable Mongoid::Criteria
+    def all
+      # criteria = Mongoid::Criteria.new(Person)
+      list Person.exists(klass.to_sym => true)
+    end
+
+    def first
+      self.all.first
+    end
   end
 
 private
@@ -128,10 +144,6 @@ private
     welcome_body = "DC HealthLink is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body)
-  end
-
-  def self.klass
-    self.to_s.downcase
   end
 
   def termination_date_must_follow_hire_date

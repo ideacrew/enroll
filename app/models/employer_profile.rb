@@ -16,10 +16,6 @@ class EmployerProfile
   # Broker writing_agent credited for enrollment and transmitted on 834
   field :writing_agent_id, type: BSON::ObjectId
 
-  # Employers terminated for non-payment may re-enroll one additional time
-  field :terminated_count, type: Integer, default: 0
-  field :terminated_on, type: Date
-
   field :aasm_state, type: String
   field :aasm_message, type: String
 
@@ -57,6 +53,11 @@ class EmployerProfile
     raise "undefined parent Organization" unless organization?
     return @organization if defined? @organization
     @organization = self.organization
+  end
+
+  def employee_roles
+    return @employee_roles if defined? @employee_roles
+    @employee_roles = EmployeeRole.find_by_employer_profile(self)
   end
 
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
@@ -188,6 +189,35 @@ class EmployerProfile
     end
   end
 
+  def revert_plan_year
+    plan_year.revert
+  end
+
+  def plan_year_publishable?
+    latest_plan_year.valid?
+  end
+
+  def event_date_valid?
+    is_valid = case aasm.current_event
+      when :begin_open_enrollment
+        Date.current.beginning_of_day >= latest_plan_year.open_enrollment_start_on.beginning_of_day
+      when :end_open_enrollment
+        Date.current.beginning_of_day >= latest_plan_year.open_enrollment_end_on.beginning_of_day
+      else
+        false
+    end
+    is_valid
+  end
+
+  def build_premium_statement
+    self.premium_statements.build(effective_on: Date.current)
+  end
+
+  # TODO add all enrollment rules
+  def enrollment_participation_met?
+    latest_plan_year.fte_count <= HbxProfile::ShopSmallMarketMaximumFteCount
+  end
+
 ## anonymous shopping
 # no fein required
 # no SSNs, names, relationships, required
@@ -212,7 +242,12 @@ class EmployerProfile
     state :suspended       # 
     state :terminated               # Premium payment > 90 days past due (day 91) or voluntarily terminate
 
-    event :publish_plan_year do
+    event :reapply do
+      transitions from: :canceled, to: :applicant
+      transitions from: :terminated, to: :applicant
+    end
+
+    event :publish_plan_year, :guards => [:plan_year_publishable?] do 
       transitions from: :applicant, to: :registered
       transitions from: :applicant, to: :ineligible
     end
@@ -224,23 +259,32 @@ class EmployerProfile
     # Initiated only by HBX Admin
     event :appeal_determination do
       transitions from: :ineligible_appealing, to: :ineligible
+
+      # Add guard -- only revert for first 30 days past submitted
+      transitions from: :ineligible_appealing, to: :applicant, 
+        :after_enter => :revert_plan_year
+
       transitions from: :ineligible_appealing, to: :registered
     end
 
-    event :begin_open_enrollment do
+    event :begin_open_enrollment, :guards => [:event_date_valid?] do
       transitions from: :registered, to: :enrolling
     end
 
-    event :close_open_enrollment do
-      transitions from: :enrolling, to: :binder_pending
-      transitions from: :enrolling, to: :canceled      
+    event :end_open_enrollment, :guards => [:event_date_valid?] do
+      transitions from: :enrolling, to: :binder_pending, 
+        :guard => :enrollment_participation_met?,
+        :after => :build_premium_statement
+
+      transitions from: :enrolling, to: :canceled
     end
 
     event :cancel_coverage do
       transitions from: :registered, to: :canceled
       transitions from: :enrolling, to: :canceled
-      transitions from: :enrolled, to: :canceled
       transitions from: :binder_pending, to: :canceled
+      transitions from: :ineligible, to: :canceled    # put guard: following 90 days in ineligible status
+      transitions from: :enrolled, to: :canceled
     end
 
     event :enroll do

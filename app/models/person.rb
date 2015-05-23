@@ -103,7 +103,7 @@ class Person
 
   # Employee child model indexes
   index({"employee_roles._id" => 1})
-  index({"employee_roles.employer_id" => 1})
+  index({"employee_roles.employer_profile_id" => 1})
   index({"employee_roles.census_family_id" => 1})
   index({"employee_roles.benefit_group_id" => 1})
   index({"employee_roles.is_active" => 1})
@@ -178,30 +178,29 @@ class Person
     end
   end
 
- class << self
+  class << self
 
-   # Find all employee_roles.  Since person has_many employee_roles, person may show up
-   # employee_role.person may not be unique in returned set
-   def employee_roles
-     people = exists(:'employee_roles.0' => true).entries
-     people.flat_map(&:employee_roles)
-   end
+    # Find all employee_roles.  Since person has_many employee_roles, person may show up
+    # employee_role.person may not be unique in returned set
+    def employee_roles
+      people = exists(:'employee_roles.0' => true).entries
+      people.flat_map(&:employee_roles)
+    end
 
   # Return an instance list of active People who match identifying information criteria
-  def match_by_id_info(options)
-    ssn_query = options[:ssn]
-    dob_query = options[:dob]
-    last_name = options[:last_name]
+    def match_by_id_info(options)
+      ssn_query = options[:ssn]
+      dob_query = options[:dob]
+      last_name = options[:last_name]
 
-    raise ArgumentError, "must provide an ssn, last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank?))
+      raise ArgumentError, "must provide an ssn, last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank?))
 
-    matches = Array.new
-    matches.concat Person.active.where(ssn: ssn_query).to_a unless ssn_query.blank?
-    matches.concat Person.where(last_name: last_name, dob: dob_query).active.to_a unless (dob_query.blank? || last_name.blank?)
-    matches.uniq
+      matches = Array.new
+      matches.concat Person.active.where(ssn: ssn_query).to_a unless ssn_query.blank?
+      matches.concat Person.where(last_name: last_name, dob: dob_query).active.to_a unless (dob_query.blank? || last_name.blank?)
+      matches.uniq
+    end
   end
-
-end
 
   def dob_to_string
     dob.blank? ? "" : dob.strftime("%Y%m%d")

@@ -12,6 +12,11 @@ class PlanYear
   field :open_enrollment_start_on, type: Date
   field :open_enrollment_end_on, type: Date
 
+  ## TODO
+  # Move FTE/PTEs to EmployerProfile
+  # 1-50 or 100, on first enrollment application
+  # no non-owners = ineligible
+
   # Number of full-time employees
   field :fte_count, type: Integer, default: 0
 
@@ -115,20 +120,20 @@ private
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
     end
 
-    if (open_enrollment_end_on - open_enrollment_start_on) < HbxProfile::ShopOpenEnrollmentMinimumPeriod
-     errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{HbxProfile::ShopOpenEnrollmentMinimumPeriod} days")
+    if (open_enrollment_end_on - open_enrollment_start_on) < HbxProfile::ShopOpenEnrollmentPeriodMinimum
+     errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{HbxProfile::ShopOpenEnrollmentPeriodMinimum} days")
     end
 
-    if (open_enrollment_end_on - open_enrollment_start_on) > HbxProfile::ShopOpenEnrollmentMaximumPeriod
-     errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{HbxProfile::ShopOpenEnrollmentMaximumPeriod} days")
+    if (open_enrollment_end_on - open_enrollment_start_on) > HbxProfile::ShopOpenEnrollmentPeriodMaximum
+     errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{HbxProfile::ShopOpenEnrollmentPeriodMaximum} days")
     end
 
-    if (end_on - start_on) < HbxProfile::ShopPlanYearMinimumPeriod
-     errors.add(:end_on, "plan year period is less than minumum: #{HbxProfile::ShopPlanYearMinimumPeriod} days")
+    if (end_on - start_on) < HbxProfile::ShopPlanYearPeriodMinimum
+     errors.add(:end_on, "plan year period is less than minumum: #{HbxProfile::ShopPlanYearPeriodMinimum} days")
     end
 
-    if (end_on - start_on) > HbxProfile::ShopPlanYearMaximumPeriod
-     errors.add(:end_on, "plan year period is greater than maximum: #{HbxProfile::ShopPlanYearMaximumPeriod} days")
+    if (end_on - start_on) > HbxProfile::ShopPlanYearPeriodMaximum
+     errors.add(:end_on, "plan year period is greater than maximum: #{HbxProfile::ShopPlanYearPeriodMaximum} days")
     end
   end
 

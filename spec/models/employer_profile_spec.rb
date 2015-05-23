@@ -1,8 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe EmployerProfile, :dbclean => :after_each do
-
-  it { should validate_presence_of :entity_kind }
+describe EmployerProfile, dbclean: :after_each do
 
   let(:entity_kind)     { "partnership" }
   let(:bad_entity_kind) { "fraternity" }
@@ -19,6 +17,7 @@ RSpec.describe EmployerProfile, :dbclean => :after_each do
         email: email
       )
     }
+
   let(:organization) { Organization.create(
       legal_name: "Sail Adventures, Inc",
       dba: "Sail Away",
@@ -27,13 +26,16 @@ RSpec.describe EmployerProfile, :dbclean => :after_each do
       ) 
     }
 
+  let(:valid_params) do
+    {
+      organization: organization,
+      entity_kind: entity_kind
+    }
+  end
+
+  it { should validate_presence_of :entity_kind }
+
   context ".new" do
-    let(:valid_params) do
-      {
-        organization: organization,
-        entity_kind: entity_kind
-      }
-    end
 
     context "with no arguments" do
       def params; {}; end
@@ -82,55 +84,148 @@ RSpec.describe EmployerProfile, :dbclean => :after_each do
         end
       end
     end
+  end
 
-    context "a new employer profile is created" do
-      let(:employer_profile)  { EmployerProfile.new(
-          organization: organization,
-          entity_kind: entity_kind,
-        ) 
-      }
+  context "when employer submits a valid profile" do
+    let(:plan_year)         { FactoryGirl.build(:plan_year) }
+    let(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
+    let(:max_full_time_equivalent_employees)  { HbxProfile::ShopSmallMarketMaximumFteCount }
 
-      it "should be valid" do
-        expect(employer_profile.valid?).to be_truthy
+    it "should initialize in applicant status" do
+      expect(employer_profile.applicant?).to be_truthy
+    end
+
+    context "and published benefit plan year is ACA-compliant" do
+      before { employer_profile.publish_plan_year }
+
+      it "should transition to registered status" do
+        expect(employer_profile.latest_plan_year.valid?).to be_truthy
+        expect(employer_profile.registered?).to be_truthy
       end
 
-      it "and initialized to applicant state" do
-        expect(employer_profile.applicant?).to be_truthy
-      end
-
-      context "and the employer completes registration by publishing plan year" do
-          let(:benefit_group)   { FactoryGirl.create(:benefit_group)}
-          let(:plan_year)       { FactoryGirl.create(:plan_year, 
-                                    employer_profile: employer_profile,
-                                    benefit_groups: [benefit_group]) }
-
+      context "and open enrollment begin date arrives" do
         before do
-          plan_year.publish
+          employer_profile.latest_plan_year.open_enrollment_start_on = Date.current
+          employer_profile.latest_plan_year.open_enrollment_end_on = Date.current + 5
+          employer_profile.begin_open_enrollment
         end
 
-        it "should transition employer profile state to registered" do
-          expect(employer_profile.registered?).to be_truthy
+        it "should transition to enrolling" do
+          expect(employer_profile.enrolling?).to be_truthy
         end
 
-        context "and the employer isn't eligible for ACA SHOP" do
-
-          it "workflow should not advance from applicant state" do
+        context "when open enrollment end date arrives" do
+          before do
+            employer_profile.latest_plan_year.open_enrollment_start_on = Date.current - 5
+            employer_profile.latest_plan_year.open_enrollment_end_on = Date.current
           end
-        end
 
-        context "and the employer is eligible for ACA SHOP" do
-          context "and the employer hasn't specified a valid open enrollment period" do
-            let(:enrollment_too_short)  {  }
-            let(:enrollment_too_long)   {  }
-            let(:enrollment_too_early)  {  }
-            let(:enrollment_too_late)   {  }
+          context "and enrollment participation minimum not met" do
+            before do
+              employer_profile.end_open_enrollment
+              employer_profile.latest_plan_year.fte_count = max_full_time_equivalent_employees + 1
+            end
 
-            it "should raise an error" do
+            it "coverage should be canceled" do
+              expect(employer_profile.canceled?).to be_truthy
+            end
+          end
+
+          context "and all enrollment requirements are met" do
+            before do
+              employer_profile.end_open_enrollment
+              employer_profile.latest_plan_year.fte_count = max_full_time_equivalent_employees
+            end
+
+            it "should comply with all enrollment rules" do
+              pending
+            end
+
+            it "should initialize a premium statement" do
+              expect(employer_profile.latest_premium_statement.effective_on).to eq Date.current
+            end
+
+            it "should be waiting for binder payment" do
+              expect(employer_profile.binder_pending?).to be_truthy
+              expect(employer_profile.latest_premium_statement.binder_pending?).to be_truthy
+            end
+
+            context "and employer doesn't post timely binder payment" do
+              before do
+
+                # TODO use HBX Profile rules to set payment deadline
+              end
+
+              it "coverage should be canceled" do
+                expect(employer_profile.canceled?).to be_truthy
+              end
+            end
+
+            context "and employer pays binder payment" do
+              before do
+                employer_profile.latest_premium_statement.allocate_binder_payment
+              end
+
+              it "should transition employer to enrolled" do
+                expect(employer_profile.enrolled?).to be_truthy
+              end
             end
           end
         end
       end
     end
+
+    context "and published benefit plan year is ACA non-compliant" do
+
+      context "or enrollment non-family participation minimum not met" do 
+        it "should transition to ineligible status" do
+        expect(employer_profile.applicant?).to be_truthy
+        end
+      end
+
+      context "or employer contribution minimum not met" do 
+        it "should transition to ineligible status" do
+        expect(employer_profile.applicant?).to be_truthy
+        end
+      end
+
+      context "or small market FTE maximum is exceeded" do 
+        it "should transition to ineligible status" do
+        expect(employer_profile.applicant?).to be_truthy
+        end
+      end
+
+      context "and the employer requests appeal review within 30 days of plan year publish date" do
+        it "transitions to ineligible_appealing" do
+        expect(employer_profile.applicant?).to be_truthy
+        end
+
+        context "and the appeal is granted" do
+          it "should transition to registered" do
+        expect(employer_profile.applicant?).to be_truthy
+          end
+        end
+
+        context "and the appeal is denied" do
+          it "should transition to ineligible" do
+        expect(employer_profile.applicant?).to be_truthy
+          end
+        end
+
+        context "and the application is reverted" do
+          it "should transition employer back to applicant status" do
+        expect(employer_profile.applicant?).to be_truthy
+          end
+        end
+      end
+
+      context "and 90 days pass from original plan year publish date" do
+        it "transitions to canceled" do
+        expect(employer_profile.applicant?).to be_truthy
+        end
+      end
+    end
+
   end
 end
 
@@ -373,15 +468,37 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       end
     end
   end
-
 end
 
 describe EmployerProfile, "instance methods" do
-  let (:census_employee)  { FactoryGirl.build(:employer_census_employee, ssn: "069851240", dob: 34.years.ago.to_date)}
-  let (:census_family)    { FactoryGirl.build(:employer_census_family, census_employee: census_employee, employer_profile: nil)}
-  let (:person)           { Person.new(first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: 34.years.ago.to_date)}
-  let (:premium_statement_1) { FactoryGirl.build(:premium_statement, effective_on: Date.current - 10)}
-  let (:premium_statement_2) { FactoryGirl.build(:premium_statement, effective_on: Date.current - 90)}
+  let(:census_employee)  { FactoryGirl.build(:employer_census_employee, ssn: "069851240", dob: 34.years.ago.to_date)}
+  let(:census_family)    { FactoryGirl.build(:employer_census_family, census_employee: census_employee, employer_profile: nil)}
+  let(:person)           { Person.new(first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: 34.years.ago.to_date)}
+  let(:premium_statement_1) { FactoryGirl.build(:premium_statement, effective_on: Date.current - 10)}
+  let(:premium_statement_2) { FactoryGirl.build(:premium_statement, effective_on: Date.current - 90)}
+
+  describe "#employee_roles" do
+    let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
+    let(:people)  { FactoryGirl.create_list(:person, 2) }
+    let!(:ee0)  { FactoryGirl.create(:employee_role, person: people[0], employer_profile: employer_profile) }
+    let!(:ee1)  { FactoryGirl.create(:employee_role, person: people[1], employer_profile: employer_profile) }
+    # let(:employees)         { FactoryGirl.create_list(:employee_role, employee_count, employer_profile: employer_profile) }
+    let!(:ee_roles)          { employer_profile.employee_roles }
+
+    context "an employer profile with multiple associated employee roles" do
+      it "should find all employees" do
+        expect(ee_roles.size).to eq 2
+      end
+
+      it "should return array of employee_role instances" do
+        expect(ee_roles.first).to be_a EmployeeRole
+      end
+
+      it "should be associated with correct employer profile" do
+        expect(ee_roles.first.employer_profile).to eq employer_profile
+      end
+    end
+  end
 
   describe "#latest_premium_statement" do
     let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
@@ -398,24 +515,24 @@ describe EmployerProfile, "instance methods" do
   end
 
   describe "#linkable_employee_family_by_person" do
-    let (:employer_profile) {FactoryGirl.create(:employer_profile)}
+    let(:employer_profile) {FactoryGirl.create(:employer_profile)}
 
     context "with matching census_family employee" do
-      let (:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [census_family])}
+      let(:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [census_family])}
 
       context "with employee previously terminated" do
-        let (:prior_census_employee) {FactoryGirl.build(:employer_census_employee, ssn: "069851240", terminated_on: Date.today )}
-        let (:prior_census_family) {FactoryGirl.build(:employer_census_family, census_employee: prior_census_employee, linked_at: Date.today - 1,terminated: true, employer_profile: nil)}
-        let (:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [prior_census_family, census_family])}
+        let(:prior_census_employee) {FactoryGirl.build(:employer_census_employee, ssn: "069851240", terminated_on: Date.today )}
+        let(:prior_census_family) {FactoryGirl.build(:employer_census_family, census_employee: prior_census_employee, linked_at: Date.today - 1,terminated: true, employer_profile: nil)}
+        let(:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [prior_census_family, census_family])}
 
         it "should return only the matching census family" do
           expect(employer_profile.linkable_employee_family_by_person(person)).to eq census_family
         end
 
         context "with employee who was never linked" do
-          let (:prior_census_employee) {FactoryGirl.build(:employer_census_employee, ssn: "069851240", terminated_on: Date.today )}
-          let (:prior_census_family) {FactoryGirl.build(:employer_census_family, census_employee: prior_census_employee, terminated: true, employer_profile: nil)}
-          let (:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [prior_census_family, census_family])}
+          let(:prior_census_employee) {FactoryGirl.build(:employer_census_employee, ssn: "069851240", terminated_on: Date.today )}
+          let(:prior_census_family) {FactoryGirl.build(:employer_census_family, census_employee: prior_census_employee, terminated: true, employer_profile: nil)}
+          let(:employer_profile) {FactoryGirl.create(:employer_profile, employee_families: [prior_census_family, census_family])}
 
           it "should return only the matching census family" do
             expect(employer_profile.linkable_employee_family_by_person(person)).to eq census_family
