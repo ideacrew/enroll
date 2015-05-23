@@ -77,6 +77,7 @@ class PremiumStatement
       transitions from: :binder_pending, to: :binder_paid
     end
 
+    # TODO Advance billing period on binder_pending in middle of month
     event :advance_billing_period do
       # transitions from: [:current, :overdue, :late, :suspended, :terminated], to: [:current, :overdue, :late, :suspended, :terminated]
       transitions from: :binder_pending, to: :canceled
