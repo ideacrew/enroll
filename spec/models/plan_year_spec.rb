@@ -231,7 +231,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 
-  context "a plan year is submitted to be published" do
+  context "application is submitted to be published" do
     let(:plan_year)                   { PlanYear.new(**valid_params) }
     let(:valid_fte_count)             { HbxProfile::ShopSmallMarketFteCountMaximum }
     let(:invalid_fte_count)           { HbxProfile::ShopSmallMarketFteCountMaximum + 1 }
@@ -240,6 +240,21 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     it "plan year should be in draft state" do
       expect(plan_year.draft?).to be_truthy
+    end
+
+    context "and employer's primary office isn't located in-state" do
+      before do
+        plan_year.employer_profile.organization.primary_office_location.address.state = "AK"
+      end
+
+      it "application should not be valid" do
+        expect(plan_year.is_application_valid?).to be_falsey
+      end
+
+      it "and should provide relevent warning message" do
+        expect(plan_year.application_warnings[:primary_office_location].present?).to be_truthy
+        expect(plan_year.application_warnings[:primary_office_location]).to match(/primary office must be located/)
+      end
     end
 
     context "and benefit group is missing" do
@@ -357,7 +372,6 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           expect(plan_year.employer_profile.ineligible?).to be_truthy
         end
       end
-
     end
 
     context "and all application elements are valid" do

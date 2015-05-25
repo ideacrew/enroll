@@ -82,6 +82,10 @@ class PlanYear
       warnings.merge!({benefit_groups: "at least one benefit group must be defined for plan year"})
     end
 
+    unless employer_profile.organization.primary_office_location.address.state.to_s.downcase == HbxProfile::StateAbbreviation.to_s.downcase
+      warnings.merge!({primary_office_location: "primary office must be located in #{HbxProfile::StateName}"})
+    end
+
     # Maximum company size at time of initial registration on the HBX
     if fte_count > HbxProfile::ShopSmallMarketFteCountMaximum
       warnings.merge!({fte_count: "number of full time equivalents (FTEs) exceeds maximum allowed (#{HbxProfile::ShopSmallMarketFteCountMaximum})"})

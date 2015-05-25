@@ -92,6 +92,10 @@ class Organization
     write_attribute(:fein, new_fein.to_s.gsub(/\D/, ''))
   end
 
+  def primary_office_location
+    office_locations.detect(&:is_primary?)
+  end
+
   def self.default_search_order
     [[:legal_name, 1]]
   end
