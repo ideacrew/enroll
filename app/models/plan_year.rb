@@ -11,11 +11,7 @@ class PlanYear
 
   field :open_enrollment_start_on, type: Date
   field :open_enrollment_end_on, type: Date
-
-  ## TODO
-  # Move FTE/PTEs to EmployerProfile
-  # 1-50 or 100, on first enrollment application
-  # no non-owners = ineligible
+  field :published, type: Boolean
 
   # Number of full-time employees
   field :fte_count, type: Integer, default: 0
@@ -46,6 +42,10 @@ class PlanYear
     @employee_families = parent.employee_families.where(:plan_year_id => self.id)
   end
 
+  def effective_date
+    start_on.beginning_of_day
+  end
+
   def employee_participation_percent
   end
 
@@ -66,6 +66,38 @@ class PlanYear
     employer_profile.publish_plan_year 
   end
 
+  def minimum_employer_contribution
+    benefit_groups.min_by(&:premium_pct_as_int).premium_pct_as_int unless benefit_groups.size == 0
+  end
+
+  def is_application_valid?
+    application_warnings.blank? ? true : false
+  end
+
+  # Check plan year application for regulatory compliance
+  def application_warnings
+    warnings = {}
+
+    if benefit_groups.size == 0
+      warnings.merge!({benefit_groups: "at least one benefit group must be defined for plan year"})
+    end
+
+    # Maximum company size at time of initial registration on the HBX
+    if fte_count > HbxProfile::ShopSmallMarketFteCountMaximum
+      warnings.merge!({fte_count: "number of full time equivalents (FTEs) exceeds maximum allowed (#{HbxProfile::ShopSmallMarketFteCountMaximum})"})
+    end
+
+    # Exclude Jan 1 effective date from certain checks
+    unless effective_date.yday == 1
+      # Employer contribution toward employee premium must meet minimum
+      if benefit_groups.size > 0 && (minimum_employer_contribution < HbxProfile::ShopEmployerContributionPercentMinimum)
+        warnings.merge!({minimum_employer_contribution: "employer contribution percent toward employee premium (#{minimum_employer_contribution}) is less than minimum allowed (#{HbxProfile::ShopEmployerContributionPercentMinimum})"})
+      end
+    end
+
+    warnings
+  end
+
   class << self
     def find(id)
       organizations = Organization.where("employer_profile.plan_years._id" => BSON::ObjectId.from_string(id))
@@ -75,16 +107,36 @@ class PlanYear
 
   aasm do
     state :draft, initial: true
-    state :published,   :after_enter => :register_employer 
+
+    # Plan application as submitted has warnings
+    state :publish_pending
+
+    state :published,   :after_enter => :register_employer
+
+    # Published plans are retired following their end on date
+    state :retired
+
+    # Non-published plans are expired following their end on date
     state :expired
 
     event :publish do
-      transitions from: :draft, to: :published
+      transitions from: :draft, to: :published, :guard => :is_application_valid?
+      transitions from: :draft, to: :publish_pending
     end
 
-    event :expire do
+    # Returns plan to draft state so that it can be edited 
+    event :withdraw_pending do
+      transitions from: :publish_pending, to: :draft      
+    end
+
+    # Submit the plan with application warnings to HBX
+    event :force_publish do
+      transitions from: :publish_pending, to: :published
+    end
+
+    event :deactivate do
       transitions from: :draft, to: :expired
-      transitions from: :published, to: :expired
+      transitions from: :published, to: :retired
     end
 
     event :revert do

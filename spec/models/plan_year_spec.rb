@@ -95,16 +95,6 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 
-# At least one non-owner must enroll
-# must owner attest?
-# publish benefit_group
-# 
-# need to limit setup to quarterly rate information
-# grace period?
-# open enrollment end, grace period, etc... get from Jack
-# grace period to 
-
-
   context "a new plan year is initialized" do
     let(:plan_year) { PlanYear.new(**valid_params) }
 
@@ -240,19 +230,160 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
   end
-end
 
-describe PlanYear do
-  context "when built" do
-    context "with valid parameters" do
-      it "has number of enrolled employees" do
+  context "a plan year is submitted to be published" do
+    let(:plan_year)                   { PlanYear.new(**valid_params) }
+    let(:valid_fte_count)             { HbxProfile::ShopSmallMarketFteCountMaximum }
+    let(:invalid_fte_count)           { HbxProfile::ShopSmallMarketFteCountMaximum + 1 }
+    let(:valid_ee_contribution_pct)   { HbxProfile::ShopEmployerContributionPercentMinimum }
+    let(:invalid_ee_contribution_pct) { HbxProfile::ShopEmployerContributionPercentMinimum - 1 }
+
+    it "plan year should be in draft state" do
+      expect(plan_year.draft?).to be_truthy
+    end
+
+    context "and benefit group is missing" do
+      it "application should not be valid" do
+        expect(plan_year.is_application_valid?).to be_falsey
       end
 
-      it "has number of employees who waived coverage" do
+      it "and should provide relevent warning message" do
+        expect(plan_year.application_warnings[:benefit_groups].present?).to be_truthy
+        expect(plan_year.application_warnings[:benefit_groups]).to match(/at least one benefit group/)
+      end
+    end
+
+    context "and the employer size exceeds regulatory max" do
+      before do
+        plan_year.fte_count = invalid_fte_count
+        plan_year.publish
       end
 
-      it "has ratio of participation (enrolled + waived / total employees)" do
+      it "application should not be valid" do
+        expect(plan_year.is_application_valid?).to be_falsey
+      end
+
+      it "and should provide relevent warning message" do
+        expect(plan_year.application_warnings[:fte_count].present?).to be_truthy
+        expect(plan_year.application_warnings[:fte_count]).to match(/number of full time equivalents/)
+      end
+
+      it "and plan year should be in publish pending state" do
+        expect(plan_year.publish_pending?).to be_truthy
+      end
+    end
+
+    context "and the employer contribution amount is below minimum" do
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+
+      before do
+        benefit_group.premium_pct_as_int = HbxProfile::ShopEmployerContributionPercentMinimum - 1
+      end
+
+      context "and the effective date isn't January 1" do
+        before do
+          plan_year.start_on = Date.current.beginning_of_year + 1.month
+          plan_year.publish
+        end
+
+        it "application should not be valid" do
+          expect(plan_year.is_application_valid?).to be_falsey
+        end
+
+        it "and should provide relevent warning message" do
+          expect(plan_year.application_warnings[:minimum_employer_contribution].present?).to be_truthy
+          expect(plan_year.application_warnings[:minimum_employer_contribution]).to match(/employer contribution percent/)
+        end
+
+        it "and plan year should be in publish pending state" do
+          expect(plan_year.publish_pending?).to be_truthy
+        end
+      end
+
+      context "and the effective date is January 1" do
+        before do
+          plan_year.start_on = Date.current.beginning_of_year
+          plan_year.publish
+        end
+
+        it "application should be valid" do
+          expect(plan_year.is_application_valid?).to be_truthy
+        end
+
+        it "and plan year should be in published state" do
+          expect(plan_year.published?).to be_truthy
+        end
+      end
+    end
+
+    context "and one or more application elements are invalid" do
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+
+      before do
+        benefit_group.premium_pct_as_int = invalid_ee_contribution_pct
+        plan_year.fte_count = invalid_fte_count
+        plan_year.start_on = Date.current.beginning_of_year + 1.month
+        plan_year.publish
+      end
+
+      it "application should not be valid" do
+        expect(plan_year.is_application_valid?).to be_falsey
+      end
+
+      it "and plan year should be in publish pending state" do
+        expect(plan_year.publish_pending?).to be_truthy
+      end
+
+      context "and application is withdrawn for correction" do
+        before do
+          plan_year.withdraw_pending
+        end
+  
+        it "plan year should be in draft state" do
+          expect(plan_year.draft?).to be_truthy
+        end
+      end
+
+      context "and application is submitted with warnings" do
+        before do
+          plan_year.force_publish
+        end
+  
+        it "plan year should be in published state" do
+          expect(plan_year.published?).to be_truthy
+        end
+
+        it "and employer_profile should be in ineligible state" do
+          expect(plan_year.employer_profile.ineligible?).to be_truthy
+        end
+      end
+
+    end
+
+    context "and all application elements are valid" do
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+
+      before do
+        benefit_group.premium_pct_as_int = valid_ee_contribution_pct
+        plan_year.fte_count = valid_fte_count
+        # plan_year.start_on = Date.current.beginning_of_year + 1.month
+        plan_year.publish
+      end
+
+      it "plan year should publish" do
+        expect(plan_year.published?).to be_truthy
+      end
+
+      it "and employer_profile should be in registered state" do
+        expect(plan_year.employer_profile.registered?).to be_truthy
+      end
+
+      context "and it is published" do
+        pending
+        it "changes to record should be blocked" do
+        end
       end
     end
   end
+
 end
