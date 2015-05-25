@@ -48,17 +48,26 @@ class HbxProfile
   # Minimum number of days an employee may submit a plan, following addition or correction to Employer roster
   ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30
 
-  # SHOP enrollment-related periods in days 
-  ShopOpenEnrollmentPeriodMinimum = 5
-  ShopOpenEnrollmentPeriodMaximum = 60
-  ShopPlanYearPeriodMinimum = 365 #1.year
-  ShopPlanYearPeriodMaximum = 365 #1.year
-  ShopPlanYearPublishMaximumBeforeEffectiveDate = 90
-
   # TODO - turn into struct that includes count, plus effective date range
-  ShopSmallMarketMaximumFteCount = 50
+  ShopSmallMarketFteCountMaximum = 50
 
-  ShopEmployerContributionAmountMinimum = 0.5
+  ## SHOP enrollment-related periods in days
+  # Minimum number of days for SHOP open enrollment period
+  ShopOpenEnrollmentPeriodMinimum = 5
+
+  # Maximum number of days for SHOP open enrollment period
+  ShopOpenEnrollmentPeriodMaximum = 60
+
+  # Minumum length of time for SHOP Plan Year
+  ShopPlanYearPeriodMinimum = 365 #1.year
+
+  # Maximum length of time for SHOP Plan Year
+  ShopPlanYearPeriodMaximum = 365 #1.year
+
+  # Maximum number of days prior to coverage effective date that a Plan Year may be defined 
+  ShopPlanYearPublishBeforeEffectiveDateMaximum = 90
+
+  ShopEmployerContributionPercentMinimum = 50
   ShopEnrollmentParticipationMinimum = 2 / 3.0
   ShopEnrollmentNonFamilyParticipationMinimum = 1
 
@@ -70,7 +79,6 @@ class HbxProfile
   def shop_schedule_report
 
   end
-
 
   # ShopOpenEnrollmentStartMax
   # EffectiveDate
@@ -84,10 +92,5 @@ class HbxProfile
   # OpenEnrollmentLatestEnd -- 10th day of month prior to effective date
   # BinderPaymentDueDate -- 15th or earliest banking day prior
 
-  # Minimum participation - composition and rate
-  # FTEs -- owner & families doesn't count
-  # 2/3rds and one non-owner or immediate family member enrolled - excluded jan 1
-  # Min contribution amt to employee 50% - excluded jan 1
-  # owner flag added to roster 
 
 end
