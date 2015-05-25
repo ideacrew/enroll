@@ -16,6 +16,10 @@ class HbxProfile
 
   ## Application-level caching
 
+  ## HBX general settings
+  StateName = "District of Columbia"
+  StateAbbreviation = "DC"
+
   ## Carriers
   # hbx_id, hbx_carrier_id, name, abbrev,
 
