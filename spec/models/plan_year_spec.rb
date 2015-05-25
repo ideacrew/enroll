@@ -125,7 +125,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and the open enrollment period is too short" do
-        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentMinimumPeriod - 1 }
+        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1 }
         let(:open_enrollment_start_on)  { Date.current }
         let(:open_enrollment_end_on)    { open_enrollment_start_on + invalid_length }
 
@@ -141,7 +141,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and the open enrollment period is too long" do
-        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentMaximumPeriod + 1 }
+        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMaximum + 1 }
         let(:open_enrollment_start_on)  { Date.current }
         let(:open_enrollment_end_on)    { open_enrollment_start_on + invalid_length }
 
@@ -159,7 +159,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       context "and a plan year start and end is specified" do
         context "and the plan year start date isn't first day of month" do
           let(:start_on)  { Date.current.beginning_of_month + 1 }
-          let(:end_on)    { start_on + HbxProfile::ShopPlanYearMinimumPeriod }
+          let(:end_on)    { start_on + HbxProfile::ShopPlanYearPeriodMinimum }
 
           before do
             plan_year.start_on = start_on
@@ -188,7 +188,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year period is too short" do
-          let(:invalid_length)  { HbxProfile::ShopPlanYearMinimumPeriod - 1 }
+          let(:invalid_length)  { HbxProfile::ShopPlanYearPeriodMinimum - 1 }
           let(:start_on)  { Date.current.end_of_month + 1 }
           let(:end_on)    { start_on + invalid_length }
 
@@ -204,7 +204,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year period is too long" do
-          let(:invalid_length)  { HbxProfile::ShopPlanYearMaximumPeriod + 1 }
+          let(:invalid_length)  { HbxProfile::ShopPlanYearPeriodMaximum + 1 }
           let(:start_on)  { Date.current.end_of_month + 1 }
           let(:end_on)    { start_on + invalid_length }
 
@@ -220,8 +220,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year begins before open enrollment ends" do
-          let(:valid_open_enrollment_length)  { HbxProfile::ShopOpenEnrollmentMaximumPeriod }
-          let(:valid_plan_year_length)  { HbxProfile::ShopPlanYearMaximumPeriod + 1 }
+          let(:valid_open_enrollment_length)  { HbxProfile::ShopOpenEnrollmentPeriodMaximum }
+          let(:valid_plan_year_length)  { HbxProfile::ShopPlanYearPeriodMaximum + 1 }
           let(:open_enrollment_start_on)  { Date.current }
           let(:open_enrollment_end_on)    { open_enrollment_start_on + valid_open_enrollment_length }
           let(:start_on)  { open_enrollment_start_on - 1 }
