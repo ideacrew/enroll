@@ -72,8 +72,8 @@ class HbxProfile
   ShopPlanYearPublishBeforeEffectiveDateMaximum = 90
 
   ShopEmployerContributionPercentMinimum = 50
-  ShopEnrollmentParticipationMinimum = 2 / 3.0
-  ShopEnrollmentNonFamilyParticipationMinimum = 1
+  ShopEnrollmentParticipationRatioMinimum = 2 / 3.0
+  ShopEnrollmentNonOwnerParticipationMinimum = 1
 
   ShopBinderPaymentDueDayOfMonth = 15
   ShopOpenEnrollmentEndDueDayOfMonth = 10
