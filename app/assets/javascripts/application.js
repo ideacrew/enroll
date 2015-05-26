@@ -473,3 +473,7 @@ $(document).on('page:update', function() {
   });
   $('select').selectric();
 });
+
+$(document).on('click', ".interaction-click-control-add-plan-year", function() {
+  $(this).button('loading');
+});
