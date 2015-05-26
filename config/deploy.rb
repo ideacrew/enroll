@@ -46,7 +46,7 @@ namespace :deploy do
   desc 'Restart application'
     task :restart do
       on roles(:app), in: :sequence, wait: 20 do
-        sudo "service eye_rails restart"
+        sudo "service eye_rails reload"
       end
     end
 
