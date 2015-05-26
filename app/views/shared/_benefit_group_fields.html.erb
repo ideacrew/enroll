@@ -24,7 +24,7 @@
           <%= f.text_field :premium_pct_as_int, class: "floatlabel form-control", required: true, placeholder: 'PREMIUM PERCENTAGE (>=50)' %>
         </div>
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-          <%= f.text_field :employer_max_amt_in_cents, class: "floatlabel form-control", required: true, placeholder: 'EMPLOYER MAXIMUM CONTRIBUTION' %>
+          <%= f.text_field :employer_max_amt_in_cents, class: "floatlabel form-control", required: true, placeholder: 'EMPLOYER MAXIMUM CONTRIBUTION', value: f.object.premium_in_dollars %>
         </div>
       </div>
     </div>
