@@ -6,7 +6,9 @@ class BrokerAgencyProfile
   embedded_in :organization
 
   MARKET_KINDS = %W[individual shop both]
+  ENTITY_KINDS = ["c_corporation", "s_corporation", "partnership", "tax_exempt_organization"]
 
+  field :entity_kind, type: String
   field :market_kind, type: String
   field :primary_broker_role_id, type: BSON::ObjectId
 
@@ -22,10 +24,14 @@ class BrokerAgencyProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
-  validates_presence_of :market_kind, :primary_broker_role_id
+  validates_presence_of :market_kind, :primary_broker_role_id, :entity_kind
 
   validates :market_kind,
     inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid market kind" },
+    allow_blank: false
+
+  validates :entity_kind,
+    inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
     allow_blank: false
 
   validate :writing_agent_employed_by_broker
