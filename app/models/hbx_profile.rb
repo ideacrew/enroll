@@ -38,7 +38,7 @@ class HbxProfile
   ## SHOP Market HBX Policies
   # Employer Contribution Strategies
 
-  # New hires in initial group that start after enrollment, but prior to coverage effective date.  Don't 
+  # New hires in initial group that start after enrollment, but prior to coverage effective date.  Don't
   # transmit EDI prior to Employer coverage effective date
 
 
@@ -63,10 +63,10 @@ class HbxProfile
   ShopOpenEnrollmentPeriodMaximum = 2
 
   # Minumum length of time for SHOP Plan Year
-  ShopPlanYearPeriodMinimum = 365 #1.year
+  ShopPlanYearPeriodMinimum = 1.year - 1.day
 
   # Maximum length of time for SHOP Plan Year
-  ShopPlanYearPeriodMaximum = 365 #1.year
+  ShopPlanYearPeriodMaximum = 1.year - 1.day
 
   # Maximum number of months prior to coverage effective date to submit a Plan Year application
   ShopPlanYearPublishBeforeEffectiveDateMaximum = 3
@@ -123,7 +123,7 @@ class HbxProfile
   # EffectiveDate
 
   # CoverageEffectiveDate - no greater than 3 calendar months max
-  # ApplicationPublished latest date - 5th end_of_day  of preceding month 
+  # ApplicationPublished latest date - 5th end_of_day  of preceding month
 
   # OpenEnrollment earliest start - 2 calendar months preceding CoverageEffectiveDate
   # OpenEnrollment min length - 5 days

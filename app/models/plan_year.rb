@@ -63,7 +63,7 @@ class PlanYear
   end
 
   def register_employer
-    employer_profile.publish_plan_year 
+    employer_profile.publish_plan_year
   end
 
   def minimum_employer_contribution
@@ -128,9 +128,9 @@ class PlanYear
       transitions from: :draft, to: :publish_pending
     end
 
-    # Returns plan to draft state so that it can be edited 
+    # Returns plan to draft state so that it can be edited
     event :withdraw_pending do
-      transitions from: :publish_pending, to: :draft      
+      transitions from: :publish_pending, to: :draft
     end
 
     # Submit the plan with application warnings to HBX
@@ -184,11 +184,11 @@ private
      errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{HbxProfile::ShopOpenEnrollmentPeriodMaximum} months")
     end
 
-    if (end_on - start_on) < HbxProfile::ShopPlanYearPeriodMinimum
+    if start_on + HbxProfile::ShopPlanYearPeriodMinimum > end_on
      errors.add(:end_on, "plan year period is less than minumum: #{HbxProfile::ShopPlanYearPeriodMinimum} days")
     end
 
-    if (end_on - start_on) > HbxProfile::ShopPlanYearPeriodMaximum
+    if start_on + HbxProfile::ShopPlanYearPeriodMaximum < end_on
      errors.add(:end_on, "plan year period is greater than maximum: #{HbxProfile::ShopPlanYearPeriodMaximum} days")
     end
   end
