@@ -341,7 +341,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         plan_year.publish
       end
 
-      it "application should not be valid" do
+      it "and application should not be valid" do
         expect(plan_year.is_application_valid?).to be_falsey
       end
 
@@ -371,6 +371,42 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         it "and employer_profile should be in ineligible state" do
           expect(plan_year.employer_profile.ineligible?).to be_truthy
         end
+
+        pending "determination of notification form and channels"
+        it "and employer should be notified that applcation is ineligible" do
+        end
+
+        context "and 30 days or less has elapsed since applicaton was submitted" do
+          context "and the employer decides to appeal" do
+            it "should transition to ineligible-appealing state" do
+            end
+
+            pending "determination of notification form and channels"
+            it "should notify HBX representatives of appeal request" do
+            end
+
+              context "and HBX determines appeal has merit" do
+                it "should transition employer status to registered" do
+                end
+              end
+
+              context "and HBX determines appeal has no merit" do
+                it "should transition employer status to ineligible" do
+                end
+              end
+
+              context "and HBX determines application was submitted with errors" do
+                it "should transition plan year application to draft" do
+                end
+                it "and should transition employer status to applicant" do
+                end
+              end
+            end
+          end
+
+        context "and more than 30 days has elapsed since application was submitted" do
+          pending "should employer actually move into additional 60-day wait period?"
+        end
       end
     end
 
@@ -378,23 +414,19 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
 
       before do
-        benefit_group.premium_pct_as_int = valid_ee_contribution_pct
-        plan_year.fte_count = valid_fte_count
-        # plan_year.start_on = Date.current.beginning_of_year + 1.month
-        plan_year.publish
       end
 
       it "plan year should publish" do
-        expect(plan_year.published?).to be_truthy
+        # expect(plan_year.published?).to be_truthy
       end
 
       it "and employer_profile should be in registered state" do
-        expect(plan_year.employer_profile.registered?).to be_truthy
+        # expect(plan_year.employer_profile.registered?).to be_truthy
       end
 
       context "and it is published" do
         pending
-        it "changes to record should be blocked" do
+        context "and changes to plan year application should be blocked" do
         end
       end
     end
