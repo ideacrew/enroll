@@ -1,6 +1,14 @@
 module ViewFunctions
   class Family
-    def after_save_search_update
+    def self.run_after_save_search_update(family_id)
+      ::Family.collection.database.command({"eval" => "db.families.find(ObjectId(\"#{family_id.to_s}\")).forEach(function(doc) { db.loadServerScripts(); familySavedSearchUpdate(doc); })", "nolock" => true})
+    end
+
+    def self.install_queries
+      ::Family.collection.database["system.js"].where({"_id" => "familySavedSearchUpdate"}).upsert({:id => "familySavedSearchUpdate", :value => BSON::Code.new(after_save_search_update_function)})
+    end
+
+    def self.after_save_search_update_function
       # Name: familySavedSearchUpdate
       <<-MONGOJS
 function(familyDoc) {
@@ -32,6 +40,7 @@ function(familyDoc) {
           if (!((per.name_sfx == null) || (per.name_sfx == undefined))) {
               primaryPerson['name_sfx'] = per.name_sfx
           }
+          familyPeople.push(primaryPerson);
         } else {
             var personRecord = {
             person_id: per._id,
@@ -60,5 +69,6 @@ function(familyDoc) {
     {upsert: true});
 }
       MONGOJS
+    end
   end
 end
