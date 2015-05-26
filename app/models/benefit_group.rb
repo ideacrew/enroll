@@ -109,7 +109,7 @@ class BenefitGroup
   end
 
   def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
-    employer_max_amt_in_cents = dollars_to_cents(new_employer_max_amt_in_cents)
+    write_attribute(:employer_max_amt_in_cents, dollars_to_cents(new_employer_max_amt_in_cents))
   end
 
   def premium_in_dollars
