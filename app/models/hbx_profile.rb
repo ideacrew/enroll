@@ -59,8 +59,8 @@ class HbxProfile
   # Minimum number of days for SHOP open enrollment period
   ShopOpenEnrollmentPeriodMinimum = 5
 
-  # Maximum number of days for SHOP open enrollment period
-  ShopOpenEnrollmentPeriodMaximum = 60
+  # Maximum number of months for SHOP open enrollment period
+  ShopOpenEnrollmentPeriodMaximum = 2
 
   # Minumum length of time for SHOP Plan Year
   ShopPlanYearPeriodMinimum = 365 #1.year
@@ -68,8 +68,8 @@ class HbxProfile
   # Maximum length of time for SHOP Plan Year
   ShopPlanYearPeriodMaximum = 365 #1.year
 
-  # Maximum number of days prior to coverage effective date that a Plan Year may be defined 
-  ShopPlanYearPublishBeforeEffectiveDateMaximum = 90
+  # Maximum number of months prior to coverage effective date to submit a Plan Year application
+  ShopPlanYearPublishBeforeEffectiveDateMaximum = 3
 
   ShopEmployerContributionPercentMinimum = 50
   ShopEnrollmentParticipationRatioMinimum = 2 / 3.0
@@ -86,20 +86,22 @@ class HbxProfile
     prior_month = effective_date - 1.month
     plan_year_start_on = effective_date
     plan_year_end_on = effective_date + 1.year - 1.day
-    earliest_plan_year_application_submitted_on = effective_date - ShopOpenEnrollmentPeriodMaximum
-    latest_plan_year_application_submitted_on   = ("#{prior_month.year}-#{prior_month.month}-#{ShopPlanYearPublishedDueDayOfMonth}").to_date
-    earliest_open_enrollment_start_on     = effective_date - ShopOpenEnrollmentPeriodMaximum
+    initial_employer_application_earliest_start_on = (effective_date - ShopPlanYearPublishBeforeEffectiveDateMaximum.months)
+    initial_employer_application_earliest_submit_on = initial_employer_application_earliest_start_on
+    initial_employer_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{ShopPlanYearPublishedDueDayOfMonth}").to_date
+    earliest_open_enrollment_start_on     = effective_date - ShopOpenEnrollmentPeriodMaximum.months
     latest_open_enrollment_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
     latest_open_enrollment_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{ShopOpenEnrollmentEndDueDayOfMonth}").to_date
-    binder_payment_due_date               = prior_weekday ("#{prior_month.year}-#{prior_month.month}-#{ShopBinderPaymentDueDayOfMonth}").to_date
+    binder_payment_due_date               = first_banking_date_prior ("#{prior_month.year}-#{prior_month.month}-#{ShopBinderPaymentDueDayOfMonth}")
 
 
     timetable = {
       effective_date: effective_date,
       plan_year_start_on: plan_year_start_on,
       plan_year_end_on: plan_year_end_on,
-      earliest_plan_year_application_submitted_on: earliest_plan_year_application_submitted_on,
-      latest_plan_year_application_submitted_on: latest_plan_year_application_submitted_on,
+      initial_employer_application_earliest_start_on: initial_employer_application_earliest_start_on,
+      initial_employer_application_earliest_submit_on: initial_employer_application_earliest_submit_on,
+      initial_employer_application_latest_submit_on: initial_employer_application_latest_submit_on,
       earliest_open_enrollment_start_on: earliest_open_enrollment_start_on,
       latest_open_enrollment_start_on: latest_open_enrollment_start_on,
       latest_open_enrollment_end_on: latest_open_enrollment_end_on,
@@ -109,10 +111,11 @@ class HbxProfile
     timetable
   end
 
-  def self.prior_weekday(date_value)
-    byebug
-    date = date_value - 1 if date_value.saturday?
-    date = date_value - 2 if date_value.sunday?
+  ## TODO - add holidays
+  def self.first_banking_date_prior(date_value)
+    date = date_value.to_date
+    date = date - 1 if date.saturday?
+    date = date - 2 if date.sunday?
     date
   end
 
