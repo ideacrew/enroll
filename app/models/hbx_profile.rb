@@ -80,8 +80,40 @@ class HbxProfile
   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
 
-  def shop_schedule_report
+  def self.shop_enrollment_timetable(new_effective_date)
 
+    effective_date = new_effective_date.to_date.beginning_of_month
+    prior_month = effective_date - 1.month
+    plan_year_start_on = effective_date
+    plan_year_end_on = effective_date + 1.year - 1.day
+    earliest_plan_year_application_submitted_on = effective_date - ShopOpenEnrollmentPeriodMaximum
+    latest_plan_year_application_submitted_on   = ("#{prior_month.year}-#{prior_month.month}-#{ShopPlanYearPublishedDueDayOfMonth}").to_date
+    earliest_open_enrollment_start_on     = effective_date - ShopOpenEnrollmentPeriodMaximum
+    latest_open_enrollment_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
+    latest_open_enrollment_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{ShopOpenEnrollmentEndDueDayOfMonth}").to_date
+    binder_payment_due_date               = prior_weekday ("#{prior_month.year}-#{prior_month.month}-#{ShopBinderPaymentDueDayOfMonth}").to_date
+
+
+    timetable = {
+      effective_date: effective_date,
+      plan_year_start_on: plan_year_start_on,
+      plan_year_end_on: plan_year_end_on,
+      earliest_plan_year_application_submitted_on: earliest_plan_year_application_submitted_on,
+      latest_plan_year_application_submitted_on: latest_plan_year_application_submitted_on,
+      earliest_open_enrollment_start_on: earliest_open_enrollment_start_on,
+      latest_open_enrollment_start_on: latest_open_enrollment_start_on,
+      latest_open_enrollment_end_on: latest_open_enrollment_end_on,
+      binder_payment_due_date: binder_payment_due_date
+    }
+
+    timetable
+  end
+
+  def self.prior_weekday(date_value)
+    byebug
+    date = date_value - 1 if date_value.saturday?
+    date = date_value - 2 if date_value.sunday?
+    date
   end
 
   # ShopOpenEnrollmentStartMax
