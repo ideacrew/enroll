@@ -148,4 +148,9 @@ describe BenefitGroup, "instance methods" do
     invalid = FactoryGirl.build(:benefit_group, premium_pct_as_int: 40)
     expect(invalid.valid?).to be false
   end
+
+  it "write attribute by employer_max_amt_in_cents" do
+    benefit_group.employer_max_amt_in_cents = "100"
+    expect(benefit_group.premium_in_dollars).to be 100.to_f
+  end
 end
