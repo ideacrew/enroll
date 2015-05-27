@@ -5,5 +5,6 @@ FactoryGirl.define do
     end_on { start_on + 1.year - 1 }
     open_enrollment_start_on { (start_on - 30).beginning_of_month }
     open_enrollment_end_on { open_enrollment_start_on + 2.weeks }
+    fte_count { 5 }
   end
 end
