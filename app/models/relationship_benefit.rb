@@ -8,7 +8,7 @@ class RelationshipBenefit
   field :employer_max_amt, type: Money
   field :offered, type: Boolean
 
-  validates :relationship, uniqueness: true
+#  validates :relationship, uniqueness: true
 
   # Indicates whether employer offers coverage for this relationship
   def offered?
