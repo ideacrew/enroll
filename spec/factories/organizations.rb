@@ -4,6 +4,7 @@ FactoryGirl.define do
     dba         "Turner Brokers"
     sequence(:fein, 111111111)
     home_page   "http://www.example.com"
-    office_locations  { FactoryGirl.build_list(:office_location, 3) }
+    office_locations  { [FactoryGirl.build(:office_location),
+                         FactoryGirl.build(:office_location, is_primary: false)] }
   end
 end
