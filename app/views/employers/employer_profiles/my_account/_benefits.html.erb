@@ -3,7 +3,8 @@
     <div class="row">
         <div class="col-md-10 col-sm-12 col-xs-12 col-gn-top">
 
-  <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile), class: "btn btn-primary" %>
+  <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile), class: "btn btn-primary", data: {loading_text: "Loading..."} %>
+
   <br><br>
   <% if @current_plan_year.present? %>
     <div class="title-dropdown">

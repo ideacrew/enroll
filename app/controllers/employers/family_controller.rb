@@ -13,15 +13,21 @@ class Employers::FamilyController < ApplicationController
     @family = EmployerCensus::EmployeeFamily.new
     @family.attributes = census_family_params
 
-    benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
-    new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new_from_group_and_roster_family(benefit_group, @family)
-    @family.benefit_group_assignments = new_benefit_group_assignment.to_a
+    if benefit_group_id.present?
+      benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
+      new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new_from_group_and_roster_family(benefit_group, @family)
+      @family.benefit_group_assignments = new_benefit_group_assignment.to_a
 
-    @employer_profile.employee_families << @family
-    if @employer_profile.save
-      flash[:notice] = "Employer Census Family is successfully created."
-      redirect_to employers_employer_profile_path(@employer_profile)
+      @employer_profile.employee_families << @family
+      if @employer_profile.save
+        flash[:notice] = "Employer Census Family is successfully created."
+        redirect_to employers_employer_profile_path(@employer_profile)
+      else
+        render action: "new"
+      end
     else
+      @family.benefit_group_assignments.build if @family.benefit_group_assignments.blank?
+      flash[:error] = "Please select Benefit Group."
       render action: "new"
     end
   end
@@ -32,16 +38,21 @@ class Employers::FamilyController < ApplicationController
   end
 
   def update
-    benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
-    new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new_from_group_and_roster_family(benefit_group, @family)
-    if @family.active_benefit_group_assignment.try(:benefit_group_id) != new_benefit_group_assignment.benefit_group_id
-      @family.add_benefit_group_assignment(new_benefit_group_assignment)
-    end
+    if benefit_group_id.present?
+      benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
+      new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new_from_group_and_roster_family(benefit_group, @family)
+      if @family.active_benefit_group_assignment.try(:benefit_group_id) != new_benefit_group_assignment.benefit_group_id
+        @family.add_benefit_group_assignment(new_benefit_group_assignment)
+      end
 
-    if @family.update_attributes(census_family_params)
-      flash[:notice] = "Employer Census Family is successfully updated."
-      redirect_to employers_employer_profile_path(@employer_profile)
+      if @family.update_attributes(census_family_params)
+        flash[:notice] = "Employer Census Family is successfully updated."
+        redirect_to employers_employer_profile_path(@employer_profile)
+      else
+        render action: "edit"
+      end
     else
+      flash[:error] = "Please select Benefit Group."
       render action: "edit"
     end
   end

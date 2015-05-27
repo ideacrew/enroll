@@ -8,7 +8,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   let(:employer_profile)                { FactoryGirl.create(:employer_profile) }
   let(:valid_plan_year_start_on)        { Date.current.end_of_month + 1 }
-  let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 12.months - 1 }
+  let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
   let(:valid_open_enrollment_start_on)  { Date.current.beginning_of_month }
   let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 14 }
   let(:valid_fte_count)                 { 5 }
@@ -95,16 +95,6 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 
-# At least one non-owner must enroll
-# must owner attest?
-# publish benefit_group
-# 
-# need to limit setup to quarterly rate information
-# grace period?
-# open enrollment end, grace period, etc... get from Jack
-# grace period to 
-
-
   context "a new plan year is initialized" do
     let(:plan_year) { PlanYear.new(**valid_params) }
 
@@ -125,7 +115,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and the open enrollment period is too short" do
-        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentMinimumPeriod - 1 }
+        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1 }
         let(:open_enrollment_start_on)  { Date.current }
         let(:open_enrollment_end_on)    { open_enrollment_start_on + invalid_length }
 
@@ -141,7 +131,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and the open enrollment period is too long" do
-        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentMaximumPeriod + 1 }
+        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMaximum + 1 }
         let(:open_enrollment_start_on)  { Date.current }
         let(:open_enrollment_end_on)    { open_enrollment_start_on + invalid_length }
 
@@ -159,7 +149,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       context "and a plan year start and end is specified" do
         context "and the plan year start date isn't first day of month" do
           let(:start_on)  { Date.current.beginning_of_month + 1 }
-          let(:end_on)    { start_on + HbxProfile::ShopPlanYearMinimumPeriod }
+          let(:end_on)    { start_on + HbxProfile::ShopPlanYearPeriodMinimum }
 
           before do
             plan_year.start_on = start_on
@@ -188,7 +178,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year period is too short" do
-          let(:invalid_length)  { HbxProfile::ShopPlanYearMinimumPeriod - 1 }
+          let(:invalid_length)  { HbxProfile::ShopPlanYearPeriodMinimum - 1.day }
           let(:start_on)  { Date.current.end_of_month + 1 }
           let(:end_on)    { start_on + invalid_length }
 
@@ -204,7 +194,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year period is too long" do
-          let(:invalid_length)  { HbxProfile::ShopPlanYearMaximumPeriod + 1 }
+          let(:invalid_length)  { HbxProfile::ShopPlanYearPeriodMaximum + 1.day }
           let(:start_on)  { Date.current.end_of_month + 1 }
           let(:end_on)    { start_on + invalid_length }
 
@@ -220,8 +210,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year begins before open enrollment ends" do
-          let(:valid_open_enrollment_length)  { HbxProfile::ShopOpenEnrollmentMaximumPeriod }
-          let(:valid_plan_year_length)  { HbxProfile::ShopPlanYearMaximumPeriod + 1 }
+          let(:valid_open_enrollment_length)  { HbxProfile::ShopOpenEnrollmentPeriodMaximum }
+          let(:valid_plan_year_length)  { HbxProfile::ShopPlanYearPeriodMaximum }
           let(:open_enrollment_start_on)  { Date.current }
           let(:open_enrollment_end_on)    { open_enrollment_start_on + valid_open_enrollment_length }
           let(:start_on)  { open_enrollment_start_on - 1 }
@@ -240,19 +230,206 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
   end
-end
 
-describe PlanYear do
-  context "when built" do
-    context "with valid parameters" do
-      it "has number of enrolled employees" do
+  context "application is submitted to be published" do
+    let(:plan_year)                   { PlanYear.new(**valid_params) }
+    let(:valid_fte_count)             { HbxProfile::ShopSmallMarketFteCountMaximum }
+    let(:invalid_fte_count)           { HbxProfile::ShopSmallMarketFteCountMaximum + 1 }
+    let(:valid_ee_contribution_pct)   { HbxProfile::ShopEmployerContributionPercentMinimum }
+    let(:invalid_ee_contribution_pct) { HbxProfile::ShopEmployerContributionPercentMinimum - 1 }
+
+    it "plan year should be in draft state" do
+      expect(plan_year.draft?).to be_truthy
+    end
+
+    context "and employer's primary office isn't located in-state" do
+      before do
+        plan_year.employer_profile.organization.primary_office_location.address.state = "AK"
       end
 
-      it "has number of employees who waived coverage" do
+      it "application should not be valid" do
+        expect(plan_year.is_application_valid?).to be_falsey
       end
 
-      it "has ratio of participation (enrolled + waived / total employees)" do
+      it "and should provide relevent warning message" do
+        expect(plan_year.application_warnings[:primary_office_location].present?).to be_truthy
+        expect(plan_year.application_warnings[:primary_office_location]).to match(/primary office must be located/)
+      end
+    end
+
+    context "and benefit group is missing" do
+      it "application should not be valid" do
+        expect(plan_year.is_application_valid?).to be_falsey
+      end
+
+      it "and should provide relevent warning message" do
+        expect(plan_year.application_warnings[:benefit_groups].present?).to be_truthy
+        expect(plan_year.application_warnings[:benefit_groups]).to match(/at least one benefit group/)
+      end
+    end
+
+    context "and the employer size exceeds regulatory max" do
+      before do
+        plan_year.fte_count = invalid_fte_count
+        plan_year.publish
+      end
+
+      it "application should not be valid" do
+        expect(plan_year.is_application_valid?).to be_falsey
+      end
+
+      it "and should provide relevent warning message" do
+        expect(plan_year.application_warnings[:fte_count].present?).to be_truthy
+        expect(plan_year.application_warnings[:fte_count]).to match(/number of full time equivalents/)
+      end
+
+      it "and plan year should be in publish pending state" do
+        expect(plan_year.publish_pending?).to be_truthy
+      end
+    end
+
+    context "and the employer contribution amount is below minimum" do
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+
+      before do
+        benefit_group.premium_pct_as_int = HbxProfile::ShopEmployerContributionPercentMinimum - 1
+      end
+
+      context "and the effective date isn't January 1" do
+        before do
+          plan_year.start_on = Date.current.beginning_of_year + 1.month
+          plan_year.publish
+        end
+
+        it "application should not be valid" do
+          expect(plan_year.is_application_valid?).to be_falsey
+        end
+
+        it "and should provide relevent warning message" do
+          expect(plan_year.application_warnings[:minimum_employer_contribution].present?).to be_truthy
+          expect(plan_year.application_warnings[:minimum_employer_contribution]).to match(/employer contribution percent/)
+        end
+
+        it "and plan year should be in publish pending state" do
+          expect(plan_year.publish_pending?).to be_truthy
+        end
+      end
+
+      context "and the effective date is January 1" do
+        before do
+          plan_year.start_on = Date.current.beginning_of_year
+          plan_year.publish
+        end
+
+        it "application should be valid" do
+          expect(plan_year.is_application_valid?).to be_truthy
+        end
+
+        it "and plan year should be in published state" do
+          expect(plan_year.published?).to be_truthy
+        end
+      end
+    end
+
+    context "and one or more application elements are invalid" do
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+
+      before do
+        benefit_group.premium_pct_as_int = invalid_ee_contribution_pct
+        plan_year.fte_count = invalid_fte_count
+        plan_year.start_on = Date.current.beginning_of_year + 1.month
+        plan_year.publish
+      end
+
+      it "and application should not be valid" do
+        expect(plan_year.is_application_valid?).to be_falsey
+      end
+
+      it "and plan year should be in publish pending state" do
+        expect(plan_year.publish_pending?).to be_truthy
+      end
+
+      context "and application is withdrawn for correction" do
+        before do
+          plan_year.withdraw_pending
+        end
+
+        it "plan year should be in draft state" do
+          expect(plan_year.draft?).to be_truthy
+        end
+      end
+
+      context "and application is submitted with warnings" do
+        before do
+          plan_year.force_publish
+        end
+
+        it "plan year should be in published state" do
+          expect(plan_year.published?).to be_truthy
+        end
+
+        it "and employer_profile should be in ineligible state" do
+          expect(plan_year.employer_profile.ineligible?).to be_truthy
+        end
+
+        pending "determination of notification form and channels"
+        it "and employer should be notified that applcation is ineligible" do
+        end
+
+        context "and 30 days or less has elapsed since applicaton was submitted" do
+          context "and the employer decides to appeal" do
+            it "should transition to ineligible-appealing state" do
+            end
+
+            pending "determination of notification form and channels"
+            it "should notify HBX representatives of appeal request" do
+            end
+
+              context "and HBX determines appeal has merit" do
+                it "should transition employer status to registered" do
+                end
+              end
+
+              context "and HBX determines appeal has no merit" do
+                it "should transition employer status to ineligible" do
+                end
+              end
+
+              context "and HBX determines application was submitted with errors" do
+                it "should transition plan year application to draft" do
+                end
+                it "and should transition employer status to applicant" do
+                end
+              end
+            end
+          end
+
+        context "and more than 30 days has elapsed since application was submitted" do
+          pending "should employer actually move into additional 60-day wait period?"
+        end
+      end
+    end
+
+    context "and all application elements are valid" do
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+
+      before do
+      end
+
+      it "plan year should publish" do
+        # expect(plan_year.published?).to be_truthy
+      end
+
+      it "and employer_profile should be in registered state" do
+        # expect(plan_year.employer_profile.registered?).to be_truthy
+      end
+
+      context "and it is published" do
+        pending
+        context "and changes to plan year application should be blocked" do
+        end
       end
     end
   end
+
 end

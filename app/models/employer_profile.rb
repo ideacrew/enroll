@@ -29,6 +29,10 @@ class EmployerProfile
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
   embeds_many :premium_statements
+  embeds_one :inbox, as: :recipient
+
+  has_one :census_roster
+  accepts_nested_attributes_for :census_roster
 
   embeds_many :employee_families,
     class_name: "EmployerCensus::EmployeeFamily",
@@ -47,12 +51,30 @@ class EmployerProfile
 
   validate :writing_agent_employed_by_broker
 
+  after_initialize :build_nested_models
+  before_save :is_persistable?
+  after_save :save_associated_nested_models
+
   scope :active, ->{ where(:is_active => true) }
 
   def parent
     raise "undefined parent Organization" unless organization?
     return @organization if defined? @organization
     @organization = self.organization
+  end
+
+  def cycle_daily_events
+    # advance premium_statements billing period for pending_binder_payment
+  end
+
+  def cycle_monthly_events
+    # expire_plan_years
+    # premimum_statements.advance_billing_period
+  end
+
+  def census_roster
+    return @census_roster if defined? @census_roster
+    @census_roster = CensusRoster.find_by_employer_profile(self)
   end
 
   def employee_roles
@@ -62,7 +84,30 @@ class EmployerProfile
 
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
   def roster_size
-    employee_families.size
+    return @roster_size if defined? @roster_size
+    @roster_size = employee_families.size
+  end
+
+  def active_plan_year
+    @active_plan_year if defined? @active_plan_year
+    plan_year = find_plan_year_by_date(Date.current)
+    @active_plan_year = plan_year if (plan_year.present? && plan_year.published?)
+  end
+
+  def plan_year_drafts
+    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
+  end
+
+  # Change plan years for a period - published -> retired and 
+  def close_plan_year
+  end
+
+  def latest_plan_year
+    plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
+  end
+
+  def find_plan_year_by_date(target_date)
+    plan_years.to_a.detect { |py| (py.start_date.beginning_of_day..py.end_date.end_of_day).cover?(target_date) }
   end
 
   def latest_premium_statement
@@ -100,18 +145,6 @@ class EmployerProfile
     @employee_families_sorted = employee_families.unscoped.order_by_last_name.order_by_first_name
   end
 
-  def latest_plan_year
-    plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
-  end
-
-  def find_plan_year_by_date(coverage_date)
-    # The #to_a is a caching thing.
-    plan_years.to_a.detect do |py|
-      (py.start_date <= coverage_date) &&
-      (py.end_date   >= coverage_date)
-    end
-  end
-
   # Enrollable employees are active and unlinked
   def linkable_employee_family_by_person(person)
     return if employee_families.nil?
@@ -121,10 +154,6 @@ class EmployerProfile
 
   def is_active?
     self.is_active
-  end
-
-  def find_employee_by_person(person)
-    return self.employee_families.select{|emf| emf.census_employee.ssn == person.ssn}.first.census_employee
   end
 
   ## Class methods
@@ -206,8 +235,8 @@ class EmployerProfile
   aasm do
     state :applicant, initial: true 
     state :ineligible               # Unable to enroll business per SHOP market regulations or business isn't DC-based
-    state :ineligible_appealing
-    state :registered               # Business information complete, before initial open enrollment period
+    state :ineligible_appealing     # Plan year application submitted with 
+    state :registered               # Business information complete submitted, before initial open enrollment period
     state :enrolling                # Employees registering and plan shopping
     state :enrolled_renewal_ready   # Annual renewal date is 90 days or less
     state :enrolled_renewing        # 
@@ -218,13 +247,20 @@ class EmployerProfile
     state :suspended       # 
     state :terminated               # Premium payment > 90 days past due (day 91) or voluntarily terminate
 
+    # Enrollment deadline has passed for first of following month 
+    event :advance_enrollment_period do
+      transitions from: :applicant, to: :canceled, :guard => :next_month_effective_date?
+    end
+
     event :reapply do
       transitions from: :canceled, to: :applicant
       transitions from: :terminated, to: :applicant
     end
 
-    event :publish_plan_year, :guards => [:plan_year_publishable?] do 
-      transitions from: :applicant, to: :registered
+    event :publish_plan_year do 
+      # Jump straight to enrolling state if plan year application is valid and today is start of open enrollment
+      transitions from: :applicant, to: :enrolling, :guards => [:plan_year_publishable?, :event_date_valid?]
+      transitions from: :applicant, to: :registered, :guard => :plan_year_publishable?
       transitions from: :applicant, to: :ineligible
     end
 
@@ -249,13 +285,14 @@ class EmployerProfile
 
     event :end_open_enrollment, :guards => [:event_date_valid?] do
       transitions from: :enrolling, to: :binder_pending, 
-        :guard => :enrollment_participation_met?,
+        :guard => :enrollment_compliant?,
         :after => :build_premium_statement
 
       transitions from: :enrolling, to: :canceled
     end
 
     event :cancel_coverage do
+      transitions from: :applicant, to: :canceled
       transitions from: :registered, to: :canceled
       transitions from: :enrolling, to: :canceled
       transitions from: :binder_pending, to: :canceled
@@ -303,12 +340,40 @@ class EmployerProfile
   end
 
 private
+  def build_nested_models
+    @census_roster = CensusRoster.new
+    @census_roster.employer_profile = self
+    build_inbox
+  end
+
+  def save_associated_nested_models
+    @census_roster.save
+  end
+
+  def save_inbox
+    welcome_subject = "Welcome to DC HealthLink"
+    welcome_body = "DC HealthLink is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    @inbox.save
+    @inbox.messages.create(subject: welcome_subject, body: welcome_body)
+  end
+
+  def next_month_effective_date?
+    latest_plan_year.effective_date.beginning_of_day == (Date.current.end_of_month + 1).beginning_of_day
+  end
+
   def plan_year_publishable?
-    latest_plan_year.valid?
+    latest_plan_year.is_application_valid?
+  end
+
+  # TODO add all enrollment rules
+  def enrollment_compliant?
+    latest_plan_year.fte_count <= HbxProfile::ShopSmallMarketMaximumFteCount
   end
 
   def event_date_valid?
     is_valid = case aasm.current_event
+      when :publish_plan_year
+        Date.current.beginning_of_day == latest_plan_year.open_enrollment_start_on.beginning_of_day
       when :begin_open_enrollment
         Date.current.beginning_of_day >= latest_plan_year.open_enrollment_start_on.beginning_of_day
       when :end_open_enrollment
@@ -323,12 +388,6 @@ private
     self.premium_statements.build(effective_on: Date.current)
   end
 
-  # TODO add all enrollment rules
-  def enrollment_participation_met?
-    latest_plan_year.fte_count <= HbxProfile::ShopSmallMarketMaximumFteCount
-  end
-
-
   def writing_agent_employed_by_broker
     if writing_agent.present? && broker_agency.present?
       unless broker_agency.writing_agents.detect(writing_agent)
@@ -337,5 +396,9 @@ private
     end
   end
 
+  # Block changes unless record is in draft state
+  def is_persistable?
+    # aasm_state == :draft ? true : false
+  end
 
 end
