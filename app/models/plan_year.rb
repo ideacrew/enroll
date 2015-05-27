@@ -152,6 +152,10 @@ class PlanYear
 
 private
 
+  def duration_in_days(duration)
+    (duration / 1.day).to_i
+  end
+
   def open_enrollment_date_checks
     return if start_on.blank? || end_on.blank? || open_enrollment_start_on.blank? || open_enrollment_end_on.blank?
     if start_on.day != 1
@@ -184,12 +188,12 @@ private
      errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{HbxProfile::ShopOpenEnrollmentPeriodMaximum} months")
     end
 
-    if start_on + HbxProfile::ShopPlanYearPeriodMinimum > end_on
-     errors.add(:end_on, "plan year period is less than minumum: #{HbxProfile::ShopPlanYearPeriodMinimum} days")
+    if start_on + HbxProfile::ShopPlanYearPeriodMinimum < end_on
+     errors.add(:end_on, "plan year period is less than minumum: #{duration_in_days(HbxProfile::ShopPlanYearPeriodMinimum)} days")
     end
 
-    if start_on + HbxProfile::ShopPlanYearPeriodMaximum < end_on
-     errors.add(:end_on, "plan year period is greater than maximum: #{HbxProfile::ShopPlanYearPeriodMaximum} days")
+    if start_on + HbxProfile::ShopPlanYearPeriodMaximum > end_on
+     errors.add(:end_on, "plan year period is greater than maximum: #{duration_in_days(HbxProfile::ShopPlanYearPeriodMaximum)} days")
     end
   end
 
