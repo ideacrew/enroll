@@ -47,7 +47,7 @@ class PlanYear
     write_attribute(:open_enrollment_start_on, new_date.to_date.beginning_of_day)
   end
 
-  def open_enrollment_end_on=(new_date) 
+  def open_enrollment_end_on=(new_date)
     write_attribute(:open_enrollment_end_on, new_date.to_date.end_of_day)
   end
 
@@ -79,7 +79,7 @@ class PlanYear
   end
 
   def register_employer
-    employer_profile.publish_plan_year 
+    employer_profile.publish_plan_year
   end
 
   def minimum_employer_contribution
@@ -194,7 +194,7 @@ class PlanYear
 
     # Returns plan to draft state for edit
     event :withdraw_pending do
-      transitions from: :publish_pending, to: :draft      
+      transitions from: :publish_pending, to: :draft
     end
 
     # Plan with application warnings submitted to HBX
@@ -208,7 +208,7 @@ class PlanYear
       transitions from: :active, to: :retired
     end
 
-    # 
+    #
     event :revert do
       transitions from: :published, to: :draft
     end
@@ -219,7 +219,11 @@ class PlanYear
 private
 
   def is_new_plan_year?
-    
+
+  end
+
+  def duration_in_days(duration)
+    (duration / 1.day).to_i
   end
 
   def open_enrollment_date_checks
@@ -255,11 +259,11 @@ private
     end
 
     if start_on + HbxProfile::ShopPlanYearPeriodMinimum < end_on
-     errors.add(:end_on, "plan year period is less than minumum: #{HbxProfile::ShopPlanYearPeriodMinimum} days")
-    end
+      errors.add(:end_on, "plan year period is less than minumum: #{duration_in_days(HbxProfile::ShopPlanYearPeriodMinimum)} days")
+     end
 
     if start_on + HbxProfile::ShopPlanYearPeriodMaximum > end_on
-     errors.add(:end_on, "plan year period is greater than maximum: #{HbxProfile::ShopPlanYearPeriodMaximum} days")
+      errors.add(:end_on, "plan year period is greater than maximum: #{duration_in_days(HbxProfile::ShopPlanYearPeriodMaximum)} days")
     end
 
     if (start_on - Date.current) > HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum
