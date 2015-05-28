@@ -73,6 +73,36 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
 
+    context "with benefit_group" do
+      before(:each) do
+        @plan_year = FactoryGirl.build(:plan_year)
+        @benefit_group = FactoryGirl.build(:benefit_group)
+      end
+
+      it "should fail validation with more than 1 employee relationship benefit" do
+        @benefit_group.relationship_benefits << FactoryGirl.build(:relationship_benefit, relationship: :employee)
+        @benefit_group.relationship_benefits << FactoryGirl.build(:relationship_benefit, relationship: :employee)
+        @plan_year.benefit_groups << @benefit_group
+        expect(@plan_year.save).to eq false
+        expect(@plan_year.errors[:benefit_group].any?).to be_truthy
+      end
+
+      it "should fail validation with more than 1 spouse relationship benefit" do
+        @benefit_group.relationship_benefits << FactoryGirl.build(:relationship_benefit, relationship: :spouse)
+        @benefit_group.relationship_benefits << FactoryGirl.build(:relationship_benefit, relationship: :spouse)
+        @plan_year.benefit_groups << @benefit_group
+        expect(@plan_year.save).to eq false
+        expect(@plan_year.errors[:benefit_group].any?).to be_truthy
+      end
+
+      it "should valid with different kind of relationship benefits" do
+        @benefit_group.relationship_benefits << FactoryGirl.build(:relationship_benefit, relationship: :child_under_26)
+        @benefit_group.relationship_benefits << FactoryGirl.build(:relationship_benefit, relationship: :child_under_26)
+        @plan_year.benefit_groups << @benefit_group
+        expect(@plan_year.save).to eq true
+      end
+    end
+
     context "with all valid arguments" do
       let(:params) { valid_params }
       let(:plan_year) { PlanYear.new(**params) }

@@ -30,6 +30,7 @@ class PlanYear
   validates_presence_of :start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on
 
   validate :open_enrollment_date_checks
+  validate :relationship_benefits_checks
 
   def parent
     raise "undefined parent employer_profile" unless employer_profile?
@@ -197,4 +198,15 @@ private
     end
   end
 
+  def relationship_benefits_checks
+    return if benefit_groups.blank?
+    benefit_groups.each do |benefit_group|
+      relationships = benefit_group.relationship_benefits.map(&:relationship)
+      if relationships.count("employee") > 1
+        errors.add(:benefit_group, "#{benefit_group.title} should not has more than 1 employee relationship benefit")
+      elsif relationships.count("spouse") > 1
+        errors.add(:benefit_group, "#{benefit_group.title} should not has more than 1 spouse relationship benefit")
+      end
+    end
+  end
 end
