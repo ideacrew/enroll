@@ -169,6 +169,10 @@ class Person
     EmployerProfile.find(employer_contact_id) if employer_contact_id.present?
   end
 
+  def get_broker_profile_contact
+    BrokerAgencyProfile.find(broker_agency_contact_id) if broker_agency_contact_id.present?
+  end
+
   def families
     Family.find_all_by_person(self)
   end
