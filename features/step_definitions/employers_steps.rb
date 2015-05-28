@@ -232,7 +232,6 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][ssn]").set("786120965")
   @browser.radio(id: "employer_census_employee_family_census_employee_attributes_gender_male").set
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][hired_on]").set("10/10/2014")
-  binding.pry
   input_field = @browser.divs(class: /selectric-wrapper/).last
   input_field.click
   input_field.li(text: /Silver PPO Group/).click
@@ -374,7 +373,6 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.a(class: /add_fields/).click
   @browser.fieldsets.last.p(class: /label/, text: /Employee/).click
   @browser.fieldsets.last.li(text:/Child under 26/).click
-  binding.pry
   @browser.text_fields(name: "plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+premium_pct").last.set("15")
   @browser.text_fields(name: "plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+employer_max_amt").last.set("51")
   @browser.text_fields(name: "plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+offered").last.set("true")
