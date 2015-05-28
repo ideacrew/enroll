@@ -26,6 +26,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
       {
         organization: organization,
         market_kind: market_kind,
+        entity_kind: "s_corporation",
         primary_broker_role_id: primary_broker_role_id
       }
     end
