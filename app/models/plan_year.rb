@@ -19,7 +19,7 @@ class PlanYear
   # Number of part-time employess
   field :pte_count, type: Integer, default: 0
 
-  # Number of Medicare second payers
+  # Number of Medicare Second Payers
   field :msp_count, type: Integer, default: 0
 
   field :aasm_state, type: String
@@ -42,9 +42,24 @@ class PlanYear
     @employee_families = parent.employee_families.where(:plan_year_id => self.id)
   end
 
-  def effective_date
-    start_on.beginning_of_day
+  def open_enrollment_start_on=(new_date)
+    write_attribute(:open_enrollment_start_on, new_date.to_date.beginning_of_day)
   end
+
+  def open_enrollment_end_on=(new_date) 
+    write_attribute(:open_enrollment_end_on, new_date.to_date.end_of_day)
+  end
+
+  def start_on=(new_date)
+    write_attribute(:start_on, new_date.to_date.beginning_of_month.beginning_of_day)
+  end
+
+  def end_on=(new_date)
+    write_attribute(:end_on, new_date.to_date.end_of_day)
+  end
+
+  alias_method :effective_date=, :start_on=
+  alias_method :effective_date, :start_on
 
   def employee_participation_percent
   end
@@ -107,6 +122,44 @@ class PlanYear
       organizations = Organization.where("employer_profile.plan_years._id" => BSON::ObjectId.from_string(id))
       organizations.size > 0 ? organizations.first.employer_profile.plan_years.unscoped.detect { |py| py._id.to_s == id.to_s} : nil
     end
+
+    def shop_enrollment_timetable(new_effective_date)
+      effective_date = new_effective_date.to_date.beginning_of_month
+      prior_month = effective_date - 1.month
+      plan_year_start_on = effective_date
+      plan_year_end_on = effective_date + 1.year - 1.day
+      employer_initial_application_earliest_start_on = (effective_date - HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum.months)
+      employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
+      employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
+      open_enrollment_earliest_start_on     = effective_date - HbxProfile::ShopOpenEnrollmentPeriodMaximum.months
+      open_enrollment_latest_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
+      open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth}").to_date
+      binder_payment_due_date               = first_banking_date_prior ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopBinderPaymentDueDayOfMonth}")
+
+
+      timetable = {
+        effective_date: effective_date,
+        plan_year_start_on: plan_year_start_on,
+        plan_year_end_on: plan_year_end_on,
+        employer_initial_application_earliest_start_on: employer_initial_application_earliest_start_on,
+        employer_initial_application_earliest_submit_on: employer_initial_application_earliest_submit_on,
+        employer_initial_application_latest_submit_on: employer_initial_application_latest_submit_on,
+        open_enrollment_earliest_start_on: open_enrollment_earliest_start_on,
+        open_enrollment_latest_start_on: open_enrollment_latest_start_on,
+        open_enrollment_latest_end_on: open_enrollment_latest_end_on,
+        binder_payment_due_date: binder_payment_due_date
+      }
+
+      timetable
+    end
+
+    ## TODO - add holidays
+    def first_banking_date_prior(date_value)
+      date = date_value.to_date
+      date = date - 1 if date.saturday?
+      date = date - 2 if date.sunday?
+      date
+    end
   end
 
   aasm do
@@ -117,32 +170,44 @@ class PlanYear
 
     state :published,   :after_enter => :register_employer
 
+    # Published plan year is in force
+    state :active
+
     # Published plans are retired following their end on date
     state :retired
 
     # Non-published plans are expired following their end on date
     state :expired
 
+    event :advance_plan_year do
+      transitions from: :draft, to: :expired
+      transitions from: :active, to: :retired
+      transitions from: :published, to: :active
+    end
+
+    # Submit application
     event :publish do
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
     end
 
-    # Returns plan to draft state so that it can be edited 
+    # Returns plan to draft state for edit
     event :withdraw_pending do
       transitions from: :publish_pending, to: :draft      
     end
 
-    # Submit the plan with application warnings to HBX
+    # Plan with application warnings submitted to HBX
     event :force_publish do
       transitions from: :publish_pending, to: :published
     end
 
+    # Permanently disable this plan year
     event :deactivate do
       transitions from: :draft, to: :expired
-      transitions from: :published, to: :retired
+      transitions from: :active, to: :retired
     end
 
+    # 
     event :revert do
       transitions from: :published, to: :draft
     end
@@ -180,8 +245,8 @@ private
      errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{HbxProfile::ShopOpenEnrollmentPeriodMinimum} days")
     end
 
-    if (open_enrollment_end_on - open_enrollment_start_on) > HbxProfile::ShopOpenEnrollmentPeriodMaximum.months
-     errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{HbxProfile::ShopOpenEnrollmentPeriodMaximum} months")
+    if (open_enrollment_end_on - open_enrollment_start_on) > HbxProfile::HbxProfile::ShopOpenEnrollmentPeriodMaximum.months
+     errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{HbxProfile::HbxProfile::ShopOpenEnrollmentPeriodMaximum} months")
     end
 
     if (end_on - start_on) < HbxProfile::ShopPlanYearPeriodMinimum
@@ -191,6 +256,17 @@ private
     if (end_on - start_on) > HbxProfile::ShopPlanYearPeriodMaximum
      errors.add(:end_on, "plan year period is greater than maximum: #{HbxProfile::ShopPlanYearPeriodMaximum} days")
     end
+
+    if (start_on - Date.current) > HbxProfile::HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum
+     errors.add(:start_on, "applications may not be started more than #{HbxProfile::HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum.months} months before effective date")
+    end
+
+    if ((start_on - 1.day).beginning_of_month + HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth) >= HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth
+     errors.add(:open_enrollment_end_on, "open enrollment must end on or before #{HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth} day of month before effective date")
+    end
+
+
+
   end
 
 end

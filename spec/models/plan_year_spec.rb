@@ -227,6 +227,49 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             expect(plan_year.errors[:start_on].any?).to be_truthy
           end
         end
+
+        context "and the effective date is too far in the future" do
+          let(:invalid_initial_application_date)  { Date.current + HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum.months + 1.month }
+          let(:schedule)  { PlanYear.shop_enrollment_timetable(invalid_initial_application_date) }
+          let(:start_on)  { schedule[:plan_year_start_on] }
+          let(:end_on)    { schedule[:plan_year_end_on] }
+          let(:open_enrollment_start_on) { schedule[:open_enrollment_earliest_start_on] }
+          let(:open_enrollment_end_on)   { schedule[:open_enrollment_latest_end_on] }
+
+          before do
+            plan_year.start_on = start_on
+            plan_year.end_on = end_on
+            plan_year.open_enrollment_start_on = open_enrollment_start_on
+            plan_year.open_enrollment_end_on = open_enrollment_end_on
+          end
+
+          it "should fail validation" do
+            expect(plan_year.valid?).to be_falsey
+            expect(plan_year.errors[:start_on].any?).to be_truthy
+            expect(plan_year.errors[:start_on].first).to match(/applications may not be started more than/)
+          end
+        end
+
+        context "and the end of open enrollment is past deadline for effective date" do
+          let(:schedule)  { PlanYear.shop_enrollment_timetable(Date.current) }
+          let(:start_on)  { schedule[:plan_year_start_on] }
+          let(:end_on)    { schedule[:plan_year_end_on] }
+          let(:open_enrollment_start_on) { schedule[:open_enrollment_latest_start_on] }
+          let(:open_enrollment_end_on)   { schedule[:open_enrollment_latest_end_on] + 1 }
+
+          before do
+            plan_year.start_on = start_on
+            plan_year.end_on = end_on
+            plan_year.open_enrollment_start_on = open_enrollment_start_on
+            plan_year.open_enrollment_end_on = open_enrollment_end_on
+          end
+
+          it "should fail validation" do
+            expect(plan_year.valid?).to be_falsey
+            expect(plan_year.errors[:open_enrollment_end_on].any?).to be_truthy
+            expect(plan_year.errors[:open_enrollment_end_on].first).to match(/open enrollment must end on or before/)
+          end
+        end
       end
     end
   end
