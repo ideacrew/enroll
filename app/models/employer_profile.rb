@@ -28,20 +28,19 @@ class EmployerProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
-  embeds_many :premium_statements
-  embeds_one :inbox, as: :recipient
 
   has_one :census_roster
-  accepts_nested_attributes_for :census_roster
+
+  embeds_one  :inbox, as: :recipient
+  embeds_many :premium_statements
+  embeds_many :plan_years, cascade_callbacks: true, validate: true
 
   embeds_many :employee_families,
     class_name: "EmployerCensus::EmployeeFamily",
     cascade_callbacks: true,
     validate: true
-  accepts_nested_attributes_for :employee_families, reject_if: :all_blank, allow_destroy: true
 
-  embeds_many :plan_years, cascade_callbacks: true, validate: true
-  accepts_nested_attributes_for :plan_years, reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :plan_years, :employee_families, :census_roster, :inbox, :premium_statements
 
   validates_presence_of :entity_kind
 
@@ -216,6 +215,20 @@ class EmployerProfile
                        "employer_profile.employee_families.census_employee.dob" => person.dob,
                        "employer_profile.employee_families.census_employee.linked_at" => nil).to_a
     end
+
+    def advance_day(new_date)
+      new_date.to_date.beginning_of_day
+      # TODO define query for set
+      # Organization.where(
+      #     ("employer_profile.plan_years.start_on" == new_date) ||
+      #     ("employer_profile.plan_years.end_on" == new_date) ||
+      #     ("employer_profile.plan_years.open_enrollment_start_on" == new_date) ||
+      #     ("employer_profile.plan_years.open_enrollment_end_on" == new_date)
+      #   ).each do |org|
+      #     org.employer_profile.advance_enrollment_period
+      #     org.employer_profile.advance_enrollment_period
+      # end
+    end
   end
 
   def revert_plan_year
@@ -248,8 +261,21 @@ class EmployerProfile
     state :terminated               # Premium payment > 90 days past due (day 91) or voluntarily terminate
 
     # Enrollment deadline has passed for first of following month 
-    event :advance_enrollment_period do
-      transitions from: :applicant, to: :canceled, :guard => :next_month_effective_date?
+    event :advance_enrollment_date do
+
+      # Plan Year application expired
+      transitions from: :applicant, to: :canceled, :guard => :effective_date_expired?
+
+      # Begin open enrollment
+      transitions from: :registered, to: :enrolling
+
+      # End open enrollment with success
+      transitions from: :enrolling, to: :binder_pending, 
+        :guard => :enrollment_compliant?,
+        :after => :build_premium_statement
+
+      # End open enrollment with invalid enrollment
+      transitions from: :enrolling, to: :canceled
     end
 
     event :reapply do
@@ -357,7 +383,7 @@ private
     @inbox.messages.create(subject: welcome_subject, body: welcome_body)
   end
 
-  def next_month_effective_date?
+  def effective_date_expired?
     latest_plan_year.effective_date.beginning_of_day == (Date.current.end_of_month + 1).beginning_of_day
   end
 
@@ -367,7 +393,7 @@ private
 
   # TODO add all enrollment rules
   def enrollment_compliant?
-    latest_plan_year.fte_count <= HbxProfile::ShopSmallMarketMaximumFteCount
+    latest_plan_year.fte_count <= HbxProfile::ShopSmallMarketFteCountMaximum
   end
 
   def event_date_valid?

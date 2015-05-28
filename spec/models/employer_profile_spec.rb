@@ -97,107 +97,176 @@ describe EmployerProfile, dbclean: :after_each do
     end
   end
 
-  context "is registered on the system" do
-    let(:plan_year)         { FactoryGirl.build(:plan_year) }
-    let(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
-    let(:max_full_time_equivalent_employees)  { HbxProfile::ShopSmallMarketMaximumFteCount }
-    let(:application_compliant_params) do
-      {
-        # employee roster includes > 0 owners
-        fte_count: HbxProfile::ShopSmallMarketMaximumFteCount
-      }
-    end
-
-    let(:enrollment_compliant_params) do
-      {
-        fte_count: HbxProfile::ShopSmallMarketMaximumFteCount
-      }
-    end
-
+  context "has registered and enters initial application process" do
+    let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
+    let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
+    let!(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
+    let(:min_non_owner_count )  { HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum }
 
     it "should initialize in applicant status" do
       expect(employer_profile.applicant?).to be_truthy
     end
 
-    context "and today is start of open enrollment" do
-      context "and employer profile is in applicant state" do
-        pending "it should send reminder notice?"
- 
-        context "and employer submits a valid plan year application" do
-          it "should transition directly to enrolling state" do
-          end
-        end
+    context "and employer submits a valid plan year application with tomorrow as start open enrollment" do
+      before do
+        plan_year.open_enrollment_start_on = Date.current + 1
+        plan_year.open_enrollment_end_on = Date.current + 5
+        plan_year.start_on = (Date.current + 25).end_of_month + 1.day
+        plan_year.end_on = plan_year.start_on + 1.year - 1.day
+        # employer_profile.latest_plan_year.publish
+        plan_year.publish
       end
 
-      context "and employer has previously submitted a valid plan year application" do
+      it "should transition transition to registered state" do
+        expect(employer_profile.registered?).to be_truthy
+      end
+    end
 
-        before do
-          # employer_profile.latest_plan_year.open_enrollment_start_on = Date.current
-          # employer_profile.latest_plan_year.open_enrollment_end_on = Date.current + 5
-          # employer_profile.begin_open_enrollment
-        end
+    context "and employer submits a valid plan year application with today as start open enrollment" do
+      before do
+        plan_year.open_enrollment_start_on = Date.current
+        plan_year.open_enrollment_end_on = Date.current + 5
+        plan_year.start_on = (Date.current + 25).end_of_month + 1.day
+        plan_year.end_on = plan_year.start_on + 1.year - 1.day
+        # employer_profile.latest_plan_year.publish
+        plan_year.publish
+      end
 
-        it "should transition to enrolling" do
-          # expect(employer_profile.enrolling?).to be_truthy
-        end
+      it "should transition directly to enrolling state" do
+        expect(employer_profile.enrolling?).to be_truthy
+      end
 
-        context "and employer is enrolling" do
+      context "and employer has enrolled" do
 
-          context "and today is the day following close of open enrollment" do
-            before do
-              # employer_profile.latest_plan_year.open_enrollment_start_on = Date.current - 5
-              # employer_profile.latest_plan_year.open_enrollment_end_on = Date.current
+        context "and today is the day following close of open enrollment" do
+          before do
+            plan_year.open_enrollment_end_on = Date.current - 1
+            plan_year.open_enrollment_start_on = plan_year.open_enrollment_end_on - 5
+            plan_year.start_on = (Date.current + 32).end_of_month + 1.day
+            plan_year.end_on = plan_year.start_on + 1.year - 1.day
+          end
+
+          context "and employer's enrollment is non-compliant" do
+
+            context "because enrollment non-owner participation minimum not met" do
+              let(:invalid_non_owner_count) { min_non_owner_count - 1 }
+              let(:owner_census_family) { FactoryGirl.create(:census_family, census_roster: employer_profile.census_roster) }
+              let(:non_owner_census_families) { FactoryGirl.create_list(:census_family, invalid_non_owner_count, census_roster: employer_profile.census_roster) }
+
+              before do
+                # owner_census_family.census_employee.is_owner = true
+
+                # [owner_census_family].concat(non_owner_census_families).each do |cf|
+                #   employee_role = FactoryGirl.create(:employee_role)
+                #   cf.add_benefit_group_assignment(benefit_group)
+                #   cf.link_employee_role(employee_role)
+
+                  ## TODO Each census family needs to either enroll or waive coverage
+                # end
+
+                employer_profile.advance_enrollment_date
+              end
+
+              it "enrollment should be invalid" do
+                # expect(employer_profile.census_roster.is_enrollment_valid?).to be_falsey
+                # expect(employer_profile.census_roster.enrollment_errors[:non_owner_enrollment_count].present?).to be_truthy
+                # expect(employer_profile.census_roster.enrollment_errors[:non_owner_enrollment_count]).to match(/non-owner employee must enroll/)
+              end
+
+              it "should advance state to canceled" do
+                # expect(employer_profile.canceled?).to be_truthy                
+              end
             end
 
-            context "and employer's enrollment is non-compliant" do
+            context "or the minimum enrollment ratio isn't met" do
               before do
-                # employer_profile.latest_plan_year.fte_count = max_full_time_equivalent_employees + 1
-                # employer_profile.end_open_enrollment
               end
 
-              it "coverage should be canceled" do
-                # expect(employer_profile.canceled?).to be_truthy
+              pending
+              context "and the effective date isn't January 1" do
+                before do
+                end
+
+                pending                
+                it "enrollment should be invalid" do
+                #   expect(employer_profile.census_roster.is_enrollment_valid?).to be_falsey
+                #   expect(employer_profile.census_roster.enrollment_errors[:enrollment_ratio].present?).to be_truthy
+                #   expect(employer_profile.census_roster.enrollment_errors[:enrollment_ratio]).to match(/number of eligible participants enrolling/)
+                end
+
+                it "should advance state to canceled" do
+                #   expect(employer_profile.canceled?).to be_truthy                
+                end
+              end
+
+              context "and the effective date is January 1" do
+                before do
+                end
+
+                it "enrollment should be valid" do
+                #   expect(employer_profile.census_roster.is_enrollment_valid?).to be_truthy
+                end
+
+                it "should transition to binder pending" do
+                #   expect(employer_profile.binder_pending?).to be_truthy
+                end
+              end
+            end
+          end
+
+          context "and employer enrollment is compliant" do
+            context "because the non-owner participation minimum is met" do
+              before do
+              end
+
+              it "enrollment should be valid" do
+              #   expect(employer_profile.census_roster.is_enrollment_valid?).to be_truthy
+              end
+
+              it "should transition to binder pending" do
+              #   expect(employer_profile.binder_pending?).to be_truthy
               end
             end
 
-            context "and employer enrollment is compliant" do
+            context "and the minimum enrollment ratio is met" do
               before do
-                # employer_profile.latest_plan_year.fte_count = max_full_time_equivalent_employees
-                # employer_profile.end_open_enrollment
               end
 
-              pending "comprehensive definition of enrollment rules"
-              it "should comply with all enrollment rules" do
+              it "enrollment should be valid" do
+              #   expect(employer_profile.census_roster.is_enrollment_valid?).to be_truthy
               end
 
-              it "should initialize a premium statement" do
-                # expect(employer_profile.latest_premium_statement.effective_on).to eq Date.current
+              it "should transition to binder pending" do
+              #   expect(employer_profile.binder_pending?).to be_truthy
+              end
+            end
+
+            it "should initialize a premium statement" do
+              # expect(employer_profile.latest_premium_statement.effective_on).to eq Date.current
+            end
+
+            it "should be waiting for binder payment" do
+              # expect(employer_profile.binder_pending?).to be_truthy
+              # expect(employer_profile.latest_premium_statement.binder_pending?).to be_truthy
+            end
+
+            context "and employer doesn't post timely binder payment" do
+              before do
+                # employer_profile.latest_premium_statement.advance_billing_period
               end
 
-              it "should be waiting for binder payment" do
-                # expect(employer_profile.binder_pending?).to be_truthy
-                # expect(employer_profile.latest_premium_statement.binder_pending?).to be_truthy
+              it "should advance state to canceled" do
+                # expect(employer_profile.canceled?).to be_truthy                
+              end
+            end
+
+            context "and employer pays binder premium on timely basis" do
+              before do
+                # employer_profile.latest_premium_statement.allocate_binder_payment
               end
 
-              context "and employer doesn't post timely binder payment" do
-                before do
-                  # employer_profile.latest_premium_statement.advance_billing_period
-                end
-
-                pending "daily timer that advances billing period on 16th of month"
-                it "coverage should be canceled" do
-                  # expect(employer_profile.canceled?).to be_truthy
-                end
-              end
-
-              context "and employer pays binder premium on timely basis" do
-                before do
-                  # employer_profile.latest_premium_statement.allocate_binder_payment
-                end
-
-                it "should transition employer to enrolled" do
-                  # expect(employer_profile.enrolled?).to be_truthy
-                end
+              it "should transition employer to enrolled" do
+                # expect(employer_profile.enrolled?).to be_truthy
               end
             end
           end
@@ -227,79 +296,57 @@ describe EmployerProfile, dbclean: :after_each do
         pending "what should be done?"
       end
     end
-  end
 
+    context "and enrolled employer enters Dunning process" do
 
-  context "when employer submits a valid profile" do
-    let(:plan_year)         { FactoryGirl.build(:plan_year) }
-    let(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
-    let(:max_full_time_equivalent_employees)  { HbxProfile::ShopSmallMarketMaximumFteCount }
-    let(:application_compliant_params) do
-      {
-        # employee roster includes > 0 owners
-        fte_count: HbxProfile::ShopSmallMarketMaximumFteCount
-      }
+      context "and employer transitions into late status" do
+        it "should transmit notice to employer" do
+        end
+
+        it "should transmit notice to broker" do
+        end
+
+        it "should transmit notices to all employees" do
+        end
+      end
+
+      context "and employer transitions into suspended status" do
+        it "should transmit notice to employer" do
+        end
+
+        it "should transmit notice to broker" do
+        end
+
+        it "should transmit retroactive terminations to issuers" do
+        end
+
+        context "and employees are placed under a Special Enrollment Period" do
+          it "should transmit notices to all employees" do
+          end
+
+          it "should create a IVL market QLE for all employees" do
+          end
+
+          it "SEP should be retroactive" do
+          end
+        end
+
+        context "and employer pays in full" do
+          pending "now what happens to SEP, etc?"
+        end
+      end
+
+      context "and employer transitions to terminated status" do
+        it "should transmit notice to employer" do
+        end
+
+        it "should transmit notice to broker" do
+        end
+
+        it "should transmit notices to all employees" do
+        end
+      end
     end
-
-    let(:enrollment_compliant_params) do
-      {
-        fte_count: HbxProfile::ShopSmallMarketMaximumFteCount
-      }
-    end
-
-    it "should initialize in applicant status" do
-      expect(employer_profile.applicant?).to be_truthy
-    end
-
-    context "and published benefit plan year is ACA-compliant" do
-      before do
-        employer_profile.publish_plan_year
-      end
-
-      it "should transition to registered status" do
-        expect(employer_profile.latest_plan_year.valid?).to be_truthy
-        # expect(employer_profile.registered?).to be_truthy
-      end
-
-      context "and open enrollment begin date arrives" do
-        before do
-          employer_profile.latest_plan_year.open_enrollment_start_on = Date.current
-          employer_profile.latest_plan_year.open_enrollment_end_on = Date.current + 5
-          # employer_profile.begin_open_enrollment
-        end
-
-        it "should transition to enrolling" do
-          # expect(employer_profile.enrolling?).to be_truthy
-        end
-
-        context "when open enrollment end date arrives" do
-
-        end
-      end
-    end
-
-    context "and published benefit plan year is ACA non-compliant" do
-
-      context "or enrollment non-family participation minimum not met" do 
-        it "should transition to ineligible status" do
-        expect(employer_profile.applicant?).to be_truthy
-        end
-      end
-
-      context "or employer contribution minimum not met" do 
-        it "should transition to ineligible status" do
-        expect(employer_profile.applicant?).to be_truthy
-        end
-      end
-
-      context "or small market FTE maximum is exceeded" do 
-        it "should transition to ineligible status" do
-        expect(employer_profile.applicant?).to be_truthy
-        end
-      end
-
-    end
-
   end
 end
 
