@@ -5,7 +5,7 @@ puts "::: Generating Employers seed data :::"
 # Retrieve Brokers
 broker_agency_0 = BrokerAgencyProfile.first
 broker_agency_1 = BrokerAgencyProfile.last
-
+raise "Prerequisite of 2+ BrokerAgencies failed" unless broker_agency_0 != broker_agency_1
 
 puts "::: Creating Jetsons :::"
 address_00 = Address.new(kind: "work", address_1: "100 Cosmic Way, NW", city: "Washington", state: "DC", zip: "20001")
