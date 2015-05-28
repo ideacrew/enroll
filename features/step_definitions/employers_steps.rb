@@ -219,7 +219,7 @@ When(/^I click on add employee button$/) do
 end
 
 Then(/^I should see a form to enter information about employee, address and dependents details$/) do
-  @browser.input(value: "Create Employee").wait_until_present
+  @browser.button(value: /Create Employee/).wait_until_present
   screenshot("employer_census_new_family")
   # Census Employee
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][first_name]").wait_until_present
@@ -253,7 +253,7 @@ Then(/^I should see a form to enter information about employee, address and depe
   # input_field.click
   # input_field.li(text: /Child under 26/).click
   # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][employee_relationship]"").set("child_under_26")
-  @browser.input(value: /Create Employee/).click
+  @browser.button(value: /Create Employee/).click
 end
 
 And(/^I should see employer census family created success message$/) do
@@ -275,13 +275,13 @@ When(/^I click on Edit family button for a census family$/) do
 end
 
 Then(/^I should see a form to update the contents of the census employee$/) do
-  @browser.input(value: /Update Employee/).wait_until_present
+  @browser.button(value: /Update Employee/).wait_until_present
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][first_name]").set("Patrick")
   @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][state]").set("VA")
   input_field = @browser.divs(class: /selectric-wrapper/).last
   input_field.click
   input_field.li(text: /Silver PPO Group/).click
-  @browser.input(value: /Update Employee/).click
+  @browser.button(value: /Update Employee/).click
 end
 
 And(/^I should see employer census family updated success message$/) do
@@ -360,6 +360,9 @@ And(/^I should be able to add information about plan year, benefits and relation
   input_field = @browser.div(class: /selectric-wrapper/)
   input_field.click
   input_field.li(text: /CareFirst/).click
+  ref_plan = @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last
+  ref_plan.click
+  ref_plan.li(index: 5).click # select plan from list.
   @browser.select_list(id: "plan_year_benefit_groups_attributes_0_effective_on_offset")
   # @browser.radio(id: /plan_year_benefit_groups_attributes_0_effective_on_offset_30").fire_event("onclick")
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][premium_pct_as_int]").set(53)
@@ -373,11 +376,11 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.a(class: /add_fields/).click
   @browser.fieldsets.last.p(class: /label/, text: /Employee/).click
   @browser.fieldsets.last.li(text:/Child under 26/).click
-  @browser.text_fields(name: "plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+premium_pct").last.set("15")
-  @browser.text_fields(name: "plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+employer_max_amt").last.set("51")
-  @browser.text_fields(name: "plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+offered").last.set("true")
+  @browser.text_fields(name: /plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+premium_pct/).last.set("15")
+  @browser.text_fields(name: /plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+employer_max_amt/).last.set("51")
+  @browser.text_fields(name: /plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+offered/).last.set("true")
   screenshot("employer_add_plan_year_info")
-  @browser.input(value: /Create Plan Year/).click
+  @browser.button(value: /Create Plan Year/).click
 end
 
 And(/^I should see a success message after clicking on create plan year button$/) do
@@ -400,9 +403,9 @@ When(/^I enter combined filter in plan selection page$/) do
   @browser.checkboxes(class: /plan-type-selection-filter/).first.wait_until_present
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
   # Nationwide
-  @browser.checkboxes(class: /plan-metal-network-selection-filter/).last.set(true)
+  @browser.checkboxes(class: /plan-metal-network-selection-filter/).first.set(true)
   # Platinum
-  @browser.checkboxes(class: /plan-metal-level-selection-filter/)[1].set(true)
+  @browser.checkboxes(class: /plan-metal-level-selection-filter/)[0].set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("")
   @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("")
   @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("$460")
@@ -412,8 +415,8 @@ end
 
 Then(/^I should see the combined filter results$/) do
   @browser.divs(class: /plan-row/).select(&:visible?).each do |plan|
-    expect(plan.text.include?(/DC Area Network/)).to eq true
-    expect(plan.text.include?(/Silver/)).to eq true
-    expect(plan.p(text: /$470.19/).visible?).to eq true
+    expect(plan.text.include?("Nationwide")).to eq true
+    expect(plan.text.include?("Bronze")).to eq true
+    expect(plan.p(text: "$476.13").visible?).to eq true
   end
 end

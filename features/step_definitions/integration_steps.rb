@@ -135,7 +135,7 @@ When(/^I complete the matching employee form$/) do
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
   @browser.text_field(name: "person[emails_attributes][1][address]").click
   screenshot("personal_info_complete")
-  @browser.input(id: "continue-employer").click
+  @browser.button(class: /interaction-click-control-continue/).click
 end
 
 
