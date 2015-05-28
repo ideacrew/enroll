@@ -1,4 +1,5 @@
 class BrokerAgencies::ProfilesController < ApplicationController
+  before_action :check_broker_role, only: [:new, :create]
 
   def new
     build_broker_agency_profile_params
@@ -11,14 +12,15 @@ class BrokerAgencies::ProfilesController < ApplicationController
     broker_agency_profile = @organization.broker_agency_profile
     broker_role = broker_agency_profile.broker_agency_contacts.first.broker_role
     broker_agency_profile.primary_broker_role = broker_role
-    current_user.person.broker_agency_contact = broker_agency_profile
+    @person = current_user.person.present? ? current_user.person : current_user.build_person(first_name: params[:first_name], last_name: params[:last_name])
+    @person.broker_agency_contact = broker_agency_profile
+    broker_role.broker_agency_profile = broker_agency_profile
     current_user.roles << "broker" unless current_user.roles.include?("broker")
 
     if @organization.save && current_user.save
       flash[:notice] = "Successfully created Broker Agency Profile."
       redirect_to broker_agencies_profile_path(current_user.person.broker_agency_contact)
     else
-      binding.pry
       render "new"
     end
   end
@@ -27,6 +29,14 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   private
+
+  def check_broker_role
+    if current_user.has_broker_role?
+      redirect_to broker_agencies_profile_path(current_user.person.broker_agency_contact)
+    else
+      redirect_to root_path, :flash => { :error => "You do not belong to a broker agency" }
+    end
+  end
 
   def build_broker_agency_profile_params
     build_organization
