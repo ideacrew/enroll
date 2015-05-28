@@ -6,20 +6,25 @@ class BrokerAgencyProfile
   embedded_in :organization
 
   MARKET_KINDS = %W[individual shop both]
-  ENTITY_KINDS = ["c_corporation", "s_corporation", "partnership", "tax_exempt_organization"]
 
   field :entity_kind, type: String
   field :market_kind, type: String
   field :primary_broker_role_id, type: BSON::ObjectId
 
+  field :languages_spoken, type: String # TODO
+  field :working_hours, type: Boolean
+  field :accept_new_clients, type: Boolean
+
   field :aasm_state, type: String
   field :aasm_state_set_on, type: Date
 
   has_many :broker_agency_contacts, class_name: "Person", inverse_of: :broker_agency_contact
+  accepts_nested_attributes_for :broker_agency_contacts, reject_if: :all_blank, allow_destroy: true
 
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: false
   delegate :dba, :dba=, to: :organization, allow_nil: true
+  delegate :home_page, :home_page=, to: :organization, allow_nil: true
   delegate :fein, :fein=, to: :organization, allow_nil: false
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
@@ -31,7 +36,7 @@ class BrokerAgencyProfile
     allow_blank: false
 
   validates :entity_kind,
-    inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
+    inclusion: { in: Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
     allow_blank: false
 
   validate :writing_agent_employed_by_broker

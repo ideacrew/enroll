@@ -15,7 +15,7 @@ Feature: Create Broker Agency
       Given I have signed up previously through individual, employee, employer or previous visit to the Broker Agency portal
       When I visit the Broker Agency portal
         And I sign in with valid user data
-      Then I should see a successful sign up message
+      Then I should see a successful sign in message
         And I should see an initial form with a fieldset for Broker Agency information, including: legal name, DBA, fein, entity_kind, address, website URL, and phone
         And I should see a second fieldset to enter Practice Area (Individual, SHOP, Both), Languages Spoken (use ISO standard), Evening/Weekend hours (boolean), Accepting new clients (boolean)
         And I should see a third fieldset to enter the primary broker's name, email and NPN
@@ -36,7 +36,7 @@ Feature: Create Broker Agency
         And My NPN is linked to my Broker Role
         And I see the Broker Agency landing page
 
-    Scenario: Broker Representative provides an unrecognized NPN 
+    Scenario: Broker Representative provides an unrecognized NPN
       Given I complete the Broker Agency initial form with an invalid NPN
       When I submit the form
       Then My form information is saved to the database
