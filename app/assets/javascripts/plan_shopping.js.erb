@@ -132,6 +132,10 @@ $(function() {
 $(document).on("change", ".carrier", function() {
   var target = $(this).parents(".form-group");
   var txt = $(this).val();
-  $(target).find(".carrier-select .selectric-wrapper").hide();
-  $(target).find(".carrier-select .selectric-carrier-" + txt).show();
+  $(target).find(".carrier-select .carrier-content").hide();
+  $(target).find(".carrier-select .carrier-" + txt).show();
 });
+
+$(document).on("change", "select[name='reference_plan']", function() {
+  $(this).parents('.carrier-select').prevAll("input[type='hidden']").val($(this).val());
+}); 
