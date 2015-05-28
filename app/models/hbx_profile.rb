@@ -69,7 +69,7 @@ class HbxProfile
   ShopPlanYearPeriodMaximum = 365 #1.year
 
   # Maximum number of months prior to coverage effective date to submit a Plan Year application
-  ShopPlanYearPublishBeforeEffectiveDateMaximum = 3
+  ShopPlanYearPublishBeforeEffectiveDateMaximum = 3.months
 
   ShopEmployerContributionPercentMinimum = 50
   ShopEnrollmentParticipationRatioMinimum = 2 / 3.0
@@ -80,44 +80,6 @@ class HbxProfile
   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
 
-  def self.shop_enrollment_timetable(new_effective_date)
-
-    effective_date = new_effective_date.to_date.beginning_of_month
-    prior_month = effective_date - 1.month
-    plan_year_start_on = effective_date
-    plan_year_end_on = effective_date + 1.year - 1.day
-    initial_employer_application_earliest_start_on = (effective_date - ShopPlanYearPublishBeforeEffectiveDateMaximum.months)
-    initial_employer_application_earliest_submit_on = initial_employer_application_earliest_start_on
-    initial_employer_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{ShopPlanYearPublishedDueDayOfMonth}").to_date
-    earliest_open_enrollment_start_on     = effective_date - ShopOpenEnrollmentPeriodMaximum.months
-    latest_open_enrollment_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
-    latest_open_enrollment_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{ShopOpenEnrollmentEndDueDayOfMonth}").to_date
-    binder_payment_due_date               = first_banking_date_prior ("#{prior_month.year}-#{prior_month.month}-#{ShopBinderPaymentDueDayOfMonth}")
-
-
-    timetable = {
-      effective_date: effective_date,
-      plan_year_start_on: plan_year_start_on,
-      plan_year_end_on: plan_year_end_on,
-      initial_employer_application_earliest_start_on: initial_employer_application_earliest_start_on,
-      initial_employer_application_earliest_submit_on: initial_employer_application_earliest_submit_on,
-      initial_employer_application_latest_submit_on: initial_employer_application_latest_submit_on,
-      earliest_open_enrollment_start_on: earliest_open_enrollment_start_on,
-      latest_open_enrollment_start_on: latest_open_enrollment_start_on,
-      latest_open_enrollment_end_on: latest_open_enrollment_end_on,
-      binder_payment_due_date: binder_payment_due_date
-    }
-
-    timetable
-  end
-
-  ## TODO - add holidays
-  def self.first_banking_date_prior(date_value)
-    date = date_value.to_date
-    date = date - 1 if date.saturday?
-    date = date - 2 if date.sunday?
-    date
-  end
 
   # ShopOpenEnrollmentStartMax
   # EffectiveDate
