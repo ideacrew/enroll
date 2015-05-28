@@ -472,6 +472,18 @@ $(document).on('page:update', function() {
     $('#employer_census_employee_family_census_employee_attributes_address_attributes_kind').val($(this).data('value'));
   });
   $('select').selectric();
+
+  $('#plan-years-list li a').on('click', function(){
+    var target = $(this).attr('href');
+    $("span#current_plan_year").text($(this).text());
+    $(".plan-years-content .plan-year").hide();
+    $(target).show();
+  });
+  $("ul.bg-list li a").on('click', function(){
+    var target = $(this).attr('href');
+    $(target).parents('.plan-year').find(".bg-content .bg").hide();
+    $(target).show();
+  });
 });
 
 $(document).on('click', ".interaction-click-control-add-plan-year", function() {

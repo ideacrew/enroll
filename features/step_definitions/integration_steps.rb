@@ -114,7 +114,7 @@ end
 
 When(/^I accept the matched employer$/) do
   @browser.input(value: /This is my employer/).click
-  @browser.input(id: "continue-employer").wait_until_present
+  @browser.input(name: "person[emails_attributes][0][address]").wait_until_present
   screenshot("update_personal_info")
 end
 
@@ -122,7 +122,7 @@ When(/^I complete the matched employee form$/) do
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
   @browser.text_field(name: "person[emails_attributes][1][address]").click
   screenshot("personal_info_complete")
-  @browser.input(id: "continue-employer").click
+  @browser.button(class: "btn-primary", :text => /Continue/).click
 end
 # TODO: needs to be merged
 When(/^I complete the matching employee form$/) do
@@ -150,12 +150,12 @@ When(/^I click edit on baby Soren$/) do
 end
 
 Then(/^I should see the edit dependent form$/) do
-  @browser.input(type: "submit", name: "commit").wait_until_present
+  @browser.button(:text => /Confirm Member/).wait_until_present
 end
 
 When(/^I click delete on baby Soren$/) do
   @browser.form(id: 'edit_dependent').a().click
-  @browser.input(type: "submit", name: "commit").wait_while_present
+  @browser.button(text: /Confirm Member/).wait_while_present
 end
 
 Then(/^I should see (.*) dependents$/) do |n|
@@ -166,11 +166,11 @@ end
 
 When(/^I click Add Member$/) do
   @browser.a(text: /Add Member/).click
-  @browser.input(type: 'submit', value: /Confirm Member/).wait_until_present
+  @browser.button(text: /Confirm Member/).wait_until_present
 end
 
 Then(/^I should see the new dependent form$/) do
-  expect(@browser.input(type: 'submit', value: /Confirm Member/).visible?).to be_truthy
+  expect(@browser.button(text: /Confirm Member/).visible?).to be_truthy
 end
 
 When(/^I enter the identifying info of Sorens daughter$/) do
@@ -183,8 +183,8 @@ When(/^I enter the identifying info of Sorens daughter$/) do
 end
 
 When(/^I click confirm member$/) do
-  @browser.input(type: 'submit', value: /Confirm Member/).click
-  @browser.input(type: 'submit', value: /Confirm Member/).wait_while_present
+  @browser.button(text: /Confirm Member/).click
+  @browser.button(text: /Confirm Member/).wait_while_present
 end
 
 When(/^I click continue on the dependents page$/) do
@@ -197,7 +197,7 @@ Then(/^I should see the group selection page$/) do
 end
 
 When(/^I click continue on the group selection page$/) do
-  @browser.input(value: /Continue/).click
+  @browser.button(class: "btn-primary", text: /Continue/).click
 end
 
 Then(/^I should see the plan shopping welcome page$/) do

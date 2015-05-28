@@ -60,9 +60,14 @@ class Family
   ViewFunctions::Family.install_queries
 
   after_save :update_family_search_collection
+  after_destroy :remove_family_search_record
 
   def update_family_search_collection
     ViewFunctions::Family.run_after_save_search_update(self.id)
+  end
+
+  def remove_family_search_record
+    Searches::FamilySearch.where("id" => self.id).delete_all
   end
 
   def latest_household

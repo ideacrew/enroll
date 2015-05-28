@@ -85,10 +85,10 @@
     			<a href="#" class="btn btn-danger remove-new-employee-dependent" data-target="#new_employee_dependent_form"><i class="fa fa-times"></i> Cancel</a>
     		<% else %>
     			<%= link_to '<i class="fa fa-times"></i> Cancel'.html_safe, consumer_employee_dependent_path(dependent), class: 'btn btn-danger', :remote => true %>
-    		<% end %>
-        <button type="submit" class="btn btn-primary pull-right">
-          <i class="fa fa-floppy-o"></i> Confirm Member
-        </button>
+		<% end %>
+		<%= f.button(class: "btn btn-primary pull-right") do %>
+                   <i class="fa fa-floppy-o"></i> Confirm Member
+		<% end %>
     	</div>
     <% end %>
   </div>
