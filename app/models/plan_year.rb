@@ -179,7 +179,7 @@ class PlanYear
     # Non-published plans are expired following their end on date
     state :expired
 
-    event :advance_plan_year do
+    event :advance_application_date, :guard => :is_new_plan_year? do
       transitions from: :draft, to: :expired
       transitions from: :active, to: :retired
       transitions from: :published, to: :active
@@ -216,6 +216,10 @@ class PlanYear
 
 
 private
+
+  def is_new_plan_year?
+    
+  end
 
   def open_enrollment_date_checks
     return if start_on.blank? || end_on.blank? || open_enrollment_start_on.blank? || open_enrollment_end_on.blank?
