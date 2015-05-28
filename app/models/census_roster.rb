@@ -49,40 +49,40 @@ class CensusRoster
     is_active
   end
 
-  def enrollment_ratio
-    (enrolled_count / eligible_to_enroll_count) unless eligible_to_enroll_count == 0
+  def eligible_to_enroll_count
   end
 
   def non_owner_enrollment_count
   end
 
-  def eligible_to_enroll_count
+  def total_enrolled_count
   end
 
-  def enrolled_count
+  def enrollment_ratio
+    (total_enrolled_count / eligible_to_enroll_count) unless eligible_to_enroll_count == 0
   end
 
   def is_enrollment_valid?
-    validate_enrollment.blank? ? true : false
+    enrollment_errors.blank? ? true : false
   end
 
-  # Minimum participation - composition and rate
-  def validate_enrollment
-    warnings = {}
+  # Determine enrollment composition compliance with HBX-defined guards
+  def enrollment_errors
+    errors = {}
     # At least one employee who isn't an owner or family member of owner must enroll
-    if non_owner_enrollment_count < ShopEnrollmentNonOwnerParticipationMinimum
-      warnings.merge!(:non_owner_enrollment_count, "at least #{ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
+    if non_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
+      errors.merge!(:non_owner_enrollment_count, "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
     end
 
-    # January 1 effective date exemptions
+    # January 1 effective date exemption(s)
     unless effective_date.yday == 1
       # Verify ratio for minimum number of eligible employees that must enroll is met
-      if enrollment_ratio < ShopEnrollmentParticipationRatioMinimum
-        warnings.merge!(:enrollment_ratio, "number of eligible participants enrolling (#{employees_enrolled_count}) is less than minimum required #{employees_eligible_to_enroll_count * ShopEnrollmentParticipationMinimum}")
+      if enrollment_ratio < HbxProfile::ShopEnrollmentParticipationRatioMinimum
+        errors.merge!(:enrollment_ratio, "number of eligible participants enrolling (#{employees_total_enrolled_count}) is less than minimum required #{employees_eligible_to_enroll_count * ShopEnrollmentParticipationMinimum}")
       end
     end
 
-    warnings
+    errors
   end
 
   class << self 
