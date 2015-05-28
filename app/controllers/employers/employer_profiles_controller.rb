@@ -65,7 +65,8 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def show
     @current_plan_year = @employer_profile.plan_years.last
-    @benefit_groups = @current_plan_year.benefit_groups if @current_plan_year.present?
+    @plan_years = @employer_profile.plan_years.order(id: :desc)
+
     @emps = @employer_profile.employee_families_sorted
 
     @page_alphabets = page_alphabets(@emps, "census_employee.last_name")

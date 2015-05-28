@@ -6,11 +6,11 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   it { should validate_presence_of :open_enrollment_start_on }
   it { should validate_presence_of :open_enrollment_end_on }
 
-  let(:employer_profile)                { FactoryGirl.create(:employer_profile) }
-  let(:valid_plan_year_start_on)        { Date.current.end_of_month + 1 }
-  let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 12.months - 1 }
+  let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
+  let(:valid_plan_year_start_on)        { (Date.current + 1.month).end_of_month + 1.day }
+  let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
   let(:valid_open_enrollment_start_on)  { Date.current.beginning_of_month }
-  let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 14 }
+  let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 15 }
   let(:valid_fte_count)                 { 5 }
 
   let(:valid_params) do
@@ -178,7 +178,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year period is too short" do
-          let(:invalid_length)  { HbxProfile::ShopPlanYearPeriodMinimum - 1 }
+          let(:invalid_length)  { HbxProfile::ShopPlanYearPeriodMinimum - 1.day }
           let(:start_on)  { Date.current.end_of_month + 1 }
           let(:end_on)    { start_on + invalid_length }
 
@@ -194,7 +194,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year period is too long" do
-          let(:invalid_length)  { HbxProfile::ShopPlanYearPeriodMaximum + 1 }
+          let(:invalid_length)  { HbxProfile::ShopPlanYearPeriodMaximum + 1.day }
           let(:start_on)  { Date.current.end_of_month + 1 }
           let(:end_on)    { start_on + invalid_length }
 
@@ -211,7 +211,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         context "and the plan year begins before open enrollment ends" do
           let(:valid_open_enrollment_length)  { HbxProfile::ShopOpenEnrollmentPeriodMaximum }
-          let(:valid_plan_year_length)  { HbxProfile::ShopPlanYearPeriodMaximum + 1 }
+          let(:valid_plan_year_length)  { HbxProfile::ShopPlanYearPeriodMaximum }
           let(:open_enrollment_start_on)  { Date.current }
           let(:open_enrollment_end_on)    { open_enrollment_start_on + valid_open_enrollment_length }
           let(:start_on)  { open_enrollment_start_on - 1 }
@@ -396,7 +396,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         before do
           plan_year.withdraw_pending
         end
-  
+
         it "plan year should be in draft state" do
           expect(plan_year.draft?).to be_truthy
         end
@@ -406,7 +406,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         before do
           plan_year.force_publish
         end
-  
+
         it "plan year should be in published state" do
           expect(plan_year.published?).to be_truthy
         end

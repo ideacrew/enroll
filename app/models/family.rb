@@ -56,6 +56,20 @@ class Family
 
   scope :all_with_multiple_family_members, -> { exists({:'family_members.1' => true}) }
 
+  # This runs on the first class load
+  ViewFunctions::Family.install_queries
+
+  after_save :update_family_search_collection
+  after_destroy :remove_family_search_record
+
+  def update_family_search_collection
+    ViewFunctions::Family.run_after_save_search_update(self.id)
+  end
+
+  def remove_family_search_record
+    Searches::FamilySearch.where("id" => self.id).delete_all
+  end
+
   def latest_household
     return households.first if households.size == 1
     households.order_by(:'submitted_at'.desc).limit(1).only(:households).first

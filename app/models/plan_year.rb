@@ -245,28 +245,25 @@ private
      errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{HbxProfile::ShopOpenEnrollmentPeriodMinimum} days")
     end
 
-    if (open_enrollment_end_on - open_enrollment_start_on) > HbxProfile::HbxProfile::ShopOpenEnrollmentPeriodMaximum.months
-     errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{HbxProfile::HbxProfile::ShopOpenEnrollmentPeriodMaximum} months")
+    if (open_enrollment_end_on - open_enrollment_start_on) > HbxProfile::ShopOpenEnrollmentPeriodMaximum.months
+     errors.add(:open_enrollment_end_on, "open enrollment period is greater than maximum: #{HbxProfile::ShopOpenEnrollmentPeriodMaximum} months")
     end
 
-    if (end_on - start_on) < HbxProfile::ShopPlanYearPeriodMinimum
+    if start_on + HbxProfile::ShopPlanYearPeriodMinimum < end_on
      errors.add(:end_on, "plan year period is less than minumum: #{HbxProfile::ShopPlanYearPeriodMinimum} days")
     end
 
-    if (end_on - start_on) > HbxProfile::ShopPlanYearPeriodMaximum
+    if start_on + HbxProfile::ShopPlanYearPeriodMaximum > end_on
      errors.add(:end_on, "plan year period is greater than maximum: #{HbxProfile::ShopPlanYearPeriodMaximum} days")
     end
 
-    if (start_on - Date.current) > HbxProfile::HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum
-     errors.add(:start_on, "applications may not be started more than #{HbxProfile::HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum.months} months before effective date")
+    if (start_on - Date.current) > HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum
+     errors.add(:start_on, "applications may not be started more than #{HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum.months} months before effective date")
     end
 
-    if ((start_on - 1.day).beginning_of_month + HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth) >= HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth
-     errors.add(:open_enrollment_end_on, "open enrollment must end on or before #{HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth} day of month before effective date")
+    if open_enrollment_end_on - (start_on - 1.month) >= HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth
+     errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.ordinalize} day of the month prior to effective date")
     end
-
-
-
   end
 
 end

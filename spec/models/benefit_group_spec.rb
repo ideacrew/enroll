@@ -21,13 +21,14 @@ describe BenefitGroup, dbclean: :after_each do
         )
       end.sort_by(&:id)
     end
+
     context "and a plan year exists" do
       let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_plan_year)}
 
       context "starting on 2/1/2015" do
         let(:start_plan_year) {Date.new(2015, 2, 1)}
         context "and a benefit_group_exists" do
-          let!(:benefit_group) { FactoryGirl.create(:benefit_group, effective_on_kind: "first_of_month", effective_on_offset: 30)}
+          let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
           it "knows effective on for dates of hire" do
             year = 2015
             day = 15
@@ -72,7 +73,7 @@ end
 
 describe BenefitGroup, "instance methods" do
   let!(:benefit_group)            { FactoryGirl.build(:benefit_group) }
-  let!(:plan_year)                { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
+  let!(:plan_year)                { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], start_on: Date.new(2015,1,1)) }
   let!(:employer_profile)         { FactoryGirl.create(:employer_profile, plan_years: [plan_year]) }
   let!(:benefit_group_assignment) { FactoryGirl.build(:employer_census_benefit_group_assignment, benefit_group: benefit_group) }
   let!(:families) do
