@@ -115,7 +115,7 @@ class User
   end
 
   def instantiate_person
-    self.build_person if self.person.nil?
+    self.person = Person.new
   end
 
   def self.send_reset_password_instructions(attributes={})
