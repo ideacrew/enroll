@@ -6,9 +6,12 @@
 
   <%= f.hidden_field :reference_plan_id, value: f.object.reference_plan_id %>
   <div class="no-pd col-md-5 col-sm-4 col-xs-12 carrier-select">
+    <% all_plans = Plan.where(active_year: 2015).to_a %>
     <% carriers.each do |carrier| %>
-      <div class="<%= carrier.id == f.object.reference_plan.try(:carrier_profile_id) ? '' : 'hide-carrier' %> carrier-<%= carrier.id %> carrier-content">
-	      <%= select_tag "reference_plan", options_for_select(carrier.plans.select{|plan| plan.active_year == 2015 }.map{|plan| [plan.name, plan.id ]}, selected: f.object.reference_plan_id), class: "carrier-#{carrier.id}", include_blank: "SELECT REFERENCE PLAN" %>
+	    <% carrier_plans = all_plans.select { |pl| pl.carrier_profile_id.to_s == carrier.id.to_s } %>
+	    <div class="<%= carrier.id == f.object.reference_plan.try(:carrier_profile_id) ? '' : 'hide-carrier' %> carrier-<%= carrier.id %> carrier-content">
+
+	      <%= select_tag "reference_plan", options_for_select(carrier_plans.map{|plan| [plan.name, plan.id ]}, selected: f.object.reference_plan_id), class: "carrier-#{carrier.id}", include_blank: "SELECT REFERENCE PLAN" %>
       </div>
     <% end %>
   </div>
