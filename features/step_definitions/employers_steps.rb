@@ -345,12 +345,12 @@ end
 
 And(/^I should be able to add information about plan year, benefits and relationship benefits$/) do
 #Plan Year
-  @browser.text_field(name: "plan_year[start_on]").wait_until_present
+  @browser.text_field(name: "plan_year[start_on_date]").wait_until_present
   screenshot("employer_add_plan_year")
-  @browser.text_field(name: "plan_year[start_on]").set("01/01/2015")
-  @browser.text_field(name: "plan_year[end_on]").set("12/31/2015")
-  @browser.text_field(name: "plan_year[open_enrollment_start_on]").set("11/01/2014")
-  @browser.text_field(name: "plan_year[open_enrollment_end_on]").set("11/30/2014")
+  @browser.text_field(name: "plan_year[start_on_date]").set("01/01/2015")
+  @browser.text_field(name: "plan_year[end_on_date]").set("12/31/2015")
+  @browser.text_field(name: "plan_year[open_enrollment_start_on_date]").set("11/01/2014")
+  @browser.text_field(name: "plan_year[open_enrollment_end_on_date]").set("11/30/2014")
   @browser.text_field(name: "plan_year[fte_count]").click
   @browser.text_field(name: "plan_year[fte_count]").set("35")
   @browser.text_field(name: "plan_year[pte_count]").set("15")

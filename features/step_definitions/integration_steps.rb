@@ -12,7 +12,6 @@ module WatirScreenshots
     end
   end
 end
-
 Before "@screenshots" do
   @take_screens = true
 end
