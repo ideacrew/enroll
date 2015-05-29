@@ -118,12 +118,12 @@ class Person
   scope :active,   ->{ where(is_active: true) }
   scope :inactive, ->{ where(is_active: false) }
 
-  ViewFunctions::Person.install_queries
+#  ViewFunctions::Person.install_queries
 
   after_save :update_family_search_collection
 
   def update_family_search_collection
-    ViewFunctions::Person.run_after_save_search_update(self.id)
+  #  ViewFunctions::Person.run_after_save_search_update(self.id)
   end
 
   def generate_hbx_id
