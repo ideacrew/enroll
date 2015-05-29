@@ -1,63 +1,65 @@
 <div class="container">
   <div class="employee-welocome">
-    <div class="col-md-9 col-sm-11 col-xs-12">
-      <div class="col-md-12 col-sm-12 no-pd col-xs-12" id="confirm_plan">
+    <div class="row">
+      <div class="col-md-9 col-sm-11 col-xs-12">
+        <div class="col-md-12 col-sm-12 no-pd col-xs-12" id="confirm_plan">
 
-          <h3>Confirm Your Plan Selection</h3>
-          <p>Your current plan selection is displayed below. Click the back button if you want to change your selection. Click confirm to complete your enrollment.</p>
-          <p>Your enrollment is not complete until you confirm your plan selection below.</p>
-          <p>
-            <strong><%= @plan.name %></strong><br>
-            Starting on : <%= @enrollment.effective_on.strftime("%m/%d/%Y") %>
-          </p>
+            <h3>Confirm Your Plan Selection</h3>
+            <p>Your current plan selection is displayed below. Click the back button if you want to change your selection. Click confirm to complete your enrollment.</p>
+            <p>Your enrollment is not complete until you confirm your plan selection below.</p>
+            <p>
+              <strong><%= @plan.name %></strong><br>
+              Starting on : <%= @enrollment.effective_on.strftime("%m/%d/%Y") %>
+            </p>
 
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Gender</th>
-                <th>Birthday</th>
-                <th>Premium</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <% total_cost = 0 %>
-              <% @enrollment.hbx_enrollment_members.each do |member| %>
+            <table class="table table-striped">
+              <thead>
                 <tr>
-                  <td><%= member.person.full_name %></td>
-                  <td><%= member.person.try(:gender).humanize %></td>
-                  <td><%= member.person.try(:dob).strftime("%m/%d/%Y") %></td>
-                  <td><%= number_to_currency(@plan.premium_for(member)) %></td>
-                  <% total_cost += @plan.premium_for(member) %>
+                  <th>Name</th>
+                  <th>Gender</th>
+                  <th>Birthday</th>
+                  <th>Premium</th>
                 </tr>
-              <% end %>
-              <tr>
-                <td colspan="3" class="text-right">Total Premium</td>
-                <td><%= number_to_currency(total_cost) %></td>
-              </tr>
+              </thead>
 
-              <tr>
-                <td colspan="3" class="text-right">Additionally your employer pays</td>
-                <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
-              </tr>
-              <tr style='font-size:20px'>
-                <td colspan="3" class="text-right"><strong>You pay</strong></td>
-                <td><strong>
-                  <%= number_to_currency(@plan.total_employee_cost || 0) %>
-                </strong></td>
-              </tr>
-              <tr>
-                <td colspan="3" class="text-right">Your coverage start date</td>
-                <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+              <tbody>
+                <% total_cost = 0 %>
+                <% @enrollment.hbx_enrollment_members.each do |member| %>
+                  <tr>
+                    <td><%= member.person.full_name %></td>
+                    <td><%= member.person.try(:gender).humanize %></td>
+                    <td><%= member.person.try(:dob).strftime("%m/%d/%Y") %></td>
+                    <td><%= number_to_currency(@plan.premium_for(member)) %></td>
+                    <% total_cost += @plan.premium_for(member) %>
+                  </tr>
+                <% end %>
+                <tr class="gray-row">
+                  <td colspan="3" class="text-right">Total Premium</td>
+                  <td><%= number_to_currency(total_cost) %></td>
+                </tr>
 
-        <%= link_to '<i class="fa fa-shopping-cart"></i>
- Purchase'.html_safe, checkout_insured_plan_shopping_path(@enrollment, :plan_id => @plan.id), :class => "btn btn-primary btn-continue pull-right", :method => :post, :disabled => (!@enrollable) %>
-    </div>
+                <tr>
+                  <td colspan="3" class="text-right">Additionally your employer pays</td>
+                  <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
+                </tr>
+                <tr style='font-size:20px' class="gray-row">
+                  <td colspan="3" class="text-right"><strong>You pay</strong></td>
+                  <td><strong>
+                    <%= number_to_currency(@plan.total_employee_cost || 0) %>
+                  </strong></td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="text-right">Your coverage start date</td>
+                  <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <%= link_to '<i class="fa fa-shopping-cart"></i>
+   Purchase'.html_safe, checkout_insured_plan_shopping_path(@enrollment, :plan_id => @plan.id), :class => "btn btn-primary btn-continue pull-right", :method => :post, :disabled => (!@enrollable) %>
+      </div>
+
     <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
       <div style="display: none;" id="sup-progress" data-signup-progress="8"></div>
 	    <input type="hidden" id="initial_progress" value="85">
@@ -78,6 +80,7 @@
           <%= link_to '<i class="fa fa-floppy-o"></i> Save & Exit'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </div><br>
