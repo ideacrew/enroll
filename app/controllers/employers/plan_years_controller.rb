@@ -35,8 +35,8 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def plan_year_params
-    new_params = format_date_params(params)
-    new_params.require(:plan_year).permit(
+#    new_params = format_date_params(params)
+    params.require(:plan_year).permit(
       :start_on_date, :end_on_date, :fte_count, :pte_count, :msp_count,
       :open_enrollment_start_on_date, :open_enrollment_end_on_date,
       :benefit_groups_attributes => [ :title, :reference_plan_id, :effective_on_offset,
