@@ -79,7 +79,7 @@ class BenefitGroup
 
   def elected_plans
     return @elected_plans if defined? @elected_plans
-    @elected_plans ||= Plan.where(:id => {"$in" => elected_plan_ids})
+    @elected_plans ||= Plan.where(:id => {"$in" => elected_plan_ids}).to_a
   end
 
   # belongs_to association (traverse the model)
