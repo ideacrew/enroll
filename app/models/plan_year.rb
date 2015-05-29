@@ -279,6 +279,8 @@ private
         errors.add(:benefit_group, "#{benefit_group.title} should not has more than 1 employee relationship benefit")
       elsif relationships.count("spouse") > 1
         errors.add(:benefit_group, "#{benefit_group.title} should not has more than 1 spouse relationship benefit")
+      elsif relationships.count("employee") == 0
+        errors.add(:benefit_group, "#{benefit_group.title} should has at least 1 employee relationship benefit")
       end
     end
   end

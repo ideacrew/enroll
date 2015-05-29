@@ -95,6 +95,13 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         expect(@plan_year.errors[:benefit_group].any?).to be_truthy
       end
 
+      it "should fail validation with no employee relationship benefit" do
+        @benefit_group.relationship_benefits = []
+        @plan_year.benefit_groups << @benefit_group
+        expect(@plan_year.save).to eq false
+        expect(@plan_year.errors[:benefit_group].any?).to be_truthy
+      end
+
       it "should valid with different kind of relationship benefits" do
         @benefit_group.relationship_benefits << FactoryGirl.build(:relationship_benefit, relationship: :child_under_26)
         @benefit_group.relationship_benefits << FactoryGirl.build(:relationship_benefit, relationship: :child_under_26)

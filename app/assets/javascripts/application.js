@@ -37,7 +37,8 @@ $(document).ready(function () {
         changeMonth: true,
         changeYear: true,
         dateFormat: 'mm/dd/yy', 
-        maxDate: "+0d"
+        maxDate: "+0d",
+        yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()
       });
     }else{
       $(this).datepicker({ 
@@ -60,7 +61,7 @@ $(document).ready(function () {
     $("."+divtoshow).show();
   });
 
-  $('.alert').delay(3200).fadeOut(300); //Fade Alert Box
+  $('.alert').delay(3200).fadeOut(2000); //Fade Alert Box
 
   /* QLE Marriage Date Validator */
   $('#date_married').focusin(function() {
