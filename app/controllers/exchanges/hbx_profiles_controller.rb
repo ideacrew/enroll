@@ -11,9 +11,11 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def employer_index
     @q = params.permit(:q)[:q]
-    page_string = params.permit(:page)[:page]
-    page_no = page_string.blank? ? nil : page_string.to_i
-    @organizations = Organization.search(@q).exists(employer_profile: true).page page_no
+    @orgs = Organization.search(@q).exists(employer_profile: true)
+    @page_alphabets = page_alphabets(@orgs, "legal_name")
+    page_no = cur_page_no(@page_alphabets.first)
+    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+
     @employer_profiles = @organizations.map {|o| o.employer_profile}
 
     render "employers/employer_profiles/index"
