@@ -33,10 +33,10 @@ class PlanYear
   validate :open_enrollment_date_checks
   validate :relationship_benefits_checks
 
-  include Validations::UsDate.on(:open_enrollment_start_on_date)
-  include Validations::UsDate.on(:open_enrollment_end_on_date)
-  include Validations::UsDate.on(:start_on_date)
-  include Validations::UsDate.on(:end_on_date)
+  include Validations::USDate.on(:open_enrollment_start_on_date)
+  include Validations::USDate.on(:open_enrollment_end_on_date)
+  include Validations::USDate.on(:start_on_date)
+  include Validations::USDate.on(:end_on_date)
 
   def start_on_date
     self.start_on.blank? ? nil : self.start_on.strftime("%m/%d/%Y")
