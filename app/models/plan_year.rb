@@ -5,6 +5,7 @@ class PlanYear
 
   embedded_in :employer_profile
 
+
   # Plan Year time period
   field :start_on, type: Date
   field :end_on, type: Date
@@ -27,10 +28,47 @@ class PlanYear
   embeds_many :benefit_groups, cascade_callbacks: true
   accepts_nested_attributes_for :benefit_groups, reject_if: :all_blank, allow_destroy: true
 
-  validates_presence_of :start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on
+  validates_presence_of :start_on, :end_on
 
   validate :open_enrollment_date_checks
   validate :relationship_benefits_checks
+
+  include Validations::UsDate.on(:open_enrollment_start_on_date)
+  include Validations::UsDate.on(:open_enrollment_end_on_date)
+  include Validations::UsDate.on(:start_on_date)
+  include Validations::UsDate.on(:end_on_date)
+
+  def start_on_date
+    self.start_on.blank? ? nil : self.start_on.strftime("%m/%d/%Y")
+  end
+
+  def start_on_date=(val)
+    self.start_on = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
+  end
+
+  def end_on_date
+    self.end_on.blank? ? nil : self.end_on.strftime("%m/%d/%Y")
+  end
+
+  def end_on_date=(val)
+    self.end_on = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
+  end
+
+  def open_enrollment_start_on_date
+    self.open_enrollment_start_on.blank? ? nil : self.open_enrollment_start_on.strftime("%m/%d/%Y")
+  end
+
+  def open_enrollment_start_on_date=(val)
+    self.open_enrollment_start_on = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
+  end
+
+  def open_enrollment_end_on_date
+    self.open_enrollment_end_on.blank? ? nil : self.open_enrollment_end_on.strftime("%m/%d/%Y")
+  end
+
+  def open_enrollment_end_on_date=(val)
+    self.open_enrollment_end_on = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
+  end
 
   def parent
     raise "undefined parent employer_profile" unless employer_profile?

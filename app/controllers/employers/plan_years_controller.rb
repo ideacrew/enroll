@@ -37,8 +37,8 @@ class Employers::PlanYearsController < ApplicationController
   def plan_year_params
     new_params = format_date_params(params)
     new_params.require(:plan_year).permit(
-      :start_on, :end_on, :fte_count, :pte_count, :msp_count,
-      :open_enrollment_start_on, :open_enrollment_end_on,
+      :start_on_date, :end_on_date, :fte_count, :pte_count, :msp_count,
+      :open_enrollment_start_on_date, :open_enrollment_end_on_date,
       :benefit_groups_attributes => [ :title, :reference_plan_id, :effective_on_offset,
                                       :premium_pct_as_int, :employer_max_amt_in_cents, :_destroy,
                                       :relationship_benefits_attributes => [
@@ -46,16 +46,5 @@ class Employers::PlanYearsController < ApplicationController
                                       ]
     ]
     )
-  end
-
-  def format_date_params(params)
-    ["start_on", "end_on", "open_enrollment_start_on", "open_enrollment_end_on"].each do |key|
-      params["plan_year"][key] = Date.strptime(params["plan_year"][key], '%m/%d/%Y')
-    end
-
-    params
-  rescue Exception => e
-    puts e
-    params
   end
 end
