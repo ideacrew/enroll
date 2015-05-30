@@ -44,15 +44,15 @@
               </div>
             </div>
 
-            <div class="col-md-3 col-sm-3 no-pd">
+            <div class="col-md-2 col-sm-2 no-pd">
               <div class="form-group form-group-lg">
                   <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", placeholder: "SOCIAL SECURITY" %>
               </div>
             </div>
 
-            <div class="col-md-2 col-sm-2 no-pd">
+            <div class="col-md-3 col-sm-3 no-pd">
               <div class="form-group form-group-lg">
-                <%= f.text_field :relationship, class: "required home floatlabel form-control", required: true, placeholder: "RELATION" %>
+                <%= f.select :relationship, options_for_select(PersonRelationship::Relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: f.object.relationship), {include_blank: "RELATION", required: true} %>
               </div>
             </div>
             <div class="col-md-4 col-sm-4 no-pd">
