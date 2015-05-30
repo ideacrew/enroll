@@ -250,14 +250,11 @@ class PlanYear
     event :revert do
       transitions from: :published, to: :draft
     end
-
   end
 
 
 private
-
   def is_new_plan_year?
-
   end
 
   def duration_in_days(duration)
@@ -283,6 +280,10 @@ private
     if open_enrollment_end_on > start_on
       errors.add(:start_on, "can't occur before open enrollment end date")
     end
+
+    # if Date.current > ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
+    #  errors.add(:start_on, "must choose a start on date #{effect_date + 1.month} or later")
+    # end
 
     if open_enrollment_end_on < open_enrollment_start_on
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
@@ -311,6 +312,7 @@ private
     if open_enrollment_end_on - (start_on - 1.month) >= HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth
      errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.ordinalize} day of the month prior to effective date")
     end
+
   end
 
   def relationship_benefits_checks

@@ -139,6 +139,35 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   context "a new plan year is initialized" do
     let(:plan_year) { PlanYear.new(**valid_params) }
 
+    context "and effective date is specified" do
+      context "and effective date doesn't provide enough time for enrollment" do
+        pending
+        context "and an employer is entering the effective date" do
+          it "should fail validation" do
+            # expect(plan_year.valid?).to be_falsey
+            # expect(plan_year.errors[:effective_date].any?).to be_truthy
+            # expect(plan_year.errors[:start_on].first).to match(/applications may not be started more than/)
+          end
+        end
+
+        context "and an HbxAdmin or system service is entering the effective date" do
+          pending
+          it "should pass validation" do
+            # expect(plan_year.valid?).to be_truthy
+            # expect(plan_year.errors[:effective_date].any?).to be_truthy
+          end
+        end
+      end
+
+      context "and effective date does provide enough time for enrollment" do
+        pending
+        it "should pass validation" do
+          # expect(plan_year.valid?).to be_truthy
+          # expect(plan_year.errors[:effective_date].any?).to be_truthy
+        end
+      end
+    end
+
     context "and an open enrollment period is specified" do
       context "and open enrollment start date is after the end date" do
         let(:open_enrollment_end_on)    { Date.current }
