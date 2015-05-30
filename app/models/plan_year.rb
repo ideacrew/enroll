@@ -82,19 +82,19 @@ class PlanYear
   end
 
   def open_enrollment_start_on=(new_date)
-    write_attribute(:open_enrollment_start_on, new_date.to_date.beginning_of_day)
+    write_attribute(:open_enrollment_start_on, new_date.try(:to_date).try(:beginning_of_day))
   end
 
   def open_enrollment_end_on=(new_date)
-    write_attribute(:open_enrollment_end_on, new_date.to_date.end_of_day)
+    write_attribute(:open_enrollment_end_on, new_date.try(:to_date).try(:end_of_day))
   end
 
   def start_on=(new_date)
-    write_attribute(:start_on, new_date.to_date.beginning_of_month.beginning_of_day)
+    write_attribute(:start_on, new_date.try(:to_date).try(:beginning_of_month).try(:beginning_of_day))
   end
 
   def end_on=(new_date)
-    write_attribute(:end_on, new_date.to_date.end_of_day)
+    write_attribute(:end_on, new_date.try(:to_date).try(:end_of_day))
   end
 
   alias_method :effective_date=, :start_on=
