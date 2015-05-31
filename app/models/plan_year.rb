@@ -31,7 +31,6 @@ class PlanYear
   validates_presence_of :start_on, :end_on
 
   validate :open_enrollment_date_checks
-  validate :relationship_benefits_checks
 
   include Validations::USDate.on(:open_enrollment_start_on_date)
   include Validations::USDate.on(:open_enrollment_end_on_date)
@@ -313,19 +312,5 @@ private
      errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.ordinalize} day of the month prior to effective date")
     end
 
-  end
-
-  def relationship_benefits_checks
-    return if benefit_groups.blank?
-    benefit_groups.each do |benefit_group|
-      relationships = benefit_group.relationship_benefits.map(&:relationship)
-      if relationships.count("employee") > 1
-        errors.add(:benefit_group, "#{benefit_group.title} should not has more than 1 employee relationship benefit")
-      elsif relationships.count("spouse") > 1
-        errors.add(:benefit_group, "#{benefit_group.title} should not has more than 1 spouse relationship benefit")
-      elsif relationships.count("employee") == 0
-        errors.add(:benefit_group, "#{benefit_group.title} should has at least 1 employee relationship benefit")
-      end
-    end
   end
 end

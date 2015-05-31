@@ -209,4 +209,13 @@ module ApplicationHelper
     family_members.each {|f| members_list << f.person } if family_members.present?
     return members_list
   end
+
+  def generate_relationship_benefits(obj)
+    return nil unless obj.class == BenefitGroup
+    if obj.relationship_benefits.present?
+      obj.relationship_benefits
+    else
+      obj.simple_benefit_list(nil, nil, nil)
+    end
+  end
 end

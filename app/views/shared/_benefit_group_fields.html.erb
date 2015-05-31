@@ -8,7 +8,8 @@
     <div class="col-md-12 no-pd first">
       <div class="row top-row">
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-          <%= f.text_field :title, class: "floatlabel form-control", required: true, placeholder: 'TITLE' %>
+          <% title_value = f.object.title.present? ? f.object.title : "#{Time.now.year} Employer Benefits" %>
+          <%= f.text_field :title, class: "floatlabel form-control", value: title_value, required: true, placeholder: 'TITLE' %>
         </div>
         <!-- Select Plan:  -->
         <%= render "shared/reference_plans_list", f: f %>
@@ -32,13 +33,10 @@
 
   <h4> Relationship Benefits</h4>
   <div class='form-inputs'>
+    <% f.object.relationship_benefits = generate_relationship_benefits(f.object) %>
     <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
-      <%= render "shared/relationship_benefit_fields", f: rb %><br>
+      <%= render "shared/relationship_benefit_fields", f: rb %>
     <% end %>
-
-    <div>
-      <%= link_to_add_fields "Add Relationship Benefit", f, :relationship_benefits, 'pull-right btn btn-success' %>
-    </div>
-  </div><br>
+  </div>
 </fieldset>
 <div class="clear"></div>

@@ -10,13 +10,13 @@
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <%= f.text_field :employer_max_amt, class: "floatlabel form-control", placeholder: 'EMPLOYER MAX AMOUNT' %>
       </div>
-      <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :offered, class: "floatlabel form-control", placeholder: 'OFFERED (TRUE/FALSE)' %>
-      </div>
-      <div class="col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd">
-        <%= link_to '#', :class => "remove_fields close-2" do %>
-          <%= image_tag("delete.png") %>
-        <% end %> 
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <div class="checkbox">
+          <label>
+            <%= f.check_box :offered, {}, true, false %>
+            <span>OFFERED</span>
+          </label>
+        </div> 
       </div>
     </div>
   </div>

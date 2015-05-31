@@ -1,5 +1,6 @@
 class Employers::PlanYearsController < ApplicationController
   before_action :find_employer
+  before_action :generate_carriers
 
   def new
     @plan_year = build_plan_year
@@ -27,10 +28,14 @@ class Employers::PlanYearsController < ApplicationController
     @employer_profile = EmployerProfile.find(id)
   end
 
+  def generate_carriers
+    @carriers = Organization.all.map{|o|o.carrier_profile}.compact
+    @all_plans = Plan.where(active_year: Time.now.year).to_a
+  end
+
   def build_plan_year
     plan_year = PlanYear.new
     benefit_groups = plan_year.benefit_groups.build
-    relationship_benefits = benefit_groups.relationship_benefits.build
     plan_year
   end
 
