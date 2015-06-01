@@ -1,4 +1,4 @@
-$(".date-picker").datepicker();
+// $(".date-picker").datepicker();
 
 $(".date-picker").on("change", function () {
     var id = $(this).attr("id");

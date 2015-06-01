@@ -7,10 +7,10 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def create
-    @plan_year = @employer_profile.plan_years.new(plan_year_params)
+    @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|
-    reference_plan = benefit_group.reference_plan
-    benefit_group.elected_plan_ids = reference_plan.carrier_profile.plans.where(active_year: 2015, market: "shop").collect(&:_id)
+      reference_plan = benefit_group.reference_plan
+      benefit_group.elected_plan_ids = reference_plan.carrier_profile.plans.where(active_year: 2015, market: "shop").collect(&:_id)
     end
     if @plan_year.save
       flash[:notice] = "Plan Year successfully created."
@@ -37,20 +37,19 @@ class Employers::PlanYearsController < ApplicationController
 
   def generate_carriers_and_plans
     @carriers = Organization.all.map{|o|o.carrier_profile}.compact
-    @all_plans = Plan.where(active_year: Time.now.year).to_a
   end
 
   def build_plan_year
     plan_year = PlanYear.new
     benefit_groups = plan_year.benefit_groups.build
-    plan_year
+    ::Forms::PlanYearForm.new(plan_year)
   end
 
   def plan_year_params
-#    new_params = format_date_params(params)
+    #    new_params = format_date_params(params)
     params.require(:plan_year).permit(
-      :start_on_date, :end_on_date, :fte_count, :pte_count, :msp_count,
-      :open_enrollment_start_on_date, :open_enrollment_end_on_date,
+      :start_on, :end_on, :fte_count, :pte_count, :msp_count,
+      :open_enrollment_start_on, :open_enrollment_end_on,
       :benefit_groups_attributes => [ :title, :reference_plan_id, :effective_on_offset,
                                       :premium_pct_as_int, :employer_max_amt_in_cents, :_destroy,
                                       :relationship_benefits_attributes => [

@@ -28,46 +28,9 @@ class PlanYear
   embeds_many :benefit_groups, cascade_callbacks: true
   accepts_nested_attributes_for :benefit_groups, reject_if: :all_blank, allow_destroy: true
 
-  validates_presence_of :start_on, :end_on
+  validates_presence_of :start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on, :message => "is invalid"
 
   validate :open_enrollment_date_checks
-
-  include Validations::USDate.on(:open_enrollment_start_on_date)
-  include Validations::USDate.on(:open_enrollment_end_on_date)
-  include Validations::USDate.on(:start_on_date)
-  include Validations::USDate.on(:end_on_date)
-
-  def start_on_date
-    self.start_on.blank? ? nil : self.start_on.strftime("%m/%d/%Y")
-  end
-
-  def start_on_date=(val)
-    self.start_on = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
-  end
-
-  def end_on_date
-    self.end_on.blank? ? nil : self.end_on.strftime("%m/%d/%Y")
-  end
-
-  def end_on_date=(val)
-    self.end_on = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
-  end
-
-  def open_enrollment_start_on_date
-    self.open_enrollment_start_on.blank? ? nil : self.open_enrollment_start_on.strftime("%m/%d/%Y")
-  end
-
-  def open_enrollment_start_on_date=(val)
-    self.open_enrollment_start_on = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
-  end
-
-  def open_enrollment_end_on_date
-    self.open_enrollment_end_on.blank? ? nil : self.open_enrollment_end_on.strftime("%m/%d/%Y")
-  end
-
-  def open_enrollment_end_on_date=(val)
-    self.open_enrollment_end_on = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
-  end
 
   def parent
     raise "undefined parent employer_profile" unless employer_profile?
@@ -78,22 +41,6 @@ class PlanYear
   def employee_families
     return @employee_families if defined? @employee_families
     @employee_families = parent.employee_families.where(:plan_year_id => self.id)
-  end
-
-  def open_enrollment_start_on=(new_date)
-    write_attribute(:open_enrollment_start_on, new_date.try(:to_date).try(:beginning_of_day))
-  end
-
-  def open_enrollment_end_on=(new_date)
-    write_attribute(:open_enrollment_end_on, new_date.try(:to_date).try(:end_of_day))
-  end
-
-  def start_on=(new_date)
-    write_attribute(:start_on, new_date.try(:to_date).try(:beginning_of_month).try(:beginning_of_day))
-  end
-
-  def end_on=(new_date)
-    write_attribute(:end_on, new_date.try(:to_date).try(:end_of_day))
   end
 
   alias_method :effective_date=, :start_on=
@@ -272,7 +219,7 @@ private
 
     # TODO: Create HBX object with configuration settings including shop_plan_year_maximum_in_days
     shop_plan_year_maximum_in_days = 365
-    if (end_on - start_on) > shop_plan_year_maximum_in_days
+    if (end_on.yday - start_on.yday) > shop_plan_year_maximum_in_days
       errors.add(:end_on, "must be less than #{shop_plan_year_maximum_in_days} days from start date")
     end
 
@@ -288,7 +235,7 @@ private
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
     end
 
-    if (open_enrollment_end_on - open_enrollment_start_on) < HbxProfile::ShopOpenEnrollmentPeriodMinimum
+    if (open_enrollment_end_on.yday - open_enrollment_start_on.yday) < HbxProfile::ShopOpenEnrollmentPeriodMinimum
      errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{HbxProfile::ShopOpenEnrollmentPeriodMinimum} days")
     end
 
