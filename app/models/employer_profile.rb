@@ -26,9 +26,6 @@ class EmployerProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
-
-  has_one :census_roster
-
   embeds_one  :inbox, as: :recipient
   embeds_many :premium_statements
   embeds_many :plan_years, cascade_callbacks: true, validate: true
@@ -38,7 +35,7 @@ class EmployerProfile
     cascade_callbacks: true,
     validate: true
 
-  accepts_nested_attributes_for :plan_years, :employee_families, :census_roster, :inbox, :premium_statements
+  accepts_nested_attributes_for :plan_years, :employee_families, :inbox, :premium_statements
 
   validates_presence_of :entity_kind
 
@@ -60,6 +57,11 @@ class EmployerProfile
     @organization = self.organization
   end
 
+  def census_employees
+    CensusEmployee.find_by_employer_profile(self)
+  end
+
+
   def cycle_daily_events
     # advance premium_statements billing period for pending_binder_payment
   end
@@ -67,11 +69,6 @@ class EmployerProfile
   def cycle_monthly_events
     # expire_plan_years
     # premimum_statements.advance_billing_period
-  end
-
-  def census_roster
-    return @census_roster if defined? @census_roster
-    @census_roster = CensusRoster.find_by_employer_profile(self)
   end
 
   def employee_roles
@@ -106,6 +103,43 @@ class EmployerProfile
   def find_plan_year_by_date(target_date)
     plan_years.to_a.detect { |py| (py.start_date.beginning_of_day..py.end_date.end_of_day).cover?(target_date) }
   end
+
+  def eligible_to_enroll_count
+  end
+
+  def non_owner_enrollment_count
+  end
+
+  def total_enrolled_count
+  end
+
+  def enrollment_ratio
+    (total_enrolled_count / eligible_to_enroll_count) unless eligible_to_enroll_count == 0
+  end
+
+  def is_enrollment_valid?
+    enrollment_errors.blank? ? true : false
+  end
+
+  # Determine enrollment composition compliance with HBX-defined guards
+  def enrollment_errors
+    errors = {}
+    # At least one employee who isn't an owner or family member of owner must enroll
+    if non_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
+      errors.merge!(:non_owner_enrollment_count, "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
+    end
+
+    # January 1 effective date exemption(s)
+    unless effective_date.yday == 1
+      # Verify ratio for minimum number of eligible employees that must enroll is met
+      if enrollment_ratio < HbxProfile::ShopEnrollmentParticipationRatioMinimum
+        errors.merge!(:enrollment_ratio, "number of eligible participants enrolling (#{employees_total_enrolled_count}) is less than minimum required #{employees_eligible_to_enroll_count * ShopEnrollmentParticipationMinimum}")
+      end
+    end
+
+    errors
+  end
+
 
   def latest_premium_statement
     return premium_statements.first if premium_statements.size == 1
@@ -223,9 +257,10 @@ class EmployerProfile
       #     ("employer_profile.plan_years.open_enrollment_start_on" == new_date) ||
       #     ("employer_profile.plan_years.open_enrollment_end_on" == new_date)
       #   ).each do |org|
-      #     org.employer_profile.advance_enrollment_period
-      #     org.employer_profile.advance_enrollment_period
+      #     org.employer_profile.advance_enrollment_date
+      #     org.employer_profile.advance_enrollment_date
       # end
+
     end
   end
 
@@ -294,13 +329,16 @@ class EmployerProfile
 
     # Initiated only by HBX Admin
     event :appeal_determination do
-      transitions from: :ineligible_appealing, to: :ineligible
+      transitions from: :ineligible_appealing, to: :registered,
+        :guard => :is_appeal_granted?
 
+      transitions from: :ineligible_appealing, to: :ineligible
+    end
+
+    event :revert do
       # Add guard -- only revert for first 30 days past submitted
       transitions from: :ineligible_appealing, to: :applicant, 
         :after_enter => :revert_plan_year
-
-      transitions from: :ineligible_appealing, to: :registered
     end
 
     event :begin_open_enrollment, :guards => [:event_date_valid?] do
@@ -365,13 +403,14 @@ class EmployerProfile
 
 private
   def build_nested_models
-    @census_roster = CensusRoster.new
-    @census_roster.employer_profile = self
     build_inbox
   end
 
   def save_associated_nested_models
-    @census_roster.save
+  end
+
+  def is_appeal_granted?
+    false
   end
 
   def save_inbox

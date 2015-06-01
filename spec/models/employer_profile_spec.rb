@@ -41,7 +41,6 @@ describe EmployerProfile, dbclean: :after_each do
       let(:employer_profile) {EmployerProfile.new(**params)}
 
       it "should initialize nested models" do
-        expect(employer_profile.census_roster).not_to be_nil
         expect(employer_profile.inbox).not_to be_nil
       end
 
@@ -86,7 +85,6 @@ describe EmployerProfile, dbclean: :after_each do
         end
 
         it "should save all nested models" do
-          expect(saved_employer_profile.census_roster.created_at).not_to be_nil
           expect(saved_employer_profile.inbox?).to be_truthy
         end
 
