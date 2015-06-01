@@ -4,21 +4,25 @@ RSpec.describe CensusEmployee, :type => :model do
   it { should validate_presence_of :ssn }
   it { should validate_presence_of :dob }
   it { should validate_presence_of :hired_on }
+  it { should validate_presence_of :is_owner }
+  it { should validate_presence_of :employer_profile_id }
 
-  let(:census_family) { FactoryGirl.build(:employer_census_family) }
-  let(:census_employee) { census_family.census_employee }
+  let(:employer_profile) { FactoryGirl.build(:employer_profile) }
 
   let(:first_name){ "Lynyrd" }
   let(:middle_name){ "Rattlesnake" }
   let(:last_name){ "Skynyrd" }
   let(:name_sfx){ "PhD" }
   let(:ssn){ "230987654" }
-  let(:dob){ Date.today }
+  let(:dob){ Date.today - 31.years }
   let(:gender){ "male" }
-  let(:address) { Address.new(kind: "home", address_1: "address 1", city: "new city", state: "new state", zip: "11111") }
+  let(:hired_on){ Date.current - 14.days }
+  let(:is_owner){ false }
+  let(:address) { Address.new(kind: "home", address_1: "221 R St, NW", city: "Washington", state: "DC", zip: "20001") }
 
-  let(:employee_params){
+  let(:valid_params){
     {
+      employer_profile: employer_profile,
       first_name: first_name,
       middle_name: middle_name,
       last_name: last_name,
@@ -26,32 +30,85 @@ RSpec.describe CensusEmployee, :type => :model do
       ssn: ssn,
       dob: dob,
       gender: gender,
-      hired_on: Date.today - 14.days,
+      hired_on: hired_on,
+      is_owner: is_owner,
       address: address
     }
   }
-  it 'properly intantiates the class' do
-    employee = EmployerCensus::Employee.new(**employee_params)
 
-    expect(employee.first_name).to eq first_name
-    expect(employee.middle_name).to eq middle_name
-    expect(employee.last_name).to eq last_name
-    expect(employee.name_sfx).to eq name_sfx
-    expect(employee.ssn).to eq ssn
-    expect(employee.dob).to eq dob
-    expect(employee.gender).to eq gender
+  describe ".new" do
 
-    # Class should set this attribute
-    expect(employee.employee_relationship).to eq "self"
+    context "with no arguments" do
+      let(:params) {{}}
 
-    # expect(employee.inspect).to eq 0
-    expect(employee.valid?).to eq true
-    expect(employee.is_linkable?).to be_falsey
-    expect(employee.errors.messages.size).to eq 0
+      it "should not save" do
+        expect(CensusEmployee.create(**params).valid?).to be_falsey
+      end
+    end
+
+    context "with no employer_profile" do
+      let(:params) {valid_params.except(:employer_profile)}
+
+    it "should fail validation" do
+        expect(CensusEmployee.create(**params).errors[:employer_profile_id].any?).to be_truthy
+      end
+    end
+
+    context "with no ssn" do
+      let(:params) {valid_params.except(:ssn)}
+
+      it "should fail validation" do
+        expect(CensusEmployee.create(**params).errors[:ssn].any?).to be_truthy
+      end
+    end
+
+    context "with no dob" do
+      let(:params) {valid_params.except(:dob)}
+
+    it "should fail validation" do
+        expect(CensusEmployee.create(**params).errors[:dob].any?).to be_truthy
+      end
+    end
+
+    context "with no hired_on" do
+      let(:params) {valid_params.except(:hired_on)}
+
+    it "should fail validation" do
+        expect(CensusEmployee.create(**params).errors[:hired_on].any?).to be_truthy
+      end
+    end
+
+    context "with no is owner" do
+      let(:params) {valid_params.except(:is_owner)}
+
+    it "should fail validation" do
+        expect(CensusEmployee.create(**params).errors[:is_owner].any?).to be_truthy
+      end
+    end
+
+    context "with all required data" do
+      let(:params) {valid_params}
+      let(:census_employee) {CensusEmployee.new(**params)}
+
+      it "should save" do
+        expect(census_employee.save).to be_truthy
+      end
+
+      context "and it is saved" do
+        let!(:saved_census_employee) do
+          ee = CensusEmployee.new(**params)
+          ee.save
+          ee
+        end
+
+        it "and should be findable" do
+          expect(CensusEmployee.find(saved_census_employee._id)).to eq saved_census_employee
+          # expect(CensusEmployee.last).to eq saved_census_employee.inspect
+        end
+
+      end
+    end
   end
 
-  it "checks if employee is_linkable? " do
-    census_employee.save
-    expect(census_employee.is_linkable?).to be_truthy
-  end
+
 end

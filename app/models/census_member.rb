@@ -15,8 +15,6 @@ class CensusMember
 
   field :employee_relationship, type: String
 
-  embedded_in :family, class_name: "EmployerCensus::Family"
-
   embeds_one :address
   accepts_nested_attributes_for :address, reject_if: :all_blank, allow_destroy: true
 
