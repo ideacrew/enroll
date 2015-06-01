@@ -364,21 +364,19 @@ And(/^I should be able to add information about plan year, benefits and relation
   ref_plan.click
   ref_plan.li(index: 5).click # select plan from list.
   @browser.select_list(id: "plan_year_benefit_groups_attributes_0_effective_on_offset")
-  # @browser.radio(id: /plan_year_benefit_groups_attributes_0_effective_on_offset_30").fire_event("onclick")
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][premium_pct_as_int]").set(53)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
   # Relationship Benefit
-  @browser.select_list(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][relationship]").select_value("employee")
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][employer_max_amt]").set(120)
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][offered]").set("true")
-  expect(@browser.a(class: /add_fields/).visible?).to be_truthy
-  @browser.a(class: /add_fields/).click
-  @browser.fieldsets.last.p(class: /label/, text: /Employee/).click
-  @browser.fieldsets.last.li(text:/Child under 26/).click
-  @browser.text_fields(name: /plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+premium_pct/).last.set("15")
-  @browser.text_fields(name: /plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+employer_max_amt/).last.set("51")
-  @browser.text_fields(name: /plan_year.benefit_groups_attributes.+relationship_benefits_attributes.+offered/).last.set("true")
+  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][4][premium_pct]").set(15)
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][4][employer_max_amt]").set(51)
+  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_offered').first.set(true)
+  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').first.set(false)
+  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_offered').first.set(false)
+  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').first.set(false)
+  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_5_offered').first.set(false)
   screenshot("employer_add_plan_year_info")
   @browser.button(value: /Create Plan Year/).click
 end
