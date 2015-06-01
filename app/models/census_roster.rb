@@ -1,4 +1,7 @@
 class CensusRoster
+
+## NOTE: this model is deprecated!!
+
   include Mongoid::Document
   include Mongoid::Timestamps
   include Sortable
