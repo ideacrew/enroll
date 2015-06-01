@@ -1,0 +1,3 @@
+<% if @shop_enrollemnt_timetable.present? %>
+  $('.recommend').html("<%= escape_javascript(render "recommend_dates") %>"); 
+<% end %>

@@ -139,3 +139,12 @@ $(document).on("change", ".carrier", function() {
 $(document).on("change", "select[name='reference_plan']", function() {
   $(this).parents('.carrier-select').prevAll("input[type='hidden']").val($(this).val());
 }); 
+
+$(document).on("click", "a#generate_recommend_dates", function() {
+  var target_url = $(this).data("href");
+  $.ajax({
+    type: "GET",
+    data:{start_on: $("input#plan_year_start_on_date").val()},
+    url: target_url
+  });
+});

@@ -2,7 +2,7 @@
   <div class="row no-buffer focus_effect personal-info-row">
     <div class="col-md-12 no-pd first">
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.select :relationship, options_for_select(BenefitGroup::PERSONAL_RELATIONSHIP_KINDS.map{|r| [r.to_s.humanize, r.to_s] }, selected: f.object.relationship), class: "floatlabel form-control", placeholder: 'SELECT RELATIONSHIP' %>
+        <%= f.text_field :relationship, class: "form-control", readonly: true %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <%= f.text_field :premium_pct, class: "floatlabel form-control", placeholder: 'PREMIUM PERCENTAGE' %>

@@ -1,6 +1,6 @@
 class Employers::PlanYearsController < ApplicationController
-  before_action :find_employer
-  before_action :generate_carriers
+  before_action :find_employer, except: [:recommend_dates]
+  before_action :generate_carriers_and_plans, except: [:recommend_dates]
 
   def new
     @plan_year = build_plan_year
@@ -20,6 +20,13 @@ class Employers::PlanYearsController < ApplicationController
     end
   end
 
+  def recommend_dates
+    if params[:start_on].present?
+      start_on = Date.strptime(params[:start_on], "%m/%d/%Y").to_date
+      @shop_enrollemnt_timetable = PlanYear.shop_enrollment_timetable(start_on)
+    end
+  end
+
   private
 
   def find_employer
@@ -28,7 +35,7 @@ class Employers::PlanYearsController < ApplicationController
     @employer_profile = EmployerProfile.find(id)
   end
 
-  def generate_carriers
+  def generate_carriers_and_plans
     @carriers = Organization.all.map{|o|o.carrier_profile}.compact
     @all_plans = Plan.where(active_year: Time.now.year).to_a
   end

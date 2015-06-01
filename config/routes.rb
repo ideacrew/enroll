@@ -68,7 +68,9 @@ Rails.application.routes.draw do
         get 'search'
         post 'match'
       end
-      resources :plan_years
+      resources :plan_years do
+        get 'recommend_dates', on: :collection
+      end
       resources :family do
         get 'delink'
         get 'terminate'

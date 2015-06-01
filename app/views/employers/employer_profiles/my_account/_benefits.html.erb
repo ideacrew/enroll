@@ -98,7 +98,7 @@
 
               <% bg.relationship_benefits.each do |rb| %>
                 <tr>
-                <td colspan="2"><%= rb.relationship.humanize %></td>
+                <td colspan="2"><%= rb.relationship.try(:humanize) %></td>
                 <td><%= rb.offered ? "Yes" : "No" %></td>
                 <td><%= number_to_percentage rb.premium_pct, precision: 0 %></td>
                 </tr>
