@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe CensusEmployee, :type => :model do
+RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   it { should validate_presence_of :ssn }
   it { should validate_presence_of :dob }
   it { should validate_presence_of :hired_on }
@@ -37,7 +37,6 @@ RSpec.describe CensusEmployee, :type => :model do
   }
 
   describe ".new" do
-
     context "with no arguments" do
       let(:params) {{}}
 
@@ -103,7 +102,7 @@ RSpec.describe CensusEmployee, :type => :model do
           ee
         end
 
-        it "should be findable" do
+        it "should be findable by ID" do
           expect(CensusEmployee.find(saved_census_employee._id)).to eq saved_census_employee
         end
 
@@ -115,16 +114,22 @@ RSpec.describe CensusEmployee, :type => :model do
           expect(saved_census_employee.employer_profile._id).to eq census_employee.employer_profile_id
         end
 
+        it "should be findable by employer profile" do
+          expect(CensusEmployee.find_all_by_employer_profile(employer_profile).size).to eq 1
+          expect(CensusEmployee.find_all_by_employer_profile(employer_profile).first).to eq saved_census_employee
+        end
+
+
         context "and a roster search is performed" do
           context "using an ssn and dob without a matching roster instance" do
             it "should return nil" do
-              expect(CensusEmployee.find_by_identifiers(invalid_employee_role.ssn, invalid_employee_role.dob)).to be_nil
+              expect(CensusEmployee.find_all_unlinked_by_identifying_information(invalid_employee_role.ssn, invalid_employee_role.dob)).to eq []
             end
           end
 
           context "using an ssn and dob with a matching roster instance" do
             it "should return the roster instance" do
-              expect(CensusEmployee.find_by_identifiers(valid_employee_role.ssn, valid_employee_role.dob)).to eq saved_census_employee
+              expect(CensusEmployee.find_all_unlinked_by_identifying_information(valid_employee_role.ssn, valid_employee_role.dob)).to eq [saved_census_employee]
             end
           end
         end
@@ -147,9 +152,15 @@ RSpec.describe CensusEmployee, :type => :model do
               expect(saved_census_employee.employee_role_linked?).to be_truthy
             end
 
-            context "and it is linked" do
+            context "and it is saved" do
+              before { saved_census_employee.save }
               it "should no longer be available for linking" do
                 expect(saved_census_employee.may_link_employee_role?).to be_falsey 
+              end
+
+              it "should be findable by employee role" do
+                expect(CensusEmployee.find_all_by_employee_role(valid_employee_role).size).to eq 1
+                expect(CensusEmployee.find_all_by_employee_role(valid_employee_role).first).to eq saved_census_employee
               end
 
               it "and should be delinkable" do

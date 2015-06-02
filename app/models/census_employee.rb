@@ -32,11 +32,11 @@ class CensusEmployee < CensusMember
   index({"employee_role_id" => 1}, {sparse: true})
   index({"benefit_group_assignments._id" => 1})
   index({"last_name" => 1})
-  index({"hired_on" => 1})
+  index({"hired_on" => -1})
   index({"is_business_owner" => 1})
   index({"ssn" => 1})
   index({"dob" => 1})
-  index({"ssn" => 1, "dob" => 1})
+  index({"ssn" => 1, "dob" => 1, "aasm_state" => 1})
 
   scope :active,  ->{ any_in(aasm_state: ["employee_role_unlinked", "employee_role_linked"]) }
 
@@ -146,16 +146,16 @@ class CensusEmployee < CensusMember
   end
 
   class << self
-    def find_by_identifiers(ssn, dob)
-      where(ssn: ssn).and(dob: dob).first
+    def find_all_unlinked_by_identifying_information(ssn, dob)
+      unscoped.and(ssn: ssn, dob: dob, aasm_state: "employee_role_unlinked").to_a
     end
 
-    def find_by_employer_profile(employer_profile)
-      where(employer_profile_id: employer_profile._id).unscoped.order_name_desc
+    def find_all_by_employer_profile(employer_profile)
+      unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
     end
 
-    def find_by_employee_role(employee_role)
-      where(employee_role_id: employee_role_.id)
+    def find_all_by_employee_role(employee_role)
+      unscoped.where(employee_role_id: employee_role._id)
     end
   end
 
