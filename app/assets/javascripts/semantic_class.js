@@ -22,6 +22,27 @@ function semantic_class() {
 		}
 	});
 
+	// Adds semantic class to all 'select' top levels
+	$('select').each(function() {
+		var element_id = $.trim($(this).attr('id'));
+
+		if(element_id) {
+			$(this).addClass('interaction-choice-control-' + element_id.toLowerCase().replace(/_| /gi, '-'));
+			$('#' + element_id + ' option').each(function(index) {
+				$(this).addClass('interaction-choice-control-' + element_id.toLowerCase().replace(/_| /gi, '-') + '-' + index);
+			});
+			// $(this).closest('.selectric-wrapper').html('test');
+			// .addClass('interaction-choice-control-' + element_id.toLowerCase().replace(/_| /gi, '-'));
+			$('select').on('selectric-init', function(element){
+				$('.selectric').addClass('interaction-choice-control-' + element_id.toLowerCase().replace(/_| /gi, '-'));
+				$('.selectric-items li').each(function() {
+					var index = $(this).data("index");
+					$(this).addClass('interaction-choice-control-' + element_id.toLowerCase().replace(/_| /gi, '-') + '-' + index);
+				});
+			});
+		}
+	});
+
 	// Adds semantic class to all radio buttons and check boxes eg. interaction-choice-control-value-male
 	$('input[type="radio"], input[type="checkbox"]').each(function() {
 		var element_id = $.trim($(this).attr('id'));
