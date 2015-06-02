@@ -127,10 +127,11 @@ class CensusEmployee < CensusMember
 
   def terminate_employment!(terminated_on)
     return nil unless self.may_terminate?
-    coverage_term_date = terminated_on.to_date.end_of_month
+    employment_term_date = terminated_on.to_date.end_of_day
+    coverage_term_date = employment_term_date.end_of_month
 
-    retro_term_maximum = HbxProfile::ShopRetroactiveTerminationMaximumInDays
-    if (Date.today - coverage_term_date) > retro_term_maximum
+    retro_term_maximum = HbxProfile::ShopRetroactiveTerminationMaximum
+    if (coverage_term_date + retro_term_maximum) < Date.today
       message =  "Error while terminating: #{first_name} #{last_name} (id=#{id}). "
       message << "Termination date: #{terminated_on.end_of_month} exceeds maximum period "
       message << "(#{retro_term_maximum} days) for a retroactive termination"
@@ -139,6 +140,7 @@ class CensusEmployee < CensusMember
     end
 
     self.coverage_terminated_on = coverage_term_date
+    self.employment_terminated_on = terminated_on.to_date.end_of_day
     self.terminate
     self
   end

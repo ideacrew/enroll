@@ -158,19 +158,39 @@ RSpec.describe CensusEmployee, :type => :model do
             end
 
             context "and employee is terminated" do
+              let(:invalid_termination_date)  { (Date.current - HbxProfile::ShopRetroactiveTerminationMaximum).beginning_of_month - 1.day }
+              let(:valid_termination_date)    { Date.current - HbxProfile::ShopRetroactiveTerminationMaximum }
+
               context "and the termination date exceeds the HBX maximum" do
                 context "and the user is employer rep" do
+
+                  it "transition to terminated state should be valid" do
+                    expect(saved_census_employee.may_terminate?).to be_truthy
+                  end
+
                   it "should prohibit termination" do
+                    expect{saved_census_employee.terminate_employment!(invalid_termination_date)}.to raise_error CensusEmployeeError
                   end
                 end
                 context "and the user is HBX admin" do
+                  it "transition to terminated state should be valid" do
+                    expect(saved_census_employee.may_terminate?).to be_truthy
+                  end
+
                   it "should permit termination" do
+                    expect(saved_census_employee.terminate_employment(valid_termination_date).employment_terminated_on).to eq valid_termination_date
                   end
                 end
               end
 
               context "and the termination date is within the HBX maximum" do
+                pending "cancancan role authorization"
+                it "transition to terminated state should be valid" do
+                  expect(saved_census_employee.may_terminate?).to be_truthy
+                end
+
                 it "should permit termination" do
+                  # expect(saved_census_employee.terminate_employment(invalid_termination_date).employment_terminated_on).to eq invalid_termination_date
                 end
               end
             end
