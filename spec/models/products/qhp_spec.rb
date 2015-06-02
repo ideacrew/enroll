@@ -24,7 +24,8 @@ describe Products::Qhp, :type => :model do
   it { should validate_presence_of :out_of_country_coverage }
   it { should validate_presence_of :out_of_service_area_coverage }
   it { should validate_presence_of :national_network }
-  it { should validate_presence_of :summary_benefit_and_coverage_url }
+  # FIXME: Re-enable once we have compliant SERFF templates from Kaiser
+  #  it { should validate_presence_of :summary_benefit_and_coverage_url }
 
   let(:plan){ FactoryGirl.create(:plan) }
   let(:qhp) { FactoryGirl.build(:products_qhp) }
