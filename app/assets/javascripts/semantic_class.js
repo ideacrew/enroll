@@ -31,8 +31,6 @@ function semantic_class() {
 			$('#' + element_id + ' option').each(function(index) {
 				$(this).addClass('interaction-choice-control-' + element_id.toLowerCase().replace(/_| /gi, '-') + '-' + index);
 			});
-			// $(this).closest('.selectric-wrapper').html('test');
-			// .addClass('interaction-choice-control-' + element_id.toLowerCase().replace(/_| /gi, '-'));
 			$('select').on('selectric-init', function(element){
 				$('.selectric').addClass('interaction-choice-control-' + element_id.toLowerCase().replace(/_| /gi, '-'));
 				$('.selectric-items li').each(function() {
