@@ -88,7 +88,9 @@ RSpec.describe CensusEmployee, :type => :model do
 
     context "with all required data" do
       let(:params) { valid_params }
-      let(:census_employee) { CensusEmployee.new(**params) }
+      let(:census_employee)         { CensusEmployee.new(**params) }
+      let(:valid_employee_role)     { FactoryGirl.create(:employee_role, ssn: census_employee.ssn, dob: census_employee.dob) }
+      let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: Date.current - 5.days) }
 
       it "should save" do
         expect(census_employee.save).to be_truthy
@@ -101,71 +103,94 @@ RSpec.describe CensusEmployee, :type => :model do
           ee
         end
 
-        it "and should be findable" do
+        it "should be findable" do
           expect(CensusEmployee.find(saved_census_employee._id)).to eq saved_census_employee
         end
 
-      end
-
-      context "a valid census employee exists" do
-        let(:census_employee)         { CensusEmployee.new(**valid_params) }
-        let(:valid_employee_role)     { FactoryGirl.create(:employee_role, ssn: census_employee.ssn, dob: census_employee.dob) }
-        let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: Date.current - 5.days) }
-
-        before { census_employee.save }
-
-        it "should be in unlinked state" do
-          expect(census_employee.unlinked?).to be_truthy
+        it "in an unlinked state" do
+          expect(saved_census_employee.employee_role_unlinked?).to be_truthy
         end
 
-        context "and a check is made whether an individual exists on roster instance" do
-          context "and an individual with matching ssn and dob exists" do
+        it "and should have the correct associated employer profile" do
+          expect(saved_census_employee.employer_profile._id).to eq census_employee.employer_profile_id
+        end
+
+        context "and a roster search is performed" do
+          context "using an ssn and dob without a matching roster instance" do
+            it "should return nil" do
+              expect(CensusEmployee.find_by_identifiers(invalid_employee_role.ssn, invalid_employee_role.dob)).to be_nil
+            end
+          end
+
+          context "using an ssn and dob with a matching roster instance" do
             it "should return the roster instance" do
-              expect(CensusEmployee.find_by_identifiers(census_employee.ssn, census_employee.dob)).to eq census_employee
+              expect(CensusEmployee.find_by_identifiers(valid_employee_role.ssn, valid_employee_role.dob)).to eq saved_census_employee
             end
           end
         end
 
-        context "and a request is made to link the roster instance with an employee role" do
-          context "and the roster instance is in unlinked state" do
-
-            before do
-              # census_employee = CensusEmployee.find_by_identifiers(census_employee.ssn, census_employee.dob)
-            end
-
-            context "and employee role identifiers don't match census employee" do
-              # before { census_employee.link_employee_role(invalid_employee_role) }
-
-              it "should puke" do
-                # expect().to be_falsey
-              end
-            end
-
-            context "and employee role identifiers do match census employee" do
-              # before { census_employee.link_employee_role(valid_employee_role) }
-
-              it "should link the roster instance and employer role" do
-                # expect().to be_truthy
-                # expect()
-                # expect(census_family.employee_role_id).to eq employee_role.id
-                # expect(employer_profile.employee_families.first.employee_role_id).to eq employee_role._id
-              end
-            end
+        context "and a link employee role request is made" do
+          it "the roster instance should be in a state ready for linking" do
+            expect(saved_census_employee.may_link_employee_role?).to be_truthy
           end
 
-          context "and the roster instance is in any state besides unlinked" do
+          context "and the provided employee role identifying information doesn't match a census employee" do
             it "should raise an error" do
-              # expect{census_family.link_employee_role(employee_role)}.to raise_error(EmployeeFamilyLinkError)
+              expect{saved_census_employee.employee_role = invalid_employee_role}.to raise_error(CensusEmployeeError)
+            end
+          end
+
+          context "and the provided employee role identifying information does match a census employee" do
+            before { saved_census_employee.employee_role = valid_employee_role }
+
+            it "should link the roster instance and employer role" do
+              expect(saved_census_employee.employee_role_linked?).to be_truthy
+            end
+
+            context "and it is linked" do
+              it "should no longer be available for linking" do
+                expect(saved_census_employee.may_link_employee_role?).to be_falsey 
+              end
+
+              it "and should be delinkable" do
+                expect(saved_census_employee.may_delink_employee_role?).to be_truthy
+              end
+            end
+
+            context "and employee is terminated" do
+              context "and the termination date exceeds the HBX maximum" do
+                context "and the user is employer rep" do
+                  it "should prohibit termination" do
+                  end
+                end
+                context "and the user is HBX admin" do
+                  it "should permit termination" do
+                  end
+                end
+              end
+
+              context "and the termination date is within the HBX maximum" do
+                it "should permit termination" do
+                end
+              end
+            end
+          end
+
+          context "and the roster census employee instance is in any state besides unlinked" do
+            let(:employee_role_linked_state)  { saved_census_employee.dup }
+            let(:employment_terminated_state)  { saved_census_employee.dup }
+            before do
+              employee_role_linked_state.aasm_state = :employee_role_linked
+              employment_terminated_state.aasm_state = :employment_terminated
+            end
+
+            it "should prevent linking with another employee role" do
+              expect(employee_role_linked_state.may_link_employee_role?).to be_falsey 
+              expect(employment_terminated_state.may_link_employee_role?).to be_falsey 
             end
           end
         end
-
       end
-
+    end
   end
-
-
-  end
-
-
 end
