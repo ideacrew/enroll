@@ -3,26 +3,33 @@
     <div class="panel-body left">
         <div class="col-md-9 col-sm-9 col-xs-12">
           <h3>Covered Family Members</h3>
-          <h3>Who would you like to cover?</h3>
+          <h4><strong>Who would you like to cover?</strong></h4>
           <%= form_tag(:group_selection_create) do %>
             <%= hidden_field_tag(:person_id, @person.id) %>
             <%= hidden_field_tag(:employee_role_id, @employee_role.id) %>
             <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
-            <% @coverage_household.family_members.each_with_index do |family_member, index| %>
-              <div>
-                <%= check_box_tag("family_member_ids[#{index}]", family_member.id, true) %>
-                <% 
-                  dob = family_member.dob
-                  now = Date.today
-                  age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
-                %>
-                <%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(age, 'year')})") %>
-              </div>
-            <% end %>
+
+            <div class="table-responsive table-border">
+              <table class="table table-wrapper table-condensed group-selection-tbl">
+                <tbody>
+              <% @coverage_household.family_members.each_with_index do |family_member, index| %>
+                <tr>
+                  <td width="20"><%= check_box_tag("family_member_ids[#{index}]", family_member.id, true) %></td>
+                  <% 
+                    dob = family_member.dob
+                    now = Date.today
+                    age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+                  %>
+                  <td><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(age, 'year')})") %></td>
+                </tr>
+              <% end %>
+              </tbody>
+              </table>
+            </div>
             
             <br>
             <h3>Select a plan</h3>
-            <p class="text-justify"><%= t('group_selection.select_plan') %></p>
+            <p class="text-justify"><%= t('welcome.employee.select_plan') %></p>
             <br>
             
             <button type="submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Continue</button>

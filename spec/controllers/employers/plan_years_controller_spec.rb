@@ -49,13 +49,13 @@ RSpec.describe Employers::PlanYearsController do
 
     let(:plan_year_params) {
       {
-           :start_on => "2015-01-01",
-           :end_on => "2015-12-31",
+           :start_on => "01/01/2015",
+           :end_on => "12/31/2015",
            :fte_count => "1",
            :pte_count => "3",
            :msp_count => "5",       
-           :open_enrollment_start_on => "2014-12-01",
-           :open_enrollment_end_on => "2014-12-15",
+           :open_enrollment_start_on => "12/01/2014",
+           :open_enrollment_end_on => "12/15/2014",
            :benefit_groups_attributes => benefit_groups_attributes
       }
     }
@@ -75,8 +75,8 @@ RSpec.describe Employers::PlanYearsController do
 
     before :each do
       sign_in
+      allow(::Forms::PlanYearForm).to receive(:build).with(employer_profile, plan_year_params).and_return(plan_year)
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(plan_year_proxy).to receive(:new).and_return(plan_year)
       allow(benefit_group).to receive(:elected_plan_ids=).and_return("test")
       allow(plan_year).to receive(:save).and_return(save_result)
       post :create, :employer_profile_id => employer_profile_id, :plan_year => plan_year_request_params

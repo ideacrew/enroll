@@ -14,7 +14,8 @@
 
             <br>
 
-            <table class="table table-border table-striped">
+            <div class="table-border">
+            <table class="table table-striped">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -36,26 +37,27 @@
                   </tr>
                 <% end %>
                 <tr class="gray-row">
-                  <td colspan="3" class="text-right">Total Premium</td>
-                  <td><%= number_to_currency(total_cost) %></td>
+                  <td colspan="3" class="text-right capital"><strong>Total Premium :</strong></td>
+                  <td><strong><%= number_to_currency(total_cost) %></strong></td>
                 </tr>
 
                 <tr>
-                  <td colspan="3" class="text-right">Additionally your employer pays</td>
+                  <td colspan="3" class="text-right">Additionally your employer pays :</td>
                   <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
                 </tr>
-                <tr style='font-size:20px' class="gray-row">
-                  <td colspan="3" class="text-right"><strong>You pay</strong></td>
+                <tr class="gray-row">
+                  <td colspan="3" class="text-right capital"><strong>You pay :</strong></td>
                   <td><strong>
                     <%= number_to_currency(@plan.total_employee_cost || 0) %>
                   </strong></td>
                 </tr>
                 <tr>
-                  <td colspan="3" class="text-right">Your coverage start date</td>
+                  <td colspan="3" class="text-right">Your coverage start date :</td>
                   <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
                 </tr>
               </tbody>
             </table>
+          </div><br>
           </div>
 
           <%= link_to '<i class="fa fa-shopping-cart"></i>

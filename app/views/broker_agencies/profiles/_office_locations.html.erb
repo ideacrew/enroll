@@ -1,0 +1,7 @@
+<h4> Office Locations </h4>
+
+<% if office_locations.present? %>
+  <% office_locations.each do |office_location| %>
+    <%= office_location.address.to_s %>
+  <% end %>
+<% end %>

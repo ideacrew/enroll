@@ -3,10 +3,8 @@ require 'rails_helper'
 describe PlanYear, :type => :model, :dbclean => :after_each do
   it { should validate_presence_of :start_on }
   it { should validate_presence_of :end_on }
-  it { should validate_presence_of :start_on_date }
-  it { should validate_presence_of :end_on_date }
-  it { should validate_presence_of :open_enrollment_start_on_date }
-  it { should validate_presence_of :open_enrollment_end_on_date }
+  it { should validate_presence_of :open_enrollment_start_on }
+  it { should validate_presence_of :open_enrollment_end_on }
 
   let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
   let(:valid_plan_year_start_on)        { (Date.current + 1.month).end_of_month + 1.day }
