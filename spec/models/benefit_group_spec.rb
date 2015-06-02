@@ -154,4 +154,24 @@ describe BenefitGroup, "instance methods" do
     benefit_group.employer_max_amt_in_cents = "100"
     expect(benefit_group.premium_in_dollars).to be 100.to_f
   end
+
+  context "simple benefit list" do
+    let(:benefit_list){benefit_group.simple_benefit_list(50,20,200)}
+
+    it "should have six item" do
+      expect(benefit_list.size).to eq BenefitGroup::PERSONAL_RELATIONSHIP_KINDS.size
+    end
+
+    it "should have same employer_max_amount" do
+      expect(benefit_list.map(&:employer_max_amt)).to eq Array.new(6, 200)
+    end
+
+    it "should have different premium_pct" do
+      expect(benefit_list.map(&:premium_pct)).to eq [50,50,20,20,20,20]
+    end
+
+    it "should have different offered" do
+      expect(benefit_list.map(&:offered)).to eq [true, false, true, true, true, true]
+    end
+  end
 end
