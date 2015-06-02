@@ -51,13 +51,20 @@ class HbxEnrollment
             inclusion: {in: Kinds, message: "%{value} is not a valid enrollment type"}
 
   aasm do
-    state :applying, initial: true
-    state :submitted
-    state :transmitted_to_carrier
-    state :carrier_processing
-    state :plan_effectuated
-    state :plan_canceled
-    state :plan_terminated
+    state :shopping, initial: true
+    state :enrollment_transmitted_to_carrier
+    state :coverage_enrolled      # effectuated
+
+    state :coverage_canceled      # coverage never took effect
+    state :coverage_terminated    # coverage ended
+
+    state :inactive   # :after_enter inform census_employee
+
+    event :waive_coverage do
+      transitions from: :shopping, to: :inactive
+    end
+
+
   end
 
   def is_active?

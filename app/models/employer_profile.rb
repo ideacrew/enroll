@@ -107,7 +107,7 @@ class EmployerProfile
   def eligible_to_enroll_count
   end
 
-  def non_owner_enrollment_count
+  def non_business_owner_enrollment_count
   end
 
   def total_enrolled_count
@@ -125,8 +125,8 @@ class EmployerProfile
   def enrollment_errors
     errors = {}
     # At least one employee who isn't an owner or family member of owner must enroll
-    if non_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
-      errors.merge!(:non_owner_enrollment_count, "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
+    if non_business_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
+      errors.merge!(:non_business_owner_enrollment_count, "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
     end
 
     # January 1 effective date exemption(s)
