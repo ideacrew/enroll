@@ -99,10 +99,6 @@ And(/^I sign in with valid user data$/) do
   user = FactoryGirl.create(:user)
   user.build_person(first_name: "John", last_name: "Doe", ssn: "111000999", dob: "10/10/1985")
   user.save
-  plan = FactoryGirl.create(:plan)
-  pt = plan.premium_tables.build(age: 34, start_on: 0.days.ago.beginning_of_year.to_date, end_on: 0.days.ago.end_of_year.to_date, cost: 345.09)
-  pt1 = plan.premium_tables.build(age: 3, start_on: 0.days.ago.beginning_of_year.to_date, end_on: 0.days.ago.end_of_year.to_date, cost: 125.10)
-  plan.save
 
   @browser.text_field(name: "user[email]").set(user.email)
   @browser.text_field(name: "user[password]").set(user.password)
