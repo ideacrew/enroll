@@ -115,7 +115,7 @@ describe EmployerProfile, dbclean: :after_each do
         plan_year.publish
       end
 
-      it "should transition transition to registered state" do
+      it "should transition to registered state" do
         expect(employer_profile.registered?).to be_truthy
       end
     end
