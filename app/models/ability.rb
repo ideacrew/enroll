@@ -20,11 +20,24 @@ class Ability
       can :read, :all
     elsif user.has_role? :hbx_staff
       can :read, :all
+      can :edit_plan_year, PlanYear do |py|
+        editable_plan_year?(py)
+      end
     elsif user.has_role? :system_service
       can :read, :all
     elsif user.has_role? :web_service
       can :read, :all
     end
 
+  end
+
+  #For controller action call authorize! :edit_plan_year
+  #For view level <% if can? :edit_plan_year %>
+  def editable_plan_year?(py)
+    unless py.draft?
+      raise CanCan::AccessDenied.new("Plan Year can no longer be updated", [:edit_plan_year], PlanYear)
+    end
+
+    true
   end
 end
