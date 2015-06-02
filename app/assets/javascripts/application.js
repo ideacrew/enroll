@@ -21,6 +21,8 @@
 //= require modalEffects
 //= require jquery.mask
 //= require override_confirm
+//= require floatlabels
+//= require jq_datepicker
 //= require_tree .
 
 $(document).ready(function () {

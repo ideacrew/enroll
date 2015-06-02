@@ -3,18 +3,18 @@
   <div class="col-md-12 no-pd first">
     <div class="row top-row">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :start_on, class: "date-picker floatlabel form-control", required: true, placeholder: 'START ON' %>
+	<%= datepicker_control(f, :start_on, {:class => "floatlabel form-control", :required => true, :placeholder => "START ON"}) %>
       </div>
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :end_on, class: "date-picker floatlabel form-control", required: true, placeholder: 'END ON' %>
+        <%= datepicker_control(f, :end_on, {:class => "floatlabel form-control", :required => true, :placeholder => "END ON"}) %>
       </div>
     </div>
     <div class="row top-row">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :open_enrollment_start_on, class: "date-picker floatlabel form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE' %>
+        <%= datepicker_control(f, :open_enrollment_start_on, {:class => "floatlabel form-control", :required => true, :placeholder => "OPEN ENROLLMENT START DATE"}) %>
       </div>
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :open_enrollment_end_on, class: "date-picker floatlabel form-control", required: true, placeholder: 'OPEN ENROLLMENT END DATE' %>
+        <%= datepicker_control(f, :open_enrollment_end_on, {:class => "floatlabel form-control", :required => true, :placeholder => "OPEN ENROLLMENT END DATE"}) %>
       </div>
     </div>
     <div class="row bottom-row">

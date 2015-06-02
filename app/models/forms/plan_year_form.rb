@@ -5,18 +5,6 @@ module Forms
        @all_plans = Plan.where(active_year: Time.now.year, market: "shop").to_a
      end
 
-     [:start_on, :end_on, :open_enrollment_end_on, :open_enrollment_start_on].each do |attr|
-       class_eval(<<-RUBYCODE)
-         def #{attr}
-           __getobj__.#{attr}.blank? ? nil : __getobj__.#{attr}.strftime("%m/%d/%Y")
-         end
-
-         def #{attr}=(val)
-           __getobj__.#{attr} = Date.strptime(val, "%m/%d/%Y") rescue nil
-         end
-       RUBYCODE
-     end
-
      def carrier_plans_for(c_profile)
        @all_plans.select { |pl| pl.carrier_profile_id.to_s == c_profile.id.to_s }
      end
