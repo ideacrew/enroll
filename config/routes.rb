@@ -105,7 +105,7 @@ Rails.application.routes.draw do
 
   # FIXME: Do this properly later
   namespace :products do
-    resources :plans, controller: :qhp do
+    resources :plans, controller: :qhp, :only => [] do
       collection do
         get 'comparison'
         get 'summary'
