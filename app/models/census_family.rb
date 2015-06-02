@@ -3,6 +3,8 @@ class CensusFamily
   include Mongoid::Timestamps
   include AASM
 
+## NOTE: this model is deprecated!!
+
   embedded_in :census_roster
 
   field :aasm_state, type: String

@@ -2,7 +2,7 @@ class CensusEmployee < CensusMember
   include AASM
   include Sortable
 
-  field :is_owner, type: Boolean
+  field :is_business_owner, type: Boolean
   field :hired_on, type: Date
   field :employment_terminated_on, type: Date
   field :coverage_terminated_on, type: Date
@@ -25,7 +25,7 @@ class CensusEmployee < CensusMember
 
   accepts_nested_attributes_for :census_dependents, :benefit_group_assignments
 
-  validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_owner
+  validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_business_owner
 
   index({"aasm_state" => 1})
   index({"employer_profile_id" => 1}, {sparse: true})
@@ -33,7 +33,7 @@ class CensusEmployee < CensusMember
   index({"benefit_group_assignments._id" => 1})
   index({"last_name" => 1})
   index({"hired_on" => 1})
-  index({"is_owner" => 1})
+  index({"is_business_owner" => 1})
   index({"ssn" => 1})
   index({"dob" => 1})
   index({"ssn" => 1, "dob" => 1})
@@ -98,13 +98,13 @@ class CensusEmployee < CensusMember
     self.unlinked?
   end
 
-  def is_owner?
-    is_owner
+  def is_business_owner?
+    is_business_owner
   end
 
   class << self
     def find_by_identifiers(ssn, dob)
-      where(ssn: ssn).and(dob: dob)
+      where(ssn: ssn).and(dob: dob).first
     end
 
     def find_by_employer_profile(employer_profile)
@@ -120,10 +120,10 @@ class CensusEmployee < CensusMember
   aasm do
     state :unlinked, initial: true
     state :linked
-    state :coverage_enrolled
-    state :coverage_waived
-    state :coverage_terminated
     state :employment_terminated
+
+    state :coverage_selected
+    state :coverage_waived
 
     event :link_employee_role do
       transitions from: :unlinked, to: :linked
@@ -134,17 +134,17 @@ class CensusEmployee < CensusMember
     end
 
     event :enroll do
-      transitions from: :linked, to: :coverage_enrolled
-      transitions from: :coverage_waived, to: :coverage_enrolled
+      transitions from: :linked, to: :coverage_selected
+      transitions from: :coverage_waived, to: :coverage_selected
     end
 
     event :waive_coverage do
       transitions from: :linked, to: :coverage_waived
-      transitions from: :coverage_enrolled, to: :coverage_waived
+      transitions from: :coverage_selected, to: :coverage_waived
     end
 
     event :terminate_coverage do
-      transitions from: :coverage_enrolled, to: :coverage_terminated
+      transitions from: :coverage_selected, to: :coverage_terminated
     end
 
     event :terminate_employment do
