@@ -1,6 +1,10 @@
 class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_broker_role, only: [:new, :create]
 
+  def index
+    @broker_agency_profiles = BrokerAgencyProfile.all
+  end
+
   def new
     build_broker_agency_profile_params
   end
@@ -26,6 +30,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def show
+    @broker_agency_profile = BrokerAgencyProfile.find(params["id"])
   end
 
   private
