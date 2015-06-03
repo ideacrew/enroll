@@ -14,9 +14,7 @@ RSpec.describe Inbox, :type => :model do
         expect(inbox_with_message.messages.size).to eq 1
       end
 
-      pending "add this spec"
-      it "message should be findable" do
-      end
+      it "message should be findable"
     end
 
   end
