@@ -1,0 +1,19 @@
+<ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
+   <li role="presentation"<%= menu_tab_class(active_tab, "home-tab") %>>
+   <%= link_to(broker_agencies_profiles_path, "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
+      <span class="home-icon" title="Home"></span>
+    <% end %>
+  </li>
+  <!-- <li role="presentation"<%= menu_tab_class(active_tab, "profile-tab") %>>
+   <%#= link_to(personal_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "profile", "role" => "tab" ) do  %>
+      <span class="hidden-xs">Profile</span>
+      <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Profile"></span>
+   <%# end %>
+  </li>
+  <li role="presentation"<%= menu_tab_class(active_tab, "plans-tab") %>>
+   <%#= link_to(plans_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "plans", "role" => "tab" ) do  %>
+      <span class="hidden-xs">Plans</span>
+      <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Plans"></span>
+   <%# end %>
+  </li> -->
+</ul>

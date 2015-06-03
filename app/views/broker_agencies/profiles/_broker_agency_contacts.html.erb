@@ -1,22 +1,24 @@
-<h4> Broker Agency Contacts </h4>
+<h3>Broker Agency Contacts</h3>
 
-<% if broker_agency_contacts.present? %>
-  <table border = "1" width="900">
-    <thead>
-      <th>First Name</th>
-      <th>Last Name</th>
-      <th>Dob</th>
-      <th>Primary Broker Role Info (npn / provider kind / active)</th>
-    </thead>
-    <% broker_agency_contacts.each do |broker_agency_contact| %>
-      <tbody>
-        <td><%= broker_agency_contact.first_name %></td>
-        <td><%= broker_agency_contact.last_name %></td>
-        <td><%= broker_agency_contact.dob %></td>
-        <td><%= broker_agency_contact.broker_role.present? ? "#{broker_agency_contact.broker_role.npn} / #{broker_agency_contact.broker_role.provider_kind} / #{broker_agency_contact.broker_role.is_active}" : "" %></td>
-      </tbody>
+<div class="table-border">
+  <table class="table">
+    <% if broker_agency_contacts.present? %>
+        <thead>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Dob</th>
+          <th>Primary Broker Role Info (npn / provider kind / active)</th>
+        </thead>
+        <% broker_agency_contacts.each do |broker_agency_contact| %>
+          <tbody>
+            <td><%= broker_agency_contact.first_name %></td>
+            <td><%= broker_agency_contact.last_name %></td>
+            <td><%= broker_agency_contact.dob %></td>
+            <td><%= broker_agency_contact.broker_role.present? ? "#{broker_agency_contact.broker_role.npn} / #{broker_agency_contact.broker_role.provider_kind} / #{broker_agency_contact.broker_role.is_active}" : "" %></td>
+          </tbody>
+        <% end %>
+    <% else %>
+      <tr><td>No Broker Agency Contacts found.</td></tr>
     <% end %>
   </table>
-<% else %>
-  No Broker Agency Contacts found.
-<% end %>
+</div>

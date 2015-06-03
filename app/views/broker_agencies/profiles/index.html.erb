@@ -1,24 +1,31 @@
-<h4> Broker Agencies </h4>
+<%= render 'menu', :active_tab => "home-tab" %>
 
-<% if @broker_agency_profiles.present? %>
-  <table border = "1" width="900">
-    <thead>
-      <th>Legal Name</th>
-      <th>dba</th>
-      <th>Fein</th>
-      <th>Entity Kind</th>
-      <th>Market Kind</th>
-    </thead>
-    <% @broker_agency_profiles.each do |broker_agency_profile| %>
-      <tbody>
-        <td><%= link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile) %></td>
-        <td><%= broker_agency_profile.dba %></td>
-        <td><%= broker_agency_profile.fein %></td>
-        <td><%= broker_agency_profile.entity_kind %></td>
-        <td><%= broker_agency_profile.market_kind %></td>
-      </tbody>
+<div class="container">
+
+  <h3>Broker Agencies</h3>
+
+  <div class="table-border">
+    <table class="table">
+    <% if @broker_agency_profiles.present? %>
+      <thead>
+        <th>Legal Name</th>
+        <th>dba</th>
+        <th>Fein</th>
+        <th>Entity Kind</th>
+        <th>Market Kind</th>
+      </thead>
+      <% @broker_agency_profiles.each do |broker_agency_profile| %>
+        <tbody>
+          <td><%= link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile) %></td>
+          <td><%= broker_agency_profile.dba %></td>
+          <td><%= broker_agency_profile.fein %></td>
+          <td><%= broker_agency_profile.entity_kind.titleize %></td>
+          <td><%= broker_agency_profile.market_kind.titleize %></td>
+        </tbody>
+      <% end %>
+    <% else %>
+      <tr><td>No Broker Agency Profiles found.</td></tr>
     <% end %>
-  </table>
-<% else %>
-  No Broker Agency Profiles found.
-<% end %>
+    </table>
+  </div>
+</div>
