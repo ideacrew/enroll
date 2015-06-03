@@ -87,6 +87,7 @@ Rails.application.routes.draw do
   end
 
   namespace :broker_agencies do
+    root 'profiles#new'
     resources :profiles, only: [:new, :create, :show, :index]
   end
 
