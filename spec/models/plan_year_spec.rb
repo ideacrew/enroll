@@ -60,19 +60,13 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "with no open enrollment start on" do
       let(:params) {valid_params.except(:open_enrollment_start_on)}
 
-      it "should fail validation" do
-        #TODO no present validation on open enrollment right now
-        #expect(PlanYear.create(**params).errors[:open_enrollment_start_on].any?).to be_truthy
-      end
+      it "should fail validation"
     end
 
     context "with no open enrollment end on" do
       let(:params) {valid_params.except(:open_enrollment_end_on)}
 
-      it "should fail validation" do
-        #TODO no present validation on open enrollment end on right now
-        #expect(PlanYear.create(**params).errors[:open_enrollment_end_on].any?).to be_truthy
-      end
+      it "should fail validation"
     end
 
     context "with all valid arguments" do
@@ -433,17 +427,15 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           expect(plan_year.employer_profile.ineligible?).to be_truthy
         end
 
-        it "and employer should be notified that applcation is ineligible" do
-          fail "determination of notification form and channels"
-        end
+        # TODO: We need to determine the form this notification will take
+        it "and employer should be notified that applcation is ineligible"
 
         context "and 30 days or less has elapsed since applicaton was submitted" do
           context "and the employer decides to appeal" do
             it "should transition to ineligible-appealing state"
 
-            it "should notify HBX representatives of appeal request" do
-              fail "determination of notification form and channels"
-            end
+            # TODO: We need to determine the form this notification will take
+            it "should notify HBX representatives of appeal request"
 
               context "and HBX determines appeal has merit" do
                 it "should transition employer status to registered"
