@@ -433,15 +433,17 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           expect(plan_year.employer_profile.ineligible?).to be_truthy
         end
 
-        pending "determination of notification form and channels"
-        it "and employer should be notified that applcation is ineligible"
+        it "and employer should be notified that applcation is ineligible" do
+          fail "determination of notification form and channels"
+        end
 
         context "and 30 days or less has elapsed since applicaton was submitted" do
           context "and the employer decides to appeal" do
             it "should transition to ineligible-appealing state"
 
-            pending "determination of notification form and channels"
-            it "should notify HBX representatives of appeal request"
+            it "should notify HBX representatives of appeal request" do
+              fail "determination of notification form and channels"
+            end
 
               context "and HBX determines appeal has merit" do
                 it "should transition employer status to registered"
@@ -459,7 +461,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           end
 
         context "and more than 30 days has elapsed since application was submitted" do
-          pending "should employer actually move into additional 60-day wait period?"
+          it "should employer actually move the employer into an additional 60-day waiting period?"
         end
       end
     end
@@ -475,9 +477,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       it "and employer_profile should be in registered state"
 
       context "and it is published" do
-        pending
-        context "and changes to plan year application should be blocked" do
-        end
+        context "and changes to plan year application should be blocked"
       end
     end
   end
