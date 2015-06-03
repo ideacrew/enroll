@@ -112,8 +112,9 @@ describe EmployeeRole, dbclean: :after_each do
     end
   end
 
-  it 'properly intantiates the class using an existing person' do
-    fail "replace with pattern"
+  # FIXME: Replace with pattern
+  it 'properly intantiates the class using an existing person' # do
+=begin
     ssn = "987654321"
     date_of_hire = Date.today - 10.days
     dob = Date.today - 36.years
@@ -163,9 +164,11 @@ describe EmployeeRole, dbclean: :after_each do
     expect(employee_role.errors.messages.size).to eq 0
     expect(employee_role.save).to eq true
   end
+=end
 
-  it 'properly intantiates the class using a new person' do
-    fail "replace with pattern"
+  # FIXME: Replace with pattern
+  it 'properly intantiates the class using a new person'# do
+=begin
     ssn = "987654320"
     date_of_hire = Date.today - 10.days
     dob = Date.today - 26.years
@@ -207,6 +210,7 @@ describe EmployeeRole, dbclean: :after_each do
     expect(employee_role.errors.messages.size).to eq 0
     expect(employee_role.save).to eq true
   end
+=end
 end
 
 describe EmployeeRole, dbclean: :after_each do

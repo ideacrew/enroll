@@ -344,7 +344,7 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:', dbclean: :after_ea
       end
 
       context "user role is HBX admin" do
-        pending "add HBX admin role authorization to override"
+        # TODO: add HBX admin role authorization to override
         it "should terminate employee" do
           expect(census_family.terminate(valid_termination_date).is_terminated?).to be_truthy
         end

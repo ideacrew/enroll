@@ -259,7 +259,7 @@ describe EmployerProfile, dbclean: :after_each do
       end
 
       context "and employer is in ineligible or ineligible_appealing state" do
-        pending "what should be done?"
+        it "what should be done?"
       end
     end
 
@@ -289,7 +289,7 @@ describe EmployerProfile, dbclean: :after_each do
         end
 
         context "and employer pays in full" do
-          pending "now what happens to SEP, etc?"
+          it "now what happens to SEP, etc?"
         end
       end
 

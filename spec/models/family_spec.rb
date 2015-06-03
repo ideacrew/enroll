@@ -119,7 +119,7 @@ describe Family, type: :model, dbclean: :after_each do
             end
 
             context "and the non-related person is a responsible party" do
-              pending "to be added for IVL market"
+              it "to be added for IVL market"
             end
           end
 
@@ -311,13 +311,11 @@ describe "special enrollment periods" do
   let(:another_current_sep) { FactoryGirl.build(:special_enrollment_period, qle_on: 4.days.ago.to_date) }
   let(:expired_sep) { FactoryGirl.build(:special_enrollment_period, :expired) }
 =end
-  pending "TODO"
   context "attempt to add new SEP with same QLE and date as existing SEP" do
     before do
     end
 
-    it "should not save as a duplicate" do
-    end
+    it "should not save as a duplicate"
   end
 end
 
