@@ -180,34 +180,22 @@ describe EmployerProfile, dbclean: :after_each do
               before do
               end
 
-              pending
               context "and the effective date isn't January 1" do
                 before do
                 end
 
-                pending                
-                it "enrollment should be invalid" do
-                #   expect(employer_profile.census_roster.is_enrollment_valid?).to be_falsey
-                #   expect(employer_profile.census_roster.enrollment_errors[:enrollment_ratio].present?).to be_truthy
-                #   expect(employer_profile.census_roster.enrollment_errors[:enrollment_ratio]).to match(/number of eligible participants enrolling/)
-                end
+                it "enrollment should be invalid"
 
-                it "should advance state to canceled" do
-                #   expect(employer_profile.canceled?).to be_truthy                
-                end
+                it "should advance state to canceled"
               end
 
               context "and the effective date is January 1" do
                 before do
                 end
 
-                it "enrollment should be valid" do
-                #   expect(employer_profile.census_roster.is_enrollment_valid?).to be_truthy
-                end
+                it "enrollment should be valid"
 
-                it "should transition to binder pending" do
-                #   expect(employer_profile.binder_pending?).to be_truthy
-                end
+                it "should transition to binder pending"
               end
             end
           end
@@ -217,45 +205,30 @@ describe EmployerProfile, dbclean: :after_each do
               before do
               end
 
-              it "enrollment should be valid" do
-              #   expect(employer_profile.census_roster.is_enrollment_valid?).to be_truthy
-              end
+              it "enrollment should be valid"
 
-              it "should transition to binder pending" do
-              #   expect(employer_profile.binder_pending?).to be_truthy
-              end
+              it "should transition to binder pending"
             end
 
             context "and the minimum enrollment ratio is met" do
               before do
               end
 
-              it "enrollment should be valid" do
-              #   expect(employer_profile.census_roster.is_enrollment_valid?).to be_truthy
-              end
+              it "enrollment should be valid"
 
-              it "should transition to binder pending" do
-              #   expect(employer_profile.binder_pending?).to be_truthy
-              end
+              it "should transition to binder pending"
             end
 
-            it "should initialize a premium statement" do
-              # expect(employer_profile.latest_premium_statement.effective_on).to eq Date.current
-            end
+            it "should initialize a premium statement"
 
-            it "should be waiting for binder payment" do
-              # expect(employer_profile.binder_pending?).to be_truthy
-              # expect(employer_profile.latest_premium_statement.binder_pending?).to be_truthy
-            end
+            it "should be waiting for binder payment"
 
             context "and employer doesn't post timely binder payment" do
               before do
                 # employer_profile.latest_premium_statement.advance_billing_period
               end
 
-              it "should advance state to canceled" do
-                # expect(employer_profile.canceled?).to be_truthy                
-              end
+              it "should advance state to canceled"
             end
 
             context "and employer pays binder premium on timely basis" do
@@ -263,9 +236,7 @@ describe EmployerProfile, dbclean: :after_each do
                 # employer_profile.latest_premium_statement.allocate_binder_payment
               end
 
-              it "should transition employer to enrolled" do
-                # expect(employer_profile.enrolled?).to be_truthy
-              end
+              it "should transition employer to enrolled"
             end
           end
         end
@@ -279,14 +250,11 @@ describe EmployerProfile, dbclean: :after_each do
 
       context "and employer profile is in applicant state" do
         context "and effective date is next month" do
-          it "should change status to canceled" do
-          end
+          it "should change status to canceled"
         end
 
         context "and effective date is later than next month" do
-          pending
-          it "should not change state" do
-          end
+          it "should not change state"
         end
       end
 
@@ -298,35 +266,26 @@ describe EmployerProfile, dbclean: :after_each do
     context "and enrolled employer enters Dunning process" do
 
       context "and employer transitions into late status" do
-        it "should transmit notice to employer" do
-        end
+        it "should transmit notice to employer"
 
-        it "should transmit notice to broker" do
-        end
+        it "should transmit notice to broker"
 
-        it "should transmit notices to all employees" do
-        end
+        it "should transmit notices to all employees"
       end
 
       context "and employer transitions into suspended status" do
-        it "should transmit notice to employer" do
-        end
+        it "should transmit notice to employer"
 
-        it "should transmit notice to broker" do
-        end
+        it "should transmit notice to broker"
 
-        it "should transmit retroactive terminations to issuers" do
-        end
+        it "should transmit retroactive terminations to issuers"
 
         context "and employees are placed under a Special Enrollment Period" do
-          it "should transmit notices to all employees" do
-          end
+          it "should transmit notices to all employees"
 
-          it "should create a IVL market QLE for all employees" do
-          end
+          it "should create a IVL market QLE for all employees"
 
-          it "SEP should be retroactive" do
-          end
+          it "SEP should be retroactive"
         end
 
         context "and employer pays in full" do
@@ -335,14 +294,11 @@ describe EmployerProfile, dbclean: :after_each do
       end
 
       context "and employer transitions to terminated status" do
-        it "should transmit notice to employer" do
-        end
+        it "should transmit notice to employer"
 
-        it "should transmit notice to broker" do
-        end
+        it "should transmit notice to broker"
 
-        it "should transmit notices to all employees" do
-        end
+        it "should transmit notices to all employees"
       end
     end
   end
