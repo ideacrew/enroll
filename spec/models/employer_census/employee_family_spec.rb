@@ -108,7 +108,7 @@ describe EmployerCensus::EmployeeFamily, 'class methods', dbclean: :after_each d
         let(:end_on) { Date.current }
         let(:benefit_group)             { FactoryGirl.create(:benefit_group)}
         let(:benefit_group_assignment)  { EmployerCensus::BenefitGroupAssignment.new(
-                                            benefit_group: benefit_group, 
+                                            benefit_group: benefit_group,
                                             start_on: start_on,
                                             end_on: end_on
                                           ) }
@@ -137,7 +137,7 @@ describe EmployerCensus::EmployeeFamily, "that exists for an employer and has no
 
   let(:benefit_group_1)             { FactoryGirl.build(:benefit_group)}
   let(:benefit_group_assignment_1)  { EmployerCensus::BenefitGroupAssignment.new(
-    benefit_group: benefit_group_1, 
+    benefit_group: benefit_group_1,
     start_on: Date.current - 45.days
   ) }
   let(:employee_role) { double }
@@ -160,14 +160,14 @@ end
 
 describe EmployerCensus::EmployeeFamily, 'that exists for an employer and is already assigned a benefit group' do
   let(:census_employee) { EmployerCensus::Employee.new }
-  let(:census_family)               { 
+  let(:census_family)               {
     EmployerCensus::EmployeeFamily.new(
       :census_employee => census_employee
     )
   }
   let(:benefit_group_1)             { FactoryGirl.build(:benefit_group)}
   let(:benefit_group_assignment_1)  { EmployerCensus::BenefitGroupAssignment.new(
-    benefit_group: benefit_group_1, 
+    benefit_group: benefit_group_1,
     start_on: start_on,
     end_on: start_on + 10.days
   ) }
@@ -175,7 +175,7 @@ describe EmployerCensus::EmployeeFamily, 'that exists for an employer and is alr
         let(:end_on)                      { start_on + 3.days }
         let(:benefit_group_2)             { FactoryGirl.build(:benefit_group)}
         let(:benefit_group_assignment_2)  { EmployerCensus::BenefitGroupAssignment.new(
-          benefit_group: benefit_group_2, 
+          benefit_group: benefit_group_2,
           start_on: start_on + 4.days,
           end_on: end_on
         ) }
@@ -249,12 +249,12 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:', dbclean: :after_ea
     :census_employee => FactoryGirl.build(:employer_census_employee),
     :terminated => false
   )
-  } 
+  }
   let(:census_employee)             { census_family.census_employee }
 
   let(:benefit_group_1)             { FactoryGirl.create(:benefit_group)}
   let(:benefit_group_assignment_1)  { EmployerCensus::BenefitGroupAssignment.new(
-    benefit_group: benefit_group_1, 
+    benefit_group: benefit_group_1,
     start_on: Date.current - 45.days
   ) }
 
@@ -324,7 +324,7 @@ describe EmployerCensus::EmployeeFamily, 'instance methods:', dbclean: :after_ea
 
   describe '#terminate and #terminate!' do
     let(:valid_termination_date) {(Date.today - maximum_retroactive_termination).beginning_of_month}
-    let(:maximum_retroactive_termination) {HbxProfile::ShopRetroactiveTerminationMaximumInDays}
+    let(:maximum_retroactive_termination) {HbxProfile::ShopRetroactiveTerminationMaximum}
 
     context "termination date > HBX policy for retro terms" do
       let(:overdue_termination_date) { valid_termination_date - 1.day}
