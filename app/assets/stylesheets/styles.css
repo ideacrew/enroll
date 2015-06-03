@@ -51,3 +51,10 @@ a.new-address-btn {
   text-align: center;
   text-transform: none;
 }
+
+.alert-plan-year {
+  padding: 15px 60px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}

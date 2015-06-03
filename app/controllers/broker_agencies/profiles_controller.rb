@@ -38,8 +38,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def check_broker_role
     if current_user.has_broker_role?
       redirect_to broker_agencies_profile_path(current_user.person.get_broker_profile_contact)
-    else
-      redirect_to root_path, :flash => { :error => "You do not belong to a broker agency" }
     end
   end
 

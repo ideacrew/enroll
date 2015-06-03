@@ -2,7 +2,7 @@ class CensusEmployee < CensusMember
   include AASM
   include Sortable
 
-  field :is_owner, type: Boolean
+  field :is_business_owner, type: Boolean
   field :hired_on, type: Date
   field :employment_terminated_on, type: Date
   field :coverage_terminated_on, type: Date
@@ -25,21 +25,20 @@ class CensusEmployee < CensusMember
 
   accepts_nested_attributes_for :census_dependents, :benefit_group_assignments
 
-  validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_owner
+  validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_business_owner
 
   index({"aasm_state" => 1})
   index({"employer_profile_id" => 1}, {sparse: true})
   index({"employee_role_id" => 1}, {sparse: true})
   index({"benefit_group_assignments._id" => 1})
   index({"last_name" => 1})
-  index({"hired_on" => 1})
-  index({"is_owner" => 1})
+  index({"hired_on" => -1})
+  index({"is_business_owner" => 1})
   index({"ssn" => 1})
   index({"dob" => 1})
-  index({"ssn" => 1, "dob" => 1})
+  index({"ssn" => 1, "dob" => 1, "aasm_state" => 1})
 
-
-  scope :active,  ->{ any_in(aasm_state: ["unlinked", "linked", "enrolled", "coverage_waived", "coverage_terminated"]) }
+  scope :active,  ->{ any_in(aasm_state: ["employee_role_unlinked", "employee_role_linked"]) }
 
   def initialize(*args)
     super(*args)
@@ -53,12 +52,30 @@ class CensusEmployee < CensusMember
   end
 
   def employer_profile
-    return @employer_profile if is_defined? @employer_profile
+    return @employer_profile if defined? @employer_profile
     @employer_profile = EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
   end
 
+  def employee_role=(new_employee_role)
+    raise ArgumentError.new("expected EmployeeRole") unless new_employee_role.is_a? EmployeeRole
+    return false unless self.may_link_employee_role?
+
+    # Guard against linking employee roles with different identifying information
+    if (self.ssn == new_employee_role.ssn) && (self.dob == new_employee_role.dob)
+      self.employee_role_id = new_employee_role._id
+      self.link_employee_role
+      @employee_role = new_employee_role
+    else
+      message =  "Identifying information mismatch error linking employee role: "
+      message << "#{new_employee_role.inspect} "
+      message << "with census employee: #{self.inspect}"
+      Rails.logger.error { message }
+      raise CensusEmployeeError, message
+    end
+  end
+
   def employee_role
-    return @employee_role if is_defined? @employee_role
+    return @employee_role if defined? @employee_role
     @employee_role = EmployeeRole.find(self.employee_role_id) unless self.employee_role_id.blank?
   end
 
@@ -82,10 +99,10 @@ class CensusEmployee < CensusMember
 
   # Initialize a new, refreshed instance for rehires via deep copy
   def replicate_for_rehire
-    return nil if is_active?  # if user clicks on rehire again after creating an active family.
+    return nil unless self.employment_terminated?
     new_employee = self.dup
-    new_employee.unlink_employee_role
-    new_employee.aasm_state = unlinked
+    new_employee.delink_employee_role
+    new_employee.aasm_state = employee_role_unlinked
     new_employee.hired_on = nil
     new_employee.employment_terminated_on = nil
     new_employee.coverage_terminated_on = nil
@@ -94,85 +111,13 @@ class CensusEmployee < CensusMember
     new_employee
   end
 
-  def is_linkable?
-    self.unlinked?
-  end
-
-  def is_owner?
-    is_owner
-  end
-
-  class << self
-    def find_by_identifiers(ssn, dob)
-      where(ssn: ssn).and(dob: dob)
-    end
-
-    def find_by_employer_profile(employer_profile)
-      where(employer_profile_id: employer_profile._id).unscoped.order_name_desc
-    end
-
-    def find_by_employee_role(employee_role)
-      where(employee_role_id: employee_role_.id)
-    end
-  end
-
-
-  aasm do
-    state :unlinked, initial: true
-    state :linked
-    state :coverage_enrolled
-    state :coverage_waived
-    state :coverage_terminated
-    state :employment_terminated
-
-    event :link_employee_role do
-      transitions from: :unlinked, to: :linked
-    end
-
-    event :unlink_employee_role do
-      transitions from: :linked, to: :unlinked
-    end
-
-    event :enroll do
-      transitions from: :linked, to: :coverage_enrolled
-      transitions from: :coverage_waived, to: :coverage_enrolled
-    end
-
-    event :waive_coverage do
-      transitions from: :linked, to: :coverage_waived
-      transitions from: :coverage_enrolled, to: :coverage_waived
-    end
-
-    event :terminate_coverage do
-      transitions from: :coverage_enrolled, to: :coverage_terminated
-    end
-
-    event :terminate_employment do
-      transitions from: [:linked, ], to: :employment_terminated
-    end
-
-  end
-
-private
-
-  def link_employee_role(new_employee_role)
-    raise ArgumentError.new("expected EmployeeRole") unless new_employee_role.is_a? EmployeeRole
-    raise CensusEmployeeLinkError, "must assign a benefit group" unless active_benefit_group_assignment.present?
-
-    self.employee_role_id = employee_role._id
-    @employee_role = new_employee_role
-    self
-  end
-
-  def unlink_employee_role
-    self.employee_role_id = nil
-    @employee_role = nil
-    self
+  def is_business_owner?
+    is_business_owner
   end
 
   def terminate_employment(terminated_on)
     begin
-      terminate!(terminated_on)
+      terminate_employment!(terminated_on)
     rescue
       nil
     else
@@ -181,23 +126,81 @@ private
   end
 
   def terminate_employment!(terminated_on)
-    coverage_term_date = terminated_on.to_date.end_of_month
+    return nil unless self.may_terminate?
+    employment_term_date = terminated_on.to_date.end_of_day
+    coverage_term_date = employment_term_date.end_of_month
 
-    retro_term_maximum = HbxProfile::ShopRetroactiveTerminationMaximumInDays
-    if (Date.today - coverage_term_date) > retro_term_maximum
+    retro_term_maximum = HbxProfile::ShopRetroactiveTerminationMaximum
+    if (coverage_term_date + retro_term_maximum) < Date.today
       message =  "Error while terminating: #{first_name} #{last_name} (id=#{id}). "
       message << "Termination date: #{terminated_on.end_of_month} exceeds maximum period "
       message << "(#{retro_term_maximum} days) for a retroactive termination"
       Rails.logger.error { message }
-      raise HbxPolicyError, message
+      raise CensusEmployeeError, message
     end
 
     self.coverage_terminated_on = coverage_term_date
-    self.is_terminated = true
+    self.employment_terminated_on = terminated_on.to_date.end_of_day
+    self.terminate
     self
   end
 
+  class << self
+    def find_all_unlinked_by_identifying_information(ssn, dob)
+      unscoped.and(ssn: ssn, dob: dob, aasm_state: "employee_role_unlinked").to_a
+    end
+
+    def find_all_by_employer_profile(employer_profile)
+      unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
+    end
+
+    def find_all_by_employee_role(employee_role)
+      unscoped.where(employee_role_id: employee_role._id)
+    end
+  end
+
+  aasm do
+    state :employee_role_unlinked, initial: true
+    state :employee_role_linked
+    state :employment_terminated
+
+    state :coverage_selected
+    state :coverage_waived
+
+    event :link_employee_role do
+      transitions from: :employee_role_unlinked, to: :employee_role_linked
+    end
+
+    event :delink_employee_role do
+      transitions from: :employee_role_linked, to: :employee_role_unlinked,
+        :after => :clear_employee_role
+    end
+
+    event :terminate do
+      transitions from: [:employee_role_unlinked, :employee_role_linked], to: :employment_terminated
+    end
+
+    event :enroll do
+      transitions from: :employee_role_linked, to: :coverage_selected
+      transitions from: :coverage_waived, to: :coverage_selected
+    end
+
+    event :waive_coverage do
+      transitions from: :employee_role_linked, to: :coverage_waived
+      transitions from: :coverage_selected, to: :coverage_waived
+    end
+
+    event :terminate_coverage do
+      transitions from: :coverage_selected, to: :coverage_terminated
+    end
+  end
+
+private
+  def clear_employee_role
+    self.employee_role_id = nil
+    @employee_role = nil
+  end
 end
 
-class CensusEmployeeLinkError < StandardError; end
+class CensusEmployeeError < StandardError; end
 

@@ -1,5 +1,21 @@
 module ApplicationHelper
 
+  def datepicker_control(f, field_name, options = {})
+    sanitized_field_name = field_name.to_s.sub(/\?$/,"")
+    opts = options.dup
+    obj_name = f.object_name
+    obj_val = f.object.send(field_name.to_sym)
+    current_value = obj_val.blank? ? "" : obj_val.strftime("%m/%d/%Y")
+    html_class_list = opts.delete(:class) { |k| "" }
+    jq_tag_classes = (html_class_list.split(/\s+/) + ["jq-datepicker"]).join(" ")
+    generated_field_name = "jq_datepicker_ignore_#{obj_name}[#{sanitized_field_name}]"
+    generated_target_id = "#{obj_name}_#{sanitized_field_name}_jq_datepicker_plain_field"
+    capture do
+      concat f.text_field(field_name, opts.merge(:class => html_class_list, :id => generated_target_id))
+      concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
+    end
+  end
+
   def generate_breadcrumbs(breadcrumbs)
     html = "<ul class='breadcrumb'>".html_safe
     breadcrumbs.each_with_index do |breadcrumb, index|
