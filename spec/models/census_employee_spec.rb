@@ -195,14 +195,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
               end
 
               context "and the termination date is within the HBX maximum" do
-                pending "cancancan role authorization"
                 it "transition to terminated state should be valid" do
+                  fail "cancancan role authorization"
                   expect(saved_census_employee.may_terminate?).to be_truthy
                 end
 
-                it "should permit termination" do
-                  # expect(saved_census_employee.terminate_employment(invalid_termination_date).employment_terminated_on).to eq invalid_termination_date
-                end
+                it "should permit termination"
               end
             end
           end
