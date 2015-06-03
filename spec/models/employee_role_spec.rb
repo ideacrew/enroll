@@ -113,7 +113,7 @@ describe EmployeeRole, dbclean: :after_each do
   end
 
   it 'properly intantiates the class using an existing person' do
-    pending "replace with pattern"
+    fail "replace with pattern"
     ssn = "987654321"
     date_of_hire = Date.today - 10.days
     dob = Date.today - 36.years
@@ -165,7 +165,7 @@ describe EmployeeRole, dbclean: :after_each do
   end
 
   it 'properly intantiates the class using a new person' do
-    pending "replace with pattern"
+    fail "replace with pattern"
     ssn = "987654320"
     date_of_hire = Date.today - 10.days
     dob = Date.today - 26.years
