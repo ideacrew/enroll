@@ -5,7 +5,6 @@ class CensusEmployee < CensusMember
   field :is_business_owner, type: Boolean
   field :hired_on, type: Date
   field :employment_terminated_on, type: Date
-  field :coverage_terminated_on, type: Date
   field :aasm_state, type: String
 
   # Employer for this employee
@@ -19,7 +18,6 @@ class CensusEmployee < CensusMember
     validate: true
 
   embeds_many :benefit_group_assignments,
-    class_name: "EmployerCensus::BenefitGroupAssignment",
     cascade_callbacks: true,
     validate: true
 
@@ -30,15 +28,16 @@ class CensusEmployee < CensusMember
   index({"aasm_state" => 1})
   index({"employer_profile_id" => 1}, {sparse: true})
   index({"employee_role_id" => 1}, {sparse: true})
-  index({"benefit_group_assignments._id" => 1})
   index({"last_name" => 1})
   index({"hired_on" => -1})
   index({"is_business_owner" => 1})
   index({"ssn" => 1})
   index({"dob" => 1})
   index({"ssn" => 1, "dob" => 1, "aasm_state" => 1})
+  index({"benefit_group_assignments._id" => 1})
+  index({"benefit_group_assignments.aasm_state" => 1})
 
-  scope :active,  ->{ any_in(aasm_state: ["employee_role_unlinked", "employee_role_linked"]) }
+  scope :active,  ->{ any_in(aasm_state: ["eligible", "employee_role_linked"]) }
 
   def initialize(*args)
     super(*args)
@@ -60,8 +59,10 @@ class CensusEmployee < CensusMember
     raise ArgumentError.new("expected EmployeeRole") unless new_employee_role.is_a? EmployeeRole
     return false unless self.may_link_employee_role?
 
-    # Guard against linking employee roles with different identifying information
-    if (self.ssn == new_employee_role.ssn) && (self.dob == new_employee_role.dob)
+    # Guard against linking employee roles with different employer/identifying information
+    if (self.ssn == new_employee_role.ssn) && (self.dob == new_employee_role.dob) &&
+       (self.employer_profile_id == new_employee_role.employer_profile._id)
+
       self.employee_role_id = new_employee_role._id
       self.link_employee_role
       @employee_role = new_employee_role
@@ -79,14 +80,16 @@ class CensusEmployee < CensusMember
     @employee_role = EmployeeRole.find(self.employee_role_id) unless self.employee_role_id.blank?
   end
 
-  def add_benefit_group_assignment(new_benefit_group_assignment)
-    raise ArgumentError, "expected valid BenefitGroupAssignment" unless new_benefit_group_assignment.valid?
-    if active_benefit_group_assignment
-      active_benefit_group_assignment.end_on = [new_benefit_group_assignment.start_on - 1.day, active_benefit_group_assignment.start_on].max
+  def add_benefit_group_assignment(new_benefit_group, start_on = Date.current)
+    raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
+
+    if active_benefit_group_assignment.present?
+      active_benefit_group_assignment.end_on = [new_benefit_group.start_on - 1.day, active_benefit_group_assignment.start_on].max
       active_benefit_group_assignment.is_active = false
     end
 
-    benefit_group_assignments << new_benefit_group_assignment
+    bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: start_on)
+    benefit_group_assignments << bga
   end
 
   def active_benefit_group_assignment
@@ -101,11 +104,11 @@ class CensusEmployee < CensusMember
   def replicate_for_rehire
     return nil unless self.employment_terminated?
     new_employee = self.dup
-    new_employee.delink_employee_role
-    new_employee.aasm_state = employee_role_unlinked
     new_employee.hired_on = nil
     new_employee.employment_terminated_on = nil
-    new_employee.coverage_terminated_on = nil
+    new_employee.employee_role_id = nil
+    new_employee.benefit_group_assignments = []
+    new_employee.rehire_employee_role
 
     # new_employee.census_dependents = self.census_dependents unless self.census_dependents.blank?
     new_employee
@@ -126,28 +129,31 @@ class CensusEmployee < CensusMember
   end
 
   def terminate_employment!(terminated_on)
-    return nil unless self.may_terminate?
-    employment_term_date = terminated_on.to_date.end_of_day
-    coverage_term_date = employment_term_date.end_of_month
-
-    retro_term_maximum = HbxProfile::ShopRetroactiveTerminationMaximum
-    if (coverage_term_date + retro_term_maximum) < Date.today
-      message =  "Error while terminating: #{first_name} #{last_name} (id=#{id}). "
-      message << "Termination date: #{terminated_on.end_of_month} exceeds maximum period "
-      message << "(#{retro_term_maximum} days) for a retroactive termination"
+    unless self.may_terminate_employee_role?
+      (employee_role.present? && employee_role.hbx_id.present?) ? ee_id = "(ee role id: #{self.employee_role.hbx_id})" : ee_id = "(census id: #{self.id})"
+      active_benefit_group_assignment.present? ? bga_status = "#{active_benefit_group_assignment.aasm_state.tr('_', ' ')}. " : bga_status = "no benefit group assigned. "
+      message =  "Unable to terminate employee.  Employment status: #{aasm_state.tr('_', ' ')}. "
+      message << "Coverage status: #{bga_status}"
+      message << ee_id
       Rails.logger.error { message }
-      raise CensusEmployeeError, message
+      raise CensusEmployeeError, message      
     end
 
-    self.coverage_terminated_on = coverage_term_date
     self.employment_terminated_on = terminated_on.to_date.end_of_day
-    self.terminate
+
+    # Coverage termination date may not exceed HBX max
+    reported_coverage_term_on = self.employment_terminated_on.end_of_month
+    max_coverage_term_on = (Date.current.end_of_day - HbxProfile::ShopRetroactiveTerminationMaximum).end_of_month
+    coverage_term_on = [reported_coverage_term_on, max_coverage_term_on].compact.max
+
+    active_benefit_group_assignment.terminate_coverage(:coverage_term_on) if active_benefit_group_assignment.may_terminate_coverage?
+    terminate_employee_role
     self
   end
 
   class << self
     def find_all_unlinked_by_identifying_information(ssn, dob)
-      unscoped.and(ssn: ssn, dob: dob, aasm_state: "employee_role_unlinked").to_a
+      unscoped.and(ssn: ssn, dob: dob, aasm_state: "eligible").to_a
     end
 
     def find_all_by_employer_profile(employer_profile)
@@ -160,44 +166,45 @@ class CensusEmployee < CensusMember
   end
 
   aasm do
-    state :employee_role_unlinked, initial: true
+    state :eligible, initial: true
     state :employee_role_linked
     state :employment_terminated
 
-    state :coverage_selected
-    state :coverage_waived
+    event :rehire_employee_role do
+      transitions from: [:employment_terminated, :employee_role_linked, :eligible], to: :eligible
+    end
 
     event :link_employee_role do
-      transitions from: :employee_role_unlinked, to: :employee_role_linked
+      transitions from: :eligible, to: :employee_role_linked,
+        :guard => :has_active_benefit_group_assignment?
     end
 
     event :delink_employee_role do
-      transitions from: :employee_role_linked, to: :employee_role_unlinked,
+      transitions from: :employee_role_linked, to: :eligible,
         :after => :clear_employee_role
     end
 
-    event :terminate do
-      transitions from: [:employee_role_unlinked, :employee_role_linked], to: :employment_terminated
-    end
-
-    event :enroll do
-      transitions from: :employee_role_linked, to: :coverage_selected
-      transitions from: :coverage_waived, to: :coverage_selected
-    end
-
-    event :waive_coverage do
-      transitions from: :employee_role_linked, to: :coverage_waived
-      transitions from: :coverage_selected, to: :coverage_waived
-    end
-
-    event :terminate_coverage do
-      transitions from: :coverage_selected, to: :coverage_terminated
+    event :terminate_employee_role do
+      transitions from: [:eligible, :employee_role_linked], to: :employment_terminated
     end
   end
 
 private
+  def may_terminate_benefit_group_assignment_coverage?
+    if active_benefit_group_assignment.present? && active_benefit_group_assignment.may_terminate_coverage?
+      return true
+    else
+      return false
+    end
+  end
+
+  def has_active_benefit_group_assignment?
+    active_benefit_group_assignment.present?
+  end
+
   def clear_employee_role
     self.employee_role_id = nil
+    unset("employee_role_id")
     @employee_role = nil
   end
 end

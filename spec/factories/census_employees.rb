@@ -7,7 +7,7 @@ FactoryGirl.define do
     employee_relationship "self"
     hired_on "04/01/2015"
     sequence(:ssn, 222222220)
-    is_owner  false
+    is_business_owner  false
     association :address, strategy: :build
     association :email, strategy: :build
 
