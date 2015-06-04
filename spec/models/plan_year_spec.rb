@@ -60,19 +60,13 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "with no open enrollment start on" do
       let(:params) {valid_params.except(:open_enrollment_start_on)}
 
-      it "should fail validation" do
-        #TODO no present validation on open enrollment right now
-        #expect(PlanYear.create(**params).errors[:open_enrollment_start_on].any?).to be_truthy
-      end
+      it "should fail validation"
     end
 
     context "with no open enrollment end on" do
       let(:params) {valid_params.except(:open_enrollment_end_on)}
 
-      it "should fail validation" do
-        #TODO no present validation on open enrollment end on right now
-        #expect(PlanYear.create(**params).errors[:open_enrollment_end_on].any?).to be_truthy
-      end
+      it "should fail validation"
     end
 
     context "with all valid arguments" do
@@ -102,30 +96,17 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     context "and effective date is specified" do
       context "and effective date doesn't provide enough time for enrollment" do
-        pending
         context "and an employer is entering the effective date" do
-          it "should fail validation" do
-            # expect(plan_year.valid?).to be_falsey
-            # expect(plan_year.errors[:effective_date].any?).to be_truthy
-            # expect(plan_year.errors[:start_on].first).to match(/applications may not be started more than/)
-          end
+          it "should fail validation"
         end
 
         context "and an HbxAdmin or system service is entering the effective date" do
-          pending
-          it "should pass validation" do
-            # expect(plan_year.valid?).to be_truthy
-            # expect(plan_year.errors[:effective_date].any?).to be_truthy
-          end
+          it "should pass validation"
         end
       end
 
       context "and effective date does provide enough time for enrollment" do
-        pending
-        it "should pass validation" do
-          # expect(plan_year.valid?).to be_truthy
-          # expect(plan_year.errors[:effective_date].any?).to be_truthy
-        end
+        it "should pass validation"
       end
     end
 
@@ -446,40 +427,33 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           expect(plan_year.employer_profile.ineligible?).to be_truthy
         end
 
-        pending "determination of notification form and channels"
-        it "and employer should be notified that applcation is ineligible" do
-        end
+        # TODO: We need to determine the form this notification will take
+        it "and employer should be notified that applcation is ineligible"
 
         context "and 30 days or less has elapsed since applicaton was submitted" do
           context "and the employer decides to appeal" do
-            it "should transition to ineligible-appealing state" do
-            end
+            it "should transition to ineligible-appealing state"
 
-            pending "determination of notification form and channels"
-            it "should notify HBX representatives of appeal request" do
-            end
+            # TODO: We need to determine the form this notification will take
+            it "should notify HBX representatives of appeal request"
 
               context "and HBX determines appeal has merit" do
-                it "should transition employer status to registered" do
-                end
+                it "should transition employer status to registered"
               end
 
               context "and HBX determines appeal has no merit" do
-                it "should transition employer status to ineligible" do
-                end
+                it "should transition employer status to ineligible"
               end
 
               context "and HBX determines application was submitted with errors" do
-                it "should transition plan year application to draft" do
-                end
-                it "and should transition employer status to applicant" do
-                end
+                it "should transition plan year application to draft"
+                it "and should transition employer status to applicant"
               end
             end
           end
 
         context "and more than 30 days has elapsed since application was submitted" do
-          pending "should employer actually move into additional 60-day wait period?"
+          it "should employer actually move the employer into an additional 60-day waiting period?"
         end
       end
     end
@@ -490,18 +464,12 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       before do
       end
 
-      it "plan year should publish" do
-        # expect(plan_year.published?).to be_truthy
-      end
+      it "plan year should publish"
 
-      it "and employer_profile should be in registered state" do
-        # expect(plan_year.employer_profile.registered?).to be_truthy
-      end
+      it "and employer_profile should be in registered state"
 
       context "and it is published" do
-        pending
-        context "and changes to plan year application should be blocked" do
-        end
+        context "and changes to plan year application should be blocked"
       end
     end
   end

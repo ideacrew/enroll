@@ -36,11 +36,7 @@ RSpec.describe CensusDependent, :type => :model do
     expect(dependent.errors.messages.size).to eq 0
   end
 
-  pending
-  it 'fails unless provided with a proper gender' do
-  end
+  it 'fails unless provided with a proper gender'
 
-  pending
-  it 'fails unless provided with a proper employee_relationship' do
-  end
+  it 'fails unless provided with a proper employee_relationship'
 end

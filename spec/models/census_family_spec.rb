@@ -4,7 +4,7 @@ require 'rails_helper'
 # terminate employee must set the employee family inactive
 # replicate_for_rehire_for_rehire
 
-describe EmployerCensus::EmployeeFamily, type: :model, dbclean: :after_each do
+RSpec.describe CensusFamily, :type => :model do
   it { should validate_presence_of :census_employee }
 
   let(:employer_profile) {FactoryGirl.create(:employer_profile)}

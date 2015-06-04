@@ -4,10 +4,8 @@ require 'active_support/time'
 describe FinancialStatement do
 
   TEN_DOLLARS = 1000
-
+=begin
   before(:all) do
-    skip "pending implemenation"
-
     @financial_statement = FinancialStatement.new
 
     alternate_benefit = AlternateBenefit.new
@@ -60,10 +58,12 @@ describe FinancialStatement do
 
 
 end
+=end
 
   context "yearwise income computation" do
 
-    it "should compute the income correctly with end_date as nil" do
+    it "should compute the income correctly with end_date as nil" # do
+=begin
       financial_statement = FinancialStatement.new
       income1 = Income.new
       income1.amount_in_cents = 111400
@@ -78,9 +78,9 @@ end
       expect(((income_hash[2014]) - 1336800).abs).to be < TEN_DOLLARS
 
     end
-
-    it "should compute prorated income" do
-
+=end
+    it "should compute prorated income" # do
+=begin
       financial_statement = FinancialStatement.new
       income1 = Income.new
       income1.amount_in_cents = 10000
@@ -95,9 +95,9 @@ end
       expect(((income_hash[2012]) - 10000).abs).to be < TEN_DOLLARS
 
     end
-
-    it "should compute the income hash" do
-
+=end
+    it "should compute the income hash" # do
+=begin
       financial_statement = FinancialStatement.new
       income1 = Income.new
       income1.amount_in_cents = 100000
@@ -117,21 +117,23 @@ end
 
       expect(((income_hash[2014]) - (96923 + 1000000)).abs).to be < TEN_DOLLARS
     end
+=end
   end
 
   context "yearwise deductions computation" do
 
-    it "should compute the deductions hash" do
-
+    it "should compute the deductions hash"# do
+=begin
       deduction_hash = @financial_statement.compute_yearwise(@financial_statement.deductions)
 
       expect(((deduction_hash[2014]) - 470).abs).to be < TEN_DOLLARS
     end
+=end
   end
 
-  it "should check for benifits in current year" do
-
+  it "should check for benifits in current year"# do
+=begin
     expect(@financial_statement.is_receiving_benefit?).to be_truthy
   end
-
+=end
 end
