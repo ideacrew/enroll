@@ -503,5 +503,6 @@ $(document).on('change', "input#jq_datepicker_ignore_plan_year_start_on", functi
   var month = time.getMonth();
   var date = time.getDate();
   var endon = new Date(year + 1, month, date - 1);
-  $("input#plan_year_end_on").val(endon.format("MM/dd/yyyy")).trigger("change")
+  $("input#jq_datepicker_ignore_plan_year_end_on").val(endon.format("MM/dd/yyyy")).trigger("change");
+  $("input#plan_year_end_on_jq_datepicker_plain_field").val(endon.format("yyyy-MM-dd"));
 }); 
