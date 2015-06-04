@@ -1,4 +1,5 @@
 class BrokerAgencies::ProfilesController < ApplicationController
+
   before_action :check_broker_role, only: [:new, :create]
 
   def index
@@ -22,7 +23,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     current_user.roles << "broker" unless current_user.roles.include?("broker")
 
     if @organization.save && current_user.save
-      flash[:notice] = "Successfully created Broker Agency Profile."
+      flash[:notice] = "Successfully created Broker Agency Profile"
       redirect_to broker_agencies_profile_path(current_user.person.broker_agency_contact)
     else
       render "new"
