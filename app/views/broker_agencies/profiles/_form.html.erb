@@ -54,10 +54,10 @@
           <%= text_field_tag :email, nil, class: "floatlabel form-control", required: true, placeholder: 'EMAIL', value: current_user.email %>
         </div>
         <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
-          <%= text_field_tag :first_name, nil, class: "floatlabel form-control", placeholder: 'FIRST NAME', value: current_user.try(:person).try(:first_name) %>
+          <%= text_field_tag :first_name, nil, class: "floatlabel form-control", placeholder: 'FIRST NAME', value: current_user.try(:person).try(:first_name), required: true %>
         </div>
         <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
-          <%= text_field_tag :last_name, nil, class: "floatlabel form-control", placeholder: 'LAST NAME', value: current_user.try(:person).try(:last_name) %>
+          <%= text_field_tag :last_name, nil, class: "floatlabel form-control", placeholder: 'LAST NAME', value: current_user.try(:person).try(:last_name), required: true %>
         </div>
       </div>
       <br>
