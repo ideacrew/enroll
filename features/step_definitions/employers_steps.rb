@@ -344,7 +344,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.text_field(class: "interaction-field-control-plan_year-start_on").wait_until_present
   screenshot("employer_add_plan_year")
   @browser.text_field(class: "interaction-field-control-plan_year-start_on").set("01/01/2015")
-  @browser.text_field(class: "interaction-field-control-plan_year-end_on").set("12/31/2015")
+  #@browser.text_field(class: "interaction-field-control-plan_year-end_on").set("12/31/2015")
   @browser.text_field(class: "interaction-field-control-plan_year-open_enrollment_start_on").set("11/01/2014")
   @browser.text_field(class: "interaction-field-control-plan_year-open_enrollment_end_on").set("11/30/2014")
   @browser.text_field(name: "plan_year[fte_count]").click
@@ -364,10 +364,10 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
   # Relationship Benefit
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][employer_max_amt]").set(120)
+  #@browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][employer_max_amt]").set(120)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][4][premium_pct]").set(15)
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][4][employer_max_amt]").set(51)
+  #@browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][4][employer_max_amt]").set(51)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_offered').first.set(true)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').first.set(false)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_offered').first.set(false)
