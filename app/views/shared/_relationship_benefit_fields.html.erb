@@ -1,16 +1,14 @@
 <fieldset>
   <div class="row no-buffer focus_effect personal-info-row">
     <div class="col-md-12 no-pd first">
-      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :relationship, class: "form-control", readonly: true %>
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.hidden_field :relationship, value: f.object.relationship %>
+        <%= f.text_field :relationship, value: f.object.relationship.try(:humanize), disabled: true, class: "form-control" %>
       </div>
-      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
         <%= f.text_field :premium_pct, class: "floatlabel form-control", placeholder: 'PREMIUM PERCENTAGE' %>
       </div>
-      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :employer_max_amt, class: "floatlabel form-control", placeholder: 'EMPLOYER MAX AMOUNT' %>
-      </div>
-      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
         <div class="checkbox">
           <label>
             <%= f.check_box :offered, {}, true, false %>
