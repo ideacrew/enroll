@@ -24,7 +24,7 @@ RSpec.describe Employers::EmployerProfilesController do
       get :show, id: employer_profile.id
     end
 
-    it "should render the new template" do
+    it "should render the show template" do
       expect(response).to have_http_status(:success)
       expect(response).to render_template("show")
       expect(assigns(:current_plan_year)).to eq employer_profile.plan_years.last
