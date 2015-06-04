@@ -9,6 +9,7 @@ class BenefitGroupAssignment
   field :hbx_enrollment_id, type: BSON::ObjectId
   field :start_on, type: Date
   field :end_on, type: Date
+  field :coverage_end_on, type: Date
   field :aasm_state, type: String
   field :is_active, type: Boolean, default: true
 
@@ -49,6 +50,18 @@ class BenefitGroupAssignment
   def hbx_enrollment
     return @hbx_enrollment if defined? @hbx_enrollment
     @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id) unless hbx_enrollment_id.blank?
+  end
+
+  def end_benefit(end_on)
+    unless coverage_waived?
+      self.coverage_end_on = end_on
+      terminate_coverage 
+    end
+  end
+
+  # Catch situations when AASM state isn't yet initialized
+  def aasm_state
+    self[:aasm_state] || "initialized"
   end
 
   aasm do
