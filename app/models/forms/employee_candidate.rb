@@ -15,14 +15,15 @@ module Forms
     include ::Forms::DateOfBirthField
     include Validations::USDate.on(:date_of_birth)
 
+    validate :does_not_match_a_different_users_person
     validates :ssn,
               length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
               numericality: true
-   
+
     def match_census_employees
       census_employees = []
       employers = Organization.where({
-        "employer_profile.employee_families" =>  { "$elemMatch" => { 
+        "employer_profile.employee_families" =>  { "$elemMatch" => {
            "census_employee.dob" => dob,
            "census_employee.ssn" => ssn,
            "linked_at" => nil} }
@@ -41,9 +42,24 @@ module Forms
     def match_person
       Person.where({
         :dob => dob,
-        :ssn => ssn        
+        :ssn => ssn
       }).first
     end
+
+    def does_not_match_a_different_users_person
+       matched_person = match_person
+       if !matched_person.nil?
+         if !matched_person.user.nil?
+           if matched_person.user.id.to_s != self.user_id.to_s
+             errors.add(
+               :match,
+               "An account already exists for #{first_name} #{last_name}."
+             )
+           end
+         end
+       end
+       true
+     end
 
     def persisted?
       false
