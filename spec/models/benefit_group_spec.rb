@@ -167,11 +167,11 @@ describe BenefitGroup, "instance methods" do
     end
 
     it "should have different premium_pct" do
-      expect(benefit_list.map(&:premium_pct)).to eq [50,50,20,20,20,20]
+      expect(benefit_list.map(&:premium_pct)).to eq [50,20,20,20,20,50]
     end
 
     it "should have different offered" do
-      expect(benefit_list.map(&:offered)).to eq [true, false, true, true, true, true]
+      expect(benefit_list.map(&:offered)).to eq [true, true, true, true, true, false]
     end
   end
 end
