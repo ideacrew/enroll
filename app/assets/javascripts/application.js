@@ -495,3 +495,14 @@ $(document).on('page:update', function() {
 $(document).on('click', ".interaction-click-control-add-plan-year", function() {
   $(this).button('loading');
 });
+
+
+$(document).on('change', "input#jq_datepicker_ignore_plan_year_start_on", function() {
+  var time = new Date(Date.parse($(this).val()));
+  var year = time.getFullYear();
+  var month = time.getMonth();
+  var date = time.getDate();
+  var endon = new Date(year + 1, month, date - 1);
+  $("input#jq_datepicker_ignore_plan_year_end_on").val(endon.format("MM/dd/yyyy")).trigger("change");
+  $("input#plan_year_end_on_jq_datepicker_plain_field").val(endon.format("yyyy-MM-dd"));
+}); 

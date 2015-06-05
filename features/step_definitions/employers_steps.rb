@@ -343,8 +343,20 @@ And(/^I should be able to add information about plan year, benefits and relation
 #Plan Year
   @browser.text_field(class: "interaction-field-control-plan_year-start_on").wait_until_present
   screenshot("employer_add_plan_year")
+  # validation error path
+  @browser.text_field(class: "interaction-field-control-plan_year-start_on").set("01/06/2017")
+  @browser.h3(text: /Plan Year/).click
+  @browser.a(text: /generate recommend dates by start on/).click
+  @browser.h4(text: /start on must be first day of the month/).wait_until_present
+  expect(@browser.text.include?("start on must be first day of the month")).to be_truthy
+  # happy path
+  begin_date = (Date.current + 5.months).beginning_of_month
+  @browser.text_field(class: "interaction-field-control-plan_year-start_on").set(begin_date)
+  @browser.h3(text: /Plan Year/).click
+  @browser.a(text: /generate recommend dates by start on/).click
+  @browser.h4(text: /Recommend Date/).wait_until_present
+  expect(@browser.text.include?("employer initial application earliest submit on")).to be_truthy
   @browser.text_field(class: "interaction-field-control-plan_year-start_on").set("01/01/2015")
-  #@browser.text_field(class: "interaction-field-control-plan_year-end_on").set("12/31/2015")
   @browser.text_field(class: "interaction-field-control-plan_year-open_enrollment_start_on").set("11/01/2014")
   @browser.text_field(class: "interaction-field-control-plan_year-open_enrollment_end_on").set("11/30/2014")
   @browser.text_field(name: "plan_year[fte_count]").click
@@ -364,10 +376,8 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
   # Relationship Benefit
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
-  #@browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][employer_max_amt]").set(120)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]").set(15)
-  #@browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][4][employer_max_amt]").set(51)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').first.set(true)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').first.set(false)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_offered').first.set(false)
