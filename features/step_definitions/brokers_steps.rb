@@ -1,10 +1,13 @@
 When(/^I visit the HBX Broker Agency portal$/) do
   @browser.goto("http://localhost:3000/")
+  screenshot("enroll_home_page")
   @browser.a(class: /interaction-click-control-broker-agency-portal/).wait_until_present
   @browser.a(class: /interaction-click-control-broker-agency-portal/).click
-  screenshot("broker_start")
+  screenshot("broker_agency_portal_click")
   @browser.a(class: /interaction-click-control-create-account/).wait_until_present
+  screenshot("broker_agency_sign_in_page")
   @browser.a(class: /interaction-click-control-create-account/).click
+  screenshot("broker_agency_create_account_click")
 end
 
 And(/^I should see an initial form to enter broker agency information$/) do
@@ -71,10 +74,12 @@ end
 
 When(/^I click on create broker agency button$/) do
   @browser.element(class: /interaction-click-control-create-broker-agency/).wait_until_present
-  screenshot("create_broker_agency_profile_info")
+  screenshot("broker_agency_new_page_with_info")
   @browser.element(class: /interaction-click-control-create-broker-agency/).click
 end
 
 Then(/^I should see a successful broker create message$/) do
   @browser.element(text: /Successfully created Broker Agency Profile/).wait_until_present
+  screenshot("show_broker_ageny_profile_page")
+  expect(@browser.element(text: /Successfully created Broker Agency Profile/).visible?).to be_truthy
 end
