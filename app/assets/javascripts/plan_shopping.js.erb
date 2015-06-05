@@ -141,10 +141,11 @@ $(document).on("change", "select[name='reference_plan']", function() {
 }); 
 
 $(document).on("click", "a#generate_recommend_dates", function() {
+  $(this).button('loading');
   var target_url = $(this).data("href");
   $.ajax({
     type: "GET",
-    data:{start_on: $("input#plan_year_start_on_date").val()},
+    data:{start_on: $("input#plan_year_start_on_jq_datepicker_plain_field").val()},
     url: target_url
   });
 });

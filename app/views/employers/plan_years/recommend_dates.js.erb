@@ -1,3 +1,15 @@
-<% if @shop_enrollemnt_timetable.present? %>
+<% if @result[:result] == "ok" %>
   $('.recommend').html("<%= escape_javascript(render "recommend_dates") %>"); 
+
+  $("input#jq_datepicker_ignore_plan_year_end_on").val("<%= @schedule[:plan_year_end_on].to_s %>").trigger("change");
+  $("input#plan_year_end_on_jq_datepicker_plain_field").val("<%= @schedule[:plan_year_end_on].to_s(:db) %>");
+
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_start_on").val("<%= @open_enrollment_dates[:open_enrollment_start_on].to_s %>").trigger("change");
+  $("input#plan_year_open_enrollment_start_on_jq_datepicker_plain_field").val("<%= @open_enrollment_dates[:open_enrollment_start_on].to_s(:db) %>");
+
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").val("<%= @open_enrollment_dates[:open_enrollment_end_on].to_s %>").trigger("change");
+  $("input#plan_year_open_enrollment_end_on_jq_datepicker_plain_field").val("<%= @open_enrollment_dates[:open_enrollment_end_on].to_s(:db) %>");
+<% else %>
+  $('.recommend').html("<div class='alert-plan-year alert-error'><h4><%= @result[:msg] %></h4></div>")
 <% end %>
+$('a#generate_recommend_dates').button('reset');

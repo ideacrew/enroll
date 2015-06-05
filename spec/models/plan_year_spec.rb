@@ -474,4 +474,45 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 
+  context "check_start_on" do
+    it "should failure when start on is not the first day of the month" do
+      start_on = (Date.current + 2.month).beginning_of_month + 10.days
+      rsp = PlanYear.check_start_on(start_on)
+      expect(rsp[:result]).to eq "failure"
+      expect(rsp[:msg]).to eq "start on must be first day of the month"
+    end
+
+    it "should valid" do
+      start_on = (Date.current + 2.month).beginning_of_month
+      rsp = PlanYear.check_start_on(start_on)
+      expect(rsp[:result]).to eq "ok"
+      expect(rsp[:msg]).to eq ""
+    end
+
+    it "should failure when current date more than open_enrollment_latest_start_on" do
+      start_on = (Time.now + 1.month).beginning_of_month
+      allow(Date).to receive(:current).and_return(Date.new(Time.now.year, Time.now.month, 15)) 
+      rsp = PlanYear.check_start_on(start_on)
+      expect(rsp[:result]).to eq "failure"
+      expect(rsp[:msg]).to start_with "start on must choose a start on date"
+    end
+  end
+
+  context "calculate_open_enrollment_date" do
+    it "start on is not close to current date" do
+      start_on = (Date.current + 3.month).beginning_of_month
+      rsp = PlanYear.calculate_open_enrollment_date(start_on)
+      expect(rsp[:open_enrollment_start_on]).to eq Date.current
+      expect(rsp[:open_enrollment_end_on]).to eq (Date.current + 10.days)
+    end
+
+    it "start on is close to current date(2 months)" do
+      start_on = (Date.current + 2.month).beginning_of_month
+      current_date = Date.new(Time.now.year, Time.now.month, 15)
+      allow(Date).to receive(:current).and_return(current_date)
+      rsp = PlanYear.calculate_open_enrollment_date(start_on)
+      expect(rsp[:open_enrollment_start_on]).to eq (start_on - 2.months)
+      expect(rsp[:open_enrollment_end_on]).to eq (start_on - 2.months + 10.days)
+    end
+  end
 end

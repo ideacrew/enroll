@@ -1,35 +1,19 @@
 <h4>Recommend Date</h4>
 <table>
   <tr>
-    <td>plan year end on: </td>
-    <td><%= @shop_enrollemnt_timetable[:plan_year_end_on].to_s %></td>
-  </tr>
-  <tr>
     <td>employer initial application earliest start on: </td>
-    <td><%= @shop_enrollemnt_timetable[:employer_initial_application_earliest_start_on].to_s %></td>
+    <td><%= @schedule[:employer_initial_application_earliest_start_on].to_s %></td>
   </tr>
   <tr>
     <td>employer initial application earliest submit on: </td>
-    <td><%= @shop_enrollemnt_timetable[:employer_initial_application_earliest_submit_on].to_s %></td>
+    <td><%= @schedule[:employer_initial_application_earliest_submit_on].to_s %></td>
   </tr>
   <tr>
     <td>employer initial application latest submit on: </td>
-    <td><%= @shop_enrollemnt_timetable[:employer_initial_application_latest_submit_on].to_s %></td>
-  </tr>
-  <tr>
-    <td>open enrollment earliest start on: </td>
-    <td><%= @shop_enrollemnt_timetable[:open_enrollment_earliest_start_on].to_s %></td>
-  </tr>
-  <tr>
-    <td>open enrollment latest start on: </td>
-    <td><%= @shop_enrollemnt_timetable[:open_enrollment_latest_start_on].to_s %></td>
-  </tr>
-  <tr>
-    <td>open enrollment latest end on: </td>
-    <td><%= @shop_enrollemnt_timetable[:open_enrollment_latest_end_on].to_s %></td>
+    <td><%= @schedule[:employer_initial_application_latest_submit_on].to_s %></td>
   </tr>
   <tr>
     <td>binder payment due date: </td>
-    <td><%= @shop_enrollemnt_timetable[:binder_payment_due_date].to_s %></td>
+    <td><%= @schedule[:binder_payment_due_date].to_s %></td>
   </tr>
 </table>

@@ -22,8 +22,12 @@ class Employers::PlanYearsController < ApplicationController
 
   def recommend_dates
     if params[:start_on].present?
-      start_on = Date.strptime(params[:start_on], "%m/%d/%Y").to_date
-      @shop_enrollemnt_timetable = PlanYear.shop_enrollment_timetable(start_on)
+      start_on = params[:start_on].to_date
+      @result = PlanYear.check_start_on(start_on)
+      if @result[:result] == "ok"
+        @open_enrollment_dates = PlanYear.calculate_open_enrollment_date(start_on)
+        @schedule= PlanYear.shop_enrollment_timetable(start_on)
+      end
     end
   end
 

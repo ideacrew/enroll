@@ -109,4 +109,16 @@ RSpec.describe Employers::PlanYearsController do
     end
 
   end
+
+  describe "GET recommend_dates" do
+    before :each do
+      sign_in
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      xhr :get, :recommend_dates, employer_profile_id: employer_profile_id, start_on: "2015-05-10", format: :js
+    end
+
+    it "should be a success" do
+      expect(response).to have_http_status(:success)
+    end
+  end
 end
