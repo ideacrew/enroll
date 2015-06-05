@@ -26,6 +26,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       flash[:notice] = "Successfully created Broker Agency Profile"
       redirect_to broker_agencies_profile_path(current_user.person.broker_agency_contact)
     else
+      flash[:error] = "Failed to create Broker Agency Profile"
       render "new"
     end
   end
