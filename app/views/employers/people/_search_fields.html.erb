@@ -23,7 +23,7 @@
       <div class="row bottom-row form-group form-group-lg no-pd">
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
           <%= f.text_field :date_of_birth, start_year: Date.today.year - 110, end_year: Date.today.year, placeholder: "BIRTHDATE",
-            class: "required date-picker floatlabel form-control", required: true %>
+            class: "required date-picker floatlabel form-control dob-picker", required: true %>
         </div>
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
           <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", required: true %>
@@ -39,7 +39,7 @@
         <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
           <div class="radio skinned-form-controls skinned-form-controls-mac">
             <label>
-              <%= f.radio_button :gender, "female", class: "required floatlabel"  %>
+              <%= f.radio_button :gender, "female", required: true, class: "required floatlabel"  %>
               <span>Female</span>
             </label>
           </div>
