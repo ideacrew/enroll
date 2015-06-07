@@ -3,14 +3,14 @@ class Employers::CensusEmployeesController < ApplicationController
   before_action :check_plan_year, only: [:new]
 
   def new
-    form = ::Forms::CensusEmployeeForm.new({},{})
-    @census_employee = form.build_census_employee_params
+    census_employee_form = Forms::CensusEmployeeForm.new()
+    @census_employee = census_employee_form.build_census_employee_params
   end
 
   def create
     params.require(:census_employee).permit!
-    form = ::Forms::CensusEmployeeForm.new(params, current_user)
-    @census_employee = form.build_and_assign_attributes
+    census_employee_form = ::Forms::CensusEmployeeForm.new(params)
+    @census_employee = census_employee_form.build_and_assign_attributes
     if @census_employee.save
       redirect_to employers_employer_profile_path(@employer_profile)
     else

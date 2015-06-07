@@ -1,8 +1,7 @@
 module Forms
   class CensusEmployeeForm < SimpleDelegator
-    def initialize(params, current_user)
+    def initialize(params={})
       @params = params
-      @current_user = current_user
     end
 
     def build_and_assign_attributes
