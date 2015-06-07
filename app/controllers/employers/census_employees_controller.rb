@@ -1,9 +1,21 @@
 class Employers::CensusEmployeesController < ApplicationController
-  before_action :find_employer
+  before_action :find_employer, only: [:new, :create]
   before_action :check_plan_year, only: [:new]
 
   def new
-    build_census_employee
+    form = ::Forms::CensusEmployeeForm.new({},{})
+    @census_employee = form.build_census_employee_params
+  end
+
+  def create
+    params.require(:census_employee).permit!
+    form = ::Forms::CensusEmployeeForm.new(params, current_user)
+    @census_employee = form.build_and_assign_attributes
+    if @census_employee.save
+      redirect_to employers_employer_profile_path(@employer_profile)
+    else
+      render action: "new"
+    end
   end
 
   private
@@ -19,11 +31,4 @@ class Employers::CensusEmployeesController < ApplicationController
     end
   end
 
-  def build_census_employee
-    @census_employee = CensusEmployee.new
-    @census_employee.build_address
-    @census_employee.census_dependents.build
-    @census_employee.benefit_group_assignments.build
-    @census_employee
-  end
 end
