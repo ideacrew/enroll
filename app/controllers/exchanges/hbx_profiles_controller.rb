@@ -37,6 +37,24 @@ class Exchanges::HbxProfilesController < ApplicationController
     render "insured/families/index"
   end
 
+  def broker_agency_index
+    @brokers = BrokerAgency.all
+  end
+
+  def broker_index
+    @brokers = BrokerRole.all
+  end
+
+  def issuer_index
+    @issuers = CarrierProfile.all
+  end
+
+  def product_index
+  end
+
+  def configuration
+  end
+
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show
@@ -96,7 +114,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 private
   # Use callbacks to share common setup or constraints between actions.
   def set_hbx_profile
-    @hbx_profile = Organization.exists(hbx_profile: true).where(hbx_profile: params[:id])
+    @hbx_profile = HbxProfile.find(params[:id])
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
