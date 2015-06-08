@@ -1,6 +1,6 @@
 class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_hbx_staff_role, except: [:welcome]
-  before_action :set_hbx_profile, only: [:show, :edit, :update, :destroy]
+  before_action :set_hbx_profile, only: [:edit, :update, :destroy]
 
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
