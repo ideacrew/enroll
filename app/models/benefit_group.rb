@@ -91,12 +91,22 @@ class BenefitGroup
     end
   end
 
+  def census_employees
+    employer_profile = plan_year.employer_profile
+    ces = CensusEmployee.where(employer_profile_id: employer_profile.id).to_a
+    ces.reduce([]) do |list, ce|
+      list << ce if ce.active_benefit_group_assignment.benefit_group == self
+      list
+    end
+  end
+
   def assignable_to?(family)
     return !(family.terminated_on < start_on || family.hired_on > end_on)
   end
 
   def assigned?
-    employee_families.any?
+    # employee_families.any?
+    census_employees.any?
   end
 
   def effective_on_for(date_of_hire)

@@ -1,5 +1,6 @@
 class Employers::CensusEmployeesController < ApplicationController
-  before_action :find_employer, only: [:new, :create]
+  before_action :find_employer, only: [:new, :create, :show]
+  before_action :find_census_employee, only: [:show]
   before_action :check_plan_year, only: [:new]
 
   def new
@@ -18,10 +19,17 @@ class Employers::CensusEmployeesController < ApplicationController
     end
   end
 
+  def show
+  end
+
   private
 
   def find_employer
     @employer_profile = EmployerProfile.find(params["employer_profile_id"])
+  end
+
+  def find_census_employee
+    @census_employee = CensusEmployee.find(params["id"])
   end
 
   def check_plan_year

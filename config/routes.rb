@@ -71,7 +71,7 @@ Rails.application.routes.draw do
       resources :plan_years do
         get 'recommend_dates', on: :collection
       end
-      resources :census_employees, only: [:new, :create, :edit, :update] do
+      resources :census_employees, only: [:new, :create, :edit, :update, :show] do
         get :delink
         get :terminate
         get :rehire

@@ -45,7 +45,7 @@
               <tbody>
                 <% @employee_families.each do |family| %>
                   <tr class="terminated_<%= family.is_terminated? %> remove_<%= family.id %>">
-                    <td> <%= link_to name_to_listing(family.census_employee), employers_employer_profile_family_path(@employer_profile.id, family.id), remote: true %> </td>
+                    <td> <%= link_to name_to_listing(family.census_employee), employers_employer_profile_census_employee_path(@employer_profile.id, family.id), remote: true %> </td>
                     <td><%= number_to_obscured_ssn family.census_employee.ssn %></td>
                     <td><%= format_date family.census_employee.dob %> </td>
                     <td><%= format_date family.census_employee.hired_on %> </td>
