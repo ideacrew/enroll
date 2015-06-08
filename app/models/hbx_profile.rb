@@ -14,6 +14,17 @@ class HbxProfile
   delegate :fein, :fein=, to: :organization, allow_nil: true
   delegate :entity_kind, :entity_kind=, to: :organization, allow_nil: true
 
+
+  class << self
+    def find(id)
+      Organization.where("hbx_profile._id" => BSON::ObjectId.from_string(id)).first.hbx_profile
+    end
+
+    def all
+      Organization.exists(hbx_profile: true).all.reduce([]) { |set, org| set << org.hbx_profile }
+    end
+  end
+
   ## Application-level caching
 
   ## HBX general settings
