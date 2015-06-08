@@ -23,5 +23,9 @@ FactoryGirl.define do
     roles ["hbx_staff"]
   end
 
+  trait :employer_staff do
+    roles ["employer_staff"]
+  end
+
   factory :invalid_user, traits: [:without_email, :without_password, :without_password_confirmation]
 end

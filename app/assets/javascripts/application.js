@@ -40,14 +40,20 @@ $(document).ready(function () {
         changeYear: true,
         dateFormat: 'mm/dd/yy', 
         maxDate: "+0d",
-        yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()
+        yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear(),
+          onSelect: function(dateText, dpInstance) {
+	    $(this).datepicker("hide");
+	  }
       });
     }else{
       $(this).datepicker({ 
         changeMonth: true,
         changeYear: true,
         dateFormat: 'mm/dd/yy', 
-        yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10)
+        yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10),
+          onSelect: function(dateText, dpInstance) {
+	    $(this).datepicker("hide");
+	  }
       });
     }
   });
@@ -97,15 +103,15 @@ $(document).ready(function () {
   
   // personal-info-row focus fields
   $(document).on('click', '.focus_effect', function() {
-    update_info_row(this, 'focus_in');
+    update_info_row($(this), 'focus_in');
   });
 
   $(document).on('focusin', '.focus_effect input', function() {
-    update_info_row(this.closest('.focus_effect'), 'focus_in');
+    update_info_row($(this).closest('.focus_effect'), 'focus_in');
   });
 
   $(document).on('blur', '.focus_effect', function() {
-    update_info_row(this, 'focus_out');
+    update_info_row($(this), 'focus_out');
   });
 
   function update_info_row(element, evt) {

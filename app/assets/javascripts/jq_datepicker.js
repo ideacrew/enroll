@@ -49,7 +49,10 @@ function applyJQDatePickerSetup(ele) {
 	  dateFormat: 'mm/dd/yy',
 	  altFormat: 'yy-mm-dd',
 	  altField: otherFieldSelector,
-	  yearRange: yearMin + ":" + yearMax
+	  yearRange: yearMin + ":" + yearMax,
+          onSelect: function(dateText, dpInstance) {
+	    $(this).datepicker("hide");
+	  }
   });
   el.datepicker("refresh");
 }

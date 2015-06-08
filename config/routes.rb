@@ -7,8 +7,18 @@ Rails.application.routes.draw do
       root 'hbx_profiles#show'
 
       collection do
-        get :employer_index
         get :family_index
+        get :employer_index
+        get :broker_index
+        get :broker_agency_index
+        get :issuer_index
+        get :product_index
+        get :configuration
+      end
+
+      member do
+        get :home
+        get :inbox
       end
 
       # resources :hbx_staff_roles, shallow: true do

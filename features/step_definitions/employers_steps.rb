@@ -346,6 +346,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   # validation error path
   @browser.text_field(class: "interaction-field-control-plan_year-start_on").set("01/06/2017")
   @browser.h3(text: /Plan Year/).click
+  sleep(1)
   @browser.a(text: /generate recommend dates by start on/).click
   @browser.h4(text: /start on must be first day of the month/).wait_until_present
   expect(@browser.text.include?("start on must be first day of the month")).to be_truthy
@@ -353,6 +354,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   begin_date = (Date.current + 5.months).beginning_of_month
   @browser.text_field(class: "interaction-field-control-plan_year-start_on").set(begin_date)
   @browser.h3(text: /Plan Year/).click
+  sleep(1)
   @browser.a(text: /generate recommend dates by start on/).click
   @browser.h4(text: /Recommend Date/).wait_until_present
   expect(@browser.text.include?("employer initial application earliest submit on")).to be_truthy
