@@ -16,19 +16,21 @@
               </li>
           </ul>
           <div class="right-menu navbar-right">
+            <% if signed_in? %>
               <ul class="navbar-nav top-menu">
-                  <li class=""><a href="#">My Account</a></li>
+                  <li><%= link_to "My Account", person_person_landing_path(@person) if @person.present? && @person.persisted? %></li>
                   <li class="hidden-xs">|</li>
-                  <li class=""><a href="#">1-855-532-5465</a></li>
+                  <li><a href="#">1-855-532-5465</a></li>
                   <li class="hidden-xs">|</li>
-                  <li class=""><a href="#">Help</a></li>
+                  <li><a href="#">Help</a></li>
                   <li class="hidden-xs">|</li>
-                  <li class=""><a href="#">LOGOUT</a></li>
+                  <li><%= link_to "LOGOUT", destroy_user_session_path, method: "delete" %></li>
               </ul>
               <div class="clearfix"></div>
               <ul class="user-info">
-                  <li class="">(ID 12345678) &nbsp;&nbsp;<strong>John Doe</strong></li>
+                  <li class="">(ID <%= @person.id %>) &nbsp; &nbsp; <strong><%= @person.full_name %></strong></li>
               </ul>
+            <% end %>
           </div>
       </div>
   </div>

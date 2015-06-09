@@ -3193,40 +3193,43 @@ a.all-filter:hover{
   transition: all 0.1s ease-in-out;
 }
 
-.submenu {
+.mainmenu {
     background: #007bc4 none repeat scroll 0 0;
 }
-.submenu ul {
+.submenu {
+    background: #00a3d9 none repeat scroll 0 0;
+}
+.mainmenu ul, .submenu ul {
     margin: 20px 0;
     text-align: left;
 }
 
-.submenu ul li {
+.mainmenu ul li, .submenu ul li {
     padding: 0 13px;
 }
 
-.submenu ul li:first-child {
+.mainmenu ul li:first-child, .submenu ul li:first-child {
     padding-left: 0;
 }
 
-.submenu ul li a {
+.mainmenu ul li a, .submenu ul li a {
     color: #fff;
     font-size: 16px;
     font-weight: 500;
     line-height: 16px;
     text-decoration: none;
 }
-.submenu ul li.active a {
+.mainmenu ul li.active a, .submenu ul li.active a {
     background: none repeat scroll 0 0 rgba(0, 0, 0, 0) !important;
     color: #fff !important;
     font-weight: bold;
 }
-.submenu ul li a:focus, .submenu ul li a:hover {
+.mainmenu ul li a:focus, .mainmenu ul li a:hover, .submenu ul li a:focus, .submenu ul li a:hover {
     background: none repeat scroll 0 0 rgba(0, 0, 0, 0) !important;
     color: #fff;
 }
 
-.submenu ul li a .badge {
+.mainmenu ul li a .badge, .submenu ul li a .badge {
     background: #d41414 none repeat scroll 0 0;
     border-radius: 50px;
     color: #fff;
@@ -3240,14 +3243,15 @@ a.all-filter:hover{
     vertical-align: middle;
 }
 
-.submenu ul li a span {
+.mainmenu ul li a span, .submenu ul li a span {
     display: block;
 }
 
-.submenu ul li a small {
+.mainmenu ul li a small, .submenu ul li a small {
     font-size: 11px;
     font-weight: 300;
 }
+.mainmenu ul li a:hover, .mainmenu ul li  a:focus, .mainmenu ul li a.active,
 .submenu ul li a:hover, .submenu ul li a:focus, .submenu ul li a.active {
     color: #00315f;
 }
