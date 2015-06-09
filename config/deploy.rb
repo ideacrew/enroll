@@ -43,6 +43,8 @@ set :assets_roles, [:web, :app]
 # set :keep_releases, 5
 before "deploy:assets:precompile", "assets:purge_all"
 
+=begin
+# FIXME: Fix when assets are generated and linked
 namespace :assets do
   desc "Kill all the assets"
   task :purge_all do
@@ -51,6 +53,7 @@ namespace :assets do
     end
   end
 end
+=end
 
 namespace :deploy do
   desc 'Restart application'
