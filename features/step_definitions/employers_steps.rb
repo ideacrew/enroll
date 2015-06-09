@@ -366,16 +366,19 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.text_field(name: "plan_year[pte_count]").set("15")
   @browser.text_field(name: "plan_year[msp_count]").set("3")
   # Benefit Group
+  elected_field = @browser.div(class: /selectric-wrapper/, text: /ELECTED PLAN/)
+  elected_field.click
+  elected_field.li(text: /All plans from a given carrier/).click
+  ref_plan = @browser.divs(class: /selectric-wrapper/, text: /SELECT CARRIER/).first
+  ref_plan.click
+  ref_plan.li(index: 3).click # select plan from list.
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
-  input_field = @browser.div(class: /selectric-wrapper/)
+  input_field = @browser.div(class: /selectric-wrapper/, text: /SELECT CARRIER/)
   input_field.click
   input_field.li(text: /CareFirst/).click
   ref_plan = @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last
   ref_plan.click
   ref_plan.li(index: 5).click # select plan from list.
-  hire_eligible = @browser.divs(class: /selectric-wrapper/, text: /NEW HIRES ELIGIBLE/).last
-  hire_eligible.click
-  hire_eligible.li(index: 1).click
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
   # Relationship Benefit
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
