@@ -5,8 +5,12 @@ module Forms
        @all_plans = Plan.where(active_year: Time.now.year, market: "shop").to_a
      end
 
-     def carrier_plans_for(c_profile)
-       @all_plans.select { |pl| pl.carrier_profile_id.to_s == c_profile.id.to_s }
+     def carrier_plans_for(c_profile_id)
+       @all_plans.select { |pl| pl.carrier_profile_id.to_s == c_profile_id.to_s }
+     end
+
+     def metal_level_plans_for(metal_level)
+       @all_plans.select { |pl| pl.metal_level == metal_level }
      end
 
      def self.model_name

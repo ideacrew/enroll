@@ -149,3 +149,20 @@ $(document).on("click", "a#generate_recommend_dates", function() {
     url: target_url
   });
 });
+
+$(document).on("change", "select.elected_plan", function() {
+  var target = $(this).parents(".form-group");
+  $(target).find(".elected-plan-select .hidden_field").hide();
+  
+  switch($(this).val()){
+    case "carrier":
+      $(target).find(".carrier_for_elected_plan").show();
+      break;
+    case "metal_level":
+      $(target).find(".metal_level_for_elected_plan").show();
+      break;
+    case "plan":
+      $(target).find(".plan_for_elected_plan").show();
+      break;
+  };
+});
