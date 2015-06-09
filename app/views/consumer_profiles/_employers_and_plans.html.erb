@@ -102,58 +102,54 @@
                     </div>
                     <div class="panel panel-default">
                     	<div class="panel-body">
-	                        <div class="page-header">
-	                            <h4>Your life events</h4>
-	                        </div>
-	                        <div class="row">
-	                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-	                                <ul class="list-unstyled list-inline list-qle">
-	                                    <li>
-	                                        <a href="#">"I got married"</a>
-	                                    </li>
-	                                    <li>
-	                                        <a href="#">"I got divorced"</a>
-	                                    </li>
-	                                    <li>
-	                                        <a href="#">"I had a baby"</a>
-	                                    </li>
-	                                    <li>
-	                                        <a href="#">"My spouse passed away"</a>
-	                                    </li>
-	                                </ul>
-	                            </div>
-	                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-	                                <ul class="list-unstyled list-inline list-qle">
-	                                    <li>
-	                                        <a href="#">"I got married"</a>
-	                                    </li>
-	                                    <li>
-	                                        <a href="#">"I got divorced"</a>
-	                                    </li>
-	                                    <li>
-	                                        <a href="#">"I had a baby"</a>
-	                                    </li>
-	                                    <li>
-	                                        <a href="#">"My spouse passed away"</a>
-	                                    </li>
-	                                </ul>
-	                            </div>
-	                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-	                                <ul class="list-unstyled list-inline list-qle">
-	                                    <li>
-	                                        <a href="#">"I got married"</a>
-	                                    </li>
-	                                    <li>
-	                                        <a href="#">"I got divorced"</a>
-	                                    </li>
-	                                    <li>
-	                                        <a href="#">"I had a baby"</a>
-	                                    </li>
-	                                    <li>
-	                                        <a href="#">"My spouse passed away"</a>
-	                                    </li>
-	                                </ul>
-	                            </div>
+                    		<div id="qle-menu">
+		                        <div class="page-header">
+		                            <h4>Your life events</h4>
+		                        </div>
+		                        <div class="row">
+		                        	<% if @qualifying_life_events %>		
+										<% @qualifying_life_events.each_with_index do |qle, index| %>
+											<% if index%5 == 0 %>
+												<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+												<ul class="list-unstyled list-inline list-qle">
+											<% end %>
+
+											<li>
+												<a class="qle-menu-item" href="javascript:void(0)" data-toggle="tooltip" title="<%= qle.description %>">"<%= qle.title.humanize %>"</a>
+											</li>
+
+											<% if index%5 == 4 || index+1 == @qualifying_life_events.count %>
+												</ul>
+												</div>
+											<% end %>
+										<% end %>
+									<% end %>
+								</div>
+							</div>
+							<div id="qle-details" class="hidden">
+								<a class="close-popup" href="javascript:void(0);"><span aria-hidden="true" class="glyphicon glyphicon-remove"></span></a>
+								<div class="row">
+									<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 qle-form-wrapper">
+		                                <h3 class="qle-details-title">"I got married"</h3>
+		                                <h5>Enter the date of the event.</h5>
+		                                <input type="text" placeholder="00-00-000" class="form-control">
+		                                <a class="btn btn-danger" href="#">Submit</a>
+		                                <br>
+		                                <a class="cancel" href="#">Cancel</a>
+		                            </div>
+
+		                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 qle-form-wrapper">
+		                                <center>
+		                                    <h4>Keep My Existing Coverage</h4>
+		                                </center>
+		                            </div>
+
+		                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 qle-form-wrapper">
+		                                <center>
+		                                    <h4>Shop for a New Plan</h4>
+		                                </center>
+		                            </div>
+		                        </div>
 							</div>
                         </div>
                     </div>

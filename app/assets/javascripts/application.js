@@ -23,6 +23,7 @@
 //= require override_confirm
 //= require floatlabels
 //= require jq_datepicker
+//= require qle
 //= require_tree .
 
 $(document).ready(function () {
@@ -30,6 +31,8 @@ $(document).ready(function () {
   $(function(){
     $('select').selectric();
   });
+
+  $('[data-toggle="tooltip"]').tooltip();
 
   semantic_class(); //Calls semantic class on all input fields & buttons (eg. interaction-click-control-continue)
 
