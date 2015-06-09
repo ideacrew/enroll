@@ -26,6 +26,14 @@ class EmployerProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
+  # TODO: make these relative to enrolling plan year
+  delegate :eligible_to_enroll_count, to: :enrolling_plan_year, allow_nil: true
+  delegate :non_business_owner_enrollment_count, to: :enrolling_plan_year, allow_nil: true
+  delegate :total_enrolled_count, to: :enrolling_plan_year, allow_nil: true
+  delegate :enrollment_ratio, to: :enrolling_plan_year, allow_nil: true
+  delegate :is_enrollment_valid, to: :enrolling_plan_year, allow_nil: true
+  delegate :enrollment_errors, to: :enrolling_plan_year, allow_nil: true
+
   embeds_one  :inbox, as: :recipient
   embeds_many :premium_statements
   embeds_many :plan_years, cascade_callbacks: true, validate: true
@@ -92,7 +100,7 @@ class EmployerProfile
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
   end
 
-  # Change plan years for a period - published -> retired and 
+  # Change plan years for a period - published -> retired and
   def close_plan_year
   end
 
@@ -104,42 +112,10 @@ class EmployerProfile
     plan_years.to_a.detect { |py| (py.start_date.beginning_of_day..py.end_date.end_of_day).cover?(target_date) }
   end
 
-  def eligible_to_enroll_count
+  def enrolling_plan_year
+    # TODO: totally wrong, write real implementation
+    latest_plan_year
   end
-
-  def non_business_owner_enrollment_count
-  end
-
-  def total_enrolled_count
-  end
-
-  def enrollment_ratio
-    (total_enrolled_count / eligible_to_enroll_count) unless eligible_to_enroll_count == 0
-  end
-
-  def is_enrollment_valid?
-    enrollment_errors.blank? ? true : false
-  end
-
-  # Determine enrollment composition compliance with HBX-defined guards
-  def enrollment_errors
-    errors = {}
-    # At least one employee who isn't an owner or family member of owner must enroll
-    if non_business_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
-      errors.merge!(:non_business_owner_enrollment_count, "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
-    end
-
-    # January 1 effective date exemption(s)
-    unless effective_date.yday == 1
-      # Verify ratio for minimum number of eligible employees that must enroll is met
-      if enrollment_ratio < HbxProfile::ShopEnrollmentParticipationRatioMinimum
-        errors.merge!(:enrollment_ratio, "number of eligible participants enrolling (#{employees_total_enrolled_count}) is less than minimum required #{employees_eligible_to_enroll_count * ShopEnrollmentParticipationMinimum}")
-      end
-    end
-
-    errors
-  end
-
 
   def latest_premium_statement
     return premium_statements.first if premium_statements.size == 1
@@ -279,21 +255,21 @@ class EmployerProfile
 
   # Workflow for self service
   aasm do
-    state :applicant, initial: true 
+    state :applicant, initial: true
     state :ineligible               # Unable to enroll business per SHOP market regulations or business isn't DC-based
-    state :ineligible_appealing     # Plan year application submitted with 
+    state :ineligible_appealing     # Plan year application submitted with
     state :registered               # Business information complete submitted, before initial open enrollment period
     state :enrolling                # Employees registering and plan shopping
     state :enrolled_renewal_ready   # Annual renewal date is 90 days or less
-    state :enrolled_renewing        # 
+    state :enrolled_renewing        #
 
     state :binder_pending
     state :enrolled                 # Enrolled and premium payment up-to-date
     state :canceled                 # Coverage didn't take effect, as Employer either didn't complete enrollment or pay binder premium
-    state :suspended       # 
+    state :suspended       #
     state :terminated               # Premium payment > 90 days past due (day 91) or voluntarily terminate
 
-    # Enrollment deadline has passed for first of following month 
+    # Enrollment deadline has passed for first of following month
     event :advance_enrollment_date do
 
       # Plan Year application expired
@@ -303,7 +279,7 @@ class EmployerProfile
       transitions from: :registered, to: :enrolling
 
       # End open enrollment with success
-      transitions from: :enrolling, to: :binder_pending, 
+      transitions from: :enrolling, to: :binder_pending,
         :guard => :enrollment_compliant?,
         :after => :build_premium_statement
 
@@ -316,7 +292,7 @@ class EmployerProfile
       transitions from: :terminated, to: :applicant
     end
 
-    event :publish_plan_year do 
+    event :publish_plan_year do
       # Jump straight to enrolling state if plan year application is valid and today is start of open enrollment
       transitions from: :applicant, to: :enrolling, :guards => [:plan_year_publishable?, :event_date_valid?]
       transitions from: :applicant, to: :registered, :guard => :plan_year_publishable?
@@ -337,7 +313,7 @@ class EmployerProfile
 
     event :revert do
       # Add guard -- only revert for first 30 days past submitted
-      transitions from: :ineligible_appealing, to: :applicant, 
+      transitions from: :ineligible_appealing, to: :applicant,
         :after_enter => :revert_plan_year
     end
 
@@ -346,7 +322,7 @@ class EmployerProfile
     end
 
     event :end_open_enrollment, :guards => [:event_date_valid?] do
-      transitions from: :enrolling, to: :binder_pending, 
+      transitions from: :enrolling, to: :binder_pending,
         :guard => :enrollment_compliant?,
         :after => :build_premium_statement
 
