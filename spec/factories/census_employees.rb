@@ -11,8 +11,8 @@ FactoryGirl.define do
     association :address, strategy: :build
     association :email, strategy: :build
 
-    trait :is_owner do
-      is_owner  true
+    trait :owner do
+      is_business_owner  true
     end
   end
 
