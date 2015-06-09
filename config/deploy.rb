@@ -41,6 +41,16 @@ set :assets_roles, [:web, :app]
 
 # Default value for keep_releases is 5
 # set :keep_releases, 5
+before "deploy:assets:precompile", "assets:purge_all"
+
+namespace :assets do
+  desc "Kill all the assets"
+  task :purge_all do
+    on roles(:web) do
+      execute "rm -rf #{shared_path}/public/assets/*"
+    end
+  end
+end
 
 namespace :deploy do
   desc 'Restart application'
