@@ -35,6 +35,7 @@ class CensusEmployee < CensusMember
   index({"dob" => 1})
   index({"ssn" => 1, "dob" => 1, "aasm_state" => 1})
   index({"benefit_group_assignments._id" => 1})
+  index({"benefit_group_assignments.benefit_group_id" => 1})
   index({"benefit_group_assignments.aasm_state" => 1})
 
   scope :active,  ->{ any_in(aasm_state: ["eligible", "employee_role_linked"]) }
