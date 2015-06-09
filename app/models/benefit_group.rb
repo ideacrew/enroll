@@ -87,8 +87,14 @@ class BenefitGroup
     end
   end
 
-  def assignable_to?(family)
-    return !(family.terminated_on < start_on || family.hired_on > end_on)
+  def assignable_to?(family_or_census_employee)
+    if family_or_census_employee.is_a?(EmployerCensus::EmployeeFamily)
+      family = family_or_census_employee
+      return !(family.terminated_on < start_on || family.hired_on > end_on)
+    elsif family_or_census_employee.is_a?(CensusEmployee)
+      census_employee = family_or_census_employee
+      return !(census_employee.employment_terminated_on < start_on || census_employee.hired_on > end_on)
+    end
   end
 
   def assigned?
