@@ -96,10 +96,10 @@ h1,h2,h3,h4,h5,h6,p,a{
   border: none;
   box-shadow: none;
 }
-.landing .panel {
+/*.landing .panel {
     background: none repeat scroll 0 0 #eee;
     margin-bottom: 0;
-}
+}*/
 
 a:hover, a:focus {
   outline: none;
@@ -1550,15 +1550,15 @@ div#house_info > p {
    font-size: 10px;
 }
 
-.landing .container-fluid {
+/*.landing .container-fluid {
   padding: 0;
-}
-.landing .panel {
+}*/
+/*.landing .panel {
   margin-bottom: 0;
   background: #eee;
   box-shadow: none;
   border: none;
-}
+}*/
 
 /** confirmation page css start **/
 
@@ -1832,11 +1832,6 @@ p.success-text {
     text-align: center;
     color: #238c00;
     font-size: 16px;
-}
-
-.panel-default > .panel-heading {background-image: none;}
-.panel-body {
-  border-top: 1px solid #ddd;
 }
 
 @media (min-width: 300px) and (max-width: 767px) {
@@ -3716,6 +3711,14 @@ div#house_info .sidebar-email-field {
   margin-top: 15px;
 }
 
+/* Custom Buttons */
+a.btn.btn-payment {
+    border-radius: 4px;
+    font-size: 14px;
+    margin-top: 0;
+    padding: 12px 7px;
+}
+
 /* Account Menu */
 
 ul.navbar-nav.top-menu {
@@ -3763,6 +3766,77 @@ ul.user-info li strong {
     font-size: 16px;
 }
 
+#profile-content .panel .page-header {
+  margin: 0;
+  border-bottom: none;
+}
+
+#profile-content .panel .page-header h4 {
+    color: #7b7b7b;
+    display: inline-block;
+    font-weight: 600;
+    margin-top: 0;
+    text-transform: uppercase;
+}
+
+#profile-content .panel .page-header a {
+  float: right;
+  font-weight: 200;
+}
+
+#profile-content .panel h3 {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 25px;
+    margin: 10px 0;
+}
+
+#profile-content .panel table.table thead tr th {
+    color: #7b7b7b;
+    font-weight: 100;
+}
+#profile-content .panel table.table thead tr th, #profile-content .panel table.table tbody tr td {
+    border: medium none;
+    font-size: 12px;
+    padding: 2px 0;
+}
+
+#profile-content .panel ul.list-comp li {
+    color: #7b7b7b;
+    font-size: 12px;
+    padding-bottom: 2px;
+}
+
+#profile-content .panel ul.list-comp li em {
+    color: #000;
+    font-style: normal;
+}
+
+#profile-content .panel.min-h {
+    min-height: 315px;
+}
+
+#profile-content .panel .info-wrapper h3 {
+    color: #007bc4;
+    font-weight: bold;
+    margin-top: 0;
+    text-transform: uppercase;
+}
+
+ul.list-qle {
+    margin: 0;
+}
+
+ul.list-qle li {
+    padding: 5px 0;
+    width: 100%;
+}
+
+ul.list-qle li a {
+    color: #0079c7;
+    font-size: 17px;
+    font-weight: 400;
+}
 /*.top-menu {
   background: #00698c;
   border: none;
@@ -4833,9 +4907,11 @@ table.table-wrapper tbody tr:first-child td {
     padding: 12px;
 }
 .info-wrapper {
-    width: 100%;
     display: inline-block;
-    margin-bottom: 25px;
+}
+
+ul.list-comp {
+    margin: 0;
 }
 .info-tag {
     border: 1px solid #000;

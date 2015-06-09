@@ -18,7 +18,7 @@
           <div class="right-menu navbar-right">
             <% if signed_in? %>
               <ul class="navbar-nav top-menu">
-                  <li><%= link_to "My Account", person_person_landing_path(@person) if @person.present? && @person.persisted? %></li>
+                  <li><%= link_to "My Account", home_consumer_profiles_path if @person.present? && @person.persisted? %></li>
                   <li class="hidden-xs">|</li>
                   <li><a href="#">1-855-532-5465</a></li>
                   <li class="hidden-xs">|</li>
