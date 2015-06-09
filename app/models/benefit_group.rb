@@ -26,7 +26,7 @@ class BenefitGroup
   field :terminate_on_kind, type: String, default: "end_of_month"
 
   # Number of days following date of hire
-  field :effective_on_offset, type: Integer
+  field :effective_on_offset, type: Integer, default: 0
 
   # Non-congressional
   # belongs_to :reference_plan, class_name: "Plan"
@@ -40,6 +40,8 @@ class BenefitGroup
   field :elected_plan_ids, type: Array, default: []
 
   delegate :start_on, :end_on, to: :plan_year
+
+  attr_accessor :plan_for_elected_plan, :metal_level_for_elected_plan, :carrier_for_elected_plan, :elected_plan_kind
 
   # Array of census employee ids
   # has_and_belongs_to_many :employee_families, class_name: "EmployeeFamily"

@@ -216,13 +216,13 @@ describe EmployerProfile, dbclean: :after_each do
               it "should transition to binder pending"
             end
 
-            it "should initialize a premium statement"
+            it "should initialize a employer profile account"
 
             it "should be waiting for binder payment"
 
             context "and employer doesn't post timely binder payment" do
               before do
-                # employer_profile.latest_premium_statement.advance_billing_period
+                # employer_profile.latest_premium_payment.advance_billing_period
               end
 
               it "should advance state to canceled"
@@ -230,7 +230,7 @@ describe EmployerProfile, dbclean: :after_each do
 
             context "and employer pays binder premium on timely basis" do
               before do
-                # employer_profile.latest_premium_statement.allocate_binder_payment
+                # employer_profile.latest_premium_payment.allocate_binder_payment
               end
 
               it "should transition employer to enrolled"
@@ -474,8 +474,8 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
   end
 
   describe ".find_all_by_person" do
-    let(:black_and_decker) do
-      org = FactoryGirl.create(:organization, legal_name: "Black and Decker, Inc.", dba: "Black + Decker")
+    let(:black_and_decker) do 
+      org = FactoryGirl.create(:organization, legal_name: "Black and Decker, Inc.", dba: "Black Decker")
       er = org.create_employer_profile(entity_kind: "c_corporation")
     end
     let(:atari) do
@@ -546,8 +546,6 @@ describe EmployerProfile, "instance methods" do
   let(:census_employee)  { FactoryGirl.build(:employer_census_employee, ssn: "069851240", dob: 34.years.ago.to_date)}
   let(:census_family)    { FactoryGirl.build(:employer_census_family, census_employee: census_employee, employer_profile: nil)}
   let(:person)           { Person.new(first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: 34.years.ago.to_date)}
-  let(:premium_statement_1) { FactoryGirl.build(:premium_statement, effective_on: Date.current - 10)}
-  let(:premium_statement_2) { FactoryGirl.build(:premium_statement, effective_on: Date.current - 90)}
 
   describe "#employee_roles" do
     let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
@@ -568,20 +566,6 @@ describe EmployerProfile, "instance methods" do
 
       it "should be associated with correct employer profile" do
         expect(ee_roles.first.employer_profile).to eq employer_profile
-      end
-    end
-  end
-
-  describe "#latest_premium_statement" do
-    let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
-
-    context "employer profile with multiple premium statuses" do
-      before do
-        employer_profile.premium_statements = [premium_statement_1, premium_statement_2]
-      end
-
-      it "should return the premiums status with latest effective on date" do
-        expect(employer_profile.latest_premium_statement).to eq premium_statement_1
       end
     end
   end

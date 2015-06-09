@@ -1,12 +1,12 @@
 <div class="col-md-9 col-sm-9 col-xs-12 form-group form-group-lg no-pd">
   <div class="col-md-7 col-sm-8 col-xs-12">
-    <%= select_tag 'carrier', options_for_select(@carriers.reject{|c| c.plans.blank? }.map{|c| [c.legal_name, c.id]}, selected: f.object.reference_plan.try(:carrier_profile_id)), class: 'carrier', include_blank: "SELECT CARRIER PROFILE" %>
+    <%= select_tag 'carrier', options_for_select(@carriers.map{|c| [c.legal_name, c.id]}, selected: f.object.reference_plan.try(:carrier_profile_id)), class: 'carrier', include_blank: "SELECT CARRIER PROFILE" %>
   </div>
 
   <%= f.hidden_field :reference_plan_id, value: f.object.reference_plan_id %>
   <div class="no-pd col-md-5 col-sm-4 col-xs-12 carrier-select">
     <% @carriers.each do |carrier| %>
-	    <% carrier_plans = @plan_year.carrier_plans_for(carrier) %>
+	    <% carrier_plans = @plan_year.carrier_plans_for(carrier.id) %>
 	    <div class="<%= carrier.id == f.object.reference_plan.try(:carrier_profile_id) ? '' : 'hide-carrier' %> carrier-<%= carrier.id %> carrier-content">
 
 	      <%= select_tag "reference_plan", options_for_select(carrier_plans.map{|plan| [plan.name, plan.id ]}, selected: f.object.reference_plan_id), class: "carrier-#{carrier.id}", include_blank: "SELECT REFERENCE PLAN" %>

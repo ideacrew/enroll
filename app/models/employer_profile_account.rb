@@ -1,52 +1,26 @@
-class PremiumStatement
+class EmployerProfileAccount
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
 
   embedded_in :employer_profile
 
-  # Payment status
-  field :effective_on, type: Date
-  field :last_premium_paid_on, type: Date
-  field :last_premium_amount, type: Money
   field :next_premium_due_on, type: Date
   field :next_premium_amount, type: Money
-
   field :aasm_state, type: String
   field :last_aasm_state, type: String
 
-  validates_presence_of :effective_on
+  embeds_many :premium_payments
 
-  def notify_hbx
+  accepts_nested_attributes_for :premium_payments
+
+  validates_presence_of :next_premium_due_on, :next_premium_amount
+
+  def last_premium_payment
+    return premium_payments.first if premium_payments.size == 1
+    premium_payments.order_by(:paid_on.desc).limit(1).first
   end
 
-  def persist_state
-    self.last_aasm_state = aasm.from_state
-  end
-
-  def revert_state
-    self.aasm_state = last_aasm_state unless last_aasm_state.blank?
-  end
-
-  def enroll_employer
-    employer_profile.enroll
-  end
-
-  def reinstate_employer
-    employer_profile.reinstate_coverage
-  end
-
-  def suspend_employer
-    employer_profile.suspend_coverage
-  end
-
-  def cancel_employer
-    employer_profile.cancel_coverage
-  end
-
-  def terminate_employer
-    employer_profile.terminate_coverage
-  end
 
   ## TODO -- reconcile the need for history via embeds_many with the state machine functionality
   aasm do
@@ -121,8 +95,38 @@ class PremiumStatement
     event :reapply do
       transitions from: :terminated, to: :binder_pending
     end
-
   end
 
+private
+  def notify_hbx
+  end
+
+  def persist_state
+    self.last_aasm_state = aasm.from_state
+  end
+
+  def revert_state
+    self.aasm_state = last_aasm_state unless last_aasm_state.blank?
+  end
+
+  def enroll_employer
+    employer_profile.enroll
+  end
+
+  def reinstate_employer
+    employer_profile.reinstate_coverage
+  end
+
+  def suspend_employer
+    employer_profile.suspend_coverage
+  end
+
+  def cancel_employer
+    employer_profile.cancel_coverage
+  end
+
+  def terminate_employer
+    employer_profile.terminate_coverage
+  end
 
 end
