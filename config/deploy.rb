@@ -44,31 +44,34 @@ set :assets_roles, [:web, :app]
 
 # FIXME: Fix when assets are generated and linked
 
-before "deploy:compile_assets", "deploy:assets:cleanup_assets"
-=begin
 namespace :assets do
   desc "Kill all the assets"
-  task :purge_all do
+  task :refresh do
     on roles(:web) do
-      execute "rm -rf #{shared_path}/public/assets/*"
+#      execute "rm -rf #{shared_path}/public/assets/*"
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          execute :rake, "assets:precompile"
+        end
+      end
     end
   end
 end
-=end
+after "deploy:updated", "assets:refresh"
 
 namespace :deploy do
   desc 'Restart application'
-    task :restart do
-      on roles(:app), in: :sequence, wait: 20 do
-        sudo "service eye_rails reload"
-      end
+  task :restart do
+    on roles(:app), in: :sequence, wait: 20 do
+      sudo "service eye_rails reload"
     end
+  end
 
-    after :publishing, :restart
+  after :publishing, :restart
 
-    after :restart, :clear_cache do
-      on roles(:web), in: :groups, limit: 3, wait: 10 do
-      end
+  after :restart, :clear_cache do
+    on roles(:web), in: :groups, limit: 3, wait: 10 do
     end
+  end
 
 end

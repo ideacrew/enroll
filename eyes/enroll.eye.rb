@@ -24,7 +24,7 @@ Eye.application 'eye_enroll' do
 
     # stop signals:
     #     # http://unicorn.bogomips.org/SIGNALS.html
-    stop_signals [:TERM, 10.seconds, :KILL]
+    stop_signals [:TERM, 10.seconds]
     #
     #             # soft restart
     #    restart_command "kill -USR2 {PID}"
