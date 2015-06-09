@@ -1,4 +1,46 @@
-<ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
+<div class="submenu">
+  <div class="container">
+      <ul class="list-unstyled list-inline">
+          <li>
+              <a href="#" class="hidden-xs"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
+              <a href="#" class="visible-xs">
+                  <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+                  <small>Home</small>
+              </a>
+          </li>
+          <li>
+              <a href="#" class="hidden-xs">Profile</a>
+              <a href="#" class="visible-xs">
+                  <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                  <small>Profile</small>
+              </a>
+          </li>
+          <li>
+              <a href="#" class="hidden-xs">Plans</a>
+              <a href="#" class="visible-xs">
+                  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                  <small>Plans</small>
+              </a>
+          </li>
+          <li>
+              <a href="#" class="hidden-xs">Documents</a>
+              <a href="#" class="visible-xs">
+                  <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
+                  <small>Documents</small>
+              </a>
+          </li>
+          <li>
+              <a href="#" class="hidden-xs"><span class="badge">4</span> Messages</a>
+              <a href="#" class="visible-xs">
+                  <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
+                  <small>Messages</small>
+              </a>
+          </li>
+      </ul>
+  </div>
+</div>
+
+<!-- <ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
    <li role="presentation"<%= menu_tab_class(active_tab, "home-tab") %>>
    <%= link_to(home_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
       <span class="home-icon" title="Home"></span>
@@ -15,7 +57,7 @@
       <span class="hidden-xs">Plans</span>
       <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Plans"></span>
    <% end %>
-  </li>
+  </li> -->
   <!--
   <li role="presentation"<%= menu_tab_class(active_tab, "documents-tab") %>>
     <a aria-controls="documents" data-toggle="tab" id="documents-tab" role="tab" href="#documents">
@@ -31,4 +73,4 @@
     </a>
     </li>
     -->
-</ul>
+<!-- </ul> -->
