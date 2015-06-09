@@ -23,7 +23,7 @@ describe EmployerProfile, dbclean: :after_each do
       dba: "Sail Away",
       fein: "001223333",
       office_locations: [office_location]
-      ) 
+      )
     }
 
   let(:valid_params) do
@@ -123,8 +123,8 @@ describe EmployerProfile, dbclean: :after_each do
     context "and employer submits a valid plan year application with today as start open enrollment" do
       before do
         plan_year.open_enrollment_start_on = Date.current
-        plan_year.open_enrollment_end_on = Date.current + 5
-        plan_year.start_on = (Date.current + 25).end_of_month + 1.day
+        plan_year.open_enrollment_end_on = Date.current + 5.days
+        plan_year.start_on = (Date.current + 25.days).end_of_month + 1.day
         plan_year.end_on = plan_year.start_on + 1.year - 1.day
         # employer_profile.latest_plan_year.publish
         plan_year.publish
@@ -138,9 +138,9 @@ describe EmployerProfile, dbclean: :after_each do
 
         context "and today is the day following close of open enrollment" do
           before do
-            plan_year.open_enrollment_end_on = Date.current - 1
-            plan_year.open_enrollment_start_on = plan_year.open_enrollment_end_on - 5
-            plan_year.start_on = (Date.current + 32).end_of_month + 1.day
+            plan_year.open_enrollment_end_on = Date.current - 1.day
+            plan_year.open_enrollment_start_on = plan_year.open_enrollment_end_on - 5.days
+            plan_year.start_on = (Date.current + 32.days).end_of_month + 1.day
             plan_year.end_on = plan_year.start_on + 1.year - 1.day
           end
 
@@ -148,31 +148,28 @@ describe EmployerProfile, dbclean: :after_each do
 
             context "because enrollment non-owner participation minimum not met" do
               let(:invalid_non_owner_count) { min_non_owner_count - 1 }
-              let(:owner_census_family) { FactoryGirl.create(:census_family, census_roster: employer_profile.census_roster) }
-              let(:non_owner_census_families) { FactoryGirl.create_list(:census_family, invalid_non_owner_count, census_roster: employer_profile.census_roster) }
+              let!(:owner_census_employee) { FactoryGirl.create(:census_employee, :owner, hired_on: (Date.current - 2.years), employer_profile_id: employer_profile.id) }
+              let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, invalid_non_owner_count, hired_on: (Date.current - 2.years), employer_profile_id: employer_profile.id) }
 
               before do
-                # owner_census_family.census_employee.is_owner = true
-
-                # [owner_census_family].concat(non_owner_census_families).each do |cf|
-                #   employee_role = FactoryGirl.create(:employee_role)
-                #   cf.add_benefit_group_assignment(benefit_group)
-                #   cf.link_employee_role(employee_role)
-
-                  ## TODO Each census family needs to either enroll or waive coverage
+                owner_census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
+                owner_census_employee.save!
+                # non_owner_census_families.each do |census_employee|
+                #   owner_census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
+                #   owner_census_employee.save!
                 # end
 
                 employer_profile.advance_enrollment_date
               end
 
               it "enrollment should be invalid" do
-                # expect(employer_profile.census_roster.is_enrollment_valid?).to be_falsey
-                # expect(employer_profile.census_roster.enrollment_errors[:non_owner_enrollment_count].present?).to be_truthy
-                # expect(employer_profile.census_roster.enrollment_errors[:non_owner_enrollment_count]).to match(/non-owner employee must enroll/)
+                expect(plan_year.is_enrollment_valid?).to be_falsey
+                expect(plan_year.enrollment_errors[:non_business_owner_enrollment_count].present?).to be_truthy
+                expect(plan_year.enrollment_errors[:non_business_owner_enrollment_count]).to match(/non-owner employee must enroll/)
               end
 
               it "should advance state to canceled" do
-                # expect(employer_profile.canceled?).to be_truthy                
+                # expect(employer_profile.canceled?).to be_truthy
               end
             end
 
@@ -336,7 +333,7 @@ describe EmployerProfile, "given an unlinked, linkable census employee with a fa
     :ssn => census_ssn,
     :dob => census_dob
   ) }
-  let(:census_family) { 
+  let(:census_family) {
     fam = EmployerCensus::EmployeeFamily.new({ :census_employee => census_employee })
     allow(fam).to receive(:is_linkable?).and_return(true)
     fam
