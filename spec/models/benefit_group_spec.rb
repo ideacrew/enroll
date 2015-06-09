@@ -6,7 +6,6 @@ describe BenefitGroup, type: :model do
   it { should validate_presence_of :terminate_on_kind }
   it { should validate_presence_of :effective_on_offset }
   it { should validate_presence_of :reference_plan_id }
-  it { should validate_presence_of :premium_pct_as_int }
   it { should validate_presence_of :employer_max_amt_in_cents }
 end
 
@@ -143,11 +142,6 @@ describe BenefitGroup, "instance methods" do
         expect(Plan.find(plan_id)).to be_instance_of Plan
       end
     end.not_to raise_exception
-  end
-
-  it "verifies premium_pct_as_integer is > 50%" do
-    invalid = FactoryGirl.build(:benefit_group, premium_pct_as_int: 40)
-    expect(invalid.valid?).to be false
   end
 
   it "write attribute by employer_max_amt_in_cents" do

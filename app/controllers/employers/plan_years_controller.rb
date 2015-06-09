@@ -55,7 +55,7 @@ class Employers::PlanYearsController < ApplicationController
       :start_on, :end_on, :fte_count, :pte_count, :msp_count,
       :open_enrollment_start_on, :open_enrollment_end_on,
       :benefit_groups_attributes => [ :title, :reference_plan_id, :effective_on_offset,
-                                      :premium_pct_as_int, :employer_max_amt_in_cents, :_destroy,
+                                      :employer_max_amt_in_cents, :_destroy,
                                       :relationship_benefits_attributes => [
                                         :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
                                       ]

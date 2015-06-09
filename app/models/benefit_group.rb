@@ -26,7 +26,7 @@ class BenefitGroup
   field :terminate_on_kind, type: String, default: "end_of_month"
 
   # Number of days following date of hire
-  field :effective_on_offset, type: Integer, default: 0
+  field :effective_on_offset, type: Integer
 
   # Non-congressional
   # belongs_to :reference_plan, class_name: "Plan"
@@ -46,7 +46,7 @@ class BenefitGroup
   # field :employee_families, type: Array, default: []
 
   validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
-    :premium_pct_as_int, :employer_max_amt_in_cents, :reference_plan_id
+    :employer_max_amt_in_cents, :reference_plan_id
 
   validates :effective_on_kind,
     allow_blank: false,
@@ -61,10 +61,6 @@ class BenefitGroup
       in: OFFSET_KINDS,
       message: "%{value} is not a valid effective date offset kind"
     }
-
-  validates_numericality_of :premium_pct_as_int,
-    only_integer: true,
-    greater_than_or_equal_to: 50
 
   def reference_plan=(new_reference_plan)
     raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan

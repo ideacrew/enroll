@@ -41,7 +41,6 @@ RSpec.describe Employers::PlanYearsController do
          :title => "My benefit group",
          :reference_plan_id => "rp_id", 
          :effective_on_offset => "e_on_offset",                      
-        :premium_pct_as_int => "66",
         :employer_max_amt_in_cents => "2232",
         :relationship_benefits_attributes => relationship_benefits_attributes
       } }
