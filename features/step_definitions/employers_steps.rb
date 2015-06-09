@@ -373,8 +373,9 @@ And(/^I should be able to add information about plan year, benefits and relation
   ref_plan = @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last
   ref_plan.click
   ref_plan.li(index: 5).click # select plan from list.
-  @browser.select_list(id: "plan_year_benefit_groups_attributes_0_effective_on_offset")
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][premium_pct_as_int]").set(53)
+  hire_eligible = @browser.divs(class: /selectric-wrapper/, text: /NEW HIRES ELIGIBLE/).last
+  hire_eligible.click
+  hire_eligible.li(index: 1).click
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
   # Relationship Benefit
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
