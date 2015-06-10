@@ -311,40 +311,6 @@ $(document).ready(function () {
     $('.new_family_member:last').submit();
   });
   
-  // Email validation after 1 seconds of stopping typing
-  // $('#email_info input').keyup(function() {
-  //   call_email_check(this);
-  // });
-  
-  // $('#email_info input').focusout(function() {
-  //   call_email_check(this);
-  // });
-
-  // function call_email_check(email) {
-  //   var timeout;
-  //   var email = $(email).val();
-
-  //   if(timeout) {
-  //       clearTimeout(timeout);
-  //       timeout = null;
-  //   }
-
-  //   timeout = setTimeout(function() {
-  //     check_email(email);
-  //   }, 1000);
-  // }
-  
-  // function check_email(email) {
-  //   var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  //   if(email != "" && !re.test(email)) {
-  //     $('#email_error').text('Enter a valid email address. ( e.g. name@domain.com )');
-  //     $('#email_info .email .first').addClass('field_error');
-  //   } else {
-  //     $('#email_error').text('');
-  //     $('#email_info .email .first').removeClass('field_error');
-  //   }
-  // }
-  
   // Add new address
   $('.btn-new-address').click(function(e){
     e.preventDefault();
