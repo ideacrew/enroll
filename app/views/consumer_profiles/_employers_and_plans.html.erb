@@ -133,8 +133,9 @@
 									<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 qle-form-wrapper">
 		                                <h3 class="qle-details-title">"I got married"</h3>
 		                                <h5>Enter the date of the event.</h5>
-		                                <input type="text" placeholder="00-00-000" class="form-control">
-		                                <%= link_to 'Submit', 'javascript:;', remote: true, class: 'btn btn-danger' %>
+		                                <input type="text" placeholder="00-00-000" class="form-control" id="qle_date">
+		                                <%= link_to 'Submit', 'javascript:;', class: 'btn btn-danger', id: 'qle_submit' %>
+		                                <%#= link_to 'Submit', 'javascript:;', class: "btn btn-danger", id: "qle_submit" %>
 		                                <br>
 		                                <a class="cancel" href="#">Cancel</a>
 		                            </div>

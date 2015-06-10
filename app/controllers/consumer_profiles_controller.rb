@@ -58,4 +58,24 @@ class ConsumerProfilesController < ApplicationController
       format.js
     end
   end
+
+  def check_qle_date
+    date_married = Date.parse(params[:date_val])
+    start_date = Date.parse('01/10/2013')
+    end_date = Date.today
+
+    if start_date <= date_married && date_married <= end_date
+      # Qualifed
+      @qualified_date = true
+    else
+      # Not Qualified
+      @qualified_date = false
+    end
+
+    # else {
+    #   var startDate = Date.parse('2013-10-01'), endDate = Date.parse(new Date()), enteredDate = Date.parse(date_value);
+
+    #   return ((startDate <= enteredDate) && (enteredDate <= endDate));
+    # }
+  end
 end

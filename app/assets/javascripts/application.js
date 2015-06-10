@@ -76,33 +76,6 @@ $(document).ready(function () {
   $('#plan_year input,select').click(function(){
     $('#plan_year .alert-error').fadeOut(2000);
   });
-
-  /* QLE Marriage Date Validator */
-  $('#date_married').focusin(function() {
-    $('#date_married').removeClass('input-error');
-  });
-
-  $('#qle_marriage_submit').click(function() {
-    if(check_marriage_date()) {
-      get_qle_marriage_date();
-    } else {
-      $('#date_married').addClass('input-error');
-    }
-  });
-
-  function check_marriage_date() {
-    var date_value = $('#date_married').val();
-    if(date_value == "" || isNaN(Date.parse(date_value)) || Date.parse(date_value) > Date.parse(new Date())) { return false; }
-    return true;
-  }
-
-  function get_qle_marriage_date() {
-    $.ajax({
-      type: "GET",
-      data:{date_val: $("#date_married").val()},
-      url: "/people/check_qle_marriage_date.js"
-    });
-  }
   
   // personal-info-row focus fields
   $(document).on('click', '.focus_effect', function() {

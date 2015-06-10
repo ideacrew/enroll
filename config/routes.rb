@@ -160,6 +160,7 @@ Rails.application.routes.draw do
       get 'plans'
       get 'personal'
       get 'family'
+      get 'check_qle_date'
     end
   end
 
