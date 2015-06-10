@@ -425,6 +425,7 @@ $(document).ready(function () {
   $(".person_ssn").mask("999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
+  $(".jq-datepicker").mask("00/00/0000");
   
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {

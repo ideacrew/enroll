@@ -62,3 +62,11 @@ a.new-address-btn {
 .hidden_field {
   display: none;
 }
+
+.hidden_second_field {
+  display: none;
+}
+
+.reference-plan-content {
+  display: none;
+}
