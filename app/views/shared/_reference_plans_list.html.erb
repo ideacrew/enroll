@@ -1,16 +1,47 @@
-<div class="col-md-9 col-sm-9 col-xs-12 form-group form-group-lg no-pd">
-  <div class="col-md-7 col-sm-8 col-xs-12">
-    <%= select_tag 'carrier', options_for_select(@carriers.map{|c| [c.legal_name, c.id]}, selected: f.object.reference_plan.try(:carrier_profile_id)), class: 'carrier', include_blank: "SELECT CARRIER PROFILE" %>
+<!-- Select Elected Plan -->
+<div class="col-md-4 col-sm-4 col-xs-12 no-pd">
+  <%= f.select 'elected_plan_kind', options_for_select([["All plans from a given carrier", "carrier"], ["All plans with a given metal level", "metal_level"], ["A single plan", "plan"]], selected: f.object.elected_plan_kind), {include_blank: "SELECT ELECTED PLAN KIND"}, {class: 'elected_plan'} %>
+</div>
+<div class="col-md-4 col-sm-4 col-xs-12 elected-plan-select no-pd">
+  <div class="hidden_field carrier_for_elected_plan" style="<%= 'display:block;' if f.object.elected_plan_kind == 'carrier' %>">
+    <%= f.select 'carrier_for_elected_plan', options_for_select(@carriers.map{|c| [c.legal_name, c.id]}, selected: f.object.carrier_for_elected_plan), {include_blank: "SELECT CARRIER PROFILE"}, {class: 'carrier'} %>
   </div>
+  <div class="hidden_field metal_level_for_elected_plan" style="<%= 'display:block;' if f.object.elected_plan_kind == 'metal_level' %>">
+    <%= f.select 'metal_level_for_elected_plan', options_for_select(Plan::METAL_LEVEL_KINDS.map{|k| [k.humanize, k]}, selected: f.object.metal_level_for_elected_plan), {include_blank: "SELECT METAL LEVEL"}, {class: 'metal-level'} %>
+  </div>
+  <div class="hidden_field plan_for_elected_plan" style="<%= 'display:block;' if f.object.elected_plan_kind == 'plan' %>">
+    <%= f.select 'plan_for_elected_plan', options_for_select(Plan.all.map{|p| [p.name, p.id]}, selected: f.object.plan_for_elected_plan), {include_blank: "SELECT PLAN"}, {class: 'plan'} %>
+  </div>
+</div>
+
+<!-- Select Reference Plan -->
+<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd reference-plan-select">
+  <!--
+  <div class="col-md-7 col-sm-8 col-xs-12 no-pd">
+    <%#= select_tag 'carrier', options_for_select(@carriers.map{|c| [c.legal_name, c.id]}, selected: f.object.reference_plan.try(:carrier_profile_id)), class: 'carrier', include_blank: "SELECT CARRIER PROFILE" %>
+  </div>
+  -->
 
   <%= f.hidden_field :reference_plan_id, value: f.object.reference_plan_id %>
-  <div class="no-pd col-md-5 col-sm-4 col-xs-12 carrier-select">
+  <div class="carrier-select reference-plan-content" style="<%= 'display:block;' if f.object.elected_plan_kind == 'carrier' %>">
     <% @carriers.each do |carrier| %>
 	    <% carrier_plans = @plan_year.carrier_plans_for(carrier.id) %>
-	    <div class="<%= carrier.id == f.object.reference_plan.try(:carrier_profile_id) ? '' : 'hide-carrier' %> carrier-<%= carrier.id %> carrier-content">
-
+      <div class="hidden_second_field carrier-<%= carrier.id %> carrier-content" style="<%= 'display:block;' if f.object.carrier_for_elected_plan == carrier.id and f.object.elected_plan_kind == 'carrier' %>">
 	      <%= select_tag "reference_plan", options_for_select(carrier_plans.map{|plan| [plan.name, plan.id ]}, selected: f.object.reference_plan_id), class: "carrier-#{carrier.id}", include_blank: "SELECT REFERENCE PLAN" %>
       </div>
     <% end %>
+  </div>
+
+  <div class="metal-level-select reference-plan-content" style="<%= 'display:block;' if f.object.elected_plan_kind == 'metal_level' %>">
+    <% Plan::METAL_LEVEL_KINDS.each do |kind| %>
+      <% metal_level_plans = @plan_year.metal_level_plans_for(kind) %>
+      <div class="metal-level-<%= kind %> metal-level-content hidden_second_field" style="<%= 'display:block;' if f.object.metal_level_for_elected_plan == kind and f.object.elected_plan_kind == 'metal_level' %>">
+	      <%= select_tag "reference_plan", options_for_select(metal_level_plans.map{|plan| [plan.name, plan.id ]}, selected: f.object.reference_plan_id), class: "metal-level-#{kind}", include_blank: "SELECT REFERENCE PLAN" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="plan-select reference-plan-content" style="<%= 'display:block;' if f.object.elected_plan_kind == 'plan' %>">
+    <label style='width:100%;text-align:center;'><%= Plan.find_by(id: f.object.plan_for_elected_plan).try(:name) if f.object.plan_for_elected_plan.present? and f.object.elected_plan_kind == 'plan' %></label>
   </div>
 </div>

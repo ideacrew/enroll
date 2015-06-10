@@ -18,7 +18,10 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @employer_profiles = @organizations.map {|o| o.employer_profile}
 
-    render "employers/employer_profiles/index"
+    respond_to do |format|
+      format.html { render "employers/employer_profiles/index" }
+      format.js {}
+    end
   end
 
   def family_index
@@ -33,26 +36,54 @@ class Exchanges::HbxProfilesController < ApplicationController
       @total = total_families.count
       @families = Kaminari.paginate_array(total_families).page page_no
     end
-
-    render "insured/families/index"
+    respond_to do |format|
+      format.html { render "insured/families/index" }
+      format.js {}
+    end
   end
 
   def broker_agency_index
-    @brokers = BrokerAgency.all
+    @broker_agency_profiles = BrokerAgencyProfile.all
+
+    respond_to do |format|
+      format.html { render "broker_agencies/profiles/index" }
+      format.js {}
+    end
   end
 
   def broker_index
     @brokers = BrokerRole.all
+
+    respond_to do |format|
+      format.html { render "broker_index" }
+      format.js {}
+    end
   end
 
   def issuer_index
     @issuers = CarrierProfile.all
+
+
+    respond_to do |format|
+      format.html { render "issuer_index" }
+      format.js {}
+    end
   end
 
   def product_index
+
+    respond_to do |format|
+      format.html { render "product_index" }
+      format.js {}
+    end
   end
 
   def configuration
+
+    respond_to do |format|
+      format.html { render "configuration_index" }
+      format.js {}
+    end
   end
 
   # GET /exchanges/hbx_profiles/1

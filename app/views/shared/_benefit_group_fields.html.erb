@@ -6,42 +6,23 @@
   </div>
   <div class="row no-buffer focus_effect personal-info-row">
     <div class="col-md-12 no-pd first">
-      <div class="row bottom-row form-group form-group-lg no-pd">
-        <!-- Select Elected Plan -->
-        <div class="col-md-6 col-sm-6 col-xs-12">
-          <%= f.select 'elected_plan_kind', options_for_select([["All plans from a given carrier", "carrier"], ["All plans with a given metal level", "metal_level"], ["A single plan", "plan"]], selected: f.object.elected_plan_kind), {include_blank: "SELECT ELECTED PLAN KIND"}, {class: 'elected_plan'} %>
-        </div>
-        <div class="col-md-6 col-sm-6 col-xs-12 elected-plan-select">
-          <div class="hidden_field carrier_for_elected_plan" style="<%= 'display:block;' if f.object.elected_plan_kind == 'carrier' %>">
-            <%= f.select 'carrier_for_elected_plan', options_for_select(@carriers.map{|c| [c.legal_name, c.id]}, selected: f.object.carrier_for_elected_plan), include_blank: "SELECT CARRIER PROFILE" %>
-          </div>
-          <div class="hidden_field metal_level_for_elected_plan" style="<%= 'display:block;' if f.object.elected_plan_kind == 'metal_level' %>">
-            <%= f.select 'metal_level_for_elected_plan', options_for_select(Plan::METAL_LEVEL_KINDS.map{|k| [k.humanize, k]}, selected: f.object.metal_level_for_elected_plan), include_blank: "SELECT METAL LEVEL" %>
-          </div>
-          <div class="hidden_field plan_for_elected_plan" style="<%= 'display:block;' if f.object.elected_plan_kind == 'plan' %>">
-            <%= f.select 'plan_for_elected_plan', options_for_select(Plan.all.map{|p| [p.name, p.id]}, selected: f.object.plan_for_elected_plan), include_blank: "SELECT PLAN" %>
-          </div>
-        </div>
-      </div>
-
       <div class="row top-row">
-        <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <% title_value = f.object.title.present? ? f.object.title : "#{Time.now.year} Employer Benefits" %>
           <%= f.text_field :title, class: "floatlabel form-control", value: title_value, required: true, placeholder: 'TITLE' %>
         </div>
-        <!-- Select Plan:  -->
-        <%= render "shared/reference_plans_list", f: f %>
-      </div>
-
-      <div class="row bottom-row">
-        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <!-- Offset :  -->
           <%= f.select(:effective_on_offset, options_for_select([["Immediately", 0], ["After 30 Days", 30], ["After 60 Days", 60]], selected: f.object.effective_on_offset), {:include_blank => "NEW HIRES ELIGIBLE"}, { :class => ''}) %>
-
         </div>
-        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <%= f.text_field :employer_max_amt_in_cents, class: "floatlabel form-control", required: true, placeholder: 'EMPLOYER MAXIMUM CONTRIBUTION', value: f.object.premium_in_dollars %>
         </div>
+      </div>
+
+      <div class="row bottom-row form-group form-group-lg no-pd">
+        <!-- Select Plan:  -->
+        <%= render "shared/reference_plans_list", f: f %>
       </div>
     </div>
   </div>

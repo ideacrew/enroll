@@ -1,25 +1,11 @@
 <p id="notice"><%= notice %></p>
-
 <div class="row content landing">
   <div class="home">
    <div><%= render "exchanges/hbx_profiles/shared/primary_nav", :active_tab => "home-tab" %></div>
+  <%= render 'shared/tab_panel' %>
 
-  <div class="panel panel-default">
-    <div class="tab-row">
-      <div class="tab-content" id="myTabContent">
-        <div aria-labelledby="inbox-tab" id="inbox" class="tab-pane" role="tabpanel">
-          <div class="col-md-10 col-sm-12">
-            <%#= render partial: "employers/employer_profiles/my_account/inbox" %>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-
+<!--
     <h1><strong>HBX Admin</strong></h1>
-
     <h3>
       <%= link_to "Families", family_index_exchanges_hbx_profiles_path, class: "btn btn-default" %>
       <%= link_to "Employers", employer_index_exchanges_hbx_profiles_path, class: "btn btn-default" %>
@@ -29,5 +15,7 @@
       <%= link_to "Products", product_index_exchanges_hbx_profiles_path, class: "btn btn-default" %>
       <%= link_to "Configuration", configuration_exchanges_hbx_profiles_path, class: "btn btn-default" %>
     </h3>
+-->
+
   </div>
 </div>
