@@ -61,5 +61,8 @@ function applyJQDatePickerSetup(ele) {
 $(function() {
   $(".jq-datepicker").each(function(idx, ele) {
     applyJQDatePickerSetup(ele);    
+    if ($(this).attr("readonly") != undefined){
+      $(ele).datepicker('disable');
+    };
   });
 });
