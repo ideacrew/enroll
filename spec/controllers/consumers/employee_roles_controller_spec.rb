@@ -98,10 +98,12 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     let(:hired_on) { double }
     let(:found_families) { [] }
     let(:employment_relationships) { double }
+    let(:user_id) { "SOMDFINKETHING_ID"}
+    let(:user) { double(id: user_id ) }
 
     before(:each) do
-      sign_in
-      allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters).and_return(mock_employee_candidate)
+      sign_in(user)
+      allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
       allow(EmployerProfile).to receive(:find_census_families_by_person).with(mock_employee_candidate).and_return(found_families)
       allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, found_families).and_return(employment_relationships)
       get :match, :person => person_parameters
