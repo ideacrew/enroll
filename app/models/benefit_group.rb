@@ -102,6 +102,7 @@ class BenefitGroup
     else
       self.elected_plan_ids << new_plans._id
     end
+    @elected_plans = new_plans
   end
 
   def census_employees

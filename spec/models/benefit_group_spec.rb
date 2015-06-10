@@ -123,7 +123,7 @@ describe BenefitGroup, "instance methods" do
   end
 
   it "verifies the reference plan is included in the set of elected_plans" do
-    expect(benefit_group.elected_plan_ids).to include(benefit_group.reference_plan_id)
+    expect(benefit_group.elected_plans).to include(benefit_group.reference_plan)
   end
 
   it "knows effective on for dates of hire" do
@@ -137,7 +137,7 @@ describe BenefitGroup, "instance methods" do
 
   it "verifies each elected plan is a plan" do
     expect do
-      benefit_group.elected_plan_ids.each do |plan_id|
+      benefit_group.elected_plans.each do |plan_id|
         expect(Plan.find(plan_id)).to be_instance_of Plan
       end
     end.not_to raise_exception
@@ -186,11 +186,7 @@ describe BenefitGroup, type: :model do
   let(:terminate_on_kind_default)     { "end_of_month" }
   let(:plan_option_kind_default)      { "single_plan" }
 
-  let(:elected_plan_ids) do
-    [
-      reference_plan.id
-    ]
-  end
+  let(:elected_plans)                 { [reference_plan] }
 
 
   let(:relationship_benefits) do
@@ -209,7 +205,7 @@ describe BenefitGroup, type: :model do
         plan_year: plan_year,
         reference_plan: reference_plan,
         relationship_benefits: relationship_benefits,
-        elected_plan_ids: elected_plan_ids,
+        elected_plans: elected_plans,
         title: title,
         plan_option_kind: plan_option_kind,
         effective_on_kind: effective_on_kind,
@@ -237,7 +233,7 @@ describe BenefitGroup, type: :model do
     end
 
     context "with no elected_plans" do
-      let(:params) {valid_params.except(:elected_plan_ids)}
+      let(:params) {valid_params.except(:elected_plans)}
 
       it "should be invalid" do
         expect(BenefitGroup.create(**params).errors[:elected_plan_ids].any?).to be_truthy
