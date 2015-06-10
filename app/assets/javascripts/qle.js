@@ -1,11 +1,11 @@
 $(function () {
-	$('a.qle-menu-item').on('click', function() {
+	$(document).on('click', 'a.qle-menu-item', function() {
 		$('#qle-menu').hide();
 		$('.qle-details-title').html($(this).html());
 		$('#qle-details').removeClass('hidden');
 	});
 
-	$('#qle-details .close-popup, #existing_coverage, #new_plan').on('click', function() {
+	$(document).on('click', '#qle-details .close-popup, #existing_coverage, #new_plan', function() {
 		$('#qle-details').addClass('hidden');
 		$('#qle-details .success-info, #qle-details .error-info').addClass('hidden');
 		$('#qle-details .default-info').removeClass('hidden');
@@ -14,11 +14,13 @@ $(function () {
 	});
 
 	/* QLE Date Validator */
-	$('#qle_submit').on('click', function() {
+	$(document).on('click', '#qle_submit', function() {
 		if(check_qle_date()) {
 			$('#qle_date').removeClass('input-error');
+			$('#qle-input-info').html('Enter the date of the event.')
 			get_qle_date();
 		} else {
+			$('#qle-input-info').html('Enter valid date here!');
 			$('#qle_date').addClass('input-error');
 		}
 	});
