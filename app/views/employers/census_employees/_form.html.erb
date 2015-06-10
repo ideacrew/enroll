@@ -8,22 +8,16 @@
           </h4>
           <ul>
             <% @census_employee.errors.full_messages.each do |msg| %>
-              <li>
-                <%= msg %>
-              </li>
+              <li> <%= msg %> </li>
             <% end %>
             <% @census_employee.census_dependents.each do |dep| %>
               <% dep.errors.full_messages.each do |msg| %>
-                <li>
-                  <%= msg %>
-                </li>
+                <li> <%= msg %> </li>
               <% end %>
             <% end %>
             <% @census_employee.benefit_group_assignments.each do |bg| %>
               <% bg.errors.full_messages.each do |msg| %>
-                <li>
-                  <%= msg %>
-                </li>
+                <li> <%= msg %> </li>
               <% end %>
             <% end %>
           </ul>

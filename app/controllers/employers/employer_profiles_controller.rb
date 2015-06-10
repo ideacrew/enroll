@@ -67,11 +67,11 @@ class Employers::EmployerProfilesController < ApplicationController
     @current_plan_year = @employer_profile.plan_years.last
     @plan_years = @employer_profile.plan_years.order(id: :desc)
 
-    @emps = @employer_profile.employee_families_sorted
+    @emps = @employer_profile.census_employees_sorted
 
-    @page_alphabets = page_alphabets(@emps, "census_employee.last_name")
+    @page_alphabets = page_alphabets(@emps, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
-    @employee_families = @emps.where("census_employee.last_name" => /^#{page_no}/i)
+    @census_employees = @emps.where("last_name" => /^#{page_no}/i)
   end
 
   def new

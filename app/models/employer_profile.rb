@@ -176,6 +176,16 @@ class EmployerProfile
     @employee_families_sorted = employee_families.unscoped.order_by_last_name.order_by_first_name
   end
 
+  def census_employees
+    return @census_employees if defined? @census_employees
+    @census_employees = CensusEmployee.where(employer_profile_id: id)
+  end
+
+  def census_employees_sorted
+    return @census_employees_sorted if defined? @census_employees_sorted
+    @census_employees_sorted = census_employees.order_by_last_name.order_by_first_name
+  end
+
   # Enrollable employees are active and unlinked
   def linkable_employee_family_by_person(person)
     return if employee_families.nil?

@@ -38,6 +38,8 @@ class CensusEmployee < CensusMember
   index({"benefit_group_assignments.aasm_state" => 1})
 
   scope :active,  ->{ any_in(aasm_state: ["eligible", "employee_role_linked"]) }
+  scope :order_by_last_name, -> { order(:"census_employee.last_name".asc) }
+  scope :order_by_first_name, -> { order(:"census_employee.first_name".asc) }
 
   def initialize(*args)
     super(*args)
