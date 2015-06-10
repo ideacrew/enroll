@@ -5,8 +5,11 @@ $(function () {
 		$('#qle-details').removeClass('hidden');
 	});
 
-	$('#qle-details .close-popup').on('click', function() {
+	$('#qle-details .close-popup, #existing_coverage, #new_plan').on('click', function() {
 		$('#qle-details').addClass('hidden');
+		$('#qle-details .success-info, #qle-details .error-info').addClass('hidden');
+		$('#qle-details .default-info').removeClass('hidden');
+
 		$('#qle-menu').show();
 	});
 
@@ -34,13 +37,3 @@ $(function () {
 		});
 	}
 });
-
-// function validate_qle(qle_date_field) {
-// 	if($(qle_date_field).val() == '') {
-// 		$(qle_date_field).css('border', '1px solid #ff0000');
-// 		return false;
-// 	} else {
-// 		$(qle_date_field).css('border', '1px solid #cccccc');
-// 		return true;
-// 	}
-// }

@@ -1,22 +1,13 @@
 <% if @qualified_date %>
-  $('#qle_marriage_form .success-info').removeClass('hidden');
-  $('#qle_marriage_form .error-info').addClass('hidden');
-  $('#qle_marriage_form .initial-info').addClass('hidden');
+  $('#qle-details .success-info').removeClass('hidden');
+  $('#qle-details .error-info').addClass('hidden');
+  $('#qle-details .initial-info').addClass('hidden');
 <% else %>
-  $('#qle_marriage_form .error-info').removeClass('hidden');
-  $('#qle_marriage_form .success-info').addClass('hidden');
-  $('#qle_marriage_form .initial-info').addClass('hidden');
+  $('#qle-details .error-info').removeClass('hidden');
+  $('#qle-details .success-info').addClass('hidden');
+  $('#qle-details .initial-info').addClass('hidden');
 <% end %>
 
-$('.add_success').click(function(){
-  $('#family-tab').click();
-  $('.add-member-buttons').removeClass('hidden');
-});
+$('#qle-details .default-info').addClass('hidden');
 
-$('.add_new_family_member').click();
-
-$('.marriage_back').click(function() {
-  $('#qle_marriage_form .initial-info').removeClass('hidden');
-  $('#qle_marriage_form .error-info').addClass('hidden');
-  $('#qle_marriage_form .success-info').addClass('hidden');
-});
+// $('.add_new_family_member').click();
