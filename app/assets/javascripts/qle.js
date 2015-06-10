@@ -1,7 +1,7 @@
 $(function () {
 	$('a.qle-menu-item').on('click', function() {
 		$('#qle-menu').hide();
-		$('.qle-details-title').html($('.qle-menu-item').html());
+		$('.qle-details-title').html($(this).html());
 		$('#qle-details').removeClass('hidden');
 	});
 

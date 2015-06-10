@@ -18,8 +18,10 @@
           <div class="right-menu navbar-right">
             <% if signed_in? %>
               <ul class="navbar-nav top-menu">
-                  <li><%= link_to "My Account", home_consumer_profiles_path if @person.present? && @person.persisted? %></li>
+                <% if @person.present? && @person.persisted? %>
+                  <li><%= link_to "My Account", home_consumer_profiles_path %></li>
                   <li class="hidden-xs">|</li>
+                <% end %>
                   <li><a href="#">1-855-532-5465</a></li>
                   <li class="hidden-xs">|</li>
                   <li><a href="#">Help</a></li>
@@ -28,7 +30,7 @@
               </ul>
               <div class="clearfix"></div>
               <ul class="user-info">
-                  <li class="">(ID <%= @person.id %>) &nbsp; &nbsp; <strong><%= @person.full_name %></strong></li>
+                  <li class="">(ID <%= current_user.id %>) &nbsp; &nbsp; <strong><%= @person.full_name if @person.present? %></strong></li>
               </ul>
             <% end %>
           </div>
