@@ -1,6 +1,6 @@
 class Employers::CensusEmployeesController < ApplicationController
-  before_action :find_employer, only: [:new, :create, :edit, :update, :show, :delink, :census_employee]
-  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate]
+  before_action :find_employer
+  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire]
   before_action :check_plan_year, only: [:new]
 
   def new
@@ -64,7 +64,7 @@ class Employers::CensusEmployeesController < ApplicationController
     end
     last_day_of_work = termination_date
     if termination_date.present?
-      @census_employee.terminate(last_day_of_work)
+      @census_employee.terminate_employment(last_day_of_work)
       @fa = @census_employee.save!
     end
     respond_to do |format|
@@ -80,6 +80,32 @@ class Employers::CensusEmployeesController < ApplicationController
         flash[:notice] = "Successfully terminated family."
         redirect_to employers_employer_profile_path(@employer_profile)
       }
+    end
+  end
+
+  def rehire
+    rehiring_date = params["rehiring_date"]
+    if rehiring_date.present?
+      rehiring_date = DateTime.strptime(rehiring_date, '%m/%d/%Y').try(:to_date)
+    else
+      rehiring_date = ""
+    end
+    @rehiring_date = rehiring_date
+    if @rehiring_date.present?
+      new_census_employee = @census_employee.replicate_for_rehire
+      if new_census_employee.present? # not an active family, then it is ready for rehire.#
+        new_census_employee.hired_on = 1.day.ago.to_date
+        new_census_employee.employer_profile = @employer_profile
+        if new_census_employee.save
+          flash[:notice] = "Successfully rehired family."
+        else
+          flash[:error] = "Error during rehire."
+        end
+      else # active family, dont replicate for rehire, just return error
+        flash[:error] = "Census Employee is already active."
+      end
+    else
+      flash[:error] = "Please enter rehiring date"
     end
   end
 
@@ -104,7 +130,8 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def find_census_employee
-    @census_employee = CensusEmployee.find(params["id"])
+    id = params[:id] || params[:census_employee_id]
+    @census_employee = CensusEmployee.find(id)
   end
 
   def build_census_employee
