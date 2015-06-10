@@ -17,7 +17,7 @@ class Employers::CensusEmployeesController < ApplicationController
       @census_employee.benefit_group_assignments = new_benefit_group_assignment.to_a
       @census_employee.employer_profile = @employer_profile
       if @census_employee.save
-        flash[:notice] = "Employer Census Family is successfully created."
+        flash[:notice] = "Census Employee is successfully created."
         redirect_to employers_employer_profile_path(@employer_profile)
       else
         render action: "new"
@@ -44,7 +44,7 @@ class Employers::CensusEmployeesController < ApplicationController
       end
 
       if @census_employee.update_attributes(params[:census_employee])
-        flash[:notice] = "Employer Census Family is successfully updated."
+        flash[:notice] = "Census Employee is successfully updated."
         redirect_to employers_employer_profile_path(@employer_profile)
       else
         render action: "edit"
@@ -70,14 +70,14 @@ class Employers::CensusEmployeesController < ApplicationController
     respond_to do |format|
       format.js {
         if termination_date.present? and @fa
-          flash[:notice] = "Successfully terminated family."
+          flash[:notice] = "Successfully terminated Census Employee."
           render text: true
         else
           render text: false
         end
       }
       format.all {
-        flash[:notice] = "Successfully terminated family."
+        flash[:notice] = "Successfully terminated Census Employee."
         redirect_to employers_employer_profile_path(@employer_profile)
       }
     end
@@ -97,7 +97,7 @@ class Employers::CensusEmployeesController < ApplicationController
         new_census_employee.hired_on = 1.day.ago.to_date
         new_census_employee.employer_profile = @employer_profile
         if new_census_employee.save
-          flash[:notice] = "Successfully rehired family."
+          flash[:notice] = "Successfully rehired Census Employee."
         else
           flash[:error] = "Error during rehire."
         end
