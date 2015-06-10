@@ -14,9 +14,6 @@ class ApplicationController < ActionController::Base
   # for i18L
   before_action :set_locale
 
-  # for current_user
-  before_action :set_current_user
-
   # before_action do
   #   resource = controller_name.singularize.to_sym
   #   method = "#{resource}_params"
@@ -95,9 +92,5 @@ class ApplicationController < ActionController::Base
     end
   rescue
     ("A".."Z").to_a
-  end
-
-  def set_current_user
-    User.current_user = current_user
   end
 end
