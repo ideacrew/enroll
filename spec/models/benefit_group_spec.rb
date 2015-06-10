@@ -6,7 +6,6 @@ describe BenefitGroup, type: :model do
   it { should validate_presence_of :terminate_on_kind }
   it { should validate_presence_of :effective_on_offset }
   it { should validate_presence_of :reference_plan_id }
-  it { should validate_presence_of :employer_max_amt_in_cents }
 end
 
 describe BenefitGroup, dbclean: :after_each do
@@ -169,3 +168,214 @@ describe BenefitGroup, "instance methods" do
     end
   end
 end
+
+
+describe BenefitGroup, type: :model do
+    
+  let(:plan_year)               { FactoryGirl.build(:plan_year) }
+  let(:reference_plan)          { FactoryGirl.build(:plan) }
+  let(:plan_option_kind)        { :single_plan }
+  let(:title)                   { "Employee Perks" }
+  let(:effective_on_kind)       { "first_of_month" }
+  let(:effective_on_offset)     { 30 }
+  let(:terminate_on_kind)       { "end_of_month" }
+  let(:premium_pct_as_int)      { 75 }
+
+  let(:effective_on_offset_default)   { 0 }
+  let(:effective_on_kind_default)     { "date_of_hire" }
+  let(:terminate_on_kind_default)     { "end_of_month" }
+  let(:plan_option_kind_default)      { "single_plan" }
+
+  let(:elected_plan_ids) do
+    [
+      reference_plan.id
+    ]
+  end
+
+
+  let(:relationship_benefits) do
+    [
+      RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
+      RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),
+      RelationshipBenefit.new(offered: true, relationship: :domestic_partner, premium_pct: 75),
+      RelationshipBenefit.new(offered: true, relationship: :child_under_26, premium_pct: 50),
+      RelationshipBenefit.new(offered: true, relationship: :disabled_child_26_and_over, premium_pct: 50),
+      RelationshipBenefit.new(offered: false, relationship: :child_26_and_older, premium_pct: 0)
+    ]
+  end
+
+  let(:valid_params) do
+    {
+        plan_year: plan_year,
+        reference_plan: reference_plan,
+        relationship_benefits: relationship_benefits,
+        elected_plan_ids: elected_plan_ids,
+        title: title,
+        plan_option_kind: plan_option_kind,
+        effective_on_kind: effective_on_kind,
+        effective_on_offset: effective_on_offset,
+        terminate_on_kind: terminate_on_kind,
+        premium_pct_as_int: premium_pct_as_int
+    }
+  end
+
+  context ".new" do
+    context "with no arguments" do
+      let(:params) {{}}
+
+      it "should be invalid" do
+        expect(BenefitGroup.create(**params).valid?).to be_falsey
+      end
+    end
+
+    context "with no reference_plan" do
+      let(:params) {valid_params.except(:reference_plan)}
+
+      it "should be invalid" do
+        expect(BenefitGroup.create(**params).errors[:reference_plan_id].any?).to be_truthy
+      end
+    end
+
+    context "with no elected_plans" do
+      let(:params) {valid_params.except(:elected_plan_ids)}
+
+      it "should be invalid" do
+        expect(BenefitGroup.create(**params).errors[:elected_plan_ids].any?).to be_truthy
+      end      
+    end
+
+    context "with no plan option kind" do
+      let(:params) {valid_params.except(:plan_option_kind)}
+
+      # TODO - Remove default value?
+      # it "should be invalid" do
+      #   expect(BenefitGroup.create(**params).errors[:plan_option_kind].any?).to be_truthy
+      # end
+
+      it "should initialize with default value" do
+        expect(BenefitGroup.new(**params).plan_option_kind).to eq plan_option_kind_default
+      end
+    end
+
+    context "with no title" do
+      let(:params) {valid_params.except(:title)}
+
+      # it "should be invalid" do
+      #   expect(BenefitGroup.create(**params).errors[:title].any?).to be_truthy
+      # end
+
+      # TODO - Remove default value?
+      it "should initialize with default value" do
+        expect(BenefitGroup.new(**params).title).to eq ""
+      end
+    end
+
+    context "with no premium_pct_as_int" do
+      let(:params) {valid_params.except(:premium_pct_as_int)}
+
+      it "should be invalid" do
+        expect(BenefitGroup.create(**params).errors[:premium_pct_as_int].any?).to be_truthy
+      end
+    end
+
+    context "with no relationship_benefits" do
+      let(:params) {valid_params.except(:relationship_benefits)}
+
+      it "should be invalid" do
+        expect(BenefitGroup.create(**params).errors[:relationship_benefits].any?).to be_truthy
+      end
+    end
+
+    context "with no effective_on_offset" do
+      let(:params) {valid_params.except(:effective_on_offset)}
+
+      it "should initialize with default value" do
+        expect(BenefitGroup.new(**params).effective_on_offset).to eq effective_on_offset_default
+      end
+    end
+
+    context "with no effective_on_kind" do
+      let(:params) {valid_params.except(:effective_on_kind)}
+
+      it "should initialize with default value" do
+        expect(BenefitGroup.new(**params).effective_on_kind).to eq effective_on_kind_default
+      end
+    end
+
+    context "with no terminate_on_kind" do
+      let(:params) {valid_params.except(:terminate_on_kind)}
+
+      it "should initialize with default value" do
+        expect(BenefitGroup.new(**params).terminate_on_kind).to eq terminate_on_kind_default
+      end
+    end
+
+    context "with all valid parameters" do
+      let(:params) {valid_params}
+      let(:benefit_group)  { BenefitGroup.new(**params) }  
+
+      it "should save" do
+        expect(benefit_group.save).to be_truthy
+      end
+
+      context "and it is saved" do
+        let!(:saved_benefit_group) do
+          b = BenefitGroup.new(**params)
+          b.save!
+          b
+        end
+
+        it "should be findable" do
+          expect(BenefitGroup.find(saved_benefit_group._id)).to eq saved_benefit_group
+        end
+      end
+    end
+  end
+
+  context "and a reference plan is selected" do
+    let(:params) {valid_params}
+    let(:benefit_group)  { BenefitGroup.new(**params) }  
+
+    context "and the 'single plan' option is offered" do
+      context "and the elected plan is not the reference plan" do
+        let(:reference_plan_choice)   { FactoryGirl.build(:plan) }
+        let(:elected_plan_choice)     { FactoryGirl.build(:plan) }
+
+        before do
+          benefit_group.plan_option_kind = :single_plan
+          benefit_group.reference_plan = reference_plan_choice
+          benefit_group.elected_plans = [elected_plan_choice]
+        end
+
+        it "should be invalid" do
+          expect(benefit_group.valid?).to be_falsey
+          expect(benefit_group.errors[:elected_plans].any?).to be_truthy
+        end
+      end
+    end
+
+    context "and the 'metal level' option is offered" do
+      context "and elected plans are not all of the same metal level as reference plan" do
+        before do
+          benefit_group.plan_option_kind = :metal_level
+        end
+
+        it "should be invalid"
+      end
+    end
+
+    context "and the 'carrier plans' option is offered" do
+      context "and the reference plan is not in the elected plan set" do
+        it "should be invalid"
+      end
+
+      context "and elected plans are not all from the same carrier as reference plan" do
+        it "should be invalid"
+      end
+    end
+  end
+
+  context "and " do
+  end
+end
+
