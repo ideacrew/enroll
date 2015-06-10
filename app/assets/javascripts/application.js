@@ -504,11 +504,15 @@ $(document).on('click', ".interaction-click-control-add-plan-year", function() {
 
 
 $(document).on('change', "input#jq_datepicker_ignore_plan_year_start_on", function() {
-  var time = new Date(Date.parse($(this).val()));
-  var year = time.getFullYear();
-  var month = time.getMonth();
-  var date = time.getDate();
-  var endon = new Date(year + 1, month, date - 1);
-  $("input#jq_datepicker_ignore_plan_year_end_on").val(endon.format("MM/dd/yyyy")).trigger("change");
-  $("input#plan_year_end_on_jq_datepicker_plain_field").val(endon.format("yyyy-MM-dd"));
+  if ($('.recommend h4').text() == "Loading Suggested Dates...") {
+    return false;
+  };
+
+  $('.recommend').html("<h4>Loading Suggested Dates...<h4>");
+  var target_url = $("a#generate_recommend_dates").data("href");
+  $.ajax({
+    type: "GET",
+    data:{start_on: $("input#plan_year_start_on_jq_datepicker_plain_field").val()},
+    url: target_url
+  });
 }); 

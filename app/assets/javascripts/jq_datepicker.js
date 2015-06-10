@@ -52,6 +52,7 @@ function applyJQDatePickerSetup(ele) {
 	  yearRange: yearMin + ":" + yearMax,
           onSelect: function(dateText, dpInstance) {
 	    $(this).datepicker("hide");
+      $(this).trigger('change');
 	  }
   });
   el.datepicker("refresh");
