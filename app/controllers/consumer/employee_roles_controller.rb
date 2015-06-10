@@ -12,7 +12,7 @@ class Consumer::EmployeeRolesController < ApplicationController
   end
 
   def match
-    @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person))
+    @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person).merge({user_id: current_user.id}))
     @person = @employee_candidate
     if @employee_candidate.valid?
       found_families = EmployerProfile.find_census_families_by_person(@employee_candidate)
