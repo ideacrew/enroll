@@ -45,6 +45,7 @@ class Person
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
+  embeds_one :employer_staff_role, cascade_callbacks: true, validate: true
   embeds_one :responsible_party, cascade_callbacks: true, validate: true
 
   embeds_many :employee_roles, cascade_callbacks: true, validate: true
@@ -96,6 +97,10 @@ class Person
   index({"broker_role.provider_kind" => 1})
   index({"broker_role.broker_agency_id" => 1})
   index({"broker_role.npn" => 1}, {sparse: true, unique: true})
+
+  # Employer role index
+  index({"employer_staff_role._id" => 1})
+  index({"employer_staff_role.employer_profile_id" => 1})
 
   # Consumer child model indexes
   index({"consumer_role._id" => 1})
