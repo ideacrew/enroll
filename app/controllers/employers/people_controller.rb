@@ -11,7 +11,7 @@ class Employers::PeopleController < ApplicationController
   end
 
   def match
-    @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person))
+    @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person).merge({user_id: current_user.id}))
     if @employee_candidate.valid?
       found_person = @employee_candidate.match_person
       unless params["create_person"].present? # when search button is clicked

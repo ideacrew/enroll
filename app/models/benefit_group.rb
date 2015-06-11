@@ -44,12 +44,8 @@ class BenefitGroup
 
   attr_accessor :plan_for_elected_plan, :metal_level_for_elected_plan, :carrier_for_elected_plan, :elected_plan_kind
 
-  # Array of census employee ids
-  # has_and_belongs_to_many :employee_families, class_name: "EmployeeFamily"
-  # field :employee_families, type: Array, default: []
-
-  #TODO add following attributes: :title, 
-  validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset, 
+  #TODO add following attributes: :title,
+  validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
                         :reference_plan_id, :plan_option_kind, :premium_pct_as_int, :elected_plan_ids
 
   validates :plan_option_kind,
@@ -106,29 +102,15 @@ class BenefitGroup
   end
 
   def census_employees
+    CensusEmployee.find_all_by_benefit_group(self)
   end
 
-  # belongs_to association (traverse the model)
-  def employee_families
-    ## Optimize -- this is ineffective for large data sets
-    plan_year.employer_profile.employee_families.reduce([]) do |list, ef|
-      list << ef if ef.active_benefit_group_assignment.benefit_group == self
-      list
-    end
-  end
-
-  def assignable_to?(family_or_census_employee)
-    if family_or_census_employee.is_a?(EmployerCensus::EmployeeFamily)
-      family = family_or_census_employee
-      return !(family.terminated_on < start_on || family.hired_on > end_on)
-    elsif family_or_census_employee.is_a?(CensusEmployee)
-      census_employee = family_or_census_employee
-      return !(census_employee.employment_terminated_on < start_on || census_employee.hired_on > end_on)
-    end
+  def assignable_to?(census_employee)
+    return !(census_employee.employment_terminated_on < start_on || census_employee.hired_on > end_on)
   end
 
   def assigned?
-    employee_families.any?
+    census_employees.any?
   end
 
   def effective_on_for(date_of_hire)

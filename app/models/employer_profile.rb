@@ -239,9 +239,8 @@ class EmployerProfile
     plan_year.revert
   end
 
-
-  def build_employer_profile_account
-    # self.build_employer_profile_account
+  def initialize_account
+    self.build_employer_profile_account
   end
 
 
@@ -282,7 +281,7 @@ class EmployerProfile
       # End open enrollment with success
       transitions from: :enrolling, to: :binder_pending,
         :guard => :enrollment_compliant?,
-        :after => :build_employer_profile_account
+        :after => :initialize_account
 
       # End open enrollment with invalid enrollment
       transitions from: :enrolling, to: :canceled
@@ -325,7 +324,7 @@ class EmployerProfile
     event :end_open_enrollment, :guards => [:event_date_valid?] do
       transitions from: :enrolling, to: :binder_pending,
         :guard => :enrollment_compliant?,
-        :after => :build_employer_profile_account
+        :after => :initialize_account
 
       transitions from: :enrolling, to: :canceled
     end

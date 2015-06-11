@@ -167,6 +167,10 @@ class CensusEmployee < CensusMember
     def find_all_by_employee_role(employee_role)
       unscoped.where(employee_role_id: employee_role._id)
     end
+
+    def find_all_by_benefit_group(benefit_group)
+      unscoped.where("benefit_group_assignments.benefit_group_id" => benefit_group._id)
+    end
   end
 
   aasm do

@@ -9,14 +9,11 @@ describe BenefitGroup, type: :model do
 end
 
 describe BenefitGroup, dbclean: :after_each do
-  context "an employer profile with families exists" do
+  context "an employer profile with census_employees exists" do
     let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
-    let!(:families) do
+    let!(:census_employees) do
       [1,2].collect do
-        FactoryGirl.create(
-          :employer_census_family,
-          employer_profile: employer_profile
-        )
+        FactoryGirl.create(:census_employee, employer_profile: employer_profile)
       end.sort_by(&:id)
     end
 
@@ -73,35 +70,31 @@ describe BenefitGroup, "instance methods" do
   let!(:benefit_group)            { FactoryGirl.build(:benefit_group) }
   let!(:plan_year)                { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], start_on: Date.new(2015,1,1)) }
   let!(:employer_profile)         { FactoryGirl.create(:employer_profile, plan_years: [plan_year]) }
-  let!(:benefit_group_assignment) { FactoryGirl.build(:employer_census_benefit_group_assignment, benefit_group: benefit_group) }
-  let!(:families) do
+  let!(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group) }
+  let!(:census_employees) do
     [1,2].collect do
-      FactoryGirl.create(:employer_census_family,
-            employer_profile: employer_profile,
-            benefit_group_assignments: [benefit_group_assignment]
-          )
+      FactoryGirl.create(:census_employee, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment] )
     end.sort_by(&:id)
   end
 
-  context "employee_census_families and benefit_group.employee_families" do
-    let(:benefit_group_families) {benefit_group.employee_families.sort_by(&:id)}
+  context "census_employees and benefit_group.census_employees" do
+    let(:benefit_group_census_employees) {benefit_group.census_employees.sort_by(&:id)}
 
-    it "should include the same families" do
-      expect(benefit_group_families).to eq families
+    it "should include the same census_employees" do
+      expect(benefit_group_census_employees).to eq census_employees
     end
   end
 
-  describe "should check if valid for family" do
+  describe "should check if valid for census_employees" do
     let(:terminated_on_date) { Date.new(2015, 7, 31) }
     let(:hired_on_date) { Date.new(2015, 6, 1) }
-    let(:census_employee) { EmployerCensus::Employee.new(:hired_on => hired_on_date, :terminated_on => terminated_on_date) }
-    let(:roster_family) { EmployerCensus::EmployeeFamily.new(:census_employee => census_employee) }
+    let(:census_employee) { CensusEmployee.new(:hired_on => hired_on_date, :employment_terminated_on => terminated_on_date) }
 
     context "given an invalid terminated and end date combo " do
        let(:terminated_on_date) { Date.new(2014, 1, 2) }
 
        it "is not assignable_to an employee fired before it starts" do
-         expect(benefit_group.assignable_to?(roster_family)).to be_falsey
+         expect(benefit_group.assignable_to?(census_employee)).to be_falsey
        end
      end
 
@@ -109,12 +102,12 @@ describe BenefitGroup, "instance methods" do
       let(:hired_on_date) { Date.new(2016, 6, 5) }
 
       it "is not assignable_to an employee hired after it ends" do
-        expect(benefit_group.assignable_to?(roster_family)).to be_falsey
+        expect(benefit_group.assignable_to?(census_employee)).to be_falsey
       end
     end
 
     it "should be valid if both dates fall inside plan year correctly" do
-      expect(benefit_group.assignable_to?(roster_family)).to be_truthy
+      expect(benefit_group.assignable_to?(census_employee)).to be_truthy
     end
   end
 
@@ -371,7 +364,15 @@ describe BenefitGroup, type: :model do
     end
   end
 
-  context "and " do
+  context "and relationship benefit values are specified" do
+    context "and the employee contribution amount is less than minimum" do
+      context "and the effective date is Jan 1" do
+        it "should be valid"
+      end
+      context "and the effective date is not Jan 1" do
+        it "should be invalid"
+      end
+    end
   end
 end
 
