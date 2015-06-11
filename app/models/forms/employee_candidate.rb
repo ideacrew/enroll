@@ -52,7 +52,7 @@ module Forms
          if matched_person.user.present?
            if matched_person.user.id.to_s != self.user_id.to_s
              errors.add(
-               :match,
+               :exception,
                "An account already exists for #{first_name} #{last_name}."
              )
            end
