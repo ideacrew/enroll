@@ -58,3 +58,15 @@ a.new-address-btn {
   border: 1px solid transparent;
   border-radius: 4px;
 }
+
+.hidden_field {
+  display: none;
+}
+
+.hidden_second_field {
+  display: none;
+}
+
+.reference-plan-content {
+  display: none;
+}

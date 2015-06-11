@@ -344,7 +344,6 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.text_field(class: "interaction-field-control-plan_year-start_on").set("01/06/2017")
   @browser.h3(text: /Plan Year/).click
   sleep(1)
-  @browser.a(text: /generate recommend dates by start on/).click
   @browser.h4(text: /start on must be first day of the month/).wait_until_present
   expect(@browser.text.include?("start on must be first day of the month")).to be_truthy
   # happy path
@@ -352,27 +351,27 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.text_field(class: "interaction-field-control-plan_year-start_on").set(begin_date)
   @browser.h3(text: /Plan Year/).click
   sleep(1)
-  @browser.a(text: /generate recommend dates by start on/).click
   @browser.h4(text: /Recommend Date/).wait_until_present
   expect(@browser.text.include?("employer initial application earliest submit on")).to be_truthy
-  @browser.text_field(class: "interaction-field-control-plan_year-start_on").set("01/01/2015")
-  @browser.text_field(class: "interaction-field-control-plan_year-open_enrollment_start_on").set("11/01/2014")
-  @browser.text_field(class: "interaction-field-control-plan_year-open_enrollment_end_on").set("11/30/2014")
+  #@browser.text_field(class: "interaction-field-control-plan_year-start_on").set("01/01/2015")
+  #@browser.text_field(class: "interaction-field-control-plan_year-open_enrollment_start_on").set("11/01/2014")
+  #@browser.text_field(class: "interaction-field-control-plan_year-open_enrollment_end_on").set("11/30/2014")
   @browser.text_field(name: "plan_year[fte_count]").click
   @browser.text_field(name: "plan_year[fte_count]").set("35")
   @browser.text_field(name: "plan_year[pte_count]").set("15")
   @browser.text_field(name: "plan_year[msp_count]").set("3")
   # Benefit Group
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
-  input_field = @browser.div(class: /selectric-wrapper/)
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
+  elected_field = @browser.div(class: /selectric-wrapper/, text: /ELECTED PLAN/)
+  elected_field.click
+  elected_field.li(text: /All plans from a given carrier/).click
+  input_field = @browser.div(class: /selectric-wrapper/, text: /SELECT CARRIER/)
   input_field.click
   input_field.li(text: /CareFirst/).click
   ref_plan = @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last
   ref_plan.click
   ref_plan.li(index: 5).click # select plan from list.
-  @browser.select_list(id: "plan_year_benefit_groups_attributes_0_effective_on_offset")
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][premium_pct_as_int]").set(53)
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
   # Relationship Benefit
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
@@ -389,6 +388,7 @@ end
 And(/^I should see a success message after clicking on create plan year button$/) do
   Watir::Wait.until(30) {  @browser.text.include?("Plan Year successfully created.") }
   screenshot("employer_plan_year_success_message")
+  Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.plan_years.first.update(start_on: '2015-01-01', end_on: '2015-12-31', open_enrollment_start_on: '2014-01-01', open_enrollment_end_on: '2014-11-30')
 end
 
 When(/^I enter filter in plan selection page$/) do

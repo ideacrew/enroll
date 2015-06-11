@@ -12,11 +12,10 @@ class Consumer::EmployeeRolesController < ApplicationController
   end
 
   def match
-    @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person))
+    @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person).merge({user_id: current_user.id}))
     @person = @employee_candidate
     if @employee_candidate.valid?
       found_census_employee = EmployerProfile.find_census_employee_by_person(@employee_candidate)
-      binding.pry
       if found_census_employee.empty?
         respond_to do |format|
           format.html { render 'no_match' }

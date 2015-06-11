@@ -27,7 +27,7 @@ class EmployerProfile
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
   embeds_one  :inbox, as: :recipient
-  embeds_many :premium_statements
+  embeds_one  :employer_profile_account
   embeds_many :plan_years, cascade_callbacks: true, validate: true
 
   embeds_many :employee_families,
@@ -35,7 +35,7 @@ class EmployerProfile
     cascade_callbacks: true,
     validate: true
 
-  accepts_nested_attributes_for :plan_years, :employee_families, :inbox, :premium_statements
+  accepts_nested_attributes_for :plan_years, :employee_families, :inbox, :employer_profile_account
 
   validates_presence_of :entity_kind
 
@@ -63,12 +63,12 @@ class EmployerProfile
 
 
   def cycle_daily_events
-    # advance premium_statements billing period for pending_binder_payment
+    # advance employer_profile_account billing period for pending_binder_payment
   end
 
   def cycle_monthly_events
     # expire_plan_years
-    # premimum_statements.advance_billing_period
+    # employer_profile_account.advance_billing_period
   end
 
   def employee_roles
@@ -138,12 +138,6 @@ class EmployerProfile
     end
 
     errors
-  end
-
-
-  def latest_premium_statement
-    return premium_statements.first if premium_statements.size == 1
-    premium_statements.order_by(:'effective_on'.desc).limit(1).only(:premium_statements).first
   end
 
   # belongs_to broker_agency_profile
@@ -280,6 +274,11 @@ class EmployerProfile
     plan_year.revert
   end
 
+  def initialize_account
+    self.build_employer_profile_account
+  end
+
+
 ## TODO - anonymous shopping
 # no fein required
 # no SSNs, names, relationships, required
@@ -317,7 +316,7 @@ class EmployerProfile
       # End open enrollment with success
       transitions from: :enrolling, to: :binder_pending, 
         :guard => :enrollment_compliant?,
-        :after => :build_premium_statement
+        :after => :initialize_account
 
       # End open enrollment with invalid enrollment
       transitions from: :enrolling, to: :canceled
@@ -360,7 +359,7 @@ class EmployerProfile
     event :end_open_enrollment, :guards => [:event_date_valid?] do
       transitions from: :enrolling, to: :binder_pending, 
         :guard => :enrollment_compliant?,
-        :after => :build_premium_statement
+        :after => :initialize_account
 
       transitions from: :enrolling, to: :canceled
     end
@@ -457,10 +456,6 @@ private
         false
     end
     is_valid
-  end
-
-  def build_premium_statement
-    self.premium_statements.build(effective_on: Date.current)
   end
 
   def writing_agent_employed_by_broker

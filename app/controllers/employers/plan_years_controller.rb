@@ -9,8 +9,19 @@ class Employers::PlanYearsController < ApplicationController
   def create
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|
-      reference_plan = benefit_group.reference_plan
-      benefit_group.elected_plan_ids = reference_plan.carrier_profile.plans.where(active_year: 2015, market: "shop").collect(&:_id)
+      elected_plan_ids = case benefit_group.elected_plan_kind
+                         when "carrier"
+                           @plan_year.carrier_plans_for(benefit_group.carrier_for_elected_plan).collect(&:_id)
+                         when "metal_level"
+                           @plan_year.metal_level_plans_for(benefit_group.metal_level_for_elected_plan).collect(&:_id)
+                         when "plan"
+                           [ BSON::ObjectId.from_string(benefit_group.plan_for_elected_plan) ]
+                         else
+                           []
+                         end
+      #reference_plan = benefit_group.reference_plan
+      #benefit_group.elected_plan_ids = reference_plan.carrier_profile.plans.where(active_year: 2015, market: "shop").collect(&:_id)
+      benefit_group.elected_plan_ids = elected_plan_ids
     end
     if @plan_year.save
       flash[:notice] = "Plan Year successfully created."
@@ -40,7 +51,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_carriers_and_plans
-    @carriers = Organization.all.map{|o|o.carrier_profile}.compact
+    @carriers = Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.blank? }
   end
 
   def build_plan_year
@@ -55,7 +66,9 @@ class Employers::PlanYearsController < ApplicationController
       :start_on, :end_on, :fte_count, :pte_count, :msp_count,
       :open_enrollment_start_on, :open_enrollment_end_on,
       :benefit_groups_attributes => [ :title, :reference_plan_id, :effective_on_offset,
-                                      :premium_pct_as_int, :employer_max_amt_in_cents, :_destroy,
+                                      :elected_plan_kind, :carrier_for_elected_plan, 
+                                      :metal_level_for_elected_plan, :plan_for_elected_plan,
+                                      :employer_max_amt_in_cents, :_destroy,
                                       :relationship_benefits_attributes => [
                                         :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
                                       ]

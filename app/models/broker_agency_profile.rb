@@ -1,3 +1,4 @@
+
 class BrokerAgencyProfile
   include Mongoid::Document
   include Mongoid::Timestamps

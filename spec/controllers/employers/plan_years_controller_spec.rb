@@ -41,7 +41,8 @@ RSpec.describe Employers::PlanYearsController do
          :title => "My benefit group",
          :reference_plan_id => "rp_id", 
          :effective_on_offset => "e_on_offset",                      
-        :premium_pct_as_int => "66",
+         :elected_plan_kind => "plan",
+         :plan_for_elected_plan => '12312',
         :employer_max_amt_in_cents => "2232",
         :relationship_benefits_attributes => relationship_benefits_attributes
       } }
@@ -78,6 +79,8 @@ RSpec.describe Employers::PlanYearsController do
       allow(::Forms::PlanYearForm).to receive(:build).with(employer_profile, plan_year_params).and_return(plan_year)
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(benefit_group).to receive(:elected_plan_ids=).and_return("test")
+      allow(benefit_group).to receive(:elected_plan_kind).and_return("plan")
+      allow(benefit_group).to receive(:plan_for_elected_plan).and_return(FactoryGirl.create(:plan).id)
       allow(plan_year).to receive(:save).and_return(save_result)
       post :create, :employer_profile_id => employer_profile_id, :plan_year => plan_year_request_params
     end

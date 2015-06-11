@@ -7,6 +7,7 @@ RSpec.describe "employers/plan_years/new.html.erb" do
   before(:each) do
     plan_year.benefit_groups.build
     assign(:plan_year, plan_year)
+    assign(:carriers, Array.new)
     controller.request.path_parameters[:employer_profile_id] = employer_profile.id
     stub_template "shared/_reference_plans_list.html.erb" => ""
     render :template => "employers/plan_years/new.html.erb"

@@ -19,6 +19,7 @@ module Parser
     element :first_name, String, xpath: 'ns1:vcard/ns1:n/ns1:given'
     element :last_name, String, xpath: 'ns1:vcard/ns1:n/ns1:surname'
     element :full_name, String, xpath: 'ns1:vcard/ns1:fn'
+    element :organization, String, xpath: 'ns1:vcard/ns1:org'
     element :exchange_id, String, tag: 'element'
     element :exchange_status, String, tag: 'exchange_status'
     element :associated_agency_name, String, tag: 'associated_agency_name'
@@ -41,7 +42,8 @@ module Parser
           emails: emails.map(&:to_hash),
           addresses: addresses.map(&:to_hash),
           exchange_id: exchange_id,
-          exchange_status: exchange_status
+          exchange_status: exchange_status,
+          organization_name: organization
       }
     end
   end

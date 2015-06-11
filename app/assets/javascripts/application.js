@@ -40,14 +40,20 @@ $(document).ready(function () {
         changeYear: true,
         dateFormat: 'mm/dd/yy', 
         maxDate: "+0d",
-        yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()
+        yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear(),
+          onSelect: function(dateText, dpInstance) {
+	    $(this).datepicker("hide");
+	  }
       });
     }else{
       $(this).datepicker({ 
         changeMonth: true,
         changeYear: true,
         dateFormat: 'mm/dd/yy', 
-        yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10)
+        yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10),
+          onSelect: function(dateText, dpInstance) {
+	    $(this).datepicker("hide");
+	  }
       });
     }
   });
@@ -97,15 +103,15 @@ $(document).ready(function () {
   
   // personal-info-row focus fields
   $(document).on('click', '.focus_effect', function() {
-    update_info_row(this, 'focus_in');
+    update_info_row($(this), 'focus_in');
   });
 
   $(document).on('focusin', '.focus_effect input', function() {
-    update_info_row(this.closest('.focus_effect'), 'focus_in');
+    update_info_row($(this).closest('.focus_effect'), 'focus_in');
   });
 
   $(document).on('blur', '.focus_effect', function() {
-    update_info_row(this, 'focus_out');
+    update_info_row($(this), 'focus_out');
   });
 
   function update_info_row(element, evt) {
@@ -419,6 +425,7 @@ $(document).ready(function () {
   $(".person_ssn").mask("999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
+  $(".jq-datepicker").mask("00/00/0000");
   
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
@@ -498,11 +505,15 @@ $(document).on('click', ".interaction-click-control-add-plan-year", function() {
 
 
 $(document).on('change', "input#jq_datepicker_ignore_plan_year_start_on", function() {
-  var time = new Date(Date.parse($(this).val()));
-  var year = time.getFullYear();
-  var month = time.getMonth();
-  var date = time.getDate();
-  var endon = new Date(year + 1, month, date - 1);
-  $("input#jq_datepicker_ignore_plan_year_end_on").val(endon.format("MM/dd/yyyy")).trigger("change");
-  $("input#plan_year_end_on_jq_datepicker_plain_field").val(endon.format("yyyy-MM-dd"));
+  if ($('.recommend h4').text() == "Loading Suggested Dates...") {
+    return false;
+  };
+
+  $('.recommend').html("<h4>Loading Suggested Dates...<h4>");
+  var target_url = $("a#generate_recommend_dates").data("href");
+  $.ajax({
+    type: "GET",
+    data:{start_on: $("input#plan_year_start_on_jq_datepicker_plain_field").val()},
+    url: target_url
+  });
 }); 

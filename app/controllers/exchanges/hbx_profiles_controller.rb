@@ -1,6 +1,6 @@
 class Exchanges::HbxProfilesController < ApplicationController
-  before_action :set_hbx_profile, only: [:show, :edit, :update, :destroy]
   before_action :check_hbx_staff_role, except: [:welcome]
+  before_action :set_hbx_profile, only: [:edit, :update, :destroy]
 
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
@@ -18,7 +18,10 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @employer_profiles = @organizations.map {|o| o.employer_profile}
 
-    render "employers/employer_profiles/index"
+    respond_to do |format|
+      format.html { render "employers/employer_profiles/index" }
+      format.js {}
+    end
   end
 
   def family_index
@@ -33,8 +36,54 @@ class Exchanges::HbxProfilesController < ApplicationController
       @total = total_families.count
       @families = Kaminari.paginate_array(total_families).page page_no
     end
+    respond_to do |format|
+      format.html { render "insured/families/index" }
+      format.js {}
+    end
+  end
 
-    render "insured/families/index"
+  def broker_agency_index
+    @broker_agency_profiles = BrokerAgencyProfile.all
+
+    respond_to do |format|
+      format.html { render "broker_agencies/profiles/index" }
+      format.js {}
+    end
+  end
+
+  def broker_index
+    @brokers = BrokerRole.all
+
+    respond_to do |format|
+      format.html { render "broker_index" }
+      format.js {}
+    end
+  end
+
+  def issuer_index
+    @issuers = CarrierProfile.all
+
+
+    respond_to do |format|
+      format.html { render "issuer_index" }
+      format.js {}
+    end
+  end
+
+  def product_index
+
+    respond_to do |format|
+      format.html { render "product_index" }
+      format.js {}
+    end
+  end
+
+  def configuration
+
+    respond_to do |format|
+      format.html { render "configuration_index" }
+      format.js {}
+    end
   end
 
   # GET /exchanges/hbx_profiles/1
@@ -96,7 +145,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 private
   # Use callbacks to share common setup or constraints between actions.
   def set_hbx_profile
-    @hbx_profile = Organization.exists(hbx_profile: true).where(hbx_profile: params[:id])
+    @hbx_profile = HbxProfile.find(params[:id])
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

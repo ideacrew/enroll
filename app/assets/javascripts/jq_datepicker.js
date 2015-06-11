@@ -44,12 +44,16 @@ function applyJQDatePickerSetup(ele) {
   }
 
   el.datepicker({
-	  changeMonth: true,
-	  changeYear: true,
-	  dateFormat: 'mm/dd/yy',
-	  altFormat: 'yy-mm-dd',
-	  altField: otherFieldSelector,
-	  yearRange: yearMin + ":" + yearMax
+    changeMonth: true,
+    changeYear: true,
+    dateFormat: 'mm/dd/yy',
+    altFormat: 'yy-mm-dd',
+    altField: otherFieldSelector,
+    yearRange: yearMin + ":" + yearMax,
+      onSelect: function(dateText, dpInstance) {
+        $(this).datepicker("hide");
+        $(this).trigger('change');
+      }
   });
   el.datepicker("refresh");
 }
@@ -57,5 +61,8 @@ function applyJQDatePickerSetup(ele) {
 $(function() {
   $(".jq-datepicker").each(function(idx, ele) {
     applyJQDatePickerSetup(ele);    
+    if ($(this).attr("readonly") != undefined){
+      $(ele).datepicker('disable');
+    };
   });
 });

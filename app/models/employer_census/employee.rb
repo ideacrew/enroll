@@ -1,5 +1,4 @@
 class EmployerCensus::Employee < EmployerCensus::Member
-
   embedded_in :employee_family, class_name: "EmployerCensus::EmployeeFamily", inverse_of: :census_employee
 
   field :hired_on, type: Date

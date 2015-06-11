@@ -40,7 +40,8 @@ RSpec.describe Employers::PeopleController do
   end
 
   describe "POST match" do
-    let(:user) { double("user") }
+    let(:user) { double(id: user_id) }
+    let(:user_id) { "SOMDFINKETHING_ID" }
     let(:phones) {double(:select => double("select")) }
     let(:addresses) {double(:select => double("select")) }
     let(:emails) {double(:select => double("select")) }
@@ -56,7 +57,7 @@ RSpec.describe Employers::PeopleController do
       allow(person).to receive(:attributes=).and_return(person_parameters)
       allow(person).to receive(:save).and_return(save_result)
       sign_in(user)
-      allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters).and_return(mock_employee_candidate)
+      allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
       allow(mock_employee_candidate).to receive(:match_person).and_return(found_person)
       post :match, more_params
     end
@@ -72,13 +73,15 @@ RSpec.describe Employers::PeopleController do
   end
 
   describe "POST match" do
+    let(:user) { double(id: user_id) }
+    let(:user_id) { "SOMDFINKETHING_ID" }
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:found_person) { [] }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result) }
 
     before(:each) do
-      sign_in
-      allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters).and_return(mock_employee_candidate)
+      sign_in(user)
+      allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
       allow(mock_employee_candidate).to receive(:match_person).and_return(found_person)
       post :match, :person => person_parameters
     end

@@ -1,0 +1,27 @@
+<div class="container">
+
+  <h3>Broker Roles</h3>
+
+  <div class="table-border">
+    <table class="table">
+    <% if @brokers.present? %>
+      <thead>
+        <th>HBX Id</th>
+        <th>NPN</th>
+        <th>Provider Kind</th>
+      </thead>
+      <% @brokers.each do |broker| %>
+        <tbody>
+         
+          <td><%= broker.hbx_id %></td>
+          <td><%= broker.npn %></td>
+          <td><%= broker.provider_kind %></td>
+          
+        </tbody>
+      <% end %>
+    <% else %>
+      <tr><td>No Brokers found.</td></tr>
+    <% end %>
+    </table>
+  </div>
+</div>
