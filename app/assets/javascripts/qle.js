@@ -5,7 +5,7 @@ $(function () {
 		$('#qle-details').removeClass('hidden');
 	});
 
-	$(document).on('click', '#qle-details .close-popup, #existing_coverage, #new_plan', function() {
+	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
 		$('#qle-details').addClass('hidden');
 		$('#qle-details .success-info, #qle-details .error-info').addClass('hidden');
 		$('#qle-details .default-info').removeClass('hidden');
