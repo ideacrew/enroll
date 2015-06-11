@@ -1,5 +1,6 @@
 class EmployerCensus::Employee < EmployerCensus::Member
   embedded_in :employee_family, class_name: "EmployerCensus::EmployeeFamily", inverse_of: :census_employee
+  include Validations::EmployeeInfo
 
   field :hired_on, type: Date
   field :terminated_on, type: Date
