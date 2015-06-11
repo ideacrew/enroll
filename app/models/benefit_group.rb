@@ -42,11 +42,11 @@ class BenefitGroup
 
   delegate :start_on, :end_on, to: :plan_year
 
-  attr_accessor :plan_for_elected_plan, :metal_level_for_elected_plan, :carrier_for_elected_plan, :elected_plan_kind
+  attr_accessor :plan_for_elected_plan, :metal_level_for_elected_plan, :carrier_for_elected_plan
 
   #TODO add following attributes: :title, 
   validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset, 
-                        :reference_plan_id, :plan_option_kind, :premium_pct_as_int, :elected_plan_ids
+                        :reference_plan_id, :plan_option_kind, :elected_plan_ids
 
   validates :plan_option_kind,
     allow_blank: false,
@@ -70,6 +70,7 @@ class BenefitGroup
     }
 
   validate :plan_integrity
+  validate :check_employer_contribution_for_employee
 
 
   def plan_option_kind=(new_plan_option_kind)
@@ -96,7 +97,7 @@ class BenefitGroup
     if new_plans.is_a? Array
       self.elected_plan_ids = new_plans.reduce([]) { |list, plan| list << plan._id }
     else
-      self.elected_plan_ids << new_plans._id
+      self.elected_plan_ids = Array.new(1, new_plans._id)
     end
     @elected_plans = new_plans
   end
@@ -210,19 +211,25 @@ class BenefitGroup
 private
 
   def plan_integrity
-
     if (plan_option_kind == "single_plan") && (elected_plan_ids.first != reference_plan_id)
       self.errors.add(:elected_plans, "single plan must be the reference plan")
     end
 
-    if (plan_option_kind == "single_plan") && (elected_plan_ids.first != reference_plan_id)
-      self.errors.add(:elected_plans, "single plan must be the reference plan")
+    if (plan_option_kind == "single_carrier") && !(elected_plan_ids.include? reference_plan_id)
+      self.errors.add(:elected_plans, "not all from the same carrier as reference plan")
     end
 
-    # self.errors.add(:elected_plans, "not all of the same metal level as reference plan")
-    # self.errors.add(:elected_plans, "not all from the same carrier as reference plan")
-
+    if (plan_option_kind == "metal_level") && !(elected_plan_ids.include? reference_plan_id)
+      self.errors.add(:elected_plans, "not all of the same metal level as reference plan")
+    end
   end
 
+  def check_employer_contribution_for_employee
+    start_on = self.plan_year.try(:start_on)
+    return if start_on.try(:at_beginning_of_year) == start_on
 
+    if relationship_benefits.present? and relationship_benefits.find_by(relationship: "employee").try(:premium_pct) < 50
+      self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
+    end
+  end
 end

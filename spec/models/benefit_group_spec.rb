@@ -259,13 +259,13 @@ describe BenefitGroup, type: :model do
       end
     end
 
-    context "with no premium_pct_as_int" do
-      let(:params) {valid_params.except(:premium_pct_as_int)}
+    #context "with no premium_pct_as_int" do
+    #  let(:params) {valid_params.except(:premium_pct_as_int)}
 
-      it "should be invalid" do
-        expect(BenefitGroup.create(**params).errors[:premium_pct_as_int].any?).to be_truthy
-      end
-    end
+    #  it "should be invalid" do
+    #    expect(BenefitGroup.create(**params).errors[:premium_pct_as_int].any?).to be_truthy
+    #  end
+    #end
 
     context "with no relationship_benefits" do
       let(:params) {valid_params.except(:relationship_benefits)}
@@ -345,17 +345,35 @@ describe BenefitGroup, type: :model do
 
     context "and the 'metal level' option is offered" do
       context "and elected plans are not all of the same metal level as reference plan" do
+        let(:reference_plan_choice)   { FactoryGirl.build(:plan) }
+        let(:elected_plan_choice)     { FactoryGirl.build(:plan) }
         before do
           benefit_group.plan_option_kind = :metal_level
+          benefit_group.reference_plan = reference_plan_choice
+          benefit_group.elected_plans = [elected_plan_choice]
         end
 
-        it "should be invalid"
+        it "should be invalid" do
+          expect(benefit_group.valid?).to be_falsey
+          expect(benefit_group.errors[:elected_plans].any?).to be_truthy
+        end
       end
     end
 
     context "and the 'carrier plans' option is offered" do
+      let(:reference_plan_choice)   { FactoryGirl.build(:plan) }
+      let(:elected_plan_choice)     { FactoryGirl.build(:plan) }
+      before do
+        benefit_group.plan_option_kind = :single_carrier
+        benefit_group.reference_plan = reference_plan_choice
+        benefit_group.elected_plans = [elected_plan_choice]
+      end
+
       context "and the reference plan is not in the elected plan set" do
-        it "should be invalid"
+        it "should be invalid" do
+          expect(benefit_group.valid?).to be_falsey
+          expect(benefit_group.errors[:elected_plans].any?).to be_truthy
+        end
       end
 
       context "and elected plans are not all from the same carrier as reference plan" do
@@ -365,12 +383,53 @@ describe BenefitGroup, type: :model do
   end
 
   context "and relationship benefit values are specified" do
+    let(:play_year) { FactoryGirl.create(:plan_year) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
+
     context "and the employee contribution amount is less than minimum" do
       context "and the effective date is Jan 1" do
         it "should be valid"
       end
       context "and the effective date is not Jan 1" do
         it "should be invalid"
+      end
+    end
+
+    context "and employer contribution for employee" do
+      context "when the start_on of plan year is benginning of year" do
+        before do
+          benefit_group.plan_year.start_on = plan_year.start_on.at_beginning_of_year
+        end
+
+        it "should be valid when more than 50%" do
+          benefit_group.relationship_benefits.find_by(relationship: "employee").premium_pct = 60
+          expect(benefit_group.valid?).to be_truthy
+          expect(benefit_group.errors[:relationship_benefits].any?).to be_falsey
+        end
+
+        it "should be valid when less than 50%" do
+          benefit_group.relationship_benefits.find_by(relationship: "employee").premium_pct = 40
+          expect(benefit_group.valid?).to be_truthy
+          expect(benefit_group.errors[:relationship_benefits].any?).to be_falsey
+        end
+      end
+
+      context "when the start_on of plan year is not benginning of year" do
+        before do
+          benefit_group.plan_year.start_on = (plan_year.start_on.at_beginning_of_year + 15.days)
+        end
+
+        it "should be valid when more than 50%" do
+          benefit_group.relationship_benefits.find_by(relationship: "employee").premium_pct = 60
+          expect(benefit_group.valid?).to be_truthy
+          expect(benefit_group.errors[:relationship_benefits].any?).to be_falsey
+        end
+
+        it "should be invalid when less than 50%" do
+          benefit_group.relationship_benefits.find_by(relationship: "employee").premium_pct = 40
+          expect(benefit_group.valid?).to be_falsey
+          expect(benefit_group.errors[:relationship_benefits].any?).to be_truthy
+        end
       end
     end
   end
