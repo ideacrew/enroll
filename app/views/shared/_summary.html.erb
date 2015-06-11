@@ -12,7 +12,7 @@
       </ul>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12">
-      <h2>$00.00</h2>
+      <h2><%= number_to_currency(@plan.total_employee_cost) %></h2>
       <%= link_to("Select Plan", '#', {:class => "btn btn-primary"}) %>
     </div>
   </div>
