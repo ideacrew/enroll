@@ -39,3 +39,10 @@ $(function () {
 		});
 	}
 });
+
+
+$(function() {
+	$(document).on('click', '#btn-continue', function() {
+		$('#btn-search-employer').click();
+	});
+});

@@ -5239,3 +5239,96 @@ footer.footer-wrapper a {
 footer.footer-wrapper .container {
     vertical-align: middle;
 }
+
+/* Sidebar */
+.right-section h3 {
+    font-weight: 600;
+    color: #414141;
+}
+ul.progress-wrapper {
+    margin: 25px 0px;
+}
+ul.progress-wrapper li {
+    padding: 5px 0px;
+    list-style: none;
+    /*border-left: 2px solid #cacaca;*/
+    padding-left: 25px;
+}
+ul.progress-wrapper li a {
+    font-size: 16px;
+    font-weight: 200;
+}
+span.circle-progress {
+    border-radius: 50px;
+    background: #fff;
+    border: 2px solid #cacaca;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    left: 10px;
+    margin-top: 3px;
+}
+ul.progress-wrapper li.complete {
+    padding: 5px 0px;
+    list-style: none;
+    /*border-left: 2px solid #007bc4;*/
+    padding-left: 25px;
+    color: #007bc4;
+}
+ul.progress-wrapper li.complete span.circle-progress {
+    background-color: #007bc4;
+    border: none;
+    width: 14px;
+    left: 9px;
+    height: 14px;
+}
+ul.progress-wrapper li.active {
+    padding: 5px 0px;
+    list-style: none;
+    /*border-left: 2px solid #007bc4;*/
+    padding-left: 25px;
+    font-weight: bold;
+    color: #007bc4;
+}
+ul.progress-wrapper li.active span.circle-progress {
+    background-color: #ffffff;
+    border: 2px solid #007bc4;
+    width: 14px;
+    left: 9px;
+    height: 14px;
+}
+.vertical-line-progress {
+    background-color: #cacaca;
+    width: 2px;
+    height: 30px;
+    position: absolute;
+    z-index: -1;
+    left: 15px;
+    margin-top: 5px;
+}
+ul.progress-wrapper li.complete .vertical-line-progress {
+    background-color: #007bc4;
+}
+ul.progress-wrapper li.active .vertical-line-progress {
+    background-color: #cacaca;
+}
+ul.progress-wrapper li:last-child .vertical-line-progress {
+    display: none;
+}
+ul.list-right-section {
+    margin-top: 20px;
+}
+ul.list-right-section li {
+    float: left;
+    width: 100%;
+    list-style-type: none;
+    padding: 5px 0px;
+}
+ul.list-right-section li a {
+    text-decoration: none;
+    color: #858585;
+    font-weight: 600;
+}
+ul.list-right-section li a img {
+    padding-right: 6px;
+}

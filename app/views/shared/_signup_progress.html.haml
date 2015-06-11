@@ -1,0 +1,42 @@
+%h3 0% Complete
+%ul.list-unstyled.progress-wrapper.hidden-xs
+	%li.active
+		%span.circle-progress
+		.vertical-line-progress
+		Personal Info
+	%li
+		%span.circle-progress
+		.vertical-line-progress
+		Employer
+	%li
+		%span.circle-progress
+		.vertical-line-progress
+		Contact Info
+	%li
+		%span.circle-progress
+		.vertical-line-progress
+		Household
+	%li
+		%span.circle-progress
+		.vertical-line-progress
+		Plan Section
+	%li
+		%span.circle-progress
+		.vertical-line-progress
+		Review
+	%li>
+		%span.circle-progress
+		.vertical-line-progress
+		Complete
+
+%button.btn.btn-lg.btn-danger.btn-block#btn-continue{type: 'submit'}
+	CONTINUE
+%ul.list-unstyled.list-right-section
+	%li
+		%a{href: '#'}
+			= image_tag 'icons/list.png'
+			PREVIOUS
+	%li
+		%a{href: '#'}
+			= image_tag 'icons/list.png'
+			SAVE &amp; EXIT
