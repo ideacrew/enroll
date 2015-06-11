@@ -4,10 +4,10 @@ module Factories
 
     end
 
-    def build(employee_candidate, employee_family)
-      benefit_group = employee_family.active_benefit_group_assignment.benefit_group
-      hired_on = employee_family.census_employee.hired_on
-      employer = employee_family.employer_profile
+    def build(employee_candidate, census_employee)
+      benefit_group = census_employee.active_benefit_group_assignment.benefit_group
+      hired_on = census_employee.hired_on
+      employer = census_employee.employer_profile
       ::Forms::EmploymentRelationship.new({
         :employer_name => employer.dba,
         :first_name => employee_candidate.first_name,
@@ -16,15 +16,15 @@ module Factories
         :name_pfx => employee_candidate.name_pfx,
         :name_sfx => employee_candidate.name_sfx,
         :gender => employee_candidate.gender,
-        :employee_family_id => employee_family.id,
+        :census_employee_id => census_employee.id,
         :hired_on => hired_on,
         :eligible_for_coverage_on => benefit_group.effective_on_for(hired_on)
       })
     end
 
-    def self.build(employee_candidate, employee_families)
+    def self.build(employee_candidate, census_employee)
       factory = self.new
-      employee_families.map { |e_family| factory.build(employee_candidate, e_family) }
+      Array(census_employee).map { |c_employee| factory.build(employee_candidate, c_employee) }
     end
   end
 end

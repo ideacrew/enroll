@@ -187,7 +187,7 @@ class EmployerProfile
   end
 
   # Enrollable employees are active and unlinked
-  def linkable_employee_family_by_person(person)
+  def linkable_census_employee_by_person(person)
     return if employee_families.nil?
 
     employee_families.detect { |ef| (ef.census_employee.ssn == person.ssn) && (ef.census_employee.dob == person.dob) && (ef.is_linkable?) }
@@ -235,11 +235,13 @@ class EmployerProfile
       where(writing_agent_id: writing_agent._id) || []
     end
 
-    def find_census_families_by_person(person)
-      organizations = match_census_employees(person)
-      organizations.reduce([]) do |families, er|
-        families << er.employer_profile.employee_families.detect { |ef| ef.census_employee.ssn == person.ssn }
-      end
+    def find_census_employee_by_person(person)
+      return [] if person.ssn.blank? || person.dob.blank?
+      CensusEmployee.find_all_unlinked_by_identifying_information(person.ssn, person.dob)
+      # organizations = match_census_employees(person)
+      # organizations.reduce([]) do |families, er|
+      #   families << er.employer_profile.employee_families.detect { |ef| ef.census_employee.ssn == person.ssn }
+      # end
     end
 
     # Returns all EmployerProfiles where person is active on the employee_census

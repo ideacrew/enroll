@@ -15,13 +15,14 @@ class Consumer::EmployeeRolesController < ApplicationController
     @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person))
     @person = @employee_candidate
     if @employee_candidate.valid?
-      found_families = EmployerProfile.find_census_families_by_person(@employee_candidate)
-      if found_families.empty?
+      found_census_employee = EmployerProfile.find_census_employee_by_person(@employee_candidate)
+      binding.pry
+      if found_census_employee.empty?
         respond_to do |format|
           format.html { render 'no_match' }
         end
       else
-        @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_families)
+        @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employee)
         respond_to do |format|
           format.html { render 'match' }
         end
@@ -35,7 +36,7 @@ class Consumer::EmployeeRolesController < ApplicationController
 
   def create
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
-    @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(current_user, @employment_relationship.employee_family, @employment_relationship)
+    @employee_role, @census_employee = Factories::EnrollmentFactory.construct_employee_role(current_user, @employment_relationship.census_employee, @employment_relationship)
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     build_nested_models
     respond_to do |format|
@@ -46,6 +47,7 @@ class Consumer::EmployeeRolesController < ApplicationController
   def edit
     @employee_role = EmployeeRole.find(params.require(:id))
     @person = Forms::EmployeeRole.new(current_user.person, @employee_role)
+    # @person.addresses << 
     @family = @person.primary_family
     build_nested_models
   end

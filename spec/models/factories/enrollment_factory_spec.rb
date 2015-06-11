@@ -7,20 +7,16 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
 
   let(:employer_profile) { EmployerProfile.new }
 
-  let(:census_employee) { EmployerCensus::Employee.new({
-    :hired_on => hired_on,
-    :terminated_on => terminated_on
-  }) }
-
   let(:benefit_group_assignment) {
-    EmployerCensus::BenefitGroupAssignment.new({
+    BenefitGroupAssignment.new({
       :benefit_group_id => benefit_group_id,
       :start_on => Date.new(2015,1,1)
     })
   }
 
-  let(:census_family) { EmployerCensus::EmployeeFamily.new({
-      :census_employee => census_employee,
+  let(:census_employee) { CensusEmployee.new({
+      :hired_on => hired_on,
+      :employment_terminated_on => terminated_on,
       :employer_profile => employer_profile,
       :benefit_group_assignments => [benefit_group_assignment]
     })
@@ -33,16 +29,11 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
   describe "After performing the link" do
 
     before(:each) do
-      @linked_at = Time.now
-      Factories::EnrollmentFactory.link_employee_family(census_family, employee_role, @linked_at)
+      Factories::EnrollmentFactory.link_census_employee(census_employee, employee_role, employer_profile)
     end
 
     it "should set employee role id on the census_family" do
-      expect(census_family.employee_role_id).to eq employee_role.id
-    end
-
-    it "should set linked at on the census_family" do
-      expect(census_family.linked_at).to eq @linked_at.localtime
+      expect(census_employee.employee_role_id).to eq employee_role.id
     end
 
     it "should set employer profile id on the employee_role" do
@@ -54,7 +45,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     end
 
     it "should set census family id on the employee_role" do
-      expect(employee_role.census_family_id).to eq census_family.id
+      expect(employee_role.census_employee_id).to eq census_employee.id
     end
 
     it "should set hired on on the employee_role" do
@@ -69,9 +60,9 @@ end
 
 RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
   let(:employer_profile_without_family) {FactoryGirl.create(:employer_profile)}
-  let(:employee_family) {FactoryGirl.create(:employer_census_family)}
-  let(:employer_profile) {employee_family.employer_profile}
-  let(:census_employee) {employee_family.census_employee}
+  # let(:employee_family) {FactoryGirl.create(:employer_census_family)}
+  let(:employer_profile) {FactoryGirl.create(:employer_profile)}
+  let(:census_employee) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id)}
   let(:user) {FactoryGirl.create(:user)}
   let(:first_name) {census_employee.first_name}
   let(:last_name) {census_employee.last_name}
@@ -116,12 +107,61 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       EmployerProfile.find(employer_profile.id.to_s).employee_families
     end
 
+    # context "and no prior person exists" do
+    #   before do
+    #     @user = FactoryGirl.create(:user)
+    #     @employee_family = FactoryGirl.create(:employer_census_family_with_dependents)
+    #     employer_profile = @employee_family.employer_profile
+    #     census_employee = @employee_family.census_employee
+    #     valid_person_params = {
+    #       user: @user,
+    #       first_name: census_employee.first_name,
+    #       last_name: census_employee.last_name,
+    #     }
+    #     valid_employee_params = {
+    #       ssn: census_employee.ssn,
+    #       gender: census_employee.gender,
+    #       dob: census_employee.dob,
+    #       hired_on: census_employee.hired_on
+    #     }
+    #     valid_params = { employer_profile: employer_profile }.merge(
+    #       valid_person_params
+    #     ).merge(valid_employee_params)
+    #     params = valid_params
+    #     @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
+    #     @primary_applicant = @family.primary_applicant
+    #   end
+
+    #   it "should have a family" do
+    #     expect(@family).to be_a Family
+    #   end
+
+    #   it "should be the primary applicant" do
+    #     expect(@employee_role.person).to eq @primary_applicant.person
+    #   end
+
+    #   it "should have linked the family foobar" do
+    #     expect(@employee_family.linked_employee_role).to eq @employee_role
+    #   end
+
+    #   it "should have all family_members" do
+    #     expect(@family.family_members.count).to eq (@employee_family.census_dependents.count + 1)
+    #   end
+
+    #   it "should set a home email" do
+    #     email = @employee_role.person.emails.first
+    #     expect(email.address).to eq @user.email
+    #     expect(email.kind).to eq "home"
+    #   end
+    # end
+
     context "and no prior person exists" do
       before do
         @user = FactoryGirl.create(:user)
-        @employee_family = FactoryGirl.create(:employer_census_family_with_dependents)
-        employer_profile = @employee_family.employer_profile
-        census_employee = @employee_family.census_employee
+        # @employee_family = FactoryGirl.create(:employer_census_family_with_dependents)
+        bga = FactoryGirl.create(:benefit_group_assignment)
+        employer_profile = FactoryGirl.create(:employer_profile)
+        census_employee = FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, benefit_group_assignments: [bga])
         valid_person_params = {
           user: @user,
           first_name: census_employee.first_name,
@@ -261,7 +301,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
     context "when the employee already exists but is not linked" do
       let(:existing_person) {FactoryGirl.create(:person, valid_person_params)}
       let(:employee) {FactoryGirl.create(:employee_role, valid_employee_params.merge(person: existing_person, employer_profile: employer_profile))}
-      before {user;employee_family;employee}
+      before {user;census_employee;employee}
 
       context "with all required data" do
         let(:params) {valid_params}

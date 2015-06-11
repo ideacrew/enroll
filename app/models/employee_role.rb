@@ -109,7 +109,7 @@ class EmployeeRole
   end
 
   def effective_on
-    benefit_group.effective_on_for(census_employee.hired_on)
+    benefit_group.effective_on_for(new_census_employee.hired_on)
   end
 
   def is_active?
