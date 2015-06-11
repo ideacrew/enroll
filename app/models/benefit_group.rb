@@ -3,11 +3,11 @@ class BenefitGroup
   include Mongoid::Timestamps
 
   embedded_in :plan_year
-  Benefit = Struct.new(:relationship, :premium_pct, :employer_max_amt)
 
-  EFFECTIVE_ON_KINDS = ["date_of_hire", "first_of_month"]
+  PLAN_OPTION_KINDS = %w(single_plan single_carrier metal_level)
+  EFFECTIVE_ON_KINDS = %w(date_of_hire first_of_month)
   OFFSET_KINDS = [0, 30, 60]
-  TERMINATE_ON_KINDS = ["end_of_month"]
+  TERMINATE_ON_KINDS = %w(end_of_month)
   PERSONAL_RELATIONSHIP_KINDS = [
     :employee,
     :spouse,
@@ -24,6 +24,7 @@ class BenefitGroup
 
   field :effective_on_kind, type: String, default: "date_of_hire"
   field :terminate_on_kind, type: String, default: "end_of_month"
+  field :plan_option_kind, type: String, default: "single_plan"
 
   # Number of days following date of hire
   field :effective_on_offset, type: Integer, default: 0
@@ -33,7 +34,7 @@ class BenefitGroup
   field :reference_plan_id, type: BSON::ObjectId
 
   # Employer contribution amount as percentage of reference plan premium
-  field :premium_pct_as_int, type: Integer, default: Integer
+  field :premium_pct_as_int, type: Integer
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
   # Array of plan_ids
@@ -43,12 +44,16 @@ class BenefitGroup
 
   attr_accessor :plan_for_elected_plan, :metal_level_for_elected_plan, :carrier_for_elected_plan, :elected_plan_kind
 
-  # Array of census employee ids
-  # has_and_belongs_to_many :employee_families, class_name: "EmployeeFamily"
-  # field :employee_families, type: Array, default: []
+  #TODO add following attributes: :title, 
+  validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset, 
+                        :reference_plan_id, :plan_option_kind, :premium_pct_as_int, :elected_plan_ids
 
-  validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
-    :employer_max_amt_in_cents, :reference_plan_id
+  validates :plan_option_kind,
+    allow_blank: false,
+    inclusion: {
+      in: PLAN_OPTION_KINDS,
+      message: "%{value} is not a valid plan option kind"
+    }
 
   validates :effective_on_kind,
     allow_blank: false,
@@ -63,6 +68,13 @@ class BenefitGroup
       in: OFFSET_KINDS,
       message: "%{value} is not a valid effective date offset kind"
     }
+
+  validate :plan_integrity
+
+
+  def plan_option_kind=(new_plan_option_kind)
+    super new_plan_option_kind.to_s
+  end
 
   def reference_plan=(new_reference_plan)
     raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
@@ -80,21 +92,25 @@ class BenefitGroup
     @elected_plans ||= Plan.where(:id => {"$in" => elected_plan_ids}).to_a
   end
 
-  # belongs_to association (traverse the model)
-  def employee_families
-    ## Optimize -- this is ineffective for large data sets
-    plan_year.employer_profile.employee_families.reduce([]) do |list, ef|
-      list << ef if ef.active_benefit_group_assignment.benefit_group == self
-      list
+  def elected_plans=(new_plans)
+    if new_plans.is_a? Array
+      self.elected_plan_ids = new_plans.reduce([]) { |list, plan| list << plan._id }
+    else
+      self.elected_plan_ids << new_plans._id
     end
+    @elected_plans = new_plans
   end
 
-  def assignable_to?(family)
-    return !(family.terminated_on < start_on || family.hired_on > end_on)
+  def census_employees
+    CensusEmployee.find_all_by_benefit_group(self)
+  end
+
+  def assignable_to?(census_employee)
+    return !(census_employee.employment_terminated_on < start_on || census_employee.hired_on > end_on)
   end
 
   def assigned?
-    employee_families.any?
+    census_employees.any?
   end
 
   def effective_on_for(date_of_hire)
@@ -190,4 +206,23 @@ class BenefitGroup
   # may be applied toward and other offered plan
   # never pay more than premium per person
   # extra may not be applied toward other members
+
+private
+
+  def plan_integrity
+
+    if (plan_option_kind == "single_plan") && (elected_plan_ids.first != reference_plan_id)
+      self.errors.add(:elected_plans, "single plan must be the reference plan")
+    end
+
+    if (plan_option_kind == "single_plan") && (elected_plan_ids.first != reference_plan_id)
+      self.errors.add(:elected_plans, "single plan must be the reference plan")
+    end
+
+    # self.errors.add(:elected_plans, "not all of the same metal level as reference plan")
+    # self.errors.add(:elected_plans, "not all from the same carrier as reference plan")
+
+  end
+
+
 end

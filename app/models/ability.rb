@@ -8,24 +8,43 @@ class Ability
 
     alias_action :update, :destroy, :to => :modify
 
+    cannot :update, EmployerCensus::Employee do |employee|
+      employee.dob_changed? or employee.ssn_changed?
+    end
+
     if user.has_role? :employer_staff
       can :read, :all
-    elsif user.has_role? :employee
+      can :update, EmployerCensus::Employee do |employee|
+        if employee.is_linkable?
+          true
+        else
+          !(employee.dob_changed? or employee.ssn_changed?)
+        end
+      end
+    end
+    if user.has_role? :employee
       can :read, :all
-    elsif user.has_role? :broker
+    end
+    if user.has_role? :broker
       can :read, :all
-    elsif user.has_role? :consumer
+    end
+    if user.has_role? :consumer
       can :read, :all
-    elsif user.has_role? :resident
+    end
+    if user.has_role? :resident
       can :read, :all
-    elsif user.has_role? :hbx_staff
+    end
+    if user.has_role? :hbx_staff
       can :read, :all
       can :edit_plan_year, PlanYear do |py|
         editable_plan_year?(py)
       end
-    elsif user.has_role? :system_service
+      can :update, EmployerCensus::Employee
+    end
+    if user.has_role? :system_service
       can :read, :all
-    elsif user.has_role? :web_service
+    end
+    if user.has_role? :web_service
       can :read, :all
     end
 
