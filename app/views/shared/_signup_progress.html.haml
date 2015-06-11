@@ -1,10 +1,12 @@
+- step = (defined? step) ? step.to_i : 1
+
 %h3 0% Complete
 %ul.list-unstyled.progress-wrapper.hidden-xs
-	%li.active
+	%li{class: add_progress_class(1, step)}
 		%span.circle-progress
 		.vertical-line-progress
 		Personal Info
-	%li
+	%li{class: add_progress_class(2, step)}
 		%span.circle-progress
 		.vertical-line-progress
 		Employer
