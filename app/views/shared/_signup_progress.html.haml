@@ -1,6 +1,9 @@
 - step = (defined? step) ? step.to_i : 1
 
-%h3 0% Complete
+- percent_complete = 0
+- percent_complete = (step == 2) ? 15 : ((step == 3) ? 30 : ((step == 4) ? 45 : ((step == 5) ? 60 : ((step == 6) ? 75 : ((step == 7) ? 90 : 0)))))
+
+%h3= "#{percent_complete}% Complete"
 %ul.list-unstyled.progress-wrapper.hidden-xs
 	%li{class: add_progress_class(1, step)}
 		%span.circle-progress

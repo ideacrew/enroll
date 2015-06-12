@@ -9,11 +9,10 @@
 <%= render 'shared/address_fields', f: f %><br>
 <%= render 'shared/phone_fields', f: f %><br>
 
-<div id="email_info" class="focus_effect personal-info-row">
+<div id="email_info" class="row row-form-wrapper no-buffer">
   <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
     <%= render 'shared/email_fields', f: email %>
   <% end %>
-  <div class="col-md-10 col-sm-10"><div id="email_error"></div></div>
 </div>
 
 <button type="submit" class="btn btn-primary hidden" id="btn_user_contact_info"><i class="fa fa-user-plus"></i> Continue</button>
