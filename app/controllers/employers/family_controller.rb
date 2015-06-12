@@ -13,7 +13,10 @@ class Employers::FamilyController < ApplicationController
     @family = EmployerCensus::EmployeeFamily.new
     @family.attributes = census_family_params
 
-    if benefit_group_id.present?
+    if Person.where(ssn: census_family_params[:census_employee_attributes][:ssn].gsub('-','')).present?
+      flash[:error] = "The provided SSN belongs to another person."
+      render action: "new"
+    elsif benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
       new_benefit_group_assignment = EmployerCensus::BenefitGroupAssignment.new_from_group_and_roster_family(benefit_group, @family)
       @family.benefit_group_assignments = new_benefit_group_assignment.to_a
