@@ -78,64 +78,31 @@ $(document).ready(function () {
   });
   
   // personal-info-row focus fields
-  $(document).on('click', '.focus_effect', function() {
-    update_info_row($(this), 'focus_in');
+  $("input.form-control").focusin(function() {
+    $(this).parents(".row-form-wrapper").addClass("active");
+    $(this).prev().addClass("active");
   });
 
-  $(document).on('focusin', '.focus_effect input', function() {
-    update_info_row($(this).closest('.focus_effect'), 'focus_in');
+  $("input.form-control").focusout(function() {
+      $(this).parents(".row-form-wrapper").removeClass("active");
+      $(this).prev().removeClass("active");
+      $("img.arrow_active").remove();
   });
 
-  $(document).on('blur', '.focus_effect', function() {
-    update_info_row($(this), 'focus_out');
-  });
 
-  function update_info_row(element, evt) {
+  // $(".adderess-select-box").focusin(function() {
+  //   $(".bg-color").css({
+  //     "background-color": "rgba(220, 234, 241, 1)",
+  //     "height": "46px",
+  //   });
+  // });
 
-    var check = check_info_exists($(element).attr('id'));
-    if( (evt == 'focus_in') || (check.length == 0 && evt == 'focus_out') ) {
-
-      switch_row_class();
-
-      // $(element).addClass('personal-info-top-row');
-      // $(element).removeClass('personal-info-row');
-      // $(element).css("opacity","1");
-    }
-    else {
-      switch_row_class();
-      // $(element).css("opacity","0.5");
-    }
-  }
-
-  function check_info_exists(id) {
-    var check = $('#' + id + ' input.required').filter(function() { return this.value == ""; });
-    return check;
-  }
-
-  function switch_row_class() {
-    // Remove personal-info-top-row from all focus_effect's whose info doesnot exists
-    $('.focus_effect').each(function() {
-      check = check_info_exists($(this).attr('id'));
-      if(check.length != 0) {
-        // $(this).removeClass('personal-info-top-row');
-        // $(this).addClass('personal-info-row');
-      }
-    });
-  }
-
-  $(".adderess-select-box").focusin(function() {
-    $(".bg-color").css({
-      "background-color": "rgba(220, 234, 241, 1)",
-      "height": "46px",
-    });
-  });
-
-  $(".adderess-select-box").focusout(function() {
-    $(".bg-color").css({
-      "background-color": "rgba(255, 255, 255, 1)",
-      "height": "46px",
-    });
-  });
+  // $(".adderess-select-box").focusout(function() {
+  //   $(".bg-color").css({
+  //     "background-color": "rgba(255, 255, 255, 1)",
+  //     "height": "46px",
+  //   });
+  // });
 
   // Employer Registration
   $('.employer_step2').click(function() {

@@ -1,11 +1,10 @@
 <h3>Personal Information</h3>
 
 <div class="row no-buffer">
-  <div id="personal_info" class="focus_effect personal-info-row">
-    <div class="col-md-12 no-pd col-sm-12 col-xs-12 first">
+  <div id="personal_info" class="focus_effect">
       <%= hidden_field "people","id" %>
 
-      <div class="row top-row">
+      <div class="row row-form-wrapper">
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
           <%= f.text_field :first_name, class: "required floatlabel form-control", required: true, placeholder: 'FIRST NAME' %>
         </div>
@@ -20,7 +19,7 @@
         </div>
       </div>
 
-      <div class="row bottom-row form-group form-group-lg no-pd">
+      <div class="row row-form-wrapper">
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
           <%= f.text_field :date_of_birth, start_year: Date.today.year - 110, end_year: Date.today.year, placeholder: "BIRTHDATE",
             class: "required date-picker dob-picker floatlabel form-control", required: true %>
@@ -46,7 +45,5 @@
         </div>
       </div>
 
-      <div class="overlay-in"></div>
-    </div>
   </div>
 </div>

@@ -1153,15 +1153,7 @@ input.floatlabe{
   transition: border-color 0.3s ease-in-out 0s, box-shadow 0.3s ease-in-out 0s, background 0.3s ease-in-out 0s !important;
   box-shadow: none;
 }
-.personal-info-row .border-bottom-none {
-  border-bottom: none !important;
-}
-.personal-info-row .border-right-none {
-  border-right: none !important;
-}
-.personal-info-row .border-left-none {
-  border-left: none !important;
-}
+
 .row.check {
   width: 100.1%;
 }
@@ -1225,11 +1217,6 @@ input.floatlabe{
   padding-top: 20px !important;
 }
 
-.personal-info-row input[type="text"], .personal-info-row input[type="email"] {
-  font-size: 14px;
-  color: #616161;
-  padding-bottom: 7px; 
-}
 #overlay {
   z-index: 999;
   position: absolute;
@@ -1256,9 +1243,6 @@ div#house_info > p {
   -ms-transition: border-color 0.3s ease-in-out 0s !important;
 }
 
-.personal-info-row .top-row, .personal-info-row .middle-row {
-  border-bottom: 1px solid #e3e3e3; 
-}
 .bg-color {
   transition: background-color 0.3s ease-in-out 0s !important;
 }
@@ -5234,4 +5218,27 @@ ul.list-right-section li a {
 }
 ul.list-right-section li a img {
     padding-right: 6px;
+}
+
+/* Form Elements */
+.row-form-wrapper {border: 1px solid #b7b7b7;border-bottom: none;padding: 3px; background-color: #fff; transition: all 0.2s ease-in-out 0s;}
+.row-form-wrapper:last-child {border-bottom: 1px solid #b7b7b7;}
+.row-form-wrapper .form-group {
+  margin-bottom: 0;
+}
+.row-form-wrapper.active {
+  box-shadow: 0px 0px 0px 3px #007bc4 inset;
+  z-index: 1;
+  position: relative;
+}
+.row-form-wrapper.active::before {
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid #007bc4;
+    border-top: 8px solid transparent;
+    content: "";
+    height: 0;
+    position: absolute;
+    right: -15px;
+    top: 15px;
+    width: 0;
 }
