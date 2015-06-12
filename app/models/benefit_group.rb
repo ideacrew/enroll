@@ -42,7 +42,7 @@ class BenefitGroup
 
   delegate :start_on, :end_on, to: :plan_year
 
-  attr_accessor :plan_for_elected_plan, :metal_level_for_elected_plan, :carrier_for_elected_plan
+  attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
 
   #TODO add following attributes: :title, 
   validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset, 
@@ -235,7 +235,7 @@ private
     start_on = self.plan_year.try(:start_on)
     return if start_on.try(:at_beginning_of_year) == start_on
 
-    if relationship_benefits.present? and relationship_benefits.find_by(relationship: "employee").try(:premium_pct) < HbxProfile::ShopEmployerContributionPercentMinimum
+    if relationship_benefits.present? and (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < HbxProfile::ShopEmployerContributionPercentMinimum
       self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
     end
   end
