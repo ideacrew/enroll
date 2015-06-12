@@ -88,13 +88,6 @@ Rails.application.routes.draw do
         get :benefit_group, on: :member
         patch :assignment_benefit_group, on: :member
       end
-      resources :family do
-        get 'delink'
-        get 'terminate'
-        get 'rehire'
-        get 'benefit_group', on: :member
-        patch 'assignment_benefit_group', on: :member
-      end
     end
   end
 
