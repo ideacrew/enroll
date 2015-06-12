@@ -1,6 +1,6 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
-  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire]
+  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :assignment_benefit_group ]
   before_action :check_plan_year, only: [:new]
 
   def new
@@ -9,8 +9,7 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def create
     @census_employee = CensusEmployee.new
-    params.permit!
-    @census_employee.attributes = params[:census_employee]
+    @census_employee.attributes = census_employee_params
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
       new_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(benefit_group, @census_employee)
@@ -35,7 +34,6 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def update
-    params.permit!
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
       new_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(benefit_group, @census_employee)
@@ -43,7 +41,9 @@ class Employers::CensusEmployeesController < ApplicationController
         @census_employee.add_benefit_group_assignment(new_benefit_group_assignment)
       end
 
-      if @census_employee.update_attributes(params[:census_employee])
+      @census_employee.attributes = census_employee_params
+      # authorize! :update, @census_employee
+      if @census_employee.save
         flash[:notice] = "Census Employee is successfully updated."
         redirect_to employers_employer_profile_path(@employer_profile)
       else
@@ -56,7 +56,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def terminate
-    termination_date = params.require(:termination_date)
+    termination_date = params["termination_date"]
     if termination_date.present?
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
     else
@@ -119,10 +119,40 @@ class Employers::CensusEmployeesController < ApplicationController
     redirect_to employers_employer_profile_path(@employer_profile)
   end
 
+  def benefit_group
+    @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
+  end
+
+  def assignment_benefit_group
+    benefit_group = @employer_profile.plan_years.first.benefit_groups.find_by(id: benefit_group_id)
+    new_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(benefit_group, @census_employee)
+
+    if @census_employee.active_benefit_group_assignment.try(:benefit_group_id) != new_benefit_group_assignment.benefit_group_id
+      @census_employee.add_benefit_group_assignment(new_benefit_group_assignment)
+    end
+
+    if @census_employee.save
+      flash[:notice] = "Assignment benefit group is successfully."
+      redirect_to employers_employer_profile_path(@employer_profile)
+    else
+      render action: "benefit_group"
+    end
+  end
+
   private
 
   def benefit_group_id
     params[:census_employee][:benefit_group_assignments_attributes]["0"][:benefit_group_id]
+  end
+
+  def census_employee_params
+    params.require(:census_employee).permit(:id, :employer_profile_id,
+        :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner,
+        :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
+      :census_dependents_attributes => [
+          :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy
+        ]
+      )
   end
 
   def find_employer
