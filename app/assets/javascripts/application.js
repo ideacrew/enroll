@@ -79,15 +79,15 @@ $(document).ready(function () {
   // });
   
   // personal-info-row focus fields
-  $("input.form-control").focusin(function() {
+  $(document).on('focusin', 'input.form-control', function() {
     $(this).parents(".row-form-wrapper").addClass("active");
     $(this).prev().addClass("active");
   });
 
-  $("input.form-control").focusout(function() {
-      $(this).parents(".row-form-wrapper").removeClass("active");
-      $(this).prev().removeClass("active");
-      $("img.arrow_active").remove();
+  $(document).on('focusout', 'input.form-control', function() {
+    $(this).parents(".row-form-wrapper").removeClass("active");
+    $(this).prev().removeClass("active");
+    $("img.arrow_active").remove();
   });
 
   // Progress Bar
