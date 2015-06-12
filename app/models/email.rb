@@ -6,7 +6,7 @@ class Email
 
   embedded_in :person
   embedded_in :office_location
-  embedded_in :employer_census_member, class_name: "EmployerCensus::Member"
+  embedded_in :census_member, class_name: "CensusMember"
 
   KINDS = %W(home work)
 

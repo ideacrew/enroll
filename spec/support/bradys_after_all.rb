@@ -127,7 +127,6 @@ module BradysAfterAll
                                                    employer_profile_id: @mikes_employer.id,
                                                    benefit_group_assignments: [@mikes_benefit_group_assignments]
                                                   )
-      # @mikes_census_family = FactoryGirl.create(:employer_census_family, employer_profile: mikes_employer, census_employee: mikes_census_employee)
       @carols_hired_on = 1.year.ago.beginning_of_year.to_date
       @carols_benefit_group = FactoryGirl.build(:benefit_group, plan_year: nil)
       @carols_plan_year = FactoryGirl.create(:plan_year, employer_profile: carols_employer, benefit_groups: [carols_benefit_group])
@@ -137,7 +136,6 @@ module BradysAfterAll
                                                     employer_profile_id: @carols_employer.id,
                                                     benefit_group_assignments: [@carols_benefit_group_assignments]
                                                    )
-      # @carols_census_family = FactoryGirl.create(:employer_census_family, employer_profile: carols_employer, census_employee: carols_census_employee)
       create_brady_employee_roles
     end
 

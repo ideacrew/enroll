@@ -109,7 +109,6 @@ class Person
   # Employee child model indexes
   index({"employee_roles._id" => 1})
   index({"employee_roles.employer_profile_id" => 1})
-  index({"employee_roles.census_family_id" => 1})
   index({"employee_roles.benefit_group_id" => 1})
   index({"employee_roles.is_active" => 1})
 

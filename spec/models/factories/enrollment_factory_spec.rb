@@ -32,7 +32,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
       Factories::EnrollmentFactory.link_census_employee(census_employee, employee_role, employer_profile)
     end
 
-    it "should set employee role id on the census_family" do
+    it "should set employee role id on the census employee" do
       expect(census_employee.employee_role_id).to eq employee_role.id
     end
 
@@ -60,7 +60,6 @@ end
 
 RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
   let(:employer_profile_without_family) {FactoryGirl.create(:employer_profile)}
-  # let(:employee_family) {FactoryGirl.create(:employer_census_family)}
   let(:employer_profile) {FactoryGirl.create(:employer_profile)}
   let(:census_employee) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id)}
   let(:user) {FactoryGirl.create(:user)}
