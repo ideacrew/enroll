@@ -76,6 +76,7 @@ spacely_benefit_group = spacely_plan_year.benefit_groups.build(
     effective_on_offset:  30,
     premium_pct_as_int:   80,
     employer_max_amt_in_cents:  1000_00,
+    elected_plan_ids: [spacely_plan._id],
     reference_plan: spacely_plan
   )
 
@@ -130,6 +131,7 @@ cogswell_benefit_group = cogswell_plan_year.benefit_groups.build(
     effective_on_offset:  30,
     premium_pct_as_int:   80,
     employer_max_amt_in_cents:  1000_00,
+    elected_plan_ids: [cogswell_plan._id],
     reference_plan: cogswell_plan
   )
 
@@ -201,6 +203,7 @@ org_1_benefit_group = org_1_plan_year.benefit_groups.build(
     effective_on_offset:  30,
     premium_pct_as_int:   80,
     employer_max_amt_in_cents:  500_00,
+    elected_plan_ids: [org_1_plan._id],
     reference_plan: org_1_plan
   )
 
@@ -270,6 +273,7 @@ org_2_benefit_group = org_2_plan_year.benefit_groups.build(
     effective_on_offset:  30,
     premium_pct_as_int:   70,
     employer_max_amt_in_cents:  500_00,
+    elected_plan_ids: [org_2_plan._id],
     reference_plan: org_2_plan
   )
 

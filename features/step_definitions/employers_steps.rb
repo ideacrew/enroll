@@ -347,7 +347,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.h4(text: /start on must be first day of the month/).wait_until_present
   expect(@browser.text.include?("start on must be first day of the month")).to be_truthy
   # happy path
-  begin_date = (Date.current + 5.months).beginning_of_month
+  begin_date = (Date.current + 1.year).beginning_of_year
   @browser.text_field(class: "interaction-field-control-plan_year-start_on").set(begin_date)
   @browser.h3(text: /Plan Year/).click
   sleep(1)
@@ -363,7 +363,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   # Benefit Group
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
-  elected_field = @browser.div(class: /selectric-wrapper/, text: /ELECTED PLAN/)
+  elected_field = @browser.div(class: /selectric-wrapper/, text: /A single plan/)
   elected_field.click
   elected_field.li(text: /All plans from a given carrier/).click
   input_field = @browser.div(class: /selectric-wrapper/, text: /SELECT CARRIER/)

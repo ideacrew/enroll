@@ -289,7 +289,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
     before do
       allow(user).to receive(:has_employer_staff_role?).and_return(true)
-      allow(user).to receive(:roles).and_return(["employer"])
+      allow(user).to receive(:roles).and_return(["employer_staff"])
       allow(user).to receive(:person).and_return(person)
       allow(Organization).to receive(:find).and_return(organization)
       allow(organization).to receive(:employer_profile).and_return(employer_profile)
@@ -298,17 +298,37 @@ RSpec.describe Employers::EmployerProfilesController do
 
     it "should redirect" do
       allow(user).to receive(:save).and_return(true)
+      allow(person).to receive(:employer_staff_role).and_return(EmployerStaffRole.new)
       sign_in(user)
+      expect(Organization).to receive(:find)
+      expect(EmployerStaffRole).to receive(:create)
+      expect(user).to receive(:roles)
       put :update, id: organization.id
       expect(response).to be_redirect
     end
 
-    it "should render edit template" do
-      allow(user).to receive(:save).and_return(false)
-      sign_in(user)
-      put :update, id: organization.id
-      expect(response).to render_template("edit")
+    context "given current user is invalid" do
+      it "should render edit template" do
+        allow(user).to receive(:save).and_return(false)
+        sign_in(user)
+        put :update, id: organization.id
+        expect(response).to render_template("edit")
+      end
     end
+
+     context "given the company has an owner" do
+      it "should render edit template" do
+        allow(employer_profile).to receive(:owner).and_return(person)
+        allow(user).to receive(:save).and_return(true)
+        sign_in(user)
+        put :update, id: organization.id
+        expect(response).to render_template("edit")
+      end
+
+    end
+
+
+
   end
 
   #describe "DELETE destroy" do
