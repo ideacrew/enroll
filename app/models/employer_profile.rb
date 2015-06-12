@@ -231,7 +231,8 @@ class EmployerProfile
 
     def find_census_employee_by_person(person)
       return [] if person.ssn.blank? || person.dob.blank?
-      CensusEmployee.find_all_unlinked_by_identifying_information(person.ssn, person.dob)
+      ce = CensusEmployee.find_all_unlinked_by_identifying_information(person.ssn, person.dob)
+      ce
       # organizations = match_census_employees(person)
       # organizations.reduce([]) do |families, er|
       #   families << er.employer_profile.employee_families.detect { |ef| ef.census_employee.ssn == person.ssn }

@@ -35,7 +35,7 @@ class Consumer::EmployeeRolesController < ApplicationController
 
   def create
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
-    @employee_role, @census_employee = Factories::EnrollmentFactory.construct_employee_role(current_user, @employment_relationship.census_employee, @employment_relationship)
+    @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(current_user, @employment_relationship.census_employee, @employment_relationship)
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     build_nested_models
     respond_to do |format|

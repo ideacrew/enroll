@@ -9,10 +9,9 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     let(:benefit_group) { double }
     let(:census_employee) { double(:hired_on => "whatever" ) }
     let(:employer_profile) { double }
-    let(:census_family) { double(:census_employee => census_employee) }
     let(:effective_date) { double }
     let(:person_id) { "5234234" }
-    let(:employee_role) { double(:id => employee_role_id, :employer_profile => employer_profile, :benefit_group => benefit_group, :census_family => census_family) }
+    let(:employee_role) { double(:id => employee_role_id, :employer_profile => employer_profile, :benefit_group => benefit_group, :census_employee => census_employee) }
     let(:person) { Person.new }
     let(:role_form) {
       Forms::EmployeeRole.new(person, employee_role)
@@ -53,13 +52,13 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     let(:family) { double }
     let(:benefit_group) { instance_double("BenefitGroup") }
     let(:employer_profile) { double }
-    let(:census_employee) { instance_double("EmployerCensus::Employee", :hired_on => hired_on ) }
-    let(:census_family) { instance_double("EmployerCensus::EmployeeFamily", :census_employee => census_employee, :employer_profile => employer_profile) }
-    let(:employee_role) { instance_double("EmployeeRole", :benefit_group => benefit_group, :census_family => census_family, :person => person, :id => "212342345") }
+    let(:census_employee) { instance_double("CensusEmployee", :hired_on => hired_on ) }
+    # let(:census_family) { instance_double("EmployerCensus::EmployeeFamily", :census_employee => census_employee, :employer_profile => employer_profile) }
+    let(:employee_role) { instance_double("EmployeeRole", :benefit_group => benefit_group, :census_employee => census_employee, :person => person, :id => "212342345") }
     let(:effective_date) { double }
     let(:employment_relationship) {
       instance_double("Forms::EmploymentRelationship", {
-             :employee_family => census_family
+             :census_employee => census_employee
       } )
     }
     let(:employment_relationship_properties) { { :skllkjasdfjksd => "a3r123rvf" } }
@@ -67,7 +66,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
 
     before :each do
       allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
-      allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_family, employment_relationship).and_return([employee_role, family])
+      allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_employee, employment_relationship).and_return([employee_role, family])
       allow(benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
       sign_in(user)
       post :create, :employment_relationship => employment_relationship_properties
@@ -104,7 +103,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     before(:each) do
       sign_in(user)
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
-      allow(EmployerProfile).to receive(:find_census_families_by_person).with(mock_employee_candidate).and_return(found_families)
+      allow(EmployerProfile).to receive(:find_census_employee_by_person).with(mock_employee_candidate).and_return(found_families)
       allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, found_families).and_return(employment_relationships)
       get :match, :person => person_parameters
     end

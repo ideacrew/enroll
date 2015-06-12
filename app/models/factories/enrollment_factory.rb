@@ -121,14 +121,14 @@ module Factories
     def self.build_employee_role(person, person_new, employer_profile, census_employee, hired_on)
       role = find_or_build_employee_role(person, employer_profile, census_employee, hired_on)
       self.link_census_employee(census_employee, role, employer_profile)
-      census_employee, primary_applicant = self.initialize_family(person, census_employee.census_dependents)
-      saved = save_all_or_delete_new(census_employee, primary_applicant, role)
+      family, primary_applicant = self.initialize_family(person, census_employee.census_dependents)
+      saved = save_all_or_delete_new(family, primary_applicant, role)
       if saved
         census_employee.save
       elsif person_new
         person.delete
       end
-      return role, census_employee
+      return role, family
     end
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,

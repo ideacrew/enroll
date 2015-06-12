@@ -91,9 +91,11 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
   end
 
   context "an employer profile exists with an employee and depenedents in the census" do
-    let!(:employee_family) {FactoryGirl.create(:employer_census_family_with_dependents)}
-    let(:employer_profile) {employee_family.employer_profile}
-    let(:census_employee) {employee_family.census_employee}
+    let(:census_dependent){FactoryGirl.build(:census_dependent)}
+    let(:benefit_group_assignment){FactoryGirl.build(:benefit_group_assignment)}
+    let(:census_employee) {FactoryGirl.create(:census_employee, employer_profile_id: "7898",
+      census_dependents: [census_dependent],
+      benefit_group_assignments: [benefit_group_assignment])}
     let(:user) {FactoryGirl.create(:user)}
     let(:first_name) {census_employee.first_name}
     let(:last_name) {census_employee.last_name}
@@ -103,65 +105,11 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
     let(:hired_on) {census_employee.hired_on}
     let(:primary_applicant) {@family.primary_applicant}
     let(:params) {valid_params}
-    let(:employer_census_families) do
-      EmployerProfile.find(employer_profile.id.to_s).employee_families
-    end
-
-    # context "and no prior person exists" do
-    #   before do
-    #     @user = FactoryGirl.create(:user)
-    #     @employee_family = FactoryGirl.create(:employer_census_family_with_dependents)
-    #     employer_profile = @employee_family.employer_profile
-    #     census_employee = @employee_family.census_employee
-    #     valid_person_params = {
-    #       user: @user,
-    #       first_name: census_employee.first_name,
-    #       last_name: census_employee.last_name,
-    #     }
-    #     valid_employee_params = {
-    #       ssn: census_employee.ssn,
-    #       gender: census_employee.gender,
-    #       dob: census_employee.dob,
-    #       hired_on: census_employee.hired_on
-    #     }
-    #     valid_params = { employer_profile: employer_profile }.merge(
-    #       valid_person_params
-    #     ).merge(valid_employee_params)
-    #     params = valid_params
-    #     @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
-    #     @primary_applicant = @family.primary_applicant
-    #   end
-
-    #   it "should have a family" do
-    #     expect(@family).to be_a Family
-    #   end
-
-    #   it "should be the primary applicant" do
-    #     expect(@employee_role.person).to eq @primary_applicant.person
-    #   end
-
-    #   it "should have linked the family foobar" do
-    #     expect(@employee_family.linked_employee_role).to eq @employee_role
-    #   end
-
-    #   it "should have all family_members" do
-    #     expect(@family.family_members.count).to eq (@employee_family.census_dependents.count + 1)
-    #   end
-
-    #   it "should set a home email" do
-    #     email = @employee_role.person.emails.first
-    #     expect(email.address).to eq @user.email
-    #     expect(email.kind).to eq "home"
-    #   end
-    # end
 
     context "and no prior person exists" do
       before do
         @user = FactoryGirl.create(:user)
-        # @employee_family = FactoryGirl.create(:employer_census_family_with_dependents)
-        bga = FactoryGirl.create(:benefit_group_assignment)
         employer_profile = FactoryGirl.create(:employer_profile)
-        census_employee = FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, benefit_group_assignments: [bga])
         valid_person_params = {
           user: @user,
           first_name: census_employee.first_name,
@@ -190,11 +138,11 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       end
 
       it "should have linked the family foobar" do
-        expect(@employee_family.linked_employee_role).to eq @employee_role
+        expect(census_employee.employee_role).to eq @employee_role
       end
 
       it "should have all family_members" do
-        expect(@family.family_members.count).to eq (@employee_family.census_dependents.count + 1)
+        expect(@family.family_members.count).to eq (census_employee.census_dependents.count + 1)
       end
 
       it "should set a home email" do
@@ -208,9 +156,11 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
 
       before do
         @user = FactoryGirl.create(:user)
-        employee_family = FactoryGirl.create(:employer_census_family_with_dependents)
-        employer_profile = employee_family.employer_profile
-        census_employee = employee_family.census_employee
+        census_dependent = FactoryGirl.build(:census_dependent)
+        benefit_group_assignment = FactoryGirl.build(:benefit_group_assignment)
+        census_employee = FactoryGirl.create(:census_employee, employer_profile_id: "7898",
+          census_dependents: [census_dependent],
+          benefit_group_assignments: [benefit_group_assignment])
         valid_person_params = {
           user: @user,
           first_name: census_employee.first_name,
@@ -243,12 +193,14 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       end
     end
 
-    context "and another employer profile exists with the same employee and dependents in the census" do
+    context "and another employer profile exists with the same employee and dependents in the census"  do
       before do
         @user = FactoryGirl.create(:user)
-        employee_family = FactoryGirl.create(:employer_census_family_with_dependents)
-        employer_profile = employee_family.employer_profile
-        census_employee = employee_family.census_employee
+        census_dependent = FactoryGirl.build(:census_dependent)
+        benefit_group_assignment = FactoryGirl.build(:benefit_group_assignment)
+        census_employee = FactoryGirl.create(:census_employee, employer_profile_id: "7898",
+                                              census_dependents: [census_dependent],
+                                              benefit_group_assignments: [benefit_group_assignment])
         valid_person_params = {
           user: @user,
           first_name: census_employee.first_name,
@@ -264,13 +216,12 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
         valid_params = { employer_profile: employer_profile }.merge(valid_person_params).merge(valid_employee_params)
         @first_employee_role, @first_family = Factories::EnrollmentFactory.add_employee_role(**valid_params)
 
-        dependents = employee_family.census_dependents.collect(&:dup)
+        dependents = census_employee.census_dependents.collect(&:dup)
         employee = census_employee.dup
-        second_employee_family = FactoryGirl.create(:employer_census_family, census_employee: employee, census_dependents: dependents)
-        second_employer_profile = second_employee_family.employer_profile
-        second_census_employee = second_employee_family.census_employee
+        second_employer_profile = FactoryGirl.create(:employer_profile)
+        second_census_employee = FactoryGirl.create(:census_employee, census_dependents: dependents, employer_profile_id: employer_profile.id)
         @second_params = { employer_profile: second_employer_profile }.merge(valid_person_params).merge(valid_employee_params)
-        @second_employee_role, @second_family = Factories::EnrollmentFactory.add_employee_role(**@second_params)
+        @second_employee_role, @second_census_employee = Factories::EnrollmentFactory.add_employee_role(**@second_params)
       end
 
       it "should still have a findable person" do
@@ -284,7 +235,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       end
 
       it "second family should be saved" do
-        expect(@second_family.persisted?).to be
+        expect(@second_census_employee.persisted?).to be
       end
 
       it "second employee role should be valid" do
@@ -292,13 +243,18 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       end
 
       it "second family should be the first family" do
-        expect(@second_family).to eq @first_family
+        expect(@second_census_employee).to eq @first_family
       end
     end
   end
 
   describe ".add_employee_role" do
     context "when the employee already exists but is not linked" do
+      let(:census_dependent){FactoryGirl.build(:census_dependent)}
+      let(:benefit_group_assignment){FactoryGirl.build(:benefit_group_assignment)}
+      let(:census_employee) {FactoryGirl.create(:census_employee, employer_profile_id: "7898",
+        census_dependents: [census_dependent],
+        benefit_group_assignments: [benefit_group_assignment])}
       let(:existing_person) {FactoryGirl.create(:person, valid_person_params)}
       let(:employee) {FactoryGirl.create(:employee_role, valid_employee_params.merge(person: existing_person, employer_profile: employer_profile))}
       before {user;census_employee;employee}
@@ -328,112 +284,117 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       end
     end
 
-    context "with no arguments" do
-      let(:params) {{}}
+    context "census_employee params" do
+      let(:benefit_group_assignment){FactoryGirl.build(:benefit_group_assignment)}
+      let(:census_dependent){FactoryGirl.build(:census_dependent)}
+      let(:census_employee) {FactoryGirl.create(:census_employee, employer_profile_id: "7898",
+              census_dependents: [census_dependent],
+              benefit_group_assignments: [benefit_group_assignment])}
+      context "with no arguments" do
+        let(:params) {{}}
 
-      it "should raise" do
-        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'with no user' do
-      let(:params) {valid_params.except(:user)}
-
-      it 'should not raise' do
-        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
-      end
-    end
-
-    context 'with no employer_profile' do
-      let(:params) {valid_params.except(:employer_profile)}
-
-      it 'should raise' do
-        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'with no first_name' do
-      let(:params) {valid_params.except(:first_name)}
-
-      it 'should raise' do
-        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'with no last_name' do
-      let(:params) {valid_params.except(:last_name)}
-
-      it 'should raise' do
-        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'with no ssn' do
-      let(:params) {valid_params.except(:ssn)}
-
-      it 'should raise' do
-        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'with no gender' do
-      let(:params) {valid_params.except(:gender)}
-
-      it 'should raise' do
-        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'with no dob' do
-      let(:params) {valid_params.except(:dob)}
-
-      it 'should raise' do
-        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'with no hired_on' do
-      let(:params) {valid_params.except(:hired_on)}
-
-      it 'should raise' do
-        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
-      end
-    end
-
-    context "with all required data, but employer_profile has no families" do
-      let(:params) {valid_params.merge(employer_profile: employer_profile_without_family)}
-
-      it "should raise" do
-        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
-      end
-    end
-
-    context "with all required data" do
-      let(:params) {valid_params}
-
-      it "should not raise" do
-        expect{Factories::EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
-      end
-
-      context "successfully created" do
-        let(:primary_applicant) {@family.primary_applicant}
-        let(:employer_census_families) do
-          EmployerProfile.find(employer_profile.id.to_s).employee_families
+        it "should raise" do
+          expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
         end
-        before do
-          @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
+      end
+
+      context 'with no user' do
+        let(:params) {valid_params.except(:user)}
+
+        it 'should not raise' do
+          expect{Factories::EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
+        end
+      end
+
+      context 'with no employer_profile' do
+        let(:params) {valid_params.except(:employer_profile)}
+
+        it 'should raise' do
+          expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        end
+      end
+
+      context 'with no first_name' do
+        let(:params) {valid_params.except(:first_name)}
+
+        it 'should raise' do
+          expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        end
+      end
+
+      context 'with no last_name' do
+        let(:params) {valid_params.except(:last_name)}
+
+        it 'should raise' do
+          expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        end
+      end
+
+      context 'with no ssn' do
+        let(:params) {valid_params.except(:ssn)}
+
+        it 'should raise' do
+          expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        end
+      end
+
+      context 'with no gender' do
+        let(:params) {valid_params.except(:gender)}
+
+        it 'should raise' do
+          expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        end
+      end
+
+      context 'with no dob' do
+        let(:params) {valid_params.except(:dob)}
+
+        it 'should raise' do
+          expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        end
+      end
+
+      context 'with no hired_on' do
+        let(:params) {valid_params.except(:hired_on)}
+
+        it 'should raise' do
+          expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        end
+      end
+
+      context "with all required data, but employer_profile has no families" do
+        let(:params) {valid_params.merge(employer_profile: employer_profile_without_family)}
+
+        it "should raise" do
+          expect{Factories::EnrollmentFactory.add_employee_role(**params)}.to raise_error(ArgumentError)
+        end
+      end
+
+      context "with all required data" do
+        let(:params) {valid_params}
+
+        it "should not raise" do
+          expect{Factories::EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
         end
 
-        it "should have a family" do
-          expect(@family).to be_a Family
-        end
+        context "successfully created" do
+          let(:primary_applicant) {@family.primary_applicant}
 
-        it "should be the primary applicant" do
-          expect(@employee_role.person).to eq primary_applicant.person
-        end
+          before do
+            @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
+          end
 
-        it "should have linked the family" do
-          expect(employee_family.linked_employee_role).to eq @employee_role
+          it "should have a family" do
+            expect(@family).to be_a Family
+          end
+
+          it "should be the primary applicant" do
+            expect(@employee_role.person).to eq primary_applicant.person
+          end
+
+          it "should have linked the family" do
+            expect(census_employee.employee_role).to eq @employee_role
+          end
         end
       end
     end
