@@ -31,7 +31,7 @@ class EmployerProfile
   delegate :non_business_owner_enrollment_count, to: :enrolling_plan_year, allow_nil: true
   delegate :total_enrolled_count, to: :enrolling_plan_year, allow_nil: true
   delegate :enrollment_ratio, to: :enrolling_plan_year, allow_nil: true
-  delegate :is_enrollment_valid, to: :enrolling_plan_year, allow_nil: true
+  delegate :is_enrollment_valid?, to: :enrolling_plan_year, allow_nil: true
   delegate :enrollment_errors, to: :enrolling_plan_year, allow_nil: true
 
   embeds_one  :inbox, as: :recipient
@@ -239,6 +239,7 @@ class EmployerProfile
     plan_year.revert
   end
 
+
   def initialize_account
     self.build_employer_profile_account
   end
@@ -324,7 +325,7 @@ class EmployerProfile
     event :end_open_enrollment, :guards => [:event_date_valid?] do
       transitions from: :enrolling, to: :binder_pending,
         :guard => :enrollment_compliant?,
-        :after => :initialize_account
+        :after => :build_employer_profile_account
 
       transitions from: :enrolling, to: :canceled
     end
@@ -406,7 +407,8 @@ private
 
   # TODO add all enrollment rules
   def enrollment_compliant?
-    latest_plan_year.fte_count <= HbxProfile::ShopSmallMarketFteCountMaximum
+    (latest_plan_year.fte_count <= HbxProfile::ShopSmallMarketFteCountMaximum) &&
+    (is_enrollment_valid?)
   end
 
   def event_date_valid?
