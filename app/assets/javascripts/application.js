@@ -97,13 +97,13 @@ $(document).ready(function () {
 
       switch_row_class();
 
-      $(element).addClass('personal-info-top-row');
-      $(element).removeClass('personal-info-row');
-      $(element).css("opacity","1");
+      // $(element).addClass('personal-info-top-row');
+      // $(element).removeClass('personal-info-row');
+      // $(element).css("opacity","1");
     }
     else {
       switch_row_class();
-      $(element).css("opacity","0.5");
+      // $(element).css("opacity","0.5");
     }
   }
 
@@ -117,8 +117,8 @@ $(document).ready(function () {
     $('.focus_effect').each(function() {
       check = check_info_exists($(this).attr('id'));
       if(check.length != 0) {
-        $(this).removeClass('personal-info-top-row');
-        $(this).addClass('personal-info-row');
+        // $(this).removeClass('personal-info-top-row');
+        // $(this).addClass('personal-info-row');
       }
     });
   }
