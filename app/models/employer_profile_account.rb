@@ -25,23 +25,23 @@ class EmployerProfileAccount
   ## TODO -- reconcile the need for history via embeds_many with the state machine functionality
   aasm do
     # Initial open enrollment period closed, first premium payment not received/processed
-    state :binder_pending, initial: true  
+    state :binder_pending, initial: true
     state :binder_paid, :after_enter => :enroll_employer
 
     # Enrolled and premium payment up-to-date
-    state :current 
+    state :current
 
     # Premium payment 1-29 days past due
     state :overdue
 
     # Premium payment 30-60 days past due - send notices to employees
-    state :late
+    state :late, :after_enter => :late_notifications
 
-    # Premium payment 61-90 - transmit terms to carriers with retro date   
-    state :suspended,   :after_enter => :suspend_employer    
+    # Premium payment 61-90 - transmit terms to carriers with retro date
+    state :suspended,   :after_enter => :suspend_employer
 
     # Premium payment > 90 days past due (day 91) or Employer voluntarily terminates
-    state :terminated,  :after_enter => :terminate_employer  
+    state :terminated,  :after_enter => :terminate_employer
 
     # Coverage never took effect, either voluntarily withdrawal or not paying binder
     state :canceled,    :after_enter => :cancel_employer
@@ -64,8 +64,10 @@ class EmployerProfileAccount
 
     # Premium payment credit received and allocated to account
     event :advance_coverage_period do
-      transitions from: [:binder_paid, :current, :overdue, :late, :suspended], 
+      transitions from: [:binder_paid, :suspended],
                   to: :current, :after => [:persist_state, :reinstate_employer]
+      transitions from: [:current, :overdue, :late],
+                  to: :current, :after => [:persist_state]
     end
 
     # Premium payment reversed and account debited
@@ -98,6 +100,10 @@ class EmployerProfileAccount
   end
 
 private
+  def late_notifications
+    # TODO: implement this
+  end
+
   def notify_hbx
   end
 

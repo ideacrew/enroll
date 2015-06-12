@@ -42,7 +42,6 @@ RSpec.describe Employers::PlanYearsController do
          :reference_plan_id => "rp_id", 
          :effective_on_offset => "e_on_offset",                      
          :plan_option_kind => "single_plan",
-         :plan_for_elected_plan => '12312',
         :employer_max_amt_in_cents => "2232",
         :relationship_benefits_attributes => relationship_benefits_attributes
       } }
@@ -80,7 +79,7 @@ RSpec.describe Employers::PlanYearsController do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(benefit_group).to receive(:elected_plans=).and_return("test")
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
-      allow(benefit_group).to receive(:plan_for_elected_plan).and_return(FactoryGirl.create(:plan).id)
+      allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(plan_year).to receive(:save).and_return(save_result)
       post :create, :employer_profile_id => employer_profile_id, :plan_year => plan_year_request_params
     end

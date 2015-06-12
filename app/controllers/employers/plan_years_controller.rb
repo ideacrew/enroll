@@ -11,7 +11,7 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year.benefit_groups.each do |benefit_group|
       benefit_group.elected_plans = case benefit_group.plan_option_kind
                                     when "single_plan"
-                                      Plan.find_by(id: benefit_group.plan_for_elected_plan)
+                                      Plan.find_by(id: benefit_group.reference_plan_id)
                                     when "single_carrier"
                                       @plan_year.carrier_plans_for(benefit_group.carrier_for_elected_plan)
                                     when "metal_level"
@@ -46,7 +46,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_carriers_and_plans
-    @carriers = Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.blank? }
+    @carriers = Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
   end
 
   def build_plan_year
@@ -61,9 +61,8 @@ class Employers::PlanYearsController < ApplicationController
       :start_on, :end_on, :fte_count, :pte_count, :msp_count,
       :open_enrollment_start_on, :open_enrollment_end_on,
       :benefit_groups_attributes => [ :title, :reference_plan_id, :effective_on_offset,
-                                      :plan_option_kind, :carrier_for_elected_plan, 
-                                      :metal_level_for_elected_plan, :plan_for_elected_plan,
-                                      :employer_max_amt_in_cents, :_destroy,
+                                      :carrier_for_elected_plan, :metal_level_for_elected_plan,
+                                      :plan_option_kind, :employer_max_amt_in_cents, :_destroy,
                                       :relationship_benefits_attributes => [
                                         :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
                                       ]
