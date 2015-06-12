@@ -26,6 +26,7 @@ class HbxEnrollment
   field :writing_agent_id, type: BSON::ObjectId
   field :employee_role_id, type: BSON::ObjectId
   field :benefit_group_id, type: BSON::ObjectId
+  field :benefit_group_assignment_id, type: BSON::ObjectId
 
   field :submitted_at, type: DateTime
 
@@ -35,6 +36,7 @@ class HbxEnrollment
   field :is_active, type: Boolean, default: true
 
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
+  associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
 
 
@@ -52,6 +54,7 @@ class HbxEnrollment
 
   aasm do
     state :shopping, initial: true
+    state :coverage_selected
     state :enrollment_transmitted_to_carrier
     state :coverage_enrolled      # effectuated
 
@@ -61,10 +64,20 @@ class HbxEnrollment
     state :inactive   # :after_enter inform census_employee
 
     event :waive_coverage do
-      transitions from: :shopping, to: :inactive
+      transitions from: :shopping, to: :inactive, after: :propogate_waiver
     end
 
+    event :select_coverage do
+      transitions from: :shopping, to: :coverage_selected, after: :propogate_selection
+    end
+  end
 
+  def propogate_waiver
+    benefit_group_assignment.waive_coverage
+  end
+
+  def propogate_selection
+    benefit_group_assignment.select_coverage
   end
 
   def is_active?

@@ -102,6 +102,71 @@ class PlanYear
     warnings
   end
 
+  def eligible_to_enroll
+    benefit_group_ids = benefit_groups.collect(&:id)
+    CensusEmployee.by_benefit_group_ids(benefit_group_ids)
+  end
+
+  def eligible_to_enroll_count
+    # TODO: confirm this is a valid definition (check with Hannah)
+    eligible_to_enroll.count
+  end
+
+  def non_business_owner_enrolled
+    enrolled.non_business_owner
+  end
+
+  def non_business_owner_enrollment_count
+    non_business_owner_enrolled.count
+  end
+
+  def enrolled
+    eligible_to_enroll.enrolled
+  end
+
+  def total_enrolled_count
+    enrolled.count
+  end
+
+  def enrollment_ratio
+    # binding.pry
+    if eligible_to_enroll_count == 0
+      0
+    else
+      (total_enrolled_count / eligible_to_enroll_count)
+    end
+  end
+
+  def is_enrollment_valid?
+    enrollment_errors.blank? ? true : false
+  end
+
+  # Determine enrollment composition compliance with HBX-defined guards
+  def enrollment_errors
+    # binding.pry
+    errors = {}
+
+    # At least one employee must be enrollable.
+    if eligible_to_enroll_count == 0
+      errors.merge!(eligible_to_enroll_count: "at least 1 employee must be eligible to enroll")
+    end
+    
+    # At least one employee who isn't an owner or family member of owner must enroll
+    if non_business_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
+      errors.merge!(non_business_owner_enrollment_count: "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
+    end
+
+    # January 1 effective date exemption(s)
+    unless effective_date.yday == 1
+      # Verify ratio for minimum number of eligible employees that must enroll is met
+      if enrollment_ratio < HbxProfile::ShopEnrollmentParticipationRatioMinimum
+        errors.merge!(enrollment_ratio: "number of eligible participants enrolling (#{total_enrolled_count}) is less than minimum required #{eligible_to_enroll_count * HbxProfile::ShopEnrollmentParticipationRatioMinimum}")
+      end
+    end
+
+    errors
+  end
+
   class << self
     def find(id)
       organizations = Organization.where("employer_profile.plan_years._id" => BSON::ObjectId.from_string(id))
@@ -157,7 +222,7 @@ class PlanYear
       open_enrollment_start_on = [(start_on - 2.months), Date.current].min
       open_enrollment_end_on = open_enrollment_start_on + 10.days
 
-      {open_enrollment_start_on: open_enrollment_start_on, 
+      {open_enrollment_start_on: open_enrollment_start_on,
        open_enrollment_end_on: open_enrollment_end_on}
     end
 
@@ -177,6 +242,15 @@ class PlanYear
     state :publish_pending
 
     state :published,   :after_enter => :register_employer
+
+    # Published plan has entered open enrollment
+    state :enrolling
+
+    # Published plan has completed open enrollment but date is before start of plan year
+    state :enrolled
+
+    # Non-compliant for enrollment
+    state :canceled
 
     # Published plan year is in force
     state :active

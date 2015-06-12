@@ -39,6 +39,9 @@ class CensusEmployee < CensusMember
   index({"benefit_group_assignments.aasm_state" => 1})
 
   scope :active,  ->{ any_in(aasm_state: ["eligible", "employee_role_linked"]) }
+  scope :non_business_owner, ->{ where(is_business_owner: false) }
+  scope :by_benefit_group_ids, ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
+  scope :enrolled, ->{ any_in("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
 
   def initialize(*args)
     super(*args)
@@ -137,7 +140,7 @@ class CensusEmployee < CensusMember
       message << "Coverage status: #{bga_status}"
       message << ee_id
       Rails.logger.error { message }
-      raise CensusEmployeeError, message      
+      raise CensusEmployeeError, message
     end
 
     self.employment_terminated_on = terminated_on.to_date.end_of_day
@@ -215,4 +218,3 @@ private
 end
 
 class CensusEmployeeError < StandardError; end
-

@@ -26,6 +26,14 @@ class EmployerProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
+  # TODO: make these relative to enrolling plan year
+  delegate :eligible_to_enroll_count, to: :enrolling_plan_year, allow_nil: true
+  delegate :non_business_owner_enrollment_count, to: :enrolling_plan_year, allow_nil: true
+  delegate :total_enrolled_count, to: :enrolling_plan_year, allow_nil: true
+  delegate :enrollment_ratio, to: :enrolling_plan_year, allow_nil: true
+  delegate :is_enrollment_valid?, to: :enrolling_plan_year, allow_nil: true
+  delegate :enrollment_errors, to: :enrolling_plan_year, allow_nil: true
+
   embeds_one  :inbox, as: :recipient
   embeds_one  :employer_profile_account
   embeds_many :plan_years, cascade_callbacks: true, validate: true
@@ -44,6 +52,7 @@ class EmployerProfile
     allow_blank: false
 
   validate :writing_agent_employed_by_broker
+  validate :no_more_than_one_owner
 
   after_initialize :build_nested_models
   before_save :is_persistable?
@@ -104,40 +113,9 @@ class EmployerProfile
     plan_years.to_a.detect { |py| (py.start_date.beginning_of_day..py.end_date.end_of_day).cover?(target_date) }
   end
 
-  def eligible_to_enroll_count
-  end
-
-  def non_business_owner_enrollment_count
-  end
-
-  def total_enrolled_count
-  end
-
-  def enrollment_ratio
-    (total_enrolled_count / eligible_to_enroll_count) unless eligible_to_enroll_count == 0
-  end
-
-  def is_enrollment_valid?
-    enrollment_errors.blank? ? true : false
-  end
-
-  # Determine enrollment composition compliance with HBX-defined guards
-  def enrollment_errors
-    errors = {}
-    # At least one employee who isn't an owner or family member of owner must enroll
-    if non_business_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
-      errors.merge!(:non_business_owner_enrollment_count, "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
-    end
-
-    # January 1 effective date exemption(s)
-    unless effective_date.yday == 1
-      # Verify ratio for minimum number of eligible employees that must enroll is met
-      if enrollment_ratio < HbxProfile::ShopEnrollmentParticipationRatioMinimum
-        errors.merge!(:enrollment_ratio, "number of eligible participants enrolling (#{employees_total_enrolled_count}) is less than minimum required #{employees_eligible_to_enroll_count * ShopEnrollmentParticipationMinimum}")
-      end
-    end
-
-    errors
+  def enrolling_plan_year
+    # TODO: totally wrong, write real implementation
+    latest_plan_year
   end
 
   # belongs_to broker_agency_profile
@@ -262,6 +240,7 @@ class EmployerProfile
     plan_year.revert
   end
 
+
   def initialize_account
     self.build_employer_profile_account
   end
@@ -347,7 +326,7 @@ class EmployerProfile
     event :end_open_enrollment, :guards => [:event_date_valid?] do
       transitions from: :enrolling, to: :binder_pending,
         :guard => :enrollment_compliant?,
-        :after => :initialize_account
+        :after => :build_employer_profile_account
 
       transitions from: :enrolling, to: :canceled
     end
@@ -437,7 +416,8 @@ private
 
   # TODO add all enrollment rules
   def enrollment_compliant?
-    latest_plan_year.fte_count <= HbxProfile::ShopSmallMarketFteCountMaximum
+    (latest_plan_year.fte_count <= HbxProfile::ShopSmallMarketFteCountMaximum) &&
+    (is_enrollment_valid?)
   end
 
   def event_date_valid?
@@ -462,6 +442,13 @@ private
     end
   end
 
+  def no_more_than_one_owner
+    if owner.present? && owner.count > 1
+      errors.add(:owner, "must only have one owner")
+    end
+
+    true
+  end
   # Block changes unless record is in draft state
   def is_persistable?
     # aasm_state == :draft ? true : false
