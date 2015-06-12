@@ -37,12 +37,6 @@ class PlanYear
     self.employer_profile
   end
 
-  # embedded association: has_many :employee_families
-  def employee_families
-    return @employee_families if defined? @employee_families
-    @employee_families = parent.employee_families.where(:plan_year_id => self.id)
-  end
-
   alias_method :effective_date=, :start_on=
   alias_method :effective_date, :start_on
 

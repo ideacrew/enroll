@@ -30,12 +30,7 @@ class EmployerProfile
   embeds_one  :employer_profile_account
   embeds_many :plan_years, cascade_callbacks: true, validate: true
 
-  embeds_many :employee_families,
-    class_name: "EmployerCensus::EmployeeFamily",
-    cascade_callbacks: true,
-    validate: true
-
-  accepts_nested_attributes_for :plan_years, :employee_families, :inbox, :employer_profile_account
+  accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account
 
   validates_presence_of :entity_kind
 
@@ -164,12 +159,6 @@ class EmployerProfile
     @writing_agent = BrokerRole.find(@writing_agent_id) unless @writing_agent_id.blank?
   end
 
-  # TODO: Benchmark this for efficiency
-  def employee_families_sorted
-    return @employee_families_sorted if defined? @employee_families_sorted
-    @employee_families_sorted = employee_families.unscoped.order_by_last_name.order_by_first_name
-  end
-
   def census_employees
     return @census_employees if defined? @census_employees
     @census_employees = CensusEmployee.where(employer_profile_id: id)
@@ -178,13 +167,6 @@ class EmployerProfile
   def census_employees_sorted
     return @census_employees_sorted if defined? @census_employees_sorted
     @census_employees_sorted = census_employees.order_by_last_name.order_by_first_name
-  end
-
-  # Enrollable employees are active and unlinked
-  def linkable_census_employee_by_person(person)
-    return if employee_families.nil?
-
-    employee_families.detect { |ef| (ef.census_employee.ssn == person.ssn) && (ef.census_employee.dob == person.dob) && (ef.is_linkable?) }
   end
 
   def is_active?
@@ -231,12 +213,7 @@ class EmployerProfile
 
     def find_census_employee_by_person(person)
       return [] if person.ssn.blank? || person.dob.blank?
-      ce = CensusEmployee.find_all_unlinked_by_identifying_information(person.ssn, person.dob)
-      ce
-      # organizations = match_census_employees(person)
-      # organizations.reduce([]) do |families, er|
-      #   families << er.employer_profile.employee_families.detect { |ef| ef.census_employee.ssn == person.ssn }
-      # end
+      CensusEmployee.find_all_unlinked_by_identifying_information(person.ssn, person.dob)
     end
 
     # Returns all EmployerProfiles where person is active on the employee_census
