@@ -52,6 +52,7 @@ class EmployerProfile
     allow_blank: false
 
   validate :writing_agent_employed_by_broker
+  validate :no_more_than_one_owner
 
   after_initialize :build_nested_models
   before_save :is_persistable?
@@ -441,6 +442,13 @@ private
     end
   end
 
+  def no_more_than_one_owner
+    if owner.present? && owner.count > 1
+      errors.add(:owner, "must only have one owner")
+    end
+
+    true
+  end
   # Block changes unless record is in draft state
   def is_persistable?
     # aasm_state == :draft ? true : false

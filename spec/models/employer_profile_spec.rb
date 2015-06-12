@@ -65,6 +65,17 @@ describe EmployerProfile, dbclean: :after_each do
       end
     end
 
+    context "with more than one owner" do
+      def params; valid_params; end
+      let(:employer_profile) {EmployerProfile.new(**params)}
+
+      it "should have errors on owner" do
+        allow(employer_profile).to receive(:owner).and_return(["owner1","owner2"])
+        employer_profile.valid?
+        expect(employer_profile).to have_errors_on(:owner)
+      end
+    end
+
     context "with all valid arguments" do
       def params; valid_params; end
       def employer_profile; EmployerProfile.new(**params); end
