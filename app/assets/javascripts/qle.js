@@ -43,6 +43,9 @@ $(function () {
 
 $(function() {
 	$(document).on('click', '#btn-continue', function() {
-		$('#btn-search-employer').click();
+		if($('#btn-search-employer').length) $('#btn-search-employer').click();
+		else if($('#btn_user_contact_info').length) $('#btn_user_contact_info').click();
+		else if($('#btn_household_continue').length) window.location = $('#btn_household_continue').val();
+		else if($('#btn_select_plan_continue').length) $('#btn_select_plan_continue').click();
 	});
 });

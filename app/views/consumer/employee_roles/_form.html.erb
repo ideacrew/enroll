@@ -1,46 +1,19 @@
-<div class="row">
-  <div class="col-md-9 col-sm-9 col-xs-12">
-    <%= f.hidden_field :employee_role_id %>
+<%= f.hidden_field :employee_role_id %>
 
-  	<%= render "shared/error_messages", object: f.object %>
-  	<%= render 'shared/person/personal_information', f: f %>
+<%= render "shared/error_messages", object: f.object %>
+<%= render 'shared/person/personal_information', f: f %>
 
-	<div id="employer-info" class="row">
-          <%= render "employers" %>
-	</div>
+<div id="employer-info" class="row">
+  <%= render "employers" %>
+</div>
+<%= render 'shared/address_fields', f: f %><br>
+<%= render 'shared/phone_fields', f: f %><br>
 
-    <%= render 'shared/address_fields', f: f %><br>
-    <%= render 'shared/phone_fields', f: f %><br>
-  </div>
-  <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
-      <%= render 'shared/signup_progress' %>
-
-      <div class="row">
-        <div class="col-md-12">
-          <%= 
-            link_to '#', class: 'btn btn-primary disabled' do
-              '<i class="fa fa-chevron-left"></i> Back'.html_safe
-            end
-          %> &nbsp;
-          <button type="submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Continue</button>
-        </div>
-      </div><br>
-      <div class="row">
-        <div class="col-md-12">
-          <%= link_to '<i class="fa fa-user"></i> My Account'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %> &nbsp;
-          <%= link_to '<i class="fa fa-floppy-o"></i> Save & Exit'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %>
-        </div>
-      </div>
-  </div>
+<div id="email_info" class="focus_effect personal-info-row">
+  <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+    <%= render 'shared/email_fields', f: email %>
+  <% end %>
+  <div class="col-md-10 col-sm-10"><div id="email_error"></div></div>
 </div>
 
-<div class="row">
-  <div class="col-md-9 col-sm-9 col-xs-12">
-    <div id="email_info" class="focus_effect personal-info-row">
-      <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
-        <%= render 'shared/email_fields', f: email %>
-      <% end %>
-      <div class="col-md-10 col-sm-10"><div id="email_error"></div></div>
-    </div>
-  </div>
-</div>
+<button type="submit" class="btn btn-primary hidden" id="btn_user_contact_info"><i class="fa fa-user-plus"></i> Continue</button>
