@@ -1,26 +1,26 @@
 require "rails_helper"
 
 describe Forms::EmployeeCandidate do
-    before :each do
-      subject.valid?
-    end
+  before :each do
+    subject.valid?
+  end
 
-    it "should have error on dob" do
-      expect(subject).to have_errors_on(:date_of_birth)
-    end
+  it "should have error on dob" do
+    expect(subject).to have_errors_on(:date_of_birth)
+  end
 
-    it "should have errors on gender" do
-      expect(subject).to have_errors_on(:gender)
-    end
+  it "should have errors on gender" do
+    expect(subject).to have_errors_on(:gender)
+  end
 
-    it "should have errors on the missing names" do
-      expect(subject).to have_errors_on(:last_name)
-      expect(subject).to have_errors_on(:first_name)
-    end
+  it "should have errors on the missing names" do
+    expect(subject).to have_errors_on(:last_name)
+    expect(subject).to have_errors_on(:first_name)
+  end
 
-    it "should have errors on the ssn" do
-      expect(subject).to have_errors_on(:ssn)
-    end
+  it "should have errors on the ssn" do
+    expect(subject).to have_errors_on(:ssn)
+  end
 end
 
 describe Forms::EmployeeCandidate, "asked to match a census employee" do
@@ -106,7 +106,7 @@ describe Forms::EmployeeCandidate, "asked to match a person" do
     it "should have an error that the person is associted with another use" do
       allow(Person).to receive(:where).with(search_params).and_return(people)
       subject.valid?
-      expect(subject).to have_errors_on(:match)
+      expect(subject).to have_errors_on(:exception)
     end
   end
 end

@@ -108,7 +108,9 @@ class Employers::EmployerProfilesController < ApplicationController
     @employer_profile = @organization.employer_profile
     current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
     current_user.person.employer_contact = @employer_profile
-    if @organization.update_attributes(employer_profile_params) && current_user.save
+    if !@employer_profile.owner.present? && @organization.update_attributes(employer_profile_params) && current_user.save
+      current_user.person.employer_staff_role = EmployerStaffRole.create(person: current_user.person, employer_profile_id: @employer_profile.id, is_owner: true)
+      current_user.person.employer_staff_role.save
       flash[:notice] = 'Employer successfully created.'
       redirect_to employers_employer_profile_path(@employer_profile)
     else

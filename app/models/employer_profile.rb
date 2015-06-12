@@ -92,7 +92,7 @@ class EmployerProfile
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
   end
 
-  # Change plan years for a period - published -> retired and 
+  # Change plan years for a period - published -> retired and
   def close_plan_year
   end
 
@@ -262,9 +262,8 @@ class EmployerProfile
     plan_year.revert
   end
 
-
-  def build_employer_profile_account
-    # self.build_employer_profile_account
+  def initialize_account
+    self.build_employer_profile_account
   end
 
 
@@ -279,21 +278,21 @@ class EmployerProfile
 
   # Workflow for self service
   aasm do
-    state :applicant, initial: true 
+    state :applicant, initial: true
     state :ineligible               # Unable to enroll business per SHOP market regulations or business isn't DC-based
-    state :ineligible_appealing     # Plan year application submitted with 
+    state :ineligible_appealing     # Plan year application submitted with
     state :registered               # Business information complete submitted, before initial open enrollment period
     state :enrolling                # Employees registering and plan shopping
     state :enrolled_renewal_ready   # Annual renewal date is 90 days or less
-    state :enrolled_renewing        # 
+    state :enrolled_renewing        #
 
     state :binder_pending
     state :enrolled                 # Enrolled and premium payment up-to-date
     state :canceled                 # Coverage didn't take effect, as Employer either didn't complete enrollment or pay binder premium
-    state :suspended       # 
+    state :suspended       #
     state :terminated               # Premium payment > 90 days past due (day 91) or voluntarily terminate
 
-    # Enrollment deadline has passed for first of following month 
+    # Enrollment deadline has passed for first of following month
     event :advance_enrollment_date do
 
       # Plan Year application expired
@@ -303,9 +302,9 @@ class EmployerProfile
       transitions from: :registered, to: :enrolling
 
       # End open enrollment with success
-      transitions from: :enrolling, to: :binder_pending, 
+      transitions from: :enrolling, to: :binder_pending,
         :guard => :enrollment_compliant?,
-        :after => :build_employer_profile_account
+        :after => :initialize_account
 
       # End open enrollment with invalid enrollment
       transitions from: :enrolling, to: :canceled
@@ -316,7 +315,7 @@ class EmployerProfile
       transitions from: :terminated, to: :applicant
     end
 
-    event :publish_plan_year do 
+    event :publish_plan_year do
       # Jump straight to enrolling state if plan year application is valid and today is start of open enrollment
       transitions from: :applicant, to: :enrolling, :guards => [:plan_year_publishable?, :event_date_valid?]
       transitions from: :applicant, to: :registered, :guard => :plan_year_publishable?
@@ -337,7 +336,7 @@ class EmployerProfile
 
     event :revert do
       # Add guard -- only revert for first 30 days past submitted
-      transitions from: :ineligible_appealing, to: :applicant, 
+      transitions from: :ineligible_appealing, to: :applicant,
         :after_enter => :revert_plan_year
     end
 
@@ -346,9 +345,9 @@ class EmployerProfile
     end
 
     event :end_open_enrollment, :guards => [:event_date_valid?] do
-      transitions from: :enrolling, to: :binder_pending, 
+      transitions from: :enrolling, to: :binder_pending,
         :guard => :enrollment_compliant?,
-        :after => :build_employer_profile_account
+        :after => :initialize_account
 
       transitions from: :enrolling, to: :canceled
     end
@@ -399,6 +398,14 @@ class EmployerProfile
       py.open_enrollment_contains?(t_date) &&
         py.coverage_period_contains?(effective_date)
     end
+  end
+
+  def owner
+    staff.select{ |p| p.employer_staff_role.is_owner }
+  end
+
+  def staff
+    Person.all.select{ |p| p.employer_staff_role? && p.employer_staff_role.employer_profile_id == self.id}
   end
 
 private

@@ -135,7 +135,7 @@ $(document).on("change", "select.elected_plan", function() {
   $(target).find(".reference-plan-select .reference-plan-content").hide();
   
   switch($(this).val()){
-    case "carrier":
+    case "single_carrier":
       $(target).find(".carrier_for_elected_plan").show();
       $(target).find(".reference-plan-select .carrier-select").show()
       break;
@@ -143,7 +143,7 @@ $(document).on("change", "select.elected_plan", function() {
       $(target).find(".metal_level_for_elected_plan").show();
       $(target).find(".reference-plan-select .metal-level-select").show()
       break;
-    case "plan":
+    case "single_plan":
       $(target).find(".plan_for_elected_plan").show();
       $(target).find(".reference-plan-select .plan-select").show()
       break;

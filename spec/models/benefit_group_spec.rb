@@ -9,14 +9,11 @@ describe BenefitGroup, type: :model do
 end
 
 describe BenefitGroup, dbclean: :after_each do
-  context "an employer profile with families exists" do
+  context "an employer profile with census_employees exists" do
     let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
-    let!(:families) do
+    let!(:census_employees) do
       [1,2].collect do
-        FactoryGirl.create(
-          :employer_census_family,
-          employer_profile: employer_profile
-        )
+        FactoryGirl.create(:census_employee, employer_profile: employer_profile)
       end.sort_by(&:id)
     end
 
@@ -73,35 +70,31 @@ describe BenefitGroup, "instance methods" do
   let!(:benefit_group)            { FactoryGirl.build(:benefit_group) }
   let!(:plan_year)                { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], start_on: Date.new(2015,1,1)) }
   let!(:employer_profile)         { FactoryGirl.create(:employer_profile, plan_years: [plan_year]) }
-  let!(:benefit_group_assignment) { FactoryGirl.build(:employer_census_benefit_group_assignment, benefit_group: benefit_group) }
-  let!(:families) do
+  let!(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group) }
+  let!(:census_employees) do
     [1,2].collect do
-      FactoryGirl.create(:employer_census_family,
-            employer_profile: employer_profile,
-            benefit_group_assignments: [benefit_group_assignment]
-          )
+      FactoryGirl.create(:census_employee, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment] )
     end.sort_by(&:id)
   end
 
-  context "employee_census_families and benefit_group.employee_families" do
-    let(:benefit_group_families) {benefit_group.employee_families.sort_by(&:id)}
+  context "census_employees and benefit_group.census_employees" do
+    let(:benefit_group_census_employees) {benefit_group.census_employees.sort_by(&:id)}
 
-    it "should include the same families" do
-      expect(benefit_group_families).to eq families
+    it "should include the same census_employees" do
+      expect(benefit_group_census_employees).to eq census_employees
     end
   end
 
-  describe "should check if valid for family" do
+  describe "should check if valid for census_employees" do
     let(:terminated_on_date) { Date.new(2015, 7, 31) }
     let(:hired_on_date) { Date.new(2015, 6, 1) }
-    let(:census_employee) { EmployerCensus::Employee.new(:hired_on => hired_on_date, :terminated_on => terminated_on_date) }
-    let(:roster_family) { EmployerCensus::EmployeeFamily.new(:census_employee => census_employee) }
+    let(:census_employee) { CensusEmployee.new(:hired_on => hired_on_date, :employment_terminated_on => terminated_on_date) }
 
     context "given an invalid terminated and end date combo " do
        let(:terminated_on_date) { Date.new(2014, 1, 2) }
 
        it "is not assignable_to an employee fired before it starts" do
-         expect(benefit_group.assignable_to?(roster_family)).to be_falsey
+         expect(benefit_group.assignable_to?(census_employee)).to be_falsey
        end
      end
 
@@ -109,12 +102,12 @@ describe BenefitGroup, "instance methods" do
       let(:hired_on_date) { Date.new(2016, 6, 5) }
 
       it "is not assignable_to an employee hired after it ends" do
-        expect(benefit_group.assignable_to?(roster_family)).to be_falsey
+        expect(benefit_group.assignable_to?(census_employee)).to be_falsey
       end
     end
 
     it "should be valid if both dates fall inside plan year correctly" do
-      expect(benefit_group.assignable_to?(roster_family)).to be_truthy
+      expect(benefit_group.assignable_to?(census_employee)).to be_truthy
     end
   end
 
@@ -266,13 +259,13 @@ describe BenefitGroup, type: :model do
       end
     end
 
-    context "with no premium_pct_as_int" do
-      let(:params) {valid_params.except(:premium_pct_as_int)}
+    #context "with no premium_pct_as_int" do
+    #  let(:params) {valid_params.except(:premium_pct_as_int)}
 
-      it "should be invalid" do
-        expect(BenefitGroup.create(**params).errors[:premium_pct_as_int].any?).to be_truthy
-      end
-    end
+    #  it "should be invalid" do
+    #    expect(BenefitGroup.create(**params).errors[:premium_pct_as_int].any?).to be_truthy
+    #  end
+    #end
 
     context "with no relationship_benefits" do
       let(:params) {valid_params.except(:relationship_benefits)}
@@ -352,26 +345,109 @@ describe BenefitGroup, type: :model do
 
     context "and the 'metal level' option is offered" do
       context "and elected plans are not all of the same metal level as reference plan" do
+        let(:reference_plan_choice)   { FactoryGirl.build(:plan) }
+        let(:elected_plan_choice)     { FactoryGirl.build(:plan) }
         before do
           benefit_group.plan_option_kind = :metal_level
+          benefit_group.reference_plan = reference_plan_choice
+          benefit_group.elected_plans = [elected_plan_choice]
         end
 
-        it "should be invalid"
+        it "should be invalid" do
+          expect(benefit_group.valid?).to be_falsey
+          expect(benefit_group.errors[:elected_plans].any?).to be_truthy
+        end
       end
     end
 
     context "and the 'carrier plans' option is offered" do
+      let(:carrier_profile_id_0)    { BSON::ObjectId.from_time(DateTime.now) }
+      let(:carrier_profile_id_1)    { BSON::ObjectId.from_time(DateTime.now + 1.day) }
+      let(:reference_plan_choice)   { FactoryGirl.create(:plan, carrier_profile_id: carrier_profile_id_0) }
+      let(:elected_plan_choice)     { FactoryGirl.create(:plan, carrier_profile_id: carrier_profile_id_1) }
+      let(:elected_plan_set) do
+        plans = [1, 2, 3].collect do
+          FactoryGirl.create(:plan, carrier_profile_id: carrier_profile_id_0)
+        end
+        plans.concat([reference_plan_choice, elected_plan_choice])
+        plans
+      end
+
       context "and the reference plan is not in the elected plan set" do
-        it "should be invalid"
+        before do
+          benefit_group.plan_option_kind = :single_carrier
+          benefit_group.reference_plan = reference_plan_choice
+          benefit_group.elected_plans = [elected_plan_choice]
+        end
+
+        it "should be invalid" do
+          expect(benefit_group.valid?).to be_falsey
+          expect(benefit_group.errors[:elected_plans].any?).to be_truthy
+          expect(benefit_group.errors[:elected_plans].first).to match(/single carrier must include reference plan/)
+        end
       end
 
       context "and elected plans are not all from the same carrier as reference plan" do
-        it "should be invalid"
+        before do
+          benefit_group.plan_option_kind = :single_carrier
+          benefit_group.reference_plan = reference_plan_choice
+          benefit_group.elected_plans = elected_plan_set
+        end
+
+        it "should be invalid" do
+          expect(benefit_group.valid?).to be_falsey
+          expect(benefit_group.errors[:elected_plans].any?)
+          .to be_truthy
+          expect(benefit_group.errors[:elected_plans].first).to match(/not all from the same carrier as reference plan/)
+        end
       end
     end
   end
 
-  context "and " do
+  context "and relationship benefit values are specified" do
+    let(:play_year) { FactoryGirl.create(:plan_year) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
+
+    context "and employer contribution for employee" do
+      let(:minimum_contribution) { HbxProfile::ShopEmployerContributionPercentMinimum }
+      let(:invalid_minimum_contribution) { minimum_contribution - 1 }
+
+      context "when the start_on of plan year is Jan 1" do
+        before do
+          benefit_group.plan_year.start_on = plan_year.start_on.at_beginning_of_year
+        end
+
+        it "should be valid when meeting the HBX minimum" do
+          benefit_group.relationship_benefits.find_by(relationship: "employee").premium_pct = minimum_contribution
+          expect(benefit_group.valid?).to be_truthy
+          expect(benefit_group.errors[:relationship_benefits].any?).to be_falsey
+        end
+
+        it "should be valid when less than HBX minimum" do
+          benefit_group.relationship_benefits.find_by(relationship: "employee").premium_pct = invalid_minimum_contribution
+          expect(benefit_group.valid?).to be_truthy
+          expect(benefit_group.errors[:relationship_benefits].any?).to be_falsey
+        end
+      end
+
+      context "when the start_on of plan year is not Jan 1" do
+        before do
+          benefit_group.plan_year.start_on = (plan_year.start_on.at_beginning_of_year + 1.month)
+        end
+
+        it "should be valid when meeting the HBX minimum" do
+          benefit_group.relationship_benefits.find_by(relationship: "employee").premium_pct = minimum_contribution
+          expect(benefit_group.valid?).to be_truthy
+          expect(benefit_group.errors[:relationship_benefits].any?).to be_falsey
+        end
+
+        it "should fail validation when less than HBX minimum" do
+          benefit_group.relationship_benefits.find_by(relationship: "employee").premium_pct = invalid_minimum_contribution
+          expect(benefit_group.valid?).to be_falsey
+          expect(benefit_group.errors[:relationship_benefits].any?).to be_truthy
+        end
+      end
+    end
   end
 end
 
