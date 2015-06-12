@@ -2,7 +2,7 @@ module Forms
   class PlanYearForm < SimpleDelegator
      def initialize(py)
        super(py)
-       @all_plans = Plan.where(active_year: Time.now.year, market: "shop").to_a
+       @all_plans = Plan.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").to_a
      end
 
      def carrier_plans_for(c_profile_id)

@@ -70,9 +70,9 @@ $(document).ready(function () {
   });
 
   $('.alert').delay(3200).fadeOut(2000); //Fade Alert Box
-  $('#plan_year input,select').click(function(){
-    $('#plan_year .alert-error').fadeOut(2000);
-  });
+  //$('#plan_year input,select').click(function(){
+  //  $('#plan_year .alert-error').fadeOut(2000);
+  //});
 
   /* QLE Marriage Date Validator */
   $('#date_married').focusin(function() {
