@@ -369,15 +369,13 @@ describe EmployerProfile, "given an unlinked, linkable census employee with a fa
 end
 
 describe EmployerProfile, "Class methods", dbclean: :after_each do
-  def ee0; FactoryGirl.build(:employer_census_employee, ssn: "369851245", dob: 32.years.ago.to_date); end
-  def ee1; FactoryGirl.build(:employer_census_employee, ssn: "258741239", dob: 42.years.ago.to_date); end
+  def er0; EmployerProfile.new(entity_kind: "partnership"); end
+  def er1; EmployerProfile.new(entity_kind: "partnership"); end
+  def er2; EmployerProfile.new(entity_kind: "partnership"); end
 
-  def family0; FactoryGirl.build(:employer_census_family, census_employee: ee0, employer_profile: nil); end
-  def family1; FactoryGirl.build(:employer_census_family, census_employee: ee1, employer_profile: nil); end
+  def ee0; FactoryGirl.build(:census_employee, ssn: "369851245", dob: 32.years.ago.to_date, employer_profile_id: er0.id); end
+  def ee1; FactoryGirl.build(:census_employee, ssn: "258741239", dob: 42.years.ago.to_date, employer_profile_id: er1.id); end
 
-  def er0; EmployerProfile.new(entity_kind: "partnership", employee_families: [family0]); end
-  def er1; EmployerProfile.new(entity_kind: "partnership", employee_families: [family0, family1]); end
-  def er2; EmployerProfile.new(entity_kind: "partnership", employee_families: [family1]); end
 
   def home_office; FactoryGirl.build(:office_location); end
 
@@ -493,17 +491,14 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     end
     def bob_params; {first_name: "Uncle", last_name: "Bob", ssn: "999441111", dob: 35.years.ago.to_date}; end
     let!(:black_and_decker_bob) do
-      fam = black_and_decker.employee_families.create()
-      ee = FactoryGirl.create(:employer_census_employee, employee_family: fam, **bob_params)
+      ee = FactoryGirl.create(:census_employee, employer_profile_id: black_and_decker.id,  **bob_params)
     end
     let!(:atari_bob) do
-      fam = atari.employee_families.create()
-      ee = FactoryGirl.create(:employer_census_employee, employee_family: fam, **bob_params)
+      ee = FactoryGirl.create(:census_employee, employer_profile_id: atari.id, **bob_params)
     end
     let!(:google_bob) do
-      fam = google.employee_families.create()
       # different dob
-      ee = FactoryGirl.create(:employer_census_employee, employee_family: fam, **bob_params.merge(dob: 40.years.ago.to_date))
+      ee = FactoryGirl.create(:census_employee, employer_profile_id: google.id, **bob_params.merge(dob: 40.years.ago.to_date))
     end
 
     def valid_ssn; ee0.ssn; end
@@ -521,15 +516,15 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
 
       it "should find the active employee in multiple employer_profiles" do
         # it shouldn't find google bob because dob are different
-        expect(EmployerProfile.find_all_by_person(valid_person).size).to eq 2
+        expect(EmployerProfile.find_census_employee_by_person(valid_person).size).to eq 2
       end
 
       it "should return EmployerProfile" do
-        expect(EmployerProfile.find_all_by_person(valid_person).first).to be_a EmployerProfile
+        expect(EmployerProfile.find_census_employee_by_person(valid_person).first.employer_profile).to be_a EmployerProfile
       end
 
       it "should include the matching employee" do
-        found = EmployerProfile.find_all_by_person(valid_person).last.employee_families.last.census_employee
+        found = EmployerProfile.find_census_employee_by_person(valid_person).last
         [:first_name, :last_name, :ssn, :dob].each do |attr|
           expect(found.send(attr)).to eq valid_person.send(attr)
         end
@@ -541,19 +536,18 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
 
       it "should not return any matches" do
         # expect(invalid_person.ssn).to eq invalid_ssn
-        expect(EmployerProfile.find_all_by_person(invalid_person).size).to eq 0
+        expect(EmployerProfile.find_census_employee_by_person(invalid_person).size).to eq 0
       end
     end
   end
 end
 
 describe EmployerProfile, "instance methods" do
-  let(:census_employee)  { FactoryGirl.build(:employer_census_employee, ssn: "069851240", dob: 34.years.ago.to_date)}
-  let(:census_family)    { FactoryGirl.build(:employer_census_family, census_employee: census_employee, employer_profile: nil)}
+  let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
+  let(:census_employee)  { FactoryGirl.build(:census_employee, ssn: "069851240", dob: 34.years.ago.to_date, employer_profile_id: employer_profile.id)}
   let(:person)           { Person.new(first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: 34.years.ago.to_date)}
 
   describe "#employee_roles" do
-    let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
     let(:people)  { FactoryGirl.create_list(:person, 2) }
     let!(:ee0)  { FactoryGirl.create(:employee_role, person: people[0], employer_profile: employer_profile) }
     let!(:ee1)  { FactoryGirl.create(:employee_role, person: people[1], employer_profile: employer_profile) }
