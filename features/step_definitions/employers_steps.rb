@@ -223,7 +223,7 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(class: /interaction-field-control-census-employee-middle-name/).set("K")
   @browser.text_field(class: /interaction-field-control-census-employee-last-name/).set("Doe")
   @browser.text_field(class: /interaction-field-control-census-employee-name-sfx/).set("Jr")
-  @browser.text_field(class: /interaction-field-control-census-employee-dob/).set("10/10/1988")
+  @browser.text_field(class: /interaction-field-control-census-employee-dob/).set("01/01/1980")
   @browser.text_field(class: /interaction-field-control-census-employee-ssn/).set("786120965")
   @browser.radio(class: /interaction-choice-control-value-census-employee-gender-male/).set
   @browser.text_field(class: /interaction-field-control-census-employee-hired-on/).set("10/10/2014")
@@ -239,20 +239,20 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-state/).set("GA")
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-zip/).set("30228")
   # Census Dependents
-  @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-first-name/).set("Mary")
-  @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-middle-name/).set("K")
-  @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-last-name/).set("Doe")
-  @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-dob/).set("10/12/2012")
-  @browser.radio(class: /interaction-choice-control-value-census-employee-census-dependents-attributes-0-gender-female/).set
-  input_field = @browser.divs(class: "selectric-wrapper").last
-  input_field.click
-  input_field.li(text: /Child under 26/).click
+  # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-first-name/).set("Mary")
+  # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-middle-name/).set("K")
+  # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-last-name/).set("Doe")
+  # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-dob/).set("10/12/2012")
+  # @browser.radio(class: /interaction-choice-control-value-census-employee-census-dependents-attributes-0-gender-female/).set
+  # input_field = @browser.divs(class: "selectric-wrapper").last
+  # input_field.click
+  # input_field.li(text: /Child under 26/).click
   screenshot("create_census_employee_with_data")
   @browser.element(class: /interaction-click-control-create-employee/).click
 end
 
 And(/^I should see employer census family created success message$/) do
-  Watir::Wait.until(30) {  @browser.text.include?("Employer Census Family is successfully created.") }
+  Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully created.") }
   screenshot("employer_census_new_family_success_message")
   @browser.refresh
   @browser.a(text: /Employees/).wait_until_present
@@ -278,7 +278,7 @@ Then(/^I should see a form to update the contents of the census employee$/) do
 end
 
 And(/^I should see employer census family updated success message$/) do
-  Watir::Wait.until(30) {  @browser.text.include?("Employer Census Family is successfully updated.") }
+  Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully updated.") }
 end
 
 And(/^I logout from employer portal$/) do
@@ -411,8 +411,8 @@ When(/^I enter combined filter in plan selection page$/) do
   @browser.checkboxes(class: /plan-metal-level-selection-filter/)[0].set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("")
   @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("")
-  @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("$460")
-  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("$480")
+  @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("$420")
+  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("$430")
   @browser.button(class: /apply-btn/, text: /Apply/).click
 end
 
@@ -420,6 +420,6 @@ Then(/^I should see the combined filter results$/) do
   @browser.divs(class: /plan-row/).select(&:visible?).each do |plan|
     expect(plan.text.include?("Nationwide")).to eq true
     expect(plan.text.include?("Bronze")).to eq true
-    expect(plan.p(text: "$476.13").visible?).to eq true
+    expect(plan.p(text: "$425.66").visible?).to eq true
   end
 end
