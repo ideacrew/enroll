@@ -378,6 +378,14 @@ class EmployerProfile
     end
   end
 
+  def owner
+    staff.select{ |p| p.employer_staff_role.is_owner }
+  end
+
+  def staff
+    Person.all.select{ |p| p.employer_staff_role? && p.employer_staff_role.employer_profile_id == self.id}
+  end
+
 private
   def build_nested_models
     build_inbox

@@ -79,7 +79,7 @@ class BenefitGroup
 
   def reference_plan=(new_reference_plan)
     raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
-    self.reference_plan_id = new_reference_plan.id
+    self.reference_plan_id = new_reference_plan._id
     @reference_plan = new_reference_plan
   end
 
@@ -180,7 +180,7 @@ class BenefitGroup
     false
   end
 
-  private
+private
   def dollars_to_cents(amount_in_dollars)
     Rational(amount_in_dollars) * Rational(100) if amount_in_dollars
   end
@@ -208,11 +208,18 @@ class BenefitGroup
   # never pay more than premium per person
   # extra may not be applied toward other members
 
-private
-
   def plan_integrity
     if (plan_option_kind == "single_plan") && (elected_plan_ids.first != reference_plan_id)
       self.errors.add(:elected_plans, "single plan must be the reference plan")
+    end
+
+    if (plan_option_kind == "single_carrier")
+      if !(elected_plan_ids.include? reference_plan_id)
+        self.errors.add(:elected_plans, "single carrier must include reference plan")
+      end
+      if elected_plans.detect { |plan| plan.carrier_profile_id != reference_plan.carrier_profile_id }
+        self.errors.add(:elected_plans, "not all from the same carrier as reference plan")
+      end
     end
 
     if (plan_option_kind == "single_carrier") && !(elected_plan_ids.include? reference_plan_id)
@@ -228,7 +235,7 @@ private
     start_on = self.plan_year.try(:start_on)
     return if start_on.try(:at_beginning_of_year) == start_on
 
-    if relationship_benefits.present? and relationship_benefits.find_by(relationship: "employee").try(:premium_pct) < 50
+    if relationship_benefits.present? and relationship_benefits.find_by(relationship: "employee").try(:premium_pct) < HbxProfile::ShopEmployerContributionPercentMinimum
       self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
     end
   end
