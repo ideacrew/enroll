@@ -12,7 +12,9 @@
       </ul>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12">
-      <h2><%= number_to_currency(@plan.total_employee_cost) %></h2>
+      Premium <h2><%= number_to_currency(@plan.total_premium) %></h2>
+      Employer Pays <h2><%= number_to_currency(@plan.total_employer_contribution) %></h2>
+      Total Employee cost <h2><%= number_to_currency(@plan.total_employee_cost) %></h2>
       <%= link_to("Select Plan", '#', {:class => "btn btn-primary"}) %>
     </div>
   </div>
@@ -59,7 +61,7 @@
         </tr>
       </tbody>
     </table>
-    
+
     <br>
     <h4>Having a Baby</h4>
     <table class="table table-bordered">

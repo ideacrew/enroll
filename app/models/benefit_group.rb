@@ -42,7 +42,7 @@ class BenefitGroup
 
   delegate :start_on, :end_on, to: :plan_year
 
-  attr_accessor :plan_for_elected_plan, :metal_level_for_elected_plan, :carrier_for_elected_plan
+  attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
 
   #TODO add following attributes: :title, 
   validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset, 
@@ -102,6 +102,14 @@ class BenefitGroup
     @elected_plans = new_plans
   end
 
+  def employee_families
+    ## Optimize -- this is ineffective for large data sets
+    plan_year.employer_profile.employee_families.reduce([]) do |list, ef|
+      list << ef if ef.active_benefit_group_assignment.benefit_group == self
+      list
+    end
+  end
+
   def census_employees
     CensusEmployee.find_all_by_benefit_group(self)
   end
@@ -111,7 +119,8 @@ class BenefitGroup
   end
 
   def assigned?
-    census_employees.any?
+    # census_employees.any?
+    employee_families.any?
   end
 
   def effective_on_for(date_of_hire)
@@ -235,7 +244,7 @@ private
     start_on = self.plan_year.try(:start_on)
     return if start_on.try(:at_beginning_of_year) == start_on
 
-    if relationship_benefits.present? and relationship_benefits.find_by(relationship: "employee").try(:premium_pct) < HbxProfile::ShopEmployerContributionPercentMinimum
+    if relationship_benefits.present? and (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < HbxProfile::ShopEmployerContributionPercentMinimum
       self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
     end
   end

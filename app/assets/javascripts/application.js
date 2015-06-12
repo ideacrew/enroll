@@ -73,9 +73,10 @@ $(document).ready(function () {
   });
 
   $('.alert').delay(3200).fadeOut(2000); //Fade Alert Box
-  $('#plan_year input,select').click(function(){
-    $('#plan_year .alert-error').fadeOut(2000);
-  });
+
+  // $('#plan_year input,select').click(function(){
+  //   $('#plan_year .alert-error').fadeOut(2000);
+  // });
   
   // personal-info-row focus fields
   $("input.form-control").focusin(function() {
@@ -88,7 +89,6 @@ $(document).ready(function () {
       $(this).prev().removeClass("active");
       $("img.arrow_active").remove();
   });
-
 
   // $(".adderess-select-box").focusin(function() {
   //   $(".bg-color").css({
