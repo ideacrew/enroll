@@ -11,6 +11,8 @@ class ConsumerProfilesController < ApplicationController
     @qualifying_life_events = QualifyingLifeEventKind.all
     @hbx_enrollments = @family.latest_household.hbx_enrollments
 
+    @employee_role = @employee_roles.first
+
     respond_to do |format|
       format.html
       format.js

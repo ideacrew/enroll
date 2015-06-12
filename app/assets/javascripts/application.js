@@ -90,19 +90,13 @@ $(document).ready(function () {
       $("img.arrow_active").remove();
   });
 
-  // $(".adderess-select-box").focusin(function() {
-  //   $(".bg-color").css({
-  //     "background-color": "rgba(220, 234, 241, 1)",
-  //     "height": "46px",
-  //   });
-  // });
-
-  // $(".adderess-select-box").focusout(function() {
-  //   $(".bg-color").css({
-  //     "background-color": "rgba(255, 255, 255, 1)",
-  //     "height": "46px",
-  //   });
-  // });
+  // Progress Bar
+  $(document).on('click', '#btn-continue', function() {
+    if($('#btn-search-employer').length) $('#btn-search-employer').click();
+    else if($('#btn_user_contact_info').length) $('#btn_user_contact_info').click();
+    else if($('#btn_household_continue').length) window.location = $('#btn_household_continue').val();
+    else if($('#btn_select_plan_continue').length) $('#btn_select_plan_continue').click();
+  });
 
   // Employer Registration
   $('.employer_step2').click(function() {
