@@ -74,7 +74,7 @@ class EmployerProfile
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
   def roster_size
     return @roster_size if defined? @roster_size
-    @roster_size = employee_families.size
+    @roster_size = census_employees.size
   end
 
   def active_plan_year
