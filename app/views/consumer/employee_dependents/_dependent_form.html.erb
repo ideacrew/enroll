@@ -40,7 +40,7 @@
           <div class="row bottom-row top-row-2">
             <div class="col-md-3 col-sm-3 no-pd">
               <div class="form-group form-group-lg">
-                  <%= f.text_field :date_of_birth, class: "required date-picker home floatlabel form-control", required: true, placeholder: "DATE OF BIRTH", id: "family_member_dob_#{dependent.id}" %>
+                  <%= f.text_field :date_of_birth, class: "required date-picker dob-picker home floatlabel form-control", required: true, placeholder: "DATE OF BIRTH", id: "family_member_dob_#{dependent.id}", start_year: Date.today.year - 110, end_year: Date.today.year%>
               </div>
             </div>
 
