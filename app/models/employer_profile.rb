@@ -216,22 +216,6 @@ class EmployerProfile
       CensusEmployee.find_all_unlinked_by_identifying_information(person.ssn, person.dob)
     end
 
-    # Returns all EmployerProfiles where person is active on the employee_census
-    def find_all_by_person(person)
-      organizations = match_census_employees(person)
-      organizations.reduce([]) do |profiles, er|
-        profiles << er.employer_profile
-      end
-    end
-
-    def match_census_employees(person)
-      raise ArgumentError.new("expected Person") unless person.respond_to?(:ssn) && person.respond_to?(:dob)
-      return [] if person.ssn.blank? || person.dob.blank?
-      Organization.and("employer_profile.employee_families.census_employee.ssn" => person.ssn,
-                       "employer_profile.employee_families.census_employee.dob" => person.dob,
-                       "employer_profile.employee_families.census_employee.linked_at" => nil).to_a
-    end
-
     def advance_day(new_date)
       new_date.to_date.beginning_of_day
       # TODO define query for set
