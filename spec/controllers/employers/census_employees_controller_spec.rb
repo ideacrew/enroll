@@ -163,7 +163,7 @@ RSpec.describe Employers::CensusEmployeesController do
         expect(flash[:error]).to eq "Census Employee is already active."
       end
 
-      context "when has new_census_family" do
+      context "when has new_census employee" do
         let(:new_census_employee){double("test")}
         before do
           sign_in

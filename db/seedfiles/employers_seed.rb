@@ -166,13 +166,13 @@ org_1_jetson = CensusEmployee.new(
         email: Email.new(kind: "work", address: "john.doe@example.com"),
         employer_profile: org_1_employer_profile, is_business_owner: true,
     census_dependents: [
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Doe", first_name: "Matt", dob: "01/12/2011", ssn: "022233311", employee_relationship: "child_under_26"
         ),
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Doe", first_name: "Jessica", dob: "03/12/1985", ssn: "021233311", employee_relationship: "spouse"
         ),
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Doe", first_name: "Caroline", dob: "04/01/2008", ssn: "021233321", employee_relationship: "child_under_26"
         )
     ]
@@ -236,13 +236,13 @@ org_2_jetson = CensusEmployee.new(
       email: Email.new(kind: "work", address: "patricia.johnson@example.com"),
       employer_profile: org_2_employer_profile, is_business_owner: false,
     census_dependents: [
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Johnson", first_name: "Matt", dob: "01/12/2011", ssn: "422233311", employee_relationship: "child_under_26"
         ),
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Johnson", first_name: "Mark", dob: "03/12/1978", ssn: "521233311", employee_relationship: "spouse"
         ),
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Johnson", first_name: "Caroline", dob: "04/01/2008", ssn: "621233321", employee_relationship: "child_under_26"
         )
     ]
