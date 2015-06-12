@@ -57,8 +57,9 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "GET edit" do
+    let(:user) { FactoryGirl.create(:user, :employer_staff) }
     it "should be render edit template" do
-      sign_in
+      sign_in user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       post :edit, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
@@ -69,7 +70,7 @@ RSpec.describe Employers::CensusEmployeesController do
   describe "PUT update" do
     let(:benefit_group) {FactoryGirl.create(:benefit_group)}
     let(:plan_year) {FactoryGirl.create(:plan_year)}
-    let(:user) { FactoryGirl.create(:user, :hbx_staff) }
+    let(:user) { FactoryGirl.create(:user, :employer_staff) }
     before do
       sign_in user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)

@@ -42,7 +42,7 @@ class Employers::CensusEmployeesController < ApplicationController
       end
 
       @census_employee.attributes = census_employee_params
-      # authorize! :update, @census_employee
+      authorize! :update, @census_employee
       if @census_employee.save
         flash[:notice] = "Census Employee is successfully updated."
         redirect_to employers_employer_profile_path(@employer_profile)
