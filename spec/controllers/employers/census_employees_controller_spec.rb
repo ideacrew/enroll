@@ -4,7 +4,6 @@ RSpec.describe Employers::CensusEmployeesController do
   let(:employer_profile_id) { "abecreded" }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:census_employee) {FactoryGirl.create(:census_employee)}
-  let(:new_census_family) {FactoryGirl.build(:census_employee)}
   let(:census_employee_params) {
     {"first_name"=>"aqzz",
        "middle_name"=>"",

@@ -137,7 +137,6 @@ class Employers::CensusEmployeesController < ApplicationController
   def build_census_employee
     @census_employee = CensusEmployee.new
     @census_employee.build_address
-    @census_employee.census_dependents.build
     @census_employee.benefit_group_assignments.build
     @census_employee
   end

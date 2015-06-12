@@ -49,7 +49,7 @@
                     <td><%= number_to_obscured_ssn census_employee.ssn %></td>
                     <td><%= format_date census_employee.dob %> </td>
                     <td><%= format_date census_employee.hired_on %> </td>
-                    <td><%= census_employee.aasm_state %></td>
+                    <td><%= census_employee.aasm_state.humanize %></td>
                     <td><%= boolean_to_human census_employee.employee_role_linked? %></td>
                     <td>
                       <% if census_employee.employment_terminated? %>

@@ -2,20 +2,17 @@
   <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
 
-      <% census_employee = @family.census_employee %>
-      <% dependents = @family.census_dependents %>
-      <% address = census_employee.address %>
-      <% benefit_group_assignments = @family.benefit_group_assignments %>
-
-      <h2> Family Details </h2>
+      <% dependents = @census_employee.census_dependents %>
+      <% address = @census_employee.address %>
+      <% benefit_group_assignments = @census_employee.benefit_group_assignments %>
 
       <div class="row">
         <div class="col-md-6 col-sm-6 col-xs-12 left-side">
           <h3> Employee Details </h3>
 
-          Name: <%= name_to_listing(census_employee) %> <br>
-          DOB: <%= format_date census_employee.dob %> <br>
-          Hired On: <%= format_date census_employee.hired_on %><br>
+          Name: <%= name_to_listing(@census_employee) %> <br>
+          DOB: <%= format_date @census_employee.dob %> <br>
+          Hired On: <%= format_date @census_employee.hired_on %><br>
         </div>
 
         <div class="col-md-6 col-sm-6 col-xs-12 right-side">
