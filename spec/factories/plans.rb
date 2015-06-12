@@ -9,7 +9,7 @@ FactoryGirl.define do
     metal_level         "silver"
     market              "shop"
     ehb                 0.9943
-    carrier_profile_id          {FactoryGirl.create(:carrier_profile)._id}
+    carrier_profile_id          { BSON::ObjectId.from_time(DateTime.now) }
 
     # association :premium_tables, strategy: :build
 
