@@ -102,6 +102,14 @@ class BenefitGroup
     @elected_plans = new_plans
   end
 
+  def employee_families
+    ## Optimize -- this is ineffective for large data sets
+    plan_year.employer_profile.employee_families.reduce([]) do |list, ef|
+      list << ef if ef.active_benefit_group_assignment.benefit_group == self
+      list
+    end
+  end
+
   def census_employees
     CensusEmployee.find_all_by_benefit_group(self)
   end
@@ -111,7 +119,8 @@ class BenefitGroup
   end
 
   def assigned?
-    census_employees.any?
+    # census_employees.any?
+    employee_families.any?
   end
 
   def effective_on_for(date_of_hire)
