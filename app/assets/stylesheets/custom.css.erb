@@ -4762,6 +4762,18 @@ ul.list-comp {
 .btn.btn-green-2:hover {
     background-color: #156f00;
 }
+.btn-tranparent {
+    background-color: transparent;
+    border-color: #b2b2b2;
+    border-radius: 2px;
+    color: #007bc4;
+    font-size: 15px;
+    font-weight: 300;
+}
+.btn-tranparent:hover {
+    background-color: #ffffff;
+    color: #007bc4;
+}
 
 table.table-wrapper a.btn {
     margin: 0px 3px;
@@ -5127,3 +5139,145 @@ div.row-form-wrapper:first-of-type, #email_info, #dependent_ul li {border-top: 1
     background: rgba(0, 0, 0, 0) url("<%= 'icons/check_radio_sheet.png' %>") no-repeat scroll -24px top;
 }
 .selectric .label {font-weight: normal;font-size: 12px !important;}
+
+/* Select Plan Page */
+.ct-1 p {
+    font-size: 14px;
+    font-weight: 100;
+    line-height: 25px;
+}
+.compare-wrapper {
+    display: inline-block;
+    padding: 0 15px;
+    width: 100%;
+}
+.compare-wrapper .checkbox {
+    float: left;
+}
+.gn-10 {
+    margin-bottom: 10px;
+}
+.checkbox-custom, .radio-custom {
+    opacity: 0;
+    position: absolute;
+}
+.checkbox-custom, .checkbox-custom-label, .radio-custom, .radio-custom-label {
+    cursor: pointer;
+    display: inline-block;
+    margin: 5px;
+    vertical-align: middle;
+}
+.checkbox-custom-label, .radio-custom-label {
+    position: relative;
+}
+.checkbox-custom + .checkbox-custom-label::before, .radio-custom + .radio-custom-label::before {
+    background: #fff none repeat scroll 0 0;
+    border: 2px solid #ddd;
+    content: "";
+    display: inline-block;
+    height: 20px;
+    margin-right: 5px;
+    margin-top: -2px;
+    padding: 2px;
+    text-align: center;
+    vertical-align: middle;
+    width: 20px;
+}
+.checkbox-custom:checked + .checkbox-custom-label::before {
+    background: #337ab7 none repeat scroll 0 0;
+    color: #fff;
+}
+label.checkbox-custom-label {
+    color: #414141;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+    text-transform: uppercase;
+}
+.checkbox label {
+    padding: 0;
+}
+.checkbox-filter-wrapper {
+    border-bottom: 1px solid #cacaca;
+    display: inline-block;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+}
+.row .checkbox-filter-wrapper:last-child {
+    border: medium none;
+}
+.checkbox-filter-wrapper h5 {
+    margin-bottom: 15px;
+}
+.checkbox-filter-wrapper ul li .checkbox label label.checkbox-custom-label {
+    text-transform: none;
+}
+.header-title {
+    border-bottom: 1px solid #cacaca;
+    font-size: 20px;
+    font-weight: 400;
+    margin-top: 0;
+    padding-bottom: 12px;
+}
+.filter-input-block {
+    display: inline-block;
+    font-weight: 100;
+    text-align: center;
+    width: 100%;
+}
+.filter-input-block input {
+    border: 1px solid #b7b7b7;
+    border-radius: 0;
+    box-shadow: none;
+    display: inline-block;
+    width: 40%;
+}
+.filter-input-block input.form-control {
+    font-size: 12px;
+}
+.search-apply-wrapper a.btn {width: 45%; padding: 6px;}
+.search-apply-wrapper a.btn:last-child, .filter-input-block input.form-control:last-child {float: right;}
+.search-apply-wrapper a.btn:first-child, .filter-input-block input.form-control:first-child {float: left;}
+.filter-input-block small {
+    display: inline-block;
+    padding: 8px 0;
+}
+input.form-control {
+    border: 1px solid #b7b7b7;
+    border-radius: 0;
+    box-shadow: none;
+    display: inline-block;
+    font-weight: 100;
+}
+h3.text-blue {
+    font-size: 20px;
+    font-weight: 500;
+}
+.text-blue {
+    color: #007bc4;
+    font-weight: 300;
+}
+#select_plan_wrapper .panel ul.list-comp li {
+    color: #7b7b7b;
+    font-size: 12px;
+    padding-bottom: 2px;
+}
+#select_plan_wrapper .panel ul.list-comp li em {
+    color: #000;
+    font-style: normal;
+}
+#select_plan_wrapper .panel table.table thead tr th, #select_plan_wrapper .panel table.table tbody tr td {
+    border: medium none;
+    font-size: 12px;
+    padding: 2px 0;
+}
+#select_plan_wrapper .panel table.table thead tr th {
+    color: #7b7b7b;
+    font-weight: 100;
+}
+#select_plan_wrapper .panel table.table tbody tr td {
+    color: #000;
+    font-weight: 700;
+}
+#select_plan_wrapper a.btn {padding: 6px 12px;}
