@@ -67,11 +67,23 @@ class Employers::EmployerProfilesController < ApplicationController
     @current_plan_year = @employer_profile.plan_years.last
     @plan_years = @employer_profile.plan_years.order(id: :desc)
 
-    @emps = @employer_profile.census_employees_sorted
+    status_params = params.permit(:id, :status)
+    @status = status_params[:status] || 'active'
 
-    @page_alphabets = page_alphabets(@emps, "last_name")
+    census_employees = case @status
+    when 'waived'
+      @employer_profile.census_employees.waived.sorted
+    when 'terminated'
+      @employer_profile.census_employees.terminated.sorted
+    when 'all'
+      @employer_profile.census_employees.sorted
+    else
+      @employer_profile.census_employees.active.sorted
+    end
+
+    @page_alphabets = page_alphabets(census_employees, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
-    @census_employees = @emps.where("last_name" => /^#{page_no}/i)
+    @census_employees = census_employees.where("last_name" => /^#{page_no}/i)
   end
 
   def new
