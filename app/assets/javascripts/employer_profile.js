@@ -1,28 +1,18 @@
 $(function() {
 
-  $(document).on('change', "input#family_all", function(){
-    $("tr.terminated_true").show();
-    $("tr.terminated_false").show();
-    $('.confirm-terminate-wrapper').hide();
-  });
+  $('div[name=employee_family_tabs] > ').children().each( function() { 
+    $(this).change(function(){
+      filter = $(this).val();
+      $('#employees_' + filter).siblings().hide();
+      $('#employees_' + filter).show();
 
-  $(document).on('change', "input#family_waived", function(){
-    $("tr.terminated_true").hide();
-    $("tr.terminated_false").hide();
-    $('.confirm-terminate-wrapper').hide();
-  });
-
-  $(document).on('change', "input#terminated_yes", function(){
-    $("tr.terminated_true").show();
-    $("tr.terminated_false").hide();
-    $('.confirm-terminate-wrapper').hide();
-  });
-
-  $(document).on('change', "input#terminated_no", function(){
-    $("tr.terminated_false").show();
-    $("tr.terminated_true").hide();
-    $('.confirm-terminate-wrapper').hide();
-  });
+      $.ajax({
+        url: $('span[name=employee_families_url]').text() + '.js',
+        type: "GET",
+        data : { 'status': filter }
+      });
+    })
+  })
 
   $("input#terminated_no").trigger("change");
   
