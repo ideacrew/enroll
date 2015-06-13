@@ -1,0 +1,64 @@
+<div class="table-responsive" style="overflow-y: hidden;">
+  <table class="table table-wrapper" style="opacity: 1;">
+    <thead>
+      <tr>
+        <th>Employee Name</th>
+        <th>SSN</th>
+        <th>DDB</th>
+        <th>Hire Date</th>
+        <th>Status</th>
+        <th>Linked?</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @employee_families.each do |family| %>
+      <tr class="terminated_<%= family.is_terminated? %> remove_<%= family.id %>">
+        <td> <%= link_to name_to_listing(family.census_employee), employers_employer_profile_family_path(@employer_profile.id, family.id), remote: true %> </td>
+        <td><%= number_to_obscured_ssn family.census_employee.ssn %></td>
+        <td><%= format_date family.census_employee.dob %> </td>
+        <td><%= format_date family.census_employee.hired_on %> </td>
+        <td><%= family.aasm_state %></td>
+        <td><%= boolean_to_human family.is_linked? %></td>
+        <td>
+          <% if family.is_terminated? %>
+          <%= link_to ('javascript:;'), class: "show_confirm btn btn-green-2", id: "show_confirm_#{family.id}" do %>
+          <span class="hidden-xs hidden-sm visible-md visible-lg">Rehire</span>
+          <span class="glyphicon glyphicon-pencil hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
+          <% end %>
+          <% else %>
+          <%= link_to '<i class="fa fa-pencil"></i> Edit'.html_safe, (edit_employers_employer_profile_family_path(@employer_profile.id, family.id)), class: "btn btn-success", remote: true %>
+
+          <%= link_to '<i class="fa fa-chain-broken"></i> Delink'.html_safe, (employers_employer_profile_family_delink_path(@employer_profile.id, family.id)), class: "btn btn-default", disabled: !family.is_linked? %>
+
+          <%= link_to '<i class="fa fa-times"></i> Terminate'.html_safe, ('javascript:;'), class: "btn btn-danger show_confirm", id: "show_confirm_#{family.id}" %>
+          <% end %>
+        </td>
+      </tr>
+      <% if family.is_terminated? %>
+      <tr class="unbrd  rehire_<%= family.id %>">
+        <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= family.id %>">
+          <div class="confirm-terminate">
+            <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker"><br/>
+            <a href="javascript:;" data-link="<%= employers_employer_profile_family_rehire_path(@employer_profile.id, family.id) %>" class="rehire_confirm" id="rehire_<%= family.id %>"><strong>Submit</strong></a>
+          </div>
+          <b><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></b>
+        </td>
+      </tr>
+      <% else %>
+      <tr class="unbrd  remove_<%= family.id %>">
+        <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= family.id %>">
+          <div class="confirm-terminate">
+            <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker"><br/>
+            <a href="javascript:;" data-link="<%= employers_employer_profile_family_terminate_path(@employer_profile.id, family.id) %>" class="delete_confirm" id="remove_<%= family.id %>"><strong>Submit</strong></a>
+          </div>
+          <%=image_tag "enter_date_termination.png", width: "300", height: "" %>
+        </td>
+      </tr>
+      <% end %>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status %>
+</div>
