@@ -294,15 +294,24 @@ end
 When(/^I click on terminate button for a census family$/) do
   @browser.a(text: /Terminate/).wait_until_present
   @browser.a(text: /Terminate/).click
-  @browser.a(text: /Patrick K Doe Jr/).wait_until_present
-  expect(@browser.a(text: /Patrick K Doe Jr/).visible?).to be_falsey
+  terminated_date = Date.current + 20.days
+  @browser.text_field(class: /date-picker/).set(terminated_date)
+  #click submit
+  @browser.h3(text: /Employee Roster/).click
+  @browser.a(text: /Submit/).wait_until_present
+  @browser.a(text: /Submit/).click
 end
 
 Then(/^The census family should be terminated and move to terminated tab$/) do
+  @browser.a(text: /Employees/).wait_until_present
+  @browser.a(text: /Employees/).click
   @browser.radio(id: "terminated_yes").fire_event("onclick")
   @browser.a(text: /Patrick K Doe Jr/).wait_until_present
   expect(@browser.a(text: /Patrick K Doe Jr/).visible?).to be_truthy
-  expect(@browser.a(text: /Rehire/).visible?).to be_truthy
+  @browser.a(text: /Employees/).wait_until_present
+  @browser.a(text: /Employees/).click
+  expect(@browser.a(class: /interaction-click-control-rehire/).visible?).to be_truthy
+  #expect(@browser.a(text: /Rehire/).visible?).to be_truthy
 end
 
 And(/^I should see the census family is successfully terminated message$/) do
@@ -356,9 +365,6 @@ And(/^I should be able to add information about plan year, benefits and relation
   sleep(1)
   @browser.h4(text: /Recommend Date/).wait_until_present
   expect(@browser.text.include?("employer initial application earliest submit on")).to be_truthy
-  #@browser.text_field(class: "interaction-field-control-plan_year-start_on").set("01/01/2015")
-  #@browser.text_field(class: "interaction-field-control-plan_year-open_enrollment_start_on").set("11/01/2014")
-  #@browser.text_field(class: "interaction-field-control-plan_year-open_enrollment_end_on").set("11/30/2014")
   @browser.text_field(name: "plan_year[fte_count]").click
   @browser.text_field(name: "plan_year[fte_count]").set("35")
   @browser.text_field(name: "plan_year[pte_count]").set("15")
