@@ -166,6 +166,8 @@ class CensusEmployee < CensusMember
       unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
     end
 
+    alias_method :find_by_employer_profile, :find_all_by_employer_profile
+
     def find_all_by_employee_role(employee_role)
       unscoped.where(employee_role_id: employee_role._id)
     end
