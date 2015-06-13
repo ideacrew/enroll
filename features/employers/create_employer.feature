@@ -24,13 +24,13 @@ Feature: Create Employer
       When I click on Edit family button for a census family
       Then I should see a form to update the contents of the census employee
         And I should see employer census family updated success message
-        And I logout from employer portal
-      #terminate
-      #When I click on the Employees tab
-        #And I click on terminate button for a census family
-      #Then The census family should be terminated and move to terminated tab
-        #And I should see the census family is successfully terminated message
         #And I logout from employer portal
+      #terminate
+        And I click on the Employees tab
+        And I click on terminate button for a census family
+      Then The census family should be terminated and move to terminated tab
+        #And I should see the census family is successfully terminated message
+        And I logout from employer portal
 
       #When I click on Rehire button for a census family on terminated tab
       #Then A new instance of the census family should be created
