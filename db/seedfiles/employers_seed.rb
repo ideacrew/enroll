@@ -66,7 +66,7 @@ spacely_plan = Plan.create(
     name: "BlueChoice 123 Silver 100",
     coverage_kind: "health",
     metal_level: "silver",
-    market: "shop",
+    market: "individual",
     carrier_profile_id: CarrierProfile.last.id
   )
 
@@ -121,7 +121,7 @@ cogswell_plan = Plan.create(
     name: "United 123 Silver 900",
     coverage_kind: "health",
     metal_level: "bronze",
-    market: "shop",
+    market: "individual",
     carrier_profile_id: CarrierProfile.first.id
   )
 
@@ -193,7 +193,7 @@ org_1_plan = Plan.create(
     name: "UHC 123 Silver 900",
     coverage_kind: "health",
     metal_level: "silver",
-    market: "shop",
+    market: "individual",
     carrier_profile_id: CarrierProfile.last.id
   )
 
@@ -263,7 +263,7 @@ org_2_plan = Plan.create(
     name: "Aetna 8913 Silver 900",
     coverage_kind: "health",
     metal_level: "gold",
-    market: "shop",
+    market: "individual",
     carrier_profile_id: CarrierProfile.first.id
   )
 
