@@ -2,11 +2,11 @@ class BrokerAgencyAccount
   include Mongoid::Document
   include Mongoid::Timestamps
 
-
   embedded_in :employer_profile
 
   # Begin date of relationship
   field :start_on, type: Date
+  
   # End date of relationship
   field :end_on, type: Date
   field :updated_by, type: String
@@ -21,7 +21,7 @@ class BrokerAgencyAccount
   validates_presence_of :start_on, :broker_agency_profile_id, :is_active
   validate :writing_agent_employed_by_broker
 
-  default_scope   ->{ where(:active => true) }
+  default_scope   ->{ where(:is_active => true) }
 
 
   # belongs_to broker_agency_profile
@@ -50,15 +50,8 @@ class BrokerAgencyAccount
 
   class << self
     def find(id)
-      org = Organization.where(:"employer_profile.broker_agency_accounts._id" => id).first
-      org.employer_profile.broker_agency_accounts.detect { |baa| baa._id == id } unless org.blank?
-    end
-
-    def find_all_active_by_broker_agency_profile(broker_agency_profile)
-      orgs = Organization.where(:"employer_profile.broker_agency_accounts.broker_agency_profile_id" => broker_agency_profile.id).to_a
-      orgs.reduce([]) do |list, org| 
-        org.employer_profile.broker_agency_accounts.detect { |baa| baa.broker_agency_profile_id == broker_agency_profile.id }
-      end
+      org = Organization.unscoped.where(:"employer_profile.broker_agency_accounts._id" => id).first
+      org.employer_profile.broker_agency_accounts.detect { |account| account._id == id } unless org.blank?
     end
   end
 
