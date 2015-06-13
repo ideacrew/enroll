@@ -3,81 +3,89 @@
     <div class="col-md-9 col-sm-9 col-xs-12">
       <h4>Broker Agency Information</h4>
       <%= f.fields_for :broker_agency_profile do |broker_agency_profile| %>
-        <%= render "shared/organizations/entity_name_and_type_fields", f: broker_agency_profile %><br>
-        <div class="col-md-12 col-sm-12 col-xs-12 form-group-lg no-pd">
-          <%= broker_agency_profile.text_field :home_page, class: "floatlabel form-control", required: true, placeholder: 'WEBSITE URL' %>
-        </div>
+	      <div class="row no-buffer focus_effect personal-info-top-row">
+		      <div class="col-md-12 no-pd first">
+			      <div class="row top-row">
+				      <%= render "shared/organizations/entity_name_and_type_fields", f: broker_agency_profile %>
+			      </div>
+			      <div class="row bottom-row">
+				      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+					      <%= broker_agency_profile.text_field :home_page, class: "floatlabel form-control", required: true, placeholder: 'WEBSITE URL' %>
+				      </div>
+			      </div>
+		      </div>
+	      </div>
       <% end %>
       <%= render "shared/organizations/office_location_fields", f: f %>
       <%= f.fields_for :broker_agency_profile do |broker_agency_profile| %>
-        <%= render "shared/broker_agency_profile_fields", f: broker_agency_profile %>
-        <h4>Broker Information</h4>
-        <%= broker_agency_profile.fields_for :broker_agency_contacts, @organization.broker_agency_profile.broker_agency_contacts.first do |broker_agency_contact| %>
-          <div class="col-md-2 col-sm-3 col-xs-12 form-group-lg no-pd">
-            <%= broker_agency_contact.text_field :first_name, class: "floatlabel form-control", required: true, placeholder: 'FIRST NAME' %>
-          </div>
-          <div class="col-md-2 col-sm-3 col-xs-12 form-group-lg no-pd">
-            <%= broker_agency_contact.text_field :last_name, class: "floatlabel form-control", required: true, placeholder: 'LAST NAME' %>
-          </div>
-          <%= broker_agency_contact.fields_for :broker_role do |broker_role| %>
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%= broker_role.select(:provider_kind, options_for_select(BrokerRole::PROVIDER_KINDS.map {|k| [k.to_s.titleize, k.to_s]}), { prompt: "Select Provider Kind"}, { :class => ''} ) %>
-          </div>
-            <div class="col-md-2 col-sm-3 col-xs-12 form-group-lg no-pd">
-              <%= broker_role.text_field :npn, class: "floatlabel form-control", required: true, placeholder: 'NPN' %>
-            </div>
-          <% end %>
-          <%= broker_agency_contact.fields_for :emails do |email| %>
-            <div class="col-md-3 col-sm-3 col-xs-12 form-group-lg no-pd">
-              <%= email.hidden_field :kind, value: "work" %>
-              <%= email.text_field :address, class: "floatlabel form-control", required: true, placeholder: 'EMAIL@WORK.COM' %>
-            </div>
-          <% end %>
-        <% end %>
+	      <%= render "shared/broker_agency_profile_fields", f: broker_agency_profile %>
+	      <h4>Broker Information</h4>
+	      <%= broker_agency_profile.fields_for :broker_agency_contacts, @organization.broker_agency_profile.broker_agency_contacts.first do |broker_agency_contact| %>
+		      <div class="col-md-2 col-sm-3 col-xs-12 form-group-lg no-pd">
+			      <%= broker_agency_contact.text_field :first_name, class: "floatlabel form-control", required: true, placeholder: 'FIRST NAME' %>
+		      </div>
+		      <div class="col-md-2 col-sm-3 col-xs-12 form-group-lg no-pd">
+			      <%= broker_agency_contact.text_field :last_name, class: "floatlabel form-control", required: true, placeholder: 'LAST NAME' %>
+		      </div>
+		      <%= broker_agency_contact.fields_for :broker_role do |broker_role| %>
+			      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+				      <%= broker_role.select(:provider_kind, options_for_select(BrokerRole::PROVIDER_KINDS.map {|k| [k.to_s.titleize, k.to_s]}), { prompt: "Select Provider Kind"}, { :class => ''} ) %>
+			      </div>
+			      <div class="col-md-2 col-sm-3 col-xs-12 form-group-lg no-pd">
+				      <%= broker_role.text_field :npn, class: "floatlabel form-control", required: true, placeholder: 'NPN' %>
+			      </div>
+		      <% end %>
+		      <%= broker_agency_contact.fields_for :emails do |email| %>
+			      <div class="col-md-3 col-sm-3 col-xs-12 form-group-lg no-pd">
+				      <%= email.hidden_field :kind, value: "work" %>
+				      <%= email.text_field :address, class: "floatlabel form-control", required: true, placeholder: 'EMAIL@WORK.COM' %>
+			      </div>
+		      <% end %>
+	      <% end %>
       <% end %>
       <div class="btn-wrapper">
-        <div class="btn-group" role="group" aria-label="">
-          <div class="btn-group" data-toggle="buttons">
-            <p>Primary Broker?</p>
-            <label class="btn btn-default">
-              <%= radio_button_tag :is_primary_broker, 1 %> Yes
-            </label>
-            <label class="btn btn-default active">
-              <%= radio_button_tag :is_primary_broker, 0, checked: true %> No
-            </label>
-          </div>
-        </div>
+	      <div class="btn-group" role="group" aria-label="">
+		      <div class="btn-group" data-toggle="buttons">
+			      <p>Primary Broker?</p>
+			      <label class="btn btn-default">
+				      <%= radio_button_tag :is_primary_broker, 1 %> Yes
+			      </label>
+			      <label class="btn btn-default active">
+				      <%= radio_button_tag :is_primary_broker, 0, checked: true %> No
+			      </label>
+		      </div>
+	      </div>
       </div>
 
       <div id="user_information">
-        <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
-          <%= text_field_tag :email, nil, class: "floatlabel form-control", required: true, placeholder: 'EMAIL', value: current_user.email %>
-        </div>
-        <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
-          <%= text_field_tag :first_name, nil, class: "floatlabel form-control", placeholder: 'FIRST NAME', value: current_user.try(:person).try(:first_name), required: true %>
-        </div>
-        <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
-          <%= text_field_tag :last_name, nil, class: "floatlabel form-control", placeholder: 'LAST NAME', value: current_user.try(:person).try(:last_name), required: true %>
-        </div>
+	      <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+		      <%= text_field_tag :email, nil, class: "floatlabel form-control", required: true, placeholder: 'EMAIL', value: current_user.email %>
+	      </div>
+	      <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+		      <%= text_field_tag :first_name, nil, class: "floatlabel form-control", placeholder: 'FIRST NAME', value: current_user.try(:person).try(:first_name), required: true %>
+	      </div>
+	      <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+		      <%= text_field_tag :last_name, nil, class: "floatlabel form-control", placeholder: 'LAST NAME', value: current_user.try(:person).try(:last_name), required: true %>
+	      </div>
       </div>
       <br>
 
       <div class="row top-row">
-        <button type="submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Create Broker Agency</button>
+	      <button type="submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Create Broker Agency</button>
       </div>
     </div>
   </div>
 </div>
 
 <script type="text/javascript">
-  $(document).ready(function () {
-      $("#is_primary_broker_1").change(function(){
-      $("#user_information").hide();
-    });
+	$(document).ready(function () {
+			$("#is_primary_broker_1").change(function(){
+				$("#user_information").hide();
+				});
 
-    $("#is_primary_broker_0").change(function(){
-      $("#user_information").show();
-    });
-    $("#is_primary_broker_0").trigger("change");
-  });
+			$("#is_primary_broker_0").change(function(){
+				$("#user_information").show();
+				});
+			$("#is_primary_broker_0").trigger("change");
+			});
 </script>
