@@ -60,6 +60,11 @@ class EmployerProfile
     CensusEmployee.find_by_employer_profile(self)
   end
 
+  def census_employees_sorted
+    return @census_employees_sorted if defined? @census_employees_sorted
+    @census_employees_sorted = census_employees.order_by_last_name.order_by_first_name
+  end
+
   def hire_broker_agency(new_broker_agency, start_on = Date.current)
     start_on = start_on.to_date.beginning_of_day
     if active_broker_agency_account.present?
