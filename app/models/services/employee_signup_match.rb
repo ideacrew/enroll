@@ -6,9 +6,9 @@ module Services
     end
 
     def call(consumer_identity)
-      census_families = @census_family_finder.find_census_families_by_person(consumer_identity)
-      return nil if census_families.empty?
-      census_employee = census_families.first.census_employee
+      census_employees = @census_family_finder.find_census_employee_by_person(consumer_identity)
+      return nil if census_employees.empty?
+      census_employee = census_employees.first
       [census_employee, @form_factory.build(consumer_identity, census_employee, consumer_identity.match_person)]
     end
   end
