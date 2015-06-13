@@ -1,11 +1,11 @@
 <div id="address_info" class="row no-buffer focus_effect personal-info-row">
   <div class="col-md-12 no-pd col-sm-12 col-xs-12 first">
     <div class="row top-row">
-      
+
     <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
       <button class="btn btn-new-address">ADDRESS</button>
     </div>
-      
+
     <div class="col-md-8 col-sm-8 col-xs-12 form-group form-group-lg no-pd address">
       <div class="form-group form-group-lg">
         <div class="row" style="margin: 0;">
@@ -32,12 +32,12 @@
           </div>
         </div>
       </div>
-                          
+
       <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd delete_address">
         <%- link_to image_tag('delete.png'), 'javascript:void(0)', class: 'close-2' %>
       </div>
     </div>
-    
+
     <div class="row middle-row form-group form-group-lg no-pd address-row">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
         <%= f.hidden_field :kind, value: address_kind %>
@@ -59,6 +59,6 @@
         <%= f.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control", required: true %>
       </div>
     </div>
-      
+
   </div>
 </div>

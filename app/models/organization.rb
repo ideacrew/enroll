@@ -71,27 +71,11 @@ class Organization
   index({"employer_profile.broker_agency_accounts.is_active" => 1,
          "employer_profile.broker_agency_accounts.broker_agency_profile_id" => 1 })
 
-  index({"employer_profile.employee_families._id" => 1}, { unique: true, sparse: true })
-  index({"employer_profile.employee_families.linked_at" => 1}, {sparse: true})
-  index({"employer_profile.employee_families.employee_role_id" => 1}, {sparse: true})
-  index({"employer_profile.employee_families.terminated" => 1})
-  index({"employer_profile.employee_families.benefit_group_assignments._id" => 1})
-  index({"employer_profile.employee_families.census_employee.last_name" => 1})
-  index({"employer_profile.employee_families.census_employee.dob" => 1})
-  index({"employer_profile.employee_families.census_employee.ssn" => 1})
-  index({"employer_profile.employee_families.census_employee.ssn" => 1,
-         "employer_profile.employee_families.census_employee.dob" => 1},
-         {name: "ssn_dob_index"})
-
   # BrokerAgencyProfile child model indexes
   index({"broker_agency_profile._id" => 1}, { unique: true, sparse: true })
   index({"broker_agency_profile.aasm_state" => 1})
   index({"broker_agency_profile.primary_broker_role_id" => 1}, { unique: true, sparse: true })
   index({"broker_agency_profile.market_kind" => 1})
-
-  # def employee_family_details(person)
-  #   return Organization.where(id: id).where(:"employer_profile.employee_families.census_employee.ssn" => person.ssn).last.employer_profile.employee_families.last
-  # end
 
   # Strip non-numeric characters
   def fein=(new_fein)

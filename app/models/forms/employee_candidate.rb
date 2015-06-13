@@ -23,15 +23,14 @@ module Forms
     def match_census_employees
       census_employees = []
       employers = Organization.where({
-        "employer_profile.employee_families" =>  { "$elemMatch" => {
-           "census_employee.dob" => dob,
-           "census_employee.ssn" => ssn,
-           "linked_at" => nil} }
+        "employer_profile.census_employees" =>  { "$elemMatch" => {
+           "dob" => dob,
+           "ssn" => ssn,
+           "aasm_state" => "eligible"} }
       })
       employers.each do |emp|
-        emp.employer_profile.employee_families.each do |ef|
-           ce = ef.census_employee
-           if (ce.ssn == ssn) && (ce.dob == dob) && (ef.linked_at.blank?)
+        emp.employer_profile.census_employees.each do |ce|
+           if (ce.ssn == ssn) && (ce.dob == dob) && (ce.eligible?)
              census_employees << ce
            end
         end

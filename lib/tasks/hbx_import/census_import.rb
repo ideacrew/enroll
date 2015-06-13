@@ -9,47 +9,43 @@ module HbxImport
     end
 
     def run
-      ees = []
+      census_employees_from_csv = []
       CSV.foreach(file_name, headers: true) do |row|
-        ees << CensusRecord.from_row(row)
+        census_employees_from_csv << CensusRecord.from_row(row)
       end
+      census_employees_from_csv = census_employees_from_csv.reject(&:nil?).sort.uniq
+      puts "Found #{census_employees_from_csv.size} unique census records in #{census_employees_from_csv.collect(&:fein).uniq.size} employers."
 
-      ees = ees.reject(&:nil?).sort.uniq
-
-      puts "Found #{ees.size} unique census records in #{ees.collect(&:fein).uniq.size} employers."
+      census_employees_grouped = census_employees_from_csv.group_by{|census_employee| census_employee.fein}
 
       census_employees_to_save = []
       benefit_groups_to_save = []
-      ees.each do |ee|
-        er = EmployerProfile.find_by_fein(ee.fein)
-        if er.present?
-          py = er.plan_years.last
-          bg = py.benefit_groups.last
-          eefs = EmployerProfile.find_census_families_by_person(ee)
-          # TODO: make sure first is the right one
-          eef = eefs.first
-          eef = er.employee_families.build if eef.nil?
-          cee = eef.census_employee
-          if cee.nil?
-            cee = eef.build_census_employee
-            cee.first_name = ee.first_name
-            cee.last_name = ee.last_name
-            cee.ssn = ee.ssn
-            cee.dob = ee.dob
-            cee.gender = ee.gender
-            cee.hired_on = ee.doh
-            cee.build_email(kind: "work", address: ee.work_email)
-            cee.build_address(kind: "home",address_1:"830 I St NE",city:"Washington",state:"DC",zip:"20002")
-            cee.terminated_on = ee.dot
-            eef.add_benefit_group_assignment(
-              ::EmployerCensus::BenefitGroupAssignment.new(
-                :benefit_group_id => bg.id,
-                :start_on => py.start_on
-              )
-            )
-            #eef.benefit_group = bg
-            bg.employee_families << cee._id
-            census_employees_to_save << cee
+      census_employees_grouped.each do |fein, census_employees|
+        employer_profile = EmployerProfile.find_by_fein(fein)
+        if employer_profile.present?
+          plan_year = employer_profile.plan_years.last
+          benefit_group = plan_year.benefit_groups.last
+          census_employees.each do |census_employee|
+            found = CensusEmployee.where(ssn: census_employee.ssn, dob: census_employee.dob).to_a.first
+            if found.nil?
+              ce = CensusEmployee.new
+              ce.first_name = census_employee.first_name
+              ce.last_name = census_employee.last_name
+              ce.ssn = census_employee.ssn
+              ce.dob = census_employee.dob
+              ce.gender = census_employee.gender
+              ce.is_business_owner = false
+              ce.hired_on = census_employee.doh
+              ce.employer_profile = employer_profile
+              ce.build_email(kind: "work", address: census_employee.work_email)
+              ce.build_address(kind: "home",address_1:"830 I St NE",city:"Washington",state:"DC",zip:"20002")
+              ce.employment_terminated_on = census_employee.dot
+              ce.add_benefit_group_assignment(benefit_group, plan_year.start_on)
+              ce.save!
+              benefit_group.census_employees << ce._id
+
+              census_employees_to_save << ce
+            end
           end
         end
       end
@@ -65,11 +61,11 @@ module HbxImport
         employee.save
         if employee.valid?
           status[:saved_census_employees] << employee
-          employee.employee_family.active_benefit_group_assignment.save
-          if employee.employee_family.active_benefit_group_assignment.valid?
-            status[:saved_benefit_groups] << employee.employee_family.active_benefit_group_assignment
+          employee.active_benefit_group_assignment.save
+          if employee.active_benefit_group_assignment.valid?
+            status[:saved_benefit_groups] << employee.active_benefit_group_assignment
           else
-            status[:failed_benefit_groups] << employee.employee_family.active_benefit_group_assignment
+            status[:failed_benefit_groups] << employee.active_benefit_group_assignment
           end
         else
           status[:failed_census_employees] << employee

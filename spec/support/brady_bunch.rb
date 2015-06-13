@@ -128,13 +128,15 @@ module BradyBunch
     end
     let(:mikes_hired_on) {1.year.ago.beginning_of_year.to_date}
     let!(:mikes_employer) {FactoryGirl.build(:employer_profile, organization: mikes_organization)}
+    let(:mikes_benefit_group_assignments){FactoryGirl.build(:benefit_group_assignment)}
     let(:mikes_census_employee) do
-      FactoryGirl.build(:employer_census_employee,
+      FactoryGirl.build(:census_employee,
                         first_name: mike.first_name,  last_name: mike.last_name,
-                        dob: mike.dob, address: mike.address, hired_on: mikes_hired_on
+                        dob: mike.dob, address: mike.address, hired_on: mikes_hired_on,
+                        employer_profile_id: mikes_employer.id,
+                        benefit_group_assignments: [mikes_benefit_group_assignments]
       )
     end
-    let(:mikes_census_family) {FactoryGirl.create(:employer_census_family, employer_profile: mikes_employer, census_employee: mikes_census_employee)}
     let(:mikes_benefit_group) {FactoryGirl.build(:benefit_group, plan_year: nil)}
     let!(:mikes_plan_year) {FactoryGirl.create(:plan_year, employer_profile: mikes_employer, benefit_groups: [mikes_benefit_group])}
 
@@ -166,13 +168,15 @@ module BradyBunch
                          employer_profile: carols_employer
       )
     end
+    let(:carols_benefit_group_assignments){FactoryGirl.build(:benefit_group_assignment)}
     let(:carols_census_employee) do
       FactoryGirl.build(:employer_census_employee,
                         first_name: carol.first_name,  last_name: carol.last_name,
-                        dob: carol.dob, address: carol.address, hired_on: carols_hired_on
+                        dob: carol.dob, address: carol.address, hired_on: carols_hired_on,
+                        employer_profile_id: carols_employer.id,
+                        benefit_group_assignments: [carols_benefit_group_assignments]
       )
     end
-    let(:carols_census_family) {FactoryGirl.create(:employer_census_family, employer_profile: carols_employer, census_employee: carols_census_employee)}
     let(:carols_benefit_group) {FactoryGirl.build(:benefit_group, plan_year: nil)}
     let!(:carols_plan_year) {FactoryGirl.create(:plan_year, employer_profile: carols_employer, benefit_groups: [carols_benefit_group])}
   end

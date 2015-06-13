@@ -7,10 +7,23 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:person) { double("person")}
 
     it "should render the new template" do
-      allow(user).to receive(:has_employer_staff_role?)
+      allow(user).to receive(:has_employer_staff_role?).and_return(false)
       sign_in(user)
       get :new
       expect(response).to have_http_status(:success)
+    end
+  end
+
+  describe "REDIRECT to my account if employer staff role present" do
+    let(:user) { double("user")}
+    let(:person) { double(:get_employer_contact => double("person"))}
+
+    it "should render the new template" do
+      allow(user).to receive(:has_employer_staff_role?).and_return(true)
+      allow(user).to receive(:person).and_return(person)
+      sign_in(user)
+      get :new
+      expect(response).to have_http_status(:redirect)
     end
   end
 

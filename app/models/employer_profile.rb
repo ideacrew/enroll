@@ -33,12 +33,7 @@ class EmployerProfile
   embeds_many :plan_years, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_accounts
 
-  embeds_many :employee_families,
-    class_name: "EmployerCensus::EmployeeFamily",
-    cascade_callbacks: true,
-    validate: true
-
-  accepts_nested_attributes_for :plan_years, :employee_families, :inbox, :employer_profile_account, :broker_agency_accounts
+  accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts
 
   validates_presence_of :entity_kind
 
@@ -46,8 +41,9 @@ class EmployerProfile
     inclusion: { in: Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
     allow_blank: false
 
+  validate :no_more_than_one_owner
+
   after_initialize :build_nested_models
-  before_save :is_persistable?
   after_save :save_associated_nested_models
 
   scope :active, ->{ where(:is_active => true) }
@@ -110,7 +106,7 @@ class EmployerProfile
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
   def roster_size
     return @roster_size if defined? @roster_size
-    @roster_size = employee_families.size
+    @roster_size = census_employees.size
   end
 
   def active_plan_year
@@ -138,19 +134,6 @@ class EmployerProfile
   def enrolling_plan_year
     # TODO: totally wrong, write real implementation
     latest_plan_year
-  end
-
-  # TODO: Benchmark this for efficiency
-  def employee_families_sorted
-    return @employee_families_sorted if defined? @employee_families_sorted
-    @employee_families_sorted = employee_families.unscoped.order_by_last_name.order_by_first_name
-  end
-
-  # Enrollable employees are active and unlinked
-  def linkable_employee_family_by_person(person)
-    return if employee_families.nil?
-
-    employee_families.detect { |ef| (ef.census_employee.ssn == person.ssn) && (ef.census_employee.dob == person.dob) && (ef.is_linkable?) }
   end
 
   ## Class methods
@@ -197,27 +180,9 @@ class EmployerProfile
       orgs.collect(&:employer_profile) 
     end
 
-    def find_census_families_by_person(person)
-      organizations = match_census_employees(person)
-      organizations.reduce([]) do |families, er|
-        families << er.employer_profile.employee_families.detect { |ef| ef.census_employee.ssn == person.ssn }
-      end
-    end
-
-    # Returns all EmployerProfiles where person is active on the employee_census
-    def find_all_by_person(person)
-      organizations = match_census_employees(person)
-      organizations.reduce([]) do |profiles, er|
-        profiles << er.employer_profile
-      end
-    end
-
-    def match_census_employees(person)
-      raise ArgumentError.new("expected Person") unless person.respond_to?(:ssn) && person.respond_to?(:dob)
+    def find_census_employee_by_person(person)
       return [] if person.ssn.blank? || person.dob.blank?
-      Organization.and("employer_profile.employee_families.census_employee.ssn" => person.ssn,
-                       "employer_profile.employee_families.census_employee.dob" => person.dob,
-                       "employer_profile.employee_families.census_employee.linked_at" => nil).to_a
+      CensusEmployee.find_all_unlinked_by_identifying_information(person.ssn, person.dob)
     end
 
     def advance_day(new_date)
@@ -434,9 +399,12 @@ private
     is_valid
   end
 
-  # Block changes unless record is in draft state
-  def is_persistable?
-    # aasm_state == :draft ? true : false
+  def no_more_than_one_owner
+    if owner.present? && owner.count > 1
+      errors.add(:owner, "must only have one owner")
+    end
+
+    true
   end
 
 end

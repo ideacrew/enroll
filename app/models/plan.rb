@@ -170,7 +170,7 @@ class Plan
         (pt.start_on <= schedule_date) && (pt.end_on >= schedule_date)
     end.cost
     rescue
-      raise [self.id, bound_age, schedule_date, schedule_date]
+      raise [self.id, bound_age_val, schedule_date, age].inspect
     end
   end
 

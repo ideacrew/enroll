@@ -20,18 +20,18 @@ describe Forms::EmploymentRelationship do
   end
 
   describe "given data needed to specify employee family" do
-    let(:employee_family_id) { double }
-    let(:employee_family) { double }
+    let(:census_employee_id) { double }
+    let(:census_employee) { double }
 
-    subject { Forms::EmploymentRelationship.new({ :employee_family_id => employee_family_id }) }
+    subject { Forms::EmploymentRelationship.new({ :census_employee_id => census_employee_id }) }
 
     before(:each) do
-      allow(EmployerCensus::EmployeeFamily).to receive(:find).with(employee_family_id).and_return(employee_family)
+      allow(CensusEmployee).to receive(:find).with(census_employee_id).and_return(census_employee)
     end
 
     it "should have the correct employee_family_data" do
-      expect(subject.employee_family_id).to eq employee_family_id
-      expect(subject.employee_family).to eq employee_family
+      expect(subject.census_employee_id).to eq census_employee_id
+      expect(subject.census_employee).to eq census_employee
     end
   end
 

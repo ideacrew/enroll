@@ -17,8 +17,8 @@ describe "User" do
     end
 
     context "update employee" do
-      let(:census_family) { FactoryGirl.build(:employer_census_family) }
-      let(:employee) {FactoryGirl.create(:employer_census_employee, employee_family: census_family)}
+      let(:employer_profile){ FactoryGirl.create(:employer_profile)}
+      let(:employee) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id)}
 
       context "when is hbx_staff user" do
         let(:user) { FactoryGirl.create(:user, :hbx_staff) }
@@ -39,7 +39,7 @@ describe "User" do
 
         context "not linked" do
           before do
-            allow(employee).to receive(:is_linkable?).and_return(true)
+            allow(employee).to receive(:eligible?).and_return(true)
           end
 
           it "can update when change dob" do
@@ -55,7 +55,7 @@ describe "User" do
 
         context "has linked" do
           before do
-            allow(employee).to receive(:is_linkable?).and_return(false)
+            allow(employee).to receive(:eligible?).and_return(false)
           end
 
           it "can not update when change dob" do

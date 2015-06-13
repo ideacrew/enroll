@@ -39,6 +39,8 @@ class CensusEmployee < CensusMember
   index({"benefit_group_assignments.aasm_state" => 1})
 
   scope :active,  ->{ any_in(aasm_state: ["eligible", "employee_role_linked"]) }
+  scope :order_by_last_name, -> { order(:"census_employee.last_name".asc) }
+  scope :order_by_first_name, -> { order(:"census_employee.first_name".asc) }
   scope :non_business_owner, ->{ where(is_business_owner: false) }
   scope :by_benefit_group_ids, ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :enrolled, ->{ any_in("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
