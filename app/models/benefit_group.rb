@@ -180,7 +180,7 @@ class BenefitGroup
           end
         end
       end
-      raise Mongoid::Errors::DocumentNotFound, "BenefitGroup #{id}"
+      raise Mongoid::Errors::DocumentNotFound.new(self, id)
     end
     return found_value
   end
