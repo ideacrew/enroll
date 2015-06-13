@@ -100,6 +100,7 @@ module Factories
       census_employee = EmployerProfile.find_census_employee_by_person(person).first
 
       raise ArgumentError.new("census employee does not exist for provided person details") unless census_employee.present?
+      raise ArgumentError.new("no census employee for provided employer profile") unless census_employee.employer_profile_id == employer_profile.id
 
       self.build_employee_role(
         person, person_new, employer_profile, census_employee, hired_on
@@ -113,7 +114,6 @@ module Factories
       employee_role.new_census_employee = census_employee
       employee_role.hired_on = census_employee.hired_on
       employee_role.terminated_on = census_employee.employment_terminated_on
-      employee_role.benefit_group_id = census_employee.active_benefit_group_assignment.benefit_group_id
     end
 
     private
@@ -190,7 +190,7 @@ module Factories
       family = person.primary_family
       family ||= Family.new
       applicant = family.primary_applicant
-      applicant ||= initialize_primary_applicant(family, person) 
+      applicant ||= initialize_primary_applicant(family, person)
       person.relatives.each do |related_person|
         family.add_family_member(related_person)
       end
