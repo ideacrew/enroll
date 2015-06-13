@@ -114,6 +114,7 @@ module Factories
       employee_role.new_census_employee = census_employee
       employee_role.hired_on = census_employee.hired_on
       employee_role.terminated_on = census_employee.employment_terminated_on
+      employee_role.benefit_group_id = census_employee.active_benefit_group_assignment.benefit_group_id #TODO
     end
 
     private
