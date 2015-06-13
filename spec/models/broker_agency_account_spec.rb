@@ -63,9 +63,6 @@ RSpec.describe BrokerAgencyAccount, type: :model do
           expect(BrokerAgencyAccount.find(saved_broker_agency_account.id)._id).to eq saved_broker_agency_account.id
         end
 
-        it "and should be findable by broker agency profile" do
-          expect(BrokerAgencyAccount.find_all_active_by_broker_agency_profile(broker_agency_profile).broker_agency_profile_id).to eq broker_agency_profile.id
-        end
       end
     end
   end
