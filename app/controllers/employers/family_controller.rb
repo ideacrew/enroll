@@ -13,7 +13,7 @@ class Employers::FamilyController < ApplicationController
     @family = EmployerCensus::EmployeeFamily.new
     @family.attributes = census_family_params
 
-    if Person.where(ssn: census_family_params[:census_employee_attributes][:ssn].gsub('-','')).present?
+    if Person.where(ssn: census_family_params["census_employee_attributes"]["ssn"].gsub('-','')).present?
       flash[:error] = "The provided SSN belongs to another person."
       render action: "new"
     elsif benefit_group_id.present?
