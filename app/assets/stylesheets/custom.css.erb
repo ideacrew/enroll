@@ -1170,10 +1170,6 @@ input.floatlabe{
     text-indent: 16px !important;
   } 
 }
-
-.top-row, .middle-row, .bottom-row {
-  margin: 0 !important;
-}
 .error {
   display: none;
 }
@@ -1415,7 +1411,6 @@ div#house_info > p {
   }
 }
 
-
 /** Search page css End **/
 
 ::-webkit-input-placeholder {
@@ -1433,16 +1428,6 @@ div#house_info > p {
 :-ms-input-placeholder {  
    font-size: 10px;
 }
-
-/*.landing .container-fluid {
-  padding: 0;
-}*/
-/*.landing .panel {
-  margin-bottom: 0;
-  background: #eee;
-  box-shadow: none;
-  border: none;
-}*/
 
 /** confirmation page css start **/
 
@@ -1604,17 +1589,6 @@ a.list-group-item.confirm {
   top: -20px;
   width: 18%;
 }
-.bottom-row p {
-  font-size: 18.45px;
-}
-.bottom-row p span {
-  display: block;
-  color: #3e3d3d;
-}
-.landing-row.bottom-row .left-side, .landing-row.bottom-row .right-side {
-  padding-top: 0;
-}
-
 /* STYLE FOR ACCORDION - QLE flow */
 .landing-row .right-side .list-group .list-group-item.qle-item {
   padding-bottom: 0;
@@ -1975,100 +1949,6 @@ a .arrow-right {
   margin-bottom: 27px;
   margin-top: 184px;
   padding-right: 56px;
-}
-
-/* hide the real form element by opacity: 0 and position: absolute - display: block and visibility: hidden do not work because then form elements cannot get the focus and actually get checked or unchecked */
-.skinned-form-controls input[type="checkbox"],
-.skinned-form-controls input[type="radio"]
-{
-  position: absolute;
-  -moz-opacity: 0;
-  -webkit-opacity: 0;
-  opacity: 0;
-}
-
-/* prevent the entire page from scrolling if there is overflow and checkbox or radio button are clicked */
-.skinned-form-controls label
-{
-  position: relative;
-}
-
-/* fallback for IE6, IE7 and IE8 */
-.skinned-form-controls input[type="checkbox"],
-.skinned-form-controls input[type="radio"]
-{
-  position: static\9;
-}
-
-.skinned-form-controls input[type="checkbox"] + span::before,
-.skinned-form-controls input[type="radio"] + span::before
-{
-  content: "";
-  display: inline-block;
-  width: 32px;
-  height: 30px;
-  vertical-align: middle;
-  background-repeat:  no-repeat;
-}
-.skinned-form-controls.radio input[type="checkbox"] + span::before,
-.skinned-form-controls.radio input[type="radio"] + span::before
-{
-  content: "";
-  display: inline-block;
-  width: 17px;
-  height: 32px;
-  vertical-align: middle;
-  background-repeat:  no-repeat;
-}
-
-.skinned-form-controls input[type="checkbox"]:checked + span::before
-{
-  background-position: 0 -20px;
-}
-
-.skinned-form-controls input[type="radio"] + span::before
-{
-  background-position: 0 0;
-}
-
-.skinned-form-controls input[type="radio"]:checked + span::before
-{
-  background-position: 0 -52px;
-}
-
-.skinned-form-controls.radio input[type="radio"] + span::before
-{
-  background-position: 0 9px;
-}
-
-.skinned-form-controls.radio input[type="radio"]:checked + span::before
-{
-  background-position: 0 -16px;
-}
-
-/* disabled form elements */
-.skinned-form-controls input[type="radio"]:disabled + span,
-.skinned-form-controls input[type="checkbox"]:disabled + span,
-.skinned-form-controls input[type="radio"]:disabled + span::before,
-.skinned-form-controls input[type="checkbox"]:disabled + span::before
-{
-  -moz-opacity: .4;
-  -webkit-opacity: .4;
-  opacity: .4;
-}
-
-
-/* skin-specific sprite */
-.skinned-form-controls.skinned-form-controls-mac input[type="checkbox"] + span::before,
-.skinned-form-controls.skinned-form-controls-mac input[type="radio"] + span::before
-{
-  background-image: url('<%= asset_path('search-sprite.png') %>');
-}
-
-.skinned-form-controls.skinned-form-controls-mac.radio input[type="checkbox"] + span::before,
-.skinned-form-controls.skinned-form-controls-mac.radio input[type="radio"] + span::before
-{
-  background-image: url('<%= asset_path('radio-img.png') %>');
 }
 
 /* Custom css for Checkboxes and Radio Buttons End */
@@ -3306,9 +3186,6 @@ a.all-filter:hover{
   .list-group.emp-ul {
     display: block;
   }
-  .landing-row .right-side .list-group .list-group-item:nth-child(4), .emp-ul.list-group .list-group-item:nth-child(4), .landing-row.bottom-row .right-side .list-group .list-group-item:nth-child(3) {
-    padding-bottom: 30px;
-  }
 }
 
 @media (min-width: 300px) and (max-width: 385px) {
@@ -3414,9 +3291,6 @@ a.all-filter:hover{
   -webkit-box-shadow: 0px 0px 0px 1px #005fd6;
   -moz-box-shadow: 0px 0px 0px 1px #005fd6;
   opacity: 0.5;
-}
-.employee-info .top-row {
-  border-color: #007bc3 !important;
 }
 .employee-info label, .employee-info input {
   color: #0080ff !important;
@@ -3554,12 +3428,6 @@ div#house_info > p{
   margin-bottom: 30px;
   font-size: 21px;
   font-family: "AvenirLTStd-Medium";
-}
-div#house_info .top-row-2 input{
-  padding-top: 20px !important;
-  height: auto;
-  line-height: 30px;
-  padding-bottom: 2px;
 }
 div#house_info .sidebar-email-field {
   padding-bottom: 15px !important;
@@ -5221,7 +5089,7 @@ ul.list-right-section li a img {
 
 /* Form Elements */
 .row-form-wrapper {border: 1px solid #b7b7b7;border-top: none;padding: 3px; background-color: #fff; transition: all 0.2s ease-in-out 0s;}
-.row-form-wrapper:first-child {border-top: 1px solid #b7b7b7;}
+div.row-form-wrapper:first-of-type, #email_info, #dependent_ul li {border-top: 1px solid #b7b7b7;}
 .row-form-wrapper .form-group {
   margin-bottom: 0;
 }

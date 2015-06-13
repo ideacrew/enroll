@@ -1,6 +1,5 @@
 <li id="add_member_list_<%= dependent.id %>" class="dependent_list">
-<div id="add_info_<%= dependent.id %>" class="focus_effect personal-info-row">
-	<div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
+	<div id="add_info_<%= dependent.id %>">
 		<div class="dependent_notice_div_<%= dependent.id%>"></div>
 		<div class="row row-form-wrapper no-buffer">
 			<div class="col-md-4 col-sm-4 no-pd">
@@ -59,13 +58,12 @@
 				</div>
 			</div>
 		</div>
-	</div>
 
-	<div class="clearfix"></div>
-</div>
-<script>
-	$('.floatlabel').floatlabel({
-		slideInput: false
-	});
-</script>
+		<div class="clearfix"></div>
+	</div>
+	<script>
+		$('.floatlabel').floatlabel({
+			slideInput: false
+		});
+	</script>
 </li>

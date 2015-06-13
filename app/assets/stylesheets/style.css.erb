@@ -613,10 +613,6 @@ input.floatlabe{
   } 
 }
 
-.top-row, .middle-row, .bottom-row {
-  margin: 0;
-}
-
 .btn-new-address {
   background: none;
   border: none !important;
@@ -1039,110 +1035,6 @@ a .arrow-right {
 }
 
 /*** employer-page css end ***/
-
-
-
-/* Custom css for Checkboxes and Radio Buttons start */
-
-
-/* hide the real form element by opacity: 0 and position: absolute - display: block and visibility: hidden do not work because then form elements cannot get the focus and actually get checked or unchecked */
-.skinned-form-controls input[type="checkbox"],
-.skinned-form-controls input[type="radio"]
-{
-  position: absolute;
-  -moz-opacity: 0;
-  -webkit-opacity: 0;
-  opacity: 0;
-}
-
-/* prevent the entire page from scrolling if there is overflow and checkbox or radio button are clicked */
-.skinned-form-controls label
-{
-  position: relative;
-}
-
-/* fallback for IE6, IE7 and IE8 */
-.skinned-form-controls input[type="checkbox"],
-.skinned-form-controls input[type="radio"]
-{
-  position: static\9;
-}
-
-.skinned-form-controls input[type="checkbox"] + span::before,
-.skinned-form-controls input[type="radio"] + span::before
-{
-  content: "";
-  display: inline-block;
-  width: 32px;
-  height: 30px;
-  vertical-align: middle;
-  background-repeat:  no-repeat;
-}
-.skinned-form-controls.radio input[type="checkbox"] + span::before,
-.skinned-form-controls.radio input[type="radio"] + span::before
-{
-  content: "";
-  display: inline-block;
-  width: 17px;
-  height: 32px;
-  vertical-align: middle;
-  background-repeat:  no-repeat;
-}
-
-.skinned-form-controls input[type="checkbox"]:checked + span::before
-{
-  background-position: 0 -20px;
-}
-
-.skinned-form-controls input[type="radio"] + span::before
-{
-  background-position: 0 0;
-}
-
-.skinned-form-controls input[type="radio"]:checked + span::before
-{
-  background-position: 0 -52px;
-}
-
-.skinned-form-controls.radio input[type="radio"] + span::before
-{
-  background-position: 0 9px;
-}
-
-.skinned-form-controls.radio input[type="radio"]:checked + span::before
-{
-  background-position: 0 -16px;
-}
-
-/* disabled form elements */
-.skinned-form-controls input[type="radio"]:disabled + span,
-.skinned-form-controls input[type="checkbox"]:disabled + span,
-.skinned-form-controls input[type="radio"]:disabled + span::before,
-.skinned-form-controls input[type="checkbox"]:disabled + span::before
-{
-  -moz-opacity: .4;
-  -webkit-opacity: .4;
-  opacity: .4;
-}
-
-
-/* skin-specific sprite */
-.skinned-form-controls.skinned-form-controls-mac input[type="checkbox"] + span::before,
-.skinned-form-controls.skinned-form-controls-mac input[type="radio"] + span::before
-{
-  background-image: url('<%= asset_path('search-sprite.png') %>');
-}
-
-.skinned-form-controls.skinned-form-controls-mac.radio input[type="checkbox"] + span::before,
-.skinned-form-controls.skinned-form-controls-mac.radio input[type="radio"] + span::before
-{
-  background-image: url('<%= asset_path('radio-img.png') %>');
-}
-
-/* Custom css for Checkboxes and Radio Buttons End */
-
-
-
 /** Generic form css start **/
 
 .form {
