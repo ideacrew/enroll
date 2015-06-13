@@ -289,6 +289,8 @@ end
 
 
 When(/^I click on terminate button for a census family$/) do
+  ce = Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.dup
+  ce.save
   @browser.a(text: /Terminate/).wait_until_present
   @browser.a(text: /Terminate/).click
   terminated_date = Date.current + 20.days
