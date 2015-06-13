@@ -8,12 +8,6 @@ class EmployerProfile
   field :entity_kind, type: String
   field :sic_code, type: String
 
-  # Broker agency representing ER
-  field :broker_agency_profile_id, type: BSON::ObjectId
-
-  # Broker writing_agent credited for enrollment and transmitted on 834
-  field :writing_agent_id, type: BSON::ObjectId
-
   field :aasm_state, type: String
   field :aasm_message, type: String
 
@@ -37,13 +31,14 @@ class EmployerProfile
   embeds_one  :inbox, as: :recipient
   embeds_one  :employer_profile_account
   embeds_many :plan_years, cascade_callbacks: true, validate: true
+  embeds_many :broker_agency_accounts
 
   embeds_many :employee_families,
     class_name: "EmployerCensus::EmployeeFamily",
     cascade_callbacks: true,
     validate: true
 
-  accepts_nested_attributes_for :plan_years, :employee_families, :inbox, :employer_profile_account
+  accepts_nested_attributes_for :plan_years, :employee_families, :inbox, :employer_profile_account, :broker_agency_accounts
 
   validates_presence_of :entity_kind
 
@@ -51,13 +46,13 @@ class EmployerProfile
     inclusion: { in: Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
     allow_blank: false
 
-  validate :writing_agent_employed_by_broker
-
   after_initialize :build_nested_models
   before_save :is_persistable?
   after_save :save_associated_nested_models
 
   scope :active, ->{ where(:is_active => true) }
+
+  alias_method :is_active?, :is_active
 
   def parent
     raise "undefined parent Organization" unless organization?
@@ -69,6 +64,34 @@ class EmployerProfile
     CensusEmployee.find_by_employer_profile(self)
   end
 
+  def hire_broker_agency(new_broker_agency, start_on = Date.current)
+    start_on = start_on.to_date.beginning_of_day
+    if active_broker_agency_account.present?
+      terminate_on = (start_on - 1.day).end_of_day
+      terminate_active_broker_agency(terminate_on)
+    end
+    broker_agency_accounts.build(broker_agency_profile: new_broker_agency, start_on: start_on)
+    @broker_agency_profile = new_broker_agency
+  end
+
+  alias_method :broker_agency_profile=, :hire_broker_agency
+
+  def terminate_active_broker_agency(terminate_on = Date.current)
+    if active_broker_agency_account.present?
+      active_broker_agency_account.end_on = terminate_on
+      active_broker_agency_account.is_active = false
+    end
+  end
+
+  def broker_agency_profile
+    return @broker_agency_profile if defined? @broker_agency_profile
+    @broker_agency_profile = active_broker_agency_account.broker_agency if active_broker_agency_account.present?
+  end
+
+  def active_broker_agency_account
+    return @active_broker_agency_account if defined? @active_broker_agency_account
+    @active_broker_agency_account = broker_agency_accounts.detect { |account| account.is_active? }
+  end
 
   def cycle_daily_events
     # advance employer_profile_account billing period for pending_binder_payment
@@ -117,30 +140,6 @@ class EmployerProfile
     latest_plan_year
   end
 
-  # belongs_to broker_agency_profile
-  def broker_agency_profile=(new_broker_agency_profile)
-    raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a?(BrokerAgencyProfile)
-    self.broker_agency_profile_id = new_broker_agency_profile._id
-    new_broker_agency_profile
-  end
-
-  def broker_agency_profile
-    return @broker_agency_profile if defined? @broker_agency_profile
-    @broker_agency_profile =  parent.broker_agency_profile.where(id: @broker_agency_profile_id) unless @broker_agency_profile_id.blank?
-  end
-
-  # belongs_to writing agent (broker)
-  def writing_agent=(new_writing_agent)
-    raise ArgumentError.new("expected BrokerRole") unless new_writing_agent.is_a?(BrokerRole)
-    self.writing_agent_id = new_writing_agent._id
-    new_writing_agent
-  end
-
-  def writing_agent
-    return @writing_agent if defined? @writing_agent
-    @writing_agent = BrokerRole.find(@writing_agent_id) unless @writing_agent_id.blank?
-  end
-
   # TODO: Benchmark this for efficiency
   def employee_families_sorted
     return @employee_families_sorted if defined? @employee_families_sorted
@@ -152,10 +151,6 @@ class EmployerProfile
     return if employee_families.nil?
 
     employee_families.detect { |ef| (ef.census_employee.ssn == person.ssn) && (ef.census_employee.dob == person.dob) && (ef.is_linkable?) }
-  end
-
-  def is_active?
-    self.is_active
   end
 
   ## Class methods
@@ -186,14 +181,20 @@ class EmployerProfile
       organization.present? ? organization.employer_profile : nil
     end
 
-    def find_by_broker_agency_profile(profile)
-      raise ArgumentError.new("expected BrokerAgencyProfile") unless profile.is_a?(BrokerAgencyProfile)
-      list_embedded Organization.where("employer_profile.broker_agency_profile_id" => profile._id).to_a
+    def find_by_broker_agency_profile(broker_agency_profile)
+      raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile)
+      orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true, 
+        :"employer_profile.broker_agency_accounts.broker_agency_profile_id" => broker_agency_profile.id).to_a
+
+      orgs.collect(&:employer_profile) 
     end
 
     def find_by_writing_agent(writing_agent)
       raise ArgumentError.new("expected BrokerRole") unless writing_agent.is_a?(BrokerRole)
-      where(writing_agent_id: writing_agent._id) || []
+      orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true,
+        :"employer_profile.broker_agency_accounts.writing_agent_id" => writing_agent.id).to_a
+
+      orgs.collect(&:employer_profile) 
     end
 
     def find_census_families_by_person(person)
@@ -431,14 +432,6 @@ private
         false
     end
     is_valid
-  end
-
-  def writing_agent_employed_by_broker
-    if writing_agent.present? && broker_agency.present?
-      unless broker_agency.writing_agents.detect(writing_agent)
-        errors.add(:writing_agent, "must be broker at broker_agency")
-      end
-    end
   end
 
   # Block changes unless record is in draft state

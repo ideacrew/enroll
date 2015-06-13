@@ -67,6 +67,10 @@ class Organization
   index({"employer_profile.plan_years.open_enrollment_end_on" => 1})
   index({"employer_profile.plan_years.benefit_groups._id" => 1})
 
+  index({"employer_profile.broker_agency_accounts._id" => 1})
+  index({"employer_profile.broker_agency_accounts.is_active" => 1,
+         "employer_profile.broker_agency_accounts.broker_agency_profile_id" => 1 })
+
   index({"employer_profile.employee_families._id" => 1}, { unique: true, sparse: true })
   index({"employer_profile.employee_families.linked_at" => 1}, {sparse: true})
   index({"employer_profile.employee_families.employee_role_id" => 1}, {sparse: true})
