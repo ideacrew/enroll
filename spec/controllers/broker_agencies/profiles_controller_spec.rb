@@ -2,7 +2,6 @@ require 'rails_helper'
 
 RSpec.describe BrokerAgencies::ProfilesController do
   let(:broker_agency_profile_id) { "abecreded" }
-  let(:plan_year_proxy) { double }
   let(:broker_agency_profile) { double("test") }
 
   describe "GET new" do
@@ -48,6 +47,50 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
     it "renders the 'index' template" do
       expect(response).to render_template("index")
+    end
+  end
+
+  describe "CREATE post" do
+    let(:user){ double(:save => double("user")) }
+    let(:person){ double(:broker_agency_contact => double("test")) }
+    let(:broker_agency_profile){ double("test") }
+    let(:form){double("test")}
+    let(:organization) {double("organization")}
+    context "when no broker role" do
+      before(:each) do
+        allow(user).to receive(:has_broker_role?).and_return(false)
+        allow(user).to receive(:person).and_return(person)
+        allow(user).to receive(:person).and_return(person)
+        sign_in(user)
+        allow(Forms::BrokerAgencyProfileForm).to receive(:new).and_return(form)
+        allow(form).to receive(:build_and_assign_attributes).and_return([organization,user])
+      end
+
+      it "returns http status" do
+        allow(organization).to receive(:save).and_return(true)
+        post :create, organization: {}
+        expect(response).to have_http_status(:redirect)
+      end
+
+      it "should render new template when invalid params" do
+        allow(organization).to receive(:save).and_return(false)
+        post :create, organization: {}
+        expect(response).to render_template("new")
+      end
+    end
+
+  end
+
+  describe "REDIRECT to my account if broker role present" do
+    let(:user){double("user")}
+    let(:person){double(:get_broker_profile_contact => double("person"))}
+
+    it "should redirect to myaccount" do
+      allow(user).to receive(:has_broker_role?).and_return(true)
+      allow(user).to receive(:person).and_return(person)
+      sign_in(user)
+      get :new
+      expect(response).to have_http_status(:redirect)
     end
   end
 
