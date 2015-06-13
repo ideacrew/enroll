@@ -1,1 +1,1 @@
-$('#employees-list').html("<%= escape_javascript(render partial: "employers/employer_profiles/my_account/census_employees") %>");
+$("#employees_<%= @status %>").html("<%= escape_javascript(render partial: "employers/employer_profiles/my_account/employees_by_status", locals: {status: "#{@status}"}) %>");

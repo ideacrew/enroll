@@ -10,88 +10,35 @@
             <h3 class="pull-left">Employee Roster</h3>
             <div class="btn-wrapper">
               <%= link_to '<i class="fa fa-user-plus"></i> Add Employee'.html_safe, new_employers_employer_profile_census_employee_path(@employer_profile), class: "btn btn-primary", remote: true %>
-              <div class="btn-group" role="group" aria-label="">
-                <div class="btn-group" data-toggle="buttons">
+                <div class="btn-group" role="group" aria-label="">
+                <div class="btn-group" data-toggle="buttons" name="employee_family_tabs">
                   <label class="btn btn-default active">
-                    <input type="radio" name="options" id="terminated_no" autocomplete="off" checked> Active
+                    <input type="radio" name="options" id="terminated_no" autocomplete="off" value="active" checked> Active
                   </label>
                   <label class="btn btn-default">
-                    <input type="radio" name="options" id="family_waived" autocomplete="off"> Waived
+                    <input type="radio" name="options" id="family_waived" autocomplete="off" value="waived"> Waived
                   </label>
                   <label class="btn btn-default">
-                    <input type="radio" name="options" id="terminated_yes" autocomplete="off" > Terminated
+                    <input type="radio" name="options" id="terminated_yes" autocomplete="off" value="terminated"> Terminated
                   </label>
                   <label class="btn btn-default">
-                    <input type="radio" name="options" id="family_all" autocomplete="off"> All
+                    <input type="radio" name="options" id="family_all" autocomplete="off" value="all"> All
                   </label>
                 </div>
               </div>
+              <span name="employee_families_url" style="display:none"><%= employers_employer_profile_path(@employer_profile) %></span>
             </div>
           </div>
 
-          <div class="table-responsive" style="overflow-y: hidden;">
-            <table class="table table-wrapper" style="opacity: 1;">
-              <thead>
-                <tr>
-                  <th>Employee Name</th>
-                  <th>SSN</th>
-                  <th>DDB</th>
-                  <th>Hire Date</th>
-                  <th>Status</th>
-                  <th>Linked?</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @census_employees.each do |census_employee| %>
-                  <tr class="terminated_<%= census_employee.employment_terminated? %> remove_<%= census_employee.id %>">
-                    <td> <%= link_to name_to_listing(census_employee), employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id), remote: true %> </td>
-                    <td><%= number_to_obscured_ssn census_employee.ssn %></td>
-                    <td><%= format_date census_employee.dob %> </td>
-                    <td><%= format_date census_employee.hired_on %> </td>
-                    <td><%= census_employee.aasm_state.humanize %></td>
-                    <td><%= boolean_to_human census_employee.employee_role_linked? %></td>
-                    <td>
-                      <% if census_employee.employment_terminated? %>
-                        <%= link_to ('javascript:;'), class: "show_confirm btn btn-green-2", id: "show_confirm_#{census_employee.id}" do %>
-                          <span class="hidden-xs hidden-sm visible-md visible-lg">Rehire</span>
-                          <span class="glyphicon glyphicon-pencil hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
-                        <% end %>
-                      <% else %>
-                        <%= link_to '<i class="fa fa-pencil"></i> Edit'.html_safe, (edit_employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id)), class: "btn btn-success", remote: true %>
-
-                        <%= link_to '<i class="fa fa-chain-broken"></i> Delink'.html_safe, (employers_employer_profile_census_employee_delink_path(@employer_profile.id, census_employee.id)), class: "btn btn-default", disabled: !census_employee.employee_role_linked? %>
-
-                        <%= link_to '<i class="fa fa-times"></i> Terminate'.html_safe, ('javascript:;'), class: "btn btn-danger show_confirm", id: "show_confirm_#{census_employee.id}" %>
-                      <% end %>
-                    </td>
-                  </tr>
-                  <% if census_employee.employment_terminated? %>
-                    <tr class="unbrd  rehire_<%= census_employee.id %>">
-                      <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>">
-                        <div class="confirm-terminate">
-                          <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker"><br/>
-                          <a href="javascript:;" data-link="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, census_employee.id) %>" class="rehire_confirm" id="rehire_<%= census_employee.id %>"><strong>Submit</strong></a>
-                        </div>
-                        <b><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></b>
-                      </td>
-                    </tr>
-                  <% else %>
-                    <tr class="unbrd  remove_<%= census_employee.id %>">
-                      <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>">
-                        <div class="confirm-terminate">
-                          <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker"><br/>
-                          <a href="javascript:;" data-link="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, census_employee.id) %>" class="delete_confirm" id="remove_<%= census_employee.id %>"><strong>Submit</strong></a>
-                        </div>
-                        <%=image_tag "enter_date_termination.png", width: "300", height: "" %>
-                      </td>
-                    </tr>
-                  <% end %>
-                <% end %>
-              </tbody>
-            </table>
-            <%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true %>
+          <div id="employee_families">
+            <div id="employees_active">
+              <%= render "employers/employer_profiles/my_account/employees_by_status", status: 'active' %>
+            </div>
+            <div id="employees_waived"></div>
+            <div id="employees_terminated"></div>
+            <div id="employees_all"></div>                     
           </div>
+          
         </div>
       </div>
     </div>

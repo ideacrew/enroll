@@ -61,11 +61,6 @@ class EmployerProfile
     @organization = self.organization
   end
 
-  def census_employees
-    CensusEmployee.find_by_employer_profile(self)
-  end
-
-
   def cycle_daily_events
     # advance employer_profile_account billing period for pending_binder_payment
   end
@@ -140,11 +135,6 @@ class EmployerProfile
   def census_employees
     return @census_employees if defined? @census_employees
     @census_employees = CensusEmployee.where(employer_profile_id: id)
-  end
-
-  def census_employees_sorted
-    return @census_employees_sorted if defined? @census_employees_sorted
-    @census_employees_sorted = census_employees.order_by_last_name.order_by_first_name
   end
 
   def is_active?
