@@ -1,24 +1,24 @@
 $(function() {
 
-  $("input#family_all").change(function(){
+  $(document).on('change', "input#family_all", function(){
     $("tr.terminated_true").show();
     $("tr.terminated_false").show();
     $('.confirm-terminate-wrapper').hide();
   });
 
-  $("input#family_waived").change(function(){
+  $(document).on('change', "input#family_waived", function(){
     $("tr.terminated_true").hide();
     $("tr.terminated_false").hide();
     $('.confirm-terminate-wrapper').hide();
   });
 
-  $("input#terminated_yes").change(function(){
+  $(document).on('change', "input#terminated_yes", function(){
     $("tr.terminated_true").show();
     $("tr.terminated_false").hide();
     $('.confirm-terminate-wrapper').hide();
   });
 
-  $("input#terminated_no").change(function(){
+  $(document).on('change', "input#terminated_no", function(){
     $("tr.terminated_false").show();
     $("tr.terminated_true").hide();
     $('.confirm-terminate-wrapper').hide();
@@ -26,14 +26,13 @@ $(function() {
 
   $("input#terminated_no").trigger("change");
   
-  $( ".show_confirm" ).click(function() {
+  $(document).on('click', ".show_confirm", function(){
     var el_id = $(this).attr('id');
     $( "td." + el_id ).toggle();
     $( "#confirm-terminate-2" ).hide();
   });
   
-  $(document).ready(function(){
-    $('.delete_confirm').click(function(){
+  $(document).on('click', ".delete_confirm", function(){
       //var element_id = $(this).attr('id');
       var termination_date = $(this).siblings().val();
       var link_to_delete = $(this).data('link');
@@ -55,8 +54,8 @@ $(function() {
         }
       });
     });
-    
-    $('.rehire_confirm').click(function(){
+
+  $(document).on('click', ".rehire_confirm", function(){
       var element_id = $(this).attr('id');
       var rehiring_date = $(this).siblings().val();
       var link_to_delete = $(this).data('link');
@@ -67,6 +66,5 @@ $(function() {
         data: {rehiring_date: rehiring_date}
       });
     });
-  });
   
 })
