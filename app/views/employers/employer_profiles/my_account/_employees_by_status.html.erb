@@ -6,6 +6,9 @@
         <th>SSN</th>
         <th>DDB</th>
         <th>Hire Date</th>
+        <% if ['terminated', 'all'].include?(status) %>
+        <th>Termination Date</th>
+        <% end %>
         <th>Status</th>
         <th>Linked?</th>
         <th></th>
@@ -18,6 +21,9 @@
         <td><%= number_to_obscured_ssn census_employee.ssn %></td>
         <td><%= format_date census_employee.dob %> </td>
         <td><%= format_date census_employee.hired_on %> </td>
+        <% if ['terminated', 'all'].include?(status) %>
+        <td><%= format_date census_employee.employment_terminated_on %> </td>
+        <% end %>
         <td><%= census_employee.aasm_state.humanize %></td>
         <td><%= boolean_to_human census_employee.employee_role_linked? %></td>
         <td>
