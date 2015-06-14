@@ -1,0 +1,65 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <% if @census_employee.errors.any? %>
+        <div class="alert alert-error">
+          <h4>
+            <%= "#{pluralize(@census_employee.errors.size, "error")} prohibited this person from being saved:" %>
+          </h4>
+          <ul>
+            <% @census_employee.errors.full_messages.each do |msg| %>
+              <li> <%= msg %> </li>
+            <% end %>
+            <% @census_employee.census_dependents.each do |dep| %>
+              <% dep.errors.full_messages.each do |msg| %>
+                <li> <%= msg %> </li>
+              <% end %>
+            <% end %>
+            <% @census_employee.benefit_group_assignments.each do |bg| %>
+              <% bg.errors.full_messages.each do |msg| %>
+                <li> <%= msg %> </li>
+              <% end %>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+      <% page_title = @census_employee.persisted? ? 'Update Employee' : 'Add New Employee' %>
+      <div class="row">
+        <div class="col-md-9 no-pd col-sm-9 col-xs-12">
+          <h3 class="pull-left">
+            <%= page_title %>
+          </h3>
+          <a class="btn btn-danger return_to_employee_roster pull-right" href="#"><i class="fa fa-times"></i> Cancel</a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-9 no-pd col-sm-9 col-xs-12">
+          <%= render 'member_fields', f: f %>
+          <%= render 'shared/census_employee_fields', {f: f} %>
+          <br/>
+          <%= f.fields_for :address, @census_employee.address, errors: {}, fieldset: false do |address| %>
+            <%= render 'address_fields', f: address %>
+          <% end %>
+          <br/>
+          <div class="form-inputs">
+            <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |dependent| %>
+              <%= render 'shared/census_dependent_fields', f: dependent %>
+            <% end %>
+            <br/>
+            <%= link_to_add_fields '<i class="fa fa-user-plus"></i> Add Dependent'.html_safe, f, :census_dependents, 'btn btn-success pull-right' %>
+            <br/>
+            <br/>
+          </div>
+          <div class="row">
+            <div class="col-md-3 key col-sm-3 col-xs-12">
+              <% button_label = @census_employee.persisted? ? 'Update Employee' : 'Create Employee' %>
+              <button class="btn btn-primary" type="submit">
+                <%= "<i class=\"fa fa-user-plus\"></i> #{button_label}".html_safe %>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

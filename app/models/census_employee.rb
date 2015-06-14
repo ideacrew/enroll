@@ -39,6 +39,11 @@ class CensusEmployee < CensusMember
   index({"benefit_group_assignments.aasm_state" => 1})
 
   scope :active,  ->{ any_in(aasm_state: ["eligible", "employee_role_linked"]) }
+  scope :order_by_last_name, -> { order(:"census_employee.last_name".asc) }
+  scope :order_by_first_name, -> { order(:"census_employee.first_name".asc) }
+  scope :non_business_owner, ->{ where(is_business_owner: false) }
+  scope :by_benefit_group_ids, ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
+  scope :enrolled, ->{ any_in("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
 
   def initialize(*args)
     super(*args)
@@ -137,7 +142,7 @@ class CensusEmployee < CensusMember
       message << "Coverage status: #{bga_status}"
       message << ee_id
       Rails.logger.error { message }
-      raise CensusEmployeeError, message      
+      raise CensusEmployeeError, message
     end
 
     self.employment_terminated_on = terminated_on.to_date.end_of_day
@@ -160,6 +165,8 @@ class CensusEmployee < CensusMember
     def find_all_by_employer_profile(employer_profile)
       unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
     end
+
+    alias_method :find_by_employer_profile, :find_all_by_employer_profile
 
     def find_all_by_employee_role(employee_role)
       unscoped.where(employee_role_id: employee_role._id)
@@ -215,4 +222,3 @@ private
 end
 
 class CensusEmployeeError < StandardError; end
-

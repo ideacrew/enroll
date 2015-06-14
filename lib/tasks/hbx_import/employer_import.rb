@@ -324,10 +324,13 @@ module HbxImport
       reference_plan = benefit_group.reference_plan
       benefit_group.elected_plan_ids = case
       when plan_count == 1
+        benefit_group.plan_option_kind = "single_plan"
         elected_plan_ids = [reference_plan._id]
       when metal_selection.present?
+        benefit_group.plan_option_kind = "metal_level"
         elected_plan_ids = PlanLookup.find_plans_by_metal_level(metal_selection, reference_plan.active_year)
       when employer.carrier_name.present?
+        benefit_group.plan_option_kind = "single_carrier"
         elected_plan_ids = PlanLookup.find_plans_by_carrier(reference_plan.carrier_profile, reference_plan.active_year)
       end
     end

@@ -44,8 +44,8 @@ class BenefitGroup
 
   attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
 
-  #TODO add following attributes: :title, 
-  validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset, 
+  #TODO add following attributes: :title,
+  validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
                         :reference_plan_id, :plan_option_kind, :elected_plan_ids
 
   validates :plan_option_kind,
@@ -180,7 +180,7 @@ class BenefitGroup
           end
         end
       end
-      raise Mongoid::Errors::DocumentNotFound, "BenefitGroup #{id}"
+      raise Mongoid::Errors::DocumentNotFound.new(self, id)
     end
     return found_value
   end

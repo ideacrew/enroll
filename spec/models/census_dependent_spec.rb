@@ -13,7 +13,7 @@ RSpec.describe CensusDependent, :type => :model do
     gender = "male"
     employee_relationship = "spouse"
 
-    dependent = EmployerCensus::Dependent.new(
+    dependent = CensusDependent.new(
         first_name: first_name,
         middle_name: middle_name,
         last_name: last_name,

@@ -52,11 +52,7 @@ module Forms
     end
 
     def census_employee
-      @census_employee ||= census_family.census_employee
-    end
-
-    def census_family
-      @census_family ||= employee_role.census_family
+      @census_employee ||= employee_role.new_census_employee
     end
 
     def employee_role

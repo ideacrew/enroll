@@ -91,7 +91,7 @@ end
 When(/^I enter the identifying information of my existing person$/) do
   @browser.text_field(name: "person[first_name]").set("Patrick")
   @browser.text_field(name: "person[last_name]").set("Doe")
-  @browser.text_field(name: "person[date_of_birth]").set("10/10/1980")
+  @browser.text_field(name: "person[date_of_birth]").set("01/01/1980")
   @browser.label(:text=> /FIRST NAME/).click
   @browser.text_field(name: "person[ssn]").set("786120965")
   screenshot("information_entered")

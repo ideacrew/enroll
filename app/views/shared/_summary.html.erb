@@ -2,22 +2,43 @@
 
 <% if qhp.present? %>
   <div class="row plan">
-    <div class="col-md-9 col-sm-9 col-xs-12">
+    <div class="col-md-6 col-sm-6 col-xs-12">
       <div class="page-header"><h4>Selected Plan</h4></div>
       <p><%= image_tag('blue-cross.jpg', width: 80) %></p>
-      <h3 class="text-blue"><%= qhp.plan_marketing_name %></h3>
+      <h3 class="text-blue"><%= @plan.name %></h3>
+      <p><%= (Caches::MongoidCache.lookup(CarrierProfile, @plan.carrier_profile_id) { @plan.carrier_profile} ).dba %></p>
       <ul class="plan-type">
         <% plan_level = qhp.metal_level.downcase %>
-        <li class="<%= plan_level %>"><i class="fa fa-circle-o"></i> <%= plan_level.humanize %></li>
-        <li class="type"><%= qhp.plan_type %></li>
+        <li class="<%= plan_level %>"><small>Level</small><br><i class="fa fa-circle-o"></i> <%= plan_level.humanize %></li>
+        <li><small>Type</small><br><%= qhp.plan_type %></li>
+        <li><small>Network</small><br><strong><%= @plan.nationwide ? "Nationwide" : "DC Area Network" %></strong></li>
+        <li><small>Deductible</small><br><strong><%= @plan.deductible %></strong></li>
       </ul>
     </div>
-    <div class="col-md-3 col-sm-3 col-xs-12">
-      <!-- Premium <h2><%= number_to_currency(@plan.total_premium) %></h2>
-      Employer Pays <h2><%= number_to_currency(@plan.total_employer_contribution) %></h2> -->
-      <!-- Total Employee cost --> 
-      <h1><%= number_to_currency(@plan.total_employee_cost) %></h1><small>/Month</small><br><br>
-      <%= link_to("Select Plan", '#', {:class => "btn btn-primary btn-lg"}) %>
+    
+    <div class="col-md-6 col-sm-6 col-xs-12">
+
+      <div class="row">
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <h3><%= number_to_currency(@plan.total_premium) %></h3><small>Premium</small>
+        </div>
+
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <h3><%= number_to_currency(@plan.total_employer_contribution) %></h3><small>Employer</small>
+        </div>
+
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <div class="pull-right">
+            <h3><strong><%= number_to_currency(@plan.total_employee_cost) %></strong></h3><small><strong>your cost</strong></small><br><br>
+          </div>
+        </div>
+      </div><br><br>
+
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => @plan.id}), {:class => "btn btn-primary btn-lg pull-right", :method => :post}) %>
+        </div>
+      </div>
     </div>
   </div>
 

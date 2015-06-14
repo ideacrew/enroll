@@ -29,43 +29,27 @@ phone_02 = Phone.new(kind: "main", area_code: "202", number: "555-1215")
 email_02 = Email.new(kind: "work", address: "info@spacely.com")
 office_location_02 = OfficeLocation.new(is_primary: false, address: address_02, phone: phone_02, email: email_02)
 
-cogswell = Organization.create(
-      dba: "Cogswell Cogs",
-      legal_name: "Cogswell Cogs, Inc",
-      fein: 555123457,
-      office_locations: [office_location_01, office_location_02]
-    )
+spacely_employer_profile = spacely.create_employer_profile(
+    entity_kind: "s_corporation",
+    broker_agency_profile: broker_agency_0
+  )
 
-jetson_0 = EmployerCensus::EmployeeFamily.new(
-    census_employee: EmployerCensus::Employee.new(
+jetson_0 = CensusEmployee.new(
         last_name: "Jetson", first_name: "George", dob: "04/01/1974", ssn: 987654321, hired_on: "03/20/2015", gender: "male",
-        email: Email.new(kind: "work", address: "dan.thomas@dc.gov")
-      ),
+        email: Email.new(kind: "work", address: "dan.thomas@dc.gov"),
+        employer_profile: spacely_employer_profile, is_business_owner: true,
     census_dependents: [
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Jetson", first_name: "Jane", dob: "04/01/1981", ssn: 987654322, employee_relationship: "spouse"
         ),
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Jetson", first_name: "Judy", dob: "04/01/2000", ssn: 987654323, employee_relationship: "child_under_26"
         ),
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Jetson", first_name: "Elroy", dob: "04/01/2008", ssn: 987654324, employee_relationship: "child_under_26"
         )
     ]
-  )
-
-jetson_1 = EmployerCensus::EmployeeFamily.new(
-    census_employee: EmployerCensus::Employee.new(
-        last_name: "Jetson", first_name: "Jane", dob: "04/01/1981", ssn: 987654322, hired_on: "03/23/2015", gender: "male",
-        email: Email.new(kind: "work", address: "dan.thomas@dc.gov")
-      )
-    )
-
-spacely_employer_profile = spacely.create_employer_profile(
-    entity_kind: "s_corporation",
-    broker_agency_profile: broker_agency_0,
-    employee_families: [jetson_0]
-  )
+  ).save!
 
 spacely_plan_year = spacely_employer_profile.plan_years.build(
     start_on: 0.days.ago.beginning_of_year.to_date,
@@ -82,7 +66,7 @@ spacely_plan = Plan.create(
     name: "BlueChoice 123 Silver 100",
     coverage_kind: "health",
     metal_level: "silver",
-    market: "shop",
+    market: "individual",
     carrier_profile_id: CarrierProfile.last.id
   )
 
@@ -103,11 +87,24 @@ spacely_benefit_group.relationship_benefits.build(
   )
 spacely.save!
 
+
+cogswell = Organization.create(
+      dba: "Cogswell Cogs",
+      legal_name: "Cogswell Cogs, Inc",
+      fein: 555123457,
+      office_locations: [office_location_01, office_location_02]
+    )
+
 cogswell_employer_profile = cogswell.create_employer_profile(
     entity_kind: "s_corporation",
-    broker_agency_profile: broker_agency_1,
-    employee_families: [jetson_1]
+    broker_agency_profile: broker_agency_1
   )
+
+jetson_1 = CensusEmployee.new(
+        last_name: "Jetson", first_name: "Jane", dob: "04/01/1981", ssn: 987654322, hired_on: "03/23/2015", gender: "male",
+        email: Email.new(kind: "work", address: "dan.thomas@dc.gov"),
+        employer_profile: cogswell_employer_profile, is_business_owner: false,
+      ).save!
 
 cogswell_plan_year = cogswell_employer_profile.plan_years.build(
     start_on: 0.days.ago.beginning_of_year.to_date,
@@ -124,7 +121,7 @@ cogswell_plan = Plan.create(
     name: "United 123 Silver 900",
     coverage_kind: "health",
     metal_level: "bronze",
-    market: "shop",
+    market: "individual",
     carrier_profile_id: CarrierProfile.first.id
   )
 
@@ -159,31 +156,29 @@ org_1 = Organization.new(
       office_locations: [org_1_off_loc]
     )
 
-org_1_jetson = EmployerCensus::EmployeeFamily.new(
-    census_employee: EmployerCensus::Employee.new(
+org_1_employer_profile = org_1.create_employer_profile(
+    entity_kind: "s_corporation",
+    broker_agency_profile: broker_agency_1
+  )
+
+org_1_jetson = CensusEmployee.new(
         last_name: "Doe", first_name: "John", dob: "01/12/1980", ssn: "111222331", hired_on: "03/20/2015", gender: "male",
-        email: Email.new(kind: "work", address: "john.doe@example.com")
-      ),
+        email: Email.new(kind: "work", address: "john.doe@example.com"),
+        employer_profile: org_1_employer_profile, is_business_owner: true,
     census_dependents: [
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Doe", first_name: "Matt", dob: "01/12/2011", ssn: "022233311", employee_relationship: "child_under_26"
         ),
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Doe", first_name: "Jessica", dob: "03/12/1985", ssn: "021233311", employee_relationship: "spouse"
         ),
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Doe", first_name: "Caroline", dob: "04/01/2008", ssn: "021233321", employee_relationship: "child_under_26"
         )
     ]
-  )
+  ).save!
 
-org_1_employer = org_1.create_employer_profile(
-    entity_kind: "s_corporation",
-    broker_agency_profile: broker_agency_1,
-    employee_families: [org_1_jetson]
-  )
-
-org_1_plan_year = org_1_employer.plan_years.build(
+org_1_plan_year = org_1_employer_profile.plan_years.build(
     start_on: 0.days.ago.beginning_of_year.to_date,
     end_on: 0.days.ago.end_of_year.to_date,
     open_enrollment_start_on: (0.days.ago.beginning_of_year.to_date - 2.months).beginning_of_month,
@@ -198,7 +193,7 @@ org_1_plan = Plan.create(
     name: "UHC 123 Silver 900",
     coverage_kind: "health",
     metal_level: "silver",
-    market: "shop",
+    market: "individual",
     carrier_profile_id: CarrierProfile.last.id
   )
 
@@ -231,29 +226,27 @@ org_2 = Organization.new(
       office_locations: [org_2_off_loc]
     )
 
-org_2_jetson = EmployerCensus::EmployeeFamily.new(
-    census_employee: EmployerCensus::Employee.new(
-        last_name: "Johnson", first_name: "Patricia", dob: "01/12/1980", ssn: "311222331", hired_on: "03/20/2015", gender: "male",
-        email: Email.new(kind: "work", address: "patricia.johnson@example.com")
-      ),
+org_2_employer_profile = org_2.create_employer_profile(
+    entity_kind: "c_corporation",
+    broker_agency_profile: broker_agency_1
+  )
+
+org_2_jetson = CensusEmployee.new(
+      last_name: "Johnson", first_name: "Patricia", dob: "01/12/1980", ssn: "311222331", hired_on: "03/20/2015", gender: "male",
+      email: Email.new(kind: "work", address: "patricia.johnson@example.com"),
+      employer_profile: org_2_employer_profile, is_business_owner: false,
     census_dependents: [
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Johnson", first_name: "Matt", dob: "01/12/2011", ssn: "422233311", employee_relationship: "child_under_26"
         ),
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Johnson", first_name: "Mark", dob: "03/12/1978", ssn: "521233311", employee_relationship: "spouse"
         ),
-      EmployerCensus::Dependent.new(
+      CensusDependent.new(
         last_name: "Johnson", first_name: "Caroline", dob: "04/01/2008", ssn: "621233321", employee_relationship: "child_under_26"
         )
     ]
-  )
-
-org_2_employer_profile = org_2.create_employer_profile(
-    entity_kind: "c_corporation",
-    broker_agency_profile: broker_agency_1,
-    employee_families: [org_2_jetson]
-  )
+  ).save!
 
 org_2_plan_year = org_2_employer_profile.plan_years.build(
     start_on: 0.days.ago.beginning_of_year.to_date,
@@ -270,7 +263,7 @@ org_2_plan = Plan.create(
     name: "Aetna 8913 Silver 900",
     coverage_kind: "health",
     metal_level: "gold",
-    market: "shop",
+    market: "individual",
     carrier_profile_id: CarrierProfile.first.id
   )
 
