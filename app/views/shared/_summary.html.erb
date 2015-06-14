@@ -1,21 +1,23 @@
-<%= link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-success all-plans' %>
+<%= link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-tranparent all-plans' %>
 
 <% if qhp.present? %>
   <div class="row plan">
     <div class="col-md-9 col-sm-9 col-xs-12">
+      <div class="page-header"><h4>Selected Plan</h4></div>
       <p><%= image_tag('blue-cross.jpg', width: 80) %></p>
-      <h3><%= qhp.plan_marketing_name %></h3>
+      <h3 class="text-blue"><%= qhp.plan_marketing_name %></h3>
       <ul class="plan-type">
         <% plan_level = qhp.metal_level.downcase %>
-        <li class="<%= plan_level %>"><i class="fa fa-circle-o"></i><%= plan_level.humanize %></li>
+        <li class="<%= plan_level %>"><i class="fa fa-circle-o"></i> <%= plan_level.humanize %></li>
         <li class="type"><%= qhp.plan_type %></li>
       </ul>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12">
-      Premium <h2><%= number_to_currency(@plan.total_premium) %></h2>
-      Employer Pays <h2><%= number_to_currency(@plan.total_employer_contribution) %></h2>
-      Total Employee cost <h2><%= number_to_currency(@plan.total_employee_cost) %></h2>
-      <%= link_to("Select Plan", '#', {:class => "btn btn-primary"}) %>
+      <!-- Premium <h2><%= number_to_currency(@plan.total_premium) %></h2>
+      Employer Pays <h2><%= number_to_currency(@plan.total_employer_contribution) %></h2> -->
+      <!-- Total Employee cost --> 
+      <h1><%= number_to_currency(@plan.total_employee_cost) %></h1><small>/Month</small><br><br>
+      <%= link_to("Select Plan", '#', {:class => "btn btn-primary btn-lg"}) %>
     </div>
   </div>
 
