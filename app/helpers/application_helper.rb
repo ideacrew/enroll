@@ -5,7 +5,7 @@ module ApplicationHelper
     opts = options.dup
     obj_name = f.object_name
     obj_val = f.object.send(field_name.to_sym)
-    current_value = obj_val.blank? ? "" : obj_val.strftime("%m/%d/%Y")
+    current_value = obj_val.blank? ? "" : (obj_val.strftime("%m/%d/%Y") rescue obj_val.to_s) 
     html_class_list = opts.delete(:class) { |k| "" }
     jq_tag_classes = (html_class_list.split(/\s+/) + ["jq-datepicker"]).join(" ")
     generated_field_name = "jq_datepicker_ignore_#{obj_name}[#{sanitized_field_name}]"

@@ -29,7 +29,7 @@ class BrokerAgencyProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
-  validates_presence_of :market_kind, :primary_broker_role_id, :entity_kind
+  validates_presence_of :market_kind, :entity_kind # , :primary_broker_role_id, :entity_kind
 
   validates :market_kind,
     inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid market kind" },
