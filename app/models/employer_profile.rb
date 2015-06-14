@@ -8,16 +8,7 @@ class EmployerProfile
   field :entity_kind, type: String
   field :sic_code, type: String
 
-  # Broker agency representing ER
-  field :broker_agency_profile_id, type: BSON::ObjectId
-
-  # Broker writing_agent credited for enrollment and transmitted on 834
-  field :writing_agent_id, type: BSON::ObjectId
-
   field :aasm_state, type: String
-  field :aasm_message, type: String
-
-  field :is_active, type: Boolean, default: true
 
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
@@ -37,8 +28,9 @@ class EmployerProfile
   embeds_one  :inbox, as: :recipient
   embeds_one  :employer_profile_account
   embeds_many :plan_years, cascade_callbacks: true, validate: true
+  embeds_many :broker_agency_accounts
 
-  accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account
+  accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts
 
   validates_presence_of :entity_kind
 
@@ -46,19 +38,58 @@ class EmployerProfile
     inclusion: { in: Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
     allow_blank: false
 
-  validate :writing_agent_employed_by_broker
   validate :no_more_than_one_owner
 
   after_initialize :build_nested_models
-  before_save :is_persistable?
   after_save :save_associated_nested_models
 
-  scope :active, ->{ where(:is_active => true) }
+  scope :all_active, ->{ where(:is_active => true) }
+
+  alias_method :is_active?, :is_active
 
   def parent
     raise "undefined parent Organization" unless organization?
     return @organization if defined? @organization
     @organization = self.organization
+  end
+
+
+  # def census_employees
+  #   CensusEmployee.find_by_employer_profile(self)
+  # end
+
+  # def census_employees_sorted
+  #   return @census_employees_sorted if defined? @census_employees_sorted
+  #   @census_employees_sorted = census_employees.order_by_last_name.order_by_first_name
+  # end
+
+  def hire_broker_agency(new_broker_agency, start_on = Date.current)
+    start_on = start_on.to_date.beginning_of_day
+    if active_broker_agency_account.present?
+      terminate_on = (start_on - 1.day).end_of_day
+      terminate_active_broker_agency(terminate_on)
+    end
+    broker_agency_accounts.build(broker_agency_profile: new_broker_agency, start_on: start_on)
+    @broker_agency_profile = new_broker_agency
+  end
+
+  alias_method :broker_agency_profile=, :hire_broker_agency
+
+  def terminate_active_broker_agency(terminate_on = Date.current)
+    if active_broker_agency_account.present?
+      active_broker_agency_account.end_on = terminate_on
+      active_broker_agency_account.is_active = false
+    end
+  end
+
+  def broker_agency_profile
+    return @broker_agency_profile if defined? @broker_agency_profile
+    @broker_agency_profile = active_broker_agency_account.broker_agency if active_broker_agency_account.present?
+  end
+
+  def active_broker_agency_account
+    return @active_broker_agency_account if defined? @active_broker_agency_account
+    @active_broker_agency_account = broker_agency_accounts.detect { |account| account.is_active? }
   end
 
   def cycle_daily_events
@@ -169,14 +200,20 @@ class EmployerProfile
       organization.present? ? organization.employer_profile : nil
     end
 
-    def find_by_broker_agency_profile(profile)
-      raise ArgumentError.new("expected BrokerAgencyProfile") unless profile.is_a?(BrokerAgencyProfile)
-      list_embedded Organization.where("employer_profile.broker_agency_profile_id" => profile._id).to_a
+    def find_by_broker_agency_profile(broker_agency_profile)
+      raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile)
+      orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true, 
+        :"employer_profile.broker_agency_accounts.broker_agency_profile_id" => broker_agency_profile.id).to_a
+
+      orgs.collect(&:employer_profile) 
     end
 
     def find_by_writing_agent(writing_agent)
       raise ArgumentError.new("expected BrokerRole") unless writing_agent.is_a?(BrokerRole)
-      where(writing_agent_id: writing_agent._id) || []
+      orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true,
+        :"employer_profile.broker_agency_accounts.writing_agent_id" => writing_agent.id).to_a
+
+      orgs.collect(&:employer_profile) 
     end
 
     def find_census_employee_by_person(person)
@@ -398,24 +435,12 @@ private
     is_valid
   end
 
-  def writing_agent_employed_by_broker
-    if writing_agent.present? && broker_agency.present?
-      unless broker_agency.writing_agents.detect(writing_agent)
-        errors.add(:writing_agent, "must be broker at broker_agency")
-      end
-    end
-  end
-
   def no_more_than_one_owner
     if owner.present? && owner.count > 1
       errors.add(:owner, "must only have one owner")
     end
 
     true
-  end
-  # Block changes unless record is in draft state
-  def is_persistable?
-    # aasm_state == :draft ? true : false
   end
 
 end

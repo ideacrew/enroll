@@ -8,11 +8,11 @@
 				<div class="select-plan">
 					<section class="select-plan-details">
 						<ul class="family-coverage">
-			                <li>Individual: <span><%= @person.full_name %></span></li>
-					<li>Dependents: <span>Spouse + 2</span></li>
-					<li>Employer: <span>Acme Unlimited, Inc.</span></li>
-			                <li>Plans: <span><%= @plans.count %></span></li>
-			            </ul>
+							<li>Individual: <span><%= @person.full_name %></span></li>
+							<li>Dependents: <span><%= @hbx_enrollment.humanized_dependent_summary %></span></li>
+							<li>Employer: <span><%= @benefit_group.plan_year.employer_profile.dba %></span></li>
+							<li>Plans: <span><%= @plans.count %></span></li>
+						</ul>
 			            <div class="clearfix"></div>
 
 			            <div id="plan-summary"></div>
@@ -43,7 +43,7 @@
 
 				<div class="row">
 		            <div class="col-md-12">
-		              <%= 
+		              <%=
 		                link_to '#', class: 'btn btn-primary', onclick: 'history.go(-1);return false;' do
 		                  '<i class="fa fa-chevron-left"></i> Back'.html_safe
 		                end

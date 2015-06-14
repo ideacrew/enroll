@@ -34,16 +34,21 @@ class Family
   index({submitted_at: 1})
 
   # child model indexes
-  index({"family_member._id" => 1}, { unique: true, sparse: true })
-  index({"family_member.person_id" => 1})
-  index({"family_member.broker_role_id" => 1})
-  index({"family_member.is_primary_applicant" => 1})
-  index({"family_member.hbx_enrollment_exemption.certificate_number" => 1})
-  index({"household.hbx_enrollment.broker_agency_id" => 1}, {sparse: true})
-  index({"household.hbx_enrollment.policy_id" => 1}, { unique: true, sparse: true })
-  index({"household.tax_household.hbx_assigned_id" => 1})
-  index({"household.tax_household.tax_household_member.financial_statement.submitted_date" => 1})
-  index({"irs_group.hbx_assigned_id" => 1})
+  index({"family_members._id" => 1})
+  index({"family_members.person_id" => 1})
+  index({"family_members.broker_role_id" => 1})
+  index({"family_members.is_primary_applicant" => 1})
+  index({"family_members.hbx_enrollment_exemption.certificate_number" => 1})
+
+  index({"households.hbx_enrollments.broker_agency_profile_id" => 1}, {sparse: true})
+  index({"households.hbx_enrollments.effective_on" => 1})
+  index({"households.hbx_enrollments.benefit_group_assignment_id" => 1})
+  index({"households.hbx_enrollments.aasm_state" => 1})
+  index({"households.hbx_enrollments.plan_id" => 1}, { unique: true, sparse: true })
+
+  index({"households.tax_households.hbx_assigned_id" => 1})
+  index({"households.tax_households.tax_household_member.financial_statement.submitted_date" => 1})
+  index({"irs_groups.hbx_assigned_id" => 1})
 
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
@@ -53,14 +58,11 @@ class Family
   validate :family_integrity
 
   after_initialize :build_household
-
-  scope :all_with_multiple_family_members, -> { exists({:'family_members.1' => true}) }
-
-  # This runs on the first class load
-#  ViewFunctions::Family.install_queries
-
   after_save :update_family_search_collection
   after_destroy :remove_family_search_record
+
+  scope :all_with_single_family_member,     -> { exists({:'family_members.1' => false}) }
+  scope :all_with_multiple_family_members,  -> { exists({:'family_members.1' => true}) }
 
   def update_family_search_collection
 #    ViewFunctions::Family.run_after_save_search_update(self.id)
@@ -247,6 +249,10 @@ class Family
   end
 
   class << self
+    # Manage: SEPs, FamilyMemberAgeOff
+    def advance_day(new_date)
+    end
+
     def default_search_order
       [
           ["primary_applicant.name_last", 1],

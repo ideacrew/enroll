@@ -240,6 +240,11 @@ describe EmployerProfile, dbclean: :after_each do
                 end
               end
             end
+
+          end
+
+          context "the number of enrollments for first month is 0" do
+            it "should advannce to enrolled state without requirement for binder premium"
           end
 
           context "and employer enrollment is compliant when the effective date isn't January 1" do
@@ -440,6 +445,9 @@ describe EmployerProfile, dbclean: :after_each do
       end
     end
   end
+
+  context "has hired a broker" do
+  end
 end
 
 describe EmployerProfile, "given multiple existing employer profiles", :dbclean => :after_all do
@@ -536,9 +544,9 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     before { broker_agency_profile; er3; er4; er5 }
 
     it 'returns employers represented by the specified broker agency' do
-      expect(er3.broker_agency_profile_id).to eq broker_agency_profile.id
-      expect(er4.broker_agency_profile_id).to eq broker_agency_profile.id
-      expect(er5.broker_agency_profile_id).to be_nil
+      expect(er3.broker_agency_profile.id).to eq broker_agency_profile.id
+      expect(er4.broker_agency_profile.id).to eq broker_agency_profile.id
+      expect(er5.broker_agency_profile).to be_nil
 
       employers_with_broker = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile)
       expect(employers_with_broker.first).to be_a EmployerProfile

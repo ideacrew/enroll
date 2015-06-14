@@ -121,7 +121,7 @@ class CensusEmployee < CensusMember
     new_employee.employment_terminated_on = nil
     new_employee.employee_role_id = nil
     new_employee.benefit_group_assignments = []
-    new_employee.rehire_employee_role
+    new_employee.init_employee_role_by_rehire
 
     # new_employee.census_dependents = self.census_dependents unless self.census_dependents.blank?
     new_employee
@@ -173,6 +173,8 @@ class CensusEmployee < CensusMember
       unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
     end
 
+    alias_method :find_by_employer_profile, :find_all_by_employer_profile
+
     def find_all_by_employee_role(employee_role)
       unscoped.where(employee_role_id: employee_role._id)
     end
@@ -186,8 +188,13 @@ class CensusEmployee < CensusMember
     state :eligible, initial: true
     state :employee_role_linked
     state :employment_terminated
+    state :rehired
 
     event :rehire_employee_role do
+      transitions from: [:employment_terminated, :employee_role_linked, :eligible], to: :rehired
+    end
+
+    event :init_employee_role_by_rehire do
       transitions from: [:employment_terminated, :employee_role_linked, :eligible], to: :eligible
     end
 

@@ -67,6 +67,10 @@ class Organization
   index({"employer_profile.plan_years.open_enrollment_end_on" => 1})
   index({"employer_profile.plan_years.benefit_groups._id" => 1})
 
+  index({"employer_profile.broker_agency_accounts._id" => 1})
+  index({"employer_profile.broker_agency_accounts.is_active" => 1,
+         "employer_profile.broker_agency_accounts.broker_agency_profile_id" => 1 })
+
   # BrokerAgencyProfile child model indexes
   index({"broker_agency_profile._id" => 1}, { unique: true, sparse: true })
   index({"broker_agency_profile.aasm_state" => 1})

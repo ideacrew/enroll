@@ -131,6 +131,10 @@ class HbxEnrollment
     benefit_group.within_new_hire_window?(employee_role.hired_on)
   end
 
+  def humanized_dependent_summary
+    hbx_enrollment_members.count - 1
+  end
+
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer
   #       This should probably be done by comparing the hired_on date with todays date.
   #       Also needs to ignore any that were already terminated before a certain date.
