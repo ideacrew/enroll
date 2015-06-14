@@ -36,6 +36,7 @@ class Plan
   # More Attributes from qhp
   field :plan_type, type: String  # "POS", "HMO", "EPO", "PPO"
   field :deductible, type: String # Deductible
+  field :family_deductible, type: String
   field :nationwide, type: Boolean # Nationwide
   field :out_of_service_area_coverage, type: Boolean # DC In-Network or not
 
