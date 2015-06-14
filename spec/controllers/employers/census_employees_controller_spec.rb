@@ -175,14 +175,17 @@ RSpec.describe Employers::CensusEmployeesController do
         end
 
         it "save success" do
+          allow(new_census_employee).to receive(:valid?).and_return(true)
+          allow(census_employee).to receive(:valid?).and_return(true)
           allow(new_census_employee).to receive(:save).and_return(true)
+          allow(census_employee).to receive(:save).and_return(true)
           xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: "05/01/2015", :format => :js
           expect(response).to have_http_status(:success)
           expect(flash[:notice]).to eq "Successfully rehired Census Employee."
         end
 
         it "save failure" do
-          allow(new_census_employee).to receive(:save).and_return(false)
+          allow(new_census_employee).to receive(:valid?).and_return(false)
           xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: "05/01/2015", :format => :js
           expect(response).to have_http_status(:success)
           expect(flash[:error]).to eq "Error during rehire."

@@ -1,5 +1,3 @@
-$(function() {
-
   $(document).on('change', "input#family_all", function(){
     $("tr.terminated_true").show();
     $("tr.terminated_false").show();
@@ -15,21 +13,22 @@ $(function() {
   $(document).on('change', "input#terminated_yes", function(){
     $("tr.terminated_true").show();
     $("tr.terminated_false").hide();
+    $("tr.rehired").hide();
     $('.confirm-terminate-wrapper').hide();
   });
 
   $(document).on('change', "input#terminated_no", function(){
     $("tr.terminated_false").show();
     $("tr.terminated_true").hide();
+    $("tr.rehired").hide();
     $('.confirm-terminate-wrapper').hide();
   });
-
-  $("input#terminated_no").trigger("change");
   
   $(document).on('click', ".show_confirm", function(){
     var el_id = $(this).attr('id');
     $( "td." + el_id ).toggle();
     $( "#confirm-terminate-2" ).hide();
+    return false;
   });
   
   $(document).on('click', ".delete_confirm", function(){
@@ -66,5 +65,7 @@ $(function() {
         data: {rehiring_date: rehiring_date}
       });
     });
-  
-})
+
+$(document).on('page:update', function(){
+  $("input#terminated_no").trigger("change");
+});

@@ -97,9 +97,12 @@ class Employers::CensusEmployeesController < ApplicationController
     if @rehiring_date.present?
       new_census_employee = @census_employee.replicate_for_rehire
       if new_census_employee.present? # not an active family, then it is ready for rehire.#
-        new_census_employee.hired_on = 1.day.ago.to_date
+        new_census_employee.hired_on = @rehiring_date
         new_census_employee.employer_profile = @employer_profile
-        if new_census_employee.save
+        @census_employee.rehire_employee_role
+        if new_census_employee.valid? and @census_employee.valid?
+          new_census_employee.save
+          @census_employee.save
           flash[:notice] = "Successfully rehired Census Employee."
         else
           flash[:error] = "Error during rehire."

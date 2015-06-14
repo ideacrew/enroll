@@ -43,8 +43,13 @@
         <strong><%= plan.nationwide ? "Nationwide" : "DC Area Network" %></strong>
       </li>
       <li>
-        <p>Deductible</p>
-        <strong><%= plan.deductible %></strong>
+        <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
+          <p>Family Deductible</p>
+          <strong><%= plan.family_deductible %></strong>
+        <% else %>
+          <p>Deductible</p>
+          <strong><%= plan.deductible %></strong>
+        <% end %>
       </li>
     </ul>
   </div>
