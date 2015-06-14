@@ -1137,14 +1137,7 @@ input.floatlabe{
   background-color: #e3e3e3 !important;
 }
 
-.form-control::-moz-placeholder {
-  color: #ccc;
-  opacity: 1;
-}
-.form-control::-webkit-placeholder {
-  color: #ccc;
-  opacity: 1;
-}
+.form-control::-webkit-placeholder, .form-control::-moz-placeholder {color: #999;}
 .form-control:focus {
   background: rgba(220, 234, 241, 1);
 }
@@ -2216,7 +2209,7 @@ a.close-1, a.close-2{
 .signin {font-size: 16px;}
 .signin h1 {text-align: center;}
 .search-wp input.form-control, .signin input.form-control,
-.qle-form-wrapper .form-control
+.qle-form-wrapper .form-control, #select_plan_wrapper .form-control
 {padding: 0 10px !important;}
 /* Sign In page css end */
 
@@ -4463,32 +4456,19 @@ table.table-bordered.table-bordered {
 #employer .emp-info input[type="text"] {
     height: 48px;
 }
-::-webkit-input-placeholder {
-  color: #cccccc;
-  font-size: 11px;
-}
-
-input[placeholder] { 
-    color: #cccccc;
-    font-size: 11px !important;  
-}
-input:-moz-placeholder { 
-    color: #cccccc;
-    font-size: 11px !important;  
-}
-
+::-webkit-input-placeholder {font-size: 11px;}
+input[placeholder] {font-size: 11px !important;}
+input:-moz-placeholder {font-size: 11px !important;}
 .form-control:-moz-placeholder { /* Firefox 18- */
-    color: #cccccc;
     font-size: 11px;
 }
 
 .form-control::-moz-placeholder {  /* Firefox 19+ */
-    color: #cccccc;
     font-size: 11px; 
 }
 
 :-ms-input-placeholder {  
-    color: #cccccc;
+    color: #999999;
     font-size: 11px;
 }
 #family input[type="text"] {
