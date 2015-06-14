@@ -2,7 +2,7 @@
   
   <%= render 'shared/error_messages', :object => dependent %>
   
-  <div id="add_info_<%= dependent.id %>" class="focus_effect personal-info-row">
+  <div id="add_info_<%= dependent.id %>">
 	  <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
         <div class="dependent_notice_div_<%= dependent.id%>"></div>
