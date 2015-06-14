@@ -53,15 +53,9 @@ class EmployerProfile
     @organization = self.organization
   end
 
-
-  # def census_employees
-  #   CensusEmployee.find_by_employer_profile(self)
-  # end
-
-  # def census_employees_sorted
-  #   return @census_employees_sorted if defined? @census_employees_sorted
-  #   @census_employees_sorted = census_employees.order_by_last_name.order_by_first_name
-  # end
+  def census_employees
+    CensusEmployee.find_by_employer_profile(self)
+  end
 
   def hire_broker_agency(new_broker_agency, start_on = Date.current)
     start_on = start_on.to_date.beginning_of_day
@@ -137,39 +131,6 @@ class EmployerProfile
   def enrolling_plan_year
     # TODO: totally wrong, write real implementation
     latest_plan_year
-  end
-
-  # belongs_to broker_agency_profile
-  def broker_agency_profile=(new_broker_agency_profile)
-    raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a?(BrokerAgencyProfile)
-    self.broker_agency_profile_id = new_broker_agency_profile._id
-    new_broker_agency_profile
-  end
-
-  def broker_agency_profile
-    return @broker_agency_profile if defined? @broker_agency_profile
-    @broker_agency_profile =  parent.broker_agency_profile.where(id: @broker_agency_profile_id) unless @broker_agency_profile_id.blank?
-  end
-
-  # belongs_to writing agent (broker)
-  def writing_agent=(new_writing_agent)
-    raise ArgumentError.new("expected BrokerRole") unless new_writing_agent.is_a?(BrokerRole)
-    self.writing_agent_id = new_writing_agent._id
-    new_writing_agent
-  end
-
-  def writing_agent
-    return @writing_agent if defined? @writing_agent
-    @writing_agent = BrokerRole.find(@writing_agent_id) unless @writing_agent_id.blank?
-  end
-
-  def census_employees
-    return @census_employees if defined? @census_employees
-    @census_employees = CensusEmployee.where(employer_profile_id: id)
-  end
-
-  def is_active?
-    self.is_active
   end
 
   ## Class methods
