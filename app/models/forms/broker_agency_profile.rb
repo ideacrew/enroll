@@ -1,16 +1,38 @@
+require 'date'
 module Forms
   class BrokerAgencyProfile < SimpleDelegator
+    extend ActiveModel::Naming
     WRAPPER_ATTRIBUTES = ["first_name", "last_name", "dob"]
-    attr_accessor :first_name, :last_name, :dob
+    attr_accessor :first_name, :last_name
     attr_accessor :person
+    attr_reader :dob
 
     class OrganizationAlreadyMatched < StandardError; end
     class PersonAlreadyMatched < StandardError; end
     class TooManyMatchingPeople < StandardError; end
 
+    def dob=(val)
+      @dob = Date.strptime(val,"%Y-%m-%d") rescue nil
+    end
+
     def initialize(org)
       super(org)
+      @errors = ActiveModel::Errors.new(self)
     end
+  
+    def self.human_attribute_name(attr, options = {})
+      attr
+    end
+
+    def errors
+      @full_errors ||= (
+        organization.errors.each do |k, err|
+          @errors.add(k, err)
+        end
+        @errors
+      )
+    end
+
 
     def self.model_name
       ::BrokerAgencyProfile.model_name
@@ -119,7 +141,7 @@ module Forms
       valid_flag = true
       ["first_name", "last_name", "dob"].each do |prop|
         if self.send(prop).blank?
-          organization.errors.add(prop, "can not be blank")
+          @errors.add(prop.to_sym, "can not be blank")
           valid_flag = false
         end
       end
