@@ -9,9 +9,6 @@ class EmployerProfile
   field :sic_code, type: String
 
   field :aasm_state, type: String
-  field :aasm_message, type: String
-
-  field :is_active, type: Boolean, default: true
 
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
@@ -46,7 +43,7 @@ class EmployerProfile
   after_initialize :build_nested_models
   after_save :save_associated_nested_models
 
-  scope :active, ->{ where(:is_active => true) }
+  scope :all_active, ->{ where(:is_active => true) }
 
   alias_method :is_active?, :is_active
 
