@@ -152,6 +152,21 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def census_employee_params
+    [:dob, :hired_on].each do |attr|
+      if params[:census_employee][attr].present?
+        params[:census_employee][attr] = DateTime.strptime(params[:census_employee][attr], '%m/%d/%Y').try(:to_date)
+      end
+    end
+
+    census_dependents_attributes = params[:census_employee][:census_dependents_attributes]
+    if census_dependents_attributes.present?
+      census_dependents_attributes.each do |id, dependent_params|
+        if census_dependents_attributes[id][:dob].present?
+          params[:census_employee][:census_dependents_attributes][id][:dob] = DateTime.strptime(dependent_params[:dob], '%m/%d/%Y').try(:to_date)
+        end
+      end
+    end
+    
     params.require(:census_employee).permit(:id, :employer_profile_id,
         :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner,
         :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
