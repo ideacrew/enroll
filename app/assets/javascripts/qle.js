@@ -2,6 +2,7 @@ $(function () {
 	$(document).on('click', 'a.qle-menu-item', function() {
 		$('#qle-menu').hide();
 		$('.qle-details-title').html($(this).html());
+		$('#change_plan').val($(this).html());
 		$('#qle-details').removeClass('hidden');
 	});
 
@@ -22,6 +23,9 @@ $(function () {
 		} else {
 			$('#qle-input-info').html('Enter a valid date.');
 			$('#qle_date').addClass('input-error');
+			$('.success-info').addClass('hidden');
+			$('.error-info').addClass('hidden');
+			$('.default-info').removeClass('hidden');
 		}
 	});
 

@@ -6,6 +6,7 @@ class Consumer::EmployeeDependentsController < ApplicationController
     @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
   end
 
   def new
