@@ -2,6 +2,11 @@
   <div id="dependents_info_wrapper">
     <div class="row">
       <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
+
+        <% if @change_plan.present? %>
+           <h3 class="blue-text">Change Plan</h3>
+        <% end %>
+
         <h3>Family Members</h3>
 
         <div class="row no-buffer">
@@ -42,19 +47,24 @@
 
         <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
   	      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-  		      <%= link_to '<i class="fa fa-user"></i> Add Member'.html_safe, new_consumer_employee_dependent_path(:family_id => @family.id), :remote => true, :class => "btn btn-primary pull-right" %>
-            <% group_selection_url = group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id) %>
+  		      <%= link_to '<i class="fa fa-user"></i> Add Member'.html_safe, new_consumer_employee_dependent_path(:family_id => @family.id), :remote => true, :class => "btn btn-primary" %>
+            <% group_selection_url = group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: 'change') %>
             <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">
-            <%#= 
-              link_to '<i class="fa fa-user-plus"></i> Continue'.html_safe, group_selection_url, class: 'btn btn-primary pull-right', id: 'btn_household_continue'
-            %>
+            
+            <% if @change_plan.present? %>
+              <%= 
+                link_to '<i class="fa fa-user-plus"></i> Continue'.html_safe, group_selection_url, class: 'btn btn-primary pull-right', id: 'btn_household_continue'
+              %>
+            <% end %>
           </div>
         </div>
       </div>
 
+      <% if @change_plan.blank? %>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
         <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
       </div>
+      <% end %>
 
     </div>
   </div>

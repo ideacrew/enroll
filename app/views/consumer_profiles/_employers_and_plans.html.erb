@@ -132,7 +132,7 @@
 									
 									<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 qle-form-wrapper">
 		                                <h3 class="qle-details-title">"I got married"</h3>
-		                                <h5 id="qle-input-info">Enter the date of the event.</h5>
+		                                <h5>Enter the date of the event.</h5>
 		                                <input type="text" placeholder="00-00-000" class="form-control" id="qle_date">
 		                                <%= link_to 'Submit', 'javascript:;', class: 'btn btn-danger', id: 'qle_submit' %>
 		                                <br>
@@ -141,9 +141,11 @@
 
 		                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 qle-form-wrapper">
 		                            	<div class="success-info hidden">
-											<p class="success-text"><strong>Success!</strong> You have created a special enrollment period.<br>Select any of the options below.</p>
+											<p class="success-text"><strong>You may be eligible for a special enrollment period.</strong></p>
 
-											<div class="col-md-6">
+											<%= link_to('Continue', consumer_employee_dependents_path(employee_role_id: @employee_role.id, change_plan: 'change'), id: 'qle_change_plan', class: 'btn btn-primary') %>
+
+											<!-- <div class="col-md-6">
 				                                <center>
 				                                    <h4><%= link_to('Keep My Existing Coverage', consumer_employee_dependents_path(employee_role_id: @employee_role.id, change_plan: 'change'), "aria-expanded" => "true", "aria-controls" => "family", "role" => "tab", id: 'existing_coverage') %></h4>
 				                                </center>
@@ -153,12 +155,14 @@
 				                                <center>
 				                                	<h4><%= link_to('Shop for a New Plan', consumer_employee_dependents_path(employee_role_id: @employee_role.id, change_plan: 'unchanged'), "aria-expanded" => "true", "aria-controls" => "family", "role" => "tab", id: 'new_plan') %></h4>
 				                                </center>
-				                            </div>
+				                            </div> -->
 										</div>
 										<div class="error-info hidden">
 											<p class="error-text">The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact DCHBX support 1-800-555-1212.</p>
 
-											<div class="col-md-6">
+											<button type="submit" class="btn">Continue</button>
+
+											<!-- <div class="col-md-6">
 				                                <center>
 				                                    <h4>Keep My Existing Coverage</h4>
 				                                </center>
@@ -168,12 +172,14 @@
 				                                <center>
 				                                    <h4>Shop for a New Plan</h4>
 				                                </center>
-				                            </div>
+				                            </div> -->
 										</div>
 										<div class="default-info">
-											<p>&nbsp;</p><br>
-
-											<div class="col-md-6">
+											<center>
+												<strong id="qle-input-info">Please enter a date to the left.</strong><br><br>
+												<button type="submit" class="btn">Continue</button>
+											</center>
+											<!-- <div class="col-md-6">
 				                                <center>
 				                                    <h4>Keep My Existing Coverage</h4>
 				                                </center>
@@ -183,7 +189,7 @@
 				                                <center>
 				                                    <h4>Shop for a New Plan</h4>
 				                                </center>
-				                            </div>
+				                            </div> -->
 										</div>
 		                            </div>
 

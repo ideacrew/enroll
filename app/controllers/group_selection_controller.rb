@@ -1,6 +1,8 @@
 class GroupSelectionController < ApplicationController
   def new
     initialize_common_vars
+
+    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
   end
 
   def create

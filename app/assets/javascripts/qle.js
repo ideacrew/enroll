@@ -20,7 +20,7 @@ $(function () {
 			$('#qle-input-info').html('Enter the date of the event.')
 			get_qle_date();
 		} else {
-			$('#qle-input-info').html('Enter valid date here!');
+			$('#qle-input-info').html('Enter a valid date.');
 			$('#qle_date').addClass('input-error');
 		}
 	});
