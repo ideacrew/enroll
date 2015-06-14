@@ -82,8 +82,11 @@
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                             <div class="panel panel-default min-h">
                             	<div class="panel-body">
+                            		<h3 style="margin-top: 0"><%= @person.full_name %></h3>
+                            		<p>(DC Health link ID : <%= @person.id %>)</p>
+                            		<br>
 	                                <div class="page-header">
-	                                    <h4>Your plan</h4>
+	                                    <h4>Employer</h4>
 	                                    <a href="#"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Edit</a>
 	                                </div>
 	                                <%= image_tag 'company-logo/acme.png' %>
@@ -148,54 +151,17 @@
 												<%= hidden_field_tag 'employee_role_id', @employee_role.id %>
 
 												<%= submit_tag 'Continue' %>
-
-												<%#= link_to('Continue', consumer_employee_dependents_path(employee_role_id: @employee_role.id, change_plan: 'change'), id: 'qle_change_plan', class: 'btn btn-primary') %>
-
-												<!-- <div class="col-md-6">
-					                                <center>
-					                                    <h4><%= link_to('Keep My Existing Coverage', consumer_employee_dependents_path(employee_role_id: @employee_role.id, change_plan: 'change'), "aria-expanded" => "true", "aria-controls" => "family", "role" => "tab", id: 'existing_coverage') %></h4>
-					                                </center>
-					                            </div>
-
-					                            <div class="col-md-6">
-					                                <center>
-					                                	<h4><%= link_to('Shop for a New Plan', consumer_employee_dependents_path(employee_role_id: @employee_role.id, change_plan: 'unchanged'), "aria-expanded" => "true", "aria-controls" => "family", "role" => "tab", id: 'new_plan') %></h4>
-					                                </center>
-					                            </div> -->
 											</div>
 											<div class="error-info hidden">
 												<p class="error-text">The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact DCHBX support 1-800-555-1212.</p>
 
 												<button type="submit" class="btn">Continue</button>
-
-												<!-- <div class="col-md-6">
-					                                <center>
-					                                    <h4>Keep My Existing Coverage</h4>
-					                                </center>
-					                            </div>
-
-					                            <div class="col-md-6">
-					                                <center>
-					                                    <h4>Shop for a New Plan</h4>
-					                                </center>
-					                            </div> -->
 											</div>
 											<div class="default-info">
 												<center>
 													<strong id="qle-input-info">Please enter a date to the left.</strong><br><br>
 													<button type="submit" class="btn">Continue</button>
 												</center>
-												<!-- <div class="col-md-6">
-					                                <center>
-					                                    <h4>Keep My Existing Coverage</h4>
-					                                </center>
-					                            </div>
-
-					                            <div class="col-md-6">
-					                                <center>
-					                                    <h4>Shop for a New Plan</h4>
-					                                </center>
-					                            </div> -->
 											</div>
 		                            	</div>
 		                            <% end %>
@@ -207,7 +173,7 @@
                 </div>
 
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="panel panel-default">
+                    <!-- <div class="panel panel-default">
                     	<div class="panel-body">
 	                        <div class="page-header">
 	                            <h4>Payments</h4>
@@ -238,6 +204,34 @@
 	                                <a href="#" class="btn btn-danger btn-block btn-payment btn-block">Make a Payment</a>
 	                            </div>
 	                        </div>
+	                    </div>
+                    </di -->
+
+                    <div class="panel panel-default">
+                    	<div class="panel-body">
+                    		<div class="row">
+	                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+	                            	<%= image_tag 'icons/family_members.png' %>
+	                            </div>
+	                            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
+	                                <h3>Manage family members</h3>
+	                                <small>Use this link to add and delete family members or edit your family information.</small>
+	                            </div>
+	                        </div>
+	                    </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                    	<div class="panel-body"><br>
+                    		<div class="row">
+	                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+	                            	<%= image_tag 'icons/shop_for_plan.png' %>
+	                            </div>
+	                            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
+	                                <h3>Shop for Plans</h3>
+	                                <small>Browse plans from carriers in the DC Health Care Exchange.</small>
+	                            </div>
+	                        </div><br>
 	                    </div>
                     </div>
 
