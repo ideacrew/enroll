@@ -309,7 +309,9 @@ Then(/^The census family should be terminated and move to terminated tab$/) do
   expect(@browser.a(text: /Patrick K Doe Jr/).visible?).to be_truthy
   @browser.a(text: /Employees/).wait_until_present
   @browser.a(text: /Employees/).click
-  expect(@browser.a(class: /interaction-click-control-rehire/).visible?).to be_truthy
+  @browser.td(text: /Employment terminated/).wait_until_present
+  expect(@browser.td(text: /Employment terminated/).visible?).to be_truthy
+  #expect(@browser.a(class: /interaction-click-control-rehire/).visible?).to be_truthy
   #expect(@browser.a(text: /Rehire/).visible?).to be_truthy
 end
 
