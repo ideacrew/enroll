@@ -53,13 +53,8 @@ class EmployeeRole
   ## TODO: propogate to EmployerCensus updates to employee demographics and family
 
   def families
-    Family.by_employee(self)
+    Family.find_by_employee_role(self)
   end
-
-  # def self.find_by_employer_profile(profile)
-  #   # return unless profile.is_a? EmployerProfile
-  #   where("employer_profile_id" =>  profile._id).to_a
-  # end
 
   # belongs_to Employer
   def employer_profile=(new_employer)
@@ -95,6 +90,9 @@ class EmployeeRole
     return @census_employee if defined? @census_employee
     @census_employee = CensusEmployee.find(self.census_employee_id) unless census_employee_id.blank?    
   end
+
+  alias_method :census_employee=, :new_census_employee=
+  alias_method :census_employee, :new_census_employee
 
   def effective_on
     benefit_group.effective_on_for(new_census_employee.hired_on)
