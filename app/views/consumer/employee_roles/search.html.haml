@@ -1,3 +1,7 @@
-.container
-  #new_person_wrapper
-    = render 'remote_search_form'
+.container.pd-container
+	#new_person_wrapper
+		.row
+			.col-lg-7.col-md-7.col-sm-8.col-xs-12
+				= render 'remote_search_form'
+			.col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
+				= render  partial: 'shared/signup_progress', locals: {step: '1'}

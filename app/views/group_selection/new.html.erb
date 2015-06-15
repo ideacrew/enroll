@@ -1,65 +1,52 @@
-<div class="container-fluid no-pd-left">
-  <div class="panel panel-default">
-    <div class="panel-body left">
-        <div class="col-md-9 col-sm-9 col-xs-12">
-          <h3>Covered Family Members</h3>
-          <h4><strong>Who would you like to cover?</strong></h4>
-          <%= form_tag(:group_selection_create) do %>
-            <%= hidden_field_tag(:person_id, @person.id) %>
-            <%= hidden_field_tag(:employee_role_id, @employee_role.id) %>
-            <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
+<div class="container">
+  <div class="row">
+      <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
+        <h3>Covered Family Members</h3>
+        <h4><strong>Who would you like to cover?</strong></h4>
+        <%= form_tag(:group_selection_create) do %>
+          <%= hidden_field_tag(:person_id, @person.id) %>
+          <%= hidden_field_tag(:employee_role_id, @employee_role.id) %>
+          <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
 
-            <div class="table-responsive table-border">
-              <table class="table table-wrapper table-condensed group-selection-tbl">
-                <tbody>
-              <% @coverage_household.family_members.each_with_index do |family_member, index| %>
-                <tr>
-                  <td width="20"><%= check_box_tag("family_member_ids[#{index}]", family_member.id, true) %></td>
-                  <% 
-                    dob = family_member.dob
-                    now = Date.today
-                    age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
-                  %>
-                  <td><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(age, 'year')})") %></td>
-                </tr>
-              <% end %>
-              </tbody>
-              </table>
-            </div>
-            
-            <br>
-            <h3>Select a plan</h3>
-            <p class="text-justify"><%= t('welcome.employee.select_plan') %></p>
-            <br>
-            
-            <button type="submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Continue</button>
-          <% end %>
-        </div>
-
-        <div class="col-md-3 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
-          <input type="hidden" id="initial_progress" value="60">
-          <div style="display: none;" id="sup-progress" data-signup-progress="6"></div>
-          <%= render 'shared/signup_progress' %>
-
-          <div class="row">
-            <div class="col-md-12">
-              <%= 
-                link_to '#', class: 'btn btn-primary', onclick: 'history.go(-1);return false;' do
-                  '<i class="fa fa-chevron-left"></i> Back'.html_safe
-                end
-              %>
-            </div>
-          </div><br>
-          <div class="row">
-            <div class="col-md-12">
-              <%= link_to '<i class="fa fa-user"></i> My Account'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %> &nbsp;
-              <%= link_to '<i class="fa fa-floppy-o"></i> Save & Exit'.html_safe, home_consumer_profiles_path, class: 'btn btn-primary' %>
-            </div>
+          <div class="table-responsive table-border">
+            <table class="table table-wrapper table-condensed group-selection-tbl">
+              <tbody>
+            <% @coverage_household.family_members.each_with_index do |family_member, index| %>
+              <tr>
+                <td width="20"><%= check_box_tag("family_member_ids[#{index}]", family_member.id, true) %></td>
+                <% 
+                  dob = family_member.dob
+                  now = Date.today
+                  age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+                %>
+                <td><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(age, 'year')})") %></td>
+              </tr>
+            <% end %>
+            </tbody>
+            </table>
           </div>
-
-          <a href="#" class="btn btn-default" style="display: none;" data-uri="<%= comparison_products_plans_path %>" id="compare-selected-plans-link">Compare Selected Plans</a>
-        </div>
+          
+          <br>
+          <% if @change_plan.present? %>
+            <h4><strong>What do you like to do?</strong></h4>
+            <%= link_to 'Keep existing plan', home_consumer_profiles_path, class: 'btn btn-primary' %>
+            <%= submit_tag 'Shop for new plan', class: 'btn btn-primary' %>
+          <% else %>
+          <h3>Select a plan</h3>
+          <p class="text-justify"><%= t('welcome.employee.select_plan') %></p>
+          <% end %>
+          <br>
+          
+          <button type="submit" class="btn btn-primary hidden" id="btn_select_plan_continue"><i class="fa fa-user-plus"></i> Continue</button>
+        <% end %>
       </div>
+
+      <% if @change_plan.blank? %>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+          <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
+        </div>
+      <% end %>
+
     </div>
   </div>
 </div>

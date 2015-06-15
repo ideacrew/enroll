@@ -67,18 +67,18 @@ Then(/^I should be logged in$/) do
 end
 
 When(/^I go to register as an employee$/) do
-  expect(@browser.a(text: "Continue").visible?).to be_truthy
-  @browser.a(text: "Continue").click
+  @browser.element(class: /interaction-click-control-continue/).wait_until_present
+  @browser.element(class: /interaction-click-control-continue/).click
 end
 
 Then(/^I should see the employee search page$/) do
-  @browser.text_field(name: "person[first_name]").wait_until_present
+  @browser.text_field(class: /interaction-field-control-person-first-name/).wait_until_present
   screenshot("employer_search")
-  expect(@browser.text_field(name: "person[first_name]").visible?).to be_truthy
+  expect(@browser.text_field(class: /interaction-field-control-person-first-name/).visible?).to be_truthy
 end
 
 When(/^I enter the identifying info of my existing person$/) do
-  @browser.text_field(name: "person[first_name]").set("Soren")
+  @browser.text_field(class: /interaction-field-control-person-first-name/).set("Soren")
   @browser.text_field(name: "person[last_name]").set("White")
   @browser.text_field(name: "person[date_of_birth]").set("08/13/1979")
   @browser.label(:text=> /FIRST NAME/).click
@@ -95,8 +95,8 @@ When(/^I enter the identifying information of my existing person$/) do
   @browser.label(:text=> /FIRST NAME/).click
   @browser.text_field(name: "person[ssn]").set("786120965")
   screenshot("information_entered")
-  @browser.button(text: "Search Employers").wait_until_present
-  @browser.button(text: "Search Employers").click
+  @browser.element(class: /interaction-click-control-continue/).wait_until_present
+  @browser.element(class: /interaction-click-control-continue/).click
 end
 
 Then(/^I should see the matched employee record form$/) do
@@ -134,7 +134,9 @@ When(/^I complete the matching employee form$/) do
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
   @browser.text_field(name: "person[emails_attributes][1][address]").click
   screenshot("personal_info_complete")
-  @browser.button(class: /interaction-click-control-continue/).click
+  # @browser.button(class: /interaction-click-control-continue/).click  # TODO cant find interaction element
+  @browser.button(id: /btn-continue/).wait_until_present
+  @browser.button(id: /btn-continue/).click
 end
 
 
@@ -176,11 +178,11 @@ When(/^I enter the identifying info of Sorens daughter$/) do
   @browser.text_field(name: 'dependent[first_name]').set('Cynthia')
   @browser.text_field(name: 'dependent[last_name]').set('White')
   @browser.text_field(name: 'dependent[date_of_birth]').set('01/15/2011')
-  @browser.label(text: /FIRST NAME/).click
+  @browser.text_field(name: 'dependent[first_name]').click
   input_field = @browser.div(class: /selectric-wrapper/)
   input_field.click
   input_field.li(text: /Child/).click
-  @browser.input(type: 'radio', value: 'female').click
+  @browser.radio(id: /radio_female/).fire_event("onclick")
 end
 
 When(/^I click confirm member$/) do
@@ -189,7 +191,7 @@ When(/^I click confirm member$/) do
 end
 
 When(/^I click continue on the dependents page$/) do
-  @browser.a(text: "Continue", :href => /group_selection\/new/).click
+  @browser.button(class: /interaction-click-control-continue/).click
 end
 
 Then(/^I should see the group selection page$/) do
@@ -198,11 +200,12 @@ Then(/^I should see the group selection page$/) do
 end
 
 When(/^I click continue on the group selection page$/) do
-  @browser.button(class: "btn-primary", text: /Continue/).click
+  @browser.element(class: /interaction-click-control-shop-for-new-plan/).wait_until_present
+  @browser.element(class: /interaction-click-control-shop-for-new-plan/).click
 end
 
 Then(/^I should see the plan shopping welcome page$/) do
-  @browser.element(text: /All Filters/i).wait_until_present
+  @browser.element(text: /Filter Results/i).wait_until_present
   # @browser.h3(text: /Select a Plan/).wait_until_present
   screenshot("plan_shopping_welcome")
   expect(@browser.element(text: /All Filters/i).visible?).to be_truthy

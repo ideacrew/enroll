@@ -1,34 +1,55 @@
-<ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
-   <li role="presentation"<%= menu_tab_class(active_tab, "home-tab") %>>
-   <%= link_to(home_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
-      <span class="home-icon" title="Home"></span>
-    <% end %>
-  </li>
-  <li role="presentation"<%= menu_tab_class(active_tab, "profile-tab") %>>
-   <%= link_to(personal_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "profile", "role" => "tab" ) do  %>
-      <span class="hidden-xs">Profile</span>
-      <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Profile"></span>
-   <% end %>
-  </li>
-  <li role="presentation"<%= menu_tab_class(active_tab, "plans-tab") %>>
-   <%= link_to(plans_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "plans", "role" => "tab" ) do  %>
-      <span class="hidden-xs">Plans</span>
-      <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Plans"></span>
-   <% end %>
-  </li>
-  <!--
-  <li role="presentation"<%= menu_tab_class(active_tab, "documents-tab") %>>
-    <a aria-controls="documents" data-toggle="tab" id="documents-tab" role="tab" href="#documents">
-      <span class="hidden-xs">Documents</span>
-      <span class="glyphicon glyphicon-file hidden-md hidden-sm hidden-lg" title="Documents"></span>
-    </a>
-    </li>
-  <li role="presentation"<%= menu_tab_class(active_tab, "messages-tab") %>>
-    <a aria-controls="messages" data-toggle="tab" id="messages-tab" role="tab" href="#messages">
-      <span class="hidden-xs">Messages</span>
-      <span class="glyphicon glyphicon-envelope hidden-md hidden-sm hidden-lg" title="Messages"></span>
-      <span class="badge">27</span>
-    </a>
-    </li>
-    -->
-</ul>
+<div class="mainmenu">
+  <div class="container">
+    <ul role="tablist" class="list-unstyled list-inline" id="myTab">
+      
+      <li role="presentation"<%= menu_tab_class(active_tab, "home-tab") %>>
+        <%= link_to(home_consumer_profiles_path, :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
+          <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+        <% end %>
+
+        <%= link_to(home_consumer_profiles_path, :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
+              <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+              <small>Home</small>
+          <% end %>
+      </li>
+
+      <li role="presentation"<%= menu_tab_class(active_tab, "profile-tab") %>>
+          <%= link_to(personal_consumer_profiles_path, :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "profile", "role" => "tab" ) do  %>
+            Profile
+          <% end %>
+
+          <%= link_to(personal_consumer_profiles_path, :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "profile", "role" => "tab" ) do  %>
+            <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+            <small>Profile</small>
+          <% end %>
+      </li>
+
+      <li role="presentation"<%= menu_tab_class(active_tab, "plans-tab") %>>
+        <%= link_to(plans_consumer_profiles_path, :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "plans", "role" => "tab" ) do  %>
+          Plans
+        <% end %>
+
+        <%= link_to(plans_consumer_profiles_path, :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "plans", "role" => "tab" ) do  %>
+          <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+          <small>Plans</small>
+        <% end %>
+      </li>
+
+      <li>
+        <a href="#" class="hidden-xs">Documents</a>
+        <a href="#" class="visible-xs">
+            <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
+            <small>Documents</small>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="hidden-xs"><span class="badge">4</span> Messages</a>
+        <a href="#" class="visible-xs">
+            <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
+            <small>Messages</small>
+        </a>
+      </li>
+
+    </ul>
+  </div>
+</div>

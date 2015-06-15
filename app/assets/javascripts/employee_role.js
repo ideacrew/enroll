@@ -2,8 +2,6 @@ function displayEmployeeRoleSearch() {
 	$("#overlay").css("display", "none");
 	$("a.name").css("padding-top", "30px");
 	$(".disable-btn").css("display", "inline-block");
-	$('.focus_effect:first').addClass('personal-info-top-row');
-	$('.focus_effect:first').removeClass('personal-info-row');
 	$('.sidebar a:first').addClass('style_s_link');
 	$(".start").hide();
 }
@@ -68,15 +66,6 @@ function getAllEmployers()
 	});
 }
 
-function common_body_style()
-{
-
-	$('#personal_info').addClass('personaol-info-row');
-	$('.focus_effect').removeClass('personaol-info-top-row');
-	$('#address_info').addClass('personaol-info-top-row');
-	$('#address_info').removeClass('personaol-info-row');
-}
-
 function side_bar_link_style()
 {
 	$('.sidebar a').removeClass('style_s_link');
@@ -85,7 +74,6 @@ function side_bar_link_style()
 
 function _getEmployers()
 {
-	common_body_style();
 	side_bar_link_style();
 
 	getAllEmployers();

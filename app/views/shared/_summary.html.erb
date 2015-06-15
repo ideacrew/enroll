@@ -1,25 +1,38 @@
-<%= link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-success all-plans' %>
+<%= link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-tranparent all-plans' %>
 
 <% if qhp.present? %>
   <div class="row plan">
-    <div class="col-md-6 col-sm-9 col-xs-12">
-      <h3><%= @plan.name %></h3>
+    <div class="col-md-6 col-sm-6 col-xs-12">
+      <div class="page-header"><h4>Selected Plan</h4></div>
+      <p><%= image_tag('blue-cross.jpg', width: 80) %></p>
+      <h3 class="text-blue"><%= @plan.name %></h3>
       <p><%= (Caches::MongoidCache.lookup(CarrierProfile, @plan.carrier_profile_id) { @plan.carrier_profile} ).dba %></p>
+      <ul class="plan-type">
+        <% plan_level = qhp.metal_level.downcase %>
+        <li class="<%= plan_level %>"><small>Level</small><br><i class="fa fa-circle-o"></i> <%= plan_level.humanize %></li>
+        <li><small>Type</small><br><%= qhp.plan_type %></li>
+        <li><small>Network</small><br><strong><%= @plan.nationwide ? "Nationwide" : "DC Area Network" %></strong></li>
+        <li><small>Deductible</small><br><strong><%= @plan.deductible %></strong></li>
+      </ul>
     </div>
+    
+    <div class="col-md-6 col-sm-6 col-xs-12">
 
-    <div class="col-md-2 col-sm-2 col-xs-6">
-      <p><%= number_to_currency(@plan.total_premium) %></p>
-      <p>premium</p>
-    </div>
+      <div class="row">
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <h3><%= number_to_currency(@plan.total_premium) %></h3><small>Premium</small>
+        </div>
 
-    <div class="col-md-2 col-sm-2 col-xs-6">
-      <p><%= number_to_currency(@plan.total_employer_contribution) %></p><p>employer</p>
-    </div>
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <h3><%= number_to_currency(@plan.total_employer_contribution) %></h3><small>Employer</small>
+        </div>
 
-    <div class="col-md-2 col-sm-2 col-xs-6">
-      <h3 class="your_cost pull-right"><%= number_to_currency(@plan.total_employee_cost) %></h3>
-      <p><strong>your cost</strong></p>
-    </div>
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <div class="pull-right">
+            <h3><strong><%= number_to_currency(@plan.total_employee_cost) %></strong></h3><small><strong>your cost</strong></small><br><br>
+          </div>
+        </div>
+      </div><br><br>
 
     <div class="col-md-12 col-sm-12 col-xs-12">
       <ul>

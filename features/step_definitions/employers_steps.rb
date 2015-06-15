@@ -309,10 +309,7 @@ Then(/^The census family should be terminated and move to terminated tab$/) do
   expect(@browser.a(text: /Patrick K Doe Jr/).visible?).to be_truthy
   @browser.a(text: /Employees/).wait_until_present
   @browser.a(text: /Employees/).click
-  @browser.td(text: /Employment terminated/).wait_until_present
-  expect(@browser.td(text: /Employment terminated/).visible?).to be_truthy
-  #expect(@browser.a(class: /interaction-click-control-rehire/).visible?).to be_truthy
-  #expect(@browser.a(text: /Rehire/).visible?).to be_truthy
+  @browser.a(text: /Rehire/).wait_until_present
 end
 
 And(/^I should see the census family is successfully terminated message$/) do
@@ -402,9 +399,9 @@ And(/^I should see a success message after clicking on create plan year button$/
 end
 
 When(/^I enter filter in plan selection page$/) do
-  Watir::Wait.until(30) { @browser.a(text: /All Filters/).present? }
-  @browser.a(text: /All Filters/).wait_until_present
-  @browser.a(text: /All Filters/).click
+  Watir::Wait.until(30) { @browser.a(text: /Filter Results/).present? }
+  # @browser.a(text: /All Filters/).wait_until_present
+  # @browser.a(text: /All Filters/).click
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(true)
   @browser.button(class: /apply-btn/, text: /Apply/).wait_until_present
   @browser.button(class: /apply-btn/, text: /Apply/).click
@@ -413,10 +410,12 @@ end
 When(/^I enter combined filter in plan selection page$/) do
   @browser.a(text: /All Filters/).wait_until_present
   @browser.a(text: /All Filters/).click
-  @browser.checkboxes(class: /plan-type-selection-filter/).first.wait_until_present
-  @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
+  # @browser.checkboxes(class: /plan-type-selection-filter/).first.wait_until_present
+  # @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
   # Nationwide
-  @browser.checkboxes(class: /plan-metal-network-selection-filter/).first.set(true)
+  # @browser.checkboxes(class: /plan-metal-network-selection-filter/).first.set(true)
+  @browser.checkbox(class: /checkbox-custom interaction-choice-control-value-checkbox-5/).set(true)
+
   # Platinum
   @browser.checkboxes(class: /plan-metal-level-selection-filter/)[0].set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("")
