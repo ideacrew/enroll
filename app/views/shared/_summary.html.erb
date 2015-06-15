@@ -8,16 +8,24 @@
       <h3 class="text-blue"><%= @plan.name %></h3>
       <p><%= (Caches::MongoidCache.lookup(CarrierProfile, @plan.carrier_profile_id) { @plan.carrier_profile} ).dba %></p>
       <ul class="plan-type">
-        <% plan_level = qhp.metal_level.downcase %>
-        <li class="<%= plan_level %>"><small>Level</small><br><i class="fa fa-circle-o"></i> <%= plan_level.humanize %></li>
-        <li><small>Type</small><br><%= qhp.plan_type %></li>
+        <% plan_level = @plan.metal_level.humanize %>
+        <li class="<%= plan_level.downcase %>"><small>Level</small><br><i class="fa fa-circle-o"></i> <%= plan_level.humanize %></li>
+        <li><small>Type</small><br><%= @plan.plan_type ? @plan.plan_type.upcase : "" %></li>
         <li><small>Network</small><br><strong><%= @plan.nationwide ? "Nationwide" : "DC Area Network" %></strong></li>
-        <li><small>Deductible</small><br><strong><%= @plan.deductible %></strong></li>
+        <li>
+            <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
+              <small>Family Deductible</small><br>
+              <strong><%= @plan.family_deductible %></strong>
+            <% else %>
+              <small>Deductible</small><br>
+              <strong><%= @plan.deductible %></strong>
+            <% end %>
+          </strong>
+        </li>
       </ul>
     </div>
     
     <div class="col-md-6 col-sm-6 col-xs-12">
-
       <div class="row">
         <div class="col-md-4 col-sm-4 col-xs-12">
           <h3><%= number_to_currency(@plan.total_premium) %></h3><small>Premium</small>
@@ -34,38 +42,10 @@
         </div>
       </div><br><br>
 
-    <div class="col-md-12 col-sm-12 col-xs-12">
-      <ul>
-        <li>
-          <p>Type</p>
-          <strong><%= @plan.plan_type ? @plan.plan_type.upcase : "" %></strong>
-        </li>
-
-        <% plan_level = @plan.metal_level.humanize %>
-        <li class="<%= plan_level.downcase %>">
-          <p>Level</p>
-          <strong>
-            <i class="fa fa-circle-o"></i><%= plan_level %>
-          </strong>
-        </li>
-        <li>
-          <p>Network</p>
-          <strong><%= @plan.nationwide ? "Nationwide" : "DC Area Network" %></strong>
-        </li>
-        <li>
-          <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
-            <p>Family Deductible</p>
-            <strong><%= @plan.family_deductible %></strong>
-          <% else %>
-            <p>Deductible</p>
-            <strong><%= @plan.deductible %></strong>
-          <% end %>
-        </li>
-      </ul>
-    </div>
-    <div class="col-md-12 col-sm-12 col-xs-12">
-      <div class="pull-right">
-        <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => @plan.id}), {:class => "btn btn-primary", :method => :post}) %>
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => @plan.id}), {:class => "btn btn-primary btn-lg pull-right", :method => :post}) %>
+        </div>
       </div>
     </div>
   </div>

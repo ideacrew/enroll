@@ -48,8 +48,8 @@
             <br/>
             <%= link_to_add_fields '<i class="fa fa-user-plus"></i> Add Dependent'.html_safe, f, :census_dependents, 'btn btn-success pull-right' %>
           </div>
-          <div class="row top-row">
-            <div class="col-md-3 key col-sm-3 col-xs-12">
+          <div class="row top-row no-border">
+            <div class="col-md-3 col-sm-3 col-xs-12 key-btn">
               <% button_label = @census_employee.persisted? ? 'Update Employee' : 'Create Employee' %>
               <button class="btn btn-primary" type="submit">
                 <%= "<i class=\"fa fa-user-plus\"></i> #{button_label}".html_safe %>
