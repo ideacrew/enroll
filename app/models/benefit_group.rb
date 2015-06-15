@@ -217,6 +217,8 @@ private
   # extra may not be applied toward other members
 
   def plan_integrity
+    return if elected_plan_ids.blank?
+
     if (plan_option_kind == "single_plan") && (elected_plan_ids.first != reference_plan_id)
       self.errors.add(:elected_plans, "single plan must be the reference plan")
     end

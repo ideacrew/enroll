@@ -2,7 +2,7 @@ class CensusEmployee < CensusMember
   include AASM
   include Sortable
 
-  field :is_business_owner, type: Boolean
+  field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
   field :employment_terminated_on, type: Date
   field :aasm_state, type: String

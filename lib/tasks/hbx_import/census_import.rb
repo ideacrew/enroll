@@ -37,14 +37,21 @@ module HbxImport
               ce.is_business_owner = false
               ce.hired_on = census_employee.doh
               ce.employer_profile = employer_profile
-              ce.build_email(kind: "work", address: census_employee.work_email)
+              if !census_employee.work_email.blank?
+                ce.build_email(kind: "work", address: census_employee.work_email)
+              end
               ce.build_address(kind: "home",address_1:"830 I St NE",city:"Washington",state:"DC",zip:"20002")
               ce.employment_terminated_on = census_employee.dot
               ce.add_benefit_group_assignment(benefit_group, plan_year.start_on)
+              begin
               ce.save!
               benefit_group.census_employees << ce._id
 
               census_employees_to_save << ce
+              rescue
+                puts census_employee.work_email.inspect
+                puts ce.errors.inspect
+              end
             end
           end
         end
@@ -79,8 +86,8 @@ module HbxImport
   end
 
   CensusRecord = Struct.new(
-    :dba, :fein, :first_name, :last_name, :ssn, :dob, :doh, :work_email,
-    :person_email, :dot, :individual_external_id, :employee_external_id,
+    :dba, :fein, :first_name, :last_name, :ssn, :dob, :doh, :dot, :work_email,
+    :person_email, :individual_external_id, :employee_external_id,
     :record_start_date, :record_end_date, :gender
   ) do
     include Comparable
@@ -96,8 +103,8 @@ module HbxImport
 
     def self.from_row(row)
       ee = CensusRecord.new
-      %w[itself to_digits itself itself to_digits to_date_safe to_date_safe itself
-         itself to_date_safe itself itself itself itself itself].each_with_index do |conversion, index|
+      %w[itself to_digits itself itself to_digits to_date_safe to_date_safe to_date_safe itself
+         itself itself itself itself itself itself].each_with_index do |conversion, index|
         ee.send("#{ee.members[index]}=", row[index].send(conversion))
       end
       ee = nil if ee.fein.nil? || ee.ssn.nil? || ee.dob.nil? || ee.doh.nil?
