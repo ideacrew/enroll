@@ -1,0 +1,7 @@
+$('#send_message').hide();
+$('#message_form').show();
+$('#message_form').html("<%= escape_javascript(render "new") %>");
+$(".btn-danger").click(function(){
+  $('#message_form').hide();
+  $('#send_message').show();
+});
