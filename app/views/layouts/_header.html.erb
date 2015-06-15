@@ -1,3 +1,44 @@
+<nav class="navbar navbar-white navbar-fixed-top">
+  <div class="container">
+      <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+          </button>
+	  <a class="navbar-brand" href="<%= root_url %>"><%= image_tag 'logo.png' %></a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav nav-info navbar-left brd-left hidden-xs hidden-sm">
+              <li class="">
+                  <a href="#"><%= image_tag 'icons/icon-family.png' %> &nbsp;I'm an Individual/Family</a> 
+              </li>
+          </ul>
+          <div class="right-menu navbar-right">
+            <% if signed_in? %>
+              <ul class="navbar-nav top-menu">
+                <% if @person.present? && @person.persisted? %>
+                  <li><%= link_to "My Account", home_consumer_profiles_path %></li>
+                  <li class="hidden-xs">|</li>
+                <% end %>
+                  <li><a href="#">1-855-532-5465</a></li>
+                  <li class="hidden-xs">|</li>
+                  <li><a href="#">Help</a></li>
+                  <li class="hidden-xs">|</li>
+                  <li><%= link_to "LOGOUT", destroy_user_session_path, method: "delete" %></li>
+              </ul>
+              <div class="clearfix"></div>
+              <ul class="user-info">
+                  <li class="">(ID <%= current_user.id %>) &nbsp; &nbsp; <strong><%= @person.full_name if @person.present? && @person.persisted? %></strong></li>
+              </ul>
+            <% end %>
+          </div>
+      </div>
+  </div>
+</nav>
+
+<!--
 <nav role="navigation" class="navbar navbar-default navbar-fixed-top">
   <div class="container">
       <div class="navbar-header">
@@ -10,11 +51,13 @@
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
+      <!--
       <div id="bs-example-navbar-collapse-1" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
           <a href="<%= root_url %>" class="pull-left"><%= image_tag 'logo_small.png' %></a>
           <li><p>Click anywhere in this area to <a href="#">ask a question</a> or <a href="#">start a search</a></p></li>
           <!-- <li class="social pull-right border nav"><a href="#"><img src="img/nav.png" alt=""></a></li> -->
+          <!--
           <li class="social pull-right border"><a href="#"><%= image_tag 'chat.png' %></a></li>
 
           <li class="social pull-right border aktif dropdown">
@@ -37,3 +80,4 @@
       </div>
   </div>
 </nav>
+-->

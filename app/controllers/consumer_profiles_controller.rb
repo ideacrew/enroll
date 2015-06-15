@@ -11,6 +11,8 @@ class ConsumerProfilesController < ApplicationController
     @qualifying_life_events = QualifyingLifeEventKind.all
     @hbx_enrollments = @family.latest_household.hbx_enrollments
 
+    @employee_role = @employee_roles.first
+
     respond_to do |format|
       format.html
       format.js
@@ -57,5 +59,13 @@ class ConsumerProfilesController < ApplicationController
       format.html
       format.js
     end
+  end
+
+  def check_qle_date
+    date_married = Date.parse(params[:date_val])
+    start_date = Date.parse('01/10/2013')
+    end_date = Date.today
+
+    @qualified_date = (start_date <= date_married && date_married <= end_date) ? true : false
   end
 end

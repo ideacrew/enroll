@@ -1,0 +1,47 @@
+- step = (defined? step) ? step.to_i : 1
+
+- percent_complete = 0
+- percent_complete = (step == 2) ? 15 : ((step == 3) ? 30 : ((step == 4) ? 45 : ((step == 5) ? 60 : ((step == 6) ? 75 : ((step == 7) ? 90 : 0)))))
+
+%h3= "#{percent_complete}% Complete"
+%ul.list-unstyled.progress-wrapper.hidden-xs
+	%li{class: add_progress_class(1, step)}
+		%span.circle-progress
+		.vertical-line-progress
+		Personal Info
+	%li{class: add_progress_class(2, step)}
+		%span.circle-progress
+		.vertical-line-progress
+		Employer
+	%li{class: add_progress_class(3, step)}
+		%span.circle-progress
+		.vertical-line-progress
+		Contact Info
+	%li{class: add_progress_class(4, step)}
+		%span.circle-progress
+		.vertical-line-progress
+		Household
+	%li{class: add_progress_class(5, step)}
+		%span.circle-progress
+		.vertical-line-progress
+		Plan Section
+	%li{class: add_progress_class(6, step)}
+		%span.circle-progress
+		.vertical-line-progress
+		Review
+	%li{class: add_progress_class(7, step)}
+		%span.circle-progress
+		.vertical-line-progress
+		Complete
+
+%button.btn.btn-lg.btn-danger.btn-block#btn-continue{type: 'submit'}
+	CONTINUE
+%ul.list-unstyled.list-right-section
+	%li
+		%a{href: '#'}
+			= image_tag 'icons/list.png'
+			PREVIOUS
+	%li
+		%a{href: '#'}
+			= image_tag 'icons/list.png'
+			SAVE &amp; EXIT

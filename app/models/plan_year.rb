@@ -61,7 +61,15 @@ class PlanYear
   end
 
   def minimum_employer_contribution
-    benefit_groups.min_by(&:premium_pct_as_int).premium_pct_as_int unless benefit_groups.size == 0
+    unless benefit_groups.size == 0
+      benefit_groups.map do |benefit_group|
+        benefit_group.relationship_benefits.select do |relationship_benefit|
+          relationship_benefit.relationship == "employee"
+        end.min_by do |relationship_benefit|
+          relationship_benefit.premium_pct
+        end
+      end.map(&:premium_pct).first
+    end
   end
 
   def is_application_valid?
@@ -146,7 +154,7 @@ class PlanYear
     if eligible_to_enroll_count == 0
       errors.merge!(eligible_to_enroll_count: "at least 1 employee must be eligible to enroll")
     end
-    
+
     # At least one employee who isn't an owner or family member of owner must enroll
     if non_business_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
       errors.merge!(non_business_owner_enrollment_count: "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")

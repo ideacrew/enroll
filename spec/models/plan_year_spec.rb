@@ -311,8 +311,6 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:plan_year)                   { PlanYear.new(**valid_params) }
     let(:valid_fte_count)             { HbxProfile::ShopSmallMarketFteCountMaximum }
     let(:invalid_fte_count)           { HbxProfile::ShopSmallMarketFteCountMaximum + 1 }
-    let(:valid_ee_contribution_pct)   { HbxProfile::ShopEmployerContributionPercentMinimum }
-    let(:invalid_ee_contribution_pct) { HbxProfile::ShopEmployerContributionPercentMinimum - 1 }
 
     it "plan year should be in draft state" do
       expect(plan_year.draft?).to be_truthy
@@ -365,14 +363,11 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context "and the employer contribution amount is below minimum" do
-      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
-
-      before do
-        benefit_group.premium_pct_as_int = HbxProfile::ShopEmployerContributionPercentMinimum - 1
-      end
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, :invalid_employee_relationship_benefit, plan_year: plan_year) }
 
       context "and the effective date isn't January 1" do
         before do
+          plan_year.benefit_groups << benefit_group
           plan_year.start_on = Date.current.beginning_of_year + 1.month
           plan_year.publish
         end
@@ -393,6 +388,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       context "and the effective date is January 1" do
         before do
+          plan_year.benefit_groups << benefit_group
           plan_year.start_on = Date.current.beginning_of_year
           plan_year.publish
         end
@@ -408,10 +404,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context "and one or more application elements are invalid" do
-      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, :invalid_employee_relationship_benefit, plan_year: plan_year) }
 
       before do
-        benefit_group.premium_pct_as_int = invalid_ee_contribution_pct
+        plan_year.benefit_groups << benefit_group
         plan_year.fte_count = invalid_fte_count
         plan_year.start_on = Date.current.beginning_of_year + 1.month
         plan_year.publish
@@ -512,7 +508,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     it "should failure when current date more than open_enrollment_latest_start_on" do
       start_on = (Time.now + 1.month).beginning_of_month
-      allow(Date).to receive(:current).and_return(Date.new(Time.now.year, Time.now.month, 15)) 
+      allow(Date).to receive(:current).and_return(Date.new(Time.now.year, Time.now.month, 15))
       rsp = PlanYear.check_start_on(start_on)
       expect(rsp[:result]).to eq "failure"
       expect(rsp[:msg]).to start_with "start on must choose a start on date"

@@ -82,7 +82,7 @@ class HbxProfile
   # Maximum number of months prior to coverage effective date to submit a Plan Year application
   ShopPlanYearPublishBeforeEffectiveDateMaximum = 3.months
 
-  ShopEmployerContributionPercentMinimum = 50
+  ShopEmployerContributionPercentMinimum = 50.0
   ShopEnrollmentParticipationRatioMinimum = 2 / 3.0
   ShopEnrollmentNonOwnerParticipationMinimum = 1
 

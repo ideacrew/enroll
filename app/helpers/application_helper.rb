@@ -234,4 +234,12 @@ module ApplicationHelper
       obj.simple_benefit_list(nil, nil, nil)
     end
   end
+
+  def add_progress_class(element_number, step)
+    if element_number < step
+      'complete'
+    elsif element_number == step
+      'active'
+    end
+  end
 end

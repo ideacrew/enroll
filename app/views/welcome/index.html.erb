@@ -1,7 +1,7 @@
 <div class="row content landing">
   	<div class="home">
     <h1><strong>Welcome to DC HealthLink</strong></h1>
-    <h3>DC's Online Health Insurance Marketplace</h3>
+    <h3>DC's Online Health Insurance Marketplace</h3><br><br>
     <% if user_signed_in? %>
       <strong>
       	Welcome <%= current_user.email %>
@@ -9,11 +9,12 @@
       </strong>
     </p>
     <% end %>
+    <br><br>
     <p>
         <%= link_to "Employee Portal", welcome_consumer_employee_index_path, class: "btn btn-default" %>
         <%= link_to "Employer Portal", welcome_employers_employer_profiles_path, class: "btn btn-default" %>
         <%= link_to "Broker Agency Portal", broker_agencies_root_path, class: "btn btn-default" %>
         <%= link_to "HBX Portal", exchanges_hbx_profiles_root_path, class: "btn btn-default" %>
-    </p>
+    </p><br><br><br><br>
   </div>
 </div>
