@@ -63,7 +63,6 @@ class EmployerProfile
 
   def staff_roles
     Person.find_all_staff_roles_by_employer_profile(self)
-    # Person.all.select{ |p| p.employer_staff_role? && p.employer_staff_role.employer_profile_id == self.id}
   end
 
   def today=(new_date)
@@ -182,10 +181,10 @@ class EmployerProfile
 
     def find_by_broker_agency_profile(broker_agency_profile)
       raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile)
-      orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true, 
+      orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true,
         :"employer_profile.broker_agency_accounts.broker_agency_profile_id" => broker_agency_profile.id).cache.to_a
 
-      orgs.collect(&:employer_profile) 
+      orgs.collect(&:employer_profile)
     end
 
     def find_by_writing_agent(writing_agent)
@@ -193,7 +192,7 @@ class EmployerProfile
       orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true,
         :"employer_profile.broker_agency_accounts.writing_agent_id" => writing_agent.id).cache.to_a
 
-      orgs.collect(&:employer_profile) 
+      orgs.collect(&:employer_profile)
     end
 
     def find_census_employee_by_person(person)
@@ -202,7 +201,7 @@ class EmployerProfile
     end
 
     def advance_day(new_date)
-      
+
       # Find employers with events today and trigger their respective workflow states
       orgs = Organization.where(
           ("employer_profile.plan_years.start_on" == new_date) ||

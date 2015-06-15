@@ -39,6 +39,8 @@ class Organization
 
   validates_presence_of :legal_name, :fein, :office_locations #, :updated_by
 
+  validate :office_location_kinds
+
   validates :fein,
     length: { is: 9, message: "%{value} is not a valid FEIN" },
     numericality: true,
@@ -101,5 +103,19 @@ class Organization
         {"legal_name" => search_rex}
       ])
     }
+  end
+
+  def office_location_kinds
+    location_kinds = self.office_locations.flat_map(&:address).flat_map(&:kind)
+    # should validate only for office location typs ie. primary, mailing, branch
+    return if location_kinds.detect{|kind| kind == 'work' || kind == 'home'}
+
+    if location_kinds.count('primary').zero?
+      errors.add(:base, "must select one primary address")
+    elsif location_kinds.count('primary') > 1
+      errors.add(:base, "can't have multiple primary addresses")
+    elsif location_kinds.count('mailing') > 1
+      errors.add(:base, "can't have more than one mailing address")
+    end
   end
 end

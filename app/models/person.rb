@@ -205,7 +205,7 @@ class Person
     end
 
     def find_all_staff_roles_by_employer_profile(employer_profile)
-      where(:'employer_staff_roles.employer_profile_id' => employer_profile.id)
+      where(:'employer_staff_role.employer_profile_id' => employer_profile.id)
     end
 
   # Return an instance list of active People who match identifying information criteria

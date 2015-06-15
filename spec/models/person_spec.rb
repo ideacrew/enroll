@@ -330,6 +330,17 @@ describe Person, '#addresses' do
   end
 end
 
+describe Person, '#find_all_staff_roles_by_employer_profile' do
+  employer_profile = FactoryGirl.build(:employer_profile)
+  person = FactoryGirl.build(:person)
+
+  it "should have the same search criteria" do
+    allow(Person).to receive(:where).and_return(person)
+    expect(Person.find_all_staff_roles_by_employer_profile(employer_profile)).to eq person
+  end
+
+end
+
 describe Person, "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
   include_context "BradyBunchAfterAll"
 
