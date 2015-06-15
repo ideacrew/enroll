@@ -82,7 +82,8 @@ spacely_benefit_group = spacely_plan_year.benefit_groups.build(
 spacely_benefit_group.relationship_benefits.build(
     relationship: "employee",
     premium_pct: 60,
-    employer_max_amt: 1000.00
+    employer_max_amt: 1000.00,
+    offered: true
   )
 spacely.save!
 
@@ -136,7 +137,8 @@ cogswell_benefit_group = cogswell_plan_year.benefit_groups.build(
 cogswell_benefit_group.relationship_benefits.build(
     relationship: "employee",
     premium_pct: 80,
-    employer_max_amt: 500.00
+    employer_max_amt: 500.00,
+    offered: true
   )
 cogswell.save!
 
@@ -207,7 +209,8 @@ org_1_benefit_group = org_1_plan_year.benefit_groups.build(
 org_1_benefit_group.relationship_benefits.build(
     relationship: "employee",
     premium_pct: 85,
-    employer_max_amt: 300.00
+    employer_max_amt: 300.00,
+    offered: true
   )
 org_1.save!
 
@@ -276,7 +279,8 @@ org_2_benefit_group = org_2_plan_year.benefit_groups.build(
 org_2_benefit_group.relationship_benefits.build(
     relationship: "employee",
     premium_pct: 65,
-    employer_max_amt: 100.00
+    employer_max_amt: 100.00,
+    offered: true
   )
 org_2.save!
 
