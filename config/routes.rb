@@ -80,6 +80,7 @@ Rails.application.routes.draw do
       end
       resources :plan_years do
         get 'recommend_dates', on: :collection
+        post 'publish'
       end
       resources :census_employees, only: [:new, :create, :edit, :update, :show] do
         get :delink
