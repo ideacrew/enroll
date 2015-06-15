@@ -200,15 +200,17 @@ Then(/^I should see the group selection page$/) do
 end
 
 When(/^I click continue on the group selection page$/) do
-  @browser.element(class: /interaction-click-control-shop-for-new-plan/).wait_until_present
-  @browser.element(class: /interaction-click-control-shop-for-new-plan/).click
+  @browser.execute_script('$("button.interaction-click-control-continue").trigger("click")')
+  #@browser.button(class: /interaction-click-control-continue/).wait_until_present
+  #@browser.element(class: /interaction-click-control-shop-for-new-plan/).wait_until_present
+  #@browser.element(class: /interaction-click-control-shop-for-new-plan/).click
 end
 
 Then(/^I should see the plan shopping welcome page$/) do
   @browser.element(text: /Filter Results/i).wait_until_present
   # @browser.h3(text: /Select a Plan/).wait_until_present
   screenshot("plan_shopping_welcome")
-  expect(@browser.element(text: /All Filters/i).visible?).to be_truthy
+  expect(@browser.element(text: /Choose a healthcare plan/i).visible?).to be_truthy
   # expect(@browser.h3(text: /Select a Plan/).visible?).to be_truthy
 end
 
