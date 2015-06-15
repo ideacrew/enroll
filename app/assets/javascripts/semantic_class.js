@@ -18,7 +18,7 @@ function semantic_class() {
 		}
 
 		if(element_id) {
-			$(this).addClass('interaction-click-control-' + element_id.toLowerCase().replace(/_| /gi, '-'));
+			$(this).addClass('interaction-click-control-' + element_id.toLowerCase().replace(/[_&]| /gi, '-'));
 		}
 	});
 
