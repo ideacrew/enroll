@@ -240,11 +240,10 @@ describe EmployerProfile, dbclean: :after_each do
                 end
               end
             end
-
           end
 
           context "the number of enrollments for first month is 0" do
-            it "should advannce to enrolled state without requirement for binder premium"
+            it "should advance to enrolled state without requirement for binder premium"
           end
 
           context "and employer enrollment is compliant when the effective date isn't January 1" do
@@ -320,8 +319,6 @@ describe EmployerProfile, dbclean: :after_each do
                   it "should be in current status" do
                     expect(employer_profile.employer_profile_account.current?).to be_truthy
                   end
-
-                  it "now what happens to SEP, etc?"
                 end
 
                 context "and employer transitions into late status" do
