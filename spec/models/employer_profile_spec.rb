@@ -558,6 +558,25 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     end
   end
 
+  describe ".staff_roles" do
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+
+    context "has no staff" do
+      it "should return any staff" do
+        expect(employer_profile.staff_roles).to eq []
+      end
+    end
+
+    context "has staff" do
+      let(:owner_person) { instance_double("Person")}
+
+      it "should return an array of persons" do
+        allow(Person).to receive(:find_all_staff_roles_by_employer_profile).with(employer_profile).and_return([owner_person])
+        expect(employer_profile.staff_roles).to include(owner_person)
+      end
+    end
+  end
+
   describe ".find_census_employee_by_person" do
     context "with person not matching ssn" do
       let(:params) do

@@ -12,6 +12,11 @@
               <%= "#{pluralize(@organization.errors.size, "error")} prohibited this form from being saved:" %>
             </h4>
             <ul>
+              <% @organization.errors.full_messages.each do |msg| %>
+                <li>
+                  <%= msg %>
+                </li>
+              <% end %>
               <% office_loc = @organization.office_locations.last %>
               <% office_loc.phone.errors.full_messages.each do |msg| %>
                 <li>

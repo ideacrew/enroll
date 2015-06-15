@@ -32,7 +32,7 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(employer_profile).to receive(:plan_years).and_return("")
       sign_in(user)
       get :new, :employer_profile_id => employer_profile_id
-      expect(response.body).to include("window.location")
+      expect(response).to be_redirect
       expect(flash[:notice]).to eq "Please create a plan year before you create your first census employee."
     end
   end
@@ -179,6 +179,7 @@ RSpec.describe Employers::CensusEmployeesController do
           allow(census_employee).to receive(:valid?).and_return(true)
           allow(new_census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:save).and_return(true)
+          allow(census_employee).to receive(:rehire_employee_role).never
           xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: "05/01/2015", :format => :js
           expect(response).to have_http_status(:success)
           expect(flash[:notice]).to eq "Successfully rehired Census Employee."

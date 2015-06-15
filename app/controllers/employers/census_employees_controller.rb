@@ -99,7 +99,6 @@ class Employers::CensusEmployeesController < ApplicationController
       if new_census_employee.present? # not an active family, then it is ready for rehire.#
         new_census_employee.hired_on = @rehiring_date
         new_census_employee.employer_profile = @employer_profile
-        @census_employee.rehire_employee_role
         if new_census_employee.valid? and @census_employee.valid?
           new_census_employee.save
           @census_employee.save
@@ -195,7 +194,7 @@ class Employers::CensusEmployeesController < ApplicationController
   def check_plan_year
     if @employer_profile.plan_years.empty?
       flash[:notice] = "Please create a plan year before you create your first census employee."
-      render js: "window.location.pathname='#{new_employers_employer_profile_plan_year_path(@employer_profile)}'"
+      redirect_to new_employers_employer_profile_plan_year_path(@employer_profile)
     end
   end
 
