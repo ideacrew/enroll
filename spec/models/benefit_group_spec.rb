@@ -172,7 +172,6 @@ describe BenefitGroup, type: :model do
   let(:effective_on_kind)       { "first_of_month" }
   let(:effective_on_offset)     { 30 }
   let(:terminate_on_kind)       { "end_of_month" }
-  let(:premium_pct_as_int)      { 75 }
 
   let(:effective_on_offset_default)   { 0 }
   let(:effective_on_kind_default)     { "date_of_hire" }
@@ -257,14 +256,6 @@ describe BenefitGroup, type: :model do
         expect(BenefitGroup.new(**params).title).to eq ""
       end
     end
-
-    #context "with no premium_pct_as_int" do
-    #  let(:params) {valid_params.except(:premium_pct_as_int)}
-
-    #  it "should be invalid" do
-    #    expect(BenefitGroup.create(**params).errors[:premium_pct_as_int].any?).to be_truthy
-    #  end
-    #end
 
     context "with no relationship_benefits" do
       let(:params) {valid_params.except(:relationship_benefits)}
