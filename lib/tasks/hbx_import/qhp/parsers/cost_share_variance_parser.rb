@@ -31,7 +31,7 @@ module Parser
     has_many :service_visits_attributes, Parser::ServiceVisitsParser, tag: "serviceVisit", deep: true
 
     def to_hash
-      {
+      response = {
         cost_share_variance_attributes: {
           hios_plan_and_variant_id: hios_plan_and_variant_id.gsub(/\n/,'').strip,
           plan_marketing_name: plan_marketing_name.gsub(/\n/,'').strip,
@@ -49,11 +49,12 @@ module Parser
           default_co_insurance_in_network: default_co_insurance_in_network.present? ? default_co_insurance_in_network.gsub(/\n/,'').strip : "",
           default_co_insurance_out_of_network: default_co_insurance_out_of_network.present? ? default_co_insurance_out_of_network.gsub(/\n/,'').strip : ""
         },
-        sbc_attributes: sbc_attributes.to_hash,
         maximum_out_of_pockets_attributes: maximum_out_of_pockets_attributes.map(&:to_hash),
         deductible_attributes: deductible_attributes.to_hash,
         service_visits_attributes: service_visits_attributes.map(&:to_hash)
       }
+      response[:sbc_attributes] = sbc_attributes.to_hash if sbc_attributes
+      response
     end
   end
 end
