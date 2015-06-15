@@ -1,48 +1,6 @@
-<% benefits = [
-	{
-	  benefit_type: "health",
-	  plan_name: "High Value 1000",
-	  issuer_name: "Aetna",
-	  plan_type: "PPO",
-	  subscriber_name: "Joe Cool",
-	  start_date: Date.current - 30,
-	  subscriber_hbx_id: "123456",
-	  subscriber_carrier_id: "987654",
-	  group_id: "1zu3t",
-	  metal_level: "gold"
-	},
-	{
-	  benefit_type: "dental",
-	  plan_name: "Pearly Whites Advantage",
-	  issuer_name: "Aetna",
-	  plan_type: "N/A",
-	  subscriber_name: "Joe Cool",
-	  start_date: (Date.current - 30).beginning_of_month,
-	  subscriber_hbx_id: "123456",
-	  subscriber_carrier_id: "987654",
-	  group_id: "7yt2q",
-	  metal_level: "N/A"
-	}
-	]
-	%>
-
-	<% employer = {
-	  name: "ACME Widgets",
-	  contact: "link to employer HR contact",
-	  plan_year: 2016,
-	  plan_year_start: (Date.current - 90).beginning_of_month,
-	  benefit_group: "link to benefit group",
-	  benefits: benefits
-	}
-%>
-
 <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
 	<div class="container">
 		<div class="row">
-
-
-
-
 			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -83,20 +41,20 @@
                             <div class="panel panel-default min-h">
                             	<div class="panel-body">
                             		<h3 style="margin-top: 0"><%= @person.full_name %></h3>
-                            		<p>(DC Health link ID : <%= @person.id %>)</p>
+                            		<p>(DC Health link ID : <%= current_user.id %>)</p>
                             		<br>
 	                                <div class="page-header">
 	                                    <h4>Employer</h4>
 	                                    <a href="#"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Edit</a>
 	                                </div>
-	                                <%= image_tag 'company-logo/acme.png' %>
-	                                <h3>Acme Unlimited, Inc.</h3>
+
+	                                <h3><%= @employer_profile.dba %></h3>
 	                                <ul class="list-unstyled list-comp">
 	                                    <li>
-	                                        HIRED: <EM>03/30/2014</EM>
+	                                        HIRED: <EM><%= @employee_roles.first.new_census_employee.hired_on.strftime("%m/%d/%Y") %></EM>
 	                                    </li>
 	                                    <li>
-	                                        ELIGIBLE FOR COVERAGE: <EM>03/30/2014</EM>
+	                                        ELIGIBLE FOR COVERAGE: <EM><%= @employee_roles.first.effective_on.strftime("%m/%d/%Y") %></EM>
 	                                    </li>
 	                                </ul>
 	                            </div>
