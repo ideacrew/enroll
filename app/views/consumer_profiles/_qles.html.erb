@@ -1,65 +1,37 @@
-<div class="row landing-row">
-	<div class="col-md-12">
-		<h3>Life Events</h3>
-	</div>
+<div id="qle-details" class="hidden">
+	<a class="close-popup" href="javascript:void(0);"><span aria-hidden="true" class="glyphicon glyphicon-remove"></span></a>
+	<div class="row">
+		<%= form_tag '/consumer/employee_dependents', method: :get do %>
+			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 qle-form-wrapper">
+                <h3 class="qle-details-title">"I got married"</h3>
+                <h5>Enter the date of the event.</h5>
+                <%= text_field_tag 'qle_date', '', placeholder: '00-00-0000', class: 'form-control' %>
+                <%= link_to 'Submit', 'javascript:;', class: 'btn btn-danger', id: 'qle_submit' %>
+                <br>
+                <a class="cancel" href="javascript:void(0);">Cancel</a>
+            </div>
 
-	<% if @qualifying_life_events %>		
-		<% @qualifying_life_events.each_with_index do |qle, index| %>
-			<% if index%5 == 0 %>
-				<div class="col-md-4 col-sm-6 col-xs-12 right-side">
-				<ul class="list-group panel panel-default panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-			<% end %>
+            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 qle-form-wrapper">
+            	<div class="success-info hidden"><br>
+					<p class="success-text"><strong>You may be eligible for a special enrollment period.</strong></p><br>
 
-			<li class="list-group-item qle-item">
-				<div class="row panel-heading" role="tab" id="heading1">
-					<a class="wdfull" data-toggle="collapse" data-parent="#accordion" href="#collapse<%= index %>" aria-expanded="true" aria-controls="collapse1">
-						<div class="col-md-8 col-sm-8 col-xs-12">
-							<h4 class="text-left"><%= qle.title.humanize %></h4>
-						</div>
-						<div class="col-md-4 col-sm-4 col-xs-12 qle-kind">
-	                    	<a href="#"><%= qle.kind unless (qle.edi_code == '32-MARRIAGE' || qle.edi_code == '02-BIRTH' || qle.edi_code == '05-ADOPTION' || qle.edi_code == '07-TERMINATION OF BENEFITS') %></a>
+					<%= hidden_field_tag 'change_plan' %>
+					<%= hidden_field_tag 'employee_role_id', @employee_role.id %>
 
-	                    	<% if (qle.edi_code == '02-BIRTH' || qle.edi_code == '05-ADOPTION' || qle.edi_code == '07-TERMINATION OF BENEFITS') %>
-		                    	<%= link_to(qle.kind, family_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "family", "role" => "tab" ) %>
-							<% end %>
-	                    </div>
-					</a>
+					<%= submit_tag 'Continue', class: 'btn btn-primary' %>
 				</div>
+				<div class="error-info hidden">
+					<p class="error-text">The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact DCHBX support 1-800-555-1212.</p>
 
-				<div id="collapse<%= index %>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading1">
-					<div class="panel-body">
-						<% if qle.edi_code == '32-MARRIAGE' %>
-							<div id="qle_marriage_form">
-								<div class="initial-info">
-									<p>
-									Getting married is an big step. It also a qualified life event that creates a special enrollment period. Start this step by telling us when you got married and then continue to "Add a Family Member" to select a plan for you and your new spouse.
-									</p>
-									<div class="error">
-										<div class="warning"><i class="fa fa-exclamation-triangle"></i>All fields Required</div>
-									</div>
-									<div class="text-center">
-										<input type="text" class="form-control input-lg" id="date_married" placeholder="eg. 4/01/2015">
-										<br/><br/>
-									</div>
-								</div>
-								<div class="success-info hidden">
-									<p class="success-text"><strong>Success!</strong> You have created a special enrollment period.<br>Click continue go to the add your new family member and select your plan.</p><div class="text-center"><a href="#profile" role="tab" data-toggle="tab" aria-controls="profile" aria-expanded="true" class="btn btn-blue-2 btn-lg add_success">Continue</a></div>
-								</div>
-								<div class="error-info hidden">
-									<p class="error-text">The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact DCHBX support 1-800-555-1212 option 1</p><div class="text-center"><a href="#" class="btn btn-blue-2 btn-lg marriage_back">Back</a></div>
-								</div>
-							</div>
-						<% else %>
-							<%= qle.description %>
-						<% end %>
-					</div>
+					<%= submit_tag 'Continue', disabled: true, class: 'btn' %>
 				</div>
-			</li>
-			<% if index%5 == 4 %>
-				</ul>
+				<div class="default-info"><br><br><br>
+					<center>
+						<strong id="qle-input-info">Please enter a date to the left.</strong><br><br>
+						<%= submit_tag 'Continue', disabled: true, class: 'btn' %>
+					</center>
 				</div>
-			<% end %>
-		<% end %>
-			<!-- <button class="btn btn-see-all md-trigger" data-modal="modal-3">See All</button> -->
-	<% end %>
+        	</div>
+        <% end %>
+    </div>
 </div>

@@ -6,14 +6,20 @@
 			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
 				<div class="ct-1">
 					<h3>Choose a healthcare plan.</h3>
-					<p class="pull-left">
-	                    Individual: <strong><%= @person.full_name %></strong> &nbsp;&nbsp;
-	                    Dependents: <strong><%= @hbx_enrollment.humanized_dependent_summary %></strong> &nbsp;&nbsp;
-	                    Employer: <strong><%= @benefit_group.plan_year.employer_profile.dba %></strong> &nbsp;&nbsp;
-	                    Plans: <strong><%= @plans.count %></strong>
-	                </p>
+            <p class="pull-left">
+                Individual: <strong><%= @person.full_name %></strong> &nbsp;&nbsp;
+                Dependents: <strong><%= @hbx_enrollment.humanized_dependent_summary %></strong> &nbsp;&nbsp;
+                Employer: <strong><%= @benefit_group.plan_year.employer_profile.dba %></strong> &nbsp;&nbsp;
+                Plans: <strong><%= @plans.count %></strong>
+            </p>
+            <p class="pull-right">
+              <a href="javascript:void(0);" style="display: none;" class="btn btn-primary", data-uri = "comparison_products_plans_path" id = "compare-selected-plans-link" %>
+                COMPARE PLANS
+              </a>
+            </p>
 	                <br/>
 	                <br/>
+                  <br/>
 	            </div>
 
               <div class="row">
@@ -169,9 +175,12 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
-        <%= render  partial: 'shared/signup_progress', locals: {step: '5'} %>
-      </div>
+
+      <% if @change_plan.blank? %>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
+          <%= render  partial: 'shared/signup_progress', locals: {step: '5'} %>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>
