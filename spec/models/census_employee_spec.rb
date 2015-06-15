@@ -78,7 +78,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
     context "with no is owner" do
-      let(:params) {valid_params.except(:is_business_owner)}
+      let(:params) { valid_params.merge({:is_business_owner => nil}) }
 
     it "should fail validation" do
         expect(CensusEmployee.create(**params).errors[:is_business_owner].any?).to be_truthy

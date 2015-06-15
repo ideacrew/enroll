@@ -9,7 +9,14 @@
           <div class="head-title head">
             <h3 class="pull-left">Employee Roster</h3>
             <div class="btn-wrapper">
-              <%= link_to '<i class="fa fa-user-plus"></i> Add Employee'.html_safe, new_employers_employer_profile_census_employee_path(@employer_profile), class: "btn btn-primary", remote: true %>
+              <% if @employer_profile.plan_years.empty? %>
+                <!--  non javascript click when clicked on new employee -->
+                <%= link_to '<i class="fa fa-user-plus"></i> Add Employee'.html_safe, new_employers_employer_profile_census_employee_path(@employer_profile), class: "btn btn-primary" %>
+              <% else %>
+                <!-- javascript click when clicked on new employee -->
+                <%= link_to '<i class="fa fa-user-plus"></i> Add Employee'.html_safe, new_employers_employer_profile_census_employee_path(@employer_profile), class: "btn btn-primary", remote: true %>
+              <% end %>
+
                 <div class="btn-group" role="group" aria-label="">
                 <div class="btn-group" data-toggle="buttons" name="employee_family_tabs">
                   <label class="btn btn-default active">
