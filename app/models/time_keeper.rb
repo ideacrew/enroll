@@ -7,6 +7,10 @@ class TimeKeeper
     end
   end
 
+  def self.current_date
+    Date.current
+  end
+
   def set_model_dates
     EmployerProfile.advance_day(current_date)
     Family.advance_day(current_date)
