@@ -7,6 +7,9 @@
 
   <br><br>
   <% if @current_plan_year.present? %>
+  <% if @current_plan_year.draft?%>
+    <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,@current_plan_year) ,method: :post, class: "btn btn-primary"%>
+  <% end %>
     <div class="title-dropdown">
       <div class="dropdown form-control float-label adderess-select-box text-center">
         <a id="dLabel" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
@@ -33,7 +36,7 @@
             <td><%= "#{plan_year.fte_count} / #{plan_year.pte_count} / #{plan_year.msp_count}" %></td>
             <th>Open Enroll Start/End :</th>
             <td>
-              <%= format_date plan_year.open_enrollment_start_on %> / 
+              <%= format_date plan_year.open_enrollment_start_on %> /
               <%= format_date plan_year.open_enrollment_end_on %>
             </td>
           </tr>
@@ -42,7 +45,7 @@
             <td><%= plan_year.employee_participation_percent || '-' %></td>
             <th>Plan Year Start/End :</th>
             <td>
-              <%= format_date plan_year.start_on %> / 
+              <%= format_date plan_year.start_on %> /
               <%= format_date plan_year.end_on %>
             </td>
           </tr>

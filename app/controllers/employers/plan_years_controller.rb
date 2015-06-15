@@ -37,6 +37,20 @@ class Employers::PlanYearsController < ApplicationController
     end
   end
 
+  def publish
+    @plan_year = @employer_profile.plan_years.last
+    @plan_year.publish
+
+    if @plan_year.save
+      flash[:notice] = "Plan Year successfully published"
+      redirect_to employers_employer_profile_path(@employer_profile)
+    else
+      flash[:notice] = "Plan Year: #{@plan_year.application_warnings}"
+      redirect_to employers_employer_profile_path(@employer_profile)
+    end
+
+  end
+
   private
 
   def find_employer
