@@ -1,36 +1,36 @@
-<div class="container" id='plan_year'>
-    <div class="row">
-      <div class="col-md-9 col-sm-9 col-xs-12">
-        <% if @plan_year.errors.any? %>
-          <div class="alert-plan-year alert-error">
-            <h4><%= pluralize(@plan_year.errors.count, "error") %> prohibited this plan year from being saved:</h4>
-            <ul>
-              <% @plan_year.errors.delete(:benefit_groups) %>
-              <% @plan_year.errors.full_messages.each do |msg| %>
-                <li><%= msg %></li>
-              <% end %>
-
-              <% @plan_year.benefit_groups.each do |bg| %>
-                <% bg.errors.full_messages.each do |msg| %>
+  <div class="container" id='plan_year'>
+      <div class="row">
+        <div class="col-md-9 col-sm-9 col-xs-12">
+          <% if @plan_year.errors.any? %>
+            <div class="alert-plan-year alert-error">
+              <h4><%= pluralize(@plan_year.errors.count, "error") %> prohibited this plan year from being saved:</h4>
+              <ul>
+                <% @plan_year.errors.delete(:benefit_groups) %>
+                <% @plan_year.errors.full_messages.each do |msg| %>
                   <li><%= msg %></li>
                 <% end %>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
 
-        <%= render "shared/plan_year_fields", f: f %><br>
-
-        <div class='form-inputs'>
-          <h3> Benefit Groups </h3>
-          <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
-            <%= render "shared/benefit_group_fields", f: bg %><br>
+                <% @plan_year.benefit_groups.each do |bg| %>
+                  <% bg.errors.full_messages.each do |msg| %>
+                    <li><%= msg %></li>
+                  <% end %>
+                <% end %>
+              </ul>
+            </div>
           <% end %>
-          <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'pull-right btn btn-success' %>
-        </div>
-      <div class="row top-row">
-        <button type="submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Create Plan Year</button>
+
+          <%= render "shared/plan_year_fields", f: f %><br>
+
+          <div class='form-inputs'>
+            <h3> Benefit Groups </h3>
+            <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
+              <%= render "shared/benefit_group_fields", f: bg %><br>
+            <% end %>
+            <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'pull-right btn btn-success' %>
+            <div class="row top-row no-border">
+              <button type="submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Create Plan Year</button>
+            </div>
+          </div>
       </div>
     </div>
-  </div>
-</div><br>
+  </div><br>

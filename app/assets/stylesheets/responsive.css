@@ -11,9 +11,15 @@
 }
 
 @media (min-width: 300px) and (max-width: 767px) {
-  
+  .input-lg, .form-group-lg{
+    border-bottom: 1px solid #ccc;
+   }
+   .top-row, .middle-row{border-bottom: 0px solid #b7b7b7;}
+
+  .key-btn{width: 50%;}
+
   .radio label, .checkbox label {
-    padding-left: 20px;
+    padding-left: 30px;
   }
   .check .col-md-4:last-child .radio label {
     padding-left: 13px;
