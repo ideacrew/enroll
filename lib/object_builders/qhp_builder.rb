@@ -102,7 +102,12 @@ class QhpBuilder
   end
 
   def cost_share_variance_params
-    cost_share_variance_list_params[:cost_share_variance_attributes].merge(sbc_params)
+
+    if sbc_params
+      cost_share_variance_list_params[:cost_share_variance_attributes].merge(sbc_params)
+    else
+      cost_share_variance_list_params[:cost_share_variance_attributes]
+    end
   end
 
   def service_visits_params

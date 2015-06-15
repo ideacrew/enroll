@@ -162,6 +162,13 @@ module ApplicationHelper
   def link_to_add_fields(name, f, association, classes='')
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
+
+    # TODO add ability to build nested attributes dynamically
+    if f.object.send(association).klass == OfficeLocation
+      new_object.build_address
+      new_object.build_phone
+    end
+
     fields = f.fields_for(association, new_object, fieldset: false, child_index: id) do |builder|
       render("shared/" + association.to_s.singularize + "_fields", f: builder)
     end

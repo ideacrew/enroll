@@ -13,8 +13,7 @@ describe EmployerProfile, dbclean: :after_each do
   let(:office_location) { OfficeLocation.new(
         is_primary: true,
         address: address,
-        phone: phone,
-        email: email
+        phone: phone
       )
     }
 

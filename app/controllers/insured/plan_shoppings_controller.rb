@@ -29,6 +29,21 @@ class Insured::PlanShoppingsController < ApplicationController
     end
   end
 
+  def waive
+    @person = current_user.person
+    @plan = Plan.find(params.require(:plan_id))
+    @hbx_enrollment = HbxEnrollment.find(params.require(:id))
+    @benefit_group = @hbx_enrollment.benefit_group
+    @reference_plan = @benefit_group.reference_plan
+    @plan = PlanCostDecorator.new(@plan, @hbx_enrollment, @benefit_group, @reference_plan)
+
+    if @hbx_enrollment.waive_coverage!
+      redirect_to home_consumer_profiles_path
+    else
+      redirect_to :back
+    end
+  end
+
   def show
     hbx_enrollment_id = params.require(:id)
 
@@ -41,6 +56,8 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = @benefit_group.elected_plans.entries.collect() do |plan|
       PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
     end
+
+    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
   end
 
   def find_person(id)

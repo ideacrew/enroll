@@ -44,6 +44,7 @@ Rails.application.routes.draw do
       member do
         post 'checkout'
         post 'thankyou'
+        post 'waive'
       end
     end
 
