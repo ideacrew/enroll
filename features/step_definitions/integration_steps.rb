@@ -84,8 +84,8 @@ When(/^I enter the identifying info of my existing person$/) do
   @browser.label(:text=> /FIRST NAME/).click
   @browser.text_field(name: "person[ssn]").set("670991234")
   screenshot("information_entered")
-  @browser.button(value: /Search Employers/).wait_until_present
-  @browser.button(value: /Search Employers/, :type => "submit").click
+  @browser.element(class: /interaction-click-control-continue/).wait_until_present
+  @browser.element(class: /interaction-click-control-continue/).click
 end
 # TODO: needs to be merged
 When(/^I enter the identifying information of my existing person$/) do
@@ -121,7 +121,8 @@ When(/^I complete the matched employee form$/) do
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
   @browser.text_field(name: "person[emails_attributes][1][address]").click
   screenshot("personal_info_complete")
-  @browser.button(class: "btn-primary", :text => /Continue/).click
+  @browser.button(id: /btn-continue/).wait_until_present
+  @browser.button(id: /btn-continue/).click
 end
 # TODO: needs to be merged
 When(/^I complete the matching employee form$/) do
@@ -178,7 +179,6 @@ When(/^I enter the identifying info of Sorens daughter$/) do
   @browser.text_field(name: 'dependent[first_name]').set('Cynthia')
   @browser.text_field(name: 'dependent[last_name]').set('White')
   @browser.text_field(name: 'dependent[date_of_birth]').set('01/15/2011')
-  @browser.text_field(name: 'dependent[first_name]').click
   input_field = @browser.div(class: /selectric-wrapper/)
   input_field.click
   input_field.li(text: /Child/).click
@@ -237,7 +237,7 @@ When(/^I confirm on the coverage summary page$/) do
 end
 
 Then(/^I should see the "my account" page$/) do
-  @browser.element(text: /Life Events/).wait_until_present
+  @browser.element(text: /Your Life Events/i).wait_until_present
   screenshot("my_account_page")
-  expect(@browser.element(text: /Life Events/).visible?).to be_truthy
+  expect(@browser.element(text: /Your Life Events/i).visible?).to be_truthy
 end
