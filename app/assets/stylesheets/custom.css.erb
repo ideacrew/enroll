@@ -4527,6 +4527,7 @@ label {
     color: #545454;
     font-family: 'AvenirLTStd-Light';
     font-size: 11px;
+    margin-left: 15px;
 }
 .abs {
     position: absolute;
@@ -5111,7 +5112,7 @@ div.row-form-wrapper:first-of-type, #email_info, #dependent_ul li {border-top: 1
     background: rgba(0, 0, 0, 0) url("<%= 'icons/check_radio_sheet.png' %>") no-repeat scroll -24px top;
 }
 .selectric .label {font-weight: normal;font-size: 12px !important;}
-
+.selectric {background: #fff !important;}
 /* Select Plan Page */
 .ct-1 p {
     font-size: 14px;
@@ -5253,4 +5254,17 @@ h3.text-blue {
     font-weight: 700;
 }
 #select_plan_wrapper a.btn {padding: 6px 12px;}
+.form-inputs fieldset .row .checkbox label { padding-left: 27px;}
+
+@media only screen and (max-width: 400px) {
+  a.add_fields.interaction-click-control-add-benefit-group, .top-row button {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+}
 #plan-summary .page-header, #qle_flow_info .page-header {margin: 0;border: none;}
+.personal-info-row{background: #fff;}
+.top-row, .middle-row{border-bottom: 1px solid #b7b7b7;}
+.no-border { border: 0px; }
+.no-border-top { border-top: 0px; }
+.no-border-bottom { border-bottom: 0px; }
