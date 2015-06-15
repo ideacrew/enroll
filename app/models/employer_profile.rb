@@ -8,16 +8,7 @@ class EmployerProfile
   field :entity_kind, type: String
   field :sic_code, type: String
 
-  # Broker agency representing ER
-  field :broker_agency_profile_id, type: BSON::ObjectId
-
-  # Broker writing_agent credited for enrollment and transmitted on 834
-  field :writing_agent_id, type: BSON::ObjectId
-
   field :aasm_state, type: String
-  field :aasm_message, type: String
-
-  field :is_active, type: Boolean, default: true
 
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
@@ -37,13 +28,9 @@ class EmployerProfile
   embeds_one  :inbox, as: :recipient
   embeds_one  :employer_profile_account
   embeds_many :plan_years, cascade_callbacks: true, validate: true
+  embeds_many :broker_agency_accounts
 
-  embeds_many :employee_families,
-    class_name: "EmployerCensus::EmployeeFamily",
-    cascade_callbacks: true,
-    validate: true
-
-  accepts_nested_attributes_for :plan_years, :employee_families, :inbox, :employer_profile_account
+  accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts
 
   validates_presence_of :entity_kind
 
@@ -51,14 +38,14 @@ class EmployerProfile
     inclusion: { in: Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
     allow_blank: false
 
-  validate :writing_agent_employed_by_broker
   validate :no_more_than_one_owner
 
   after_initialize :build_nested_models
-  before_save :is_persistable?
   after_save :save_associated_nested_models
 
-  scope :active, ->{ where(:is_active => true) }
+  scope :all_active, ->{ where(:is_active => true) }
+
+  alias_method :is_active?, :is_active
 
   def parent
     raise "undefined parent Organization" unless organization?
@@ -70,6 +57,53 @@ class EmployerProfile
     CensusEmployee.find_by_employer_profile(self)
   end
 
+  def owner
+    staff_roles.select{ |staff| staff.employer_staff_role.is_owner }
+  end
+
+  def staff_roles
+    Person.find_all_staff_roles_by_employer_profile(self)
+    # Person.all.select{ |p| p.employer_staff_role? && p.employer_staff_role.employer_profile_id == self.id}
+  end
+
+  def today=(new_date)
+    raise ArgumentError.new("expected Date") unless new_date.is_a?(Date)
+    @today = new_date
+  end
+
+  def today
+    return @today if defined? @today
+    @today = TimeKeeper.current_date
+  end
+
+  def hire_broker_agency(new_broker_agency, start_on = today)
+    start_on = start_on.to_date.beginning_of_day
+    if active_broker_agency_account.present?
+      terminate_on = (start_on - 1.day).end_of_day
+      terminate_active_broker_agency(terminate_on)
+    end
+    broker_agency_accounts.build(broker_agency_profile: new_broker_agency, start_on: start_on)
+    @broker_agency_profile = new_broker_agency
+  end
+
+  alias_method :broker_agency_profile=, :hire_broker_agency
+
+  def terminate_active_broker_agency(terminate_on = today)
+    if active_broker_agency_account.present?
+      active_broker_agency_account.end_on = terminate_on
+      active_broker_agency_account.is_active = false
+    end
+  end
+
+  def broker_agency_profile
+    return @broker_agency_profile if defined? @broker_agency_profile
+    @broker_agency_profile = active_broker_agency_account.broker_agency if active_broker_agency_account.present?
+  end
+
+  def active_broker_agency_account
+    return @active_broker_agency_account if defined? @active_broker_agency_account
+    @active_broker_agency_account = broker_agency_accounts.detect { |account| account.is_active? }
+  end
 
   def cycle_daily_events
     # advance employer_profile_account billing period for pending_binder_payment
@@ -88,12 +122,12 @@ class EmployerProfile
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
   def roster_size
     return @roster_size if defined? @roster_size
-    @roster_size = employee_families.size
+    @roster_size = census_employees.size
   end
 
   def active_plan_year
     @active_plan_year if defined? @active_plan_year
-    plan_year = find_plan_year_by_date(Date.current)
+    plan_year = find_plan_year_by_date(today)
     @active_plan_year = plan_year if (plan_year.present? && plan_year.published?)
   end
 
@@ -101,7 +135,7 @@ class EmployerProfile
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
   end
 
-  # Change plan years for a period - published -> retired and
+  # Change plan years for a period - published -> retired
   def close_plan_year
   end
 
@@ -116,47 +150,6 @@ class EmployerProfile
   def enrolling_plan_year
     # TODO: totally wrong, write real implementation
     latest_plan_year
-  end
-
-  # belongs_to broker_agency_profile
-  def broker_agency_profile=(new_broker_agency_profile)
-    raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a?(BrokerAgencyProfile)
-    self.broker_agency_profile_id = new_broker_agency_profile._id
-    new_broker_agency_profile
-  end
-
-  def broker_agency_profile
-    return @broker_agency_profile if defined? @broker_agency_profile
-    @broker_agency_profile =  parent.broker_agency_profile.where(id: @broker_agency_profile_id) unless @broker_agency_profile_id.blank?
-  end
-
-  # belongs_to writing agent (broker)
-  def writing_agent=(new_writing_agent)
-    raise ArgumentError.new("expected BrokerRole") unless new_writing_agent.is_a?(BrokerRole)
-    self.writing_agent_id = new_writing_agent._id
-    new_writing_agent
-  end
-
-  def writing_agent
-    return @writing_agent if defined? @writing_agent
-    @writing_agent = BrokerRole.find(@writing_agent_id) unless @writing_agent_id.blank?
-  end
-
-  # TODO: Benchmark this for efficiency
-  def employee_families_sorted
-    return @employee_families_sorted if defined? @employee_families_sorted
-    @employee_families_sorted = employee_families.unscoped.order_by_last_name.order_by_first_name
-  end
-
-  # Enrollable employees are active and unlinked
-  def linkable_employee_family_by_person(person)
-    return if employee_families.nil?
-
-    employee_families.detect { |ef| (ef.census_employee.ssn == person.ssn) && (ef.census_employee.dob == person.dob) && (ef.is_linkable?) }
-  end
-
-  def is_active?
-    self.is_active
   end
 
   ## Class methods
@@ -187,51 +180,41 @@ class EmployerProfile
       organization.present? ? organization.employer_profile : nil
     end
 
-    def find_by_broker_agency_profile(profile)
-      raise ArgumentError.new("expected BrokerAgencyProfile") unless profile.is_a?(BrokerAgencyProfile)
-      list_embedded Organization.where("employer_profile.broker_agency_profile_id" => profile._id).to_a
+    def find_by_broker_agency_profile(broker_agency_profile)
+      raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile)
+      orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true, 
+        :"employer_profile.broker_agency_accounts.broker_agency_profile_id" => broker_agency_profile.id).cache.to_a
+
+      orgs.collect(&:employer_profile) 
     end
 
     def find_by_writing_agent(writing_agent)
       raise ArgumentError.new("expected BrokerRole") unless writing_agent.is_a?(BrokerRole)
-      where(writing_agent_id: writing_agent._id) || []
+      orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true,
+        :"employer_profile.broker_agency_accounts.writing_agent_id" => writing_agent.id).cache.to_a
+
+      orgs.collect(&:employer_profile) 
     end
 
-    def find_census_families_by_person(person)
-      organizations = match_census_employees(person)
-      organizations.reduce([]) do |families, er|
-        families << er.employer_profile.employee_families.detect { |ef| ef.census_employee.ssn == person.ssn }
-      end
-    end
-
-    # Returns all EmployerProfiles where person is active on the employee_census
-    def find_all_by_person(person)
-      organizations = match_census_employees(person)
-      organizations.reduce([]) do |profiles, er|
-        profiles << er.employer_profile
-      end
-    end
-
-    def match_census_employees(person)
-      raise ArgumentError.new("expected Person") unless person.respond_to?(:ssn) && person.respond_to?(:dob)
+    def find_census_employee_by_person(person)
       return [] if person.ssn.blank? || person.dob.blank?
-      Organization.and("employer_profile.employee_families.census_employee.ssn" => person.ssn,
-                       "employer_profile.employee_families.census_employee.dob" => person.dob,
-                       "employer_profile.employee_families.census_employee.linked_at" => nil).to_a
+      CensusEmployee.find_all_unlinked_by_identifying_information(person.ssn, person.dob)
     end
 
     def advance_day(new_date)
-      new_date.to_date.beginning_of_day
-      # TODO define query for set
-      # Organization.where(
-      #     ("employer_profile.plan_years.start_on" == new_date) ||
-      #     ("employer_profile.plan_years.end_on" == new_date) ||
-      #     ("employer_profile.plan_years.open_enrollment_start_on" == new_date) ||
-      #     ("employer_profile.plan_years.open_enrollment_end_on" == new_date)
-      #   ).each do |org|
-      #     org.employer_profile.advance_enrollment_date
-      #     org.employer_profile.advance_enrollment_date
-      # end
+      
+      # Find employers with events today and trigger their respective workflow states
+      orgs = Organization.where(
+          ("employer_profile.plan_years.start_on" == new_date) ||
+          ("employer_profile.plan_years.end_on" == new_date) ||
+          ("employer_profile.plan_years.open_enrollment_start_on" == new_date) ||
+          ("employer_profile.plan_years.open_enrollment_end_on" == new_date)
+        )
+
+      orgs.each do |org|
+        org.today = new_date
+        org.employer_profile.advance_enrollment_date
+      end
 
     end
   end
@@ -240,11 +223,9 @@ class EmployerProfile
     plan_year.revert
   end
 
-
   def initialize_account
     self.build_employer_profile_account
   end
-
 
 ## TODO - anonymous shopping
 # no fein required
@@ -369,7 +350,6 @@ class EmployerProfile
     event :reenroll do
       transitions from: :terminated, to: :binder_pending
     end
-
   end
 
   def within_open_enrollment_for?(t_date, effective_date)
@@ -377,14 +357,6 @@ class EmployerProfile
       py.open_enrollment_contains?(t_date) &&
         py.coverage_period_contains?(effective_date)
     end
-  end
-
-  def owner
-    staff.select{ |p| p.employer_staff_role.is_owner }
-  end
-
-  def staff
-    Person.all.select{ |p| p.employer_staff_role? && p.employer_staff_role.employer_profile_id == self.id}
   end
 
 private
@@ -407,7 +379,7 @@ private
   end
 
   def effective_date_expired?
-    latest_plan_year.effective_date.beginning_of_day == (Date.current.end_of_month + 1).beginning_of_day
+    latest_plan_year.effective_date.beginning_of_day == (today.end_of_month + 1).beginning_of_day
   end
 
   def plan_year_publishable?
@@ -423,23 +395,15 @@ private
   def event_date_valid?
     is_valid = case aasm.current_event
       when :publish_plan_year
-        Date.current.beginning_of_day == latest_plan_year.open_enrollment_start_on.beginning_of_day
+        today == latest_plan_year.open_enrollment_start_on.beginning_of_day
       when :begin_open_enrollment
-        Date.current.beginning_of_day >= latest_plan_year.open_enrollment_start_on.beginning_of_day
+        today >= latest_plan_year.open_enrollment_start_on.beginning_of_day
       when :end_open_enrollment
-        Date.current.beginning_of_day >= latest_plan_year.open_enrollment_end_on.beginning_of_day
+        today >= latest_plan_year.open_enrollment_end_on.beginning_of_day
       else
         false
     end
     is_valid
-  end
-
-  def writing_agent_employed_by_broker
-    if writing_agent.present? && broker_agency.present?
-      unless broker_agency.writing_agents.detect(writing_agent)
-        errors.add(:writing_agent, "must be broker at broker_agency")
-      end
-    end
   end
 
   def no_more_than_one_owner
@@ -448,10 +412,6 @@ private
     end
 
     true
-  end
-  # Block changes unless record is in draft state
-  def is_persistable?
-    # aasm_state == :draft ? true : false
   end
 
 end

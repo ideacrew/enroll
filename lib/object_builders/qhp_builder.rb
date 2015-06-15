@@ -71,6 +71,7 @@ class QhpBuilder
       plan.update_attributes(
           plan_type: @qhp.plan_type.downcase,
           deductible: @qhp.qhp_cost_share_variance.qhp_deductable.in_network_tier_1_individual,
+          family_deductible: @qhp.qhp_cost_share_variance.qhp_deductable.in_network_tier_1_family,
           nationwide: @qhp.national_network,
           out_of_service_area_coverage: @qhp.out_of_service_area_coverage
         )

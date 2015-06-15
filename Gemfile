@@ -88,6 +88,7 @@ group :development, :test do
 
   # Use Capistrano for deployment
   gem 'capistrano', '3.3.5'
+  # gem 'capistrano-scm-gitcopy'
   gem 'capistrano-rails', '~> 1.1.2'
   gem 'ruby-progressbar', '1.6.0'
 

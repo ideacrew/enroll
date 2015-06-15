@@ -54,40 +54,32 @@ class Organization
   # CarrierProfile child model indexes
   index({"carrier_profile._id" => 1}, { unique: true, sparse: true })
 
-  # EmployerProfile child model indexes
-  index({"employer_profile._id" => 1}, { unique: true, sparse: true })
-  index({"employer_profile.aasm_state" => 1})
-  index({"employer_profile.broker_agency_profile_id" => 1}, {sparse: true})
-  index({"employer_profile.writing_agent_id" => 1}, {sparse: true})
-  index({"employer_profile.plan_years._id" => 1}, { unique: true, sparse: true })
-  index({"employer_profile.plan_years.aasm_state" => 1})
-  index({"employer_profile.plan_years.start_date" => 1})
-  index({"employer_profile.plan_years.end_date" => 1})
-  index({"employer_profile.plan_years.open_enrollment_start_on" => 1})
-  index({"employer_profile.plan_years.open_enrollment_end_on" => 1})
-  index({"employer_profile.plan_years.benefit_groups._id" => 1})
-
-  index({"employer_profile.employee_families._id" => 1}, { unique: true, sparse: true })
-  index({"employer_profile.employee_families.linked_at" => 1}, {sparse: true})
-  index({"employer_profile.employee_families.employee_role_id" => 1}, {sparse: true})
-  index({"employer_profile.employee_families.terminated" => 1})
-  index({"employer_profile.employee_families.benefit_group_assignments._id" => 1})
-  index({"employer_profile.employee_families.census_employee.last_name" => 1})
-  index({"employer_profile.employee_families.census_employee.dob" => 1})
-  index({"employer_profile.employee_families.census_employee.ssn" => 1})
-  index({"employer_profile.employee_families.census_employee.ssn" => 1,
-         "employer_profile.employee_families.census_employee.dob" => 1},
-         {name: "ssn_dob_index"})
-
   # BrokerAgencyProfile child model indexes
   index({"broker_agency_profile._id" => 1}, { unique: true, sparse: true })
   index({"broker_agency_profile.aasm_state" => 1})
   index({"broker_agency_profile.primary_broker_role_id" => 1}, { unique: true, sparse: true })
   index({"broker_agency_profile.market_kind" => 1})
 
-  # def employee_family_details(person)
-  #   return Organization.where(id: id).where(:"employer_profile.employee_families.census_employee.ssn" => person.ssn).last.employer_profile.employee_families.last
-  # end
+  # EmployerProfile child model indexes
+  index({"employer_profile._id" => 1}, { unique: true, sparse: true })
+  index({"employer_profile.aasm_state" => 1})
+
+  index({"employer_profile.plan_years._id" => 1}, { unique: true, sparse: true })
+  index({"employer_profile.plan_years.aasm_state" => 1})
+  index({"employer_profile.plan_years.start_on" => 1})
+  index({"employer_profile.plan_years.end_on" => 1})
+  index({"employer_profile.plan_years.open_enrollment_start_on" => 1})
+  index({"employer_profile.plan_years.open_enrollment_end_on" => 1})
+  index({"employer_profile.plan_years.benefit_groups._id" => 1})
+  index({"employer_profile.plan_years.benefit_groups.reference_plan_id" => 1})
+
+  index({"employer_profile.broker_agency_accounts._id" => 1})
+  index({"employer_profile.broker_agency_accounts.is_active" => 1,
+         "employer_profile.broker_agency_accounts.broker_agency_profile_id" => 1 },
+         { name: "active_broker_accounts_broker_agency" })
+  index({"employer_profile.broker_agency_accounts.is_active" => 1,
+         "employer_profile.broker_agency_accounts.writing_agent_id" => 1 },
+         { name: "active_broker_accounts_writing_agent" })
 
   # Strip non-numeric characters
   def fein=(new_fein)

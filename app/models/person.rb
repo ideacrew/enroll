@@ -48,6 +48,7 @@ class Person
   embeds_one :employer_staff_role, cascade_callbacks: true, validate: true
   embeds_one :responsible_party, cascade_callbacks: true, validate: true
 
+  embeds_many :broker_agency_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :employee_roles, cascade_callbacks: true, validate: true
 
   embeds_many :person_relationships, cascade_callbacks: true, validate: true
@@ -109,7 +110,6 @@ class Person
   # Employee child model indexes
   index({"employee_roles._id" => 1})
   index({"employee_roles.employer_profile_id" => 1})
-  index({"employee_roles.census_family_id" => 1})
   index({"employee_roles.benefit_group_id" => 1})
   index({"employee_roles.is_active" => 1})
 
@@ -202,6 +202,10 @@ class Person
     def employee_roles
       people = exists(:'employee_roles.0' => true).entries
       people.flat_map(&:employee_roles)
+    end
+
+    def find_all_staff_roles_by_employer_profile(employer_profile)
+      where(:'employer_staff_roles.employer_profile_id' => employer_profile.id)
     end
 
   # Return an instance list of active People who match identifying information criteria

@@ -75,18 +75,18 @@ module Factories
     # Fix this method to utilize the following:
     # needs:
     #   an object that responds to the names and gender methods
-    #   employee_family
+    #   census_employee
     #   user
-    def self.construct_employee_role(user, employer_census_family, person_details)
+    def self.construct_employee_role(user, census_employee, person_details)
       person, person_new = initialize_person(
         user, person_details.name_pfx, person_details.first_name,
         person_details.middle_name, person_details.last_name,
-        person_details.name_sfx, employer_census_family.census_employee_ssn,
-        employer_census_family.census_employee_dob, person_details.gender
+        person_details.name_sfx, census_employee.ssn,
+        census_employee.dob, person_details.gender
         )
       self.build_employee_role(
-        person, person_new, employer_census_family.employer_profile,
-        employer_census_family, employer_census_family.hired_on
+        person, person_new, census_employee.employer_profile,
+        census_employee, census_employee.hired_on
         )
     end
 
@@ -97,35 +97,35 @@ module Factories
       person, person_new = initialize_person(user, name_pfx, first_name, middle_name,
                                              last_name, name_sfx, ssn, dob, gender)
 
-      employer_census_family = employer_profile.linkable_employee_family_by_person(person)
+      census_employee = EmployerProfile.find_census_employee_by_person(person).first
 
-      raise ArgumentError.new("employee_family does not exist for provided person details") unless employer_census_family.present?
+      raise ArgumentError.new("census employee does not exist for provided person details") unless census_employee.present?
+      raise ArgumentError.new("no census employee for provided employer profile") unless census_employee.employer_profile_id == employer_profile.id
 
       self.build_employee_role(
-        person, person_new, employer_profile, employer_census_family, hired_on
+        person, person_new, employer_profile, census_employee, hired_on
         )
     end
 
-    def self.link_employee_family(census_family, employee_role, linked_at = Time.now)
-      census_family.link_employee_role(employee_role, linked_at)
-      [:employer_profile_id,
-       :hired_on,
-       :terminated_on,
-      ].each do |property|
-        employee_role.send("#{property}=", census_family.send(property))
-      end
-      employee_role.benefit_group_id = census_family.active_benefit_group_id
+    def self.link_census_employee(census_employee, employee_role, employer_profile)
+      census_employee.employer_profile = employer_profile
+      employee_role.employer_profile = employer_profile
+      census_employee.employee_role = employee_role
+      employee_role.new_census_employee = census_employee
+      employee_role.hired_on = census_employee.hired_on
+      employee_role.terminated_on = census_employee.employment_terminated_on
+      employee_role.benefit_group_id = census_employee.active_benefit_group_assignment.benefit_group_id #TODO
     end
 
     private
 
-    def self.build_employee_role(person, person_new, employer_profile, employer_census_family, hired_on)
-      role = find_or_build_employee_role(person, employer_profile, employer_census_family, hired_on)
-      self.link_employee_family(employer_census_family, role)
-      family, primary_applicant = self.initialize_family(person, employer_census_family.census_dependents)
+    def self.build_employee_role(person, person_new, employer_profile, census_employee, hired_on)
+      role = find_or_build_employee_role(person, employer_profile, census_employee, hired_on)
+      self.link_census_employee(census_employee, role, employer_profile)
+      family, primary_applicant = self.initialize_family(person, census_employee.census_dependents)
       saved = save_all_or_delete_new(family, primary_applicant, role)
       if saved
-        employer_census_family.save
+        census_employee.save
       elsif person_new
         person.delete
       end
@@ -134,7 +134,7 @@ module Factories
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
                                last_name, name_sfx, ssn, dob, gender)
-      people = Person.match_by_id_info(ssn: ssn)
+      people = Person.match_by_id_info(ssn: ssn, dob: dob, last_name: last_name)
       person, is_new = nil, nil
       case people.count
       when 1
@@ -169,10 +169,10 @@ module Factories
       return person, is_new
     end
 
-    def self.find_or_build_employee_role(person, employer_profile, employer_census_family, hired_on)
+    def self.find_or_build_employee_role(person, employer_profile, census_employee, hired_on)
       roles = person.employee_roles.where(
           "employer_profile_id" => employer_profile.id.to_s,
-          "hired_on" => employer_census_family.census_employee.hired_on
+          "hired_on" => census_employee.hired_on
         )
 
       role = case roles.count
@@ -191,7 +191,7 @@ module Factories
       family = person.primary_family
       family ||= Family.new
       applicant = family.primary_applicant
-      applicant ||= initialize_primary_applicant(family, person) 
+      applicant ||= initialize_primary_applicant(family, person)
       person.relatives.each do |related_person|
         family.add_family_member(related_person)
       end

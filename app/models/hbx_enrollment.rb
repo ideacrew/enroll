@@ -73,7 +73,7 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    benefit_group_assignment.waive_coverage
+    benefit_group_assignment.waive_coverage if benefit_group_assignment
   end
 
   def propogate_selection
@@ -129,6 +129,10 @@ class HbxEnrollment
   def can_complete_shopping?(t_date = Date.today)
     return false unless benefit_group
     benefit_group.within_new_hire_window?(employee_role.hired_on)
+  end
+
+  def humanized_dependent_summary
+    hbx_enrollment_members.count - 1
   end
 
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer

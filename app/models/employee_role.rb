@@ -7,7 +7,6 @@ class EmployeeRole
   embedded_in :person
 
   field :employer_profile_id, type: BSON::ObjectId
-  field :census_family_id, type: BSON::ObjectId   # Deprecated
   field :census_employee_id, type: BSON::ObjectId
   field :benefit_group_id, type: BSON::ObjectId
   field :employment_status, type: String
@@ -54,13 +53,8 @@ class EmployeeRole
   ## TODO: propogate to EmployerCensus updates to employee demographics and family
 
   def families
-    Family.by_employee(self)
+    Family.find_by_employee_role(self)
   end
-
-  # def self.find_by_employer_profile(profile)
-  #   # return unless profile.is_a? EmployerProfile
-  #   where("employer_profile_id" =>  profile._id).to_a
-  # end
 
   # belongs_to Employer
   def employer_profile=(new_employer)
@@ -86,17 +80,6 @@ class EmployeeRole
     @benefit_group = BenefitGroup.find(self.benefit_group_id) unless benefit_group_id.blank?
   end
 
-  # <b>DEPRECATED:</b> Please use <tt>new_census_employee</tt> instead
-  def census_family
-    warn "[DEPRECATION] `census_family` is deprecated.  Please use `census_employee` instead."
-    EmployerCensus::EmployeeFamily.find_by_employee_role(self)
-  end
-
-  def census_employee
-    return nil unless census_family.present?
-    census_family.census_employee
-  end
-
   def new_census_employee=(new_census_employee)
     raise ArgumentError.new("expected CensusEmployee class") unless new_census_employee.is_a? CensusEmployee
     self.census_employee_id = new_census_employee._id
@@ -108,8 +91,11 @@ class EmployeeRole
     @census_employee = CensusEmployee.find(self.census_employee_id) unless census_employee_id.blank?    
   end
 
+  alias_method :census_employee=, :new_census_employee=
+  alias_method :census_employee, :new_census_employee
+
   def effective_on
-    benefit_group.effective_on_for(census_employee.hired_on)
+    benefit_group.effective_on_for(new_census_employee.hired_on)
   end
 
   def is_active?

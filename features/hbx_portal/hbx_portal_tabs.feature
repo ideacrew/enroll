@@ -6,7 +6,7 @@ Feature: HBX Portal Overview
   Scenario: Look at portal tabs
     When I visit the HBX portal to sign in
     When I sign in with valid Admin data
-    Then Toolbar is visible
+
     When I select the tab Families
     Then I should see the header Families
     Then I select the tab Employers

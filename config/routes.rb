@@ -44,6 +44,7 @@ Rails.application.routes.draw do
       member do
         post 'checkout'
         post 'thankyou'
+        post 'waive'
       end
     end
 
@@ -80,13 +81,14 @@ Rails.application.routes.draw do
       end
       resources :plan_years do
         get 'recommend_dates', on: :collection
+        post 'publish'
       end
-      resources :family do
-        get 'delink'
-        get 'terminate'
-        get 'rehire'
-        get 'benefit_group', on: :member
-        patch 'assignment_benefit_group', on: :member
+      resources :census_employees, only: [:new, :create, :edit, :update, :show] do
+        get :delink
+        get :terminate
+        get :rehire
+        get :benefit_group, on: :member
+        patch :assignment_benefit_group, on: :member
       end
     end
   end
@@ -160,6 +162,7 @@ Rails.application.routes.draw do
       get 'plans'
       get 'personal'
       get 'family'
+      get 'check_qle_date'
     end
   end
 

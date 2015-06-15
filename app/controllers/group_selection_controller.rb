@@ -1,6 +1,8 @@
 class GroupSelectionController < ApplicationController
   def new
     initialize_common_vars
+
+    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
   end
 
   def create
@@ -16,7 +18,13 @@ class GroupSelectionController < ApplicationController
       family_member_ids.include? member.applicant_id
     end
     hbx_enrollment.save!
-    redirect_to insured_plan_shopping_path(:id => hbx_enrollment)
+
+    change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    if change_plan.present?
+      redirect_to insured_plan_shopping_path(:id => hbx_enrollment, change_plan: change_plan)
+    else
+      redirect_to insured_plan_shopping_path(:id => hbx_enrollment)
+    end
   end
 
   private

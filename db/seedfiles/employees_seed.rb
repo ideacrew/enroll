@@ -2,7 +2,7 @@ puts "*"*80
 puts "::: Creating Employee Roles:::"
 
 employer_profiles = Organization.all.collect(&:employer_profile).reject(&:nil?)
-employer_profiles.select(&:employee_families).each do |employer_profile|
+employer_profiles.select(&:census_employees).each do |employer_profile|
 =begin
     case employer_profile.employee_families.count
     when 1

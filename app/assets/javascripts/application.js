@@ -23,6 +23,7 @@
 //= require override_confirm
 //= require floatlabels
 //= require jq_datepicker
+//= require qle
 //= require_tree .
 
 $(document).ready(function () {
@@ -30,6 +31,8 @@ $(document).ready(function () {
   $(function(){
     $('select').selectric();
   });
+
+  $('[data-toggle="tooltip"]').tooltip();
 
   semantic_class(); //Calls semantic class on all input fields & buttons (eg. interaction-click-control-continue)
 
@@ -70,95 +73,29 @@ $(document).ready(function () {
   });
 
   $('.alert').delay(3200).fadeOut(2000); //Fade Alert Box
-  //$('#plan_year input,select').click(function(){
-  //  $('#plan_year .alert-error').fadeOut(2000);
-  //});
 
-  /* QLE Marriage Date Validator */
-  $('#date_married').focusin(function() {
-    $('#date_married').removeClass('input-error');
-  });
-
-  $('#qle_marriage_submit').click(function() {
-    if(check_marriage_date()) {
-      get_qle_marriage_date();
-    } else {
-      $('#date_married').addClass('input-error');
-    }
-  });
-
-  function check_marriage_date() {
-    var date_value = $('#date_married').val();
-    if(date_value == "" || isNaN(Date.parse(date_value)) || Date.parse(date_value) > Date.parse(new Date())) { return false; }
-    return true;
-  }
-
-  function get_qle_marriage_date() {
-    $.ajax({
-      type: "GET",
-      data:{date_val: $("#date_married").val()},
-      url: "/people/check_qle_marriage_date.js"
-    });
-  }
+  // $('#plan_year input,select').click(function(){
+  //   $('#plan_year .alert-error').fadeOut(2000);
+  // });
   
   // personal-info-row focus fields
-  $(document).on('click', '.focus_effect', function() {
-    update_info_row($(this), 'focus_in');
+  $(document).on('focusin', 'input.form-control', function() {
+    $(this).parents(".row-form-wrapper").addClass("active");
+    $(this).prev().addClass("active");
   });
 
-  $(document).on('focusin', '.focus_effect input', function() {
-    update_info_row($(this).closest('.focus_effect'), 'focus_in');
+  $(document).on('focusout', 'input.form-control', function() {
+    $(this).parents(".row-form-wrapper").removeClass("active");
+    $(this).prev().removeClass("active");
+    $("img.arrow_active").remove();
   });
 
-  $(document).on('blur', '.focus_effect', function() {
-    update_info_row($(this), 'focus_out');
-  });
-
-  function update_info_row(element, evt) {
-
-    var check = check_info_exists($(element).attr('id'));
-    if( (evt == 'focus_in') || (check.length == 0 && evt == 'focus_out') ) {
-
-      switch_row_class();
-
-      $(element).addClass('personal-info-top-row');
-      $(element).removeClass('personal-info-row');
-      $(element).css("opacity","1");
-    }
-    else {
-      switch_row_class();
-      $(element).css("opacity","0.5");
-    }
-  }
-
-  function check_info_exists(id) {
-    var check = $('#' + id + ' input.required').filter(function() { return this.value == ""; });
-    return check;
-  }
-
-  function switch_row_class() {
-    // Remove personal-info-top-row from all focus_effect's whose info doesnot exists
-    $('.focus_effect').each(function() {
-      check = check_info_exists($(this).attr('id'));
-      if(check.length != 0) {
-        $(this).removeClass('personal-info-top-row');
-        $(this).addClass('personal-info-row');
-      }
-    });
-  }
-
-  $(".adderess-select-box").focusin(function() {
-    $(".bg-color").css({
-      "background-color": "rgba(220, 234, 241, 1)",
-      "height": "46px",
-    });
-  });
-
-  $(".adderess-select-box").focusout(function() {
-    $(".bg-color").css({
-      "background-color": "rgba(255, 255, 255, 1)",
-      "height": "46px",
-    });
+  // Progress Bar
+  $(document).on('click', '#btn-continue', function() {
+    if($('#btn-search-employer').length) $('#btn-search-employer').click();
+    else if($('#btn_user_contact_info').length) $('#btn_user_contact_info').click();
+    else if($('#btn_household_continue').length) window.location = $('#btn_household_continue').val();
+    else if($('#btn_select_plan_continue').length) $('#btn_select_plan_continue').click();
   });
 
   // Employer Registration
@@ -334,40 +271,6 @@ $(document).ready(function () {
   $('#save_member').click(function() {
     $('.new_family_member:last').submit();
   });
-  
-  // Email validation after 1 seconds of stopping typing
-  // $('#email_info input').keyup(function() {
-  //   call_email_check(this);
-  // });
-  
-  // $('#email_info input').focusout(function() {
-  //   call_email_check(this);
-  // });
-
-  // function call_email_check(email) {
-  //   var timeout;
-  //   var email = $(email).val();
-
-  //   if(timeout) {
-  //       clearTimeout(timeout);
-  //       timeout = null;
-  //   }
-
-  //   timeout = setTimeout(function() {
-  //     check_email(email);
-  //   }, 1000);
-  // }
-  
-  // function check_email(email) {
-  //   var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  //   if(email != "" && !re.test(email)) {
-  //     $('#email_error').text('Enter a valid email address. ( e.g. name@domain.com )');
-  //     $('#email_info .email .first').addClass('field_error');
-  //   } else {
-  //     $('#email_error').text('');
-  //     $('#email_info .email .first').removeClass('field_error');
-  //   }
-  // }
   
   // Add new address
   $('.btn-new-address').click(function(e){

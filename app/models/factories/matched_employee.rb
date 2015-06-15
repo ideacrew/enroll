@@ -55,7 +55,6 @@ module Factories
       person_wrapper.terminated_on = census_employee.terminated_on
       person_wrapper.benefit_group_id = emp_family.benefit_group_id
       person_wrapper.employer_profile_id = emp_family.employer_profile.id
-      person_wrapper.census_family_id = emp_family.id
       person_wrapper.organization_id = emp_family.employer_profile.organization.id
       person_wrapper.census_employee_id = census_employee.id
       person_wrapper

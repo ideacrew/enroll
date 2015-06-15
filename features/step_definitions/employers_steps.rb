@@ -215,45 +215,44 @@ When(/^I click on add employee button$/) do
 end
 
 Then(/^I should see a form to enter information about employee, address and dependents details$/) do
-  @browser.button(value: /Create Employee/).wait_until_present
-  screenshot("employer_census_new_family")
+  @browser.element(class: /interaction-click-control-create-employee/).wait_until_present
+  screenshot("create_census_employee")
   # Census Employee
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][first_name]").wait_until_present
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][first_name]").set("John")
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][middle_name]").set("K")
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][last_name]").set("Doe")
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][name_sfx]").set("Jr")
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][dob]").set("10/10/1980")
-  # @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][ssn]").click
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][ssn]").set("786120965")
-  @browser.radio(id: "employer_census_employee_family_census_employee_attributes_gender_male").set
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][hired_on]").set("10/10/2014")
-  input_field = @browser.divs(class: /selectric-wrapper/).last
+  @browser.text_field(class: /interaction-field-control-census-employee-first-name/).wait_until_present
+  @browser.text_field(class: /interaction-field-control-census-employee-first-name/).set("John")
+  @browser.text_field(class: /interaction-field-control-census-employee-middle-name/).set("K")
+  @browser.text_field(class: /interaction-field-control-census-employee-last-name/).set("Doe")
+  @browser.text_field(class: /interaction-field-control-census-employee-name-sfx/).set("Jr")
+  @browser.text_field(class: /interaction-field-control-census-employee-dob/).set("01/01/1980")
+  @browser.text_field(class: /interaction-field-control-census-employee-ssn/).set("786120965")
+  @browser.radio(class: /interaction-choice-control-value-census-employee-gender-male/).set
+  @browser.text_field(class: /interaction-field-control-census-employee-hired-on/).set("10/10/2014")
+  @browser.checkbox(class: /interaction-choice-control-value-census-employee-is-business-owner/).set
+  input_field = @browser.divs(class: /selectric-wrapper/).first
   input_field.click
   input_field.li(text: /Silver PPO Group/).click
   # Address
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][address_1]").wait_until_present
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][address_1]").set("1026 potomac")
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][address_2]").set("apt abc")
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][city]").set("alpharetta")
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][state]").set("GA")
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][zip]").set("30228")
+  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).wait_until_present
+  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).set("1026 Potomac")
+  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-2/).set("apt abc")
+  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-city/).set("Alpharetta")
+  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-state/).set("GA")
+  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-zip/).set("30228")
   # Census Dependents
-  # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][first_name]").set("Mary")
-  # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][middle_name]").set("K")
-  # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][last_name]").set("Doe")
-  # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][dob]").set("10/12/2012")
-  # @browser.radio(id: /employer_census_employee_family_census_dependents_attributes_0_gender_female/).set
-  # screenshot("employer_census_new_family_with_data")
-  # input_field = @browser.divs(class: "selectric-wrapper").first
+  # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-first-name/).set("Mary")
+  # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-middle-name/).set("K")
+  # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-last-name/).set("Doe")
+  # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-dob/).set("10/12/2012")
+  # @browser.radio(class: /interaction-choice-control-value-census-employee-census-dependents-attributes-0-gender-female/).set
+  # input_field = @browser.divs(class: "selectric-wrapper").last
   # input_field.click
   # input_field.li(text: /Child under 26/).click
-  # @browser.text_field(name: "employer_census_employee_family[census_dependents_attributes][0][employee_relationship]"").set("child_under_26")
-  @browser.button(value: /Create Employee/).click
+  screenshot("create_census_employee_with_data")
+  @browser.element(class: /interaction-click-control-create-employee/).click
 end
 
 And(/^I should see employer census family created success message$/) do
-  Watir::Wait.until(30) {  @browser.text.include?("Employer Census Family is successfully created.") }
+  Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully created.") }
   screenshot("employer_census_new_family_success_message")
   @browser.refresh
   @browser.a(text: /Employees/).wait_until_present
@@ -272,16 +271,14 @@ end
 
 Then(/^I should see a form to update the contents of the census employee$/) do
   @browser.button(value: /Update Employee/).wait_until_present
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][first_name]").set("Patrick")
-  @browser.text_field(name: "employer_census_employee_family[census_employee_attributes][address_attributes][state]").set("VA")
-  input_field = @browser.divs(class: /selectric-wrapper/).last
-  input_field.click
-  input_field.li(text: /Silver PPO Group/).click
+  @browser.text_field(id: /census_employee_first_name/).set("Patrick")
+  @browser.text_field(id: /census_employee_address_attributes_state/).set("VA")
+  screenshot("update_census_employee_with_data")
   @browser.button(value: /Update Employee/).click
 end
 
 And(/^I should see employer census family updated success message$/) do
-  Watir::Wait.until(30) {  @browser.text.include?("Employer Census Family is successfully updated.") }
+  Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully updated.") }
 end
 
 And(/^I logout from employer portal$/) do
@@ -292,17 +289,29 @@ end
 
 
 When(/^I click on terminate button for a census family$/) do
+  ce = Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.dup
+  ce.save
   @browser.a(text: /Terminate/).wait_until_present
   @browser.a(text: /Terminate/).click
-  @browser.a(text: /Patrick K Doe Jr/).wait_until_present
-  expect(@browser.a(text: /Patrick K Doe Jr/).visible?).to be_falsey
+  terminated_date = Date.current + 20.days
+  @browser.text_field(class: /date-picker/).set(terminated_date)
+  #click submit
+  @browser.h3(text: /Employee Roster/).click
+  @browser.a(text: /Submit/).wait_until_present
+  @browser.a(text: /Submit/).click
 end
 
 Then(/^The census family should be terminated and move to terminated tab$/) do
+  @browser.a(text: /Employees/).wait_until_present
+  @browser.a(text: /Employees/).click
   @browser.radio(id: "terminated_yes").fire_event("onclick")
   @browser.a(text: /Patrick K Doe Jr/).wait_until_present
   expect(@browser.a(text: /Patrick K Doe Jr/).visible?).to be_truthy
-  expect(@browser.a(text: /Rehire/).visible?).to be_truthy
+  @browser.a(text: /Employees/).wait_until_present
+  @browser.a(text: /Employees/).click
+  @browser.td(text: /Employment terminated/).wait_until_present
+  expect(@browser.td(text: /Employment terminated/).visible?).to be_truthy
+  #@browser.a(text: /Rehire/).wait_until_present
 end
 
 And(/^I should see the census family is successfully terminated message$/) do
@@ -350,15 +359,12 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.h4(text: /start on must be first day of the month/).wait_until_present
   expect(@browser.text.include?("start on must be first day of the month")).to be_truthy
   # happy path
-  begin_date = (Date.current + 1.year).beginning_of_year
+  begin_date = (Date.current + 3.months).beginning_of_month
   @browser.text_field(class: "interaction-field-control-plan_year-start_on").set(begin_date)
   @browser.h3(text: /Plan Year/).click
   sleep(1)
   @browser.h4(text: /Recommend Date/).wait_until_present
   expect(@browser.text.include?("employer initial application earliest submit on")).to be_truthy
-  #@browser.text_field(class: "interaction-field-control-plan_year-start_on").set("01/01/2015")
-  #@browser.text_field(class: "interaction-field-control-plan_year-open_enrollment_start_on").set("11/01/2014")
-  #@browser.text_field(class: "interaction-field-control-plan_year-open_enrollment_end_on").set("11/30/2014")
   @browser.text_field(name: "plan_year[fte_count]").click
   @browser.text_field(name: "plan_year[fte_count]").set("35")
   @browser.text_field(name: "plan_year[pte_count]").set("15")
@@ -376,7 +382,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   ref_plan.click
   ref_plan.li(index: 5).click # select plan from list.
   # Relationship Benefit
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(51)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]").set(15)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').first.set(true)
@@ -395,9 +401,9 @@ And(/^I should see a success message after clicking on create plan year button$/
 end
 
 When(/^I enter filter in plan selection page$/) do
-  Watir::Wait.until(30) { @browser.a(text: /All Filters/).present? }
-  @browser.a(text: /All Filters/).wait_until_present
-  @browser.a(text: /All Filters/).click
+  Watir::Wait.until(30) { @browser.a(text: /Filter Results/).present? }
+  # @browser.a(text: /All Filters/).wait_until_present
+  # @browser.a(text: /All Filters/).click
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(true)
   @browser.button(class: /apply-btn/, text: /Apply/).wait_until_present
   @browser.button(class: /apply-btn/, text: /Apply/).click
@@ -406,16 +412,18 @@ end
 When(/^I enter combined filter in plan selection page$/) do
   @browser.a(text: /All Filters/).wait_until_present
   @browser.a(text: /All Filters/).click
-  @browser.checkboxes(class: /plan-type-selection-filter/).first.wait_until_present
-  @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
+  # @browser.checkboxes(class: /plan-type-selection-filter/).first.wait_until_present
+  # @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
   # Nationwide
-  @browser.checkboxes(class: /plan-metal-network-selection-filter/).first.set(true)
+  # @browser.checkboxes(class: /plan-metal-network-selection-filter/).first.set(true)
+  @browser.checkbox(class: /checkbox-custom interaction-choice-control-value-checkbox-5/).set(true)
+
   # Platinum
   @browser.checkboxes(class: /plan-metal-level-selection-filter/)[0].set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("")
   @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("")
-  @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("$460")
-  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("$480")
+  @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("$420")
+  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("$430")
   @browser.button(class: /apply-btn/, text: /Apply/).click
 end
 
@@ -423,6 +431,6 @@ Then(/^I should see the combined filter results$/) do
   @browser.divs(class: /plan-row/).select(&:visible?).each do |plan|
     expect(plan.text.include?("Nationwide")).to eq true
     expect(plan.text.include?("Bronze")).to eq true
-    expect(plan.p(text: "$476.13").visible?).to eq true
+    expect(plan.p(text: "$425.66").visible?).to eq true
   end
 end

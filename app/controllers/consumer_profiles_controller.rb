@@ -11,6 +11,8 @@ class ConsumerProfilesController < ApplicationController
     @qualifying_life_events = QualifyingLifeEventKind.all
     @hbx_enrollments = @family.latest_household.hbx_enrollments
 
+    @employee_role = @employee_roles.first
+
     respond_to do |format|
       format.html
       format.js
@@ -53,9 +55,21 @@ class ConsumerProfilesController < ApplicationController
     @person = current_user.person
     @family = @person.primary_family
     @family_members = @family.active_family_members if @family.present?
+
+    @qualifying_life_events = QualifyingLifeEventKind.all
+    @employee_role = @person.employee_roles.first
+    
     respond_to do |format|
       format.html
       format.js
     end
+  end
+
+  def check_qle_date
+    qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    start_date = Date.strptime('01/10/2013', "%m/%d/%Y")
+    end_date = Date.today
+
+    @qualified_date = (start_date <= qle_date && qle_date <= end_date) ? true : false
   end
 end

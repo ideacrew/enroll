@@ -25,9 +25,8 @@ end
 
 describe Forms::EmployeeCandidate, "asked to match a census employee" do
   let(:fake_org) { instance_double("Organization", :employer_profile => fake_employer) }
-  let(:fake_employer) { instance_double("EmployerProfile", :employee_families => [employee_family]) }
-  let(:employee_family) { instance_double("EmployerCensus::EmployeeFamily", :census_employee => census_employee, :linked_at => nil) }
-  let(:census_employee) { instance_double("EmployerCensus::Employee", :ssn => "123456789", :dob => Date.new(2012,10,12) ) }
+  let(:census_employee) { instance_double("CensusEmployee", :ssn => "123456789", :dob => Date.new(2012,10,12), :aasm_state => "eligible", :eligible? => true ) }
+  let(:fake_employer) { instance_double("EmployerProfile", :census_employees => [census_employee]) }
 
   subject {
     Forms::EmployeeCandidate.new({

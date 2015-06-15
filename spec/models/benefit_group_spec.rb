@@ -164,7 +164,7 @@ end
 
 
 describe BenefitGroup, type: :model do
-    
+
   let(:plan_year)               { FactoryGirl.build(:plan_year) }
   let(:reference_plan)          { FactoryGirl.build(:plan) }
   let(:plan_option_kind)        { :single_plan }
@@ -172,7 +172,6 @@ describe BenefitGroup, type: :model do
   let(:effective_on_kind)       { "first_of_month" }
   let(:effective_on_offset)     { 30 }
   let(:terminate_on_kind)       { "end_of_month" }
-  let(:premium_pct_as_int)      { 75 }
 
   let(:effective_on_offset_default)   { 0 }
   let(:effective_on_kind_default)     { "date_of_hire" }
@@ -204,7 +203,6 @@ describe BenefitGroup, type: :model do
         effective_on_kind: effective_on_kind,
         effective_on_offset: effective_on_offset,
         terminate_on_kind: terminate_on_kind,
-        premium_pct_as_int: premium_pct_as_int
     }
   end
 
@@ -230,7 +228,7 @@ describe BenefitGroup, type: :model do
 
       it "should be invalid" do
         expect(BenefitGroup.create(**params).errors[:elected_plan_ids].any?).to be_truthy
-      end      
+      end
     end
 
     context "with no plan option kind" do
@@ -258,14 +256,6 @@ describe BenefitGroup, type: :model do
         expect(BenefitGroup.new(**params).title).to eq ""
       end
     end
-
-    #context "with no premium_pct_as_int" do
-    #  let(:params) {valid_params.except(:premium_pct_as_int)}
-
-    #  it "should be invalid" do
-    #    expect(BenefitGroup.create(**params).errors[:premium_pct_as_int].any?).to be_truthy
-    #  end
-    #end
 
     context "with no relationship_benefits" do
       let(:params) {valid_params.except(:relationship_benefits)}
@@ -301,7 +291,7 @@ describe BenefitGroup, type: :model do
 
     context "with all valid parameters" do
       let(:params) {valid_params}
-      let(:benefit_group)  { BenefitGroup.new(**params) }  
+      let(:benefit_group)  { BenefitGroup.new(**params) }
 
       it "should save" do
         expect(benefit_group.save).to be_truthy
@@ -323,7 +313,7 @@ describe BenefitGroup, type: :model do
 
   context "and a reference plan is selected" do
     let(:params) {valid_params}
-    let(:benefit_group)  { BenefitGroup.new(**params) }  
+    let(:benefit_group)  { BenefitGroup.new(**params) }
 
     context "and the 'single plan' option is offered" do
       context "and the elected plan is not the reference plan" do
@@ -446,6 +436,20 @@ describe BenefitGroup, type: :model do
           expect(benefit_group.valid?).to be_falsey
           expect(benefit_group.errors[:relationship_benefits].any?).to be_truthy
         end
+      end
+    end
+
+    context "check offered for employee" do
+      it "should valid when offered" do
+        benefit_group.relationship_benefits.find_by(relationship: "employee").offered = true
+        expect(benefit_group.valid?).to be_truthy
+        expect(benefit_group.errors[:relationship_benefits].any?).to be_falsey
+      end
+
+      it "should fail when not offered" do
+        benefit_group.relationship_benefits.find_by(relationship: "employee").offered = false
+        expect(benefit_group.valid?).to be_falsey
+        expect(benefit_group.errors[:relationship_benefits].any?).to be_truthy
       end
     end
   end

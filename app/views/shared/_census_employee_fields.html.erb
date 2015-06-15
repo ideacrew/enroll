@@ -1,17 +1,17 @@
 <div class="row no-buffer focus_effect personal-info-row">
-  <div class="col-md-12 no-pd col-sm-12 col-xs-12 first">
+  <div class="col-md-12 no-pd col-sm-12 col-xs-12 first no-border-top">
     <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <%= f.text_field :hired_on, placeholder: "HIRE DATE", class: "required date-picker hire-picker floatlabel form-control", required: true   %>
     </div>
     <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <div class="checkbox">
         <label>
-          <%= f.check_box :is_owner %> IS OWNER?
+          <%= f.check_box :is_business_owner %> IS OWNER?
         </label>
       </div>
     </div>
     <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-      <%= ff.fields_for :benefit_group_assignments, @family.active_benefit_group_assignment ,errors: {}, fieldset: false do |benefit_group_assignment| %>
+      <%= f.fields_for :benefit_group_assignments, @census_employee.active_benefit_group_assignment ,errors: {}, fieldset: false do |benefit_group_assignment| %>
         <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment %>
       <% end %>
     </div>

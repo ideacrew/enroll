@@ -37,12 +37,6 @@ class PlanYear
     self.employer_profile
   end
 
-  # embedded association: has_many :employee_families
-  def employee_families
-    return @employee_families if defined? @employee_families
-    @employee_families = parent.employee_families.where(:plan_year_id => self.id)
-  end
-
   alias_method :effective_date=, :start_on=
   alias_method :effective_date, :start_on
 
@@ -67,7 +61,15 @@ class PlanYear
   end
 
   def minimum_employer_contribution
-    benefit_groups.min_by(&:premium_pct_as_int).premium_pct_as_int unless benefit_groups.size == 0
+    unless benefit_groups.size == 0
+      benefit_groups.map do |benefit_group|
+        benefit_group.relationship_benefits.select do |relationship_benefit|
+          relationship_benefit.relationship == "employee"
+        end.min_by do |relationship_benefit|
+          relationship_benefit.premium_pct
+        end
+      end.map(&:premium_pct).first
+    end
   end
 
   def is_application_valid?
@@ -102,16 +104,17 @@ class PlanYear
     warnings
   end
 
+  # All employees present on the roster with benefit groups belonging to this plan year
   def eligible_to_enroll
     benefit_group_ids = benefit_groups.collect(&:id)
     CensusEmployee.by_benefit_group_ids(benefit_group_ids)
   end
 
   def eligible_to_enroll_count
-    # TODO: confirm this is a valid definition (check with Hannah)
     eligible_to_enroll.count
   end
 
+  # Employees who selected or waived and are not owners or direct family members of owners
   def non_business_owner_enrolled
     enrolled.non_business_owner
   end
@@ -120,6 +123,7 @@ class PlanYear
     non_business_owner_enrolled.count
   end
 
+  # Any employee who selected or waived coverage
   def enrolled
     eligible_to_enroll.enrolled
   end
@@ -133,7 +137,7 @@ class PlanYear
     if eligible_to_enroll_count == 0
       0
     else
-      (total_enrolled_count / eligible_to_enroll_count)
+      ((total_enrolled_count * 1.0)/ eligible_to_enroll_count)
     end
   end
 
@@ -150,7 +154,7 @@ class PlanYear
     if eligible_to_enroll_count == 0
       errors.merge!(eligible_to_enroll_count: "at least 1 employee must be eligible to enroll")
     end
-    
+
     # At least one employee who isn't an owner or family member of owner must enroll
     if non_business_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
       errors.merge!(non_business_owner_enrollment_count: "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
@@ -342,14 +346,15 @@ private
 
     if start_on + HbxProfile::ShopPlanYearPeriodMinimum < end_on
       errors.add(:end_on, "plan year period is less than minumum: #{duration_in_days(HbxProfile::ShopPlanYearPeriodMinimum)} days")
-     end
+    end
 
     if start_on + HbxProfile::ShopPlanYearPeriodMaximum > end_on
       errors.add(:end_on, "plan year period is greater than maximum: #{duration_in_days(HbxProfile::ShopPlanYearPeriodMaximum)} days")
     end
 
-    if (start_on - Date.current) > HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum
-     errors.add(:start_on, "applications may not be started more than #{HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum} months before effective date")
+    if (start_on - HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum) > Date.current
+     errors.add(:start_on, "may not start application before " \
+        "#{(start_on - HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum).to_date} with #{start_on} effective date")
     end
 
     if open_enrollment_end_on - (start_on - 1.month) >= HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth

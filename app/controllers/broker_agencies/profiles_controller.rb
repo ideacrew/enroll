@@ -7,18 +7,17 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def new
-    form = ::Forms::BrokerAgencyProfileForm.new({},{})
-    @organization = form.build_broker_agency_profile_params
+    form = ::Forms::BrokerAgencyProfile.build
+    @organization = form
   end
 
   def create
     params.permit!
-    form = ::Forms::BrokerAgencyProfileForm.new(params, current_user)
-    @organization, user = form.build_and_assign_attributes
+    @organization = ::Forms::BrokerAgencyProfile.build(params[:organization])
 
-    if @organization.save && user.save
+    if @organization.save(current_user)
       flash[:notice] = "Successfully created Broker Agency Profile"
-      redirect_to broker_agencies_profile_path(current_user.person.broker_agency_contact)
+      redirect_to broker_agencies_profile_path(@organization.broker_agency_profile)
     else
       flash[:error] = "Failed to create Broker Agency Profile"
       render "new"

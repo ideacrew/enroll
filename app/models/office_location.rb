@@ -14,8 +14,17 @@ class OfficeLocation
 
   validates_presence_of :address, :phone
 
-  def is_primary?
-    is_primary
+  alias_method :is_primary?, :is_primary
+
+  def parent
+    self.organization
   end
+
+  # TODO -- only one office location can be primary
+  # def is_primary=(new_primary_value)
+  #   if parent.present? && new_primary_value == true
+  #     parent.office_locations.each { |loc| loc.is_primary == false unless loc == self }
+  #   end
+  # end
 
 end

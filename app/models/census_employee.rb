@@ -39,6 +39,15 @@ class CensusEmployee < CensusMember
   index({"benefit_group_assignments.aasm_state" => 1})
 
   scope :active,  ->{ any_in(aasm_state: ["eligible", "employee_role_linked"]) }
+  scope :terminated, ->{ where(aasm_state: "employment_terminated") }
+
+  #TODO - need to add fix for multiple plan years
+  scope :waived, ->{ where( "benefit_group_assignments.aasm_state" => "coverage_waived" ) }
+  scope :sorted, ->{ order(:"census_employee.last_name".asc, :"census_employee.first_name".asc)}
+
+  scope :order_by_last_name, -> { order(:"census_employee.last_name".asc) }
+  scope :order_by_first_name, -> { order(:"census_employee.first_name".asc) }
+
   scope :non_business_owner, ->{ where(is_business_owner: false) }
   scope :by_benefit_group_ids, ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :enrolled, ->{ any_in("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
@@ -112,7 +121,7 @@ class CensusEmployee < CensusMember
     new_employee.employment_terminated_on = nil
     new_employee.employee_role_id = nil
     new_employee.benefit_group_assignments = []
-    new_employee.rehire_employee_role
+    new_employee.init_employee_role_by_rehire
 
     # new_employee.census_dependents = self.census_dependents unless self.census_dependents.blank?
     new_employee
@@ -164,6 +173,8 @@ class CensusEmployee < CensusMember
       unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
     end
 
+    alias_method :find_by_employer_profile, :find_all_by_employer_profile
+
     def find_all_by_employee_role(employee_role)
       unscoped.where(employee_role_id: employee_role._id)
     end
@@ -177,8 +188,13 @@ class CensusEmployee < CensusMember
     state :eligible, initial: true
     state :employee_role_linked
     state :employment_terminated
+    state :rehired
 
     event :rehire_employee_role do
+      transitions from: [:employment_terminated, :employee_role_linked, :eligible], to: :rehired
+    end
+
+    event :init_employee_role_by_rehire do
       transitions from: [:employment_terminated, :employee_role_linked, :eligible], to: :eligible
     end
 

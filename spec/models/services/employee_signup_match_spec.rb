@@ -3,23 +3,23 @@ require 'rails_helper'
 describe Services::EmployeeSignupMatch do
   let(:signup_builder) { instance_double("Factories::MatchedEmployee") }
   let(:form_factory) { class_double("Factories::MatchedEmployee", :new => signup_builder) }
-  let(:census_family_finder) { class_double("EmployerProfile") }
-  subject { Services::EmployeeSignupMatch.new(form_factory, census_family_finder) }
+  let(:census_employee_finder) { class_double("EmployerProfile") }
+  subject { Services::EmployeeSignupMatch.new(form_factory, census_employee_finder) }
 
   it "should not match when there is no matching roster entry" do
     consumer_identity = double
-    allow(census_family_finder).to receive(:find_census_families_by_person).with(consumer_identity).and_return([])
+    allow(census_employee_finder).to receive(:find_census_employee_by_person).with(consumer_identity).and_return([])
     expect(subject.call(consumer_identity)).to be_nil
   end
 
   describe "with a matching roster entry" do
-    let(:census_employee) { instance_double("EmployerCensus::Employee") }
-    let(:census_families) { [instance_double("EmployerCensus::EmployeeFamily", :census_employee => census_employee)] }
+    let(:census_employee) { instance_double("CensusEmployee") }
+    let(:census_employees) { [census_employee]}
     let(:consumer_identity) { instance_double("Forms::ConsumerIdentity", :match_person => nil) }
     let(:built_form) { double }
 
     before(:each) do
-      allow(census_family_finder).to receive(:find_census_families_by_person).with(consumer_identity).and_return(census_families)
+      allow(census_employee_finder).to receive(:find_census_employee_by_person).with(consumer_identity).and_return(census_employees)
     end
 
     it "should match that roster entry" do

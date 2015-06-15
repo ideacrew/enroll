@@ -60,13 +60,17 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "with no open enrollment start on" do
       let(:params) {valid_params.except(:open_enrollment_start_on)}
 
-      it "should fail validation"
+      it "should fail validation" do
+        expect(PlanYear.create(**params).errors[:open_enrollment_start_on].any?).to be_truthy
+      end
     end
 
     context "with no open enrollment end on" do
       let(:params) {valid_params.except(:open_enrollment_end_on)}
 
-      it "should fail validation"
+      it "should fail validation" do
+        expect(PlanYear.create(**params).errors[:open_enrollment_end_on].any?).to be_truthy
+      end
     end
 
     context "with all valid arguments" do
@@ -94,20 +98,37 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   context "a new plan year is initialized" do
     let(:plan_year) { PlanYear.new(**valid_params) }
 
-    context "and effective date is specified" do
-      context "and effective date doesn't provide enough time for enrollment" do
-        context "and an employer is entering the effective date" do
-          it "should fail validation"
-        end
+    context "and effective date is specified and effective date doesn't provide enough time for enrollment" do
+      let(:prior_month_open_enrollment_start)  { Date.current.beginning_of_month + HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.days - HbxProfile::ShopOpenEnrollmentPeriodMinimum.days - 1.day}
+      let(:invalid_effective_date)   { (prior_month_open_enrollment_start + 1.month).beginning_of_month }
+      before do
+        plan_year.effective_date = invalid_effective_date
+        plan_year.end_on = invalid_effective_date + HbxProfile::ShopPlanYearPeriodMinimum
+      end
 
-        context "and an HbxAdmin or system service is entering the effective date" do
-          it "should pass validation"
+      context "and an employer is submitting the effective date" do
+        it "should be invalid" do
+          expect(plan_year.valid?).to be_falsey
         end
       end
 
-      context "and effective date does provide enough time for enrollment" do
-        it "should pass validation"
+      context "and an HbxAdmin or system service is submitting the effective date" do
+        it "should be valid" 
       end
+    end
+
+    context "and effective date is specified and effective date does provide enough time for enrollment" do
+      let(:prior_month_open_enrollment_start)  { Date.current.beginning_of_month + HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.days - HbxProfile::ShopOpenEnrollmentPeriodMinimum.days - 1.day}
+      let(:valid_effective_date)   { (prior_month_open_enrollment_start + 3.months).beginning_of_month }
+      before do
+        plan_year.effective_date = valid_effective_date
+        plan_year.end_on = valid_effective_date + HbxProfile::ShopPlanYearPeriodMinimum
+      end
+ 
+      it "should be valid" do
+        expect(plan_year.valid?).to be_truthy
+      end
+ 
     end
 
     context "and an open enrollment period is specified" do
@@ -258,7 +279,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           it "should fail validation" do
             expect(plan_year.valid?).to be_falsey
             expect(plan_year.errors[:start_on].any?).to be_truthy
-            expect(plan_year.errors[:start_on].first).to match(/applications may not be started more than/)
+            expect(plan_year.errors[:start_on].first).to match(/may not start application before/)
           end
         end
 
@@ -290,8 +311,6 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:plan_year)                   { PlanYear.new(**valid_params) }
     let(:valid_fte_count)             { HbxProfile::ShopSmallMarketFteCountMaximum }
     let(:invalid_fte_count)           { HbxProfile::ShopSmallMarketFteCountMaximum + 1 }
-    let(:valid_ee_contribution_pct)   { HbxProfile::ShopEmployerContributionPercentMinimum }
-    let(:invalid_ee_contribution_pct) { HbxProfile::ShopEmployerContributionPercentMinimum - 1 }
 
     it "plan year should be in draft state" do
       expect(plan_year.draft?).to be_truthy
@@ -344,14 +363,11 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context "and the employer contribution amount is below minimum" do
-      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
-
-      before do
-        benefit_group.premium_pct_as_int = HbxProfile::ShopEmployerContributionPercentMinimum - 1
-      end
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, :invalid_employee_relationship_benefit, plan_year: plan_year) }
 
       context "and the effective date isn't January 1" do
         before do
+          plan_year.benefit_groups << benefit_group
           plan_year.start_on = Date.current.beginning_of_year + 1.month
           plan_year.publish
         end
@@ -372,6 +388,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       context "and the effective date is January 1" do
         before do
+          plan_year.benefit_groups << benefit_group
           plan_year.start_on = Date.current.beginning_of_year
           plan_year.publish
         end
@@ -387,10 +404,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context "and one or more application elements are invalid" do
-      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, :invalid_employee_relationship_benefit, plan_year: plan_year) }
 
       before do
-        benefit_group.premium_pct_as_int = invalid_ee_contribution_pct
+        plan_year.benefit_groups << benefit_group
         plan_year.fte_count = invalid_fte_count
         plan_year.start_on = Date.current.beginning_of_year + 1.month
         plan_year.publish
@@ -491,7 +508,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     it "should failure when current date more than open_enrollment_latest_start_on" do
       start_on = (Time.now + 1.month).beginning_of_month
-      allow(Date).to receive(:current).and_return(Date.new(Time.now.year, Time.now.month, 15)) 
+      allow(Date).to receive(:current).and_return(Date.new(Time.now.year, Time.now.month, 15))
       rsp = PlanYear.check_start_on(start_on)
       expect(rsp[:result]).to eq "failure"
       expect(rsp[:msg]).to start_with "start on must choose a start on date"
