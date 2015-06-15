@@ -70,7 +70,7 @@ class BenefitGroup
 
   validate :plan_integrity
   validate :check_employer_contribution_for_employee
-
+  validate :check_offered_for_employee
 
   def plan_option_kind=(new_plan_option_kind)
     super new_plan_option_kind.to_s
@@ -245,6 +245,12 @@ private
 
     if relationship_benefits.present? and (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < HbxProfile::ShopEmployerContributionPercentMinimum
       self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
+    end
+  end
+
+  def check_offered_for_employee
+    if relationship_benefits.present? and (relationship_benefits.find_by(relationship: "employee").try(:offered) != true)
+      self.errors.add(:relationship_benefits, "employee must be offered")
     end
   end
 end

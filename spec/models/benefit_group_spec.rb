@@ -438,6 +438,20 @@ describe BenefitGroup, type: :model do
         end
       end
     end
+
+    context "check offered for employee" do
+      it "should valid when offered" do
+        benefit_group.relationship_benefits.find_by(relationship: "employee").offered = true
+        expect(benefit_group.valid?).to be_truthy
+        expect(benefit_group.errors[:relationship_benefits].any?).to be_falsey
+      end
+
+      it "should fail when not offered" do
+        benefit_group.relationship_benefits.find_by(relationship: "employee").offered = false
+        expect(benefit_group.valid?).to be_falsey
+        expect(benefit_group.errors[:relationship_benefits].any?).to be_truthy
+      end
+    end
   end
 end
 
