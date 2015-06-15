@@ -65,6 +65,10 @@ describe HbxEnrollment, dbclean: :after_all do
       )
     end
 
+    it "should assign the benefit group assignment" do
+      expect(@enrollment.benefit_group_assignment_id).not_to be_nil
+    end
+
     it "should be employer sponsored" do
       expect(enrollment.kind).to eq "employer_sponsored"
     end
