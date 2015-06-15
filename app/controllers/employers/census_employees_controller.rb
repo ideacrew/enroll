@@ -99,7 +99,6 @@ class Employers::CensusEmployeesController < ApplicationController
       if new_census_employee.present? # not an active family, then it is ready for rehire.#
         new_census_employee.hired_on = @rehiring_date
         new_census_employee.employer_profile = @employer_profile
-        @census_employee.rehire_employee_role
         if new_census_employee.valid? and @census_employee.valid?
           new_census_employee.save
           @census_employee.save

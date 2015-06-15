@@ -1,0 +1,11 @@
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <h2>New Message</h2>
+    Recipient: All Employees<%#= @employer_profile.legal_name %> <br>
+    <%= f.text_field :subject, class: "floatlabel form-control", required: true, placeholder: 'SUBJECT*' %> <br>
+    <%= f.text_area :body, class: "floatlabel form-control", required: true, placeholder: 'CONTENT*' %> <br>
+    <%= f.hidden_field :sender_id, value: @employer_profile.id%>
+    <%= f.submit 'Send', class: "btn btn-primary" %>
+    <a class="btn btn-danger" href="#"><i class="fa fa-times"></i> Cancel</a>
+  </div>
+</div>
