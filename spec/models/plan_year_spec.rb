@@ -519,8 +519,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     it "start on is not close to current date" do
       start_on = (Date.current + 3.month).beginning_of_month
       rsp = PlanYear.calculate_open_enrollment_date(start_on)
-      expect(rsp[:open_enrollment_start_on]).to eq Date.current
-      expect(rsp[:open_enrollment_end_on]).to eq (Date.current + 10.days)
+      expect(rsp[:open_enrollment_start_on]).to eq start_on - 2.months
+      expect(rsp[:open_enrollment_end_on]).to eq (start_on - 2.months + 10.days)
     end
 
     it "start on is close to current date(2 months)" do
@@ -528,8 +528,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       current_date = Date.new(Time.now.year, Time.now.month, 15)
       allow(Date).to receive(:current).and_return(current_date)
       rsp = PlanYear.calculate_open_enrollment_date(start_on)
-      expect(rsp[:open_enrollment_start_on]).to eq (start_on - 2.months)
-      expect(rsp[:open_enrollment_end_on]).to eq (start_on - 2.months + 10.days)
+      expect(rsp[:open_enrollment_start_on]).to eq (current_date)
+      expect(rsp[:open_enrollment_end_on]).to eq (current_date + 10.days)
     end
   end
 end
