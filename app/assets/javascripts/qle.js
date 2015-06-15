@@ -42,4 +42,9 @@ $(function () {
 			url: "/consumer_profiles/check_qle_date.js"
 		});
 	}
+
+	$(document).on('click', '#qle_continue_button', function() {
+		$('#qle_flow_info .initial-info').hide();
+		$('#qle_flow_info .qle-info').removeClass('hidden');
+	})
 });

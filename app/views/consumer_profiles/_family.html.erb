@@ -28,7 +28,34 @@
 					<% end %>
 				</ul>
 			</div>
+		</div>
 
+		<div id="qle_flow_info" class="hidden">
+			<div class="row coverage-table">
+				<div class="col-md-9 col-sm-12">
+					<div class="initial-info notification-error-wrapper">
+						<div class="row no-buffer">
+							<div class="col-md-8">
+								<center><strong>You have added a family member to your profile. <br>You may qualify for a special enrollment period.</strong></center>
+							</div>
+							<div class="col-md-4">
+								<%= button_tag 'Continue', class: 'btn btn-default', id: 'qle_continue_button' %>
+							</div>
+						</div>
+					</div>
+
+					<div class="qle-info notification-error-wrapper hidden">
+						<div class="row no-buffer">
+							<%= render 'qles' %>
+						</div>
+					</div>
+
+					<%= link_to image_tag('member-close.png'), 'javascript:;', class: 'close-fail', style: 'margin: 7px 15px;', onclick: "$('#qle_flow_info').hide();" %>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
 			<div class="col-md-9 col-sm-12">
 				<div id="dependent_buttons" class="focus_effect personal-info-row">
 					<div class="col-md-12 no-pd col-sm-12 col-xs-12" id="add-member-btn">

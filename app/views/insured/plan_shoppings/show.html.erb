@@ -1,164 +1,34 @@
 <%= render "insured/plan_shoppings/detail_modal" %>
 
 <div class="container">
-  <div id="select_plan_wrapper">
-    <div class="row">
-      <div class="col-md-9 col-sm-9 col-xs-12">
-        <h3>Choose a healthcare plan.</h3>
-        <div class="select-plan">
-          <section class="select-plan-details">
-            <ul class="family-coverage">
-              <li>Individual: <span><%= @person.full_name %></span></li>
-              <li>Dependents: <span><%= @hbx_enrollment.humanized_dependent_summary %></span></li>
-              <li>Employer: <span><%= @benefit_group.plan_year.employer_profile.dba %></span></li>
-              <li>Plans: <span><%= @plans.count %></span></li>
-            </ul>
-                  <div class="clearfix"></div>
+	<div id="select_plan_wrapper">
+		<div class="row">
+			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+				<div class="ct-1">
+					<h3>Choose a healthcare plan.</h3>
+					<p class="pull-left">
+                    Individual: <strong><%= @person.full_name %></strong> &nbsp;&nbsp;
+                    Dependents: <strong><%= @hbx_enrollment.humanized_dependent_summary %></strong> &nbsp;&nbsp;
+                    Employer: <strong><%= @benefit_group.plan_year.employer_profile.dba %></strong> &nbsp;&nbsp;
+                    Plans: <strong><%= @plans.count %></strong>
+                </p>
+                <br/>
+                <br/>
+            </div>
 
-              <div class="row">
-                <div id="plan-summary"></div>
+            <p class="pull-right">
+              <a href="javascript:void(0);" style="display: none;" class="btn btn-primary", data-uri = "comparison_products_plans_path" id = "compare-selected-plans-link" %>
+                COMPARE PLANS
+              </a>
+            </p>
+	          <br/><br/><br/>
+	       </div>
 
-                <div id="all-plans">
-                  <div class="col-lg-3 col-md-3 co-sm-3 col-xs-12">
-                          <h3 class="header-title">Filter Results</h3>
-                          <div class="checkbox-filter-wrapper">
-                              <h5><strong>Metallic Level</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Sample information"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
-                              
-                              <ul class="list-unstyled">
-                                  <li>
-                                      <div class="checkbox">
-                                          <label>
-                                              <input id="checkbox-5" class="checkbox-custom" name="checkbox-5" type="checkbox">
-                                              <label for="checkbox-5" class="checkbox-custom-label">Bronze</label>
-                                          </label>
-                                      </div>
-                                  </li>
-                                  <li>
-                                      <div class="checkbox">
-                                          <label>
-                                              <input id="checkbox-6" class="checkbox-custom" name="checkbox-6" type="checkbox">
-                                              <label for="checkbox-6" class="checkbox-custom-label">Silver</label>
-                                          </label>
-                                      </div>
-                                  </li>
-                                  <li>
-                                      <div class="checkbox">
-                                          <label>
-                                              <input id="checkbox-7" class="checkbox-custom" name="checkbox-7" type="checkbox">
-                                              <label for="checkbox-7" class="checkbox-custom-label">Gold</label>
-                                          </label>
-                                      </div>
-                                  </li>
-                                  <li>
-                                      <div class="checkbox">
-                                          <label>
-                                              <input id="checkbox-8" class="checkbox-custom" name="checkbox-8" type="checkbox">
-                                              <label for="checkbox-8" class="checkbox-custom-label">Platinum</label>
-                                          </label>
-                                      </div>
-                                  </li>
-                                  <li>
-                                      <div class="checkbox">
-                                          <label>
-                                              <input id="checkbox-9" class="checkbox-custom" name="checkbox-9" type="checkbox">
-                                              <label for="checkbox-9" class="checkbox-custom-label">Catastrophic</label>
-                                          </label>
-                                      </div>
-                                  </li>
-                              </ul>
-                          </div>
-                          <div class="checkbox-filter-wrapper">
-                              <h5><strong>Plan Type</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Sample information"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
-                              
-                              <ul class="list-unstyled">
-                                  <li>
-                                      <div class="checkbox">
-                                          <label>
-                                              <input id="checkbox-10" class="checkbox-custom" name="checkbox-10" type="checkbox">
-                                              <label for="checkbox-10" class="checkbox-custom-label">HMO</label>
-                                          </label>
-                                      </div>
-                                  </li>
-                                  <li>
-                                      <div class="checkbox">
-                                          <label>
-                                              <input id="checkbox-11" class="checkbox-custom" name="checkbox-11" type="checkbox">
-                                              <label for="checkbox-11" class="checkbox-custom-label">PPO</label>
-                                          </label>
-                                      </div>
-                                  </li>
-                                  <li>
-                                      <div class="checkbox">
-                                          <label>
-                                              <input id="checkbox-12" class="checkbox-custom" name="checkbox-12" type="checkbox">
-                                              <label for="checkbox-12" class="checkbox-custom-label">POS</label>
-                                          </label>
-                                      </div>
-                                  </li>
-                              </ul>
-                          </div>
-                          <div class="checkbox-filter-wrapper">
-                              <h5><strong>Network</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Sample information"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
-                              
-                              <ul class="list-unstyled">
-                                  <li>
-                                      <div class="checkbox">
-                                          <label>
-                                              <input id="checkbox-13" class="checkbox-custom" name="checkbox-13" type="checkbox">
-                                              <label for="checkbox-13" class="checkbox-custom-label">Nationwide</label>
-                                          </label>
-                                      </div>
-                                  </li>
-                                  <li>
-                                      <div class="checkbox">
-                                          <label>
-                                              <input id="checkbox-14" class="checkbox-custom" name="checkbox-14" type="checkbox">
-                                              <label for="checkbox-14" class="checkbox-custom-label">DC in-Network</label>
-                                          </label>
-                                      </div>
-                                  </li>
-                                  <li>
-                                      <div class="checkbox">
-                                          <label>
-                                              <input id="checkbox-15" class="checkbox-custom" name="checkbox-15" type="checkbox">
-                                              <label for="checkbox-15" class="checkbox-custom-label">POS</label>
-                                          </label>
-                                      </div>
-                                  </li>
-                              </ul>
-                          </div>
-                          <div class="checkbox-filter-wrapper">
-                              <h5><strong>Premium amount</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Sample information"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
-                              <div class="filter-input-block">
-                                  <input type="text" class="form-control" placeholder="$0">
-                                  <small>To</small>
-                                  <input type="text" class="form-control" placeholder="$500">
-                              </div>
-                              <br/>
-                              <br/>
-                              <h5><strong>Deductible Amount</strong></h5>
-                              <div class="filter-input-block">
-                                  <input type="text" class="form-control" placeholder="$0">
-                                  <small>To</small>
-                                  <input type="text" class="form-control" placeholder="$500">
-                              </div>
-                          </div>
-                          <div class="checkbox-filter-wrapper">
-                              <div class="form-inline search-apply-wrapper">
-                                  <a href="#" class="btn btn-primary ">Apply</a>
-                                  <a href="#" class="btn btn-tranparent btn-sm">Reset</a>
-                              </div>
-                          </div>
-                          <div class="checkbox-filter-wrapper">
-                              <h4>Find Your Doctor</h4>
-                              <div class="form-group has-default has-feedback">
-                                  <label class="control-label sr-only" for="inputSuccess5">Hidden label</label>
-                                  <input type="text" class="form-control" id="inputSuccess5" aria-describedby="inputSuccess5Status" placeholder="Type Name...">
-                                  <span class="glyphicon glyphicon-search form-control-feedback" aria-hidden="true"></span>
-                                  <span id="inputSuccess5Status" class="sr-only">(success)</span>
-                              </div>
-                          </div>
-                      </div>
+        <div class="row">
+          <div id="plan-summary"></div>
+
+          <div id="all-plans" class="all-filters-row">
+            <%= render 'plan_filters' %>
 
             <div class="col-lg-9 col-md-9 co-sm-9 col-xs-12">
               <% @plans.each do |plan| %>
@@ -168,9 +38,12 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
-        <%= render  partial: 'shared/signup_progress', locals: {step: '5'} %>
-      </div>
+
+      <% if @change_plan.blank? %>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
+          <%= render  partial: 'shared/signup_progress', locals: {step: '5'} %>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>
