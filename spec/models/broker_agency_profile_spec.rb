@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
   it { should validate_presence_of :market_kind }
-  it { should validate_presence_of :primary_broker_role_id }
+#  it { should validate_presence_of :primary_broker_role_id }
 
   it { should delegate_method(:hbx_id).to :organization }
   it { should delegate_method(:legal_name).to :organization }
@@ -62,7 +62,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
         expect(BrokerAgencyProfile.create(**params).errors[:market_kind]).to eq [market_kind_error_message]
       end
     end
-
+=begin
     context "with no primary_broker" do
       let(:params) {valid_params.except(:primary_broker_role_id)}
 
@@ -70,7 +70,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
         expect(BrokerAgencyProfile.create(**params).errors[:primary_broker_role_id].any?).to be_truthy
       end
     end
-
+=end
     context "with all valid arguments" do
       let(:params) {valid_params}
       let(:broker_agency_profile) {BrokerAgencyProfile.new(**params)}

@@ -9,9 +9,6 @@ class EmployerProfile
   field :sic_code, type: String
 
   field :aasm_state, type: String
-  field :aasm_message, type: String
-
-  field :is_active, type: Boolean, default: true
 
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
@@ -46,7 +43,7 @@ class EmployerProfile
   after_initialize :build_nested_models
   after_save :save_associated_nested_models
 
-  scope :active, ->{ where(:is_active => true) }
+  scope :all_active, ->{ where(:is_active => true) }
 
   alias_method :is_active?, :is_active
 
@@ -58,11 +55,6 @@ class EmployerProfile
 
   def census_employees
     CensusEmployee.find_by_employer_profile(self)
-  end
-
-  def census_employees_sorted
-    return @census_employees_sorted if defined? @census_employees_sorted
-    @census_employees_sorted = census_employees.order_by_last_name.order_by_first_name
   end
 
   def hire_broker_agency(new_broker_agency, start_on = Date.current)

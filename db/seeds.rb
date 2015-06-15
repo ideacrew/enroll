@@ -7,7 +7,7 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
 reset_tasks = %w(
-  db:purge
+  db:mongoid:purge
   db:mongoid:remove_indexes
   db:mongoid:create_indexes
 )

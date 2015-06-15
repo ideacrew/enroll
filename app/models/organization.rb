@@ -54,28 +54,32 @@ class Organization
   # CarrierProfile child model indexes
   index({"carrier_profile._id" => 1}, { unique: true, sparse: true })
 
-  # EmployerProfile child model indexes
-  index({"employer_profile._id" => 1}, { unique: true, sparse: true })
-  index({"employer_profile.aasm_state" => 1})
-  index({"employer_profile.broker_agency_profile_id" => 1}, {sparse: true})
-  index({"employer_profile.writing_agent_id" => 1}, {sparse: true})
-  index({"employer_profile.plan_years._id" => 1}, { unique: true, sparse: true })
-  index({"employer_profile.plan_years.aasm_state" => 1})
-  index({"employer_profile.plan_years.start_date" => 1})
-  index({"employer_profile.plan_years.end_date" => 1})
-  index({"employer_profile.plan_years.open_enrollment_start_on" => 1})
-  index({"employer_profile.plan_years.open_enrollment_end_on" => 1})
-  index({"employer_profile.plan_years.benefit_groups._id" => 1})
-
-  index({"employer_profile.broker_agency_accounts._id" => 1})
-  index({"employer_profile.broker_agency_accounts.is_active" => 1,
-         "employer_profile.broker_agency_accounts.broker_agency_profile_id" => 1 })
-
   # BrokerAgencyProfile child model indexes
   index({"broker_agency_profile._id" => 1}, { unique: true, sparse: true })
   index({"broker_agency_profile.aasm_state" => 1})
   index({"broker_agency_profile.primary_broker_role_id" => 1}, { unique: true, sparse: true })
   index({"broker_agency_profile.market_kind" => 1})
+
+  # EmployerProfile child model indexes
+  index({"employer_profile._id" => 1}, { unique: true, sparse: true })
+  index({"employer_profile.aasm_state" => 1})
+
+  index({"employer_profile.plan_years._id" => 1}, { unique: true, sparse: true })
+  index({"employer_profile.plan_years.aasm_state" => 1})
+  index({"employer_profile.plan_years.start_on" => 1})
+  index({"employer_profile.plan_years.end_on" => 1})
+  index({"employer_profile.plan_years.open_enrollment_start_on" => 1})
+  index({"employer_profile.plan_years.open_enrollment_end_on" => 1})
+  index({"employer_profile.plan_years.benefit_groups._id" => 1})
+  index({"employer_profile.plan_years.benefit_groups.reference_plan_id" => 1})
+
+  index({"employer_profile.broker_agency_accounts._id" => 1})
+  index({"employer_profile.broker_agency_accounts.is_active" => 1,
+         "employer_profile.broker_agency_accounts.broker_agency_profile_id" => 1 },
+         { name: "active_broker_accounts_broker_agency" })
+  index({"employer_profile.broker_agency_accounts.is_active" => 1,
+         "employer_profile.broker_agency_accounts.writing_agent_id" => 1 },
+         { name: "active_broker_accounts_writing_agent" })
 
   # Strip non-numeric characters
   def fein=(new_fein)

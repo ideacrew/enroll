@@ -34,10 +34,38 @@
         </div>
       </div><br><br>
 
-      <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-          <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => @plan.id}), {:class => "btn btn-primary btn-lg pull-right", :method => :post}) %>
-        </div>
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <ul>
+        <li>
+          <p>Type</p>
+          <strong><%= @plan.plan_type ? @plan.plan_type.upcase : "" %></strong>
+        </li>
+
+        <% plan_level = @plan.metal_level.humanize %>
+        <li class="<%= plan_level.downcase %>">
+          <p>Level</p>
+          <strong>
+            <i class="fa fa-circle-o"></i><%= plan_level %>
+          </strong>
+        </li>
+        <li>
+          <p>Network</p>
+          <strong><%= @plan.nationwide ? "Nationwide" : "DC Area Network" %></strong>
+        </li>
+        <li>
+          <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
+            <p>Family Deductible</p>
+            <strong><%= @plan.family_deductible %></strong>
+          <% else %>
+            <p>Deductible</p>
+            <strong><%= @plan.deductible %></strong>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="pull-right">
+        <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => @plan.id}), {:class => "btn btn-primary", :method => :post}) %>
       </div>
     </div>
   </div>

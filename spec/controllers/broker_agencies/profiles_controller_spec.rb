@@ -54,7 +54,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:user){ double(:save => double("user")) }
     let(:person){ double(:broker_agency_contact => double("test")) }
     let(:broker_agency_profile){ double("test") }
-    let(:form){double("test")}
+    let(:form){double("test", :broker_agency_profile => broker_agency_profile)}
     let(:organization) {double("organization")}
     context "when no broker role" do
       before(:each) do
@@ -62,18 +62,17 @@ RSpec.describe BrokerAgencies::ProfilesController do
         allow(user).to receive(:person).and_return(person)
         allow(user).to receive(:person).and_return(person)
         sign_in(user)
-        allow(Forms::BrokerAgencyProfileForm).to receive(:new).and_return(form)
-        allow(form).to receive(:build_and_assign_attributes).and_return([organization,user])
+        allow(Forms::BrokerAgencyProfile).to receive(:build).and_return(form)
       end
 
       it "returns http status" do
-        allow(organization).to receive(:save).and_return(true)
+        allow(form).to receive(:save).and_return(true)
         post :create, organization: {}
         expect(response).to have_http_status(:redirect)
       end
 
       it "should render new template when invalid params" do
-        allow(organization).to receive(:save).and_return(false)
+        allow(form).to receive(:save).and_return(false)
         post :create, organization: {}
         expect(response).to render_template("new")
       end
