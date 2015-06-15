@@ -55,6 +55,10 @@ class ConsumerProfilesController < ApplicationController
     @person = current_user.person
     @family = @person.primary_family
     @family_members = @family.active_family_members if @family.present?
+
+    @qualifying_life_events = QualifyingLifeEventKind.all
+    @employee_role = @person.employee_roles.first
+    
     respond_to do |format|
       format.html
       format.js

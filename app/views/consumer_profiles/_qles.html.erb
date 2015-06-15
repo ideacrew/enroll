@@ -1,3 +1,28 @@
+<div id="qle-menu">
+    <div class="page-header">
+        <h4>Your life events</h4>
+    </div>
+    <div class="row">
+    	<% if @qualifying_life_events %>		
+			<% @qualifying_life_events.each_with_index do |qle, index| %>
+				<% if index%5 == 0 %>
+					<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+					<ul class="list-unstyled list-inline list-qle">
+				<% end %>
+
+				<li>
+					<a class="qle-menu-item" href="javascript:void(0)" data-toggle="tooltip" title="<%= qle.description %>">"<%= qle.title.humanize %>"</a>
+				</li>
+
+				<% if index%5 == 4 || index+1 == @qualifying_life_events.count %>
+					</ul>
+					</div>
+				<% end %>
+			<% end %>
+		<% end %>
+	</div>
+</div>
+
 <div id="qle-details" class="hidden">
 	<a class="close-popup" href="javascript:void(0);"><span aria-hidden="true" class="glyphicon glyphicon-remove"></span></a>
 	<div class="row">
