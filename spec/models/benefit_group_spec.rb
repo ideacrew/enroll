@@ -164,7 +164,7 @@ end
 
 
 describe BenefitGroup, type: :model do
-    
+
   let(:plan_year)               { FactoryGirl.build(:plan_year) }
   let(:reference_plan)          { FactoryGirl.build(:plan) }
   let(:plan_option_kind)        { :single_plan }
@@ -204,7 +204,6 @@ describe BenefitGroup, type: :model do
         effective_on_kind: effective_on_kind,
         effective_on_offset: effective_on_offset,
         terminate_on_kind: terminate_on_kind,
-        premium_pct_as_int: premium_pct_as_int
     }
   end
 
@@ -230,7 +229,7 @@ describe BenefitGroup, type: :model do
 
       it "should be invalid" do
         expect(BenefitGroup.create(**params).errors[:elected_plan_ids].any?).to be_truthy
-      end      
+      end
     end
 
     context "with no plan option kind" do
@@ -301,7 +300,7 @@ describe BenefitGroup, type: :model do
 
     context "with all valid parameters" do
       let(:params) {valid_params}
-      let(:benefit_group)  { BenefitGroup.new(**params) }  
+      let(:benefit_group)  { BenefitGroup.new(**params) }
 
       it "should save" do
         expect(benefit_group.save).to be_truthy
@@ -323,7 +322,7 @@ describe BenefitGroup, type: :model do
 
   context "and a reference plan is selected" do
     let(:params) {valid_params}
-    let(:benefit_group)  { BenefitGroup.new(**params) }  
+    let(:benefit_group)  { BenefitGroup.new(**params) }
 
     context "and the 'single plan' option is offered" do
       context "and the elected plan is not the reference plan" do

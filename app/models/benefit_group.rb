@@ -34,7 +34,6 @@ class BenefitGroup
   field :reference_plan_id, type: BSON::ObjectId
 
   # Employer contribution amount as percentage of reference plan premium
-  field :premium_pct_as_int, type: Integer
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
   # Array of plan_ids
