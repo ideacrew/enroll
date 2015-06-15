@@ -15,8 +15,7 @@ RSpec.describe Organization, dbclean: :after_each do
   let(:valid_office_location_attributes) do
     {
       address: FactoryGirl.build(:address, kind: "work"),
-      phone: FactoryGirl.build(:phone, kind: "work"),
-      email: FactoryGirl.build(:email, kind: "work")
+      phone: FactoryGirl.build(:phone, kind: "work")
     }
   end
 

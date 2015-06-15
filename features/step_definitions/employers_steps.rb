@@ -79,7 +79,7 @@ And(/^I should see an initial form to enter information about my Employer and my
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("898")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("9990000")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][extension]").set("1111")
-  @browser.text_field(name: "organization[office_locations_attributes][0][email_attributes][address]").set("john.doe.abcsystems@example.com")
+  # @browser.text_field(name: "organization[office_locations_attributes][0][email_attributes][address]").set("john.doe.abcsystems@example.com")
   screenshot("employer_portal_employer_data_new")
   @browser.button(value: /Create/).fire_event("onclick")
 end
@@ -401,36 +401,36 @@ And(/^I should see a success message after clicking on create plan year button$/
 end
 
 When(/^I enter filter in plan selection page$/) do
-  Watir::Wait.until(30) { @browser.a(text: /Filter Results/).present? }
+  Watir::Wait.until(30) { @browser.element(text: /Filter Results/).present? }
   # @browser.a(text: /All Filters/).wait_until_present
   # @browser.a(text: /All Filters/).click
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(true)
-  @browser.button(class: /apply-btn/, text: /Apply/).wait_until_present
-  @browser.button(class: /apply-btn/, text: /Apply/).click
+  @browser.element(class: /apply-btn/, text: /Apply/).wait_until_present
+  @browser.element(class: /apply-btn/, text: /Apply/).click
 end
 
 When(/^I enter combined filter in plan selection page$/) do
-  @browser.a(text: /All Filters/).wait_until_present
-  @browser.a(text: /All Filters/).click
+  #@browser.a(text: /All Filters/).wait_until_present
+  #@browser.a(text: /All Filters/).click
   # @browser.checkboxes(class: /plan-type-selection-filter/).first.wait_until_present
   # @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
   # Nationwide
   # @browser.checkboxes(class: /plan-metal-network-selection-filter/).first.set(true)
-  @browser.checkbox(class: /checkbox-custom interaction-choice-control-value-checkbox-5/).set(true)
+  #@browser.checkbox(class: /checkbox-custom interaction-choice-control-value-checkbox-5/).set(true)
 
   # Platinum
   @browser.checkboxes(class: /plan-metal-level-selection-filter/)[0].set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("")
   @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("")
-  @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("$420")
-  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("$430")
-  @browser.button(class: /apply-btn/, text: /Apply/).click
+  @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("320")
+  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("399")
+  @browser.element(class: /apply-btn/, text: /Apply/).click
 end
 
 Then(/^I should see the combined filter results$/) do
   @browser.divs(class: /plan-row/).select(&:visible?).each do |plan|
     expect(plan.text.include?("Nationwide")).to eq true
     expect(plan.text.include?("Bronze")).to eq true
-    expect(plan.p(text: "$425.66").visible?).to eq true
+    expect(plan.element(text: "$90.72").visible?).to eq true
   end
 end
