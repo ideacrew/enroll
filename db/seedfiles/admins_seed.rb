@@ -5,7 +5,7 @@ puts "::: Creating HBX Admin:::"
 address  = Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002")
 phone    = Phone.new(kind: "main", area_code: "202", number: "555-9999")
 email    = Email.new(kind: "work", address: "info@hbx.gov")
-office_location= OfficeLocation.new(is_primary: true, address: address, phone: phone, email: email)
+office_location= OfficeLocation.new(is_primary: true, address: address, phone: phone)
 hbx_profile = HbxProfile.new(cms_id: "DC0")
 
 hbx = Organization.create(
