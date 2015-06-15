@@ -32,7 +32,7 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(employer_profile).to receive(:plan_years).and_return("")
       sign_in(user)
       get :new, :employer_profile_id => employer_profile_id
-      expect(response).to be_redirect
+      expect(response.body).to include("window.location")
       expect(flash[:notice]).to eq "Please create a plan year before you create your first census employee."
     end
   end

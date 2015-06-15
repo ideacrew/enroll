@@ -20,7 +20,7 @@ class Employers::CensusEmployeesController < ApplicationController
       @census_employee.employer_profile = @employer_profile
       if @census_employee.save
         flash[:notice] = "Census Employee is successfully created."
-        redirect_to employers_employer_profile_path(@employer_profile)
+        redirect_to employers_employer_profile_path(@census_employee)
       else
         render action: "new"
       end
@@ -195,7 +195,7 @@ class Employers::CensusEmployeesController < ApplicationController
   def check_plan_year
     if @employer_profile.plan_years.empty?
       flash[:notice] = "Please create a plan year before you create your first census employee."
-      redirect_to new_employers_employer_profile_plan_year_path(@employer_profile)
+      render js: "window.location.pathname='#{new_employers_employer_profile_plan_year_path(@employer_profile)}'"
     end
   end
 
