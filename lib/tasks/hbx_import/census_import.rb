@@ -40,7 +40,7 @@ module HbxImport
               if !census_employee.work_email.blank?
                 ce.build_email(kind: "work", address: census_employee.work_email)
               end
-              ce.build_address(kind: "home",address_1:"830 I St NE",city:"Washington",state:"DC",zip:"20002")
+#              ce.build_address(kind: "home",address_1:"830 I St NE",city:"Washington",state:"DC",zip:"20002")
               ce.employment_terminated_on = census_employee.dot
               ce.add_benefit_group_assignment(benefit_group, plan_year.start_on)
               begin
