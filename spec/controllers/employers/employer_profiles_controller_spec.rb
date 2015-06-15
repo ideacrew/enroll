@@ -311,7 +311,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
     it "should redirect" do
       allow(user).to receive(:save).and_return(true)
-      allow(person).to receive(:employer_staff_role).and_return(EmployerStaffRole.new)
+      allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
       sign_in(user)
       expect(Organization).to receive(:find)
       expect(EmployerStaffRole).to receive(:create)
