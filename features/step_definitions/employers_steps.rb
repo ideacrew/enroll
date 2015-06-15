@@ -79,7 +79,7 @@ And(/^I should see an initial form to enter information about my Employer and my
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("898")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("9990000")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][extension]").set("1111")
-  @browser.text_field(name: "organization[office_locations_attributes][0][email_attributes][address]").set("john.doe.abcsystems@example.com")
+  # @browser.text_field(name: "organization[office_locations_attributes][0][email_attributes][address]").set("john.doe.abcsystems@example.com")
   screenshot("employer_portal_employer_data_new")
   @browser.button(value: /Create/).fire_event("onclick")
 end
