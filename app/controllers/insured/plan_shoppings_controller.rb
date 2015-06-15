@@ -56,6 +56,8 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = @benefit_group.elected_plans.entries.collect() do |plan|
       PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
     end
+
+    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
   end
 
   def find_person(id)

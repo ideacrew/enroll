@@ -57,7 +57,26 @@ class EmployerProfile
     CensusEmployee.find_by_employer_profile(self)
   end
 
-  def hire_broker_agency(new_broker_agency, start_on = Date.current)
+  def owner
+    staff_roles.select{ |staff| staff.employer_staff_role.is_owner }
+  end
+
+  def staff_roles
+    Person.find_all_staff_roles_by_employer_profile(self)
+    # Person.all.select{ |p| p.employer_staff_role? && p.employer_staff_role.employer_profile_id == self.id}
+  end
+
+  def today=(new_date)
+    raise ArgumentError.new("expected Date") unless new_date.is_a?(Date)
+    @today = new_date
+  end
+
+  def today
+    return @today if defined? @today
+    @today = TimeKeeper.current_date
+  end
+
+  def hire_broker_agency(new_broker_agency, start_on = today)
     start_on = start_on.to_date.beginning_of_day
     if active_broker_agency_account.present?
       terminate_on = (start_on - 1.day).end_of_day
@@ -69,7 +88,7 @@ class EmployerProfile
 
   alias_method :broker_agency_profile=, :hire_broker_agency
 
-  def terminate_active_broker_agency(terminate_on = Date.current)
+  def terminate_active_broker_agency(terminate_on = today)
     if active_broker_agency_account.present?
       active_broker_agency_account.end_on = terminate_on
       active_broker_agency_account.is_active = false
@@ -108,7 +127,7 @@ class EmployerProfile
 
   def active_plan_year
     @active_plan_year if defined? @active_plan_year
-    plan_year = find_plan_year_by_date(Date.current)
+    plan_year = find_plan_year_by_date(today)
     @active_plan_year = plan_year if (plan_year.present? && plan_year.published?)
   end
 
@@ -116,7 +135,7 @@ class EmployerProfile
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
   end
 
-  # Change plan years for a period - published -> retired and
+  # Change plan years for a period - published -> retired
   def close_plan_year
   end
 
@@ -164,7 +183,7 @@ class EmployerProfile
     def find_by_broker_agency_profile(broker_agency_profile)
       raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile)
       orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true, 
-        :"employer_profile.broker_agency_accounts.broker_agency_profile_id" => broker_agency_profile.id).to_a
+        :"employer_profile.broker_agency_accounts.broker_agency_profile_id" => broker_agency_profile.id).cache.to_a
 
       orgs.collect(&:employer_profile) 
     end
@@ -172,7 +191,7 @@ class EmployerProfile
     def find_by_writing_agent(writing_agent)
       raise ArgumentError.new("expected BrokerRole") unless writing_agent.is_a?(BrokerRole)
       orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true,
-        :"employer_profile.broker_agency_accounts.writing_agent_id" => writing_agent.id).to_a
+        :"employer_profile.broker_agency_accounts.writing_agent_id" => writing_agent.id).cache.to_a
 
       orgs.collect(&:employer_profile) 
     end
@@ -183,17 +202,19 @@ class EmployerProfile
     end
 
     def advance_day(new_date)
-      new_date.to_date.beginning_of_day
-      # TODO define query for set
-      # Organization.where(
-      #     ("employer_profile.plan_years.start_on" == new_date) ||
-      #     ("employer_profile.plan_years.end_on" == new_date) ||
-      #     ("employer_profile.plan_years.open_enrollment_start_on" == new_date) ||
-      #     ("employer_profile.plan_years.open_enrollment_end_on" == new_date)
-      #   ).each do |org|
-      #     org.employer_profile.advance_enrollment_date
-      #     org.employer_profile.advance_enrollment_date
-      # end
+      
+      # Find employers with events today and trigger their respective workflow states
+      orgs = Organization.where(
+          ("employer_profile.plan_years.start_on" == new_date) ||
+          ("employer_profile.plan_years.end_on" == new_date) ||
+          ("employer_profile.plan_years.open_enrollment_start_on" == new_date) ||
+          ("employer_profile.plan_years.open_enrollment_end_on" == new_date)
+        )
+
+      orgs.each do |org|
+        org.today = new_date
+        org.employer_profile.advance_enrollment_date
+      end
 
     end
   end
@@ -202,11 +223,9 @@ class EmployerProfile
     plan_year.revert
   end
 
-
   def initialize_account
     self.build_employer_profile_account
   end
-
 
 ## TODO - anonymous shopping
 # no fein required
@@ -331,7 +350,6 @@ class EmployerProfile
     event :reenroll do
       transitions from: :terminated, to: :binder_pending
     end
-
   end
 
   def within_open_enrollment_for?(t_date, effective_date)
@@ -339,14 +357,6 @@ class EmployerProfile
       py.open_enrollment_contains?(t_date) &&
         py.coverage_period_contains?(effective_date)
     end
-  end
-
-  def owner
-    staff.select{ |p| p.employer_staff_role.is_owner }
-  end
-
-  def staff
-    Person.all.select{ |p| p.employer_staff_role? && p.employer_staff_role.employer_profile_id == self.id}
   end
 
 private
@@ -369,7 +379,7 @@ private
   end
 
   def effective_date_expired?
-    latest_plan_year.effective_date.beginning_of_day == (Date.current.end_of_month + 1).beginning_of_day
+    latest_plan_year.effective_date.beginning_of_day == (today.end_of_month + 1).beginning_of_day
   end
 
   def plan_year_publishable?
@@ -385,11 +395,11 @@ private
   def event_date_valid?
     is_valid = case aasm.current_event
       when :publish_plan_year
-        Date.current.beginning_of_day == latest_plan_year.open_enrollment_start_on.beginning_of_day
+        today == latest_plan_year.open_enrollment_start_on.beginning_of_day
       when :begin_open_enrollment
-        Date.current.beginning_of_day >= latest_plan_year.open_enrollment_start_on.beginning_of_day
+        today >= latest_plan_year.open_enrollment_start_on.beginning_of_day
       when :end_open_enrollment
-        Date.current.beginning_of_day >= latest_plan_year.open_enrollment_end_on.beginning_of_day
+        today >= latest_plan_year.open_enrollment_end_on.beginning_of_day
       else
         false
     end

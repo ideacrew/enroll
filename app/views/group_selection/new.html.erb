@@ -28,6 +28,7 @@
           
           <br>
           <% if @change_plan.present? %>
+            <%= hidden_field_tag 'change_plan', 'change' %>
             <h4><strong>What do you like to do?</strong></h4>
             <%= link_to 'Keep existing plan', home_consumer_profiles_path, class: 'btn btn-primary' %>
             <%= submit_tag 'Shop for new plan', class: 'btn btn-primary' %>
