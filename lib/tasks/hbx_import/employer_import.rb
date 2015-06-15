@@ -310,7 +310,6 @@ module HbxImport
         benefit_group.effective_on_kind = "first_of_month"
         benefit_group.effective_on_offset = 60
       end
-      benefit_group.premium_pct_as_int = employee_contribution
       benefit_group.employer_max_amt_in_cents = 0
       benefit_group.title = name
     end
