@@ -309,7 +309,9 @@ Then(/^The census family should be terminated and move to terminated tab$/) do
   expect(@browser.a(text: /Patrick K Doe Jr/).visible?).to be_truthy
   @browser.a(text: /Employees/).wait_until_present
   @browser.a(text: /Employees/).click
-  @browser.a(text: /Rehire/).wait_until_present
+  @browser.td(text: /Employment terminated/).wait_until_present
+  expect(@browser.td(text: /Employment terminated/).visible?).to be_truthy
+  #@browser.a(text: /Rehire/).wait_until_present
 end
 
 And(/^I should see the census family is successfully terminated message$/) do
@@ -357,7 +359,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.h4(text: /start on must be first day of the month/).wait_until_present
   expect(@browser.text.include?("start on must be first day of the month")).to be_truthy
   # happy path
-  begin_date = (Date.current + 1.year).beginning_of_year
+  begin_date = (Date.current + 3.months).beginning_of_month
   @browser.text_field(class: "interaction-field-control-plan_year-start_on").set(begin_date)
   @browser.h3(text: /Plan Year/).click
   sleep(1)
@@ -380,7 +382,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   ref_plan.click
   ref_plan.li(index: 5).click # select plan from list.
   # Relationship Benefit
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(51)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]").set(15)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').first.set(true)
