@@ -107,7 +107,7 @@ class Organization
 
   def office_location_kinds
     location_kinds = self.office_locations.flat_map(&:address).flat_map(&:kind)
-    # should validate only for office location typs ie. primary, mailing, branch
+    # should validate only office location kinds ie. primary, mailing, branch
     return if location_kinds.detect{|kind| kind == 'work' || kind == 'home'}
 
     if location_kinds.count('primary').zero?
