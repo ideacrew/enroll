@@ -6,34 +6,33 @@
 			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
 				<div class="ct-1">
 					<h3>Choose a healthcare plan.</h3>
-					<p class="pull-left">
+          <div class="row no-buffer">
+              <p class="pull-left">
                     Individual: <strong><%= @person.full_name %></strong> &nbsp;&nbsp;
                     Dependents: <strong><%= @hbx_enrollment.humanized_dependent_summary %></strong> &nbsp;&nbsp;
                     Employer: <strong><%= @benefit_group.plan_year.employer_profile.dba %></strong> &nbsp;&nbsp;
                     Plans: <strong><%= @plans.count %></strong>
-                </p>
-                <br/>
-                <br/>
-            </div>
+              </p>
 
-            <p class="pull-right">
-              <a href="javascript:void(0);" style="display: none;" class="btn btn-primary", data-uri="<%= comparison_products_plans_path %>" id="compare-selected-plans-link">
-                COMPARE PLANS
-              </a>
-            </p>
-	          <br/><br/><br/>
-	       </div>
+              <p class="pull-right">
+                <a href="javascript:void(0);" style="display: none;" class="btn btn-primary", data-uri="<%= comparison_products_plans_path %>" id="compare-selected-plans-link">
+                  COMPARE PLANS
+                </a>
+              </p>
+  	          <br/><br/><br/>
+          </div>
 
-        <div class="row">
-          <div id="plan-summary"></div>
+          <div class="row">
+            <div id="plan-summary"></div>
 
-          <div id="all-plans" class="all-filters-row">
-            <%= render 'plan_filters' %>
+            <div id="all-plans" class="all-filters-row">
+              <%= render 'plan_filters' %>
 
-            <div class="col-lg-9 col-md-9 co-sm-9 col-xs-12">
-              <% @plans.each do |plan| %>
-                <%= render "insured/plan_shoppings/plan_details", :plan => plan %>
-              <% end %>
+              <div class="col-lg-9 col-md-9 co-sm-9 col-xs-12">
+                <% @plans.each do |plan| %>
+                  <%= render "insured/plan_shoppings/plan_details", :plan => plan %>
+                <% end %>
+              </div>
             </div>
           </div>
         </div>
