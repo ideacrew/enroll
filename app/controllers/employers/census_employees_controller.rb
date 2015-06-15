@@ -20,7 +20,7 @@ class Employers::CensusEmployeesController < ApplicationController
       @census_employee.employer_profile = @employer_profile
       if @census_employee.save
         flash[:notice] = "Census Employee is successfully created."
-        redirect_to employers_employer_profile_path(@census_employee)
+        redirect_to employers_employer_profile_path(@employer_profile)
       else
         render action: "new"
       end
