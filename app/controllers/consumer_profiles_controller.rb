@@ -62,10 +62,10 @@ class ConsumerProfilesController < ApplicationController
   end
 
   def check_qle_date
-    date_married = Date.parse(params[:date_val])
-    start_date = Date.parse('01/10/2013')
+    qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    start_date = Date.strptime('01/10/2013', "%m/%d/%Y")
     end_date = Date.today
 
-    @qualified_date = (start_date <= date_married && date_married <= end_date) ? true : false
+    @qualified_date = (start_date <= qle_date && qle_date <= end_date) ? true : false
   end
 end
