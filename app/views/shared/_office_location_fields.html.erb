@@ -24,7 +24,7 @@
 
                 <%= f.fields_for :phone, errors: {}, fieldset: false do |phone| %>
                   <h5> Phone </h5>
-                      <div class="row no-buffer row-form-wrapper">                
+                      <div id="phone_info" class="row no-buffer row-form-wrapper">                
                       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
                         <%= phone.select :kind, options_for_select(Phone::OFFICE_KINDS.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
                       </div>
