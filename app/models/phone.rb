@@ -7,6 +7,7 @@ class Phone
   embedded_in :census_member, class_name: "CensusMember"
 
   KINDS = ["home", "work", "mobile", "main", "fax"]
+  OFFICE_KINDS = ["main"]
 
   field :kind, type: String
   field :country_code, type: String, default: ""

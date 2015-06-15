@@ -173,7 +173,6 @@ class Employers::EmployerProfilesController < ApplicationController
       office_location = @organization.office_locations.first
       office_location.build_address unless office_location.address.present?
       office_location.build_phone unless office_location.phone.present?
-      office_location.build_email unless office_location.email.present?
       @organization
     end
 
