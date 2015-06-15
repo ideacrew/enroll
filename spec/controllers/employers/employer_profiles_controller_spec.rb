@@ -16,7 +16,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
   describe "REDIRECT to my account if employer staff role present" do
     let(:user) { double("user")}
-    let(:person) { double(:get_employer_contact => double("person"))}
+    let(:person) { double(:employer_staff_roles => [double("person")])}
 
     it "should render the new template" do
       allow(user).to receive(:has_employer_staff_role?).and_return(true)
@@ -143,10 +143,6 @@ RSpec.describe Employers::EmployerProfilesController do
       :extension => "extension"
     } }
 
-    let(:email_attributes) { {
-      :kind => "email",
-      :address => "address"
-    } }
     let(:address_attributes) { {
       :kind => "address kind",
       :address_1 => "address 1",
@@ -158,16 +154,13 @@ RSpec.describe Employers::EmployerProfilesController do
 
     let(:organization_params) {
       {
-        :employer_profile_attributes => {
           :entity_kind => "an entity kind",
           :dba => "a dba",
           :fein => "123456789",
-          :legal_name => "a legal name"
-        },
+          :legal_name => "a legal name",
         :office_locations_attributes => {
           "0" => {
             :phone_attributes => phone_attributes,
-            :email_attributes => email_attributes,
             :address_attributes => address_attributes
           }
         }
@@ -176,13 +169,11 @@ RSpec.describe Employers::EmployerProfilesController do
 
     let(:save_result) { false }
 
-    let(:organization) { double }
+    let(:organization) { double(:employer_profile => double) }
 
     before(:each) do
       sign_in
-      allow(Organization).to receive(:new).and_return(organization)
-      allow(organization).to receive(:build_employer_profile)
-      allow(organization).to receive(:attributes=).with(organization_params)
+      allow(Forms::EmployerProfile).to receive(:new).and_return(organization)
       allow(organization).to receive(:save).and_return(save_result)
       post :create, :organization => organization_params
     end
@@ -216,23 +207,23 @@ RSpec.describe Employers::EmployerProfilesController do
 
   describe "POST create" do
     let(:employer_parameters) { { :first_name => "SOMDFINKETHING" } }
-    let(:found_employer) { double("test") }
+    let(:found_employer) { double("test", :save => validation_result, :employer_profile => double) }
     let(:office_locations){[double(address: double("address"), phone: double("phone"), email: double("email"))]}
     let(:organization) {double(office_locations: office_locations)}
 
     before(:each) do
       sign_in
-      allow(EmployerProfile).to receive(:find_by_fein).and_return(found_employer)
-      allow(found_employer).to receive(:organization).and_return(organization)
-      post :create, :employer_profile => employer_parameters
+      allow(Forms::EmployerProfile).to receive(:new).and_return(found_employer)
+#      allow(EmployerProfile).to receive(:find_by_fein).and_return(found_employer)
+#      allow(found_employer).to receive(:organization).and_return(organization)
+      post :create, :organization => employer_parameters
     end
 
-    context "given valid parameters" do
+    context "given invalid parameters" do
       let(:validation_result) { true }
 
       it "renders the 'edit' template" do
-        expect(response).to have_http_status(:success)
-        expect(response).to render_template("edit")
+        expect(response).to have_http_status(:redirect)
       end
     end
   end
