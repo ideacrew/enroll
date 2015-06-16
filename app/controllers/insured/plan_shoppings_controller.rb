@@ -5,14 +5,18 @@ class Insured::PlanShoppingsController < ApplicationController
     @person = current_user.person
     @plan = Plan.find(params.require(:plan_id))
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
+    @hbx_enrollment.select_coverage
     @benefit_group = @hbx_enrollment.benefit_group
     @reference_plan = @benefit_group.reference_plan
     @plan = PlanCostDecorator.new(@plan, @hbx_enrollment, @benefit_group, @reference_plan)
     UserMailer.plan_shopping_completed(current_user, @hbx_enrollment, @plan).deliver_now
     notify("acapi.info.events.enrollment.submitted", @hbx_enrollment.to_xml)
 
-#    redirect_to thankyou_plan_shopping_path(id: @person, plan_id: params[:plan_id], organization_id: params[:organization_id])
-    redirect_to home_consumer_profiles_path
+    if @hbx_enrollment.select_coverage!
+      redirect_to home_consumer_profiles_path
+    else
+      redirect_to :back
+    end
   end
 
   def thankyou
@@ -31,11 +35,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def waive
     @person = current_user.person
-    @plan = Plan.find(params.require(:plan_id))
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    @benefit_group = @hbx_enrollment.benefit_group
-    @reference_plan = @benefit_group.reference_plan
-    @plan = PlanCostDecorator.new(@plan, @hbx_enrollment, @benefit_group, @reference_plan)
 
     if @hbx_enrollment.waive_coverage!
       redirect_to home_consumer_profiles_path
