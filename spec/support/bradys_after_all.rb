@@ -16,7 +16,7 @@ module BradysAfterAll
                        )
     end
 
-    def build_brady_phone 
+    def build_brady_phone
       FactoryGirl.build(:phone, kind: "home", area_code: "202", number: "7620799", extension: nil)
     end
 
@@ -116,12 +116,15 @@ module BradysAfterAll
     def create_brady_census_families
       create_brady_coverage_households
       create_brady_employers
-      @mikes_benefit_group_assignments = FactoryGirl.build(:benefit_group_assignment)
-      @carols_benefit_group_assignments = FactoryGirl.build(:benefit_group_assignment)
       @mikes_benefit_group = FactoryGirl.build(:benefit_group, plan_year: nil)
       @mikes_plan_year = FactoryGirl.create(:plan_year, employer_profile: mikes_employer, benefit_groups: [mikes_benefit_group])
       @mikes_hired_on = 1.year.ago.beginning_of_year.to_date
-      @mikes_census_employee = FactoryGirl.build(:census_employee,
+      @mikes_benefit_group_assignments = FactoryGirl.build(:benefit_group_assignment,
+                                                           benefit_group_id: @mikes_benefit_group.id,
+                                                           start_on: @mikes_plan_year.start_on,
+                                                           aasm_state: "initialized"
+                                                           )
+      @mikes_census_employee = FactoryGirl.create(:census_employee,
                                                    first_name: mike.first_name,  last_name: mike.last_name,
                                                    dob: mike.dob, address: mike.addresses.first, hired_on: mikes_hired_on,
                                                    employer_profile_id: @mikes_employer.id,
@@ -130,7 +133,12 @@ module BradysAfterAll
       @carols_hired_on = 1.year.ago.beginning_of_year.to_date
       @carols_benefit_group = FactoryGirl.build(:benefit_group, plan_year: nil)
       @carols_plan_year = FactoryGirl.create(:plan_year, employer_profile: carols_employer, benefit_groups: [carols_benefit_group])
-      @carols_census_employee = FactoryGirl.build(:census_employee,
+      @carols_benefit_group_assignments = FactoryGirl.build(:benefit_group_assignment,
+                                                           benefit_group_id: @carols_benefit_group.id,
+                                                           start_on: @carols_plan_year.start_on,
+                                                           aasm_state: "initialized"
+                                                           )
+      @carols_census_employee = FactoryGirl.create(:census_employee,
                                                     first_name: carol.first_name,  last_name: carol.last_name,
                                                     dob: carol.dob, address: carol.addresses.first, hired_on: carols_hired_on,
                                                     employer_profile_id: @carols_employer.id,
@@ -145,6 +153,7 @@ module BradysAfterAll
         :person => mike,
         :employer_profile_id => mikes_employer.id,
         :benefit_group_id => mikes_benefit_group.id,
+        :census_employee_id => @mikes_census_employee.id,
         :hired_on => mikes_hired_on
       })
     end

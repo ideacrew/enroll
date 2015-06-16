@@ -56,8 +56,10 @@ And(/^I should see an initial form to enter information about my Employer and my
   @browser.text_field(name: "person[emails_attributes][1][address]").set("john.doe@work.com")
   @browser.text_field(name: "person[emails_attributes][1][address]").click
   screenshot("employer_portal_person_data_new")
-  @browser.button(id: /continue-employer/).wait_until_present
-  @browser.button(id: /continue-employer/).click
+  @browser.button(id: /btn-continue/).wait_until_present
+  @browser.button(id: /btn-continue/).click
+  # @browser.button(id: /continue-employer/).wait_until_present
+  # @browser.button(id: /continue-employer/).click
   @browser.text_field(name: "employer_profile[legal_name]").wait_until_present
   @browser.text_field(name: "employer_profile[legal_name]").set("Turner Agency, Inc")
   @browser.text_field(name: "employer_profile[dba]").set("Turner Brokers")

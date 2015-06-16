@@ -16,6 +16,8 @@ class BenefitGroupAssignment
   validates_presence_of :benefit_group_id, :start_on, :is_active
   validate :date_guards, :model_integrity
 
+  scope :by_benefit_group_id, ->(benefit_group_id) {where(benefit_group_id: benefit_group_id)}
+
   class << self
     def find(id)
       ee = CensusEmployee.where(:"benefit_group_assignments._id" => id).first
@@ -55,7 +57,7 @@ class BenefitGroupAssignment
   def end_benefit(end_on)
     unless coverage_waived?
       self.coverage_end_on = end_on
-      terminate_coverage 
+      terminate_coverage
     end
   end
 
@@ -86,7 +88,7 @@ class BenefitGroupAssignment
 private
   def model_integrity
     self.errors.add(:benefit_group, "benefit_group required") unless benefit_group.present?
-    
+
     if coverage_selected?
       self.errors.add(:hbx_enrollment, "hbx_enrollment required") if hbx_enrollment.blank?
     end
