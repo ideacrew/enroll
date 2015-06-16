@@ -1,4 +1,27 @@
-<%= form_for @organization, url: {action: "create"} do |f| %>
-  <%= render 'shared/error_messages', :object => @organization %>
-  <%= render 'form', f: f %>
-<% end %>
+<div class="mainmenu">
+  <div class="container">
+    <ul role="tablist" class="list-unstyled list-inline" id="myTab">
+      <li role="presentation" class='active'>
+        <a aria-expanded="true" aria-controls="home" data-toggle="tab" role="tab" id="home-tab" href="#home">
+          <span class="hidden-xs">Home</span>
+          <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Home"></span>
+        </a>
+      </li>
+      <li role="presentation">
+        <a aria-expanded="true" aria-controls="profile" data-toggle="tab" role="tab" id="profile-tab" href="#profile">
+          <span class="hidden-xs">Brokers</span>
+          <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Profile"></span>
+        </a>
+      </li>
+      </ul>
+  </div>
+</div>
+
+<div class="profile-content">
+  <div class="tab-row">
+    <div class="tab-content" id="myTabContent">
+      <%= render 'broker_agencies/profiles/broker_form' %>
+      <%= render 'broker_agencies/profiles/brokers' %>
+    </div>
+  </div>
+</div>

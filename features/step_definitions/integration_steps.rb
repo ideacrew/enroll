@@ -106,9 +106,9 @@ Then(/^I should see the matched employee record form$/) do
 end
 # TODO: needs to be merged
 Then(/^I should see the matching employee record form$/) do
-  @browser.dd(text: /Turner Agency, Inc/).wait_until_present
+  @browser.element(text: /Turner Agency/).wait_until_present
   screenshot("employer_search_results")
-  expect(@browser.dd(text: /Turner Agency, Inc/).visible?).to be_truthy
+  expect(@browser.element(text: /Turner Agency/).visible?).to be_truthy
 end
 
 When(/^I accept the matched employer$/) do
