@@ -118,13 +118,11 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def broker_management
-    @broker_agency_profile = @employer_profile.broker_agency_profile
-    @broker_agency_profiles = @broker_agency_profile.to_a
+    @broker_agency_profiles = @employer_profile.broker_agency_profile.to_a
   end
 
   def active_broker
-    @broker_agency_profile = @employer_profile.broker_agency_profile
-    @broker_agency_profiles = @broker_agency_profile.to_a
+    @broker_agency_profiles = @employer_profile.broker_agency_profile.to_a
   end
 
   def broker_agency_index
