@@ -11,7 +11,7 @@
                                   </div>
                                   <% plan = @hbx_enrollments.first.try(:plan) %>
                                   <% hbx_enrollment = @hbx_enrollments.first %>
-                                  <%= image_tag "#{plan.try(:carrier_profile).try(:id).try(:to_s)}" %>
+                                  <%= image_tag "#{plan.try(:carrier_profile).try(:organization).try(:legal_name)}" %>
 
                                   <h3><%= plan.name %></h3>
                                   <div>
