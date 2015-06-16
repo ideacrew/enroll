@@ -13,6 +13,14 @@ describe RelationshipBenefit do
 
   let(:params){relationship_benefit_params}
 
+  context "created without a premium percent" do
+    let(:relationship_benefit) {RelationshipBenefit.new(**(params.except(:premium_pct)))}
+
+    it "should default premium percent to 0" do
+      expect(relationship_benefit.premium_pct).to eq 0.0
+    end
+  end
+
   context " should return offered?" do
     it "should return true if its true" do
       expect(RelationshipBenefit.new(**params).offered?).to eq true
