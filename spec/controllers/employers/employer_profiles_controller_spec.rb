@@ -16,7 +16,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
   describe "REDIRECT to my account if employer staff role present" do
     let(:user) { double("user")}
-    let(:person) { double(:employer_staff_roles => [double("person")])}
+    let(:person) { double(:employer_staff_roles => [double("person", :employer_profile_id => double)])}
 
     it "should render the new template" do
       allow(user).to receive(:has_employer_staff_role?).and_return(true)
