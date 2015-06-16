@@ -73,11 +73,11 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    benefit_group_assignment.waive_coverage if benefit_group_assignment
+    benefit_group_assignment.waive_coverage! if benefit_group_assignment
   end
 
   def propogate_selection
-    benefit_group_assignment.select_coverage
+    benefit_group_assignment.select_coverage! if benefit_group_assignment
   end
 
   def is_active?
