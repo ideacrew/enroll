@@ -11,9 +11,9 @@
                                   </div>
                                   <% plan = @hbx_enrollments.first.try(:plan) %>
                                   <% hbx_enrollment = @hbx_enrollments.first %>
-                                  <%= plan.carrier_profile.legal_name %>
+                                  <%= plan.try(:carrier_profile).try(:legal_name) %>
 
-                                  <h3><%= plan.name %></h3>
+                                  <h3><%= plan.try(:name) %></h3>
                                   <div>
                                     Subscriber Id : <%= hbx_enrollment.try(:subscriber).try(:id).try(:to_s) %>
                                     <br/>
