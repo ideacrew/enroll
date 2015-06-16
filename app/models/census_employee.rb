@@ -159,7 +159,7 @@ class CensusEmployee < CensusMember
     max_coverage_term_on = (Date.current.end_of_day - HbxProfile::ShopRetroactiveTerminationMaximum).end_of_month
     coverage_term_on = [reported_coverage_term_on, max_coverage_term_on].compact.max
 
-    active_benefit_group_assignment.terminate_coverage(coverage_term_on) if active_benefit_group_assignment.may_terminate_coverage?
+    active_benefit_group_assignment.terminate_coverage(coverage_term_on) if active_benefit_group_assignment.try(:may_terminate_coverage?)
     terminate_employee_role
     self
   end
