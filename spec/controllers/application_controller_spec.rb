@@ -9,7 +9,7 @@ RSpec.describe ApplicationController do
 
   context "when not signed in" do
     before do
-      sign_in nil
+  #    sign_in nil
       get :index
     end
 
@@ -23,8 +23,10 @@ RSpec.describe ApplicationController do
   end
 
   context "when signed in" do
+    let(:user) { double(:has_hbx_staff_role? => true, :has_employer_staff_role? => false) }
+
     before do
-      sign_in
+      sign_in(user)
       get :index
     end
 

@@ -3,10 +3,11 @@ require 'rails_helper'
 RSpec.describe Employers::EmployerProfilesController do
 
   describe "GET new" do
-    let(:user) { double("user")}
+    let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false)}
     let(:person) { double("person")}
 
     it "should render the new template" do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(user).to receive(:has_employer_staff_role?).and_return(false)
       sign_in(user)
       get :new
@@ -19,6 +20,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:person) { double(:employer_staff_roles => [double("person", :employer_profile_id => double)])}
 
     it "should render the new template" do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(user).to receive(:has_employer_staff_role?).and_return(true)
       allow(user).to receive(:person).and_return(person)
       sign_in(user)
@@ -32,6 +34,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:person) { double("person")}
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     before(:each) do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(user).to receive(:has_employer_staff_role?)
       sign_in(user)
       get :show, id: employer_profile.id
@@ -53,6 +56,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:user) { double("user")}
 
     it "renders the 'welcome' template" do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(user).to receive(:has_employer_staff_role?)
       sign_in(user)
       get :welcome
@@ -81,9 +85,10 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:criteria_page_results) { [found_organization] }
     let(:employer) { double }
     let(:employer_list) { [employer] }
+    let(:user) { double(:has_employer_staff_role? => false, :has_hbx_staff_role? => true) }
 
     before :each do
-      sign_in
+      sign_in(user)
       allow(Organization).to receive(:search).with(nil).and_return(organization_search_criteria)
       allow(organization_search_criteria).to receive(:exists).with({employer_profile: true}).and_return(organization_employer_criteria)
       allow(organization_employer_criteria).to receive(:where).and_return(criteria_page_results)
@@ -111,9 +116,10 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:criteria_page_results) { [found_organization] }
     let(:employer) { double }
     let(:employer_list) { [employer] }
+    let(:user) { double(:has_employer_staff_role? => false, :has_hbx_staff_role? => true) }
 
     before :each do
-      sign_in
+      sign_in(user)
       allow(Organization).to receive(:search).with("A Name").and_return(organization_search_criteria)
       allow(organization_search_criteria).to receive(:exists).with({employer_profile: true}).and_return(organization_employer_criteria)
       allow(organization_employer_criteria).to receive(:where).and_return(criteria_page_results)

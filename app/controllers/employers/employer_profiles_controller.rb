@@ -1,6 +1,7 @@
 class Employers::EmployerProfilesController < ApplicationController
   before_action :find_employer, only: [:show, :destroy, :broker_agency_index, :assign_broker_agency, :active_broker]
-  before_action :check_employer_staff_role, only: [:new, :welcome]
+  before_action :check_admin_staff_role, only: [:index]
+  before_action :check_employer_staff_role, only: [:new]
 
   def index
     @q = params.permit(:q)[:q]
@@ -144,10 +145,18 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   private
-
     def check_employer_staff_role
       if current_user.has_employer_staff_role?
         redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
+      end
+    end
+
+    def check_admin_staff_role
+      if current_user.has_hbx_staff_role?
+      elsif current_user.has_employer_staff_role?
+        redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
+      else
+        redirect_to new_employers_employer_profile_path
       end
     end
 
