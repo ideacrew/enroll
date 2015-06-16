@@ -1,1 +1,6 @@
+$("#agency_index_tab").siblings().each(function(){
+  $(this).removeClass('active')
+})
+$("#agency_index_tab").addClass('active')
+
 set_tab_content("<%= escape_javascript render "employers/employer_profiles/broker_agency_index" %>")

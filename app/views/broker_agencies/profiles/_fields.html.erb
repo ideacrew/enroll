@@ -1,0 +1,26 @@
+<div id="broker_agency_info" class="row no-buffer focus_effect personal-info-row">
+  <div class="col-md-12 col-sm-12 col-xs-12 first">
+
+    <div class="row top-row">
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= broker_agency_profile.legal_name %>
+      </div>
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= broker_agency_profile.primary_broker_role.person.full_name%>
+      </div>
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+        <%= broker_agency_profile.primary_broker_role.person.phones.map(&:to_s).join('/') %>
+      </div>
+    </div>
+
+    <div class="row bottom-row form-group form-group-lg no-pd">
+      <div class="col-md-4 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%#= f.text_field :dob, start_year: Date.today.year - 110, end_year: Date.today.year, placeholder: "BIRTHDATE",
+          class: "required date-picker dob-picker floatlabel form-control", required: true %>
+      </div>
+      <div class="col-md-4 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <%#= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel mask-ssn form-control", input_html: {value: "", maxlength: 11}, required: true   %>
+      </div>
+    </div>
+  </div>
+</div>

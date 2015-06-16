@@ -33,7 +33,9 @@ class BrokerAgencyAccount
 
   def broker_agency_profile
     return @broker_agency_profile if defined? @broker_agency_profile
-    @broker_agency_profile = employer_profile.organization.broker_agency_profile.where(id: @broker_agency_profile_id) unless @broker_agency_profile_id.blank?
+    # @broker_agency_profile = employer_profile.organization.broker_agency_profile.where(id: @broker_agency_profile_id) unless @broker_agency_profile_id.blank?
+     
+    @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_profile_id) unless self.broker_agency_profile_id.blank?
   end
 
   # belongs_to writing agent (broker)

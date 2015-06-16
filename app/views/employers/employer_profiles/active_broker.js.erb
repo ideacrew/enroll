@@ -1,0 +1,6 @@
+$("#active_broker_tab").siblings().each(function(){
+  $(this).removeClass('active')
+})
+$("#active_broker_tab").addClass('active')
+
+set_tab_content("<%= escape_javascript render "employers/employer_profiles/active_broker" %>")

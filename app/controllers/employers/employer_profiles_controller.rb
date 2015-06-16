@@ -1,5 +1,5 @@
 class Employers::EmployerProfilesController < ApplicationController
-  before_action :find_employer, only: [:show, :destroy]
+  before_action :find_employer, only: [:show, :destroy, :broker_management, :broker_agency_index, :assign_broker_agency, :active_broker]
   before_action :check_employer_staff_role, only: [:new, :welcome]
 
   def index
@@ -118,6 +118,13 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def broker_management
+    @broker_agency_profile = @employer_profile.broker_agency_profile
+    @broker_agency_profiles = @broker_agency_profile.to_a
+  end
+
+  def active_broker
+    @broker_agency_profile = @employer_profile.broker_agency_profile
+    @broker_agency_profiles = @broker_agency_profile.to_a
   end
 
   def broker_agency_index
@@ -128,6 +135,15 @@ class Employers::EmployerProfilesController < ApplicationController
     @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
 
     @broker_agency_profiles = @organizations.map(&:broker_agency_profile)
+  end
+
+  def assign_broker_agency
+    broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
+    if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
+      @employer_profile.broker_agency_profile = broker_agency_profile
+      @employer_profile.save!
+    end
+    redirect_to employers_employer_profile_broker_management_path(@employer_profile)
   end
 
   private

@@ -1,14 +1,14 @@
-<div id="show_broker_agency"></div>
-
-<div class="container" id="broker_agencies_panel">
+<!-- <div id="show_broker_agency"></div>
+ -->
+<div class="container" id="active_broker_panel">
   <div class="col-md-12 col-sm-12 col-xs-12" >
-    <h3>Broker Agencies</h3>
+    <h3>Active Broker</h3>
 
-    <div class="row no-buffer">
+<!--     <div class="row no-buffer">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 search-wp">
-        <%= render 'shared/search', url: employers_employer_profiles_path, q: @q, placeholder: 'Name, Broker Name, NPN' %>
+        <%= render 'shared/search', url: employers_employer_profiles_path, q: @q, placeholder: 'Name' %>
       </div>
-    </div>
+    </div> -->
 
     <div class="table-responsive">
       <table class="table table-wrapper" style="opacity: 1;">
@@ -26,16 +26,14 @@
               <td><%= agency_profile.legal_name %></td>
               <td><%= agency_profile.primary_broker_role.person.full_name %></td>
               <td><%=  %></td>
-<!--               <td><%= agency_profile.primary_broker_role.person.phones.first.to_s %></td>
-              <td><%= agency_profile.primary_broker_role.person.emails.first.address %></td> -->
               <td>     
-                <%= link_to 'Show'.html_safe, "/broker_agencies/profiles/#{agency_profile.id}/employer_view?employer_id=#{@employer_profile.id}", class: "btn btn-success", remote: true %>
+                <%= link_to 'Terminate'.html_safe, "/broker_agencies/profiles/#{agency_profile.id}/employer_view?employer_id=#{@employer_profile.id}", class: "btn btn-success", remote: true %>
               </td>
             </tr>
           <% end %>
         </tbody>
       </table>
-      <%= render 'shared/alph_paginate', url: employers_employer_profile_broker_agency_index_path, alphs: @page_alphabets, remote: true %>
+      <%#= render 'shared/alph_paginate', url: employers_employer_profile_broker_agency_index_path, alphs: @page_alphabets, remote: true %>
     </div>
   </div>
 </div>

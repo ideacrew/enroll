@@ -96,7 +96,7 @@ class EmployerProfile
 
   def broker_agency_profile
     return @broker_agency_profile if defined? @broker_agency_profile
-    @broker_agency_profile = active_broker_agency_account.broker_agency if active_broker_agency_account.present?
+    @broker_agency_profile = active_broker_agency_account.broker_agency_profile if active_broker_agency_account.present?
   end
 
   def active_broker_agency_account
