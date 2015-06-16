@@ -72,6 +72,7 @@ Rails.application.routes.draw do
       end
     end
     resources :employer_profiles do
+      root "employer_profiles#new"
       get 'new'
       get 'my_account'
       get 'broker_management'
