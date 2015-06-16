@@ -351,6 +351,11 @@ $(document).ready(function () {
     $('#add_employee_action').html('');
     $('#employee_roster').show();
   });
+
+  $(document).on('click', '.return_to_employer_broker_agenices', function() {
+    $('#show_broker_agency').html('');
+    $('#broker_agencies_panel').show();
+  });
  
 });
 

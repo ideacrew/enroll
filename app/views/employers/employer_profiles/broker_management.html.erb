@@ -1,10 +1,8 @@
 <% active_tab = "active-broker-tab" %>
 <div class="row content landing">
   <div class="home">
-
     <div>    
       <ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
-
        <li role="presentation"<%= menu_tab_class(active_tab, "active-broker-tab") %>>
          <%= link_to(family_index_exchanges_hbx_profiles_path, "aria-expanded" => "true", :remote => true, "aria-controls" => "active-broker", "role" => "tab" ) do  %>
          <span class="hidden-xs">Active Broker</span>
@@ -17,12 +15,8 @@
          <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agencies"></span>
          <% end %>
        </li>
-
-
      </ul>
    </div>
-
    <%= render 'shared/tab_panel' %>
-
  </div>
 </div>

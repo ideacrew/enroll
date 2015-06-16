@@ -1,14 +1,13 @@
-<div class="container">
-  <div class="col-md-12 col-sm-12 col-xs-12">
+<div id="show_broker_agency"></div>
+
+<div class="container" id="broker_agencies_panel">
+  <div class="col-md-12 col-sm-12 col-xs-12" >
     <h3>Broker Agencies</h3>
 
     <div class="row no-buffer">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 search-wp">
         <%= render 'shared/search', url: employers_employer_profiles_path, q: @q, placeholder: 'Name' %>
       </div>
-<!--       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 no-pd">
-        <%= link_to '<i class="fa fa-user-plus"></i> New Employer Profile'.html_safe, new_employers_employer_profile_path, class: "btn btn-primary pull-right new_emp_button" %>
-      </div> -->
     </div>
 
     <div class="table-responsive">
@@ -30,7 +29,7 @@
 <!--               <td><%= agency_profile.primary_broker_role.person.phones.first.to_s %></td>
               <td><%= agency_profile.primary_broker_role.person.emails.first.address %></td> -->
               <td>     
-                <%= link_to 'Show'.html_safe, (broker_agencies_profile_path(agency_profile)), class: "btn btn-success", remote: true %>
+                <%= link_to 'Show'.html_safe, (broker_agencies_profile_employer_view_path(agency_profile)), class: "btn btn-success", remote: true %>
               </td>
             </tr>
           <% end %>

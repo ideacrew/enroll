@@ -28,6 +28,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @broker_agency_profile = BrokerAgencyProfile.find(params["id"])
   end
 
+  def employer_view
+  end
+
   private
 
   def check_broker_role
