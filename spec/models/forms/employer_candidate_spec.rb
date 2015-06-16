@@ -30,7 +30,7 @@ describe Forms::EmployerCandidate, "asked to match an employer" do
   } }
 
   it "should return nothing if the company does not exist" do
-    allow(EmployerProfile).to receive(:find_by_fein).and_return(nil)
+    allow(::EmployerProfile).to receive(:find_by_fein).and_return(nil)
     expect(subject.match_employer).to be_nil
   end
 
@@ -38,7 +38,7 @@ describe Forms::EmployerCandidate, "asked to match an employer" do
     let(:fake_employer) { instance_double("EmployerProfile", :owner => false) }
 
     it "should return the employer profile" do
-      allow(EmployerProfile).to receive(:find_by_fein).and_return(fake_employer)
+      allow(::EmployerProfile).to receive(:find_by_fein).and_return(fake_employer)
       expect(subject.match_employer).to eq fake_employer
     end
   end
@@ -47,7 +47,7 @@ describe Forms::EmployerCandidate, "asked to match an employer" do
     let(:owned_employer) { instance_double("EmployerProfile", :owner => true) }
 
     it "should have an error on the employer profile" do
-      allow(EmployerProfile).to receive(:find_by_fein).and_return(owned_employer)
+      allow(::EmployerProfile).to receive(:find_by_fein).and_return(owned_employer)
       subject.valid?
       expect(subject).to have_errors_on(:exception)
     end

@@ -1,67 +1,62 @@
 require 'date'
 module Forms
-  class EmployerProfile < SimpleDelegator
-    extend ActiveModel::Naming
-    WRAPPER_ATTRIBUTES = ["first_name", "last_name", "dob"]
+  class EmployerProfile 
+    include ActiveModel::Validations
+    attr_accessor :id
     attr_accessor :first_name, :last_name
-    attr_accessor :person
+    attr_accessor :legal_name, :dba, :entity_kind, :fein
     attr_reader :dob
+    attr_reader :office_locations
+    attr_accessor :person
+    attr_reader :employer_profile
+
+      validates :fein,
+            length: { is: 9, message: "%{value} is not a valid FEIN" },
+                numericality: true
+    validates_presence_of :dob, :first_name, :last_name, :fein, :legal_name
+    validates :entity_kind,
+        inclusion: { in: ::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
+        allow_blank: false
+
+    validate :office_location_validations
+
+    def to_key
+      @id
+    end
+
+    def office_location_validations
+      @office_locations.each_with_index do |ol, idx|
+         ol.errors.each do |k, v|
+           self.errors.add("office_locations_attributes.#{idx}.#{k}", v) 
+         end
+      end
+    end
+
 
     class OrganizationAlreadyMatched < StandardError; end
     class PersonAlreadyMatched < StandardError; end
     class TooManyMatchingPeople < StandardError; end
 
+    def office_locations_attributes
+      @office_locations.map do |office_location|
+        office_location.attributes
+      end
+    end
+
+    def office_locations_attributes=(attrs)
+      attrs.each_pair do |k, att_set|
+        @office_locations << OfficeLocation.new(att_set)
+      end
+    end
+
     def dob=(val)
       @dob = Date.strptime(val,"%Y-%m-%d") rescue nil
     end
 
-    def initialize(org)
-      super(org)
-      @errors = ActiveModel::Errors.new(self)
-    end
-  
-    def self.human_attribute_name(attr, options = {})
-      attr
-    end
-
-    def errors
-      @full_errors ||= (
-        organization.errors.each do |k, err|
-          @errors.add(k, err)
-        end
-        @errors
-      )
-    end
-
-
-    def self.model_name
-      ::EmployerProfile.model_name
-    end
-
-    def self.build_blank(attrs={})
-      new_form = self.new(Organization.new)
-      new_form.build_employer_profile
-      new_form.build_office_location
-      new_form
-    end
-
-    def self.build(attrs = {})
-      org_atts, wrapper_atts = pick_wrapper_attributes(attrs)
-      new_form = self.new(check_existing_organization(org_atts))
-      new_form.assign_wrapper_attributes(wrapper_atts)
-    end
-
-    def self.pick_wrapper_attributes(atts = {})
-      org_atts = {}
-      wrapper_atts = {}
-      atts.each_pair do |k, v|
-        if WRAPPER_ATTRIBUTES.include?(k.to_s)
-          wrapper_atts[k] = v
-        else
-          org_atts[k] = v
-        end
-      end
-      [org_atts, wrapper_atts]
+    def initialize(attrs = {})
+      @office_locations ||= []
+      assign_wrapper_attributes(attrs)
+      ensure_office_locations
     end
 
     def assign_wrapper_attributes(attrs = {})
@@ -70,35 +65,13 @@ module Forms
       end
     end
 
-    def organization
-      __getobj__
-    end
-
-    def bubble_employer_profile_errors
-      bap = organization.broker_agency_profile
-      organization.errors.delete(:employer_profile)
-      bap.errors.each do |attr, err|
-        organization.errors.add("employer_profile_attributes_#{attr}", err)
+    def ensure_office_locations
+      if @office_locations.empty?
+        new_office_location = OfficeLocation.new
+        new_office_location.build_address
+        new_office_location.build_phone
+        @office_locations = [new_office_location]
       end
-    end
-
-    def build_office_location
-      self.class.build_office_location(__getobj__)
-    end
-
-    def self.build_office_location(org)
-      org.office_locations.build unless org.office_locations.present?
-      office_location = org.office_locations.first
-      office_location.build_address unless office_location.address.present?
-      office_location.build_phone unless office_location.phone.present?
-    end
-
-    def self.build_employer_profile(org)
-      org.build_employer_profile unless org.employer_profile.present?
-    end
-
-    def build_employer_profile
-      self.class.build_employer_profile(__getobj__)
     end
 
     def match_or_create_person(current_user)
@@ -128,65 +101,75 @@ module Forms
       end
     end
 
-    def self.check_existing_organization(attrs)
-      new_organization = Organization.new(attrs)
-      build_employer_profile(new_organization)
-      build_office_location(new_organization)
-      existing_org = Organization.where(:fein => new_organization.fein).first
+    def check_existing_organization
+      existing_org = Organization.where(:fein => fein).first
       if existing_org.present?
         if existing_org.employer_profile.present?
           if (Person.where({:employer_staff_roles => { :employer_profile_id => existing_org.employer_profile._id }}).any?)
-            new_organization.errors.add(:base, "a staff role for this organization has already been claimed.")
-            return new_organization
-          else
-            existing_org.attributes = attrs
-            return existing_org
+            raise OrganizationAlreadyMatched.new
           end
-        else
-          existing_org.build_employer_profile
-          existing_org.attributes = attrs
-          return existing_org
         end
+        return existing_org
       end
-      new_org
-    end
-
-    def employer_profile
-      organization.employer_profile
+      nil
     end
 
     # TODO: Fix this to give broker agency staff role, not broker role
-    def create_employer_staff_role(current_user, employer_staff)
+    def create_employer_staff_role(current_user, employer_profile)
       person.user = current_user
-      person.broker_agency_staff_roles << EmployerStaffRole.new(:employer_profile => employer_profile)
+      person.employer_staff_roles << EmployerStaffRole.new(:employer_profile_id => employer_profile.id)
       current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
-    end
-
-    def valid?(current_user)
-      ["first_name", "last_name", "dob"].each do |prop|
-        if self.send(prop).blank?
-          @errors.add(prop.to_sym, "can not be blank")
-        end
-      end
-      begin
-        match_or_create_person(current_user)
-      rescue TooManyMatchingPeople
-        organization.errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
-        valid_flag = false
-      rescue PersonAlreadyMatched
-        organization.errors.add(:base, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
-      end
-
-      (__getobj__.valid? && @errors.empty?).tap do 
-        bubble_employer_profile_errors
-      end
+      current_user.save!
     end
 
     def save(current_user)
-      return false unless valid?(current_user)
-      organization.save!
-      create_employer_staff_role(current_user, organization.employer_profile)
+      return false unless valid?
+      begin
+        match_or_create_person(current_user)
+        person.save!
+      rescue TooManyMatchingPeople
+        errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
+        return false
+      rescue PersonAlreadyMatched
+        errors.add(:base, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
+        return false
+      end
+      existing_org = nil
+      begin
+        existing_org = check_existing_organization
+      rescue OrganizationAlreadyMatched
+            errors.add(:base, "a staff role for this organization has already been claimed.")
+            return false
+      end
+      employer_profile = nil
+      if existing_org
+        update_organization(existing_org)
+        employer_profile = existing_org.employer_profile
+      else
+        org = create_new_organization
+        @employer_profile = org.employer_profile
+      end
+      create_employer_staff_role(current_user, @employer_profile)
       true
+    end
+
+    def create_new_organization
+      Organization.create!(
+        :fein => fein,
+        :legal_name => legal_name,
+        :dba => dba,
+        :employer_profile => ::EmployerProfile.new({
+          :entity_kind => entity_kind
+        }),
+        :office_locations => office_locations
+      )
+    end
+
+    def update_organization(org)
+      if !org.employer_profile.present?
+        org.create_employer_profile({:entity_kind => entity_kind})
+        org.save!
+      end
     end
 
     def regex_for(str)

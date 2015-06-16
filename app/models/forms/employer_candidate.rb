@@ -16,7 +16,7 @@ module Forms
               numericality: true
 
     def match_employer
-      EmployerProfile.find_by_fein(fein)
+      ::EmployerProfile.find_by_fein(fein)
     end
 
     def does_not_match_a_company_with_existing_owner

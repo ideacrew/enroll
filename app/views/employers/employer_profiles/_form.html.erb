@@ -1,66 +1,30 @@
-<div class="row content landing">
-  <div class="container">
-    <div class="panel panel-default">
-      <div class="panel-body left">
+<div class="container">
+	<div class="row">
+		<div class="col-md-9 col-sm-9 col-xs-12">
+			<h4>Personal Information</h4>
+			<div class="row no-buffer row-form-wrapper">
+						<div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+							<%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH"} %>
+						</div>
+						<div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+							<%= f.text_field :first_name, class: "floatlabel form-control", placeholder: 'FIRST NAME' %>
+						</div>
+						<div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+							<%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME' %>
+						</div>
+			</div>
+		</div>
+		<br>
+		<div class="col-md-9 col-sm-9 col-xs-12">
+			<h4>Employer Information</h4>
+						<div class="row no-buffer row-form-wrapper">
+							<%= render "shared/organizations/entity_name_and_type_fields", f: f %>
+						</div>
+			<%= render "shared/organizations/office_location_fields", f: f %>
 
-        <div class="col-sm-2 left-pd" id="sidebar_partial_value">
-          <%= render 'sidebar' %>
-        </div>
-
-        <div class="col-md-10 col-sm-12 employer-section">
-
-          <%= render 'welcome_msg' %>
-
-          <div class="col-md-11 col-sm-12 col-xs-12">
-            <% if @employer.errors.any? %>
-              <div class="alert alert-error">
-                <h4><%= pluralize(@employer.errors.count, "error") %> prohibited this employer from being saved:</h4>
-                <ul>
-                  <% @employer.errors.full_messages.each do |msg| %>
-                    <li><%= msg %></li>
-                  <% end %>
-                </ul>
-              </div>
-            <% end %>
-
-            <div id="overlay"></div>
-
-            <!-- Step 1 -->
-            <%= render 'credentials_fields', f: f %>
-            <%= render 'name_fields', f: f %>
-
-            <div id="tax_info" class="focus_effect row personal-info-row" style="opacity: 0.5;">
-              <%= render 'tax_fields', f: f %>
-              <div class="col-md-2 col-sm-2 col-xs-12">
-                <%= link_to 'Continue', '#', :class => 'btn btn-continue employer_step2' %>
-              </div>
-            </div>
-
-            <!-- Step 2 -->
-            <%= render 'emp_contact_fields', f: f %>
-            <%= render 'coverage_fields', f: f %>
-
-            <div id="plan_selection_info" class="focus_effect row personal-info-row hidden" style="opacity: 0.5;">
-              <%= render 'plan_selection_fields', f: f %>
-              <div class="col-md-2 col-sm-2 col-xs-12 emp-btn-continue">
-                <%= link_to 'Continue', '#', :class => 'btn employer_step3' %>
-              </div>
-            </div>
-
-            <!-- Step 3 -->
-            <%= render 'emp_contributions_fields', f: f %>
-            <%= render 'eligibility_rules_fields', f: f %>
-
-            <div id="broker_info" class="focus_effect row personal-info-row hidden" style="opacity: 0.5;">
-              <%= render 'broker_info_fields', f: f %>
-              <div class="col-md-2 col-sm-2 col-xs-12 emp-save-btn">
-                <%= f.submit 'Save', :class => 'btn btn-continue' %>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+			<div class="row">
+				<button type="submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Create Employer</button>
+			</div>
+		</div>
+	</div>
 </div>
