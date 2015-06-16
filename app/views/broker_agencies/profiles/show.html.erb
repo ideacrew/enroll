@@ -1,27 +1,56 @@
 <%= render 'menu', :active_tab => "home-tab" %>
 
-<div class="container">
-  <h3>Broker Agency : <%= @broker_agency_profile.legal_name %></h3>
+<div class="profile-content">
+  <div class="tab-row">
+    <div class="tab-content" id="myTabContent">
 
-  <div class="table-border">
-    <table class="table">
-      <thead>
-        <th>Legal Name</th>
-        <th>dba</th>
-        <th>Fein</th>
-        <th>Entity Kind</th>
-        <th>Market Kind</th>
-      </thead>
-      <tbody>
-        <td><%= @broker_agency_profile.legal_name %></td>
-        <td><%= @broker_agency_profile.dba %></td>
-        <td><%= @broker_agency_profile.fein %></td>
-        <td><%= @broker_agency_profile.entity_kind.titleize %></td>
-        <td><%= @broker_agency_profile.market_kind.titleize %></td>
-      </tbody>
-    </table>
+      <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
+        <div class="container">
+          <div class="row">
+            <div class="landing-row">
+
+             <h3>Broker Agency : <%= @broker_agency_profile.legal_name %></h3>
+
+             <div class="table-border">
+              <table class="table">
+                <thead>
+                  <th>Legal Name</th>
+                  <th>dba</th>
+                  <th>Fein</th>
+                  <th>Entity Kind</th>
+                  <th>Market Kind</th>
+                </thead>
+                <tbody>
+                  <td><%= @broker_agency_profile.legal_name %></td>
+                  <td><%= @broker_agency_profile.dba %></td>
+                  <td><%= @broker_agency_profile.fein %></td>
+                  <td><%= @broker_agency_profile.entity_kind.titleize %></td>
+                  <td><%= @broker_agency_profile.market_kind.titleize %></td>
+                </tbody>
+              </table>
+            </div>
+
+            <%= render "broker_agency_contacts", broker_agency_contacts: @broker_agency_profile.broker_agency_contacts %>
+            <%= render "office_locations", office_locations: @broker_agency_profile.organization.office_locations %>
+
+          </div>
+        </div>
+      </div>
+    </div>
+<!--       <div aria-labelledby="families-tab" id="families" class="tab-pane fade" role="tabpanel">
+        <div class="container">
+          <div class="row">
+            <%#= render 'insured/families/index' %>
+          </div>
+      </div>
+    </div> -->
+<!--     <div aria-labelledby="employers-tab" id="employers" class="tab-pane fade" role="tabpanel">
+      <div class="container">
+        <div class="row">
+          <%#= render 'employers/employer_profiles/index' %>
+        </div>
+      </div>
+    </div> -->
   </div>
-
-  <%= render "broker_agency_contacts", broker_agency_contacts: @broker_agency_profile.broker_agency_contacts %>
-  <%= render "office_locations", office_locations: @broker_agency_profile.organization.office_locations %>
+</div>
 </div>

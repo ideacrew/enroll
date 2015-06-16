@@ -1,19 +1,24 @@
-<ul role="tablist" class="nav nav-tabs top-menu" id="myTab">
-   <li role="presentation"<%= menu_tab_class(active_tab, "home-tab") %>>
-   <%= link_to(broker_agencies_profiles_path, "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
-      <span class="home-icon" title="Home"></span>
-    <% end %>
-  </li>
-  <!-- <li role="presentation"<%= menu_tab_class(active_tab, "profile-tab") %>>
-   <%#= link_to(personal_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "profile", "role" => "tab" ) do  %>
-      <span class="hidden-xs">Profile</span>
-      <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Profile"></span>
-   <%# end %>
-  </li>
-  <li role="presentation"<%= menu_tab_class(active_tab, "plans-tab") %>>
-   <%#= link_to(plans_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "plans", "role" => "tab" ) do  %>
-      <span class="hidden-xs">Plans</span>
-      <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Plans"></span>
-   <%# end %>
-  </li> -->
-</ul>
+<div class="mainmenu">
+  <div class="container">
+    <ul role="tablist" class="list-unstyled list-inline" id="myTab">
+      <li role="presentation" class='active'>
+        <a aria-expanded="true" aria-controls="home" data-toggle="tab" role="tab" id="home-tab" href="#home">
+          <span class="hidden-xs">Home</span>
+          <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Home"></span>
+        </a>
+      </li>
+      <li role="presentation">
+        <a aria-expanded="true" aria-controls="families" data-toggle="tab" role="tab" id="families-tab" href="#families">
+          <span class="hidden-xs">Families</span>
+          <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Families"></span>
+        </a>
+      </li>
+      <li role="presentation">
+        <a aria-expanded="true" aria-controls="employers" data-toggle="tab" role="tab" id="employers-tab" href="#employers">
+          <span class="hidden-xs">Employers</span>
+          <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Employers"></span>
+        </a>
+      </li>
+      </ul>
+  </div>
+</div>
