@@ -25,9 +25,7 @@
             <tr>
               <td><%= agency_profile.legal_name %></td>
               <td><%= agency_profile.primary_broker_role.person.full_name %></td>
-              <td><%=  %></td>
-<!--               <td><%= agency_profile.primary_broker_role.person.phones.first.to_s %></td>
-              <td><%= agency_profile.primary_broker_role.person.emails.first.address %></td> -->
+              <td><%= agency_profile.primary_broker_role.npn %></td>
               <td>     
                 <%= link_to 'Show'.html_safe, "/broker_agencies/profiles/#{agency_profile.id}/employer_view?employer_id=#{@employer_profile.id}", class: "btn btn-success", remote: true %>
               </td>
