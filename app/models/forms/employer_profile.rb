@@ -10,13 +10,13 @@ module Forms
     attr_accessor :person
     attr_reader :employer_profile
 
-      validates :fein,
-            length: { is: 9, message: "%{value} is not a valid FEIN" },
-                numericality: true
+    validates :fein,
+      length: { is: 9, message: "%{value} is not a valid FEIN" },
+      numericality: true
     validates_presence_of :dob, :first_name, :last_name, :fein, :legal_name
     validates :entity_kind,
-        inclusion: { in: ::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
-        allow_blank: false
+      inclusion: { in: ::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
+      allow_blank: false
 
     validate :office_location_validations
 
@@ -26,9 +26,9 @@ module Forms
 
     def office_location_validations
       @office_locations.each_with_index do |ol, idx|
-         ol.errors.each do |k, v|
-           self.errors.add("office_locations_attributes.#{idx}.#{k}", v) 
-         end
+        ol.errors.each do |k, v|
+          self.errors.add("office_locations_attributes.#{idx}.#{k}", v) 
+        end
       end
     end
 
@@ -76,9 +76,9 @@ module Forms
 
     def match_or_create_person(current_user)
       new_person =   Person.new({
-          :first_name => first_name,
-          :last_name => last_name,
-          :dob => dob
+        :first_name => first_name,
+        :last_name => last_name,
+        :dob => dob
       })
       matched_people = Person.where(
         first_name: regex_for(first_name),
@@ -138,8 +138,8 @@ module Forms
       begin
         existing_org = check_existing_organization
       rescue OrganizationAlreadyMatched
-            errors.add(:base, "a staff role for this organization has already been claimed.")
-            return false
+        errors.add(:base, "a staff role for this organization has already been claimed.")
+        return false
       end
       employer_profile = nil
       if existing_org
@@ -174,6 +174,19 @@ module Forms
 
     def regex_for(str)
       Regexp.compile(Regexp.escape(str.to_s))
+    end
+    def office_location_kinds
+      location_kinds = self.office_locations.flat_map(&:address).flat_map(&:kind)
+      # should validate only office location kinds ie. primary, mailing, branch
+      return if location_kinds.detect{|kind| kind == 'work' || kind == 'home'}
+
+      if location_kinds.count('primary').zero?
+        errors.add(:base, "must select one primary address")
+      elsif location_kinds.count('primary') > 1
+        errors.add(:base, "can't have multiple primary addresses")
+      elsif location_kinds.count('mailing') > 1
+        errors.add(:base, "can't have more than one mailing address")
+      end
     end
 
   end
