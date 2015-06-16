@@ -26,64 +26,31 @@ Then(/^I should see a successful sign up message$/) do
 end
 
 And(/^I should see an initial form to enter information about my Employer and myself$/) do
-  @browser.a(text: /Continue/).wait_until_present
-  @browser.a(text: /Continue/).click
-  @browser.text_field(name: "person[first_name]").wait_until_present
+  @browser.text_field(name: "organization[first_name]").wait_until_present
   plan = FactoryGirl.create(:plan)
   pt = plan.premium_tables.build(age: 34, start_on: 0.days.ago.beginning_of_year.to_date, end_on: 0.days.ago.end_of_year.to_date, cost: 345.09)
   pt1 = plan.premium_tables.build(age: 3, start_on: 0.days.ago.beginning_of_year.to_date, end_on: 0.days.ago.end_of_year.to_date, cost: 125.10)
   plan.save
-  @browser.text_field(name: "person[first_name]").set("Doe")
-  @browser.text_field(name: "person[last_name]").set("John")
-  @browser.text_field(name: "person[date_of_birth]").set("11/10/1982")
-  @browser.text_field(name: "person[first_name]").click
-  @browser.text_field(name: "person[ssn]").set("111010999")
-  @browser.button(value: /Search Person/).wait_until_present
-  @browser.button(value: /Search Person/).fire_event("onclick")
-  @browser.button(value: /Create Person/).wait_until_present
-  screenshot("employer_portal_person_search_no_match")
+  @browser.text_field(name: "organization[first_name]").set("Doe")
+  @browser.text_field(name: "organization[last_name]").set("John")
+  @browser.text_field(name: "jq_datepicker_ignore_organization[dob]").set("11/10/1982")
+  @browser.text_field(name: "organization[first_name]").click
 
-  @browser.button(value: /Create Person/).fire_event("onclick")
-  @browser.text_field(name: "person[addresses_attributes][0][address_1]").wait_until_present
-  @browser.text_field(name: "person[addresses_attributes][0][address_1]").set("100 North Street")
-  @browser.text_field(name: "person[addresses_attributes][0][address_2]").set("Suite 990")
-  @browser.text_field(name: "person[addresses_attributes][0][city]").set("Sterling")
-  @browser.text_field(name: "person[addresses_attributes][0][state]").set("VA")
-  @browser.text_field(name: "person[addresses_attributes][0][zip]").set("20166")
-  @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("6781230986")
-  @browser.text_field(name: "person[phones_attributes][1][full_phone_number]").set("6781230987")
-  @browser.text_field(name: "person[emails_attributes][0][address]").set("john.doe@home.com")
-  @browser.text_field(name: "person[emails_attributes][1][address]").set("john.doe@work.com")
-  @browser.text_field(name: "person[emails_attributes][1][address]").click
-  screenshot("employer_portal_person_data_new")
-  @browser.button(id: /btn-continue/).wait_until_present
-  @browser.button(id: /btn-continue/).click
-  # @browser.button(id: /continue-employer/).wait_until_present
-  # @browser.button(id: /continue-employer/).click
-  @browser.text_field(name: "employer_profile[legal_name]").wait_until_present
-  @browser.text_field(name: "employer_profile[legal_name]").set("Turner Agency, Inc")
-  @browser.text_field(name: "employer_profile[dba]").set("Turner Brokers")
-  @browser.text_field(name: "employer_profile[fein]").set("678121089")
-  input_field = @browser.div(class: /selectric-wrapper/)
+  @browser.text_field(name: "organization[legal_name]").set("My Employer")
+  @browser.text_field(name: "organization[dba]").set("My Employer")
+  @browser.text_field(name: "organization[fein]").set("123456999")
+  input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-entity-kind").first
   input_field.click
-  input_field.li(text: /Partnership/).click
-  @browser.button(value: /Search Employers/).wait_until_present
-  @browser.button(value: /Search Employers/).fire_event("onclick")
-  screenshot("employer_portal_employer_search_no_match")
-  @browser.button(value: /Create Employer/).wait_until_present
-  @browser.button(value: /Create Employer/).fire_event("onclick")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").wait_until_present
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").set("981 North State")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_2]").set("Suite 2a")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Springfield")
+  input_field.li(text: /C Corporation/).click
+  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").set("100 North Street")
+  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_2]").set("Suite 990")
+  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Sterling")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][state]").set("VA")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("93833")
-  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("898")
-  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("9990000")
-  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][extension]").set("1111")
-  # @browser.text_field(name: "organization[office_locations_attributes][0][email_attributes][address]").set("john.doe.abcsystems@example.com")
-  screenshot("employer_portal_employer_data_new")
-  @browser.button(value: /Create/).fire_event("onclick")
+  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("20166")
+  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("678")
+  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("1230987")
+  screenshot("employer_portal_person_data_new")
+  @browser.button(class: "interaction-click-control-create-employer").click
 end
 
 Given(/^I have signed up previously through consumer, broker agency or previous visit to the Employer portal$/) do
