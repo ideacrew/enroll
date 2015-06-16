@@ -10,11 +10,11 @@
 	                                    <h4>Your plan</h4>
 	                                    <a href="#"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Details</a>
 	                                </div>
-	                                <%= image_tag 'company-logo/CareFirst.png' %>
+	                                <%#= image_tag 'company-logo/CareFirst.png' %>
 
-	                                <h3>BlueCross Blueshield Preferred 500, A Multi State Plan</h3>
+	                                <h3><%= @hbx_enrollments.first.plan %></h3>
 	                                <div class="page-header">
-	                                    <h1>$249 <small>/Month</small></h1>
+	                                    <h1><%= @hbx_enrollments.first.applied_premium_credit %> <small>/Month</small></h1>
 	                                </div>
 	                                <table class="table">
 	                                    <thead>
