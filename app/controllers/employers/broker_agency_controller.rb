@@ -3,6 +3,10 @@ class Employers::BrokerAgencyController < ApplicationController
   before_action :find_employer
   before_action :find_borker_agency
 
+  #TODO move assign_broker_agency to here
+  def create
+  end
+
   def terminate
     termination_date = params["termination_date"]
     if termination_date.present?
@@ -27,7 +31,7 @@ class Employers::BrokerAgencyController < ApplicationController
         end
       }
       format.all {
-        flash[:notice] = "Successfully terminated Census Employee."
+        flash[:notice] = "Successfully terminated broker agency."
         redirect_to employers_employer_profile_path(@employer_profile)
       }
     end

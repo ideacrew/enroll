@@ -75,7 +75,6 @@ Rails.application.routes.draw do
       root "employer_profiles#new"
       get 'new'
       get 'my_account'
-      get 'broker_management'
       get 'broker_agency_index'
       get 'assign_broker_agency'
       get 'active_broker'
@@ -91,7 +90,7 @@ Rails.application.routes.draw do
         post 'publish'
       end
 
-      resources :broker_agency do
+      resources :broker_agency, only: [:create] do
         get :terminate
       end
 
