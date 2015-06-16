@@ -117,6 +117,19 @@ class Employers::EmployerProfilesController < ApplicationController
     end
   end
 
+  def broker_management
+  end
+
+  def broker_agency_index
+    @q = params.permit(:q)[:q]
+    @orgs = Organization.search(@q).exists(broker_agency_profile: true)
+    @page_alphabets = page_alphabets(@orgs, "legal_name")
+    page_no = cur_page_no(@page_alphabets.first)
+    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+
+    @broker_agency_profiles = @organizations.map(&:broker_agency_profile)
+  end
+
   private
 
     def check_employer_staff_role

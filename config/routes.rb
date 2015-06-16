@@ -74,6 +74,9 @@ Rails.application.routes.draw do
     resources :employer_profiles do
       get 'new'
       get 'my_account'
+      get 'broker_management'
+      get 'broker_agency_index'
+
       collection do
         get 'welcome'
         get 'search'
