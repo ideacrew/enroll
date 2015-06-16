@@ -79,6 +79,7 @@ Rails.application.routes.draw do
         get 'search'
         post 'match'
       end
+      resource :inbox, only: [:new, :create, :index]
       resources :plan_years do
         get 'recommend_dates', on: :collection
         post 'publish'

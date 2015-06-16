@@ -1,0 +1,7 @@
+$('#employer_profile_form').hide();
+$('#message_form').show();
+$('#message_form').html("<%= escape_javascript(render "form") %>");
+$(".btn-danger").click(function(){
+  $('#message_form').hide();
+  $('#employer_profile_form').show();
+});

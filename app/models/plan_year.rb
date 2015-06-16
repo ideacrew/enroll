@@ -5,7 +5,6 @@ class PlanYear
 
   embedded_in :employer_profile
 
-
   # Plan Year time period
   field :start_on, type: Date
   field :end_on, type: Date
@@ -72,6 +71,10 @@ class PlanYear
     end
   end
 
+  def open_to_publish?
+    employer_profile.plan_years.reject{ |py| py==self }.any?(&:published?)
+  end
+
   def is_application_valid?
     application_warnings.blank? ? true : false
   end
@@ -91,6 +94,10 @@ class PlanYear
     # Maximum company size at time of initial registration on the HBX
     if fte_count > HbxProfile::ShopSmallMarketFteCountMaximum
       warnings.merge!({fte_count: "number of full time equivalents (FTEs) exceeds maximum allowed (#{HbxProfile::ShopSmallMarketFteCountMaximum})"})
+    end
+
+    if open_to_publish?
+      warnings.merge!({publish: "You may only have one published plan year at a time"})
     end
 
     # Exclude Jan 1 effective date from certain checks

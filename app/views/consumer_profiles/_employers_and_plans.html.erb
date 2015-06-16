@@ -8,29 +8,33 @@
                             	<div class="panel-body">
 	                                <div class="page-header">
 	                                    <h4>Your plan</h4>
-	                                    <a href="#"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Details</a>
 	                                </div>
-	                                <%= image_tag 'company-logo/CareFirst.png' %>
+                                  <% plan = @hbx_enrollments.first.try(:plan) %>
+                                  <% hbx_enrollment = @hbx_enrollments.first %>
+	                                <%= image_tag "#{plan.try(:carrier_profile).try(:id).try(:to_s)}" %>
 
-	                                <h3>BlueCross Blueshield Preferred 500, A Multi State Plan</h3>
-	                                <div class="page-header">
-	                                    <h1>$249 <small>/Month</small></h1>
-	                                </div>
+	                                <h3><%= plan.name %></h3>
+                                  <div>
+                                    Subscriber Id : <%= hbx_enrollment.try(:subscriber).try(:id).try(:to_s) %>
+                                    <br/>
+                                    Group Id : <%= hbx_enrollment.try(:benefit_group_id).try(:to_s) %>
+                                  </div>
+                                  <br/>
 	                                <table class="table">
 	                                    <thead>
 	                                        <tr>
 	                                            <th>TYPE</th>
 	                                            <th>LEVEL</th>
-	                                            <th>NETWORK</th>
-	                                            <th>DEDUCTIBLE</th>
+	                                            <th>START</th>
+                                              <th></th>
 	                                        </tr>
 	                                    </thead>
 	                                    <tbody>
 	                                        <tr>
-	                                            <td>HMO</td>
-	                                            <td><%= image_tag 'icons/gold-circle.png', class: 'hidden-sm' %> Gold</td>
-	                                            <td>Nationwide</td>
-	                                            <td>$500</td>
+	                                            <td><%= plan.try(:plan_type).try(:upcase) %></td>
+	                                            <td><%= image_tag 'icons/gold-circle-2.png', class: 'hidden-sm' %> Gold</td>
+	                                            <td><%= hbx_enrollment.try(:effective_on) %></td>
+                                              <td></td>
 	                                        </tr>
 	                                    </tbody>
 	                                </table>
