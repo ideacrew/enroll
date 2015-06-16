@@ -36,8 +36,8 @@ And(/^I should see an initial form to enter information about my Employer and my
   @browser.text_field(name: "jq_datepicker_ignore_organization[dob]").set("11/10/1982")
   @browser.text_field(name: "organization[first_name]").click
 
-  @browser.text_field(name: "organization[legal_name]").set("My Employer")
-  @browser.text_field(name: "organization[dba]").set("My Employer")
+  @browser.text_field(name: "organization[legal_name]").set("Turner Agency, Inc")
+  @browser.text_field(name: "organization[dba]").set("Turner Agency, Inc")
   @browser.text_field(name: "organization[fein]").set("123456999")
   input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-entity-kind").first
   input_field.click
