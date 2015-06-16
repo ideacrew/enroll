@@ -12,4 +12,8 @@ class RelationshipBenefit
   def offered?
     self.offered
   end
+
+  def premium_pct=(new_premium_pct)
+    self[:premium_pct] = new_premium_pct.blank? ? 0.0 : new_premium_pct
+  end
 end

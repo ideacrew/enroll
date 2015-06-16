@@ -13,6 +13,23 @@ describe RelationshipBenefit do
 
   let(:params){relationship_benefit_params}
 
+  context "created with valid params" do
+    let(:relationship_benefit) {RelationshipBenefit.new(**params)}
+
+    it "should have the correct premium percent" do
+      expect(relationship_benefit.premium_pct).to eq params[:premium_pct]
+    end
+    
+    context "then premium percent is set to nil" do
+      before do
+        relationship_benefit.premium_pct = nil
+      end
+
+      it "should have a premium percent of 0" do
+        expect(relationship_benefit.premium_pct).to eq 0.0
+      end
+    end
+  end
   context "created without a premium percent" do
     let(:relationship_benefit) {RelationshipBenefit.new(**(params.except(:premium_pct)))}
 
