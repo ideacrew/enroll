@@ -1,174 +1,155 @@
 <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
-	<div class="container">
-		<div class="row">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                             <div class="panel panel-default min-h">
-                            	<div class="panel-body">
-	                                <div class="page-header">
-	                                    <h4>Your plan</h4>
-	                                </div>
+                              <div class="panel-body">
+                                  <div class="page-header">
+                                      <h4>Your plan</h4>
+                                  </div>
                                   <% plan = @hbx_enrollments.first.try(:plan) %>
                                   <% hbx_enrollment = @hbx_enrollments.first %>
-	                                <%= image_tag "#{plan.try(:carrier_profile).try(:id).try(:to_s)}" %>
+                                  <%= plan.carrier_profile.legal_name %>
 
-	                                <h3><%= plan.name %></h3>
+                                  <h3><%= plan.name %></h3>
                                   <div>
                                     Subscriber Id : <%= hbx_enrollment.try(:subscriber).try(:id).try(:to_s) %>
                                     <br/>
                                     Group Id : <%= hbx_enrollment.try(:benefit_group_id).try(:to_s) %>
                                   </div>
                                   <br/>
-	                                <table class="table">
-	                                    <thead>
-	                                        <tr>
-	                                            <th>TYPE</th>
-	                                            <th>LEVEL</th>
-	                                            <th>START</th>
+                                  <table class="table">
+                                      <thead>
+                                          <tr>
+                                              <th>TYPE</th>
+                                              <th>LEVEL</th>
+                                              <th>START</th>
                                               <th></th>
-	                                        </tr>
-	                                    </thead>
-	                                    <tbody>
-	                                        <tr>
-	                                            <td><%= plan.try(:plan_type).try(:upcase) %></td>
-	                                            <td><%= image_tag 'icons/gold-circle-2.png', class: 'hidden-sm' %> Gold</td>
-	                                            <td><%= hbx_enrollment.try(:effective_on) %></td>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr>
+                                              <td><%= plan.try(:plan_type).try(:upcase) %></td>
+                                              <td><%= image_tag 'icons/gold-circle-2.png', class: 'hidden-sm' %> Gold</td>
+                                              <td><%= hbx_enrollment.try(:effective_on) %></td>
                                               <td></td>
-	                                        </tr>
-	                                    </tbody>
-	                                </table>
-	                            </div>
+                                          </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                             <div class="panel panel-default min-h">
-                            	<div class="panel-body">
-                            		<h3 style="margin-top: 0"><%= @person.full_name %></h3>
-                            		<p>(DC Health link ID : <%= current_user.id %>)</p>
-                            		<br>
-	                                <div class="page-header">
-	                                    <h4>Employer</h4>
-	                                    <a href="#"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Edit</a>
-	                                </div>
+                              <div class="panel-body">
+                                <h3 style="margin-top: 0"><%= @person.full_name %></h3>
+                                <p>(DC Health link ID : <%= current_user.id %>)</p>
+                                <br>
+                                  <div class="page-header">
+                                      <h4>Employer</h4>
+                                  </div>
 
-	                                <h3><%= @employer_profile.dba %></h3>
-	                                <ul class="list-unstyled list-comp">
-	                                    <li>
-	                                        HIRED: <EM><%= @employee_roles.first.new_census_employee.hired_on.strftime("%m/%d/%Y") %></EM>
-	                                    </li>
-	                                    <li>
-	                                        ELIGIBLE FOR COVERAGE: <EM><%= @employee_roles.first.effective_on.strftime("%m/%d/%Y") %></EM>
-	                                    </li>
-	                                </ul>
-	                            </div>
+                                  <h3><%= @employer_profile.dba %></h3>
+                                  <ul class="list-unstyled list-comp">
+                                      <li>
+                                          HIRED: <EM><%= @employee_role.hired_on.strftime("%m/%d/%Y") %></EM>
+                                      </li>
+                                      <li>
+                                          ELIGIBLE FOR COVERAGE: <EM><%= @employee_role.effective_on.strftime("%m/%d/%Y") %></EM>
+                                      </li>
+                                  </ul>
+                              </div>
                             </div>
                         </div>
                     </div>
                     <div class="panel panel-default">
-                    	<div class="panel-body">
-							<%= render 'qles' %>
+                      <div class="panel-body">
+              <%= render 'qles' %>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <!-- <div class="panel panel-default">
-                    	<div class="panel-body">
-	                        <div class="page-header">
-	                            <h4>Payments</h4>
-	                            <a href="#"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Details</a>
-	                        </div>
-	                        <ul class="list-unstyled list-comp">
-	                            <li>
-	                                NEXT PAYMENT DUE: <EM>03/30/2014</EM>
-	                            </li>
-	                        </ul>
-	                        <H1>$249</H1>
-	                        <br/>
-	                        <div class="row">
-	                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-	                                <ul class="list-unstyled list-comp no-pd">
-	                                    <li>
-	                                        LAST PAYMENT: <EM>$249</EM>
-	                                    </li>
-	                                    <li>
-	                                        RECEIVED: <EM>03/30/2014</EM>
-	                                    </li>
-	                                    <li>
-	                                        <a href="#">PAYMENT HISTORY</a>
-	                                    </li>
-	                                </ul>
-	                            </div>
-	                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-	                                <a href="#" class="btn btn-danger btn-block btn-payment btn-block">Make a Payment</a>
-	                            </div>
-	                        </div>
-	                    </div>
+                      <div class="panel-body">
+                          <div class="page-header">
+                              <h4>Payments</h4>
+                              <a href="#"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Details</a>
+                          </div>
+                          <ul class="list-unstyled list-comp">
+                              <li>
+                                  NEXT PAYMENT DUE: <EM>03/30/2014</EM>
+                              </li>
+                          </ul>
+                          <H1>$249</H1>
+                          <br/>
+                          <div class="row">
+                              <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                  <ul class="list-unstyled list-comp no-pd">
+                                      <li>
+                                          LAST PAYMENT: <EM>$249</EM>
+                                      </li>
+                                      <li>
+                                          RECEIVED: <EM>03/30/2014</EM>
+                                      </li>
+                                      <li>
+                                          <a href="#">PAYMENT HISTORY</a>
+                                      </li>
+                                  </ul>
+                              </div>
+                              <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                  <a href="#" class="btn btn-danger btn-block btn-payment btn-block">Make a Payment</a>
+                              </div>
+                          </div>
+                      </div>
                     </di -->
 
                     <div class="panel panel-default">
-                    	<div class="panel-body">
-                    		<div class="row">
-	                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-	                            	<%= image_tag 'icons/family_members.png' %>
-	                            </div>
-	                            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
-	                                <h3>Manage family members</h3>
-	                                <small>Use this link to add and delete family members or edit your family information.</small>
-	                            </div>
-	                        </div>
-	                    </div>
+                      <div class="panel-body">
+                        <div class="row">
+                              <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                <%= image_tag 'icons/family_members.png' %>
+                              </div>
+                              <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
+                                  <h3>Manage family members</h3>
+                                  <small>Use this link to add and delete family members or edit your family information.</small>
+                              </div>
+                          </div>
+                      </div>
                     </div>
 
                     <div class="panel panel-default">
-                    	<div class="panel-body"><br>
-                    		<div class="row">
-	                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-	                            	<%= image_tag 'icons/shop_for_plan.png' %>
-	                            </div>
-	                            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
-	                                <h3>Shop for Plans</h3>
-	                                <small>Browse plans from carriers in the DC Health Care Exchange.</small>
-	                            </div>
-	                        </div><br>
-	                    </div>
+                      <div class="panel-body"><br>
+                        <div class="row">
+                              <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                <%= image_tag 'icons/shop_for_plan.png' %>
+                              </div>
+                              <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
+                                  <h3>Shop for Plans</h3>
+                                  <small>Browse plans from carriers in the DC Health Care Exchange.</small>
+                              </div>
+                          </div><br>
+                      </div>
                     </div>
 
                     <div class="panel panel-default">
-                    	<div class="panel-body">
-	                        <div class="row">
-	                            <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
-	                            	<%= image_tag 'icons/contact.png' %>
-	                            </div>
-	                            <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 info-wrapper">
-	                                <h3>Carrier Contact</h3>
-	                                <%= image_tag 'company-logo/CareFirst.png' %>
-	                                <ul class="list-unstyled list-comp">
-	                                    <li>PHONE: <EM>855-444-3119</EM></li>
-	                                    <li>WEB: <a href="#" class="text-success">www.carefist.com</a></li>
-	                                </ul>
-	                            </div>
-	                        </div>
-	                    </div>
-                    </div>
-
-                    <div class="panel panel-default">
-                    	<div class="panel-body">
-	                        <div class="row">
-	                            <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
-	                            	<%= image_tag 'icons/find-doctor.png' %>
-	                            </div>
-	                            <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 info-wrapper">
-	                                <h3>FIND DOCTORS</h3>
-	                                <small>
-	                                    Search for doctors by name, location, specialty, health plan participation and more.
-	                                </small>
-	                            </div>
-	                        </div>
-	                    </div>
+                      <div class="panel-body">
+                          <div class="row">
+                              <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
+                                <%= image_tag 'icons/find-doctor.png' %>
+                              </div>
+                              <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 info-wrapper">
+                                  <h3>FIND DOCTORS</h3>
+                                  <small>
+                                      Search for doctors by name, location, specialty, health plan participation and more.
+                                  </small>
+                              </div>
+                          </div>
+                      </div>
                     </div>
                 </div>
-		</div>
-	</div>
+    </div>
+  </div>
 </div>

@@ -5,8 +5,8 @@
     <% end %>
   </div>
   <div class="row no-buffer focus_effect personal-info-row">
-    <div class="col-md-12 first">
-      <div class="top-row">
+    <div class="col-md-12 col-sm-12 col-xs-12 first">
+      <div class="row top-row">
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <% title_value = f.object.title.present? ? f.object.title : "#{Time.now.year} Employer Benefits" %>
           <%= f.text_field :title, class: "floatlabel form-control", value: title_value, required: true, placeholder: 'TITLE' %>

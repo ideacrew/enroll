@@ -73,11 +73,11 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    benefit_group_assignment.waive_coverage if benefit_group_assignment
+    benefit_group_assignment.waive_coverage! if benefit_group_assignment
   end
 
   def propogate_selection
-    benefit_group_assignment.select_coverage
+    benefit_group_assignment.select_coverage! if benefit_group_assignment
   end
 
   def is_active?
@@ -150,6 +150,9 @@ class HbxEnrollment
     enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
     # benefit_group.plan_year.start_on
     enrollment.benefit_group = benefit_group
+    census_employee = employee_role.census_employee
+    benefit_group_assignment = census_employee.benefit_group_assignments.by_benefit_group_id(benefit_group.id).first
+    enrollment.benefit_group_assignment_id = benefit_group_assignment.id
     coverage_household.coverage_household_members.each do |coverage_member|
       enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
       enrollment_member.eligibility_date = enrollment.effective_on

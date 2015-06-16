@@ -26,7 +26,7 @@
         <% end %>
         <td><%= census_employee.aasm_state.humanize %></td>
         <td><%= boolean_to_human census_employee.employee_role_linked? %></td>
-        <td>
+        <td class="content_no_wrap">
           <% if census_employee.employment_terminated? %>
           <%= link_to ('javascript:;'), class: "show_confirm btn btn-green-2", id: "show_confirm_#{census_employee.id}" do %>
           <span class="hidden-xs hidden-sm visible-md visible-lg">Rehire</span>
