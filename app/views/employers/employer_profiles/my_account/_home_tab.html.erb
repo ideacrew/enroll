@@ -114,7 +114,10 @@
                 <% end %>
                 <div class="row no-buffer">
                     <div class="col-md-12">
-                       <a class="pull-right" href="<%= employers_employer_profile_broker_management_path(@employer_profile)%>">Broker Agency</a>
+        <a class="pull-right" aria-controls="employees" data-toggle="tab" id="broker-agency-tab" role="tab" href="#broker_agency">
+          <span class="hidden-xs">Broker Agency</span>
+          <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agency"></span>
+        </a>
                     </div>
                  </div>
                 </li>
