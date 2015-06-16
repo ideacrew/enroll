@@ -11,7 +11,7 @@
                                   </div>
                                   <% plan = @hbx_enrollments.first.try(:plan) %>
                                   <% hbx_enrollment = @hbx_enrollments.first %>
-                                  <%= image_tag "#{plan.try(:carrier_profile).try(:organization).try(:legal_name)}" %>
+                                  <%= plan.carrier_profile.legal_name %>
 
                                   <h3><%= plan.name %></h3>
                                   <div>
@@ -49,16 +49,15 @@
                                 <br>
                                   <div class="page-header">
                                       <h4>Employer</h4>
-                                      <a href="#"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Edit</a>
                                   </div>
 
                                   <h3><%= @employer_profile.dba %></h3>
                                   <ul class="list-unstyled list-comp">
                                       <li>
-                                          HIRED: <EM><%= @employee_roles.first.new_census_employee.hired_on.strftime("%m/%d/%Y") %></EM>
+                                          HIRED: <EM><%= @employee_role.hired_on.strftime("%m/%d/%Y") %></EM>
                                       </li>
                                       <li>
-                                          ELIGIBLE FOR COVERAGE: <EM><%= @employee_roles.first.effective_on.strftime("%m/%d/%Y") %></EM>
+                                          ELIGIBLE FOR COVERAGE: <EM><%= @employee_role.effective_on.strftime("%m/%d/%Y") %></EM>
                                       </li>
                                   </ul>
                               </div>
@@ -132,24 +131,6 @@
                                   <small>Browse plans from carriers in the DC Health Care Exchange.</small>
                               </div>
                           </div><br>
-                      </div>
-                    </div>
-
-                    <div class="panel panel-default">
-                      <div class="panel-body">
-                          <div class="row">
-                              <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
-                                <%= image_tag 'icons/contact.png' %>
-                              </div>
-                              <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 info-wrapper">
-                                  <h3>Carrier Contact</h3>
-                                  <%= image_tag 'company-logo/CareFirst.png' %>
-                                  <ul class="list-unstyled list-comp">
-                                      <li>PHONE: <EM>855-444-3119</EM></li>
-                                      <li>WEB: <a href="#" class="text-success">www.carefist.com</a></li>
-                                  </ul>
-                              </div>
-                          </div>
                       </div>
                     </div>
 
