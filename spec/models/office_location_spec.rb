@@ -18,7 +18,6 @@ RSpec.describe OfficeLocation, :type => :model do
         organization: organization,
         address: address,
         phone: phone,
-        email: email,
         is_primary: is_primary
       }
     end

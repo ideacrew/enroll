@@ -113,7 +113,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and an HbxAdmin or system service is submitting the effective date" do
-        it "should be valid" 
+        it "should be valid"
       end
     end
 
@@ -124,11 +124,11 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         plan_year.effective_date = valid_effective_date
         plan_year.end_on = valid_effective_date + HbxProfile::ShopPlanYearPeriodMinimum
       end
- 
+
       it "should be valid" do
         expect(plan_year.valid?).to be_truthy
       end
- 
+
     end
 
     context "and an open enrollment period is specified" do
@@ -314,6 +314,25 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     it "plan year should be in draft state" do
       expect(plan_year.draft?).to be_truthy
+    end
+
+    context "and another plan_year is already published on that employer profile" do
+    let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+    let(:published_plan_year) { FactoryGirl.build(:plan_year, aasm_state: :published)}
+
+      before do
+        plan_year.benefit_groups << benefit_group
+        employer_profile.plan_years << published_plan_year
+      end
+
+      it "application should not be valid" do
+        expect(plan_year.is_application_valid?).to be_falsey
+      end
+
+      it "and should provide relevent warning message" do
+        expect(plan_year.application_warnings[:publish].present?).to be_truthy
+        expect(plan_year.application_warnings[:publish]).to match(/You may only have one published plan year at a time/)
+      end
     end
 
     context "and employer's primary office isn't located in-state" do
@@ -519,8 +538,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     it "start on is not close to current date" do
       start_on = (Date.current + 3.month).beginning_of_month
       rsp = PlanYear.calculate_open_enrollment_date(start_on)
-      expect(rsp[:open_enrollment_start_on]).to eq Date.current
-      expect(rsp[:open_enrollment_end_on]).to eq (Date.current + 10.days)
+      expect(rsp[:open_enrollment_start_on]).to eq start_on - 2.months
+      expect(rsp[:open_enrollment_end_on]).to eq (start_on - 2.months + 10.days)
     end
 
     it "start on is close to current date(2 months)" do
@@ -528,8 +547,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       current_date = Date.new(Time.now.year, Time.now.month, 15)
       allow(Date).to receive(:current).and_return(current_date)
       rsp = PlanYear.calculate_open_enrollment_date(start_on)
-      expect(rsp[:open_enrollment_start_on]).to eq (start_on - 2.months)
-      expect(rsp[:open_enrollment_end_on]).to eq (start_on - 2.months + 10.days)
+      expect(rsp[:open_enrollment_start_on]).to eq (current_date)
+      expect(rsp[:open_enrollment_end_on]).to eq (current_date + 10.days)
     end
   end
 end

@@ -79,7 +79,7 @@ And(/^I should see an initial form to enter information about my Employer and my
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("898")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("9990000")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][extension]").set("1111")
-  @browser.text_field(name: "organization[office_locations_attributes][0][email_attributes][address]").set("john.doe.abcsystems@example.com")
+  # @browser.text_field(name: "organization[office_locations_attributes][0][email_attributes][address]").set("john.doe.abcsystems@example.com")
   screenshot("employer_portal_employer_data_new")
   @browser.button(value: /Create/).fire_event("onclick")
 end
@@ -309,7 +309,9 @@ Then(/^The census family should be terminated and move to terminated tab$/) do
   expect(@browser.a(text: /Patrick K Doe Jr/).visible?).to be_truthy
   @browser.a(text: /Employees/).wait_until_present
   @browser.a(text: /Employees/).click
-  @browser.a(text: /Rehire/).wait_until_present
+  @browser.td(text: /Employment terminated/).wait_until_present
+  expect(@browser.td(text: /Employment terminated/).visible?).to be_truthy
+  #@browser.a(text: /Rehire/).wait_until_present
 end
 
 And(/^I should see the census family is successfully terminated message$/) do
@@ -357,7 +359,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.h4(text: /start on must be first day of the month/).wait_until_present
   expect(@browser.text.include?("start on must be first day of the month")).to be_truthy
   # happy path
-  begin_date = (Date.current + 1.year).beginning_of_year
+  begin_date = (Date.current + 3.months).beginning_of_month
   @browser.text_field(class: "interaction-field-control-plan_year-start_on").set(begin_date)
   @browser.h3(text: /Plan Year/).click
   sleep(1)
@@ -380,7 +382,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   ref_plan.click
   ref_plan.li(index: 5).click # select plan from list.
   # Relationship Benefit
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(21)
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(51)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]").set(15)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').first.set(true)
@@ -399,36 +401,36 @@ And(/^I should see a success message after clicking on create plan year button$/
 end
 
 When(/^I enter filter in plan selection page$/) do
-  Watir::Wait.until(30) { @browser.a(text: /Filter Results/).present? }
+  Watir::Wait.until(30) { @browser.element(text: /Filter Results/).present? }
   # @browser.a(text: /All Filters/).wait_until_present
   # @browser.a(text: /All Filters/).click
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(true)
-  @browser.button(class: /apply-btn/, text: /Apply/).wait_until_present
-  @browser.button(class: /apply-btn/, text: /Apply/).click
+  @browser.element(class: /apply-btn/, text: /Apply/).wait_until_present
+  @browser.element(class: /apply-btn/, text: /Apply/).click
 end
 
 When(/^I enter combined filter in plan selection page$/) do
-  @browser.a(text: /All Filters/).wait_until_present
-  @browser.a(text: /All Filters/).click
+  #@browser.a(text: /All Filters/).wait_until_present
+  #@browser.a(text: /All Filters/).click
   # @browser.checkboxes(class: /plan-type-selection-filter/).first.wait_until_present
   # @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
   # Nationwide
   # @browser.checkboxes(class: /plan-metal-network-selection-filter/).first.set(true)
-  @browser.checkbox(class: /checkbox-custom interaction-choice-control-value-checkbox-5/).set(true)
+  #@browser.checkbox(class: /checkbox-custom interaction-choice-control-value-checkbox-5/).set(true)
 
   # Platinum
   @browser.checkboxes(class: /plan-metal-level-selection-filter/)[0].set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("")
   @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("")
-  @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("$420")
-  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("$430")
-  @browser.button(class: /apply-btn/, text: /Apply/).click
+  @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("320")
+  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("399")
+  @browser.element(class: /apply-btn/, text: /Apply/).click
 end
 
 Then(/^I should see the combined filter results$/) do
   @browser.divs(class: /plan-row/).select(&:visible?).each do |plan|
     expect(plan.text.include?("Nationwide")).to eq true
     expect(plan.text.include?("Bronze")).to eq true
-    expect(plan.p(text: "$425.66").visible?).to eq true
+    expect(plan.element(text: "$90.72").visible?).to eq true
   end
 end

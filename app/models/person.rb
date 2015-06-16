@@ -45,9 +45,9 @@ class Person
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
-  embeds_one :employer_staff_role, cascade_callbacks: true, validate: true
   embeds_one :responsible_party, cascade_callbacks: true, validate: true
 
+  embeds_many :employer_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :employee_roles, cascade_callbacks: true, validate: true
 
@@ -57,7 +57,7 @@ class Person
   embeds_many :emails, cascade_callbacks: true, validate: true
 
   accepts_nested_attributes_for :consumer_role, :responsible_party, :broker_role, :hbx_staff_role,
-    :person_relationships, :employee_roles, :phones
+    :person_relationships, :employee_roles, :phones, :employer_staff_roles
 
   accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| Phone.new(addy).blank? }
   accepts_nested_attributes_for :addresses, :reject_if => Proc.new { |addy| Address.new(addy).blank? }
@@ -205,7 +205,7 @@ class Person
     end
 
     def find_all_staff_roles_by_employer_profile(employer_profile)
-      where(:'employer_staff_roles.employer_profile_id' => employer_profile.id)
+      where(:'employer_staff_role.employer_profile_id' => employer_profile.id)
     end
 
   # Return an instance list of active People who match identifying information criteria

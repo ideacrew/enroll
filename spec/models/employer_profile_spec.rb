@@ -13,8 +13,7 @@ describe EmployerProfile, dbclean: :after_each do
   let(:office_location) { OfficeLocation.new(
         is_primary: true,
         address: address,
-        phone: phone,
-        email: email
+        phone: phone
       )
     }
 
@@ -556,6 +555,25 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     it "should return record for matching fein" do
       employer_profile.save
       expect(EmployerProfile.find_by_fein(employer_profile.organization.fein)).to be_an_instance_of EmployerProfile
+    end
+  end
+
+  describe ".staff_roles" do
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+
+    context "has no staff" do
+      it "should return any staff" do
+        expect(employer_profile.staff_roles).to eq []
+      end
+    end
+
+    context "has staff" do
+      let(:owner_person) { instance_double("Person")}
+
+      it "should return an array of persons" do
+        allow(Person).to receive(:find_all_staff_roles_by_employer_profile).with(employer_profile).and_return([owner_person])
+        expect(employer_profile.staff_roles).to include(owner_person)
+      end
     end
   end
 

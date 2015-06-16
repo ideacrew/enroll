@@ -6,6 +6,7 @@ class Inbox
   # Enable polymorphic associations
   embedded_in :recipient, polymorphic: true
   embeds_many :messages
+  accepts_nested_attributes_for :messages
 
   before_create :generate_acccess_key
 

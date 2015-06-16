@@ -12,6 +12,11 @@
               <%= "#{pluralize(@organization.errors.size, "error")} prohibited this form from being saved:" %>
             </h4>
             <ul>
+              <% @organization.errors.full_messages.each do |msg| %>
+                <li>
+                  <%= msg %>
+                </li>
+              <% end %>
               <% office_loc = @organization.office_locations.last %>
               <% office_loc.phone.errors.full_messages.each do |msg| %>
                 <li>
@@ -19,11 +24,6 @@
                 </li>
               <% end %>
               <% office_loc.address.errors.full_messages.each do |msg| %>
-                <li>
-                  <%= msg %>
-                </li>
-              <% end %>
-              <% office_loc.email.errors.full_messages.each do |msg| %>
                 <li>
                   <%= msg %>
                 </li>
@@ -40,82 +40,20 @@
                 <h4> Employer information</h4>
                 <%= render "shared/employer_profile_fields", f: emp %><br>
               <% end %>
-
+              <br/><br/>
+              <h4> Office Locations </h4>
               <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location| %>
-
-                <% # Address Fields %>
-                <%= office_location.fields_for :address, errors: {}, fieldset: false do |address| %>
-                  <h4> Address </h4>
-                  <div class="row top-row personal-info-top-row">
-                    <div class="col-md-12 no-pd first employee-info">
-                      <div class="row top-row">
-                        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                          <!-- Kind:  -->
-                          <%= address.select :kind, options_for_select(Address::KINDS.map {|a| [a.to_s.humanize, a.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
-                        </div>
-                        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                          <%= address.text_field :address_1, class: "floatlabel form-control", required: true, placeholder: 'ADDRESS LINE 1' %>
-                        </div>
-                        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                          <%= address.text_field :address_2, class: "floatlabel form-control", placeholder: 'ADDRESS LINE 2' %>
-                        </div>
-                      </div>
-                      <div class="row bottom-row">
-                        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                          <%= address.text_field :city, class: "floatlabel form-control", required: true, placeholder: 'CITY' %>
-                        </div>
-                        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                          <%= address.text_field :state, class: "floatlabel form-control", required: true, placeholder: 'STATE' %>
-                        </div>
-                        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                          <%= address.text_field :zip, class: "floatlabel form-control", required: true, placeholder: 'ZIP' %>
-                        </div>
-                      </div>
-                    </div>
-                  </div><br>
-                <% end %>
-
-                <% # Phone Fields %>
-                <%= office_location.fields_for :phone, errors: {}, fieldset: false do |phone| %>
-                  <h4> Phone </h4>
-                  <div class="row top-row personal-info-top-row">
-                    <div class="col-md-12 no-pd first employee-info">
-                      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-                        <!-- Kind:    -->
-                        <%= phone.select :kind, options_for_select(Phone::KINDS.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
-                      </div>
-                      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-                        <%= phone.text_field :area_code, class: "floatlabel form-control", required: true, placeholder: 'AREA CODE' %>
-                      </div>
-                      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-                        <%= phone.text_field :number, class: "floatlabel form-control", required: true, placeholder: 'NUMBER' %>
-                      </div>
-                      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-                        <%= phone.text_field :extension, class: "floatlabel form-control", placeholder: 'EXTENSION' %>
-                      </div>
-                    </div>
-                  </div><br>
-                <% end %>
-
-                <% # Email Fields %>
-                <%= office_location.fields_for :email, errors: {}, fieldset: false do |email| %>
-                  <h4> Email </h4>
-                  <div class="row top-row personal-info-top-row">
-                    <div class="col-md-12 no-pd first employee-info">
-                      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-                        <!-- Kind:  -->
-                        <%= email.select :kind,options_for_select(Email::KINDS.map {|e| [e.to_s.humanize, e.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
-                      </div>
-                      <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-                        <%= email.text_field :address, class: "floatlabel form-control", required: true, placeholder: 'EMAIL ADDRESS' %>
-                      </div>
-                    </div>
-                  </div><br>
-                <% end %>
-
+                <%= render partial: 'shared/office_location_fields', locals: {f: office_location} %>
               <% end %>
 
-              <div class="row top-row">
+                <br/>
+
+              <div class="form-inputs">
+                <%= link_to_add_fields '<i class="fa fa-user-plus"></i> Add Office Location'.html_safe, f, :office_locations, 'btn btn-success pull-right' %>
+                <br/>
+              </div>
+
+              <div class="row top-row no-border">
                 <%= f.submit "Create", class: "btn btn-save" %>
               </div>
 

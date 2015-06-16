@@ -87,31 +87,16 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def new
-    @organization = build_employer_profile_params
+    @organization = Forms::EmployerProfile.new
   end
 
   def create
-    if params[:organization].present?
-      build_organization
-      @organization.attributes = employer_profile_params
-      if @organization.save
-        flash[:notice] = 'Employer successfully created.'
-        redirect_to employers_employer_profiles_path
-      else
-        render action: "new"
-      end
+    params.permit!
+    @organization = Forms::EmployerProfile.new(params[:organization])
+    if @organization.save(current_user)
+      redirect_to employers_employer_profile_path(@organization.employer_profile)
     else
-      found_employer = EmployerProfile.find_by_fein(params[:employer_profile][:fein])
-      if found_employer.present?
-        @employer_profile = found_employer
-        @organization = @employer_profile.organization
-        build_office_location
-        respond_to do |format|
-          format.js { render "edit" }
-          format.html { render "edit" }
-        end
-      else
-      end
+      render action: "new"
     end
   end
 
@@ -121,8 +106,7 @@ class Employers::EmployerProfilesController < ApplicationController
     current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
     current_user.person.employer_contact = @employer_profile
     if !@employer_profile.owner.present? && @organization.update_attributes(employer_profile_params) && current_user.save
-      current_user.person.employer_staff_role = EmployerStaffRole.create(person: current_user.person, employer_profile_id: @employer_profile.id, is_owner: true)
-      current_user.person.employer_staff_role.save
+      current_user.person.employer_staff_roles << EmployerStaffRole.create(person: current_user.person, employer_profile_id: @employer_profile.id, is_owner: true)
       flash[:notice] = 'Employer successfully created.'
       redirect_to employers_employer_profile_path(@employer_profile)
     else
@@ -137,7 +121,7 @@ class Employers::EmployerProfilesController < ApplicationController
 
     def check_employer_staff_role
       if current_user.has_employer_staff_role?
-        redirect_to employers_employer_profile_path(current_user.person.get_employer_contact)
+        redirect_to employers_employer_profile_path(current_user.person.employer_staff_roles.first)
       end
     end
 
@@ -173,7 +157,6 @@ class Employers::EmployerProfilesController < ApplicationController
       office_location = @organization.office_locations.first
       office_location.build_address unless office_location.address.present?
       office_location.build_phone unless office_location.phone.present?
-      office_location.build_email unless office_location.email.present?
       @organization
     end
 
