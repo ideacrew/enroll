@@ -144,7 +144,7 @@ module Forms
       employer_profile = nil
       if existing_org
         update_organization(existing_org)
-        employer_profile = existing_org.employer_profile
+        @employer_profile = existing_org.employer_profile
       else
         org = create_new_organization
         @employer_profile = org.employer_profile
