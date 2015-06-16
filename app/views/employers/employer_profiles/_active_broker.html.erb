@@ -24,8 +24,8 @@
           <% @broker_agency_profiles.each do |agency_profile| %>
             <tr>
               <td><%= agency_profile.legal_name %></td>
-              <td><%= agency_profile.primary_broker_role.person.full_name %></td>
-              <td><%= agency_profile.primary_broker_role.npn %></td>
+              <td><%= agency_profile.primary_broker_role.person.full_name  if agency_profile.primary_broker_role %></td>
+              <td><%= agency_profile.primary_broker_role.npn if agency_profile.primary_broker_role  %></td>
               <td> 
                 <%= link_to '<i class="fa fa-times"></i> Terminate'.html_safe, ('javascript:;'), class: "btn btn-danger show_confirm", id: "show_confirm_#{agency_profile.id}" %>
               </td>

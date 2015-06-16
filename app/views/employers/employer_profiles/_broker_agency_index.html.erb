@@ -22,17 +22,15 @@
         </thead>
         <tbody>
           <% @broker_agency_profiles.each do |agency_profile| %>
-            <% if agency_profile.primary_broker_role.present? %>
             <tr>
               <td><%= agency_profile.legal_name %></td>
-              <td><%= agency_profile.primary_broker_role.person.full_name %></td>
-              <td><%= agency_profile.primary_broker_role.npn %></td>
+              <td><%= agency_profile.primary_broker_role.person.full_name if agency_profile.primary_broker_role %></td>
+              <td><%= agency_profile.primary_broker_role.npn if agency_profile.primary_broker_role %></td>
               <td>     
                 <%= link_to 'Show'.html_safe, "/broker_agencies/profiles/#{agency_profile.id}/employer_view?employer_id=#{@employer_profile.id}", class: "btn btn-success", remote: true %>
               </td>
             </tr>
             <% end %>
-          <% end %>
         </tbody>
       </table>
       <%= render 'shared/alph_paginate', url: employers_employer_profile_broker_agency_index_path, alphs: @page_alphabets, remote: true %>
