@@ -25,7 +25,7 @@ class EmployerProfile
   delegate :is_enrollment_valid?, to: :enrolling_plan_year, allow_nil: true
   delegate :enrollment_errors, to: :enrolling_plan_year, allow_nil: true
 
-  embeds_one  :inbox, as: :recipient
+  embeds_one  :inbox, as: :recipient, cascade_callbacks: true
   embeds_one  :employer_profile_account
   embeds_many :plan_years, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_accounts
@@ -360,7 +360,7 @@ class EmployerProfile
 
 private
   def build_nested_models
-    build_inbox
+    build_inbox if inbox.nil?
   end
 
   def save_associated_nested_models

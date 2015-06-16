@@ -1,4 +1,5 @@
-<div class="container">
+<div id= 'message_form'></div>
+<div class="container" id="employer_profile_form">
   <div class="col-md-12 col-sm-12 col-xs-12">
     <h3>Employers</h3>
 
@@ -18,6 +19,7 @@
             <th>Name</th>
             <th>Rostered EE Ct</th>
             <th>Broker Agency</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -26,6 +28,7 @@
               <td><%= link_to er.legal_name, employers_employer_profile_path(er) %></td>
               <td><%= er.roster_size %></td>
               <td><%= er.broker_agency_profile.try(:legal_name) %></td>
+              <td><%= link_to '<i class="fa fa-user-plus"></i> Send Secure Message'.html_safe, new_employers_employer_profile_inbox_path(er), class: "btn btn-primary", remote: true %></td>
             </tr>
           <% end %>
         </tbody>
