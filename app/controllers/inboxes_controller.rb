@@ -7,7 +7,6 @@ class InboxesController < ApplicationController
   end
 
   def create
-    binding.pry
     params.require(:inbox).permit!
     inbox_record = @inbox_provider.inbox
     inbox_record.attributes = params["inbox"]
