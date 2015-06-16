@@ -5,13 +5,13 @@
 			<div class="row no-buffer row-form-wrapper">
                                                 <%= hidden_field :email, value: current_user.email %>
 						<div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
-							<%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH"} %>
-						</div>
-						<div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
 							<%= f.text_field :first_name, class: "floatlabel form-control", placeholder: 'FIRST NAME' %>
 						</div>
 						<div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
 							<%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME' %>
+						</div>
+						<div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+							<%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH"} %>
 						</div>
 			</div>
 		</div>

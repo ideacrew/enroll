@@ -328,7 +328,6 @@ $(document).ready(function () {
   $(".person_ssn").mask("999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
-  $(".jq-datepicker").mask("00/00/0000");
   
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
@@ -413,15 +412,39 @@ $(document).on('click', ".interaction-click-control-add-plan-year", function() {
 
 
 $(document).on('change', "input#jq_datepicker_ignore_plan_year_start_on", function() {
-  if ($('.recommend h4').text() == "Loading Suggested Dates...") {
+  if ($('.recommend #notice h4').text() == "Loading Suggested Dates...") {
     return false;
   };
 
-  $('.recommend').html("<h4>Loading Suggested Dates...<h4>");
-  var target_url = $("a#generate_recommend_dates").data("href");
-  $.ajax({
-    type: "GET",
-    data:{start_on: $("input#plan_year_start_on_jq_datepicker_plain_field").val()},
-    url: target_url
-  });
+  var date = $("input#jq_datepicker_ignore_plan_year_start_on").val();
+  if(check_dateformat(date) == true) {
+    $('.recommend #notice').html("<h4>Loading Suggested Dates...<h4>");
+    var target_url = $("a#generate_recommend_dates").data("href");
+    var start_on_date = $("input#plan_year_start_on_jq_datepicker_plain_field").val();
+    $.ajax({
+      type: "GET",
+      data:{start_on: start_on_date},
+      url: target_url
+    });
+  } else {
+    $('.recommend #notice').html("<div class='alert-plan-year alert-error'><h4>Plan Year Start On: Invalid date format!</h4></div>");
+  };
 }); 
+
+$(document).on('change', "input#jq_datepicker_ignore_plan_year_open_enrollment_start_on", function() {
+  var date = $(this).val();
+  if(check_dateformat(date) != true) {
+    $('.recommend #notice').html("<div class='alert-plan-year alert-error'><h4>Open Enrollment Start Date: Invalid date format!</h4></div>");
+  } else {
+    $('.recommend #notice').html("");
+  };
+});
+
+$(document).on('change', "input#jq_datepicker_ignore_plan_year_open_enrollment_end_on", function() {
+  var date = $(this).val();
+  if(check_dateformat(date) != true) {
+    $('.recommend #notice').html("<div class='alert-plan-year alert-error'><h4>Open Enrollment End Date: Invalid date format!</h4></div>");
+  } else {
+    $('.recommend #notice').html("");
+  };
+});

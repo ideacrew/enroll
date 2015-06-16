@@ -1,29 +1,11 @@
-class Employers::InboxesController < ApplicationController
-  before_action :find_employer
+class Employers::InboxesController < InboxesController
 
-  def new
-    @inbox = Inbox.new
-    @inbox.messages.build
+  def find_inbox_provider
+    @inbox_provider = EmployerProfile.find(params["employer_profile_id"])
+    @inbox_provider_name = @inbox_provider.legal_name
   end
 
-  def create
-    params.permit!
-    inbox_record = @employer_profile.build_inbox
-    inbox_record.attributes = params["inbox"]
-    if inbox_record.save
-      flash[:notice] = "Successfully sent message."
-      redirect_to employers_employer_profile_path(@employer_profile)
-    else
-      render "new"
-    end
-  end
-
-  def index
-
-  end
-
-private
-  def find_employer
-    @employer_profile = EmployerProfile.find(params["employer_profile_id"])
+  def successful_save_path
+    employers_employer_profile_path(@inbox_provider)
   end
 end

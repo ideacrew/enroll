@@ -6,10 +6,13 @@ class Message
   field :sender_id, type: BSON::ObjectId
   field :subject, type: String
   field :body, type: String
+  field :message_read, type: Boolean
   field :created_at, type: DateTime
 
   after_initialize :set_timestamp
   validate :message_has_content
+
+  alias_method :message_read?, :message_read
 
 private
   def set_timestamp

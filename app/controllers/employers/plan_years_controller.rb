@@ -11,7 +11,7 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year.benefit_groups.each do |benefit_group|
       benefit_group.elected_plans = case benefit_group.plan_option_kind
                                     when "single_plan"
-                                      Plan.find_by(id: benefit_group.reference_plan_id)
+                                      Plan.where(id: benefit_group.reference_plan_id).first
                                     when "single_carrier"
                                       @plan_year.carrier_plans_for(benefit_group.carrier_for_elected_plan)
                                     when "metal_level"

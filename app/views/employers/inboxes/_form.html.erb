@@ -1,4 +1,4 @@
-<%= form_for @inbox do |f|%>
+<%= form_for @inbox, url: {action: "create", employer_id: @inbox_provider.id} do |f|%>
   <%= f.fields_for :messages do |ff| %>
     <%= render "shared/inbox_compose_message", f: ff %>
   <%end%>

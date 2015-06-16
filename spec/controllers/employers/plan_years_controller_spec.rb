@@ -21,6 +21,9 @@ RSpec.describe Employers::PlanYearsController do
       expect(response).to render_template("new")
     end
 
+    it "should generate carriers" do
+      expect(assigns(:carriers)).to eq Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
+    end
   end
 
   describe "POST create" do
@@ -79,7 +82,8 @@ RSpec.describe Employers::PlanYearsController do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(benefit_group).to receive(:elected_plans=).and_return("test")
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
-      allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
+      #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
+      allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)
       post :create, :employer_profile_id => employer_profile_id, :plan_year => plan_year_request_params
     end
@@ -96,6 +100,10 @@ RSpec.describe Employers::PlanYearsController do
       it "should assign the new plan year" do
         expect(assigns(:plan_year)).to eq plan_year
       end
+
+      it "should generate carriers" do
+        expect(assigns(:carriers)).to eq Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
+      end
     end
 
     describe "with a valid plan year" do
@@ -108,8 +116,11 @@ RSpec.describe Employers::PlanYearsController do
       it "should be a redirect" do
         expect(response).to have_http_status(:redirect)
       end
-    end
 
+      it "should has successful notice" do
+        expect(flash[:notice]).to eq "Plan Year successfully created."
+      end
+    end
   end
 
   describe "GET recommend_dates" do
