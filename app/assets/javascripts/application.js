@@ -92,6 +92,8 @@ $(document).ready(function () {
 
   // Progress Bar
   $(document).on('click', '#btn-continue', function() {
+    console.log('continue', $('#btn-search-employer').length, $('#btn_user_contact_info').length, $('#btn_household_continue').length,$('#btn_select_plan_continue').length)
+    
     if($('#btn-search-employer').length) $('#btn-search-employer').click();
     else if($('#btn_user_contact_info').length) $('#btn_user_contact_info').click();
     else if($('#btn_household_continue').length) window.location = $('#btn_household_continue').val();
