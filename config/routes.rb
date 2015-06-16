@@ -79,6 +79,7 @@ Rails.application.routes.draw do
       get 'broker_agency_index'
       get 'assign_broker_agency'
       get 'active_broker'
+
       collection do
         get 'welcome'
         get 'search'
@@ -89,6 +90,11 @@ Rails.application.routes.draw do
         get 'recommend_dates', on: :collection
         post 'publish'
       end
+
+      resources :broker_agency do
+        get :terminate
+      end
+
       resources :census_employees, only: [:new, :create, :edit, :update, :show] do
         get :delink
         get :terminate

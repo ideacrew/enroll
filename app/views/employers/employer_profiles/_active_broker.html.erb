@@ -26,8 +26,17 @@
               <td><%= agency_profile.legal_name %></td>
               <td><%= agency_profile.primary_broker_role.person.full_name %></td>
               <td><%= agency_profile.primary_broker_role.npn %></td>
-              <td>     
-                <%= link_to 'Terminate'.html_safe, "/broker_agencies/profiles/#{agency_profile.id}/employer_view?employer_id=#{@employer_profile.id}", class: "btn btn-success", remote: true %>
+              <td> 
+                <%= link_to '<i class="fa fa-times"></i> Terminate'.html_safe, ('javascript:;'), class: "btn btn-danger show_confirm", id: "show_confirm_#{agency_profile.id}" %>
+              </td>
+            </tr>
+            <tr class="unbrd  remove_<%= agency_profile.id %>">
+              <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= agency_profile.id %>">
+                <div class="confirm-terminate">
+                  <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker"><br/>
+                  <a href="javascript:;" data-link="<%= employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, agency_profile.id) %>" class="delete_confirm" id="remove_<%= agency_profile.id %>"><strong>Submit</strong></a>
+                </div>
+                <%=image_tag "enter_date_termination.png", width: "300", height: "" %>
               </td>
             </tr>
           <% end %>
