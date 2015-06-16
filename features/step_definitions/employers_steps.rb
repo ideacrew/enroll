@@ -346,6 +346,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   elected_field.li(text: /All plans from a given carrier/).click
   input_field = @browser.div(class: /selectric-wrapper/, text: /SELECT CARRIER/)
   input_field.click
+  sleep(1)
   input_field.li(text: /CareFirst/).click
   ref_plan = @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last
   ref_plan.click
