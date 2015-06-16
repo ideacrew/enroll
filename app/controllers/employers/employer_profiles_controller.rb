@@ -84,6 +84,7 @@ class Employers::EmployerProfilesController < ApplicationController
     @page_alphabets = page_alphabets(census_employees, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
     @census_employees = census_employees.where("last_name" => /^#{page_no}/i)
+    @broker_agency_profiles = @employer_profile.broker_agency_profile.to_a
   end
 
   def new
