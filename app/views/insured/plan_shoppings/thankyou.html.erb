@@ -19,9 +19,11 @@
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Gender</th>
-                  <th>Birthday</th>
+                  <th>Relationship</th>
+                  <th>Age</th>
                   <th>Premium</th>
+                  <th>Employer Contribution</th>
+                  <th>You Pay</th>
                 </tr>
               </thead>
 
@@ -30,9 +32,11 @@
                 <% @enrollment.hbx_enrollment_members.each do |member| %>
                   <tr>
                     <td><%= member.person.full_name %></td>
-                    <td><%= member.person.try(:gender).humanize %></td>
-                    <td><%= member.person.try(:dob).strftime("%m/%d/%Y") %></td>
+                    <td><%= member.primary_relationship %></td>
+                    <td><%= member.person.age_on(Time.now.utc.to_date) %></td>
                     <td><%= number_to_currency(@plan.premium_for(member)) %></td>
+                    <td>$0</td>
+                    <td>$0</td>
                     <% total_cost += @plan.premium_for(member) %>
                   </tr>
                 <% end %>
