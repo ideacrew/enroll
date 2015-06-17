@@ -1,7 +1,7 @@
 class Employers::BrokerAgencyController < ApplicationController
 
   before_action :find_employer
-  before_action :find_borker_agency, :except => [:index]
+  before_action :find_borker_agency, :except => [:index, :active_broker]
 
 
   def index
@@ -15,6 +15,10 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def show
+  end
+
+  def active_broker
+    @broker_agency_profiles = @employer_profile.broker_agency_profile.to_a
   end
 
   def create

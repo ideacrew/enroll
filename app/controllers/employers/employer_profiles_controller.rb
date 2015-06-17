@@ -1,5 +1,5 @@
 class Employers::EmployerProfilesController < ApplicationController
-  before_action :find_employer, only: [:show, :destroy, :active_broker]
+  before_action :find_employer, only: [:show, :destroy]
   before_action :check_admin_staff_role, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
 
@@ -119,9 +119,6 @@ class Employers::EmployerProfilesController < ApplicationController
     end
   end
 
-  def active_broker
-    @broker_agency_profiles = @employer_profile.broker_agency_profile.to_a
-  end
 
   private
     def check_employer_staff_role

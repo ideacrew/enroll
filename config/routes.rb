@@ -74,7 +74,6 @@ Rails.application.routes.draw do
     resources :employer_profiles do
       get 'new'
       get 'my_account'
-      get 'active_broker'
 
       collection do
         get 'welcome'
@@ -88,6 +87,9 @@ Rails.application.routes.draw do
       end
 
       resources :broker_agency, only: [:index, :show, :create] do
+        collection do 
+          get :active_broker
+        end
         get :terminate
       end
 
