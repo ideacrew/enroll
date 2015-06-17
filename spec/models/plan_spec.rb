@@ -143,7 +143,7 @@ RSpec.describe Plan, dbclean: :after_each do
   end
 
   describe ".premium_for" do
-    let(:valid_params) do
+    let(:valid_plan_params) do
       {
           name: name,
           active_year: active_year,
@@ -153,31 +153,38 @@ RSpec.describe Plan, dbclean: :after_each do
           coverage_kind: coverage_kind,
           market: market,
           premium_tables: [{start_on: "2015-01-01",
-                             end_on:  "2015-12-31",
-                             cost: 500,
-                             age: 32}]
+                            end_on: "2015-12-31",
+                            cost: 500,
+                            age: 32}]
       }
     end
 
-    context "with all valid arguments" do
-      def params;
-        valid_params;
+    context "invalid arguments" do
+      def plan_params;
+        valid_plan_params;
       end
 
       def plan;
-        Plan.new(**params);
+        Plan.new(**plan_params);
       end
 
-      context "invalid arguments" do
-        it "should raise exception" do
-          expect{ plan.premium_for(Date.today.at_beginning_of_month, params[:premium_tables][0][:age] + 1)}.to raise_error
-        end
+      it "should raise exception" do
+        expect { plan.premium_for(Date.today.at_beginning_of_month, params[:premium_tables][0][:age] + 1) }.to raise_error
+      end
+    end
+
+    context "valid arguments" do
+
+      def plan_params;
+        valid_plan_params;
       end
 
-      context "valid arguments and premium tables" do
-        it "should compute premium" do
-          expect(plan.premium_for(Date.today.at_beginning_of_month, params[:premium_tables][0][:age])).to eq(params[:premium_tables][0][:cost])
-        end
+      def plan;
+        Plan.new(**plan_params);
+      end
+
+      it "should compute premium" do
+        expect(plan.premium_for(Date.today.at_beginning_of_month, plan_params[:premium_tables][0][:age])).to eq(plan_params[:premium_tables][0][:cost])
       end
     end
   end
