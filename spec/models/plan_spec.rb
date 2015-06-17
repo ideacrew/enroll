@@ -1,22 +1,57 @@
 require 'rails_helper'
 
 RSpec.describe Plan, dbclean: :after_each do
-  def carrier_profile; FactoryGirl.create(:carrier_profile); end
+  def carrier_profile;
+    FactoryGirl.create(:carrier_profile);
+  end
 
-  def name; "BlueChoice Silver $2,000"; end
-  def active_year; 2015; end
-  def hios_id; "86052DC0400001-01"; end
-  def carrier_profile_id; carrier_profile._id; end
-  def metal_level; "platinum"; end
-  def coverage_kind; "health"; end
-  def market; "shop"; end
-  def ehb; 0.9943; end
+  def name;
+    "BlueChoice Silver $2,000";
+  end
 
-  def bad_active_year; (active_year + 4).to_i; end
-  def bad_metal_level; "copper"; end
+  def active_year;
+    2015;
+  end
 
-  def active_year_error_message; "#{bad_active_year} is an invalid active year"; end
-  def metal_level_error_message; "#{bad_metal_level} is not a valid metal level kind"; end
+  def hios_id;
+    "86052DC0400001-01";
+  end
+
+  def carrier_profile_id;
+    carrier_profile._id;
+  end
+
+  def metal_level;
+    "platinum";
+  end
+
+  def coverage_kind;
+    "health";
+  end
+
+  def market;
+    "shop";
+  end
+
+  def ehb;
+    0.9943;
+  end
+
+  def bad_active_year;
+    (active_year + 4).to_i;
+  end
+
+  def bad_metal_level;
+    "copper";
+  end
+
+  def active_year_error_message;
+    "#{bad_active_year} is an invalid active year";
+  end
+
+  def metal_level_error_message;
+    "#{bad_metal_level} is not a valid metal level kind";
+  end
 
   it { should validate_presence_of :name }
   it { should validate_presence_of :carrier_profile_id }
@@ -26,26 +61,34 @@ RSpec.describe Plan, dbclean: :after_each do
   describe ".new" do
     let(:valid_params) do
       {
-        name: name,
-        active_year: active_year,
-        hios_id: hios_id,
-        carrier_profile_id: carrier_profile_id,
-        metal_level: metal_level,
-        coverage_kind: coverage_kind,
-        market: market
+          name: name,
+          active_year: active_year,
+          hios_id: hios_id,
+          carrier_profile_id: carrier_profile_id,
+          metal_level: metal_level,
+          coverage_kind: coverage_kind,
+          market: market
       }
     end
 
     context "with no arguments" do
-      def params; {}; end
+      def params;
+        {};
+      end
+
       it "should not save" do
         expect(Plan.new(**params).save).to be_falsey
       end
     end
 
     context "with all valid arguments" do
-      def params; valid_params; end
-      def plan; Plan.new(**params); end
+      def params;
+        valid_params;
+      end
+
+      def plan;
+        Plan.new(**params);
+      end
 
       it "should save" do
         # expect(plan.inspect).to be_nil
@@ -67,7 +110,9 @@ RSpec.describe Plan, dbclean: :after_each do
     end
 
     context "with no metal_level" do
-      def params; valid_params.except(:metal_level); end
+      def params;
+        valid_params.except(:metal_level);
+      end
 
       it "should fail validation " do
         expect(Plan.create(**params).errors[:metal_level].any?).to be_truthy
@@ -75,7 +120,10 @@ RSpec.describe Plan, dbclean: :after_each do
     end
 
     context "with improper metal_level" do
-      def params; valid_params.deep_merge({metal_level: bad_metal_level}); end
+      def params;
+        valid_params.deep_merge({metal_level: bad_metal_level});
+      end
+
       it "should fail validation with improper metal_level" do
         expect(Plan.create(**params).errors[:metal_level].any?).to be_truthy
         expect(Plan.create(**params).errors[:metal_level]).to eq [metal_level_error_message]
@@ -83,10 +131,53 @@ RSpec.describe Plan, dbclean: :after_each do
     end
 
     context "with invalid active_year" do
-      def params; valid_params.deep_merge({active_year: bad_active_year}); end
+      def params;
+        valid_params.deep_merge({active_year: bad_active_year});
+      end
+
       it "should fail active_year validation" do
         expect(Plan.create(**params).errors[:active_year].any?).to be_truthy
         expect(Plan.create(**params).errors[:active_year]).to eq [active_year_error_message]
+      end
+    end
+  end
+
+  describe ".premium_for" do
+    let(:valid_params) do
+      {
+          name: name,
+          active_year: active_year,
+          hios_id: hios_id,
+          carrier_profile_id: carrier_profile_id,
+          metal_level: metal_level,
+          coverage_kind: coverage_kind,
+          market: market,
+          premium_tables: [{start_on: "2015-01-01",
+                             end_on:  "2015-12-31",
+                             cost: 500,
+                             age: 32}]
+      }
+    end
+
+    context "with all valid arguments" do
+      def params;
+        valid_params;
+      end
+
+      def plan;
+        Plan.new(**params);
+      end
+
+      context "invalid arguments" do
+        it "should raise exception" do
+          expect{ plan.premium_for(Date.today.at_beginning_of_month, params[:premium_tables][0][:age] + 1)}.to raise_error
+        end
+      end
+
+      context "valid arguments and premium tables" do
+        it "should compute premium" do
+          expect(plan.premium_for(Date.today.at_beginning_of_month, params[:premium_tables][0][:age])).to eq(params[:premium_tables][0][:cost])
+        end
       end
     end
   end
@@ -94,12 +185,29 @@ end
 
 RSpec.describe Plan, dbclean: :after_each do
   describe "scopes" do
-    def platinum_count; 11; end
-    def gold_count; 7; end
-    def shop_silver_count; 5; end
-    def individual_silver_count; 5; end
-    def bronze_count; 3; end
-    def catastrophic_count; 1; end
+    def platinum_count;
+      11;
+    end
+
+    def gold_count;
+      7;
+    end
+
+    def shop_silver_count;
+      5;
+    end
+
+    def individual_silver_count;
+      5;
+    end
+
+    def bronze_count;
+      3;
+    end
+
+    def catastrophic_count;
+      1;
+    end
 
     let(:total_plan_count) { platinum_count + gold_count + shop_silver_count + individual_silver_count + bronze_count + catastrophic_count }
 
