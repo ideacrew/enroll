@@ -1,5 +1,5 @@
 class Employers::EmployerProfilesController < ApplicationController
-  before_action :find_employer, only: [:show, :destroy, :broker_agency_index, :assign_broker_agency, :active_broker]
+  before_action :find_employer, only: [:show, :destroy, :broker_agency_index, :active_broker]
   before_action :check_admin_staff_role, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
 
@@ -131,17 +131,6 @@ class Employers::EmployerProfilesController < ApplicationController
     @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
 
     @broker_agency_profiles = @organizations.map(&:broker_agency_profile)
-  end
-
-  def assign_broker_agency
-    broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
-    if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
-      @employer_profile.broker_agency_profile = broker_agency_profile
-      @employer_profile.save!
-    end
-
-    flash[:notice] = "Successfully selected broker agency."
-    redirect_to employers_employer_profile_path(@employer_profile)
   end
 
   private

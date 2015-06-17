@@ -75,7 +75,6 @@ Rails.application.routes.draw do
       get 'new'
       get 'my_account'
       get 'broker_agency_index'
-      get 'assign_broker_agency'
       get 'active_broker'
 
       collection do

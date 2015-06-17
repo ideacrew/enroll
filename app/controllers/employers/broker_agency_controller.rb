@@ -3,8 +3,18 @@ class Employers::BrokerAgencyController < ApplicationController
   before_action :find_employer
   before_action :find_borker_agency
 
-  #TODO move assign_broker_agency to here
+  def show
+  end
+
   def create
+    broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
+    if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
+      @employer_profile.broker_agency_profile = broker_agency_profile
+      @employer_profile.save!
+    end
+
+    flash[:notice] = "Successfully selected broker agency."
+    redirect_to employers_employer_profile_path(@employer_profile)
   end
 
   def terminate
