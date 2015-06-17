@@ -15,7 +15,7 @@
                 <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
                   <% Array(@employer_profile.organization.office_locations.last).each do |loc| %>
                     <li class="list-group-item">
-                      <div class="row no-buffer">
+                      <div class="row">
                         <div class="col-md-12">
                             <%= loc.address.to_html %>
                             <%= loc.phone.to_s %>
@@ -34,7 +34,7 @@
               
                 <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
                   <li class="list-group-item">
-                    <div class="row no-buffer">
+                    <div class="row">
                       <div class="col-md-12">
                         FEIN <%= number_to_obscured_fein @employer_profile.fein %><br/>
                         Entity Kind <%= @employer_profile.entity_kind.to_s.titleize %>
@@ -44,13 +44,6 @@
                 </ul>
               </div>
             </div>
-
-
-
-
-
-
-
 
             <div class="col-md-6 col-sm-6 col-xs-12">
               <div class="row">
@@ -81,8 +74,6 @@
                   </div>
               </div>
 
-
-
               <div class="row bottom">
                 <p class="head">
                   <span>Enrollment</span>
@@ -92,7 +83,7 @@
                 <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
                   <% if @current_plan_year.present? %>
                     <li class="list-group-item">
-                      <div class="row no-buffer">
+                      <div class="row">
                         <div class="col-md-12">
                           <dl class="dl-horizontal">
                             <dt>Plan Year</dt>
@@ -128,7 +119,7 @@
                 <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
                   <li class="list-group-item">
                   <% if @employer_profile.broker_agency_profile.present? %>
-                      <div class="row no-buffer">
+                      <div class="row">
                         <div class="col-md-12">
                           <dl class="dl-horizontal">
                             <dt>Agency Name</dt>
@@ -145,13 +136,13 @@
                         </div>
                       </div>
                   <% else %>
-                    <div class="row no-buffer">
+                    <div class="row">
                       <div class="col-md-12">
                          No Active Broker
                       </div>
                     </div>
                   <% end %>
-                  <div class="row no-buffer">
+                  <div class="row">
                     <div class="col-md-12">
                       <a class="pull-right" aria-controls="employees" data-toggle="tab" id="broker-agency-tab" role="tab" href="#broker_agency">
                         <span class="hidden-xs">Broker Agency</span>
