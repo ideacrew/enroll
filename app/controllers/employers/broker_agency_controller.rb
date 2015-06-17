@@ -1,10 +1,35 @@
 class Employers::BrokerAgencyController < ApplicationController
 
   before_action :find_employer
-  before_action :find_borker_agency
+  before_action :find_borker_agency, :except => [:index, :active_broker]
 
-  #TODO move assign_broker_agency to here
+
+  def index
+    @q = params.permit(:q)[:q]
+    @orgs = Organization.search(@q).exists(broker_agency_profile: true)
+    @page_alphabets = page_alphabets(@orgs, "legal_name")
+    page_no = cur_page_no(@page_alphabets.first)
+    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+
+    @broker_agency_profiles = @organizations.map(&:broker_agency_profile)
+  end
+
+  def show
+  end
+
+  def active_broker
+    @broker_agency_profiles = @employer_profile.broker_agency_profile.to_a
+  end
+
   def create
+    broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
+    if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
+      @employer_profile.broker_agency_profile = broker_agency_profile
+      @employer_profile.save!
+    end
+
+    flash[:notice] = "Successfully selected broker agency."
+    redirect_to employers_employer_profile_path(@employer_profile)
   end
 
   def terminate

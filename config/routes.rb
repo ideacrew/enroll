@@ -74,9 +74,6 @@ Rails.application.routes.draw do
     resources :employer_profiles do
       get 'new'
       get 'my_account'
-      get 'broker_agency_index'
-      get 'assign_broker_agency'
-      get 'active_broker'
 
       collection do
         get 'welcome'
@@ -89,7 +86,10 @@ Rails.application.routes.draw do
         post 'publish'
       end
 
-      resources :broker_agency, only: [:create] do
+      resources :broker_agency, only: [:index, :show, :create] do
+        collection do 
+          get :active_broker
+        end
         get :terminate
       end
 
@@ -112,7 +112,6 @@ Rails.application.routes.draw do
     root 'profiles#new'
     resources :profiles, only: [:new, :create, :show, :index] do 
       resource :inbox, only: [:new, :create, :index]
-      get :employer_view
     end
   end
 

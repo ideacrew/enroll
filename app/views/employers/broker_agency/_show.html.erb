@@ -1,4 +1,4 @@
-<%= form_for @broker_agency_profile, {url: employers_employer_profile_assign_broker_agency_path(@employer_profile), method: :get} do |f| %>
+<%= form_for @broker_agency, {url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", method: :post} do |f| %>
 <div class="container">
   <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
@@ -12,8 +12,8 @@
       </div>
       <div class="row">
         <div class="col-md-9 no-pd col-sm-9 col-xs-12">
-          <%= hidden_field_tag(:broker_agency_id, @broker_agency_profile.id) %>
-          <%= render 'fields', broker_agency_profile: @broker_agency_profile %>
+          <%= hidden_field_tag(:broker_agency_id, @broker_agency.id) %>
+          <%= render 'fields', broker_agency_profile: @broker_agency %>
 
           <div class="row top-row no-border">
             <div class="col-md-3 col-sm-3 col-xs-12 key-btn">

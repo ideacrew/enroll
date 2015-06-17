@@ -27,13 +27,13 @@
               <td><%= agency_profile.primary_broker_role.person.full_name if agency_profile.primary_broker_role %></td>
               <td><%= agency_profile.primary_broker_role.npn if agency_profile.primary_broker_role %></td>
               <td>     
-                <%= link_to 'Show'.html_safe, "/broker_agencies/profiles/#{agency_profile.id}/employer_view?employer_id=#{@employer_profile.id}", class: "btn btn-success", remote: true %>
+                <%= link_to 'Show'.html_safe, employers_employer_profile_broker_agency_path(@employer_profile, agency_profile) , class: "btn btn-success", remote: true %>
               </td>
             </tr>
             <% end %>
         </tbody>
       </table>
-      <%= render 'shared/alph_paginate', url: employers_employer_profile_broker_agency_index_path, alphs: @page_alphabets, remote: true %>
+      <%= render 'shared/alph_paginate', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", alphs: @page_alphabets, remote: true %>
     </div>
   </div>
 </div>
