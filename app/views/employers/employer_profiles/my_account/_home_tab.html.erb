@@ -1,127 +1,167 @@
 <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
-  <div class="container">
-    <div class="row">
-      <div class="landing-row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-          <div class="col-md-6 col-sm-6 col-xs-12 left-side">
-            <div class="row">
-              <p class="head">
-                <span><%= @employer_profile.legal_name %></span>
-                <span></span>
-              </p>
+  <div id="add_home_action"></div>
+  <div id="main-home">
+    <div class="container">
+      <div class="row">
+        <div class="landing-row">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="col-md-6 col-sm-6 col-xs-12 left-side">
+              <div class="row">
+                <p class="head">
+                  <span><%= @employer_profile.legal_name %></span>
+                  <span></span>
+                </p>
 
-              <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
-                <% Array(@employer_profile.organization.office_locations.last).each do |loc| %>
+                <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
+                  <% Array(@employer_profile.organization.office_locations.last).each do |loc| %>
+                    <li class="list-group-item">
+                      <div class="row no-buffer">
+                        <div class="col-md-12">
+                            <%= loc.address.to_html %>
+                            <%= loc.phone.to_s %>
+                        </div>
+                      </div>
+                    </li>
+                  <% end %>
+                </ul>
+              </div>
+
+              <div class="row bottom">
+                <p class="head">
+                  <span>Company Details</span>
+                  <span></span>
+                </p>
+              
+                <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
                   <li class="list-group-item">
                     <div class="row no-buffer">
                       <div class="col-md-12">
-                          <%= loc.address.to_html %>
-                          <%= loc.phone.to_s %>
+                        FEIN <%= number_to_obscured_fein @employer_profile.fein %><br/>
+                        Entity Kind <%= @employer_profile.entity_kind.to_s.titleize %>
                       </div>
                     </div>
                   </li>
-                <% end %>
-              </ul>
+                </ul>
+              </div>
             </div>
 
-            <div class="row bottom">
-              <p class="head">
-                <span>Company Details</span>
-                <span></span>
-              </p>
-            
-              <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
-                <li class="list-group-item">
-                  <div class="row no-buffer">
-                    <div class="col-md-12">
-                      FEIN <%= number_to_obscured_fein @employer_profile.fein %><br/>
-                      Entity Kind <%= @employer_profile.entity_kind.to_s.titleize %>
-                    </div>
+
+
+
+
+
+
+
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <div class="row">
+                <p class="head">
+                      <span>Premium Billing Report 1/22/2015 - 12/12/2015</span>
+                      <span></span>
+                  </p>
+                  <div class="table-responsive table-border">
+                      <table class="table table-wrapper table-condensed">
+                          <tbody>
+                              <tr>
+                                  <th><strong>Total Premium :</strong></th>
+                                  <td><strong>$47,434.34</strong></td>
+                              </tr>
+                              <tr>
+                                  <th>Employee Contributions :</th>
+                                  <td>$16,234.33</td>
+                              </tr>
+                              <tr>
+                                  <th>Employer Contributions :</th>
+                                  <td>$31,234.33</td>
+                              </tr>
+                          </tbody>
+                      </table>
                   </div>
-                </li>
-              </ul>
-            </div>
-          </div>
+                  <div class="col-md-4 col-md-offset-4">
+                    <%= link_to 'Get Reports', employers_premium_statement_path, remote: true, class: 'btn btn-see-details' %>
+                  </div>
+              </div>
 
-          <div class="col-md-6 col-sm-6 col-xs-12 right-side">
-            <div class="row">
-              <p class="head">
-                <span>Enrollment</span>
-                <span></span>
-              </p>
 
-              <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
-                <% if @current_plan_year.present? %>
+
+              <div class="row bottom">
+                <p class="head">
+                  <span>Enrollment</span>
+                  <span></span>
+                </p>
+
+                <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
+                  <% if @current_plan_year.present? %>
+                    <li class="list-group-item">
+                      <div class="row no-buffer">
+                        <div class="col-md-12">
+                          <dl class="dl-horizontal">
+                            <dt>Plan Year</dt>
+                            <dd><%= @current_plan_year.start_on.to_date.year %></dd>
+                            <dt>Plan Year Start</dt>
+                            <dd><%= format_date @current_plan_year.start_on %></dd>
+                            <dt>Open Enroll Start/End</dt>
+                              <dd>
+                                <%= format_date @current_plan_year.open_enrollment_start_on %> / 
+                                <%= format_date @current_plan_year.open_enrollment_end_on %>
+                              </dd>
+                            <dt>Full Time Employees</dt>
+                            <dd> <%= @current_plan_year.fte_count %></dd>
+                            <dt>Participation Pct</dt>
+                            <dd>100%</dd>
+                            <dt><%= @current_plan_year.employee_participation_percent %></dt>
+                          </dl>
+                        </div>
+                      </div>
+                    </li>
+                  <% else %>
+                   <li>No Plan Years Found</li>
+                  <% end %>
+                </ul>
+              </div>
+
+              <div class="row bottom">
+                <p class="head">
+                  <span>Broker</span>
+                  <span></span>
+                </p>
+
+                <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
                   <li class="list-group-item">
+                  <% if @employer_profile.broker_agency_profile.present? %>
+                      <div class="row no-buffer">
+                        <div class="col-md-12">
+                          <dl class="dl-horizontal">
+                            <dt>Agency Name</dt>
+                            <dd><%= @employer_profile.broker_agency_profile.legal_name %></dd>
+                            <% if @employer_profile.broker_agency_profile.primary_broker_role.present? %>
+                            <dt>Broker Name</dt>
+                            <dd><%= @employer_profile.broker_agency_profile.primary_broker_role.person.full_name %></dd>
+                            <dt>Contact Phone</dt>
+                            <dd><%= @employer_profile.broker_agency_profile.primary_broker_role.person.phones.map(&:to_s).join('/') %></dd>
+                            <dt>Email</dt>
+                            <dd><a href="mailto:<%= @employer_profile.broker_agency_profile.primary_broker_role.person.emails.first.address %>"><%= @employer_profile.broker_agency_profile.primary_broker_role.person.emails.first.address %></a></dd>
+                            <% end %> 
+                          </dl>
+                        </div>
+                      </div>
+                  <% else %>
                     <div class="row no-buffer">
                       <div class="col-md-12">
-                        <dl class="dl-horizontal">
-                          <dt>Plan Year</dt>
-                          <dd><%= @current_plan_year.start_on.to_date.year %></dd>
-                          <dt>Plan Year Start</dt>
-                          <dd><%= format_date @current_plan_year.start_on %></dd>
-                          <dt>Open Enroll Start/End</dt>
-                            <dd>
-                              <%= format_date @current_plan_year.open_enrollment_start_on %> / 
-                              <%= format_date @current_plan_year.open_enrollment_end_on %>
-                            </dd>
-                          <dt>Full Time Employees</dt>
-                          <dd> <%= @current_plan_year.fte_count %></dd>
-                          <dt>Participation Pct</dt>
-                          <dd>100%</dd>
-                          <dt><%= @current_plan_year.employee_participation_percent %></dt>
-                        </dl>
+                         No Active Broker
                       </div>
                     </div>
-                  </li>
-                <% else %>
-                 <li>No Plan Years Found</li>
-                <% end %>
-              </ul>
-            </div>
-
-            <div class="row bottom">
-              <p class="head">
-                <span>Broker</span>
-                <span></span>
-              </p>
-
-              <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
-                <li class="list-group-item">
-                <% if @employer_profile.broker_agency_profile.present? %>
-                    <div class="row no-buffer">
-                      <div class="col-md-12">
-                        <dl class="dl-horizontal">
-                          <dt>Agency Name</dt>
-                          <dd><%= @employer_profile.broker_agency_profile.legal_name %></dd>
-                          <% if @employer_profile.broker_agency_profile.primary_broker_role.present? %>
-                          <dt>Broker Name</dt>
-                          <dd><%= @employer_profile.broker_agency_profile.primary_broker_role.person.full_name %></dd>
-                          <dt>Contact Phone</dt>
-                          <dd><%= @employer_profile.broker_agency_profile.primary_broker_role.person.phones.map(&:to_s).join('/') %></dd>
-                          <dt>Email</dt>
-                          <dd><a href="mailto:<%= @employer_profile.broker_agency_profile.primary_broker_role.person.emails.first.address %>"><%= @employer_profile.broker_agency_profile.primary_broker_role.person.emails.first.address %></a></dd>
-                          <% end %> 
-                        </dl>
-                      </div>
-                    </div>
-                <% else %>
+                  <% end %>
                   <div class="row no-buffer">
                     <div class="col-md-12">
-                       No Active Broker
+                      <a class="pull-right" aria-controls="employees" data-toggle="tab" id="broker-agency-tab" role="tab" href="#broker_agency">
+                        <span class="hidden-xs">Broker Agency</span>
+                        <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agency"></span>
+                      </a>
                     </div>
                   </div>
-                <% end %>
-                <div class="row no-buffer">
-                  <div class="col-md-12">
-                    <a class="pull-right" aria-controls="employees" data-toggle="tab" id="broker-agency-tab" role="tab" href="#broker_agency">
-                      <span class="hidden-xs">Broker Agency</span>
-                      <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agency"></span>
-                    </a>
-                  </div>
-                </div>
-                </li>
-              </ul>              
+                  </li>
+                </ul>              
+              </div>
             </div>
           </div>
         </div>

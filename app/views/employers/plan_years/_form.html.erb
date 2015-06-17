@@ -27,7 +27,7 @@
               <%= render "shared/benefit_group_fields", f: bg %><br>
             <% end %>
             <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'pull-right btn btn-success' %>
-            <div class="row top-row no-border">
+            <div class="row no-buffer">
               <button type="submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Create Plan Year</button>
             </div>
           </div>
