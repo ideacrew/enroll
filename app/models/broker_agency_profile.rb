@@ -18,6 +18,9 @@ class BrokerAgencyProfile
   field :aasm_state, type: String
   field :aasm_state_set_on, type: Date
 
+  embeds_one  :inbox, as: :recipient, cascade_callbacks: true
+  accepts_nested_attributes_for :inbox
+
   has_many :broker_agency_contacts, class_name: "Person", inverse_of: :broker_agency_contact
   accepts_nested_attributes_for :broker_agency_contacts, reject_if: :all_blank, allow_destroy: true
 
@@ -40,6 +43,8 @@ class BrokerAgencyProfile
     allow_blank: false
 
   validate :writing_agent_employed_by_broker
+
+  after_initialize :build_nested_models
 
   # has_many employers
   def employer_clients
@@ -145,6 +150,11 @@ class BrokerAgencyProfile
   end
 
 private
+
+  def build_nested_models
+    build_inbox if inbox.nil?
+  end
+
   def writing_agent_employed_by_broker
     # TODO: make this work when I'm not tired - Sean Carley
     if writing_agents.present?

@@ -111,6 +111,7 @@ Rails.application.routes.draw do
   namespace :broker_agencies do
     root 'profiles#new'
     resources :profiles, only: [:new, :create, :show, :index] do 
+      resource :inbox, only: [:new, :create, :index]
       get :employer_view
     end
   end

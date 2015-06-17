@@ -17,6 +17,7 @@
  *= require component
  *= require style
  *= require custom
+ *= require open_sans
  *= require styles
  *= require selectric
  *= require responsive

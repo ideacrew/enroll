@@ -14,6 +14,10 @@ class Message
 
   alias_method :message_read?, :message_read
 
+  def sender_name
+    User.find(sender_id).person.full_name
+  end
+
 private
   def set_timestamp
     self.created_at = Time.now.utc

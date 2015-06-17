@@ -1,7 +1,7 @@
 <div class="container">
   <div class="employee-welocome">
     <div class="row">
-      <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
+      <div class="col-lg-9 col-md-9 col-sm-10 col-xs-12">
         <div class="col-md-12 col-sm-12 no-pd col-xs-12" id="confirm_plan">
 
             <h3>Confirm Your Plan Selection</h3>
@@ -19,40 +19,37 @@
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Gender</th>
-                  <th>Birthday</th>
-                  <th>Premium</th>
+                  <th>Relationship</th>
+                  <th>Age</th>
+                  <th class="text-right">Premium</th>
+                  <th class="text-right" width="50">Employer Contribution</th>
+                  <th class="text-right" width="50">You Pay</th>
                 </tr>
               </thead>
 
               <tbody>
-                <% total_cost = 0 %>
+                <% total_cost, total_contribution, total_employee_cost = 0, 0, 0 %>
                 <% @enrollment.hbx_enrollment_members.each do |member| %>
                   <tr>
                     <td><%= member.person.full_name %></td>
-                    <td><%= member.person.try(:gender).humanize %></td>
-                    <td><%= member.person.try(:dob).strftime("%m/%d/%Y") %></td>
-                    <td><%= number_to_currency(@plan.premium_for(member)) %></td>
+                    <td><%= member.primary_relationship %></td>
+                    <td><%= member.person.age_on(Time.now.utc.to_date) %></td>
+                    <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
+                    <td class="text-right"><%= number_to_currency(@plan.employer_contribution_for(member)) %></td> 
+                    <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
                     <% total_cost += @plan.premium_for(member) %>
+                    <% total_contribution += @plan.employer_contribution_for(member) %>
+                    <% total_employee_cost += @plan.employee_cost_for(member) %>
                   </tr>
                 <% end %>
                 <tr class="gray-row">
-                  <td colspan="3" class="text-right capital"><strong>Total Premium :</strong></td>
-                  <td><strong><%= number_to_currency(total_cost) %></strong></td>
-                </tr>
-
-                <tr>
-                  <td colspan="3" class="text-right">Additionally your employer pays :</td>
-                  <td><%= number_to_currency(@plan.total_employer_contribution) %></td>
-                </tr>
-                <tr class="gray-row">
-                  <td colspan="3" class="text-right capital"><strong>You pay :</strong></td>
-                  <td><strong>
-                    <%= number_to_currency(@plan.total_employee_cost || 0) %>
-                  </strong></td>
+                  <td colspan="3" class="text-right capital"><strong>Totals</strong></td>
+                  <td class="text-right"><strong><%= number_to_currency(total_cost) %></strong></td>
+                  <td class="text-right"><strong><%= number_to_currency(total_contribution) %></strong></td>
+                  <td class="text-right"><strong><%= number_to_currency(total_employee_cost) %></strong></td>
                 </tr>
                 <tr>
-                  <td colspan="3" class="text-right">Your coverage start date :</td>
+                  <td colspan="5" class="text-right">Your coverage start date :</td>
                   <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
                 </tr>
               </tbody>
@@ -65,7 +62,7 @@
    Purchase'.html_safe, checkout_insured_plan_shopping_path(@enrollment, :plan_id => @plan.id), :class => "btn btn-primary btn-continue pull-right", :method => :post %>
         </div>
 
-        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
           <%= render  partial: 'shared/signup_progress', locals: {step: '6'} %>
         </div>
     </div>
