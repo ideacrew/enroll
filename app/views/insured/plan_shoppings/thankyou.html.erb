@@ -21,30 +21,32 @@
                   <th>Name</th>
                   <th>Relationship</th>
                   <th>Age</th>
-                  <th>Premium</th>
-                  <th width="50">Employer Contribution</th>
-                  <th width="50">You Pay</th>
+                  <th class="text-right">Premium</th>
+                  <th class="text-right" width="50">Employer Contribution</th>
+                  <th class="text-right" width="50">You Pay</th>
                 </tr>
               </thead>
 
               <tbody>
-                <% total_cost = 0 %>
+                <% total_cost, total_contribution, total_employee_cost = 0, 0, 0 %>
                 <% @enrollment.hbx_enrollment_members.each do |member| %>
                   <tr>
                     <td><%= member.person.full_name %></td>
                     <td><%= member.primary_relationship %></td>
                     <td><%= member.person.age_on(Time.now.utc.to_date) %></td>
-                    <td><%= number_to_currency(@plan.premium_for(member)) %></td>
-                    <td>$0</td>
-                    <td>$0</td>
+                    <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
+                    <td class="text-right"><%= number_to_currency(@plan.employer_contribution_for(member)) %></td> 
+                    <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
                     <% total_cost += @plan.premium_for(member) %>
+                    <% total_contribution += @plan.employer_contribution_for(member) %>
+                    <% total_employee_cost += @plan.employee_cost_for(member) %>
                   </tr>
                 <% end %>
                 <tr class="gray-row">
                   <td colspan="3" class="text-right capital"><strong>Totals</strong></td>
-                  <td><strong><%= number_to_currency(total_cost) %></strong></td>
-                  <td><strong>$0</strong></td>
-                  <td><strong>$0</strong></td>
+                  <td class="text-right"><strong><%= number_to_currency(total_cost) %></strong></td>
+                  <td class="text-right"><strong><%= number_to_currency(total_contribution) %></strong></td>
+                  <td class="text-right"><strong><%= number_to_currency(total_employee_cost) %></strong></td>
                 </tr>
                 <tr>
                   <td colspan="5" class="text-right">Your coverage start date :</td>
