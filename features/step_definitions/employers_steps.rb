@@ -270,6 +270,19 @@ When(/^I click on terminate button for a census family$/) do
   @browser.a(text: /Submit/).click
 end
 
+When(/^I click on terminate button for rehired census employee$/) do
+  @browser.a(text: /Terminate/).wait_until_present
+  @browser.execute_script("$('.interaction-click-control-terminate').last().trigger('click')")
+  terminated_date = (Date.current + 60.days).strftime("%m/%d/%Y")
+  @browser.execute_script("$('.date-picker').val(\'#{terminated_date}\')")
+  #click submit
+  @browser.h3(text: /Employee Roster/).click
+  @browser.a(text: /Submit/).wait_until_present
+  @browser.a(text: /Submit/).click
+  @browser.a(text: /Logout/i).wait_until_present
+  @browser.a(text: /Logout/i).click
+end
+
 Then(/^The census family should be terminated and move to terminated tab$/) do
   @browser.a(text: /Employees/).wait_until_present
   @browser.a(text: /Employees/).click
@@ -288,15 +301,25 @@ And(/^I should see the census family is successfully terminated message$/) do
 end
 
 When(/^I click on Rehire button for a census family on terminated tab$/) do
+  Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.where(aasm_state: "employment_terminated").update(name_sfx: "Sr", first_name: "Polly")
   @browser.a(text: /Rehire/).wait_until_present
   @browser.a(text: /Rehire/).click
+  hired_date = (Date.current + 30.days).strftime("%m/%d/%Y")
+  #@browser.text_field(class: /hasDatepicker/).set(hired_date)
+  @browser.execute_script("$('.date-picker').val(\'#{hired_date}\')")
+  #click submit
+  @browser.h3(text: /Employee Roster/).click
+  @browser.a(text: /Submit/).wait_until_present
+  @browser.a(text: /Submit/).click
 end
 
 Then(/^A new instance of the census family should be created$/) do
-  @browser.radio(id: "terminated_no").wait_until_present
-  @browser.radio(id: "terminated_no").fire_event("onclick")
-  @browser.a(text: /Terminate/).wait_until_present
-  expect(@browser.text.include?(/Patrick K Doe Jr/)).to be_truthy
+  @browser.a(text: /Employees/).wait_until_present
+  @browser.a(text: /Employees/).click
+  @browser.radio(id: "family_all").wait_until_present
+  @browser.radio(id: "family_all").fire_event("onclick")
+  @browser.element(text: /Rehired/).wait_until_present
+  @browser.element(text: /Rehired/).visible?
   expect(@browser.a(text: /Terminate/).visible?).to be_truthy
 end
 

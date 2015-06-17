@@ -29,10 +29,12 @@ Feature: Create Employer
         And I click on terminate button for a census family
       Then The census family should be terminated and move to terminated tab
         #And I should see the census family is successfully terminated message
-        And I logout from employer portal
-
-      #When I click on Rehire button for a census family on terminated tab
-      #Then A new instance of the census family should be created
+        #And I logout from employer portal
+      #Rehire
+      When I click on Rehire button for a census family on terminated tab
+      Then A new instance of the census family should be created
+        And I click on the Employees tab
+        And I click on terminate button for rehired census employee
         #And I should see the census family is successfully rehired message
         #And I logout from employer portal
       Given I do not exist as a user
