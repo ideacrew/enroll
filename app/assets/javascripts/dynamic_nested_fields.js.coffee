@@ -1,22 +1,22 @@
-ready = ->
-  $('form').on 'click', '.add_fields', (event) ->
-    event.preventDefault()
-    time = new Date().getTime()
-    regexp = new RegExp($(this).data('id'), 'g')
-    html = $(this).data('fields').replace(regexp, time)
-    target = $(this).closest('.form-inputs')
-    if $(target).children('fieldset:last').length > 0
-      $(target).children('fieldset:last').after(html)
-    else
-      $(target).prepend(html)
-    $(target).children('fieldset:last').find('select').selectric()
-    $(target).children('fieldset:last').find("input.floatlabel").floatlabel slideInput: false
+$(document).on 'click', 'form .add_fields', (event) ->
+  event.preventDefault()
+  time = new Date().getTime()
+  regexp = new RegExp($(this).data('id'), 'g')
+  html = $(this).data('fields').replace(regexp, time)
+  target = $(this).closest('.form-inputs')
+  if $(target).children('fieldset:last').length > 0
+    $(target).children('fieldset:last').after(html)
+  else
+    $(target).prepend(html)
+  $(target).children('fieldset:last').find('select').selectric()
+  $(target).children('fieldset:last').find("input.floatlabel").floatlabel slideInput: false
 
-    update_delete_buttons()
+  update_delete_buttons()
 
-  $('form').on 'click', '.remove_fields', (event) ->
-    $(this).closest('fieldset').remove()
-    event.preventDefault()
+
+$(document).on 'click', 'form .remove_fields', (event) ->
+  $(this).closest('fieldset').remove()
+  event.preventDefault()
 
 @update_delete_buttons = ->
   nested_fields = $('.form-inputs')
@@ -27,5 +27,3 @@ ready = ->
       delete_button.hide()
     else
       delete_button.show()
-
-$(document).on('page:update', ready)
