@@ -7,6 +7,7 @@ describe BenefitGroup, type: :model do
   it { should validate_presence_of :effective_on_offset }
   it { should validate_presence_of :reference_plan_id }
   it { should validate_presence_of :elected_plan_ids }
+  it { should validate_uniqueness_of :title }
 end
 
 describe BenefitGroup, dbclean: :after_each do

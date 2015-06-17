@@ -47,6 +47,8 @@ class BenefitGroup
   validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
                         :reference_plan_id, :plan_option_kind, :elected_plan_ids
 
+  validates_uniqueness_of :title
+
   validates :plan_option_kind,
     allow_blank: false,
     inclusion: {
