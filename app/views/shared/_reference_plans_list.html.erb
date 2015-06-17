@@ -18,7 +18,7 @@
 
 <!-- Select Reference Plan -->
 <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd reference-plan-select">
-  <%= f.hidden_field :reference_plan_id, value: f.object.reference_plan_id, required: true %>
+  <%= f.hidden_field :reference_plan_id, value: f.object.reference_plan_id %>
   <div class="carrier-select reference-plan-content" style="<%= 'display:block;' if (selected_kind_carrier or selected_kind_plan) %>">
     <% @carriers.each do |carrier| %>
 	    <% carrier_plans = @plan_year.carrier_plans_for(carrier.id) %>

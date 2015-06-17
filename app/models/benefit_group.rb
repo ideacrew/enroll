@@ -98,7 +98,7 @@ class BenefitGroup
     if new_plans.is_a? Array
       self.elected_plan_ids = new_plans.reduce([]) { |list, plan| list << plan._id }
     else
-      self.elected_plan_ids = Array.new(1, new_plans._id)
+      self.elected_plan_ids = Array.new(1, new_plans.try(:_id))
     end
     @elected_plans = new_plans
   end
@@ -229,13 +229,9 @@ private
       if !(elected_plan_ids.include? reference_plan_id)
         self.errors.add(:elected_plans, "single carrier must include reference plan")
       end
-      if elected_plans.detect { |plan| plan.carrier_profile_id != reference_plan.carrier_profile_id }
+      if elected_plans.detect { |plan| plan.carrier_profile_id != reference_plan.try(:carrier_profile_id) }
         self.errors.add(:elected_plans, "not all from the same carrier as reference plan")
       end
-    end
-
-    if (plan_option_kind == "single_carrier") && !(elected_plan_ids.include? reference_plan_id)
-      self.errors.add(:elected_plans, "not all from the same carrier as reference plan")
     end
 
     if (plan_option_kind == "metal_level") && !(elected_plan_ids.include? reference_plan_id)
