@@ -23,6 +23,7 @@ end
 Before "@watir" do
   extend WatirScreenshots
   @browser = Watir::Browser.new :chrome, switches: ["--test-type"]
+  @browser.window.resize_to(1440, 900)
   @screen_count = 0
 end
 
