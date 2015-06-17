@@ -327,6 +327,11 @@ And(/^I should be able to add information about plan year, benefits and relation
   sleep(1)
   @browser.h4(text: /start on must be first day of the month/).wait_until_present
   expect(@browser.text.include?("start on must be first day of the month")).to be_truthy
+  
+
+  @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").set("91/96/2017")
+  @browser.h3(text: /Plan Year/).click
+  expect(@browser.text.include?("Open Enrollment Start Date: Invalid date format!")).to be_truthy
   # happy path
   begin_date = (Date.current + 3.months).beginning_of_month
   @browser.text_field(class: "interaction-field-control-plan_year-start_on").set(begin_date)
