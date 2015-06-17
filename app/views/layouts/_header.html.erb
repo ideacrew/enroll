@@ -30,7 +30,7 @@
               </ul>
               <div class="clearfix"></div>
               <ul class="user-info">
-                  <li class="">(ID <%= current_user.id %>) &nbsp; &nbsp; <strong><%= @person.full_name if @person.present? && @person.persisted? %></strong></li>
+                  <li class="">(ID <%= current_user.id %>) &nbsp; &nbsp; <strong><%= user_full_name %></strong></li>
               </ul>
             <% end %>
           </div>
