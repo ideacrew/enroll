@@ -1,8 +1,8 @@
 <td><%= mixed_case b[:benefit_type] %></td>
 <td><%= b[:benefit_name] %></td>
 <td><%= b[:issuer_name] %></td>
-<td class="text-right"><%= b[:covered_member_count] %></td>
+<td style="text-align: center;"><%= b[:covered_member_count] %></td>
 <td><%= boolean_to_human b[:is_cobra] %></td>
-<td class="text-right"><%= number_to_currency b[:ee_premium_amount] %></td>
-<td class="text-right"><%= number_to_currency b[:er_premium_amount] %></td>
-<td class="text-right"><%= number_to_currency b[:total_premium_amount] %></td>
+<td style="text-align: center;"><%= number_to_currency b[:ee_premium_amount] %></td>
+<td style="text-align: center;"><%= number_to_currency b[:er_premium_amount] %></td>
+<td style="text-align: center;"><%= number_to_currency b[:total_premium_amount] %></td>
