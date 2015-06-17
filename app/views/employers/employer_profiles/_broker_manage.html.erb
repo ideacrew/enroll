@@ -10,7 +10,7 @@
          <% end %>
        </li>
        <li role="presentation"<%= menu_tab_class(active_tab, "broker-agencies-tab") %> id="agency_index_tab">
-         <%= link_to(employers_employer_profile_broker_agency_index_path(@employer_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "employers", "role" => "tab" ) do  %>
+         <%= link_to("/employers/employer_profiles/#{@employer_profile.id}/broker_agency", :remote => true, "aria-expanded" => "true", "aria-controls" => "employers", "role" => "tab" ) do  %>
          <span class="hidden-xs">Broker Agencies</span>
          <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agencies"></span>
          <% end %>

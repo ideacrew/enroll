@@ -33,7 +33,7 @@
             <% end %>
         </tbody>
       </table>
-      <%= render 'shared/alph_paginate', url: employers_employer_profile_broker_agency_index_path, alphs: @page_alphabets, remote: true %>
+      <%= render 'shared/alph_paginate', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", alphs: @page_alphabets, remote: true %>
     </div>
   </div>
 </div>

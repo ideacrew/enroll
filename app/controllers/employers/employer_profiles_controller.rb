@@ -1,5 +1,5 @@
 class Employers::EmployerProfilesController < ApplicationController
-  before_action :find_employer, only: [:show, :destroy, :broker_agency_index, :active_broker]
+  before_action :find_employer, only: [:show, :destroy, :active_broker]
   before_action :check_admin_staff_role, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
 
@@ -121,16 +121,6 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def active_broker
     @broker_agency_profiles = @employer_profile.broker_agency_profile.to_a
-  end
-
-  def broker_agency_index
-    @q = params.permit(:q)[:q]
-    @orgs = Organization.search(@q).exists(broker_agency_profile: true)
-    @page_alphabets = page_alphabets(@orgs, "legal_name")
-    page_no = cur_page_no(@page_alphabets.first)
-    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
-
-    @broker_agency_profiles = @organizations.map(&:broker_agency_profile)
   end
 
   private
