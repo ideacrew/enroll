@@ -1,0 +1,18 @@
+<h2>Messages</h2>
+<div class="container">
+<table class="table">
+  <tr>
+    <th> Sent by </th>
+    <th> Subject </th>
+    <th> Content </th>
+  </tr>
+
+  <% provider.inbox.messages.each do |message| %>
+    <tr>
+      <td> <%= message.sender_name.humanize %> </td>
+      <td> <%= message.subject %> </td>
+      <td> <%= message.body %> </td>
+    </tr>
+  <% end %>
+</table>
+</div>

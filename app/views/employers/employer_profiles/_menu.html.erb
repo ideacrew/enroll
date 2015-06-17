@@ -38,7 +38,7 @@
       </li>
       <li role="presentation">
         <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox" class="hidden-xs interaction-click-control-4-messages">
-          <span class="badge">1</span>Inbox
+          <span class="badge"><%= @employer_profile.inbox.messages.size if @employer_profile.inbox.messages.present? %></span>Inbox
         </a>
         <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox" class="visible-xs interaction-click-control-messages">
           <span aria-hidden="true" class="glyphicon glyphicon-comment"></span>

@@ -19,6 +19,14 @@
           <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Employers"></span>
         </a>
       </li>
-      </ul>
+      <li role="presentation">
+        <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox" class="hidden-xs interaction-click-control-4-messages">
+        <span class="badge"><%= @broker_agency_profile.inbox.messages.size rescue nil %></span>Inbox
+        </a>
+        <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox" class="visible-xs interaction-click-control-messages">
+          <span aria-hidden="true" class="glyphicon glyphicon-comment"></span>
+        </a>
+      </li>
+    </ul>
   </div>
 </div>

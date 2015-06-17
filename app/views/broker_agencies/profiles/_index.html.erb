@@ -1,6 +1,6 @@
 <%-  render 'broker_agencies/profiles/menu', :active_tab => "home-tab" %>
-
-<div class="container">
+<div id= 'message_form'></div>
+<div class="container" id="inbox_provider_form">
 
   <h3>Broker Agencies</h3>
 
@@ -13,6 +13,7 @@
         <th>Fein</th>
         <th>Entity Kind</th>
         <th>Market Kind</th>
+        <th></th>
       </thead>
       <% @broker_agency_profiles.each do |broker_agency_profile| %>
         <tbody>
@@ -21,6 +22,8 @@
           <td><%= broker_agency_profile.fein %></td>
           <td><%= broker_agency_profile.entity_kind.titleize %></td>
           <td><%= broker_agency_profile.market_kind.titleize %></td>
+          <td><%= link_to '<i class="fa fa-user-plus"></i> Send Secure Message'.html_safe, 
+          new_broker_agencies_profile_inbox_path(broker_agency_profile), class: "btn btn-primary", remote: true %></td>
         </tbody>
       <% end %>
     <% else %>
