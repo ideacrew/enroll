@@ -72,7 +72,7 @@ $(document).ready(function () {
     $("."+divtoshow).show();
   });
 
-  $('.alert').delay(3200).fadeOut(2000); //Fade Alert Box
+  $('.alert').delay(7000).fadeOut(2000); //Fade Alert Box
 
   // $('#plan_year input,select').click(function(){
   //   $('#plan_year .alert-error').fadeOut(2000);

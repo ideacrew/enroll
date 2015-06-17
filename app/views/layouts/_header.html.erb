@@ -17,7 +17,7 @@
           </ul>
           <div class="right-menu navbar-right">
             <% if signed_in? %>
-              <ul class="navbar-nav top-menu">
+              <ul class="navbar-nav top-menu pull-right">
                 <% if @person.present? && @person.persisted? %>
                   <li><%= link_to "My Account", home_consumer_profiles_path %></li>
                   <li class="hidden-xs">|</li>
