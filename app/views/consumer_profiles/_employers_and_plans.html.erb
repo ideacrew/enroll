@@ -72,40 +72,8 @@
                 </div>
 
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <!-- <div class="panel panel-default">
-                      <div class="panel-body">
-                          <div class="page-header">
-                              <h4>Payments</h4>
-                              <a href="#"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Details</a>
-                          </div>
-                          <ul class="list-unstyled list-comp">
-                              <li>
-                                  NEXT PAYMENT DUE: <EM>03/30/2014</EM>
-                              </li>
-                          </ul>
-                          <H1>$249</H1>
-                          <br/>
-                          <div class="row">
-                              <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                                  <ul class="list-unstyled list-comp no-pd">
-                                      <li>
-                                          LAST PAYMENT: <EM>$249</EM>
-                                      </li>
-                                      <li>
-                                          RECEIVED: <EM>03/30/2014</EM>
-                                      </li>
-                                      <li>
-                                          <a href="#">PAYMENT HISTORY</a>
-                                      </li>
-                                  </ul>
-                              </div>
-                              <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                                  <a href="#" class="btn btn-danger btn-block btn-payment btn-block">Make a Payment</a>
-                              </div>
-                          </div>
-                      </div>
-                    </di -->
 
+                  <%= link_to(family_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "family", "role" => "tab" ) do  %>
                     <div class="panel panel-default">
                       <div class="panel-body">
                         <div class="row">
@@ -119,7 +87,9 @@
                           </div>
                       </div>
                     </div>
+                  <% end %>
 
+                  <%= link_to insured_plan_shopping_path(:id => @hbx_enrollments.first._id, change_plan: 'change') do %>
                     <div class="panel panel-default">
                       <div class="panel-body"><br>
                         <div class="row">
@@ -130,14 +100,16 @@
                                 <% if @hbx_enrollments.map(&:coverage_selected?).include?(true) %>
                                   <h3>Shop for plans</h3>
                                 <% else %>
-                                  <h3><%= link_to 'Shop for plans'.html_safe, insured_plan_shopping_path(:id => @hbx_enrollments.first._id) %></h3>
+                                  <h3>Shop for plans</h3>
                                 <% end %>
-                              <small>Browse plans from carriers in the DC Health Care Exchange.</small>
+                                <small>Browse plans from carriers in the DC Health Care Exchange.</small>
                               </div>
                           </div><br>
                       </div>
                     </div>
+                  <% end %>
 
+                  <a href="#">
                     <div class="panel panel-default">
                       <div class="panel-body">
                           <div class="row">
@@ -153,6 +125,7 @@
                           </div>
                       </div>
                     </div>
+                  </a>
                 </div>
     </div>
   </div>

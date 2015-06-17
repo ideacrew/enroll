@@ -249,4 +249,10 @@ module ApplicationHelper
       'active'
     end
   end
+
+  def user_full_name
+    if signed_in?
+      current_user.person.try(:full_name) ? current_user.person.full_name : 'User'
+    end
+  end
 end

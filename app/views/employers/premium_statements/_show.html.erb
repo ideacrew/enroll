@@ -47,28 +47,43 @@
 
   <% staff = [employee1.dup, employee0.dup, employee0.dup, employee1.dup, employee0.dup, employee0.dup, employee1.dup] %>
 
-  <table class="table table-condensed">
-    <thead>
-      <tr>
-        <th>Employee</th>
-        <th>SSN</th>
-        <th>DOB</th>
-        <th>Hired</th>
-        <th>Benefit Group</th>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Issuer</th>
-        <th>Covered Ct</th>
-        <th>COBRA?</th>
-        <th>Employer Contribution</th>
-        <th>Employee Premium</th>
-        <th>Total Premium</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% staff.each do |employee| %>
-        <%= render "employee_line_item", ee: employee %>
-      <% end %>      
-    </tbody>
-  </table>
+<div class="col-md-12 col-sm-12 col-xs-12 col-gn-top">
 
+<div class="row">
+  <div class="container">
+    <div class="col-md-12 no-pd">
+      <h3 class="pull-left">Premium Biling Report</h3>
+      <a href="#" class="btn btn-danger return_to_home pull-right"><i class="fa fa-times"></i> Cancel</a>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row no-buffer">
+    <table class="table table-condensed table-border">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>SSN</th>
+          <th>DOB</th>
+          <th>Hired</th>
+          <th>Benefit Group</th>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Issuer</th>
+          <th style="text-align: center;">Covered Ct</th>
+          <th>COBRA?</th>
+          <th style="text-align: center;">Employer Contribution</th>
+          <th style="text-align: center;">Employee Premium</th>
+          <th style="text-align: center;">Total Premium</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% staff.each do |employee| %>
+          <%= render "employee_line_item", ee: employee %>
+        <% end %>      
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>

@@ -1,24 +1,26 @@
     <fieldset>            
                 <%= f.fields_for :address, errors: {}, fieldset: false do |address| %>
-                        <div class="row no-buffer row-form-wrapper">
-                        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                          <%= address.select :kind, options_for_select(Address::OFFICE_KINDS.map {|a| [a.to_s.humanize, a.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
-                        </div>
-                        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                          <%= address.text_field :address_1, class: "floatlabel form-control", required: true, placeholder: 'ADDRESS LINE 1' %>
-                        </div>
-                        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                          <%= address.text_field :address_2, class: "floatlabel form-control", placeholder: 'ADDRESS LINE 2' %>
-                        </div>
-                        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                          <%= address.text_field :city, class: "floatlabel form-control", required: true, placeholder: 'CITY' %>
-                        </div>
-                        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                          <%= address.text_field :state, class: "floatlabel form-control", required: true, placeholder: 'STATE' %>
-                        </div>
-                        <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">
-                          <%= address.text_field :zip, class: "floatlabel form-control", required: true, placeholder: 'ZIP' %>
-                        </div>
+                  <div class="row no-buffer row-form-wrapper">
+                      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+                        <%= address.select :kind, options_for_select(Address::OFFICE_KINDS.map {|a| [a.to_s.humanize, a.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
+                      </div>
+                      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+                        <%= address.text_field :address_1, class: "floatlabel form-control", required: true, placeholder: 'ADDRESS LINE 1' %>
+                      </div>
+                      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+                        <%= address.text_field :address_2, class: "floatlabel form-control", placeholder: 'ADDRESS LINE 2' %>
+                      </div>
+                  </div>
+                  <div class="row no-buffer row-form-wrapper">
+                      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+                        <%= address.text_field :city, class: "floatlabel form-control", required: true, placeholder: 'CITY' %>
+                      </div>
+                      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+                        <%= address.text_field :state, class: "floatlabel form-control capital address-state", required: true, placeholder: 'STATE' %>
+                      </div>
+                      <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">
+                        <%= address.text_field :zip, class: "floatlabel form-control zip", required: true, placeholder: 'ZIP' %>
+                      </div>
                   </div>
                 <% end %>
 
