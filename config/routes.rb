@@ -89,7 +89,7 @@ Rails.application.routes.draw do
         post 'publish'
       end
 
-      resources :broker_agency, only: [:create] do
+      resources :broker_agency, only: [:index, :show, :create] do
         get :terminate
       end
 
@@ -112,7 +112,6 @@ Rails.application.routes.draw do
     root 'profiles#new'
     resources :profiles, only: [:new, :create, :show, :index] do 
       resource :inbox, only: [:new, :create, :index]
-      get :employer_view
     end
   end
 
