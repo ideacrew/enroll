@@ -19,7 +19,7 @@
         <% provider.inbox.messages.each do |message| %>
           <tr>
             <td> <%= message.sender_name.humanize %> </td>
-            <td> <%= message.subject %> </td>
+            <td> <%= message.try(:subject) %> </td>
             <td> Delete Button </td>
             <td> Show Button </td>
           </tr>
