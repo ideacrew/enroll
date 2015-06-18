@@ -40,7 +40,8 @@
 
 /* Layout Specifics */
 html {
-  position: relative;
+  height: 100%;
+  /*position: relative;*/
 }
 * {
     font-family: 'Open Sans', sans-serif;
@@ -48,6 +49,10 @@ html {
 body {
     background-color: #f2f2f2;
     font-family: "Open Sans",sans-serif;
+    min-height: 100%;
+    position: relative;
+    padding-top: 73px;
+    padding-bottom: 70px;
 }
 
 .navbar-default {
@@ -332,8 +337,8 @@ p.information {
 }
 /* End New Person Signup */
 
-.row.content{
-  margin: 46px 0 0;
+.content{
+  padding: 40px 0 0; 
 }
 .welcome-msg {
     padding-top: 25px;
@@ -907,7 +912,7 @@ a:hover{
    landing-page
    ========================================================================== */
 .landing{
-  padding-top: 26px;
+  /*padding-top: 26px;*/
 }
 .panel.personal{
   position: relative;
@@ -2218,7 +2223,7 @@ a.close-1, a.close-2{
 /* Sign In page css start */
 .signin {font-size: 16px;}
 .signin h1 {text-align: center;}
-.search-wp input.form-control, .signin input.form-control,
+.search-wp input.form-control, .signin input.form-control, #new_user input.form-control,
 .qle-form-wrapper .form-control, #select_plan_wrapper .form-control, #new_inbox input.form-control
 {padding: 0 10px !important;}
 
@@ -4955,9 +4960,11 @@ table.table tr.gray-row {background-color: ivory;}
 
 footer.footer-wrapper {
     background-color: #003260;
-    bottom: 0;
-    margin-top: 60px;
     padding: 15px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
 }
 footer.footer-wrapper p {
     color: #ffffff;
