@@ -41,13 +41,7 @@
             <%= render 'address_fields', f: address %>
           <% end %>
           <br/>
-          <div class="form-inputs">
-            <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |dependent| %>
-              <%= render 'shared/census_dependent_fields', f: dependent %>
-            <% end %>
-            <br/>
-            <%= link_to_add_fields '<i class="fa fa-user-plus"></i> Add Dependent'.html_safe, f, :census_dependents, 'btn btn-success pull-right' %>
-          </div>
+          <%= render 'shared/add_dependents', {f: f} %>
           <div class="row top-row no-border">
             <div class="col-md-3 col-sm-3 col-xs-12 key-btn">
               <% button_label = @census_employee.persisted? ? 'Update Employee' : 'Create Employee' %>
