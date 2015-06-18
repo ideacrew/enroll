@@ -1,7 +1,7 @@
 require 'date'
 module Forms
   class BrokerAgencyProfile < ::Forms::OrganizationSignup
-    attr_reader :broker_agency_profile
+    attr_accessor :broker_agency_profile
     attr_accessor :market_kind, :languages_spoken
     attr_accessor :working_hours, :accept_new_clients, :home_page
 
