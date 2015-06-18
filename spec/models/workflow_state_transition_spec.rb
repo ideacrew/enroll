@@ -1,17 +1,19 @@
 require 'rails_helper'
 
 RSpec.describe WorkflowStateTransition, type: :model do
-  it { should validate_presence_of :end_state }
-  it { should validate_presence_of :transition_on }
+  it { should validate_presence_of :to_state }
+  it { should validate_presence_of :transition_at }
 
-  let(:end_state) { "approved" }
-  let(:transition_on) { Date.current }
+  let(:from_state) { "applicant" }
+  let(:to_state) { "approved" }
+  let(:transition_at) { Time.now }
 
   describe ".new" do
     let(:valid_params) do
       {
-        end_state: end_state,
-        transition_on: Date.current
+        from_state: from_state,
+        to_state: to_state,
+        transition_at: transition_at
       }
     end
 
@@ -23,16 +25,16 @@ RSpec.describe WorkflowStateTransition, type: :model do
       end
     end
 
-    context "with no end_state" do
-      let(:params) {valid_params.except(:end_state)}
+     context "with no to_state" do
+      let(:params) {valid_params.except(:to_state)}
 
       it "should invalid" do
         expect(WorkflowStateTransition.new(**params).valid?).to be_falsey
       end
     end
 
-    context "with no transition_on" do
-      let(:params) {valid_params.except(:transition_on)}
+    context "with no transition_at" do
+      let(:params) {valid_params.except(:transition_at)}
 
       it "should invalid" do
         expect(WorkflowStateTransition.new(**params).valid?).to be_falsey

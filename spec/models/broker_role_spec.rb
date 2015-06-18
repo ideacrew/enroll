@@ -82,8 +82,71 @@ describe BrokerRole, dbclean: :after_each do
         # expect{BrokerRole.with(safe: true).create(**params)}.to raise_error(Mongoid::Errors::NoParent)
       end
     end
-  end
 
+    context "a broker registers" do
+      let(:person)  { FactoryGirl.build(:person) }
+      let(:registered_broker_role) { BrokerRole.new(person: person, npn: "2323334", provider_kind: "broker") }
+
+      it "should initialize to applicant state" do
+        expect(registered_broker_role.valid?).to be_truthy
+        expect(registered_broker_role.aasm_state).to eq "applicant"
+      end
+
+      it "should record the transition" do
+        expect(registered_broker_role.workflow_state_transitions.size).to eq 1
+        expect(registered_broker_role.workflow_state_transitions.first.from_state).to be_nil
+        expect(registered_broker_role.workflow_state_transitions.first.to_state).to eq "applicant"
+      end
+
+      context "and is approved by the HBX" do
+        before do
+          registered_broker_role.approve
+        end
+
+        it "should transition to active status" do
+          expect(registered_broker_role.aasm_state).to eq "active"
+        end
+
+        it "should record the transition" do
+          expect(registered_broker_role.workflow_state_transitions.size).to eq 2
+          expect(registered_broker_role.workflow_state_transitions.last.from_state).to eq "applicant"
+          expect(registered_broker_role.workflow_state_transitions.last.to_state).to eq "active"
+        end
+
+        context "and is then decertified by the HBX" do
+          before do
+            registered_broker_role.decertify
+          end
+
+          it "should transition to active status" do
+            expect(registered_broker_role.aasm_state).to eq "decertified"
+          end
+
+          it "should record the transition" do
+            expect(registered_broker_role.workflow_state_transitions.size).to eq 3
+            expect(registered_broker_role.workflow_state_transitions.last.from_state).to eq "active"
+            expect(registered_broker_role.workflow_state_transitions.last.to_state).to eq "decertified"
+          end
+        end
+      end
+
+      context "and is denied by the HBX" do
+        before do
+          registered_broker_role.deny
+        end
+
+        it "should transition to active status" do
+          expect(registered_broker_role.aasm_state).to eq "denied"
+        end
+
+        it "should record the transition" do
+          expect(registered_broker_role.workflow_state_transitions.size).to eq 2
+          expect(registered_broker_role.workflow_state_transitions.last.from_state).to eq "applicant"
+          expect(registered_broker_role.workflow_state_transitions.last.to_state).to eq "denied"
+        end
+      end
+    end
+  end
 
   describe BrokerRole, '.find', :dbclean => :after_each do
     it 'returns Broker instance for the specified ID' do
@@ -114,7 +177,6 @@ describe BrokerRole, dbclean: :after_each do
     end
   end
 
-
   describe BrokerRole, '.find_by_broker_agency_profile', :dbclean => :after_each do
     let(:ba) {FactoryGirl.create(:broker_agency_profile)}
 
@@ -126,7 +188,6 @@ describe BrokerRole, dbclean: :after_each do
       expect(BrokerRole.find_by_broker_agency_profile(ba).first.broker_agency_profile_id).to eq ba._id
     end
   end
-
 
   describe BrokerRole, '.all', :dbclean => :after_each do
     it 'returns all Broker instances' do
@@ -161,5 +222,4 @@ describe BrokerRole, dbclean: :after_each do
       # expect(person0.build_broker_role(npn: npn0, provider_kind: provider_kind, address: address).save).to eq true
     end
   end
-
 end
