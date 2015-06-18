@@ -6,7 +6,7 @@
 
     <div class="row no-buffer">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 search-wp">
-        <%= render 'shared/search', url: employers_employer_profiles_path, q: @q, placeholder: 'Name, Broker Name, NPN' %>
+        <%= render 'shared/search', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", q: @q, remote: true, placeholder: 'Name, Broker Name, NPN' %>
       </div>
     </div>
 
