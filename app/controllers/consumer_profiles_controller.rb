@@ -72,4 +72,7 @@ class ConsumerProfilesController < ApplicationController
 
     @qualified_date = (start_date <= qle_date && qle_date <= end_date) ? true : false
   end
+
+  def inbox
+  end
 end
