@@ -84,6 +84,7 @@ module Forms
 
     def office_location_validations
       @office_locations.each_with_index do |ol, idx|
+        ol.valid?
         ol.errors.each do |k, v|
           self.errors.add("office_locations_attributes.#{idx}.#{k}", v)
         end
