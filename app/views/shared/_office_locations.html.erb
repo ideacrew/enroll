@@ -1,0 +1,9 @@
+<%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location| %>
+<h4> Address </h4>
+<%= render partial: 'shared/office_location_fields', locals: {f: office_location} %>
+<% end %>
+
+<div class="form-inputs">
+  <%= link_to_add_fields '<i class="fa fa-user-plus"></i> Add Office Location'.html_safe, f, :office_locations, 'btn btn-success pull-right' %>
+  <br/>
+</div>
