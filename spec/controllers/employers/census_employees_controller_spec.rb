@@ -3,19 +3,19 @@ require 'rails_helper'
 RSpec.describe Employers::CensusEmployeesController do
   let(:employer_profile_id) { "abecreded" }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-  let(:census_employee) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id)}
+  let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id) }
   let(:census_employee_params) {
-    {"first_name"=>"aqzz",
-       "middle_name"=>"",
-       "last_name"=>"White",
-       "dob"=>"05/01/2015",
-       "ssn"=>"123-12-3112",
-       "gender"=>"male",
-       "is_business_owner" => true,
-       "hired_on"=>"05/02/2015"} }
+    {"first_name" => "aqzz",
+     "middle_name" => "",
+     "last_name" => "White",
+     "dob" => "05/01/2015",
+     "ssn" => "123-12-3112",
+     "gender" => "male",
+     "is_business_owner" => true,
+     "hired_on" => "05/02/2015"} }
 
   describe "GET new" do
-    let(:user) { double("user")}
+    let(:user) { double("user") }
 
     it "should render the new template" do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
@@ -38,7 +38,7 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "POST create" do
-    let(:benefit_group) {FactoryGirl.create(:benefit_group)}
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     before do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
@@ -48,10 +48,25 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
     end
 
+
+
     it "should be redirect when valid" do
       allow(census_employee).to receive(:save).and_return(true)
       post :create, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(response).to be_redirect
+    end
+
+    context "Person with ssn already exists" do
+      it "should not allow the use of SSN belonging to another person" do
+        Person.create!({"first_name" => census_employee_params["first_name"],
+                       "last_name" => census_employee_params["last_name"],
+                       "dob" => census_employee_params["dob"],
+                       "ssn" => census_employee_params["ssn"],
+                       "gender" => census_employee_params["gender"]})
+        allow(census_employee).to receive(:save).and_return(true)
+        post :create, :employer_profile_id => employer_profile_id, census_employee: census_employee_params
+        expect(flash[:error]).to eq("The provided SSN belongs to another person.")
+      end
     end
 
   end
@@ -68,8 +83,8 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "PUT update" do
-    let(:benefit_group) {FactoryGirl.create(:benefit_group)}
-    let(:plan_year) {FactoryGirl.create(:plan_year)}
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:plan_year) { FactoryGirl.create(:plan_year) }
     let(:user) { FactoryGirl.create(:user, :employer_staff) }
     before do
       sign_in user
@@ -103,7 +118,7 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "GET delink" do
-    let(:census_employee){double(id: "test", :delink_employee_role => "test")}
+    let(:census_employee) { double(id: "test", :delink_employee_role => "test") }
     it "should be redirect" do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
@@ -164,7 +179,7 @@ RSpec.describe Employers::CensusEmployeesController do
       end
 
       context "when has new_census employee" do
-        let(:new_census_employee){double("test")}
+        let(:new_census_employee) { double("test") }
         before do
           sign_in
           allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
@@ -206,8 +221,8 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "PUT assignment_benefit_group" do
-    let(:benefit_group) {FactoryGirl.create(:benefit_group)}
-    let(:plan_year) {FactoryGirl.create(:plan_year)}
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:plan_year) { FactoryGirl.create(:plan_year) }
     before do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)

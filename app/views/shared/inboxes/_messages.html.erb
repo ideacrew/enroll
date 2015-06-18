@@ -1,18 +1,43 @@
 <h2>Messages</h2>
 <div class="container">
-<table class="table">
-  <tr>
-    <th> Sent by </th>
-    <th> Subject </th>
-    <th> Content </th>
-  </tr>
+  <div style='width:200px; display:inline-block'>
+    <a href='#'> Compose a Message </a>
+    <ul>
+    <li><a href='#'>Inbox</a></li>
+    <li><a href='#'>Sent</a></li>
+    <li><a href='#'>Deleted</a></li>
+    </ul>
+  </div>
+  <div style='width:70%; display:inline-block'>
+    <table class="table">
+      <tr>
+        <th> Sent by </th>
+        <th> Subject </th>
+        <th> </th>
+      </tr>
+      <%- if provider.try(:inbox).try(:messages) %>
+        <% provider.inbox.messages.each do |message| %>
+          <tr>
+            <td> <%= message.sender_name.humanize %> </td>
+            <td> <%= message.subject %> </td>
+            <td> Delete Button </td>
+            <td> Show Button </td>
+          </tr>
+        <% end %>
+      <% end %>
 
-  <% provider.inbox.messages.each do |message| %>
-    <tr>
-      <td> <%= message.sender_name.humanize %> </td>
-      <td> <%= message.subject %> </td>
-      <td> <%= message.body %> </td>
-    </tr>
-  <% end %>
-</table>
+      <tr>
+        <td> Test Sender </td>
+        <td> Serious regulatory message </td>
+        <td> Delete Button </td>
+        <td> Show Button </td>
+      </tr>
+      <tr class='already_read_it'>
+        <td> Important Test Sender </td>
+        <td> So important I already read it </td>
+        <td> Delete Button </td>
+        <td> Show Button </td>
+      </tr>
+    </table>
+  </div>
 </div>
