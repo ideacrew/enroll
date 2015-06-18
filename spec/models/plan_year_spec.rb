@@ -551,4 +551,25 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       expect(rsp[:open_enrollment_end_on]).to eq (current_date + 10.days)
     end
   end
+
+  context "calculate_start_on_options" do
+    it "should return two options" do
+      date1 = (Time.now + 2.month).beginning_of_month
+      date2 = (Time.now + 3.month).beginning_of_month
+      dates = [date1, date2].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
+
+      allow(Date).to receive(:current).and_return(Date.new(Time.now.year, Time.now.month, 15))
+      expect(PlanYear.calculate_start_on_options).to eq dates
+    end
+
+    it "should return three options" do
+      date1 = (Time.now + 1.month).beginning_of_month
+      date2 = (Time.now + 2.month).beginning_of_month
+      date3 = (Time.now + 3.month).beginning_of_month
+      dates = [date1, date2, date3].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
+
+      allow(Date).to receive(:current).and_return(Date.new(Time.now.year, Time.now.month, 2))
+      expect(PlanYear.calculate_start_on_options).to eq dates
+    end
+  end
 end

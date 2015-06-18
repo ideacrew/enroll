@@ -18,7 +18,7 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def active_broker
-    @broker_agency_profiles = @employer_profile.broker_agency_profile.to_a
+    @broker_agency_accounts = @employer_profile.broker_agency_accounts
   end
 
   def create

@@ -342,24 +342,15 @@ end
 
 And(/^I should be able to add information about plan year, benefits and relationship benefits$/) do
 #Plan Year
-  @browser.text_field(class: "interaction-field-control-plan_year-start_on").wait_until_present
+  @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").wait_until_present
   screenshot("employer_add_plan_year")
-  # validation error path
-  @browser.text_field(class: "interaction-field-control-plan_year-start_on").set("01/06/2017")
-  @browser.h3(text: /Plan Year/).click
-  sleep(1)
-  @browser.h4(text: /start on must be first day of the month/).wait_until_present
-  expect(@browser.text.include?("start on must be first day of the month")).to be_truthy
-  
-
   @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").set("91/96/2017")
   @browser.h3(text: /Plan Year/).click
   expect(@browser.text.include?("Open Enrollment Start Date: Invalid date format!")).to be_truthy
   # happy path
-  begin_date = (Date.current + 3.months).beginning_of_month
-  @browser.text_field(class: "interaction-field-control-plan_year-start_on").set(begin_date)
-  @browser.h3(text: /Plan Year/).click
-  sleep(1)
+  start_on_field = @browser.div(class: /selectric-wrapper/, text: /SELECT START ON/i)
+  start_on_field.click
+  start_on_field.li(index: 1).click
   @browser.h4(text: /Recommend Date/).wait_until_present
   expect(@browser.text.include?("employer initial application earliest submit on")).to be_truthy
   @browser.text_field(name: "plan_year[fte_count]").click

@@ -3,7 +3,7 @@
   <div class="col-md-12 col-sm-12 col-xs-12 first">
     <div class="row top-row">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-  <%= datepicker_control(f, :start_on, {:class => "floatlabel form-control interaction-field-control-plan_year-start_on", :required => true, :placeholder => "START ON"}) %>
+        <%= f.select(:start_on, options_for_select(PlanYear.calculate_start_on_options, selected: f.object.start_on.try(:to_s, :db)), {:include_blank => "SELECT START ON"}, { :class => ''}) %>
       </div>
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
         <%= datepicker_control(f, :end_on, {:class => "floatlabel form-control interaction-field-control-plan_year-start_on", :required => true, :placeholder => "END ON", readonly: true}) %>
