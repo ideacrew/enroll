@@ -175,6 +175,7 @@ Rails.application.routes.draw do
       get 'personal'
       get 'family'
       get 'check_qle_date'
+      get 'inbox'
     end
   end
 
