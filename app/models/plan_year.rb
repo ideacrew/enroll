@@ -223,14 +223,21 @@ class PlanYear
         msg = "start on must be first day of the month"
       elsif Date.current > shop_enrollemnt_times[:open_enrollment_latest_start_on]
         result = "failure"
-        msg = "start on must choose a start on date #{(Date.current - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + 2.months).beginning_of_month} or later"
+        msg = "start on must choose a start on date #{(Date.current - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + HbxProfile::ShopOpenEnrollmentPeriodMaximum.months).beginning_of_month} or later"
       end
       {result: (result || "ok"), msg: (msg || "")}
     end
 
+    def calculate_start_on_options
+      start_at = (Date.current - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + HbxProfile::ShopOpenEnrollmentPeriodMaximum.months).beginning_of_month
+      end_at = (Date.current + HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum).beginning_of_month
+      dates = (start_at..end_at).select {|t| t == t.beginning_of_month}
+      dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
+    end
+
     def calculate_open_enrollment_date(start_on)
       start_on = start_on.to_date
-      open_enrollment_start_on = [(start_on - 2.months), Date.current].max
+      open_enrollment_start_on = [(start_on - HbxProfile::ShopOpenEnrollmentPeriodMaximum.months), Date.current].max
       open_enrollment_end_on = open_enrollment_start_on + 10.days
 
       {open_enrollment_start_on: open_enrollment_start_on,
