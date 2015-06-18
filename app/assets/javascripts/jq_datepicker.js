@@ -18,6 +18,9 @@ function applyJQDatePickerSetup(ele) {
 
   var inErrorState = false;
 
+  var dateMax = null;
+  var dateMin = null;
+
   if (ofParentControl.is(".floatlabel-wrapper")) {
     if (ofGrandparentControl.is(".field_with_errors")) {
       inErrorState = true;
@@ -43,6 +46,15 @@ function applyJQDatePickerSetup(ele) {
     yearMin = el.attr("data-year-min");
   }
 
+  if (el.is("[data-date-max]")) {
+    dateMax = el.attr("data-date-max");
+  }
+
+  if (el.is("[data-date-min]")) {
+    dateMin = el.attr("data-date-min");
+  }
+
+
   el.datepicker({
     changeMonth: true,
     changeYear: true,
@@ -50,6 +62,8 @@ function applyJQDatePickerSetup(ele) {
     altFormat: 'yy-mm-dd',
     altField: otherFieldSelector,
     yearRange: yearMin + ":" + yearMax,
+    maxDate: dateMax,
+    minDate: dateMin,
       onSelect: function(dateText, dpInstance) {
         $(this).datepicker("hide");
         $(this).trigger('change');
