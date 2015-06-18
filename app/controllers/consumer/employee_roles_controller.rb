@@ -51,20 +51,33 @@ class Consumer::EmployeeRolesController < ApplicationController
     build_nested_models
   end
 
-  def update
+  def update    
+    save_and_exit =  params['exit_after_method'] == 'true'
     person = Person.find(params.require(:id))
     object_params = params.require(:person).permit(*person_parameters_list)
     @employee_role = person.employee_roles.detect { |emp_role| emp_role.id.to_s == object_params[:employee_role_id].to_s }
     @person = Forms::EmployeeRole.new(person, @employee_role)
     if @person.update_attributes(object_params)
-      respond_to do |format|
-        format.html { redirect_to consumer_employee_dependents_path(employee_role_id: @employee_role.id) }
-      end
+      if save_and_exit 
+        respond_to do |format|
+          format.html {redirect_to destroy_user_session_path}
+        end
+      else 
+        respond_to do |format|
+          format.html { redirect_to consumer_employee_dependents_path(employee_role_id: @employee_role.id) }
+        end
+      end  
     else
-      build_nested_models
-      respond_to do |format|
-        format.html { render "edit" }
-      end
+      if save_and_exit 
+        respond_to do |format|
+          format.html {redirect_to destroy_user_session_path}
+        end
+      else
+        build_nested_models
+        respond_to do |format|
+          format.html { render "edit" }
+        end
+      end  
     end
   end
 
