@@ -18,7 +18,6 @@ module Forms
       nil
     end
 
-    # TODO: Fix this to give broker agency staff role, not broker role
     def create_employer_staff_role(current_user, employer_profile)
       person.user = current_user
       person.employer_staff_roles << EmployerStaffRole.new(:employer_profile_id => employer_profile.id)

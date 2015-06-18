@@ -1,6 +1,8 @@
 require "rails_helper"
 
-describe Forms::EmployerProfile do
+describe Forms::EmployerProfile, "given valid parameters" do
+  subject { Forms::EmployerProfile.new }
+
   before :each do
     subject.valid?
   end
@@ -40,6 +42,6 @@ describe Forms::EmployerProfile, "given more than one office location of the sam
   end
 
   it "should be invalid" do
-    expect(subject).to have_errors_on(:base)
+    expect(subject.errors.to_hash[:base]).to include("may not have more than one of the same kind of address")
   end
 end
