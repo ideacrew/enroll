@@ -46,7 +46,7 @@ module Forms
       begin
         check_existing_organization
       rescue OrganizationAlreadyMatched
-        organization.errors.add(:base, "a staff role for this organization has already been claimed.")
+        errors.add(:base, "a staff role for this organization has already been claimed.")
         return false
       end
       organization = create_new_organization
