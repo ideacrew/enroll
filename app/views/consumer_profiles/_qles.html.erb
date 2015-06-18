@@ -41,7 +41,7 @@
 					<p class="success-text"><strong>You may be eligible for a special enrollment period.</strong></p><br>
 
 					<%= hidden_field_tag 'change_plan' %>
-					<%= hidden_field_tag 'employee_role_id', @employee_role.id %>
+					<%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || "None" %>
 
 					<%= submit_tag 'Continue', class: 'btn btn-primary' %>
 				</div>
