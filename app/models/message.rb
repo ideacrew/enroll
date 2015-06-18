@@ -7,6 +7,7 @@ class Message
   field :subject, type: String
   field :body, type: String
   field :message_read, type: Boolean
+  field :folder, type: String
   field :created_at, type: DateTime
 
   after_initialize :set_timestamp
