@@ -262,4 +262,19 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "validation for employment_terminated_on" do
+    let(:census_employee) {FactoryGirl.build(:census_employee, employer_profile: employer_profile, hired_on: Date.current.beginning_of_year)}
+
+    it "should fail when terminated date before than hired date" do
+      census_employee.employment_terminated_on = census_employee.hired_on - 10.days
+      expect(census_employee.valid?).to be_falsey
+      expect(census_employee.errors[:employment_terminated_on].any?).to be_truthy
+    end
+
+    it "should success" do
+      census_employee.employment_terminated_on = census_employee.hired_on + 10.days
+      expect(census_employee.valid?).to be_truthy
+      expect(census_employee.errors[:employment_terminated_on].any?).to be_falsey
+    end
+  end
 end

@@ -68,7 +68,7 @@ class Employers::CensusEmployeesController < ApplicationController
     last_day_of_work = termination_date
     if termination_date.present?
       @census_employee.terminate_employment(last_day_of_work)
-      @fa = @census_employee.save!
+      @fa = @census_employee.save
     end
     respond_to do |format|
       format.js {
@@ -94,7 +94,7 @@ class Employers::CensusEmployeesController < ApplicationController
       rehiring_date = ""
     end
     @rehiring_date = rehiring_date
-    if @rehiring_date.present?
+    if @rehiring_date.present? and @rehiring_date > @census_employee.employment_terminated_on
       new_census_employee = @census_employee.replicate_for_rehire
       if new_census_employee.present? # not an active family, then it is ready for rehire.#
         new_census_employee.hired_on = @rehiring_date
@@ -109,8 +109,10 @@ class Employers::CensusEmployeesController < ApplicationController
       else # active family, dont replicate for rehire, just return error
         flash[:error] = "Census Employee is already active."
       end
+    elsif @rehiring_date.blank?
+      flash[:error] = "Please enter rehiring date."
     else
-      flash[:error] = "Please enter rehiring date"
+      flash[:error] = "Rehiring date can't occur before terminated date."
     end
   end
 
