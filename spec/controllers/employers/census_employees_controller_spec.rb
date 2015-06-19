@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Employers::CensusEmployeesController do
   let(:employer_profile_id) { "abecreded" }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-  let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id) }
+  let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, employment_terminated_on: "2015-1-1", hired_on: "2014-11-11") }
   let(:census_employee_params) {
     {"first_name" => "aqzz",
      "middle_name" => "",
@@ -165,7 +165,7 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, :format => :js
       expect(response).to have_http_status(:success)
-      expect(flash[:error]).to eq "Please enter rehiring date"
+      expect(flash[:error]).to eq "Please enter rehiring date."
     end
 
     context "with rehiring_date" do
@@ -205,6 +205,13 @@ RSpec.describe Employers::CensusEmployeesController do
           xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: "05/01/2015", :format => :js
           expect(response).to have_http_status(:success)
           expect(flash[:error]).to eq "Error during rehire."
+        end
+
+        it "with rehiring date before terminated date" do
+          allow(census_employee).to receive(:employment_terminated_on).and_return(Date.current)
+          xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: "05/01/2015", :format => :js
+          expect(response).to have_http_status(:success)
+          expect(flash[:error]).to eq "Rehiring date can't occur before terminated date."
         end
       end
     end

@@ -99,15 +99,12 @@
                             <tr>
                             <td colspan="2"><%= rb.relationship.try(:humanize) %></td>
                             <td><%= rb.offered ? "Yes" : "No" %></td>
-                            <td><%= number_to_percentage rb.premium_pct, precision: 0 %></td>
+                            <td><%= number_to_percentage rb.premium_pct, precision: 2 %></td>
                             </tr>
                           <% end %>
                           </table>
                         <% end %>
                       </div>
-
-
-
                   </div>
                   </div>
               <% end %>

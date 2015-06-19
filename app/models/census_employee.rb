@@ -24,6 +24,7 @@ class CensusEmployee < CensusMember
   accepts_nested_attributes_for :census_dependents, :benefit_group_assignments
 
   validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_business_owner
+  validate :check_employment_terminated_on
 
   index({"aasm_state" => 1})
   index({"employer_profile_id" => 1}, {sparse: true})
@@ -162,6 +163,12 @@ class CensusEmployee < CensusMember
     active_benefit_group_assignment.terminate_coverage(coverage_term_on) if active_benefit_group_assignment.try(:may_terminate_coverage?)
     terminate_employee_role
     self
+  end
+
+  def check_employment_terminated_on
+    if employment_terminated_on and employment_terminated_on <= hired_on 
+      errors.add(:employment_terminated_on, "can't occur before rehiring date")
+    end
   end
 
   class << self
