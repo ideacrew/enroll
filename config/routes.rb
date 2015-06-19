@@ -193,6 +193,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :office_locations, only: [:new]
+
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
 
