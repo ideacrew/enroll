@@ -130,7 +130,7 @@ $(function() {
 });
 
 $(document).on("change", "select.elected_plan", function() {
-  var target = $(this).parents(".form-group");
+  var target = $(this).parents(".reference-plan-selection-controls");
   $(target).find(".elected-plan-select .hidden_field").hide();
   $(target).find(".reference-plan-select .reference-plan-content").hide();
   
@@ -152,7 +152,7 @@ $(document).on("change", "select.elected_plan", function() {
 
 $(document).on("change", ".elected-plan-select .carrier", function() {
   console.log(".carrier");
-  var target = $(this).parents(".form-group").find(".reference-plan-select");
+  var target = $(this).parents(".reference-plan-selection-controls").find(".reference-plan-select");
   var txt = $(this).val();
   $(target).find(".carrier-select .carrier-content").hide();
   $(target).find(".carrier-select .carrier-" + txt).show();
@@ -160,7 +160,7 @@ $(document).on("change", ".elected-plan-select .carrier", function() {
 
 $(document).on("change", ".elected-plan-select .metal-level", function() {
   console.log(".metal");
-  var target = $(this).parents(".form-group").find(".reference-plan-select");
+  var target = $(this).parents(".reference-plan-selection-controls").find(".reference-plan-select");
   var txt = $(this).val();
   $(target).find(".metal-level-select .metal-level-content").hide();
   $(target).find(".metal-level-select .metal-level-" + txt).show();
