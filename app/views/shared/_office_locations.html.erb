@@ -3,7 +3,7 @@
 <%= render partial: 'shared/office_location_fields', locals: {f: office_location} %>
 <% end %>
 
-<div class="form-inputs">
-  <%= link_to_add_fields '<i class="fa fa-user-plus"></i> Add Office Location'.html_safe, f, :office_locations, 'btn btn-success pull-right' %>
+<div class="form-inputs" id="office_locations_buttons">
+	<%= link_to('<i class="fa fa-user-plus"></i> Add Office Location'.html_safe, new_office_location_path(:child_index => f.object.office_locations.length, :parent_object => f.object_name), remote: true, class: 'fui-plus-circle') %>
   <br/>
 </div>
