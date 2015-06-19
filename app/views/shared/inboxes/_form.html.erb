@@ -1,5 +1,3 @@
-<%= form_for @inbox, url: {action: "create"} do |f|%>
-  <%= f.fields_for :messages do |ff| %>
-    <%= render "shared/inboxes/compose_message", f: ff %>
-  <%end%>
+<%= form_for @message, url: {action: "create"} do |f|%>
+  <%= render "shared/inboxes/compose_message", f: f %>
 <% end %>

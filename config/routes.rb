@@ -37,9 +37,6 @@ Rails.application.routes.draw do
   end
 
   namespace :insured do
-    resources :families, :only => [:show] do
-    end
-
     resources :plan_shoppings, :only => [:show] do
       member do
         post 'checkout'
@@ -48,7 +45,8 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :families do
+    resources :families, only: [:show] do
+      resource :inbox, only: [:new, :create, :index]
       get 'new'
 
       resources :people do

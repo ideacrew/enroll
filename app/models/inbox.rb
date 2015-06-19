@@ -10,6 +10,14 @@ class Inbox
 
   before_create :generate_acccess_key
 
+  def read_messages
+    messages.where(message_read: true)
+  end
+
+  def unread_messages
+    messages.where(message_read: false)
+  end
+
   def post_message(new_message)
     self.messages.push new_message
     self

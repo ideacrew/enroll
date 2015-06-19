@@ -6,7 +6,7 @@ class Message
   field :sender_id, type: BSON::ObjectId
   field :subject, type: String
   field :body, type: String
-  field :message_read, type: Boolean
+  field :message_read, type: Boolean, default: false
   field :folder, type: String
   field :created_at, type: DateTime
 

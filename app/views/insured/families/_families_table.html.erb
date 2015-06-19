@@ -1,28 +1,31 @@
-<table class="table table-condensed">
-  <thead>
-    <tr>
-      <th colspan="5">Primary Applicant</th>
-      <th colspan="7">Benefits</th>
-    </tr>
-    <tr>
-      <th>Name</th>
-      <th>SSN</th>
-      <th>DOB</th>
-      <th>HBX ID</th>
-      <th>Family Ct</th>
+<div id= 'message_form'></div>
+<div class="container" id="inbox_provider_form">
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th colspan="5">Primary Applicant</th>
+        <th colspan="7">Benefits</th>
+      </tr>
+      <tr>
+        <th>Name</th>
+        <th>SSN</th>
+        <th>DOB</th>
+        <th>HBX ID</th>
+        <th>Family Ct</th>
 
-      <th>Market</th>
-      <th>Issuer</th>
-      <th>Broker</th>
-      <th>Benefit Type</th>
-      <th>Member Ct</th>
-      <th>Start Date</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    <%= table_empty_to_human if families.count == 0 %>
-    <% families.each do |family| %>
+        <th>Market</th>
+        <th>Issuer</th>
+        <th>Broker</th>
+        <th>Benefit Type</th>
+        <th>Member Ct</th>
+        <th>Start Date</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= table_empty_to_human if families.count == 0 %>
+      <% families.each do |family| %>
       <% pp = family.primary_applicant.person %>
       <% benefits = family.latest_household.hbx_enrollments %>
       <tr>
@@ -35,11 +38,14 @@
         <td><%= pp.hbx_id %></td>
         <td><%= family.active_family_members.size %></td>
         <% if benefits.size == 0 %>
-          <%= content_tag(:td, "None given", class: "text-right") %>
-          <%= content_tag(:td, "", colspan: "6") %>
+        <%= content_tag(:td, "None given", class: "text-right") %>
+        <%= content_tag(:td, "", colspan: "6") %>
         <% end %>
-      <%= render "insured/families/benefits_table", benefits: benefits %>
+        <%= render "insured/families/benefits_table", benefits: benefits %>
+        <td><%= link_to '<i class="fa fa-user-plus"></i> Send Secure Message'.html_safe, 
+          new_insured_family_inbox_path(family), class: "btn btn-primary", remote: true %></td>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+      <% end %>
+    </tbody>
+  </table>
+</div>
