@@ -28,7 +28,7 @@
   </div>
 
   <div class="top-pd">
-    <h4> Relationship Benefits</h4>
+    <h3> Relationship Benefits</h3>
     <div class='form-inputs'>
       <% f.object.relationship_benefits = generate_relationship_benefits(f.object) %>
       <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>

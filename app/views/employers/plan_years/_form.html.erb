@@ -22,7 +22,7 @@
           <%= render "shared/plan_year_fields", f: f %><br>
 
           <div class='form-inputs'>
-            <h4>Benefit Groups</h4>
+            <h3>Benefit Groups</h3>
             <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
               <%= render "shared/benefit_group_fields", f: bg %><br>
             <% end %>
