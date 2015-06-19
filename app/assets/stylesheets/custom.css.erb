@@ -390,9 +390,17 @@ a.btn.add{
 }
 
 /* Buttons */
-.btn-save, .btn-save:hover, .btn-save:focus {
-  background: none repeat scroll 0 0 #4d74ff;
-  color: #fff;
+.btn-save {
+    background-color: #007bc4;
+    border-bottom-width: medium;
+    border-color: #004872;
+    color: #fff;
+}
+.btn-save:hover {
+    background-color: #0069a8;
+    border-bottom-width: medium;
+    border-color: #004872;
+    color: #fff;
 }
 .btn-green {
   background: none repeat scroll 0 0 #008c00;
@@ -1464,10 +1472,6 @@ a.list-group-item.confirm {
   display: block;
   color: #009acc;
 }
-.confrim-row .btn-save {
-  margin-top: 150px;
-  margin-bottom: 20px;
-}
 
 /*** landing page css start ***/
 .landing-row {
@@ -2261,10 +2265,6 @@ a.all-filter:hover{
 }
 .select-plan p.detail span {
   color: #0079c5;
-}
-.select-plan a.btn-save{
-  margin-top: 20px;
-  padding: 6px 20px;
 }
 .select-plan-details {
   margin-top: 20px;
@@ -3424,9 +3424,6 @@ div#house_info > p{
 div#house_info .sidebar-email-field {
   padding-bottom: 15px !important;
 }
-.btn-save.blue{
-  background-color: #027ac3 !important
-}
 .panel-body.member{
   padding-top: 15px !important;
   background: #fff;
@@ -3444,7 +3441,7 @@ div#house_info .sidebar-email-field {
 /* Custom Buttons */
 .btn {
   border-radius: 2px;
-  /*padding: 6px 25px;*/
+  transition: all 0.3s ease 0s;
 }
 
 a.btn.btn-payment {
