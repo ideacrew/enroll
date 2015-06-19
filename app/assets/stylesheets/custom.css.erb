@@ -41,19 +41,19 @@
 /* Layout Specifics */
 html {
   height: 100%;
-  /*position: relative;*/
 }
 * {
     font-family: 'Open Sans', sans-serif;
 }
 body {
     background-color: #f2f2f2;
-    font-family: "Open Sans",sans-serif;
     min-height: 100%;
     position: relative;
     padding-top: 73px;
     padding-bottom: 70px;
 }
+
+h1, h2, h3 {font-weight: 300;}
 
 .navbar-default {
     background-color: #eee;
@@ -3451,7 +3451,7 @@ div#house_info .sidebar-email-field {
 /* Custom Buttons */
 .btn {
   border-radius: 2px;
-  padding: 6px 25px;
+  /*padding: 6px 25px;*/
 }
 
 a.btn.btn-payment {
@@ -3465,6 +3465,10 @@ a.btn.btn-payment {
     background-color: #e72b2d;
     border-color: #b7191b;
     border-bottom-width: medium;
+}
+
+.btn.btn-tranparent.btn-sm {
+    padding: 5px 12px;
 }
 
 /* Account Menu */
@@ -5316,4 +5320,8 @@ h3.text-blue {
   .border_bottom_zero {
     border-bottom: 0 !important;
   }
+}
+span.badge.message-badge {
+    background-color: #dedede;
+    color: #007bc4;
 }
