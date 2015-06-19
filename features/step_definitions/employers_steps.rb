@@ -429,6 +429,10 @@ When(/^I enter combined filter in plan selection page$/) do
   #@browser.checkbox(class: /checkbox-custom interaction-choice-control-value-checkbox-5/).set(true)
 
   # Platinum
+  @browser.execute_script(
+    'arguments[0].scrollIntoView();', 
+    @browser.element(:text => /Choose a healthcare plan/)
+  )
   @browser.checkboxes(class: /plan-metal-level-selection-filter/)[0].set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("")
   @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("")
