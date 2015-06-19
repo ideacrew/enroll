@@ -1,6 +1,6 @@
-<div id="address_info" class="row no-buffer focus_effect personal-info-row">
-  <div class="col-md-12 col-sm-12 col-xs-12 first">
-    <div class="row top-row">
+<div id="address_info" class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="row row-form-wrapper no-buffer">
 
     <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
       <button class="btn btn-new-address">ADDRESS</button>
@@ -38,7 +38,7 @@
       </div>
     </div>
 
-    <div class="row middle-row form-group form-group-lg no-pd address-row">
+    <div class="row row-form-wrapper no-buffer address-row">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
         <%= f.hidden_field :kind, value: address_kind %>
         <%= f.text_field :address_1, placeholder: "ADDRESS LINE 1", class: "floatlabel form-control border-bottom-none border-right-none", required: true %>
@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <div class="row bottom-row address-row">
+    <div class="row row-form-wrapper no-buffer address-row">
       <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
         <%= f.text_field :city, placeholder: "CITY", class: "floatlabel form-control", required: true %>
       </div>
