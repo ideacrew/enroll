@@ -1,43 +1,50 @@
 <div class="container">
-  <h2>Messages</h2>
-  <div style='width:200px; display:inline-block'>
-    <a href='#'> Compose a Message </a>
-    <ul>
-    <li><a href='#'>Inbox</a></li>
-    <li><a href='#'>Sent</a></li>
-    <li><a href='#'>Deleted</a></li>
-    </ul>
-  </div>
-  <div style='width:70%; display:inline-block'>
-    <table class="table">
-      <tr>
-        <th> Sent by </th>
-        <th> Subject </th>
-        <th> </th>
-      </tr>
-      <%- if provider.try(:inbox).try(:messages) %>
-        <% provider.inbox.messages.each do |message| %>
-          <tr>
-            <td> <%= message.sender_name.humanize %> </td>
-            <td> <%= message.try(:subject) %> </td>
-            <td> Delete Button </td>
-            <td> Show Button </td>
-          </tr>
-        <% end %>
-      <% end %>
 
-      <tr>
-        <td> Test Sender </td>
-        <td> Serious regulatory message </td>
-        <td> Delete Button </td>
-        <td> Show Button </td>
-      </tr>
-      <tr class='already_read_it'>
-        <td> Important Test Sender </td>
-        <td> So important I already read it </td>
-        <td> Delete Button </td>
-        <td> Show Button </td>
-      </tr>
-    </table>
-  </div>
+  <h2>Messages</h2><br>
+
+  <div class="row">
+    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+      <a class="btn btn-danger btn-block btn-payment btn-block" href='#'> Compose a Message </a><br>
+      <ul class="list-group">
+      <li class="list-group-item"><a href='#'>Inbox <span class="badge message-badge pull-right">2</span></a></li>
+      <li class="list-group-item"><a href='#'>Sent</a></li>
+      <li class="list-group-item"><a href='#'>Deleted</a></li>
+      </ul>
+    </div>
+
+    <div class="col-lg-10 col-md-9 col-sm-8 col-xs-12">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Sent by</th>
+              <th>Subject</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <%- if provider.try(:inbox).try(:messages) %>
+              <% provider.inbox.messages.each do |message| %>
+                <tr>
+                  <td> <%= message.sender_name.humanize %> </td>
+                  <td> <%= message.try(:subject) %> </td>
+                  <td><a href="#" class="btn btn-tranparent btn-sm">Delete</a> <a href="#" class="btn btn-primary">Show</a></td>
+                </tr>
+              <% end %>
+            <% end %>
+
+            <tr>
+              <td> Test Sender </td>
+              <td> Serious regulatory message </td>
+              <td><a href="#" class="btn btn-tranparent btn-sm">Delete</a> <a href="#" class="btn btn-primary">Show</a></td>
+            </tr>
+            <tr class='already_read_it'>
+              <td> Important Test Sender </td>
+              <td> So important I already read it </td>
+              <td><a href="#" class="btn btn-tranparent btn-sm">Delete</a> <a href="#" class="btn btn-primary">Show</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 </div>

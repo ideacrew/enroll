@@ -41,20 +41,19 @@
 /* Layout Specifics */
 html {
   height: 100%;
-  /*position: relative;*/
 }
 * {
     font-family: 'Open Sans', sans-serif;
 }
 body {
     background-color: #f2f2f2;
-    font-family: "Open Sans",sans-serif;
     min-height: 100%;
     position: relative;
     padding-top: 73px;
     padding-bottom: 70px;
 }
 
+h1, h2, h3, h4, h5, h6 {font-weight: 300;}
 .navbar-default {
     background-color: #eee;
     background-image: none;
@@ -3027,9 +3026,6 @@ a.all-filter:hover{
   background: #fff;
     padding-bottom: 0px;
 }
-#home .landing-row .bottom{
-  margin-top: 30px;
-}
 .tab-pane.landing-row .right-side {
   padding: 0;
   border: none;
@@ -3451,7 +3447,7 @@ div#house_info .sidebar-email-field {
 /* Custom Buttons */
 .btn {
   border-radius: 2px;
-  padding: 6px 25px;
+  /*padding: 6px 25px;*/
 }
 
 a.btn.btn-payment {
@@ -3465,6 +3461,15 @@ a.btn.btn-payment {
     background-color: #e72b2d;
     border-color: #b7191b;
     border-bottom-width: medium;
+}
+
+.btn.btn-tranparent.btn-sm {
+    padding: 5px 12px;
+}
+
+.btn-wide {padding: 10px 25px;}
+.btn-lg, .btn-group-lg > .btn {
+  border-radius: 3px;
 }
 
 /* Account Menu */
@@ -4658,10 +4663,9 @@ p.head-title span {
     font-weight: lighter;
     color: #000;
 }
-.table-border{
-    background-color: #ffffff;
-    border: 1px solid #565656;
-}
+.table-border {border: 1px solid #b7b7b7;}
+.table-border > tbody > tr > td, .table-border > tbody > tr > th {border-top: 1px solid #b7b7b7;}
+
 table.table {
     background-color: #ffffff;
 }
@@ -5316,4 +5320,16 @@ h3.text-blue {
   .border_bottom_zero {
     border-bottom: 0 !important;
   }
+}
+span.badge.message-badge {
+    background-color: #dedede;
+    color: #007bc4;
+}
+.form-border {
+    background: #ffffff none repeat scroll 0 0;
+    border: 1px solid #b7b7b7;
+    padding: 15px;
+}
+.row-bottom{
+  margin-top: 30px;
 }

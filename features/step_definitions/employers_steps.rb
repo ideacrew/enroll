@@ -238,8 +238,29 @@ When(/^I click on Edit family button for a census family$/) do
   @browser.a(text: /Edit/).click
 end
 
-Then(/^I should see a form to update the contents of the census employee$/) do
+When(/^I edit ssn and dob on employee detail page after linked$/) do
+  Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.link_employee_role!
   @browser.button(value: /Update Employee/).wait_until_present
+  @browser.text_field(id: /census_employee_dob/).set("01/01/1981")
+  @browser.text_field(id: /census_employee_ssn/).set("786120969")
+  @browser.button(value: /Update Employee/).click
+end
+
+
+Then(/^I should see Access Denied$/) do
+  @browser.element(text: /Access Denied!/).wait_until_present
+  @browser.element(text: /Access Denied!/).visible?
+end
+
+When(/^I go back$/) do
+  @browser.execute_script('window.history.back()')
+end
+
+Then(/^I should see a form to update the contents of the census employee$/) do
+  Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.delink_employee_role!
+  @browser.button(value: /Update Employee/).wait_until_present
+  @browser.text_field(id: /census_employee_dob/).set("01/01/1980")
+  @browser.text_field(id: /census_employee_ssn/).set("786120965")
   @browser.text_field(id: /census_employee_first_name/).set("Patrick")
   @browser.text_field(id: /census_employee_address_attributes_state/).set("VA")
   screenshot("update_census_employee_with_data")

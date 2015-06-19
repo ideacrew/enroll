@@ -37,6 +37,7 @@ $(document).ready(function () {
   semantic_class(); //Calls semantic class on all input fields & buttons (eg. interaction-click-control-continue)
 
   $(document).on("focus", "[class~='date-picker']", function(e){
+    dateMin = $(this).attr("data-date-min");
     if ($(this).hasClass('dob-picker') || $(this).hasClass('hire-picker')){
       $(this).datepicker({ 
         changeMonth: true,
@@ -53,6 +54,7 @@ $(document).ready(function () {
         changeMonth: true,
         changeYear: true,
         dateFormat: 'mm/dd/yy', 
+        minDate: dateMin,
         yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10),
           onSelect: function(dateText, dpInstance) {
 	    $(this).datepicker("hide");
