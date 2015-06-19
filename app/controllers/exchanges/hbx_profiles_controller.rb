@@ -101,6 +101,23 @@ class Exchanges::HbxProfilesController < ApplicationController
   def edit
   end
 
+  # GET /exchanges/hbx_profiles/1/inbox
+  def inbox
+    if HbxPortal.count > 0
+      @hbx_portal = HbxPortal.try(params[:id]) || HbxPortal.first
+    else  
+      @hbx_portal = HbxPortal.new
+      @hbx_portal.save
+      m = Message.new
+      m.subject = 'Portal test message'
+      m.sender_id=current_user.id
+      @hbx_portal.inbox.messages << m
+      @hbx_portal.inbox.messages << m
+      @hbx_portal.save
+    end
+   
+  end
+
   # POST /exchanges/hbx_profiles
   # POST /exchanges/hbx_profiles.json
   def create

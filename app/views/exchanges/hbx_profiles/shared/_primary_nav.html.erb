@@ -47,11 +47,11 @@
       <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Configuration"></span>
    <% end %>
  </li>
-<!--   <li role="presentation"<%= menu_tab_class(active_tab, "inbox-tab") %>>
-   <%#= link_to(inbox_exchanges_hbx_profile_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
+<li role="presentation"<%= menu_tab_class(active_tab, "inbox-tab") %>>
+   <%= link_to(inbox_exchanges_hbx_profile_path(1), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
       <span class="hidden-xs">Inbox</span>
       <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Inbox"></span>
-   <%# end %>
+   <% end %>
  </li>
- -->
+ 
  </ul>

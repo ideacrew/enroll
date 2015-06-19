@@ -1,7 +1,7 @@
 require "rails_helper"
 
-describe Forms::EmployerProfile, "given nothing" do
-  subject { Forms::EmployerProfile.new }
+describe Forms::BrokerAgencyProfile, "given nothing" do
+  subject { Forms::BrokerAgencyProfile.new }
 
   before :each do
     subject.valid?
@@ -32,10 +32,10 @@ describe Forms::EmployerProfile, "given nothing" do
   end
 end
 
-describe Forms::EmployerProfile, "given more than one office location of the same type" do
+describe Forms::BrokerAgencyProfile, "given more than one office location of the same type" do
   let(:office_location_1) { OfficeLocation.new( :address => Address.new(:kind => "work") ) }
   let(:office_location_2) { OfficeLocation.new( :address => Address.new(:kind => "work") ) }
-  subject { Forms::EmployerProfile.new( :office_locations => [office_location_1, office_location_2]) }
+  subject { Forms::BrokerAgencyProfile.new( :office_locations => [office_location_1, office_location_2]) }
 
   before :each do
     subject.valid?

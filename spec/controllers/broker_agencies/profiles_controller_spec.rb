@@ -9,7 +9,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:person) { double("person")}
 
     it "should render the new template" do
-      allow(user).to receive(:has_broker_role?)
+      allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
       sign_in(user)
       get :new
       expect(response).to have_http_status(:success)
@@ -36,8 +36,10 @@ RSpec.describe BrokerAgencies::ProfilesController do
   end
 
   describe "GET index" do
+    let(:user) { double(:has_hbx_staff_role? => true) }
+
     before :each do
-      sign_in
+      sign_in(user)
       get :index
     end
 
@@ -58,11 +60,11 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:organization) {double("organization")}
     context "when no broker role" do
       before(:each) do
-        allow(user).to receive(:has_broker_role?).and_return(false)
+        allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
         allow(user).to receive(:person).and_return(person)
         allow(user).to receive(:person).and_return(person)
         sign_in(user)
-        allow(Forms::BrokerAgencyProfile).to receive(:build).and_return(form)
+        allow(Forms::BrokerAgencyProfile).to receive(:new).and_return(form)
       end
 
       it "returns http status" do
@@ -82,10 +84,10 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
   describe "REDIRECT to my account if broker role present" do
     let(:user){double("user")}
-    let(:person){double(:get_broker_profile_contact => double("person"))}
+    let(:person){double(:broker_agency_staff_roles => [double(:broker_agency_profile_id => 5)]) }
 
     it "should redirect to myaccount" do
-      allow(user).to receive(:has_broker_role?).and_return(true)
+      allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
       allow(user).to receive(:person).and_return(person)
       sign_in(user)
       get :new

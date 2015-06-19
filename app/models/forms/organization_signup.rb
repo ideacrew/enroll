@@ -2,6 +2,7 @@ module Forms
   class OrganizationSignup
     include ActiveModel::Validations
     attr_accessor :id
+    attr_accessor :person_id
     attr_accessor :person
     attr_accessor :first_name, :last_name
     attr_accessor :legal_name, :dba, :entity_kind, :fein
@@ -11,7 +12,10 @@ module Forms
     validates :fein,
       length: { is: 9, message: "%{value} is not a valid FEIN" },
       numericality: true
-    validates_presence_of :dob, :first_name, :last_name, :fein, :legal_name
+    validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
+    validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
+    validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
+    validates_presence_of :fein, :legal_name
     validates :entity_kind,
       inclusion: { in: ::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
       allow_blank: false
@@ -35,6 +39,10 @@ module Forms
     end
 
     def match_or_create_person(current_user)
+      if !self.person_id.blank?
+        self.person = Person.find(self.person_id)
+        return
+      end
       new_person =   Person.new({
         :first_name => first_name,
         :last_name => last_name,
@@ -76,6 +84,7 @@ module Forms
 
     def office_location_validations
       @office_locations.each_with_index do |ol, idx|
+        ol.valid?
         ol.errors.each do |k, v|
           self.errors.add("office_locations_attributes.#{idx}.#{k}", v)
         end

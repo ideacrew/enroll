@@ -1,6 +1,11 @@
 $(document).ready(function () {
    $(document).on('click', '.interaction-click-control-save---exit', function(){
-   	  	$('.interaction-click-control-logout').click()
+   	    if ($('#btn_user_contact_info').length) {
+   	       $('#exit_after_method').val('true')
+   	       $('#btn_user_contact_info').click()
+        } else {
+   	    	$('.interaction-click-control-logout').click()
+   	    }
    })
 });
 

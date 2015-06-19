@@ -82,6 +82,11 @@ class User
 
   delegate :primary_family, to: :person, allow_nil: true
 
+  def person_id
+    return nil unless person.present?
+    person.id
+  end
+
   def send_welcome_email
     UserMailer.welcome(self).deliver_now
     true
@@ -97,6 +102,10 @@ class User
 
   def has_employer_staff_role?
     has_role?(:employer_staff)
+  end
+
+  def has_broker_agency_staff_role?
+    has_role?(:broker_agency_staff)
   end
 
   def has_broker_role?

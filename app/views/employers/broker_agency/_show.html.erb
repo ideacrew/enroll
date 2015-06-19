@@ -7,6 +7,7 @@
           <h3 class="pull-left">
             <%= 'Select Broker' %>
           </h3>
+          <br>
           <a class="btn btn-danger return_to_employer_broker_agenices pull-right" href="#"><i class="fa fa-times"></i> Cancel</a>
         </div>
       </div>
@@ -14,10 +15,10 @@
         <div class="col-md-9 no-pd col-sm-9 col-xs-12">
           <%= hidden_field_tag(:broker_agency_id, @broker_agency.id) %>
           <%= render 'fields', broker_agency_profile: @broker_agency %>
-
+          <br>
           <div class="row top-row no-border">
             <div class="col-md-3 col-sm-3 col-xs-12 key-btn">
-              <button class="btn btn-primary" type="submit">
+              <button class="btn btn-primary" type="submit" onclick="return confirm('This will terminate your existing active broker effective immediatedly. Are you sure you want to select new broker?')">
                 <%= "<i class=\"fa fa-user-plus\"></i> Select".html_safe %>
               </button>
             </div>

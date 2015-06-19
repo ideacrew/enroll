@@ -1,4 +1,4 @@
-<%= form_tag url, { method: :get, class: "form form-inline", role: "search", style: "margin: 0;"} do %>
+<%= form_tag url, { method: :get, remote: (defined?(remote) ? remote : false), class: "form form-inline input-no-pd", role: "search", style: "margin: 0;"} do %>
   <div class="input-group">
       <%= label_tag :q, "Search term", {class: "sr-only"} %>
       <%= text_field_tag :q, q, {placeholder: placeholder, class: "form-control", style: "padding: 12px 15px; border: 1px solid #ccc; height: 43px;"} %>

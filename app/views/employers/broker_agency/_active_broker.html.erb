@@ -1,7 +1,11 @@
 <!-- <div id="show_broker_agency"></div>
  -->
-<div class="container" id="active_broker_panel">
-  <div class="col-md-12 col-sm-12 col-xs-12" >
+
+ <div class="container" id="active_broker_panel">
+  <div class="row">
+      <div class="">
+      <div class="col-md-12 col-sm-12 col-xs-12 col-gn-top">
+
     <h3>Active Broker</h3>
 
 <!--     <div class="row no-buffer">
@@ -10,7 +14,7 @@
       </div>
     </div> -->
 
-    <div class="table-responsive">
+    <div class="table-responsive" style="overflow-y: hidden;">
       <table class="table table-wrapper" style="opacity: 1;">
         <thead>
           <tr>
@@ -49,5 +53,7 @@
       </table>
       <%#= render 'shared/alph_paginate', url: employers_employer_profile_broker_agency_index_path, alphs: @page_alphabets, remote: true %>
     </div>
+    </div>
+  </div>
   </div>
 </div>
