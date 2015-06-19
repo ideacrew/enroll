@@ -4912,14 +4912,14 @@ h5.detail-enrolled {
     line-height: 25px;
 }
 .unpd {
-    padding: 0 !important;
+    /*padding: 0 !important;*/
 }
 
 table.table-wrapper tbody tr.brd-top th, table.table-wrapper tbody tr.brd-top td {
-  border-top: 1px solid #000 !important;
+  /*border-top: 1px solid #000 !important;*/
 }
-.tr-dropdown .title-dropdown .form-control {
-    border-left: 0 none;
+.tr-dropdown {
+  /*background-color: #f2f2f2;*/
 }
 
 .group-buttons {
@@ -5361,3 +5361,44 @@ span.badge.message-badge {
   list-style: square;
 }
 .field_with_errors {display: inline;}
+
+.plan-year-wrapper {
+    display: inline-block;
+    margin-bottom: 15px;
+    width: 100%;
+}
+.plan-year-wrapper table {
+    background-color: #fff;
+    width: 100%;
+}
+.plan-year-wrapper table.table tr td {
+    font-size: 12px;
+    font-weight: 100;
+    padding: 15px;
+}
+.plan-year-wrapper table.table tr:first-child td {
+    border-top: medium none;
+}
+.plan-year-wrapper table.table tr td:first-child, .plan-year-wrapper table.table tr td:nth-child(3) {
+    font-weight: 600;
+}
+.plan-year-wrapper .dropdown button {
+    background-color: #bfddff;
+    border: medium none;
+    font-size: 18px;
+    padding: 15px;
+}
+.plan-year-wrapper .dropdown button span.glyphicon {
+    color: #007bc4;
+    font-size: 13px;
+    padding-left: 10px;
+}
+.plan-year-wrapper .dropdown ul li a {
+    font-weight: 100;
+}
+.plan-year-wrapper .dropdown ul {
+    border-radius: 0;
+}
+.benefit-group-heading {
+  margin-top: 15px; 
+}

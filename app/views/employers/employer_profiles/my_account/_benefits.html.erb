@@ -1,121 +1,120 @@
 <div aria-labelledby="benefits-tab" id="benefits" class="tab-pane fade" role="tabpanel">
   <div class="container">
-    <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12 col-gn-top">
+    <div class="row top-pd">
+        <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
 
-          <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile), class: "btn btn-primary", data: {loading_text: "Loading..."} %>
+          <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile), class: "btn btn-danger btn-lg", data: {loading_text: "Loading..."} %>
         
 
-  <br><br>
-  <% if @current_plan_year.present? %>
-  <% if @current_plan_year.draft?%>
-    <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,@current_plan_year) ,method: :post, class: "btn btn-primary"%>
-  <% end %>
-    <div class="title-dropdown">
-      <div class="dropdown form-control float-label adderess-select-box text-center">
-        <a id="dLabel" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
-          <span id='current_plan_year'>
-            Plan Year <%= @current_plan_year.start_on.to_date.year %>
-          </span>
-          <i class="glyphicon glyphicon-menu-down"></i>
-        </a>
-        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id='plan-years-list'>
-          <% @plan_years.each do |plan_year| %>
-            <li><a href="#planyear<%= plan_year.id %>">Plan Year <%= plan_year.start_on.to_date.year %></a></li>
+          <br><br>
+          <% if @current_plan_year.present? %>
+          <% if @current_plan_year.draft?%>
+            <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,@current_plan_year) ,method: :post, class: "btn btn-primary"%>
           <% end %>
-        </ul>
-      </div>
-    </div>
 
-    <div class="table-responsive table-border unmgn plan-years-content">
-      <% @plan_years.each_with_index do |plan_year, p_index| %>
-        <div class="plan-year" style="display: <%= p_index == 0 ? 'block' : 'none' %>" id="planyear<%= plan_year.id %>">
-          <table class="table table-wrapper table-condensed">
-          <tbody>
-          <tr>
-            <th>FTE/PTE/MSP Count :</th>
-            <td><%= "#{plan_year.fte_count} / #{plan_year.pte_count} / #{plan_year.msp_count}" %></td>
-            <th>Open Enroll Start/End :</th>
-            <td>
-              <%= format_date plan_year.open_enrollment_start_on %> /
-              <%= format_date plan_year.open_enrollment_end_on %>
-            </td>
-          </tr>
-          <tr>
-            <th>Participant Pct :</th>
-            <td><%= plan_year.employee_participation_percent || '-' %></td>
-            <th>Plan Year Start/End :</th>
-            <td>
-              <%= format_date plan_year.start_on %> /
-              <%= format_date plan_year.end_on %>
-            </td>
-          </tr>
-          <tr>
-            <th colspan="4" class="unpd tr-dropdown">
-              <div class="title-dropdown">
-                <div class="dropdown form-control float-label adderess-select-box text-center">
-                  <a id="dLabel" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
-                    Benefit Group
-                    <i class="glyphicon glyphicon-menu-down"></i>
-                  </a>
-                  <ul class="dropdown-menu bg-list" role="menu" aria-labelledby="dLabel">
-                    <% plan_year.benefit_groups.each do |bg| %>
-                      <li><a href="#bg<%= bg.id %>"><%= bg.title %></a></li>
-                    <% end %>
-                  </ul>
-                </div>
-              </div>
-            </th>
-          </tr>
-          </tbody>
-          </table>
-
-          <div class='bg-content'>
-            <% plan_year.benefit_groups.each_with_index do |bg, index| %>
-              <table class="table table-wrapper table-condensed bg" id="bg<%= bg.id %>" style="display: <%= index == 0 ? 'block' : 'none' %>">
-              <tr class="brd-top">
-                <th>Benefit Group :</th>
-                <td><%= bg.title %></td>
-                <th>Coverage Effective :</th>
-                <td><%= "#{bg.effective_on_kind.humanize} after #{bg.effective_on_offset} days from date of hire" %></td>
-              </tr>
-              <tr>
-                <th>Coverage Termination :</th>
-                <td><%= "#{bg.terminate_on_kind.humanize} following last day of employment" %></td>
-                <th>Ref Plan :</th>
-                <td><%= "#{bg.reference_plan.name}" %></td>
-              </tr>
-              <tr>
-                <th>Ref Plan Metal Level</th>
-                <td colspan="3"><%= "#{bg.reference_plan.metal_level.titleize}" %></td>
-              </tr>
-
-              <tr>
-                <td colspan="4">Employer Contributions</td>
-              </tr>
-
-              <tr>
-                <th class="no-border" colspan="2">Employee Relationship</th>
-                <th class="no-border">Coverage Offered</th>
-                <th class="no-border">Employer Contribution Pct</th>
-              </tr>
-
-              <% bg.relationship_benefits.each do |rb| %>
-                <tr>
-                <td colspan="2"><%= rb.relationship.try(:humanize) %></td>
-                <td><%= rb.offered ? "Yes" : "No" %></td>
-                <td><%= number_to_percentage rb.premium_pct, precision: 0 %></td>
-                </tr>
-              <% end %>
-              </table>
-            <% end %>
+          <div class="plan-year-wrapper">
+            <div class="dropdown">
+                <button aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" type="button" id="dLabel">
+                    <span id="current_plan_year">Plan Year <%= @current_plan_year.start_on.to_date.year %></span>
+                    <span aria-hidden="true" class="glyphicon glyphicon-chevron-down"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id='plan-years-list'>
+                  <% @plan_years.each do |plan_year| %>
+                    <li><a href="#planyear<%= plan_year.id %>">Plan Year <%= plan_year.start_on.to_date.year %></a></li>
+                  <% end %>
+                </ul>
             </div>
-          </div>
-      <% end %>
-      </div>
-  <% else %>
-    No Plan Years found
-  <% end %>
-  </div>
+
+            <div class="table-responsive unmgn plan-years-content">
+              <% @plan_years.each_with_index do |plan_year, p_index| %>
+                <div class="plan-year" style="display: <%= p_index == 0 ? 'block' : 'none' %>" id="planyear<%= plan_year.id %>">
+                  <table class="table table-wrapper table-condensed">
+                    <tbody>
+                      <tr>
+                        <th>FTE/PTE/MSP Count :</th>
+                        <td><%= "#{plan_year.fte_count} / #{plan_year.pte_count} / #{plan_year.msp_count}" %></td>
+                        <th>Open Enroll Start/End :</th>
+                        <td>
+                          <%= format_date plan_year.open_enrollment_start_on %> /
+                          <%= format_date plan_year.open_enrollment_end_on %>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Participant Pct :</th>
+                        <td><%= plan_year.employee_participation_percent || '-' %></td>
+                        <th>Plan Year Start/End :</th>
+                        <td>
+                          <%= format_date plan_year.start_on %> /
+                          <%= format_date plan_year.end_on %>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <div class="plan-year-wrapper">
+                      <div class="dropdown benefit-group-heading">
+                        <button aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" type="button" id="bLabel">
+                            Benefit Group
+                            <span aria-hidden="true" class="glyphicon glyphicon-chevron-down"></span>
+                        </button>
+
+                        <ul class="dropdown-menu bg-list" role="menu" aria-labelledby="dLabel">
+                          <% plan_year.benefit_groups.each do |bg| %>
+                            <li><a href="#bg<%= bg.id %>"><%= bg.title %></a></li>
+                          <% end %>
+                        </ul>
+                      </div>
+
+                      <div class='bg-content'>
+                        <% plan_year.benefit_groups.each_with_index do |bg, index| %>
+                          <table class="table table-wrapper table-condensed bg" id="bg<%= bg.id %>" style="display: <%= index == 0 ? 'block' : 'none' %>">
+                          <tr class="brd-top">
+                            <th>Benefit Group :</th>
+                            <td><%= bg.title %></td>
+                            <th>Coverage Effective :</th>
+                            <td><%= "#{bg.effective_on_kind.humanize} after #{bg.effective_on_offset} days from date of hire" %></td>
+                          </tr>
+                          <tr>
+                            <th>Coverage Termination :</th>
+                            <td><%= "#{bg.terminate_on_kind.humanize} following last day of employment" %></td>
+                            <th>Ref Plan :</th>
+                            <td><%= "#{bg.reference_plan.name}" %></td>
+                          </tr>
+                          <tr>
+                            <th>Ref Plan Metal Level</th>
+                            <td colspan="3"><%= "#{bg.reference_plan.metal_level.titleize}" %></td>
+                          </tr>
+
+                          <tr>
+                            <td colspan="4">Employer Contributions</td>
+                          </tr>
+
+                          <tr>
+                            <th class="no-border" colspan="2">Employee Relationship</th>
+                            <th class="no-border">Coverage Offered</th>
+                            <th class="no-border">Employer Contribution Pct</th>
+                          </tr>
+
+                          <% bg.relationship_benefits.each do |rb| %>
+                            <tr>
+                            <td colspan="2"><%= rb.relationship.try(:humanize) %></td>
+                            <td><%= rb.offered ? "Yes" : "No" %></td>
+                            <td><%= number_to_percentage rb.premium_pct, precision: 0 %></td>
+                            </tr>
+                          <% end %>
+                          </table>
+                        <% end %>
+                      </div>
+
+
+
+                  </div>
+                  </div>
+              <% end %>
+              </div>
+          <% else %>
+            No Plan Years found
+          <% end %>
+        </div>
 </div>
-</div></div>
+</div></div></div>
