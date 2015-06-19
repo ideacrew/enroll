@@ -1,6 +1,5 @@
 class Insured::InboxesController < InboxesController
-  def 
-  	puts 'the right class'
+  def inbox
     if HbxPortal.count > 0
       @hbx_portal = HbxPortal.try(params[:id]) || HbxPortal.first
     else  
