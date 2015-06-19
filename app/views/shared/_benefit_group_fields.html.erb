@@ -4,9 +4,9 @@
       <%= image_tag("delete.png") %>
     <% end %>
   </div>
-  <div class="row no-buffer focus_effect personal-info-row">
-    <div class="col-md-12 col-sm-12 col-xs-12 first">
-      <div class="row top-row">
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="row row-form-wrapper no-buffer">
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <% title_value = f.object.title.present? ? f.object.title : "#{Time.now.year} Employer Benefits" %>
           <%= f.text_field :title, class: "floatlabel form-control", value: title_value, required: true, placeholder: 'TITLE' %>
@@ -20,19 +20,21 @@
         </div>
       </div>
 
-      <div class="bottom-row form-group form-group-lg no-pd">
+      <div class="row row-form-wrapper no-buffer">
         <!-- Select Plan:  -->
         <%= render "shared/reference_plans_list", f: f %>
       </div>
     </div>
   </div>
 
-  <h4> Relationship Benefits</h4>
-  <div class='form-inputs'>
-    <% f.object.relationship_benefits = generate_relationship_benefits(f.object) %>
-    <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
-      <%= render "shared/relationship_benefit_fields", f: rb %>
-    <% end %>
+  <div class="top-pd">
+    <h4> Relationship Benefits</h4>
+    <div class='form-inputs'>
+      <% f.object.relationship_benefits = generate_relationship_benefits(f.object) %>
+      <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
+        <%= render "shared/relationship_benefit_fields", f: rb %>
+      <% end %>
+    </div>
   </div>
 </fieldset>
 <div class="clear"></div>

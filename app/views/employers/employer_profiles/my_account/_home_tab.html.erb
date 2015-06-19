@@ -2,7 +2,7 @@
   <div id="add_home_action"></div>
   <div id="main-home">
     <div class="container">
-      <div class="row">
+      <div class="row top-pd">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="row no-buffer">
             <h4><%= @employer_profile.legal_name %></h4>
@@ -16,7 +16,7 @@
           </div>
 
 
-          <div class="row no-buffer row-bottom">
+          <div class="row no-buffer top-pd">
             <h4>Company Details</h4>
             <div class="form-border">
               FEIN <%= number_to_obscured_fein @employer_profile.fein %><br/>
@@ -24,7 +24,7 @@
             </div>
           </div>
 
-          <div class="row no-buffer row-bottom">
+          <div class="row no-buffer top-pd">
             <h4>Enrollment</h4>
 
             <div class="form-border">
@@ -51,7 +51,7 @@
             </div>
           </div>
 
-          <div class="row no-buffer row-bottom">
+          <div class="row no-buffer top-pd">
             <h4>Broker</h4>
 
             <div class="form-border">
@@ -107,4 +107,4 @@
       </div>
     </div>
   </div>
-</div><br>
+</div>

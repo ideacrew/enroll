@@ -390,9 +390,17 @@ a.btn.add{
 }
 
 /* Buttons */
-.btn-save, .btn-save:hover, .btn-save:focus {
-  background: none repeat scroll 0 0 #4d74ff;
-  color: #fff;
+.btn-save {
+    background-color: #007bc4;
+    border-bottom-width: medium;
+    border-color: #004872;
+    color: #fff;
+}
+.btn-save:hover {
+    background-color: #0069a8;
+    border-bottom-width: medium;
+    border-color: #004872;
+    color: #fff;
 }
 .btn-green {
   background: none repeat scroll 0 0 #008c00;
@@ -1044,9 +1052,6 @@ h5.active a{
 .left-pd{
   padding-left: 0;
 }
-/*.top-pad{
-  padding-top: 15px;
-}*/
 select.confirm{
   margin-top: 15px;
 }
@@ -1466,10 +1471,6 @@ a.list-group-item.confirm {
 .confirm-text span {
   display: block;
   color: #009acc;
-}
-.confrim-row .btn-save {
-  margin-top: 150px;
-  margin-bottom: 20px;
 }
 
 /*** landing page css start ***/
@@ -2264,10 +2265,6 @@ a.all-filter:hover{
 }
 .select-plan p.detail span {
   color: #0079c5;
-}
-.select-plan a.btn-save{
-  margin-top: 20px;
-  padding: 6px 20px;
 }
 .select-plan-details {
   margin-top: 20px;
@@ -3427,9 +3424,6 @@ div#house_info > p{
 div#house_info .sidebar-email-field {
   padding-bottom: 15px !important;
 }
-.btn-save.blue{
-  background-color: #027ac3 !important
-}
 .panel-body.member{
   padding-top: 15px !important;
   background: #fff;
@@ -3447,7 +3441,7 @@ div#house_info .sidebar-email-field {
 /* Custom Buttons */
 .btn {
   border-radius: 2px;
-  /*padding: 6px 25px;*/
+  transition: all 0.3s ease 0s;
 }
 
 a.btn.btn-payment {
@@ -4915,14 +4909,14 @@ h5.detail-enrolled {
     line-height: 25px;
 }
 .unpd {
-    padding: 0 !important;
+    /*padding: 0 !important;*/
 }
 
 table.table-wrapper tbody tr.brd-top th, table.table-wrapper tbody tr.brd-top td {
-  border-top: 1px solid #000 !important;
+  /*border-top: 1px solid #000 !important;*/
 }
-.tr-dropdown .title-dropdown .form-control {
-    border-left: 0 none;
+.tr-dropdown {
+  /*background-color: #f2f2f2;*/
 }
 
 .group-buttons {
@@ -5330,6 +5324,78 @@ span.badge.message-badge {
     border: 1px solid #b7b7b7;
     padding: 15px;
 }
-.row-bottom{
+.top-pd{
   margin-top: 30px;
+}
+
+#error_explanation {
+  width: 100%;
+  border: 2px solid red;
+  padding: 7px;
+  padding-bottom: 12px;
+  margin: 20px 0;
+  background-color: #f0f0f0;
+}
+
+#error_explanation h2 {
+  text-align: left;
+  font-weight: bold;
+  padding: 5px 5px 5px 15px;
+  font-size: 12px;
+  margin: -7px -7px 15px;
+  background-color: #c00;
+  color: #fff;
+}
+
+#error_explanation p {
+  color: #333;
+  margin-bottom: 0;
+  padding: 5px;
+}
+
+#error_explanation ul li {
+  font-size: 12px;
+  list-style: square;
+}
+.field_with_errors {display: inline;}
+
+.plan-year-wrapper {
+    display: inline-block;
+    margin-bottom: 15px;
+    width: 100%;
+}
+.plan-year-wrapper table {
+    background-color: #fff;
+    width: 100%;
+}
+.plan-year-wrapper table.table tr td {
+    font-size: 12px;
+    font-weight: 100;
+    padding: 15px;
+}
+.plan-year-wrapper table.table tr:first-child td {
+    border-top: medium none;
+}
+.plan-year-wrapper table.table tr td:first-child, .plan-year-wrapper table.table tr td:nth-child(3) {
+    font-weight: 600;
+}
+.plan-year-wrapper .dropdown button {
+    background-color: #bfddff;
+    border: medium none;
+    font-size: 18px;
+    padding: 15px;
+}
+.plan-year-wrapper .dropdown button span.glyphicon {
+    color: #007bc4;
+    font-size: 13px;
+    padding-left: 10px;
+}
+.plan-year-wrapper .dropdown ul li a {
+    font-weight: 100;
+}
+.plan-year-wrapper .dropdown ul {
+    border-radius: 0;
+}
+.benefit-group-heading {
+  margin-top: 15px; 
 }
