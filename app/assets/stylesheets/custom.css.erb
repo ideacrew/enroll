@@ -2228,7 +2228,7 @@ a.close-1, a.close-2{
 .input-no-pd .form-control {padding: 0 10px !important;}
 .input-no-pd .form-control:focus {background-color: #fff; border-color: #337ab7;}
 
-#new_inbox textarea.form-control {border: 1px solid #b7b7b7; border-radius: 0;}
+/*#new_inbox textarea.form-control {border: 1px solid #b7b7b7; border-radius: 0;}*/
 /* Sign In page css end */
 
 .coverage-options{
@@ -5432,4 +5432,35 @@ table.table-bg-white tr th {
 }
 td.brd-r {
     border-left: 1px solid #ddd;
+}
+table.table.table-message-wrapper {
+    background: #ffffff none repeat scroll 0 0;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+table.table.table-message-wrapper tr th {
+    color: #414141;
+    font-size: 12px;
+    font-weight: 400;
+    padding-left: 20px !important;
+    text-transform: uppercase;
+    width: 20%;
+}
+table.table.table-message-wrapper tr td, table.table.table-message-wrapper tr th {
+    padding: 15px 5px;
+    vertical-align: middle;
+}
+table.table.table-message-wrapper tr:first-child td, table.table.table-message-wrapper tr:first-child th {
+    border-top: medium none;
+}
+table.table.table-message-wrapper tr td input, table.table.table-message-wrapper tr td textarea {
+    border: medium none;
+    box-shadow: none;
+    font-size: 14px;
+    font-weight: 100;
+    margin: 0;
+    padding: 0;
+}
+table.table.table-message-wrapper tr th.vtop {
+    vertical-align: top;
 }
