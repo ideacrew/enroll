@@ -72,11 +72,15 @@ function applyJQDatePickerSetup(ele) {
   el.datepicker("refresh");
 }
 
-$(function() {
+function applyJQDatePickers() {
   $(".jq-datepicker").each(function(idx, ele) {
     applyJQDatePickerSetup(ele);    
     if ($(this).attr("readonly") != undefined){
       $(ele).datepicker('disable');
-    };
+    }
   });
+}
+
+$(function() {
+  applyJQDatePickers();
 });
