@@ -390,9 +390,17 @@ a.btn.add{
 }
 
 /* Buttons */
-.btn-save, .btn-save:hover, .btn-save:focus {
-  background: none repeat scroll 0 0 #4d74ff;
-  color: #fff;
+.btn-save {
+    background-color: #007bc4;
+    border-bottom-width: medium;
+    border-color: #004872;
+    color: #fff;
+}
+.btn-save:hover {
+    background-color: #0069a8;
+    border-bottom-width: medium;
+    border-color: #004872;
+    color: #fff;
 }
 .btn-green {
   background: none repeat scroll 0 0 #008c00;
@@ -1044,9 +1052,6 @@ h5.active a{
 .left-pd{
   padding-left: 0;
 }
-/*.top-pad{
-  padding-top: 15px;
-}*/
 select.confirm{
   margin-top: 15px;
 }
@@ -1466,10 +1471,6 @@ a.list-group-item.confirm {
 .confirm-text span {
   display: block;
   color: #009acc;
-}
-.confrim-row .btn-save {
-  margin-top: 150px;
-  margin-bottom: 20px;
 }
 
 /*** landing page css start ***/
@@ -2223,11 +2224,6 @@ a.close-1, a.close-2{
 .signin {font-size: 16px;}
 .signin h1 {text-align: center;}
 
-.input-no-pd .form-group {margin-bottom: 15px;}
-.input-no-pd .form-control {padding: 0 10px !important;}
-.input-no-pd .form-control:focus {background-color: #fff; border-color: #337ab7;}
-
-#new_inbox textarea.form-control {border: 1px solid #b7b7b7; border-radius: 0;}
 /* Sign In page css end */
 
 .coverage-options{
@@ -2264,10 +2260,6 @@ a.all-filter:hover{
 }
 .select-plan p.detail span {
   color: #0079c5;
-}
-.select-plan a.btn-save{
-  margin-top: 20px;
-  padding: 6px 20px;
 }
 .select-plan-details {
   margin-top: 20px;
@@ -3427,9 +3419,6 @@ div#house_info > p{
 div#house_info .sidebar-email-field {
   padding-bottom: 15px !important;
 }
-.btn-save.blue{
-  background-color: #027ac3 !important
-}
 .panel-body.member{
   padding-top: 15px !important;
   background: #fff;
@@ -3447,7 +3436,7 @@ div#house_info .sidebar-email-field {
 /* Custom Buttons */
 .btn {
   border-radius: 2px;
-  /*padding: 6px 25px;*/
+  transition: all 0.3s ease 0s;
 }
 
 a.btn.btn-payment {
@@ -4776,7 +4765,6 @@ table.table-wrapper a.btn {
     font-size: 16px;
     font-weight: 400;
     float: right;
-    line-height: 28px;
     font-family: 'lato', "AvenirLTStd-Light";
 }
 #contact.employer-info-wrapper input[type="text"] {
@@ -4821,12 +4809,8 @@ table.table-wrapper a.btn {
     padding: 20px 15px;
 }
 .search-wp .input-group span.input-group-btn button {
-    font-family: 'lato', 'AvenirLTStd-Light';
     color: #000;
-    font-weight: 100;
-    font-size: 15px;
     border-radius: 0px;
-    padding: 9.3px 15px;
     background: #007bc4;
     border-color: #007bc4;
     color: #ffffff;
@@ -4915,14 +4899,14 @@ h5.detail-enrolled {
     line-height: 25px;
 }
 .unpd {
-    padding: 0 !important;
+    /*padding: 0 !important;*/
 }
 
 table.table-wrapper tbody tr.brd-top th, table.table-wrapper tbody tr.brd-top td {
-  border-top: 1px solid #000 !important;
+  /*border-top: 1px solid #000 !important;*/
 }
-.tr-dropdown .title-dropdown .form-control {
-    border-left: 0 none;
+.tr-dropdown {
+  /*background-color: #f2f2f2;*/
 }
 
 .group-buttons {
@@ -5330,6 +5314,156 @@ span.badge.message-badge {
     border: 1px solid #b7b7b7;
     padding: 15px;
 }
-.row-bottom{
+.top-pd{
   margin-top: 30px;
+  margin-bottom: 30px;
 }
+
+#error_explanation {
+  width: 100%;
+  border: 2px solid red;
+  padding: 7px;
+  padding-bottom: 12px;
+  margin: 20px 0;
+  background-color: #f0f0f0;
+}
+
+#error_explanation h2 {
+  text-align: left;
+  font-weight: bold;
+  padding: 5px 5px 5px 15px;
+  font-size: 12px;
+  margin: -7px -7px 15px;
+  background-color: #c00;
+  color: #fff;
+}
+
+#error_explanation p {
+  color: #333;
+  margin-bottom: 0;
+  padding: 5px;
+}
+
+#error_explanation ul li {
+  font-size: 12px;
+  list-style: square;
+}
+.field_with_errors {display: inline;}
+
+.plan-year-wrapper {
+    display: inline-block;
+    margin-bottom: 15px;
+    width: 100%;
+}
+.plan-year-wrapper table {
+    background-color: #fff;
+    width: 100%;
+}
+.plan-year-wrapper table.table tr td {
+    font-size: 12px;
+    font-weight: 100;
+    padding: 15px;
+}
+.plan-year-wrapper table.table tr:first-child td {
+    border-top: medium none;
+}
+.plan-year-wrapper table.table tr td:first-child, .plan-year-wrapper table.table tr td:nth-child(3) {
+    font-weight: 600;
+}
+.plan-year-wrapper .dropdown button {
+    background-color: #bfddff;
+    border: medium none;
+    font-size: 18px;
+    padding: 15px;
+}
+.plan-year-wrapper .dropdown button span.glyphicon {
+    color: #007bc4;
+    font-size: 13px;
+    padding-left: 10px;
+}
+.plan-year-wrapper .dropdown ul li a {
+    font-weight: 100;
+}
+.plan-year-wrapper .dropdown ul {
+    border-radius: 0;
+}
+.benefit-group-heading {
+  margin-top: 15px; 
+}
+a.remove {
+    float: right;
+    font-size: 14px;
+    font-weight: 200;
+    padding: 10px 0;
+    text-transform: none;
+}
+
+.button-group-wrapper {
+    display: inline-block;
+    float: right;
+    margin-bottom: 20px;
+}
+
+.title-inline {
+    float: left;
+    margin-bottom: 20px;
+    margin-top: 0;
+}
+table.table.table-employee-2 tr td, table.table.table-employee-2 tr th {
+    font-size: 12px;
+    padding: 8px;
+}
+table.table-bg-white {
+    background-color: #ffffff;
+}
+table.table-bg-white tr td, table.table-bg-white tr th {
+    padding: 8px 18px;
+    vertical-align: middle;
+}
+table.table-bg-white tr td {
+    font-weight: 300;
+}
+table.table-bg-white tr th {
+    font-weight: 400;
+}
+td.brd-r {
+    border-left: 1px solid #ddd;
+}
+table.table.table-message-wrapper {
+    background: #ffffff none repeat scroll 0 0;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+table.table.table-message-wrapper tr th {
+    color: #414141;
+    font-size: 12px;
+    font-weight: 400;
+    padding-left: 20px !important;
+    text-transform: uppercase;
+    width: 20%;
+}
+table.table.table-message-wrapper tr td, table.table.table-message-wrapper tr th {
+    padding: 15px 5px;
+    vertical-align: middle;
+}
+table.table.table-message-wrapper tr:first-child td, table.table.table-message-wrapper tr:first-child th {
+    border-top: medium none;
+}
+table.table.table-message-wrapper tr td input, table.table.table-message-wrapper tr td textarea {
+    border: medium none;
+    box-shadow: none;
+    font-size: 14px;
+    font-weight: 100;
+    margin: 0;
+    padding: 0;
+}
+table.table.table-message-wrapper tr th.vtop {
+    vertical-align: top;
+}
+.input-no-pd .form-group {margin-bottom: 15px;}
+.input-no-pd .form-control {padding: 0 10px !important;}
+.input-no-pd .form-control:focus {background-color: #fff; border-color: #337ab7;}
+
+.input-no-pd input[placeholder] {font-size: 14px !important; color: #555555;}
+.input-no-pd .form-control::-webkit-input-placeholder {font-size: 14px !important; color: #555555;}
+.input-no-pd .form-control:-moz-placeholder {font-size: 14px !important; color: #555555;}

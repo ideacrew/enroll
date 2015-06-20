@@ -33,7 +33,7 @@
           <span class="glyphicon glyphicon-pencil hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
           <% end %>
           <% elsif !census_employee.rehired? %>
-          <%= link_to '<i class="fa fa-pencil"></i> Edit'.html_safe, (edit_employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id)), class: "btn btn-success", remote: true %>
+          <%= link_to '<i class="fa fa-pencil"></i> Edit'.html_safe, (edit_employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id)), class: "btn btn-default", remote: true %>
 
           <%= link_to '<i class="fa fa-chain-broken"></i> Delink'.html_safe, (employers_employer_profile_census_employee_delink_path(@employer_profile.id, census_employee.id)), class: "btn btn-default", disabled: !census_employee.employee_role_linked? %>
 

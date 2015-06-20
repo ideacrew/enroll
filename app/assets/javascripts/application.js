@@ -26,6 +26,12 @@
 //= require qle
 //= require_tree .
 
+function applyFloatLabels() {
+  $('input.floatlabel').floatlabel({
+    slideInput: false
+  });
+}
+
 $(document).ready(function () {
 
   $(function(){
@@ -63,9 +69,7 @@ $(document).ready(function () {
     }
   });
 
-  $('input.floatlabel').floatlabel({
-    slideInput: false
-  });
+  applyFloatLabels();
   
   $(".address-li").on('click',function(){
     $(".address-span").html($(this).data("address-text"));

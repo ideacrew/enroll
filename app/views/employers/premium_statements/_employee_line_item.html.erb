@@ -1,5 +1,5 @@
   <tr>
-    <td <%= "rowspan=#{ee[:benefits].size}" %>><%= ee[:full_name] %></td>
+    <td <%= "rowspan=#{ee[:benefits].size}" %>><a href="#"><strong><%= ee[:full_name] %></strong></a></td>
     <td <%= "rowspan=#{ee[:benefits].size}" %>><%= number_to_obscured_ssn ee[:ssn] %></td>
     <td <%= "rowspan=#{ee[:benefits].size}" %>><%= format_date ee[:dob] %></td>
     <td <%= "rowspan=#{ee[:benefits].size}" %>><%= format_date ee[:hired_on] %></td>

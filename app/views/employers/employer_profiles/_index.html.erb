@@ -1,17 +1,19 @@
 <div id= 'message_form'></div>
-<div class="container" id="inbox_provider_form">
-  <div class="col-md-12 col-sm-12 col-xs-12">
-    <h3>Employers</h3>
+<div class="container top-pd" id="inbox_provider_form">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <h3 class="title-inline">Employers</h3>
 
-    <div class="row no-buffer">
+    <div class="form-inline button-group-wrapper">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 search-wp">
         <%= render 'shared/search', url: employers_employer_profiles_path, q: @q, placeholder: 'Name' %>
       </div>
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 no-pd">
-        <%= link_to '<i class="fa fa-user-plus"></i> New Employer Profile'.html_safe, new_employers_employer_profile_path, class: "btn btn-primary pull-right new_emp_button new_employer_profile" %>
+        <%= link_to 'New Employer Profile'.html_safe, new_employers_employer_profile_path, class: "btn btn-danger pull-right new_emp_button new_employer_profile" %>
       </div>
     </div>
+  </div>
 
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <div class="table-responsive">
       <table class="table table-wrapper" style="opacity: 1;">
         <thead>
@@ -28,7 +30,7 @@
               <td><%= link_to er.legal_name, employers_employer_profile_path(er) %></td>
               <td><%= er.roster_size %></td>
               <td><%= er.broker_agency_profile.try(:legal_name) %></td>
-              <td><%= link_to '<i class="fa fa-user-plus"></i> Send Secure Message'.html_safe, new_employers_employer_profile_inbox_path(er), class: "btn btn-primary", remote: true %></td>
+              <td><%= link_to 'Send Secure Message'.html_safe, new_employers_employer_profile_inbox_path(er), class: "btn btn-default", remote: true %></td>
             </tr>
           <% end %>
         </tbody>

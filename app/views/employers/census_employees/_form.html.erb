@@ -1,6 +1,6 @@
 <div class="container">
   <div class="row">
-    <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
       <% if @census_employee.errors.any? %>
         <div class="alert alert-error">
           <h4>
@@ -25,15 +25,13 @@
       <% end %>
       <% page_title = @census_employee.persisted? ? 'Update Employee' : 'Add New Employee' %>
       <div class="row">
-        <div class="col-md-9 no-pd col-sm-9 col-xs-12">
-          <h3 class="pull-left">
-            <%= page_title %>
-          </h3>
-          <a class="btn btn-danger return_to_employee_roster pull-right" href="#"><i class="fa fa-times"></i> Cancel</a>
-        </div>
+          <h4 class="pull-left"><%= page_title %></h4>
+          <a class="remove return_to_employee_roster" href="#">
+            <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
+            Cancel
+          </a>
       </div>
       <div class="row">
-        <div class="col-md-9 no-pd col-sm-9 col-xs-12">
           <%= render 'member_fields', f: f %>
           <%= render 'shared/census_employee_fields', {f: f} %>
           <br/>
@@ -45,12 +43,11 @@
           <div class="row top-row no-border">
             <div class="col-md-3 col-sm-3 col-xs-12 key-btn">
               <% button_label = @census_employee.persisted? ? 'Update Employee' : 'Create Employee' %>
-              <button class="btn btn-primary" type="submit">
-                <%= "<i class=\"fa fa-user-plus\"></i> #{button_label}".html_safe %>
+              <button class="btn btn-tranparent" type="submit">
+                <%= "#{button_label}".html_safe %>
               </button>
             </div>
           </div>
-        </div>
       </div>
     </div>
   </div>

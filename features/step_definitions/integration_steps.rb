@@ -13,7 +13,7 @@ module WatirScreenshots
   end
 end
 Before "@screenshots" do
-  @take_screens = true
+  @take_screens = ENV.has_key?("DISABLE_WATIR_SCREENSHOTS") ? false : true
 end
 
 Before "@keep_browser_open" do
@@ -223,6 +223,10 @@ Then(/^I should see the list of plans$/) do
 end
 
 When(/^I select a plan on the plan shopping page$/) do
+  @browser.execute_script(
+    'arguments[0].scrollIntoView();',
+    @browser.element(:text => /Choose a healthcare plan/)
+  )
   @browser.a(text: /Select/).click
 end
 

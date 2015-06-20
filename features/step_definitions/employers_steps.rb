@@ -194,7 +194,7 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(class: /interaction-field-control-census-employee-name-sfx/).set("Jr")
   @browser.text_field(class: /interaction-field-control-census-employee-dob/).set("01/01/1980")
   @browser.text_field(class: /interaction-field-control-census-employee-ssn/).set("786120965")
-  @browser.radio(class: /interaction-choice-control-value-census-employee-gender-male/).set
+  @browser.radio(class: /interaction-choice-control-value-radio-male/).set
   @browser.text_field(class: /interaction-field-control-census-employee-hired-on/).set("10/10/2014")
   @browser.checkbox(class: /interaction-choice-control-value-census-employee-is-business-owner/).set
   input_field = @browser.divs(class: /selectric-wrapper/).first
@@ -429,6 +429,10 @@ When(/^I enter combined filter in plan selection page$/) do
   #@browser.checkbox(class: /checkbox-custom interaction-choice-control-value-checkbox-5/).set(true)
 
   # Platinum
+  @browser.execute_script(
+    'arguments[0].scrollIntoView();', 
+    @browser.element(:text => /Choose a healthcare plan/)
+  )
   @browser.checkboxes(class: /plan-metal-level-selection-filter/)[0].set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("")
   @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("")
