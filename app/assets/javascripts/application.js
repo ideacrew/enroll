@@ -336,6 +336,8 @@ $(document).ready(function () {
   $(".person_ssn").mask("999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
+  $(".area_code").mask("999");
+  $(".phone_number7").mask("999-9999");
   
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
