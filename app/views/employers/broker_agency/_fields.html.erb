@@ -1,24 +1,19 @@
- <div class="row">
-  <ul class="list-group emp-ul col-md-12 col-sm-12 col-xs-12">
-    <li class="list-group-item">
-      <div class="row">
-        <div class="col-md-12">
-          <dl class="dl-horizontal">
-            <dt>Agency Name</dt>
-            <dd><%= broker_agency_profile.legal_name %></dd>
-            <% if broker_agency_profile.primary_broker_role.present? %>
-            <dt>Broker Name</dt>
-            <dd><%= broker_agency_profile.primary_broker_role.person.full_name %></dd>
-            <dt>Broker NPN</dt>
-            <dd><%= broker_agency_profile.primary_broker_role.npn %></dd>            
-            <dt>Contact Phone</dt>
-            <dd><%= broker_agency_profile.primary_broker_role.person.phones.map(&:to_s).join('/') %></dd>
-            <dt>Email</dt>
-            <dd><a href="mailto:<%= broker_agency_profile.primary_broker_role.person.emails.first.address %>"><%= broker_agency_profile.primary_broker_role.person.emails.first.address %></a></dd>
-            <% end %> 
-          </dl>
-        </div>
-      </div>
-    </li>
-  </ul>              
-</div>
+<table class="table">
+  <tr>
+    <th>Agency</th>
+    <th>Broker</th>
+    <th>Broker NPN</th>
+    <th>Contact Phone</th>
+    <th>Email</th>
+  </tr>
+
+  <tr>
+    <td><%= broker_agency_profile.legal_name %></td>
+    <% if broker_agency_profile.primary_broker_role.present? %>
+      <td><%= broker_agency_profile.primary_broker_role.person.full_name %></td>
+      <td><%= broker_agency_profile.primary_broker_role.npn %></td>
+      <td><%= broker_agency_profile.primary_broker_role.person.phones.map(&:to_s).join('/') %></td>
+      <td><a href="mailto:<%= broker_agency_profile.primary_broker_role.person.emails.first.address %>"><%= broker_agency_profile.primary_broker_role.person.emails.first.address %></a></td>
+    <% end %>
+  </tr>
+</table>

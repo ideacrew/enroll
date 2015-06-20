@@ -1,15 +1,18 @@
 <div id="show_broker_agency"></div>
 
-<div class="container" id="broker_agencies_panel">
-  <div class="col-md-12 col-sm-12 col-xs-12" >
-    <h3>Broker Agencies</h3>
+<div id="broker_agencies_panel">
 
-    <div class="row no-buffer">
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 search-wp">
+  <div class="row no-buffer top-pd">
+    <h3 class="title-inline">Broker Agencies</h3>
+
+    <div class="pull-right">
+      <div class="search-wp">
         <%= render 'shared/search', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", q: @q, remote: true, placeholder: 'Name, Broker Name, NPN' %>
       </div>
     </div>
+  </div>
 
+  <div class="row no-buffer">
     <div class="table-responsive">
       <table class="table table-wrapper" style="opacity: 1;">
         <thead>
@@ -27,13 +30,12 @@
               <td><%= agency_profile.primary_broker_role.person.full_name if agency_profile.primary_broker_role %></td>
               <td><%= agency_profile.primary_broker_role.npn if agency_profile.primary_broker_role %></td>
               <td>     
-                <%= link_to 'Show'.html_safe, employers_employer_profile_broker_agency_path(@employer_profile, agency_profile) , class: "btn btn-success", remote: true %>
+                <%= link_to 'Show', employers_employer_profile_broker_agency_path(@employer_profile, agency_profile) , class: "btn btn-default", remote: true %>
               </td>
             </tr>
             <% end %>
         </tbody>
       </table>
-      <%= render 'shared/alph_paginate', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", alphs: @page_alphabets, remote: true %>
     </div>
-  </div>
+    <%= render 'shared/alph_paginate', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", alphs: @page_alphabets, remote: true %>
 </div>
