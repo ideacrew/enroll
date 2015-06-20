@@ -7,7 +7,8 @@ class InboxesController < ApplicationController
   end
 
   def create
-    if @inbox.post_message(@message)
+    @inbox.post_message(@message)
+    if @inbox.save
       flash[:notice] = "Successfully sent message."
       redirect_to successful_save_path
     else
@@ -23,6 +24,6 @@ class InboxesController < ApplicationController
 
   def set_inbox_and_assign_message
     @inbox = @inbox_provider.inbox
-    @message = @inbox.messages.build(params.require(:message).permit!)
+    @message = Message.new(params.require(:message).permit!)
   end
 end
