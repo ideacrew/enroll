@@ -4,7 +4,7 @@
   <div class="submenu">
     <div class="container">
 
-      <div class="row">
+      <div class="row no-buffer">
 
         <ul role="tablist" class="list-unstyled list-inline" id="myTab1">
 
@@ -32,16 +32,8 @@
   </div>
 
   <div class="container">
-    <div class="panel panel-default">
-      <div class="tab-row">
-        <div class="tab-content" id="myTabContent">
-          <div aria-labelledby="active-broker-tab" id="broker_agency_panel" class="tab-pane-hbx" role="tabpanel">
-            <div class="col-md-10 col-sm-12">
-              <%= render "employers/broker_agency/active_broker" %>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div aria-labelledby="active-broker-tab" id="broker_agency_panel" class="tab-pane-hbx" role="tabpanel">
+      <%= render "employers/broker_agency/active_broker" %>
     </div>
   </div>
 </div>
