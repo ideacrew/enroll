@@ -4,6 +4,7 @@ module Forms
     attr_accessor :broker_agency_profile
     attr_accessor :market_kind, :languages_spoken
     attr_accessor :working_hours, :accept_new_clients, :home_page
+    attr_accessor :broker_applicant_type
 
     validates :market_kind,
       inclusion: { in: ::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid market kind" },

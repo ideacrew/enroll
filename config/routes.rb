@@ -103,6 +103,10 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :broker_roles, only: [:new, :create]
+
+  match 'broker_registration', to: 'broker_roles#new', via: [:get]
+
   namespace :carriers do
     resources :carrier_profiles do
     end
