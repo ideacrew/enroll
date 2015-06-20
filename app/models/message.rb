@@ -13,9 +13,11 @@ class Message
   after_initialize :set_timestamp
   validate :message_has_content
 
+  scope :by_message_id, ->(id){where(:id => id)}
+
   alias_method :message_read?, :message_read
 
-  def sender_name
+  def sent_by
     User.find(sender_id).person.full_name
   end
 

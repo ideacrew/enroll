@@ -1,2 +1,2 @@
-$("#profile-content").html("<%= escape_javascript(render("shared/inboxes/messages", provider: current_user.person)) %>");
+$("#profile-content").html("<%= escape_javascript(render("shared/inboxes/message_list", provider: current_user.person)) %>");
 semantic_class();
