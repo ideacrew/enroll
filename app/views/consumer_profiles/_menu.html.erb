@@ -44,9 +44,8 @@
       </li>
       
       <li role="presentation"<%= menu_tab_class(active_tab, "messages-tab") %>>
-        
         <%= link_to(inbox_consumer_profiles_path, :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
-          <span class="badge"></span>
+          <span class="badge"><%= @person.inbox.messages.size if @person.inbox.messages.present? %></span>
           Inbox
         <% end %>
 
