@@ -6,7 +6,7 @@ class Insured::InboxesController < InboxesController
   end
 
   def successful_save_path
-    broker_agencies_profile_path(@inbox_provider)
+    exchanges_hbx_profiles_root_path
   end
 
 end
