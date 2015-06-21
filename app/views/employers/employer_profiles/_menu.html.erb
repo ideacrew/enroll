@@ -37,11 +37,16 @@
         </a>
       </li>
       <li role="presentation">
-        <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox" class="hidden-xs interaction-click-control-4-messages">
-          <span class="badge"><%= @employer_profile.inbox.messages.size if @employer_profile.inbox.messages.present? %></span>Inbox
-        </a>
-        <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox" class="visible-xs interaction-click-control-messages">
-          <span aria-hidden="true" class="glyphicon glyphicon-comment"></span>
+        <%= link_to(inbox_employers_employer_profiles_path(id: @employer_profile.id), :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
+          <span class="badge"></span>
+          Inbox
+        <% end %>
+
+        <a href="#" class="visible-xs">
+            <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
+            <%= link_to(inbox_employers_employer_profiles_path(id: @employer_profile.id), :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
+              Inbox
+            <% end %>
         </a>
       </li>
     </ul>

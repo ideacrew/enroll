@@ -78,6 +78,7 @@ Rails.application.routes.draw do
         get 'welcome'
         get 'search'
         post 'match'
+        get 'inbox'
       end
       resources :plan_years do
         get 'recommend_dates', on: :collection

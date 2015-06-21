@@ -1,5 +1,5 @@
 class Employers::EmployerProfilesController < ApplicationController
-  before_action :find_employer, only: [:show, :destroy]
+  before_action :find_employer, only: [:show, :destroy, :inbox]
   before_action :check_admin_staff_role, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
 
@@ -119,6 +119,8 @@ class Employers::EmployerProfilesController < ApplicationController
     end
   end
 
+  def inbox
+  end
 
   private
     def check_employer_staff_role
