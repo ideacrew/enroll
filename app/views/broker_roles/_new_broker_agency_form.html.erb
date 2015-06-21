@@ -1,7 +1,6 @@
 <%= form_for @organization, as: :organization, url: {action: "create"} do |f| %>
   <%= render 'shared/error_messages', :object => @organization %>
 
-
   <div class="container">
   <div class="row">
     <%= render "shared/organization_staff_search", f: f %>
