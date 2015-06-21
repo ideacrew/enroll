@@ -43,11 +43,12 @@ class User
     employee: "employee",
     resident: "resident",
     consumer: "consumer",
-    employer_staff: "employer_staff",
     broker: "broker",
-    hbx_staff: "hbx_staff",
     system_service: "system_service",
-    web_service: "web_service"
+    web_service: "web_service",
+    hbx_staff: "hbx_staff",
+    employer_staff: "employer_staff",
+    broker_agency_staff: "broker_agency_staff"
   }
 
   PROFILES = {
