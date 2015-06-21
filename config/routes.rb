@@ -45,8 +45,8 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :inboxes, only: [:new, :create, :show]
     resources :families, only: [:show] do
-      resource :inbox, only: [:new, :create, :show]
       get 'new'
 
       resources :people do
@@ -69,6 +69,7 @@ Rails.application.routes.draw do
         post 'match'
       end
     end
+    resource :inboxes, only: [:new, :create, :show]
     resources :employer_profiles do
       get 'new'
       get 'my_account'
@@ -78,7 +79,6 @@ Rails.application.routes.draw do
         get 'search'
         post 'match'
       end
-      resource :inbox, only: [:new, :create, :show]
       resources :plan_years do
         get 'recommend_dates', on: :collection
         post 'publish'
@@ -108,8 +108,8 @@ Rails.application.routes.draw do
 
   namespace :broker_agencies do
     root 'profiles#new'
+    resource :inboxes, only: [:new, :create, :show]
     resources :profiles, only: [:new, :create, :show, :index] do 
-      resource :inbox, only: [:new, :create, :show]
     end
   end
 

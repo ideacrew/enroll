@@ -1,7 +1,7 @@
 class BrokerAgencies::InboxesController < InboxesController
 
   def find_inbox_provider
-    @inbox_provider = BrokerAgencyProfile.find(params["profile_id"])
+    @inbox_provider = BrokerAgencyProfile.find(params["id"])
     @inbox_provider_name = @inbox_provider.legal_name
   end
 

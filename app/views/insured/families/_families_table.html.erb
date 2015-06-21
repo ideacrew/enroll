@@ -47,7 +47,7 @@
           <%= render "insured/families/benefits_table", benefits: benefits %>
         <% end %>
         <% if pp.user.present? || pp.emails.present? %>
-          <td><%= link_to 'Send Secure Message'.html_safe, new_insured_family_inbox_path(family.primary_applicant.person), class: "btn btn-default", remote: true %></td>
+          <td><%= link_to 'Send Secure Message'.html_safe, new_insured_inbox_path(id: family.primary_applicant.person.id), class: "btn btn-default", remote: true %></td>
         <% end %>
       </tr>
       <% end %>

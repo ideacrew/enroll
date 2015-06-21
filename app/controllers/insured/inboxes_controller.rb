@@ -1,7 +1,7 @@
 class Insured::InboxesController < InboxesController
 
   def find_inbox_provider
-    @inbox_provider = Person.find(params["family_id"])
+    @inbox_provider = Person.find(params["id"])
     @inbox_provider_name = @inbox_provider.full_name
   end
 
