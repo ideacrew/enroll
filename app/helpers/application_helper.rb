@@ -255,4 +255,16 @@ module ApplicationHelper
       current_user.person.try(:full_name) ? current_user.person.full_name : 'User'
     end
   end
+
+  def retrieve_show_path(provider, message)
+    case(provider.model_name.name)
+    when "Person"
+      insured_inbox_path(provider, message_id: message.id)
+    when "EmployerProfile"
+      employers_inbox_path(provider, message_id: message.id)
+    when "BrokerAgencyProfile"
+      broker_agencies_inbox(provider, message_id: message.id)
+    end
+  end
+
 end

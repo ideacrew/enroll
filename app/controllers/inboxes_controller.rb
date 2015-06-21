@@ -1,5 +1,6 @@
 class InboxesController < ApplicationController
   before_action :find_inbox_provider
+  before_action :find_message, only: [:show, :destroy]
   before_action :set_inbox_and_assign_message, only: [:create]
 
   def new
@@ -17,10 +18,21 @@ class InboxesController < ApplicationController
   end
 
   def show
-    @message = @inbox_provider.inbox.messages.by_message_id(params["message_id"]).to_a.first
+    @message.update_attributes(message_read: true)
+    respond_to do |format|
+      format.html
+      format.js
+    end
+  end
+
+  def destroy
+    @message.destroy
   end
 
   private
+  def find_message
+    @message = @inbox_provider.inbox.messages.by_message_id(params["message_id"]).to_a.first
+  end
 
   def set_inbox_and_assign_message
     @inbox = @inbox_provider.inbox

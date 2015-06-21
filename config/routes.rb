@@ -45,7 +45,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :inboxes, only: [:new, :create, :show]
+    resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
       get 'new'
 
@@ -69,7 +69,7 @@ Rails.application.routes.draw do
         post 'match'
       end
     end
-    resources :inboxes, only: [:new, :create, :show]
+    resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :employer_profiles do
       get 'new'
       get 'my_account'
@@ -108,7 +108,7 @@ Rails.application.routes.draw do
 
   namespace :broker_agencies do
     root 'profiles#new'
-    resources :inboxes, only: [:new, :create, :show]
+    resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :profiles, only: [:new, :create, :show, :index] do 
     end
   end
