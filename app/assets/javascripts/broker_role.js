@@ -1,38 +1,30 @@
 $(function() {
-
-  $('#radio_existing_agency').click(function(){
-    displayExistingAgencyForm()
+  $('div[name=broker_signup_primary_tabs] > ').children().each( function() { 
+    $(this).change(function(){
+      filter = $(this).val();
+      $('#' + filter + '_panel').siblings().hide();
+      $('#' + filter + '_panel').show();
+      $.ajax({
+        url: '/broker_roles/new.js',
+        type: "GET",
+        data : { 'filter': filter }
+      });
+    })
   })
+})
 
-  $('#radio_broker').click(function(){
-    $('#broker_agency_type').show();
-    $('#person_broker_applicant_type').val('broker');
-    if($('#radio_existing_agency').is(':checked')) {
-      displayExistingAgencyForm()
-    }
-    else{
-      displayNewAgencyForm()
-    }
+$(function() {
+  $('div[name=broker_agency_tabs] > ').children().each( function() { 
+    $(this).change(function(){
+      filter = 'broker_role';
+      agency_type = $(this).val();
+      $('#' + agency_type + '_broker_agency_form').siblings().hide();
+      $('#' + agency_type + '_broker_agency_form').show();
+      $.ajax({
+        url: '/broker_roles/new.js',
+        type: "GET",
+        data : { 'filter': filter, 'agency_type': agency_type }
+      });
+    })
   })
-
-  $('#radio_staff').click(function(){
-    $('#person_broker_applicant_type').val('staff');
-    $('#broker_agency_type').hide();
-    $('#broker_npn_field').hide();
-    displayExistingAgencyForm()
-  })
-
-  $('#radio_new_agency').click(function(){
-    displayNewAgencyForm()
-  })
-
-  function displayNewAgencyForm(){
-    $('#existing_broker_agency_form').hide();
-    $('#new_broker_agency_form').show();
-  }
-
-  function displayExistingAgencyForm(){
-    $('#new_broker_agency_form').hide();
-    $('#existing_broker_agency_form').show(); 
-  }
 })
