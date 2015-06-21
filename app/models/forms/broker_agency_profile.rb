@@ -4,7 +4,8 @@ module Forms
     attr_accessor :broker_agency_profile
     attr_accessor :market_kind, :languages_spoken
     attr_accessor :working_hours, :accept_new_clients, :home_page
-    attr_accessor :broker_applicant_type
+    attr_accessor :broker_applicant_type, :email
+    include NpnField
 
     validates :market_kind,
       inclusion: { in: ::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid market kind" },
@@ -26,15 +27,22 @@ module Forms
 
     def create_broker_agency_staff_role(current_user, broker_agency_profile)
       person.user = current_user
-      person.broker_agency_staff_roles << BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)
+      person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)
       current_user.roles << "broker_agency_staff" unless current_user.roles.include?("broker_agency_staff")
       current_user.save!
+    end
+
+    def create_broker_role(user, broker_agency_profile)
+      person.broker_role = ::BrokerRole.new({ :provider_kind => 'broker', :npn => self.npn, :broker_agency_profile => broker_agency_profile })
+      user.roles << "broker" unless user.roles.include?("broker")
+      user.save!
     end
 
     def save(current_user)
       return false unless valid?
       begin
         match_or_create_person(current_user)
+        create_new_user unless current_user
         person.save!
       rescue TooManyMatchingPeople
         errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
@@ -53,7 +61,13 @@ module Forms
       organization = create_new_organization
       organization.save!
       self.broker_agency_profile = organization.broker_agency_profile
-      create_broker_agency_staff_role(current_user, organization.broker_agency_profile)
+      if current_user
+        create_broker_agency_staff_role(current_user, organization.broker_agency_profile)
+      else
+        create_broker_role(person.user, organization.broker_agency_profile)
+        self.broker_agency_profile.primary_broker_role = person.broker_role
+        self.broker_agency_profile.save!
+      end
       true
     end
 
@@ -72,6 +86,13 @@ module Forms
         }),
         :office_locations => office_locations
       )
+    end
+
+    def create_new_user
+      password = Devise.friendly_token.first(8)
+      user = User.new(:email => email, :password => password, :password_confirmation => password)
+      user.save!
+      person.user = user
     end
   end
 end

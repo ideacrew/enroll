@@ -5,7 +5,7 @@ module Forms
         attr_reader :npn
 
         def npn=(new_npn)
-          if !new_np.blank?
+          if !new_npn.blank?
             @npn = new_npn.to_s.gsub(/\D/, '')
           end
         end
