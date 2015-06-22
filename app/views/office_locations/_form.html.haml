@@ -1,6 +1,6 @@
 = fields_for(@parent_object, @slug_owner, :fieldset => false) do |f|
   = f.fields_for("office_locations", @office_location, child_index: @child_index) do |builder|
-    %h4 Address
+    %h4 Office Location
     = render("shared/office_location_fields", f: builder)
 
 .form-inputs#office_locations_buttons
