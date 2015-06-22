@@ -24,9 +24,10 @@ describe Forms::EmployeeCandidate do
 end
 
 describe Forms::EmployeeCandidate, "asked to match a census employee" do
-  let(:fake_org) { instance_double("Organization", :employer_profile => fake_employer) }
+  let(:fake_plan_year) { instance_double("PlanYear")}
   let(:census_employee) { instance_double("CensusEmployee", :ssn => "123456789", :dob => Date.new(2012,10,12), :aasm_state => "eligible", :eligible? => true ) }
-  let(:fake_employer) { instance_double("EmployerProfile", :census_employees => [census_employee]) }
+  let(:fake_employer) { instance_double("EmployerProfile", :census_employees => [census_employee], :plan_years => [fake_plan_year]) }
+  let(:fake_org) { instance_double("Organization", :employer_profile => fake_employer) }
 
   subject {
     Forms::EmployeeCandidate.new({
@@ -45,11 +46,27 @@ describe Forms::EmployeeCandidate, "asked to match a census employee" do
     expect(subject.match_census_employees).to be_empty
   end
 
-  it "should return the census employee when one is matched by dob and ssn" do
-    allow(Organization).to receive(:where).and_return([fake_org])
-    expect(subject.match_census_employees).to eq [census_employee]
+  context "and the plan year is not allowing matching" do
+    before do
+      allow(fake_plan_year).to receive(:is_eligible_to_match_census_employees?).and_return(false)
+      allow(Organization).to receive(:where).and_return([fake_org])
+    end
+
+    it "should return nothing" do
+      expect(subject.match_census_employees).to be_empty
+    end
   end
 
+  context "and the plan year is allowing matching" do
+    before do
+      allow(fake_plan_year).to receive(:is_eligible_to_match_census_employees?).and_return(true)
+      allow(Organization).to receive(:where).and_return([fake_org])
+    end
+
+    it "should return the census employee when one is matched by dob and ssn" do
+      expect(subject.match_census_employees).to eq [census_employee]
+    end
+  end
 end
 
 describe Forms::EmployeeCandidate, "asked to match a person" do

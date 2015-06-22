@@ -22,17 +22,25 @@ module Forms
 
     def match_census_employees
       census_employees = []
-      employers = Organization.where({
+      employer_organizations = Organization.where({
         "employer_profile.census_employees" =>  { "$elemMatch" => {
            "dob" => dob,
            "ssn" => ssn,
            "aasm_state" => "eligible"} }
       })
-      employers.each do |emp|
-        emp.employer_profile.census_employees.each do |ce|
+      employer_organizations.each do |employer_organization|
+        plan_years = employer_organization.try(:employer_profile).try(:plan_years) || []
+        eligible_plan_years = []
+        plan_years.each do |plan_year|
+          eligible_plan_years << plan_year if plan_year.is_eligible_to_match_census_employees?
+        end
+
+        if eligible_plan_years.size > 0
+          employer_organization.employer_profile.census_employees.each do |ce|
            if (ce.ssn == ssn) && (ce.dob == dob) && (ce.eligible?)
              census_employees << ce
            end
+          end
         end
       end
       census_employees
