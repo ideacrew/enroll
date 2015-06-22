@@ -1,0 +1,5 @@
+<% if @broker_agency.present? %>
+  <p><strong>legal name: </strong><%= @broker_agency.legal_name %></p>
+  <p><strong>FEIN: </strong><%= @broker_agency.fein %></p>
+  <p><strong>kind: </strong><%= @broker_agency.entity_kind %></p>
+<% end %>

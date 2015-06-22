@@ -1,0 +1,59 @@
+<%= form_for @person, as: :person, url: {action: "create"} do |f| %>
+  <%= render 'shared/error_messages', :object => @person %>
+
+  <div class="container">
+  <div class="row">
+    <%= render "shared/organization_staff_search", f: f %>
+
+    <%= f.hidden_field :broker_applicant_type %>
+
+    <div class="row">
+      <div class="col-md-9 col-sm-9 col-xs-12">
+       <div class="row no-buffer row-form-wrapper">
+        <div class="col-md-6 col-sm-4 col-xs-12 form-group-lg no-pd">
+          <%= f.text_field :email, class: "floatlabel form-control", placeholder: 'EMAIL' %>
+        </div>
+        <% if @filter == 'broker_role' %>
+        <div class="col-md-6 col-sm-4 col-xs-12 form-group-lg no-pd">
+          <%= f.text_field :npn, class: "floatlabel form-control", placeholder: 'NPN' %>
+        </div>
+        <% end %>
+        </div>
+      </div>
+    </div>
+
+<!-- 
+    <div id="broker_agency_search_form">
+      <%#= render 'shared/broker_agency_search_form' %>
+    </div> -->
+
+    <div class="row">
+      <div class="col-md-9 col-sm-9 col-xs-12 broker-agency-search">
+        <h4>Select Your Broker Agency</h4>
+        <div class="row">
+          <div class="col-md-4 col-sm-9 col-xs-12">
+            <%= f.select(:broker_agency_id, options_for_select(@broker_agency_profiles.map {|agency| [agency.legal_name, agency.id]}), { prompt: "Select Broker Application Type"}, { :class => 'broker_agency'} ) %>
+          </div>
+          <div class="col-md-4 col-sm-9 col-xs-12">
+            <a href="#" class="btn btn-primary search" data-loading-text="Loading..."><i class="fa fa-search"></i> search</a>
+          </div>
+        </div>
+        <div class='result'></div>
+      </div>
+    </div>
+
+    <br>
+    <div class="row">
+      <div class="col-md-9 col-sm-9 col-xs-12">
+        <div class="row no-buffer">
+          <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
+          <button type="submit" class
+          ="btn btn-primary"><i class="fa fa-user-plus"></i> Submit Application</button>
+        </div> 
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% end %>

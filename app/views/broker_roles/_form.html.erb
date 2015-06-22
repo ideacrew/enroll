@@ -1,0 +1,25 @@
+<div id="broker_registration_panel">
+  <div class="container top-pd">
+   <div class="row no-buffer">
+     <div class="col-lg-6 col-md-9 col-xs-12 form-group form-group-lg pd">
+      <div class="btn-group" role="group" aria-label="">
+        <div class="btn-group" data-toggle="buttons" name="broker_signup_primary_tabs">
+          <label class="btn btn-default active">
+            <input type="radio" name="options" id="broker" autocomplete="off" value="broker_role" checked> BROKER
+          </label>
+          <label class="btn btn-default">
+            <input type="radio" name="options" id="staff" autocomplete="off" value="staff_role"> BROKER AGENCY STAFF
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="broker_signup_container" class="top-pd">
+    <div id="broker_role_panel">
+      <%= render 'broker_signup', agency_type: @agency_type %>
+    </div>
+    <div id="staff_role_panel"></div>
+  </div>
+</div>
+
