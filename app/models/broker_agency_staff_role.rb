@@ -13,6 +13,9 @@ class BrokerAgencyStaffRole
 
   validates_presence_of :broker_agency_profile_id
 
+  accepts_nested_attributes_for :person, :workflow_state_transitions
+
+  after_initialize :initial_transition
 
   aasm do
     state :broker_agency_pending, initial: true
