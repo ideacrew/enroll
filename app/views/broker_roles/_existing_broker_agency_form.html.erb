@@ -1,7 +1,7 @@
 <%= form_for @person, as: :person, url: {action: "create"} do |f| %>
 <%= render 'shared/error_messages', :object => @person %>
 <div class="container">
-  <%= f.hidden_field :broker_applicant_type %>
+  <%= f.hidden_field :broker_applicant_type, value: @filter %>
   <div class="row">
     <%= render "person_info_fields", f: f %>
     <div class="row">

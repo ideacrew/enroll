@@ -25,8 +25,7 @@ class BrokerRolesController < ApplicationController
     if params[:person].present?
       person_params = params[:person]
       applicant_type = person_params.delete(:broker_applicant_type) if person_params[:broker_applicant_type]
-      if applicant_type && applicant_type == 'staff'
-        person_params.delete(:npn)
+      if applicant_type && applicant_type == 'staff_role'
         @person = ::Forms::BrokerAgencyStaffRole.new(person_params)
       else
         @person = ::Forms::BrokerRole.new(person_params)
@@ -41,7 +40,6 @@ class BrokerRolesController < ApplicationController
       end
     else
       @organization = ::Forms::BrokerAgencyProfile.new(params[:organization])
-
       if @organization.save(current_user)
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
         redirect_to "/broker_registration"
