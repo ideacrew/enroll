@@ -8,7 +8,8 @@ class InboxesController < ApplicationController
   end
 
   def create
-    @new_message.folder = 'Sent'
+    @new_message.folder = 'Inbox'
+
     @inbox.post_message(@new_message)
     if @inbox.save
       flash[:notice] = "Successfully sent message."
