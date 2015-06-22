@@ -20,7 +20,6 @@ function applyJQDatePickerSetup(ele) {
 
     var dateMax = null;
     var dateMin = null;
-    var dateFormat = 'mm/dd/yy';
 
     if (ofParentControl.is(".floatlabel-wrapper")) {
         if (ofGrandparentControl.is(".field_with_errors")) {
@@ -55,14 +54,11 @@ function applyJQDatePickerSetup(ele) {
         dateMin = el.attr("data-date-min");
     }
 
-    if (el.is("[data-date-format]")) {
-        dateFormat = el.attr("data-date-format");
-    }
-
     el.datepicker({
         changeMonth: true,
         changeYear: true,
-        dateFormat: dateFormat,
+        dateFormat: 'mm/dd/yy',
+        altFormat: 'yy-mm-dd',
         altField: otherFieldSelector,
         yearRange: yearMin + ":" + yearMax,
         maxDate: dateMax,

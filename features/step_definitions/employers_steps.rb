@@ -33,7 +33,7 @@ And(/^I should see an initial form to enter information about my Employer and my
   plan.save
   @browser.text_field(name: "organization[first_name]").set("Doe")
   @browser.text_field(name: "organization[last_name]").set("John")
-  @browser.text_field(name: "jq_datepicker_ignore_organization[dob]").set("1982-10-11")
+  @browser.text_field(name: "jq_datepicker_ignore_organization[dob]").set("10/11/1982")
   @browser.text_field(name: "organization[first_name]").click
 
   @browser.text_field(name: "organization[legal_name]").set("Turner Agency, Inc")
