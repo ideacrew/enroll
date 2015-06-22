@@ -22,6 +22,8 @@ class BrokerRolesController < ApplicationController
 
   def create
     params.permit!
+    success = false
+    
     if params[:person].present?
       person_params = params[:person]
       applicant_type = person_params.delete(:broker_applicant_type) if person_params[:broker_applicant_type]
@@ -31,26 +33,21 @@ class BrokerRolesController < ApplicationController
         @person = ::Forms::BrokerRole.new(person_params)
       end
       if @person.save(current_user)
-        flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
-        redirect_to "/broker_registration"
-      else
-        flash[:error] = "Failed to create Broker Agency Profile"
-        @person = Forms::BrokerCandidate.new
-        redirect_to "/broker_registration"
+        success = true
       end
     else
       @organization = ::Forms::BrokerAgencyProfile.new(params[:organization])
       if @organization.save(current_user)
-        flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
-        redirect_to "/broker_registration"
-      else
-        flash[:error] = "Failed to create Broker Agency Profile"
-        @person = Forms::BrokerCandidate.new
-        redirect_to "/broker_registration"
+        success = true
       end
     end
-  end
 
-  def thank_you
+    if success
+      flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+    else
+      flash[:error] = "Failed to create Broker Agency Profile"
+    end
+
+    redirect_to "/broker_registration"
   end
 end
