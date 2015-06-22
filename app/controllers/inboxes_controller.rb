@@ -8,6 +8,7 @@ class InboxesController < ApplicationController
   end
 
   def create
+    @new_message.folder = 'Sent'
     @inbox.post_message(@new_message)
     if @inbox.save
       flash[:notice] = "Successfully sent message."
@@ -26,7 +27,8 @@ class InboxesController < ApplicationController
   end
 
   def destroy
-    @message.destroy
+    #@message.destroy
+    @message.update_attributes(folder: 'Deleted')
   end
 
   private
