@@ -1,3 +1,4 @@
+### Handles Broker Registration requests made by anonymous users. Authentication disbaled for this controller.
 class BrokerRolesController < ApplicationController
 
   def new
