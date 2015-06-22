@@ -103,7 +103,9 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :broker_roles, only: [:new, :create]
+  resources :broker_roles, only: [:new, :create] do
+    get :search_broker_agency, on: :collection
+  end
 
   match 'thank_you', to: 'broker_roles#thank_you', via: [:get]
   match 'broker_registration', to: 'broker_roles#new', via: [:get]
