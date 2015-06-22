@@ -155,9 +155,8 @@ class BrokerRole
 
 private
 
-
   def is_primary_broker?
-    broker_agency_profile.primary_broker == self
+    broker_agency_profile.primary_broker_role == self
   end
 
   def initial_transition

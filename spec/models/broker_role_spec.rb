@@ -100,6 +100,7 @@ describe BrokerRole, dbclean: :after_each do
 
       context "and is approved by the HBX" do
         before do
+          allow(registered_broker_role).to receive(:is_primary_broker?).and_return(true)
           registered_broker_role.approve
         end
 
