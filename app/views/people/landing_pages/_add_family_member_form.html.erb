@@ -27,7 +27,8 @@
             <div class="row middle-row top-row-2">
               <div class="col-md-3 col-sm-3 no-pd">
                 <div class="form-group form-group-lg">
-                    <%= f.text_field :dob, class: "required date-picker dob-picker home floatlabel form-control", required: true, value: dependent.dob.try(:strftime, "%m/%d/%Y"), placeholder: "DATE OF BIRTH", id: "family_member_dob_#{dependent.id}", start_year: Date.today.year - 110, end_year: Date.today.year %>
+                  <%= datepicker_control f, :dob, {:class => "floatlabel form-control home", :placeholder => "DATE OF BIRTH",
+                                                   :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'mm/dd/yy', required: true, value: dependent.dob.try(:strftime, "%m/%d/%Y"), id: "family_member_dob_#{dependent.id}"} %>
                 </div>
               </div>
 
