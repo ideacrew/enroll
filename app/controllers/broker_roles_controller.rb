@@ -16,6 +16,10 @@ class BrokerRolesController < ApplicationController
     end
   end
 
+  def search_broker_agency
+    @broker_agency = Organization.where({"broker_agency_profile._id" => BSON::ObjectId.from_string(params[:broker_agency_id])}).last.try(:broker_agency_profile)
+  end
+
   def create
     params.permit!
     if params[:person].present?

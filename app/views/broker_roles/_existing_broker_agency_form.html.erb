@@ -28,13 +28,17 @@
     </div> -->
 
     <div class="row">
-      <div class="col-md-9 col-sm-9 col-xs-12">
+      <div class="col-md-9 col-sm-9 col-xs-12 broker-agency-search">
         <h4>Select Your Broker Agency</h4>
         <div class="row">
           <div class="col-md-4 col-sm-9 col-xs-12">
-            <%= f.select(:broker_agency_id, options_for_select(@broker_agency_profiles.map {|agency| [agency.legal_name, agency.id]}), { prompt: "Select Broker Application Type"}, { :class => ''} ) %>
+            <%= f.select(:broker_agency_id, options_for_select(@broker_agency_profiles.map {|agency| [agency.legal_name, agency.id]}), { prompt: "Select Broker Application Type"}, { :class => 'broker_agency'} ) %>
+          </div>
+          <div class="col-md-4 col-sm-9 col-xs-12">
+            <a href="#" class="btn btn-primary search" data-loading-text="Loading..."><i class="fa fa-search"></i> search</a>
           </div>
         </div>
+        <div class='result'></div>
       </div>
     </div>
 
