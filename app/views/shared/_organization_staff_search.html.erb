@@ -10,7 +10,7 @@
 				<%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME' %>
 			</div>
 			<div class="col-md-4 col-sm-4 col-xs-12 form-group-lg no-pd">
-              <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH", :'data-date-min' => "-110y", :'data-date-max' => "+0"} %>
+              <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH", :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'yy-mm-dd'} %>
 			</div>
 		</div>
 	</div>
