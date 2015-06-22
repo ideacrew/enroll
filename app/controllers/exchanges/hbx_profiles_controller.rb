@@ -111,11 +111,14 @@ class Exchanges::HbxProfilesController < ApplicationController
       m = Message.new
       m.subject = 'Portal test message'
       m.sender_id=current_user.id
+      m.folder = 'Inbox'
       @hbx_portal.inbox.messages << m
+      m.folder = 'Sent'
+      m.subject = 'Portal test message - Sent'
       @hbx_portal.inbox.messages << m
       @hbx_portal.save
     end
-   
+    @folder = params[:folder] || 'Inbox'
   end
 
   # POST /exchanges/hbx_profiles

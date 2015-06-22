@@ -263,8 +263,15 @@ module ApplicationHelper
     when "EmployerProfile"
       employers_inbox_path(provider, message_id: message.id)
     when "BrokerAgencyProfile"
-      broker_agencies_inbox(provider, message_id: message.id)
+      broker_agencies_inbox_path(provider, message_id: message.id)
     end
   end
-
+def retrieve_inbox_path(provider, folder: 'Inbox')
+    case(provider.model_name.name)
+    when "EmployerProfile"
+      inbox_employers_employer_profiles(provider)
+    when "HbxPortal"
+      inbox_exchanges_hbx_profile_path(provider, folder: folder)
+    end
+  end
 end
