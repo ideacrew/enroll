@@ -120,6 +120,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def delink
+    authorize! :delink, @census_employee
     @census_employee.delink_employee_role
     @census_employee.save!
     flash[:notice] = "Successfully delinked census employee."

@@ -358,6 +358,14 @@ class EmployerProfile
     end
   end
 
+  def is_eligible_to_shop?
+    registered? or enrolling?
+  end
+
+  def is_eligible_to_enroll?
+    enrolling?
+  end
+
 private
   def build_nested_models
     build_inbox if inbox.nil?
