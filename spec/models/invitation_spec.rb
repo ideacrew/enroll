@@ -99,3 +99,21 @@ describe Invitation, "starting in the initial state" do
     expect(subject.may_claim?).to eq true
   end
 end
+
+describe "A valid invitation in the sent state" do
+  let(:valid_params) {
+    {
+      :source_id => BSON::ObjectId.new,
+      :source_kind => "census_employee",
+      :role => "employee_role"
+    } 
+  }
+  let(:user) { User.new }
+
+  subject { Invitation.new(valid_params) }
+
+  it "can be claimed by a user" do
+    subject.claim_invitation!(user)
+    expect(subject.user).to eq user
+  end
+end

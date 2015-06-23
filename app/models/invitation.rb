@@ -14,8 +14,9 @@ class Invitation
   field :role, type: String
   field :source_id, type: BSON::ObjectId
   field :source_kind, type: String
-
   field :aasm_state, type: String
+
+  belongs_to :user
 
   validates_presence_of :role, :allow_blank => false
   validates_presence_of :source_id, :allow_blank => false
@@ -28,8 +29,17 @@ class Invitation
     state :claimed
 
     event :claim do
-      transitions from: :sent, to: :claimed
+      transitions from: :sent, to: :claimed, :after => Proc.new { |*args| assign_user!(*args) }
     end
+  end
+
+  def claim_invitation!(user_obj)
+    self.claim!(:claimed, user_obj)
+  end
+
+  def assign_user!(user_obj)
+    self.user = user_obj
+    self.save!
   end
 
   def allowed_invite_types
