@@ -150,6 +150,10 @@ class EmployerProfile
     plan_years.to_a.detect { |py| (py.start_date.beginning_of_day..py.end_date.end_of_day).cover?(target_date) }
   end
 
+  def find_plan_year(id)
+    plan_years.where(id: id).first
+  end
+
   def enrolling_plan_year
     published_plan_year
   end

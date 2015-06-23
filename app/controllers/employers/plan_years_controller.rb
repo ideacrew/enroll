@@ -38,7 +38,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def publish
-    @plan_year = @employer_profile.plan_years.last
+    @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     @plan_year.publish
 
     if @plan_year.save

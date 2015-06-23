@@ -65,7 +65,7 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show
-    @current_plan_year = @employer_profile.plan_years.last
+    @current_plan_year = @employer_profile.published_plan_year
     @plan_years = @employer_profile.plan_years.order(id: :desc)
 
     status_params = params.permit(:id, :status)
