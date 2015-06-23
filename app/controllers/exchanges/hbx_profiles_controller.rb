@@ -105,7 +105,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def inbox
     if HbxPortal.count > 0
       @hbx_portal = HbxPortal.try(params[:id]) || HbxPortal.first
-    else  
+    else
       @hbx_portal = HbxPortal.new
       @hbx_portal.save
       m = Message.new
@@ -115,7 +115,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       @hbx_portal.inbox.messages << m
       @hbx_portal.save
     end
-   
+
   end
 
   # POST /exchanges/hbx_profiles
@@ -158,6 +158,13 @@ class Exchanges::HbxProfilesController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  def set_date
+    TimeKeeper.set_date_of_record(params[:time_keeper][:date_of_record])
+    TimeKeeper.instance.push_date_of_record
+    redirect_to exchanges_hbx_profiles_root_path
+  end
+
 
 private
   # Use callbacks to share common setup or constraints between actions.
