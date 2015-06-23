@@ -46,11 +46,16 @@ module Forms
     end
 
     def match_broker_agency
-      raise BrokerAgencyMissing.new if self.broker_agency_id.blank?
+      if self.broker_agency_id.blank?
+        raise BrokerAgencyMissing.new
+      end
       self.broker_agency_profile = ::BrokerAgencyProfile.find(self.broker_agency_id)
     end
 
     def match_broker_npn
+      if Person.where("broker_role.npn" => npn).count > 0
+        raise BrokerNpnAlreadyExists
+      end
     end
   end
 end
