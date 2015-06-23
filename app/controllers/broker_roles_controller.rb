@@ -21,22 +21,19 @@ class BrokerRolesController < ApplicationController
   end
 
   def create
-    params.permit!
     success = false
-    
     if params[:person].present?
-      person_params = params[:person]
-      applicant_type = person_params.delete(:broker_applicant_type) if person_params[:broker_applicant_type]
+      applicant_type = params[:person][:broker_applicant_type] if params[:person][:broker_applicant_type]
       if applicant_type && applicant_type == 'staff_role'
-        @person = ::Forms::BrokerAgencyStaffRole.new(person_params)
+        @person = ::Forms::BrokerAgencyStaffRole.new(broker_agency_staff_role_params)
       else
-        @person = ::Forms::BrokerRole.new(person_params)
+        @person = ::Forms::BrokerRole.new(broker_role_params)
       end
       if @person.save(current_user)
         success = true
       end
     else
-      @organization = ::Forms::BrokerAgencyProfile.new(params[:organization])
+      @organization = ::Forms::BrokerAgencyProfile.new(primary_broker_role_params)
       if @organization.save(current_user)
         success = true
       end
@@ -49,5 +46,28 @@ class BrokerRolesController < ApplicationController
     end
 
     redirect_to "/broker_registration"
+  end
+
+
+  private
+
+  def primary_broker_role_params
+    params.require(:organization).permit(
+      :first_name, :last_name, :dob, :email, :npn, :legal_name, :dba, 
+      :fein, :entity_kind, :home_page, :market_kind, :languages_spoken, 
+      :working_hours, :accept_new_clients,
+      :office_locations_attributes => [ 
+        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip], 
+        :phone_attributes => [:kind, :area_code, :number, :extension]
+      ]
+    )
+  end
+
+  def broker_role_params
+    params.require(:person).permit(:first_name, :last_name, :dob, :email, :npn, :broker_agency_id)
+  end
+
+  def broker_agency_staff_role_params
+    params.require(:person).permit(:first_name, :last_name, :dob, :email, :broker_agency_id)
   end
 end
