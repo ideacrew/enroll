@@ -120,7 +120,9 @@ Rails.application.routes.draw do
   namespace :broker_agencies do
     root 'profiles#new'
     resources :inboxes, only: [:new, :create, :show, :destroy]
-    resources :profiles, only: [:new, :create, :show, :index]
+    resources :profiles, only: [:new, :create, :show, :index] do
+      get :inbox 
+    end
   end
 
   resources :translations

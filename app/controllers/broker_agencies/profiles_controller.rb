@@ -37,6 +37,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
   end
 
+  def inbox
+    @broker_agency_provider = BrokerAgencyProfile.find(params["id"]||params['profile_id'])
+    @folder = (params[:folder] || 'Inbox').capitalize
+  end
+
   private
 
   def find_hbx_profile

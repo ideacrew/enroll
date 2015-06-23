@@ -1,8 +1,8 @@
 class BrokerAgencies::InboxesController < InboxesController
 
   def find_inbox_provider
-    @inbox_provider = BrokerAgencyProfile.find(params["id"])
-    @inbox_provider_name = @inbox_provider.legal_name
+    @broker_agency_provider = BrokerAgencyProfile.find(params["id"]||params['profile_id'])
+    
   end
 
   def successful_save_path
