@@ -503,6 +503,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       let(:benefit_group) { FactoryGirl.build(:benefit_group) }
 
       before do
+        expect(benefit_group).to receive(:publish_plan_year)
         plan_year.benefit_groups = [benefit_group]
         plan_year.publish
       end
