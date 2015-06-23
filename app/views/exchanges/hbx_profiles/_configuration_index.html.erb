@@ -1,3 +1,14 @@
 <div class='container'>
 <h3>Configuration</h3>
+  <%= form_tag({controller: "hbx_profiles", action: "set_date"}, method: "post", class: "form") do %>
+    <div class="row no-buffer row-form-wrapper">
+      <div class="col-md-4">
+        <h4>Current Date: <%= TimeKeeper.date_of_record.to_date %></h4>
+      </div>
+      <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg">
+        <%= date_field(:time_keeper, :date_of_record) %>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Set Curent Date</button>
+  <% end %>
 </div>
