@@ -42,26 +42,28 @@ class BrokerRolesController < ApplicationController
         else
           @person = ::Forms::BrokerRole.new(broker_role_params)
         end
-        
+
         if @person.save(current_user)
-          success = true
+          flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+          redirect_to "/broker_registration"
+        else
+          @organization = ::Forms::BrokerAgencyProfile.new
+          render "new"
         end
       else
         @organization = ::Forms::BrokerAgencyProfile.new(primary_broker_role_params)
         if @organization.save(current_user)
-          success = true
+          flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+          redirect_to "/broker_registration"
+        else
+          @person = Forms::BrokerCandidate.new
+          render "new"
         end
-      end
-
-      if success
-        flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
-      else
-        flash[:error] = "Something went wrong!!"
       end
     rescue Error => e
       flash[:error] = e.message
+      redirect_to "/broker_registration"
     end
-    redirect_to "/broker_registration"
   end
 
 

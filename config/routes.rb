@@ -104,6 +104,7 @@ Rails.application.routes.draw do
   end
 
   resources :broker_roles, only: [:new, :create] do
+    root 'broker_roles#new'
     get :search_broker_agency, on: :collection
   end
   
