@@ -20,5 +20,5 @@ admin_user    = User.create!(email: "admin@dc.gov", password: "password", passwo
 admin_person  = Person.new(first_name: "system", last_name: "admin", dob: "1976-07-04", user: admin_user)
 admin_person.save!
 admin_person.build_hbx_staff_role(hbx_profile_id: hbx._id, job_title: "grand poobah", department: "accountability")
-
+admin_person.save!
 puts "::: HBX Admins Complete :::"
