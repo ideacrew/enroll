@@ -82,3 +82,20 @@ describe Invitation do
     include_examples "an invitation with invalid source kind and role", source_kinds[idx.first], role_kinds[idx.last]
   end
 end
+
+describe Invitation, "starting in the initial state" do
+  let(:valid_params) { {:source_id => BSON::ObjectId.new} }
+  subject { Invitation.new(valid_params) }
+
+  it "should have been 'sent'" do
+    expect(subject.sent?).to eq true
+  end
+
+  it "should not have been claimed" do
+    expect(subject.claimed?).to eq false
+  end
+
+  it "should be able to be claimed" do
+    expect(subject.may_claim?).to eq true
+  end
+end

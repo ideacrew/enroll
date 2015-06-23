@@ -1,5 +1,7 @@
 class Invitation
   include Mongoid::Document
+  include Mongoid::Timestamps
+  include AASM
 
   INVITE_TYPES = {
     "census_employee" => "employee_role",
@@ -13,11 +15,22 @@ class Invitation
   field :source_id, type: BSON::ObjectId
   field :source_kind, type: String
 
+  field :aasm_state, type: String
+
   validates_presence_of :role, :allow_blank => false
   validates_presence_of :source_id, :allow_blank => false
   validates :source_kind, :inclusion => { in: SOURCE_KINDS }, :allow_blank => false
 
   validate :allowed_invite_types
+
+  aasm do
+    state :sent, initial: true
+    state :claimed
+
+    event :claim do
+      transitions from: :sent, to: :claimed
+    end
+  end
 
   def allowed_invite_types
     result_type = INVITE_TYPES[self.source_kind]
