@@ -1,4 +1,4 @@
-@watir @screenshots @keep_browser_open
+@watir @screenshots
 Feature: Create Employer
   In order to offer health and dental insurance benefits to my employees, employers must create and manage an account on the HBX for their organization.  Such organizations are referred to as an Employer
   An Employer Representative

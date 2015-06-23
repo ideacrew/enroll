@@ -11,7 +11,7 @@ class PlanYear
 
   field :open_enrollment_start_on, type: Date
   field :open_enrollment_end_on, type: Date
-  field :published, type: Boolean
+  # field :published, type: Boolean
 
   # Number of full-time employees
   field :fte_count, type: Integer, default: 0
@@ -83,6 +83,7 @@ class PlanYear
   def application_warnings
     warnings = {}
 
+    # TODO: ENFORCE NO PUBLISH
     if benefit_groups.size == 0
       warnings.merge!({benefit_groups: "at least one benefit group must be defined for plan year"})
     end
@@ -154,7 +155,6 @@ class PlanYear
 
   # Determine enrollment composition compliance with HBX-defined guards
   def enrollment_errors
-    # binding.pry
     errors = {}
 
     # At least one employee must be enrollable.
@@ -255,29 +255,15 @@ class PlanYear
 
   aasm do
     state :draft, initial: true
-
-    # Plan application as submitted has warnings
-    state :publish_pending
-
-    state :published,   :after_enter => :register_employer
-
-    # Published plan has entered open enrollment
-    state :enrolling
-
-    # Published plan has completed open enrollment but date is before start of plan year
-    state :enrolled
-
-    # Non-compliant for enrollment
-    state :canceled
-
-    # Published plan year is in force
-    state :active
-
-    # Published plans are retired following their end on date
-    state :retired
-
-    # Non-published plans are expired following their end on date
-    state :expired
+    state :publish_pending # Plan application was submitted has warnings
+    state :published,      # Plan has been finalized and is ready to be enrolled
+          :after_enter => :register_employer
+    state :enrolling       # Published plan has entered open enrollment
+    state :enrolled        # Published plan has completed open enrollment but date is before start of plan year
+    state :canceled        # Non-compliant for enrollment
+    state :active          # Published plan year is in force
+    state :retired         # Published plans are retired following their end on date
+    state :expired         # Non-published plans are expired following their end on date
 
     event :advance_application_date, :guard => :is_new_plan_year? do
       transitions from: :draft, to: :expired
@@ -313,6 +299,20 @@ class PlanYear
     end
   end
 
+  def is_eligible_to_match_census_employees?
+    (benefit_groups.size > 0) and
+    (published? or enrolling? or enrolled? or active?)
+  end
+
+  # def shoppable? # is_eligible_to_shop?
+  #   (benefit_groups.size > 0) and
+  #   ((published? and employer_profile.shoppable?))
+  # end
+
+  def is_eligible_to_enroll?
+    (benefit_groups.size > 0) and
+    (published? and employer_profile.is_eligible_to_enroll?)
+  end
 
 private
   def is_new_plan_year?

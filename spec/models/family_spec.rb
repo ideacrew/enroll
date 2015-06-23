@@ -70,7 +70,7 @@ describe Family, type: :model, dbclean: :after_each do
         end
 
         it "all the added people are represented as family members" do
-          expect(family.family_members.size).to eq 2            
+          expect(family.family_members.size).to eq 2
         end
 
         it "the correct person is primary applicant" do
@@ -202,7 +202,7 @@ describe Family, type: :model, dbclean: :after_each do
   end
 
   ## TODO: Add method
-  # describe HbxEnrollment, "#is_enrollable?", type: :model do
+  # describe HbxEnrollment, "#is_eligible_to_enroll?", type: :model do
   #   context "family is under open enrollment period" do
   #     it "should return true" do
   #     end
@@ -271,7 +271,7 @@ describe Family do
   end
   context "family has a QLE and is under a SEP" do
     before do
-      @current_sep = FactoryGirl.build(:special_enrollment_period) 
+      @current_sep = FactoryGirl.build(:special_enrollment_period)
       family.special_enrollment_periods << @current_sep
     end
 
@@ -287,7 +287,7 @@ describe Family do
 
     context "and the family is under more than one SEP" do
       before do
-        current_sep = FactoryGirl.build(:special_enrollment_period) 
+        current_sep = FactoryGirl.build(:special_enrollment_period)
         family.special_enrollment_periods << current_sep
         another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: 4.days.ago.to_date)
         family.special_enrollment_periods << another_current_sep
@@ -408,7 +408,7 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
     let(:existing_primary_member) {existing}
     let(:existing_family) { FactoryGirl.create(:family)}
 
-    it "should return the family for this employee_role" 
+    it "should return the family for this employee_role"
   end
 
 end
@@ -459,8 +459,8 @@ describe Family, "with a primary applicant" do
     let(:dependent_id) { double }
     let(:dependent) { double(:id => dependent_id) }
 
-    subject { 
-      fam = Family.new 
+    subject {
+      fam = Family.new
       fam.build_from_employee_role(employee_role)
       fam
     }

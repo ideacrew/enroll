@@ -96,7 +96,7 @@ describe HbxEnrollment, dbclean: :after_all do
 end
 
 #### TODO - move this to Family model.  Indicator for UI
-# describe HbxEnrollment, "#enrollable?", type: :model do
+# describe HbxEnrollment, "#is_eligible_to_enroll?", type: :model do
 #   context "employer_profile is under open enrollment period" do
 #
 #     it "should return true" do

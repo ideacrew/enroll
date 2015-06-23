@@ -9,7 +9,7 @@ module Factories
       hired_on = census_employee.hired_on
       employer = census_employee.employer_profile
       ::Forms::EmploymentRelationship.new({
-        :employer_name => employer.dba,
+        :employer_name => employer.legal_name,
         :first_name => employee_candidate.first_name,
         :last_name => employee_candidate.last_name,
         :middle_name => employee_candidate.middle_name,
