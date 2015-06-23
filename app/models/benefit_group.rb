@@ -111,6 +111,10 @@ class BenefitGroup
     end
   end
 
+  def benefit_group_assignments
+    BenefitGroupAssignment.by_benefit_group_id(id)
+  end
+
   def census_employees
     CensusEmployee.find_all_by_benefit_group(self)
   end
@@ -188,6 +192,10 @@ class BenefitGroup
 
   def within_new_hire_window?(hire_date)
     false
+  end
+
+  def publish_plan_year
+    benefit_group_assignments.each(){ |bga| bga.publish_plan_year }
   end
 
 private

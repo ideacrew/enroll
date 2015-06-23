@@ -175,7 +175,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
               context "and it is saved" do
                 before { new_census_employee.save }
                 it "should no longer be available for linking" do
-                  expect(new_census_employee.may_link_employee_role?).to be_falsey 
+                  expect(new_census_employee.may_link_employee_role?).to be_falsey
                 end
 
                 it "should be findable by employee role" do
@@ -185,6 +185,13 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
                 it "and should be delinkable" do
                   expect(new_census_employee.may_delink_employee_role?).to be_truthy
+                end
+
+                context "and the census employee receives publish plan year" do
+                  it "should update the employee role with the appropriate benefit group" do
+                    expect(valid_employee_role).to receive(:benefit_group=).with(benefit_group)
+                    new_census_employee.publish_plan_year(benefit_group)
+                  end
                 end
               end
 
@@ -253,8 +260,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
             end
 
             it "should prevent linking with another employee role" do
-              expect(employee_role_linked_state.may_link_employee_role?).to be_falsey 
-              expect(employment_terminated_state.may_link_employee_role?).to be_falsey 
+              expect(employee_role_linked_state.may_link_employee_role?).to be_falsey
+              expect(employment_terminated_state.may_link_employee_role?).to be_falsey
             end
           end
         end

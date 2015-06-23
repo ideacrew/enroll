@@ -142,13 +142,16 @@ class EmployerProfile
     plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
+  def published_plan_year
+    plan_years.published.first
+  end
+
   def find_plan_year_by_date(target_date)
     plan_years.to_a.detect { |py| (py.start_date.beginning_of_day..py.end_date.end_of_day).cover?(target_date) }
   end
 
   def enrolling_plan_year
-    # TODO: totally wrong, write real implementation
-    latest_plan_year
+    published_plan_year
   end
 
   ## Class methods
@@ -203,16 +206,24 @@ class EmployerProfile
     def advance_day(new_date)
 
       # Find employers with events today and trigger their respective workflow states
-      orgs = Organization.where(
-          ("employer_profile.plan_years.start_on" == new_date) ||
-          ("employer_profile.plan_years.end_on" == new_date) ||
-          ("employer_profile.plan_years.open_enrollment_start_on" == new_date) ||
-          ("employer_profile.plan_years.open_enrollment_end_on" == new_date)
-        )
+      # orgs = Organization.where().where(
+      #     ("employer_profile.plan_years.start_on" == new_date) ||
+      #     ("employer_profile.plan_years.end_on" == new_date) ||
+      #     ("employer_profile.plan_years.open_enrollment_start_on" == new_date) ||
+      #     ("employer_profile.plan_years.open_enrollment_end_on" == new_date)
+      #   )
+
+        orgs = Organization.where( { "$and" => [{ employer_profile: { "$exists" =>  true,
+                                                                      "$nin" => [ nil] } },
+                                                                    { "$or" => [{ "employer_profile.plan_years.start_on" => { "$eq" => new_date } },
+                                                                                { "employer_profile.plan_years.start_on" => { "$eq" => new_date } },
+                                                                                { "employer_profile.plan_years.open_enrollment_start_on" => { "$eq" => new_date } },
+                                                                                { "employer_profile.plan_years.open_enrollment_end_on" => { "$eq" => new_date } } ] }]})
+
 
       orgs.each do |org|
-        org.today = new_date
-        org.employer_profile.advance_enrollment_date
+        org.employer_profile.today = new_date
+        org.employer_profile.advance_enrollment_date! if org.employer_profile.may_advance_enrollment_date?
       end
 
     end
@@ -224,6 +235,7 @@ class EmployerProfile
 
   def initialize_account
     self.build_employer_profile_account
+    save
   end
 
 ## TODO - anonymous shopping
@@ -366,6 +378,25 @@ class EmployerProfile
     enrolling?
   end
 
+  # TODO add all enrollment rules
+  def enrollment_compliant?
+    (published_plan_year.fte_count <= HbxProfile::ShopSmallMarketFteCountMaximum) &&
+    (is_enrollment_valid?)
+  end
+
+  def event_date_valid?
+    case aasm.current_event
+    when :publish_plan_year, :publish_plan_year!
+      today == published_plan_year.open_enrollment_start_on.beginning_of_day
+    when :begin_open_enrollment, :begin_open_enrollment!
+      today >= published_plan_year.open_enrollment_start_on.beginning_of_day
+    when :end_open_enrollment, :end_open_enrollment!
+      today >= published_plan_year.open_enrollment_end_on.beginning_of_day
+    else
+      false
+    end
+  end
+
 private
   def build_nested_models
     build_inbox if inbox.nil?
@@ -390,27 +421,7 @@ private
   end
 
   def plan_year_publishable?
-    latest_plan_year.is_application_valid?
-  end
-
-  # TODO add all enrollment rules
-  def enrollment_compliant?
-    (latest_plan_year.fte_count <= HbxProfile::ShopSmallMarketFteCountMaximum) &&
-    (is_enrollment_valid?)
-  end
-
-  def event_date_valid?
-    is_valid = case aasm.current_event
-      when :publish_plan_year
-        today == latest_plan_year.open_enrollment_start_on.beginning_of_day
-      when :begin_open_enrollment
-        today >= latest_plan_year.open_enrollment_start_on.beginning_of_day
-      when :end_open_enrollment
-        today >= latest_plan_year.open_enrollment_end_on.beginning_of_day
-      else
-        false
-    end
-    is_valid
+    published_plan_year.is_application_valid?
   end
 
   def no_more_than_one_owner
