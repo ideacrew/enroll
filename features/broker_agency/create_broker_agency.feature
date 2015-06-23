@@ -1,4 +1,4 @@
-@watir @screenshots @keep_browser_open
+@watir @screenshots
 Feature: Create Broker Agency
 
     Scenario: A Broker Agency Representative has not signed up on the HBX

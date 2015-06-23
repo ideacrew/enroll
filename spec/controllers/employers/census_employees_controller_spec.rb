@@ -123,6 +123,7 @@ RSpec.describe Employers::CensusEmployeesController do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
+      allow(controller).to receive(:authorize!).and_return(true)
       allow(census_employee).to receive(:save!).and_return(true)
       get :delink, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id
       expect(response).to be_redirect

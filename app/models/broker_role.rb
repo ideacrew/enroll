@@ -123,9 +123,25 @@ class BrokerRole
     state :active
     state :denied
     state :decertified
+    state :broker_agency_pending
+    state :broker_agency_declined
+    state :broker_agency_terminated
 
     event :approve, :after => :record_transition do
-      transitions from: :applicant, to: :active
+      transitions from: :applicant, to: :active, :guard => :is_primary_broker?
+      transitions from: :applicant, to: :broker_agency_pending
+    end
+
+    event :broker_agency_accept, :after => :record_transition do 
+      transitions from: :broker_agency_pending, to: :active
+    end
+
+    event :broker_agency_decline, :after => :record_transition do 
+      transitions from: :broker_agency_pending, to: :broker_agency_declined
+    end
+
+    event :broker_agency_terminate, :after => :record_transition do 
+      transitions from: :active, to: :broker_agency_terminated
     end
 
     event :deny, :after => :record_transition  do
@@ -138,6 +154,10 @@ class BrokerRole
   end
 
 private
+
+  def is_primary_broker?
+    broker_agency_profile.primary_broker_role == self
+  end
 
   def initial_transition
     return if workflow_state_transitions.size > 0
@@ -156,6 +176,4 @@ private
       transition_at: Time.now.utc
     )
   end
-
-
 end
