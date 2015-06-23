@@ -104,6 +104,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   # GET /exchanges/hbx_profiles/1/inbox
   def inbox
+    @inbox_provider = current_user.person.hbx_staff_role.hbx_profile
     @folder = params[:folder] || 'inbox'
   end
 
