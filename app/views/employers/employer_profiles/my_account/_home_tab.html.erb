@@ -55,6 +55,10 @@
             <h4>Broker</h4>
 
             <div class="form-border">
+              <a class="pull-right" aria-controls="employees" data-toggle="tab" id="broker-agency-tab" role="tab" href="#broker_agency">
+                <span class="hidden-xs">Broker Agency</span>
+                <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agency"></span>
+              </a>
               <% if @employer_profile.broker_agency_profile.present? %>
                 <dl class="dl-horizontal no-buffer">
                     <dt>Agency Name</dt>
@@ -71,11 +75,6 @@
               <% else %>
                 No Active Broker
               <% end %>
-
-              <a class="pull-right" aria-controls="employees" data-toggle="tab" id="broker-agency-tab" role="tab" href="#broker_agency">
-                <span class="hidden-xs">Broker Agency</span>
-                <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agency"></span>
-              </a>
             </div>
           </div>
         </div>

@@ -98,6 +98,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   context "a new plan year is initialized" do
     let(:plan_year) { PlanYear.new(**valid_params) }
 
+    it "census employees should not be matchable" do
+      expect(plan_year.is_eligible_to_match_census_employees?).to be_falsey
+    end
+
     context "and effective date is specified and effective date doesn't provide enough time for enrollment" do
       let(:prior_month_open_enrollment_start)  { Date.current.beginning_of_month + HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.days - HbxProfile::ShopOpenEnrollmentPeriodMinimum.days - 1.day}
       let(:invalid_effective_date)   { (prior_month_open_enrollment_start + 1.month).beginning_of_month }
@@ -113,6 +117,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and an HbxAdmin or system service is submitting the effective date" do
+        # TODO: how do we know an HbxAdmin is making the change at the model level?
         it "should be valid"
       end
     end
@@ -308,7 +313,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   end
 
   context "application is submitted to be published" do
-    let(:plan_year)                   { PlanYear.new(**valid_params) }
+    let(:plan_year)                   { PlanYear.new(aasm_state: "draft", **valid_params) }
     let(:valid_fte_count)             { HbxProfile::ShopSmallMarketFteCountMaximum }
     let(:invalid_fte_count)           { HbxProfile::ShopSmallMarketFteCountMaximum + 1 }
 
@@ -317,8 +322,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context "and another plan_year is already published on that employer profile" do
-    let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
-    let(:published_plan_year) { FactoryGirl.build(:plan_year, aasm_state: :published)}
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+      let(:published_plan_year) { FactoryGirl.build(:plan_year, aasm_state: :published)}
 
       before do
         plan_year.benefit_groups << benefit_group
@@ -459,12 +464,12 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           expect(plan_year.published?).to be_truthy
         end
 
-        it "and employer_profile should be in ineligible state" do
+        it "employer_profile should be in ineligible state" do
           expect(plan_year.employer_profile.ineligible?).to be_truthy
         end
 
         # TODO: We need to determine the form this notification will take
-        it "and employer should be notified that applcation is ineligible"
+        it "employer should be notified that applcation is ineligible"
 
         context "and 30 days or less has elapsed since applicaton was submitted" do
           context "and the employer decides to appeal" do
@@ -494,24 +499,37 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
 
-    context "and all application elements are valid" do
-      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+    context "and all application elements are valid and it is published" do
+      let(:benefit_group) { FactoryGirl.build(:benefit_group) }
 
       before do
+        plan_year.benefit_groups = [benefit_group]
+        plan_year.publish
       end
 
-      it "plan year should publish"
+      it "plan year should publish" do
+        expect(plan_year.published?).to be_truthy
+      end
 
-      it "and employer_profile should be in registered state"
+      it "and employer_profile should be in registered state" do
+        expect(plan_year.employer_profile.registered?).to be_truthy
+      end
 
-      context "and it is published" do
-        context "and changes to plan year application should be blocked"
+      context "and the plan year is changed" do
+        before do
+          plan_year.start_on = plan_year.start_on.next_month
+          plan_year.end_on = plan_year.end_on.next_month
+          plan_year.open_enrollment_start_on = plan_year.open_enrollment_start_on.next_month
+          plan_year.open_enrollment_end_on = plan_year.open_enrollment_end_on.next_month
+        end
+
+        it "should not be valid"
       end
     end
   end
 
   context "check_start_on" do
-    it "should failure when start on is not the first day of the month" do
+    it "should fail when start on is not the first day of the month" do
       start_on = (Date.current + 2.month).beginning_of_month + 10.days
       rsp = PlanYear.check_start_on(start_on)
       expect(rsp[:result]).to eq "failure"

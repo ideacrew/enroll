@@ -29,10 +29,10 @@
           <%= phone.select :kind, options_for_select(Phone::OFFICE_KINDS.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
         </div>
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-          <%= phone.text_field :area_code, class: "floatlabel form-control", required: true, placeholder: 'AREA CODE' %>
+          <%= phone.text_field :area_code, class: "floatlabel form-control area_code", required: true, placeholder: 'AREA CODE' %>
         </div>
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-          <%= phone.text_field :number, class: "floatlabel form-control", required: true, placeholder: 'NUMBER' %>
+          <%= phone.text_field :number, class: "floatlabel form-control phone_number7", required: true, placeholder: 'NUMBER' %>
         </div>
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">
           <%= phone.text_field :extension, class: "floatlabel form-control", placeholder: 'EXTENSION' %>

@@ -3,5 +3,5 @@
     %h4 Office Location
     = render("shared/office_location_fields", f: builder)
 
-.form-inputs#office_locations_buttons
-  = link_to('<i class="fa fa-user-plus"></i> Add Office Location'.html_safe, new_office_location_path(:child_index => @child_index.to_i + 1, :parent_object => @parent_object), remote: true, class: 'fui-plus-circle')
+.form-inputs.pull-right#office_locations_buttons
+  = link_to('Add Office Location', new_office_location_path(:child_index => @child_index.to_i + 1, :parent_object => @parent_object), remote: true, class: 'fui-plus-circle btn btn-primary')

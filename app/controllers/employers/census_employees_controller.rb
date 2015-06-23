@@ -120,6 +120,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def delink
+    authorize! :delink, @census_employee
     @census_employee.delink_employee_role
     @census_employee.save!
     flash[:notice] = "Successfully delinked census employee."
@@ -153,6 +154,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def census_employee_params
+=begin
     [:dob, :hired_on].each do |attr|
       if params[:census_employee][attr].present?
         params[:census_employee][attr] = DateTime.strptime(params[:census_employee][attr].to_s, '%m/%d/%Y').try(:to_date)
@@ -167,6 +169,7 @@ class Employers::CensusEmployeesController < ApplicationController
         end
       end
     end
+=end
 
     params.require(:census_employee).permit(:id, :employer_profile_id,
         :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner,

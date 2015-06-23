@@ -33,7 +33,7 @@ And(/^I should see an initial form to enter information about my Employer and my
   plan.save
   @browser.text_field(name: "organization[first_name]").set("Doe")
   @browser.text_field(name: "organization[last_name]").set("John")
-  @browser.text_field(name: "jq_datepicker_ignore_organization[dob]").set("11/10/1982")
+  @browser.text_field(name: "jq_datepicker_ignore_organization[dob]").set("10/11/1982")
   @browser.text_field(name: "organization[first_name]").click
 
   @browser.text_field(name: "organization[legal_name]").set("Turner Agency, Inc")
@@ -241,7 +241,7 @@ end
 When(/^I edit ssn and dob on employee detail page after linked$/) do
   Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.link_employee_role!
   @browser.button(value: /Update Employee/).wait_until_present
-  @browser.text_field(id: /census_employee_dob/).set("01/01/1981")
+  @browser.text_field(id: /jq_datepicker_ignore_census_employee_dob/).set("01/01/1981")
   @browser.text_field(id: /census_employee_ssn/).set("786120969")
   @browser.button(value: /Update Employee/).click
 end
@@ -259,7 +259,7 @@ end
 Then(/^I should see a form to update the contents of the census employee$/) do
   Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.delink_employee_role!
   @browser.button(value: /Update Employee/).wait_until_present
-  @browser.text_field(id: /census_employee_dob/).set("01/01/1980")
+  @browser.text_field(id: /jq_datepicker_ignore_census_employee_dob/).set("01/01/1980")
   @browser.text_field(id: /census_employee_ssn/).set("786120965")
   @browser.text_field(id: /census_employee_first_name/).set("Patrick")
   @browser.text_field(id: /census_employee_address_attributes_state/).set("VA")

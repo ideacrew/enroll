@@ -1,6 +1,6 @@
-@watir @keep_browser_open @screenshots
+@watir @screenshots
 
-Feature: HBX Portal Overview 
+Feature: HBX Portal Overview
   In order to administer HBX the tabs must show multiple views under the tabs.
 
   Scenario: Look at portal tabs

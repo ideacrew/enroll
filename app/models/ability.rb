@@ -11,6 +11,7 @@ class Ability
     cannot :update, CensusEmployee do |employee|
       employee.dob_changed? or employee.ssn_changed?
     end
+    cannot :delink, CensusEmployee
 
     if user.has_role? :employer_staff
       can :read, :all
@@ -40,6 +41,9 @@ class Ability
         editable_plan_year?(py)
       end
       can :update, CensusEmployee
+      can :delink, CensusEmployee do |employee|
+        employee.employee_role_linked?
+      end
     end
     if user.has_role? :system_service
       can :read, :all
