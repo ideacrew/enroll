@@ -202,6 +202,11 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :invitations, only: [] do
+    member do
+      get :claim
+    end
+  end
   resources :office_locations, only: [:new]
 
   # Temporary for Generic Form Template
