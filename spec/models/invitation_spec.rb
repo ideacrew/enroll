@@ -19,6 +19,10 @@ describe Invitation do
     expect(subject).to have_errors_on(:source_kind)
   end
 
+  it "should require an invitation email" do
+    expect(subject).to have_errors_on(:invitation_email)
+  end
+
   ["employee_role", "broker_role", "employer_staff_role"].each do |role|
     it "should allow a role of #{role}" do
       record = Invitation.new(role: role)
@@ -56,7 +60,7 @@ describe Invitation do
     {
       "census_employee" => "employee_role",
       "broker_role" => "broker_role",
-      "employer_profile" => "employer_profile"
+      "employer_profile" => "employer_staff_role"
     }
   end
 
@@ -67,7 +71,12 @@ describe Invitation do
   def self.role_kinds
     invite_types.values
   end
-  let(:valid_params) { {:source_id => BSON::ObjectId.new} }
+  let(:valid_params) {
+    {
+      :source_id => BSON::ObjectId.new,
+      :invitation_email => "user@somewhere.com"
+    } 
+  }
 
   [0,1,2].each do |idx|
     include_examples "a valid invitation", source_kinds[idx], role_kinds[idx]
@@ -105,7 +114,8 @@ describe "A valid invitation in the sent state" do
     {
       :source_id => BSON::ObjectId.new,
       :source_kind => "census_employee",
-      :role => "employee_role"
+      :role => "employee_role",
+      :invitation_email => "user@somewhere.com"
     } 
   }
   let(:user) { User.new }
