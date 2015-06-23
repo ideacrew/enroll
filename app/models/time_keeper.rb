@@ -1,30 +1,26 @@
 class TimeKeeper
+  include Mongoid::Document
   include Singleton
 
+  field :date_of_record, type: Date
+
   # time zone management
-  # class << SYSTEM_TIME = Object.new
 
   def initialize
-    @date_of_record = Date.current.beginning_of_day
     @mutex  = Mutex.new
+    @date_of_record = Date.current.beginning_of_day
   end
 
-  def date_of_record=(new_date)
-    with_mutex { @date_of_record = new_date.to_date.beginning_of_day }
-  end
-
-  def date_of_record
-    with_mutex { @date_of_record }
-    @date_of_record
-  end
-
-  def clear
-    with_mutex { @date_of_record.clear }
-  end
-
-  def self.date_of_record=(new_date)
+  def self.set_date_of_record(new_date)
     new_date = new_date.to_date.beginning_of_day
-    instance.date_of_record = new_date unless new_date == instance.date_of_record
+    if instance.date_of_record != new_date
+      if instance.date_of_record > new_date
+        raise StandardError, "system may not go backward in time"
+      else
+        (new_date - instance.date_of_record).to_i
+        instance.set_date_of_record(new_date)
+      end
+    end
     instance.date_of_record
   end
 
@@ -32,8 +28,12 @@ class TimeKeeper
     instance.date_of_record
   end
 
-  def self.clear
-    instance.clear
+  def set_date_of_record(new_date)
+    with_mutex { @date_of_record = new_date }
+  end
+
+  def date_of_record
+    with_mutex { @date_of_record }
   end
 
   def push_date_of_record
@@ -61,12 +61,5 @@ private
 #     @settings
 #   end
 # end
-
-#   class << self
-
-#     def date_of_record=(new_date)
-#       write_attribute(:date_of_record, new_date.to_date.beginning_of_day)
-#     end
-#   end
 
 end
