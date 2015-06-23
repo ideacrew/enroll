@@ -2,7 +2,7 @@
 <%- if message.present? %>
 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
   <ul class="list-group">
-    <li class="list-group-item"> Sent By:  <%= message.sent_by.humanize %> <br></li>
+    <li class="list-group-item"> Sent By:  <%= "System Admin" %> <br></li>
     <li class="list-group-item"> Subject:  <%= message.try(:subject) %> <br></li>
     <li class="list-group-item"> Content:  <%= message.try(:body) %> <br></li>
   </ul>
