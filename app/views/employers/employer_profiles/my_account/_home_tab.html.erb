@@ -42,8 +42,7 @@
                     <dt>Full Time Employees</dt>
                     <dd> <%= @current_plan_year.fte_count %></dd>
                     <dt>Participation Pct</dt>
-                    <dd>100%</dd>
-                    <dt><%= @current_plan_year.employee_participation_percent %></dt>
+                    <dd><%= number_to_percentage(@current_plan_year.employee_participation_percent, precision: 2) %></dd>
                 </dl>
               <% else %>
                 No Plan Years Found
