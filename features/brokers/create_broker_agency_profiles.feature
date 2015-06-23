@@ -1,4 +1,4 @@
-@watir @keep_browser_open @screenshots
+@watir @screenshots
 Feature: Create Broker Agency
   In order to support individual and SHOP market clients, brokers must create and manage an account on the HBX for their organization.  Such organizations are referred to as a Broker Agency
   A Broker Representative

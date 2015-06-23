@@ -1,0 +1,6 @@
+<% if @filter == "staff_role" %>
+  $('#staff_role_panel').html("<%= escape_javascript(render "staff_signup") %>");
+<% else %>
+  $('#broker_role_panel').html("<%= escape_javascript(render 'broker_signup', agency_type: @agency_type) %>");
+<% end %>
+

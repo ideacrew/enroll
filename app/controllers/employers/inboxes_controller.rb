@@ -6,6 +6,6 @@ class Employers::InboxesController < InboxesController
   end
 
   def successful_save_path
-    employers_employer_profile_path(@inbox_provider)
+    exchanges_hbx_profiles_root_path
   end
 end
