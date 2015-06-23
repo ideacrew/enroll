@@ -70,3 +70,7 @@ a.new-address-btn {
 .reference-plan-content {
   display: none;
 }
+
+.agency-selected {
+  border: 1px solid #007bc4;
+}
