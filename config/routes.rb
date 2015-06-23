@@ -84,6 +84,7 @@ Rails.application.routes.draw do
       resources :plan_years do
         get 'recommend_dates', on: :collection
         post 'publish'
+        get 'search_reference_plan', on: :collection
       end
 
       resources :broker_agency, only: [:index, :show, :create] do

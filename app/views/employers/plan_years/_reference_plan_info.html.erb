@@ -1,0 +1,18 @@
+<% if @plan.premium_tables.present? %>
+  <table class="table table-bordered">
+    <tr>
+      <th>start on</th>
+      <th>end on</th>
+      <th>age</th>
+      <th>cost</th>
+    </tr>
+    <% @plan.premium_tables.each do |premium| %>
+      <tr>
+        <td><%= premium.start_on %></td>
+        <td><%= premium.end_on %></td>
+        <td><%= premium.age %></td>
+        <td><%= premium.cost %></td>
+      </tr>
+    <% end %>
+  </table>
+<% end  %>
