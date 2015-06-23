@@ -72,7 +72,7 @@ class EmployerProfile
 
   def today
     return @today if defined? @today
-    @today = TimeKeeper.current_date
+    @today = TimeKeeper.date_of_record
   end
 
   def hire_broker_agency(new_broker_agency, start_on = today)
