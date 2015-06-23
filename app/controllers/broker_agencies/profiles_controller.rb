@@ -1,6 +1,7 @@
 class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
+  before_action :find_hbx_profile, only: [:index]
 
   def index
     @broker_agency_profiles = BrokerAgencyProfile.all
@@ -37,6 +38,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   private
+
+  def find_hbx_profile
+    @profile = current_user.person.hbx_staff_role.hbx_profile
+  end
 
   def check_broker_agency_staff_role
     if current_user.has_broker_agency_staff_role?
