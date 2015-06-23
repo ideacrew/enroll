@@ -3,7 +3,10 @@ class Message
 
   embedded_in :inbox
 
+  FOLDER_TYPES = {inbox: "inbox", sent: "sent", deleted: "deleted"}
+
   field :sender_id, type: BSON::ObjectId
+  field :parent_message_id, type: BSON::ObjectId
   field :subject, type: String
   field :body, type: String
   field :message_read, type: Boolean, default: false

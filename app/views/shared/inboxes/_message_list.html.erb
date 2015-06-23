@@ -7,14 +7,14 @@
     <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
       <br><br><br>
       <ul class="list-groupx">
-        <%=link_to(retrieve_inbox_path(provider), remote: true) do%> 
+        <%= link_to(retrieve_inbox_path(provider), remote: true) do%> 
         <li class="list-group-item">Inbox <span class="badge message-badge pull-right"><%= provider.inbox.unread_messages.size %></span></li>
         <% end %>
-        <%=link_to(retrieve_inbox_path(provider, folder: 'Sent'), remote: true) do%> 
-        <li class="list-group-item">Sent</li>
+        <%= link_to(retrieve_inbox_path(provider, folder: 'sent'), remote: true) do%> 
+          <li class="list-group-item">Sent</li>
         <% end %>
-        <%=link_to(retrieve_inbox_path(provider, folder: 'Deleted'), remote: true) do%> 
-        <li class="list-group-item">Deleted</li>
+        <%= link_to(retrieve_inbox_path(provider, folder: 'deleted'), remote: true) do%> 
+          <li class="list-group-item">Deleted</li>
         <% end %>
       </ul>
     </div>
@@ -24,7 +24,7 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th> <%=@folder%></th>
+            <th> <%= @folder.capitalize %></th>
             <th>Subject</th>
             <th></th>
           </tr>
@@ -32,9 +32,9 @@
 
         <tbody>
           <%- if provider.try(:inbox).try(:messages) %>
-          <% provider.inbox.messages.select{|m| (@folder||'Inbox') == m.folder}.each do |message| %>
+          <% provider.inbox.messages.select{|m| (@folder||'inbox') == m.folder}.each do |message| %>
           <tr>
-            <td> <%= message.sent_by.humanize %> </td>
+            <td> <%= "System Admin" %> </td>
             <td> <%= message.try(:subject) %> </td>
             <td> <%#= link_to "show", polymorphic_path([:insured, :family, provider.inbox, message]), class: "btn btn-primary", remote: true %>
               <%= link_to "show", retrieve_show_path(provider, message), class: "btn btn-primary", remote: true %>

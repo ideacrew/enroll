@@ -1,5 +1,6 @@
 class InboxesController < ApplicationController
   before_action :find_inbox_provider
+  before_action :find_hbx_profile, only: [:new, :create]
   before_action :find_message, only: [:show, :destroy]
   before_action :set_inbox_and_assign_message, only: [:create]
 
@@ -8,10 +9,11 @@ class InboxesController < ApplicationController
   end
 
   def create
-    @new_message.folder = 'Inbox'
+    @new_message.folder = Message::FOLDER_TYPES[:inbox]
 
     @inbox.post_message(@new_message)
     if @inbox.save
+      create_sent_message
       flash[:notice] = "Successfully sent message."
       redirect_to successful_save_path
     else
@@ -29,10 +31,24 @@ class InboxesController < ApplicationController
 
   def destroy
     #@message.destroy
-    @message.update_attributes(folder: 'Deleted')
+    @message.update_attributes(folder: Message::FOLDER_TYPES[:deleted])
   end
 
   private
+
+  def create_sent_message
+    sent_message = @new_message.dup
+    sent_message.folder = Message::FOLDER_TYPES[:sent]
+    sent_message.parent_message_id = @new_message._id
+    inbox = @profile.inbox
+    inbox.post_message(sent_message)
+    inbox.save!
+  end
+
+  def find_hbx_profile
+    @profile = HbxProfile.find(params["profile_id"])
+  end
+
   def find_message
     @message = @inbox_provider.inbox.messages.by_message_id(params["message_id"]).to_a.first
   end

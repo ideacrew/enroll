@@ -18,7 +18,7 @@
         </tr>
       </tbody>
     </table>
-    <%= f.hidden_field :sender_id, value: current_user.id %>
+    <%= f.hidden_field :sender_id, value: @profile._id %>
     <%= f.submit 'Send', class: "btn btn-primary interaction-control-inbox-send" %>
     <a class="btn btn-danger" href="#"><i class="fa fa-times interaction-control-inbox-cancel"></i> Cancel</a>
   </div>
