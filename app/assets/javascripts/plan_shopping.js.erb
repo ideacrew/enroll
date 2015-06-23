@@ -169,4 +169,5 @@ $(document).on("change", ".elected-plan-select .metal-level", function() {
 $(document).on("change", "select[name='reference_plan']", function() {
   console.log($(this).val());
   $(this).parents('.reference-plan-select').find("input[type='hidden']").val($(this).val());
+  $(this).parents('fieldset').find('.reference_plan_info').html($(this).find("option:selected").attr('title'));
 }); 
