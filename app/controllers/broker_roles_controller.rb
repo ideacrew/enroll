@@ -1,5 +1,7 @@
 ### Handles Broker Registration requests made by anonymous users. Authentication disbaled for this controller.
 class BrokerRolesController < ApplicationController
+  
+  class Error < RuntimeError; end
 
   def new
     @person = Forms::BrokerCandidate.new
@@ -26,30 +28,39 @@ class BrokerRolesController < ApplicationController
   end
 
   def create
-    success = false
-    if params[:person].present?
-      applicant_type = params[:person][:broker_applicant_type] if params[:person][:broker_applicant_type]
-      if applicant_type && applicant_type == 'staff_role'
-        @person = ::Forms::BrokerAgencyStaffRole.new(broker_agency_staff_role_params)
+    begin
+      success = false
+      if params[:person].present?
+        applicant_type = params[:person][:broker_applicant_type] if params[:person][:broker_applicant_type]
+
+        if params[:person][:broker_agency_id].blank?
+          raise Error.new('broker agency missing. please choose your broker agency.')
+        end
+
+        if applicant_type && applicant_type == 'staff_role'
+          @person = ::Forms::BrokerAgencyStaffRole.new(broker_agency_staff_role_params)
+        else
+          @person = ::Forms::BrokerRole.new(broker_role_params)
+        end
+        
+        if @person.save(current_user)
+          success = true
+        end
       else
-        @person = ::Forms::BrokerRole.new(broker_role_params)
+        @organization = ::Forms::BrokerAgencyProfile.new(primary_broker_role_params)
+        if @organization.save(current_user)
+          success = true
+        end
       end
-      if @person.save(current_user)
-        success = true
-      end
-    else
-      @organization = ::Forms::BrokerAgencyProfile.new(primary_broker_role_params)
-      if @organization.save(current_user)
-        success = true
-      end
-    end
 
-    if success
-      flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
-    else
-      flash[:error] = "Failed to create Broker Agency Profile"
+      if success
+        flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+      else
+        flash[:error] = "Something went wrong!!"
+      end
+    rescue Error => e
+      flash[:error] = e.message
     end
-
     redirect_to "/broker_registration"
   end
 
