@@ -33,20 +33,21 @@ module Forms
         :first_name => first_name,
         :last_name => last_name,
         :dob => dob
-      })
+        })
       matched_people = Person.where(
         first_name: regex_for(first_name),
-        last_name: regex_for(first_name),
+        last_name: regex_for(last_name),
         dob: new_person.dob
-      )
+        )
 
       if matched_people.count > 1
         raise TooManyMatchingPeople.new
       end
+
       if matched_people.count == 1
         mp = matched_people.first
         if mp.user.present?
-          if mp.user.id.to_s != current_user.id
+          if current_user.nil? || mp.user.id.to_s != current_user.id
             raise PersonAlreadyMatched.new
           end
         end
