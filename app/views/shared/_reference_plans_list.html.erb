@@ -12,7 +12,7 @@
     <%= f.select 'carrier_for_elected_plan', options_for_select(@carriers.map{|c| [c.legal_name, c.id]}, selected: f.object.carrier_for_elected_plan), {include_blank: "SELECT CARRIER"}, {class: 'carrier'} %>
   </div>
   <div class="hidden_field metal_level_for_elected_plan" style="<%= 'display:block;' if selected_kind_metal_level %>">
-    <%= f.select 'metal_level_for_elected_plan', options_for_select(Plan::METAL_LEVEL_KINDS.map{|k| [k.humanize, k]}, selected: f.object.metal_level_for_elected_plan), {include_blank: "SELECT METAL LEVEL"}, {class: 'metal-level'} %>
+    <%= f.select 'metal_level_for_elected_plan', options_for_select(Plan::REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}, selected: f.object.metal_level_for_elected_plan), {include_blank: "SELECT METAL LEVEL"}, {class: 'metal-level'} %>
   </div>
 </div>
 
@@ -29,7 +29,7 @@
   </div>
 
   <div class="metal-level-select reference-plan-content" style="<%= 'display:block;' if selected_kind_metal_level %>">
-    <% Plan::METAL_LEVEL_KINDS.each do |kind| %>
+    <% Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
       <% metal_level_plans = @plan_year.metal_level_plans_for(kind) %>
       <div class="metal-level-<%= kind %> metal-level-content hidden_second_field" style="<%= 'display:block;' if f.object.metal_level_for_elected_plan == kind and selected_kind_metal_level %>">
         <%= select_tag "reference_plan", options_for_select(metal_level_plans.map{|plan| ["#{plan.carrier_profile.try(:legal_name)} - #{plan.name}", plan.id]}, selected: f.object.reference_plan_id), class: "metal-level-#{kind}", include_blank: "SELECT REFERENCE PLAN" %>

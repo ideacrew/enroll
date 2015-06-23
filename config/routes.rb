@@ -14,6 +14,7 @@ Rails.application.routes.draw do
         get :issuer_index
         get :product_index
         get :configuration
+        post :set_date
       end
 
       member do
@@ -88,7 +89,7 @@ Rails.application.routes.draw do
       end
 
       resources :broker_agency, only: [:index, :show, :create] do
-        collection do 
+        collection do
           get :active_broker
         end
         get :terminate
@@ -105,9 +106,10 @@ Rails.application.routes.draw do
   end
 
   resources :broker_roles, only: [:new, :create] do
+    root 'broker_roles#new'
     get :search_broker_agency, on: :collection
   end
-  
+
   # match 'thank_you', to: 'broker_roles#thank_you', via: [:get]
   match 'broker_registration', to: 'broker_roles#new', via: [:get]
 
@@ -118,7 +120,7 @@ Rails.application.routes.draw do
 
   namespace :broker_agencies do
     root 'profiles#new'
-    resources :profiles, only: [:new, :create, :show, :index] do 
+    resources :profiles, only: [:new, :create, :show, :index] do
       resource :inbox, only: [:new, :create, :index]
     end
   end
