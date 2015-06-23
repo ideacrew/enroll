@@ -270,7 +270,7 @@ module ApplicationHelper
   def retrieve_inbox_path(provider, folder: 'inbox')
     case(provider.model_name.name)
     when "EmployerProfile"
-      inbox_employers_employer_profiles_path
+      inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
     when "HbxProfile"
       inbox_exchanges_hbx_profile_path(provider, folder: folder)
     end
