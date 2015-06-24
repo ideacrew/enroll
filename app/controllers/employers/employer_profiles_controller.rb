@@ -121,7 +121,7 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def inbox
-    @folder = params[:folder] || 'inbox'
+    @folder = params[:folder] || 'Inbox'
   end
 
   private
