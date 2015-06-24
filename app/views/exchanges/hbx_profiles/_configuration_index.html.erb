@@ -6,7 +6,9 @@
         <h4>Current Date: <%= TimeKeeper.date_of_record.to_date %></h4>
       </div>
       <div class="col-md-4 col-sm-4 col-xs-12 form-group-lg">
-        <%= date_field(:time_keeper, :date_of_record) %>
+        <input placeholder="Date of Record" data-date-min="-110y" data-date-max="+0" required="required" class="interaction-field-control-time-keeper-date-of-record-jq-datepicker-plain-field" id="  time_keeper_date_of_record_jq_datepicker_plain_field" type="text" value="04/21/1983" name="time_keeper[date_of_record]" style="display: none;"><div class="floatlabel-wrapper" style="position:relative">
+        <label for="jq_datepicker_ignore_time_keeper_date_of_record" class="label-floatlabel" style="position: absolute; top: 0px; left: 8px; display: block; opacity: 1; font-size: 11px; font-weight: bold; color: rgb(131, 135, 128); -webkit-transition: all 0.1s ease-in-out; transition: all 0.1s ease-in-out;">Date of Record</label>
+        <input type="text" name="jq_datepicker_ignore_time_keeper[date_of_record]" id="jq_datepicker_ignore_time_keeper_date_of_record" value="<%= TimeKeeper.date_of_record.to_date %>" placeholder="Date of Record" data-date-min="-110y" data-date-max="+0" required="required" class="floatlabel form-control jq-datepicker hasDatepicker interaction-field-control-jq-datepicker-ignore-time-keeper-date-of-record active-floatlabel" style="padding-top: 34px; -webkit-transition: all 0.1s ease-in-out; transition: all 0.1s ease-in-out;" data-submission-field="#time_keeper_date_of_record_jq_datepicker_plain_field"></div>
       </div>
     </div>
     <button type="submit" class="btn btn-primary">Set Curent Date</button>

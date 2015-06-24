@@ -36,7 +36,7 @@ class BrokerRolesController < ApplicationController
         @person = ::Forms::BrokerRole.new(broker_role_params)
       end
 
-      if @person.save(current_user)
+      if @person.save
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
         redirect_to "/broker_registration"
       else
