@@ -116,6 +116,10 @@ class EmployeeRole
       end
     end
 
+    def ids_in(collection)
+      list Person.in("employee_roles._id" => collection)
+    end
+
     def list(collection)
       collection.reduce([]) { |elements, person| elements.concat person.send(klass.pluralize) }
     end

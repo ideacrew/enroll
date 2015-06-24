@@ -385,16 +385,23 @@ describe EmployeeRole, dbclean: :after_each do
     let(:non_match_size)              { 3 }
     let(:match_employer_profile)      { FactoryGirl.create(:employer_profile) }
     let(:non_match_employer_profile)  { FactoryGirl.create(:employer_profile) }
-    let!(:match_employee_roles)        { FactoryGirl.create_list(:employee_role, 5, employer_profile: match_employer_profile) }
-    let!(:non_match_employee_roles)    { FactoryGirl.create_list(:employee_role, 3, employer_profile: non_match_employer_profile) }
+    let!(:match_employee_roles)       { FactoryGirl.create_list(:employee_role, 5, employer_profile: match_employer_profile) }
+    let!(:non_match_employee_roles)   { FactoryGirl.create_list(:employee_role, 3, employer_profile: non_match_employer_profile) }
+    let(:first_match_employee_role)   { match_employee_roles.first }
+    let(:first_non_match_employee_role)   { non_match_employee_roles.first }
+    let(:ee_ids)   { [first_match_employee_role.id, first_non_match_employee_role.id] }
 
+    it "should find employee roles using a list of ids" do
+      expect(EmployeeRole.ids_in(ee_ids).size).to eq ee_ids.size
+      expect(EmployeeRole.ids_in([first_match_employee_role.id]).first).to eq first_match_employee_role
+    end
 
-    it "should find all employee roles" do
+    it "finds all employee roles" do
       expect(EmployeeRole.all.size).to eq (match_size + non_match_size)
       expect(EmployeeRole.all.first).to be_an_instance_of EmployeeRole
     end
 
-    it "should find first employee role" do
+    it "finds first employee role" do
       expect(EmployeeRole.first).to be_an_instance_of EmployeeRole
     end
 
