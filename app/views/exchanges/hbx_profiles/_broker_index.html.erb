@@ -1,27 +1,42 @@
 <div class="container">
 
-  <h3>Broker Roles</h3>
+  <h3>Applicants</h3>
 
   <div class="table-border">
     <table class="table">
-    <% if @brokers.present? %>
       <thead>
-        <th>HBX Id</th>
-        <th>NPN</th>
+        <th>Applicant Name</th>
+        <th>Applicant NPN</th>
+        <th>Agency Name</th>
         <th>Provider Kind</th>
+        <th>Status</th>
+        <th></th>
       </thead>
-      <% @brokers.each do |broker| %>
-        <tbody>
-         
-          <td><%= broker.hbx_id %></td>
-          <td><%= broker.npn %></td>
-          <td><%= broker.provider_kind %></td>
-          
-        </tbody>
+      <% if @broker_roles.any? %>
+      <% @broker_roles.each do |broker_role| %>
+      <% if broker_role.broker_agency_profile %>
+      <tbody>
+        <td><%= broker_role.person.full_name %></td>
+        <td><%= broker_role.npn %></td>
+        <td><%= broker_role.broker_agency_profile.legal_name %></td>
+        <td><%= broker_role.provider_kind %></td>
+        <td><%= broker_role.current_state %></td>
+        <td>
+          <% if broker_role.applicant? %>
+          <%= link_to 'Certify'.html_safe,
+          certify_broker_exchanges_hbx_profiles_path(id: broker_role.id), class: "btn btn-default", method: :post %>
+          <% end %>
+          <% if broker_role.approved_or_pending? %>
+          <%= link_to 'Decertify'.html_safe,
+          decertify_broker_exchanges_hbx_profiles_path(id: broker_role.id), class: "btn btn-default", method: :post %>
+          <% end %>
+        </td>
+      </tbody>
+      <% end %> 
       <% end %>
-    <% else %>
-      <tr><td>No Brokers found.</td></tr>
-    <% end %>
+      <% else %>
+      <tbody><td>No Applicants found.</td></tbody>
+      <% end %>
     </table>
   </div>
 </div>

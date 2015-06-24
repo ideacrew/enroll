@@ -15,6 +15,8 @@ Rails.application.routes.draw do
         get :product_index
         get :configuration
         post :set_date
+        post :certify_broker
+        post :decertify_broker
       end
 
       member do
@@ -38,9 +40,6 @@ Rails.application.routes.draw do
   end
 
   namespace :insured do
-    resources :families, :only => [:show] do
-    end
-
     resources :plan_shoppings, :only => [:show] do
       member do
         post 'checkout'
@@ -49,7 +48,8 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :families do
+    resources :inboxes, only: [:new, :create, :show, :destroy]
+    resources :families, only: [:show] do
       get 'new'
 
       resources :people do
@@ -72,6 +72,7 @@ Rails.application.routes.draw do
         post 'match'
       end
     end
+    resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :employer_profiles do
       get 'new'
       get 'my_account'
@@ -80,8 +81,8 @@ Rails.application.routes.draw do
         get 'welcome'
         get 'search'
         post 'match'
+        get 'inbox'
       end
-      resource :inbox, only: [:new, :create, :index]
       resources :plan_years do
         get 'recommend_dates', on: :collection
         post 'publish'
@@ -120,8 +121,9 @@ Rails.application.routes.draw do
 
   namespace :broker_agencies do
     root 'profiles#new'
+    resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :profiles, only: [:new, :create, :show, :index] do
-      resource :inbox, only: [:new, :create, :index]
+      get :inbox 
     end
   end
 

@@ -1,0 +1,11 @@
+<h2> Message Details </h2>
+<%- if message.present? %>
+<div class="col-lg-7 col-md-7 col-sm-7 col-xs-10">
+  <ul class="list-group">
+    <li class="list-group-item"> Sent By:  <%= "System Admin" %> <br></li>
+    <li class="list-group-item"> Subject:  <%= message.try(:subject) %> <br></li>
+    <li class="list-group-item"> Content:  <%= message.try(:body) %> <br></li>
+  </ul>
+  <a class="btn btn-danger" href="#"><i class="fa fa-times interaction-control-inbox-cancel"></i> Cancel</a>
+</div>
+<% end %>

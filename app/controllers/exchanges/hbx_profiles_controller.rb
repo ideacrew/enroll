@@ -1,6 +1,7 @@
 class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_hbx_staff_role, except: [:welcome]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
+  before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox]
 
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
@@ -46,13 +47,13 @@ class Exchanges::HbxProfilesController < ApplicationController
     @broker_agency_profiles = BrokerAgencyProfile.all
 
     respond_to do |format|
-      format.html { render "broker_agencies/profiles/index" }
+      format.html { render "broker" }
       format.js {}
     end
   end
 
   def broker_index
-    @brokers = BrokerRole.all
+    @broker_roles = BrokerRole.all
 
     respond_to do |format|
       format.html { render "broker_index" }
@@ -103,19 +104,8 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   # GET /exchanges/hbx_profiles/1/inbox
   def inbox
-    if HbxPortal.count > 0
-      @hbx_portal = HbxPortal.try(params[:id]) || HbxPortal.first
-    else
-      @hbx_portal = HbxPortal.new
-      @hbx_portal.save
-      m = Message.new
-      m.subject = 'Portal test message'
-      m.sender_id=current_user.id
-      @hbx_portal.inbox.messages << m
-      @hbx_portal.inbox.messages << m
-      @hbx_portal.save
-    end
-
+    @inbox_provider = current_user.person.hbx_staff_role.hbx_profile
+    @folder = params[:folder] || 'inbox'
   end
 
   # POST /exchanges/hbx_profiles
@@ -165,8 +155,32 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path
   end
 
+  def certify_broker
+    broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
+    password = SecureRandom.hex(5)
+    user = broker_role.person.user
+    if user.present?
+      user.set_random_password(password)
+    end
+    broker_role.approve!
+    UserMailer.broker_invitation(user, broker_role.broker_agency_profile, password).deliver_now
+    flash[:notice] = "Broker applicant certified successfully."
+    redirect_to "/exchanges/hbx_profiles"
+  end
+
+  def decertify_broker
+    broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
+    broker_role.decertify!
+    flash[:notice] = "Broker applicant decertified successfully."
+    redirect_to "/exchanges/hbx_profiles"
+  end
 
 private
+
+  def find_hbx_profile
+    @profile = current_user.person.hbx_staff_role.hbx_profile
+  end
+
   # Use callbacks to share common setup or constraints between actions.
   def set_hbx_profile
     @hbx_profile = HbxProfile.find(params[:id])

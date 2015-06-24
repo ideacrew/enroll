@@ -9,7 +9,7 @@ module Forms
       existing_org = Organization.where(:fein => fein).first
       if existing_org.present?
         if existing_org.employer_profile.present?
-          if (Person.where({:employer_staff_roles => { :employer_profile_id => existing_org.employer_profile._id }}).any?)
+          if (Person.where({"employer_staff_roles.employer_profile_id" => existing_org.employer_profile._id}).any?)
             raise OrganizationAlreadyMatched.new
           end
         end
@@ -23,6 +23,7 @@ module Forms
       person.employer_staff_roles << EmployerStaffRole.new(:employer_profile_id => employer_profile.id)
       current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
       current_user.save!
+      person.save!
     end
 
     def save(current_user)
