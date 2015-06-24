@@ -285,7 +285,7 @@ module ApplicationHelper
   end
 
   def portal_display_name(controller)
-    if controller == 'consumer_profiles'
+    if controller == 'consumer_profiles' || controller == 'employee_roles'
       text = "I'm an Individual/Family"
     elsif controller == 'employer_profiles'
       text = "I'm an Employer"
