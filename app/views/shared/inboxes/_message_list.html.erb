@@ -25,16 +25,16 @@
         <thead>
           <tr><%- @folder = (@folder||'Inbox').capitalize %>
             <th> <%= @folder %></th>
-            <th>Subject<%-provider.inbox.messages.inspect%></th>
+            <th>Subject</th>
           </tr>
         </thead>
 
         <tbody>
           <%- if provider.try(:inbox).try(:messages) %>
-          <% provider.inbox.messages.select{|m| @folder == m.folder.capitalize}.each do |message| %>
+          <% provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.each do |message| %>
           <tr>
-            <td> <%= message.try(:from) if @folder != 'Inbox' %>
-                 <%= message.try(:to)   if @folder != 'Sent'%>  </td>
+            <td> <%= message.try(:from) if @folder == 'Inbox' %>
+                 <%= message.try(:to)   if @folder == 'Sent'%>  </td>
             <td> <%= message.try(:subject) %> </td>
             <td> <%#= link_to "show", polymorphic_path([:insured, :family, provider.inbox, message]), class: "btn btn-primary", remote: true %>
               <%= link_to "show", retrieve_show_path(provider, message), class: "btn btn-primary", remote: true %>
