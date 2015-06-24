@@ -31,6 +31,8 @@ class PlanYear
 
   validate :open_enrollment_date_checks
 
+  scope :published, ->{ where(aasm_state: "published") }
+
   def parent
     raise "undefined parent employer_profile" unless employer_profile?
     self.employer_profile
@@ -61,7 +63,8 @@ class PlanYear
   end
 
   def register_employer
-    employer_profile.publish_plan_year
+    employer_profile.publish_plan_year!
+    benefit_groups.each(){|bg| bg.publish_plan_year}
   end
 
   def minimum_employer_contribution
@@ -146,7 +149,6 @@ class PlanYear
   end
 
   def enrollment_ratio
-    # binding.pry
     if eligible_to_enroll_count == 0
       0
     else

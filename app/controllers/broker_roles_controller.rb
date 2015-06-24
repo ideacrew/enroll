@@ -1,8 +1,6 @@
 ### Handles Broker Registration requests made by anonymous users. Authentication disbaled for this controller.
 class BrokerRolesController < ApplicationController
   
-  class Error < RuntimeError; end
-
   def new
     @person = Forms::BrokerCandidate.new
     @organization = ::Forms::BrokerAgencyProfile.new
@@ -28,42 +26,35 @@ class BrokerRolesController < ApplicationController
   end
 
   def create
-    begin
-      success = false
-      if params[:person].present?
-        applicant_type = params[:person][:broker_applicant_type] if params[:person][:broker_applicant_type]
+    success = false
+    if params[:person].present?
+      applicant_type = params[:person][:broker_applicant_type] if params[:person][:broker_applicant_type]
 
-        if params[:person][:broker_agency_id].blank?
-          raise Error.new('broker agency missing. please choose your broker agency.')
-        end
-
-        if applicant_type && applicant_type == 'staff_role'
-          @person = ::Forms::BrokerAgencyStaffRole.new(broker_agency_staff_role_params)
-        else
-          @person = ::Forms::BrokerRole.new(broker_role_params)
-        end
-        
-        if @person.save(current_user)
-          success = true
-        end
+      if applicant_type && applicant_type == 'staff_role'
+        @person = ::Forms::BrokerAgencyStaffRole.new(broker_agency_staff_role_params)
       else
-        @organization = ::Forms::BrokerAgencyProfile.new(primary_broker_role_params)
-        if @organization.save(current_user)
-          success = true
-        end
+        @person = ::Forms::BrokerRole.new(broker_role_params)
       end
 
-      if success
+      if @person.save
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+        redirect_to "/broker_registration"
       else
-        flash[:error] = "Something went wrong!!"
+        @filter = applicant_type
+        @organization = ::Forms::BrokerAgencyProfile.new
+        render "new"
       end
-    rescue Error => e
-      flash[:error] = e.message
+    else
+      @organization = ::Forms::BrokerAgencyProfile.new(primary_broker_role_params)
+      if @organization.save(current_user)
+        flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+        redirect_to "/broker_registration"
+      else
+        @person = Forms::BrokerCandidate.new
+        render "new"
+      end
     end
-    redirect_to "/broker_registration"
   end
-
 
   private
 

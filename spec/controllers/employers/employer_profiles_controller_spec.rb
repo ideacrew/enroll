@@ -32,10 +32,13 @@ RSpec.describe Employers::EmployerProfilesController do
   describe "GET show" do
     let(:user) { double("user")}
     let(:person) { double("person")}
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:plan_year) { FactoryGirl.create(:plan_year) }
+    let(:employer_profile) { plan_year.employer_profile}
+
     before(:each) do
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(user).to receive(:has_employer_staff_role?)
+      employer_profile.plan_years = [plan_year]
       sign_in(user)
       get :show, id: employer_profile.id
     end
@@ -43,13 +46,14 @@ RSpec.describe Employers::EmployerProfilesController do
     it "should render the show template" do
       expect(response).to have_http_status(:success)
       expect(response).to render_template("show")
-      expect(assigns(:current_plan_year)).to eq employer_profile.plan_years.last
+      expect(assigns(:current_plan_year)).to eq employer_profile.published_plan_year
     end
 
     it "should get plan years" do
       expect(assigns(:plan_years)).to eq employer_profile.plan_years.order(id: :desc)
-      expect(assigns(:current_plan_year)).to eq employer_profile.plan_years.last
+      expect(assigns(:current_plan_year)).to eq employer_profile.published_plan_year
     end
+
   end
 
   describe "GET welcome" do

@@ -167,7 +167,19 @@ $(document).on("change", ".elected-plan-select .metal-level", function() {
 });
 
 $(document).on("change", "select[name='reference_plan']", function() {
-  console.log($(this).val());
-  $(this).parents('.reference-plan-select').find("input[type='hidden']").val($(this).val());
-  $(this).parents('fieldset').find('.reference_plan_info').html($(this).find("option:selected").attr('title'));
+  //console.log($(this).val());
+  var reference_plan_id = $(this).val();
+  if (reference_plan_id != "" && reference_plan_id != undefined){
+    $(this).parents('.reference-plan-select').find("input[type='hidden']").val(reference_plan_id);
+    $(this).parents('fieldset').find('.reference_plan_info').html("<h4>loading...</h4>")
+    $.ajax({
+      type: "GET",
+      url: $('a#search_reference_plan_link').data('href'),
+      dataType: 'script',
+      data: {
+        "reference_plan_id": reference_plan_id,
+        "location_id": $(this).parents('fieldset').attr('id')
+      }
+    });
+  };
 }); 

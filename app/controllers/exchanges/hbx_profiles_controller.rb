@@ -149,6 +149,13 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def set_date
+    TimeKeeper.set_date_of_record(params[:time_keeper][:date_of_record])
+    TimeKeeper.instance.push_date_of_record
+    redirect_to exchanges_hbx_profiles_root_path
+  end
+
+
 private
 
   def find_hbx_profile

@@ -101,7 +101,7 @@ class EmployeeRole
 
   class << self
     def klass
-      self.to_s.downcase
+      self.to_s.underscore
     end
 
     def find(employee_role_id)
@@ -111,23 +111,19 @@ class EmployeeRole
     end
 
     def find_by_employer_profile(employer_profile)
-      employee_roles = []
-      Person.where("employee_roles.employer_profile_id" => employer_profile.id ).each do |person|
-        person.employee_roles.each do |role|
-          employee_roles << role if role.employer_profile.id == employer_profile.id
-        end
+      Person.where("employee_roles.employer_profile_id" => employer_profile.id).reduce([]) do |list, person|
+        list << person.employee_roles.detect { |ee| ee.employer_profile_id == employer_profile.id }
       end
-      employee_roles
     end
 
     def list(collection)
-      collection.reduce([]) { |elements, person| elements << person.send(klass) }
+      collection.reduce([]) { |elements, person| elements.concat person.send(klass.pluralize) }
     end
 
     # TODO: return as chainable Mongoid::Criteria
     def all
       # criteria = Mongoid::Criteria.new(Person)
-      list Person.exists(klass.to_sym => true)
+      list Person.exists(klass.pluralize.to_sym => true)
     end
 
     def first

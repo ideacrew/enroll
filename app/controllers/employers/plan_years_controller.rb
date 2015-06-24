@@ -26,6 +26,11 @@ class Employers::PlanYearsController < ApplicationController
     end
   end
 
+  def search_reference_plan
+    @plan = Plan.find(params[:reference_plan_id]) if params[:reference_plan_id].present?
+    @location_id = params[:location_id]
+  end
+
   def recommend_dates
     if params[:start_on].present?
       start_on = params[:start_on].to_date
@@ -38,7 +43,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def publish
-    @plan_year = @employer_profile.plan_years.last
+    @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     @plan_year.publish
 
     if @plan_year.save

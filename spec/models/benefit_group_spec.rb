@@ -68,6 +68,34 @@ describe BenefitGroup, dbclean: :after_each do
   end
 end
 
+describe BenefitGroup, dbclean: :after_each do
+  context "an employer profile with census_employees exists" do
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
+    let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
+
+    context "and a plan year exists" do
+      let(:start_plan_year) { Date.new(2015, 2, 1) }
+      let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_plan_year) }
+
+      context "and benefit group exists" do
+        let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
+
+        context "and census employees are assigned to the benefit group" do
+          let(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+
+          context "and the benefit group receives publish plan year" do
+            it "should call publish plan year on the benefit group assignments" do
+              expect(BenefitGroupAssignment).to receive(:by_benefit_group_id).with(benefit_group.id).and_return([benefit_group_assignment])
+              expect(benefit_group_assignment).to receive(:publish_plan_year)
+              benefit_group.publish_plan_year
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
 describe BenefitGroup, "instance methods" do
   let!(:benefit_group)            { FactoryGirl.build(:benefit_group) }
   let!(:plan_year)                { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], start_on: Date.new(2015,1,1)) }
@@ -456,4 +484,3 @@ describe BenefitGroup, type: :model do
     end
   end
 end
-

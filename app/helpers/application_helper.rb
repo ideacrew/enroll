@@ -275,4 +275,10 @@ module ApplicationHelper
       inbox_exchanges_hbx_profile_path(provider, folder: folder)
     end
   end
+
+  def can_register_new_account
+    # Do this once we have invites working:
+    # !params[:invitation_id].blank?
+    true
+  end
 end
