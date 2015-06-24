@@ -5,6 +5,12 @@ module Forms
     attr_accessor :broker_agency_profile
     attr_accessor :npn, :broker_agency_id
 
+    validates_presence_of :npn
+
+    validates :npn,
+      length: { is: 9, message: "%{value} is not a valid NPN" },
+      numericality: true
+
 
     class BrokerNpnAlreadyExists < StandardError; end
     class BrokerAgencyMissing < StandardError; end
