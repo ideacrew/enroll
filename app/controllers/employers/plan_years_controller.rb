@@ -26,6 +26,11 @@ class Employers::PlanYearsController < ApplicationController
     end
   end
 
+  def search_reference_plan
+    @plan = Plan.find(params[:reference_plan_id]) if params[:reference_plan_id].present?
+    @location_id = params[:location_id]
+  end
+
   def recommend_dates
     if params[:start_on].present?
       start_on = params[:start_on].to_date
