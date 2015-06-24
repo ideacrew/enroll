@@ -82,7 +82,6 @@ class Person
   before_save :generate_hbx_id
   before_save :strip_empty_fields
   after_create :create_inbox
-  after_initialize :build_nested_models
 
   index({hbx_id: 1}, {sparse:true, unique: true})
 
@@ -303,10 +302,6 @@ class Person
  end
 
 private
-
-  def build_nested_models
-    build_inbox if inbox.nil?
-  end
 
   def create_inbox
     welcome_subject = "Welcome to DC HealthLink"
