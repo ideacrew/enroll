@@ -47,13 +47,13 @@ class Exchanges::HbxProfilesController < ApplicationController
     @broker_agency_profiles = BrokerAgencyProfile.all
 
     respond_to do |format|
-      format.html { render "broker_agencies/profiles/index" }
+      format.html { render "broker" }
       format.js {}
     end
   end
 
   def broker_index
-    @brokers = BrokerRole.all
+    @broker_roles = BrokerRole.all
 
     respond_to do |format|
       format.html { render "broker_index" }
@@ -155,6 +155,25 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path
   end
 
+  def certify_broker
+    broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
+    password = SecureRandom.hex(5)
+    user = broker_role.person.user
+    if user.present?
+      user.set_random_password(password)
+    end
+    broker_role.approve!
+    UserMailer.broker_invitation(user, broker_role.broker_agency_profile, password).deliver_now
+    flash[:notice] = "Broker applicant certified successfully."
+    redirect_to "/exchanges/hbx_profiles"
+  end
+
+  def decertify_broker
+    broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
+    broker_role.decertify!
+    flash[:notice] = "Broker applicant decertified successfully."
+    redirect_to "/exchanges/hbx_profiles"
+  end
 
 private
 

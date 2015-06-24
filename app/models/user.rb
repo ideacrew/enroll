@@ -112,6 +112,12 @@ class User
     true
   end
 
+  def set_random_password(passwd)
+    self.password = passwd
+    self.password_confirmation = passwd
+    self.save
+  end
+
   def has_role?(role_sym)
     roles.any? { |r| r == role_sym.to_s }
   end
