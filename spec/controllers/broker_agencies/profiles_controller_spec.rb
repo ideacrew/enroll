@@ -36,9 +36,16 @@ RSpec.describe BrokerAgencies::ProfilesController do
   end
 
   describe "GET index" do
-    let(:user) { double(:has_hbx_staff_role? => true) }
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_broker_agency_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("hbx_profile")}
 
     before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
       sign_in(user)
       get :index
     end
@@ -83,10 +90,16 @@ RSpec.describe BrokerAgencies::ProfilesController do
   end
 
   describe "REDIRECT to my account if broker role present" do
-    let(:user){double("user")}
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("hbx_profile")}
     let(:person){double(:broker_agency_staff_roles => [double(:broker_agency_profile_id => 5)]) }
 
     it "should redirect to myaccount" do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
       allow(user).to receive(:person).and_return(person)
       sign_in(user)

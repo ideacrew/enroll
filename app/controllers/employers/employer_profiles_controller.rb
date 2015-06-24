@@ -1,7 +1,8 @@
 class Employers::EmployerProfilesController < ApplicationController
-  before_action :find_employer, only: [:show, :destroy]
+  before_action :find_employer, only: [:show, :destroy, :inbox]
   before_action :check_admin_staff_role, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
+  before_action :find_hbx_profile, only: [:index]
 
   def index
     @q = params.permit(:q)[:q]
@@ -119,12 +120,19 @@ class Employers::EmployerProfilesController < ApplicationController
     end
   end
 
+  def inbox
+    @folder = params[:folder] || 'Inbox'
+  end
 
   private
     def check_employer_staff_role
       if current_user.has_employer_staff_role?
         redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
       end
+    end
+
+    def find_hbx_profile
+      @profile = current_user.person.hbx_staff_role.hbx_profile
     end
 
     def check_admin_staff_role

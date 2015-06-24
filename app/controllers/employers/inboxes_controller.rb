@@ -1,7 +1,13 @@
 class Employers::InboxesController < InboxesController
 
+  def new
+    @inbox_to_name = params["to"]
+    puts 'Params', params
+    super
+  end
+
   def find_inbox_provider
-    @inbox_provider = EmployerProfile.find(params["employer_profile_id"])
+    @inbox_provider = EmployerProfile.find(params["id"])
     @inbox_provider_name = @inbox_provider.legal_name
   end
 

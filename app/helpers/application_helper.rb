@@ -256,6 +256,28 @@ module ApplicationHelper
     end
   end
 
+  def retrieve_show_path(provider, message)
+    case(provider.model_name.name)
+    when "Person"
+      insured_inbox_path(provider, message_id: message.id)
+    when "EmployerProfile"
+      employers_inbox_path(provider, message_id: message.id)
+    when "BrokerAgencyProfile"
+      broker_agencies_inbox_path(provider, message_id: message.id)
+    end
+  end
+
+  def retrieve_inbox_path(provider, folder: 'inbox')
+    case(provider.model_name.name)
+    when "EmployerProfile"
+      inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
+    when "HbxProfile"
+      inbox_exchanges_hbx_profile_path(provider, folder: folder)
+    when "BrokerAgencyProfile"
+      broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
+    end
+  end
+
   def can_register_new_account
     # Do this once we have invites working:
     # !params[:invitation_id].blank?

@@ -89,9 +89,15 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:criteria_page_results) { [found_organization] }
     let(:employer) { double }
     let(:employer_list) { [employer] }
-    let(:user) { double(:has_employer_staff_role? => false, :has_hbx_staff_role? => true) }
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("hbx_profile")}
 
     before :each do
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
       sign_in(user)
       allow(Organization).to receive(:search).with(nil).and_return(organization_search_criteria)
       allow(organization_search_criteria).to receive(:exists).with({employer_profile: true}).and_return(organization_employer_criteria)
@@ -120,9 +126,15 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:criteria_page_results) { [found_organization] }
     let(:employer) { double }
     let(:employer_list) { [employer] }
-    let(:user) { double(:has_employer_staff_role? => false, :has_hbx_staff_role? => true) }
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("hbx_profile")}
 
     before :each do
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
       sign_in(user)
       allow(Organization).to receive(:search).with("A Name").and_return(organization_search_criteria)
       allow(organization_search_criteria).to receive(:exists).with({employer_profile: true}).and_return(organization_employer_criteria)

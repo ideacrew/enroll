@@ -31,7 +31,7 @@ class ApplicationController < ActionController::Base
 
   def authenticate_me!
     # Skip auth if you are trying to log in
-    return true if ["welcome", "broker_roles", "office_locations"].include?(controller_name.downcase)
+    return true if ["welcome", "broker_roles", "office_locations", "invitations"].include?(controller_name.downcase)
     authenticate_user!
   end
 
