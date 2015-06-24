@@ -446,6 +446,29 @@ describe EmployerProfile, dbclean: :after_each do
 
   context "has hired a broker" do
   end
+
+  context "has employees that have enrolled in coverage" do
+    let(:benefit_group)       { FactoryGirl.build(:benefit_group)}
+    let(:plan_year)           { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
+    let!(:employer_profile)   { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
+    let(:census_employees)    { FactoryGirl.create_list(:census_employee, 7, 
+                                  employer_profile: employer_profile,
+                                  benefit_group_assignments: [benefit_group]
+                                ) 
+                              }
+    let(:person0)  { FactoryGirl.create(:person, ssn: census_employees[0].ssn, last_name: census_employees[0].last_name) }
+    let(:person0)  { FactoryGirl.create(:person, ssn: census_employees[1].ssn, last_name: census_employees[1].last_name) }
+    let!(:ee0)    { FactoryGirl.create(:employee_role, person: people[0], employer_profile: employer_profile) }
+    let!(:ee1)    { FactoryGirl.create(:employee_role, person: people[1], employer_profile: employer_profile) }
+    # let(:employees)         { FactoryGirl.create_list(:employee_role, employee_count, employer_profile: employer_profile) }
+    let!(:ee_roles)          { employer_profile.employee_roles }
+
+
+    before do
+      census_employees.each 
+    end
+
+  end
 end
 
 describe EmployerProfile, "given multiple existing employer profiles", :dbclean => :after_all do
@@ -732,6 +755,8 @@ describe EmployerProfile, "instance methods" do
     end
   end
 end
+
+describe ""
 
 describe "#advance_day" do
   let(:start_on) { (Date.current + 60).beginning_of_month }

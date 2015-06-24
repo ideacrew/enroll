@@ -1,7 +1,21 @@
+// $(function() {
+//   $('ul[name=broker_signup_primary_tabs] > ').children().each( function() { 
+//     $(this).change(function(){
+//       filter = $(this).val();
+//       $('#' + filter + '_panel').siblings().empty().hide();
+//       $('#' + filter + '_panel').show();
+//       $.ajax({
+//         url: '/broker_roles/new.js',
+//         type: "GET",
+//         data : { 'filter': filter }
+//       });
+//     })
+//   })
+// })
+
 $(function() {
-  $('div[name=broker_signup_primary_tabs] > ').children().each( function() { 
-    $(this).change(function(){
-      filter = $(this).val();
+  $('ul[name=broker_signup_primary_tabs] > li > a').on('click', function() {
+      filter = $(this).data('value');
       $('#' + filter + '_panel').siblings().empty().hide();
       $('#' + filter + '_panel').show();
       $.ajax({
@@ -9,7 +23,6 @@ $(function() {
         type: "GET",
         data : { 'filter': filter }
       });
-    })
   })
 })
 
