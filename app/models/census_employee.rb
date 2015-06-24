@@ -180,6 +180,13 @@ class CensusEmployee < CensusMember
     employee_role.save
   end
 
+  def published_benefit_group
+    benefit_group_assignment = benefit_group_assignments.detect do |benefit_group_assignment|
+      benefit_group_assignment.benefit_group.plan_year.published?
+    end
+    benefit_group_assignment.benefit_group
+  end
+
   class << self
     def find_all_unlinked_by_identifying_information(ssn, dob)
       unscoped.and(ssn: ssn, dob: dob, aasm_state: "eligible").to_a

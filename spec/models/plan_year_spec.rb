@@ -366,9 +366,40 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
 
+    context "and there is an employee in the roster but not assigned to the benefit group" do
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+      let(:census_employee) { FactoryGirl.build(:census_employee, employer_profile: employer_profile) }
+      before do
+        plan_year.benefit_groups = [benefit_group]
+        plan_year.save
+        census_employee.save
+      end
+
+      context "and it tries to publish" do
+        before do
+          plan_year.publish
+        end
+
+        it "should still be in draft" do
+          expect(plan_year.aasm_state).to eq "draft"
+        end
+
+        it "should have application errors" do
+          expect(plan_year.application_errors[:benefit_groups].present?).to be_truthy
+          expect(plan_year.application_errors[:benefit_groups]).to match(/every employee must be assigned/)
+        end
+
+        it "should not be publishable" do
+          expect(plan_year.is_application_unpublishable?).to be_truthy
+        end
+      end
+    end
+
     context "and the employer size exceeds regulatory max" do
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
       before do
         plan_year.fte_count = invalid_fte_count
+        plan_year.benefit_groups = [benefit_group]
         plan_year.publish
       end
 

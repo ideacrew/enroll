@@ -257,7 +257,7 @@ RSpec.describe Employers::PlanYearsController do
 
   describe "POST publish" do
     let(:plan_year_id) { "plan_year_id"}
-    let(:plan_year_proxy) { instance_double("PlanYear", publish: double)}
+    let(:plan_year_proxy) { instance_double("PlanYear", publish!: double)}
 
     before :each do
       sign_in
@@ -266,7 +266,9 @@ RSpec.describe Employers::PlanYearsController do
 
     context "plan year published sucessfully" do
       before :each do
-        allow(plan_year_proxy).to receive(:save).and_return(true)
+        allow(plan_year_proxy).to receive(:draft?).and_return(false)
+        allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
+        allow(plan_year_proxy).to receive(:published?).and_return(true)
       end
 
       it "should be a redirect" do
@@ -275,9 +277,10 @@ RSpec.describe Employers::PlanYearsController do
       end
     end
 
-    context "plan year did not publish" do
+    context "plan year did not publish with warnings" do
       before :each do
-        allow(plan_year_proxy).to receive(:save).and_return(false)
+        allow(plan_year_proxy).to receive(:draft?).and_return(false)
+        allow(plan_year_proxy).to receive(:publish_pending?).and_return(true)
         allow(plan_year_proxy).to receive(:application_warnings)
       end
 
@@ -287,6 +290,17 @@ RSpec.describe Employers::PlanYearsController do
       end
     end
 
+    context "plan year did not publish with errors" do
+      before :each do
+        allow(plan_year_proxy).to receive(:draft?).and_return(true)
+        allow(plan_year_proxy).to receive(:application_errors)
+      end
+
+      it "should be a redirect with errors" do
+        post :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
+        expect(response).to have_http_status(:redirect)
+      end
+    end
   end
 
   describe "GET search_reference_plan" do

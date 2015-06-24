@@ -65,16 +65,8 @@ class EmployeeRole
     @employer_profile = EmployerProfile.find(self.employer_profile_id)
   end
 
-  # belongs_to BenefitGroup
-  def benefit_group=(new_benefit_group)
-    raise ArgumentError.new("expected BenefitGroup class") unless new_benefit_group.is_a? BenefitGroup
-    self.benefit_group_id = new_benefit_group._id
-    @benefit_group = new_benefit_group
-  end
-
   def benefit_group
-    return @benefit_group if defined? @benefit_group
-    @benefit_group = BenefitGroup.find(self.benefit_group_id) unless benefit_group_id.blank?
+    census_employee.published_benefit_group
   end
 
   def new_census_employee=(new_census_employee)
@@ -85,7 +77,7 @@ class EmployeeRole
 
   def new_census_employee
     return @census_employee if defined? @census_employee
-    @census_employee = CensusEmployee.find(self.census_employee_id) unless census_employee_id.blank?    
+    @census_employee = CensusEmployee.find(self.census_employee_id) unless census_employee_id.blank?
   end
 
   alias_method :census_employee=, :new_census_employee=

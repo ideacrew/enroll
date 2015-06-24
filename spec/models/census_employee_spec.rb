@@ -186,13 +186,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                 it "and should be delinkable" do
                   expect(new_census_employee.may_delink_employee_role?).to be_truthy
                 end
-
-                context "and the census employee receives publish plan year" do
-                  it "should update the employee role with the appropriate benefit group" do
-                    expect(valid_employee_role).to receive(:benefit_group=).with(benefit_group)
-                    new_census_employee.publish_plan_year(benefit_group)
-                  end
-                end
               end
 
               context "and employee is terminated" do
