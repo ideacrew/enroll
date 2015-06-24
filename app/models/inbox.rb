@@ -11,11 +11,11 @@ class Inbox
   before_create :generate_acccess_key
 
   def read_messages
-    messages.where(message_read: true)
+    messages.where(message_read: true, folder: Message::FOLDER_TYPES[:inbox])
   end
 
   def unread_messages
-    messages.where(message_read: false)
+    messages.where(message_read: false, folder: Message::FOLDER_TYPES[:inbox])
   end
 
   def post_message(new_message)
