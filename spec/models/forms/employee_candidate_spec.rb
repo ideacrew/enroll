@@ -6,7 +6,7 @@ describe Forms::EmployeeCandidate do
   end
 
   it "should have error on dob" do
-    expect(subject).to have_errors_on(:date_of_birth)
+    expect(subject).to have_errors_on(:dob)
   end
 
   it "should have errors on gender" do
@@ -31,7 +31,7 @@ describe Forms::EmployeeCandidate, "asked to match a census employee" do
 
   subject {
     Forms::EmployeeCandidate.new({
-      :date_of_birth => "10/12/2012",
+      :dob => "2012-10-12",
       :ssn => "123-45-6789"
     })
   }
@@ -73,7 +73,7 @@ describe Forms::EmployeeCandidate, "asked to match a person" do
 
   subject {
     Forms::EmployeeCandidate.new({
-      :date_of_birth => "10/12/2012",
+      :dob => "2012-10-12",
       :ssn => "123-45-6789",
       :first_name => "yo",
       :last_name => "guy",

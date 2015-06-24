@@ -12,13 +12,20 @@ module Forms
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
     validates_presence_of :gender, :allow_blank => nil
-    include ::Forms::DateOfBirthField
-    include Validations::USDate.on(:date_of_birth)
+    validates_presence_of :dob
+    # include ::Forms::DateOfBirthField
+    #include Validations::USDate.on(:date_of_birth)
 
     validate :does_not_match_a_different_users_person
     validates :ssn,
               length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
               numericality: true
+
+    attr_reader :dob
+
+    def dob=(val)
+      @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
+    end
 
     def match_census_employees
       census_employees = []

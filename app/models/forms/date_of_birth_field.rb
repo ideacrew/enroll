@@ -5,7 +5,7 @@ module Forms
         attr_accessor :date_of_birth
 
         def dob
-          Date.strptime(date_of_birth, "%m/%d/%Y") rescue nil
+          Date.strptime(date_of_birth, "%Y-%m-%d") rescue nil
         end
       end
     end

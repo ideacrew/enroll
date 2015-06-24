@@ -8,15 +8,21 @@ module Forms
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::SsnField
-    include ::Forms::DateOfBirthField
-    include Validations::USDate.on(:date_of_birth)
+    #include ::Forms::DateOfBirthField
+    #include Validations::USDate.on(:date_of_birth)
 
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
     validates_presence_of :gender, :allow_blank => nil
     validates_presence_of :family_id, :allow_blank => nil
-
+    validates_presence_of :dob
     validates_inclusion_of :relationship, :in => ::PersonRelationship::Relationships, :allow_blank => nil
+
+    attr_reader :dob
+
+    def dob=(val)
+      @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
+    end
 
     def save
       return false unless valid?
@@ -56,7 +62,7 @@ module Forms
         :name_pfx => name_pfx,
         :name_sfx => name_sfx,
         :gender => gender,
-        :date_of_birth => date_of_birth,
+        :dob => dob,
         :ssn => ssn
       }
     end
@@ -86,7 +92,7 @@ module Forms
         :middle_name => found_family_member.middle_name,
         :name_pfx => found_family_member.name_pfx,
         :name_sfx => found_family_member.name_sfx,
-        :date_of_birth => found_family_member.date_of_birth,
+        :dob => found_family_member.dob,
         :gender => found_family_member.gender,
         :ssn => found_family_member.ssn
       })

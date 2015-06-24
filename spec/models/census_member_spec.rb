@@ -13,13 +13,13 @@ RSpec.describe CensusMember, :type => :model do
   end
 
   it "sets date of birth" do
-    census_employee.date_of_birth = "12/12/1980"
-    expect(census_employee.dob).to eq "12/12/1980".to_date
+    census_employee.date_of_birth = "1980-12-12"
+    expect(census_employee.dob).to eq "1980-12-12".to_date
   end
 
   context "dob" do
     before(:each) do
-      census_employee.date_of_birth = "12/01/1980"
+      census_employee.date_of_birth = "1980-12-01"
     end
 
     it "dob_string" do
