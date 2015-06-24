@@ -2,10 +2,9 @@
 <body>
 Congratulations <%= user.person.full_name %>,
 <br />
-<span>Your application is approved by DCHealthLink</span>
-<%= link_to "View Account", broker_agencies_profile_url(agency_profile, host: "https://enroll1.dchealthlink.com") %>
-
-<span>We've created an account for you. You can login with your email address and the following password</span>
-<span><%= password %></span>
+<div>Your application is approved by DCHealthLink.</div>
+<div>We've created an account for you. You can login with your email address and the following password</div>
+<div><%= password %></div>
+<div>Please click <%= link_to "View Account", broker_agencies_profile_url(agency_profile, host: "https://enroll1.dchealthlink.com") %>.</div>
 </body>
 </html>
