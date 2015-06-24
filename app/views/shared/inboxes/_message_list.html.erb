@@ -23,17 +23,18 @@
     <div class="col-lg-10 col-md-9 col-sm-8 col-xs-12" id="message_list_form">
       <table class="table table-hover">
         <thead>
-          <tr>
-            <th> <%= (@folder||'Inbox').try(:capitalize) %></th>
-            <th>Subject</th>
+          <tr><%- @folder = (@folder||'Inbox').capitalize %>
+            <th> <%= @folder %></th>
+            <th>Subject<%-provider.inbox.messages.inspect%></th>
           </tr>
         </thead>
 
         <tbody>
           <%- if provider.try(:inbox).try(:messages) %>
-          <% provider.inbox.messages.select{|m| (@folder||'Inbox') == m.folder.capitalize}.each do |message| %>
+          <% provider.inbox.messages.select{|m| @folder == m.folder.capitalize}.each do |message| %>
           <tr>
-            <td> <%= "System Admin" %> </td>
+            <td> <%= message.try(:from) if @folder != 'Inbox' %>
+                 <%= message.try(:to)   if @folder != 'Sent'%>  </td>
             <td> <%= message.try(:subject) %> </td>
             <td> <%#= link_to "show", polymorphic_path([:insured, :family, provider.inbox, message]), class: "btn btn-primary", remote: true %>
               <%= link_to "show", retrieve_show_path(provider, message), class: "btn btn-primary", remote: true %>
