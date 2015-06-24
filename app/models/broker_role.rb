@@ -176,4 +176,12 @@ private
       transition_at: Time.now.utc
     )
   end
+
+  def applicant?
+    aasm_state == 'applicant'
+  end
+
+  def approved_or_pending?
+    aasm_state == 'active' || aasm_state == 'broker_agency_pending'
+  end
 end

@@ -15,6 +15,8 @@ Rails.application.routes.draw do
         get :product_index
         get :configuration
         post :set_date
+        post :certify_broker
+        post :decertify_broker
       end
 
       member do
