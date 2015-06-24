@@ -1,4 +1,5 @@
-@media (min-width: 320px) and (max-width: 767px)  {
+@media (max-width: 767px)  {
+  body {padding-bottom: 170px;}
   ul.navbar-nav.top-menu {
     padding: 0px 15px;
     margin: 0px -15px;
@@ -31,15 +32,11 @@
   .mainmenu ul li a span {
     display: block;
   }
-}
+  .mainmenu ul li {padding: 0 2px;}
 
-@media(max-width: 460px) {
-    body {padding-bottom: 190px;}
-}
-@media(max-width: 767px) {
-    footer.footer-wrapper .container {text-align: center;}
-    footer.footer-wrapper .container .pull-right {float: none !important;}
-    footer.footer-wrapper .container ul li {display: block; padding: 5px 0;}
+  footer.footer-wrapper .container {text-align: center;}
+  footer.footer-wrapper .container .pull-right {float: none !important;}
+  footer.footer-wrapper .container ul li {display: block; padding: 5px 0;}
 
   #address_info .new-address-flow{padding-top: 40%;}
   #key-section {display: none;}
@@ -100,11 +97,8 @@
     padding: 0 5px 20px;
   }
   .tab-row #myTabContent .submenu ul li a {
-    padding: 20px 0;
+    /*padding: 20px 0;*/
     font-size: 14px;
-  }
-  .tab-row #myTabContent .submenu ul li:nth-child(1) a, .tab-row #myTabContent .submenu ul li:nth-child(3) a {
-    border-right: 1px solid #bbb !important;
   }
     .compare-slctd-plan .compare table{
     table-layout: inherit;
@@ -130,17 +124,19 @@
   .tab-row #myTabContent #myTabContent1 {
     padding: 0 5px 20px;
   }
+  #myTab1 {margin: 0;}
   #myTab1 li {
     border-bottom: 1px solid #bbb;
     text-align: center;
     width: 50%;
-    margin: 0;
+    float: left;
+    padding: 10px;
   }
   .submenu ul li a {
-    padding: 20px 0;
+    /*padding: 20px 0;*/
     font-size: 14px;
   }
-  .submenu ul li:nth-child(1) a, .submenu ul li:nth-child(3) a {
+  .submenu ul li:nth-child(1), .submenu ul li:nth-child(3) {
     border-right: 1px solid #bbb !important;
   }
   .top-menu > li > a .badge {
