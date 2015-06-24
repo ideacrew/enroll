@@ -1,4 +1,4 @@
-<fieldset>
+<fieldset id='benefit-group-<%= f.object.id.to_s %>'>
   <div style="height:50px;position:relative;">
     <%= link_to '#', :class => "remove_fields close-2" do %>
       <%= image_tag("delete.png") %>
@@ -24,6 +24,8 @@
         <!-- Select Plan:  -->
         <%= render "shared/reference_plans_list", f: f %>
       </div>
+    </div>
+    <div class="reference_plan_info">
     </div>
   </div>
 

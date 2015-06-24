@@ -8,18 +8,10 @@ module Forms
       ::BrokerAgencyStaffRole.model_name
     end
 
-    def create_broker_agency_staff_role(current_user, broker_agency_profile)
-      person.user = current_user
-      person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)
-      current_user.roles << "broker_agency_staff" unless current_user.roles.include?("broker_agency_staff")
-      current_user.save!
-    end
-
-    def save(current_user)
+    def save
       return false unless valid?
       begin
-        match_or_create_person(current_user)
-        create_new_user unless current_user
+        match_or_create_person
         person.save!
       rescue TooManyMatchingPeople
         errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
@@ -30,8 +22,8 @@ module Forms
       end
 
       broker_agency_profile = ::BrokerAgencyProfile.find(broker_agency_id)
-      create_broker_agency_staff_role((current_user || person.user), broker_agency_profile)
-
+      person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)
+      
       true
     end
   end

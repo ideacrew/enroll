@@ -44,14 +44,18 @@ class CensusEmployee < CensusMember
 
   #TODO - need to add fix for multiple plan years
   scope :enrolled,    ->{ any_in("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
+  scope :covered,     ->{ where( "benefit_group_assignments.aasm_state" => "coverage_selected" ) }
   scope :waived,      ->{ where( "benefit_group_assignments.aasm_state" => "coverage_waived" ) }
 
   scope :sorted,                -> { order(:"census_employee.last_name".asc, :"census_employee.first_name".asc)}
   scope :order_by_last_name,    -> { order(:"census_employee.last_name".asc) }
   scope :order_by_first_name,   -> { order(:"census_employee.first_name".asc) }
 
-  scope :non_business_owner,    ->{ where(is_business_owner: false) }
-  scope :by_benefit_group_ids,  ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
+  scope :non_business_owner,      ->{ where(is_business_owner: false) }
+  scope :by_benefit_group_ids,    ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
+  scope :by_employer_profile_id,  ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
+
+  # scope :enrolled_by_employer_profile ->{ find_all_by_employer_profile().enrolled }
 
   def initialize(*args)
     super(*args)
@@ -166,9 +170,14 @@ class CensusEmployee < CensusMember
   end
 
   def check_employment_terminated_on
-    if employment_terminated_on and employment_terminated_on <= hired_on 
+    if employment_terminated_on and employment_terminated_on <= hired_on
       errors.add(:employment_terminated_on, "can't occur before rehiring date")
     end
+  end
+
+  def publish_plan_year(published_benefit_group)
+    employee_role.benefit_group = published_benefit_group
+    employee_role.save
   end
 
   class << self

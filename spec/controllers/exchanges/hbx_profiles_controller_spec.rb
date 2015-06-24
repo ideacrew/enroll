@@ -47,4 +47,19 @@ RSpec.describe Exchanges::HbxProfilesController do
     end
   end
 
+  describe "POST" do
+    let(:user) { double("user")}
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in(user)
+    end
+
+    it "sends timekeeper a date" do
+      expect(TimeKeeper).to receive(:set_date_of_record).with( Date.current.next_day.to_s)
+      expect(TimeKeeper.instance).to receive(:push_date_of_record)
+      post :set_date, :time_keeper => { :date_of_record =>  Date.current.next_day.to_s }
+      expect(response).to have_http_status(:redirect)
+    end
+  end
 end

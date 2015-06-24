@@ -62,7 +62,7 @@ class ApplicationController < ActionController::Base
 
   # Broker Signup form should be accessibile for anonymous users
   def authentication_not_required?
-    devise_controller? || (controller_name == "broker_roles") || (controller_name == "office_locations")
+    devise_controller? || (controller_name == "broker_roles") || (controller_name == "office_locations") || (controller_name == "invitations")
   end
 
   def require_login

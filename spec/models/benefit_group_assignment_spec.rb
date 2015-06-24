@@ -53,7 +53,7 @@ describe BenefitGroupAssignment, type: :model do
 
     context "and invalid dates are specified" do
       let(:params) {valid_params}
-      let(:benefit_group_assignment)  { BenefitGroupAssignment.new(**params) }  
+      let(:benefit_group_assignment)  { BenefitGroupAssignment.new(**params) }
 
       context "start too early" do
         before { benefit_group_assignment.start_on = benefit_group.plan_year.start_on - 1.day }
@@ -98,7 +98,7 @@ describe BenefitGroupAssignment, type: :model do
 
     context "and valid dates are specified" do
       let(:params) {valid_params}
-      let(:benefit_group_assignment)  { BenefitGroupAssignment.new(**params) }  
+      let(:benefit_group_assignment)  { BenefitGroupAssignment.new(**params) }
 
       context "start and end timely" do
         before do
@@ -114,10 +114,17 @@ describe BenefitGroupAssignment, type: :model do
 
     context "with all valid parameters" do
       let(:params) {valid_params}
-      let(:benefit_group_assignment)  { BenefitGroupAssignment.new(**params) }  
+      let(:benefit_group_assignment)  { BenefitGroupAssignment.new(**params) }
 
       it "should save" do
         expect(benefit_group_assignment.save).to be_truthy
+      end
+
+      context "receives publish plan year" do
+        it "should notify the census employee" do
+          expect(census_employee).to receive(:publish_plan_year).with(benefit_group)
+          benefit_group_assignment.publish_plan_year
+        end
       end
 
       context "and it is saved" do
@@ -222,4 +229,3 @@ describe BenefitGroupAssignment, type: :model do
     end
   end
 end
-

@@ -32,6 +32,10 @@ describe EmployerProfile, dbclean: :after_each do
     }
   end
 
+  after do
+    TimeKeeper.set_date_of_record_unprotected!(Date.current)
+  end
+
   it { should validate_presence_of :entity_kind }
 
   context ".new" do
@@ -117,12 +121,12 @@ describe EmployerProfile, dbclean: :after_each do
 
     context "and employer submits a valid plan year application with tomorrow as start open enrollment" do
       before do
-        plan_year.open_enrollment_start_on = Date.current + 1
-        plan_year.open_enrollment_end_on = Date.current + 5
-        plan_year.start_on = (Date.current + 25).end_of_month + 1.day
+        TimeKeeper.set_date_of_record_unprotected!(Date.current.beginning_of_month.next_month + 8.days)
+        plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
+        plan_year.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
+        plan_year.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
         plan_year.end_on = plan_year.start_on + 1.year - 1.day
-        # employer_profile.latest_plan_year.publish
-        plan_year.publish
+        plan_year.publish!
       end
 
       it "should transition to registered state" do
@@ -132,26 +136,24 @@ describe EmployerProfile, dbclean: :after_each do
 
     context "and employer submits a valid plan year application with today as start open enrollment" do
       before do
-        plan_year.open_enrollment_start_on = Date.current
-        plan_year.open_enrollment_end_on = Date.current + 5.days
-        plan_year.start_on = (Date.current + 25.days).end_of_month + 1.day
+        TimeKeeper.set_date_of_record_unprotected!(Date.current.beginning_of_month.next_month + 8.days)
+        plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
+        plan_year.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
+        plan_year.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
         plan_year.end_on = plan_year.start_on + 1.year - 1.day
-        # employer_profile.latest_plan_year.publish
-        plan_year.publish
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record + 1.day)
+        plan_year.publish!
       end
 
       it "should transition directly to enrolling state" do
-        expect(employer_profile.enrolling?).to be_truthy
+        expect(employer_profile.aasm_state).to eq("enrolling")
       end
 
       context "and employer has enrolled" do
 
         context "and today is the day following close of open enrollment" do
           before do
-            plan_year.open_enrollment_end_on = Date.current - 1.day
-            plan_year.open_enrollment_start_on = plan_year.open_enrollment_end_on - 5.days
-            plan_year.start_on = (Date.current + 32.days).end_of_month + 1.day
-            plan_year.end_on = plan_year.start_on + 1.year - 1.day
+            TimeKeeper.set_date_of_record_unprotected!(plan_year.open_enrollment_end_on + 1.day)
           end
 
           context "and employer's enrollment is non-compliant" do
@@ -249,7 +251,7 @@ describe EmployerProfile, dbclean: :after_each do
             let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, 1, hired_on: (Date.current - 2.years), employer_profile_id: employer_profile.id) }
 
             before do
-              plan_year.start_on = Date.current.beginning_of_year.next_month
+              plan_year.start_on = plan_year.start_on.next_month if plan_year.start_on.month == 1
               non_owner_census_families.each do |census_employee|
                 census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
                 benefit_group_assignment = census_employee.benefit_group_assignments.first
@@ -259,7 +261,7 @@ describe EmployerProfile, dbclean: :after_each do
                 benefit_group_assignment.select_coverage
                 census_employee.save!
               end
-              employer_profile.advance_enrollment_date
+              employer_profile.advance_enrollment_date!
             end
 
             it "enrollment should be valid" do
@@ -443,6 +445,29 @@ describe EmployerProfile, dbclean: :after_each do
   end
 
   context "has hired a broker" do
+  end
+
+  context "has employees that have enrolled in coverage" do
+    let(:benefit_group)       { FactoryGirl.build(:benefit_group)}
+    let(:plan_year)           { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
+    let!(:employer_profile)   { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
+    let(:census_employees)    { FactoryGirl.create_list(:census_employee, 7, 
+                                  employer_profile: employer_profile,
+                                  benefit_group_assignments: [benefit_group]
+                                ) 
+                              }
+    let(:person0)  { FactoryGirl.create(:person, ssn: census_employees[0].ssn, last_name: census_employees[0].last_name) }
+    let(:person0)  { FactoryGirl.create(:person, ssn: census_employees[1].ssn, last_name: census_employees[1].last_name) }
+    let!(:ee0)    { FactoryGirl.create(:employee_role, person: people[0], employer_profile: employer_profile) }
+    let!(:ee1)    { FactoryGirl.create(:employee_role, person: people[1], employer_profile: employer_profile) }
+    # let(:employees)         { FactoryGirl.create_list(:employee_role, employee_count, employer_profile: employer_profile) }
+    let!(:ee_roles)          { employer_profile.employee_roles }
+
+
+    before do
+      census_employees.each 
+    end
+
   end
 end
 
@@ -729,5 +754,83 @@ describe EmployerProfile, "instance methods" do
       end
     end
   end
+end
 
+describe ""
+
+describe "#advance_day" do
+  let(:start_on) { (Date.current + 60).beginning_of_month }
+  let(:end_on) {start_on + 1.year - 1 }
+  let(:open_enrollment_start_on) { (start_on - 32).beginning_of_month }
+  let(:open_enrollment_end_on) { open_enrollment_start_on + 2.weeks }
+  let(:plan_year) { FactoryGirl.create(:plan_year, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on) }
+  let(:employer_profile) { plan_year.employer_profile }
+  let(:organization) { employer_profile.organization }
+  let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
+
+  context "without any published plan years" do
+    it "should stay in the applicant state" do
+      EmployerProfile.advance_day(start_on - 100)
+      expect(EmployerProfile.find(employer_profile.id).aasm_state).to eq("applicant")
+    end
+  end
+
+  context "with a single successfully published a plan year" do
+    before do
+      plan_year.benefit_groups << benefit_group
+      plan_year.publish!
+      expect(plan_year.aasm_state).to eq("published")
+    end
+
+    it "should be in a registered state" do
+      expect(EmployerProfile.find(employer_profile.id).aasm_state).to eq("registered")
+    end
+
+    it "should be in an enrolling state if day is on or greater than open enrollment start" do
+      EmployerProfile.advance_day(open_enrollment_start_on)
+      expect(EmployerProfile.find(employer_profile.id).aasm_state).to eq("enrolling")
+    end
+
+    context "with an in in valid plan year" do
+      it "should be in an ineligible state" do
+        allow(plan_year).to receive(:is_application_valid?).and_return(false)
+        EmployerProfile.advance_day(open_enrollment_start_on)
+        expect(EmployerProfile.find(employer_profile.id).aasm_state).to eq("enrolling")
+      end
+    end
+  end
+
+  context "with a three plan years that one of which successfully published" do
+    let(:plan_year1) { FactoryGirl.create(:plan_year, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on) }
+    let(:benefit_group2) { FactoryGirl.create(:benefit_group, plan_year: plan_year2) }
+    let(:plan_year2) { FactoryGirl.create(:plan_year, employer_profile: plan_year1.employer_profile, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on) }
+    let(:benefit_group3) { FactoryGirl.create(:benefit_group, plan_year: plan_year3) }
+    let(:plan_year3) { FactoryGirl.create(:plan_year, employer_profile: plan_year1.employer_profile, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on) }
+    let(:employer_profile) { plan_year1.employer_profile }
+
+    before do
+      plan_year1.benefit_groups << benefit_group
+      plan_year2.benefit_groups << benefit_group2
+      plan_year3.benefit_groups << benefit_group3
+      plan_year2.publish!
+      expect(plan_year2.aasm_state).to eq("published")
+    end
+
+    it "should be in a registered state" do
+      expect(EmployerProfile.find(employer_profile.id).aasm_state).to eq("registered")
+    end
+
+    it "should be in an enrolling state if day is on or greater than open enrollment start" do
+      EmployerProfile.advance_day(open_enrollment_start_on)
+      expect(EmployerProfile.find(employer_profile.id).aasm_state).to eq("enrolling")
+    end
+
+    context "with an in in valid plan year" do
+      it "should be in an ineligible state" do
+        allow(plan_year).to receive(:is_application_valid?).and_return(false)
+        EmployerProfile.advance_day(open_enrollment_start_on)
+        expect(EmployerProfile.find(employer_profile.id).aasm_state).to eq("enrolling")
+      end
+    end
+  end
 end

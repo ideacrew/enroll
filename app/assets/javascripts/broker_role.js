@@ -22,13 +22,20 @@ $(document).on('change', "div[name=broker_agency_tabs] input[type='radio']", fun
 
 $(document).on('click', '.broker-agency-search a.search', function() {
   $('.broker-agency-search .result').empty();
-  var broker_agency_id = $('select.broker_agency').val();
-  if (broker_agency_id != undefined && broker_agency_id != ""){
+  var broker_agency_search = $('input#agency_search').val();
+  if (broker_agency_search != undefined && broker_agency_search != ""){
     $(this).button('loading');
+    $('#person_broker_agency_id').val("");
     $.ajax({
       url: '/broker_roles/search_broker_agency.js',
       type: "GET",
-      data : { 'broker_agency_id': broker_agency_id }
+      data : { 'broker_agency_search': broker_agency_search }
     });
   };
+});
+
+$(document).on('click', "a.select-broker-agency", function() {
+  $('.result .form-border').removeClass("agency-selected");
+  $('#person_broker_agency_id').val($(this).data('broker_agency_profile_id'));
+  $(this).parents(".form-border").addClass("agency-selected");
 });
