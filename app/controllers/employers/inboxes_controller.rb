@@ -2,6 +2,7 @@ class Employers::InboxesController < InboxesController
 
   def new
     @inbox_to_name = params["to"]
+     @inbox_provider_name = 'HBXAdmin'
     puts 'Params', params
     super
   end
