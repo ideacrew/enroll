@@ -79,7 +79,7 @@ class User
 
   before_save :ensure_authentication_token
 
-  after_create :send_welcome_email
+#  after_create :send_welcome_email
 
   delegate :primary_family, to: :person, allow_nil: true
 
