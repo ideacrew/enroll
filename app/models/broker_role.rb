@@ -184,4 +184,8 @@ private
   def approved_or_pending?
     aasm_state == 'active' || aasm_state == 'broker_agency_pending'
   end
+
+  def current_state
+    aasm_state.gsub(/\_/,' ').camelcase
+  end
 end

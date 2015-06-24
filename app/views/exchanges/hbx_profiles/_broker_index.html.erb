@@ -9,26 +9,30 @@
         <th>Applicant NPN</th>
         <th>Agency Name</th>
         <th>Provider Kind</th>
+        <th>Status</th>
         <th></th>
       </thead>
       <% if @broker_roles.any? %>
       <% @broker_roles.each do |broker_role| %>
+      <% if broker_role.broker_agency_profile %>
       <tbody>
         <td><%= broker_role.person.full_name %></td>
         <td><%= broker_role.npn %></td>
-        <td><%= broker_role.broker_agency_profile.legal_name if broker_role.broker_agency_profile %></td>
+        <td><%= broker_role.broker_agency_profile.legal_name %></td>
         <td><%= broker_role.provider_kind %></td>
+        <td><%= broker_role.current_state %></td>
         <td>
           <% if broker_role.applicant? %>
           <%= link_to 'Certify'.html_safe,
-          certify_broker_exchanges_hbx_profiles_path(id: broker_role.id), class: "btn btn-default", remote: true, method: :post %>
+          certify_broker_exchanges_hbx_profiles_path(id: broker_role.id), class: "btn btn-default", method: :post %>
           <% end %>
           <% if broker_role.approved_or_pending? %>
           <%= link_to 'Decertify'.html_safe,
-          decertify_broker_exchanges_hbx_profiles_path(id: broker_role.id), class: "btn btn-default", remote: true, method: :post %>
+          decertify_broker_exchanges_hbx_profiles_path(id: broker_role.id), class: "btn btn-default", method: :post %>
           <% end %>
         </td>
       </tbody>
+      <% end %> 
       <% end %>
       <% else %>
       <tbody><td>No Applicants found.</td></tbody>

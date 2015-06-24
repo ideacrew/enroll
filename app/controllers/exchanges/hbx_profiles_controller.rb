@@ -164,9 +164,15 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
     broker_role.approve!
     UserMailer.broker_invitation(user, broker_role.broker_agency_profile, password).deliver_now
+    flash[:notice] = "Broker applicant certified successfully."
+    redirect_to "/exchanges/hbx_profiles"
   end
 
   def decertify_broker
+    broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
+    broker_role.decertify!
+    flash[:notice] = "Broker applicant decertified successfully."
+    redirect_to "/exchanges/hbx_profiles"
   end
 
 private
