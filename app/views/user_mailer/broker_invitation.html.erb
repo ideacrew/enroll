@@ -1,0 +1,11 @@
+<html>
+<body>
+Congratulations <%= user.person.full_name %>,
+<br />
+<span>Your application is approved by DCHealthLink</span>
+<%= link_to "View Account", broker_agencies_profile_path(agency_profile) %>
+
+<span>We've created an account for you. You can login with your email address and following password</span>
+<span><%= password %></span>
+</body>
+</html>
