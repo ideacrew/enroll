@@ -31,6 +31,30 @@ class Employers::PlanYearsController < ApplicationController
     @location_id = params[:location_id]
   end
 
+  def edit
+    @plan_year = ::Forms::PlanYearForm.new(@employer_profile.find_plan_year(params[:id]))
+  end
+
+  def update
+    @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
+    @plan_year.benefit_groups.each do |benefit_group|
+      benefit_group.elected_plans = case benefit_group.plan_option_kind
+                                    when "single_plan"
+                                      Plan.where(id: benefit_group.reference_plan_id).first
+                                    when "single_carrier"
+                                      @plan_year.carrier_plans_for(benefit_group.carrier_for_elected_plan)
+                                    when "metal_level"
+                                      @plan_year.metal_level_plans_for(benefit_group.metal_level_for_elected_plan)
+                                    end
+    end
+    if @plan_year.save
+      flash[:notice] = "Plan Year successfully saved."
+      redirect_to employers_employer_profile_path(@employer_profile)
+    else
+      render action: "edit"
+    end
+  end
+
   def recommend_dates
     if params[:start_on].present?
       start_on = params[:start_on].to_date
@@ -60,7 +84,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def find_employer
     id_params = params.permit(:id, :employer_profile_id)
-    id = id_params[:id] || id_params[:employer_profile_id]
+    id = id_params[:employer_profile_id] || id_params[:id]
     @employer_profile = EmployerProfile.find(id)
   end
 

@@ -11,6 +11,7 @@
                 Plan Year - <%= plan_year.start_on.to_date.year %>
                 <% if plan_year.draft? && @current_plan_year.nil? %>
                   <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year) ,method: :post, class: "btn btn-primary"%>
+                  <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-primary"%>
                 <% else %>
                   <%= plan_year.aasm_state.to_s %>
                 <% end %>
@@ -89,8 +90,8 @@
                       <td><%= number_to_percentage bg.relationship_benefits[3].premium_pct, precision: 2 %></td>
                     </tr>
                     <tr>
-                      <th></th>
-                      <td></td>
+                      <th>Plan Option Kind</th>
+                      <td><%= "#{bg.plan_option_kind.titleize}" %></td>
                       <td colspan="2"><%= bg.relationship_benefits[4].relationship.try(:humanize) %></td>
                       <td><%= bg.relationship_benefits[4].offered ? "Yes" : "No" %></td>
                       <td><%= number_to_percentage bg.relationship_benefits[4].premium_pct, precision: 2 %></td>
