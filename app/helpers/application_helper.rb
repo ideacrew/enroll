@@ -283,4 +283,16 @@ module ApplicationHelper
     # !params[:invitation_id].blank?
     true
   end
+
+  def portal_display_name(controller)
+    if controller_name == 'consumer_profiles'
+      text = "I'm an Individual/Family"
+    elsif controller_name == 'employer_profiles'
+      text = "I'm an Employer"
+    elsif controller_name == 'profiles' || controller_name == 'broker_roles'
+      text = "I'm a Broker"
+    elsif controller_name == 'hbx_profiles'
+      text = "I'm HBX Staff"
+    end
+  end
 end
