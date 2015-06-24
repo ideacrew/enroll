@@ -1,7 +1,35 @@
-@media (min-width: 320px) {
+@media (min-width: 320px) and (max-width: 767px)  {
   ul.navbar-nav.top-menu {
     padding: 0px 15px;
     margin: 0px -15px;
+  }
+  .navbar-white {border-bottom: 1px solid #ccc;}
+  .navbar-nav li {
+    display: list-item;
+    padding: 12px 0px !important;
+  }
+  .right-menu ul li {
+    border-top: 1px solid #ddd;
+    width: 100%;
+  }
+  ul.user-info li:first-child {
+    padding-top: 12px;
+    vertical-align: middle;
+  }
+  .mainmenu ul {
+    margin: 15px 0px;
+    text-align: center;
+  }
+  .mainmenu ul li a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+    font-size: 20px;
+    text-align: center;
+    line-height: 16px;
+  }
+  .mainmenu ul li a span {
+    display: block;
   }
 }
 
@@ -89,13 +117,6 @@
   }
   .all-filters-row label input[type="text"]{
     padding: 6px;
-  }
-
-  .top-menu > li {
-    text-align: center;
-  }
-  .top-menu > li > a {
-    padding: 15px 20px;
   }
   .top-menu > li > a .glyphicon {
     top: 8px;
@@ -730,9 +751,6 @@
     width: 100%;
     margin-bottom: 15px;
   }
-  .navbar-nav a{
-    display: none;
-  }
   .prev a{
     font-size: 9px;
   }
@@ -783,12 +801,6 @@
   }
 }
 @media only screen and (max-width: 768px) {
-  .navbar-nav li p{
-    display: none;
-  }
-  .navbar-nav a{
-    padding-left: 20px;
-  }
   .green-btn{
     display: block;
     width: 100%;
@@ -797,15 +809,8 @@
   .btn-blue{
     margin-top: 15px;
   }
-  li.nav{
-    display: none;
-  }
   .more{
     margin-bottom: 15px;
-  }
- .navbar-fixed-bottom{
-    position: absolute !important;
-    bottom: 0 !important;
   }
   .key p{
     padding-top: 0 !important;
