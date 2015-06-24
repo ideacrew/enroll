@@ -1,21 +1,31 @@
 <% @broker_agency_profiles.each do |agency| %>
   <br />
-  <div class="form-border">
-    <div class="row">
-      <div class="col-md-8 col-sm-8 col-xs-12">
-        <dl class="dl-horizontal">
-          <dt>Legal Name: </dt>
-          <dd><%= agency.legal_name %></dd>
 
-          <dt>NPN: </dt>
-          <dd><%= agency.try(:primary_broker_role).try(:npn) %></dd>
+  <div class="row">
+    <div class="col-md-9 col-sm-9 col-xs-12">
+      <div class="table-responsive">
+        <table class="table table-border">
+          <tbody>
+            <tr>
+              <th>Legal Name:</th>
+              <td><%= agency.legal_name %></td>
+            </tr>
 
-          <dt>Primary Broker Name: </dt>
-          <dd><%= agency.try(:primary_broker_role).try(:person).try(:full_name) %></dd>
-        </dl>
-      </div>
-      <div class="col-md-4 col-sm-4 col-xs-12 text-right">
-        <a href="javascript:void(0)" class='btn btn-primary select-broker-agency' data-broker_agency_profile_id="<%= agency._id %>">select this broker agency</a>
+            <tr>
+              <th>NPN:</th>
+              <td><%= agency.try(:primary_broker_role).try(:npn) %></td>
+            </tr>
+
+            <tr>
+              <th>Primary Broker Name:</th>
+              <td><%= agency.try(:primary_broker_role).try(:person).try(:full_name) %></td>
+            </tr>
+
+            <tr>
+              <td colspan="2"><a href="javascript:void(0)" class='btn btn-primary select-broker-agency pull-right' data-broker_agency_profile_id="<%= agency._id %>">select this broker agency</a></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

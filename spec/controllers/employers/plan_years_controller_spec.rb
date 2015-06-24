@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Employers::PlanYearsController do
   let(:employer_profile_id) { EmployerProfile.new.id}
   let(:plan_year_proxy) { double }
-  let(:employer_profile) { double(:plan_years => plan_year_proxy) }
+  let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy) }
 
   describe "GET new" do
 
@@ -137,17 +137,16 @@ RSpec.describe Employers::PlanYearsController do
 
   describe "POST publish" do
     let(:plan_year_id) { "plan_year_id"}
-    let(:plan_year) { instance_double("PlanYear", publish: double)}
+    let(:plan_year_proxy) { instance_double("PlanYear", publish: double)}
 
     before :each do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(plan_year_proxy).to receive(:last).and_return(plan_year)
     end
 
     context "plan year published sucessfully" do
       before :each do
-        allow(plan_year).to receive(:save).and_return(true)
+        allow(plan_year_proxy).to receive(:save).and_return(true)
       end
 
       it "should be a redirect" do
@@ -158,8 +157,8 @@ RSpec.describe Employers::PlanYearsController do
 
     context "plan year did not publish" do
       before :each do
-        allow(plan_year).to receive(:save).and_return(false)
-        allow(plan_year).to receive(:application_warnings)
+        allow(plan_year_proxy).to receive(:save).and_return(false)
+        allow(plan_year_proxy).to receive(:application_warnings)
       end
 
       it "should be a redirect with warnings" do

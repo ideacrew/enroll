@@ -57,6 +57,11 @@ class EmployerProfile
     CensusEmployee.find_by_employer_profile(self)
   end
 
+  def covered_employee_roles
+    covered_ee_ids = CensusEmployee.by_employer_profile_id(self.id).covered.only(:employee_role_id)
+    EmployeeRole.ids_in(covered_ee_ids)
+  end
+
   def owner
     staff_roles.select{ |staff| staff.employer_staff_role.is_owner }
   end
@@ -148,6 +153,10 @@ class EmployerProfile
 
   def find_plan_year_by_date(target_date)
     plan_years.to_a.detect { |py| (py.start_date.beginning_of_day..py.end_date.end_of_day).cover?(target_date) }
+  end
+
+  def find_plan_year(id)
+    plan_years.where(id: id).first
   end
 
   def enrolling_plan_year

@@ -407,4 +407,37 @@ describe EmployeeRole, dbclean: :after_each do
       end
   end
 
+
+  context "with saved employee roles from multiple employers" do
+    let(:match_size)                  { 5 }
+    let(:non_match_size)              { 3 }
+    let(:match_employer_profile)      { FactoryGirl.create(:employer_profile) }
+    let(:non_match_employer_profile)  { FactoryGirl.create(:employer_profile) }
+    let!(:match_employee_roles)       { FactoryGirl.create_list(:employee_role, 5, employer_profile: match_employer_profile) }
+    let!(:non_match_employee_roles)   { FactoryGirl.create_list(:employee_role, 3, employer_profile: non_match_employer_profile) }
+    let(:first_match_employee_role)   { match_employee_roles.first }
+    let(:first_non_match_employee_role)   { non_match_employee_roles.first }
+    let(:ee_ids)   { [first_match_employee_role.id, first_non_match_employee_role.id] }
+
+    it "should find employee roles using a list of ids" do
+      expect(EmployeeRole.ids_in(ee_ids).size).to eq ee_ids.size
+      expect(EmployeeRole.ids_in([first_match_employee_role.id]).first).to eq first_match_employee_role
+    end
+
+    it "finds all employee roles" do
+      expect(EmployeeRole.all.size).to eq (match_size + non_match_size)
+      expect(EmployeeRole.all.first).to be_an_instance_of EmployeeRole
+    end
+
+    it "finds first employee role" do
+      expect(EmployeeRole.first).to be_an_instance_of EmployeeRole
+    end
+
+    it "should find employee roles from the provided employer profile" do
+      expect(EmployeeRole.find_by_employer_profile(match_employer_profile).size).to eq match_size
+      expect(EmployeeRole.find_by_employer_profile(match_employer_profile).first).to be_an_instance_of EmployeeRole
+    end
+  end
+
+
 end
