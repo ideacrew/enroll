@@ -285,13 +285,13 @@ module ApplicationHelper
   end
 
   def portal_display_name(controller)
-    if controller_name == 'consumer_profiles'
+    if controller == 'consumer_profiles'
       text = "I'm an Individual/Family"
-    elsif controller_name == 'employer_profiles'
+    elsif controller == 'employer_profiles'
       text = "I'm an Employer"
-    elsif controller_name == 'profiles' || controller_name == 'broker_roles'
+    elsif controller == 'profiles' || controller_name == 'broker_roles'
       text = "I'm a Broker"
-    elsif controller_name == 'hbx_profiles'
+    elsif controller == 'hbx_profiles'
       text = "I'm HBX Staff"
     end
   end
