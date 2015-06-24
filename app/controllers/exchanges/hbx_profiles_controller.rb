@@ -161,6 +161,12 @@ class Exchanges::HbxProfilesController < ApplicationController
     user = broker_role.person.user
     if user.present?
       user.set_random_password(password)
+    else
+      person = broker_role.person
+      user = User.new(:email => person.emails.first.address, :password => password, :password_confirmation => password)
+      user.save!
+      person.user = user
+      person.save!
     end
     broker_role.approve!
     UserMailer.broker_invitation(user, broker_role.broker_agency_profile, password).deliver_now
@@ -200,5 +206,4 @@ private
       redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
     end
   end
-
 end

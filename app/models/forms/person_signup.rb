@@ -46,6 +46,7 @@ module Forms
         raise PersonAlreadyMatched.new
       end
       self.person = new_person
+      self.person.emails << Email.new({kind: 'work', address: email})
     end
 
     def to_key
