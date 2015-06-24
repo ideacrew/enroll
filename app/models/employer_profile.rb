@@ -57,6 +57,11 @@ class EmployerProfile
     CensusEmployee.find_by_employer_profile(self)
   end
 
+  def covered_employee_roles
+    covered_ee_ids = CensusEmployee.by_employer_profile_id(self.id).covered.only(:employee_role_id)
+    EmployeeRole.ids_in(covered_ee_ids)
+  end
+
   def owner
     staff_roles.select{ |staff| staff.employer_staff_role.is_owner }
   end
