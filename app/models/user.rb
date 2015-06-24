@@ -83,6 +83,25 @@ class User
 
   delegate :primary_family, to: :person, allow_nil: true
 
+  attr_accessor :invitation_id
+#  validate :ensure_valid_invitation, :on => :create
+
+  def ensure_valid_invitation
+    if self.invitation_id.blank?
+      errors.add(:base, "There is no valid invitation for this account.")
+      return
+    end
+    invitation = Invitation.where(id: self.invitation_id).first
+    if !invitation.present?
+      errors.add(:base, "There is no valid invitation for this account.")
+      return
+    end
+    if !invitation.may_claim?
+      errors.add(:base, "There is no valid invitation for this account.")
+      return
+    end
+  end
+
   def person_id
     return nil unless person.present?
     person.id

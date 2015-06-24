@@ -13,19 +13,12 @@ module Forms
       ::BrokerRole.model_name
     end
 
-    def create_broker_role(user, broker_agency_profile)
-      person.broker_role = ::BrokerRole.new({ :provider_kind => 'broker', :npn => self.npn, :broker_agency_profile => broker_agency_profile })
-      user.roles << "broker" unless user.roles.include?("broker")
-      user.save!
-    end
-
-    def save(current_user)
+    def save
       return false unless valid?
       begin
         match_broker_agency
         match_broker_npn
-        match_or_create_person(current_user)
-        create_new_user unless current_user
+        match_or_create_person
         person.save!
       rescue TooManyMatchingPeople
         errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
@@ -41,7 +34,7 @@ module Forms
         return false
       end
 
-      create_broker_role((current_user || person.user), broker_agency_profile)
+      person.broker_role = ::BrokerRole.new({ :provider_kind => 'broker', :npn => self.npn, :broker_agency_profile => broker_agency_profile })
       true
     end
 

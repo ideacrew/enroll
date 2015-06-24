@@ -255,4 +255,10 @@ module ApplicationHelper
       current_user.person.try(:full_name) ? current_user.person.full_name : 'User'
     end
   end
+
+  def can_register_new_account
+    # Do this once we have invites working:
+    # !params[:invitation_id].blank?
+    true
+  end
 end

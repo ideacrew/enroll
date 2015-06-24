@@ -166,9 +166,14 @@ class CensusEmployee < CensusMember
   end
 
   def check_employment_terminated_on
-    if employment_terminated_on and employment_terminated_on <= hired_on 
+    if employment_terminated_on and employment_terminated_on <= hired_on
       errors.add(:employment_terminated_on, "can't occur before rehiring date")
     end
+  end
+
+  def publish_plan_year(published_benefit_group)
+    employee_role.benefit_group = published_benefit_group
+    employee_role.save
   end
 
   class << self
