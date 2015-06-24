@@ -162,7 +162,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     if user.present?
       user.set_random_password(password)
     end
-
+    broker_role.approve!
     UserMailer.broker_invitation(user, broker_role.broker_agency_profile, password).deliver_now
   end
 
