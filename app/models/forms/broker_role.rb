@@ -8,7 +8,8 @@ module Forms
     validates_presence_of :npn
 
     validates :npn,
-      length: { is: 9, message: "%{value} is not a valid NPN" },
+      length: { maximum: 10, message: "%{value} is not a valid NPN" },
+      format: { with: /\A[1-9][0-9]+\z/, message: "%{value} is not a valid NPN" },
       numericality: true
 
 
