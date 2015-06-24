@@ -157,7 +157,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def certify_broker
     broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
-    password = SecureRandom.base64(6)
+    password = SecureRandom.hex(5)
     user = broker_role.person.user
     if user.present?
       user.set_random_password(password)
