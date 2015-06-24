@@ -46,6 +46,7 @@ class Person
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
   embeds_one :responsible_party, cascade_callbacks: true, validate: true
+  embeds_one :inbox, as: :recipient
 
   embeds_many :employer_staff_roles, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_staff_roles, cascade_callbacks: true, validate: true
@@ -80,6 +81,7 @@ class Person
   before_save :update_full_name
   before_save :generate_hbx_id
   before_save :strip_empty_fields
+  after_create :create_inbox
 
   index({hbx_id: 1}, {sparse:true, unique: true})
 
@@ -300,6 +302,14 @@ class Person
  end
 
 private
+
+  def create_inbox
+    welcome_subject = "Welcome to DC HealthLink"
+    welcome_body = "DC HealthLink is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    mailbox = Inbox.create(recipient: self)
+    mailbox.messages.create(subject: welcome_subject, body: welcome_body)
+  end
+
   def update_full_name
     full_name
   end

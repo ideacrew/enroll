@@ -5,6 +5,8 @@ class HbxProfile
   embedded_in :organization
   embeds_many :hbx_staff_roles
   embeds_many :enrollment_periods
+  embeds_one :inbox, as: :recipient
+  accepts_nested_attributes_for :inbox
 
   field :cms_id, type: String
   field :markets, type: Array, default: []
@@ -14,6 +16,7 @@ class HbxProfile
   delegate :fein, :fein=, to: :organization, allow_nil: true
   delegate :entity_kind, :entity_kind=, to: :organization, allow_nil: true
 
+  after_initialize :build_nested_models
 
   class << self
     def find(id)
@@ -103,6 +106,18 @@ class HbxProfile
   # OpenEnrollment latest start date - 5th of month
   # OpenEnrollmentLatestEnd -- 10th day of month prior to effective date
   # BinderPaymentDueDate -- 15th or earliest banking day prior
+
+  private
+  def build_nested_models
+    build_inbox if inbox.nil?
+  end
+
+  def save_inbox
+    welcome_subject = "Welcome to DC HealthLink"
+    welcome_body = "DC HealthLink is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    @inbox.save
+    @inbox.messages.create(subject: welcome_subject, body: welcome_body)
+  end
 
 
 end

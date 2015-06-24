@@ -3,19 +3,25 @@ class Message
 
   embedded_in :inbox
 
+  FOLDER_TYPES = {inbox: "inbox", sent: "sent", deleted: "deleted"}
+
   field :sender_id, type: BSON::ObjectId
+  field :parent_message_id, type: BSON::ObjectId
   field :subject, type: String
   field :body, type: String
   field :message_read, type: Boolean, default: false
   field :folder, type: String
   field :created_at, type: DateTime
-
+  field :from, type: String
+  field :to, type: String
   after_initialize :set_timestamp
   validate :message_has_content
 
+  scope :by_message_id, ->(id){where(:id => id)}
+
   alias_method :message_read?, :message_read
 
-  def sender_name
+  def sent_by
     User.find(sender_id).person.full_name
   end
 

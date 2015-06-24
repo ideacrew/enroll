@@ -34,6 +34,17 @@ spacely_employer_profile = spacely.create_employer_profile(
     broker_agency_profile: broker_agency_0
   )
 
+admin_user = User.find_by(email: "admin@dc.gov")
+hbx_profile = admin_user.person.hbx_staff_role.hbx_profile
+spacely_message_1 = Message.new(subject: "Test subject 1", folder: Message::FOLDER_TYPES[:inbox], body: "Test content 1", sender_id: hbx_profile._id)
+spacely_inbox = spacely_employer_profile.inbox
+spacely_inbox.post_message(spacely_message_1)
+spacely_inbox.save!
+admin_message = Message.new(subject: "Test subject 2", folder: Message::FOLDER_TYPES[:sent], body: "Test content 2", sender_id: hbx_profile._id, parent_message_id: spacely_message_1._id)
+hbx_inbox = hbx_profile.inbox
+hbx_inbox.post_message(admin_message)
+hbx_inbox.save!
+
 jetson_0 = CensusEmployee.new(
         last_name: "Jetson", first_name: "George", dob: "04/01/1974", ssn: 987654321, hired_on: "03/20/2015", gender: "male",
         email: Email.new(kind: "work", address: "dan.thomas@dc.gov"),

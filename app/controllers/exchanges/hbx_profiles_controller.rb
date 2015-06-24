@@ -1,6 +1,7 @@
 class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_hbx_staff_role, except: [:welcome]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
+  before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox]
 
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
@@ -103,19 +104,8 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   # GET /exchanges/hbx_profiles/1/inbox
   def inbox
-    if HbxPortal.count > 0
-      @hbx_portal = HbxPortal.try(params[:id]) || HbxPortal.first
-    else
-      @hbx_portal = HbxPortal.new
-      @hbx_portal.save
-      m = Message.new
-      m.subject = 'Portal test message'
-      m.sender_id=current_user.id
-      @hbx_portal.inbox.messages << m
-      @hbx_portal.inbox.messages << m
-      @hbx_portal.save
-    end
-
+    @inbox_provider = current_user.person.hbx_staff_role.hbx_profile
+    @folder = params[:folder] || 'inbox'
   end
 
   # POST /exchanges/hbx_profiles
@@ -167,6 +157,11 @@ class Exchanges::HbxProfilesController < ApplicationController
 
 
 private
+
+  def find_hbx_profile
+    @profile = current_user.person.hbx_staff_role.hbx_profile
+  end
+
   # Use callbacks to share common setup or constraints between actions.
   def set_hbx_profile
     @hbx_profile = HbxProfile.find(params[:id])
