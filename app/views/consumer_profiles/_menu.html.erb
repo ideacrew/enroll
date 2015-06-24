@@ -44,18 +44,17 @@
       </li>
       
       <li role="presentation"<%= menu_tab_class(active_tab, "messages-tab") %>>
-        
         <%= link_to(inbox_consumer_profiles_path, :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
           <span class="badge"></span>
           Inbox
         <% end %>
 
         <a href="#" class="visible-xs">
-            <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
-            <%= link_to(inbox_consumer_profiles_path, :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
-              Inbox
-            <% end %>
-        </a>
+            
+        <%= link_to(inbox_consumer_profiles_path, :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
+          <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
+          <small>Inbox</small>
+        <% end %>
       </li>
     </ul>
   </div>

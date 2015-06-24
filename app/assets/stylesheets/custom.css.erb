@@ -170,6 +170,11 @@ a:hover, a:focus {
     text-align: left;
  }
  .navbar-toggle .icon-bar {background-color: #000;}
+ /*.container > .navbar-header, .container-fluid > .navbar-header, .container > .navbar-collapse, .container-fluid > .navbar-collapse {
+  margin-right: -15px;
+  margin-left: -15px;
+}*/
+.navbar-toggle {margin-top: 18px; margin-bottom: 18px;}
 
 /* ==========================================================================
    nav 1
@@ -178,7 +183,7 @@ a:hover, a:focus {
   width: 100%;
   text-align: center;
 }*/
-.navbar-nav a{
+/*.navbar-nav a{
   padding-top: 10px;
 }
 .navbar-nav li {
@@ -199,7 +204,7 @@ a:hover, a:focus {
 }
 .navbar-nav li p a:hover{
   text-decoration: none;
-}
+}*/
 .social.aktif{
   background-color: #007bc4;
 }
@@ -2965,6 +2970,9 @@ ul.navbar-nav.top-menu li a {
 
 ul.navbar-nav.top-menu li {
     padding: 3px;
+    list-style-type: none;
+    vertical-align: middle;
+    font-weight: 300;
 }
 
 .navbar-nav li {
