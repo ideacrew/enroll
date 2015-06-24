@@ -1,4 +1,11 @@
 <fieldset>            
+  <h4 style='float:left;'> Office Location </h4>
+  <div style="height:50px;position:relative;">
+    <%= link_to '#', :class => "remove_fields close-2" do %>
+      <%= image_tag("delete.png") %>
+    <% end %>
+  </div>
+  <div class="clear"></div>
   <%= f.fields_for :address, errors: {}, fieldset: false do |address| %>
     <div class="row no-buffer row-form-wrapper">
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">

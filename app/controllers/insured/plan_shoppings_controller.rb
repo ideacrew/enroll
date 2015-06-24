@@ -11,7 +11,7 @@ class Insured::PlanShoppingsController < ApplicationController
     UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now
     notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
-    if hbx_enrollment.select_coverage!
+    if hbx_enrollment.coverage_selected? or hbx_enrollment.select_coverage!
       redirect_to home_consumer_profiles_path
     else
       redirect_to :back

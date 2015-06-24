@@ -48,4 +48,29 @@ describe RelationshipBenefit do
       expect(RelationshipBenefit.new(**params).offered?).to eq false
     end
   end
+
+  context "validation" do
+    let(:benefit_group) {FactoryGirl.build(:benefit_group)}
+    let(:relationship_benefit) { FactoryGirl.create(:relationship_benefit, benefit_group: benefit_group) }
+
+    it "should success" do
+      relationship_benefit.premium_pct = 70
+      expect(relationship_benefit.valid?).to be_truthy
+      expect(relationship_benefit.errors[:premium_pct].any?).to be_falsey
+    end
+    
+    context "should fail" do
+      it "when greater than 100" do
+        relationship_benefit.premium_pct = 120
+        expect(relationship_benefit.valid?).to be_falsey
+        expect(relationship_benefit.errors[:premium_pct].any?).to be_truthy
+      end
+
+      it "when less than 0" do
+        relationship_benefit.premium_pct = -20
+        expect(relationship_benefit.valid?).to be_falsey
+        expect(relationship_benefit.errors[:premium_pct].any?).to be_truthy
+      end
+    end
+  end
 end
