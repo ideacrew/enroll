@@ -1,8 +1,8 @@
 class BrokerAgencies::InboxesController < InboxesController
 
   def new
-    @inbox_provider_name = @broker_agency_provider.legal_name
-    @inbox_to_name = 'Hbx Admin.'
+    @inbox_provider_name = 'HBX Admin.'
+    @inbox_to_name = @broker_agency_provider.legal_name
     @inbox_provider = @broker_agency_provider
     super
   end

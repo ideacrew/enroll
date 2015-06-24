@@ -164,6 +164,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     else
       person = broker_role.person
       user = User.new(:email => person.emails.first.address, :password => password, :password_confirmation => password)
+      user.roles << "broker"
       user.save!
       person.user = user
       person.save!

@@ -64,6 +64,7 @@ module Forms
       if current_user
         create_broker_agency_staff_role(current_user, organization.broker_agency_profile)
       else
+        create_broker_agency_staff_role(person.user, organization.broker_agency_profile)
         create_broker_role(person.user, organization.broker_agency_profile)
         self.broker_agency_profile.primary_broker_role = person.broker_role
         self.broker_agency_profile.save!
