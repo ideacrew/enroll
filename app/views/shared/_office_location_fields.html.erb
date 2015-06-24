@@ -7,7 +7,7 @@
   </div>
   <div class="clear"></div>
   <%= f.fields_for :address, errors: {}, fieldset: false do |address| %>
-    <div class="row no-buffer row-form-wrapper">
+    <div class="row no-buffer row-form-wrapper row-form-wrapper-top">
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <%= address.select :kind, options_for_select(Address::OFFICE_KINDS.map {|a| [a.to_s.humanize, a.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
         </div>
@@ -31,7 +31,7 @@
     </div>
   <% end %>
   <%= f.fields_for :phone, errors: {}, fieldset: false do |phone| %>
-        <div id="phone_info" class="row no-buffer row-form-wrapper">                
+        <div id="phone_info" class="row no-buffer row-form-wrapper remove-top-bdr">                
         <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
           <%= phone.select :kind, options_for_select(Phone::OFFICE_KINDS.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
         </div>
