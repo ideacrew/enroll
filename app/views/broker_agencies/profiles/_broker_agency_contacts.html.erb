@@ -14,7 +14,7 @@
             <td><%= broker_agency_contact.first_name %></td>
             <td><%= broker_agency_contact.last_name %></td>
             <td><%= broker_agency_contact.dob %></td>
-            <td><%= broker_agency_contact.broker_role.present? ? "#{broker_agency_contact.broker_role.npn} / #{broker_agency_contact.broker_role.provider_kind} / #{broker_agency_contact.broker_role.is_active}" : "" %></td>
+            <td><%= broker_agency_contact.broker_role.present? ? "#{broker_agency_contact.broker_role.npn} / #{broker_agency_contact.broker_role.provider_kind}" : "" %></td>
           </tbody>
         <% end %>
     <% else %>
