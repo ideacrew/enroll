@@ -21,8 +21,6 @@ module Forms
               length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
               numericality: true
 
-    validate :date_of_birth_is_past
-
     attr_reader :dob
 
     def dob=(val)
@@ -79,11 +77,6 @@ module Forms
 
     def persisted?
       false
-    end
-
-    def date_of_birth_is_past
-      return unless self.dob.present?
-      errors.add(:dob, "future date: %{self.dob} is invalid date of birth") if Date.today < self.dob
     end
   end
 end
