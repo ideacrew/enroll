@@ -14,34 +14,34 @@ class PersonRelationship
                               stepdaughter child sponsored\ dependent dependent\ of\ a\ minor\ dependent
                               guardian court\ appointed\ guardian collateral\ dependent life\ partner)
   Relationships = [
-    "parent",
-    "grandparent",
-    "aunt_or_uncle",
-    "nephew_or_niece",
-    "father_or_mother_in_law",
-    "daughter_or_son_in_law",
-    "brother_or_sister_in_law",
-    "adopted_child",
-    "stepparent",
-    "foster_child",
-    "sibling",
-    "ward",
-    "stepchild",
-    "sponsored_dependent",
-    "dependent_of_a_minor_dependent",
-    "guardian",
-    "court_appointed_guardian",
-    "collateral_dependent",
-    "life_partner",
     "spouse",
+    "life_partner",
     "child",
+    "adopted_child",
+    "annuitant", # no inverse
+    "aunt_or_uncle",
+    "brother_or_sister_in_law",
+    "collateral_dependent",
+    "court_appointed_guardian",
+    "daughter_or_son_in_law",
+    "dependent_of_a_minor_dependent",
+    "father_or_mother_in_law",
+    "foster_child",
     "grandchild",
-    "trustee", # no inverse
-    "annuitant", # no inverse,
-    "other_relationship",
-    "unrelated",
+    "grandparent",
+    "great_grandchild",
     "great_grandparent",
-    "great_grandchild"
+    "guardian",
+    "nephew_or_niece",
+    "other_relationship",
+    "parent",
+    "sibling",
+    "sponsored_dependent",
+    "stepchild",
+    "stepparent",
+    "trustee", # no inverse
+    "unrelated",
+    "ward"
   ]
 
   InverseMap = {

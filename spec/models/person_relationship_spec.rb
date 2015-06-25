@@ -1,12 +1,17 @@
 require 'rails_helper'
 
-
 describe PersonRelationship, dbclean: :after_each do
   it { should validate_presence_of :relative_id }
   it { should validate_presence_of :kind }
 
   let(:kind) {"spouse"}
   let(:person) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789" )}
+
+  describe "class methods" do
+    context "shop_display_relationship_kinds" do
+      let(:shop_kinds) {["spouse", "domestic_partner", "child", ""]}
+    end
+  end
 
   describe ".new" do
     let(:valid_params) do
@@ -17,37 +22,40 @@ describe PersonRelationship, dbclean: :after_each do
     end
 
     let(:kinds) {  [
-      "parent",
-      "grandparent",
-      "aunt_or_uncle",
-      "nephew_or_niece",
-      "father_or_mother_in_law",
-      "daughter_or_son_in_law",
-      "brother_or_sister_in_law",
-      "adopted_child",
-      "stepparent",
-      "foster_child",
-      "sibling",
-      "ward",
-      "stepchild",
-      "sponsored_dependent",
-      "dependent_of_a_minor_dependent",
-      "guardian",
-      "court_appointed_guardian",
-      "collateral_dependent",
-      "life_partner",
       "spouse",
+      "life_partner",
       "child",
+      "adopted_child",
+      "annuitant",
+      "aunt_or_uncle",
+      "brother_or_sister_in_law",
+      "collateral_dependent",
+      "court_appointed_guardian",
+      "daughter_or_son_in_law",
+      "dependent_of_a_minor_dependent",
+      "father_or_mother_in_law",
+      "foster_child",
       "grandchild",
-      "trustee", # no inverse
-      "annuitant", # no inverse,
-      "other_relationship",
-      "unrelated",
+      "grandparent",
+      "great_grandchild",
       "great_grandparent",
-      "great_grandchild"
-  ] }
+      "guardian",
+      "nephew_or_niece",
+      "other_relationship",
+      "parent",
+      "sibling",
+      "sponsored_dependent",
+      "stepchild",
+      "stepparent",
+      "trustee",
+      "unrelated",
+      "ward"
+    ] }
 
-
+    it "relationships should be sorted" do
+      expect(PersonRelationship::Relationships).to eq kinds
+    end
+    
     context "with no arguments" do
       let(:params) {{}}
 
