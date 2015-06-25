@@ -384,6 +384,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   elected_field = @browser.div(class: /selectric-wrapper/, text: /A single plan/)
   elected_field.click
   elected_field.li(text: /All plans from a given carrier/).click
+  sleep(1)
   input_field = @browser.div(class: /selectric-wrapper/, text: /SELECT CARRIER/)
   input_field.click
   sleep(1)
