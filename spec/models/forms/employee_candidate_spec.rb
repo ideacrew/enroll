@@ -122,7 +122,7 @@ describe Forms::EmployeeCandidate, "asked to match a person" do
     it "should have an error that the person is associted with another use" do
       allow(Person).to receive(:where).with(search_params).and_return(people)
       subject.valid?
-      expect(subject).to have_errors_on(:exception)
+      expect(subject).to have_errors_on(:base)
     end
   end
 end
