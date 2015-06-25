@@ -24,11 +24,11 @@
         <td>
           <% if broker_role.applicant? %>
           <%= link_to 'Certify'.html_safe,
-          certify_broker_exchanges_hbx_profiles_path(id: broker_role.id), class: "btn btn-default", method: :post %>
+          certify_broker_exchanges_broker_applicants_path(id: broker_role.id), class: "btn btn-default", method: :post %>
           <% end %>
           <% if broker_role.approved_or_pending? %>
           <%= link_to 'Decertify'.html_safe,
-          decertify_broker_exchanges_hbx_profiles_path(id: broker_role.id), class: "btn btn-default", method: :post %>
+          decertify_broker_exchanges_broker_applicants_path(id: broker_role.id), class: "btn btn-default", method: :post %>
           <% end %>
         </td>
       </tbody>

@@ -107,4 +107,17 @@ class Invitation
       invitation.send_invitation!(census_employee.full_name)
     end
   end
+
+
+  def self.invite_broker!(broker_role)
+    if !broker_role.email_address.blank?
+      invitation = self.create(
+        :role => "broker_role",
+        :source_kind => "broker_role",
+        :source_id => broker_role.id,
+        :invitation_email => broker_role.email_address
+      )
+      invitation.send_invitation!(broker_role.parent.full_name)
+    end
+  end
 end
