@@ -17,6 +17,7 @@ module Forms
     validates_presence_of :family_id, :allow_blank => nil
     validates_presence_of :dob
     validates_inclusion_of :relationship, :in => ::PersonRelationship::Relationships, :allow_blank => nil
+    validate :date_of_birth_is_past
 
     attr_reader :dob
 
@@ -129,6 +130,11 @@ module Forms
       family_member.update_relationship(relationship)
       family_member.save!
       true
+    end
+
+    def date_of_birth_is_past
+      return unless self.dob.present?
+      errors.add(:dob, "future date: %{self.dob} is invalid date of birth") if Date.today < self.dob
     end
   end
 end
