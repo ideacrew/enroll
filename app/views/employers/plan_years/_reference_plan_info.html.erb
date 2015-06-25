@@ -1,17 +1,14 @@
-<% if @plan.premium_tables.present? %>
+<% if @plan.present? and @premiums.present? %>
+  <h5><%= @plan.name %></h5>
   <table class="table table-bordered">
     <tr>
-      <th>start on</th>
-      <th>end on</th>
       <th>age</th>
       <th>cost</th>
     </tr>
-    <% @plan.premium_tables.each do |premium| %>
+    <% @premiums.each do |k, v| %>
       <tr>
-        <td><%= premium.start_on %></td>
-        <td><%= premium.end_on %></td>
-        <td><%= premium.age %></td>
-        <td><%= premium.cost %></td>
+        <td><%= k %></td>
+        <td><%= "#{v.min.round(2)} ~ #{v.max.round(2)}" %></td>
       </tr>
     <% end %>
   </table>

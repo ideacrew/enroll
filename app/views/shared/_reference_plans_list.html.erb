@@ -22,7 +22,7 @@
   <div class="carrier-select reference-plan-content" style="<%= 'display:block;' if (selected_kind_carrier or selected_kind_plan) %>">
     <% @carriers.each do |carrier| %>
 	    <% carrier_plans = @plan_year.carrier_plans_for(carrier.id) %>
-      <div class="hidden_second_field carrier-<%= carrier.id %> carrier-content" style="<%= 'display:block;' if f.object.carrier_for_elected_plan == carrier.id.to_s and (selected_kind_carrier or selected_kind_plan) %>">
+      <div class="hidden_second_field carrier-<%= carrier.id %> carrier-content" style="<%= 'display:block;' if f.object.carrier_for_elected_plan.to_s == carrier.id.to_s and (selected_kind_carrier or selected_kind_plan) %>">
         <%= select_tag "reference_plan", options_for_select(carrier_plans.map{|plan| ["#{plan.carrier_profile.try(:legal_name)} - #{plan.name}", plan.id]}, selected: f.object.reference_plan_id), class: "carrier-#{carrier.id}", include_blank: "SELECT REFERENCE PLAN" %>
       </div>
     <% end %>

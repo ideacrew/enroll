@@ -27,10 +27,12 @@ RSpec.describe Employers::PlanYearsController do
   end
 
   describe "GET edit" do
+    let(:plan_year) {FactoryGirl.build(:plan_year)}
 
     before :each do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(employer_profile).to receive(:find_plan_year).and_return(plan_year)
       get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id
     end
 
@@ -285,5 +287,25 @@ RSpec.describe Employers::PlanYearsController do
       end
     end
 
+  end
+
+  describe "GET search_reference_plan" do
+    let(:plan) {FactoryGirl.create(:plan)}
+    before :each do
+      sign_in
+      xhr :get, :search_reference_plan, employer_profile_id: employer_profile_id, location_id: "test", reference_plan_id: plan.id, format: :js
+    end
+
+    it "should be a success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should be get location_id" do
+      expect(assigns(:location_id)).to eq "test"
+    end
+
+    it "should be get plan" do
+      expect(assigns(:plan)).to eq plan
+    end
   end
 end

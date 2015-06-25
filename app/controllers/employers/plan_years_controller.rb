@@ -27,12 +27,28 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def search_reference_plan
-    @plan = Plan.find(params[:reference_plan_id]) if params[:reference_plan_id].present?
     @location_id = params[:location_id]
+    return unless params[:reference_plan_id].present?
+    @plan = Plan.find(params[:reference_plan_id])
+
+    @premium_tables = @plan.premium_tables
+    @premiums = Hash.new
+    @premiums["0 ~ 19"]  = @premium_tables.select{|p| p.age <= 19}.map(&:cost)
+    @premiums["20 ~ 39"] = @premium_tables.select{|p| p.age >= 20 and p.age <= 39}.map(&:cost)
+    @premiums["40 ~ 59"] = @premium_tables.select{|p| p.age >= 40 and p.age <= 59}.map(&:cost)
+    @premiums["60 ~ 66"] = @premium_tables.select{|p| p.age >= 60 and p.age <= 66}.map(&:cost)
   end
 
   def edit
     @plan_year = ::Forms::PlanYearForm.new(@employer_profile.find_plan_year(params[:id]))
+    @plan_year.benefit_groups.each do |benefit_group|
+      case benefit_group.plan_option_kind
+      when "metal_level"
+        benefit_group.metal_level_for_elected_plan = benefit_group.elected_plans.try(:last).try(:metal_level)
+      else
+        benefit_group.carrier_for_elected_plan = benefit_group.elected_plans.try(:last).try(:carrier_profile_id)
+      end
+    end
   end
 
   def update
