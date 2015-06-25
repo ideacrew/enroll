@@ -69,6 +69,11 @@ class PlanYear
   end
 
   def send_employee_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.each do |ce|
+        Invitation.invite_employee!(ce)
+      end
+    end
   end
 
   def minimum_employer_contribution
