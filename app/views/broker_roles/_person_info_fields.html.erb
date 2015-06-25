@@ -6,7 +6,7 @@
       <div class="col-md-6 col-sm-4 col-xs-12 form-group-lg no-pd">
         <%= f.text_field :email, class: "floatlabel form-control", required: true, placeholder: 'EMAIL' %>
       </div>
-      <% if @filter != 'staff_role' %>
+      <% if @filter != 'staff' %>
         <div class="col-md-6 col-sm-4 col-xs-12 form-group-lg no-pd">
           <%= f.text_field :npn, class: "floatlabel form-control", required: true, placeholder: 'NPN' %>
         </div>

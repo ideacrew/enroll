@@ -7,8 +7,8 @@ class BrokerRolesController < ApplicationController
     @orgs = Organization.exists(broker_agency_profile: true)
     @broker_agency_profiles = @orgs.map(&:broker_agency_profile)
 
-    @filter = params[:filter] || 'broker_role'
-    @agency_type = params[:agency_type] || 'existing'
+    @filter = params[:filter] || 'broker'
+    @agency_type = params[:agency_type]
 
     respond_to do |format|
       format.html
