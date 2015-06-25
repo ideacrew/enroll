@@ -10,6 +10,9 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     end
   end
 
+  def edit
+  end
+
   def certify_broker
     broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
     password = SecureRandom.hex(5)
@@ -25,7 +28,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       person.save!
     end
     broker_role.approve!
-    UserMailer.broker_invitation(user, broker_role.broker_agency_profile, password).deliver_now
+    Invitation.invite_broker!(broker_role)
     flash[:notice] = "Broker applicant certified successfully."
     redirect_to "/exchanges/hbx_profiles"
   end
