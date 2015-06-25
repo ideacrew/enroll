@@ -93,7 +93,7 @@ class Invitation
   end
 
   def send_invitation!(invitee_name)
-    UserMailer.invitation_email(invitation_email, invitee_name, self)
+    UserMailer.invitation_email(invitation_email, invitee_name, self).deliver_now
   end
 
   def self.invite_employee!(census_employee)
