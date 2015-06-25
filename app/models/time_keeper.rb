@@ -8,11 +8,11 @@ class TimeKeeper
 
   def initialize
     @mutex  = Mutex.new
-    @date_of_record = Date.current.beginning_of_day.to_date
+    @date_of_record = Date.current
   end
 
   def self.set_date_of_record(new_date)
-    new_date = new_date.to_date.beginning_of_day.to_date
+    new_date = new_date.to_date
     if instance.date_of_record != new_date
       if instance.date_of_record > new_date
         raise StandardError, "system may not go backward in time"
@@ -26,7 +26,7 @@ class TimeKeeper
 
   # DO NOT EVER USE OUTSIDE OF TESTS
   def self.set_date_of_record_unprotected!(new_date)
-    new_date = new_date.to_date.beginning_of_day
+    new_date = new_date.to_date
     if instance.date_of_record != new_date
       (new_date - instance.date_of_record).to_i
       instance.set_date_of_record(new_date)
