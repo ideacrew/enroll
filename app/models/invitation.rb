@@ -91,4 +91,20 @@ class Invitation
       errors.add(:base, "a combination of source #{self.source_kind} and role #{self.role} is invalid")
     end
   end
+
+  def send_invitation!(invitee_name)
+    UserMailer.invitation_email(invitation_email, invitee_name, self)
+  end
+
+  def self.invite_employee!(census_employee)
+    if !census_employee.email_address.blank?
+      invitation = self.create(
+        :role => "employee_role",
+        :source_kind => "census_employee",
+        :source_id => census_employee.id,
+        :invitation_email => census_employee.email_address
+      )
+      invitation.send_invitation!(census_employee.full_name)
+    end
+  end
 end

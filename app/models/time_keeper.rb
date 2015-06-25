@@ -8,11 +8,11 @@ class TimeKeeper
 
   def initialize
     @mutex  = Mutex.new
-    @date_of_record = Date.current.beginning_of_day
+    @date_of_record = Date.current.beginning_of_day.to_date
   end
 
   def self.set_date_of_record(new_date)
-    new_date = new_date.to_date.beginning_of_day
+    new_date = new_date.to_date.beginning_of_day.to_date
     if instance.date_of_record != new_date
       if instance.date_of_record > new_date
         raise StandardError, "system may not go backward in time"
@@ -49,7 +49,7 @@ class TimeKeeper
   def push_date_of_record
     EmployerProfile.advance_day(@date_of_record)
     Family.advance_day(@date_of_record)
-    HbxProfile.advance_day(@date_of_record)
+    #HbxProfile.advance_day(@date_of_record)
   end
 
 private

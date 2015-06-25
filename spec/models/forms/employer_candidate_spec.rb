@@ -49,7 +49,7 @@ describe Forms::EmployerCandidate, "asked to match an employer" do
     it "should have an error on the employer profile" do
       allow(::EmployerProfile).to receive(:find_by_fein).and_return(owned_employer)
       subject.valid?
-      expect(subject).to have_errors_on(:exception)
+      expect(subject).to have_errors_on(:base)
     end
   end
 

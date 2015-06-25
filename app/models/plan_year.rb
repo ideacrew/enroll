@@ -65,6 +65,15 @@ class PlanYear
   def register_employer
     employer_profile.publish_plan_year!
     benefit_groups.each(){|bg| bg.publish_plan_year}
+    send_employee_invites
+  end
+
+  def send_employee_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.each do |ce|
+        Invitation.invite_employee!(ce)
+      end
+    end
   end
 
   def minimum_employer_contribution
