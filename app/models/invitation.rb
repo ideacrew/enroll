@@ -6,7 +6,7 @@ class Invitation
   INVITE_TYPES = {
     "census_employee" => "employee_role",
     "broker_role" => "broker_role",
-    "employer_profile" => "employer_staff_role"
+    "employer_staff_role" => "employer_staff_role"
   }
   ROLES = INVITE_TYPES.values
   SOURCE_KINDS = INVITE_TYPES.keys
@@ -30,19 +30,57 @@ class Invitation
   aasm do
     state :sent, initial: true
     state :claimed
-
+    
     event :claim do
-      transitions from: :sent, to: :claimed, :after => Proc.new { |*args| assign_user!(*args) }
+      transitions from: :sent, to: :claimed, :after => Proc.new { |*args| process_claim!(*args) }
     end
   end
 
-  def claim_invitation!(user_obj)
-    self.claim!(:claimed, user_obj)
+  def claim_invitation!(user_obj, redirection_obj)
+    self.claim!(:claimed, user_obj, redirection_obj)
   end
 
-  def assign_user!(user_obj)
+  def process_claim!(user_obj, redirection_obj)
     self.user = user_obj
     self.save!
+    case self.role
+    when "employee_role"
+      claim_employee_role(user_obj, redirection_obj)
+    when "broker_role"
+      claim_broker_role(user_obj, redirection_obj)
+    when "employer_staff_role"
+      claim_employer_staff_role(user_obj, redirection_obj)
+    else
+      raise "Unrecognized role: #{self.role}"
+    end
+  end
+
+  def claim_employer_staff_role(user_obj, redirection_obj)
+    employer_staff_role = EmployerStaffRole.find(source_id)
+    person = employer_staff_role.person
+    user_obj.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
+    user_obj.save!
+    person.user = current_user
+    person.save!
+    redirect_to_employer_profile(employer_staff_role.employer_profile)
+  end
+
+  def claim_employee_role(user_obj, redirection_obj)
+    census_employee = CensusEmployee.find(source_id)
+    redirection_obj.redirect_to_employee_match(census_employee)
+  end
+
+  def claim_broker_role(user_obj, redirection_obj)
+    b_role = BrokerRole.find(source_id)
+    person = b_role.person
+    person.user = user_obj
+    person.save!
+    broker_agency_profile = b_role.broker_agency_profile
+    person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)
+    person.save!
+    user_obj.roles << "broker_agency_staff" unless current_user.roles.include?("broker_agency_staff")
+    user_obj.save!
+    redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
   end
 
   def allowed_invite_types

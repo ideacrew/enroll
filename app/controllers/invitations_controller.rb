@@ -5,6 +5,18 @@ class InvitationsController < ApplicationController
 
   end
 
+  def redirect_to_broker_agency_profile(ba_profile)
+    redirect_to broker_agencies_profile_path(ba_profile)
+  end
+
+  def redirect_to_employee_match(census_employee)
+    redirect_to welcome_consumer_employee_index_path
+  end
+
+  def redirect_to_employer_profile(employer_profile)
+    redirect_to employers_employer_profile_path(employer_profile)
+  end
+
   def require_login_and_allow_new_account
     session[:portal] = url_for(params)
     redirect_to new_user_session_url(:invitation_id => params[:id])
