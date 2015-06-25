@@ -81,7 +81,7 @@ end
 When(/^I enter the identifying info of my existing person$/) do
   @browser.text_field(class: /interaction-field-control-person-first-name/).set("Soren")
   @browser.text_field(name: "person[last_name]").set("White")
-  @browser.text_field(name: "person[date_of_birth]").set("08/13/1979")
+  @browser.text_field(name: "jq_datepicker_ignore_person[dob]").set("08/13/1979")
   @browser.label(:text=> /FIRST NAME/).click
   @browser.text_field(name: "person[ssn]").set("670991234")
   screenshot("information_entered")
@@ -92,7 +92,7 @@ end
 When(/^I enter the identifying information of my existing person$/) do
   @browser.text_field(name: "person[first_name]").set("Patrick")
   @browser.text_field(name: "person[last_name]").set("Doe")
-  @browser.text_field(name: "person[date_of_birth]").set("01/01/1980")
+  @browser.text_field(name: "jq_datepicker_ignore_person[dob]").set("01/01/1980")
   @browser.label(:text=> /FIRST NAME/).click
   @browser.text_field(name: "person[ssn]").set("786120965")
   screenshot("information_entered")
@@ -179,7 +179,7 @@ end
 When(/^I enter the identifying info of Sorens daughter$/) do
   @browser.text_field(name: 'dependent[first_name]').set('Cynthia')
   @browser.text_field(name: 'dependent[last_name]').set('White')
-  @browser.text_field(name: 'dependent[date_of_birth]').set('01/15/2011')
+  @browser.text_field(name: 'jq_datepicker_ignore_dependent[dob]').set('01/15/2011')
   input_field = @browser.div(class: /selectric-wrapper/)
   input_field.click
   input_field.li(text: /Child/).click

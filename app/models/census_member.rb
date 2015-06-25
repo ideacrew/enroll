@@ -53,7 +53,7 @@ class CensusMember
   end
 
   def date_of_birth=(val)
-    self.dob = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
+    self.dob = Date.strptime(val, "%Y-%m-%d").to_date rescue nil
   end
 
 end

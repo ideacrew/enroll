@@ -13,8 +13,8 @@ describe Forms::EmployeeDependent do
     expect(subject).to have_errors_on(:gender)
   end
 
-  it "should require a date_of_birth" do
-    expect(subject).to have_errors_on(:date_of_birth)
+  it "should require a dob" do
+    expect(subject).to have_errors_on(:dob)
   end
 
   it "should require the correct set of name components" do
@@ -35,7 +35,7 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
   let(:family_id) { double }
   let(:family) { instance_double("Family") }
   let(:ssn) { nil }
-  let(:date_of_birth) { "06/09/2007" }
+  let(:dob) { "2007-06-09" }
   let(:existing_family_member_id) { double }
   let(:relationship) { double }
   let(:existing_family_member) { nil }
@@ -50,7 +50,7 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
       :name_sfx => "eee",
       :ssn => "123456778",
       :gender => "male",
-      :date_of_birth => date_of_birth
+      :dob => dob
     }
   }
 
@@ -102,11 +102,13 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
     end
 
     it "should create a new person" do
+      person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
       expect(Person).to receive(:new).with(person_properties).and_return(new_person)
       subject.save
     end
 
     it "should create a new family member" do
+      person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
       allow(Person).to receive(:new).with(person_properties).and_return(new_person)
       subject.save
       expect(subject.id).to eq new_family_member_id
@@ -118,7 +120,7 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
   let(:family_member_id) { double }
   let(:family_id) { double }
   let(:family) { instance_double("Family", :id => family_id) }
-  let(:date_of_birth) { "06/09/2007" }
+  let(:dob) { "2007-06-09" }
   let(:relationship) { "spouse" }
   let(:person_properties) {
     {
@@ -129,7 +131,7 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
       :name_sfx => "eee",
       :ssn => "123456778",
       :gender => "male",
-      :date_of_birth => date_of_birth
+      :dob => Date.strptime(dob, "%Y-%m-%d")
     }
   }
   let(:person) { double(:errors => double(:has_key? => false)) }
@@ -138,7 +140,7 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
                                         :family => family,
                                         :family_id => family_id, :person => person, :primary_relationship => relationship, :save! => true})) }
 
-  let(:update_attributes) { person_properties.merge(:family_id => family_id, :relationship => relationship) }
+  let(:update_attributes) { person_properties.merge(:family_id => family_id, :relationship => relationship, :dob => dob) }
 
   subject { Forms::EmployeeDependent.new({ :id => family_member_id }) }
 
