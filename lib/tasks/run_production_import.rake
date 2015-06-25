@@ -10,7 +10,7 @@ namespace :production do
     require File.join(Rails.root, "db/seedfiles/carriers_seed")
     Rake::Task["seed:plans"].invoke
     Rake::Task["xml:serff"].invoke("XML")
-    Rake::Task["seed:broker_json"].invoke
+#    Rake::Task["seed:broker_json"].invoke
     Rake::Task["seed:people"].invoke
     Rake::Task["seed:families"].invoke
     Rake::Task["hbx:employers:add"].invoke("tmp/employers.csv","db/seedfiles/blacklist.csv")
