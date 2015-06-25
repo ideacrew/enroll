@@ -7,8 +7,8 @@ class BrokerRolesController < ApplicationController
     @orgs = Organization.exists(broker_agency_profile: true)
     @broker_agency_profiles = @orgs.map(&:broker_agency_profile)
 
-    @filter = params[:filter] || 'broker_role'
-    @agency_type = params[:agency_type] || 'existing'
+    @filter = params[:filter] || 'broker'
+    @agency_type = params[:agency_type]
 
     respond_to do |format|
       format.html
@@ -30,7 +30,7 @@ class BrokerRolesController < ApplicationController
     if params[:person].present?
       applicant_type = params[:person][:broker_applicant_type] if params[:person][:broker_applicant_type]
 
-      if applicant_type && applicant_type == 'staff_role'
+      if applicant_type && applicant_type == 'staff'
         @person = ::Forms::BrokerAgencyStaffRole.new(broker_agency_staff_role_params)
       else
         @person = ::Forms::BrokerRole.new(broker_role_params)
@@ -41,7 +41,6 @@ class BrokerRolesController < ApplicationController
         redirect_to "/broker_registration"
       else
         @filter = applicant_type
-        @organization = ::Forms::BrokerAgencyProfile.new
         render "new"
       end
     else
@@ -50,7 +49,8 @@ class BrokerRolesController < ApplicationController
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
         redirect_to "/broker_registration"
       else
-        @person = Forms::BrokerCandidate.new
+        @filter = 'broker'
+        @agency_type = 'new'
         render "new"
       end
     end
