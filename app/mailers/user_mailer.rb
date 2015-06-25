@@ -17,4 +17,14 @@ class UserMailer < ApplicationMailer
       format.html { render "broker_invitation", :locals => { :user => user, :password => password, :agency_profile => agency_profile } }
     end
   end
+
+  def invitation_email(email, person_name, invitation)
+    mail({to: user.email, subject: "DCHealthLink Invitation "}) do |format|
+      format.html { render "broker_invitation", :locals => { :person_name => person_name, :invitation => invitation }}
+    end
+  end
+
+  def self.invite_employee!(census_employee)
+
+  end
 end 

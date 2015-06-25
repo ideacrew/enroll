@@ -56,6 +56,10 @@ class CensusEmployee < CensusMember
   scope :by_employer_profile_id,  ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
 
   # scope :enrolled_by_employer_profile ->{ find_all_by_employer_profile().enrolled }
+  def email_address
+    return nil unless email.present?
+    email.address
+  end
 
   def initialize(*args)
     super(*args)
