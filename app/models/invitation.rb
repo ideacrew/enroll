@@ -58,7 +58,7 @@ class Invitation
   def claim_employer_staff_role(user_obj, redirection_obj)
     employer_staff_role = EmployerStaffRole.find(source_id)
     person = employer_staff_role.person
-    user_obj.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
+    user_obj.roles << "employer_staff" unless user_obj.roles.include?("employer_staff")
     user_obj.save!
     person.user = current_user
     person.save!
@@ -78,7 +78,7 @@ class Invitation
     broker_agency_profile = b_role.broker_agency_profile
     person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)
     person.save!
-    user_obj.roles << "broker_agency_staff" unless current_user.roles.include?("broker_agency_staff")
+    user_obj.roles << "broker_agency_staff" unless user_obj.roles.include?("broker_agency_staff")
     user_obj.save!
     redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
   end
@@ -93,7 +93,7 @@ class Invitation
   end
 
   def send_invitation!(invitee_name)
-    UserMailer.invitation_email(invitation_email, invitee_name, self)
+    UserMailer.invitation_email(invitation_email, invitee_name, self).deliver_now
   end
 
   def self.invite_employee!(census_employee)
