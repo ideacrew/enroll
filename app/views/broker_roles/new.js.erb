@@ -1,6 +1,8 @@
 <% if @filter == "staff_role" %>
-  $('#staff_role_panel').html("<%= escape_javascript(render "staff_signup") %>");
+$('#staff_role_panel').html("<%= escape_javascript(render "staff_signup") %>");
+<% elsif @agency_type == "existing" %>
+$('#exising_broker_agency_form').html("<%= escape_javascript(render "existing_broker_agency_form") %>");
 <% else %>
-  $('#broker_role_panel').html("<%= escape_javascript(render 'broker_signup', agency_type: @agency_type) %>");
+$('#new_broker_agency_form').html("<%= escape_javascript(render "new_broker_agency_form") %>")
 <% end %>
 
