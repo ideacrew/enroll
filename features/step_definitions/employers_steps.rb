@@ -203,6 +203,10 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-city/).set("Alpharetta")
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-state/).set("GA")
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-zip/).set("30228")
+  email_kind = @browser.divs(text: /SELECT KIND/).last
+  email_kind.click
+  @browser.li(text: /home/).click
+  @browser.text_field(class: /interaction-field-control-census-employee-email-attributes-address/).set("trey.john@dc.gov")
   # Census Dependents
   # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-first-name/).set("Mary")
   # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-middle-name/).set("K")
@@ -434,8 +438,8 @@ When(/^I enter combined filter in plan selection page$/) do
   @browser.checkboxes(class: /plan-type-selection-filter/).last.set(true)
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("2100")
   @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("3900")
-  @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("10")
-  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250")
+  @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("5")
+  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("25")
   @browser.element(class: /apply-btn/, text: /Apply/).click
 end
 

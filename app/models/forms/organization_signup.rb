@@ -93,10 +93,18 @@ module Forms
 
     def office_location_kinds
       location_kinds = self.office_locations.flat_map(&:address).flat_map(&:kind)
-      too_many_of_a_kind = location_kinds.group_by(&:to_s).any? { |k, v| v.length > 1 }
+      #too_many_of_a_kind = location_kinds.group_by(&:to_s).any? { |k, v| v.length > 1 }
 
-      if too_many_of_a_kind
-        self.errors.add(:base, "may not have more than one of the same kind of address")
+      #if too_many_of_a_kind
+      #  self.errors.add(:base, "may not have more than one of the same kind of address")
+      #end
+
+      if location_kinds.count('primary').zero?
+        self.errors.add(:base, "must select one primary address")
+      elsif location_kinds.count('primary') > 1
+        self.errors.add(:base, "can't have multiple primary addresses")
+      elsif location_kinds.count('mailing') > 1
+        self.errors.add(:base, "can't have more than one mailing address")
       end
     end
 
