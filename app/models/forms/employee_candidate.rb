@@ -39,21 +39,20 @@ module Forms
       }).first
     end
 
-    def does_not_match_a_different_users_person
-       matched_person = match_person
-       if matched_person.present?
-         if matched_person.user.present?
-           if matched_person.user.id.to_s != self.user_id.to_s
-             errors.add(
-               :base,
-               "An account already exists for #{first_name} #{last_name}."
-             )
-           end
-         end
-       end
+  def does_not_match_a_different_users_person
+    matched_person = match_person
+    if matched_person.present?
+      if matched_person.user.present?
+        if matched_person.user.id.to_s != self.user_id.to_s
+          errors.add(
+            :base,
+            "An account already exists for #{first_name} #{last_name}."
+          )
+        end
       end
-      true
     end
+    true
+  end
 
     def persisted?
       false
