@@ -30,13 +30,7 @@ class Employers::PlanYearsController < ApplicationController
     @location_id = params[:location_id]
     return unless params[:reference_plan_id].present?
     @plan = Plan.find(params[:reference_plan_id])
-
-    @premium_tables = @plan.premium_tables
-    @premiums = Hash.new
-    @premiums["0 ~ 19"]  = @premium_tables.select{|p| p.age <= 19}.map(&:cost)
-    @premiums["20 ~ 39"] = @premium_tables.select{|p| p.age >= 20 and p.age <= 39}.map(&:cost)
-    @premiums["40 ~ 59"] = @premium_tables.select{|p| p.age >= 40 and p.age <= 59}.map(&:cost)
-    @premiums["60 ~ 66"] = @premium_tables.select{|p| p.age >= 60 and p.age <= 66}.map(&:cost)
+    @premium_tables = @plan.premium_tables.where(start_on: @plan.premium_tables.distinct(:start_on).max)
   end
 
   def edit
@@ -84,16 +78,20 @@ class Employers::PlanYearsController < ApplicationController
 
   def publish
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
-    @plan_year.publish
+    @plan_year.publish!
 
-    if @plan_year.save
+    case
+    when @plan_year.draft?
+      flash[:notice] = "Plan Year failed to publish: #{@plan_year.application_errors}"
+      redirect_to employers_employer_profile_path(@employer_profile)
+    when @plan_year.publish_pending?
+      # tell user bad idea
+      flash[:notice] = "Publishing Plan Year is a bad idea because:: #{@plan_year.application_warnings}"
+      redirect_to employers_employer_profile_path(@employer_profile)
+    when @plan_year.published?
       flash[:notice] = "Plan Year successfully published"
       redirect_to employers_employer_profile_path(@employer_profile)
-    else
-      flash[:notice] = "Plan Year: #{@plan_year.application_warnings}"
-      redirect_to employers_employer_profile_path(@employer_profile)
     end
-
   end
 
   private

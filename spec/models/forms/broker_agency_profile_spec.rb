@@ -31,17 +31,3 @@ describe Forms::BrokerAgencyProfile, "given nothing" do
     expect(subject).to have_errors_on(:legal_name)
   end
 end
-
-describe Forms::BrokerAgencyProfile, "given more than one office location of the same type" do
-  let(:office_location_1) { OfficeLocation.new( :address => Address.new(:kind => "work") ) }
-  let(:office_location_2) { OfficeLocation.new( :address => Address.new(:kind => "work") ) }
-  subject { Forms::BrokerAgencyProfile.new( :office_locations => [office_location_1, office_location_2]) }
-
-  before :each do
-    subject.valid?
-  end
-
-  it "should be invalid" do
-    expect(subject.errors.to_hash[:base]).to include("may not have more than one of the same kind of address")
-  end
-end

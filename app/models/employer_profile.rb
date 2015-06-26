@@ -5,18 +5,6 @@ class EmployerProfile
 
   embedded_in :organization
 
-  ENTITY_KINDS = [
-    "tax_exempt_organization",
-    "c_corporation",
-    "s_corporation",
-    "partnership",
-    "limited_liability_corporation",
-    "limited_liability_partnership",
-    "household_employer",
-    "governmental_employer",
-    "foreign_embassy_or_consulate"
-  ]
-
   field :entity_kind, type: String
   field :sic_code, type: String
 
@@ -47,7 +35,7 @@ class EmployerProfile
   validates_presence_of :entity_kind
 
   validates :entity_kind,
-    inclusion: { in: ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
+    inclusion: { in: Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
     allow_blank: false
 
   validate :no_more_than_one_owner
@@ -221,7 +209,7 @@ class EmployerProfile
 
     def find_census_employee_by_person(person)
       return [] if person.ssn.blank? || person.dob.blank?
-      CensusEmployee.find_all_unlinked_by_identifying_information(person.ssn, person.dob)
+      CensusEmployee.matchable(person.ssn, person.dob)
     end
 
     def advance_day(new_date)

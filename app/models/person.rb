@@ -3,6 +3,7 @@ class Person
   include Mongoid::Timestamps
   include Mongoid::Versioning
   include Notify
+  include UnsetableSparseFields
 
   extend Mongorder
 
@@ -84,6 +85,7 @@ class Person
   after_create :create_inbox
 
   index({hbx_id: 1}, {sparse:true, unique: true})
+  index({user_id: 1}, {sparse:true, unique: true})
 
   index({last_name:  1})
   index({first_name: 1})
@@ -141,7 +143,10 @@ class Person
 
   def strip_empty_fields
     if ssn.blank?
-      unset("ssn")
+      unset_sparse("ssn")
+    end
+    if user_id.blank?
+      unset_sparse("user_id")
     end
   end
 

@@ -366,9 +366,40 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
 
+    context "and there is an employee in the roster but not assigned to the benefit group" do
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+      let(:census_employee) { FactoryGirl.build(:census_employee, employer_profile: employer_profile) }
+      before do
+        plan_year.benefit_groups = [benefit_group]
+        plan_year.save
+        census_employee.save
+      end
+
+      context "and it tries to publish" do
+        before do
+          plan_year.publish
+        end
+
+        it "should still be in draft" do
+          expect(plan_year.aasm_state).to eq "draft"
+        end
+
+        it "should have application errors" do
+          expect(plan_year.application_errors[:benefit_groups].present?).to be_truthy
+          expect(plan_year.application_errors[:benefit_groups]).to match(/every employee must be assigned/)
+        end
+
+        it "should not be publishable" do
+          expect(plan_year.is_application_unpublishable?).to be_truthy
+        end
+      end
+    end
+
     context "and the employer size exceeds regulatory max" do
+      let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year) }
       before do
         plan_year.fte_count = invalid_fte_count
+        plan_year.benefit_groups = [benefit_group]
         plan_year.publish
       end
 
@@ -499,32 +530,41 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
 
-    context "and all application elements are valid and it is published" do
+    context "and it has a terminated employee assigned to the benefit group" do
       let(:benefit_group) { FactoryGirl.build(:benefit_group) }
 
       before do
-        expect(benefit_group).to receive(:publish_plan_year)
         plan_year.benefit_groups = [benefit_group]
-        plan_year.publish
+        terminated_census_employee = FactoryGirl.create(
+          :census_employee, employer_profile: plan_year.employer_profile,
+          benefit_group_assignments: [FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)]
+        )
+        terminated_census_employee.terminate_employment!(TimeKeeper.date_of_record.yesterday)
       end
 
-      it "plan year should publish" do
-        expect(plan_year.published?).to be_truthy
-      end
-
-      it "and employer_profile should be in registered state" do
-        expect(plan_year.employer_profile.registered?).to be_truthy
-      end
-
-      context "and the plan year is changed" do
+      context "and all application elements are valid and it is published" do
         before do
-          plan_year.start_on = plan_year.start_on.next_month
-          plan_year.end_on = plan_year.end_on.next_month
-          plan_year.open_enrollment_start_on = plan_year.open_enrollment_start_on.next_month
-          plan_year.open_enrollment_end_on = plan_year.open_enrollment_end_on.next_month
+          plan_year.publish
         end
 
-        it "should not be valid"
+        it "plan year should publish" do
+          expect(plan_year.published?).to be_truthy
+        end
+
+        it "and employer_profile should be in registered state" do
+          expect(plan_year.employer_profile.registered?).to be_truthy
+        end
+
+        context "and the plan year is changed" do
+          before do
+            plan_year.start_on = plan_year.start_on.next_month
+            plan_year.end_on = plan_year.end_on.next_month
+            plan_year.open_enrollment_start_on = plan_year.open_enrollment_start_on.next_month
+            plan_year.open_enrollment_end_on = plan_year.open_enrollment_end_on.next_month
+          end
+
+          it "should not be valid"
+        end
       end
     end
   end
@@ -597,14 +637,14 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
     it "when fte_count equal 0" do
       allow(plan_year).to receive(:fte_count).and_return(0)
-      expect(plan_year.employee_participation_percent).to eq 0
+      expect(plan_year.employee_participation_percent).to eq "-"
     end
 
     it "when fte_count > 0" do
       allow(plan_year).to receive(:fte_count).and_return(10)
       employee_role_linked_count = employer_profile.census_employees.where(aasm_state: "employee_role_linked").count
 
-      expect(plan_year.employee_participation_percent).to eq employee_role_linked_count/10.0
+      expect(plan_year.employee_participation_percent).to eq "#{(employee_role_linked_count/10.0*100).round(2)}%"
     end
   end
 end

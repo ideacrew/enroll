@@ -55,7 +55,7 @@ describe EmployerProfile, dbclean: :after_each do
       let(:employer_profile) {EmployerProfile.new(**params)}
 
       it "should match entity kinds" do
-        expect(EmployerProfile::ENTITY_KINDS).to eq entity_kinds
+        expect(Organization::ENTITY_KINDS).to eq entity_kinds
       end
 
       it "should initialize nested models" do
@@ -466,10 +466,10 @@ describe EmployerProfile, dbclean: :after_each do
     let(:benefit_group)       { FactoryGirl.build(:benefit_group)}
     let(:plan_year)           { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
     let!(:employer_profile)   { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
-    let(:census_employees)    { FactoryGirl.create_list(:census_employee, 7, 
+    let(:census_employees)    { FactoryGirl.create_list(:census_employee, 7,
                                   employer_profile: employer_profile,
                                   benefit_group_assignments: [benefit_group]
-                                ) 
+                                )
                               }
     let(:person0)  { FactoryGirl.create(:person, ssn: census_employees[0].ssn, last_name: census_employees[0].last_name) }
     let(:person0)  { FactoryGirl.create(:person, ssn: census_employees[1].ssn, last_name: census_employees[1].last_name) }
@@ -480,7 +480,7 @@ describe EmployerProfile, dbclean: :after_each do
 
 
     before do
-      census_employees.each 
+      census_employees.each
     end
 
   end
@@ -514,6 +514,10 @@ describe EmployerProfile, "given an unlinked, linkable census employee with a fa
   let(:census_dob) { Date.new(1983,2,15) }
   let(:census_ssn) { "123456789" }
 
+  let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+  let(:plan_year) { benefit_group.plan_year }
+  let(:employer_profile) { plan_year.employer_profile }
+  let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
   let(:census_employee) { CensusEmployee.new(
     :ssn => census_ssn,
     :dob => census_dob,
@@ -521,8 +525,13 @@ describe EmployerProfile, "given an unlinked, linkable census employee with a fa
     :first_name => "Roger",
     :last_name => "Martin",
     :hired_on => 20.days.ago,
-    :is_business_owner => false
+    :is_business_owner => false,
+    :benefit_group_assignments => [benefit_group_assignment]
   ) }
+
+  before do
+    plan_year.publish!
+  end
 
   it "should not find the linkable family when given a different ssn" do
     person = OpenStruct.new({
@@ -649,7 +658,10 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     end
 
     context "with person matching ssn and dob" do
-      let(:census_employee) { FactoryGirl.create(:census_employee, ssn: ee0.ssn, dob: ee0.dob, employer_profile_id: "11112") }
+      let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+      let(:plan_year) { benefit_group.plan_year }
+      let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group) }
+      let(:census_employee) { FactoryGirl.create(:census_employee, ssn: ee0.ssn, dob: ee0.dob, employer_profile_id: "11112", benefit_group_assignments: [benefit_group_assignment]) }
       let(:params) do
         {  ssn:        ee0.ssn,
            first_name: ee0.first_name,
@@ -658,6 +670,9 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
         }
       end
       def p0; Person.new(**params); end
+      before do
+        plan_year.publish!
+      end
 
       it "should return an instance of CensusEmployee" do
         # expect(organization0.save).errors.messages).to eq ""
@@ -710,6 +725,22 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
         last_name:  ee0.last_name,
         dob:        ee0.dob
       }
+    end
+
+    before do
+      [black_and_decker, atari, google].each() do |employer_profile|
+        plan_year = FactoryGirl.build(:plan_year, employer_profile: employer_profile)
+        benefit_group = FactoryGirl.build(:benefit_group, plan_year: plan_year)
+        plan_year.save
+        benefit_group.save
+
+        employer_profile.census_employees.each() do |census_employee|
+          benefit_group_assignment = FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)
+          census_employee.benefit_group_assignments = [benefit_group_assignment]
+          census_employee.save
+        end
+        plan_year.publish!
+      end
     end
 
     context "finds an EmployerProfile employee" do

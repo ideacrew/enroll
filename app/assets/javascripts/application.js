@@ -94,8 +94,7 @@ $(document).ready(function () {
     $("."+divtoshow).show();
   });
 
-  $('.alert').delay(7000).fadeOut(2000); //Fade Alert Box
-
+  // $('.alert').delay(7000).fadeOut(2000); //Fade Alert Box
   // $('#plan_year input,select').click(function(){
   //   $('#plan_year .alert-error').fadeOut(2000);
   // });
@@ -386,7 +385,11 @@ $(document).ready(function () {
     $('#show_broker_agency').html('');
     $('#broker_agencies_panel').show();
   });
- 
+
+  $(document).on('click', '.return_to_broker_applicants', function() {
+    $('#edit_broker_applicant').html('');
+    $('#broker_applicants_roster').show();
+  });
 });
 
 $(document).ready(function () {

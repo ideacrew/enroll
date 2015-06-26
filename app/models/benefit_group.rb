@@ -194,10 +194,6 @@ class BenefitGroup
     false
   end
 
-  def publish_plan_year
-    benefit_group_assignments.each(){ |bga| bga.publish_plan_year }
-  end
-
 private
   def dollars_to_cents(amount_in_dollars)
     Rational(amount_in_dollars) * Rational(100) if amount_in_dollars

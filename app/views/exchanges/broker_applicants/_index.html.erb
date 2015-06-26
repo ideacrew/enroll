@@ -1,42 +1,42 @@
-<div class="container">
+<div class="container" id="employees-list">
+  <div class="row">
+    <div id="edit_broker_applicant"></div>
 
-  <h3>Applicants</h3>
+    <div id="broker_applicants_roster">
 
-  <div class="table-border">
-    <table class="table">
-      <thead>
-        <th>Applicant Name</th>
-        <th>Applicant NPN</th>
-        <th>Agency Name</th>
-        <th>Provider Kind</th>
-        <th>Status</th>
-        <th></th>
-      </thead>
-      <% if @broker_roles.any? %>
-      <% @broker_roles.each do |broker_role| %>
-      <% if broker_role.broker_agency_profile %>
-      <tbody>
-        <td><%= broker_role.person.full_name %></td>
-        <td><%= broker_role.npn %></td>
-        <td><%= broker_role.broker_agency_profile.legal_name %></td>
-        <td><%= broker_role.provider_kind %></td>
-        <td><%= broker_role.current_state %></td>
-        <td>
-          <% if broker_role.applicant? %>
-          <%= link_to 'Certify'.html_safe,
-          certify_broker_exchanges_broker_applicants_path(id: broker_role.id), class: "btn btn-default", method: :post %>
+      <h3>Applicants</h3>
+
+      <div class="table-border">
+        <table class="table">
+          <thead>
+            <th>Applicant Name</th>
+            <th>Applicant NPN</th>
+            <th>Agency Name</th>
+            <th>Status</th>
+            <th>Certified Date</th>
+            <th></th>
+          </thead>
+          <% if @broker_roles.any? %>
+          <% @broker_roles.each do |broker_role| %>
+          <% if broker_role.broker_agency_profile %>
+          <tbody>
+            <td><%= broker_role.person.full_name %></td>
+            <td><%= broker_role.npn %></td>
+            <td><%= broker_role.broker_agency_profile.legal_name %></td>
+            <td><%= broker_role.current_state %></td>
+            <td><%= format_date broker_role.certified_date %></td>
+            <td>
+              <%= link_to 'Show'.html_safe,
+              edit_exchanges_broker_applicant_path(broker_role), class: "btn btn-default", method: :get, remote: true %>
+            </td>
+          </tbody>
+          <% end %> 
           <% end %>
-          <% if broker_role.approved_or_pending? %>
-          <%= link_to 'Decertify'.html_safe,
-          decertify_broker_exchanges_broker_applicants_path(id: broker_role.id), class: "btn btn-default", method: :post %>
+          <% else %>
+          <tbody><td>No Applicants found.</td></tbody>
           <% end %>
-        </td>
-      </tbody>
-      <% end %> 
-      <% end %>
-      <% else %>
-      <tbody><td>No Applicants found.</td></tbody>
-      <% end %>
-    </table>
+        </table>
+      </div>
+    </div>
   </div>
 </div>

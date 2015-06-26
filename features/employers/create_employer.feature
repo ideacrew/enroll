@@ -31,18 +31,20 @@ Feature: Create Employer
       Then I should see a form to update the contents of the census employee
         And I should see employer census family updated success message
       #terminate
-        And I click on the Employees tab
-        And I click on terminate button for a census family
-      Then The census family should be terminated and move to terminated tab
+      #  And I click on the Employees tab
+      #  And I click on terminate button for a census family
+      #Then The census family should be terminated and move to terminated tab
         #And I should see the census family is successfully terminated message
         #And I logout from employer portal
       #Rehire
-      When I click on Rehire button for a census family on terminated tab
-      Then A new instance of the census family should be created
-        And I click on the Employees tab
-        And I click on terminate button for rehired census employee
-        #And I should see the census family is successfully rehired message
-        #And I logout from employer portal
+      #When I click on Rehire button for a census family on terminated tab
+      #Then A new instance of the census family should be created
+      #  And I click on the Employees tab
+      #  And I click on terminate button for rehired census employee
+      When I go to the benefits tab
+      Then I should see the plan year
+      When I click on publish plan year
+      When I log out
       Given I do not exist as a user
       And I have an existing employee record
       And I have an existing person record
@@ -51,15 +53,11 @@ Feature: Create Employer
       Then I should be logged in
       When I go to register as an employee
       Then I should see the employee search page
-      When I enter the identifying information of my existing person
+      When I enter the identifying info of Patrick Doe
       Then I should see the matching employee record form
       When I accept the matched employer
       When I complete the matching employee form
       Then I should see the dependents page
-      When I click Add Member
-      Then I should see the new dependent form
-      When I enter the identifying info of Sorens daughter
-      When I click confirm member
       When I click continue on the dependents page
       Then I should see the group selection page
       When I click continue on the group selection page
@@ -109,4 +107,3 @@ Feature: Create Employer
         And the supplied FEIN is compared against the list of registered FEINs
       When The FEIN match fails
       Then I see a message explaining the error and instructing me to either: correct the FEIN and resubmit, or contact reprentatives at the HBX
-

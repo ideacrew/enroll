@@ -61,10 +61,6 @@ class BenefitGroupAssignment
     end
   end
 
-  def publish_plan_year
-    census_employee.publish_plan_year(benefit_group)
-  end
-
   # Catch situations when AASM state isn't yet initialized
   def aasm_state
     self[:aasm_state] || "initialized"

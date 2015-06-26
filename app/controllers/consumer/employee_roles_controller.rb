@@ -15,13 +15,13 @@ class Consumer::EmployeeRolesController < ApplicationController
     @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person).merge({user_id: current_user.id}))
     @person = @employee_candidate
     if @employee_candidate.valid?
-      found_census_employee = EmployerProfile.find_census_employee_by_person(@employee_candidate)
-      if found_census_employee.empty?
+      found_census_employees = @employee_candidate.match_census_employees
+      if found_census_employees.empty?
         respond_to do |format|
           format.html { render 'no_match' }
         end
       else
-        @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employee)
+        @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees.first)
         respond_to do |format|
           format.html { render 'match' }
         end
@@ -51,24 +51,24 @@ class Consumer::EmployeeRolesController < ApplicationController
     build_nested_models
   end
 
-  def update    
+  def update
     save_and_exit =  params['exit_after_method'] == 'true'
     person = Person.find(params.require(:id))
     object_params = params.require(:person).permit(*person_parameters_list)
     @employee_role = person.employee_roles.detect { |emp_role| emp_role.id.to_s == object_params[:employee_role_id].to_s }
     @person = Forms::EmployeeRole.new(person, @employee_role)
     if @person.update_attributes(object_params)
-      if save_and_exit 
+      if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
         end
-      else 
+      else
         respond_to do |format|
           format.html { redirect_to consumer_employee_dependents_path(employee_role_id: @employee_role.id) }
         end
-      end  
+      end
     else
-      if save_and_exit 
+      if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
         end
@@ -77,7 +77,7 @@ class Consumer::EmployeeRolesController < ApplicationController
         respond_to do |format|
           format.html { render "edit" }
         end
-      end  
+      end
     end
   end
 
