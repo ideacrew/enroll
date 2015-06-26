@@ -11,6 +11,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   end
 
   def edit
+    @broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
   end
 
   def certify_broker

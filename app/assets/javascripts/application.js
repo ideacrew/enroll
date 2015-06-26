@@ -370,7 +370,11 @@ $(document).ready(function () {
     $('#show_broker_agency').html('');
     $('#broker_agencies_panel').show();
   });
- 
+
+  $(document).on('click', '.return_to_broker_applicants', function() {
+    $('#edit_broker_applicant').html('');
+    $('#broker_applicants_roster').show();
+  });
 });
 
 $(document).ready(function () {

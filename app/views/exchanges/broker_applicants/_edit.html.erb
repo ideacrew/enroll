@@ -1,0 +1,53 @@
+<%= form_for @broker_role, url: {action: "update"} do |f| %>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
+      <% if @broker_role.errors.any? %>
+        <div class="alert alert-error">
+          <h4>
+            <%= "#{pluralize(@broker_role.errors.size, "error")} prohibited this person from being saved:" %>
+          </h4>
+          <ul>
+            <% @broker_role.errors.full_messages.each do |msg| %>
+              <li> <%= msg %> </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+      <% page_title = 'Applicant Details' %>
+      <div class="row">
+          <h4 class="pull-left"><%= page_title %></h4>
+          <a class="remove return_to_broker_applicants" href="#">
+            <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
+            Cancel
+          </a>
+      </div>
+      <div class="row">
+        <div class="row top-row no-border">
+          <div class="col-md-3 col-sm-3 col-xs-12 key-btn">
+           <%= @broker_role.person.full_name %>
+           <%= @broker_role.npn %>
+           <%= @broker_role.broker_agency_profile.legal_name %>
+           <%= @broker_role.provider_kind %>
+           <%= @broker_role.current_state %>
+         </div>
+       </div>
+
+       <div class="row top-row no-border">
+        <div class="col-md-3 col-sm-3 col-xs-12 key-btn">
+          <% if @broker_role.applicant? %>
+          <%= link_to 'Certify'.html_safe,
+          certify_broker_exchanges_broker_applicants_path(id: @broker_role.id), class: "btn btn-default", method: :post %>
+          <% end %>
+          <% if @broker_role.approved_or_pending? %>
+          <%= link_to 'Decertify'.html_safe,
+          decertify_broker_exchanges_broker_applicants_path(id: @broker_role.id), class: "btn btn-default", method: :post %>
+          <% end %>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>
+
