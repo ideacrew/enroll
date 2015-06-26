@@ -14,27 +14,49 @@
           </ul>
         </div>
       <% end %>
-      <% page_title = 'Applicant Details' %>
       <div class="row">
-          <h4 class="pull-left"><%= page_title %></h4>
           <a class="remove return_to_broker_applicants" href="#">
             <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
             Cancel
           </a>
       </div>
+
       <div class="row">
-        <div class="row top-row no-border">
-          <div class="col-md-3 col-sm-3 col-xs-12 key-btn">
-           <%= @broker_role.person.full_name %>
-           <%= @broker_role.npn %>
-           <%= @broker_role.broker_agency_profile.legal_name %>
-           <%= @broker_role.provider_kind %>
-           <%= @broker_role.current_state %>
-         </div>
-       </div>
+        <div class="row">
+          <div class="col-sm-12 col-xs-12 left-side">
+            <h4> Applicant Details </h4>
+            Name: <%= @broker_role.person.full_name %> <br>
+            NPN: <%= @broker_role.npn %> <br>
+            Email: <%= @broker_role.email_address %><br>
+          </div>
+
+          <div class="col-sm-12 col-xs-12 left-side">
+            <h4> Broker Agency Details </h4>
+            Agency Name: <%= @broker_role.broker_agency_profile.legal_name %> <br>
+            FEIN: <%= @broker_role.broker_agency_profile.fein %> <br>
+          </div>
+
+          <div class="col-sm-12 col-xs-12 left-side">
+            <h4> Address </h4>
+            <% @broker_role.broker_agency_profile.organization.office_locations.each do |office_location| %>
+            <%= office_location.address.to_s %>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="col-md-8 col-sm-12 col-xs-12 left-side">
+          <table class="table table-message-wrapper">
+            <tbody>
+              <tr>
+                <th style="vertical-align: top;">Comments<span class="text-danger">*</span>:</th>
+                <td><%= f.text_area :comments, class: "floatlabel form-control interaction-control-inbox-mesage-body", required: true, placeholder: 'Write here...', rows: 6 %></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
        <div class="row top-row no-border">
-        <div class="col-md-3 col-sm-3 col-xs-12 key-btn">
+        <div class="col-md-8 col-sm-3 col-xs-12 key-btn">
           <% if @broker_role.applicant? %>
           <%= link_to 'Certify'.html_safe,
           certify_broker_exchanges_broker_applicants_path(id: @broker_role.id), class: "btn btn-default", method: :post %>
