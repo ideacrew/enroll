@@ -52,15 +52,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
-  def broker_index
-    @broker_roles = BrokerRole.all
-
-    respond_to do |format|
-      format.html { render "broker_index" }
-      format.js {}
-    end
-  end
-
   def issuer_index
     @issuers = CarrierProfile.all
 
@@ -150,37 +141,12 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def set_date
-    TimeKeeper.set_date_of_record(params[:time_keeper][:date_of_record])
+    date_of_record = Date.strptime(params[:time_keeper][:date_of_record], "%m/%d/%Y").strftime('%Y-%m-%d')
+    TimeKeeper.set_date_of_record(date_of_record)
     TimeKeeper.instance.push_date_of_record
     redirect_to exchanges_hbx_profiles_root_path
   end
 
-  def certify_broker
-    broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
-    password = SecureRandom.hex(5)
-    user = broker_role.person.user
-    if user.present?
-      user.set_random_password(password)
-    else
-      person = broker_role.person
-      user = User.new(:email => person.emails.first.address, :password => password, :password_confirmation => password)
-      user.roles << "broker"
-      user.save!
-      person.user = user
-      person.save!
-    end
-    broker_role.approve!
-    UserMailer.broker_invitation(user, broker_role.broker_agency_profile, password).deliver_now
-    flash[:notice] = "Broker applicant certified successfully."
-    redirect_to "/exchanges/hbx_profiles"
-  end
-
-  def decertify_broker
-    broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
-    broker_role.decertify!
-    flash[:notice] = "Broker applicant decertified successfully."
-    redirect_to "/exchanges/hbx_profiles"
-  end
 
 private
 

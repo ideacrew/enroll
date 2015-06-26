@@ -3,20 +3,18 @@ Rails.application.routes.draw do
   devise_for :users
 
   namespace :exchanges do
+
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
       collection do
         get :family_index
         get :employer_index
-        get :broker_index
         get :broker_agency_index
         get :issuer_index
         get :product_index
         get :configuration
         post :set_date
-        post :certify_broker
-        post :decertify_broker
       end
 
       member do
@@ -27,6 +25,14 @@ Rails.application.routes.draw do
       # resources :hbx_staff_roles, shallow: true do
       resources :hbx_staff_roles do
         # root 'hbx_profiles/hbx_staff_roles#show'
+      end
+    end
+
+    
+    resources :broker_applicants do
+      collection do
+        post :certify_broker
+        post :decertify_broker
       end
     end
 
@@ -121,7 +127,9 @@ Rails.application.routes.draw do
 
   namespace :broker_agencies do
     root 'profiles#new'
-    resources :inboxes, only: [:new, :create, :show, :destroy]
+    resources :inboxes, only: [:new, :create, :show, :destroy] do
+      get :msg_to_portal
+    end
     resources :profiles, only: [:new, :create, :show, :index] do
       get :inbox 
     end

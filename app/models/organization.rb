@@ -5,7 +5,17 @@ class Organization
 
   extend Mongorder
 
-  ENTITY_KINDS = ["c_corporation", "s_corporation", "partnership", "tax_exempt_organization"]
+  ENTITY_KINDS = [
+    "tax_exempt_organization",
+    "c_corporation",
+    "s_corporation",
+    "partnership",
+    "limited_liability_corporation",
+    "limited_liability_partnership",
+    "household_employer",
+    "governmental_employer",
+    "foreign_embassy_or_consulate"
+  ]
 
   auto_increment :hbx_id, type: Integer
 

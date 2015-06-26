@@ -22,7 +22,7 @@ module Forms
     def does_not_match_a_company_with_existing_owner
       if match_employer.present? && match_employer.owner.present?
         errors.add(
-          :exception,
+          :base,
           "This company already has a managing owner"
           )
       end

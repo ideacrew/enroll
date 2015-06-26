@@ -39,7 +39,7 @@ class BrokerAgencyProfile
     allow_blank: false
 
   validates :entity_kind,
-    inclusion: { in: Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
+    inclusion: { in: Organization::ENTITY_KINDS[0..3], message: "%{value} is not a valid business entity kind" },
     allow_blank: false
 
   validate :writing_agent_employed_by_broker

@@ -55,7 +55,7 @@ describe EmployerProfile, dbclean: :after_each do
       let(:employer_profile) {EmployerProfile.new(**params)}
 
       it "should match entity kinds" do
-        expect(EmployerProfile::ENTITY_KINDS).to eq entity_kinds
+        expect(Organization::ENTITY_KINDS).to eq entity_kinds
       end
 
       it "should initialize nested models" do

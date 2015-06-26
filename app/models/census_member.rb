@@ -56,4 +56,7 @@ class CensusMember
     self.dob = Date.strptime(val, "%Y-%m-%d").to_date rescue nil
   end
 
+  def full_name
+   [first_name, middle_name, last_name, name_sfx].compact.join(" ")
+  end
 end

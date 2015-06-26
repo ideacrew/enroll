@@ -31,7 +31,7 @@ describe Invitation do
     end
   end
 
-  ["census_employee", "broker_role", "employer_profile"].each do |source_kind|
+  ["census_employee", "broker_role", "employer_staff_role"].each do |source_kind|
     it "should allow a source_kind of #{source_kind}" do
       record = Invitation.new(source_kind: source_kind)
       record.valid?
@@ -60,7 +60,7 @@ describe Invitation do
     {
       "census_employee" => "employee_role",
       "broker_role" => "broker_role",
-      "employer_profile" => "employer_staff_role"
+      "employer_staff_role" => "employer_staff_role"
     }
   end
 
@@ -110,20 +110,28 @@ describe Invitation, "starting in the initial state" do
 end
 
 describe "A valid invitation in the sent state" do
+  let(:source_id) { BSON::ObjectId.new }
   let(:valid_params) {
     {
-      :source_id => BSON::ObjectId.new,
+      :source_id => source_id,
       :source_kind => "census_employee",
       :role => "employee_role",
       :invitation_email => "user@somewhere.com"
     } 
   }
   let(:user) { User.new }
+  let(:redirection_obj) { instance_double(InvitationsController) }
+  let(:mock_census_employee) { instance_double(CensusEmployee) }
 
   subject { Invitation.new(valid_params) }
 
+  before :each do
+    allow(CensusEmployee).to receive(:find).with(source_id).and_return(mock_census_employee)
+    allow(redirection_obj).to receive(:redirect_to_employee_match)
+  end
+
   it "can be claimed by a user" do
-    subject.claim_invitation!(user)
+    subject.claim_invitation!(user, redirection_obj)
     expect(subject.user).to eq user
   end
 end

@@ -64,6 +64,15 @@ class PlanYear
 
   def register_employer
     employer_profile.publish_plan_year!
+    send_employee_invites
+  end
+
+  def send_employee_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.each do |ce|
+        Invitation.invite_employee!(ce)
+      end
+    end
   end
 
   def minimum_employer_contribution
@@ -407,6 +416,5 @@ private
     if open_enrollment_end_on - (start_on - 1.month) >= HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth
      errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.ordinalize} day of the month prior to effective date")
     end
-
   end
 end

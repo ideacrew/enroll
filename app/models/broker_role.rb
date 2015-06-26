@@ -14,6 +14,7 @@ class BrokerRole
   field :npn, type: String
   field :broker_agency_profile_id, type: BSON::ObjectId
   field :provider_kind, type: String
+  field :comments, type: String
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -35,6 +36,11 @@ class BrokerRole
   scope :decertified, ->{ where(aasm_state: "decertified") }
 
 
+  def email_address
+    return nil unless email.present?
+    email.address
+  end
+  
   def parent
     # raise "undefined parent: Person" unless self.person?
     self.person

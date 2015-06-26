@@ -65,6 +65,11 @@ class CensusEmployee < CensusMember
     matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
   }
 
+  def email_address
+    return nil unless email.present?
+    email.address
+  end
+
   def initialize(*args)
     super(*args)
     write_attribute(:employee_relationship, "self")

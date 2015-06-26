@@ -263,14 +263,13 @@ When(/^I select a plan on the plan shopping page$/) do
 end
 
 Then(/^I should see the coverage summary page$/) do
-  @browser.a(href: /plan_shoppings/, class: "btn-continue").wait_until_present
+  @browser.element(id: /btn-continue/).wait_until_present
   screenshot("summary_page")
-  expect(@browser.a(href: /plan_shoppings/, class: "btn-continue").visible?).to be_truthy
+  expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
 end
 
 When(/^I confirm on the coverage summary page$/) do
-  @browser.a(href: /insured.plan_shoppings.(.*).checkout/).wait_until_present
-  @browser.a(href: /insured.plan_shoppings.(.*).checkout/).fire_event("onclick")
+  @browser.element(id: /btn-continue/, class: /interaction-click-control-purchase/).click
 end
 
 Then(/^I should see the "my account" page$/) do
