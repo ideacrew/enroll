@@ -40,13 +40,11 @@
           <% end %>
           <br/>
           <%= render 'shared/add_dependents', {f: f} %>
-          <div class="row top-row no-border">
-            <div class="col-md-3 col-sm-3 col-xs-12 key-btn">
-              <% button_label = @census_employee.persisted? ? 'Update Employee' : 'Create Employee' %>
-              <button class="btn btn-tranparent" type="submit">
-                <%= "#{button_label}".html_safe %>
-              </button>
-            </div>
+          <div class="key-btn">
+            <% button_label = @census_employee.persisted? ? 'Update Employee' : 'Create Employee' %>
+            <button class="btn btn-save pull-right" type="submit">
+              <%= "#{button_label}".html_safe %>
+            </button>
           </div>
       </div>
     </div>
