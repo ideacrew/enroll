@@ -30,13 +30,7 @@ class Employers::PlanYearsController < ApplicationController
     @location_id = params[:location_id]
     return unless params[:reference_plan_id].present?
     @plan = Plan.find(params[:reference_plan_id])
-
-    @premium_tables = @plan.premium_tables
-    @premiums = Hash.new
-    @premiums["0 ~ 19"]  = @premium_tables.select{|p| p.age <= 19}.map(&:cost)
-    @premiums["20 ~ 39"] = @premium_tables.select{|p| p.age >= 20 and p.age <= 39}.map(&:cost)
-    @premiums["40 ~ 59"] = @premium_tables.select{|p| p.age >= 40 and p.age <= 59}.map(&:cost)
-    @premiums["60 ~ 66"] = @premium_tables.select{|p| p.age >= 60 and p.age <= 66}.map(&:cost)
+    @premium_tables = @plan.premium_tables.where(start_on: @plan.premium_tables.distinct(:start_on).max)
   end
 
   def edit
