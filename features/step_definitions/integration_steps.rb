@@ -282,7 +282,8 @@ Then(/^I should see the coverage summary page$/) do
 end
 
 When(/^I confirm on the coverage summary page$/) do
-  scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
+  @browser.execute_script('$(".interaction-click-control-purchase").trigger("click")')
+  #scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
 end
 
 Then(/^I should see the "my account" page$/) do
