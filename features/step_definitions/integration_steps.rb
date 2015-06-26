@@ -246,3 +246,13 @@ Then(/^I should see the "my account" page$/) do
   screenshot("my_account_page")
   expect(@browser.element(text: /Your Life Events/i).visible?).to be_truthy
 end
+
+When(/^I visit consumer profile homepage$/) do
+  visit "/consumer_profiles/home"
+end
+
+Then(/^I should see the "YOUR LIFE EVENTS" section/) do
+  @browser.element(text: /YOUR LIFE EVENTS/i).wait_until_present
+  screenshot("your_life_events")
+  expect(@browser.element(text: /YOUR LIFE EVENTS/i).visible?).to be_truthy
+end
