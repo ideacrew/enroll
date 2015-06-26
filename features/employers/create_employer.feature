@@ -72,8 +72,6 @@ Feature: Create Employer
       Then I should see the "my account" page
       When I visit consumer profile homepage
       Then I should see the "YOUR LIFE EVENTS" section
-      When I click on "I've had a baby" QLE
-      Then I should see the "I've had a baby" QLE form
 
     @wip
     Scenario: Employer Representative has previously signed up on HBX

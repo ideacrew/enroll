@@ -332,3 +332,13 @@ When(/^I log in to the employee account page$/) do
   @browser.text_field(class: /interaction-field-control-user-password/).set(@password)
   scroll_then_click(@browser.element(class: /interaction-click-control-sign-in/))
 end
+
+When(/^I visit consumer profile homepage$/) do
+  visit "/consumer_profiles/home"
+end
+
+Then(/^I should see the "YOUR LIFE EVENTS" section/) do
+  @browser.element(text: /YOUR LIFE EVENTS/i).wait_until_present
+  screenshot("your_life_events")
+  expect(@browser.element(text: /YOUR LIFE EVENTS/i).visible?).to be_truthy
+end
