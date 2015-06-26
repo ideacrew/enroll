@@ -13,6 +13,19 @@ module WatirScreenshots
   end
 end
 
+def scroll_into_view(element)
+  @browser.execute_script(
+    'arguments[0].scrollIntoView(false);',
+    element
+  )
+  element
+end
+
+def scroll_then_click(element)
+  scroll_into_view(element).click
+  element
+end
+
 Before "@watir" do
   extend WatirScreenshots
   @browser = Watir::Browser.new :chrome, switches: ["--test-type"]
@@ -43,10 +56,10 @@ When(/^I go to the employee account creation page$/) do
   @browser.goto("http://localhost:3000/")
   @browser.a(text: "Employee Portal").wait_until_present
   screenshot("start")
-  @browser.a(text: "Employee Portal").click
+  scroll_then_click(@browser.a(text: "Employee Portal"))
   @browser.a(text: "Create account").wait_until_present
   screenshot("employee_portal")
-  @browser.a(text: "Create account").click
+  scroll_then_click(@browser.a(text: "Create account"))
 end
 
 When(/^I enter my new account information$/) do
@@ -57,7 +70,7 @@ When(/^I enter my new account information$/) do
   @browser.text_field(name: "user[email]").set(@email)
   @browser.text_field(name: "user[password]").set(@password)
   @browser.text_field(name: "user[password_confirmation]").set(@password)
-  @browser.input(value: "Create account").click
+  scroll_then_click(@browser.input(value: "Create account"))
 end
 
 Then(/^I should be logged in$/) do
@@ -67,7 +80,7 @@ Then(/^I should be logged in$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
-  @browser.element(class: /interaction-click-control-logout/).click
+  scroll_then_click(@browser.element(class: /interaction-click-control-logout/))
   @browser.element(class: /interaction-click-control-logout/).wait_while_present
 end
 
@@ -77,7 +90,7 @@ end
 
 When(/^I go to register as an employee$/) do
   @browser.element(class: /interaction-click-control-continue/).wait_until_present
-  @browser.element(class: /interaction-click-control-continue/).click
+  scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
 end
 
 Then(/^I should see the employee search page$/) do
@@ -108,22 +121,22 @@ When(/^I enter the identifying info of (.*)$/) do |named_person|
   @browser.text_field(class: /interaction-field-control-person-first-name/).set(person[:first_name])
   @browser.text_field(name: "person[last_name]").set(person[:last_name])
   @browser.text_field(name: "jq_datepicker_ignore_person[dob]").set(person[:dob])
-  @browser.label(:text=> /FIRST NAME/).click
+  scroll_then_click(@browser.label(:text=> /FIRST NAME/))
   @browser.text_field(name: "person[ssn]").set(person[:ssn])
   screenshot("information_entered")
   @browser.element(class: /interaction-click-control-continue/).wait_until_present
-  @browser.element(class: /interaction-click-control-continue/).click
+  scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
 end
 # # TODO: needs to be merged
 # When(/^I enter the identifying information of my existing person$/) do
 #   @browser.text_field(name: "person[first_name]").set("Patrick")
 #   @browser.text_field(name: "person[last_name]").set("Doe")
 #   @browser.text_field(name: "jq_datepicker_ignore_person[dob]").set("01/01/1980")
-#   @browser.label(:text=> /FIRST NAME/).click
+#   scroll_then_click(@browser.label(:text=> /FIRST NAME/))
 #   @browser.text_field(name: "person[ssn]").set("786120965")
 #   screenshot("information_entered")
 #   @browser.element(class: /interaction-click-control-continue/).wait_until_present
-#   @browser.element(class: /interaction-click-control-continue/).click
+#   scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
 #   @browser.element(class: /interaction-click-control-continue/).wait_while_present
 # end
 
@@ -145,17 +158,17 @@ Then(/^I should see the matching employee record form$/) do
 end
 
 When(/^I accept the matched employer$/) do
-  @browser.input(value: /This is my employer/).click
+  scroll_then_click(@browser.input(value: /This is my employer/))
   @browser.input(name: "person[emails_attributes][0][address]").wait_until_present
   screenshot("update_personal_info")
 end
 
 When(/^I complete the matched employee form$/) do
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
-  @browser.text_field(name: "person[emails_attributes][1][address]").click
+  scroll_then_click(@browser.text_field(name: "person[emails_attributes][1][address]"))
   screenshot("personal_info_complete")
   @browser.button(id: /btn-continue/).wait_until_present
-  @browser.button(id: /btn-continue/).click
+  scroll_then_click(@browser.button(id: /btn-continue/))
 end
 # TODO: needs to be merged
 When(/^I complete the matching employee form$/) do
@@ -166,11 +179,11 @@ When(/^I complete the matching employee form$/) do
   @browser.text_field(name: "person[addresses_attributes][0][zip]").set("20171")
 
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
-  @browser.text_field(name: "person[emails_attributes][1][address]").click
+  scroll_then_click(@browser.text_field(name: "person[emails_attributes][1][address]"))
   screenshot("personal_info_complete")
-  # @browser.button(class: /interaction-click-control-continue/).click  # TODO cant find interaction element
+  # scroll_then_click(@browser.button(class: /interaction-click-control-continue/))  # TODO cant find interaction element
   @browser.button(id: /btn-continue/).wait_until_present
-  @browser.button(id: /btn-continue/).click
+  scroll_then_click(@browser.button(id: /btn-continue/))
 end
 
 
@@ -181,7 +194,7 @@ Then(/^I should see the dependents page$/) do
 end
 
 When(/^I click edit on baby Soren$/) do
-  @browser.span(text: "07/03/2014").as(xpath: "./preceding::a[contains(@href, 'edit')]").last.click
+  scroll_then_click(@browser.span(text: "07/03/2014").as(xpath: "./preceding::a[contains(@href, 'edit')]").last)
 end
 
 Then(/^I should see the edit dependent form$/) do
@@ -189,7 +202,7 @@ Then(/^I should see the edit dependent form$/) do
 end
 
 When(/^I click delete on baby Soren$/) do
-  @browser.form(id: 'edit_dependent').a().click
+  scroll_then_click(@browser.form(id: 'edit_dependent').a())
   @browser.button(text: /Confirm Member/).wait_while_present
 end
 
@@ -200,7 +213,7 @@ Then(/^I should see (.*) dependents$/) do |n|
 end
 
 When(/^I click Add Member$/) do
-  @browser.a(text: /Add Member/).click
+  scroll_then_click(@browser.a(text: /Add Member/))
   @browser.button(text: /Confirm Member/).wait_until_present
 end
 
@@ -219,12 +232,12 @@ When(/^I enter the dependent info of Sorens daughter$/) do
 end
 
 When(/^I click confirm member$/) do
-  @browser.button(text: /Confirm Member/).click
+  scroll_then_click(@browser.button(text: /Confirm Member/))
   @browser.button(text: /Confirm Member/).wait_while_present
 end
 
 When(/^I click continue on the dependents page$/) do
-  @browser.button(class: /interaction-click-control-continue/).click
+  scroll_then_click(@browser.button(class: /interaction-click-control-continue/))
 end
 
 Then(/^I should see the group selection page$/) do
@@ -234,7 +247,7 @@ end
 
 When(/^I click continue on the group selection page$/) do
   @browser.element(class: /interaction-click-control-continue/, id: /btn-continue/).wait_until_present
-  @browser.element(class: /interaction-click-control-continue/, id: /btn-continue/).click
+  scroll_then_click(@browser.element(class: /interaction-click-control-continue/, id: /btn-continue/))
 end
 
 Then(/^I should see the plan shopping welcome page$/) do
@@ -246,7 +259,7 @@ Then(/^I should see the plan shopping welcome page$/) do
 end
 
 When(/^I click continue on the plan shopping welcome page$/) do
-  @browser.a(text: "Continue").click
+  scroll_then_click(@browser.a(text: "Continue"))
 end
 
 Then(/^I should see the list of plans$/) do
@@ -259,7 +272,7 @@ When(/^I select a plan on the plan shopping page$/) do
     'arguments[0].scrollIntoView();',
     @browser.element(:text => /Choose a healthcare plan/)
   )
-  @browser.a(text: /Select/).click
+  scroll_then_click(@browser.a(text: /Select/))
 end
 
 Then(/^I should see the coverage summary page$/) do
@@ -269,7 +282,7 @@ Then(/^I should see the coverage summary page$/) do
 end
 
 When(/^I confirm on the coverage summary page$/) do
-  @browser.element(class: /interaction-click-control-purchase/).click
+  scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
 end
 
 Then(/^I should see the "my account" page$/) do
@@ -280,16 +293,16 @@ end
 
 When(/^My employer publishes a plan year$/) do
   @browser.a(text: /Employer Portal/).wait_until_present
-  @browser.a(text: /Employer Portal/).click
+  scroll_then_click(@browser.a(text: /Employer Portal/))
   @browser.element(class: /interaction-field-control-user-email/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set(@email)
   @browser.text_field(class: /interaction-field-control-user-password/).set(@password)
-  @browser.element(class: /interaction-click-control-sign-in/).click
+  scroll_then_click(@browser.element(class: /interaction-click-control-sign-in/))
   @browser.text_field(name: "organization[first_name]").wait_until_present
   @browser.text_field(name: "organization[first_name]").set("Soren")
   @browser.text_field(name: "organization[last_name]").set("White")
   @browser.text_field(name: "jq_datepicker_ignore_organization[dob]").set("08/13/1979")
-  @browser.text_field(name: "organization[first_name]").click
+  scroll_then_click(@browser.text_field(name: "organization[first_name]"))
 
   @browser.text_field(name: "organization[legal_name]").set("Acme Inc.")
   @browser.text_field(name: "organization[dba]").set("Acme Inc.")
@@ -303,18 +316,18 @@ When(/^My employer publishes a plan year$/) do
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("20002")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("202")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("5551212")
-  @browser.button(class: "interaction-click-control-create-employer").click
+  scroll_then_click(@browser.button(class: "interaction-click-control-create-employer"))
   @browser.element(class: /interaction-click-control-benefits/).wait_until_present
-  @browser.element(class: /interaction-click-control-benefits/).click
+  scroll_then_click(@browser.element(class: /interaction-click-control-benefits/))
   @browser.element(class: /interaction-click-control-publish-plan-year/).wait_until_present
-  @browser.element(class: /interaction-click-control-publish-plan-year/).click
+  scroll_then_click(@browser.element(class: /interaction-click-control-publish-plan-year/))
 end
 
 When(/^I log in to the employee account page$/) do
   @browser.a(text: /Employee Portal/).wait_until_present
-  @browser.a(text: /Employee Portal/).click
+  scroll_then_click(@browser.a(text: /Employee Portal/))
   @browser.element(class: /interaction-field-control-user-email/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set(@email)
   @browser.text_field(class: /interaction-field-control-user-password/).set(@password)
-  @browser.element(class: /interaction-click-control-sign-in/).click
+  scroll_then_click(@browser.element(class: /interaction-click-control-sign-in/))
 end
