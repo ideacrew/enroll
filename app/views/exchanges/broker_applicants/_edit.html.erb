@@ -1,0 +1,86 @@
+<%= form_for @broker_role, url: {action: "update"} do |f| %>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
+      <% if @broker_role.errors.any? %>
+        <div class="alert alert-error">
+          <h4>
+            <%= "#{pluralize(@broker_role.errors.size, "error")} prohibited this person from being saved:" %>
+          </h4>
+          <ul>
+            <% @broker_role.errors.full_messages.each do |msg| %>
+              <li> <%= msg %> </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+      <div class="row">
+          <a class="remove return_to_broker_applicants" href="#">
+            <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
+            Cancel
+          </a>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12 left-side">
+          <table class="table table-message-wrapper">
+            <tbody>
+
+              <tr>
+                <th>Applicant Name:</th>
+                <td>&nbsp; &nbsp;<%= @broker_role.person.full_name %></td>
+              </tr>
+              <tr>
+                <th>NPN:</th>
+                <td>&nbsp; &nbsp;<%= @broker_role.npn %></td>
+              </tr>
+              <tr>
+                <th>Email:</th>
+                <td>&nbsp; &nbsp;<%= @broker_role.email_address %></td>
+              </tr>
+              <tr>
+                <th>Application Status:</th>
+                <td>&nbsp; &nbsp;<%= @broker_role.current_state %></td>
+              </tr>
+              <tr>
+                <th>Borker Agency Name:</th>
+                <td>&nbsp; &nbsp;<%= @broker_role.broker_agency_profile.legal_name %></td>
+              </tr>
+               <tr>
+                <th>FEIN:</th>
+                <td>&nbsp; &nbsp;<%= @broker_role.broker_agency_profile.fein %></td>
+              </tr>
+              <tr>
+                <th>Office Locations:</th>
+                <td>&nbsp; &nbsp;
+                  
+                    <% @broker_role.broker_agency_profile.organization.office_locations.each do |office_location| %>
+                      <%= office_location.address.to_html %>
+                    <% end %>
+                  
+                </td>
+              </tr>              
+              <tr>
+                <th style="vertical-align: top;">Comments<span class="text-danger">*</span>:</th>
+                <td><%= f.text_area :comments, class: "floatlabel form-control", required: true, placeholder: 'Write here...', rows: 6, disabled: (!@broker_role.applicant? && !@broker_role.approved_or_pending? ? true : false) %></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+       <div class="row top-row no-border">
+        <div class="col-md-8 col-sm-3 col-xs-12 key-btn">
+          <% if @broker_role.applicant? %>
+            <%= submit_tag 'Certify', class: "btn btn-primary" %>
+          <% end %>
+          <% if @broker_role.approved_or_pending? %>
+            <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary" %>
+          <% end %>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>
+

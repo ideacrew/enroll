@@ -188,7 +188,17 @@ private
   end
 
   def approved_or_pending?
-    aasm_state == 'active' || aasm_state == 'broker_agency_pending'
+    aasm_state == 'active'
+  end
+
+  def certified_date
+    if self.workflow_state_transitions.any?
+      transition = workflow_state_transitions.detect do |transition|
+        transition.from_state == 'applicant' && ( transition.to_state == 'active' || transition.to_state == 'broker_agency_pending')
+      end
+    end
+    return unless transition
+    transition.transition_at
   end
 
   def current_state

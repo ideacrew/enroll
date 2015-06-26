@@ -46,9 +46,9 @@ class Address
 
   def to_html
     if address_2.blank?
-      "#{address_1}<br/>#{city}, #{state} #{zip}<br/>".html_safe
+      "<div>#{address_1.strip()}</div><div>#{city}, #{state} #{zip}</div>".html_safe
     else
-      "#{address_1}<br/> #{address_2}<br/> #{city}, #{state} #{zip}<br/>".html_safe
+      "<div>#{address_1.strip()}</div><div>#{address_2}</div><div>#{city}, #{state} #{zip}</div>".html_safe
     end
   end
 

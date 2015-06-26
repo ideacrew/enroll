@@ -52,10 +52,19 @@ class CensusEmployee < CensusMember
   scope :order_by_first_name,   -> { order(:"census_employee.first_name".asc) }
 
   scope :non_business_owner,      ->{ where(is_business_owner: false) }
-  scope :by_benefit_group_ids,    ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
+  # scope :by_benefit_group_ids,    ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
+  scope :by_benefit_group_assignment_ids, ->(benefit_group_assignment_ids) { any_in("benefit_group_assignments._id" => benefit_group_assignment_ids) }
+  scope :by_benefit_group_ids, ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :by_employer_profile_id,  ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
 
-  # scope :enrolled_by_employer_profile ->{ find_all_by_employer_profile().enrolled }
+  scope :matchable, ->(ssn, dob) {
+    matched = unscoped.and(ssn: ssn, dob: dob, aasm_state: "eligible")
+    benefit_group_assignment_ids = matched.flat_map() do |ee|
+      ee.published_benefit_group_assignment ? ee.published_benefit_group_assignment.id : []
+    end
+    matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
+  }
+
   def email_address
     return nil unless email.present?
     email.address
@@ -179,16 +188,17 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def publish_plan_year(published_benefit_group)
-    employee_role.benefit_group = published_benefit_group
-    employee_role.save
+  def published_benefit_group_assignment
+    benefit_group_assignment = benefit_group_assignments.detect do |benefit_group_assignment|
+      benefit_group_assignment.benefit_group.plan_year.published?
+    end
+  end
+
+  def published_benefit_group
+    published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
   end
 
   class << self
-    def find_all_unlinked_by_identifying_information(ssn, dob)
-      unscoped.and(ssn: ssn, dob: dob, aasm_state: "eligible").to_a
-    end
-
     def find_all_by_employer_profile(employer_profile)
       unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
     end
