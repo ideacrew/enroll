@@ -2,5 +2,7 @@
   = f.fields_for("office_locations", @office_location, child_index: @child_index) do |builder|
     = render("shared/office_location_fields", f: builder)
 
-.form-inputs.pull-right#office_locations_buttons
-  = link_to('Add Office Location', new_office_location_path(:child_index => @child_index.to_i + 1, :parent_object => @parent_object), remote: true, class: 'fui-plus-circle btn btn-primary')
+.form-inputs#office_locations_buttons
+  = link_to(new_office_location_path(:child_index => @child_index.to_i + 1, :parent_object => @parent_object), remote: true) do
+    %span.glyphicon.glyphicon-remove-circle{"aria-hidden" => "true"}
+    Add Office Location

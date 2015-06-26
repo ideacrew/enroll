@@ -2,7 +2,11 @@
 <%= render partial: 'shared/office_location_fields', locals: {f: office_location} %>
 <% end %>
 
-<div class="form-inputs pull-right" id="office_locations_buttons">
-	<%= link_to('Add Office Location', new_office_location_path(:child_index => f.object.office_locations.length, :parent_object => f.object_name), remote: true, class: 'fui-plus-circle btn btn-primary') %>
+<div class="form-inputs" id="office_locations_buttons">
+	<%= link_to(new_office_location_path(:child_index => f.object.office_locations.length, :parent_object => f.object_name), remote: true) do %>
+		<span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
+		Add Office Location
+	<% end %>
   <br/>
 </div>
+
