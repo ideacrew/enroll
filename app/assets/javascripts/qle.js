@@ -14,6 +14,16 @@ $(function () {
 		$('#qle-menu').show();
 	});
 
+	// Disable form submit on pressing Enter, instead click Submit link
+	$('#qle_form').on('keyup keypress', function(e) {
+	    var code = e.keyCode || e.which;
+	    if (code == 13) { 
+	      e.preventDefault();
+	      $("#qle_submit").click();
+	      return false;
+	    }
+	});
+
 	/* QLE Date Validator */
 	$(document).on('click', '#qle_submit', function() {
 		if(check_qle_date()) {
