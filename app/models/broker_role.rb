@@ -35,6 +35,7 @@ class BrokerRole
   scope :denied,      ->{ where(aasm_state: "denied") }
   scope :decertified, ->{ where(aasm_state: "decertified") }
 
+  default_scope   ->{ order(:"created_at".desc) }
 
   def email_address
     return nil unless email.present?
