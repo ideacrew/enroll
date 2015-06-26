@@ -70,6 +70,8 @@ Feature: Create Employer
       Then I should see the coverage summary page
       When I confirm on the coverage summary page
       Then I should see the "my account" page
+      When I visit consumer profile homepage
+      Then I should see the "YOUR LIFE EVENTS" section
 
     @wip
     Scenario: Employer Representative has previously signed up on HBX

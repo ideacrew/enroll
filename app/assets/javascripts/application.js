@@ -42,10 +42,25 @@ $(document).ready(function () {
 
   semantic_class(); //Calls semantic class on all input fields & buttons (eg. interaction-click-control-continue)
 
+    $(document).on("click", "[class~='qle-date-picker']", function(e) {
+        dateMin = $(this).attr("data-date-min");
+        dateMax = $(this).attr("data-date-max");
+
+        if ($(".qle-details-title").html() === "\"I've had a baby\"" || $(".qle-details-title").html() === "\"Death\"") {
+            dateMax = "+0d";
+        }
+
+        $(this).datepicker('option', 'maxDate', dateMax);
+        $(this).datepicker('show');
+
+    });
+
   $(document).on("focus", "[class~='date-picker']", function(e){
     dateMin = $(this).attr("data-date-min");
+    dateMax = $(this).attr("data-date-max");
+
     if ($(this).hasClass('dob-picker') || $(this).hasClass('hire-picker')){
-      $(this).datepicker({ 
+      $(this).datepicker({
         changeMonth: true,
         changeYear: true,
         dateFormat: 'mm/dd/yy', 
@@ -61,6 +76,7 @@ $(document).ready(function () {
         changeYear: true,
         dateFormat: 'mm/dd/yy', 
         minDate: dateMin,
+        maxDate: dateMax,
         yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10),
           onSelect: function(dateText, dpInstance) {
 	    $(this).datepicker("hide");
