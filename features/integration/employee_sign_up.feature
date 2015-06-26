@@ -8,12 +8,24 @@ Feature: Employee Sign Up
     Given I do not exist as a user
     And I have an existing employee record
     And I have an existing person record
+    And I am employed by an employer with no published plan year
     When I go to the employee account creation page
     When I enter my new account information
     Then I should be logged in
     When I go to register as an employee
     Then I should see the employee search page
-    When I enter the identifying info of my existing person
+    When I enter the identifying info of Soren White
+    Then I should not see the matched employee record form
+    When I log out
+    Then I should see the hbx home page
+    When My employer publishes a plan year
+     And My employer logs out
+    Then I should see the hbx home page
+    When I log in to the employee account page
+    Then I should be logged in
+    When I go to register as an employee
+    Then I should see the employee search page
+    When I enter the identifying info of Soren White
     Then I should see the matched employee record form
     When I accept the matched employer
     When I complete the matched employee form
@@ -24,7 +36,7 @@ Feature: Employee Sign Up
     Then I should see 2 dependents
     When I click Add Member
     Then I should see the new dependent form
-    When I enter the identifying info of Sorens daughter
+    When I enter the dependent info of Sorens daughter
     When I click confirm member
     Then I should see 3 dependents
     When I click continue on the dependents page

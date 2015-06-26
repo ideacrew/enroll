@@ -64,7 +64,6 @@ class PlanYear
 
   def register_employer
     employer_profile.publish_plan_year!
-    benefit_groups.each(){|bg| bg.publish_plan_year}
     send_employee_invites
   end
 
@@ -88,22 +87,42 @@ class PlanYear
     end
   end
 
+  def assigned_census_employees
+    benefit_groups.flat_map(){ |benefit_group| benefit_group.census_employees.active }
+  end
+
   def open_to_publish?
     employer_profile.plan_years.reject{ |py| py==self }.any?(&:published?)
   end
 
+  # does the plan year violate model integrity relative to publishing
+  def is_application_unpublishable?
+    application_errors.blank? ? false : true
+  end
+
+  # is the plan year compliant with all regulations
   def is_application_valid?
     application_warnings.blank? ? true : false
   end
 
+  # Check plan year for violations of model integrity relative to publishing
+  def application_errors
+    errors = {}
+
+    if benefit_groups.size == 0
+      errors.merge!({benefit_groups: "at least one benefit group must be defined to publish a plan year"})
+    end
+
+    if employer_profile.census_employees.active.to_set != assigned_census_employees.to_set
+      errors.merge!({benefit_groups: "every employee must be assigned to a benefit group defined for the published plan year"})
+    end
+
+    errors
+  end
+
   # Check plan year application for regulatory compliance
   def application_warnings
-    warnings = {}
-
-    # TODO: ENFORCE NO PUBLISH
-    if benefit_groups.size == 0
-      warnings.merge!({benefit_groups: "at least one benefit group must be defined for plan year"})
-    end
+    warnings = application_errors
 
     unless employer_profile.organization.primary_office_location.address.state.to_s.downcase == HbxProfile::StateAbbreviation.to_s.downcase
       warnings.merge!({primary_office_location: "primary office must be located in #{HbxProfile::StateName}"})
@@ -289,6 +308,7 @@ class PlanYear
 
     # Submit application
     event :publish do
+      transitions from: :draft, to: :draft, :guard => :is_application_unpublishable?, after: :report_unpublishable
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
     end
@@ -331,6 +351,12 @@ class PlanYear
   end
 
 private
+
+  # attempted to publish but plan year violates publishing plan model integrity
+  def report_unpublishable
+    application_warnings.each_pair(){ |key, value| errors.add(key, value) }
+  end
+
   def is_new_plan_year?
   end
 
@@ -390,6 +416,5 @@ private
     if open_enrollment_end_on - (start_on - 1.month) >= HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth
      errors.add(:open_enrollment_end_on, "open enrollment must end on or before the #{HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.ordinalize} day of the month prior to effective date")
     end
-
   end
 end

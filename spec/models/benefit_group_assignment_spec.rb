@@ -120,13 +120,6 @@ describe BenefitGroupAssignment, type: :model do
         expect(benefit_group_assignment.save).to be_truthy
       end
 
-      context "receives publish plan year" do
-        it "should notify the census employee" do
-          expect(census_employee).to receive(:publish_plan_year).with(benefit_group)
-          benefit_group_assignment.publish_plan_year
-        end
-      end
-
       context "and it is saved" do
         let!(:saved_benefit_group_assignment) do
           b = BenefitGroupAssignment.new(**params)
