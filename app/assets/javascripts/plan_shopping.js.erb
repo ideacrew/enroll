@@ -63,6 +63,7 @@ function maybeAddComparisonPlan(cb) {
 	var is_checked = $(cb).prop("checked");
 	if (is_checked) {
 		if (plansToCompareArray.length > 2) {
+      $("#plans-compare-alert").modal("show");
 			var removed_id = plansToCompareArray.shift();
 			var lookup_string = "input[data-hios-id='" +
 				removed_id + "'].select-plan-for-comparison";
@@ -81,9 +82,9 @@ function maybeAddComparisonPlan(cb) {
 		plansToCompareArray = tmpArray;
 	}
 	if (plansToCompareArray.length > 1) {
-		$("#compare-selected-plans-link").show();
+		$(".compare-selected-plans-link").show();
 	} else {
-		$("#compare-selected-plans-link").hide();
+		$(".compare-selected-plans-link").hide();
 	}
 }
 
@@ -118,7 +119,7 @@ $(function() {
 		maybeAddComparisonPlan(this);
 	});
 
-	$("#compare-selected-plans-link").click(function() {
+	$(".compare-selected-plans-link").click(function() {
 		var base_url = $(this).attr("data-uri");
 		doPlanComparison(base_url);
 	});
@@ -127,6 +128,12 @@ $(function() {
 		// $(".all-filters-row").hide();
 		applyPlanFilters();
 	});
+
+  $(".all-filters-row .reset-btn").on('click', function() {
+    $(".filter-sidebar input[type='checkbox']").attr("checked", false);
+    $(".filter-sidebar input[type='text']").val("");
+		applyPlanFilters();
+  });
 });
 
 $(document).on("change", "select.elected_plan", function() {

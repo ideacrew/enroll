@@ -15,7 +15,7 @@
               </p>
 
               <p class="pull-right">
-                <a href="javascript:void(0);" style="display: none;" class="btn btn-primary", data-uri="<%= comparison_products_plans_path %>" id="compare-selected-plans-link">
+                <a href="javascript:void(0);" style="display: none;" class="btn btn-primary compare-selected-plans-link", data-uri="<%= comparison_products_plans_path %>">
                   COMPARE PLANS
                 </a>
               </p>
@@ -35,6 +35,14 @@
               </div>
             </div>
           </div>
+
+          <div class="row no-buffer">
+            <p class="pull-right">
+              <a href="javascript:void(0);" style="display: none;" class="btn btn-primary compare-selected-plans-link", data-uri="<%= comparison_products_plans_path %>">
+                COMPARE PLANS
+              </a>
+            </p>
+          </div>
         </div>
       </div>
 
@@ -46,3 +54,20 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="plans-compare-alert">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Plan Compare Alert</h4>
+			</div>
+			<div class="modal-body">
+        <p style='color:red;'>Can not select more than 3 plans to compare.</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
