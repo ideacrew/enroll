@@ -43,9 +43,9 @@ class PlanYear
 
   def employee_participation_percent
     if fte_count == 0
-      0
+      "-"
     else
-      employer_profile.census_employees.where(aasm_state: "employee_role_linked").try(:count) / fte_count.to_f
+      "#{(employer_profile.census_employees.where(aasm_state: "employee_role_linked").try(:count) / fte_count.to_f * 100).round(2)}%"
     end
   end
 

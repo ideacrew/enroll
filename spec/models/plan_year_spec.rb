@@ -597,14 +597,14 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
     it "when fte_count equal 0" do
       allow(plan_year).to receive(:fte_count).and_return(0)
-      expect(plan_year.employee_participation_percent).to eq 0
+      expect(plan_year.employee_participation_percent).to eq "-"
     end
 
     it "when fte_count > 0" do
       allow(plan_year).to receive(:fte_count).and_return(10)
       employee_role_linked_count = employer_profile.census_employees.where(aasm_state: "employee_role_linked").count
 
-      expect(plan_year.employee_participation_percent).to eq employee_role_linked_count/10.0
+      expect(plan_year.employee_participation_percent).to eq "#{(employee_role_linked_count/10.0*100).round(2)}%"
     end
   end
 end
