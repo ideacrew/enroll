@@ -497,3 +497,17 @@ describe Person, "call notify change event when after save" do
     end
   end
 end
+
+describe Person, "does not allow two people with the same user ID to be saved" do
+  let(:person1){FactoryGirl.build(:person)}
+  let(:person2){FactoryGirl.build(:person)}
+
+  it "should let fail to save" do
+    user_id = BSON::ObjectId.new
+    person1.user_id = user_id
+    person2.user_id = user_id
+    person1.save!
+    expect { person2.save! }.to raise_error(Moped::Errors::OperationFailure)
+  end
+  
+end
