@@ -27,10 +27,6 @@ end
 
 And(/^I should see an initial form to enter information about my Employer and myself$/) do
   @browser.text_field(name: "organization[first_name]").wait_until_present
-  plan = FactoryGirl.create(:plan)
-  pt = plan.premium_tables.build(age: 34, start_on: 0.days.ago.beginning_of_year.to_date, end_on: 0.days.ago.end_of_year.to_date, cost: 345.09)
-  pt1 = plan.premium_tables.build(age: 3, start_on: 0.days.ago.beginning_of_year.to_date, end_on: 0.days.ago.end_of_year.to_date, cost: 125.10)
-  plan.save
   @browser.text_field(name: "organization[first_name]").set("Doe")
   @browser.text_field(name: "organization[last_name]").set("John")
   @browser.text_field(name: "jq_datepicker_ignore_organization[dob]").set("10/11/1982")
@@ -44,9 +40,9 @@ And(/^I should see an initial form to enter information about my Employer and my
   input_field.li(text: /C Corporation/).click
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").set("100 North Street")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_2]").set("Suite 990")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Sterling")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][state]").set("VA")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("20166")
+  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Washington")
+  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][state]").set("DC")
+  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("20002")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("678")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("1230987")
   screenshot("employer_portal_person_data_new")
@@ -279,8 +275,8 @@ end
 
 
 When(/^I click on terminate button for a census family$/) do
-  ce = Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.dup
-  ce.save
+  # ce = Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.dup
+  # ce.save
   @browser.a(text: /Terminate/).wait_until_present
   @browser.a(text: /Terminate/).click
   terminated_date = Date.current + 20.days
@@ -300,8 +296,6 @@ When(/^I click on terminate button for rehired census employee$/) do
   @browser.h3(text: /Employee Roster/).click
   @browser.a(text: /Submit/).wait_until_present
   @browser.a(text: /Submit/).click
-  @browser.a(text: /Logout/i).wait_until_present
-  @browser.a(text: /Logout/i).click
 end
 
 Then(/^The census family should be terminated and move to terminated tab$/) do
@@ -322,7 +316,7 @@ And(/^I should see the census family is successfully terminated message$/) do
 end
 
 When(/^I click on Rehire button for a census family on terminated tab$/) do
-  Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.where(aasm_state: "employment_terminated").update(name_sfx: "Sr", first_name: "Polly")
+  # Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.where(aasm_state: "employment_terminated").update(name_sfx: "Sr", first_name: "Polly")
   @browser.a(text: /Rehire/).wait_until_present
   @browser.a(text: /Rehire/).click
   hired_date = (Date.current + 30.days).strftime("%m/%d/%Y")
@@ -407,7 +401,8 @@ end
 And(/^I should see a success message after clicking on create plan year button$/) do
   Watir::Wait.until(30) {  @browser.text.include?("Plan Year successfully created.") }
   screenshot("employer_plan_year_success_message")
-  Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.plan_years.first.update(start_on: '2015-01-01', end_on: '2015-12-31', open_enrollment_start_on: '2014-01-01', open_enrollment_end_on: '2014-11-30')
+  # TimeKeeper.set_date_of_record_unprotected!("2014-11-01")
+  # Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.plan_years.first.update(start_on: '2015-01-01', end_on: '2015-12-31', open_enrollment_start_on: '2014-11-01', open_enrollment_end_on: '2014-11-30')
 end
 
 When(/^I enter filter in plan selection page$/) do
@@ -430,21 +425,37 @@ When(/^I enter combined filter in plan selection page$/) do
 
   # Platinum
   @browser.execute_script(
-    'arguments[0].scrollIntoView();', 
+    'arguments[0].scrollIntoView();',
     @browser.element(:text => /Choose a healthcare plan/)
   )
-  @browser.checkboxes(class: /plan-metal-level-selection-filter/)[0].set(true)
-  @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("")
-  @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("")
-  @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("320")
-  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("399")
+  @browser.checkboxes(class: /plan-metal-level-selection-filter/).first.set(true)
+  @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
+  @browser.checkboxes(class: /plan-type-selection-filter/).last.set(true)
+  @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("2100")
+  @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("3900")
+  @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("10")
+  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250")
   @browser.element(class: /apply-btn/, text: /Apply/).click
 end
 
 Then(/^I should see the combined filter results$/) do
   @browser.divs(class: /plan-row/).select(&:visible?).each do |plan|
-    expect(plan.text.include?("Nationwide")).to eq true
+    expect(plan.text.include?("BlueChoice Plus HSA/HRA $3500")).to eq true
     expect(plan.text.include?("Bronze")).to eq true
-    expect(plan.element(text: "$90.72").visible?).to eq true
+    expect(plan.element(text: "$6.51").visible?).to eq true
   end
+end
+
+When(/^I go to the benefits tab$/) do
+  @browser.element(class: /interaction-click-control-benefits/).wait_until_present
+  @browser.element(class: /interaction-click-control-benefits/).click
+end
+
+Then(/^I should see the plan year$/) do
+  @browser.element(class: /interaction-click-control-publish-plan-year/).wait_until_present
+end
+
+When(/^I click on publish plan year$/) do
+  @browser.element(class: /interaction-click-control-publish-plan-year/).click
+  @browser.element(class: /interaction-click-control-publish-plan-year/).wait_while_present
 end

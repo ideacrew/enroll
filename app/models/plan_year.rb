@@ -64,7 +64,6 @@ class PlanYear
 
   def register_employer
     employer_profile.publish_plan_year!
-    benefit_groups.each(){|bg| bg.publish_plan_year}
   end
 
   def minimum_employer_contribution
@@ -80,7 +79,7 @@ class PlanYear
   end
 
   def assigned_census_employees
-    benefit_groups.flat_map(&:census_employees)
+    benefit_groups.flat_map(){ |benefit_group| benefit_group.census_employees.active }
   end
 
   def open_to_publish?

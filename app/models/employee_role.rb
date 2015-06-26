@@ -84,7 +84,7 @@ class EmployeeRole
   alias_method :census_employee, :new_census_employee
 
   def effective_on
-    benefit_group.effective_on_for(new_census_employee.hired_on)
+    benefit_group.try(:effective_on_for, new_census_employee.hired_on)
   end
 
   def is_active?

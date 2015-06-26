@@ -221,7 +221,7 @@ class EmployerProfile
 
     def find_census_employee_by_person(person)
       return [] if person.ssn.blank? || person.dob.blank?
-      CensusEmployee.find_all_unlinked_by_identifying_information(person.ssn, person.dob)
+      CensusEmployee.matchable(person.ssn, person.dob)
     end
 
     def advance_day(new_date)

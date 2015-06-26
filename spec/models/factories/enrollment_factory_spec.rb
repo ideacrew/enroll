@@ -89,14 +89,15 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
     {employer_profile: employer_profile}.merge(valid_person_params).merge(valid_employee_params)
   end
 
-  context "an employer profile exists with an employee and depenedents in the census" do
+  context "an employer profile exists with an employee and dependents in the census and a published plan year" do
     let(:census_dependent){FactoryGirl.build(:census_dependent)}
     let(:primary_applicant) {@family.primary_applicant}
     let(:params) {valid_params}
 
-    def before
+    before do
       census_employee.census_dependents = [census_dependent]
       census_employee.save
+      plan_year.publish!
     end
 
     context "and no prior person exists" do
@@ -150,10 +151,10 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       before do
         @user = FactoryGirl.create(:user)
         census_dependent = FactoryGirl.build(:census_dependent)
-        benefit_group_assignment = FactoryGirl.build(:benefit_group_assignment)
-        census_employee = FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id,
-          census_dependents: [census_dependent],
-          benefit_group_assignments: [benefit_group_assignment])
+        benefit_group = FactoryGirl.create(:benefit_group)
+        plan_year = benefit_group.plan_year
+        employer_profile = plan_year.employer_profile
+        census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile, benefit_group_assignments: [FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)])
         valid_person_params = {
           user: @user,
           first_name: census_employee.first_name,
@@ -170,6 +171,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
         @person = FactoryGirl.create(:person,
                                      valid_person_params.except(:user).merge(dob: census_employee.dob,
                                                                              ssn: census_employee.ssn))
+        plan_year.publish!
         @employee_role, @family = Factories::EnrollmentFactory.add_employee_role(**params)
       end
 
@@ -192,11 +194,18 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
         employer_profile = FactoryGirl.create(:employer_profile)
         plan_year = FactoryGirl.create(:plan_year, employer_profile: employer_profile)
         benefit_group = FactoryGirl.create(:benefit_group, plan_year: plan_year)
+        plan_year.benefit_groups = [benefit_group]
+        plan_year.save
+
         census_dependent = FactoryGirl.build(:census_dependent)
-        benefit_group_assignment = FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, :start_on => plan_year.start_on, is_active: true)
         census_employee = FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id,
-                                              census_dependents: [census_dependent],
-                                              benefit_group_assignments: [benefit_group_assignment])
+                                              census_dependents: [census_dependent])
+        benefit_group_assignment = FactoryGirl.create(:benefit_group_assignment, census_employee: census_employee, benefit_group: benefit_group)
+        census_employee.benefit_group_assignments = [benefit_group_assignment]
+        census_employee.save
+
+        plan_year.publish!
+
         valid_person_params = {
           user: @user,
           first_name: census_employee.first_name,
@@ -219,14 +228,18 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
         employer_profile_2 = FactoryGirl.create(:employer_profile)
         plan_year_2 = FactoryGirl.create(:plan_year, employer_profile: employer_profile_2)
         benefit_group_2 = FactoryGirl.create(:benefit_group, plan_year: plan_year_2)
+        plan_year_2.benefit_groups = [benefit_group_2]
+        plan_year_2.save
+
         census_dependent_2 = census_dependent.dup
-        benefit_group_assignment_2 = FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group_2, :start_on => plan_year_2.start_on, is_active: true)
         census_employee_2 = census_employee.dup
         census_employee_2.employer_profile_id = employer_profile_2.id
         census_employee_2.census_dependents = [census_dependent_2]
+        benefit_group_assignment_2 = FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group_2, :start_on => plan_year_2.start_on, is_active: true)
         census_employee_2.benefit_group_assignments = [benefit_group_assignment_2]
         census_employee_2.save
 
+        plan_year_2.publish!
 
         @second_params = { employer_profile: employer_profile_2 }.merge(valid_person_params).merge(valid_employee_params)
         @second_employee_role, @second_census_employee = Factories::EnrollmentFactory.add_employee_role(**@second_params)
@@ -259,16 +272,26 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
   describe ".add_employee_role" do
     context "when the employee already exists but is not linked" do
       let(:census_dependent){FactoryGirl.build(:census_dependent)}
-      let(:benefit_group_assignment){FactoryGirl.build(:benefit_group_assignment)}
       let(:census_employee) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id,
         census_dependents: [census_dependent],
-        benefit_group_assignments: [benefit_group_assignment])}
+        )}
       let(:existing_person) {FactoryGirl.create(:person, valid_person_params)}
       let(:employee) {FactoryGirl.create(:employee_role, valid_employee_params.merge(person: existing_person, employer_profile: employer_profile))}
       before {user;census_employee;employee}
 
       context "with all required data" do
         let(:params) {valid_params}
+        let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+        let(:benefit_group_assignment) {FactoryGirl.create(:benefit_group_assignment, census_employee: census_employee, benefit_group: benefit_group)}
+        let(:params) {valid_params}
+
+        before do
+          plan_year.benefit_groups = [benefit_group]
+          plan_year.save
+          census_employee.benefit_group_assignments = [benefit_group_assignment]
+          census_employee.save
+          PlanYear.find(plan_year.id).publish!
+        end
 
         it "should not raise" do
           expect{Factories::EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
@@ -293,11 +316,12 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
     end
 
     context "census_employee params" do
-      let(:benefit_group_assignment){FactoryGirl.build(:benefit_group_assignment)}
+      # let(:benefit_group_assignment){FactoryGirl.build(:benefit_group_assignment)}
       let(:census_dependent){FactoryGirl.build(:census_dependent)}
       let(:census_employee) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id,
               census_dependents: [census_dependent],
-              benefit_group_assignments: [benefit_group_assignment])}
+              # benefit_group_assignments: [benefit_group_assignment]
+              )}
       context "with no arguments" do
         let(:params) {{}}
 
@@ -308,6 +332,16 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
 
       context 'with no user' do
         let(:params) {valid_params.except(:user)}
+        let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+        let(:benefit_group_assignment) {FactoryGirl.create(:benefit_group_assignment, census_employee: census_employee, benefit_group: benefit_group)}
+
+        before do
+          plan_year.benefit_groups = [benefit_group]
+          plan_year.save
+          census_employee.benefit_group_assignments = [benefit_group_assignment]
+          census_employee.save
+          PlanYear.find(plan_year.id).publish!
+        end
 
         it 'should not raise' do
           expect{Factories::EnrollmentFactory.add_employee_role(**params)}.not_to raise_error
@@ -379,7 +413,17 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       end
 
       context "with all required data" do
+        let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+        let(:benefit_group_assignment) {FactoryGirl.create(:benefit_group_assignment, census_employee: census_employee, benefit_group: benefit_group)}
         let(:params) {valid_params}
+
+        before do
+          plan_year.benefit_groups = [benefit_group]
+          plan_year.save
+          census_employee.benefit_group_assignments = [benefit_group_assignment]
+          census_employee.save
+          PlanYear.find(plan_year.id).publish!
+        end
 
         it "should not raise" do
           expect{Factories::EnrollmentFactory.add_employee_role(**params)}.not_to raise_error

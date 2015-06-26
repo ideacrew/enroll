@@ -27,30 +27,9 @@ module Forms
       @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
     end
 
+    # TODO fix and use as the only way to match census employees for the employee flow or blow this away
     def match_census_employees
-      census_employees = []
-      employer_organizations = Organization.where({
-        "employer_profile.census_employees" =>  { "$elemMatch" => {
-           "dob" => dob,
-           "ssn" => ssn,
-           "aasm_state" => "eligible"} }
-      })
-      employer_organizations.each do |employer_organization|
-        plan_years = employer_organization.try(:employer_profile).try(:plan_years) || []
-        eligible_plan_years = []
-        plan_years.each do |plan_year|
-          eligible_plan_years << plan_year if plan_year.is_eligible_to_match_census_employees?
-        end
-
-        if eligible_plan_years.size > 0
-          employer_organization.employer_profile.census_employees.each do |ce|
-           if (ce.ssn == ssn) && (ce.dob == dob) && (ce.eligible?)
-             census_employees << ce
-           end
-          end
-        end
-      end
-      census_employees
+      CensusEmployee.matchable(ssn, dob).to_a
     end
 
     def match_person
@@ -61,19 +40,19 @@ module Forms
     end
 
     def does_not_match_a_different_users_person
-       matched_person = match_person
-       if matched_person.present?
-         if matched_person.user.present?
-           if matched_person.user.id.to_s != self.user_id.to_s
-             errors.add(
-               :exception,
-               "An account already exists for #{first_name} #{last_name}."
-             )
-           end
+      matched_person = match_person
+      if matched_person.present?
+       if matched_person.user.present?
+         if matched_person.user.id.to_s != self.user_id.to_s
+           errors.add(
+             :exception,
+             "An account already exists for #{first_name} #{last_name}."
+           )
          end
        end
-       true
-     end
+      end
+      true
+    end
 
     def persisted?
       false

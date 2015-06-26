@@ -530,32 +530,41 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
 
-    context "and all application elements are valid and it is published" do
+    context "and it has a terminated employee assigned to the benefit group" do
       let(:benefit_group) { FactoryGirl.build(:benefit_group) }
 
       before do
-        expect(benefit_group).to receive(:publish_plan_year)
         plan_year.benefit_groups = [benefit_group]
-        plan_year.publish
+        terminated_census_employee = FactoryGirl.create(
+          :census_employee, employer_profile: plan_year.employer_profile,
+          benefit_group_assignments: [FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)]
+        )
+        terminated_census_employee.terminate_employment!(TimeKeeper.date_of_record.yesterday)
       end
 
-      it "plan year should publish" do
-        expect(plan_year.published?).to be_truthy
-      end
-
-      it "and employer_profile should be in registered state" do
-        expect(plan_year.employer_profile.registered?).to be_truthy
-      end
-
-      context "and the plan year is changed" do
+      context "and all application elements are valid and it is published" do
         before do
-          plan_year.start_on = plan_year.start_on.next_month
-          plan_year.end_on = plan_year.end_on.next_month
-          plan_year.open_enrollment_start_on = plan_year.open_enrollment_start_on.next_month
-          plan_year.open_enrollment_end_on = plan_year.open_enrollment_end_on.next_month
+          plan_year.publish
         end
 
-        it "should not be valid"
+        it "plan year should publish" do
+          expect(plan_year.published?).to be_truthy
+        end
+
+        it "and employer_profile should be in registered state" do
+          expect(plan_year.employer_profile.registered?).to be_truthy
+        end
+
+        context "and the plan year is changed" do
+          before do
+            plan_year.start_on = plan_year.start_on.next_month
+            plan_year.end_on = plan_year.end_on.next_month
+            plan_year.open_enrollment_start_on = plan_year.open_enrollment_start_on.next_month
+            plan_year.open_enrollment_end_on = plan_year.open_enrollment_end_on.next_month
+          end
+
+          it "should not be valid"
+        end
       end
     end
   end
