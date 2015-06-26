@@ -233,8 +233,8 @@ Then(/^I should see the group selection page$/) do
 end
 
 When(/^I click continue on the group selection page$/) do
-  @browser.element(id: /btn-continue/, class: /interaction-click-control-continue/).wait_until_present
-  @browser.element(id: /btn-continue/, class: /interaction-click-control-continue/).click
+  @browser.element(class: /interaction-click-control-continue/, id: /btn-continue/).wait_until_present
+  @browser.element(class: /interaction-click-control-continue/, id: /btn-continue/).click
 end
 
 Then(/^I should see the plan shopping welcome page$/) do
@@ -269,7 +269,7 @@ Then(/^I should see the coverage summary page$/) do
 end
 
 When(/^I confirm on the coverage summary page$/) do
-  @browser.element(id: /btn-continue/, class: /interaction-click-control-purchase/).click
+  @browser.element(class: /interaction-click-control-purchase/).click
 end
 
 Then(/^I should see the "my account" page$/) do
