@@ -349,6 +349,7 @@ $(document).ready(function () {
   $(".zip").mask("99999");
   $("#person_ssn").mask("999-99-9999");
   $(".person_ssn").mask("999999999");
+  $(".broker_npn").mask("9999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
   $(".area_code").mask("999");
