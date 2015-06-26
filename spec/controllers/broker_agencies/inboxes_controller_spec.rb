@@ -41,7 +41,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
     end
   end
 
-  describe "GET show" do
+  describe "GET show / DELETE destroy" do
     let(:message){double(to_a: double("to_array"))}
     let(:inbox_provider){double(id: double("id"),legal_name: double("inbox_provider"))}
     before do
@@ -53,8 +53,13 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
       allow(message).to receive(:update_attributes).and_return(true)
     end
 
-    it "creates new message" do
+    it "show action" do
       get :show, id: 1
+      expect(response).to have_http_status(:success)
+    end
+
+    it "delete action" do
+      xhr :delete, :destroy, id: 1
       expect(response).to have_http_status(:success)
     end
   end
