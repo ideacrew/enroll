@@ -22,34 +22,47 @@
       </div>
 
       <div class="row">
-        <div class="row">
-          <div class="col-sm-12 col-xs-12 left-side">
-            <h4> Applicant Details </h4>
-            Name: <%= @broker_role.person.full_name %> <br>
-            NPN: <%= @broker_role.npn %> <br>
-            Email: <%= @broker_role.email_address %><br>
-          </div>
-
-          <div class="col-sm-12 col-xs-12 left-side">
-            <h4> Broker Agency Details </h4>
-            Agency Name: <%= @broker_role.broker_agency_profile.legal_name %> <br>
-            FEIN: <%= @broker_role.broker_agency_profile.fein %> <br>
-          </div>
-
-          <div class="col-sm-12 col-xs-12 left-side">
-            <h4> Address </h4>
-            <% @broker_role.broker_agency_profile.organization.office_locations.each do |office_location| %>
-            <%= office_location.address.to_s %>
-            <% end %>
-          </div>
-        </div>
-
-        <div class="col-md-8 col-sm-12 col-xs-12 left-side">
+        <div class="col-md-12 col-sm-12 col-xs-12 left-side">
           <table class="table table-message-wrapper">
             <tbody>
+
+              <tr>
+                <th>Applicant Name:</th>
+                <td>&nbsp; &nbsp;<%= @broker_role.person.full_name %></td>
+              </tr>
+              <tr>
+                <th>NPN:</th>
+                <td>&nbsp; &nbsp;<%= @broker_role.npn %></td>
+              </tr>
+              <tr>
+                <th>Email:</th>
+                <td>&nbsp; &nbsp;<%= @broker_role.email_address %></td>
+              </tr>
+              <tr>
+                <th>Application Status:</th>
+                <td>&nbsp; &nbsp;<%= @broker_role.current_state %></td>
+              </tr>
+              <tr>
+                <th>Borker Agency Name:</th>
+                <td>&nbsp; &nbsp;<%= @broker_role.broker_agency_profile.legal_name %></td>
+              </tr>
+               <tr>
+                <th>FEIN:</th>
+                <td>&nbsp; &nbsp;<%= @broker_role.broker_agency_profile.fein %></td>
+              </tr>
+              <tr>
+                <th>Office Locations:</th>
+                <td>&nbsp; &nbsp;
+                  
+                    <% @broker_role.broker_agency_profile.organization.office_locations.each do |office_location| %>
+                      <%= office_location.address.to_html %>
+                    <% end %>
+                  
+                </td>
+              </tr>              
               <tr>
                 <th style="vertical-align: top;">Comments<span class="text-danger">*</span>:</th>
-                <td><%= f.text_area :comments, class: "floatlabel form-control interaction-control-inbox-mesage-body", required: true, placeholder: 'Write here...', rows: 6 %></td>
+                <td><%= f.text_area :comments, class: "floatlabel form-control", required: true, placeholder: 'Write here...', rows: 6, disabled: (!@broker_role.applicant? && !@broker_role.approved_or_pending? ? true : false) %></td>
               </tr>
             </tbody>
           </table>
@@ -58,12 +71,10 @@
        <div class="row top-row no-border">
         <div class="col-md-8 col-sm-3 col-xs-12 key-btn">
           <% if @broker_role.applicant? %>
-          <%= link_to 'Certify'.html_safe,
-          certify_broker_exchanges_broker_applicants_path(id: @broker_role.id), class: "btn btn-default", method: :post %>
+            <%= submit_tag 'Certify', class: "btn btn-primary" %>
           <% end %>
           <% if @broker_role.approved_or_pending? %>
-          <%= link_to 'Decertify'.html_safe,
-          decertify_broker_exchanges_broker_applicants_path(id: @broker_role.id), class: "btn btn-default", method: :post %>
+            <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary" %>
           <% end %>
         </div>
       </div>
