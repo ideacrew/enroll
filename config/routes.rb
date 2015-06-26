@@ -127,7 +127,9 @@ Rails.application.routes.draw do
 
   namespace :broker_agencies do
     root 'profiles#new'
-    resources :inboxes, only: [:new, :create, :show, :destroy]
+    resources :inboxes, only: [:new, :create, :show, :destroy] do
+      get :msg_to_portal
+    end
     resources :profiles, only: [:new, :create, :show, :index] do
       get :inbox 
     end

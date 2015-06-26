@@ -31,6 +31,19 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
       }
     end
 
+    let(:entity_kinds){ [
+      "tax_exempt_organization",
+      "c_corporation",
+      "s_corporation",
+      "partnership",
+    ] }
+
+    context "match entity kinds" do
+      it "should match entity kinds" do
+        expect(Organization::ENTITY_KINDS[0..3]).to eq entity_kinds
+      end
+    end
+
     context "with no arguments" do
       let(:params) {{}}
 
