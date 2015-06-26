@@ -84,16 +84,20 @@ class Employers::PlanYearsController < ApplicationController
 
   def publish
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
-    @plan_year.publish
+    @plan_year.publish!
 
-    if @plan_year.save
+    case
+    when @plan_year.draft?
+      flash[:notice] = "Plan Year failed to publish: #{@plan_year.application_errors}"
+      redirect_to employers_employer_profile_path(@employer_profile)
+    when @plan_year.publish_pending?
+      # tell user bad idea
+      flash[:notice] = "Publishing Plan Year is a bad idea because:: #{@plan_year.application_warnings}"
+      redirect_to employers_employer_profile_path(@employer_profile)
+    when @plan_year.published?
       flash[:notice] = "Plan Year successfully published"
       redirect_to employers_employer_profile_path(@employer_profile)
-    else
-      flash[:notice] = "Plan Year: #{@plan_year.application_warnings}"
-      redirect_to employers_employer_profile_path(@employer_profile)
     end
-
   end
 
   private
