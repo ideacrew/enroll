@@ -40,4 +40,23 @@ RSpec.describe Employers::InboxesController, :type => :controller do
       expect(response).to have_http_status(:redirect)
     end
   end
+
+  describe "GET show" do
+    let(:message){double(to_a: double("to_array"))}
+    let(:inbox_provider){double(id: double("id"),legal_name: double("inbox_provider"))}
+    before do
+      allow(user).to receive(:person).and_return(person)
+      sign_in(user)
+      allow(EmployerProfile).to receive(:find).and_return(inbox_provider)
+      allow(controller).to receive(:find_message)
+      controller.instance_variable_set(:@message, message)
+      allow(message).to receive(:update_attributes).and_return(true)
+    end
+
+    it "creates new message" do
+      get :show, id: 1
+      expect(response).to have_http_status(:success)
+    end
+  end
+
 end
