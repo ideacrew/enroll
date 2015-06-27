@@ -1,8 +1,9 @@
 <fieldset>            
   <h4 style='float:left;'> Office Location </h4>
   <div style="height:50px;position:relative;">
-    <%= link_to '#', :class => "remove_fields close-2" do %>
-      <%= image_tag("delete.png") %>
+    <%= link_to 'javascript:void(0);', :class => "remove_fields close-2" do %>
+      <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span> Remove
+      <%#= image_tag("delete.png") %>
     <% end %>
   </div>
   <div class="clear"></div>

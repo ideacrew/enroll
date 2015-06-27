@@ -21,7 +21,7 @@
     <%= f.hidden_field :sender_id, value: @profile._id %>
     <%= f.hidden_field :from, value: @inbox_provider_name %>
     <%= f.hidden_field :to, value: @inbox_to_name  %>
-    <%= f.submit 'Send', class: "btn btn-primary interaction-control-inbox-send" %>
-    <a class="btn btn-danger" href="#"><i class="fa fa-times interaction-control-inbox-cancel"></i> Cancel</a>
+    <%= f.submit 'Send', class: "btn btn-danger interaction-control-inbox-send" %>
+    <a class="btn btn-tranparent interaction-control-inbox-cancel" href="#">Cancel</a>
   </div>
 </div>
