@@ -33,7 +33,8 @@
                                           <tr>
                                               <td><%= plan.try(:plan_type).try(:upcase) %></td>
 
-                                              <td class="<%= plan.try(:metal_level).try(:humanize).try(:downcase) %>"><%= plan.try(:metal_level).try(:humanize) %></td>
+                                              <% plan_level = plan.try(:metal_level).try(:humanize) %>
+                                              <td class="<%= plan_level.downcase %>"><%= plan_level %></td>
                                               <td><%= hbx_enrollment.try(:effective_on) %></td>
                                               <td></td>
                                           </tr>
