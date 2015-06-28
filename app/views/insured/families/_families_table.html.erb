@@ -1,5 +1,5 @@
 <div id= 'message_form'></div>
-<div class="container" id="inbox_provider_form">
+<div id="inbox_provider_form">
   <table class="table table-condensed">
     <thead>
       <tr>
@@ -51,7 +51,7 @@
                new_insured_inbox_path(id: family.primary_applicant.person.id,
                 profile_id: current_user.person.hbx_staff_role.hbx_profile.id,
                to: family.primary_applicant.person.last_name + ', ' + family.primary_applicant.person.first_name),
-            class: "btn btn-default", remote: true %></td>
+            class: "btn btn-default btn-sm", remote: true %></td>
         <% end %>
       </tr>
       <% end %>

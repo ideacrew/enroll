@@ -15,10 +15,8 @@
  *= require bootstrap-theme
  *= require bootstrap.min
  *= require component
- *= require style
  *= require custom
  *= require open_sans
- *= require styles
  *= require selectric
  *= require responsive
  *= require_self
