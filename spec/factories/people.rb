@@ -3,9 +3,9 @@ FactoryGirl.define do
     # name_pfx 'Mr'
     first_name 'John'
     # middle_name 'X'
-    sequence(:last_name) {|n| "Smith\##{n}" }
+    sequence(:last_name) {|n| "Smith#{n}" }
     # name_sfx 'Jr'
-    dob "04/04/1972"
+    dob "1972-04-04".to_date
     is_active true
 
     after(:create) do |p, evaluator|
