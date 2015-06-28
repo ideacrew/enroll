@@ -36,7 +36,7 @@
             <td> <%= message.try(:subject) %> </td>
             <td> <%#= link_to "show", polymorphic_path([:insured, :family, provider.inbox, message]), class: "btn btn-primary", remote: true %>
               <%= link_to "show", retrieve_show_path(provider, message), class: "btn btn-primary", remote: true %>
-              <%= link_to "Delete", retrieve_show_path(provider, message), class: "btn btn-tranparent btn-sm", remote: true, method: :delete %>
+              <%= link_to "Delete", retrieve_show_path(provider, message), class: "btn btn-transparent btn-sm", remote: true, method: :delete %>
             </td>
           </tr>
           <% end %>

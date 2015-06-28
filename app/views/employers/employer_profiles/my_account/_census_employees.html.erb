@@ -6,15 +6,16 @@
         <div id="add_employee_action"></div>
 
         <div id="employee_roster">
-          <div class="head-title head">
-            <h3 class="pull-left">Employee Roster</h3>
-            <div class="btn-wrapper">
+          <div class="row container">
+            <h3 class="title-inline">Employee Roster</h3>
+            
+            <div class="form-inline button-group-wrapper">
               <% if @employer_profile.plan_years.empty? %>
                 <!--  non javascript click when clicked on new employee -->
-                <%= link_to 'Add Employee'.html_safe, new_employers_employer_profile_census_employee_path(@employer_profile), class: "btn btn-danger" %>
+                <%= link_to 'Add Employee'.html_safe, new_employers_employer_profile_census_employee_path(@employer_profile), class: "btn btn-primary" %>
               <% else %>
                 <!-- javascript click when clicked on new employee -->
-                <%= link_to 'Add Employee'.html_safe, new_employers_employer_profile_census_employee_path(@employer_profile), class: "btn btn-danger", remote: true %>
+                <%= link_to 'Add Employee'.html_safe, new_employers_employer_profile_census_employee_path(@employer_profile), class: "btn btn-primary", remote: true %>
               <% end %>
 
                 <div class="btn-group" role="group" aria-label="">
@@ -36,7 +37,7 @@
               <span name="employee_families_url" style="display:none"><%= employers_employer_profile_path(@employer_profile) %></span>
             </div>
           </div>
-
+          
           <div id="employee_families">
             <div id="employees_active">
               <%= render "employers/employer_profiles/my_account/employees_by_status", status: 'active' %>
