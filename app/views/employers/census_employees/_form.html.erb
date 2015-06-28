@@ -39,6 +39,11 @@
             <%= render 'address_fields', f: address %>
           <% end %>
           <br/>
+
+          <%= f.fields_for :email, @census_employee.email, errors: {}, fieldset: false do |email| %>
+            <%= render 'email_fields', f: email %>
+          <% end %>
+          <br/>
           <%= render 'shared/add_dependents', {f: f} %>
           <div class="key-btn">
             <% button_label = @census_employee.persisted? ? 'Update Employee' : 'Create Employee' %>

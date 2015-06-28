@@ -30,7 +30,8 @@
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 qle-form-wrapper">
                 <h3 class="qle-details-title">"I got married"</h3>
                 <h5>Enter the date of the event.</h5>
-                <%= text_field_tag 'qle_date', '', placeholder: '00-00-0000', class: 'form-control' %>
+                <%= text_field_tag 'qle_date', '', :'data-date-max'=> "+30d", :'data-date-min'=> "-30d", placeholder: " ",
+                                 class: "required date-picker qle-date-picker floatlabel form-control", required: true %>
                 <%= link_to 'Submit', 'javascript:;', class: 'btn btn-danger', id: 'qle_submit' %>
                 <br>
                 <a class="cancel" href="javascript:void(0);">Cancel</a>

@@ -5,7 +5,7 @@ $(function() {
 function applyBrokerTabClickHandlers(){
   $('div[name=broker_agency_tabs] >').children().each( function() { 
     $(this).change(function(){
-      filter = 'broker_role';
+      filter = 'broker';
       agency_type = $(this).attr('value');
       $.ajax({
         url: '/broker_roles/new.js',

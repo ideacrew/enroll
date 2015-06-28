@@ -185,6 +185,14 @@ class User
     end
   end
 
+  # def password_digest(plaintext_password)
+  #     Rypt::Sha512.encrypt(plaintext_password)
+  # end
+  # # Verifies whether a password (ie from sign in) is the user password.
+  # def valid_password?(plaintext_password)
+  #   Rypt::Sha512.compare(self.encrypted_password, plaintext_password)
+  # end
+
 private
   # Remove indexed, unique, empty attributes from document
   def strip_empty_fields

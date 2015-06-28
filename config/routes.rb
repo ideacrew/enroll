@@ -29,12 +29,7 @@ Rails.application.routes.draw do
     end
 
     
-    resources :broker_applicants do
-      collection do
-        post :certify_broker
-        post :decertify_broker
-      end
-    end
+    resources :broker_applicants
 
     # get 'hbx_profiles', to: 'hbx_profiles#welcome'
     # get 'hbx_profiles/:id', to: 'hbx_profiles#show', as: "my_account"

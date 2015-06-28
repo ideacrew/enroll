@@ -42,10 +42,25 @@ $(document).ready(function () {
 
   semantic_class(); //Calls semantic class on all input fields & buttons (eg. interaction-click-control-continue)
 
+    $(document).on("click", "[class~='qle-date-picker']", function(e) {
+        dateMin = $(this).attr("data-date-min");
+        dateMax = $(this).attr("data-date-max");
+
+        if ($(".qle-details-title").html() === "\"I've had a baby\"" || $(".qle-details-title").html() === "\"Death\"") {
+            dateMax = "+0d";
+        }
+
+        $(this).datepicker('option', 'maxDate', dateMax);
+        $(this).datepicker('show');
+
+    });
+
   $(document).on("focus", "[class~='date-picker']", function(e){
     dateMin = $(this).attr("data-date-min");
+    dateMax = $(this).attr("data-date-max");
+
     if ($(this).hasClass('dob-picker') || $(this).hasClass('hire-picker')){
-      $(this).datepicker({ 
+      $(this).datepicker({
         changeMonth: true,
         changeYear: true,
         dateFormat: 'mm/dd/yy', 
@@ -61,6 +76,7 @@ $(document).ready(function () {
         changeYear: true,
         dateFormat: 'mm/dd/yy', 
         minDate: dateMin,
+        maxDate: dateMax,
         yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10),
           onSelect: function(dateText, dpInstance) {
 	    $(this).datepicker("hide");
@@ -97,13 +113,12 @@ $(document).ready(function () {
 
   // Progress Bar
   $(document).on('click', '#btn-continue', function() {
-    // console.log('continue', $('#btn-search-employer').length, $('#btn_user_contact_info').length, $('#btn_household_continue').length,$('#btn_select_plan_continue').length)
+    console.log('continue', $('#btn-search-employer').length, $('#btn_user_contact_info').length, $('#btn_household_continue').length,$('#btn_select_plan_continue').length)
     
     if($('#btn-search-employer').length) $('#btn-search-employer').click();
     else if($('#btn_user_contact_info').length) $('#btn_user_contact_info').click();
     else if($('#btn_household_continue').length) window.location = $('#btn_household_continue').val();
     else if($('#btn_select_plan_continue').length) $('#btn_select_plan_continue').click();
-    else if($('#confirm_plan').length) {$('#btn_purchase_plan_continue').click();}
   });
 
   // Employer Registration
@@ -334,6 +349,7 @@ $(document).ready(function () {
   $(".zip").mask("99999");
   $("#person_ssn").mask("999-99-9999");
   $(".person_ssn").mask("999999999");
+  $(".broker_npn").mask("9999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
   $(".area_code").mask("999");
@@ -370,7 +386,11 @@ $(document).ready(function () {
     $('#show_broker_agency').html('');
     $('#broker_agencies_panel').show();
   });
- 
+
+  $(document).on('click', '.return_to_broker_applicants', function() {
+    $('#edit_broker_applicant').html('');
+    $('#broker_applicants_roster').show();
+  });
 });
 
 $(document).ready(function () {

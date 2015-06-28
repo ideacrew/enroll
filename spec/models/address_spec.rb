@@ -139,12 +139,12 @@ describe 'view helpers/presenters' do
 
   describe "#to_html" do
     it "returns the address with html tags" do
-      expect(address.to_html).to eq "An address line 1<br/> An address line 2<br/> A City, CA 21222<br/>"
+      expect(address.to_html).to eq "<div>An address line 1</div><div>An address line 2</div><div>A City, CA 21222</div>"
     end
 
     it "retuns address with html tags if no address_2 field is present" do
       address.address_2 = ""
-      expect(address.to_html).to eq "An address line 1<br/>A City, CA 21222<br/>"
+      expect(address.to_html).to eq "<div>An address line 1</div><div>A City, CA 21222</div>"
     end
   end
 end
