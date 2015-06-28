@@ -7,7 +7,7 @@ describe Person do
 
   let(:first_name) {"Martina"}
   let(:last_name) {"Williams"}
-  let(:ssn) {"123456789"}
+  let(:ssn) {"657637863"}
   let(:gender) {"male"}
   let(:address) {FactoryGirl.build(:address)}
   let(:valid_params) do
@@ -54,7 +54,7 @@ describe Person do
     context "with no arguments" do
       let(:params) {{}}
 
-      it "should not save" do
+      it "should be invalid" do
         expect(Person.new(**params).valid?).to be_falsey
       end
     end
@@ -229,34 +229,6 @@ describe Person do
           expect(person.errors[:date_of_death].size).to eq 1
         end
       end
-    end
-
-  end
-
-end
-
-describe Person, "class methods" do
-  context "no employee_roles are present" do
-    it "should not find any employee_roles" do
-      expect(Person.employee_roles.size).to eq 0
-    end
-  end
-
-  context "employee_roles are present" do
-    before(:all) do
-      FactoryGirl.create_list(:employee_role, 11)
-    end
-
-    after(:all) do
-      DatabaseCleaner.clean
-    end
-
-    let(:employee_count) { 11 }
-
-    it "should find a matching number of employee_roles" do
-      expect(Person.employee_roles.count).to eq employee_count
-      expect((Person.employee_roles).first).to be_a EmployeeRole
-      DatabaseCleaner.clean
     end
 
   end
