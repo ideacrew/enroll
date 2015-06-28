@@ -39,6 +39,14 @@ class User
   # Oracle Identity Manager ID
   field :oim_id, type: String, default: ""
 
+  index({preferred_language: 1})
+  index({approved: 1})
+  index({roles: 1},  {sparse: true}) # MongoDB multikey index
+  index({email: 1},  {sparse: true, unique: true})
+  index({oim_id: 1}, {sparse: true, unique: true})
+
+  before_save :strip_empty_fields
+
   ROLES = {
     employee: "employee",
     resident: "resident",
@@ -177,9 +185,13 @@ class User
     end
   end
 
-protected
-
 private
+  # Remove indexed, unique, empty attributes from document
+  def strip_empty_fields
+    unset("email") if email.blank?
+    unset("oim_id") if oim_id.blank?
+  end
+  
   def generate_authentication_token
     loop do
       token = Devise.friendly_token
