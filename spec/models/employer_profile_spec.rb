@@ -40,23 +40,8 @@ describe EmployerProfile, dbclean: :after_each do
 
   context ".new" do
     context "with no arguments" do
-      let(:entity_kinds){ [
-        "tax_exempt_organization",
-        "c_corporation",
-        "s_corporation",
-        "partnership",
-        "limited_liability_corporation",
-        "limited_liability_partnership",
-        "household_employer",
-        "governmental_employer",
-        "foreign_embassy_or_consulate"
-      ] }
       let(:params)  { {} }
       let(:employer_profile) {EmployerProfile.new(**params)}
-
-      it "should match entity kinds" do
-        expect(Organization::ENTITY_KINDS).to eq entity_kinds
-      end
 
       it "should initialize nested models" do
         expect(employer_profile.inbox).not_to be_nil
