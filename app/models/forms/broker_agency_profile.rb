@@ -42,7 +42,7 @@ module Forms
       return false unless valid?
       begin
         match_or_create_person(current_user)
-        create_new_user unless current_user
+        person.add_work_email(email)
         person.save!
       rescue TooManyMatchingPeople
         errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
@@ -64,8 +64,8 @@ module Forms
       if current_user
         create_broker_agency_staff_role(current_user, organization.broker_agency_profile)
       else
-        create_broker_agency_staff_role(person.user, organization.broker_agency_profile)
-        create_broker_role(person.user, organization.broker_agency_profile)
+#        create_broker_agency_staff_role(person.user, organization.broker_agency_profile)
+#        create_broker_role(person.user, organization.broker_agency_profile)
         self.broker_agency_profile.primary_broker_role = person.broker_role
         self.broker_agency_profile.save!
       end
@@ -89,11 +89,5 @@ module Forms
       )
     end
 
-    def create_new_user
-      password = Devise.friendly_token.first(8)
-      user = User.new(:email => email, :password => password, :password_confirmation => password)
-      user.save!
-      person.user = user
-    end
   end
 end

@@ -306,6 +306,15 @@ class Person
    }
  end
 
+ def add_work_email(email)
+   existing_email = person.emails.detect do |e|
+     (e.kind == 'work') &&
+       (e.email.downcase == email.downcase)
+   end
+   return nil if existing_email.present?
+   self.emails << ::Email.new(:kind => 'work', :address => 'email')
+ end
+
 private
 
   def create_inbox
