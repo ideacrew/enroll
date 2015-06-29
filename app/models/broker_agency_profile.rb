@@ -71,7 +71,7 @@ class BrokerAgencyProfile
       raise ArgumentError.new("expected BrokerRole class") unless new_primary_broker_role.is_a? BrokerRole
       self.primary_broker_role_id = new_primary_broker_role._id
     else
-      unset(new_primary_broker_role)
+      unset("primary_broker_role_id")
     end
     @primary_broker_role = new_primary_broker_role
   end
