@@ -10,10 +10,8 @@
           <div class="col-md-12 col-sm-12 col-xs-12">
             <h4>Select Your Broker Agency</h4>
             <div class="col-md-4 col-sm-4 col-xs-12 input-group input-no-pd">
-              <%#= f.select(:broker_agency_id, options_for_select(@broker_agency_profiles.map {|agency| [agency.legal_name, agency.id]}), { prompt: "Select Broker Application Type"}, { :class => 'broker_agency'} ) %>
               <%= f.hidden_field :broker_agency_id %>
-              <%= text_field_tag :agency_search, nil, placeholder: 'Name/NPN', class: 'form-control' %>
-            
+              <%= text_field_tag :agency_search, nil, placeholder: 'Name/NPN', class: 'form-control' %>            
               <div class="input-group-btn">
                 <a href="#" onclick="return false;" class="btn btn-primary search" data-loading-text="Loading..."><i class="fa fa-search"></i> search</a>
               </div>

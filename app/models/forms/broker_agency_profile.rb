@@ -32,7 +32,7 @@ module Forms
       # current_user.save!
     end
 
-    def create_broker_role(user, broker_agency_profile)
+    def create_broker_role(user, broker_agency_profile=nil)
       person.broker_role = ::BrokerRole.new({ :provider_kind => 'broker', :npn => self.npn, :broker_agency_profile => broker_agency_profile })
       # user.roles << "broker" unless user.roles.include?("broker")
       # user.save!
