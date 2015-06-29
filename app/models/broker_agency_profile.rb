@@ -9,6 +9,7 @@ class BrokerAgencyProfile
 
   field :entity_kind, type: String
   field :market_kind, type: String
+  field :corporate_npn, type: String
   field :primary_broker_role_id, type: BSON::ObjectId
 
   field :languages_spoken, type: String # TODO
@@ -32,7 +33,13 @@ class BrokerAgencyProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
-  validates_presence_of :market_kind, :entity_kind # , :primary_broker_role_id, :entity_kind
+  validates_presence_of :market_kind, :entity_kind, :primary_broker_role_id
+
+  validates :corporate_npn, 
+    numericality: {only_integer: true},
+    length: { minimum: 1, maximum: 10 },    
+    uniqueness: true,
+    allow_blank: true
 
   validates :market_kind,
     inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid market kind" },
@@ -42,36 +49,31 @@ class BrokerAgencyProfile
     inclusion: { in: Organization::ENTITY_KINDS[0..3], message: "%{value} is not a valid business entity kind" },
     allow_blank: false
 
-  validate :writing_agent_employed_by_broker
-
   after_initialize :build_nested_models
 
   # has_many employers
   def employer_clients
-    return unless MARKET_KINDS.except("individual").include?(market_kind)
+    return unless (MARKET_KINDS - ["individual"]).include?(market_kind)
     return @employer_clients if defined? @employer_clients
-    @employer_clients = EmployerProfile.find_by_broker_agency_profile(self.id)
+    @employer_clients = EmployerProfile.find_by_broker_agency_profile(self)
   end
 
   # TODO: has_many families
   def family_clients
-    return unless MARKET_KINDS.except("shop").include?(market_kind)
+    return unless (MARKET_KINDS - ["shop"]).include?(market_kind)
     return @family_clients if defined? @family_clients
     @family_clients = Family.find_by_broker_agency_profile(self.id)
   end
 
   # has_one primary_broker_role
-  def primary_broker_role=(new_primary_broker_role)
+  def primary_broker_role=(new_primary_broker_role = nil)
     if new_primary_broker_role.present?
       raise ArgumentError.new("expected BrokerRole class") unless new_primary_broker_role.is_a? BrokerRole
       self.primary_broker_role_id = new_primary_broker_role._id
     else
-      primary_broker_role_id = nil
+      unset(new_primary_broker_role)
     end
-  end
-
-  def legal_name
-    organization.legal_name
+    @primary_broker_role = new_primary_broker_role
   end
 
   def primary_broker_role
@@ -79,15 +81,36 @@ class BrokerAgencyProfile
     @primary_broker_role = BrokerRole.find(self.primary_broker_role_id) unless primary_broker_role_id.blank?
   end
 
-  # alias for brokers
-  def writing_agents
-    brokers
+  # has_many active broker_roles
+  def active_broker_roles
+    # return @active_broker_roles if defined? @active_broker_roles
+    @active_broker_roles = BrokerRole.find_active_by_broker_agency_profile(self)
   end
 
-  # has_many brokers
+  # has_many candidate_broker_roles
+  def candidate_broker_roles
+    # return @candidate_broker_roles if defined? @candidate_broker_roles
+    @candidate_broker_roles = BrokerRole.find_candidates_by_broker_agency_profile(self)
+  end
+
+  # has_many inactive_broker_roles
+  def inactive_broker_roles
+    # return @inactive_broker_roles if defined? @inactive_broker_roles
+    @inactive_broker_roles = BrokerRole.find_inactive_by_broker_agency_profile(self)
+  end
+
+  # alias for broker_roles
+  def writing_agents
+    active_broker_roles
+  end
+
+  # alias for broker_roles - deprecate
   def brokers
-    return @broker_role if defined? @broker_role
-    @broker_role = BrokerRole.find_by_broker_agency_profile(self)
+    active_broker_roles
+  end
+
+  def legal_name
+    organization.legal_name
   end
 
   def market_kind=(new_market_kind)
@@ -106,7 +129,7 @@ class BrokerAgencyProfile
 
     # TODO; return as chainable Mongoid::Criteria
     def all
-      list_embedded Organization.exists(broker_agency_profile: true).order_by([:dba]).to_a
+      list_embedded Organization.exists(broker_agency_profile: true).order_by([:legal_name]).to_a
     end
 
     def first
@@ -153,18 +176,5 @@ private
 
   def build_nested_models
     build_inbox if inbox.nil?
-  end
-
-  def writing_agent_employed_by_broker
-    # TODO: make this work when I'm not tired - Sean Carley
-    if writing_agents.present?
-      employers = EmployerProfile.find_by_broker_agency_profile(self)
-      writing_agents.each do |broker_role|
-        brokers = EmployerProfile.find_by_writing_agent(broker_role)
-        unless true
-          errors.add(:writing_agent, "must be broker at broker_agency")
-        end
-      end
-    end
   end
 end

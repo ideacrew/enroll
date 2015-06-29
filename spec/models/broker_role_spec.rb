@@ -8,9 +8,9 @@ describe BrokerRole, dbclean: :after_each do
   let(:person0) {FactoryGirl.create(:person)}
   let(:person1) {FactoryGirl.create(:person)}
   let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
-  let(:npn0) {"xyz123xyz"}
-  let(:npn1) {"123xyz123"}
-  let(:provider_kind)  {"assister"}
+  let(:npn0) {"7775566"}
+  let(:npn1) {"48484848"}
+  let(:provider_kind)  {"broker"}
 
 
   describe ".new" do

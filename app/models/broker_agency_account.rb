@@ -3,6 +3,7 @@ class BrokerAgencyAccount
   include Mongoid::Timestamps
 
   embedded_in :employer_profile
+  embedded_in :family
 
   # Begin date of relationship
   field :start_on, type: Date
@@ -19,7 +20,6 @@ class BrokerAgencyAccount
   field :is_active, type: Boolean, default: true
 
   validates_presence_of :start_on, :broker_agency_profile_id, :is_active
-  validate :writing_agent_employed_by_broker
 
   default_scope   ->{ where(:is_active => true) }
 
@@ -33,8 +33,6 @@ class BrokerAgencyAccount
 
   def broker_agency_profile
     return @broker_agency_profile if defined? @broker_agency_profile
-    # @broker_agency_profile = employer_profile.organization.broker_agency_profile.where(id: @broker_agency_profile_id) unless @broker_agency_profile_id.blank?
-     
     @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_profile_id) unless self.broker_agency_profile_id.blank?
   end
 
@@ -54,15 +52,6 @@ class BrokerAgencyAccount
     def find(id)
       org = Organization.unscoped.where(:"employer_profile.broker_agency_accounts._id" => id).first
       org.employer_profile.broker_agency_accounts.detect { |account| account._id == id } unless org.blank?
-    end
-  end
-
-private
-  def writing_agent_employed_by_broker
-    if writing_agent.present? && broker_agency.present?
-      unless broker_agency.writing_agents.detect(writing_agent)
-        errors.add(:writing_agent, "must be broker at broker_agency")
-      end
     end
   end
 
