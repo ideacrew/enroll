@@ -24,25 +24,32 @@
           <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "BIRTHDATE",
                                            :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'mm/dd/yy',required: true} %>
         </div>
+
+        <%
+          male_id = Time.now.to_f
+          female_id = Time.now.to_f + 1
+        %>
         <div class="col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
-          <div class="radio skinned-form-controls skinned-form-controls-mac">
-            <label>
-              <%= f.radio_button :gender, "male", class: "" %>
-              <span>Male</span>
-            </label>
+          <div class="radio">
+              <%= f.radio_button :gender, "male", checked: true %>
+              <%= f.label :gender, "<span>MALE</span>".html_safe, value: 'male' %>
           </div>
         </div>
         <div class="col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
-          <div class="radio skinned-form-controls skinned-form-controls-mac">
-            <label>
-              <%= f.radio_button :gender, "female",class: ""  %>
-              <span>Female</span>
-            </label>
+          <div class="radio">
+              <%= f.radio_button :gender, "female" %>
+              <%= f.label :gender, "<span>FEMALE</span>".html_safe, value: 'female' %>
           </div>
         </div>
+
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <%= f.select :employee_relationship, options_for_select(CensusDependent::EMPLOYEE_RELATIONSHIP_KINDS.map{|r| [r.to_s.humanize, r.to_s] }, selected: f.object.employee_relationship), {include_blank: "SELECT RELATIONSHIP", required: true} %>
         </div>
+
+        <% 
+          male_id = nil
+          female_id = nil
+        %>
       </div>
     </div>
   </div>
