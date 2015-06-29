@@ -48,6 +48,10 @@
   .input-lg, .form-group-lg{
     border-bottom: 1px solid #ccc;
    }
+
+  .border_bottom_zero, .form-group-lg:last-child{
+    border-bottom: 0px solid #ccc;
+  }
    .top-row, .middle-row{border-bottom: 0px solid #b7b7b7;}
 
   .key-btn{width: 50%;}
@@ -185,9 +189,17 @@
   #key-section {
     margin: 0;
   }
+
+  .form-inputs{float: left; margin-right: 10px;}
+}
+
+@media (max-width: 545px){
+  .form-inputs{float: left; margin-bottom: 10px;}  
 }
 
 @media (max-width: 480px) { 
+    .form-inputs{float: left; margin-bottom: 10px;}
+
     #family .right-side .btn.new-member {
         width: 100%;
     }
@@ -438,7 +450,13 @@
     width: 100%;
     margin-bottom: 5px;
   }
+  .interaction-click-control-create-plan-year{width: 100%;}
 }
+
+@media only screen and (max-width: 450px){
+  .interaction-click-control-sign-in, .interaction-click-control-create-account{margin-bottom: 10px;}
+}
+
 @media(min-width: 768px) and (max-width: 999px){
   .compare-slctd-plan .compare table ul.plan-type{
     width: 100%;
