@@ -6,13 +6,13 @@ class Organization
   extend Mongorder
 
   ENTITY_KINDS = [
+    "tax_exempt_organization",
     "c_corporation",
     "s_corporation",
     "partnership",
     "limited_liability_corporation",
     "limited_liability_partnership",
     "household_employer",
-    "tax_exempt_organization",
     "governmental_employer",
     "foreign_embassy_or_consulate"
   ]
@@ -63,21 +63,20 @@ class Organization
   index({ fein: 1 }, { unique: true })
   index({ is_active: 1 })
 
-  # CarrierProfile child model indexes - small number of Carriers make index conterproductive 
-  # index({"carrier_profile._id" => 1}, { unique: true })
+  # CarrierProfile child model indexes
+  index({"carrier_profile._id" => 1}, { unique: true, sparse: true })
 
   # BrokerAgencyProfile child model indexes
-  index({"broker_agency_profile._id" => 1}, { unique: true })
+  index({"broker_agency_profile._id" => 1}, { unique: true, sparse: true })
   index({"broker_agency_profile.aasm_state" => 1})
-  index({"broker_agency_profile.corporate_npn" => 1}, { unique: true, sparse: true })
-  index({"broker_agency_profile.primary_broker_role_id" => 1}, { unique: true })
+  index({"broker_agency_profile.primary_broker_role_id" => 1}, { unique: true, sparse: true })
   index({"broker_agency_profile.market_kind" => 1})
 
   # EmployerProfile child model indexes
-  index({"employer_profile._id" => 1}, { unique: true })
+  index({"employer_profile._id" => 1}, { unique: true, sparse: true })
   index({"employer_profile.aasm_state" => 1})
 
-  index({"employer_profile.plan_years._id" => 1}, { unique: true })
+  index({"employer_profile.plan_years._id" => 1}, { unique: true, sparse: true })
   index({"employer_profile.plan_years.aasm_state" => 1})
   index({"employer_profile.plan_years.start_on" => 1})
   index({"employer_profile.plan_years.end_on" => 1})
@@ -86,7 +85,7 @@ class Organization
   index({"employer_profile.plan_years.benefit_groups._id" => 1})
   index({"employer_profile.plan_years.benefit_groups.reference_plan_id" => 1})
 
-  index({"employer_profile.broker_agency_accounts._id" => 1}, { unique: true })
+  index({"employer_profile.broker_agency_accounts._id" => 1})
   index({"employer_profile.broker_agency_accounts.is_active" => 1,
          "employer_profile.broker_agency_accounts.broker_agency_profile_id" => 1 },
          { name: "active_broker_accounts_broker_agency" })
