@@ -28,14 +28,14 @@ module Forms
     def create_broker_agency_staff_role(current_user, broker_agency_profile)
       person.user = current_user
       person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)
-      current_user.roles << "broker_agency_staff" unless current_user.roles.include?("broker_agency_staff")
-      current_user.save!
+      # current_user.roles << "broker_agency_staff" unless current_user.roles.include?("broker_agency_staff")
+      # current_user.save!
     end
 
     def create_broker_role(user, broker_agency_profile)
       person.broker_role = ::BrokerRole.new({ :provider_kind => 'broker', :npn => self.npn, :broker_agency_profile => broker_agency_profile })
-      user.roles << "broker" unless user.roles.include?("broker")
-      user.save!
+      # user.roles << "broker" unless user.roles.include?("broker")
+      # user.save!
     end
 
     def save(current_user)
@@ -64,8 +64,8 @@ module Forms
       if current_user
         create_broker_agency_staff_role(current_user, organization.broker_agency_profile)
       else
-#        create_broker_agency_staff_role(person.user, organization.broker_agency_profile)
-#        create_broker_role(person.user, organization.broker_agency_profile)
+        create_broker_agency_staff_role(person.user, organization.broker_agency_profile)
+        create_broker_role(person.user, organization.broker_agency_profile)
         self.broker_agency_profile.primary_broker_role = person.broker_role
         self.broker_agency_profile.save!
       end
