@@ -21,6 +21,10 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def benefit_relationship(person_relationship)
+    PlanCostDecorator.benefit_relationship(person_relationship)
+  end
+
+  def self.benefit_relationship(person_relationship)
     {
       "head of household" => nil,
       "spouse" => "spouse",

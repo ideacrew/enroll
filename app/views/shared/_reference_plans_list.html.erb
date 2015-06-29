@@ -4,7 +4,7 @@
 
 <!-- Select Elected Plan -->
 <div class="col-md-4 col-sm-4 col-xs-12 no-pd">
-  <%= f.select 'plan_option_kind', options_for_select([["All plans from a given carrier", "single_carrier"], ["All plans with a given metal level", "metal_level"], ["A single plan", "single_plan"]], selected: f.object.plan_option_kind), {include_blank: "SELECT ELECTED PLAN KIND"}, {class: 'elected_plan'} %>
+  <%= f.select 'plan_option_kind', options_for_select([["All plans from a given carrier", "single_carrier"], ["All plans with a given metal level", "metal_level"], ["A single plan", "single_plan"]], selected: f.object.plan_option_kind), {include_blank: "Select Plan Offerings"}, {class: 'elected_plan'} %>
 </div>
 
 <div class="col-md-4 col-sm-4 col-xs-12 elected-plan-select no-pd">
