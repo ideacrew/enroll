@@ -1,5 +1,0 @@
-<% if @agency_type.present? %>
-  $('#new_and_existing_broker_form').html("<%= escape_javascript(render "#{@agency_type}_broker_agency_form") %>");
-<% else %>
-  $('#broker_and_staff_form').html("<%= escape_javascript(render "#{@filter}_signup") %>");
-<% end %>

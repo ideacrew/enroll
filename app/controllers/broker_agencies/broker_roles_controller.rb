@@ -1,18 +1,30 @@
 ### Handles Broker Registration requests made by anonymous users. Authentication disbaled for this controller.
 class BrokerAgencies::BrokerRolesController < ApplicationController
-  
-  def new
-    @person = Forms::BrokerCandidate.new
-    
-    @organization = ::Forms::BrokerAgencyProfile.new
-    @orgs = Organization.exists(broker_agency_profile: true)
-    @broker_agency_profiles = @orgs.map(&:broker_agency_profile)
+  before_action :assign_filter_and_agency_type
 
-    @filter = params[:filter] || 'broker'
-    @agency_type = params[:agency_type]
+  def new_broker
+    @person = Forms::BrokerCandidate.new
 
     respond_to do |format|
-      format.html
+      format.html { render 'new' }
+      format.js
+    end
+  end
+
+  def new_staff_member
+    @person = Forms::BrokerCandidate.new
+
+    respond_to do |format|
+      format.html { render 'new' }
+      format.js
+    end
+  end
+
+  def new_broker_agency
+    @organization = Forms::BrokerAgencyProfile.new
+
+    respond_to do |format|
+      format.html { render 'new' }
       format.js
     end
   end
@@ -42,7 +54,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
         redirect_to "/broker_registration"
       else
         @filter = applicant_type
-        render "new"
+        render 'new'
       end
     else
       @organization = ::Forms::BrokerAgencyProfile.new(primary_broker_role_params)
@@ -50,7 +62,6 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
         redirect_to "/broker_registration"
       else
-        @filter = 'broker'
         @agency_type = 'new'
         render "new"
       end
@@ -58,6 +69,11 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   private
+
+  def assign_filter_and_agency_type
+    @filter = params[:filter] || 'broker'
+    @agency_type = params[:agency_type] || 'existing'
+  end
 
   def primary_broker_role_params
     params.require(:organization).permit(

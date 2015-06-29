@@ -1,19 +1,15 @@
 <div id="broker_registration_panel">
   <div class="container top-pd">
     <div class="tab-wrapper">
-      <ul class="nav nav-tabs" role="tablist" name="broker_signup_primary_tabs">
-        <li role="presentation" class="<%= 'active' if @filter == 'broker' %>">
-          <a data-toggle="tab" role="tab" data-value="broker" aria-controls="home" href="#" onclick="return false;" aria-expanded="true">BROKER</a>
-        </li>
-        <li role="presentation" class="<%= 'active' if @filter == 'staff' %>">
-          <a data-toggle="tab" role="tab" data-value="staff" aria-controls="profile" href="#" onclick="return false;" aria-expanded="false">BROKER AGENCY STAFF</a>
-        </li>
-      </ul>
-
-            <div id="broker_signup_container" class="tab-content-pd bottom-pd">
-               <div id="broker_and_staff_form">
-                <%= render "#{@filter}_signup", agency_type: @agency_type %>
-              </div>
-            </div>
+      <%= render "primary_nav" %>
+      <div id="broker_signup_container" class="tab-content-pd bottom-pd">
+       <div id="broker_and_staff_form">
+        <% if @filter == 'broker' %>
+        <%= render "broker_signup" %>
+        <% else %>
+        <%= render "existing_broker_agency_form" %>
+        <% end %>
+      </div>
     </div>
+  </div>
 </div>
