@@ -54,8 +54,6 @@
           </div>
 
           <%= link_to("Waive", waive_insured_plan_shopping_path(@enrollment, {:plan_id => @plan.id}), {:class => "btn btn-default", :method => :post}) %>
-          <%= link_to '<i class="fa fa-shopping-cart"></i>
-   Purchase'.html_safe, checkout_insured_plan_shopping_path(@enrollment, :plan_id => @plan.id), :class => "btn btn-primary btn-continue pull-right", :method => :post %>
         </div>
 
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">

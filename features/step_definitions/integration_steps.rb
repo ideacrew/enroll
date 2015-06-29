@@ -237,7 +237,7 @@ When(/^I click confirm member$/) do
 end
 
 When(/^I click continue on the dependents page$/) do
-  scroll_then_click(@browser.button(class: /interaction-click-control-continue/))
+  scroll_then_click(@browser.element(class: /interaction-click-control-continue/, id: /btn-continue/))
 end
 
 Then(/^I should see the group selection page$/) do

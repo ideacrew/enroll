@@ -1,7 +1,7 @@
 <div class="container">
   <div id="dependents_info_wrapper">
     <div class="row">
-      <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
+      <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12 bottom-pd">
 
         <% if @change_plan.present? %>
            <h3 class="blue-text"><%= @change_plan %>, on: <%= @change_plan_date %></h3>
@@ -66,7 +66,7 @@
 
       <% if @change_plan.blank? %>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
-        <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
+        <%= render  partial: 'shared/signup_progress', locals: {step: '4', url: group_selection_url} %>
       </div>
       <% end %>
 
