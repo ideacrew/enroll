@@ -307,7 +307,7 @@ class Person
  end
 
  def add_work_email(email)
-   existing_email = person.emails.detect do |e|
+   existing_email = self.emails.detect do |e|
      (e.kind == 'work') &&
        (e.email.downcase == email.downcase)
    end
