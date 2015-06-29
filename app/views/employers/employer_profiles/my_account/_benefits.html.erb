@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row top-pd">
       <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
-        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile), class: "btn btn-danger btn-lg", data: {loading_text: "Loading..."} %>
+        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."} %>
         <br><br>
         <% if @plan_years.present? %>
           <% @plan_years.each do |plan_year| %>

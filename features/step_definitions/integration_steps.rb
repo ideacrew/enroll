@@ -123,6 +123,7 @@ When(/^I enter the identifying info of (.*)$/) do |named_person|
   @browser.text_field(name: "jq_datepicker_ignore_person[dob]").set(person[:dob])
   scroll_then_click(@browser.label(:text=> /FIRST NAME/))
   @browser.text_field(name: "person[ssn]").set(person[:ssn])
+  @browser.radio(id: /radio_male/).fire_event("onclick")
   screenshot("information_entered")
   @browser.element(class: /interaction-click-control-continue/).wait_until_present
   scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
@@ -237,7 +238,7 @@ When(/^I click confirm member$/) do
 end
 
 When(/^I click continue on the dependents page$/) do
-  scroll_then_click(@browser.button(class: /interaction-click-control-continue/))
+  scroll_then_click(@browser.element(class: /interaction-click-control-continue/, id: /btn-continue/))
 end
 
 Then(/^I should see the group selection page$/) do

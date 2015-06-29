@@ -46,14 +46,14 @@
       <li role="presentation"<%= menu_tab_class(active_tab, "messages-tab") %>>
         <%= link_to(inbox_consumer_profiles_path, :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
           <span class="badge"><%= @person.inbox.messages.size if @person.inbox.messages.present? %></span>
-          Inbox
+          Messages
         <% end %>
 
         <a href="#" class="visible-xs">
             
         <%= link_to(inbox_consumer_profiles_path, :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
           <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
-          <small>Inbox</small>
+          <small>Messages</small>
         <% end %>
       </li>
     </ul>

@@ -1,5 +1,5 @@
 <div class="row no-buffer">
-  <div class="col-md-6 col-md-offset-3 input-no-pd">
+  <div class="col-md-6 col-md-offset-3 input-no-pd bottom-pd">
     <h3>New Message</h3>
 
     <table class="table table-message-wrapper">
@@ -21,7 +21,7 @@
     <%= f.hidden_field :sender_id, value: @profile._id %>
     <%= f.hidden_field :from, value: @inbox_provider_name %>
     <%= f.hidden_field :to, value: @inbox_to_name  %>
-    <%= f.submit 'Send', class: "btn btn-danger interaction-control-inbox-send" %>
-    <a class="btn btn-tranparent interaction-control-inbox-cancel" href="#">Cancel</a>
+    <%= f.submit 'Send', class: "btn btn-primary interaction-control-inbox-send" %>
+    <a class="btn btn-transparent interaction-control-inbox-cancel" href="#">Cancel</a>
   </div>
 </div>
