@@ -14,7 +14,7 @@ class BrokerRole
   field :npn, type: String
   field :broker_agency_profile_id, type: BSON::ObjectId
   field :provider_kind, type: String
-  field :comments, type: String
+  field :reason, type: String
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -193,6 +193,7 @@ class BrokerRole
 private
 
   def is_primary_broker?
+    return false unless broker_agency_profile
     broker_agency_profile.primary_broker_role == self
   end
 
