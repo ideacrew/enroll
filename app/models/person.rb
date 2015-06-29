@@ -312,7 +312,7 @@ class Person
        (e.email.downcase == email.downcase)
    end
    return nil if existing_email.present?
-   self.emails << ::Email.new(:kind => 'work', :address => 'email')
+   self.emails << ::Email.new(:kind => 'work', :address => email)
  end
 
 private
