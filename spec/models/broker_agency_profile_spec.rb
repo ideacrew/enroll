@@ -61,7 +61,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
         expect(BrokerAgencyProfile.create(**params).errors[:market_kind]).to eq [market_kind_error_message]
       end
     end
-
+=begin
     context "with no primary_broker" do
       let(:params) {valid_params.except(:primary_broker_role)}
 
@@ -69,6 +69,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
         expect(BrokerAgencyProfile.create(**params).errors[:primary_broker_role_id].any?).to be_truthy
       end
     end
+=end
 
     context "with all valid arguments" do
       let(:params) {valid_params}

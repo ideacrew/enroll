@@ -33,7 +33,7 @@ class BrokerAgencyProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
-  validates_presence_of :market_kind, :entity_kind, :primary_broker_role_id
+  validates_presence_of :market_kind, :entity_kind #, :primary_broker_role_id
 
   validates :corporate_npn, 
     numericality: {only_integer: true},
