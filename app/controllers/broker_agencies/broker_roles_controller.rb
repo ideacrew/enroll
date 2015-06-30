@@ -39,7 +39,6 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   def create
-    success = false
     if params[:person].present?
       @person = ::Forms::BrokerCandidate.new(applicant_params)
       if @person.save
@@ -51,7 +50,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
       end
     else
       @organization = ::Forms::BrokerAgencyProfile.new(primary_broker_role_params)
-      if @organization.save(current_user)
+      if @organization.save
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
         redirect_to broker_registration_path
       else
