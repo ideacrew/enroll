@@ -1,8 +1,9 @@
 ### Handles Broker Registration requests made by anonymous users. Authentication disbaled for this controller.
-class BrokerRolesController < ApplicationController
+class BrokerAgencies::BrokerRolesController < ApplicationController
   
   def new
     @person = Forms::BrokerCandidate.new
+    
     @organization = ::Forms::BrokerAgencyProfile.new
     @orgs = Organization.exists(broker_agency_profile: true)
     @broker_agency_profiles = @orgs.map(&:broker_agency_profile)

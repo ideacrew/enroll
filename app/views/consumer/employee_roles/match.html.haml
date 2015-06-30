@@ -2,7 +2,8 @@
 	#new_person_wrapper
 		.row
 			.col-lg-7.col-md-7.col-sm-8.col-xs-12
-				= render 'remote_search_form'
+				= form_for @person, { :as => :person, :url => match_consumer_employee_index_path, :method => :get } do |f|
+					= render 'remote_search_form', f: f
 				#person_search_results
 					= render 'select_employer'
 			.col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section

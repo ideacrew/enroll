@@ -25,8 +25,9 @@ class Family
   embeds_many :special_enrollment_periods, cascade_callbacks: true
   embeds_many :irs_groups, cascade_callbacks: true
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
+  embeds_many :broker_agency_accounts
 
-  accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups, :households
+  accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups, :households, :broker_agency_accounts
 
   index({person_id: 1})
   index({e_case_id: 1}, { unique: true, sparse: true })

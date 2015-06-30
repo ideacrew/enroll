@@ -10,7 +10,7 @@ class Employers::CensusEmployeesController < ApplicationController
   def create
     @census_employee = CensusEmployee.new
     @census_employee.attributes = census_employee_params
-    if Person.where(ssn: census_employee_params["ssn"].gsub('-','')).present?
+    if CensusEmployee.where(ssn: census_employee_params["ssn"].gsub('-','')).present?
       flash[:error] = "The provided SSN belongs to another person."
       render action: "new"
     elsif benefit_group_id.present?
@@ -46,11 +46,16 @@ class Employers::CensusEmployeesController < ApplicationController
 
       @census_employee.attributes = census_employee_params
       authorize! :update, @census_employee
-      if @census_employee.save
+
+      if CensusEmployee.where(ssn: census_employee_params["ssn"].gsub('-','')).present? && CensusEmployee.where(ssn: census_employee_params["ssn"].gsub('-','')).first != @census_employee
+        flash[:error] = "The provided SSN belongs to another person."
+        redirect_to employers_employer_profile_path(@employer_profile)
+      elsif @census_employee.save
         flash[:notice] = "Census Employee is successfully updated."
         redirect_to employers_employer_profile_path(@employer_profile)
       else
-        render action: "edit"
+        flash[:error] = "Failed to update Census Employee."
+        redirect_to employers_employer_profile_path(@employer_profile)
       end
     else
       flash[:error] = "Please select Benefit Group."
@@ -175,7 +180,7 @@ class Employers::CensusEmployeesController < ApplicationController
         :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
         :email_attributes => [:id, :kind, :address],
       :census_dependents_attributes => [
-          :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy
+          :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy, :ssn
         ]
       )
   end

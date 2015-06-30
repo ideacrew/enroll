@@ -123,6 +123,7 @@ When(/^I enter the identifying info of (.*)$/) do |named_person|
   @browser.text_field(name: "jq_datepicker_ignore_person[dob]").set(person[:dob])
   scroll_then_click(@browser.label(:text=> /FIRST NAME/))
   @browser.text_field(name: "person[ssn]").set(person[:ssn])
+  @browser.radio(id: /radio_male/).fire_event("onclick")
   screenshot("information_entered")
   @browser.element(class: /interaction-click-control-continue/).wait_until_present
   scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
@@ -237,7 +238,7 @@ When(/^I click confirm member$/) do
 end
 
 When(/^I click continue on the dependents page$/) do
-  scroll_then_click(@browser.button(class: /interaction-click-control-continue/))
+  scroll_then_click(@browser.element(class: /interaction-click-control-continue/, id: /btn-continue/))
 end
 
 Then(/^I should see the group selection page$/) do
@@ -331,4 +332,14 @@ When(/^I log in to the employee account page$/) do
   @browser.text_field(class: /interaction-field-control-user-email/).set(@email)
   @browser.text_field(class: /interaction-field-control-user-password/).set(@password)
   scroll_then_click(@browser.element(class: /interaction-click-control-sign-in/))
+end
+
+When(/^I visit consumer profile homepage$/) do
+  visit "/consumer_profiles/home"
+end
+
+Then(/^I should see the "YOUR LIFE EVENTS" section/) do
+  @browser.element(text: /YOUR LIFE EVENTS/i).wait_until_present
+  screenshot("your_life_events")
+  expect(@browser.element(text: /YOUR LIFE EVENTS/i).visible?).to be_truthy
 end

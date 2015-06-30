@@ -34,10 +34,15 @@
 		.vertical-line-progress
 		Complete
 
-%button.btn.btn-lg.btn-danger.btn-block#btn-continue{type: 'submit'}
-	- if controller_name == 'plan_shoppings' && action_name == 'thankyou'
-		PURCHASE
-	- else
+- if step == 4 && defined? url
+	= link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
+- elsif step == 5
+	%button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{disabled: true}
+		CONTINUE
+- elsif step == 6
+	= link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment, :plan_id => @plan.id), :class => 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue', :method => :post
+- else
+	%button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{type: 'submit'}
 		CONTINUE
 
 %ul.list-unstyled.list-right-section

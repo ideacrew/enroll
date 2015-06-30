@@ -41,14 +41,17 @@ $(function () {
 
 	function check_qle_date() {
 		var date_value = $('#qle_date').val();
-		if(date_value == "" || isNaN(Date.parse(date_value)) || Date.parse(date_value) > Date.parse(new Date())) { return false; }
+		if(date_value == "" || isNaN(Date.parse(date_value))) { return false; }
 		return true;
 	}
 
 	function get_qle_date() {
+        qle_string = $(".qle-details-title").html();
+        qle_type = qle_string.substring(1, qle_string.length-1);
+
 		$.ajax({
 			type: "GET",
-			data:{date_val: $("#qle_date").val()},
+			data:{date_val: $("#qle_date").val(), qle_type: qle_type},
 			url: "/consumer_profiles/check_qle_date.js"
 		});
 	}

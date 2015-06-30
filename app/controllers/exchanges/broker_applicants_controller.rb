@@ -16,17 +16,21 @@ class Exchanges::BrokerApplicantsController < ApplicationController
 
   def update
     broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
-    broker_role.comments = params[:broker_role][:comments]
+    broker_role.reason = params[:broker_role][:reason]
     broker_role.save!
 
-    if params[:decertify].present?
+    if params['deny']
+      broker_role.deny!
+      flash[:notice] = "Broker applicant denied."
+    elsif params['decertify']
       broker_role.decertify!
-      flash[:notice] = "Broker applicant decertified successfully."
+      flash[:notice] = "Broker applicant decertified."
     else
       broker_role.approve!
       Invitation.invite_broker!(broker_role)
-      flash[:notice] = "Broker applicant certified successfully."
+      flash[:notice] = "Broker applicant approved successfully."
     end
+
     redirect_to "/exchanges/hbx_profiles"
   end
 

@@ -1,12 +1,11 @@
-<div class="container">
-
+<div class="container bottom-pd">
+  <div class="row">
+    <h3 class="title-inline">Messages</h3>
+  </div>
 
   <div class="row">
-    <div id="inbox_form">
-    <h2>Messages</h2><br>
-    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
-      <br><br><br>
-      <ul class="list-groupx">
+    <div id="inbox_form" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 no-pd">
+      <ul class="list-group">
         <%= link_to(retrieve_inbox_path(provider), remote: true) do%>
         <li class="list-group-item">Inbox <span class="badge message-badge pull-right"><%= provider.inbox.unread_messages.size %></span></li>
         <% end %>
@@ -17,7 +16,6 @@
           <li class="list-group-item">Deleted</li>
         <% end %>
       </ul>
-    </div>
     </div>
    
     <div class="col-lg-10 col-md-9 col-sm-8 col-xs-12" id="message_list_form">
@@ -38,7 +36,7 @@
             <td> <%= message.try(:subject) %> </td>
             <td> <%#= link_to "show", polymorphic_path([:insured, :family, provider.inbox, message]), class: "btn btn-primary", remote: true %>
               <%= link_to "show", retrieve_show_path(provider, message), class: "btn btn-primary", remote: true %>
-              <%= link_to "Delete", retrieve_show_path(provider, message), class: "btn btn-tranparent btn-sm", remote: true, method: :delete %>
+              <%= link_to "Delete", retrieve_show_path(provider, message), class: "btn btn-transparent btn-sm", remote: true, method: :delete %>
             </td>
           </tr>
           <% end %>

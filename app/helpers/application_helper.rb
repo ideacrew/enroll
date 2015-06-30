@@ -287,14 +287,16 @@ module ApplicationHelper
   end
 
   def portal_display_name(controller)
-    if controller == 'consumer_profiles' || controller == 'employee_roles'
-      text = "I'm an Individual/Family"
+    if controller == 'welcome'
+      "Welcome to the District's Health Insurance Marketplace"
+    elsif controller == 'consumer_profiles' || controller == 'employee_roles'
+      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Individual/Family".html_safe
     elsif controller == 'employer_profiles'
-      text = "I'm an Employer"
+      "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe
     elsif controller == 'profiles' || controller == 'broker_roles'
-      text = "I'm a Broker"
+      "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe
     elsif controller == 'hbx_profiles'
-      text = "I'm HBX Staff"
+      "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm HBX Staff".html_safe
     end
   end
 end

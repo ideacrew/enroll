@@ -28,7 +28,7 @@ class EmployerProfile
   embeds_one  :inbox, as: :recipient, cascade_callbacks: true
   embeds_one  :employer_profile_account
   embeds_many :plan_years, cascade_callbacks: true, validate: true
-  embeds_many :broker_agency_accounts
+  embeds_many :broker_agency_accounts, cascade_callbacks: true, validate: true
 
   accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts
 
@@ -194,7 +194,7 @@ class EmployerProfile
     def find_by_broker_agency_profile(broker_agency_profile)
       raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile)
       orgs = Organization.and(:"employer_profile.broker_agency_accounts.is_active" => true,
-        :"employer_profile.broker_agency_accounts.broker_agency_profile_id" => broker_agency_profile.id).cache.to_a
+        :"employer_profile.broker_agency_accounts.broker_agency_profile_id" => broker_agency_profile.id)
 
       orgs.collect(&:employer_profile)
     end

@@ -14,7 +14,7 @@ class BrokerRole
   field :npn, type: String
   field :broker_agency_profile_id, type: BSON::ObjectId
   field :provider_kind, type: String
-  field :comments, type: String
+  field :reason, type: String
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -25,15 +25,16 @@ class BrokerRole
   after_initialize :initial_transition
 
   validates_presence_of :npn, :provider_kind
-  validates :npn, uniqueness: true
+
+  validates :npn, 
+    numericality: {only_integer: true},
+    length: { minimum: 1, maximum: 10 },    
+    uniqueness: true,
+    allow_blank: false
+
   validates :provider_kind,
     allow_blank: false,
     inclusion: { in: PROVIDER_KINDS, message: "%{value} is not a valid provider kind" }
-
-  scope :active,      ->{ where(aasm_state: "active") }
-  scope :inactive,    ->{ any_in(aasm_state: ["denied", "decertified"]) }
-  scope :denied,      ->{ where(aasm_state: "denied") }
-  scope :decertified, ->{ where(aasm_state: "decertified") }
 
 
   def email_address
@@ -118,9 +119,29 @@ class BrokerRole
       all.last
     end
 
-    def find_by_broker_agency_profile(profile)
-      return unless profile.is_a? BrokerAgencyProfile
-      list_brokers(Person.where("broker_role.broker_agency_profile_id" => profile._id))
+    def find_by_broker_agency_profile(broker_agency_profile)
+      raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile)
+      # list_brokers(Person.where("broker_role.broker_agency_profile_id" => profile._id))
+      people = (Person.where("broker_role.broker_agency_profile_id" => broker_agency_profile.id))
+      people.collect(&:broker_role)
+    end
+
+    def find_candidates_by_broker_agency_profile(broker_agency_profile)
+      people = Person.where(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id)\
+                            .any_in(:"broker_role.aasm_state" => ["applicant", "broker_agency_pending"])
+      people.collect(&:broker_role)
+    end
+
+    def find_active_by_broker_agency_profile(broker_agency_profile)
+      people = Person.and(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id,
+                          :"broker_role.aasm_state"  => "active")
+      people.collect(&:broker_role)
+    end
+
+    def find_inactive_by_broker_agency_profile(broker_agency_profile)
+      people = Person.where(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id)\
+                            .any_in(:"broker_role.aasm_state" => ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"])
+      people.collect(&:broker_role)
     end
   end
 
@@ -157,11 +178,22 @@ class BrokerRole
     event :decertify, :after => :record_transition  do
       transitions from: :active, to: :decertified
     end
+
+    # Attempt to achieve or return to good standing with HBX
+    event :reapply, :after => :record_transition  do
+      transitions from: [:applicant, :decertified, :denied, :broker_agency_declined], to: :applicant
+    end  
+
+    # Moves between broker agency organizations that don't require HBX re-certification
+    event :transfer, :after => :record_transition  do
+      transitions from: [:active, :broker_agency_pending, :broker_agency_terminated], to: :applicant
+    end  
   end
 
 private
 
   def is_primary_broker?
+    return false unless broker_agency_profile
     broker_agency_profile.primary_broker_role == self
   end
 

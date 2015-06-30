@@ -68,7 +68,14 @@ class ConsumerProfilesController < ApplicationController
   def check_qle_date
     qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = Date.strptime('01/10/2013', "%m/%d/%Y")
-    end_date = Date.today
+    future_days = 30.days
+
+    if ["I've had a baby", "Death"].include? params[:qle_type]
+      future_days = 0.days
+
+    end
+
+    end_date = Date.today + future_days
 
     @qualified_date = (start_date <= qle_date && qle_date <= end_date) ? true : false
   end

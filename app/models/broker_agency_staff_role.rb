@@ -5,7 +5,7 @@ class BrokerAgencyStaffRole
 
   embedded_in :person
   field :aasm_state, type: String
-
+  field :reason, type: String
   field :broker_agency_profile_id, type: BSON::ObjectId
   embeds_many :workflow_state_transitions, as: :transitional
 

@@ -39,6 +39,14 @@ class User
   # Oracle Identity Manager ID
   field :oim_id, type: String, default: ""
 
+  index({preferred_language: 1})
+  index({approved: 1})
+  index({roles: 1},  {sparse: true}) # MongoDB multikey index
+  index({email: 1},  {sparse: true, unique: true})
+  index({oim_id: 1}, {sparse: true, unique: true})
+
+  before_save :strip_empty_fields
+
   ROLES = {
     employee: "employee",
     resident: "resident",
@@ -177,17 +185,21 @@ class User
     end
   end
 
-  def password_digest(plaintext_password)
-      Rypt::Sha512.encrypt(plaintext_password)
-  end
-  # Verifies whether a password (ie from sign in) is the user password.
-  def valid_password?(plaintext_password)
-    Rypt::Sha512.compare(self.encrypted_password, plaintext_password)
-  end
-
-protected
+  # def password_digest(plaintext_password)
+  #     Rypt::Sha512.encrypt(plaintext_password)
+  # end
+  # # Verifies whether a password (ie from sign in) is the user password.
+  # def valid_password?(plaintext_password)
+  #   Rypt::Sha512.compare(self.encrypted_password, plaintext_password)
+  # end
 
 private
+  # Remove indexed, unique, empty attributes from document
+  def strip_empty_fields
+    unset("email") if email.blank?
+    unset("oim_id") if oim_id.blank?
+  end
+  
   def generate_authentication_token
     loop do
       token = Devise.friendly_token

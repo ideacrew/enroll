@@ -28,52 +28,58 @@
 
               <tr>
                 <th>Applicant Name:</th>
-                <td>&nbsp; &nbsp;<%= @broker_role.person.full_name %></td>
+                <td><%= @broker_role.person.full_name %></td>
               </tr>
               <tr>
                 <th>NPN:</th>
-                <td>&nbsp; &nbsp;<%= @broker_role.npn %></td>
+                <td><%= @broker_role.npn %></td>
               </tr>
               <tr>
                 <th>Email:</th>
-                <td>&nbsp; &nbsp;<%= @broker_role.email_address %></td>
+                <td><%= @broker_role.email_address %></td>
               </tr>
               <tr>
-                <th>Application Status:</th>
-                <td>&nbsp; &nbsp;<%= @broker_role.current_state %></td>
-              </tr>
-              <tr>
-                <th>Borker Agency Name:</th>
-                <td>&nbsp; &nbsp;<%= @broker_role.broker_agency_profile.legal_name %></td>
-              </tr>
-               <tr>
-                <th>FEIN:</th>
-                <td>&nbsp; &nbsp;<%= @broker_role.broker_agency_profile.fein %></td>
+                <th>Broker:</th>
+                <td><%= @broker_role.broker_agency_profile.legal_name %></td>
               </tr>
               <tr>
                 <th>Office Locations:</th>
-                <td>&nbsp; &nbsp;
-                  
+                <td>
                     <% @broker_role.broker_agency_profile.organization.office_locations.each do |office_location| %>
                       <%= office_location.address.to_html %>
                     <% end %>
                   
                 </td>
-              </tr>              
+              </tr> 
               <tr>
-                <th style="vertical-align: top;">Comments<span class="text-danger">*</span>:</th>
-                <td><%= f.text_area :comments, class: "floatlabel form-control", required: true, placeholder: 'Write here...', rows: 6, disabled: (!@broker_role.applicant? && !@broker_role.approved_or_pending? ? true : false) %></td>
+                <th>History</th> 
+                <td>
+                    <% @broker_role.workflow_state_transitions.each do |transition| %>
+                      <%= transition.to_html %>
+                    <% end %>
+                </td>
+              </tr> 
+              <tr>
+                <th>Application Status:</th>
+                <td><%= @broker_role.current_state %></td>
+              </tr>  
+              <tr>
+                <th style="vertical-align: top;">Reason<span class="text-danger"></span>:</th>
+                <td><%= f.text_area :reason, class: "floatlabel form-control", placeholder: 'Write here...', rows: 6, disabled: (!@broker_role.applicant? && !@broker_role.approved_or_pending? ? true : false) %></td>
               </tr>
             </tbody>
           </table>
         </div>
 
        <div class="row top-row no-border">
-        <div class="col-md-8 col-sm-3 col-xs-12 key-btn">
-          <% if @broker_role.applicant? %>
-            <%= submit_tag 'Certify', class: "btn btn-primary" %>
+        <div class="col-xs-12 key-btn text-center">
+          <% if @broker_role.may_approve? %>
+            <%= submit_tag 'Approve', class: "btn btn-primary" %>
           <% end %>
-          <% if @broker_role.approved_or_pending? %>
+          <% if @broker_role.may_deny? %>
+            <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary" %>
+          <% end %>
+          <% if @broker_role.may_decertify? %>
             <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary" %>
           <% end %>
         </div>
