@@ -51,7 +51,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
 
       if @person.save
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
-        redirect_to "/broker_registration"
+        redirect_to broker_registration_path
       else
         @filter = applicant_type
         render 'new'
@@ -60,7 +60,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
       @organization = ::Forms::BrokerAgencyProfile.new(primary_broker_role_params)
       if @organization.save(current_user)
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
-        redirect_to "/broker_registration"
+        redirect_to broker_registration_path
       else
         @agency_type = 'new'
         render "new"
