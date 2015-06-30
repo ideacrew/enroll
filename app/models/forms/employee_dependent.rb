@@ -17,6 +17,7 @@ module Forms
     validates_presence_of :family_id, :allow_blank => nil
     validates_presence_of :dob
     validates_inclusion_of :relationship, :in => ::PersonRelationship::Relationships, :allow_blank => nil
+    validate :relationship_validation
 
     attr_reader :dob
 
@@ -129,6 +130,16 @@ module Forms
       family_member.update_relationship(relationship)
       family_member.save!
       true
+    end
+
+
+    def relationship_validation
+      return if family.blank? or family.family_members.blank?
+
+      relationships = family.family_members.where(is_active: true).map(&:relationship) << self.relationship
+      if relationships.group_by(&:to_s).any? { |k, v| k == "spouse" and v.length > 1 }
+        self.errors.add(:base, "can not have multiple spouse")
+      end
     end
   end
 end
