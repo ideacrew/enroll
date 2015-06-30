@@ -460,10 +460,8 @@
 
 @media only screen and (max-width: 400px) {
   a.add_fields.interaction-click-control-add-benefit-group, .top-row button {
-    width: 100%;
     margin-bottom: 5px;
   }
-  .interaction-click-control-create-plan-year{width: 100%;}
 }
 
 @media only screen and (max-width: 450px){
