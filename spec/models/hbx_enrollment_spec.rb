@@ -46,6 +46,122 @@ describe HbxEnrollment, "for an employee who does not currently have a life even
   end
 end
 
+describe HbxEnrollment do
+  context "an employer defines a plan year with multiple benefit groups, adds employees to roster and assigns benefit groups" do
+    # subject { HbxEnrollment.new(:employee_role => employee_role, :benefit_group => benefit_group, :effective_on => effective_on_date) }
+
+    let(:blue_collar_employee_count)              { 7 }
+    let(:white_collar_employee_count)             { 5 }
+    let(:fte_count)                               { blue_collar_employee_count + white_collar_employee_count }
+    let(:employer_profile)                        { FactoryGirl.create(:employer_profile) }
+
+    let(:blue_collar_benefit_group)               { FactoryGirl.build(:benefit_group, title: "blue collar") }
+    let(:blue_collar_benefit_group_assignment)    { BenefitGroupAssignment.new(benefit_group: blue_collar_benefit_group, start_on: Date.current.beginning_of_month )}
+
+    let(:white_collar_benefit_group)              { FactoryGirl.build(:benefit_group, title: "white collar") }
+    let(:white_collar_benefit_group_assignment)   { BenefitGroupAssignment.new(benefit_group: white_collar_benefit_group, start_on: Date.current.beginning_of_month )}
+    let(:plan_year)                               { FactoryGirl.create(:plan_year, 
+                                                      employer_profile: employer_profile,
+                                                      benefit_groups: [blue_collar_benefit_group, white_collar_benefit_group]
+                                                    )}
+    let!(:blue_collar_census_employees)            { FactoryGirl.create_list(:census_employee, blue_collar_employee_count, 
+                                                      employer_profile: employer_profile,
+                                                      benefit_group_assignments: [blue_collar_benefit_group_assignment]
+                                                    )}
+    let!(:white_collar_census_employees)           { FactoryGirl.create_list(:census_employee, white_collar_employee_count, 
+                                                      employer_profile: employer_profile,
+                                                      benefit_group_assignments: [white_collar_benefit_group_assignment]
+                                                    )}
+
+    let(:blue_collar_employees)                   { FactoryGirl.create_list(:employee, employer_profile: employer_profile)}
+
+    before do
+      plan_year.publish!
+    end
+
+    it "should have a valid plan year in published state" do
+      expect(plan_year.aasm_state).to eq "published"
+    end
+
+    it "should have a roster with all blue and white collar employees" do
+      expect(employer_profile.census_employees.size).to eq fte_count
+    end
+
+    context "and employees create employee roles and families" do
+      let(:blue_collar_employee_roles) do
+        bc_employees = blue_collar_census_employees.collect do |census_employee|
+          person = Person.create!(
+                    first_name: census_employee.first_name, 
+                    last_name: census_employee.last_name, 
+                    ssn: census_employee.ssn, 
+                    dob: census_employee.dob, 
+                    gender: "male"
+                  )
+          employee_role = person.employee_roles.build(
+                    employer_profile: census_employee.employer_profile,
+                    census_employee: census_employee,
+                    hired_on: census_employee.hired_on
+                  )
+
+          census_employee.employee_role = employee_role
+          census_employee.link_employee_role unless census_employee.employee_role_linked?
+          census_employee.save!
+          employee_role
+        end
+        bc_employees
+      end
+
+      let(:white_collar_employee_roles) do
+        wc_employees = white_collar_census_employees.collect do |census_employee|
+          person = Person.create!(
+                    first_name: census_employee.first_name, 
+                    last_name: census_employee.last_name, 
+                    ssn: census_employee.ssn, 
+                    # ssn: (census_employee.ssn.to_i + 20).to_s, 
+                    dob: census_employee.dob, 
+                    gender: "male"
+                  )
+          employee_role = person.employee_roles.build(
+                    employer_profile: census_employee.employer_profile,
+                    census_employee: census_employee,
+                    hired_on: census_employee.hired_on
+                  )
+
+          census_employee.employee_role = employee_role
+          census_employee.link_employee_role unless census_employee.employee_role_linked?
+          census_employee.save!
+          employee_role
+        end
+        wc_employees
+      end
+
+      let(:blue_collar_families) do
+        blue_collar_employee_roles.reduce([]) { |list, employee_role| family = Family.find_or_build_from_employee_role(employee_role); list << family }
+      end
+
+      let(:white_collar_families) do
+        white_collar_employee_roles.reduce([]) { |list, employee_role| family = Family.find_or_build_from_employee_role(employee_role); list << family }
+      end
+
+      it "should include the requisite blue collar employee roles and families" do
+        expect(blue_collar_employee_roles.size).to eq blue_collar_employee_count
+        expect(blue_collar_families.size).to eq blue_collar_employee_count
+      end
+
+      it "should include the requisite white collar employee roles and families" do
+        expect(white_collar_employee_roles.size).to eq white_collar_employee_count
+        expect(white_collar_families.size).to eq white_collar_employee_count
+      end
+
+      context "and families either select plan or waive coverage" do
+
+
+      end
+
+    end
+  end
+end
+
 describe HbxEnrollment, dbclean: :after_all do
   include_context "BradyWorkAfterAll"
 
