@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   devise_for :users
 
   namespace :exchanges do
+    resources :inboxes, only: [:show, :destroy]
 
     resources :hbx_profiles do
       root 'hbx_profiles#show'

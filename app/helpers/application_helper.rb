@@ -264,6 +264,8 @@ module ApplicationHelper
       employers_inbox_path(provider, message_id: message.id)
     when "BrokerAgencyProfile"
       broker_agencies_inbox_path(provider, message_id: message.id)
+    when "HbxProfile"
+      exchanges_inbox_path(provider, message_id: message.id)
     end
   end
 
