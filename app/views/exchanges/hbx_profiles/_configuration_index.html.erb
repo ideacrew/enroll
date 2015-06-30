@@ -8,10 +8,13 @@
       <table class="table table-border">
         <tbody>
           <td width="50%" style="padding: 18px;font-weight: bold;">Current Date: <%= TimeKeeper.date_of_record.to_date %></td>
-          <td><%= text_field_tag 'time_keeper[date_of_record]', '', :'data-date-min'=>"0d",
+          <td>
+            <%= text_field_tag 'time_keeper[date_of_record]', '', :'data-date-min'=>"0d",
                                class: "required date-picker floatlabel form-control", required: true,
-                               :value=>TimeKeeper.date_of_record.to_date, :placeholder=>"Date of Record" %></td>
-          <td><button type="submit" class="btn btn-primary pull-right">Set Curent Date</button></td>
+                               :value=>TimeKeeper.date_of_record.to_date, :placeholder=>"Date of Record" %>
+            <button type="submit" class="btn btn-primary pull-right display-on-mobile">Set Curent Date</button>
+          </td>
+          <td class="hide-on-mobile"><button type="submit" class="btn btn-primary pull-right">Set Curent Date</button></td>
         </tbody>
       </table>
 
