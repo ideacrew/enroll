@@ -230,7 +230,6 @@ And(/^I should see employer census family created success message$/) do
   expect(@browser.a(text: /John K Doe Jr/).visible?).to be_truthy
   expect(@browser.a(text: /Edit/).visible?).to be_truthy
   expect(@browser.a(text: /Terminate/).visible?).to be_truthy
-  expect(@browser.a(text: /Delink/).visible?).to be_truthy
 end
 
 When(/^I click on Edit family button for a census family$/) do

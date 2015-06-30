@@ -1,7 +1,11 @@
 require 'rails_helper'
 
 describe Forms::EmployeeDependent do
+  let(:family_id) { double }
+  let(:family) { instance_double("Family") }
   before(:each) do
+    allow(Family).to receive(:find).and_return(family)
+    allow(family).to receive(:family_members).and_return([])
     subject.valid?
   end
 
