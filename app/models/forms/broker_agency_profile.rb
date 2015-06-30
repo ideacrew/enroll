@@ -32,7 +32,7 @@ module Forms
         })
     end
 
-    def save(current_user)
+    def save(current_user=nil)
       return false unless valid?
 
       begin
@@ -60,7 +60,7 @@ module Forms
       self.broker_agency_profile = organization.broker_agency_profile
       self.broker_agency_profile.primary_broker_role = person.broker_role
       self.broker_agency_profile.save!
-      
+
       true
     end
 
