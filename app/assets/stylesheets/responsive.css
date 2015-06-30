@@ -48,9 +48,13 @@
   .input-lg, .form-group-lg{
     border-bottom: 1px solid #ccc;
    }
+
+  .border_bottom_zero, .form-group-lg:last-child{
+    border-bottom: 0px solid #ccc;
+  }
    .top-row, .middle-row{border-bottom: 0px solid #b7b7b7;}
 
-  .key-btn{width: 50%;}
+  .key-btn{width: 50%;float: right;}
 
   .radio label, .checkbox label {
     padding-left: 30px;
@@ -149,6 +153,19 @@
   .list-group.emp-ul {
     display: block;
   }
+
+  .row-form-wrapper > div:last-child {
+    border: none;
+  }
+
+  .no-border-xs {border: none;}
+  .bottom-mgn-xs {
+    margin-bottom: 15px;
+    float: left !important;
+  }
+
+  #inbox_form {margin-bottom: 20px;}
+  #message_list_form {padding: 0;}
 }
 
 @media (min-width: 768px) and (max-width: 1200px) {
@@ -185,9 +202,17 @@
   #key-section {
     margin: 0;
   }
+
+  .form-inputs{float: left; margin-right: 10px;}
+}
+
+@media (max-width: 545px){
+  .form-inputs{float: left; margin-bottom: 10px;}  
 }
 
 @media (max-width: 480px) { 
+    .form-inputs{float: left; margin-bottom: 10px;}
+
     #family .right-side .btn.new-member {
         width: 100%;
     }
@@ -435,10 +460,14 @@
 
 @media only screen and (max-width: 400px) {
   a.add_fields.interaction-click-control-add-benefit-group, .top-row button {
-    width: 100%;
     margin-bottom: 5px;
   }
 }
+
+@media only screen and (max-width: 450px){
+  .interaction-click-control-sign-in, .interaction-click-control-create-account{margin-bottom: 10px;}
+}
+
 @media(min-width: 768px) and (max-width: 999px){
   .compare-slctd-plan .compare table ul.plan-type{
     width: 100%;
@@ -830,15 +859,6 @@
   }
 }
 @media only screen and (max-width: 992px) {
-  .btn-blue{
-    margin-top: 30px;
-  }
-  .list-group{
-    display: none;
-  }
-  .emp-sidebar {
-    display: none;
-  }
   .panel-body.left{
     padding-left: 15px;
     margin-right: 15px;
