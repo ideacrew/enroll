@@ -91,8 +91,8 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
         context "and it has some employer profile clients" do
           let(:my_client_count)       { 3 }
           let(:broker_agency_account) { BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile.id,
-                                          start_on: Date.current, is_active: true)}
-          let!(:my_clients)           { FactoryGirl.create_list(:employer_profile, my_client_count, 
+                                          start_on: TimeKeeper.date_of_record, is_active: true)}
+          let!(:my_clients)           { FactoryGirl.create_list(:employer_profile, my_client_count,
                                           broker_agency_accounts: [broker_agency_account] )}
 
           it "should find all my active employer clients" do
@@ -112,7 +112,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
           it "should find all the new broker roles as candidates" do
             expect(broker_agency_profile.candidate_broker_roles.size).to eq added_broker_count
           end
- 
+
           context "and all but one are approved by the HBX" do
             let(:last_added_broker_index)   { added_broker_count - 1 }
             before do
