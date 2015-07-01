@@ -90,7 +90,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
 
       let(:organization_params) { {
         first_name: 'firstname',
-        last_name: 'last_name',
+        last_name: 'lastname',
         dob: "2015-06-01",
         email: 'useraccount@gmail.com',
         npn: "8422323232",
@@ -162,9 +162,96 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
     end
 
     context "with broker for existing agency" do
+
+      let(:person) { instance_double("Person") }
+
+      let(:person_params) { {
+        broker_applicant_type: "broker", 
+        first_name: "firstname", 
+        last_name: "lastname", 
+        dob: "1993-06-03", 
+        email: "useraccount@gmail.com", 
+        npn: "8323232323", 
+        broker_agency_id: "55929d867261670838550000"
+      } }
+
+      context "when valid" do 
+        before :each do
+          allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
+          allow(person).to receive(:save).and_return(true)
+          post :create, :person => person_params
+        end
+
+        it "should be a redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should has successful notice" do
+          expect(flash[:notice]).to eq "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+        end
+      end
+
+      context "when invalid" do 
+        before :each do
+          allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
+          allow(person).to receive(:save).and_return(false)
+          post :create, :person => person_params
+        end
+
+        it "should be a redirect" do
+          expect(response).to render_template('new')
+        end
+
+        it "should assign variables" do
+          expect(assigns(:filter)).to eq "broker"
+        end
+      end
     end
 
-    context "with staff member for existing agency" do 
+    context "with staff member for existing agency" do
+
+      let(:person) { instance_double("Person") }
+
+      let(:person_params) { {
+        broker_applicant_type: "staff", 
+        first_name: "firstname", 
+        last_name: "lastname", 
+        dob: "1993-06-03", 
+        email: "useraccount@gmail.com", 
+        broker_agency_id: "55929d867261670838550000"
+      } }
+
+      context "when valid" do 
+        before :each do
+          allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
+          allow(person).to receive(:save).and_return(true)
+          post :create, :person => person_params
+        end
+
+        it "should be a redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should has successful notice" do
+          expect(flash[:notice]).to eq "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
+        end
+      end
+
+      context "when invalid" do 
+        before :each do
+          allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
+          allow(person).to receive(:save).and_return(false)
+          post :create, :person => person_params
+        end
+
+        it "should be a redirect" do
+          expect(response).to render_template('new')
+        end
+
+        it "should assign variables" do
+          expect(assigns(:filter)).to eq "staff"
+        end
+      end 
     end
   end
 end
