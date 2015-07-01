@@ -220,7 +220,7 @@
 @media (max-width: 480px) { 
     .form-inputs{float: left; margin-bottom: 10px;}
 
-    #family .right-side .btn.new-member {
+    .new_employer_profile, #family .right-side .btn.new-member {
         width: 100%;
     }
     .input-lg, .form-group-lg .form-control {
@@ -563,6 +563,10 @@
     width: 32%;
   }
 }
+@media(max-width: 345px){
+  .interaction-click-control-show{margin-bottom: 5px;}
+}
+
 @media(min-width: 300px) and (max-width: 767px){
   .selected-plans-row h3{
     font-size: 21px;
