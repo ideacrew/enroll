@@ -68,6 +68,7 @@ $(document).ready(function () {
         yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear(),
           onSelect: function(dateText, dpInstance) {
 	    $(this).datepicker("hide");
+      $(this).trigger('change');
 	  }
       });
     }else{
@@ -80,6 +81,7 @@ $(document).ready(function () {
         yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10),
           onSelect: function(dateText, dpInstance) {
 	    $(this).datepicker("hide");
+      $(this).trigger('change');
 	  }
       });
     }

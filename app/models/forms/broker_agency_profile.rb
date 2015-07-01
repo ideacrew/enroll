@@ -29,7 +29,7 @@ module Forms
       person.broker_role = ::BrokerRole.new({ 
         :provider_kind => 'broker', 
         :npn => self.npn 
-        })
+      })
     end
 
     def save(current_user=nil)
@@ -37,24 +37,21 @@ module Forms
 
       begin
         match_or_create_person(current_user)
-        person.add_work_email(email)
-        person.save!
-        add_broker_role
-
+        check_existing_organization
       rescue TooManyMatchingPeople
         errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
         return false
       rescue PersonAlreadyMatched
         errors.add(:base, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
         return false
-      end
-
-      begin
-        check_existing_organization
       rescue OrganizationAlreadyMatched
         errors.add(:base, "organization has already been created.")
         return false
       end
+
+      person.add_work_email(email) unless current_user
+      person.save!
+      add_broker_role
 
       organization = create_new_organization
       self.broker_agency_profile = organization.broker_agency_profile
@@ -80,6 +77,5 @@ module Forms
         :office_locations => office_locations
       )
     end
-
   end
 end

@@ -117,6 +117,7 @@ class CensusEmployee < CensusMember
     if active_benefit_group_assignment.present?
       active_benefit_group_assignment.end_on = [new_benefit_group.start_on - 1.day, active_benefit_group_assignment.start_on].max
       active_benefit_group_assignment.is_active = false
+      active_benefit_group_assignment.save
     end
 
     bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: start_on)

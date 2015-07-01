@@ -52,3 +52,21 @@ $(document).on('click', ".rehire_confirm", function(){
     data: {rehiring_date: rehiring_date}
   });
 });
+
+$(document).on('change', '.dependent_info input.dob-picker', function(){
+  var element = $(this).val().split("/");
+  year = parseInt(element[2]);
+  month = parseInt(element[0]);
+  day = parseInt(element[1]);
+  var mydate = new Date();
+  mydate.setFullYear(year + 26,month-1,day);
+  var target = $(this).parents('.dependent_info').find('select');
+
+  if (mydate > new Date()){
+    data = "<option value=''>SELECT RELATIONSHIP</option><option value='spouse'>Spouse</option><option value='domestic_partner'>Domestic partner</option><option value='child_under_26'>Child</option><option value='disabled_child_26_and_over'>Disabled child</option>'";
+  }else{
+    data = "<option value=''>SELECT RELATIONSHIP</option><option value='spouse'>Spouse</option><option value='domestic_partner'>Domestic partner</option><option value='child_26_and_over'>Child</option><option value='disabled_child_26_and_over'>Disabled child</option>'";
+  }
+  $(target).html(data);
+  $(target).selectric('refresh');
+});
