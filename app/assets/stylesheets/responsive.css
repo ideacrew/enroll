@@ -168,8 +168,8 @@
   #message_list_form {padding: 0;}
 }
 
-@media (min-width: 768px) and (max-width: 1200px) {
-  .welcome-msg p {
+@media (min-width: 768px) and (max-width: 991px) {
+  /*.welcome-msg p {
     letter-spacing: 0;
   }
   .key p {
@@ -185,7 +185,8 @@
   }
   #email_info {
     margin-bottom: 15px !important;
-  }
+  }*/
+  body {padding-bottom: 86px;}
 }
 
 @media (min-width: 300px) and (max-width: 400px) {
@@ -207,10 +208,10 @@
 }
 
 @media (max-width: 545px){
-  .form-inputs{float: left; margin-bottom: 10px;}  
+  .form-inputs{float: left; margin-bottom: 10px;}
 }
 
-@media (max-width: 480px) { 
+@media (max-width: 480px) {
     .form-inputs{float: left; margin-bottom: 10px;}
 
     #family .right-side .btn.new-member {
