@@ -3,7 +3,7 @@ require 'rails_helper'
 describe EmployerProfileAccount, type: :model, dbclean: :after_each do
 
   let(:employer_profile)    { FactoryGirl.build(:employer_profile) }
-  let(:next_premium_due_on) { Date.current.end_of_month + 1.day }
+  let(:next_premium_due_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
   let(:next_premium_amount) { 3155.86 }
 
   let(:valid_params) do
@@ -124,14 +124,14 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
           it "coverage should be canceled" do
             expect(employer_profile_account.aasm_state).to eq "canceled"
             expect(employer_profile.aasm_state).to eq "canceled"
-          end          
+          end
         end
       end
     end
 
     context "for an enrolled employer" do
       let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
-      let(:premium_payment_1) { FactoryGirl.build(:premium_payment, paid_on: (Date.current.beginning_of_month - 63.days).end_of_month) }
+      let(:premium_payment_1) { FactoryGirl.build(:premium_payment, paid_on: (TimeKeeper.date_of_record.beginning_of_month - 63.days).end_of_month) }
       let(:premium_payment_2) { FactoryGirl.build(:premium_payment, paid_on: (premium_payment_1.paid_on + 1.day).end_of_month) }
 
       before do
@@ -192,7 +192,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
                   employer_profile_account.reverse_coverage_period
                 end
 
-                it "should revert to suspended status" do 
+                it "should revert to suspended status" do
                   expect(employer_profile_account.aasm_state).to eq "suspended"
                 end
 

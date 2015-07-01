@@ -1,5 +1,5 @@
- <div class="table-responsive" style="overflow-y: hidden;">
-   <h4><%= "#{@census_employees.count} out of #{@total_census_employees_quantity}" if @total_census_employees_quantity.present? %></h4>
+<h4><%= "#{@census_employees.count} out of #{@total_census_employees_quantity}" if @total_census_employees_quantity.present? %></h4>
+<div class="table-responsive" style="overflow-y: hidden;">
   <table class="table table-wrapper" style="opacity: 1;">
     <thead>
       <tr>
@@ -46,7 +46,7 @@
       <tr class="unbrd  rehire_<%= census_employee.id %>">
         <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>">
           <div class="confirm-terminate">
-            <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker" data-date-min="<%= (census_employee.employment_terminated_on - Date.current).to_i + 1 %>d"><br/>
+            <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker" data-date-min="<%= (census_employee.employment_terminated_on - TimeKeeper.date_of_record).to_i + 1 %>d"><br/>
             <a href="javascript:;" data-link="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, census_employee.id) %>" class="rehire_confirm" id="rehire_<%= census_employee.id %>"><strong>Submit</strong></a>
           </div>
           <b><%=image_tag "enter_rehire_date.png", alt: "Enter re-hire date.", width: "200", height: "" %></b>
@@ -56,7 +56,7 @@
       <tr class="unbrd  remove_<%= census_employee.id %>">
         <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>">
           <div class="confirm-terminate">
-            <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker" data-date-min="<%= (census_employee.hired_on - Date.current).to_i + 1 %>d"><br/>
+            <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker" data-date-min="<%= (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 %>d"><br/>
             <a href="javascript:;" data-link="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, census_employee.id) %>" class="delete_confirm" id="remove_<%= census_employee.id %>"><strong>Submit</strong></a>
           </div>
           <%=image_tag "enter_date_termination.png", width: "300", height: "" %>
@@ -66,6 +66,6 @@
       <% end %>
     </tbody>
   </table>
-  <%= link_to 'default', employers_employer_profile_path(@employer_profile, status: @status), remote: true, class: 'btn btn-primary btn-sm', style:'float:left;margin:20px 10px;' %>
-  <%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status %>
 </div>
+<%= link_to 'default', employers_employer_profile_path(@employer_profile, status: @status), remote: true, class: 'btn btn-primary btn-sm' %>
+<%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status %>

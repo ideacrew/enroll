@@ -77,7 +77,12 @@ class HbxEnrollment
   end
 
   def propogate_selection
-    benefit_group_assignment.select_coverage! if benefit_group_assignment
+    #benefit_group_assignment.select_coverage! if benefit_group_assignment
+    if benefit_group_assignment
+      benefit_group_assignment.select_coverage
+      benefit_group_assignment.hbx_enrollment = self
+      benefit_group_assignment.save
+    end
   end
 
   def is_active?

@@ -371,7 +371,7 @@ private
   end
 
   def initialize_irs_group
-    irs_groups.build(effective_starting_on: Date.current)
+    irs_groups.build(effective_starting_on: TimeKeeper.date_of_record)
   end
 
   def initialize_household(irs_group)

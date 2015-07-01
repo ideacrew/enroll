@@ -220,7 +220,7 @@ RSpec.describe Employers::CensusEmployeesController do
         end
 
         it "with rehiring date before terminated date" do
-          allow(census_employee).to receive(:employment_terminated_on).and_return(Date.current)
+          allow(census_employee).to receive(:employment_terminated_on).and_return(TimeKeeper.date_of_record)
           xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: "05/01/2015", :format => :js
           expect(response).to have_http_status(:success)
           expect(flash[:error]).to eq "Rehiring date can't occur before terminated date."
