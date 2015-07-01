@@ -273,7 +273,7 @@ class PlanYear
     def calculate_open_enrollment_date(start_on)
       start_on = start_on.to_date
       open_enrollment_start_on = [(start_on - HbxProfile::ShopOpenEnrollmentPeriodMaximum.months), Date.current].max
-      open_enrollment_end_on = open_enrollment_start_on + 10.days
+      open_enrollment_end_on = open_enrollment_start_on + 9.days
 
       {open_enrollment_start_on: open_enrollment_start_on,
        open_enrollment_end_on: open_enrollment_end_on}
