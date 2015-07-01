@@ -52,6 +52,9 @@
   .border_bottom_zero, .form-group-lg:last-child{
     border-bottom: 0px solid #ccc;
   }
+  .border_bottom_no_zero{
+    border-bottom: 1px solid #ccc !important;
+  }
    .top-row, .middle-row{border-bottom: 0px solid #b7b7b7;}
 
   .key-btn{width: 50%;float: right;}
@@ -191,6 +194,9 @@
 @media (min-width: 300px) and (max-width: 400px) {
   .adderess-select-box + .dropdown-menu {
     left: 0;
+  }
+  #employer-info .text-right p{
+    text-align: left !important;
   }
 }
 
