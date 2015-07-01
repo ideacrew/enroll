@@ -63,8 +63,8 @@ class PlanYear
   end
 
   def register_employer
-    employer_profile.publish_plan_year!
-    send_employee_invites
+    state_change_successful = employer_profile.publish_plan_year!
+    send_employee_invites if state_change_successful
   end
 
   def send_employee_invites
@@ -256,23 +256,23 @@ class PlanYear
       if start_on.day != 1
         result = "failure"
         msg = "start on must be first day of the month"
-      elsif Date.current > shop_enrollemnt_times[:open_enrollment_latest_start_on]
+      elsif TimeKeeper.date_of_record > shop_enrollemnt_times[:open_enrollment_latest_start_on]
         result = "failure"
-        msg = "start on must choose a start on date #{(Date.current - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + HbxProfile::ShopOpenEnrollmentPeriodMaximum.months).beginning_of_month} or later"
+        msg = "start on must choose a start on date #{(TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + HbxProfile::ShopOpenEnrollmentPeriodMaximum.months).beginning_of_month} or later"
       end
       {result: (result || "ok"), msg: (msg || "")}
     end
 
     def calculate_start_on_options
-      start_at = (Date.current - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + HbxProfile::ShopOpenEnrollmentPeriodMaximum.months).beginning_of_month
-      end_at = (Date.current + HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum).beginning_of_month
+      start_at = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + HbxProfile::ShopOpenEnrollmentPeriodMaximum.months).beginning_of_month
+      end_at = (TimeKeeper.date_of_record + HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum).beginning_of_month
       dates = (start_at..end_at).select {|t| t == t.beginning_of_month}
       dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
     end
 
     def calculate_open_enrollment_date(start_on)
       start_on = start_on.to_date
-      open_enrollment_start_on = [(start_on - HbxProfile::ShopOpenEnrollmentPeriodMaximum.months), Date.current].max
+      open_enrollment_start_on = [(start_on - HbxProfile::ShopOpenEnrollmentPeriodMaximum.months), TimeKeeper.date_of_record].max
       open_enrollment_end_on = open_enrollment_start_on + 9.days
 
       {open_enrollment_start_on: open_enrollment_start_on,
@@ -384,7 +384,7 @@ private
       errors.add(:start_on, "can't occur before open enrollment end date")
     end
 
-    # if Date.current > ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
+    # if TimeKeeper.date_of_record > ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
     #  errors.add(:start_on, "must choose a start on date #{effect_date + 1.month} or later")
     # end
 
@@ -408,7 +408,7 @@ private
       errors.add(:end_on, "plan year period is greater than maximum: #{duration_in_days(HbxProfile::ShopPlanYearPeriodMaximum)} days")
     end
 
-    if (start_on - HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum) > Date.current
+    if (start_on - HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum) > TimeKeeper.date_of_record
      errors.add(:start_on, "may not start application before " \
         "#{(start_on - HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum).to_date} with #{start_on} effective date")
     end

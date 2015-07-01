@@ -6,7 +6,7 @@
       issuer_name: "Aetna",
       plan_type: "PPO",
       subscriber_name: "Joe Cool",
-      start_date: Date.current - 30,
+      start_date: TimeKeeper.date_of_record - 30,
       subscriber_hbx_id: "123456",
       subscriber_carrier_id: "987654",
       group_id: "1zu3t",
@@ -18,7 +18,7 @@
       issuer_name: "Aetna",
       plan_type: "N/A",
       subscriber_name: "Joe Cool",
-      start_date: (Date.current - 30).beginning_of_month,
+      start_date: (TimeKeeper.date_of_record - 30).beginning_of_month,
       subscriber_hbx_id: "123456",
       subscriber_carrier_id: "987654",
       group_id: "7yt2q",
@@ -31,7 +31,7 @@
       name: "ACME Widgets",
       contact: "link to employer HR contact",
       plan_year: 2016,
-      plan_year_start: (Date.current - 90).beginning_of_month,
+      plan_year_start: (TimeKeeper.date_of_record - 90).beginning_of_month,
       benefit_group: "link to benefit group",
       benefits: benefits
     }

@@ -7,7 +7,7 @@ RSpec.describe BrokerAgencyAccount, type: :model do
 
   let(:employer_profile)      { FactoryGirl.create(:employer_profile)}
   let(:broker_agency_profile) { FactoryGirl.build(:broker_agency_profile) }
-  let(:start_on)              { Date.current }
+  let(:start_on)              { TimeKeeper.date_of_record }
   let(:writing_agent)         { FactoryGirl.build(:broker_role) }
 
   let(:valid_params) do

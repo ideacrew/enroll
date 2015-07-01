@@ -7,9 +7,9 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   it { should validate_presence_of :open_enrollment_end_on }
 
   let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
-  let(:valid_plan_year_start_on)        { (Date.current + 1.month).end_of_month + 1.day }
+  let(:valid_plan_year_start_on)        { (TimeKeeper.date_of_record + 1.month).end_of_month + 1.day }
   let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
-  let(:valid_open_enrollment_start_on)  { Date.current.beginning_of_month }
+  let(:valid_open_enrollment_start_on)  { TimeKeeper.date_of_record.beginning_of_month }
   let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 15.days }
   let(:valid_fte_count)                 { 5 }
 
@@ -103,7 +103,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context "and effective date is specified and effective date doesn't provide enough time for enrollment" do
-      let(:prior_month_open_enrollment_start)  { Date.current.beginning_of_month + HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.days - HbxProfile::ShopOpenEnrollmentPeriodMinimum.days - 1.day}
+      let(:prior_month_open_enrollment_start)  { TimeKeeper.date_of_record.beginning_of_month + HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.days - HbxProfile::ShopOpenEnrollmentPeriodMinimum.days - 1.day}
       let(:invalid_effective_date)   { (prior_month_open_enrollment_start + 1.month).beginning_of_month }
       before do
         plan_year.effective_date = invalid_effective_date
@@ -123,7 +123,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     context "and effective date is specified and effective date does provide enough time for enrollment" do
-      let(:prior_month_open_enrollment_start)  { Date.current.beginning_of_month + HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.days - HbxProfile::ShopOpenEnrollmentPeriodMinimum.days - 1.day}
+      let(:prior_month_open_enrollment_start)  { TimeKeeper.date_of_record.beginning_of_month + HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth.days - HbxProfile::ShopOpenEnrollmentPeriodMinimum.days - 1.day}
       let(:valid_effective_date)   { (prior_month_open_enrollment_start + 3.months).beginning_of_month }
       before do
         plan_year.effective_date = valid_effective_date
@@ -138,7 +138,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     context "and an open enrollment period is specified" do
       context "and open enrollment start date is after the end date" do
-        let(:open_enrollment_end_on)    { Date.current }
+        let(:open_enrollment_end_on)    { TimeKeeper.date_of_record }
         let(:open_enrollment_start_on)  { open_enrollment_end_on + 1 }
 
         before do
@@ -154,7 +154,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       context "and the open enrollment period is too short" do
         let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1 }
-        let(:open_enrollment_start_on)  { Date.current }
+        let(:open_enrollment_start_on)  { TimeKeeper.date_of_record }
         let(:open_enrollment_end_on)    { open_enrollment_start_on + invalid_length }
 
         before do
@@ -170,7 +170,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       context "and the open enrollment period is too long" do
         let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMaximum + 1 }
-        let(:open_enrollment_start_on)  { Date.current }
+        let(:open_enrollment_start_on)  { TimeKeeper.date_of_record }
         let(:open_enrollment_end_on)    { open_enrollment_start_on + invalid_length }
 
         before do
@@ -186,7 +186,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       context "and a plan year start and end is specified" do
         context "and the plan year start date isn't first day of month" do
-          let(:start_on)  { Date.current.beginning_of_month + 1 }
+          let(:start_on)  { TimeKeeper.date_of_record.beginning_of_month + 1 }
           let(:end_on)    { start_on + HbxProfile::ShopPlanYearPeriodMinimum }
 
           before do
@@ -201,7 +201,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the plan year start date is after the end date" do
-          let(:end_on)    { Date.current.beginning_of_month }
+          let(:end_on)    { TimeKeeper.date_of_record.beginning_of_month }
           let(:start_on)  { end_on + 1 }
 
           before do
@@ -217,7 +217,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         context "and the plan year period is too short" do
           let(:invalid_length)  { HbxProfile::ShopPlanYearPeriodMinimum - 1.day }
-          let(:start_on)  { Date.current.end_of_month + 1 }
+          let(:start_on)  { TimeKeeper.date_of_record.end_of_month + 1 }
           let(:end_on)    { start_on + invalid_length }
 
           before do
@@ -233,7 +233,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         context "and the plan year period is too long" do
           let(:invalid_length)  { HbxProfile::ShopPlanYearPeriodMaximum + 1.day }
-          let(:start_on)  { Date.current.end_of_month + 1 }
+          let(:start_on)  { TimeKeeper.date_of_record.end_of_month + 1 }
           let(:end_on)    { start_on + invalid_length }
 
           before do
@@ -250,7 +250,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         context "and the plan year begins before open enrollment ends" do
           let(:valid_open_enrollment_length)  { HbxProfile::ShopOpenEnrollmentPeriodMaximum }
           let(:valid_plan_year_length)  { HbxProfile::ShopPlanYearPeriodMaximum }
-          let(:open_enrollment_start_on)  { Date.current }
+          let(:open_enrollment_start_on)  { TimeKeeper.date_of_record }
           let(:open_enrollment_end_on)    { open_enrollment_start_on + valid_open_enrollment_length }
           let(:start_on)  { open_enrollment_start_on - 1 }
           let(:end_on)    { start_on + valid_plan_year_length }
@@ -267,7 +267,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the effective date is too far in the future" do
-          let(:invalid_initial_application_date)  { Date.current + HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum.months + 1.month }
+          let(:invalid_initial_application_date)  { TimeKeeper.date_of_record + HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum.months + 1.month }
           let(:schedule)  { PlanYear.shop_enrollment_timetable(invalid_initial_application_date) }
           let(:start_on)  { schedule[:plan_year_start_on] }
           let(:end_on)    { schedule[:plan_year_end_on] }
@@ -289,7 +289,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the end of open enrollment is past deadline for effective date" do
-          let(:schedule)  { PlanYear.shop_enrollment_timetable(Date.current) }
+          let(:schedule)  { PlanYear.shop_enrollment_timetable(TimeKeeper.date_of_record) }
           let(:start_on)  { schedule[:plan_year_start_on] }
           let(:end_on)    { schedule[:plan_year_end_on] }
           let(:open_enrollment_start_on) { schedule[:open_enrollment_latest_start_on] }
@@ -423,7 +423,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       context "and the effective date isn't January 1" do
         before do
           plan_year.benefit_groups << benefit_group
-          plan_year.start_on = Date.current.beginning_of_year + 1.month
+          plan_year.start_on = TimeKeeper.date_of_record.beginning_of_year + 1.month
           plan_year.publish
         end
 
@@ -444,7 +444,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       context "and the effective date is January 1" do
         before do
           plan_year.benefit_groups << benefit_group
-          plan_year.start_on = Date.current.beginning_of_year
+          plan_year.start_on = TimeKeeper.date_of_record.beginning_of_year
           plan_year.publish
         end
 
@@ -464,7 +464,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       before do
         plan_year.benefit_groups << benefit_group
         plan_year.fte_count = invalid_fte_count
-        plan_year.start_on = Date.current.beginning_of_year + 1.month
+        plan_year.start_on = TimeKeeper.date_of_record.beginning_of_year + 1.month
         plan_year.publish
       end
 
@@ -544,7 +544,13 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       context "and all application elements are valid and it is published" do
         before do
+          @starting_date_of_record = TimeKeeper.date_of_record
+          TimeKeeper.set_date_of_record_unprotected!(plan_year.open_enrollment_start_on - 5.days)
           plan_year.publish
+        end
+
+        after do
+          TimeKeeper.set_date_of_record_unprotected!(@starting_date_of_record)
         end
 
         it "plan year should publish" do
@@ -571,22 +577,22 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   context "check_start_on" do
     it "should fail when start on is not the first day of the month" do
-      start_on = (Date.current + 2.month).beginning_of_month + 10.days
+      start_on = (TimeKeeper.date_of_record + 2.month).beginning_of_month + 10.days
       rsp = PlanYear.check_start_on(start_on)
       expect(rsp[:result]).to eq "failure"
       expect(rsp[:msg]).to eq "start on must be first day of the month"
     end
 
     it "should valid" do
-      start_on = (Date.current + 2.month).beginning_of_month
+      start_on = (TimeKeeper.date_of_record + 2.month).beginning_of_month
       rsp = PlanYear.check_start_on(start_on)
       expect(rsp[:result]).to eq "ok"
       expect(rsp[:msg]).to eq ""
     end
 
     it "should failure when current date more than open_enrollment_latest_start_on" do
-      start_on = (Time.now + 1.month).beginning_of_month
-      allow(Date).to receive(:current).and_return(Date.new(Time.now.year, Time.now.month, 15))
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + 14.days)
+      start_on = (TimeKeeper.date_of_record + 1.month).beginning_of_month
       rsp = PlanYear.check_start_on(start_on)
       expect(rsp[:result]).to eq "failure"
       expect(rsp[:msg]).to start_with "start on must choose a start on date"
@@ -595,19 +601,18 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   context "calculate_open_enrollment_date" do
     it "start on is not close to current date" do
-      start_on = (Date.current + 3.month).beginning_of_month
+      start_on = (TimeKeeper.date_of_record + 3.month).beginning_of_month
       rsp = PlanYear.calculate_open_enrollment_date(start_on)
       expect(rsp[:open_enrollment_start_on]).to eq start_on - 2.months
       expect(rsp[:open_enrollment_end_on]).to eq (start_on - 2.months + 9.days)
     end
 
     it "start on is close to current date(2 months)" do
-      current_date = Date.new(Time.now.year, Time.now.month, 15)
-      allow(Date).to receive(:current).and_return(current_date)
-      start_on = (Date.current + 2.month).beginning_of_month
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + 14.days)
+      start_on = (TimeKeeper.date_of_record + 2.month).beginning_of_month
       rsp = PlanYear.calculate_open_enrollment_date(start_on)
-      expect(rsp[:open_enrollment_start_on]).to eq (current_date)
-      expect(rsp[:open_enrollment_end_on]).to eq (current_date + 9.days)
+      expect(rsp[:open_enrollment_start_on]).to eq (TimeKeeper.date_of_record)
+      expect(rsp[:open_enrollment_end_on]).to eq (TimeKeeper.date_of_record + 9.days)
     end
   end
 
@@ -617,7 +622,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       date2 = (Time.now + 3.month).beginning_of_month
       dates = [date1, date2].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
 
-      allow(Date).to receive(:current).and_return(Date.new(Time.now.year, Time.now.month, 15))
+      TimeKeeper.set_date_of_record_unprotected!(Date.new(Time.now.year, Time.now.month, 15))
       expect(PlanYear.calculate_start_on_options).to eq dates
     end
 
@@ -627,7 +632,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       date3 = (Time.now + 3.month).beginning_of_month
       dates = [date1, date2, date3].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
 
-      allow(Date).to receive(:current).and_return(Date.new(Time.now.year, Time.now.month, 2))
+      TimeKeeper.set_date_of_record_unprotected!(Date.new(Time.now.year, Time.now.month, 2))
       expect(PlanYear.calculate_start_on_options).to eq dates
     end
   end
