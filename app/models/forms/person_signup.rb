@@ -28,8 +28,8 @@ module Forms
         last_name: regex_for(last_name),
         dob: dob
         )
-      
-      if matched_people.count == 1
+
+      if matched_people.count > 0
         raise PersonAlreadyMatched.new
       end
 
