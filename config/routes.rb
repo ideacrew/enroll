@@ -107,13 +107,8 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :broker_roles, only: [:new, :create] do
-    root 'broker_roles#new'
-    get :search_broker_agency, on: :collection
-  end
-
   # match 'thank_you', to: 'broker_roles#thank_you', via: [:get]
-  match 'broker_registration', to: 'broker_roles#new', via: [:get]
+  match 'broker_registration', to: 'broker_agencies/broker_roles#new_broker', via: [:get]
 
   namespace :carriers do
     resources :carrier_profiles do
@@ -127,6 +122,15 @@ Rails.application.routes.draw do
     end
     resources :profiles, only: [:new, :create, :show, :index] do
       get :inbox 
+    end
+    resources :broker_roles, only: [:create] do
+      root 'broker_roles#new_broker'
+      collection do 
+        get :new_broker
+        get :new_staff_member
+        get :new_broker_agency
+        get :search_broker_agency
+      end
     end
   end
 

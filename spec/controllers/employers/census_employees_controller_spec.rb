@@ -12,7 +12,20 @@ RSpec.describe Employers::CensusEmployeesController do
      "ssn" => "123-12-3112",
      "gender" => "male",
      "is_business_owner" => true,
-     "hired_on" => "05/02/2015"} }
+     "hired_on" => "05/02/2015",
+     "employer_profile_id" => employer_profile_id} }
+
+  let(:census_employee2_params) {
+    params_hash = census_employee_params;
+    params_hash["ssn"] = "999-99-9999";
+    params_hash
+  }
+
+  let(:census_employee3_params) {
+    params_hash = census_employee_params;
+    params_hash["ssn"] = "999-99-9998";
+    params_hash
+  }
 
   describe "GET new" do
     let(:user) { double("user") }
@@ -39,6 +52,7 @@ RSpec.describe Employers::CensusEmployeesController do
 
   describe "POST create" do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+
     before do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
@@ -58,13 +72,9 @@ RSpec.describe Employers::CensusEmployeesController do
 
     context "Person with ssn already exists" do
       it "should not allow the use of SSN belonging to another person" do
-        Person.create!({"first_name" => census_employee_params["first_name"],
-                       "last_name" => census_employee_params["last_name"],
-                       "dob" => census_employee_params["dob"],
-                       "ssn" => census_employee_params["ssn"],
-                       "gender" => census_employee_params["gender"]})
+        CensusEmployee.create!(census_employee2_params)
         allow(census_employee).to receive(:save).and_return(true)
-        post :create, :employer_profile_id => employer_profile_id, census_employee: census_employee_params
+        post :create, :employer_profile_id => employer_profile_id, census_employee: census_employee2_params
         expect(flash[:error]).to eq("The provided SSN belongs to another person.")
       end
     end
@@ -101,9 +111,10 @@ RSpec.describe Employers::CensusEmployeesController do
     end
 
     it "should be render edit template when invalid" do
+      CensusEmployee.create!(census_employee3_params)
       allow(census_employee).to receive(:save).and_return(false)
       post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
-      expect(response).to render_template("edit")
+      expect(flash[:error]).to eq("The provided SSN belongs to another person.")
     end
   end
 

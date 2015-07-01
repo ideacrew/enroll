@@ -230,7 +230,6 @@ And(/^I should see employer census family created success message$/) do
   expect(@browser.a(text: /John K Doe Jr/).visible?).to be_truthy
   expect(@browser.a(text: /Edit/).visible?).to be_truthy
   expect(@browser.a(text: /Terminate/).visible?).to be_truthy
-  expect(@browser.a(text: /Delink/).visible?).to be_truthy
 end
 
 When(/^I click on Edit family button for a census family$/) do
@@ -379,7 +378,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   # Benefit Group
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
-  elected_field = @browser.div(class: /selectric-wrapper/, text: /A single plan/)
+  elected_field = @browser.div(class: /selectric-wrapper/, text: /Select Plan Offerings/)
   elected_field.click
   elected_field.li(text: /All plans from a given carrier/).click
   sleep(1)

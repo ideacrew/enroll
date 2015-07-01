@@ -29,9 +29,21 @@
               <%= render 'plan_filters' %>
 
               <div class="col-lg-9 col-md-9 co-sm-9 col-xs-12">
-                <% @plans.each do |plan| %>
-                  <%= render "insured/plan_shoppings/plan_details", :plan => plan %>
-                <% end %>
+                <div class="sort-area" style='margin:10px 0;'>
+                  <span><strong>Sort By</strong></span>
+                  <div class="btn-group" role="group" id='sort_by'>
+                    <a href='javascript:void(0)' class="btn btn-default" data-sort-by='plan-name'>Plan Name</a>
+                    <a href='javascript:void(0)' class="btn btn-default" data-sort-by='plan-metal-premium'>Premium Amount</a>
+                    <a href='javascript:void(0)' class="btn btn-default" data-sort-by='plan-metal-deductible'>Deductible</a>
+                    <a href='javascript:void(0)' class="btn btn-default" data-sort-by='plan-carrier'>Carrier</a>
+                  </div>
+                </div>
+
+                <div id="plans">
+                  <% @plans.each do |plan| %>
+                    <%= render "insured/plan_shoppings/plan_details", :plan => plan %>
+                  <% end %>
+                </div>
               </div>
             </div>
           </div>

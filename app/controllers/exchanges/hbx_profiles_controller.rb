@@ -1,7 +1,7 @@
 class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_hbx_staff_role, except: [:welcome]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
-  before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox]
+  before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox, :configuration]
 
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
@@ -73,7 +73,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def configuration
 
     respond_to do |format|
-      format.html { render "configuration_index" }
+      format.html { render partial: "configuration_index" }
       format.js {}
     end
   end

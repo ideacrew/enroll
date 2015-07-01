@@ -1,7 +1,11 @@
 require 'rails_helper'
 
 describe Forms::EmployeeDependent do
+  let(:family_id) { double }
+  let(:family) { instance_double("Family") }
   before(:each) do
+    allow(Family).to receive(:find).and_return(family)
+    allow(family).to receive(:family_members).and_return([])
     subject.valid?
   end
 
@@ -180,5 +184,41 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
       allow(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
+  end
+end
+
+describe Forms::EmployeeDependent, "relationship validation" do
+  let(:family) { FactoryGirl.build(:family) }
+  let(:family_member) { FactoryGirl.build(:family_member, family: family) }
+  let(:family_members) { family.family_members}
+  let(:ssn) { nil }
+  let(:dob) { "2007-06-09" }
+  let(:relationship) { "spouse" }
+
+  let(:person_properties) {
+    {
+      :first_name => "aaa",
+      :last_name => "bbb",
+      :middle_name => "ccc",
+      :name_pfx => "ddd",
+      :name_sfx => "eee",
+      :ssn => "123456778",
+      :gender => "male",
+      :dob => dob
+    }
+  }
+
+  subject { Forms::EmployeeDependent.new(person_properties.merge({:family_id => family.id, :relationship => relationship })) }
+
+  before(:each) do
+    allow(Family).to receive(:find).with(family.id).and_return(family)
+    allow(family).to receive(:family_members).and_return(family_members)
+    allow(family_members).to receive(:where).and_return([family_member])
+    allow(family_member).to receive(:relationship).and_return("spouse")
+  end
+
+  it "should fail with multiple spouse" do
+    expect(subject.valid?).to be false
+    expect(subject.errors.to_hash[:base]).to include("can not have multiple spouse") 
   end
 end

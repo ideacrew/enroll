@@ -3,6 +3,7 @@ module Forms
     include ActiveModel::Validations
 
     attr_accessor :broker_agency_id
+    validate :broker_agency_presence
     
     def self.model_name
       ::BrokerAgencyStaffRole.model_name
@@ -25,6 +26,12 @@ module Forms
       person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)
       
       true
+    end
+
+    def broker_agency_presence
+      if self.broker_agency_id.blank? || ::BrokerAgencyProfile.find(self.broker_agency_id).blank?
+        errors.add(:base, "please select your broker agency.")
+      end
     end
   end
 end

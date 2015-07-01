@@ -309,7 +309,7 @@ class Person
  def add_work_email(email)
    existing_email = self.emails.detect do |e|
      (e.kind == 'work') &&
-       (e.email.downcase == email.downcase)
+       (e.address.downcase == email.downcase)
    end
    return nil if existing_email.present?
    self.emails << ::Email.new(:kind => 'work', :address => email)

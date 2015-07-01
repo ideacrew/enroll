@@ -99,6 +99,21 @@ function doPlanComparison(action_uri) {
 	});
 }
 
+function applyPlanSort(sort_by){
+  var plandivs = $('#all-plans #plans .plan-row');
+  plandivs.sort(function(a, b){
+    if (sort_by == "plan-metal-premium" || sort_by == "plan-metal-deductible"){
+      var keyA = parseFloat($(a).data(sort_by).toString().replace(/[^\d\.]/g,''));
+      var keyB = parseFloat($(b).data(sort_by).toString().replace(/[^\d\.]/g,''));
+    }else{
+      var keyA = $(a).data(sort_by);
+      var keyB = $(b).data(sort_by);
+    }
+    return (keyA > keyB) ? 1 : -1;
+  });
+  $("#all-plans #plans").empty().append(plandivs);
+};
+
 $(function() {
 	$("#select-plan-container a[role='tab'][data-toggle='tab']").click(function() {
 		hidePlanTabs();
@@ -136,6 +151,10 @@ $(function() {
     $(".filter-sidebar input[type='text'].plan-metal-deductible-from-selection-filter").val("0");
     $(".filter-sidebar input[type='text'].plan-metal-deductible-to-selection-filter").val("2000");
 		applyPlanFilters();
+  });
+
+  $(document).on('click', '#sort_by a', function(){
+    applyPlanSort($(this).data('sort-by'));
   });
 });
 
