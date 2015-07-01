@@ -1,5 +1,2 @@
-<!-- <h4>Benefit Group</h4> -->
 <% benefit_groups = @employer_profile.plan_years.map(&:benefit_groups).try(:flatten) %>
-<div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
-  <%= f.select :benefit_group_id, benefit_groups.map{|bg| [bg.title, bg.id]}, prompt: "SELECT BENEFIT GROUP", required: true %>
-</div>
+<%= f.select :benefit_group_id, benefit_groups.map{|bg| [bg.title, bg.id]}, prompt: "SELECT BENEFIT GROUP", required: true %>

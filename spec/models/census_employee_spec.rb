@@ -18,7 +18,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   let(:ssn){ "230987654" }
   let(:dob){ Date.today - 31.years }
   let(:gender){ "male" }
-  let(:hired_on){ Date.current - 14.days }
+  let(:hired_on){ TimeKeeper.date_of_record - 14.days }
   let(:is_business_owner){ false }
   let(:address) { Address.new(kind: "home", address_1: "221 R St, NW", city: "Washington", state: "DC", zip: "20001") }
 
@@ -91,7 +91,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       let(:params) { valid_params }
       let(:census_employee)         { CensusEmployee.new(**params) }
       let(:valid_employee_role)     { FactoryGirl.create(:employee_role, ssn: census_employee.ssn, dob: census_employee.dob, employer_profile: employer_profile) }
-      let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: Date.current - 5.days) }
+      let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
 
       it "should save" do
         expect(census_employee.save).to be_truthy
@@ -204,8 +204,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                 end
 
                 context "and employee is terminated" do
-                  let(:invalid_termination_date)  { (Date.current - HbxProfile::ShopRetroactiveTerminationMaximum).beginning_of_month - 1.day }
-                  let(:valid_termination_date)    { Date.current - HbxProfile::ShopRetroactiveTerminationMaximum }
+                  let(:invalid_termination_date)  { (TimeKeeper.date_of_record - HbxProfile::ShopRetroactiveTerminationMaximum).beginning_of_month - 1.day }
+                  let(:valid_termination_date)    { TimeKeeper.date_of_record - HbxProfile::ShopRetroactiveTerminationMaximum }
 
                   it "transition to termination should be valid" do
                     expect(new_census_employee.may_terminate_employee_role?).to be_truthy
@@ -284,7 +284,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context "validation for employment_terminated_on" do
-    let(:census_employee) {FactoryGirl.build(:census_employee, employer_profile: employer_profile, hired_on: Date.current.beginning_of_year)}
+    let(:census_employee) {FactoryGirl.build(:census_employee, employer_profile: employer_profile, hired_on: TimeKeeper.date_of_record.beginning_of_year)}
 
     it "should fail when terminated date before than hired date" do
       census_employee.employment_terminated_on = census_employee.hired_on - 10.days

@@ -33,7 +33,7 @@ describe EmployerProfile, dbclean: :after_each do
   end
 
   after do
-    TimeKeeper.set_date_of_record_unprotected!(Date.current)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
   end
 
   it { should validate_presence_of :entity_kind }
@@ -121,7 +121,7 @@ describe EmployerProfile, dbclean: :after_each do
 
     context "and employer submits a valid plan year application with tomorrow as start open enrollment" do
       before do
-        TimeKeeper.set_date_of_record_unprotected!(Date.current.beginning_of_month.next_month + 8.days)
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
         plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
         plan_year.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
         plan_year.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
@@ -136,7 +136,7 @@ describe EmployerProfile, dbclean: :after_each do
 
     context "and employer submits a valid plan year application with today as start open enrollment" do
       before do
-        TimeKeeper.set_date_of_record_unprotected!(Date.current.beginning_of_month.next_month + 8.days)
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
         plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
         plan_year.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
         plan_year.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
@@ -160,8 +160,8 @@ describe EmployerProfile, dbclean: :after_each do
 
             context "because enrollment non-owner participation minimum not met" do
               let(:invalid_non_owner_count) { min_non_owner_count - 1 }
-              let!(:owner_census_employee) { FactoryGirl.create(:census_employee, :owner, hired_on: (Date.current - 2.years), employer_profile_id: employer_profile.id) }
-              let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, invalid_non_owner_count, hired_on: (Date.current - 2.years), employer_profile_id: employer_profile.id) }
+              let!(:owner_census_employee) { FactoryGirl.create(:census_employee, :owner, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
+              let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, invalid_non_owner_count, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
 
               before do
                 owner_census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
@@ -186,7 +186,7 @@ describe EmployerProfile, dbclean: :after_each do
             end
 
             context "or the minimum enrollment ratio isn't met" do
-              let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, 1, hired_on: (Date.current - 2.years), employer_profile_id: employer_profile.id) }
+              let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, 1, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
 
               before do
                 non_owner_census_families.each do |census_employee|
@@ -197,7 +197,7 @@ describe EmployerProfile, dbclean: :after_each do
 
               context "and the effective date isn't January 1" do
                 before do
-                  plan_year.start_on = Date.current.beginning_of_year.next_month
+                  plan_year.start_on = TimeKeeper.date_of_record.beginning_of_year.next_month
                   non_owner_census_families.each do |census_employee|
                     census_employee.benefit_group_assignments.first.start_on = plan_year.start_on
                     census_employee.save!
@@ -219,7 +219,7 @@ describe EmployerProfile, dbclean: :after_each do
 
               context "and the effective date is January 1" do
                 before do
-                  plan_year.start_on = Date.current.beginning_of_year
+                  plan_year.start_on = TimeKeeper.date_of_record.beginning_of_year
                   non_owner_census_families.each do |census_employee|
                     benefit_group_assignment = census_employee.benefit_group_assignments.first
                     benefit_group_assignment.start_on = plan_year.start_on
@@ -248,7 +248,7 @@ describe EmployerProfile, dbclean: :after_each do
           end
 
           context "and employer enrollment is compliant when the effective date isn't January 1" do
-            let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, 1, hired_on: (Date.current - 2.years), employer_profile_id: employer_profile.id) }
+            let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, 1, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
 
             before do
               plan_year.start_on = plan_year.start_on.next_month if plan_year.start_on.month == 1
@@ -790,7 +790,7 @@ end
 describe ""
 
 describe "#advance_day" do
-  let(:start_on) { (Date.current + 60).beginning_of_month }
+  let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }
   let(:end_on) {start_on + 1.year - 1 }
   let(:open_enrollment_start_on) { (start_on - 32).beginning_of_month }
   let(:open_enrollment_end_on) { open_enrollment_start_on + 2.weeks }

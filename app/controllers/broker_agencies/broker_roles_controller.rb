@@ -39,26 +39,18 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   def create
-    success = false
     if params[:person].present?
-      applicant_type = params[:person][:broker_applicant_type] if params[:person][:broker_applicant_type]
-
-      if applicant_type && applicant_type == 'staff'
-        @person = ::Forms::BrokerAgencyStaffRole.new(broker_agency_staff_role_params)
-      else
-        @person = ::Forms::BrokerRole.new(broker_role_params)
-      end
-
+      @person = ::Forms::BrokerCandidate.new(applicant_params)
       if @person.save
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
         redirect_to broker_registration_path
       else
-        @filter = applicant_type
+        @filter = params[:person][:broker_applicant_type]
         render 'new'
       end
     else
       @organization = ::Forms::BrokerAgencyProfile.new(primary_broker_role_params)
-      if @organization.save(current_user)
+      if @organization.save
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
         redirect_to broker_registration_path
       else
@@ -87,11 +79,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
     )
   end
 
-  def broker_role_params
-    params.require(:person).permit(:first_name, :last_name, :dob, :email, :npn, :broker_agency_id)
-  end
-
-  def broker_agency_staff_role_params
-    params.require(:person).permit(:first_name, :last_name, :dob, :email, :broker_agency_id)
+  def applicant_params
+    params.require(:person).permit(:first_name, :last_name, :dob, :email, :npn, :broker_agency_id, :broker_applicant_type)
   end
 end

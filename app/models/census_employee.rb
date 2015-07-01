@@ -111,7 +111,7 @@ class CensusEmployee < CensusMember
     @employee_role = EmployeeRole.find(self.employee_role_id) unless self.employee_role_id.blank?
   end
 
-  def add_benefit_group_assignment(new_benefit_group, start_on = Date.current)
+  def add_benefit_group_assignment(new_benefit_group, start_on = TimeKeeper.date_of_record)
     raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
 
     if active_benefit_group_assignment.present?
@@ -174,7 +174,7 @@ class CensusEmployee < CensusMember
 
     # Coverage termination date may not exceed HBX max
     reported_coverage_term_on = self.employment_terminated_on.end_of_month
-    max_coverage_term_on = (Date.current.end_of_day - HbxProfile::ShopRetroactiveTerminationMaximum).end_of_month
+    max_coverage_term_on = (TimeKeeper.date_of_record.end_of_day - HbxProfile::ShopRetroactiveTerminationMaximum).end_of_month
     coverage_term_on = [reported_coverage_term_on, max_coverage_term_on].compact.max
 
     active_benefit_group_assignment.terminate_coverage(coverage_term_on) if active_benefit_group_assignment.try(:may_terminate_coverage?)

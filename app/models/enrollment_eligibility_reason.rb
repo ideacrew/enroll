@@ -6,7 +6,7 @@ class EnrollmentEligibilityReason
     self.provider = provider
   end
 
-  def provider=(new_provider_object, date_of_reason = Date.current)
+  def provider=(new_provider_object, date_of_reason = TimeKeeper.date_of_record)
     @provider = ReasonProvider.new(new_provider_object)
   end
 

@@ -60,7 +60,7 @@ module Forms
       self.broker_agency_profile = organization.broker_agency_profile
       self.broker_agency_profile.primary_broker_role = person.broker_role
       self.broker_agency_profile.save!
-
+      person.broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id })
       true
     end
 
