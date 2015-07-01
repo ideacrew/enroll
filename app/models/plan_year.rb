@@ -63,8 +63,8 @@ class PlanYear
   end
 
   def register_employer
-    employer_profile.publish_plan_year!
-    send_employee_invites
+    state_change_successful = employer_profile.publish_plan_year!
+    send_employee_invites if state_change_successful
   end
 
   def send_employee_invites

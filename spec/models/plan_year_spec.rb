@@ -551,8 +551,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           expect(plan_year.published?).to be_truthy
         end
 
-        it "and employer_profile should be in registered state" do
-          expect(plan_year.employer_profile.registered?).to be_truthy
+        it "and employer_profile should be in either registered or enrolling state" do
+          expect(plan_year.employer_profile.registered? || plan_year.employer_profile.enrolling?).to be_truthy
         end
 
         context "and the plan year is changed" do
