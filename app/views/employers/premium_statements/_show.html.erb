@@ -26,9 +26,9 @@
   <% employee0 = {
       full_name: "Joe Cool",
       ssn: "876543211",
-      dob: Date.current - 34.years,
-      hired_on: (Date.current - 90),
-      start_date: (Date.current - 60).beginning_of_month,
+      dob: TimeKeeper.date_of_record - 34.years,
+      hired_on: (TimeKeeper.date_of_record - 90),
+      start_date: (TimeKeeper.date_of_record - 60).beginning_of_month,
       benefit_group: "2015 Benefits",
       benefits: benefits.dup
     }
@@ -37,9 +37,9 @@
   <% employee1 = {
       full_name: "Lucy Brown",
       ssn: "012345678",
-      dob: Date.current - 39.years,
-      hired_on: (Date.current - 90),
-      start_date: (Date.current - 60).beginning_of_month,
+      dob: TimeKeeper.date_of_record - 39.years,
+      hired_on: (TimeKeeper.date_of_record - 90),
+      start_date: (TimeKeeper.date_of_record - 60).beginning_of_month,
       benefit_group: "2015 Benefits",
       benefits: benefits.dup
     }
@@ -75,7 +75,7 @@
       <tbody>
         <% staff.each do |employee| %>
           <%= render "employee_line_item", ee: employee %>
-        <% end %>      
+        <% end %>
       </tbody>
     </table>
   </div>

@@ -38,16 +38,19 @@ RSpec.configure do |config|
   # https://relishapp.com/rspec/rspec-rails/docs
   config.after(:suite, :dbclean => :after_all) do
     DatabaseCleaner.clean
+    TimeKeeper.set_date_of_record_unprotected!(Date.current)
   end
 
   config.after(:example, :dbclean => :after_each) do
     DatabaseCleaner.clean
+    TimeKeeper.set_date_of_record_unprotected!(Date.current)
   end
 
   config.around(:example, :dbclean => :around_each) do |example|
     DatabaseCleaner.clean
     example.run
     DatabaseCleaner.clean
+    TimeKeeper.set_date_of_record_unprotected!(Date.current)
   end
 
   config.include ModelMatcherHelpers, :type => :model
