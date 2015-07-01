@@ -25,25 +25,22 @@ module Forms
       end
     end
 
-    def create_broker_agency_staff_role(current_user, broker_agency_profile)
-      person.user = current_user
-      person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)
-      # current_user.roles << "broker_agency_staff" unless current_user.roles.include?("broker_agency_staff")
-      # current_user.save!
+    def add_broker_role
+      person.broker_role = ::BrokerRole.new({ 
+        :provider_kind => 'broker', 
+        :npn => self.npn 
+        })
     end
 
-    def create_broker_role(user, broker_agency_profile=nil)
-      person.broker_role = ::BrokerRole.new({ :provider_kind => 'broker', :npn => self.npn, :broker_agency_profile => broker_agency_profile })
-      # user.roles << "broker" unless user.roles.include?("broker")
-      # user.save!
-    end
-
-    def save(current_user)
+    def save(current_user=nil)
       return false unless valid?
+
       begin
         match_or_create_person(current_user)
         person.add_work_email(email)
         person.save!
+        add_broker_role
+
       rescue TooManyMatchingPeople
         errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
         return false
@@ -55,20 +52,15 @@ module Forms
       begin
         check_existing_organization
       rescue OrganizationAlreadyMatched
-        errors.add(:base, "a staff role for this organization has already been claimed.")
+        errors.add(:base, "organization has already been created.")
         return false
       end
+
       organization = create_new_organization
-      organization.save!
       self.broker_agency_profile = organization.broker_agency_profile
-      if current_user
-        create_broker_agency_staff_role(current_user, organization.broker_agency_profile)
-      else
-        create_broker_agency_staff_role(person.user, organization.broker_agency_profile)
-        create_broker_role(person.user, organization.broker_agency_profile)
-        self.broker_agency_profile.primary_broker_role = person.broker_role
-        self.broker_agency_profile.save!
-      end
+      self.broker_agency_profile.primary_broker_role = person.broker_role
+      self.broker_agency_profile.save!
+      person.broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id })
       true
     end
 
