@@ -35,6 +35,14 @@ class ConsumerProfilesController < ApplicationController
   end
 
   def plans
+    @person = current_user.person
+    @employee_roles = @person.employee_roles
+    @employer_profile = @employee_roles.first.employer_profile if @employee_roles.any?
+    @current_plan_year = @employer_profile.latest_plan_year if @employer_profile.present?
+    @benefit_group = @current_plan_year.benefit_groups.first if @current_plan_year.present?
+    @plan = @benefit_group.reference_plan
+    @qhp = Products::Qhp.where(standard_component_id: @plan.hios_id[0..13]).to_a.first
+    @qhp_benefits = @qhp.qhp_benefits
     respond_to do |format|
       format.html
       format.js
