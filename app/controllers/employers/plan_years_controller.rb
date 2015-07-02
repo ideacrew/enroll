@@ -46,7 +46,8 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def update
-    @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
+    plan_year = @employer_profile.plan_years.where(id: params[:id]).last
+    @plan_year = ::Forms::PlanYearForm.rebuild(plan_year, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|
       benefit_group.elected_plans = case benefit_group.plan_option_kind
                                     when "single_plan"
@@ -113,17 +114,18 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def plan_year_params
-    #    new_params = format_date_params(params)
-    params.require(:plan_year).permit(
+    plan_year_params = params.require(:plan_year).permit(
       :start_on, :end_on, :fte_count, :pte_count, :msp_count,
       :open_enrollment_start_on, :open_enrollment_end_on,
-      :benefit_groups_attributes => [ :title, :reference_plan_id, :effective_on_offset,
+      :benefit_groups_attributes => [ :id, :title, :reference_plan_id, :effective_on_offset,
                                       :carrier_for_elected_plan, :metal_level_for_elected_plan,
                                       :plan_option_kind, :employer_max_amt_in_cents, :_destroy,
                                       :relationship_benefits_attributes => [
-                                        :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
+                                        :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
                                       ]
     ]
     )
+    plan_year_params["benefit_groups_attributes"].delete_if {|k, v| v.count<2 } 
+    plan_year_params
   end
 end

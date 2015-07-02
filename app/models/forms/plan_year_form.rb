@@ -29,5 +29,11 @@ module Forms
          new_proxy.assign_plan_year_attributes(atts)
        end
      end
+
+     def self.rebuild(plan_year, atts)
+       self.new(plan_year).tap do |proxy|
+         proxy.assign_plan_year_attributes(atts)
+       end
+     end
   end
 end
