@@ -1,12 +1,15 @@
 <%-  render 'broker_agencies/profiles/menu', :active_tab => "home-tab" %>
 <div id= 'message_form'></div>
-<div class="container bottom-pd" id="inbox_provider_form">
+<div class="container" id="inbox_provider_form">
   <div class="row">
-    <h3 class="title-inline">Broker Agencies</h3>
+    <div class="col-md-12">
+      <h3 class="title-inline">Broker Agencies</h3>
+    </div>
   </div>
 
   <div class="row">
-    <div class="table-border">
+    <div class="col-md-12">
+    <div class="table-border table-responsive">
       <table class="table">
       <% if @broker_agency_profiles.present? %>
         <thead>
@@ -33,5 +36,6 @@
       <% end %>
       </table>
     </div>
+   </div>
   </div>
 </div>
