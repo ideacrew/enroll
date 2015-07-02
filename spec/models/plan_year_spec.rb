@@ -609,6 +609,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     it "start on is close to current date(2 months)" do
       TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + 14.days)
+      current_date = Date.new(Time.now.year, Time.now.month, 15)
+      allow(TimeKeeper).to receive(:date_of_record).and_return(current_date)
       start_on = (TimeKeeper.date_of_record + 2.month).beginning_of_month
       rsp = PlanYear.calculate_open_enrollment_date(start_on)
       expect(rsp[:open_enrollment_start_on]).to eq (TimeKeeper.date_of_record)
