@@ -4,7 +4,7 @@
       <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
         <h3>Covered Family Members</h3>
         <h4><strong>Who would you like to cover?</strong></h4>
-        
+
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:employee_role_id, @employee_role.id) %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
@@ -22,7 +22,7 @@
                     <%= check_box_tag("family_member_ids[#{index}]", family_member.id, false, disabled: true) %>
                   <% end %>
                 </td>
-                <% 
+                <%
                   dob = family_member.dob
                   now = Date.today
                   age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
@@ -33,13 +33,15 @@
             </tbody>
             </table>
           </div>
-          
+
           <br>
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', 'change' %>
             <h4><strong>What do you like to do?</strong></h4>
-            <%= link_to 'Keep existing plan', home_consumer_profiles_path, class: 'btn btn-primary' %>
-            <%= submit_tag 'Shop for new plan', class: 'btn btn-primary' %>
+            <%#= link_to 'Keep existing plan', home_consumer_profiles_path, class: 'btn btn-primary' %>
+            <%= link_to 'Keep existing plan', purchase_consumer_profiles_path, class: 'btn btn-lg btn-primary' %> &nbsp;
+            <input type="button", value="Terminate Plan", onclick="confirm('Are you sure?');", class="btn btn-lg btn-primary"> &nbsp;
+            <%= submit_tag 'Shop for new plan', class: 'btn btn-lg btn-primary' %>
           <% else %>
           <h3>Select a plan</h3>
           <p class="text-justify"><%= t('welcome.employee.select_plan') %></p>

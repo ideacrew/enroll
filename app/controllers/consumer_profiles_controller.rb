@@ -66,7 +66,7 @@ class ConsumerProfilesController < ApplicationController
 
     @qualifying_life_events = QualifyingLifeEventKind.all
     @employee_role = @person.employee_roles.first
-    
+
     respond_to do |format|
       format.html
       format.js
@@ -89,5 +89,8 @@ class ConsumerProfilesController < ApplicationController
   end
 
   def inbox
+  end
+
+  def purchase
   end
 end

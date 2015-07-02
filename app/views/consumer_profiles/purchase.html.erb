@@ -1,0 +1,77 @@
+<div class="container bottom-pd">
+  <div id="confirm_plan" class="col-md-8 col-sm-8 col-xs-12">
+    <h3>Confirm Your Plan Selection</h3>
+    <p class="alert alert-info">
+      INFO: This page should display the changes in Total amount after adding or deleting the family member.
+    </p>
+    <p>Your current plan selection is displayed below. Click the back button if you want to change your selection. Click Purchase button to complete your enrollment.</p>
+    <p>Your enrollment is not complete until you purchase your plan selection below.</p>
+    <p>
+      <strong>BlueChoice Advantage $1000</strong><br>
+      Starting on : 02/01/2015
+    </p>
+
+    <br>
+
+    <div class="table-border">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Relationship</th>
+            <th>Age</th>
+            <th class="text-right">Premium</th>
+            <th width="50" class="text-right">Employer Contribution</th>
+            <th width="50" class="text-right">You Pay</th>
+          </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+              <td>Soren  White </td>
+              <td>self</td>
+              <td>35</td>
+              <td class="text-right">$331.43</td>
+              <td class="text-right">$91.92</td>
+              <td class="text-right">$239.50</td>
+            </tr>
+            <tr>
+              <td>Soren White</td>
+              <td>child</td>
+              <td>0</td>
+              <td class="text-right">$247.43</td>
+              <td class="text-right">$0.00</td>
+              <td class="text-right">$247.43</td>
+            </tr>
+            <tr>
+              <td>Katherine White</td>
+              <td>spouse</td>
+              <td>47</td>
+              <td class="text-right">$464.22</td>
+              <td class="text-right">$0.00</td>
+              <td class="text-right">$464.22</td>
+            </tr>
+            <tr>
+              <td>Charles D White</td>
+              <td>child</td>
+              <td>4</td>
+              <td class="text-right">$247.43</td>
+              <td class="text-right">$0.00</td>
+              <td class="text-right">$247.43</td>
+            </tr>
+          <tr class="gray-row">
+            <td class="text-right capital" colspan="3"><strong>Totals</strong></td>
+            <td class="text-right"><strong>$1,290.52</strong></td>
+            <td class="text-right"><strong>$91.92</strong></td>
+            <td class="text-right"><strong>$1,198.59</strong></td>
+          </tr>
+          <tr>
+            <td class="text-right" colspan="5">Your coverage start date :</td>
+            <td>02/01/2015</td>
+          </tr>
+        </tbody>
+      </table>
+    </div><br>
+    <%= link_to 'Purchase', '#', class: 'btn btn-primary pull-right' %>
+  </div>
+</div>
