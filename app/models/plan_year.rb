@@ -282,32 +282,35 @@ class PlanYear
     end
 
     def map_binder_payment_due_date_by_start_on(start_on)
-      dates_map = {
-        "2015-01-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2014,12,12)),
-        "2015-02-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,1,13)),
-        "2015-03-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,2,12)),
-        "2015-04-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,3,12)),
-        "2015-05-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,4,14)),
-        "2015-06-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,5,12)),
-        "2015-07-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,6,12)),
-        "2015-08-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,7,14)),
-        "2015-09-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,8,12)),
-        "2015-10-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,9,14)),
-        "2015-11-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,14)),
-        "2015-12-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,11,12)),
-        "2016-01-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,12,14)),
-        "2016-02-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2016,1,12)),
-        "2016-03-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2016,2,12)),
-        "2016-04-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2016,3,14)),
-        "2016-05-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2016,4,12)),
-        "2016-06-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2016,5,12)),
-        "2016-07-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2016,6,14)),
-        "2016-08-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2016,7,12)),
-        "2016-09-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2016,8,12)),
-        "2016-10-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2016,9,13)),
-        "2016-11-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2016,10,12)),
-        "2016-12-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2016,11,14)),
-        "2017-01-01" => TimeKeeper.set_date_of_record_unprotected!(Date.new(2016,12,13))}
+      dates_map = {}
+      {
+        "2015-01-01" => '2014,12,12',
+        "2015-02-01" => '2015,1,13',
+        "2015-03-01" => '2015,2,12',
+        "2015-04-01" => '2015,3,12',
+        "2015-05-01" => '2015,4,14',
+        "2015-06-01" => '2015,5,12',
+        "2015-07-01" => '2015,6,12',
+        "2015-08-01" => '2015,7,14',
+        "2015-09-01" => '2015,8,12',
+        "2015-10-01" => '2015,9,14',
+        "2015-11-01" => '2015,10,14',
+        "2015-12-01" => '2015,11,12',
+        "2016-01-01" => '2015,12,14',
+        "2016-02-01" => '2016,1,12',
+        "2016-03-01" => '2016,2,12',
+        "2016-04-01" => '2016,3,14',
+        "2016-05-01" => '2016,4,12',
+        "2016-06-01" => '2016,5,12',
+        "2016-07-01" => '2016,6,14',
+        "2016-08-01" => '2016,7,12',
+        "2016-09-01" => '2016,8,12',
+        "2016-10-01" => '2016,9,13',
+        "2016-11-01" => '2016,10,12',
+        "2016-12-01" => '2016,11,14',
+        "2017-01-01" => '2016,12,13'}.each_pair do |k, v|
+          dates_map[k] = TimeKeeper.set_date_of_record_unprotected!(Date.strptime(v, '%Y,%m,%d'))
+        end
 
       dates_map[start_on.strftime('%Y-%m-%d')] || shop_enrollment_timetable(start_on)[:binder_payment_due_date]
     end
