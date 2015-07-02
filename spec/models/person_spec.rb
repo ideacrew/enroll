@@ -27,6 +27,10 @@ describe Person do
         person.valid?
       end
 
+      it 'should generate hbx_id' do
+        expect(person.hbx_id).to be_truthy
+      end
+
       context "and a second person is created with the same ssn" do
         let(:person2) {Person.create(**params)}
         before do

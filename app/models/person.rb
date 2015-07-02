@@ -136,8 +136,9 @@ class Person
   end
 
   def generate_hbx_id
+
     if hbx_id.blank?
-      hbx_id = HbxIdGenerator.generate
+      write_attribute(:hbx_id, HbxIdGenerator.generate)
     end
   end
 
