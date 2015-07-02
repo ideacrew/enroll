@@ -207,7 +207,7 @@ When(/^I click delete on baby Soren$/) do
   @browser.button(text: /Confirm Member/).wait_while_present
 end
 
-Then(/^I should see (.*) dependents$/) do |n|
+Then(/^I should see (.*) dependents*$/) do |n|
   n = n.to_i
   expect(@browser.li(class: "dependent_list", index: n)).not_to exist
   expect(@browser.li(class: "dependent_list", index: n - 1)).to exist

@@ -58,6 +58,7 @@ Feature: Create Employer
       When I accept the matched employer
       When I complete the matching employee form
       Then I should see the dependents page
+      Then I should see 1 dependent
       When I click continue on the dependents page
       Then I should see the group selection page
       When I click continue on the group selection page
