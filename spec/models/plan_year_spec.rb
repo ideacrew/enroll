@@ -616,6 +616,19 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 
+  context "map binder_payment_due_date" do
+    it "in interval of map" do
+      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,9,1)))
+      expect(binder_payment_due_date).to eq TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,8,12))
+    end
+
+    it "out of map" do
+      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(TimeKeeper.set_date_of_record_unprotected!(Date.new(2017,9,1)))
+
+      expect(binder_payment_due_date).to eq PlanYear.shop_enrollment_timetable(TimeKeeper.set_date_of_record_unprotected!(Date.new(2017,9,1)))[:binder_payment_due_date]
+    end
+  end
+
   context "calculate_start_on_options" do
     it "should return two options" do
       date1 = (Time.now + 2.month).beginning_of_month
