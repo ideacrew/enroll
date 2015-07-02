@@ -7,8 +7,9 @@
 
   <div class="row no-buffer">
     <%= hidden_field_tag(:broker_agency_id, @broker_agency.id) %>
-    <%= render 'fields', broker_agency_profile: @broker_agency %>
-
+    <div class="table-responsive">
+      <%= render 'fields', broker_agency_profile: @broker_agency %>
+    </div>
     <button class="btn btn-primary" type="submit" onclick="return confirm('This will terminate your existing active broker effective immediatedly. Are you sure you want to select new broker?')">
       Select Broker
     </button>
