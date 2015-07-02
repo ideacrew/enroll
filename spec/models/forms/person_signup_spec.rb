@@ -58,15 +58,15 @@ describe Forms::PersonSignup, ".match_or_create_person" do
 
 
   context 'when user already exists in the system' do 
-    let(:other_attributes) { {first_name: "john"}}
+    let(:other_attributes) { {first_name: "larry"}}
 
      before :each do
-      FactoryGirl.create(:person, first_name: "john", last_name: "smith", dob: "10/10/1974")
+      FactoryGirl.create(:person, first_name: "larry", last_name: "smith", dob: "10/10/1974")
       subject.match_or_create_person
     end
 
     it "should build person from existing record" do
-      person = Person.where(first_name: "john", last_name: "smith", dob: "10/10/1974").first
+      person = Person.where(first_name: "larry", last_name: "smith", dob: "10/10/1974").first
       expect(subject.person).to eq(person)
     end
   end
