@@ -10,7 +10,7 @@ module Forms
     validates_presence_of :last_name
     validates_presence_of :email
 
-    class PersonAlreadyMatched < StandardError; end
+    class TooManyMatchingPeople < StandardError; end
 
     def initialize(attrs = {})
       assign_wrapper_attributes(attrs)
@@ -28,16 +28,20 @@ module Forms
         last_name: regex_for(last_name),
         dob: dob
         )
-
-      if matched_people.count > 0
-        raise PersonAlreadyMatched.new
+      
+      if matched_people.count > 1
+        raise TooManyMatchingPeople.new
       end
 
-      self.person = Person.new({
-        first_name: first_name,
-        last_name: last_name,
-        dob: dob
-        })
+      if matched_people.count == 1
+        self.person = matched_people.first
+      else
+        self.person = Person.new({
+          first_name: first_name,
+          last_name: last_name,
+          dob: dob
+          })
+      end
 
       self.person.add_work_email(email)
     end
