@@ -599,40 +599,213 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 
-  context "calculate_open_enrollment_date" do
-    it "start on is not close to current date" do
-      start_on = (TimeKeeper.date_of_record + 3.month).beginning_of_month
-      rsp = PlanYear.calculate_open_enrollment_date(start_on)
-      expect(rsp[:open_enrollment_start_on]).to eq start_on - 2.months
-      expect(rsp[:open_enrollment_end_on]).to eq (start_on - 2.months + 9.days)
+  context "calculate_open_enrollment_date when the earliest effective date is chosen" do
+    let(:new_effective_date) { PlanYear.calculate_start_on_dates.first }
+    let(:calculate_open_enrollment_date) { PlanYear.calculate_open_enrollment_date(new_effective_date) }
+
+    context "on the first of the month" do
+      let(:date_of_record_to_use) { Date.new(2015, 7, 1) }
+      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 1) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_start_on) { Date.new(2015, 8, 1) }
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+      end
+
+      it "should suggest correct open enrollment start" do
+        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+      end
+
+      it "should suggest correct open enrollment end" do
+        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+      end
+
+      it "should have the right start on" do
+        expect(new_effective_date).to eq expected_start_on
+      end
     end
 
-    it "start on is close to current date(2 months)" do
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + 14.days)
-      start_on = (TimeKeeper.date_of_record + 2.month).beginning_of_month
-      rsp = PlanYear.calculate_open_enrollment_date(start_on)
-      expect(rsp[:open_enrollment_start_on]).to eq (TimeKeeper.date_of_record)
-      expect(rsp[:open_enrollment_end_on]).to eq (TimeKeeper.date_of_record + 9.days)
+    context "on the second of the month" do
+      let(:date_of_record_to_use) { Date.new(2015, 7, 2) }
+      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 2) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_start_on) { Date.new(2015, 8, 1) }
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+      end
+
+      it "should suggest correct open enrollment start" do
+        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+      end
+
+      it "should suggest correct open enrollment end" do
+        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+      end
+
+      it "should have the right start on" do
+        expect(new_effective_date).to eq expected_start_on
+      end
+    end
+
+    context "on the third of the month" do
+      let(:date_of_record_to_use) { Date.new(2015, 7, 3) }
+      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 3) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_start_on) { Date.new(2015, 8, 1) }
+      let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 2.days }
+      let(:expected_open_enrollment_start_on) { date_of_record_to_use }
+      let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+      end
+
+      it "should suggest correct open enrollment start" do
+        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+      end
+
+      it "should suggest correct open enrollment end" do
+        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+      end
+
+      it "should have the right start on" do
+        expect(new_effective_date).to eq expected_start_on
+      end
+    end
+
+    context "on the fourth of the month" do
+      let(:date_of_record_to_use) { Date.new(2015, 7, 4) }
+      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 4) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_start_on) { Date.new(2015, 8, 1) }
+      let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 3.days }
+      let(:expected_open_enrollment_start_on) { date_of_record_to_use }
+      let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+      end
+
+      it "should suggest correct open enrollment start" do
+        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+      end
+
+      it "should suggest correct open enrollment end" do
+        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+      end
+
+      it "should have the right start on" do
+        expect(new_effective_date).to eq expected_start_on
+      end
+    end
+
+    context "on the fifth of the month" do
+      let(:date_of_record_to_use) { Date.new(2015, 7, 5) }
+      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 5) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_start_on) { Date.new(2015, 8, 1) }
+      let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 4.days }
+      let(:expected_open_enrollment_start_on) { date_of_record_to_use }
+      let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+      end
+
+      it "should suggest correct open enrollment start" do
+        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+      end
+
+      it "should suggest correct open enrollment end" do
+        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+      end
+
+      it "should have the right start on" do
+        expect(new_effective_date).to eq expected_start_on
+      end
+    end
+
+    context "on the sixth of the month" do
+      let(:date_of_record_to_use) { Date.new(2015, 7, 6) }
+      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 6) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_start_on) { Date.new(2015, 9, 1) }
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+      end
+
+      it "should suggest correct open enrollment start" do
+        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+      end
+
+      it "should suggest correct open enrollment end" do
+        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+      end
+
+      it "should have the right start on" do
+        expect(new_effective_date).to eq expected_start_on
+      end
+    end
+
+    context "on the 7th of the month" do
+      let(:date_of_record_to_use) { Date.new(2015, 7, 7) }
+      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 7) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 8, 10) }
+      let(:expected_start_on) { Date.new(2015, 9, 1) }
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+      end
+
+      it "should suggest correct open enrollment start" do
+        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+      end
+
+      it "should suggest correct open enrollment end" do
+        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+      end
+
+      it "should have the right start on" do
+        expect(new_effective_date).to eq expected_start_on
+      end
+    end
+
+    context "on the tenth of the month" do
+    end
+
+    context "on the twelfth of the month" do
+    end
+
+    context "on the last day of the month" do
+    end
+  end
+
+  context "map binder_payment_due_date" do
+    it "in interval of map" do
+      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,9,1)))
+      expect(binder_payment_due_date).to eq TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,8,12))
+    end
+
+    it "out of map" do
+      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(TimeKeeper.set_date_of_record_unprotected!(Date.new(2017,9,1)))
+
+      expect(binder_payment_due_date).to eq PlanYear.shop_enrollment_timetable(TimeKeeper.set_date_of_record_unprotected!(Date.new(2017,9,1)))[:binder_payment_due_date]
     end
   end
 
   context "calculate_start_on_options" do
     it "should return two options" do
-      date1 = (Time.now + 2.month).beginning_of_month
-      date2 = (Time.now + 3.month).beginning_of_month
+      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
+      date2 = date1.next_month
       dates = [date1, date2].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
 
-      TimeKeeper.set_date_of_record_unprotected!(Date.new(Time.now.year, Time.now.month, 15))
+      TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 15))
       expect(PlanYear.calculate_start_on_options).to eq dates
     end
 
     it "should return three options" do
-      date1 = (Time.now + 1.month).beginning_of_month
-      date2 = (Time.now + 2.month).beginning_of_month
-      date3 = (Time.now + 3.month).beginning_of_month
+      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month
+      date2 = date1.next_month
+      date3 = date2.next_month
       dates = [date1, date2, date3].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
 
-      TimeKeeper.set_date_of_record_unprotected!(Date.new(Time.now.year, Time.now.month, 2))
+      TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 2))
       expect(PlanYear.calculate_start_on_options).to eq dates
     end
   end
