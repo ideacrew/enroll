@@ -72,11 +72,9 @@ class ConsumerProfilesController < ApplicationController
 
     if ["I've had a baby", "Death"].include? params[:qle_type]
       future_days = 0.days
-
     end
 
-    end_date = Date.today + future_days
-
+    end_date = TimeKeeper.date_of_record + future_days
     @qualified_date = (start_date <= qle_date && qle_date <= end_date) ? true : false
   end
 
