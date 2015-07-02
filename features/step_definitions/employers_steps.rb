@@ -207,15 +207,19 @@ Then(/^I should see a form to enter information about employee, address and depe
   email_kind.click
   @browser.li(text: /home/).click
   @browser.text_field(class: /interaction-field-control-census-employee-email-attributes-address/).set("trey.john@dc.gov")
-  # Census Dependents
-  # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-first-name/).set("Mary")
-  # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-middle-name/).set("K")
-  # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-last-name/).set("Doe")
-  # @browser.text_field(class: /interaction-field-control-census-employee-census-dependents-attributes-0-dob/).set("10/12/2012")
-  # @browser.radio(class: /interaction-choice-control-value-census-employee-census-dependents-attributes-0-gender-female/).set
-  # input_field = @browser.divs(class: "selectric-wrapper").last
-  # input_field.click
-  # input_field.li(text: /Child under 26/).click
+
+  @browser.a(text: /Add Dependent/).click
+  @browser.div(id: /dependent_info/).wait_until_present
+  @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mary")
+  @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_middle_name/).set("K")
+  @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_last_name/).set("Doe")
+  @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_dob/).set("10/12/2012")
+  @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_ssn/).set("321321321")
+  @browser.label(for: /census_employee_census_dependents_attributes_\d+_gender_female/).click
+  input_field = @browser.divs(class: "selectric-wrapper").last
+  input_field.click
+  input_field.li(text: /Child/).click
+
   screenshot("create_census_employee_with_data")
   @browser.element(class: /interaction-click-control-create-employee/).click
 end
@@ -262,6 +266,7 @@ Then(/^I should see a form to update the contents of the census employee$/) do
   @browser.text_field(id: /census_employee_ssn/).set("786120965")
   @browser.text_field(id: /census_employee_first_name/).set("Patrick")
   @browser.text_field(id: /census_employee_address_attributes_state/).set("VA")
+  @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mariah")
   screenshot("update_census_employee_with_data")
   @browser.button(value: /Update Employee/).click
 end
@@ -435,18 +440,18 @@ When(/^I enter combined filter in plan selection page$/) do
   @browser.checkboxes(class: /plan-metal-level-selection-filter/).first.set(true)
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(false)
   @browser.checkboxes(class: /plan-type-selection-filter/).last.set(true)
-  @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("2100")
+  @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("1000")
   @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("3900")
   @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("5")
-  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("25")
+  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250") 
   @browser.element(class: /apply-btn/, text: /Apply/).click
 end
 
 Then(/^I should see the combined filter results$/) do
-  @browser.divs(class: /plan-row/).select(&:visible?).each do |plan|
+  @browser.divs(class: /plan-row/).select(&:visible?).first do |plan|
     expect(plan.text.include?("BlueChoice Plus HSA/HRA $3500")).to eq true
     expect(plan.text.include?("Bronze")).to eq true
-    expect(plan.element(text: "$6.51").visible?).to eq true
+    expect(plan.element(text: "$126.18").visible?).to eq true
   end
 end
 
