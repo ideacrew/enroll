@@ -6,7 +6,11 @@ class BenefitGroupAssignment
   embedded_in :census_employee
 
   field :benefit_group_id, type: BSON::ObjectId
+
+  # Represents the most recent completed enrollment
   field :hbx_enrollment_id, type: BSON::ObjectId
+
+
   field :start_on, type: Date
   field :end_on, type: Date
   field :coverage_end_on, type: Date

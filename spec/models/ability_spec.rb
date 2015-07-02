@@ -53,7 +53,7 @@ describe "User" do
         let(:user) { FactoryGirl.create(:user, :hbx_staff) }
 
         it "can update when change dob" do
-          employee.dob = Date.current
+          employee.dob = TimeKeeper.date_of_record
           should be_able_to(:update, employee)
         end
 
@@ -72,7 +72,7 @@ describe "User" do
           end
 
           it "can update when change dob" do
-            employee.dob = Date.current
+            employee.dob = TimeKeeper.date_of_record
             should be_able_to(:update, employee)
           end
 
@@ -88,7 +88,7 @@ describe "User" do
           end
 
           it "can not update when change dob" do
-            employee.dob = Date.current
+            employee.dob = TimeKeeper.date_of_record
             should_not be_able_to(:update, employee)
           end
 
@@ -101,7 +101,7 @@ describe "User" do
 
       context "when is normal user" do
         it "can not update when change dob" do
-          employee.dob = Date.current
+          employee.dob = TimeKeeper.date_of_record
           should_not be_able_to(:update, employee)
         end
 
@@ -113,4 +113,3 @@ describe "User" do
     end
   end
 end
-

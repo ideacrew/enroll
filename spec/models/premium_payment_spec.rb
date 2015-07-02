@@ -3,7 +3,7 @@ require 'rails_helper'
 describe PremiumPayment, type: :model do
 
   let(:employer_profile_account)  { FactoryGirl.build(:employer_profile_account) }
-  let(:paid_on)                   { Date.current.beginning_of_month }
+  let(:paid_on)                   { TimeKeeper.date_of_record.beginning_of_month }
   let(:amount)                    { 2345.07 }
   let(:method_kind)               { "ach" }
   let(:reference_id)              { "alphabetadelta" }

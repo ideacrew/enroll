@@ -5,8 +5,6 @@ class HbxEnrollment
   include AASM
   include MongoidSupport::AssociationProxies
 
-  # Persists result of a completed plan shopping process
-
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
   Authority = [:open_enrollment]
 
@@ -77,7 +75,12 @@ class HbxEnrollment
   end
 
   def propogate_selection
-    benefit_group_assignment.select_coverage! if benefit_group_assignment
+    #benefit_group_assignment.select_coverage! if benefit_group_assignment
+    if benefit_group_assignment
+      benefit_group_assignment.select_coverage
+      benefit_group_assignment.hbx_enrollment = self
+      benefit_group_assignment.save
+    end
   end
 
   def is_active?
