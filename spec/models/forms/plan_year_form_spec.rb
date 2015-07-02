@@ -66,3 +66,15 @@ describe ::Forms::PlanYearForm, "when newly created" do
     end
   end
 end
+
+describe ::Forms::PlanYearForm, "when update" do
+  let(:plan_year) { FactoryGirl.build(:plan_year) }
+  let(:plan_year_atts) {plan_year.attributes}
+
+  it "change plan_year attributes" do
+    plan_year_atts[:msp_count] = 8
+    py = ::Forms::PlanYearForm.rebuild(plan_year, plan_year_atts)
+
+    expect(py.msp_count).to eq 8
+  end
+end

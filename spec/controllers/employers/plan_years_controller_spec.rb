@@ -98,11 +98,14 @@ RSpec.describe Employers::PlanYearsController do
            :benefit_groups_attributes => benefit_groups_attributes
       }
     }
+    let(:plan_years) {double}
 
     before :each do
       sign_in
-      allow(::Forms::PlanYearForm).to receive(:build).with(employer_profile, plan_year_params).and_return(plan_year)
+      allow(::Forms::PlanYearForm).to receive(:rebuild).with(plan_year, plan_year_params).and_return(plan_year)
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(employer_profile).to receive(:plan_years).and_return(plan_years)
+      allow(plan_years).to receive(:where).and_return([plan_year])
       allow(benefit_group).to receive(:elected_plans=).and_return("test")
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
