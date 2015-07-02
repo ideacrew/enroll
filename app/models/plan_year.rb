@@ -263,17 +263,28 @@ class PlanYear
       {result: (result || "ok"), msg: (msg || "")}
     end
 
-    def calculate_start_on_options
+    def calculate_start_on_dates
+      # Today - 5 + 2.months).beginning_of_month
+      # July 6 => Sept 1
+      # July 1 => Aug 1
       start_at = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + HbxProfile::ShopOpenEnrollmentPeriodMaximum.months).beginning_of_month
       end_at = (TimeKeeper.date_of_record + HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum).beginning_of_month
       dates = (start_at..end_at).select {|t| t == t.beginning_of_month}
-      dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
+    end
+
+    def calculate_start_on_options
+      calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
     end
 
     def calculate_open_enrollment_date(start_on)
       start_on = start_on.to_date
       open_enrollment_start_on = [(start_on - HbxProfile::ShopOpenEnrollmentPeriodMaximum.months), TimeKeeper.date_of_record].max
-      open_enrollment_end_on = open_enrollment_start_on + 9.days
+      candidate_open_enrollment_end_on = Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth)
+      open_enrollment_end_on = if (candidate_open_enrollment_end_on - open_enrollment_start_on) < (HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1)
+        candidate_open_enrollment_end_on.next_month
+      else
+        candidate_open_enrollment_end_on
+      end
       binder_payment_due_date = map_binder_payment_due_date_by_start_on(start_on)
 
       {open_enrollment_start_on: open_enrollment_start_on,
