@@ -2,17 +2,15 @@ module Forms
   class PersonSignup
     include ActiveModel::Validations
     attr_accessor :id
-    attr_accessor :person_id
     attr_accessor :person
-    attr_accessor :first_name, :last_name, :email
-    attr_reader :dob
+    attr_accessor :first_name, :last_name, :email, :dob
 
-    validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
-    validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
-    validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
+    validates_presence_of :dob
+    validates_presence_of :first_name
+    validates_presence_of :last_name
+    validates_presence_of :email
 
     class PersonAlreadyMatched < StandardError; end
-    class TooManyMatchingPeople < StandardError; end
 
     def initialize(attrs = {})
       assign_wrapper_attributes(attrs)
@@ -25,28 +23,23 @@ module Forms
     end
 
     def match_or_create_person
-      new_person = Person.new({
-        :first_name => first_name,
-        :last_name => last_name,
-        :dob => dob
-        })
-
       matched_people = Person.where(
         first_name: regex_for(first_name),
         last_name: regex_for(last_name),
-        dob: new_person.dob
+        dob: dob
         )
 
-      if matched_people.count > 1
-        raise TooManyMatchingPeople.new
-      end
-
-      if matched_people.count == 1
-        mp = matched_people.first
+      if matched_people.count > 0
         raise PersonAlreadyMatched.new
       end
-      self.person = new_person
-      self.person.emails << Email.new({kind: 'work', address: email})
+
+      self.person = Person.new({
+        first_name: first_name,
+        last_name: last_name,
+        dob: dob
+        })
+
+      self.person.add_work_email(email)
     end
 
     def to_key

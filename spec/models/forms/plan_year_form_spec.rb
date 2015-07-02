@@ -21,17 +21,48 @@ describe ::Forms::PlanYearForm, "when newly created" do
     before :each do
       Plan.delete_all
       @plan = FactoryGirl.create(:plan, active_year: Time.now.year, market: "shop", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "silver")
+      @excluded_metal_level_plan = FactoryGirl.create(:plan, active_year: Time.now.year, market: "shop", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "catastrophic")
+      @excluded_market_plan = FactoryGirl.create(:plan, active_year: Time.now.year, market: "individual", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "silver")
+      @excluded_coverage_kind_plan = FactoryGirl.create(:plan, active_year: Time.now.year, market: "shop", coverage_kind: "dental", carrier_profile: carrier_profile, metal_level: "silver")
       FactoryGirl.create(:plan, active_year: (Time.now.year - 1), carrier_profile: carrier_profile)
       FactoryGirl.create(:plan, market: "individual", carrier_profile: carrier_profile)
       FactoryGirl.create(:plan, coverage_kind: "dental", carrier_profile: carrier_profile)
     end
 
-    it "carrier_plans_for" do
-      expect(subject.carrier_plans_for(carrier_profile.id)).to eq [@plan]
+    describe "asked to provide plans for a carrier" do
+      it "should include the expected plan" do
+        expect(subject.carrier_plans_for(carrier_profile.id)).to include(@plan)
+      end
+
+      it "should not include dental" do
+        expect(subject.carrier_plans_for(carrier_profile.id)).not_to include(@excluded_coverage_kind_plan)
+      end
+
+      it "should not include individual" do
+        expect(subject.carrier_plans_for(carrier_profile.id)).not_to include(@excluded_market_plan)
+      end
+
+      it "should not include catastrophic" do
+        expect(subject.carrier_plans_for(carrier_profile.id)).not_to include(@excluded_metal_level_plan)
+      end
     end
 
-    it "metal_level_plans_for" do
-      expect(subject.metal_level_plans_for("silver")).to eq [@plan]
+    describe "asked to provide plans for a metal level" do
+
+      it "should include the expected plan" do
+        expect(subject.metal_level_plans_for("silver")).to include(@plan)
+      end
+      it "should not include dental" do
+        expect(subject.metal_level_plans_for("silver")).not_to include(@excluded_coverage_kind_plan)
+      end
+
+      it "should not include individual" do
+        expect(subject.metal_level_plans_for("silver")).not_to include(@excluded_market_plan)
+      end
+
+      it "should not include catastrophic" do
+        expect(subject.metal_level_plans_for("silver")).not_to include(@excluded_metal_level_plan)
+      end
     end
   end
 end
