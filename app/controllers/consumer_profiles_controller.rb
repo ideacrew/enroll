@@ -92,5 +92,18 @@ class ConsumerProfilesController < ApplicationController
   end
 
   def purchase
+    @person = current_user.person
+    @family = @person.primary_family
+    @enrollment = @family.try(:latest_household).try(:hbx_enrollments).try(:first)
+
+    if @enrollment.present?
+      plan = @enrollment.try(:plan)
+      @benefit_group = @enrollment.benefit_group
+      @reference_plan = @benefit_group.reference_plan
+      @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
+      @enrollable = @family.is_eligible_to_enroll? && @benefit_group.plan_year.is_eligible_to_enroll?
+    else
+      redirect_to :back
+    end
   end
 end

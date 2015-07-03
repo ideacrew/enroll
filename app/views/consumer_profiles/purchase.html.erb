@@ -7,8 +7,8 @@
     <p>Your current plan selection is displayed below. Click the back button if you want to change your selection. Click Purchase button to complete your enrollment.</p>
     <p>Your enrollment is not complete until you purchase your plan selection below.</p>
     <p>
-      <strong>BlueChoice Advantage $1000</strong><br>
-      Starting on : 02/01/2015
+      <strong><%= @plan.name %></strong><br>
+      Starting on : <%= @enrollment.effective_on.strftime("%m/%d/%Y") %>
     </p>
 
     <br>
@@ -27,47 +27,25 @@
         </thead>
 
         <tbody>
+          <% @enrollment.hbx_enrollment_members.each do |member| %>
             <tr>
-              <td>Soren  White </td>
-              <td>self</td>
-              <td>35</td>
-              <td class="text-right">$331.43</td>
-              <td class="text-right">$91.92</td>
-              <td class="text-right">$239.50</td>
+              <td><%= member.person.full_name %></td>
+              <td><%= member.primary_relationship %></td>
+              <td><%= member.person.age_on(Time.now.utc.to_date) %></td>
+              <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
+              <td class="text-right"><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
+              <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
             </tr>
-            <tr>
-              <td>Soren White</td>
-              <td>child</td>
-              <td>0</td>
-              <td class="text-right">$247.43</td>
-              <td class="text-right">$0.00</td>
-              <td class="text-right">$247.43</td>
-            </tr>
-            <tr>
-              <td>Katherine White</td>
-              <td>spouse</td>
-              <td>47</td>
-              <td class="text-right">$464.22</td>
-              <td class="text-right">$0.00</td>
-              <td class="text-right">$464.22</td>
-            </tr>
-            <tr>
-              <td>Charles D White</td>
-              <td>child</td>
-              <td>4</td>
-              <td class="text-right">$247.43</td>
-              <td class="text-right">$0.00</td>
-              <td class="text-right">$247.43</td>
-            </tr>
+          <% end %>
           <tr class="gray-row">
-            <td class="text-right capital" colspan="3"><strong>Totals</strong></td>
-            <td class="text-right"><strong>$1,290.52</strong></td>
-            <td class="text-right"><strong>$91.92</strong></td>
-            <td class="text-right"><strong>$1,198.59</strong></td>
+            <td colspan="3" class="text-right capital"><strong>Totals</strong></td>
+            <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
+            <td class="text-right"><strong><%= number_to_currency(@plan.total_employer_contribution) %></strong></td>
+            <td class="text-right"><strong><%= number_to_currency(@plan.total_employee_cost) %></strong></td>
           </tr>
           <tr>
-            <td class="text-right" colspan="5">Your coverage start date :</td>
-            <td>02/01/2015</td>
+            <td colspan="5" class="text-right">Your coverage start date :</td>
+            <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
           </tr>
         </tbody>
       </table>
