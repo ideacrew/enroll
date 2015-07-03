@@ -26,7 +26,7 @@ class CensusEmployee < CensusMember
   validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_business_owner
   validate :check_employment_terminated_on
   validate :active_census_employee_is_unique
-  # validate :allow_id_info_changes_only_in_eligible_state
+  validate :allow_id_info_changes_only_in_eligible_state
 
   index({"aasm_state" => 1})
   index({"employer_profile_id" => 1}, {sparse: true})
@@ -256,7 +256,7 @@ private
 
   # SSN and DOB values may be edited only in pre-linked status
   def allow_id_info_changes_only_in_eligible_state
-    if (ssn.changed? || dob.changed?) && aasm_state != "eligible"
+    if (ssn_changed? || dob_changed?) && aasm_state != "eligible"
       message = "An employee's identifying information may change only when in 'eligible' status. "
       errors.add(:base, message)
     end
