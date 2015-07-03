@@ -343,3 +343,14 @@ Then(/^I should see the "YOUR LIFE EVENTS" section/) do
   screenshot("your_life_events")
   expect(@browser.element(text: /YOUR LIFE EVENTS/i).visible?).to be_truthy
 end
+
+When(/^I click on the plans tab$/) do
+  @browser.element(class: /interaction-click-control-plans/).wait_until_present
+  scroll_then_click(@browser.element(class: /interaction-click-control-plans/))
+end
+
+Then(/^I should see my plan/) do
+  @browser.element(text: /plan name/i).wait_until_present
+  screenshot("my_plan")
+  expect(@browser.element(text: /plan name/i).visible?).to be_truthy
+end
