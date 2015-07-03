@@ -73,6 +73,8 @@ Feature: Create Employer
       Then I should see the "my account" page
       When I visit consumer profile homepage
       Then I should see the "YOUR LIFE EVENTS" section
+      When I click on the plans tab
+      Then I should see my plan
 
     @wip
     Scenario: Employer Representative has previously signed up on HBX

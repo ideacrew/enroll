@@ -157,7 +157,7 @@ end
 When(/^I click on the Employees tab$/) do
   @browser.refresh
   @browser.a(text: /Employees/).wait_until_present
-  @browser.a(text: /Employees/).click
+  scroll_then_click(@browser.a(text: /Employees/))
 end
 
 Then(/^I should see the employee family roster$/) do
