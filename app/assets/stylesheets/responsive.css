@@ -52,6 +52,9 @@
   .border_bottom_zero, .form-group-lg:last-child{
     border-bottom: 0px solid #ccc;
   }
+  .border_bottom_no_zero{
+    border-bottom: 1px solid #ccc !important;
+  }
    .top-row, .middle-row{border-bottom: 0px solid #b7b7b7;}
 
   .key-btn{width: 50%;float: right;}
@@ -193,6 +196,16 @@
   .adderess-select-box + .dropdown-menu {
     left: 0;
   }
+  #employer-info .text-right p{
+    text-align: left !important;
+  }
+}
+
+@media (max-width: 425px){
+  #office_locations_buttons, #office_locations_buttons a, .interaction-click-control-create-broker-agency{
+    width: 100%;
+  }
+  #office_locations_buttons{margin-top: 5px;}
 }
 
 @media (min-width: 400px) and (max-width: 767px) {
@@ -214,7 +227,7 @@
 @media (max-width: 480px) {
     .form-inputs{float: left; margin-bottom: 10px;}
 
-    #family .right-side .btn.new-member {
+    .new_employer_profile, #family .right-side .btn.new-member {
         width: 100%;
     }
     .input-lg, .form-group-lg .form-control {
@@ -557,6 +570,10 @@
     width: 32%;
   }
 }
+@media(max-width: 345px){
+  .interaction-click-control-show{margin-bottom: 5px;}
+}
+
 @media(min-width: 300px) and (max-width: 767px){
   .selected-plans-row h3{
     font-size: 21px;
@@ -739,6 +756,7 @@
   .result-row .right h6 {
     margin: 30px 0 27px;
   }
+
 }
 
 @media only screen and (max-width: 992px) {
@@ -748,6 +766,16 @@
   .btn-green {
     margin-bottom: 20px;
   }
+}
+
+@media only screen and (max-width: 580px){
+  .display-on-mobile{ display: block;}
+  .hide-on-mobile{ display: none;}  
+  button.display-on-mobile{ margin-top: 5px;}
+}
+
+@media (min-width: 768px) and (max-width: 992px){
+  .tab-second{padding-left: 44px !important;}  
 }
 
 @media (min-width: 768px) and (max-width: 1024px) {

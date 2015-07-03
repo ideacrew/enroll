@@ -22,8 +22,8 @@
       </div>
 
       <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12 left-side">
-          <table class="table table-message-wrapper">
+        <div class="table-responsive">
+          <table class="table table-message-wrapper none_margin_bottom none_margin_top">
             <tbody>
 
               <tr>
@@ -72,7 +72,7 @@
         </div>
 
        <div class="row top-row no-border">
-        <div class="col-xs-12 key-btn text-center">
+        <div class="col-xs-12 text-center broker_approve_deny_btn">
           <% if @broker_role.may_approve? %>
             <%= submit_tag 'Approve', class: "btn btn-primary" %>
           <% end %>

@@ -17,15 +17,13 @@ module Forms
 
     def save
       return false unless valid?
+
       begin
         match_or_create_person
         person.save!
-      # rescue TooManyMatchingPeople
-      #   errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
-      #   return false
-      rescue PersonAlreadyMatched
-        errors.add(:base, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
-        return false        
+      rescue TooManyMatchingPeople
+        errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
+        return false      
       end
 
       broker_agency_profile = ::BrokerAgencyProfile.find(self.broker_agency_id)
@@ -43,8 +41,10 @@ module Forms
     end
 
     def broker_agency_presence
-      if self.broker_agency_id.blank? || ::BrokerAgencyProfile.find(self.broker_agency_id).blank?
-        errors.add(:base, "please select your broker agency.")
+      if self.broker_agency_id.blank?
+        errors.add(:base, "Please select your broker agency.")
+      elsif ::BrokerAgencyProfile.find(self.broker_agency_id).blank?
+        errors.add(:base, "Unable to locate the broker agnecy. Please contact HBX.")
       end
     end
 
