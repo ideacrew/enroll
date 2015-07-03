@@ -38,8 +38,8 @@
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', 'change' %>
             <h4><strong>What do you like to do?</strong></h4>
-            <%= link_to 'Keep existing plan', home_consumer_profiles_path, class: 'btn btn-primary' %>
-            <%= submit_tag 'Shop for new plan', class: 'btn btn-primary' %>
+            <%= link_to 'Keep existing plan', home_consumer_profiles_path, class: 'btn btn-primary keep_existing_plan' %>
+            <%= submit_tag 'Shop for new plan', class: 'btn btn-primary keep_existing_plan' %>
           <% else %>
           <h3>Select a plan</h3>
           <p class="text-justify"><%= t('welcome.employee.select_plan') %></p>
