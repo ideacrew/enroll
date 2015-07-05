@@ -393,6 +393,35 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "a plan year application is submitted" do
+    before { plan_year.publish! }
+
+    it "should be in published status" do
+      expect(plan_year.aasm_state).to eq "published" 
+    end
+
+    context "and a new census employee is added with no benefit group assigned" do
+      let!(:new_hire)  { FactoryGirl.create(:census_employee, employer_profile: plan_year.employer_profile) }
+
+      it "census employee should not be ready for linking" do
+        expect(new_hire.may_link_employee_role?).to be_falsey
+      end
+
+      context "and a benefit group is assigned to census_employee" do
+        let(:benefit_group_assignment)  { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group) }
+
+        before do
+          new_hire.benefit_group_assignments = [benefit_group_assignment]
+          new_hire.save
+        end
+
+        it "census employee should be linkable" do
+          expect(new_hire.may_link_employee_role?).to be_truthy
+        end
+      end
+    end
+  end
+
   context "validation for employment_terminated_on" do
     let(:census_employee) {FactoryGirl.build(:census_employee, employer_profile: employer_profile, hired_on: TimeKeeper.date_of_record.beginning_of_year)}
 
