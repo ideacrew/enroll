@@ -201,7 +201,9 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).set("1026 Potomac")
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-2/).set("apt abc")
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-city/).set("Alpharetta")
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-state/).set("GA")
+  select_state = @browser.divs(text: /SELECT STATE/).last
+  select_state.click
+  scroll_then_click(@browser.li(text: /Georgia/))
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-zip/).set("30228")
   email_kind = @browser.divs(text: /SELECT KIND/).last
   email_kind.click
@@ -265,7 +267,10 @@ Then(/^I should see a form to update the contents of the census employee$/) do
   @browser.text_field(id: /jq_datepicker_ignore_census_employee_dob/).set("01/01/1980")
   @browser.text_field(id: /census_employee_ssn/).set("786120965")
   @browser.text_field(id: /census_employee_first_name/).set("Patrick")
-  @browser.text_field(id: /census_employee_address_attributes_state/).set("VA")
+  select_state = @browser.divs(text: /Georgia/).last
+  select_state.click
+  scroll_then_click(@browser.li(text: /Virginia/))
+  #@browser.text_field(id: /census_employee_address_attributes_state/).set("VA")
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mariah")
   screenshot("update_census_employee_with_data")
   @browser.button(value: /Update Employee/).click
