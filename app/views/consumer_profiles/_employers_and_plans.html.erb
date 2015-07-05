@@ -91,7 +91,7 @@
                     </div>
                   <% end %>
                   <%- if @hbx_enrollments &&  @hbx_enrollments.first%>
-                    <%= link_to insured_plan_shopping_path(:id => @hbx_enrollments.first._id, change_plan: 'change') do %>
+                    <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: 'change') do %>
                       <div class="panel panel-default">
                         <div class="panel-body"><br>
                           <div class="row">
@@ -99,11 +99,7 @@
                                   <%= image_tag 'icons/shop_for_plan.png' %>
                                 </div>
                                 <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
-                                  <% if @hbx_enrollments.map(&:coverage_selected?).include?(true) %>
-                                    <h3>Shop for plans</h3>
-                                  <% else %>
-                                    <h3>Shop for plans</h3>
-                                  <% end %>
+                                  <h3>Shop for plans</h3>
                                   <small>Browse plans from carriers in the DC Health Care Exchange.</small>
                                 </div>
                             </div><br>
