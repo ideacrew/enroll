@@ -9,7 +9,7 @@ class ConsumerProfilesController < ApplicationController
     @benefit_groups = @current_plan_year.benefit_groups if @current_plan_year.present?
     @benefit_group = @current_plan_year.benefit_groups.first if @current_plan_year.present?
     @qualifying_life_events = QualifyingLifeEventKind.all
-    @hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments) || []
+    @hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active || []
 
     @employee_role = @employee_roles.first
 
@@ -94,7 +94,7 @@ class ConsumerProfilesController < ApplicationController
   def purchase
     @person = current_user.person
     @family = @person.primary_family
-    @enrollment = @family.try(:latest_household).try(:hbx_enrollments).try(:first)
+    @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
 
     if @enrollment.present?
       plan = @enrollment.try(:plan)

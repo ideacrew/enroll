@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe ConsumerProfilesController, :type => :controller do
   let(:plan) { double }
   let(:hbx_enrollment) { double }
+  let(:hbx_enrollments) { double }
   let(:benefit_group) {double}
   let(:reference_plan) {double}
   let(:usermailer) {double}
@@ -18,7 +19,8 @@ RSpec.describe ConsumerProfilesController, :type => :controller do
       allow(person).to receive(:primary_family).and_return(family)
       allow(family).to receive(:latest_household).and_return(household)
       allow(family).to receive(:is_eligible_to_enroll?).and_return(true)
-      allow(household).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:active).and_return([hbx_enrollment])
       allow(hbx_enrollment).to receive(:plan=).with(plan).and_return(true)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(:reference_plan)
@@ -37,7 +39,7 @@ RSpec.describe ConsumerProfilesController, :type => :controller do
     end
 
     it "redirect when has no hbx_enrollment" do
-      allow(household).to receive(:hbx_enrollments).and_return([])
+      allow(hbx_enrollments).to receive(:active).and_return([])
       request.env["HTTP_REFERER"] = "/"
       sign_in user
       get :purchase

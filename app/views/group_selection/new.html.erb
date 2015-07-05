@@ -39,9 +39,13 @@
             <%= hidden_field_tag 'change_plan', 'change' %>
             <h4><strong>What do you like to do?</strong></h4>
             <%#= link_to 'Keep existing plan', home_consumer_profiles_path, class: 'btn btn-primary' %>
-            <%= link_to 'Keep existing plan', purchase_consumer_profiles_path, class: 'btn btn-lg btn-primary' %> &nbsp;
-            <input type="button", value="Terminate Plan", onclick="confirm('Are you sure?');", class="btn btn-lg btn-primary"> &nbsp;
-            <%= submit_tag 'Shop for new plan', class: 'btn btn-lg btn-primary' %>
+            <%= submit_tag 'Keep existing plan', class: 'btn btn-lg btn-primary' %>
+            <%#= link_to 'Keep existing plan', purchase_consumer_profiles_path, class: 'btn btn-lg btn-primary' %> &nbsp;
+            <input type="button", value="Terminate Plan", onclick="confirm('Are you sure?');", class="btn btn-lg btn-primary">
+            <% if @employee_role.benefit_group.plan_option_kind != "single_plan" %>
+              &nbsp;
+              <%= submit_tag 'Shop for new plan', class: 'btn btn-lg btn-primary' %>
+            <% end %>
           <% else %>
           <h3>Select a plan</h3>
           <p class="text-justify"><%= t('welcome.employee.select_plan') %></p>

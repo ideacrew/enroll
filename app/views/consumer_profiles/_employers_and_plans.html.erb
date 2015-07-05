@@ -9,8 +9,8 @@
                                   <div class="page-header">
                                       <h4>Your plan</h4>
                                   </div>
-                                  <% plan = @hbx_enrollments.first.try(:plan) %>
-                                  <% hbx_enrollment = @hbx_enrollments.first %>
+                                  <% plan = @hbx_enrollments.last.try(:plan) %>
+                                  <% hbx_enrollment = @hbx_enrollments.last %>
                                   <%= plan.try(:carrier_profile).try(:legal_name) %>
 
                                   <h3><%= plan.try(:name) %></h3>
@@ -90,7 +90,7 @@
                       </div>
                     </div>
                   <% end %>
-                  <%- if @hbx_enrollments &&  @hbx_enrollments.first%>
+                  <%- if @hbx_enrollments &&  @hbx_enrollments.last %>
                     <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: 'change') do %>
                       <div class="panel panel-default">
                         <div class="panel-body"><br>
