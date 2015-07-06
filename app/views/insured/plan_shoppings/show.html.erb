@@ -39,10 +39,8 @@
                   </div>
                 </div>
 
-                <div id="plans">
-                  <% @plans.each do |plan| %>
-                    <%= render "insured/plan_shoppings/plan_details", :plan => plan %>
-                  <% end %>
+		<div id="plans">
+			<%= render :partial => "insured/plan_shoppings/plan_details", :collection => @plans, :as => :plan %>
                 </div>
               </div>
             </div>
