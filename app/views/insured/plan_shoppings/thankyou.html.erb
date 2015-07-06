@@ -14,7 +14,7 @@
 
             <br>
 
-            <div class="table-border">
+            <div class="table-border table-responsive">
             <table class="table table-striped">
               <thead>
                 <tr>
@@ -53,7 +53,7 @@
           </div><br>
           </div>
 
-          <%= link_to("Waive", waive_insured_plan_shopping_path(@enrollment, {:plan_id => @plan.id}), {:class => "btn btn-default", :method => :post}) %>
+          <%= link_to("Waive", waive_insured_plan_shopping_path(@enrollment.id, {:plan_id => @plan.id}), {:class => "btn btn-default", :method => :post}) %>
         </div>
 
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">

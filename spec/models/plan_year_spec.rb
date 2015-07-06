@@ -153,7 +153,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and the open enrollment period is too short" do
-        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1 }
+        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMinimum - 2 }
         let(:open_enrollment_start_on)  { TimeKeeper.date_of_record }
         let(:open_enrollment_end_on)    { open_enrollment_start_on + invalid_length }
 
@@ -244,6 +244,26 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           it "should fail validation" do
             expect(plan_year.valid?).to be_falsey
             expect(plan_year.errors[:end_on].any?).to be_truthy
+          end
+        end
+
+        context "and the open enrollment period is 5 days" do
+          let(:minimum_open_enrollment_length) { HbxProfile::ShopOpenEnrollmentPeriodMinimum }
+          let(:open_enrollment_end_on) { Date.new(2015, 7, HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth) }
+          let(:open_enrollment_start_on) { open_enrollment_end_on - minimum_open_enrollment_length.days + 1.days }
+          before do
+            TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 7, 1))
+            plan_year.open_enrollment_start_on = open_enrollment_start_on
+            plan_year.open_enrollment_end_on = open_enrollment_end_on
+            plan_year.valid?
+          end
+
+          it "should pass validation" do
+            expect(plan_year.valid?).to be_truthy
+          end
+
+          it "should not have validation errors" do
+            expect(plan_year.errors.messages).to eq({})
           end
         end
 

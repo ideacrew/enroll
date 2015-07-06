@@ -9,7 +9,7 @@ class ConsumerProfilesController < ApplicationController
     @benefit_groups = @current_plan_year.benefit_groups if @current_plan_year.present?
     @benefit_group = @current_plan_year.benefit_groups.first if @current_plan_year.present?
     @qualifying_life_events = QualifyingLifeEventKind.all
-    @hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments) || []
+    @hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active || []
 
     @employee_role = @employee_roles.first
 
@@ -35,6 +35,14 @@ class ConsumerProfilesController < ApplicationController
   end
 
   def plans
+    @person = current_user.person
+    @employee_roles = @person.employee_roles
+    @employer_profile = @employee_roles.first.employer_profile if @employee_roles.any?
+    @current_plan_year = @employer_profile.latest_plan_year if @employer_profile.present?
+    @benefit_group = @current_plan_year.benefit_groups.first if @current_plan_year.present?
+    @plan = @benefit_group.reference_plan
+    @qhp = Products::Qhp.where(standard_component_id: @plan.hios_id[0..13]).to_a.first
+    @qhp_benefits = @qhp.qhp_benefits
     respond_to do |format|
       format.html
       format.js
@@ -58,7 +66,7 @@ class ConsumerProfilesController < ApplicationController
 
     @qualifying_life_events = QualifyingLifeEventKind.all
     @employee_role = @person.employee_roles.first
-    
+
     respond_to do |format|
       format.html
       format.js
@@ -79,5 +87,21 @@ class ConsumerProfilesController < ApplicationController
   end
 
   def inbox
+  end
+
+  def purchase
+    @person = current_user.person
+    @family = @person.primary_family
+    @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
+
+    if @enrollment.present?
+      plan = @enrollment.try(:plan)
+      @benefit_group = @enrollment.benefit_group
+      @reference_plan = @benefit_group.reference_plan
+      @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
+      @enrollable = @family.is_eligible_to_enroll? && @benefit_group.plan_year.is_eligible_to_enroll?
+    else
+      redirect_to :back
+    end
   end
 end
