@@ -68,7 +68,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   def primary_broker_role_params
     params.require(:organization).permit(
       :first_name, :last_name, :dob, :email, :npn, :legal_name, :dba, 
-      :fein, :entity_kind, :home_page, :market_kind, :languages_spoken, 
+      :fein, :entity_kind, :corporate_npn, :home_page, :market_kind, :languages_spoken,
       :working_hours, :accept_new_clients,
       :office_locations_attributes => [ 
         :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip], 
