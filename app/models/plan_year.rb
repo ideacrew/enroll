@@ -288,7 +288,7 @@ class PlanYear
       binder_payment_due_date = map_binder_payment_due_date_by_start_on(start_on)
 
       {open_enrollment_start_on: open_enrollment_start_on,
-       open_enrollment_end_on: open_enrollment_end_on, 
+       open_enrollment_end_on: open_enrollment_end_on,
        binder_payment_due_date: binder_payment_due_date}
     end
 
@@ -439,7 +439,7 @@ private
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
     end
 
-    if (open_enrollment_end_on.yday - open_enrollment_start_on.yday) < HbxProfile::ShopOpenEnrollmentPeriodMinimum
+    if (open_enrollment_end_on.yday - open_enrollment_start_on.yday) < (HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1)
      errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{HbxProfile::ShopOpenEnrollmentPeriodMinimum} days")
     end
 
