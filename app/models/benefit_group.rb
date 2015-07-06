@@ -190,6 +190,7 @@ class BenefitGroup
     return found_value
   end
 
+  # TODO -- fix
   def within_new_hire_window?(hire_date)
     false
   end
