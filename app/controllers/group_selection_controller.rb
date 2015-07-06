@@ -7,23 +7,34 @@ class GroupSelectionController < ApplicationController
 
   def create
     initialize_common_vars
+    change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    keep_existing_plan = params[:commit] == "Keep existing plan"
+
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
     end
-    hbx_enrollment = HbxEnrollment.new_from(
-      employee_role: @employee_role,
-      coverage_household: @coverage_household,
-      benefit_group: find_benefit_group(@employee_role))
+
+    if keep_existing_plan or change_plan.present?
+      hbx_enrollment = @family.latest_household.hbx_enrollments.active.last
+      hbx_enrollment.rebuild_members_by_coverage_household(coverage_household: @coverage_household)
+    else
+      hbx_enrollment = HbxEnrollment.new_from(
+        employee_role: @employee_role,
+        coverage_household: @coverage_household,
+        benefit_group: find_benefit_group(@employee_role))
+    end
+
     hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
       family_member_ids.include? member.applicant_id
     end
     hbx_enrollment.save!
 
-    change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-    if change_plan.present?
-      redirect_to insured_plan_shopping_path(:id => hbx_enrollment, change_plan: change_plan)
+    if keep_existing_plan 
+      redirect_to purchase_consumer_profiles_path
+    elsif change_plan.present?
+      redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: change_plan)
     else
-      redirect_to insured_plan_shopping_path(:id => hbx_enrollment)
+      redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id)
     end
   end
 

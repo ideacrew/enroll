@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   devise_for :users
 
   namespace :exchanges do
+    resources :inboxes, only: [:show, :destroy]
 
     resources :hbx_profiles do
       root 'hbx_profiles#show'
@@ -28,7 +29,7 @@ Rails.application.routes.draw do
       end
     end
 
-    
+
     resources :broker_applicants
 
     # get 'hbx_profiles', to: 'hbx_profiles#welcome'
@@ -121,11 +122,11 @@ Rails.application.routes.draw do
       get :msg_to_portal
     end
     resources :profiles, only: [:new, :create, :show, :index] do
-      get :inbox 
+      get :inbox
     end
     resources :broker_roles, only: [:create] do
       root 'broker_roles#new_broker'
-      collection do 
+      collection do
         get :new_broker
         get :new_staff_member
         get :new_broker_agency
@@ -195,6 +196,7 @@ Rails.application.routes.draw do
       get 'family'
       get 'check_qle_date'
       get 'inbox'
+      get 'purchase'
     end
   end
 

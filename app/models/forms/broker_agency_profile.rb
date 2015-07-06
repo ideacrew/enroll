@@ -17,14 +17,6 @@ module Forms
       ::BrokerAgencyProfile.model_name
     end
 
-    def check_existing_organization
-      fein_value = self.fein
-      existing_org = Organization.where(:fein => fein_value).first
-      if existing_org.present?
-        raise OrganizationAlreadyMatched.new
-      end
-    end
-
     def add_broker_role
       person.broker_role = ::BrokerRole.new({ 
         :provider_kind => 'broker', 
@@ -36,20 +28,16 @@ module Forms
       return false unless valid?
 
       begin
-        match_or_create_person(current_user)
+        match_or_create_person
         check_existing_organization
       rescue TooManyMatchingPeople
         errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
-        return false
-      rescue PersonAlreadyMatched
-        errors.add(:base, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
         return false
       rescue OrganizationAlreadyMatched
         errors.add(:base, "organization has already been created.")
         return false
       end
 
-      person.add_work_email(email) unless current_user
       person.save!
       add_broker_role
 
@@ -59,6 +47,30 @@ module Forms
       self.broker_agency_profile.save!
       person.broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id })
       true
+    end
+
+    def match_or_create_person
+      matched_people = Person.where(
+        first_name: regex_for(first_name),
+        last_name: regex_for(last_name),
+        dob: dob
+        )
+
+      if matched_people.count > 1
+        raise TooManyMatchingPeople.new
+      end
+
+      if matched_people.count == 1
+        self.person = matched_people.first
+      else
+        self.person = Person.new({
+          first_name: first_name,
+          last_name: last_name,
+          dob: dob
+          })
+      end
+
+      self.person.add_work_email(email)
     end
 
     def create_new_organization
@@ -76,6 +88,12 @@ module Forms
         }),
         :office_locations => office_locations
       )
+    end
+
+    def check_existing_organization
+      if Organization.where(:fein => self.fein).any?
+        raise OrganizationAlreadyMatched.new
+      end
     end
   end
 end

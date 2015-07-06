@@ -37,6 +37,7 @@ class HbxEnrollment
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
 
+  scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -75,9 +76,8 @@ class HbxEnrollment
   end
 
   def propogate_selection
-    #benefit_group_assignment.select_coverage! if benefit_group_assignment
     if benefit_group_assignment
-      benefit_group_assignment.select_coverage
+      benefit_group_assignment.select_coverage unless benefit_group_assignment.coverage_selected?
       benefit_group_assignment.hbx_enrollment = self
       benefit_group_assignment.save
     end
@@ -136,6 +136,18 @@ class HbxEnrollment
 
   def humanized_dependent_summary
     hbx_enrollment_members.count - 1
+  end
+
+  def rebuild_members_by_coverage_household(coverage_household:)
+    applicant_ids = hbx_enrollment_members.map(&:applicant_id)
+    coverage_household.coverage_household_members.each do |coverage_member|
+      next if applicant_ids.include? coverage_member.family_member_id
+      enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
+      enrollment_member.eligibility_date = self.effective_on
+      enrollment_member.coverage_start_on = self.effective_on
+      self.hbx_enrollment_members << enrollment_member
+    end
+    self
   end
 
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer

@@ -207,7 +207,7 @@ When(/^I click delete on baby Soren$/) do
   @browser.button(text: /Confirm Member/).wait_while_present
 end
 
-Then(/^I should see (.*) dependents$/) do |n|
+Then(/^I should see (.*) dependents*$/) do |n|
   n = n.to_i
   expect(@browser.li(class: "dependent_list", index: n)).not_to exist
   expect(@browser.li(class: "dependent_list", index: n - 1)).to exist
@@ -342,4 +342,15 @@ Then(/^I should see the "YOUR LIFE EVENTS" section/) do
   @browser.element(text: /YOUR LIFE EVENTS/i).wait_until_present
   screenshot("your_life_events")
   expect(@browser.element(text: /YOUR LIFE EVENTS/i).visible?).to be_truthy
+end
+
+When(/^I click on the plans tab$/) do
+  @browser.element(class: /interaction-click-control-plans/).wait_until_present
+  scroll_then_click(@browser.element(class: /interaction-click-control-plans/))
+end
+
+Then(/^I should see my plan/) do
+  @browser.element(text: /plan name/i).wait_until_present
+  screenshot("my_plan")
+  expect(@browser.element(text: /plan name/i).visible?).to be_truthy
 end
