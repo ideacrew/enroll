@@ -67,6 +67,7 @@ class Person
 
   validates_presence_of :first_name, :last_name
   validate :date_functional_validations
+  validate :no_changing_my_user, :on => :update
 
   validates :ssn,
     length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
@@ -327,6 +328,16 @@ private
 
   def update_full_name
     full_name
+  end
+
+  def no_changing_my_user
+    if self.persisted? && self.user_id_changed?
+      old_user, new_user= self.user_id_change
+      return if old_user.blank?
+      if (old_user != new_user)
+        errors.add(:base, "you may not change the user_id of a person once it has been set and saved")
+      end
+    end
   end
 
   # Verify basic date rules
