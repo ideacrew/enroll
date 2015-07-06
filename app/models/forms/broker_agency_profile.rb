@@ -82,6 +82,7 @@ module Forms
           :entity_kind => entity_kind,
           :home_page => home_page,
           :market_kind => market_kind,
+          :corporate_npn => corporate_npn,
           :languages_spoken => languages_spoken,
           :working_hours => working_hours,
           :accept_new_clients => accept_new_clients
