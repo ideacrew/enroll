@@ -9,7 +9,7 @@
 
              <h3>Broker Agency : <%= @broker_agency_profile.legal_name %></h3>
 
-             <div class="table-border">
+            <div class="table-border table-responsive">
               <table class="table">
                 <thead>
                   <th>Legal Name</th>
@@ -54,7 +54,7 @@
         <div class="row col-lg-6 col-md-6 col-sm-6 col-xs-12 no-pd">
            <%= link_to 'Send Secure Message to DC HealthLink'.html_safe,
                broker_agencies_inbox_msg_to_portal_path(inbox_id: @broker_agency_profile.id,
-               to: 'HBX_Admin', 
+               to: 'HBX_Admin',
                from: @broker_agency_profile.legal_name),
             class: "btn btn-primary", remote: true %></td>
         </div>

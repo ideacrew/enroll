@@ -58,6 +58,7 @@ Feature: Create Employer
       When I accept the matched employer
       When I complete the matching employee form
       Then I should see the dependents page
+      Then I should see 1 dependent
       When I click continue on the dependents page
       Then I should see the group selection page
       When I click continue on the group selection page
@@ -72,6 +73,8 @@ Feature: Create Employer
       Then I should see the "my account" page
       When I visit consumer profile homepage
       Then I should see the "YOUR LIFE EVENTS" section
+      When I click on the plans tab
+      Then I should see my plan
 
     @wip
     Scenario: Employer Representative has previously signed up on HBX

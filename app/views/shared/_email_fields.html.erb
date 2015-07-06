@@ -1,7 +1,7 @@
 <% kind = f.object.kind.upcase %>
 <div class="email">
   <div class="col-md-6 col-sm-6 no-pd">
-    <div class="form-group form-group-lg">
+    <div class="form-group form-group-lg <%= 'border_bottom_no_zero' if kind.eql?('HOME') %>">
 
       <% if kind == 'HOME' %>
           <% required = "required" %>
