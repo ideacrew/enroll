@@ -190,7 +190,8 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(class: /interaction-field-control-census-employee-name-sfx/).set("Jr")
   @browser.text_field(class: /interaction-field-control-census-employee-dob/).set("01/01/1980")
   @browser.text_field(class: /interaction-field-control-census-employee-ssn/).set("786120965")
-  @browser.radio(class: /interaction-choice-control-value-radio-male/).set
+  #@browser.radio(class: /interaction-choice-control-value-radio-male/).set
+  @browser.radio(id: /radio_male/).fire_event("onclick")
   @browser.text_field(class: /interaction-field-control-census-employee-hired-on/).set("10/10/2014")
   @browser.checkbox(class: /interaction-choice-control-value-census-employee-is-business-owner/).set
   input_field = @browser.divs(class: /selectric-wrapper/).first

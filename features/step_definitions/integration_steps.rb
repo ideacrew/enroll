@@ -248,7 +248,8 @@ end
 
 When(/^I click continue on the group selection page$/) do
   @browser.element(class: /interaction-click-control-continue/, id: /btn-continue/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-continue/, id: /btn-continue/))
+  @browser.execute_script("$('.interaction-click-control-continue').trigger('click')")
+  #scroll_then_click(@browser.element(class: /interaction-click-control-continue/, id: /btn-continue/))
 end
 
 Then(/^I should see the plan shopping welcome page$/) do

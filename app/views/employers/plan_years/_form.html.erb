@@ -31,9 +31,9 @@
             <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
               <%= render "shared/benefit_group_fields", f: bg %><br>
             <% end %>
-            <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-transparent pull-left' %>
+            <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-transparent pull-left xs_full_width' %>
             <div class="row no-buffer">
-              <button type="submit" class="btn btn-primary pull-right">Create Plan Year</button>
+              <button type="submit" class="btn btn-primary pull-right xs_full_width">Create Plan Year</button>
             </div>
           </div>
       </div>
