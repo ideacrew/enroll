@@ -1,10 +1,42 @@
 require 'rails_helper'
 
+module TkNotifyWrapper
+  class ExpectedLogCallInvoked < StandardError; end
+
+  class SimpleWrapper < SimpleDelegator
+    def initialize(obj)
+      super(obj)
+    end
+
+    def expect_event(e, pay)
+      @event = e
+      @payload = pay
+    end
+
+    def instrument(event, payload)
+      if (event == @event && payload == @payload)
+        raise ExpectedLogCallInvoked.new
+      else 
+        super(event,payload)
+      end
+    end
+  end
+end
+
 RSpec.describe TimeKeeper, type: :model do
 
   context "the system initializes" do
     context "and a date_of_record value isn't available in the locally-persisted store" do
-      it "should send a syslog info message to the enterprise logger"
+      let(:notification_stub) { TkNotifyWrapper::SimpleWrapper.new(ActiveSupport::Notifications) }
+      before :each do
+        Rails.cache.delete(TimeKeeper::CACHE_KEY)
+        stub_const("ActiveSupport::Notifications", notification_stub)
+      end
+
+      it "should send a syslog info message to the enterprise logger" do
+        notification_stub.expect_event("acapi.info.application.enroll.logging", {:body => "date_of_record not available for TimeKeeper - using Date.current"})
+        expect { TimeKeeper.date_of_record }.to raise_error(TkNotifyWrapper::ExpectedLogCallInvoked)
+      end
 
       context "and the date_of_record isn't available from enterprise service" do
         it "should send a syslog critical error to the enterprise logger"
@@ -30,7 +62,15 @@ RSpec.describe TimeKeeper, type: :model do
     context "and new date is prior to the current date_of_record" do
       # expect(TimeKeeper.set_date_of_record(past_date)).to raise_error(StandardError)
 
-      it "should send a syslog critical error to the enterprise logger"
+      let(:notification_stub) { TkNotifyWrapper::SimpleWrapper.new(ActiveSupport::Notifications) }
+      before :each do
+        stub_const("ActiveSupport::Notifications", notification_stub)
+      end
+
+      it "should send a syslog critical error to the enterprise logger" do
+        notification_stub.expect_event("acapi.error.application.enroll.logging", {:body => "Attempt made to set date to past: #{past_date}"})
+        expect { TimeKeeper.set_date_of_record(past_date) }.to raise_error(TkNotifyWrapper::ExpectedLogCallInvoked)
+      end
     end
 
     context "and new date is one day later than current date_of_record" do
@@ -49,6 +89,23 @@ RSpec.describe TimeKeeper, type: :model do
       it "should send the new date_of_record to registered models for each day" 
       it "should persist in the local data storage the new date_of_record for each successful advance"
       it "should send a syslog info message to the enterprise logger for each successful advance"
+    end
+  end
+
+  context "which can avoid local cache hits" do
+    before :each do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
+    it "should return identical values for the life of the cache" do
+      first_value = "first value"
+      second_value = "second value"
+      TimeKeeper.with_cache do
+        first_value = TimeKeeper.date_of_record
+        second_value = TimeKeeper.date_of_record
+      end
+      expect(first_value).to eq(second_value)
+      expect(first_value).to equal(second_value)
     end
   end
 end
