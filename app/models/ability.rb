@@ -16,10 +16,10 @@ class Ability
     if user.has_role? :employer_staff
       can :read, :all
       can :update, CensusEmployee do |employee|
+        # Do not enable editing on any other state without updating
+        # model validation
         if employee.eligible?
           true
-        else
-          !(employee.dob_changed? or employee.ssn_changed?)
         end
       end
     end
