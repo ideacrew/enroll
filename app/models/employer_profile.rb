@@ -8,6 +8,7 @@ class EmployerProfile
   field :entity_kind, type: String
   field :sic_code, type: String
 
+  # Workflow attributes
   field :aasm_state, type: String
 
   delegate :hbx_id, to: :organization, allow_nil: true
@@ -18,17 +19,19 @@ class EmployerProfile
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
   # TODO: make these relative to enrolling plan year
-  delegate :eligible_to_enroll_count, to: :enrolling_plan_year, allow_nil: true
-  delegate :non_business_owner_enrollment_count, to: :enrolling_plan_year, allow_nil: true
-  delegate :total_enrolled_count, to: :enrolling_plan_year, allow_nil: true
-  delegate :enrollment_ratio, to: :enrolling_plan_year, allow_nil: true
-  delegate :is_enrollment_valid?, to: :enrolling_plan_year, allow_nil: true
-  delegate :enrollment_errors, to: :enrolling_plan_year, allow_nil: true
+  # delegate :eligible_to_enroll_count, to: :enrolling_plan_year, allow_nil: true
+  # delegate :non_business_owner_enrollment_count, to: :enrolling_plan_year, allow_nil: true
+  # delegate :total_enrolled_count, to: :enrolling_plan_year, allow_nil: true
+  # delegate :enrollment_ratio, to: :enrolling_plan_year, allow_nil: true
+  # delegate :is_enrollment_valid?, to: :enrolling_plan_year, allow_nil: true
+  # delegate :enrollment_errors, to: :enrolling_plan_year, allow_nil: true
 
   embeds_one  :inbox, as: :recipient, cascade_callbacks: true
   embeds_one  :employer_profile_account
   embeds_many :plan_years, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_accounts, cascade_callbacks: true, validate: true
+
+  embeds_many :workflow_state_transitions, as: :transitional
 
   accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts
 
@@ -43,14 +46,18 @@ class EmployerProfile
   after_initialize :build_nested_models
   after_save :save_associated_nested_models
 
-  scope :all_active, ->{ where(:is_active => true) }
+  scope :all_active,             ->{ where(:is_active => true) }
+
+  scope :enrollments_applicant,  ->{  where(aasm_state: "applicant") }
+  scope :enrollments_active,     ->{ any_in(aasm_state: %w(applicant registered enrolling binder_pending binder_allocated enrolled)) }
+  scope :enrollments_inactive,   ->{ any_in(aasm_state: %w(suspended canceled terminated enrollment_ineligible)) }
+
 
   alias_method :is_active?, :is_active
 
   def parent
     raise "undefined parent Organization" unless organization?
-    return @organization if defined? @organization
-    @organization = self.organization
+    organization
   end
 
   def census_employees
@@ -259,115 +266,102 @@ class EmployerProfile
   # Workflow for self service
   aasm do
     state :applicant, initial: true
-    state :ineligible               # Unable to enroll business per SHOP market regulations or business isn't DC-based
-    state :ineligible_appealing     # Plan year application submitted with
-    state :registered               # Business information complete submitted, before initial open enrollment period
-    state :enrolling                # Employees registering and plan shopping
-    state :enrolled_renewal_ready   # Annual renewal date is 90 days or less
-    state :enrolled_renewing        #
+    state :registered                 # Employer has submitted application and is eligible to enroll on HBX
+    state :terminated                 # Registered Employer's coverage lapsed due to non-payment or voluntarily termination
+    state :enrollment_ineligible      # Employer is unable to obtain coverage on the HBX per regulation or policy
 
-    state :binder_pending
-    state :enrolled                 # Enrolled and premium payment up-to-date
-    state :canceled                 # Coverage didn't take effect, as Employer either didn't complete enrollment or pay binder premium
-    state :suspended       #
-    state :terminated               # Premium payment > 90 days past due (day 91) or voluntarily terminate
+    # state :enrolled                   # Enrolled and premium payment up-to-date
+    # state :enrolling                # Employees registering and plan shopping
+    # state :binder_pending           # Open enrollment ended, first premium payment due
+    # state :binder_allocated         # First premium paid-in-full, before plan year effective date
+    # state :enrolled                 # Enrolled and premium payment up-to-date
+
+    # state :suspended                # Premium payment 61 - 90 days past due
+    # state :canceled                 # Coverage didn't take effect, as Employer either didn't complete enrollment or pay binder premium
+    # state :terminated               # Premium payment > 90 days past due (day 91) or voluntarily terminate
+
+    # TODO Renewal process
+    # state :enrolled_renewal_ready   # Annual renewal date is 90 days or less
+    # state :enrolled_renewing        # 
+
 
     # Enrollment deadline has passed for first of following month
-    event :advance_enrollment_date do
+    event :advance_enrollment_date, :guard => :first_day_of_month?, :after => :record_transition do
 
       # Plan Year application expired
-      transitions from: :applicant, to: :canceled, :guard => :effective_date_expired?
+      transitions from: :applicant,   to: :canceled #, :guard => :effective_date_expired?
 
       # Begin open enrollment
-      transitions from: :registered, to: :enrolling
+      transitions from: :registered,  to: :enrolling
 
       # End open enrollment with success
-      transitions from: :enrolling, to: :binder_pending,
-        :guard => :enrollment_compliant?,
+      transitions from: :enrolling,   to: :binder_pending, :guard => :enrollment_compliant?,
         :after => :initialize_account
 
       # End open enrollment with invalid enrollment
-      transitions from: :enrolling, to: :canceled
+      transitions from: :enrolling,   to: :canceled
+
+      # For employer who submitted enrollment_ineligible application, required wait period submitting 
+      #  another plan year application
+      transitions from: :enrollment_ineligible,  to: :canceled #, :guard => :enrollment_ineligible_period_expired?
     end
 
-    event :reapply do
-      transitions from: :canceled, to: :applicant
-      transitions from: :terminated, to: :applicant
+    event :reapply, :after => :record_transition do
+      transitions from: :terminated,  to: :applicant
     end
 
-    event :publish_plan_year do
-      # Jump straight to enrolling state if plan year application is valid and today is start of open enrollment
-      transitions from: :applicant, to: :enrolling, :guards => [:plan_year_publishable?, :event_date_valid?]
-      transitions from: :applicant, to: :registered, :guard => :plan_year_publishable?
-      transitions from: :applicant, to: :ineligible
+    # event :publish_plan_year, :after => :record_transition do
+    #   # Jump straight to enrolling state if plan year application is valid and today is start of open enrollment
+    #   transitions from: :applicant,   to: :enrolling,  :guards => [:plan_year_publishable?, :event_date_valid?]
+    #   transitions from: :applicant,   to: :registered, :guard =>   :plan_year_publishable?
+    # end
+
+    event :register_employer do
+      transitions from: :applicant, to: :registered
+      transitions from: :enrollment_ineligible, to: :registered
     end
 
-    event :appeal do
-      transitions from: :ineligible, to: :ineligible_appealing
+    event :revoke_eligibility, :after => :record_transition do
+      transitions from: :applicant,   to: :enrollment_ineligible
     end
 
-    # Initiated only by HBX Admin
-    event :appeal_determination do
-      transitions from: :ineligible_appealing, to: :registered,
-        :guard => :is_appeal_granted?
-
-      transitions from: :ineligible_appealing, to: :ineligible
+    event :reinstate_eligibility, :after => :record_transition do
+      transitions from: :enrollment_ineligible,  to: :applicant
     end
 
-    event :revert do
+    event :revert, :after => :record_transition do
       # Add guard -- only revert for first 30 days past submitted
-      transitions from: :ineligible_appealing, to: :applicant,
-        :after_enter => :revert_plan_year
+      transitions from: :enrollment_ineligible_appealing, to: :applicant, :after_enter => :revert_plan_year
     end
 
-    event :begin_open_enrollment, :guards => [:event_date_valid?] do
-      transitions from: :registered, to: :enrolling
+    event :enroll, :after => :record_transition do
+      transitions from: :binder_pending,  to: :enrolled
     end
 
-    event :end_open_enrollment, :guards => [:event_date_valid?] do
-      transitions from: :enrolling, to: :binder_pending,
-        :guard => :enrollment_compliant?,
-        :after => :build_employer_profile_account
-
-      transitions from: :enrolling, to: :canceled
+    event :cancel_coverage, :after => :record_transition do
+      transitions from: :applicant,       to: :canceled
+      transitions from: :registered,      to: :canceled
+      transitions from: :enrolling,       to: :canceled
+      transitions from: :binder_pending,  to: :canceled
+      transitions from: :enrollment_ineligible,      to: :canceled    # put guard: following 90 days in enrollment_ineligible status
+      transitions from: :enrolled,        to: :canceled
     end
 
-    event :cancel_coverage do
-      transitions from: :applicant, to: :canceled
-      transitions from: :registered, to: :canceled
-      transitions from: :enrolling, to: :canceled
-      transitions from: :binder_pending, to: :canceled
-      transitions from: :ineligible, to: :canceled    # put guard: following 90 days in ineligible status
-      transitions from: :enrolled, to: :canceled
-    end
-
-    event :enroll do
-      transitions from: :binder_pending, to: :enrolled
-    end
-
-    event :prepare_for_renewal do
-      transitions from: :enrolled, to: :enrolled_renewal_ready
-    end
-
-    event :renew do
-      transitions from: :enrolled_renewal_ready, to: :enrolled_renewing
-    end
-
-    event :suspend_coverage do
+    event :suspend_coverage, :after => :record_transition do
       transitions from: :enrolled, to: :suspended
     end
 
-    event :terminate_coverage do
-      transitions from: :suspended, to: :terminated
-      transitions from: :enrolled, to: :terminated
+    event :terminate_coverage, :after => :record_transition do
+      transitions from: :suspended,   to: :terminated
+      transitions from: :enrolled,    to: :terminated
     end
 
-    event :reinstate_coverage do
-      transitions from: :suspended, to: :enrolled
-      transitions from: :terminated, to: :enrolled
+    event :reinstate_coverage, :after => :record_transition do
+      transitions from: :suspended,   to: :enrolled
+      transitions from: :terminated,  to: :enrolled
     end
 
-    event :reenroll do
+    event :reenroll, :after => :record_transition do
       transitions from: :terminated, to: :binder_pending
     end
   end
@@ -379,6 +373,15 @@ class EmployerProfile
     end
   end
 
+  def first_day_of_month?
+    TimeKeeper.date_of_record
+  end
+
+  def enrollment_ineligible_period_expired?
+    return false
+    (aasm_date + HbxProfile::ShopApplicationenrollment_IneligiblePeriodMaximum) <= TimeKeeper.date_of_record
+  end
+
   def is_eligible_to_shop?
     registered? or enrolling?
   end
@@ -388,12 +391,13 @@ class EmployerProfile
   end
 
   # TODO add all enrollment rules
-  def enrollment_compliant?
-    (published_plan_year.fte_count <= HbxProfile::ShopSmallMarketFteCountMaximum) &&
-    (is_enrollment_valid?)
-  end
+  # def enrollment_compliant?
+  #   (published_plan_year.fte_count <= HbxProfile::ShopSmallMarketFteCountMaximum) &&
+  #   (is_enrollment_valid?)
+  # end
 
   def event_date_valid?
+    today = TimeKeeper.date_of_record
     case aasm.current_event
     when :publish_plan_year, :publish_plan_year!
       today == published_plan_year.open_enrollment_start_on.beginning_of_day
@@ -407,15 +411,19 @@ class EmployerProfile
   end
 
 private
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state,
+      transition_at: Time.now.utc
+    )
+  end
+
   def build_nested_models
     build_inbox if inbox.nil?
   end
 
   def save_associated_nested_models
-  end
-
-  def is_appeal_granted?
-    false
   end
 
   def save_inbox
@@ -426,7 +434,7 @@ private
   end
 
   def effective_date_expired?
-    latest_plan_year.effective_date.beginning_of_day == (today.end_of_month + 1).beginning_of_day
+    latest_plan_year.effective_date.beginning_of_day == (TimeKeeper.date_of_record.end_of_month + 1).beginning_of_day
   end
 
   def plan_year_publishable?

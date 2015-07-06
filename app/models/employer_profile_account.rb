@@ -11,6 +11,8 @@ class EmployerProfileAccount
   field :last_aasm_state, type: String
 
   embeds_many :premium_payments
+  embeds_many :workflow_state_transitions, as: :transitional
+
 
   accepts_nested_attributes_for :premium_payments
 
@@ -30,21 +32,12 @@ class EmployerProfileAccount
 
     # Enrolled and premium payment up-to-date
     state :current
+    state :overdue                                          # Premium payment 1-29 days past due
+    state :late,        :after_enter => :late_notifications # Premium payment 30-60 days past due - send notices to employees
+    state :suspended,   :after_enter => :suspend_plan_year   # Premium payment 61-90 - transmit terms to carriers with retro date   
 
-    # Premium payment 1-29 days past due
-    state :overdue
-
-    # Premium payment 30-60 days past due - send notices to employees
-    state :late, :after_enter => :late_notifications
-
-    # Premium payment 61-90 - transmit terms to carriers with retro date
-    state :suspended,   :after_enter => :suspend_employer
-
-    # Premium payment > 90 days past due (day 91) or Employer voluntarily terminates
-    state :terminated,  :after_enter => :terminate_employer
-
-    # Coverage never took effect, either voluntarily withdrawal or not paying binder
-    state :canceled,    :after_enter => :cancel_employer
+    state :canceled,    :after_enter => :cancel_employer    # Coverage never took effect, either voluntarily withdrawal or not paying binder
+    state :terminated,  :after_enter => [:terminate_employer, :terminate_plan_year] # Premium payment > 90 days past due (day 91) or Employer voluntarily terminates
 
     # Signal parent Employer Profile
     event :allocate_binder_payment do
@@ -63,43 +56,52 @@ class EmployerProfileAccount
     end
 
     # Premium payment credit received and allocated to account
-    event :advance_coverage_period do
-      transitions from: [:binder_paid, :suspended],
-                  to: :current, :after => [:persist_state, :reinstate_employer]
-      transitions from: [:current, :overdue, :late],
-                  to: :current, :after => [:persist_state]
+    event :advance_coverage_period, :after => :record_transition do
+      transitions from: [:binder_paid, :suspended], to: :current, 
+        :after => [:persist_state, :reinstate_employer]
+
+      transitions from: [:current, :overdue, :late], to: :current, 
+        :after => [:persist_state]
     end
 
     # Premium payment reversed and account debited
-    event :reverse_coverage_period, :after => :revert_state do
+    event :reverse_coverage_period, :after => [:revert_state, :record_transition] do
       transitions from: :binder_paid, to: :canceled
       transitions from: :current, to: :overdue
       transitions from: :overdue, to: :late
       transitions from: :late, to: :suspended
     end
 
-    event :cancel_coverage do
+    event :cancel_coverage, :after => :record_transition do
       transitions from: :binder_pending, to: :canceled
     end
 
-    event :suspend_coverage do
+    event :suspend_coverage, :after => :record_transition do
       transitions from: [:current, :late, :overdue], to: :suspended
     end
 
-    event :reinstate_coverage do
+    event :reinstate_coverage, :after => :record_transition do
       transitions from: :suspended, to: :current
     end
 
-    event :terminate_coverage do
+    event :terminate_coverage, :after => :record_transition do
       transitions from: :suspended, to: :terminated
     end
 
-    event :reapply do
+    event :reapply, :after => :record_transition do
       transitions from: :terminated, to: :binder_pending
     end
   end
 
 private
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state,
+      transition_at: Time.now.utc
+    )
+  end
+
   def late_notifications
     # TODO: implement this
   end
