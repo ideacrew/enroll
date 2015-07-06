@@ -1,6 +1,7 @@
 class CensusEmployee < CensusMember
   include AASM
   include Sortable
+  include Validations::EmployeeInfo
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
