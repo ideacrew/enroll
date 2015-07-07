@@ -13,7 +13,7 @@ module Validations
             return if !self.send("#{name}_changed?") or new_record? or current_user.has_hbx_staff_role?
 
             if current_user.has_employer_staff_role?
-              unless is_linkable?
+              unless employee_role_linked?
                 errors.add(name.to_sym, 'has not ability to change after linked')
               end
             else
