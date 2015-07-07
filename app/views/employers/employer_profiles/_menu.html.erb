@@ -65,7 +65,7 @@
       </li>
       <li role="presentation">
         <%= link_to(inbox_employers_employer_profiles_path(id: @employer_profile.id), :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab", "data-toggle" => "tab", 'id'=>'inbox-tab' ) do  %>
-          <span class="badge message-unread"><%= @employer_profile.inbox.unread_messages.try(:count) ||0 %></span>
+          <span class="badge"></span>
           Inbox
         <% end %>
 

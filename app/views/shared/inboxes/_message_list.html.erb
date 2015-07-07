@@ -9,10 +9,8 @@
         <%= link_to(retrieve_inbox_path(provider), remote: true) do%>
         <li class="list-group-item">Inbox <span class="badge message-badge pull-right"><%= provider.inbox.unread_messages.size %></span></li>
         <% end %>
-        <%- if @sent_box == true %>
-          <%= link_to(retrieve_inbox_path(provider, folder: 'Sent'), remote: true) do%>
-            <li class="list-group-item">Sent</li>
-          <% end %>
+        <%= link_to(retrieve_inbox_path(provider, folder: 'Sent'), remote: true) do%>
+          <li class="list-group-item">Sent</li>
         <% end %>
         <%= link_to(retrieve_inbox_path(provider, folder: 'Deleted'), remote: true) do%>
           <li class="list-group-item">Deleted</li>
@@ -32,18 +30,15 @@
         <tbody>
           <%- if provider.try(:inbox).try(:messages) %>
           <% provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.each do |message| %>
-            <tr class='<%=message.message_read==true ? "msg-inbox-read" : ""%>'>
-              <td> <%= message.try(:from) if @folder == 'Inbox' %>
-                   <%= message.try(:to)   if @folder == 'Sent'%>
-              </td>
-              <td> <%= message.try(:subject) %> </td>
-              <td> <%#= link_to "show", polymorphic_path([:insured, :family, provider.inbox, message]), class: "btn btn-primary", remote: true %>
-                <%= link_to "show", retrieve_show_path(provider, message), class: "btn btn-primary show_msg", remote: true %>
-                <%- if @folder != 'Deleted' %>
-                  <%= link_to "Delete", retrieve_show_path(provider, message), class: "btn btn-transparent btn-sm", remote: true, method: :delete %>
-                <% end %>
-              </td>
-            </tr>
+          <tr>
+            <td> <%= message.try(:from) if @folder == 'Inbox' %>
+                 <%= message.try(:to)   if @folder == 'Sent'%>  </td>
+            <td> <%= message.try(:subject) %> </td>
+            <td> <%#= link_to "show", polymorphic_path([:insured, :family, provider.inbox, message]), class: "btn btn-primary", remote: true %>
+              <%= link_to "show", retrieve_show_path(provider, message), class: "btn btn-primary", remote: true %>
+              <%= link_to "Delete", retrieve_show_path(provider, message), class: "btn btn-transparent btn-sm", remote: true, method: :delete %>
+            </td>
+          </tr>
           <% end %>
           <% end %>
         </tbody>
