@@ -128,6 +128,7 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def inbox
     @folder = params[:folder] || 'Inbox'
+    @sent_box = false
   end
 
   private

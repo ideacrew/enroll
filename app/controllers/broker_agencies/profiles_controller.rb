@@ -25,6 +25,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def show
+    @sent_box = true
     @broker_agency_profile = BrokerAgencyProfile.find(params["id"])
   end
 
@@ -38,6 +39,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def inbox
+    @sent_box = true
     @broker_agency_provider = BrokerAgencyProfile.find(params["id"]||params['profile_id'])
     @folder = (params[:folder] || 'Inbox').capitalize
   end

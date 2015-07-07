@@ -271,12 +271,15 @@ module ApplicationHelper
 
   def retrieve_inbox_path(provider, folder: 'inbox')
     case(provider.model_name.name)
+
     when "EmployerProfile"
       inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
     when "HbxProfile"
       inbox_exchanges_hbx_profile_path(provider, folder: folder)
     when "BrokerAgencyProfile"
       broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
+    when "Person"
+      inbox_consumer_profiles_path(profile_id: provider.id, folder: folder)
     end
   end
 

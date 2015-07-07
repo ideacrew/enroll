@@ -1,2 +1,2 @@
 $("#inbox_form, #message_list_form").hide();
-$('#show_message_form').show().html("<%= escape_javascript(render "shared/inboxes/message_list", provider: @inbox_provider) %>");
+$('#profile-content .container').show().html("<%= escape_javascript(render "shared/inboxes/message_list", provider: @inbox_provider) %>");
