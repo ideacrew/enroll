@@ -1,4 +1,4 @@
-<div class="container bottom-pd">
+<div class="container bottom-pd" id='inbox-messages'>
   <div class="row no_margin">
     <h3 class="title-inline">Messages</h3>
   </div>
@@ -19,12 +19,13 @@
         <% end %>
       </ul>
     </div>
-   
+   <%- @folder = (@folder||'Inbox').capitalize %>
     <div class="col-lg-10 col-md-9 col-sm-8 col-xs-12 table-responsive" id="message_list_form">
       <table class="table table-hover">
         <thead>
-          <tr><%- @folder = (@folder||'Inbox').capitalize %>
+          <tr>
             <th> <%= @folder %></th>
+            <th> Date  </th>
             <th>Subject</th>
           </tr>
         </thead>
@@ -36,6 +37,7 @@
               <td> <%= message.try(:from) if @folder == 'Inbox' %>
                    <%= message.try(:to)   if @folder == 'Sent'%>
               </td>
+              <td> <%=message.created_at %>
               <td> <%= message.try(:subject) %> </td>
               <td> <%#= link_to "show", polymorphic_path([:insured, :family, provider.inbox, message]), class: "btn btn-primary", remote: true %>
                 <%= link_to "show", retrieve_show_path(provider, message), class: "btn btn-primary show_msg", remote: true %>
