@@ -165,6 +165,11 @@ When(/^I accept the matched employer$/) do
 end
 
 When(/^I complete the matched employee form$/) do
+  scroll_then_click(@browser.element(class: /interaction-click-control-click-here/))
+  @browser.button(class: /interaction-click-control-close/).wait_until_present
+  scroll_then_click(@browser.element(class: /interaction-click-control-close/))
+  @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").wait_until_present
+  
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
   scroll_then_click(@browser.text_field(name: "person[emails_attributes][1][address]"))
   screenshot("personal_info_complete")
