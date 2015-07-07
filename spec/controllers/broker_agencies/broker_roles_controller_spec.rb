@@ -258,7 +258,6 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
   context "search_broker_agency" do
     let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
     let(:organization) {broker_agency_profile.organization}
-    let(:broker_role) {FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id)}
 
     context "search by legal_name" do
       before do
@@ -274,7 +273,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
 
     context "search by npn" do
       before do
-        xhr :get, :search_broker_agency, broker_agency_search: broker_role.npn, format: :js
+        xhr :get, :search_broker_agency, broker_agency_search: broker_agency_profile.corporate_npn, format: :js
       end
 
       it "should be a success" do
