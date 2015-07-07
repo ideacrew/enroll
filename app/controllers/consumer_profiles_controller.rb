@@ -89,8 +89,6 @@ class ConsumerProfilesController < ApplicationController
   end
 
   def inbox
-    @folder = params[:folder] || 'Inbox'
-    @sent_box = false
   end
 
   def purchase

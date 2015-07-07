@@ -21,7 +21,7 @@
       </li>
       <li role="presentation">
         <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox" class="hidden-xs interaction-click-control-4-messages">
-        <span class="badge message-unread"><%=begin; @broker_agency_profile.inbox.unread_messages.try(:count); rescue; return 0; end %></span>Messages
+        <span class="badge"><%= @broker_agency_profile.inbox.messages.size rescue nil %></span>Messages
         </a>
         <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox" class="visible-xs interaction-click-control-messages">
           <span aria-hidden="true" class="glyphicon glyphicon-comment"></span>

@@ -482,12 +482,3 @@ $(document).on('change', "input#jq_datepicker_ignore_plan_year_open_enrollment_e
     $('.recommend #notice').html("");
   };
 });
-
-
-$(document).on('click', 'tr .show_msg', function() {
-  $(this).parent().parent().addClass('msg-inbox-read')
-})
-$(document).on('click', '.btn-danger', function() {
-  var unread = $('.message-badge').text();
-  $('.message-unread').html(unread);
-})

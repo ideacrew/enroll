@@ -1,7 +1,7 @@
 class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_hbx_staff_role, except: [:welcome]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
-  before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox, :configuration, :show]
+  before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox, :configuration]
 
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
@@ -81,7 +81,6 @@ class Exchanges::HbxProfilesController < ApplicationController
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show
-    @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
   end
 
   # GET /exchanges/hbx_profiles/new
@@ -98,7 +97,6 @@ class Exchanges::HbxProfilesController < ApplicationController
   def inbox
     @inbox_provider = current_user.person.hbx_staff_role.hbx_profile
     @folder = params[:folder] || 'inbox'
-    @sent_box = true
   end
 
   # POST /exchanges/hbx_profiles
