@@ -390,26 +390,6 @@ class EmployerProfile
     enrolling?
   end
 
-  # TODO add all enrollment rules
-  # def enrollment_compliant?
-  #   (published_plan_year.fte_count <= HbxProfile::ShopSmallMarketFteCountMaximum) &&
-  #   (is_enrollment_valid?)
-  # end
-
-  def event_date_valid?
-    today = TimeKeeper.date_of_record
-    case aasm.current_event
-    when :publish_plan_year, :publish_plan_year!
-      today == published_plan_year.open_enrollment_start_on.beginning_of_day
-    when :begin_open_enrollment, :begin_open_enrollment!
-      today >= published_plan_year.open_enrollment_start_on.beginning_of_day
-    when :end_open_enrollment, :end_open_enrollment!
-      today >= published_plan_year.open_enrollment_end_on.beginning_of_day
-    else
-      false
-    end
-  end
-
 private
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(

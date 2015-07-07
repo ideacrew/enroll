@@ -370,25 +370,24 @@ class PlanYear
     state :enrolling       # Published plan has entered open enrollment
     state :enrolled        # Published plan open enrollment has ended, but coverage effective date is in future
     state :active          # Published plan year is in-force
-    state :suspended       # Premium payment is 61-90 days past due and coverage is currently not in effect
 
-    state :expired         # Non-published plans are expired following their end on date
+    state :suspended       # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :canceled        # Coverage under this application never took effect
     state :terminated      # Coverage under this application is terminated
     state :ineligible      # Application is non-compliant for enrollment
+    state :expired         # Non-published plans are expired following their end on date
 
 
     # Change enrollment state, in-force plan year and clean house on any plan year applications from prior year
     event :advance_date, :after => :record_transition do
-      transitions from: :published, to: :enrolling, :guard => :is_open_enrollment_start_on?
-      transitions from: :enrolling, to: :active,    :guard => :is_effective_date?
-      transitions from: :enrolling, to: :enrolled,  :guards => [:is_open_enrollment_closed?, :is_enrollment_compliant?]
-      transitions from: :enrolled,  to: :active,    :guard => :is_effective_date?
+      transitions from: :enrolled,  to: :active,    :guard  => :is_event_date_valid?
+      transitions from: :published, to: :enrolling, :guard  => :is_event_date_valid?
+      transitions from: :enrolling, to: :enrolled,  :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+      transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?
 
-      transitions from: :active, to: :terminated, :guard => :plan_year_ended?
-      transitions from: [:draft, :ineligible, :publish_pending, :publish_invalid, :eligibility_review], to: :expired, :guard => :is_effective_date?
+      transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
+      transitions from: [:draft, :ineligible, :publish_pending, :publish_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
     end
-
 
     ## Application eligibility determination process
 
@@ -406,7 +405,7 @@ class PlanYear
 
     # Plan as submitted failed eligibility check
     event :force_publish, :after => :record_transition do
-      transitions from: :publish_pending, to: :publish_invalid, :after => [:set_event_date, :revoke_employer_eligibility]
+      transitions from: :publish_pending, to: :publish_invalid, :after => :revoke_employer_eligibility
     end
 
     # Employer requests review of ineligible application determination
@@ -425,22 +424,14 @@ class PlanYear
       transitions from: :eligibility_review, to: :publish_invalid
     end
 
+    event :terminate, :after => :record_transition do
+      transitions from: [:active, :suspended], to: :terminated
+    end
+
     # Admin ability to reset application
     event :revert_application, :after => :record_transition do
       transitions from: [:ineligible, :publish_invalid, :eligibility_review, :published], to: :draft
     end
-
-    event :begin_open_enrollment, :guard => :event_date_valid?, :after => :record_transition do
-      transitions from: :registered, to: :enrolling
-    end
-
-    event :end_open_enrollment, :guard => :event_date_valid?, :after => :record_transition do
-      transitions from: :enrolling, to: :binder_pending, :guard => :enrollment_compliant?,
-        :after => :build_employer_profile_account
-
-      transitions from: :enrolling, to: :canceled
-    end
-
   end
 
   def revoke_employer_eligibility
@@ -456,6 +447,7 @@ class PlanYear
     (published? or enrolling? or enrolled? or active?)
   end
 
+  #TODO: implement
   def is_within_review_period?
     true
   end
@@ -465,17 +457,32 @@ class PlanYear
   #   ((published? and employer_profile.shoppable?))
   # end
 
-  def is_eligible_to_enroll?
-    (benefit_groups.size > 0) and
-    (published? and employer_profile.is_eligible_to_enroll?)
-  end
-
 
   def latest_workflow_state_transition
     workflow_state_transitions.order_by(:'transition_at'.desc).limit(1).first
   end
 
 private
+  def is_event_date_valid?
+    today = TimeKeeper.date_of_record
+    case aasm.aasm_state
+    when :published
+      today == open_enrollment_start_on
+    when :enrolling
+      today.end_of_day >= open_enrollment_end_on
+    when :enrolled
+      today >= start_on
+    when :active
+      today >= end_on
+    else
+      false
+    end
+  end
+
+  def is_plan_year_end?
+    TimeKeeper.date_of_record.end_of_day == end_date
+  end
+
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
@@ -497,10 +504,6 @@ private
     end
   end
 
-  def set_event_date
-    self.aasm_date = TimeKeeper.date_of_record
-  end
-
   # attempted to publish but plan year violates publishing plan model integrity
   def report_unpublishable
     application_eligibility_warnings.each_pair(){ |key, value| errors.add(key, value) }
@@ -508,14 +511,6 @@ private
 
   def within_review_period?
     (aasm_date + HbxProfile::ShopApplicationAppealPeriodMaximum) > TimeKeeper.date_of_record
-  end
-
-  def plan_year_ended?
-    TimeKeeper.date_of_record > end_on
-  end
-
-  def is_new_plan_year?
-    TimeKeeper.date_of_record == start_on
   end
 
   def duration_in_days(duration)

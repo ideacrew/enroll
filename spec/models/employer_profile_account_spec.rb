@@ -219,5 +219,6 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
   end
 
   context "an employer who is terminated" do
+    it "should do what?"
   end
 end
