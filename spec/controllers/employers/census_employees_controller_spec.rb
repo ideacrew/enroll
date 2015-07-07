@@ -15,18 +15,6 @@ RSpec.describe Employers::CensusEmployeesController do
      "hired_on" => "05/02/2015",
      "employer_profile_id" => employer_profile_id} }
 
-  let(:census_employee2_params) {
-    params_hash = census_employee_params;
-    params_hash["ssn"] = "999-99-9999";
-    params_hash
-  }
-
-  let(:census_employee3_params) {
-    params_hash = census_employee_params;
-    params_hash["ssn"] = "999-99-9998";
-    params_hash
-  }
-
   describe "GET new" do
     let(:user) { double("user") }
 
@@ -69,16 +57,6 @@ RSpec.describe Employers::CensusEmployeesController do
       post :create, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(response).to be_redirect
     end
-
-    context "Person with ssn already exists" do
-      it "should not allow the use of SSN belonging to another person" do
-        CensusEmployee.create!(census_employee2_params)
-        allow(census_employee).to receive(:save).and_return(true)
-        post :create, :employer_profile_id => employer_profile_id, census_employee: census_employee2_params
-        expect(flash[:error]).to eq("The provided SSN belongs to another person.")
-      end
-    end
-
   end
 
   describe "GET edit" do
@@ -108,13 +86,6 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(census_employee).to receive(:save).and_return(true)
       post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(response).to be_redirect
-    end
-
-    it "should be render edit template when invalid" do
-      CensusEmployee.create!(census_employee3_params)
-      allow(census_employee).to receive(:save).and_return(false)
-      post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
-      expect(flash[:error]).to eq("The provided SSN belongs to another person.")
     end
   end
 

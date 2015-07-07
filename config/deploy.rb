@@ -63,7 +63,9 @@ namespace :deploy do
   desc 'Restart application'
   task :restart do
     on roles(:app), in: :sequence, wait: 20 do
+      sudo 'redis-cli "flushall"'
       sudo "service eye_rails reload"
+      sudo 'redis-cli "flushall"'
     end
   end
 
