@@ -5,42 +5,33 @@
 
     <div class="row">
       <h3 class="title-inline">Applicants</h3>
+      <div class="form-inline button-group-wrapper">
+      <div class="btn-group" role="group" aria-label="">
+        <div class="btn-group" data-toggle="buttons" name="broker_applicants_tabs">
+          <label class="btn btn-default active">
+            <input type="radio" name="options" autocomplete="off" value="applicant" checked> Applicant
+          </label>
+          <label class="btn btn-default">
+            <input type="radio" name="options" autocomplete="off" value="certified"> Certified
+          </label>
+          <label class="btn btn-default">
+            <input type="radio" name="options" autocomplete="off" value="decertified"> Decertified
+          </label>
+          <label class="btn btn-default">
+            <input type="radio" name="options" autocomplete="off" value="denied"> Denied
+          </label>
+          <label class="btn btn-default">
+            <input type="radio" name="options" autocomplete="off" value="all"> All
+          </label>
+        </div>
+      </div>
+    </div>
     </div>
 
     <div class="row">
-      <div class="table-border table-responsive">
-        <table class="table">
-          <thead>
-            <th>Applicant Name</th>
-            <th>Applicant NPN</th>
-            <th>Agency Name</th>
-            <th>Status</th>
-            <th>Certified Date</th>
-            <th></th>
-          </thead>
-          <% if @broker_applicants.any? %>
-          <% @broker_applicants.each do |applicant| %>
-          <% broker_role = applicant.broker_role %>
-          <% if broker_role.broker_agency_profile %>
-          <tbody>
-            <td><%= applicant.full_name %></td>
-            <td><%= broker_role.npn %></td>
-            <td><%= broker_role.broker_agency_profile.legal_name %></td>
-            <td><%= broker_role.current_state %></td>
-            <td><%= format_date broker_role.certified_date %></td>
-            <td>
-              <%= link_to 'Show'.html_safe,
-              edit_exchanges_broker_applicant_path(applicant), class: "btn btn-default", method: :get, remote: true %>
-            </td>
-          </tbody>
-          <% end %> 
-          <% end %>
-          <% else %>
-          <tbody><td>No Applicants found.</td></tbody>
-          <% end %>
-        </table>
+      <div id="broker_applicants">
+         <%= render "applicants" %>
       </div>
-      <%= render 'shared/alph_paginate', url: "/exchanges/broker_applicants", alphs: @page_alphabets, remote: true %>
     </div>
   </div>
 </div>
