@@ -320,7 +320,7 @@ class PlanYear
         "2016-11-01" => '2016,10,12',
         "2016-12-01" => '2016,11,14',
         "2017-01-01" => '2016,12,13'}.each_pair do |k, v|
-          dates_map[k] = TimeKeeper.set_date_of_record_unprotected!(Date.strptime(v, '%Y,%m,%d'))
+          dates_map[k] = Date.strptime(v, '%Y,%m,%d')
         end
 
       dates_map[start_on.strftime('%Y-%m-%d')] || shop_enrollment_timetable(start_on)[:binder_payment_due_date]
