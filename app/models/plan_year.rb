@@ -423,7 +423,7 @@ private
 
     # TODO: Create HBX object with configuration settings including shop_plan_year_maximum_in_days
     shop_plan_year_maximum_in_days = 365
-    if (end_on.yday - start_on.yday) > shop_plan_year_maximum_in_days
+    if (end_on - start_on).to_i > shop_plan_year_maximum_in_days
       errors.add(:end_on, "must be less than #{shop_plan_year_maximum_in_days} days from start date")
     end
 
@@ -439,7 +439,7 @@ private
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
     end
 
-    if (open_enrollment_end_on.yday - open_enrollment_start_on.yday) < (HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1)
+    if (open_enrollment_end_on - open_enrollment_start_on).to_i < (HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1)
      errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{HbxProfile::ShopOpenEnrollmentPeriodMinimum} days")
     end
 
