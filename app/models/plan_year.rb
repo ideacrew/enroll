@@ -320,7 +320,7 @@ class PlanYear
         "2016-11-01" => '2016,10,12',
         "2016-12-01" => '2016,11,14',
         "2017-01-01" => '2016,12,13'}.each_pair do |k, v|
-          dates_map[k] = TimeKeeper.set_date_of_record_unprotected!(Date.strptime(v, '%Y,%m,%d'))
+          dates_map[k] = Date.strptime(v, '%Y,%m,%d')
         end
 
       dates_map[start_on.strftime('%Y-%m-%d')] || shop_enrollment_timetable(start_on)[:binder_payment_due_date]
@@ -423,7 +423,7 @@ private
 
     # TODO: Create HBX object with configuration settings including shop_plan_year_maximum_in_days
     shop_plan_year_maximum_in_days = 365
-    if (end_on.yday - start_on.yday) > shop_plan_year_maximum_in_days
+    if (end_on - start_on).to_i > shop_plan_year_maximum_in_days
       errors.add(:end_on, "must be less than #{shop_plan_year_maximum_in_days} days from start date")
     end
 
@@ -439,7 +439,7 @@ private
       errors.add(:open_enrollment_end_on, "can't occur before open enrollment start date")
     end
 
-    if (open_enrollment_end_on.yday - open_enrollment_start_on.yday) < (HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1)
+    if (open_enrollment_end_on - open_enrollment_start_on).to_i < (HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1)
      errors.add(:open_enrollment_end_on, "open enrollment period is less than minumum: #{HbxProfile::ShopOpenEnrollmentPeriodMinimum} days")
     end
 

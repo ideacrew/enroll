@@ -13,22 +13,42 @@ RSpec.describe ConsumerProfilesController do
     end
 
     it "renders the 'check_qle_date' template" do
-      xhr :get, 'check_qle_date', :date_val => "06/06/2015", :qle_type => "I've married", :format => 'js'
+      xhr :get, 'check_qle_date', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_type => "I've married", :format => 'js'
       expect(response).to have_http_status(:success)
     end
 
     describe "with valid params" do
       it "returns qualified_date as true" do
-        xhr :get, 'check_qle_date', :date_val => "06/06/2015", :qle_type => "I've married", :format => 'js'
+        xhr :get, 'check_qle_date', :date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_type => "I've married", :format => 'js'
         expect(response).to have_http_status(:success)
         expect(assigns['qualified_date']).to eq(true)
       end
     end
 
     describe "with invalid params" do
-      it "returns qualified_date as false" do
-        xhr :get, 'check_qle_date', {:date_val => "06/06/2016", :qle_type => "I've married", :format => 'js'}
+
+      context "I've married" do
+      it "returns qualified_date as false for invalid future date" do
+        xhr :get, 'check_qle_date', {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :qle_type => "I've married", :format => 'js'}
         expect(assigns['qualified_date']).to eq(false)
+      end
+
+      it "returns qualified_date as false for invalid past date" do
+        xhr :get, 'check_qle_date', {:date_val => (TimeKeeper.date_of_record - 31.days).strftime("%m/%d/%Y"), :qle_type => "I've married", :format => 'js'}
+        expect(assigns['qualified_date']).to eq(false)
+      end
+      end
+
+      context "Death" do
+        it "returns qualified_date as false for invalid future date" do
+          xhr :get, 'check_qle_date', {:date_val => (TimeKeeper.date_of_record + 1.days).strftime("%m/%d/%Y"), :qle_type => "Death", :format => 'js'}
+          expect(assigns['qualified_date']).to eq(false)
+        end
+
+        it "returns qualified_date as false for invalid past date" do
+          xhr :get, 'check_qle_date', {:date_val => (TimeKeeper.date_of_record - 31.days).strftime("%m/%d/%Y"), :qle_type => "Death", :format => 'js'}
+          expect(assigns['qualified_date']).to eq(false)
+        end
       end
     end
   end

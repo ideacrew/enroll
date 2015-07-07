@@ -15,18 +15,6 @@ RSpec.describe Employers::CensusEmployeesController do
      "hired_on" => "05/02/2015",
      "employer_profile_id" => employer_profile_id} }
 
-  let(:census_employee2_params) {
-    params_hash = census_employee_params;
-    params_hash["ssn"] = "999-99-9999";
-    params_hash
-  }
-
-  let(:census_employee3_params) {
-    params_hash = census_employee_params;
-    params_hash["ssn"] = "999-99-9998";
-    params_hash
-  }
-
   describe "GET new" do
     let(:user) { double("user") }
 
@@ -69,16 +57,6 @@ RSpec.describe Employers::CensusEmployeesController do
       post :create, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(response).to be_redirect
     end
-
-    context "Person with ssn already exists" do
-      it "should not allow the use of SSN belonging to another person" do
-        CensusEmployee.create!(census_employee2_params)
-        allow(census_employee).to receive(:save).and_return(true)
-        post :create, :employer_profile_id => employer_profile_id, census_employee: census_employee2_params
-        expect(flash[:error]).to eq("The provided SSN belongs to another person.")
-      end
-    end
-
   end
 
   describe "GET edit" do
@@ -109,13 +87,6 @@ RSpec.describe Employers::CensusEmployeesController do
       post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(response).to be_redirect
     end
-
-    it "should be render edit template when invalid" do
-      CensusEmployee.create!(census_employee3_params)
-      allow(census_employee).to receive(:save).and_return(false)
-      post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
-      expect(flash[:error]).to eq("The provided SSN belongs to another person.")
-    end
   end
 
   describe "GET show" do
@@ -129,15 +100,30 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "GET delink" do
-    let(:census_employee) { double(id: "test", :delink_employee_role => "test") }
-    it "should be redirect" do
+    let(:census_employee) { double(id: "test", :delink_employee_role => "test", employee_role: nil, benefit_group_assignments: [benefit_group_assignment], save: true) }
+    let(:benefit_group_assignment) { double(hbx_enrollment: hbx_enrollment, delink_coverage: true, save: true) }
+    let(:hbx_enrollment) { double(destroy: true) }
+
+    before do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       allow(controller).to receive(:authorize!).and_return(true)
-      allow(census_employee).to receive(:save!).and_return(true)
+    end
+
+    it "should be redirect and successful when valid" do
+      allow(census_employee).to receive(:valid?).and_return(true)
+
       get :delink, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id
       expect(response).to be_redirect
+      expect(flash[:notice]).to eq "Successfully delinked census employee."
+    end
+
+    it "should be redirect and failure when invalid" do
+      allow(census_employee).to receive(:valid?).and_return(false)
+      get :delink, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id
+      expect(response).to be_redirect
+      expect(flash[:alert]).to eq "Delink census employee failure."
     end
   end
 

@@ -28,12 +28,9 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   def search_broker_agency
-    orgs = Organization.exists(broker_agency_profile: true).where(legal_name: /#{params[:broker_agency_search]}/i)
-    broker_agency_profiles_by_name = orgs.present? ? orgs.map(&:broker_agency_profile) : []
+    orgs = Organization.exists(broker_agency_profile: true).or({legal_name: /#{params[:broker_agency_search]}/i}, {"broker_agency_profile.corporate_npn" => params[:broker_agency_search]})
 
-    pers = Person.where({"broker_role.npn" => params[:broker_agency_search]})
-    broker_agency_profiles_by_npn = pers.present? ? pers.map(&:broker_role).map(&:broker_agency_profile) : []
-    @broker_agency_profiles = (broker_agency_profiles_by_name | broker_agency_profiles_by_npn).compact
+    @broker_agency_profiles = orgs.present? ? orgs.map(&:broker_agency_profile) : []
   end
 
   def create

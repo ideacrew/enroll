@@ -32,6 +32,7 @@ class CensusMember
     allow_blank: true,
     numericality: true
 
+  validate :date_of_birth_is_past
 
   # Strip non-numeric chars from ssn
   # SSN validation rules, see: http://www.ssa.gov/employer/randomizationfaqs.html#a0=12
@@ -59,5 +60,10 @@ class CensusMember
 
   def full_name
    [first_name, middle_name, last_name, name_sfx].compact.join(" ")
+  end
+
+  def date_of_birth_is_past
+    return unless self.dob.present?
+    errors.add(:dob, "future date: %{self.dob} is invalid date of birth") if TimeKeeper.date_of_record < self.dob
   end
 end

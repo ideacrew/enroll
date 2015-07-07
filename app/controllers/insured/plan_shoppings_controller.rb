@@ -10,7 +10,7 @@ class Insured::PlanShoppingsController < ApplicationController
     decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
     # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
-    if (hbx_enrollment.coverage_selected? or hbx_enrollment.select_coverage!) and hbx_enrollment.save
+    if (hbx_enrollment.coverage_selected? or hbx_enrollment.select_coverage) and hbx_enrollment.save
       UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now
       redirect_to home_consumer_profiles_path
     else

@@ -1,23 +1,25 @@
 class Exchanges::BrokerApplicantsController < ApplicationController
   before_action :check_hbx_staff_role
+  before_action :find_broker_applicant, only: [:edit, :update]
 
   def index
-    @broker_roles = BrokerRole.all
+    @broker_applicants = Person.exists(broker_role: true)
 
     respond_to do |format|
-      format.html
       format.js
     end
   end
 
   def edit
-    @broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
+
+    respond_to do |format|
+      format.js
+    end
   end
 
   def update
-    broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
-    broker_role.reason = params[:broker_role][:reason]
-    broker_role.save!
+    broker_role = @broker_applicant.broker_role
+    broker_role.update_attributes(:reason => params[:person][:broker_role_attributes][:reason])
 
     if params['deny']
       broker_role.deny!
@@ -34,38 +36,15 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     redirect_to "/exchanges/hbx_profiles"
   end
 
-  # def certify_broker
-  #   broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
-  #   password = SecureRandom.hex(5)
-  #   user = broker_role.person.user
-  #   if user.present?
-  #     user.set_random_password(password)
-  #   else
-  #     person = broker_role.person
-  #     user = User.new(:email => person.emails.first.address, :password => password, :password_confirmation => password)
-  #     user.roles << "broker"
-  #     user.save!
-  #     person.user = user
-  #     person.save!
-  #   end
-  #   broker_role.approve!
-  #   Invitation.invite_broker!(broker_role)
-  #   flash[:notice] = "Broker applicant certified successfully."
-  #   redirect_to "/exchanges/hbx_profiles"
-  # end
-  
-  # def decertify_broker
-  #   broker_role = BrokerRole.find(BSON::ObjectId.from_string(params[:id]))
-  #   broker_role.decertify!
-  #   flash[:notice] = "Broker applicant decertified successfully."
-  #   redirect_to "/exchanges/hbx_profiles"
-  # end
-
   private
+
+  def find_broker_applicant
+    @broker_applicant = Person.find(BSON::ObjectId.from_string(params[:id]))
+  end
 
   def check_hbx_staff_role
     unless current_user.has_hbx_staff_role?
-      redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
+      redirect_to exchanges_hbx_profiles_root_path, :flash => { :error => "You must be an HBX staff member" }
     end
   end
 end

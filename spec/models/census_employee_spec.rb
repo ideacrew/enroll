@@ -16,7 +16,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   let(:last_name){ "Skynyrd" }
   let(:name_sfx){ "PhD" }
   let(:ssn){ "230987654" }
-  let(:dob){ Date.today - 31.years }
+  let(:dob){ TimeKeeper.date_of_record - 31.years }
   let(:gender){ "male" }
   let(:hired_on){ TimeKeeper.date_of_record - 14.days }
   let(:is_business_owner){ false }
@@ -92,11 +92,42 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       let(:census_employee)         { CensusEmployee.new(**params) }
       let(:valid_employee_role)     { FactoryGirl.create(:employee_role, ssn: census_employee.ssn, dob: census_employee.dob, employer_profile: employer_profile) }
       let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
+=begin
+      let(:params2) { valid_params2 = valid_params;
+        valid_params2[:ssn] = "9999999999";
+        valid_params2
+      }
+
+      let(:params2) { valid_params2 = valid_params;
+      valid_params2[:ssn] = "9999999998";
+      valid_params2
+      }
+=end
 
       it "should save" do
         expect(census_employee.save).to be_truthy
       end
 
+=begin
+      context "reusing SSN" do
+
+        let(:census_employee2) {census_employee.clone}
+
+        before do
+          new_ssn = rand.to_s[2..10]
+          census_employee1 = census_employee.clone
+          census_employee1.ssn = new_ssn
+          census_employee1.save
+          census_employee2.ssn = new_ssn
+        end
+
+        it "should fail validation" do
+          expect(census_employee2.valid?).to be_falsey
+          expect(census_employee2.errors.full_messages).to include("Employee with this identifying information is already active. Update or terminate the active record before adding another.")
+
+        end
+      end
+=end
       context "and it is saved" do
         let!(:saved_census_employee) do
           ee = CensusEmployee.new(**params)
@@ -177,6 +208,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
               end
 
               context "and the provided employee role identifying information does match a census employee" do
+
                 before { new_census_employee.employee_role = valid_employee_role }
 
                 it "should link the roster instance and employer role" do
@@ -184,7 +216,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                 end
 
                 context "and it is saved" do
-                  before { new_census_employee.save }
+                  let(:new_ssn) {rand.to_s[2..10]}
+
+                    before { new_census_employee.ssn = new_ssn; new_census_employee.save }
                   it "should no longer be available for linking" do
                     expect(new_census_employee.may_link_employee_role?).to be_falsey
                   end

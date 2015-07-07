@@ -14,10 +14,10 @@ module Validations
 
             if current_user.has_employer_staff_role?
               unless employee_role_linked?
-                errors.add(name.to_sym, 'has not ability to change after linked')
+                errors.add(name.to_sym, 'does not have the ability to be change after linking')
               end
             else
-              errors.add(name.to_sym, 'has not ability to change')
+              errors.add(name.to_sym, 'dose not have the ability to change')
             end
           }
         end
