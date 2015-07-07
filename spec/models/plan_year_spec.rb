@@ -550,7 +550,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           context "and the employer doesn't request eligibility review" do
             context "and 90 days have elapsed since the ineligible application was submitted" do
               before do
-                TimeKeeper.set_date_of_record_unprotected!(submit_date + 91.days)
+                TimeKeeper.set_date_of_record_unprotected!(submit_date + 90.days)
                 TimeKeeper.instance.push_date_of_record
               end
 

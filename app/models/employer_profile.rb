@@ -220,28 +220,24 @@ class EmployerProfile
     end
 
     def advance_day(new_date)
-      # binding.pry
       # Find employers with events today and trigger their respective workflow states
       orgs = Organization.or(
           {:"employer_profile.plan_years.start_on" => new_date},
           {:"employer_profile.plan_years.end_on" => new_date},
           {:"employer_profile.plan_years.open_enrollment_start_on" => new_date},
-          {:"employer_profile.plan_years.open_enrollment_end_on" => new_date}
+          {:"employer_profile.plan_years.open_enrollment_end_on" => new_date},
+          {:"employer_profile.workflow_state_transitions".elem_match => {
+            "$and" => [
+              {:transition_at.gte => (new_date.beginning_of_day - 90.days)},
+              {:transition_at.lte => (new_date.end_of_day - 90.days)},
+              {:to_state => "enrollment_ineligible"}
+            ]
+          }}
         )
-
-        # orgs = Organization.where( { "$and" => [{ employer_profile: { "$exists" =>  true,
-        #                                                               "$nin" => [ nil] } },
-        #                                                             { "$or" => [{ "employer_profile.plan_years.start_on" => { "$eq" => new_date } },
-        #                                                                         { "employer_profile.plan_years.start_on" => { "$eq" => new_date } },
-        #                                                                         { "employer_profile.plan_years.open_enrollment_start_on" => { "$eq" => new_date } },
-        #                                                                         { "employer_profile.plan_years.open_enrollment_end_on" => { "$eq" => new_date } } ] }]})
-        #
-
       orgs.each do |org|
         org.employer_profile.today = new_date
         org.employer_profile.advance_enrollment_date! if org.employer_profile.may_advance_enrollment_date?
       end
-
     end
   end
 
@@ -361,7 +357,6 @@ class EmployerProfile
   end
 
   def enrollment_ineligible_period_expired?
-binding.pry
     if latest_workflow_state_transition.to_state == "enrollment_ineligible"
       (latest_workflow_state_transition.transition_at.to_date + HbxProfile::ShopApplicationenrollment_IneligiblePeriodMaximum) <= TimeKeeper.date_of_record
     else
