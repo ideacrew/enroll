@@ -128,6 +128,8 @@ class Person
   scope :active,   ->{ where(is_active: true) }
   scope :inactive, ->{ where(is_active: false) }
 
+  scope :with_broker_agency, ->{ where("broker_role.broker_agency_profile_id" => { "$ne" => nil }) }
+
 #  ViewFunctions::Person.install_queries
 
   after_save :update_family_search_collection

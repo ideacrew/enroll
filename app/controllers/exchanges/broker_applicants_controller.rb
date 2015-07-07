@@ -3,7 +3,11 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   before_action :find_broker_applicant, only: [:edit, :update]
 
   def index
-    @broker_applicants = Person.exists(broker_role: true)
+    @q = params.permit(:q)[:q]
+    @people = Person.search(@q).exists(broker_role: true).with_broker_agency
+    @page_alphabets = page_alphabets(@people, "last_name")
+    page_no = cur_page_no(@page_alphabets.first)
+    @broker_applicants = @people.where("last_name" => /^#{page_no}/i)
 
     respond_to do |format|
       format.js
