@@ -220,7 +220,7 @@ class EmployerProfile
     end
 
     def advance_day(new_date)
-      binding.pry
+      # binding.pry
       # Find employers with events today and trigger their respective workflow states
       orgs = Organization.or(
           {:"employer_profile.plan_years.start_on" => new_date},
@@ -286,9 +286,9 @@ class EmployerProfile
       # End open enrollment with invalid enrollment
       transitions from: :enrolling,   to: :canceled
 
-      # For employer who submitted enrollment_ineligible application, required wait period submitting
+      # For employer who submitted enrollment_ineligible application, required wait period before submitting
       #  another plan year application
-      transitions from: :enrollment_ineligible,  to: :canceled #, :guard => :enrollment_ineligible_period_expired?
+      transitions from: :enrollment_ineligible,  to: :applicant, :guard => :enrollment_ineligible_period_expired?
     end
 
     event :reapply, :after => :record_transition do
@@ -313,36 +313,36 @@ class EmployerProfile
       transitions from: :enrollment_ineligible_appealing, to: :applicant, :after_enter => :revert_plan_year
     end
 
-    event :enroll, :after => :record_transition do
-      transitions from: :binder_pending,  to: :enrolled
-    end
+    # event :enroll, :after => :record_transition do
+    #   transitions from: :binder_pending,  to: :enrolled
+    # end
 
-    event :cancel_coverage, :after => :record_transition do
-      transitions from: :applicant,       to: :canceled
-      transitions from: :registered,      to: :canceled
-      transitions from: :enrolling,       to: :canceled
-      transitions from: :binder_pending,  to: :canceled
-      transitions from: :enrollment_ineligible,      to: :canceled    # put guard: following 90 days in enrollment_ineligible status
-      transitions from: :enrolled,        to: :canceled
-    end
+    # event :cancel_coverage, :after => :record_transition do
+    #   transitions from: :applicant,       to: :canceled
+    #   transitions from: :registered,      to: :canceled
+    #   transitions from: :enrolling,       to: :canceled
+    #   transitions from: :binder_pending,  to: :canceled
+    #   transitions from: :enrollment_ineligible,      to: :canceled    # put guard: following 90 days in enrollment_ineligible status
+    #   transitions from: :enrolled,        to: :canceled
+    # end
 
-    event :suspend_coverage, :after => :record_transition do
-      transitions from: :enrolled, to: :suspended
-    end
+    # event :suspend_coverage, :after => :record_transition do
+    #   transitions from: :enrolled, to: :suspended
+    # end
 
-    event :terminate_coverage, :after => :record_transition do
-      transitions from: :suspended,   to: :terminated
-      transitions from: :enrolled,    to: :terminated
-    end
+    # event :terminate_coverage, :after => :record_transition do
+    #   transitions from: :suspended,   to: :terminated
+    #   transitions from: :enrolled,    to: :terminated
+    # end
 
-    event :reinstate_coverage, :after => :record_transition do
-      transitions from: :suspended,   to: :enrolled
-      transitions from: :terminated,  to: :enrolled
-    end
+    # event :reinstate_coverage, :after => :record_transition do
+    #   transitions from: :suspended,   to: :enrolled
+    #   transitions from: :terminated,  to: :enrolled
+    # end
 
-    event :reenroll, :after => :record_transition do
-      transitions from: :terminated, to: :binder_pending
-    end
+    # event :reenroll, :after => :record_transition do
+    #   transitions from: :terminated, to: :binder_pending
+    # end
   end
 
   def within_open_enrollment_for?(t_date, effective_date)
@@ -356,9 +356,17 @@ class EmployerProfile
     TimeKeeper.date_of_record
   end
 
+  def latest_workflow_state_transition
+    workflow_state_transitions.order_by(:'transition_at'.desc).limit(1).first
+  end
+
   def enrollment_ineligible_period_expired?
-    return false
-    (aasm_date + HbxProfile::ShopApplicationenrollment_IneligiblePeriodMaximum) <= TimeKeeper.date_of_record
+binding.pry
+    if latest_workflow_state_transition.to_state == "enrollment_ineligible"
+      (latest_workflow_state_transition.transition_at.to_date + HbxProfile::ShopApplicationenrollment_IneligiblePeriodMaximum) <= TimeKeeper.date_of_record
+    else
+      true
+    end
   end
 
   def is_eligible_to_shop?
