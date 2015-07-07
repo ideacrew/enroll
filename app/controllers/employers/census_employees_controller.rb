@@ -125,10 +125,31 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def delink
     authorize! :delink, @census_employee
+
+    employee_role = @census_employee.employee_role
+    if employee_role.present?
+      employee_role.census_employee_id = nil
+      user = employee_role.person.user
+      user.roles.delete("employee")
+    end
+    benefit_group_assignment = @census_employee.benefit_group_assignments.last
+    hbx_enrollment = benefit_group_assignment.hbx_enrollment 
+    benefit_group_assignment.delink_coverage
     @census_employee.delink_employee_role
-    @census_employee.save!
-    flash[:notice] = "Successfully delinked census employee."
-    redirect_to employers_employer_profile_path(@employer_profile)
+
+    if @census_employee.valid?
+      user.try(:save)
+      employee_role.try(:save)
+      benefit_group_assignment.save
+      hbx_enrollment.destroy
+      @census_employee.save
+
+      flash[:notice] = "Successfully delinked census employee."
+      redirect_to employers_employer_profile_path(@employer_profile)
+    else
+      flash[:alert] = "Delink census employee failure."
+      redirect_to employers_employer_profile_path(@employer_profile)
+    end
   end
 
   def benefit_group
