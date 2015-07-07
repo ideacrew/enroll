@@ -10,10 +10,8 @@ class Employers::CensusEmployeesController < ApplicationController
   def create
     @census_employee = CensusEmployee.new
     @census_employee.attributes = census_employee_params
-    if CensusEmployee.where(ssn: census_employee_params["ssn"].gsub('-','')).present?
-      flash[:error] = "The provided SSN belongs to another person."
-      render action: "new"
-    elsif benefit_group_id.present?
+
+    if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
       new_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(benefit_group, @census_employee)
       @census_employee.benefit_group_assignments = new_benefit_group_assignment.to_a
@@ -22,6 +20,7 @@ class Employers::CensusEmployeesController < ApplicationController
         flash[:notice] = "Census Employee is successfully created."
         redirect_to employers_employer_profile_path(@employer_profile)
       else
+        flash[:error] = "Failed to create Census Employee."
         render action: "new"
       end
     else
@@ -47,15 +46,12 @@ class Employers::CensusEmployeesController < ApplicationController
       @census_employee.attributes = census_employee_params
       authorize! :update, @census_employee
 
-      if CensusEmployee.where(ssn: census_employee_params["ssn"].gsub('-','')).present? && CensusEmployee.where(ssn: census_employee_params["ssn"].gsub('-','')).first != @census_employee
-        flash[:error] = "The provided SSN belongs to another person."
-        redirect_to employers_employer_profile_path(@employer_profile)
-      elsif @census_employee.save
+      if @census_employee.save
         flash[:notice] = "Census Employee is successfully updated."
         redirect_to employers_employer_profile_path(@employer_profile)
       else
         flash[:error] = "Failed to update Census Employee."
-        redirect_to employers_employer_profile_path(@employer_profile)
+        render action: "edit"
       end
     else
       flash[:error] = "Please select Benefit Group."
