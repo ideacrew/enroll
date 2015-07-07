@@ -168,6 +168,29 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
       end
 
+      context "when open enrollment period is over the end of year" do
+        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMinimum - 2 }
+        let(:valid_length) { HbxProfile::ShopOpenEnrollmentPeriodMinimum + 2 }
+        let(:open_enrollment_start_on)  { TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,12,30)) }
+        let(:open_enrollment_end_on_invalid)    { open_enrollment_start_on + invalid_length }
+        let(:open_enrollment_end_on_valid)    { open_enrollment_start_on + valid_length }
+
+        before do
+          plan_year.open_enrollment_start_on = open_enrollment_start_on
+        end
+
+        it "should fail validation" do
+          plan_year.open_enrollment_end_on = open_enrollment_end_on_invalid
+          expect(plan_year.valid?).to be_falsey
+          expect(plan_year.errors[:open_enrollment_end_on].any?).to be_truthy
+        end
+
+        it "should success" do
+          plan_year.open_enrollment_end_on = open_enrollment_end_on_valid
+          expect(plan_year.errors[:open_enrollment_end_on].any?).to be_falsey
+        end
+      end
+
       context "and the open enrollment period is too long" do
         let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMaximum + 1 }
         let(:open_enrollment_start_on)  { TimeKeeper.date_of_record }
