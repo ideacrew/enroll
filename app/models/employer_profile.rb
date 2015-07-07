@@ -221,13 +221,13 @@ class EmployerProfile
 
     def advance_day(new_date)
 
-      # Find employers with events today and trigger their respective workflow states
-      # orgs = Organization.where().where(
-      #     ("employer_profile.plan_years.start_on" == new_date) ||
-      #     ("employer_profile.plan_years.end_on" == new_date) ||
-      #     ("employer_profile.plan_years.open_enrollment_start_on" == new_date) ||
-      #     ("employer_profile.plan_years.open_enrollment_end_on" == new_date)
-      #   )
+      Find employers with events today and trigger their respective workflow states
+      orgs = Organization.or(
+          {:"employer_profile.plan_years.start_on" => new_date},
+          {:"employer_profile.plan_years.end_on" => new_date},
+          {:"employer_profile.plan_years.open_enrollment_start_on" => new_date},
+          {:"employer_profile.plan_years.open_enrollment_end_on" => new_date}
+        )
 
         orgs = Organization.where( { "$and" => [{ employer_profile: { "$exists" =>  true,
                                                                       "$nin" => [ nil] } },
@@ -270,21 +270,6 @@ class EmployerProfile
     state :terminated                 # Registered Employer's coverage lapsed due to non-payment or voluntarily termination
     state :enrollment_ineligible      # Employer is unable to obtain coverage on the HBX per regulation or policy
 
-    # state :enrolled                   # Enrolled and premium payment up-to-date
-    # state :enrolling                # Employees registering and plan shopping
-    # state :binder_pending           # Open enrollment ended, first premium payment due
-    # state :binder_allocated         # First premium paid-in-full, before plan year effective date
-    # state :enrolled                 # Enrolled and premium payment up-to-date
-
-    # state :suspended                # Premium payment 61 - 90 days past due
-    # state :canceled                 # Coverage didn't take effect, as Employer either didn't complete enrollment or pay binder premium
-    # state :terminated               # Premium payment > 90 days past due (day 91) or voluntarily terminate
-
-    # TODO Renewal process
-    # state :enrolled_renewal_ready   # Annual renewal date is 90 days or less
-    # state :enrolled_renewing        # 
-
-
     # Enrollment deadline has passed for first of following month
     event :advance_enrollment_date, :guard => :first_day_of_month?, :after => :record_transition do
 
@@ -309,12 +294,6 @@ class EmployerProfile
     event :reapply, :after => :record_transition do
       transitions from: :terminated,  to: :applicant
     end
-
-    # event :publish_plan_year, :after => :record_transition do
-    #   # Jump straight to enrolling state if plan year application is valid and today is start of open enrollment
-    #   transitions from: :applicant,   to: :enrolling,  :guards => [:plan_year_publishable?, :event_date_valid?]
-    #   transitions from: :applicant,   to: :registered, :guard =>   :plan_year_publishable?
-    # end
 
     event :register_employer do
       transitions from: :applicant, to: :registered
