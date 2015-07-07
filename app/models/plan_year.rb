@@ -23,7 +23,7 @@ class PlanYear
   field :msp_count, type: Integer, default: 0
 
   # Workflow attributes
-  field :aasm_state, type: String
+  field :aasm_state, type: String, default: :draft
   field :aasm_date, type: Date
 
   embeds_many :benefit_groups, cascade_callbacks: true
@@ -312,7 +312,7 @@ class PlanYear
       binder_payment_due_date = map_binder_payment_due_date_by_start_on(start_on)
 
       {open_enrollment_start_on: open_enrollment_start_on,
-       open_enrollment_end_on: open_enrollment_end_on, 
+       open_enrollment_end_on: open_enrollment_end_on,
        binder_payment_due_date: binder_payment_due_date}
     end
 
@@ -365,7 +365,7 @@ class PlanYear
     state :publish_pending      # Plan application as submitted has warnings
     state :publish_invalid      # Plan application was forced-published with warnings
     state :eligibility_review   # Plan application was submitted with warnding and is under review by HBX officials
-     
+
     state :published, :after_enter => :register_employer  # Plan is finalized. Employees may view benefits, but not enroll
     state :enrolling       # Published plan has entered open enrollment
     state :enrolled        # Published plan open enrollment has ended, but coverage effective date is in future
@@ -413,9 +413,9 @@ class PlanYear
       transitions from: :publish_invalid, to: :eligibility_review, :guard => :is_within_review_period?
     end
 
-    # Upon review, application ineligible status overturned and deemed eligible 
+    # Upon review, application ineligible status overturned and deemed eligible
     event :grant_eligibility, :after => :record_transition do
-      transitions from: :eligibility_review, to: :published, 
+      transitions from: :eligibility_review, to: :published,
         :after => :reinstate_employer_eligibility
     end
 

@@ -220,8 +220,8 @@ class EmployerProfile
     end
 
     def advance_day(new_date)
-
-      Find employers with events today and trigger their respective workflow states
+      binding.pry
+      # Find employers with events today and trigger their respective workflow states
       orgs = Organization.or(
           {:"employer_profile.plan_years.start_on" => new_date},
           {:"employer_profile.plan_years.end_on" => new_date},
@@ -229,13 +229,13 @@ class EmployerProfile
           {:"employer_profile.plan_years.open_enrollment_end_on" => new_date}
         )
 
-        orgs = Organization.where( { "$and" => [{ employer_profile: { "$exists" =>  true,
-                                                                      "$nin" => [ nil] } },
-                                                                    { "$or" => [{ "employer_profile.plan_years.start_on" => { "$eq" => new_date } },
-                                                                                { "employer_profile.plan_years.start_on" => { "$eq" => new_date } },
-                                                                                { "employer_profile.plan_years.open_enrollment_start_on" => { "$eq" => new_date } },
-                                                                                { "employer_profile.plan_years.open_enrollment_end_on" => { "$eq" => new_date } } ] }]})
-
+        # orgs = Organization.where( { "$and" => [{ employer_profile: { "$exists" =>  true,
+        #                                                               "$nin" => [ nil] } },
+        #                                                             { "$or" => [{ "employer_profile.plan_years.start_on" => { "$eq" => new_date } },
+        #                                                                         { "employer_profile.plan_years.start_on" => { "$eq" => new_date } },
+        #                                                                         { "employer_profile.plan_years.open_enrollment_start_on" => { "$eq" => new_date } },
+        #                                                                         { "employer_profile.plan_years.open_enrollment_end_on" => { "$eq" => new_date } } ] }]})
+        #
 
       orgs.each do |org|
         org.employer_profile.today = new_date
@@ -286,7 +286,7 @@ class EmployerProfile
       # End open enrollment with invalid enrollment
       transitions from: :enrolling,   to: :canceled
 
-      # For employer who submitted enrollment_ineligible application, required wait period submitting 
+      # For employer who submitted enrollment_ineligible application, required wait period submitting
       #  another plan year application
       transitions from: :enrollment_ineligible,  to: :canceled #, :guard => :enrollment_ineligible_period_expired?
     end
