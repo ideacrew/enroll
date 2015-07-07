@@ -26,6 +26,7 @@ class CensusEmployee < CensusMember
 
   validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_business_owner
   validate :check_employment_terminated_on
+  #validate :active_census_employee_is_unique
 
   index({"aasm_state" => 1})
   index({"employer_profile_id" => 1}, {sparse: true})
@@ -198,6 +199,13 @@ class CensusEmployee < CensusMember
 
   def published_benefit_group
     published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
+  end
+
+  def active_census_employee_is_unique
+    if CensusEmployee.unscoped.and(employer_profile_id: employer_profile_id, ssn: ssn).active.present?
+      message = "Employee with this identifying information is already active. Update or terminate the active record before adding another."
+      errors.add(:base, message)
+    end
   end
 
   class << self
