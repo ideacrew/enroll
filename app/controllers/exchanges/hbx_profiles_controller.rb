@@ -72,6 +72,8 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def configuration
 
+    @time_keeper = Forms::TimeKeeper.new
+
     respond_to do |format|
       format.html { render partial: "configuration_index" }
       format.js {}
@@ -143,9 +145,14 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def set_date
-    date_of_record = Date.strptime(params[:time_keeper][:date_of_record], "%m/%d/%Y").strftime('%Y-%m-%d')
-    TimeKeeper.set_date_of_record(date_of_record)
-    TimeKeeper.instance.push_date_of_record
+    forms_time_keeper = Forms::TimeKeeper.new(params[:forms_time_keeper])
+    begin
+      forms_time_keeper.set_date_of_record(forms_time_keeper.forms_date_of_record)
+      forms_time_keeper.instance.push_date_of_record
+      flash[:notice] = "Date of record set to " + TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+    rescue Exception=>e
+      flash[:error] = "Failed to set date of record, " + e.message
+    end
     redirect_to exchanges_hbx_profiles_root_path
   end
 
