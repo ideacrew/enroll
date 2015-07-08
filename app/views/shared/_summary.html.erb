@@ -81,7 +81,7 @@
         <tr>
           <td>Plan Details (PDF)</td>
           <td colspan="3" class="text-center">
-            <%= link_to '#', class: "download" do %>
+            <%= link_to(root_path + "sbc/" + @plan.sbc_file, class: "download") do %>
               <i class="glyphicon glyphicon-download-alt"></i> Download
             <% end %>
           </td>
