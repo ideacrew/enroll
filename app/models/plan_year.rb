@@ -468,13 +468,13 @@ private
   def is_event_date_valid?
     today = TimeKeeper.date_of_record
     case aasm_state
-    when :published, :draft
+    when "published", "draft"
       today == open_enrollment_start_on
-    when :enrolling
+    when "enrolling"
       today.end_of_day >= open_enrollment_end_on
-    when :enrolled
+    when "enrolled"
       today >= start_on
-    when :active
+    when "active"
       today >= end_on
     else
       false
