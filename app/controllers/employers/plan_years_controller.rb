@@ -109,7 +109,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def build_plan_year
     plan_year = PlanYear.new
-    benefit_groups = plan_year.benefit_groups.build(plan_option_kind: nil)
+    benefit_groups = plan_year.benefit_groups.build
     ::Forms::PlanYearForm.new(plan_year)
   end
 
