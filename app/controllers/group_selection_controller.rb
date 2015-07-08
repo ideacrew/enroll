@@ -27,14 +27,17 @@ class GroupSelectionController < ApplicationController
     hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
       family_member_ids.include? member.applicant_id
     end
-    hbx_enrollment.save!
-
-    if keep_existing_plan 
-      redirect_to purchase_consumer_profiles_path
-    elsif change_plan.present?
-      redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: change_plan)
+    if hbx_enrollment.save
+      if keep_existing_plan
+        redirect_to purchase_consumer_profiles_path
+      elsif change_plan.present?
+        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: change_plan)
+      else
+        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id)
+      end
     else
-      redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id)
+      flash[:error] = "You must select the primary applicant to enroll in the healthcare plan"
+      redirect_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id)
     end
   end
 
