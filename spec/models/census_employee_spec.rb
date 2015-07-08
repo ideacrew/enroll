@@ -360,7 +360,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       context "not linked" do
         before do
-          allow(employee).to receive(:employee_role_linked?).and_return(true)
+          allow(employee).to receive(:employee_role_linked?).and_return(false)
         end
 
         it "can change dob" do
@@ -376,7 +376,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       context "has linked" do
         before do
-          allow(employee).to receive(:employee_role_linked?).and_return(false)
+          allow(employee).to receive(:employee_role_linked?).and_return(true)
         end
 
         it "can not change dob" do
