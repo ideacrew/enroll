@@ -4,18 +4,18 @@
   </div>
 
   <div class="row input-no-pd">
-    <%= form_tag({controller: "hbx_profiles", action: "set_date"}, method: "post", class: "form") do %>
+    <%= form_for @time_keeper, url: set_date_exchanges_hbx_profiles_path, method: "post", class: "form" do |f|%>
       <table class="table table-border">
         <tbody>
-          <td width="50%" style="padding: 18px;font-weight: bold;">Current Date: <%= TimeKeeper.date_of_record.to_date %></td>
-          <td>
-            <%= text_field_tag 'time_keeper[date_of_record]', '', :'data-date-min'=>"0d",
-                               class: "required date-picker floatlabel form-control", required: true,
-                               :value=>TimeKeeper.date_of_record.to_date, :placeholder=>"Date of Record" %>
-            <button type="submit" class="btn btn-primary pull-right display-on-mobile">Set Curent Date</button>
-          </td>
-          <td class="hide-on-mobile"><button type="submit" class="btn btn-primary pull-right">Set Curent Date</button></td>
-        </tbody>
+        <td width="50%" style="padding: 18px;font-weight: bold;">Current Date: <%= @time_keeper.date_of_record %>
+        </td>
+        <td>
+          <%= datepicker_control f, :date_of_record, {:class => "floatlabel form-control", :placeholder => "DATE OF RECORD",
+                                           :'data-date-min' => "0d", required: true } %>
+
+          <button type="submit" class="btn btn-primary pull-right display-on-mobile">Set Current Date</button>
+        </td>
+        <td class="hide-on-mobile"><button type="submit" class="btn btn-primary pull-right">Set Current Date</button></td>
       </table>
     <% end %>
   </div>
