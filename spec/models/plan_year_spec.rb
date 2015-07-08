@@ -635,36 +635,37 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         context "and today is the day following close of open enrollment" do
           before do
-            TimeKeeper.set_date_of_record_unprotected!(plan_year.open_enrollment_end_on + 1.day)
+            TimeKeeper.set_date_of_record_unprotected!(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
           end
 
-          # context "and enrollment non-owner participation minimum not met" do
-          #   let(:invalid_non_owner_count) { min_non_owner_count - 1 }
-          #   let!(:owner_census_employee) { FactoryGirl.create(:census_employee, :owner, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
-          #   let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, invalid_non_owner_count, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
-          #
-          #   before do
-          #     owner_census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
-          #     owner_census_employee.save!
-          #     # non_owner_census_families.each do |census_employee|
-          #     #   owner_census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
-          #     #   owner_census_employee.save!
-          #     # end
-          #
-          #     workflow_plan_year_with_benefit_group.advance_enrollment_date
-          #   end
-          #
-          #   it "enrollment should be invalid" do
-          #     expect(workflow_plan_year_with_benefit_groupis_enrollment_valid?).to be_falsey
-          #     expect(workflow_plan_year_with_benefit_groupenrollment_errors[:non_business_owner_enrollment_count].present?).to be_truthy
-          #     expect(workflow_plan_year_with_benefit_groupenrollment_errors[:non_business_owner_enrollment_count]).to match(/non-owner employee must enroll/)
-          #   end
-          #
-          #   it "should advance state to canceled" do
-          #     expect(workflow_plan_year_with_benefit_group.canceled?).to be_truthy
-          #   end
-          # end
-          #
+          context "and enrollment non-owner participation minimum not met" do
+            let(:invalid_non_owner_count) { HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum - 1 }
+            let!(:owner_census_employee) { FactoryGirl.create(:census_employee, :owner, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
+            let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, invalid_non_owner_count, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
+
+            before do
+              owner_census_employee.add_benefit_group_assignment(benefit_group, workflow_plan_year_with_benefit_group.start_on)
+              owner_census_employee.save!
+              # non_owner_census_families.each do |census_employee|
+              #   owner_census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
+              #   owner_census_employee.save!
+              # end
+              TimeKeeper.set_date_of_record_unprotected!(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
+              TimeKeeper.instance.push_date_of_record
+              # workflow_plan_year_with_benefit_group.advance_enrollment_date
+            end
+
+            it "enrollment should be invalid" do
+              expect(workflow_plan_year_with_benefit_group.is_enrollment_valid?).to be_falsey
+              expect(workflow_plan_year_with_benefit_group.enrollment_errors[:non_business_owner_enrollment_count].present?).to be_truthy
+              expect(workflow_plan_year_with_benefit_group.enrollment_errors[:non_business_owner_enrollment_count]).to match(/non-owner employee must enroll/)
+            end
+
+            it "should advance state to canceled" do
+              expect(PlanYear.find(workflow_plan_year_with_benefit_group.id).canceled?).to be_truthy
+            end
+          end
+
           # context "and enrollment the minimum enrollment ratio isn't met" do
           #   let!(:non_owner_census_families) { FactoryGirl.create_list(:census_employee, 1, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
           #
