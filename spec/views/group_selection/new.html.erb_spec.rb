@@ -11,7 +11,7 @@ describe "group_selection/new.html.erb" do
 
   def new_relationship_benefit
     random_value=rand(999_999_999)
-    instance_double(
+    double(
       "RelationshipBenefit",
       offered: "offered:#{random_value}",
       select: double(map: "test")
