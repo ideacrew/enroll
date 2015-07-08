@@ -18,7 +18,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
       end
 
       it "should assign variables" do
-        expect(assigns(:person)).to be_kind_of(Forms::BrokerCandidate)
+        expect(assigns(:broker_candidate)).to be_kind_of(Forms::BrokerCandidate)
         expect(assigns(:filter)).to eq('broker')
         expect(assigns(:agency_type)).to eq('existing')
       end
@@ -38,7 +38,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
       end
 
       it "should assign variables" do
-        expect(assigns(:person)).to be_kind_of(Forms::BrokerCandidate)
+        expect(assigns(:broker_candidate)).to be_kind_of(Forms::BrokerCandidate)
         expect(assigns(:filter)).to eq('broker')
       end
     end
@@ -58,7 +58,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
     end
 
     it "should assign variables" do
-      expect(assigns(:person)).to be_kind_of(Forms::BrokerCandidate)
+      expect(assigns(:broker_candidate)).to be_kind_of(Forms::BrokerCandidate)
       expect(assigns(:filter)).to eq('staff')
     end
   end
@@ -137,6 +137,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
 
         it "should be a redirect" do
           expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to(broker_registration_path)
         end
 
         it "should has successful notice" do
