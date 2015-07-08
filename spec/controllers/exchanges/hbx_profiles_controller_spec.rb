@@ -100,7 +100,7 @@ RSpec.describe Exchanges::HbxProfilesController do
     it "sends timekeeper a date" do
       expect(TimeKeeper).to receive(:set_date_of_record).with( Date.current.next_day.strftime('%Y-%m-%d'))
       expect(TimeKeeper.instance).to receive(:push_date_of_record)
-      post :set_date, :time_keeper => { :date_of_record =>  Date.current.next_day.to_s }
+      post :set_date, :forms_time_keeper => { :date_of_record =>  Date.current.next_day.strftime('%Y-%m-%d') }
       expect(response).to have_http_status(:redirect)
     end
   end
