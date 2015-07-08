@@ -65,5 +65,7 @@ end
 qhp_import_hash.run
 puts "*"*80
 
+require File.join(File.dirname(__FILE__),'seedfiles', 'shop_2015_sbc_files')
+
 puts "*"*80
 puts "End of Seed Data"
