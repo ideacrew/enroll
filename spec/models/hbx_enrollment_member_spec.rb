@@ -33,12 +33,12 @@ describe HbxEnrollmentMember, dbclean: :after_all do
       let!(:subscriber) {enrollment.hbx_enrollment_members.first}
       let!(:enrollment_members) {enrollment.hbx_enrollment_members}
 
-      it "should not raise error if subscriber(primary applicant) is selected in the list" do
+      it "should not raise error if subscriber(primary applicant) is selected during enrollment" do
         expect(@enrollment.valid?).to be_truthy
         expect(@enrollment.hbx_enrollment_members.first.errors[:is_subscriber].any?).to be_falsey
       end
 
-      it "should raise if subscriber(primary applicant) is not selected in the list" do
+      it "should raise if subscriber(primary applicant) is not selected during enrollment" do
         enrollment_members.reject!{ |a| a._id == subscriber._id }
         expect(@enrollment.valid?).to be_falsey
         expect(@enrollment.hbx_enrollment_members.first.errors[:is_subscriber].any?).to be_truthy
