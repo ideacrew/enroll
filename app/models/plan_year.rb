@@ -394,6 +394,7 @@ class PlanYear
     # Submit plan year application
     event :publish, :after => :record_transition do
       transitions from: :draft, to: :draft,     :guard => :is_application_unpublishable?, :after => :report_unpublishable
+      transitions from: :draft, to: :enrolling, :guard => [:is_application_valid?, :is_event_date_valid?]
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
     end
@@ -447,9 +448,10 @@ class PlanYear
     (published? or enrolling? or enrolled? or active?)
   end
 
-  #TODO: implement
   def is_within_review_period?
-    true
+    publish_invalid? and
+    (latest_workflow_state_transition.transition_at >
+      (TimeKeeper.date_of_record - HbxProfile::ShopApplicationAppealPeriodMaximum))
   end
 
   # def shoppable? # is_eligible_to_shop?
@@ -465,8 +467,8 @@ class PlanYear
 private
   def is_event_date_valid?
     today = TimeKeeper.date_of_record
-    case aasm.aasm_state
-    when :published
+    case aasm_state
+    when :published, :draft
       today == open_enrollment_start_on
     when :enrolling
       today.end_of_day >= open_enrollment_end_on

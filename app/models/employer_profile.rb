@@ -228,8 +228,8 @@ class EmployerProfile
         {:"employer_profile.plan_years.open_enrollment_end_on" => new_date},
         {:"employer_profile.workflow_state_transitions".elem_match => {
             "$and" => [
-              {:transition_at.gte => (new_date.beginning_of_day - 90.days)},
-              {:transition_at.lte => (new_date.end_of_day - 90.days)},
+              {:transition_at.gte => (new_date.beginning_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
+              {:transition_at.lte => (new_date.end_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
               {:to_state => "enrollment_ineligible"}
             ]
           }
@@ -238,6 +238,7 @@ class EmployerProfile
       orgs.each do |org|
         org.employer_profile.today = new_date
         org.employer_profile.advance_enrollment_date! if org.employer_profile.may_advance_enrollment_date?
+        nil
       end
     end
   end
