@@ -65,7 +65,7 @@ class QhpBuilder
 
   def associate_plan_with_qhp
     plan_year = @qhp.plan_effective_date.to_date.year
-    puts @qhp.standard_component_id
+    # puts @qhp.standard_component_id
     plan = Plan.where(active_year: plan_year, hios_id: /#{@qhp.standard_component_id.strip}-01/).to_a.first
     plans_to_update = Plan.where(active_year: plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
     plans_to_update.each do |up_plan|
