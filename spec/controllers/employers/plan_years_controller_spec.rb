@@ -24,6 +24,11 @@ RSpec.describe Employers::PlanYearsController do
     it "should generate carriers" do
       expect(assigns(:carriers)).to eq Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
     end
+
+    it "should generate benefit_group with nil plan_option_kind" do
+      benefit_group = assigns(:plan_year).benefit_groups.first
+      expect(benefit_group.plan_option_kind).to eq nil
+    end
   end
 
   describe "GET edit" do

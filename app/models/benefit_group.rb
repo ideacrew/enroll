@@ -24,7 +24,7 @@ class BenefitGroup
 
   field :effective_on_kind, type: String, default: "date_of_hire"
   field :terminate_on_kind, type: String, default: "end_of_month"
-  field :plan_option_kind, type: String, default: "single_plan"
+  field :plan_option_kind, type: String
 
   # Number of days following date of hire
   field :effective_on_offset, type: Integer, default: 0
