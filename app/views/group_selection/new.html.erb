@@ -17,7 +17,7 @@
               <tr>
                 <td width="20">
                   <% if offered_relationship_benefits.include?(PlanCostDecorator.benefit_relationship(family_member.primary_relationship)) %>
-                    <%= check_box_tag("family_member_ids[#{index}]", family_member.id, true) %>
+                    <%= check_box_tag("family_member_ids[#{index}]", family_member.id, true, disabled: family_member.is_primary_applicant?) %>
                   <% else %>
                     <%= check_box_tag("family_member_ids[#{index}]", family_member.id, false, disabled: true) %>
                   <% end %>
