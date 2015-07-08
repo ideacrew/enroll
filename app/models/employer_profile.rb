@@ -268,7 +268,7 @@ class EmployerProfile
     state :enrollment_ineligible      # Employer is unable to obtain coverage on the HBX per regulation or policy
 
     # Enrollment deadline has passed for first of following month
-    event :advance_enrollment_date, :guard => :first_day_of_month?, :after => :record_transition do
+    event :advance_enrollment_date, :after => :record_transition do
 
       # Plan Year application expired
       transitions from: :applicant,   to: :canceled #, :guard => :effective_date_expired?
@@ -347,10 +347,6 @@ class EmployerProfile
       py.open_enrollment_contains?(t_date) &&
         py.coverage_period_contains?(effective_date)
     end
-  end
-
-  def first_day_of_month?
-    TimeKeeper.date_of_record
   end
 
   def latest_workflow_state_transition

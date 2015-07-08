@@ -45,7 +45,7 @@ class EmployerProfileAccount
     end
 
     # TODO Advance billing period on binder_pending in middle of month
-    event :advance_billing_period do
+    event :advance_billing_period, :guard => :first_day_of_month? do
       # transitions from: [:current, :overdue, :late, :suspended, :terminated], to: [:current, :overdue, :late, :suspended, :terminated]
       transitions from: :binder_pending, to: :canceled
       transitions from: :binder_paid, to: :overdue
@@ -100,6 +100,10 @@ private
       to_state: aasm.to_state,
       transition_at: Time.now.utc
     )
+  end
+
+  def first_day_of_month?
+    TimeKeeper.date_of_record
   end
 
   def late_notifications
