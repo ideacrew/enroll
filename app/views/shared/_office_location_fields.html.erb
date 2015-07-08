@@ -14,7 +14,7 @@
               <div class="row" style="margin: 0;">
                 <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
                   <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
-                    <%= address.select :kind, options_for_select(Address::OFFICE_KINDS.map {|a| [a.to_s.humanize, a.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
+                    <%= address.select :kind, options_for_select(Address::OFFICE_KINDS.map {|a| [a.to_s.humanize, a.to_s]}),class: "floatlabel form-control interaction-choice-control-office-location-address-kind", required: true, placeholder: 'KIND' %>
                   </div>
                   <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
                 </div>
@@ -28,22 +28,22 @@
 
           <div class="row row-form-wrapper no-buffer">
             <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-              <%= address.text_field :address_1, class: "floatlabel form-control", required: true, placeholder: 'ADDRESS LINE 1' %>
+              <%= address.text_field :address_1, class: "floatlabel form-control interaction-field-control-office-location-address-address-1", required: true, placeholder: 'ADDRESS LINE 1' %>
             </div>
             <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-              <%= address.text_field :address_2, class: "floatlabel form-control", placeholder: 'ADDRESS LINE 2' %>
+              <%= address.text_field :address_2, class: "floatlabel form-control interaction-field-control-office-location-address-address-2", placeholder: 'ADDRESS LINE 2' %>
             </div>
           </div>
 
           <div class="row row-form-wrapper no-buffer">
               <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                <%= address.text_field :city, class: "floatlabel form-control", required: true, placeholder: 'CITY' %>
+                <%= address.text_field :city, class: "floatlabel form-control interaction-field-control-office-location-address-city", required: true, placeholder: 'CITY' %>
               </div>
               <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                <%= address.text_field :state, class: "floatlabel form-control capital address-state", required: true, placeholder: 'STATE' %>
+                <%= address.text_field :state, class: "floatlabel form-control capital address-state interaction-field-control-office-location-address-state", required: true, placeholder: 'STATE' %>
               </div>
               <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                <%= address.text_field :zip, class: "floatlabel form-control zip", required: true, placeholder: 'ZIP' %>
+                <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP' %>
               </div>
           </div>
         <% end %>
@@ -55,16 +55,16 @@
   <%= f.fields_for :phone, errors: {}, fieldset: false do |phone| %>
     <div id="phone_info" class="row no-buffer row-form-wrapper">
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= phone.select :kind, options_for_select(Phone::OFFICE_KINDS.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control", required: true, placeholder: 'KIND' %>
+        <%= phone.select :kind, options_for_select(Phone::OFFICE_KINDS.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control interaction-choice-control-office-location-phone-kind", required: true, placeholder: 'KIND' %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= phone.text_field :area_code, class: "floatlabel form-control area_code", required: true, placeholder: 'AREA CODE' %>
+        <%= phone.text_field :area_code, class: "floatlabel form-control area_code interaction-field-control-office-location-phone-area-code", required: true, placeholder: 'AREA CODE' %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= phone.text_field :number, class: "floatlabel form-control phone_number7", required: true, placeholder: 'NUMBER' %>
+        <%= phone.text_field :number, class: "floatlabel form-control phone_number7 interaction-field-control-office-location-phone-number", required: true, placeholder: 'NUMBER' %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">
-        <%= phone.text_field :extension, class: "floatlabel form-control", placeholder: 'EXTENSION' %>
+        <%= phone.text_field :extension, class: "floatlabel form-control interaction-field-control-office-location-phone-extension", placeholder: 'EXTENSION' %>
       </div>
     </div><br>
   <% end %>

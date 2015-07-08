@@ -42,7 +42,7 @@ RSpec.describe GroupSelectionController, :type => :controller do
     before do
       allow(HbxEnrollment).to receive(:new_from).and_return(hbx_enrollment)
       allow(controller).to receive(:find_benefit_group).and_return(benefit_group)
-      allow(hbx_enrollment).to receive(:save!).and_return(true)
+      allow(hbx_enrollment).to receive(:save).and_return(true)
       allow(hbx_enrollment).to receive(:rebuild_members_by_coverage_household).with(coverage_household: coverage_household).and_return(true)
       allow(family).to receive(:latest_household).and_return(household)
       sign_in
