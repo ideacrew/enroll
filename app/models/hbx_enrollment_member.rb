@@ -18,7 +18,7 @@ class HbxEnrollmentMember
   validates_presence_of :applicant_id, :is_subscriber, :eligibility_date,# :premium_amount,
     :coverage_start_on
 
-  validate :check_primary_applicant
+  validate :check_primary_applicant_selected_during_enrollment
 
   validate :end_date_gt_start_date
 
@@ -76,7 +76,7 @@ private
     end
   end
 
-  def check_primary_applicant
+  def check_primary_applicant_selected_during_enrollment
     if self.hbx_enrollment.subscriber.nil?
       self.errors.add(:is_subscriber, "You must select the primary applicant to enroll in the healthcare plan.")
     end
