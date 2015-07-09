@@ -41,7 +41,9 @@ And(/^I should see an initial form to enter information about my Employer and my
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").set("100 North Street")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_2]").set("Suite 990")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Washington")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][state]").set("DC")
+  input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-office-locations-attributes-0-address-attributes-state").first
+  input_field.click
+  input_field.li(text: /District of Columbia/).click
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("20002")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("678")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("1230987")
@@ -449,7 +451,7 @@ When(/^I enter combined filter in plan selection page$/) do
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("1000")
   @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("3900")
   @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("5")
-  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250") 
+  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250")
   @browser.element(class: /apply-btn/, text: /Apply/).click
 end
 
