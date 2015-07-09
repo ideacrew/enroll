@@ -68,6 +68,22 @@ describe RelationshipBenefit do
     end
   end
 
+  context "created with a string premium_pct" do
+    let(:relationship_benefit_params){
+      {
+        relationship: "employee",
+        premium_pct: "60.12",
+        employer_max_amt: 1000.00,
+        offered: true
+      }
+    }
+
+    it "should premium percent to 60" do
+      relationship_benefit = RelationshipBenefit.new(**(relationship_benefit_params))
+      expect(relationship_benefit.premium_pct).to eq 60.0
+    end
+  end
+
   context " should return offered?" do
     it "should return true if its true" do
       expect(RelationshipBenefit.new(**params).offered?).to eq true

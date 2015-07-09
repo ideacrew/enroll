@@ -14,7 +14,7 @@ class RelationshipBenefit
   end
 
   def premium_pct=(new_premium_pct)
-    self[:premium_pct] = new_premium_pct.blank? ? 0.0 : new_premium_pct.try(:round)
+    self[:premium_pct] = new_premium_pct.blank? ? 0.0 : new_premium_pct.try(:to_f).try(:round)
   end
 
   validates_numericality_of :premium_pct, greater_than_or_equal_to: 0.0, less_than_or_equal_to: 100.0
