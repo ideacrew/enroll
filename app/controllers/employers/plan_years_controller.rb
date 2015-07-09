@@ -40,7 +40,7 @@ class Employers::PlanYearsController < ApplicationController
       plan_year.withdraw_pending!
       if !plan_year.is_application_valid?
         @just_a_warning = true
-        plan_year.report_unpublishable
+        plan_year.application_warnings.each_pair(){ |key, value| plan_year.errors.add(:base, value) }
       end
     end
 
