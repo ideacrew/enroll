@@ -199,6 +199,11 @@ class PlanYear
     enrollment_errors.blank? ? true : false
   end
 
+  def is_open_enrollment_closed?
+    binding.pry
+    open_enrollment_end_on.end_of_day < TimeKeeper.date_of_record.beginning_of_day
+  end
+
   # Determine enrollment composition compliance with HBX-defined guards
   def enrollment_errors
     errors = {}
