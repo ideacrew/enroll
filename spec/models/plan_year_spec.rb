@@ -662,7 +662,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             end
 
             it "should advance state to canceled" do
-              expect(PlanYear.find(workflow_plan_year_with_benefit_group.id).canceled?).to be_truthy
+              expect(PlanYear.find(workflow_plan_year_with_benefit_group.id).aasm_state).to eq "canceled"
             end
           end
 

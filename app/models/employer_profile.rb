@@ -223,9 +223,9 @@ class EmployerProfile
       # Find employers with events today and trigger their respective workflow states
       orgs = Organization.or(
         {:"employer_profile.plan_years.start_on" => new_date},
-        {:"employer_profile.plan_years.end_on" => new_date},
+        {:"employer_profile.plan_years.end_on" => new_date - 1.day},
         {:"employer_profile.plan_years.open_enrollment_start_on" => new_date},
-        {:"employer_profile.plan_years.open_enrollment_end_on" => new_date},
+        {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day},
         {:"employer_profile.workflow_state_transitions".elem_match => {
             "$and" => [
               {:transition_at.gte => (new_date.beginning_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
