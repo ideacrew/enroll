@@ -1,0 +1,30 @@
+<div class="modal fade" id="purchase_confirm" tabindex="-1" role="dialog" aria-labelledby="purchaseConfirm" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Purchase Confirmation</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+          Your purchase of <%= @plan.name%> was completed on <%= @enrollment.updated_at %>. <br>
+          Please print this page for your records.
+          A copy of this confirmation has also been emailed to you. <br>
+          Clicking the Continue button will confirm your purchase. <br>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <%= link_to 'Continue', checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id), class: 'btn btn-default', id: 'btn-continue', method: :post %>
+        <%= link_to 'Print', '#', onclick: 'window.print();return false;', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/css">
+  @media print {
+    body {
+      background: #FFF;
+   }
+  }
+</script>
