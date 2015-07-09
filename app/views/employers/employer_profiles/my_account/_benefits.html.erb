@@ -18,7 +18,7 @@
                     <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-select" %>
                     <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-select"%>
                   <% else %>
-                    <%= plan_year.aasm_state.to_s %>
+                    <%= plan_year.aasm_state.to_s.humanize %>
                   <% end %>
                 </div>
               </div>
