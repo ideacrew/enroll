@@ -8,11 +8,9 @@ class EmployerProfileAccount
   field :next_premium_due_on, type: Date
   field :next_premium_amount, type: Money
   field :aasm_state, type: String
-  field :last_aasm_state, type: String
 
   embeds_many :premium_payments
   embeds_many :workflow_state_transitions, as: :transitional
-
 
   accepts_nested_attributes_for :premium_payments
 
@@ -31,12 +29,13 @@ class EmployerProfileAccount
     state :binder_paid, :after_enter => :enroll_employer
 
     # Enrolled and premium payment up-to-date
+    state :prepaid
     state :current
-    state :overdue                                          # Premium payment 1-29 days past due
-    state :late,        :after_enter => :late_notifications # Premium payment 30-60 days past due - send notices to employees
+    state :past_due                                          # Premium payment 1-29 days past due
+    state :delinquent,  :after_enter => :late_notifications  # Premium payment 30-60 days past due - send notices to employees
     state :suspended,   :after_enter => :suspend_plan_year   # Premium payment 61-90 - transmit terms to carriers with retro date   
 
-    state :canceled,    :after_enter => :cancel_employer    # Coverage never took effect, either voluntarily withdrawal or not paying binder
+    state :canceled,    :after_enter => :cancel_employer     # Coverage never took effect, either voluntarily withdrawal or not paying binder
     state :terminated,  :after_enter => [:terminate_employer, :terminate_plan_year] # Premium payment > 90 days past due (day 91) or Employer voluntarily terminates
 
     # Signal parent Employer Profile
@@ -46,30 +45,28 @@ class EmployerProfileAccount
 
     # TODO Advance billing period on binder_pending in middle of month
     event :advance_billing_period, :guard => :first_day_of_month? do
-      # transitions from: [:current, :overdue, :late, :suspended, :terminated], to: [:current, :overdue, :late, :suspended, :terminated]
       transitions from: :binder_pending, to: :canceled
-      transitions from: :binder_paid, to: :overdue
-      transitions from: :current, to: :overdue
-      transitions from: :overdue, to: :late
-      transitions from: :late, to: :suspended
+      transitions from: :binder_paid, to: :current
+      transitions from: :prepaid, to: :current
+      transitions from: :current, to: :past_due
+      transitions from: :past_due, to: :delinquent
+      transitions from: :delinquent, to: :suspended
       transitions from: :suspended, to: :terminated
     end
 
     # Premium payment credit received and allocated to account
     event :advance_coverage_period, :after => :record_transition do
-      transitions from: [:binder_paid, :suspended], to: :current, 
-        :after => [:persist_state, :reinstate_employer]
-
-      transitions from: [:current, :overdue, :late], to: :current, 
-        :after => [:persist_state]
+      transitions from: [:binder_pending, :current], to: :prepaid
+      transitions from: [:binder_paid, :suspended],  to: :current, :after => :reinstate_employer
+      transitions from: [:current, :past_due, :delinquent], to: :current
     end
 
     # Premium payment reversed and account debited
     event :reverse_coverage_period, :after => [:revert_state, :record_transition] do
       transitions from: :binder_paid, to: :canceled
-      transitions from: :current, to: :overdue
-      transitions from: :overdue, to: :late
-      transitions from: :late, to: :suspended
+      transitions from: :current, to: :past_due
+      transitions from: :past_due, to: :delinquent
+      transitions from: :delinquent, to: :suspended
     end
 
     event :cancel_coverage, :after => :record_transition do
@@ -77,7 +74,7 @@ class EmployerProfileAccount
     end
 
     event :suspend_coverage, :after => :record_transition do
-      transitions from: [:current, :late, :overdue], to: :suspended
+      transitions from: [:current, :delinquent, :past_due], to: :suspended
     end
 
     event :reinstate_coverage, :after => :record_transition do
@@ -102,8 +99,12 @@ private
     )
   end
 
+  def latest_workflow_state_transition
+    workflow_state_transitions.order_by(:'transition_at'.desc).limit(1).first
+  end
+
   def first_day_of_month?
-    TimeKeeper.date_of_record
+    TimeKeeper.date_of_record.day == 1
   end
 
   def late_notifications
