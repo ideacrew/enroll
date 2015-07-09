@@ -11,4 +11,9 @@ Feature: Create Broker Agency
     And I should see a second fieldset to enter broker agency information
     And I should see a third fieldset to enter more office location information
     When I click on create broker agency button
-    Then I should see a successful broker create message
+    Then I should see a successful broker registration message
+    When I login as an Hbx Admin
+    And I click on brokers tab
+    Then I click on show button for the broker
+    And I click on approve broker
+    Then I should see a broker successful approve message
