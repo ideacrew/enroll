@@ -368,19 +368,21 @@ class PlanYear
     state :draft, initial: true
 
     state :publish_pending      # Plan application as submitted has warnings
-    state :publish_invalid      # Plan application was forced-published with warnings
     state :eligibility_review   # Plan application was submitted with warnding and is under review by HBX officials
+    state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
+    state :published_invalid, :after_enter => :decline_application    # Plan application was forced-published with warnings
 
-    state :published, :after_enter => :register_employer  # Plan is finalized. Employees may view benefits, but not enroll
-    state :enrolling       # Published plan has entered open enrollment
-    state :enrolled        # Published plan open enrollment has ended, but coverage effective date is in future
-    state :active          # Published plan year is in-force
+    state :enrolling                                      # Published plan has entered open enrollment
+    state :enrolled, :after_enter => :ratify_enrollment   # Published plan open enrollment has ended and is eligible for coverage, 
+                                                          #   but effective date is in future
+    state :canceled                                       # Published plan open enrollment has ended and is ineligible for coverage
 
-    state :suspended       # Premium payment is 61-90 days past due and coverage is currently not in effect
-    state :canceled        # Coverage under this application never took effect
-    state :terminated      # Coverage under this application is terminated
-    state :ineligible      # Application is non-compliant for enrollment
-    state :expired         # Non-published plans are expired following their end on date
+    state :active         # Published plan year is in-force
+
+    state :suspended      # Premium payment is 61-90 days past due and coverage is currently not in effect
+    state :terminated     # Coverage under this application is terminated
+    state :ineligible     # Application is non-compliant for enrollment
+    state :expired        # Non-published plans are expired following their end on date
 
 
     # Change enrollment state, in-force plan year and clean house on any plan year applications from prior year
@@ -388,10 +390,10 @@ class PlanYear
       transitions from: :enrolled,  to: :active,    :guard  => :is_event_date_valid?
       transitions from: :published, to: :enrolling, :guard  => :is_event_date_valid?
       transitions from: :enrolling, to: :enrolled,  :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?
+      transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
-      transitions from: [:draft, :ineligible, :publish_pending, :publish_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
+      transitions from: [:draft, :ineligible, :publish_pending, :published_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
     end
 
     ## Application eligibility determination process
@@ -411,41 +413,60 @@ class PlanYear
 
     # Plan as submitted failed eligibility check
     event :force_publish, :after => :record_transition do
-      transitions from: :publish_pending, to: :publish_invalid, :after => :revoke_employer_eligibility
+      transitions from: :publish_pending, to: :published_invalid
     end
 
     # Employer requests review of ineligible application determination
     event :request_eligibility_review, :after => :record_transition do
-      transitions from: :publish_invalid, to: :eligibility_review, :guard => :is_within_review_period?
+      transitions from: :published_invalid, to: :eligibility_review, :guard => :is_within_review_period?
     end
 
     # Upon review, application ineligible status overturned and deemed eligible
     event :grant_eligibility, :after => :record_transition do
-      transitions from: :eligibility_review, to: :published,
-        :after => :reinstate_employer_eligibility
+      transitions from: :eligibility_review, to: :published
     end
 
     # Upon review, submitted application ineligible status verified ineligible
     event :deny_eligibility, :after => :record_transition do
-      transitions from: :eligibility_review, to: :publish_invalid
+      transitions from: :eligibility_review, to: :published_invalid
     end
 
+    # Enrollment processed stopped due to missing binder payment
+    event :cancel, :after => :record_transition do
+      transitions from: :enrolled, to: :canceled
+    end
+
+    # Coverage disabled due to non-payment
+    event :suspend, :after => :record_transition do
+      transitions from: :active, to: :suspended
+    end
+
+    # Coverage termianted due to non-payment
     event :terminate, :after => :record_transition do
       transitions from: [:active, :suspended], to: :terminated
     end
 
     # Admin ability to reset application
     event :revert_application, :after => :record_transition do
-      transitions from: [:ineligible, :publish_invalid, :eligibility_review, :published], to: :draft
+      transitions from: [:ineligible, :published_invalid, :eligibility_review, :published], to: :draft
     end
   end
 
-  def revoke_employer_eligibility
-    employer_profile.revoke_eligibility!
+  def accept_application
+    transition_success = employer_profile.application_accepted!
+    send_employee_invites if transition_success
   end
 
-  def reinstate_employer_eligibility
-    employer_profile.reinstate_eligibility!
+  def decline_application
+    employer_profile.application_declined!
+  end
+
+  def ratify_enrollment
+    employer_profile.enrollment_ratified!
+  end
+
+  def deny_enrollment
+    employer_profile.enrollment_denied!
   end
 
   def is_eligible_to_match_census_employees?
@@ -454,7 +475,7 @@ class PlanYear
   end
 
   def is_within_review_period?
-    publish_invalid? and
+    published_invalid? and
     (latest_workflow_state_transition.transition_at >
       (TimeKeeper.date_of_record - HbxProfile::ShopApplicationAppealPeriodMaximum))
   end
@@ -496,11 +517,6 @@ private
       to_state: aasm.to_state,
       transition_at: Time.now.utc
     )
-  end
-
-  def register_employer
-    state_change_successful = employer_profile.register_employer!
-    send_employee_invites if state_change_successful
   end
 
   def send_employee_invites

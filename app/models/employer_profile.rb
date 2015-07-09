@@ -9,7 +9,7 @@ class EmployerProfile
   field :sic_code, type: String
 
   # Workflow attributes
-  field :aasm_state, type: String
+  field :aasm_state, type: String, default: "applicant"
 
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
@@ -142,20 +142,16 @@ class EmployerProfile
     @active_plan_year = plan_year if (plan_year.present? && plan_year.published?)
   end
 
-  def plan_year_drafts
-    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
-  end
-
-  # Change plan years for a period - published -> retired
-  def close_plan_year
-  end
-
   def latest_plan_year
     plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
   def published_plan_year
     plan_years.published.first
+  end
+
+  def plan_year_drafts
+    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
   end
 
   def find_plan_year_by_date(target_date)
@@ -247,11 +243,6 @@ class EmployerProfile
     plan_year.revert
   end
 
-  def initialize_account
-    self.build_employer_profile_account
-    save
-  end
-
 ## TODO - anonymous shopping
 # no fein required
 # no SSNs, names, relationships, required
@@ -264,83 +255,46 @@ class EmployerProfile
   # Workflow for self service
   aasm do
     state :applicant, initial: true
-    state :registered                 # Employer has submitted application and is eligible to enroll on HBX
-    state :terminated                 # Registered Employer's coverage lapsed due to non-payment or voluntarily termination
-    state :enrollment_ineligible      # Employer is unable to obtain coverage on the HBX per regulation or policy
+    state :registered                 # Employer has submitted valid application
+    state :eligible                   # Employer is unable to obtain coverage on the HBX per regulation or policy
+    state :enrolled                   # Employer has completed eligible enrollment and has active benefit coverage
+    # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
+    state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
+    state :ineligible                 # Employer is unable to obtain coverage on the HBX per regulation or policy
 
-    # Enrollment deadline has passed for first of following month
-    event :advance_enrollment_date, :after => :record_transition do
-
-      # Plan Year application expired
-      transitions from: :applicant,   to: :canceled #, :guard => :effective_date_expired?
-
-      # Begin open enrollment
-      transitions from: :registered,  to: :enrolling
-
-      # End open enrollment with success
-      transitions from: :enrolling,   to: :binder_pending, :guard => :enrollment_compliant?,
-        :after => :initialize_account
-
-      # End open enrollment with invalid enrollment
-      transitions from: :enrolling,   to: :canceled
-
-      # For employer who submitted enrollment_ineligible application, required wait period before submitting
-      #  another plan year application
-      transitions from: :enrollment_ineligible,  to: :applicant, :guard => :enrollment_ineligible_period_expired?
+    event :application_accepted, :after => :record_transition do
+      transitions from: [:applicant, :ineligible], to: :registered
     end
 
-    event :reapply, :after => :record_transition do
-      transitions from: :terminated,  to: :applicant
+    event :application_declined, :after => :record_transition do
+      transitions from: :applicant, to: :ineligible
+      transitions from: :ineligible, to: :ineligible
     end
 
-    event :register_employer do
-      transitions from: :applicant, to: :registered
-      transitions from: :enrollment_ineligible, to: :registered
+    event :application_expired, :after => :record_transition do
+      transitions from: :registered, to: :applicant
     end
 
-    event :revoke_eligibility, :after => :record_transition do
-      transitions from: :applicant,   to: :enrollment_ineligible
+    event :enrollment_ratified, :after => :record_transition do
+      transitions from: [:registered, :ineligible], to: :eligible, :after => :initialize_account
     end
 
-    event :reinstate_eligibility, :after => :record_transition do
-      transitions from: :enrollment_ineligible,  to: :applicant
+    event :enrollment_denied, :after => :record_transition do
+      transitions from: [:registered, :enrolled], to: :applicant
     end
 
-    event :revert, :after => :record_transition do
-      # Add guard -- only revert for first 30 days past submitted
-      transitions from: :enrollment_ineligible_appealing, to: :applicant, :after_enter => :revert_plan_year
+    event :benefit_suspended, :after => :record_transition do
+      transitions from: :enrolled, to: :suspended, :after => :suspend_benefit
     end
 
-    # event :enroll, :after => :record_transition do
-    #   transitions from: :binder_pending,  to: :enrolled
-    # end
+    event :benefit_terminated, :after => :record_transition do
+      transitions from: [:enrolled, :suspended], to: :applicant
+    end
 
-    # event :cancel_coverage, :after => :record_transition do
-    #   transitions from: :applicant,       to: :canceled
-    #   transitions from: :registered,      to: :canceled
-    #   transitions from: :enrolling,       to: :canceled
-    #   transitions from: :binder_pending,  to: :canceled
-    #   transitions from: :enrollment_ineligible,      to: :canceled    # put guard: following 90 days in enrollment_ineligible status
-    #   transitions from: :enrolled,        to: :canceled
-    # end
+    event :benefit_canceled, :after => :record_transition do
+      transitions from: :registered, to: :applicant, :after => :cancel_benefit
+    end
 
-    # event :suspend_coverage, :after => :record_transition do
-    #   transitions from: :enrolled, to: :suspended
-    # end
-
-    # event :terminate_coverage, :after => :record_transition do
-    #   transitions from: :suspended,   to: :terminated
-    #   transitions from: :enrolled,    to: :terminated
-    # end
-
-    # event :reinstate_coverage, :after => :record_transition do
-    #   transitions from: :suspended,   to: :enrolled
-    #   transitions from: :terminated,  to: :enrolled
-    # end
-
-    # event :reenroll, :after => :record_transition do
-    #   transitions from: :terminated, to: :binder_pending
-    # end
   end
 
   def within_open_enrollment_for?(t_date, effective_date)
@@ -362,21 +316,40 @@ class EmployerProfile
     end
   end
 
-  def is_eligible_to_shop?
-    registered? or enrolling?
-  end
+  # def is_eligible_to_shop?
+  #   registered? or published_plan_year.enrolling?
+  # end
 
   def is_eligible_to_enroll?
-    enrolling?
+    published_plan_year.enrolling?
   end
 
 private
+  def cancel_benefit
+    published_plan_year.cancel
+  end
+
+  def suspend_benefit
+    published_plan_year.suspend
+  end
+
+  def terminate_benefit
+    published_plan_year.terminate
+  end
+
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
       transition_at: Time.now.utc
     )
+  end
+
+  def initialize_account
+    if employer_profile_account.blank?
+      self.build_employer_profile_account
+      save
+    end
   end
 
   def build_nested_models

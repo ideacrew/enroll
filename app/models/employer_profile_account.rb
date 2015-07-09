@@ -7,7 +7,7 @@ class EmployerProfileAccount
 
   field :next_premium_due_on, type: Date
   field :next_premium_amount, type: Money
-  field :aasm_state, type: String
+  field :aasm_state, type: String, default: "binder_pending"
 
   embeds_many :premium_payments
   embeds_many :workflow_state_transitions, as: :transitional
@@ -29,65 +29,54 @@ class EmployerProfileAccount
     state :binder_paid, :after_enter => :enroll_employer
 
     # Enrolled and premium payment up-to-date
-    state :prepaid
     state :current
+    state :invoiced
     state :past_due                                          # Premium payment 1-29 days past due
     state :delinquent,  :after_enter => :late_notifications  # Premium payment 30-60 days past due - send notices to employees
-    state :suspended,   :after_enter => :suspend_plan_year   # Premium payment 61-90 - transmit terms to carriers with retro date   
+    state :suspended,   :after_enter => :suspend_benefit     # Premium payment 61-90 - transmit terms to carriers with retro date   
 
-    state :canceled,    :after_enter => :cancel_employer     # Coverage never took effect, either voluntarily withdrawal or not paying binder
-    state :terminated,  :after_enter => [:terminate_employer, :terminate_plan_year] # Premium payment > 90 days past due (day 91) or Employer voluntarily terminates
+    state :canceled,    :after_enter => :cancel_benefit      # Coverage never took effect, either voluntarily withdrawal or not paying binder
+    state :terminated,  :after_enter => :terminate_benefit   # Premium payment > 90 days past due (day 91) or Employer voluntarily terminates
 
-    # Signal parent Employer Profile
-    event :allocate_binder_payment do
+    # 
+    event :allocate_binder_payment, :after => :record_transition do
       transitions from: :binder_pending, to: :binder_paid
     end
 
     # TODO Advance billing period on binder_pending in middle of month
-    event :advance_billing_period, :guard => :first_day_of_month? do
+    event :advance_billing_period, :guard => :first_day_of_month?, :after => :record_transition do
       transitions from: :binder_pending, to: :canceled
-      transitions from: :binder_paid, to: :current
-      transitions from: :prepaid, to: :current
-      transitions from: :current, to: :past_due
+
+      transitions from: :binder_paid, to: :invoiced
+      transitions from: :invoiced, to: :past_due
       transitions from: :past_due, to: :delinquent
       transitions from: :delinquent, to: :suspended
       transitions from: :suspended, to: :terminated
+      # april 10th open enrollment ends => binder pending
+      # april 15th binder is due, paid (allocate binder payment happened) => binder paid, not paid => binder pending
+      # may 1st plan year start, binder paid => invoiced (due may 31st), binder pending => cancelled
+      # may 20th paid bill due 31st, invoiced => current
+      # june 1st haven't paid bill, invoiced => past_due
     end
 
     # Premium payment credit received and allocated to account
     event :advance_coverage_period, :after => :record_transition do
-      transitions from: [:binder_pending, :current], to: :prepaid
-      transitions from: [:binder_paid, :suspended],  to: :current, :after => :reinstate_employer
-      transitions from: [:current, :past_due, :delinquent], to: :current
+      transitions from: [:invoiced, :past_due, :delinquent], to: :current
+      transitions from: :suspended, to: :current, :after => :reinstate_employer
     end
 
     # Premium payment reversed and account debited
     event :reverse_coverage_period, :after => [:revert_state, :record_transition] do
+      transitions from: :binder_paid, to: :binder_pending, :guard => :before_plan_year_start
       transitions from: :binder_paid, to: :canceled
-      transitions from: :current, to: :past_due
+      transitions from: :current, to: :invoiced
+      transitions from: :invoiced, to: :past_due
       transitions from: :past_due, to: :delinquent
+
       transitions from: :delinquent, to: :suspended
+      # may 1 invoiced, may 10 paid(1), june 1 invoiced, june 5 paid(2), june 6 nsf(1)
     end
 
-    event :cancel_coverage, :after => :record_transition do
-      transitions from: :binder_pending, to: :canceled
-    end
-
-    event :suspend_coverage, :after => :record_transition do
-      transitions from: [:current, :delinquent, :past_due], to: :suspended
-    end
-
-    event :reinstate_coverage, :after => :record_transition do
-      transitions from: :suspended, to: :current
-    end
-
-    event :terminate_coverage, :after => :record_transition do
-      transitions from: :suspended, to: :terminated
-    end
-
-    event :reapply, :after => :record_transition do
-      transitions from: :terminated, to: :binder_pending
-    end
   end
 
 private
@@ -126,20 +115,14 @@ private
     employer_profile.enroll
   end
 
-  def reinstate_employer
-    employer_profile.reinstate_coverage
+  def cancel_benefit
   end
 
-  def suspend_employer
-    employer_profile.suspend_coverage
+  def suspend_benefit
   end
 
-  def cancel_employer
-    employer_profile.cancel_coverage
+  def terminate_benefit
   end
 
-  def terminate_employer
-    employer_profile.terminate_coverage
-  end
 
 end
