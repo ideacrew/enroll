@@ -213,7 +213,7 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.li(text: /home/).click
   @browser.text_field(class: /interaction-field-control-census-employee-email-attributes-address/).set("trey.john@dc.gov")
 
-  @browser.a(text: /Add Dependent/).click
+  @browser.a(text: /Add Family Member/).click
   @browser.div(id: /dependent_info/).wait_until_present
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mary")
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_middle_name/).set("K")
