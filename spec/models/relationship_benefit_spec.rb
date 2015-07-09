@@ -30,11 +30,41 @@ describe RelationshipBenefit do
       end
     end
   end
+
   context "created without a premium percent" do
     let(:relationship_benefit) {RelationshipBenefit.new(**(params.except(:premium_pct)))}
 
     it "should default premium percent to 0" do
       expect(relationship_benefit.premium_pct).to eq 0.0
+    end
+  end
+
+  context "created with a float premium_pct" do
+    let(:relationship_benefit1_params){
+      {
+        relationship: "employee",
+        premium_pct: 60.12,
+        employer_max_amt: 1000.00,
+        offered: true
+      }
+    }
+    let(:relationship_benefit2_params){
+      {
+        relationship: "employee",
+        premium_pct: 60.56,
+        employer_max_amt: 1000.00,
+        offered: true
+      }
+    }
+
+    it "should premium percent to 60" do
+      relationship_benefit = RelationshipBenefit.new(**(relationship_benefit1_params))
+      expect(relationship_benefit.premium_pct).to eq 60.0
+    end
+
+    it "should premium percent to 61" do
+      relationship_benefit = RelationshipBenefit.new(**(relationship_benefit2_params))
+      expect(relationship_benefit.premium_pct).to eq 61.0
     end
   end
 

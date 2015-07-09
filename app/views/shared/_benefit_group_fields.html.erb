@@ -16,7 +16,7 @@
           <%= f.select(:effective_on_offset, options_for_select([["Immediately", 0], ["After 30 Days", 30], ["After 60 Days", 60]], selected: f.object.effective_on_offset), {:include_blank => "NEW HIRES ELIGIBLE"}, { :class => ''}) %>
         </div>
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-          <%= f.text_field :employer_max_amt_in_cents, class: "floatlabel form-control", required: true, placeholder: 'EMPLOYER MAXIMUM CONTRIBUTION', value: f.object.premium_in_dollars %>
+          <%= f.text_field :employer_max_amt_in_cents, class: "floatlabel form-control", required: true, placeholder: 'EMPLOYER MAXIMUM CONTRIBUTION', value: f.object.premium_in_dollars.try(:to_i) %>
         </div>
       </div>
 
