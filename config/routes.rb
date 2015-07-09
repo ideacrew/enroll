@@ -88,6 +88,7 @@ Rails.application.routes.draw do
       resources :plan_years do
         get 'recommend_dates', on: :collection
         post 'publish'
+        post 'force_publish'
         get 'search_reference_plan', on: :collection
       end
 
