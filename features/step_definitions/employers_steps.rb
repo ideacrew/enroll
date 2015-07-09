@@ -369,7 +369,7 @@ And(/^I should see a button to create new plan year$/) do
   @browser.a(text: /Add Plan Year/).click
 end
 
-And(/^I should be able to add information about plan year, benefits and relationship benefits$/) do
+And(/^I should be able to enter plan year, benefits, relationship benefits with high FTE$/) do
 #Plan Year
   @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").wait_until_present
   screenshot("employer_add_plan_year")
@@ -383,7 +383,7 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.h4(text: /Recommend Date/).wait_until_present
   expect(@browser.text.include?("employer initial application earliest submit on")).to be_truthy
   @browser.text_field(name: "plan_year[fte_count]").click
-  @browser.text_field(name: "plan_year[fte_count]").set("35")
+  @browser.text_field(name: "plan_year[fte_count]").set("235")
   @browser.text_field(name: "plan_year[pte_count]").set("15")
   @browser.text_field(name: "plan_year[msp_count]").set("3")
   # Benefit Group
@@ -471,6 +471,41 @@ Then(/^I should see the plan year$/) do
 end
 
 When(/^I click on publish plan year$/) do
+  @browser.element(class: /interaction-click-control-publish-plan-year/).wait_until_present
   @browser.element(class: /interaction-click-control-publish-plan-year/).click
-  @browser.element(class: /interaction-click-control-publish-plan-year/).wait_while_present
+end
+
+Then(/^I should see Publish Plan Year Modal with warnings$/) do
+
+  @browser.element(class: /modal-body/).wait_until_present
+
+  modal = @browser.div(class: /modal-dialog/)
+  warnings= modal.ul(class: /application-warnings/)
+  expect(warnings.element(text: /number of full time equivalents (FTEs) exceeds maximum allowed/i)).to be_truthy
+end
+
+Then(/^I click on the Cancel button$/) do
+  modal = @browser.div(class: 'modal-dialog')
+  modal.a(class: 'interaction-click-control-cancel').click
+end
+
+Then(/^I should be on the Plan Year Edit page with warnings$/) do
+  @browser.element(id: /plan_year/).present?
+  warnings= @browser.div(class: 'alert-plan-year')
+  expect(warnings.element(text: /number of full time equivalents (FTEs) exceeds maximum allowed/i)).to be_truthy 
+end
+
+Then(/^I update the FTE field with valid input and save plan year$/) do
+  @browser.text_field(name: "plan_year[fte_count]").set("99")
+  scroll_then_click(@browser.element(class: 'interaction-click-control-create-plan-year'))
+end
+
+Then(/^I should see a plan year successfully saved message$/) do
+  @browser.element(class: /mainmenu/).wait_until_present
+  expect(@browser.element(text: /Plan Year successfully saved/)).to be_truthy
+end
+When(/^I should see a published success message$/) do
+  @browser.element(class: /mainmenu/).wait_until_present
+  expect(@browser.element(text: /Plan Year successfully published/)).to be_truthy
+  binding.pry
 end

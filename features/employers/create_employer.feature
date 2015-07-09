@@ -12,7 +12,7 @@ Feature: Create Employer
         And I should see an initial form to enter information about my Employer and myself
       When I go to the benefits tab I should see plan year information
         And I should see a button to create new plan year
-        And I should be able to add information about plan year, benefits and relationship benefits
+        And I should be able to enter plan year, benefits, relationship benefits with high FTE
         And I should see a success message after clicking on create plan year button
       When I click on the Employees tab
       Then I should see the employee family roster
@@ -44,6 +44,16 @@ Feature: Create Employer
       When I go to the benefits tab
       Then I should see the plan year
       When I click on publish plan year
+      Then I should see Publish Plan Year Modal with warnings
+      When I click on the Cancel button
+      Then I should be on the Plan Year Edit page with warnings
+      When I update the FTE field with valid input and save plan year
+
+      Then I should see a plan year successfully saved message
+      When I go to the benefits tab I should see plan year information
+      Then I click on publish plan year
+      Then I should see a published successfully
+
       When I log out
       Given I do not exist as a user
       And I have an existing employee record
