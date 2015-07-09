@@ -16,6 +16,9 @@ class EmployerProfileAccount
 
   validates_presence_of :next_premium_due_on, :next_premium_amount
 
+  scope :active,      ->{ not_in(aasm_state: %w(canceled terminated)) }
+
+
   def last_premium_payment
     return premium_payments.first if premium_payments.size == 1
     premium_payments.order_by(:paid_on.desc).limit(1).first
@@ -54,7 +57,7 @@ class EmployerProfileAccount
       transitions from: :suspended, to: :terminated
       # april 10th open enrollment ends => binder pending
       # april 15th binder is due, paid (allocate binder payment happened) => binder paid, not paid => binder pending
-      # may 1st plan year start, binder paid => invoiced (due may 31st), binder pending => cancelled
+      # may 1st plan year start, binder paid => invoiced (due may 31st), binder pending => canceled
       # may 20th paid bill due 31st, invoiced => current
       # june 1st haven't paid bill, invoiced => past_due
     end
@@ -116,12 +119,15 @@ private
   end
 
   def cancel_benefit
+    employer_profile.benefit_canceled!
   end
 
   def suspend_benefit
+    employer_profile.benefit_suspended!
   end
 
   def terminate_benefit
+    employer_profile.benefit_terminated!
   end
 
 

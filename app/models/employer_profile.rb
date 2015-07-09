@@ -116,15 +116,6 @@ class EmployerProfile
     @active_broker_agency_account = broker_agency_accounts.detect { |account| account.is_active? }
   end
 
-  def cycle_daily_events
-    # advance employer_profile_account billing period for pending_binder_payment
-  end
-
-  def cycle_monthly_events
-    # expire_plan_years
-    # employer_profile_account.advance_billing_period
-  end
-
   def employee_roles
     return @employee_roles if defined? @employee_roles
     @employee_roles = EmployeeRole.find_by_employer_profile(self)
@@ -216,13 +207,24 @@ class EmployerProfile
     end
 
     def advance_day(new_date)
+
+      # Organization.exists(:"employer_profile.employer_profile_account" => true).only(:"employer_profile.employer_profile_account_id").active
+      # Organization.exists(:"employer_profile.employer_profile_account" => true)
+
+      if new_date.day == 1
+        orgs = Organization.not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
+        orgs.each do |org|
+          org.employer_profile.employer_profile_account.advance_billing_period! 
+        end
+      end
+
       # Find employers with events today and trigger their respective workflow states
       orgs = Organization.or(
         {:"employer_profile.plan_years.start_on" => new_date},
         {:"employer_profile.plan_years.end_on" => new_date - 1.day},
         {:"employer_profile.plan_years.open_enrollment_start_on" => new_date},
         {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day},
-        {:"employer_profile.workflow_state_transitions".elem_match => {
+        {:"employer_profile.plan_years.workflow_state_transitions".elem_match => {
             "$and" => [
               {:transition_at.gte => (new_date.beginning_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
               {:transition_at.lte => (new_date.end_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
@@ -231,10 +233,11 @@ class EmployerProfile
           }
         }
       )
+
       orgs.each do |org|
         org.employer_profile.today = new_date
-        org.employer_profile.advance_enrollment_date! if org.employer_profile.may_advance_enrollment_date?
-        nil
+        plan_year = org.employer_profile.published_plan_year
+        plan_year.advance_date! if plan_year.may_advance_enrollment_date?
       end
     end
   end
@@ -256,7 +259,8 @@ class EmployerProfile
   aasm do
     state :applicant, initial: true
     state :registered                 # Employer has submitted valid application
-    state :eligible                   # Employer is unable to obtain coverage on the HBX per regulation or policy
+    state :eligible                   # Employer has completed enrollment and is eligible for coverage
+
     state :enrolled                   # Employer has completed eligible enrollment and has active benefit coverage
     # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
     state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
