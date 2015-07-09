@@ -35,10 +35,13 @@ class Employers::PlanYearsController < ApplicationController
 
   def edit
     plan_year = @employer_profile.find_plan_year(params[:id])
-
+    @just_a_warning = false
     if plan_year.publish_pending?
       plan_year.withdraw_pending!
-      plan_year.report_unpublishable unless plan_year.is_application_valid?
+      if !plan_year.is_application_valid?
+        @just_a_warning = true
+        plan_year.report_unpublishable
+      end
     end
 
     @plan_year = ::Forms::PlanYearForm.new(plan_year)
