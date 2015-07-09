@@ -76,13 +76,13 @@
        <div class="row top-row no-border">
         <div class="col-xs-12 text-center broker_approve_deny_btn">
           <% if @broker_applicant.broker_role.may_approve? %>
-            <%= submit_tag 'Approve', class: "btn btn-primary" %>
+            <%= submit_tag 'Approve', class: "btn btn-primary interaction-click-control-broker-approve" %>
           <% end %>
           <% if @broker_applicant.broker_role.may_deny? %>
-            <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary" %>
+            <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary interaction-click-control-broker-deny" %>
           <% end %>
           <% if @broker_applicant.broker_role.may_decertify? %>
-            <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary" %>
+            <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary interaction-click-control-broker-decertify" %>
           <% end %>
         </div>
       </div>
