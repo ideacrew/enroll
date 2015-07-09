@@ -28,4 +28,18 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       expect(response).to have_http_status(:redirect)
     end
   end
+
+  context "POST terminate" do
+    before do
+      allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
+      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(hbx_enrollment).to receive(:terminate_coverage!).and_return(true)
+      sign_in
+      post :terminate, id: "hbx_id"
+    end
+
+    it "returns http success" do
+      expect(response).to be_redirect
+    end
+  end
 end

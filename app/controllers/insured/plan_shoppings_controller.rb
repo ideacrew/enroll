@@ -43,6 +43,16 @@ class Insured::PlanShoppingsController < ApplicationController
     end
   end
 
+  def terminate
+    hbx_enrollment = HbxEnrollment.find(params.require(:id))
+
+    if hbx_enrollment.coverage_selected? and hbx_enrollment.terminate_coverage!
+      redirect_to home_consumer_profiles_path
+    else
+      redirect_to :back
+    end
+  end
+
   def show
     hbx_enrollment_id = params.require(:id)
 

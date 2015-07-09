@@ -38,10 +38,11 @@
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', 'change' %>
             <h4><strong>What do you like to do?</strong></h4>
-            <%#= link_to 'Keep existing plan', home_consumer_profiles_path, class: 'btn btn-primary' %>
-            <%= submit_tag 'Keep existing plan', class: 'btn btn-lg btn-primary' %>
-            <%#= link_to 'Keep existing plan', purchase_consumer_profiles_path, class: 'btn btn-lg btn-primary' %> &nbsp;
-            <input type="button", value="Terminate Plan", onclick="confirm('Are you sure?');", class="btn btn-lg btn-primary">
+            <% if @hbx_enrollment.present? and @hbx_enrollment.plan %>
+              <%= submit_tag 'Keep existing plan', class: 'btn btn-lg btn-primary' %>
+              &nbsp;
+            <% end %>
+            <%= link_to("Terminate Plan", terminate_insured_plan_shopping_path(@hbx_enrollment.id), {:class => "btn btn-lg btn-primary", :method => :post}) if @hbx_enrollment %>
             <% if @employee_role.benefit_group.plan_option_kind != "single_plan" %>
               &nbsp;
               <%= submit_tag 'Shop for new plan', class: 'btn btn-lg btn-primary' %>
