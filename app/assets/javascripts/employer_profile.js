@@ -70,3 +70,9 @@ $(document).on('change', '.dependent_info input.dob-picker', function(){
   $(target).html(data);
   $(target).selectric('refresh');
 });
+
+$(function() {
+  $("#publishPlanYear .close").click(function(){
+    location.reload();
+  })
+})
