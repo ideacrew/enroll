@@ -7,6 +7,16 @@ class HbxEnrollment
 
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
   Authority = [:open_enrollment]
+  WAIVER_REASONS = [
+    "I have coverage through spouse’s employer health plan",
+    "I have coverage through parent’s employer health plan",
+    "I have coverage through any other employer health plan",
+    "I have coverage through an individual market health plan",
+    "I have coverage through Medicare",
+    "I have coverage through Tricare",
+    "I have coverage through Medicaid",
+    "I do not have other coverage"
+  ]
 
   embedded_in :household
 
@@ -32,6 +42,7 @@ class HbxEnrollment
   field :aasm_state_date, type: Date
   field :updated_by, type: String
   field :is_active, type: Boolean, default: true
+  field :waiver_reason, type: String
 
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
@@ -63,7 +74,7 @@ class HbxEnrollment
     state :inactive   # :after_enter inform census_employee
 
     event :waive_coverage do
-      transitions from: :shopping, to: :inactive, after: :propogate_waiver
+      transitions from: [:shopping, :coverage_selected], to: :inactive, after: :propogate_waiver
     end
 
     event :select_coverage do
