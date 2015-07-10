@@ -495,7 +495,7 @@ Then(/^I should be on the Plan Year Edit page with warnings$/) do
 end
 
 Then(/^I update the FTE field with valid input and save plan year$/) do
-  @browser.text_field(name: "plan_year[fte_count]").set("99")
+  @browser.text_field(name: "plan_year[fte_count]").set("10")
   scroll_then_click(@browser.element(class: 'interaction-click-control-create-plan-year'))
 end
 
@@ -506,5 +506,4 @@ end
 When(/^I should see a published success message$/) do
   @browser.element(class: /mainmenu/).wait_until_present
   expect(@browser.element(text: /Plan Year successfully published/)).to be_truthy
-  binding.pry
 end

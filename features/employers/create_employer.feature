@@ -52,7 +52,7 @@ Feature: Create Employer
       Then I should see a plan year successfully saved message
       When I go to the benefits tab I should see plan year information
       Then I click on publish plan year
-      Then I should see a published successfully
+      Then I should see a published success message
 
       When I log out
       Given I do not exist as a user
