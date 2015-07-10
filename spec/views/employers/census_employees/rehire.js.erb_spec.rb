@@ -1,0 +1,17 @@
+require 'rails_helper'
+
+describe "employers/census_employees/rehire.js.erb" do
+  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+
+  before :each do
+    assign(:employer_profile, employer_profile)
+    assign(:census_employee, census_employee)
+    assign(:rehiring_date, Date.today)
+    render file: "employers/census_employees/rehire.js.erb"
+  end
+
+  it "should display notice" do
+    expect(rendered).to match /Successfully rehired Census Employee. Please update benefit group/
+  end
+end

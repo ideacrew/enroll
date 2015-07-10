@@ -47,6 +47,7 @@ Rails.application.routes.draw do
         post 'checkout'
         post 'thankyou'
         post 'waive'
+        post 'terminate'
       end
     end
 

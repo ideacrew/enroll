@@ -63,10 +63,16 @@ $(document).on('change', '.dependent_info input.dob-picker', function(){
   var target = $(this).parents('.dependent_info').find('select');
 
   if (mydate > new Date()){
-    data = "<option value=''>SELECT RELATIONSHIP</option><option value='spouse'>Spouse</option><option value='domestic_partner'>Domestic partner</option><option value='child_under_26'>Child</option><option value='disabled_child_26_and_over'>Disabled child</option>'";
+    data = "<option value=''>SELECT RELATIONSHIP</option><option value='spouse'>Spouse</option><option value='domestic_partner'>Domestic partner</option><option value='child_under_26'>Child</option>";
   }else{
-    data = "<option value=''>SELECT RELATIONSHIP</option><option value='spouse'>Spouse</option><option value='domestic_partner'>Domestic partner</option><option value='child_26_and_over'>Child</option><option value='disabled_child_26_and_over'>Disabled child</option>'";
+    data = "<option value=''>SELECT RELATIONSHIP</option><option value='spouse'>Spouse</option><option value='domestic_partner'>Domestic partner</option><option value='child_26_and_over'>Child</option>";
   }
   $(target).html(data);
   $(target).selectric('refresh');
 });
+
+$(function() {
+  $("#publishPlanYear .close").click(function(){
+    location.reload();
+  })
+})

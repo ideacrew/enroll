@@ -17,8 +17,8 @@ RSpec.describe "employers/plan_years/new.html.erb" do
     expect(rendered).to match /Benefit Groups/
   end
 
-  it "displays six relationship benefits" do
-    %w(employee child_26_and_over spouse domestic_partner child_under_26 disabled_child_26_and_over).each do |kind|
+  it "displays four relationship benefits" do
+    %w(employee spouse domestic_partner child_under_26).each do |kind|
       expect(rendered).to match /#{kind}/
     end
   end

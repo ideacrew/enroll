@@ -11,6 +11,7 @@
         <th>Termination Date</th>
         <% end %>
         <th>Status</th>
+        <th>Enrollment Status</th>
         <th>Linked?</th>
         <th></th>
       </tr>
@@ -26,6 +27,7 @@
         <td><%= format_date census_employee.employment_terminated_on %> </td>
         <% end %>
         <td><%= census_employee.aasm_state.humanize %></td>
+        <td><%= enrollment_state(census_employee) %></td>
         <td><%= boolean_to_human census_employee.employee_role_linked? %></td>
         <td class="content_no_wrap">
           <% if census_employee.employment_terminated? %>

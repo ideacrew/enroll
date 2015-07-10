@@ -1,59 +1,75 @@
 <% dependents = @census_employee.census_dependents %>
 <% address = @census_employee.address %>
-<% benefit_group_assignments = @census_employee.benefit_group_assignments %>
+<% benefit_group_assignment = @census_employee.active_benefit_group_assignment %>
 <h3>Census Employee Details</h3>
 <div class="row">
   <div class="col-md-6 col-sm-6 col-xs-12">
-    <h3>Employee Details</h3>
-    <p>
-      Name:
-      <%= name_to_listing(@census_employee) %>
-      <br/>
-      DOB:
-      <%= format_date @census_employee.dob %>
-      <br/>
-      Hired On:
-      <%= format_date @census_employee.hired_on %>
-    </p>
+    <h4>Employee Details</h4>
+    <div class="form-border">
+      <p>
+        Name:
+        <%= name_to_listing(@census_employee) %>
+        <br/>
+        DOB:
+        <%= format_date @census_employee.dob %>
+        <br/>
+        Hired On:
+        <%= format_date @census_employee.hired_on %>
+      </p>
+    </div>
   </div>
   <div class="col-md-6 col-sm-6 col-xs-12">
-    <h3>Address</h3>
-    <% if address.present? %>
-      <%= address.to_s %>
-    <% end %>
+    <h4>Address</h4>
+    <div class="form-border">
+      <% if address.present? %>
+        <%= address.to_html %>
+      <% end %>
+    </div>
   </div>
 </div>
 <div class="row">
-  <div class="col-md-12 col-sm-12 col-xs-12">
-    <h3>Dependents</h3>
-    <% if dependents.present? %>
-      <table>
-        <tr>
-          <th>Name</th>
-          <th>DOB</th>
-          <th>Relationship</th>
-          <th>Gender</th>
-        </tr>
-        <% dependents.each do |dependent| %>
+  <div class="col-md-6 col-sm-6 col-xs-12">
+    <h4>Dependents</h4>
+    <div class="form-border">
+      <% if dependents.present? %>
+        <table style='width:100%;'>
           <tr>
-            <td>
-              <%= dependent.first_name + " " + dependent.last_name %>
-            </td>
-            <td>
-              <%= format_date dependent.dob %>
-            </td>
-            <td>
-              <%= dependent.employee_relationship %>
-            </td>
-            <td>
-              <%= dependent.gender %>
-            </td>
+            <th>Name</th>
+            <th>DOB</th>
+            <th>Relationship</th>
+            <th>Gender</th>
           </tr>
-        <% end %>
-      </table>
-    <% else %>
-      <p>No Dependents</p>
-    <% end %>
+          <% dependents.each do |dependent| %>
+            <tr>
+              <td>
+                <%= dependent.first_name + " " + dependent.last_name %>
+              </td>
+              <td>
+                <%= format_date dependent.dob %>
+              </td>
+              <td>
+                <%= dependent.employee_relationship %>
+              </td>
+              <td>
+                <%= dependent.gender %>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+      <% else %>
+        <p>No Dependents</p>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-sm-6 col-xs-12">
+    <h4>Plan</h4>
+    <div class="form-border">
+      <p><%= benefit_group_assignment.try(:benefit_group).try(:title) %></p>
+      <%= "Waiver" if benefit_group_assignment.try(:coverage_waived?) %>
+    </div>
   </div>
 </div>
+
+<br />
 <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, 'javascript:;', class: 'btn btn-primary return_to_employee_roster' %>

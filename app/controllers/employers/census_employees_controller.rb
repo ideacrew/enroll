@@ -102,6 +102,8 @@ class Employers::CensusEmployeesController < ApplicationController
         if new_census_employee.valid? and @census_employee.valid?
           new_census_employee.save
           @census_employee.save
+          @census_employee.build_address unless @census_employee.address.present?
+          @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
           flash[:notice] = "Successfully rehired Census Employee."
         else
           flash[:error] = "Error during rehire."

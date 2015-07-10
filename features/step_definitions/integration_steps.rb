@@ -169,7 +169,7 @@ When(/^I complete the matched employee form$/) do
   @browser.button(class: /interaction-click-control-close/).wait_until_present
   scroll_then_click(@browser.element(class: /interaction-click-control-close/))
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").wait_until_present
-  
+
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
   scroll_then_click(@browser.text_field(name: "person[emails_attributes][1][address]"))
   screenshot("personal_info_complete")
@@ -181,7 +181,10 @@ When(/^I complete the matching employee form$/) do
   @browser.text_field(name: "person[addresses_attributes][0][address_1]").set("84 I st")
   @browser.text_field(name: "person[addresses_attributes][0][address_2]").set("Suite 201")
   @browser.text_field(name: "person[addresses_attributes][0][city]").set("Herndon")
-  @browser.text_field(name: "person[addresses_attributes][0][state]").set("VA")
+
+  input_field = @browser.divs(class: "selectric-interaction-choice-control-person-addresses-attributes-0-state").first
+  input_field.click
+  input_field.li(text: /Virginia/).click
   @browser.text_field(name: "person[addresses_attributes][0][zip]").set("20171")
 
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
@@ -283,14 +286,19 @@ When(/^I select a plan on the plan shopping page$/) do
 end
 
 Then(/^I should see the coverage summary page$/) do
-  @browser.element(id: /btn-continue/).wait_until_present
+  @browser.element(class: /interaction-click-control-purchase/).wait_until_present
   screenshot("summary_page")
   expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
 end
 
-When(/^I confirm on the coverage summary page$/) do
+When(/^I click on purchase button on the coverage summary page$/) do
   @browser.execute_script('$(".interaction-click-control-purchase").trigger("click")')
   #scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
+end
+
+And(/^I click on continue button on the purchase confirmation pop up$/) do
+  @browser.element(class: /interaction-click-control-continue/).wait_until_present
+  @browser.element(class: /interaction-click-control-continue/).click
 end
 
 Then(/^I should see the "my account" page$/) do
@@ -320,7 +328,10 @@ When(/^My employer publishes a plan year$/) do
   input_field.li(text: /C Corporation/).click
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").set("830 I St NE")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Washington")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][state]").set("DC")
+  input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-office-locations-attributes-0-address-attributes-state").first
+  input_field.click
+  input_field.li(text: /District of Columbia/).click
+  @browser.select_list(name: "organization[office_locations_attributes][0][address_attributes][state]").select("District of Columbia")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("20002")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("202")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("5551212")

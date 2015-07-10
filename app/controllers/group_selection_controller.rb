@@ -50,6 +50,7 @@ class GroupSelectionController < ApplicationController
     @family = @person.primary_family
     @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
     @coverage_household = @family.active_household.immediate_family_coverage_household
+    @hbx_enrollment = (@family.latest_household.try(:hbx_enrollments).active || []).last
   end
 
   def find_benefit_group(employee_role)
