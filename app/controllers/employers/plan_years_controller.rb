@@ -43,7 +43,6 @@ class Employers::PlanYearsController < ApplicationController
         plan_year.application_warnings.each_pair(){ |key, value| plan_year.errors.add(:base, value) }
       end
     end
-
     @plan_year = ::Forms::PlanYearForm.new(plan_year)
     @plan_year.benefit_groups.each do |benefit_group|
       case benefit_group.plan_option_kind
@@ -107,8 +106,8 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def force_publish
-    @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
-    @plan_year.force_publish!
+    plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
+    plan_year.force_publish!
     flash[:error] = "As submitted, this application is ineligible for coverage under the DC HealthLink exchange. If information that you provided leading to this determination is inaccurate, you have 30 days from this notice to request a review by DCHL officials."
     redirect_to employers_employer_profile_path(@employer_profile)
   end
