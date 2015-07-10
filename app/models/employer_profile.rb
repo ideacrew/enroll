@@ -49,8 +49,8 @@ class EmployerProfile
   scope :all_active,             ->{ where(:is_active => true) }
 
   scope :enrollments_applicant,  ->{  where(aasm_state: "applicant") }
-  scope :enrollments_active,     ->{ any_in(aasm_state: %w(applicant registered enrolling binder_pending binder_allocated enrolled)) }
-  scope :enrollments_inactive,   ->{ any_in(aasm_state: %w(suspended canceled terminated enrollment_ineligible)) }
+  scope :enrollments_active,     ->{ any_in(aasm_state: %w(applicant registered eligible binder_allocated enrolled)) }
+  scope :enrollments_inactive,   ->{ any_in(aasm_state: %w(suspended canceled ineligible)) }
 
 
   alias_method :is_active?, :is_active
@@ -228,7 +228,7 @@ class EmployerProfile
             "$and" => [
               {:transition_at.gte => (new_date.beginning_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
               {:transition_at.lte => (new_date.end_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
-              {:to_state => "enrollment_ineligible"}
+              {:to_state => "ineligible"}
             ]
           }
         }
@@ -260,7 +260,7 @@ class EmployerProfile
     state :applicant, initial: true
     state :registered                 # Employer has submitted valid application
     state :eligible                   # Employer has completed enrollment and is eligible for coverage
-
+    state :binder_paid
     state :enrolled                   # Employer has completed eligible enrollment and has active benefit coverage
     # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
     state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
@@ -283,6 +283,10 @@ class EmployerProfile
       transitions from: [:registered, :ineligible], to: :eligible, :after => :initialize_account
     end
 
+    event :binder_credited, :after => :record_transition do
+      transitions from: :eligible, to: :binder_paid
+    end
+
     event :enrollment_denied, :after => :record_transition do
       transitions from: [:registered, :enrolled], to: :applicant
     end
@@ -296,7 +300,7 @@ class EmployerProfile
     end
 
     event :benefit_canceled, :after => :record_transition do
-      transitions from: :registered, to: :applicant, :after => :cancel_benefit
+      transitions from: :eligible, to: :applicant, :after => :cancel_benefit
     end
 
   end
@@ -313,7 +317,7 @@ class EmployerProfile
   end
 
   def enrollment_ineligible_period_expired?
-    if latest_workflow_state_transition.to_state == "enrollment_ineligible"
+    if latest_workflow_state_transition.to_state == "ineligible"
       (latest_workflow_state_transition.transition_at.to_date + HbxProfile::ShopApplicationIneligiblePeriodMaximum) <= TimeKeeper.date_of_record
     else
       true

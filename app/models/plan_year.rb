@@ -124,7 +124,7 @@ class PlanYear
       errors.merge!({benefit_groups: "Every employee must be assigned to a benefit group defined for the published plan year"})
     end
 
-    if employer_profile.enrollment_ineligible?
+    if employer_profile.ineligible?
       errors.merge!({employer_profile: "This employer is ineligible to enroll for coverage at this time"})
     end
 

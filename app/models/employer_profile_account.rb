@@ -24,12 +24,17 @@ class EmployerProfileAccount
     premium_payments.order_by(:paid_on.desc).limit(1).first
   end
 
+  def self.find(id)
+    org = Organization.where(:"employer_profile.employer_profile_account._id" => id)
+    org.first.employer_profile.employer_profile_account
+  end
+
 
   ## TODO -- reconcile the need for history via embeds_many with the state machine functionality
   aasm do
     # Initial open enrollment period closed, first premium payment not received/processed
     state :binder_pending, initial: true
-    state :binder_paid, :after_enter => :enroll_employer
+    state :binder_paid, :after_enter => :credit_binder
 
     # Enrolled and premium payment up-to-date
     state :current
@@ -114,8 +119,8 @@ private
     self.aasm_state = last_aasm_state unless last_aasm_state.blank?
   end
 
-  def enroll_employer
-    employer_profile.enroll
+  def credit_binder
+    employer_profile.binder_credited!
   end
 
   def cancel_benefit
