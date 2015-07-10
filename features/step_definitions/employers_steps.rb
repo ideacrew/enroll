@@ -390,7 +390,6 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.text_field(name: "plan_year[msp_count]").set("3")
   # Benefit Group
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
   elected_field = @browser.div(class: /selectric-wrapper/, text: /Select Plan Offerings/)
   elected_field.click
   elected_field.li(text: /All plans from a given carrier/).click
@@ -409,8 +408,6 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').first.set(true)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').first.set(false)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_offered').first.set(false)
-  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_offered').first.set(false)
-  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_5_offered').first.set(false)
   screenshot("employer_add_plan_year_info")
   @browser.button(value: /Create Plan Year/).click
 end
