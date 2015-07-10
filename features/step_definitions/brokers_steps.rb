@@ -41,14 +41,16 @@ And(/^I should see a second fieldset to enter broker agency information$/) do
 end
 
 And(/^I should see a third fieldset to enter more office location information$/) do
-  @browser.text_field(class: /interaction-field-control-office-location-address-address-1/).set("623a Spalding Ct")
-  @browser.text_field(class: /interaction-field-control-office-location-address-address-2/).set("Suite 200")
-  @browser.text_field(class: /interaction-field-control-office-location-address-city/).set("McLean")
-  @browser.text_field(class: /interaction-field-control-office-location-address-state/).set("VA")
-  @browser.text_field(class: /interaction-field-control-office-location-address-zip/).set("22108")
-  @browser.text_field(class: /interaction-field-control-office-location-phone-area-code/).set("202")
-  @browser.text_field(class: /interaction-field-control-office-location-phone-number/).set("1110000")
-  @browser.text_field(class: /interaction-field-control-office-location-phone-extension/).set("1111")
+  enter_office_location({
+    address1: "623a Spalding Ct",
+    address2: "Suite 200",
+    city: "McLean",
+    state: "Virginia",
+    zip: "22180",
+    phone_area_code: "202",
+    phone_number: "1110000",
+    phone_extension: "1111"
+    })
 end
 
 When(/^I click on create broker agency button$/) do
