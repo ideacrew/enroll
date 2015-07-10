@@ -33,6 +33,7 @@ class GroupSelectionController < ApplicationController
       elsif change_plan.present?
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: change_plan)
       else
+        hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id)
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id)
       end
     else
