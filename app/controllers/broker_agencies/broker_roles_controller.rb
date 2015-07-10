@@ -3,7 +3,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   before_action :assign_filter_and_agency_type
 
   def new_broker
-    @person = Forms::BrokerCandidate.new
+    @broker_candidate = Forms::BrokerCandidate.new
 
     respond_to do |format|
       format.html { render 'new' }
@@ -12,7 +12,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   def new_staff_member
-    @person = Forms::BrokerCandidate.new
+    @broker_candidate = Forms::BrokerCandidate.new
 
     respond_to do |format|
       format.js
@@ -35,8 +35,8 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
 
   def create
     if params[:person].present?
-      @person = ::Forms::BrokerCandidate.new(applicant_params)
-      if @person.save
+      @broker_candidate = ::Forms::BrokerCandidate.new(applicant_params)
+      if @broker_candidate.save
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
         redirect_to broker_registration_path
       else

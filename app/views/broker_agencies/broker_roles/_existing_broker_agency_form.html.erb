@@ -1,6 +1,6 @@
 <div class="container top-pd">
-<%= form_for @person, as: :person, url: {action: "create"} do |f| %>
-<%= render 'shared/error_messages', :object => @person %>
+<%= form_for @broker_candidate, as: :person, url: {action: "create"} do |f| %>
+<%= render 'shared/error_messages', :object => @broker_candidate %>
 <div class="container">
   <%= f.hidden_field :broker_applicant_type, value: @filter %>
   <div class="row">
