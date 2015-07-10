@@ -20,6 +20,6 @@ RSpec.describe "employers/census_employees/_details.html.erb" do
   end
 
   it "should show waiver" do
-    expect(rendered).to match /Waiver/
+    expect(rendered).to match /Coverage Waived/
   end
 end

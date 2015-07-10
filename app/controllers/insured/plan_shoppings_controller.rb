@@ -36,11 +36,13 @@ class Insured::PlanShoppingsController < ApplicationController
     person = current_user.person
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
 
-    if hbx_enrollment.waive_coverage!
-      redirect_to home_consumer_profiles_path
+    if (hbx_enrollment.shopping? or hbx_enrollment.coverage_selected?) and hbx_enrollment.waive_coverage!
+      hbx_enrollment.update(waiver_reason: params.require(:waiver_reason))
+      flash[:notice] = "Waive Successful"
     else
-      redirect_to :back
+      flash[:alert] = "Waive Failure"
     end
+    redirect_to home_consumer_profiles_path
   end
 
   def terminate

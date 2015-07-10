@@ -1,0 +1,20 @@
+<div class="modal fade" id="waive_confirm" tabindex="-1" role="dialog" aria-labelledby="waiveConfirm" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Select Waive Reason</h4>
+      </div>
+      <%= form_tag(waive_insured_plan_shopping_path(@enrollment.id), method: :post) do %>
+        <div class="modal-body">
+          <%= select_tag "waiver_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: "Please select waive reason" %>
+          <%= hidden_field "plan_id", value: @plan.id  %>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <%= submit_tag "Submit", class: 'btn btn-primary' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

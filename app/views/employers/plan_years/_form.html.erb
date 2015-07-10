@@ -3,7 +3,9 @@
         <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
           <% if @plan_year.errors.any? %>
             <div class="alert-plan-year alert-error">
+              <% if @just_a_warning == false %>
               <h4><%= pluralize(@plan_year.errors.count, "error") %> prohibited this plan year from being saved:</h4>
+              <% end %>
               <ul>
                 <% @plan_year.errors.delete(:benefit_groups) %>
                 <% @plan_year.errors.full_messages.each do |msg| %>

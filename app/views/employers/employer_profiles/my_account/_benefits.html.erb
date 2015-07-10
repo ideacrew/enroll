@@ -15,13 +15,15 @@
                 <h4 class="title-inline">Plan Year - <%= plan_year.start_on.to_date.year %></h4>
                 <div class="pull-right bottom-mgn-xs">
                   <% if plan_year.draft? && @current_plan_year.nil? %>
-                    <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year) ,method: :post, class: "btn btn-select"%>
+                    <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-select" %>
                     <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-select"%>
                   <% else %>
-                    <%= plan_year.aasm_state.to_s %>
+                    <%= plan_year.aasm_state.to_s.humanize %>
                   <% end %>
                 </div>
               </div>
+             
+              <%= render "employers/plan_years/publish_modal", plan_year: plan_year %>
               
               <div class="table-responsive unmgn plan-years-content">
                 <table class="table table-wrapper table-condensed">
