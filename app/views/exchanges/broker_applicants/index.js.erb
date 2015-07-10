@@ -1,1 +1,7 @@
-set_tab_content("<%= escape_javascript render "index"%>")
+if ($("#broker_applicants_roster").length > 0) {
+  $('#broker_applicants').html("<%= escape_javascript(render "applicants") %>");
+}
+else {
+  set_tab_content("<%= escape_javascript render "index" %>")
+  enableBrokerApplicantFilters();
+}

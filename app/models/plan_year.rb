@@ -399,7 +399,7 @@ class PlanYear
 
 private
 
-  # attempted to publish but plan year violates publishing plan model integrity
+    # attempted to publish but plan year violates publishing plan model integrity
   def report_unpublishable
     application_warnings.each_pair(){ |key, value| errors.add(key, value) }
   end
