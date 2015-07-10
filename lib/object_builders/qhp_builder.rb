@@ -72,6 +72,7 @@ class QhpBuilder
       nationwide_str = (@qhp.national_network.blank? ? "" : @qhp.national_network)
       nationwide_value = nationwide_str.downcase.strip == "yes"
       up_plan.update_attributes(
+          name: @qhp.plan_marketing_name,
           plan_type: @qhp.plan_type.downcase,
           deductible: @qhp.qhp_cost_share_variance.qhp_deductable.in_network_tier_1_individual,
           family_deductible: @qhp.qhp_cost_share_variance.qhp_deductable.in_network_tier_1_family,
