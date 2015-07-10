@@ -28,6 +28,17 @@ class Ability
     end
     if user.has_role? :broker
       can :read, :all
+      can :update, CensusEmployee
+      can :delink, CensusEmployee do |employee|
+        employee.employee_role_linked?
+      end
+    end
+    if user.has_role? :broker_agency_staff
+      can :read, :all
+      can :update, :all
+      can :delink, CensusEmployee do |employee|
+        employee.employee_role_linked?
+      end
     end
     if user.has_role? :consumer
       can :read, :all
