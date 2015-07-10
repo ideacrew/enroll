@@ -11,9 +11,10 @@
           <% title_value = f.object.title.present? ? f.object.title : "#{Time.now.year} Employer Benefits" %>
           <%= f.text_field :title, class: "floatlabel form-control", value: title_value, required: true, placeholder: 'TITLE' %>
         </div>
-        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd" data-toggle="tooltip" data-placement="top" title="For dates of hire on the 1st day of the month, coverage would start on the date of hire">
+        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd benefit-group-offset" data-toggle="tooltip" data-placement="top" title="For dates of hire on the 1st day of the month, coverage would start on the date of hire">
           <!-- Offset :  -->
-          <%= f.select(:effective_on_offset, options_for_select([["date of hire", 0], ["30 days after date of hire", 30], ["60 days after date of hire", 60]], selected: f.object.effective_on_offset), {:include_blank => "1st day of the month following:"}, { :class => ''}) %>
+          <label class="title">1st day of the month following:</label>
+          <%= f.select(:effective_on_offset, options_for_select([["date of hire", 0], ["30 days after date of hire", 30], ["60 days after date of hire", 60]], selected: f.object.effective_on_offset), {:include_blank => true}, { :class => ''}) %>
         </div>
       </div>
 
