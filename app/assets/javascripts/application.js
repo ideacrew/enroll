@@ -40,6 +40,11 @@ $(document).ready(function () {
 
   $('[data-toggle="tooltip"]').tooltip();
 
+  $('a.back').click(function(){
+    parent.history.back();
+    return false;
+  });
+
   semantic_class(); //Calls semantic class on all input fields & buttons (eg. interaction-click-control-continue)
 
     $(document).on("click", "[class~='qle-date-picker']", function(e) {

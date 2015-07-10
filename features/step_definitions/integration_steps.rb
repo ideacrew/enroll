@@ -286,14 +286,19 @@ When(/^I select a plan on the plan shopping page$/) do
 end
 
 Then(/^I should see the coverage summary page$/) do
-  @browser.element(id: /btn-continue/).wait_until_present
+  @browser.element(class: /interaction-click-control-purchase/).wait_until_present
   screenshot("summary_page")
   expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
 end
 
-When(/^I confirm on the coverage summary page$/) do
+When(/^I click on purchase button on the coverage summary page$/) do
   @browser.execute_script('$(".interaction-click-control-purchase").trigger("click")')
   #scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
+end
+
+And(/^I click on continue button on the purchase confirmation pop up$/) do
+  @browser.element(class: /interaction-click-control-continue/).wait_until_present
+  @browser.element(class: /interaction-click-control-continue/).click
 end
 
 Then(/^I should see the "my account" page$/) do
