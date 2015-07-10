@@ -69,6 +69,14 @@ class HbxEnrollment
     event :select_coverage do
       transitions from: :shopping, to: :coverage_selected, after: :propogate_selection
     end
+
+    event :terminate_coverage do
+      transitions from: :coverage_selected, to: :coverage_terminated, after: :propogate_terminate
+    end
+  end
+
+  def propogate_terminate
+    self.plan_id = nil
   end
 
   def propogate_waiver

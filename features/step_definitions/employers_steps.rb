@@ -41,7 +41,9 @@ And(/^I should see an initial form to enter information about my Employer and my
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").set("100 North Street")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_2]").set("Suite 990")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Washington")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][state]").set("DC")
+  input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-office-locations-attributes-0-address-attributes-state").first
+  input_field.click
+  input_field.li(text: /District of Columbia/).click
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("20002")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("678")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("1230987")
@@ -211,7 +213,7 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.li(text: /home/).click
   @browser.text_field(class: /interaction-field-control-census-employee-email-attributes-address/).set("trey.john@dc.gov")
 
-  @browser.a(text: /Add Dependent/).click
+  @browser.a(text: /Add Family Member/).click
   @browser.div(id: /dependent_info/).wait_until_present
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mary")
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_middle_name/).set("K")
@@ -388,7 +390,6 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.text_field(name: "plan_year[msp_count]").set("3")
   # Benefit Group
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
   elected_field = @browser.div(class: /selectric-wrapper/, text: /Select Plan Offerings/)
   elected_field.click
   elected_field.li(text: /All plans from a given carrier/).click
@@ -407,8 +408,6 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').first.set(true)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').first.set(false)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_offered').first.set(false)
-  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_offered').first.set(false)
-  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_5_offered').first.set(false)
   screenshot("employer_add_plan_year_info")
   @browser.button(value: /Create Plan Year/).click
 end
@@ -449,7 +448,7 @@ When(/^I enter combined filter in plan selection page$/) do
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("1000")
   @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("3900")
   @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("5")
-  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250") 
+  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250")
   @browser.element(class: /apply-btn/, text: /Apply/).click
 end
 
