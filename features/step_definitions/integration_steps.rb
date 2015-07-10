@@ -212,6 +212,8 @@ end
 
 When(/^I click delete on baby Soren$/) do
   scroll_then_click(@browser.form(id: 'edit_dependent').a())
+  @browser.div(id: 'remove_confirm').wait_until_present
+  scroll_then_click(@browser.a(class: /confirm/))
   @browser.button(text: /Confirm Member/).wait_while_present
 end
 
