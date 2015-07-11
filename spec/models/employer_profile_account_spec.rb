@@ -1,21 +1,25 @@
 require 'rails_helper'
 
 describe EmployerProfileAccount, type: :model, dbclean: :after_each do
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(Date.current.next_month.beginning_of_month)
+    # TimeKeeper.instance.push_date_of_record
+  end
 
   let(:open_enrollment_start_on)    { TimeKeeper.date_of_record }
-  let(:open_enrollment_end_on)      { open_enrollment_end_on + HbxProfile::ShopOpenEnrollmentPeriodMinimum.days - 1.day }
+  let(:open_enrollment_end_on)      { open_enrollment_start_on + HbxProfile::ShopOpenEnrollmentPeriodMinimum.days - 1.day }
   let(:start_on)                    { open_enrollment_start_on + 1.month }
   let(:end_on)                      { start_on + 1.year - 1.day }
 
   let(:employer_profile)        { FactoryGirl.create(:employer_profile) }
-  let(:benefit_group)           { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
-  let(:plan_year)               { FactoryGirl.create(:plan_year, 
+  let(:plan_year)               { FactoryGirl.create(:plan_year,
                                     employer_profile: employer_profile,
                                     start_on: start_on,
                                     end_on: end_on,
                                     open_enrollment_start_on: open_enrollment_start_on,
                                     open_enrollment_end_on: open_enrollment_end_on
                                   ) }
+  let(:benefit_group)           { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
 
   let(:binder_payment_due_on)   { open_enrollment_end_on + 2.days }
   let(:next_premium_due_on)     { binder_payment_due_on }
@@ -27,17 +31,6 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
       next_premium_due_on: next_premium_due_on,
       next_premium_amount: next_premium_amount
     }
-  end
-
-  before do
-    TimeKeeper.set_date_of_record_unprotected!(Date.current.end_of_month + 1.day)
-    # TimeKeeper.instance.push_date_of_record
-  end
-
-  it "shouldn't puke" do
-    binding.pry
-    EmployerProfileAccount.create(**valid_params).not_to raise_error
-    nil
   end
 
   context ".new" do
