@@ -131,7 +131,7 @@ class HbxEnrollment
 
   def can_complete_shopping?(t_date = Date.today)
     return false unless benefit_group
-    benefit_group.within_new_hire_window?(employee_role.hired_on)
+    benefit_group.within_new_hire_window?(employee_role.hired_on) || household.family.is_eligible_to_enroll?
   end
 
   def humanized_dependent_summary
@@ -194,4 +194,25 @@ class HbxEnrollment
     end
     return found_value
   end
+
+  def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
+    id_list = benefit_group_assignments.collect(&:id)
+
+    if id_list.size == 1
+      families = Family.where(:"households.hbx_enrollments.benefit_group_id" => id_list.first)
+    else
+      families = Family.any_in(:"households.hbx_enrollments.benefit_group_id" => id_list )
+    end
+
+    enrollment_list = []
+    families.each do |family|
+      family.households.each do |household|
+        household.hbx_enrollments.each do |enrollment|
+          enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_id)
+        end
+      end
+    end
+    enrollment_list
+  end
+
 end

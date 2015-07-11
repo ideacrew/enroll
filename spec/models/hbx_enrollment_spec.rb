@@ -55,12 +55,21 @@ describe HbxEnrollment do
     let(:fte_count)                               { blue_collar_employee_count + white_collar_employee_count }
     let(:employer_profile)                        { FactoryGirl.create(:employer_profile) }
 
+    let(:plan_year_start_on)                      { Date.current.next_month.end_of_month + 1.day }
+    let(:plan_year_end_on)                        { (plan_year_start_on + 1.year) - 1.day }
+
     let(:blue_collar_benefit_group)               { FactoryGirl.build(:benefit_group, title: "blue collar") }
-    let(:blue_collar_benefit_group_assignment)    { BenefitGroupAssignment.new(benefit_group: blue_collar_benefit_group, start_on: Date.current.beginning_of_month )}
+    let(:blue_collar_benefit_group_assignment)    { BenefitGroupAssignment.new(benefit_group: blue_collar_benefit_group, start_on: plan_year_start_on )}
 
     let(:white_collar_benefit_group)              { FactoryGirl.build(:benefit_group, title: "white collar") }
-    let(:white_collar_benefit_group_assignment)   { BenefitGroupAssignment.new(benefit_group: white_collar_benefit_group, start_on: Date.current.beginning_of_month )}
+    let(:white_collar_benefit_group_assignment)   { BenefitGroupAssignment.new(benefit_group: white_collar_benefit_group, start_on: plan_year_start_on )}
+
+    let(:all_benefit_group_assignments)           { [blue_collar_benefit_group, white_collar_benefit_group] }
     let(:plan_year)                               { FactoryGirl.create(:plan_year, 
+                                                      start_on: plan_year_start_on,
+                                                      end_on: plan_year_end_on,
+                                                      open_enrollment_start_on: Date.current,
+                                                      open_enrollment_end_on: Date.current + 5.days,
                                                       employer_profile: employer_profile,
                                                       benefit_groups: [blue_collar_benefit_group, white_collar_benefit_group]
                                                     )}
@@ -154,8 +163,48 @@ describe HbxEnrollment do
       end
 
       context "and families either select plan or waive coverage" do
+        let!(:blue_collar_enrollment_waivers) do
+          family = blue_collar_families.first
+          employee_role = family.primary_family_member.person.employee_roles.first
+          election = HbxEnrollment.create_from(
+              employee_role: employee_role,
+              coverage_household: family.households.first.coverage_households.first, 
+              benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
+            )
 
+          election.waive_coverage
+          election.household.family.save!
+          election.to_a
+        end
 
+        let!(:blue_collar_enrollments) do
+          enrollments = blue_collar_families[1..(blue_collar_employee_count - 1)].collect do |family|
+            employee_role = family.primary_family_member.person.employee_roles.first
+            # benefit_group = employee_role.census_employee.active_benefit_group_assignment.benefit_group
+            election = HbxEnrollment.create_from(
+                employee_role: employee_role,
+                coverage_household: family.households.first.coverage_households.first, 
+                benefit_group: benefit_group
+              )
+            election.plan = benefit_group.elected_plans.sample
+# binding.pry
+            election.select_coverage if election.can_complete_shopping?
+            election.household.family.save!
+            election
+          end
+          enrollments
+        end
+
+        let(:white_collar_enrollment_waivers) do
+        end
+
+        let(:white_collar_enrollments) do
+        end
+
+        it "should find all employees who have waived or selected plans" do
+          expect(HbxEnrollment.find_by_benefit_group_assignments(all_benefit_group_assignments).size).to eq (blue_collar_employee_count + white_collar_employee_count)
+          expect(HbxEnrollment.find_by_benefit_group_assignments(all_benefit_group_assignments).first).to eq blue_collar_enrollment_waivers.first
+        end
       end
 
     end
