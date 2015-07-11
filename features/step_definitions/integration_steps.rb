@@ -26,6 +26,19 @@ def scroll_then_click(element)
   element
 end
 
+def enter_office_location(location)
+  @browser.text_field(class: /interaction-field-control-office-location-address-address-1/).set(location[:address1])
+  @browser.text_field(class: /interaction-field-control-office-location-address-address-2/).set(location[:address2])
+  @browser.text_field(class: /interaction-field-control-office-location-address-city/).set(location[:city])
+  input_field = @browser.select(name: /state/).divs(xpath: "ancestor::div")[-2]
+  input_field.click
+  input_field.li(text: /#{location[:state]}/).click
+  @browser.text_field(class: /interaction-field-control-office-location-address-zip/).set(location[:zip])
+  @browser.text_field(class: /interaction-field-control-office-location-phone-area-code/).set(location[:phone_area_code])
+  @browser.text_field(class: /interaction-field-control-office-location-phone-number/).set(location[:phone_number])
+  @browser.text_field(class: /interaction-field-control-office-location-phone-extension/).set(location[:phone_extension])
+end
+
 Before "@watir" do
   extend WatirScreenshots
   @browser = Watir::Browser.new :chrome, switches: ["--test-type"]

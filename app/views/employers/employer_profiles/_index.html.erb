@@ -30,7 +30,9 @@
               <td><%= link_to er.legal_name, employers_employer_profile_path(er) %></td>
               <td><%= er.roster_size %></td>
               <td><%= er.broker_agency_profile.try(:legal_name) %></td>
+              <%- if @profile %>
               <td><%= link_to 'Send Secure Message'.html_safe, new_employers_inbox_path(id: er.id, profile_id: @profile._id, to: er.legal_name), class: "btn btn-default", remote: true %></td>
+              <% end %>
             </tr>
           <% end %>
         </tbody>

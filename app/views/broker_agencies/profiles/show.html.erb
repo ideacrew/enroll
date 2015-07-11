@@ -32,20 +32,16 @@
             <%= render "office_locations", office_locations: @broker_agency_profile.organization.office_locations %>
       </div>
     </div>
-<!--       <div aria-labelledby="families-tab" id="families" class="tab-pane fade" role="tabpanel">
-        <div class="container">
-          <div class="row">
-            <%#= render 'insured/families/index' %>
-          </div>
-      </div>
-    </div> -->
-<!--     <div aria-labelledby="employers-tab" id="employers" class="tab-pane fade" role="tabpanel">
+
+    <div aria-labelledby="employers-tab" id="employers" class="tab-pane fade" role="tabpanel">
       <div class="container">
         <div class="row">
-          <%#= render 'employers/employer_profiles/index' %>
+          <%= render 'employers/employer_profiles/index' %>
         </div>
       </div>
-    </div> -->
+    </div>
+
+
     <div aria-labelledby="inbox-tab" id="inbox" class="container top-pd bottom-pd tab-pane fade" role="tabpanel">
       <div class="container">
         <div class="row">

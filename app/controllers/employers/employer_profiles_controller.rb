@@ -2,15 +2,21 @@ class Employers::EmployerProfilesController < ApplicationController
   before_action :find_employer, only: [:show, :destroy, :inbox]
   before_action :check_admin_staff_role, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
-  before_action :find_hbx_profile, only: [:index]
 
   def index
     @q = params.permit(:q)[:q]
     @orgs = Organization.search(@q).exists(employer_profile: true)
+ 
+    if current_user.person.try(:broker_role)
+      broker_id = current_user.person.broker_role.broker_agency_profile_id.to_s
+      profile = BrokerAgencyProfile.find(broker_id)
+      @orgs = Organization.where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => profile._id})
+    end
     @page_alphabets = page_alphabets(@orgs, "legal_name")
     page_no = cur_page_no(@page_alphabets.first)
     @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
 
+    @profile = find_mailbox_provider
     @employer_profiles = @organizations.map {|o| o.employer_profile}
   end
 
@@ -138,12 +144,19 @@ class Employers::EmployerProfilesController < ApplicationController
       end
     end
 
-    def find_hbx_profile
-      @profile = current_user.person.hbx_staff_role.hbx_profile
-    end
+   def find_mailbox_provider
+     hbx_staff = current_user.person.hbx_staff_role
+     if hbx_staff
+       profile = current_user.person.hbx_staff_role.hbx_profile
+     else
+       broker_id = current_user.person.broker_role.broker_agency_profile_id.to_s
+       profile = BrokerAgencyProfile.find(broker_id)
+     end
+     return profile
+   end
 
     def check_admin_staff_role
-      if current_user.has_hbx_staff_role?
+      if current_user.has_hbx_staff_role? || current_user.has_broker_agency_staff_role?
       elsif current_user.has_employer_staff_role?
         redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
       else

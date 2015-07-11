@@ -65,8 +65,13 @@
   <div class="col-md-6 col-sm-6 col-xs-12">
     <h4>Plan</h4>
     <div class="form-border">
-      <p><%= benefit_group_assignment.try(:benefit_group).try(:title) %></p>
-      <%= "Waiver" if benefit_group_assignment.try(:coverage_waived?) %>
+      <p>Benefit Group: <%= benefit_group_assignment.try(:benefit_group).try(:title) %></p>
+      <% if benefit_group_assignment.try(:coverage_waived?) %>
+        <p>Enrollment Status: Coverage Waived</p>
+        <p>Waiver Reason: <%= benefit_group_assignment.try(:hbx_enrollment).try(:waiver_reason) %></p>
+      <% elsif benefit_group_assignment.try(:coverage_selected?) %>
+        <p>Plan Name: <%= benefit_group_assignment.try(:hbx_enrollment).try(:plan).try(:name) %></p>
+      <% end %>
     </div>
   </div>
 </div>
