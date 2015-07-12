@@ -11,7 +11,6 @@ class PlanYear
 
   field :open_enrollment_start_on, type: Date
   field :open_enrollment_end_on, type: Date
-  # field :published, type: Boolean
 
   # Number of full-time employees
   field :fte_count, type: Integer, default: 0
@@ -24,7 +23,6 @@ class PlanYear
 
   # Workflow attributes
   field :aasm_state, type: String, default: :draft
-  field :aasm_date, type: Date
 
   embeds_many :benefit_groups, cascade_callbacks: true
   embeds_many :workflow_state_transitions, as: :transitional
@@ -35,7 +33,8 @@ class PlanYear
 
   validate :open_enrollment_date_checks
 
-  scope :published, ->{ where(aasm_state: "published") }
+  scope :not_yet_active, ->{ any_in(aasm_state: %w(published enrolling enrolled)) }
+  scope :published, ->{ any_in(aasm_state: %w(published enrolling enrolled active suspended)) }
 
   def parent
     raise "undefined parent employer_profile" unless employer_profile?
@@ -200,7 +199,6 @@ class PlanYear
   end
 
   def is_open_enrollment_closed?
-    binding.pry
     open_enrollment_end_on.end_of_day < TimeKeeper.date_of_record.beginning_of_day
   end
 
@@ -401,7 +399,7 @@ class PlanYear
     # Submit plan year application
     event :publish, :after => :record_transition do
       transitions from: :draft, to: :draft,     :guard => :is_application_unpublishable?, :after => :report_unpublishable
-      transitions from: :draft, to: :enrolling, :guard => [:is_application_valid?, :is_event_date_valid?]
+      transitions from: :draft, to: :enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
     end
@@ -490,6 +488,10 @@ class PlanYear
     workflow_state_transitions.order_by(:'transition_at'.desc).limit(1).first
   end
 
+  def is_before_start?
+    TimeKeeper.date_of_record.end_of_day < start_on
+  end
+
 private
   def is_event_date_valid?
     today = TimeKeeper.date_of_record
@@ -508,7 +510,7 @@ private
   end
 
   def is_plan_year_end?
-    TimeKeeper.date_of_record.end_of_day == end_date
+    TimeKeeper.date_of_record.end_of_day == end_on
   end
 
   def record_transition
@@ -533,7 +535,7 @@ private
   end
 
   def within_review_period?
-    (aasm_date + HbxProfile::ShopApplicationAppealPeriodMaximum) > TimeKeeper.date_of_record
+    (latest_workflow_state_transition.transition_at.end_of_day + HbxProfile::ShopApplicationAppealPeriodMaximum) > TimeKeeper.date_of_record
   end
 
   def duration_in_days(duration)

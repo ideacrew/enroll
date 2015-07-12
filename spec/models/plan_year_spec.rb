@@ -550,8 +550,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           context "and the employer doesn't request eligibility review" do
             context "and 90 days have elapsed since the ineligible application was submitted" do
               before do
-                TimeKeeper.set_date_of_record_unprotected!(submit_date + 90.days)
-                TimeKeeper.instance.push_date_of_record
+                TimeKeeper.set_date_of_record(submit_date + 90.days)
               end
 
               it "should transition employer profile to applicant status" do
@@ -563,7 +562,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           context "and the applicant requests eligibility review" do
             context "and 30 days or less have elapsed since application was submitted" do
               before do
-                TimeKeeper.set_date_of_record_unprotected!(submit_date + 10.days)
+                TimeKeeper.set_date_of_record(submit_date + 10.days)
                 workflow_plan_year_with_benefit_group.request_eligibility_review!
               end
 
@@ -594,7 +593,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
             context "and more than 30 days have elapsed since application was submitted" do
               before do
-                TimeKeeper.set_date_of_record_unprotected!(submit_date + 31.days)
+                TimeKeeper.set_date_of_record(submit_date + 31.days)
               end
 
               it "should not be able to request eligibility review" do
@@ -603,8 +602,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
               context "and 90 days have elapsed since the ineligible application was submitted" do
                 before do
-                  TimeKeeper.set_date_of_record_unprotected!(submit_date + HbxProfile::ShopApplicationIneligiblePeriodMaximum)
-                  TimeKeeper.instance.push_date_of_record
+                  TimeKeeper.set_date_of_record(submit_date + HbxProfile::ShopApplicationIneligiblePeriodMaximum)
                 end
 
                 it "should transition employer to applicant status" do
@@ -620,12 +618,12 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       # Proceed with enrollment
       context "and employer submits a valid plan year application with today as start open enrollment" do
         before do
-          TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
+          TimeKeeper.set_date_of_record(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
           workflow_plan_year_with_benefit_group.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
           workflow_plan_year_with_benefit_group.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
           workflow_plan_year_with_benefit_group.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
           workflow_plan_year_with_benefit_group.end_on = workflow_plan_year_with_benefit_group.start_on + 1.year - 1.day
-          TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record + 1.day)
+          TimeKeeper.set_date_of_record(TimeKeeper.date_of_record + 1.day)
           workflow_plan_year_with_benefit_group.publish!
         end
 
@@ -635,7 +633,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         context "and today is the day following close of open enrollment" do
           before do
-            TimeKeeper.set_date_of_record_unprotected!(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
+            TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
           end
 
           context "and enrollment non-owner participation minimum not met" do
@@ -650,8 +648,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               #   owner_census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
               #   owner_census_employee.save!
               # end
-              TimeKeeper.set_date_of_record_unprotected!(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
-              TimeKeeper.instance.push_date_of_record
+              TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
               # workflow_plan_year_with_benefit_group.advance_enrollment_date
             end
 
@@ -745,7 +742,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #
   #   context "a plan year application is submitted with tomorrow as start open enrollment" do
   #     before do
-  #       TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
+  #       TimeKeeper.set_date_of_record(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
   #       plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
   #       plan_year.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
   #       plan_year.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
@@ -760,12 +757,12 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #
   #   context "and employer submits a valid plan year application with today as start open enrollment" do
   #     before do
-  #       TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
+  #       TimeKeeper.set_date_of_record(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
   #       plan_year.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
   #       plan_year.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
   #       plan_year.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
   #       plan_year.end_on = plan_year.start_on + 1.year - 1.day
-  #       TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record + 1.day)
+  #       TimeKeeper.set_date_of_record(TimeKeeper.date_of_record + 1.day)
   #       plan_year.publish!
   #     end
   #
@@ -777,7 +774,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #
   #       context "and today is the day following close of open enrollment" do
   #         before do
-  #           TimeKeeper.set_date_of_record_unprotected!(plan_year.open_enrollment_end_on + 1.day)
+  #           TimeKeeper.set_date_of_record(plan_year.open_enrollment_end_on + 1.day)
   #         end
   #
   #         context "and employer's enrollment is non-compliant" do
@@ -1204,12 +1201,12 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #     context "and all application elements are valid and it is published" do
   #       before do
   #         @starting_date_of_record = TimeKeeper.date_of_record
-  #         TimeKeeper.set_date_of_record_unprotected!(plan_year.open_enrollment_start_on - 5.days)
+  #         TimeKeeper.set_date_of_record(plan_year.open_enrollment_start_on - 5.days)
   #         plan_year.publish
   #       end
   #
   #       after do
-  #         TimeKeeper.set_date_of_record_unprotected!(@starting_date_of_record)
+  #         TimeKeeper.set_date_of_record(@starting_date_of_record)
   #       end
   #
   #       it "plan year should publish" do
@@ -1250,7 +1247,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #   end
   #
   #   it "should failure when current date more than open_enrollment_latest_start_on" do
-  #     TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + 14.days)
+  #     TimeKeeper.set_date_of_record(TimeKeeper.date_of_record.beginning_of_month + 14.days)
   #     start_on = (TimeKeeper.date_of_record + 1.month).beginning_of_month
   #     rsp = PlanYear.check_start_on(start_on)
   #     expect(rsp[:result]).to eq "failure"
@@ -1268,7 +1265,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #     let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
   #     let(:expected_start_on) { Date.new(2015, 8, 1) }
   #     before do
-  #       TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
   #     end
   #
   #     it "should suggest correct open enrollment start" do
@@ -1290,7 +1287,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #     let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
   #     let(:expected_start_on) { Date.new(2015, 8, 1) }
   #     before do
-  #       TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
   #     end
   #
   #     it "should suggest correct open enrollment start" do
@@ -1315,7 +1312,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #     let(:expected_open_enrollment_start_on) { date_of_record_to_use }
   #     let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
   #     before do
-  #       TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
   #     end
   #
   #     it "should suggest correct open enrollment start" do
@@ -1340,7 +1337,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #     let(:expected_open_enrollment_start_on) { date_of_record_to_use }
   #     let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
   #     before do
-  #       TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
   #     end
   #
   #     it "should suggest correct open enrollment start" do
@@ -1365,7 +1362,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #     let(:expected_open_enrollment_start_on) { date_of_record_to_use }
   #     let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
   #     before do
-  #       TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
   #     end
   #
   #     it "should suggest correct open enrollment start" do
@@ -1387,7 +1384,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #     let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
   #     let(:expected_start_on) { Date.new(2015, 9, 1) }
   #     before do
-  #       TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
   #     end
   #
   #     it "should suggest correct open enrollment start" do
@@ -1409,7 +1406,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #     let(:expected_open_enrollment_end_on) { Date.new(2015, 8, 10) }
   #     let(:expected_start_on) { Date.new(2015, 9, 1) }
   #     before do
-  #       TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
   #     end
   #
   #     it "should suggest correct open enrollment start" do
@@ -1437,14 +1434,14 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #
   # context "map binder_payment_due_date" do
   #   it "in interval of map" do
-  #     binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,9,1)))
-  #     expect(binder_payment_due_date).to eq TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,8,12))
+  #     binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(TimeKeeper.set_date_of_record(Date.new(2015,9,1)))
+  #     expect(binder_payment_due_date).to eq TimeKeeper.set_date_of_record(Date.new(2015,8,12))
   #   end
   #
   #   it "out of map" do
-  #     binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(TimeKeeper.set_date_of_record_unprotected!(Date.new(2017,9,1)))
+  #     binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(TimeKeeper.set_date_of_record(Date.new(2017,9,1)))
   #
-  #     expect(binder_payment_due_date).to eq PlanYear.shop_enrollment_timetable(TimeKeeper.set_date_of_record_unprotected!(Date.new(2017,9,1)))[:binder_payment_due_date]
+  #     expect(binder_payment_due_date).to eq PlanYear.shop_enrollment_timetable(TimeKeeper.set_date_of_record(Date.new(2017,9,1)))[:binder_payment_due_date]
   #   end
   # end
   #
@@ -1454,7 +1451,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #     date2 = date1.next_month
   #     dates = [date1, date2].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
   #
-  #     TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 15))
+  #     TimeKeeper.set_date_of_record(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 15))
   #     expect(PlanYear.calculate_start_on_options).to eq dates
   #   end
   #
@@ -1464,7 +1461,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   #     date3 = date2.next_month
   #     dates = [date1, date2, date3].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
   #
-  #     TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 2))
+  #     TimeKeeper.set_date_of_record(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 2))
   #     expect(PlanYear.calculate_start_on_options).to eq dates
   #   end
   # end

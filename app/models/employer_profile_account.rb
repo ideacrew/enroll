@@ -29,37 +29,48 @@ class EmployerProfileAccount
     org.first.employer_profile.employer_profile_account
   end
 
+  def latest_workflow_state_transition
+    workflow_state_transitions.order_by(:'transition_at'.desc).limit(1).first
+  end
 
-  ## TODO -- reconcile the need for history via embeds_many with the state machine functionality
+  def first_day_of_month?
+    TimeKeeper.date_of_record.day == 1
+  end
+
+  # TODO: implement this
+  def notify_employees
+  end
+
   aasm do
     # Initial open enrollment period closed, first premium payment not received/processed
     state :binder_pending, initial: true
     state :binder_paid, :after_enter => :credit_binder
 
-    # Enrolled and premium payment up-to-date
-    state :current
-    state :invoiced
+    state :current                                           # Premium payment received before next invoice is generated
+    state :invoiced                                          # Premium payment up-to-date
     state :past_due                                          # Premium payment 1-29 days past due
-    state :delinquent,  :after_enter => :late_notifications  # Premium payment 30-60 days past due - send notices to employees
+    state :delinquent,  :after_enter => :notify_employees    # Premium payment 30-60 days past due - send notices to employees
     state :suspended,   :after_enter => :suspend_benefit     # Premium payment 61-90 - transmit terms to carriers with retro date   
 
-    state :canceled,    :after_enter => :cancel_benefit      # Coverage never took effect, either voluntarily withdrawal or not paying binder
+    state :canceled,    :after_enter => :cancel_benefit      # Coverage never took effect, through either voluntarily withdrawal or binder non-payment
     state :terminated,  :after_enter => :terminate_benefit   # Premium payment > 90 days past due (day 91) or Employer voluntarily terminates
 
-    # 
+    # Binder payment credit received and allocated to account
     event :allocate_binder_payment, :after => :record_transition do
       transitions from: :binder_pending, to: :binder_paid
     end
 
-    # TODO Advance billing period on binder_pending in middle of month
+    # A new billing period begins the first day of each month
     event :advance_billing_period, :guard => :first_day_of_month?, :after => :record_transition do
-      transitions from: :binder_pending, to: :canceled
+      transitions from: :binder_pending, to: :canceled #, :after => :expire_enrollment
 
-      transitions from: :binder_paid, to: :invoiced
+      transitions from: :binder_paid, to: :invoiced, :after => :enroll_employer
+      transitions from: :current, to: :invoiced
       transitions from: :invoiced, to: :past_due
       transitions from: :past_due, to: :delinquent
       transitions from: :delinquent, to: :suspended
       transitions from: :suspended, to: :terminated
+
       # april 10th open enrollment ends => binder pending
       # april 15th binder is due, paid (allocate binder payment happened) => binder paid, not paid => binder pending
       # may 1st plan year start, binder paid => invoiced (due may 31st), binder pending => canceled
@@ -74,17 +85,29 @@ class EmployerProfileAccount
     end
 
     # Premium payment reversed and account debited
-    event :reverse_coverage_period, :after => [:revert_state, :record_transition] do
-      transitions from: :binder_paid, to: :binder_pending, :guard => :before_plan_year_start
-      transitions from: :binder_paid, to: :canceled
-      transitions from: :current, to: :invoiced
-      transitions from: :invoiced, to: :past_due
-      transitions from: :past_due, to: :delinquent
+    event :reverse_coverage_period, :after => [:record_transition] do
 
-      transitions from: :delinquent, to: :suspended
+      transitions from: :binder_paid, to: :binder_pending, :guard => :is_before_plan_year_start?, :after => :reverse_binder
+      # transitions from: :invoiced, to: :canceled, :guard => :was_last_state?
+
+      # TODO -- add complex state transitions
+      # transitions from: [:current, :invoiced], to: :delinquent, :guard => :was_last_state?
+
+      # transitions from: :binder_paid, to: :canceled, :after => :revert_state
+      # transitions from: :current, to: :invoiced
+      # transitions from: :invoiced, to: :past_due
+      # transitions from: :past_due, to: :delinquent
+
+      # transitions from: :delinquent, to: :suspended
       # may 1 invoiced, may 10 paid(1), june 1 invoiced, june 5 paid(2), june 6 nsf(1)
-    end
 
+      # binder_paid, wst = [binder_pending, binder_paid]
+      # reverse_coverage_period
+      # transition happens
+      # wst = [binder_pending, binder_paid, binder_pending]
+      # revert_state happens
+
+    end
   end
 
 private
@@ -96,31 +119,34 @@ private
     )
   end
 
-  def latest_workflow_state_transition
-    workflow_state_transitions.order_by(:'transition_at'.desc).limit(1).first
-  end
-
-  def first_day_of_month?
-    TimeKeeper.date_of_record.day == 1
-  end
-
-  def late_notifications
-    # TODO: implement this
-  end
-
-  def notify_hbx
-  end
-
-  def persist_state
-    self.last_aasm_state = aasm.from_state
-  end
-
   def revert_state
-    self.aasm_state = last_aasm_state unless last_aasm_state.blank?
+    # binding.pry
+    self.aasm_state = latest_workflow_state_transition.to_state
+  end
+
+  def is_before_plan_year_start?
+# binding.pry
+    employer_profile.published_plan_year.is_before_start?
+  end
+
+  def reinstate_employer
+    employer_profile.employer_reinstated!
   end
 
   def credit_binder
     employer_profile.binder_credited!
+  end
+
+  def reverse_binder
+    employer_profile.binder_reversed!
+  end
+
+  def enroll_employer
+    employer_profile.employer_enrolled!
+  end
+
+  def expire_enrollment
+    employer_profile.enrollment_expired!
   end
 
   def cancel_benefit

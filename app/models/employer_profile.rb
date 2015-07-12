@@ -212,7 +212,7 @@ class EmployerProfile
       # Organization.exists(:"employer_profile.employer_profile_account" => true)
 
       if new_date.day == 1
-        orgs = Organization.not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
+        orgs = Organization.exists(:"employer_profile.employer_profile_account._id" => true).not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
         orgs.each do |org|
           org.employer_profile.employer_profile_account.advance_billing_period! 
         end
@@ -237,7 +237,9 @@ class EmployerProfile
       orgs.each do |org|
         org.employer_profile.today = new_date
         plan_year = org.employer_profile.published_plan_year
-        plan_year.advance_date! if plan_year.may_advance_enrollment_date?
+
+        # binding.pry
+        plan_year.advance_date! if plan_year && plan_year.may_advance_date?
       end
     end
   end
@@ -261,7 +263,7 @@ class EmployerProfile
     state :registered                 # Employer has submitted valid application
     state :eligible                   # Employer has completed enrollment and is eligible for coverage
     state :binder_paid
-    state :enrolled                   # Employer has completed eligible enrollment and has active benefit coverage
+    state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
     # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
     state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
     state :ineligible                 # Employer is unable to obtain coverage on the HBX per regulation or policy
@@ -283,8 +285,20 @@ class EmployerProfile
       transitions from: [:registered, :ineligible], to: :eligible, :after => :initialize_account
     end
 
+    event :enrollment_expired, :after => :record_transition do
+      transitions from: :eligible, to: :applicant
+    end
+
     event :binder_credited, :after => :record_transition do
       transitions from: :eligible, to: :binder_paid
+    end
+
+    event :binder_reversed, :after => :record_transition do
+      transitions from: :binder_paid, to: :eligible
+    end
+
+    event :employer_enrolled, :after => :record_transition do
+      transitions from: :binder_paid, to: :enrolled
     end
 
     event :enrollment_denied, :after => :record_transition do
@@ -293,6 +307,10 @@ class EmployerProfile
 
     event :benefit_suspended, :after => :record_transition do
       transitions from: :enrolled, to: :suspended, :after => :suspend_benefit
+    end
+
+    event :employer_reinstated, :after => :record_transition do
+      transitions from: :suspended, to: :enrolled
     end
 
     event :benefit_terminated, :after => :record_transition do
@@ -353,9 +371,13 @@ private
     )
   end
 
+  # TODO - fix premium amount
   def initialize_account
     if employer_profile_account.blank?
       self.build_employer_profile_account
+      employer_profile_account.next_premium_due_on = (published_plan_year.start_on.last_month) + (HbxProfile::ShopBinderPaymentDueDayOfMonth - 1).days
+      employer_profile_account.next_premium_amount = 100
+      # census_employees.covered 
       save
     end
   end

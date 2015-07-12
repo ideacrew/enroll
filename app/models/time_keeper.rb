@@ -17,8 +17,11 @@ class TimeKeeper
       if instance.date_of_record > new_date
         raise StandardError, "system may not go backward in time"
       else
-        (new_date - instance.date_of_record).to_i
-        instance.set_date_of_record(new_date)
+        number_of_days = (new_date - instance.date_of_record).to_i
+        number_of_days.times do
+          instance.set_date_of_record(instance.date_of_record + 1.day)
+          instance.push_date_of_record
+        end
       end
     end
     instance.date_of_record
