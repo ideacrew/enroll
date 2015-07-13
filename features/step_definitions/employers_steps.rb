@@ -43,7 +43,7 @@ And(/^I should see an initial form to enter information about my Employer and my
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Washington")
   input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-office-locations-attributes-0-address-attributes-state").first
   input_field.click
-  input_field.li(text: /District of Columbia/).click
+  input_field.li(text: /DC/).click
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("20002")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("678")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("1230987")
@@ -206,7 +206,7 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-city/).set("Alpharetta")
   select_state = @browser.divs(text: /SELECT STATE/).last
   select_state.click
-  scroll_then_click(@browser.li(text: /Georgia/))
+  scroll_then_click(@browser.li(text: /GA/))
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-zip/).set("30228")
   email_kind = @browser.divs(text: /SELECT KIND/).last
   email_kind.click
@@ -270,9 +270,9 @@ Then(/^I should see a form to update the contents of the census employee$/) do
   @browser.text_field(id: /jq_datepicker_ignore_census_employee_dob/).set("01/01/1980")
   @browser.text_field(id: /census_employee_ssn/).set("786120965")
   @browser.text_field(id: /census_employee_first_name/).set("Patrick")
-  select_state = @browser.divs(text: /Georgia/).last
+  select_state = @browser.divs(text: /GA/).last
   select_state.click
-  scroll_then_click(@browser.li(text: /Virginia/))
+  scroll_then_click(@browser.li(text: /VA/))
   #@browser.text_field(id: /census_employee_address_attributes_state/).set("VA")
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mariah")
   screenshot("update_census_employee_with_data")
