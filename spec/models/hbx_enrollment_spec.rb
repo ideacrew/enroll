@@ -1,55 +1,53 @@
 require 'rails_helper'
 
-describe HbxEnrollment, "for an employee who does not currently have a life event enrollment period" do
-  let(:todays_date) { double }
-  let(:hire_date) { Date.today }
-  let(:effective_on_date) { Date.today.next_month }
-  let(:employer_profile) { EmployerProfile.new }
-  let(:employee_role) { EmployeeRole.new(:hired_on => hire_date, :employer_profile => employer_profile) }
-  let(:benefit_group) { BenefitGroup.new }
-
-  subject { HbxEnrollment.new(:employee_role => employee_role, :benefit_group => benefit_group, :effective_on => effective_on_date) }
-
-  describe "and the employer is not in open enrollment" do
-    describe "and the employee is not shopping within the new-hire window" do
-      before(:each) do
-        allow(benefit_group).to receive(:within_new_hire_window?).with(hire_date).and_return(false)
-        allow(employer_profile).to receive(:within_open_enrollment_for?).with(todays_date, effective_on_date).and_return(false)
-      end
-
-      it "should not be able to complete shoppping" do
-        expect(subject.can_complete_shopping?(todays_date)).to be_falsey
-      end
-    end
-
-    describe "and the employee is shopping within the new-hire window" do
-      before(:each) do
-        allow(benefit_group).to receive(:within_new_hire_window?).with(hire_date).and_return(true)
-      allow(employer_profile).to receive(:within_open_enrollment_for?).with(todays_date, effective_on_date).and_return(false)
-      end
-
-      it "should be able to complete shoppping" do
-        expect(subject.can_complete_shopping?(todays_date)).to be_truthy
-      end
-    end
-  end
-
-  describe "and the employer is under open enrollment" do
-    before(:each) do
-      allow(benefit_group).to receive(:within_new_hire_window?).with(hire_date).and_return(false)
-      allow(employer_profile).to receive(:within_open_enrollment_for?).with(todays_date, effective_on_date).and_return(true)
-    end
-
-    it "should be able to complete shopping" do
-      expect(subject.can_complete_shopping?(todays_date)).to be_falsey
-    end
-  end
-end
+# describe HbxEnrollment, "for an employee who does not currently have a life event enrollment period" do
+#   let(:todays_date) { double }
+#   let(:hire_date) { Date.today }
+#   let(:effective_on_date) { Date.today.next_month }
+#   let(:employer_profile) { EmployerProfile.new }
+#   let(:employee_role) { EmployeeRole.new(:hired_on => hire_date, :employer_profile => employer_profile) }
+#   let(:benefit_group) { BenefitGroup.new }
+#
+#   subject { HbxEnrollment.new(:employee_role => employee_role, :benefit_group => benefit_group, :effective_on => effective_on_date) }
+#
+#   describe "and the employer is not in open enrollment" do
+#     describe "and the employee is not shopping within the new-hire window" do
+#       before(:each) do
+#         allow(benefit_group).to receive(:within_new_hire_window?).with(hire_date).and_return(false)
+#         allow(employer_profile).to receive(:within_open_enrollment_for?).with(todays_date, effective_on_date).and_return(false)
+#       end
+#
+#       it "should not be able to complete shopping" do
+#         expect(subject.can_complete_shopping?(todays_date)).to be_falsey
+#       end
+#     end
+#
+#     describe "and the employee is shopping within the new-hire window" do
+#       before(:each) do
+#         allow(benefit_group).to receive(:within_new_hire_window?).with(hire_date).and_return(true)
+#       allow(employer_profile).to receive(:within_open_enrollment_for?).with(todays_date, effective_on_date).and_return(false)
+#       end
+#
+#       it "should be able to complete shoppping" do
+#         expect(subject.can_complete_shopping?(todays_date)).to be_truthy
+#       end
+#     end
+#   end
+#
+#   describe "and the employer is under open enrollment" do
+#     before(:each) do
+#       allow(benefit_group).to receive(:within_new_hire_window?).with(hire_date).and_return(false)
+#       allow(employer_profile).to receive(:within_open_enrollment_for?).with(todays_date, effective_on_date).and_return(true)
+#     end
+#
+#     it "should be able to complete shopping" do
+#       expect(subject.can_complete_shopping?(todays_date)).to be_falsey
+#     end
+#   end
+# end
 
 describe HbxEnrollment do
   context "an employer defines a plan year with multiple benefit groups, adds employees to roster and assigns benefit groups" do
-    # subject { HbxEnrollment.new(:employee_role => employee_role, :benefit_group => benefit_group, :effective_on => effective_on_date) }
-
     let(:blue_collar_employee_count)              { 7 }
     let(:white_collar_employee_count)             { 5 }
     let(:fte_count)                               { blue_collar_employee_count + white_collar_employee_count }
@@ -58,29 +56,47 @@ describe HbxEnrollment do
     let(:plan_year_start_on)                      { Date.current.next_month.end_of_month + 1.day }
     let(:plan_year_end_on)                        { (plan_year_start_on + 1.year) - 1.day }
 
-    let(:blue_collar_benefit_group)               { FactoryGirl.build(:benefit_group, title: "blue collar") }
-    let(:blue_collar_benefit_group_assignment)    { BenefitGroupAssignment.new(benefit_group: blue_collar_benefit_group, start_on: plan_year_start_on )}
+    let(:blue_collar_benefit_group)               { plan_year.benefit_groups[0] }
+    def blue_collar_benefit_group_assignment
+      BenefitGroupAssignment.new(benefit_group: blue_collar_benefit_group, start_on: plan_year_start_on )
+    end
 
-    let(:white_collar_benefit_group)              { FactoryGirl.build(:benefit_group, title: "white collar") }
-    let(:white_collar_benefit_group_assignment)   { BenefitGroupAssignment.new(benefit_group: white_collar_benefit_group, start_on: plan_year_start_on )}
+    let(:white_collar_benefit_group)              { plan_year.benefit_groups[1] }
+    def white_collar_benefit_group_assignment
+      BenefitGroupAssignment.new(benefit_group: white_collar_benefit_group, start_on: plan_year_start_on )
+    end
 
-    let(:all_benefit_group_assignments)           { [blue_collar_benefit_group, white_collar_benefit_group] }
-    let(:plan_year)                               { FactoryGirl.create(:plan_year, 
+    let(:all_benefit_group_assignments)           { [blue_collar_census_employees, white_collar_census_employees].flat_map do |census_employees|
+                                                      census_employees.flat_map(&:benefit_group_assignments)
+                                                    end
+                                                  }
+    let(:plan_year)                               { py = FactoryGirl.create(:plan_year,
                                                       start_on: plan_year_start_on,
                                                       end_on: plan_year_end_on,
                                                       open_enrollment_start_on: Date.current,
                                                       open_enrollment_end_on: Date.current + 5.days,
-                                                      employer_profile: employer_profile,
-                                                      benefit_groups: [blue_collar_benefit_group, white_collar_benefit_group]
-                                                    )}
-    let!(:blue_collar_census_employees)            { FactoryGirl.create_list(:census_employee, blue_collar_employee_count, 
-                                                      employer_profile: employer_profile,
-                                                      benefit_group_assignments: [blue_collar_benefit_group_assignment]
-                                                    )}
-    let!(:white_collar_census_employees)           { FactoryGirl.create_list(:census_employee, white_collar_employee_count, 
-                                                      employer_profile: employer_profile,
-                                                      benefit_group_assignments: [white_collar_benefit_group_assignment]
-                                                    )}
+                                                      employer_profile: employer_profile
+                                                    )
+                                                    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                                    white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
+                                                    py.benefit_groups = [blue, white]
+                                                    py.save
+                                                    py
+                                                  }
+    let!(:blue_collar_census_employees)            { ees = FactoryGirl.create_list(:census_employee, blue_collar_employee_count, employer_profile: employer_profile)
+                                                     ees.each() do |ee|
+                                                       ee.benefit_group_assignments = [blue_collar_benefit_group_assignment]
+                                                       ee.save
+                                                     end
+                                                     ees
+                                                    }
+    let!(:white_collar_census_employees)           { ees = FactoryGirl.create_list(:census_employee, white_collar_employee_count, employer_profile: employer_profile)
+                                                     ees.each() do |ee|
+                                                       ee.benefit_group_assignments = [white_collar_benefit_group_assignment]
+                                                       ee.save
+                                                     end
+                                                     ees
+                                                    }
 
     let(:blue_collar_employees)                   { FactoryGirl.create_list(:employee, employer_profile: employer_profile)}
 
@@ -100,10 +116,10 @@ describe HbxEnrollment do
       let(:blue_collar_employee_roles) do
         bc_employees = blue_collar_census_employees.collect do |census_employee|
           person = Person.create!(
-                    first_name: census_employee.first_name, 
-                    last_name: census_employee.last_name, 
-                    ssn: census_employee.ssn, 
-                    dob: census_employee.dob, 
+                    first_name: census_employee.first_name,
+                    last_name: census_employee.last_name,
+                    ssn: census_employee.ssn,
+                    dob: census_employee.dob,
                     gender: "male"
                   )
           employee_role = person.employee_roles.build(
@@ -113,7 +129,6 @@ describe HbxEnrollment do
                   )
 
           census_employee.employee_role = employee_role
-          census_employee.link_employee_role unless census_employee.employee_role_linked?
           census_employee.save!
           employee_role
         end
@@ -123,11 +138,11 @@ describe HbxEnrollment do
       let(:white_collar_employee_roles) do
         wc_employees = white_collar_census_employees.collect do |census_employee|
           person = Person.create!(
-                    first_name: census_employee.first_name, 
-                    last_name: census_employee.last_name, 
-                    ssn: census_employee.ssn, 
-                    # ssn: (census_employee.ssn.to_i + 20).to_s, 
-                    dob: census_employee.dob, 
+                    first_name: census_employee.first_name,
+                    last_name: census_employee.last_name,
+                    ssn: census_employee.ssn,
+                    # ssn: (census_employee.ssn.to_i + 20).to_s,
+                    dob: census_employee.dob,
                     gender: "male"
                   )
           employee_role = person.employee_roles.build(
@@ -137,7 +152,6 @@ describe HbxEnrollment do
                   )
 
           census_employee.employee_role = employee_role
-          census_employee.link_employee_role unless census_employee.employee_role_linked?
           census_employee.save!
           employee_role
         end
@@ -168,10 +182,10 @@ describe HbxEnrollment do
           employee_role = family.primary_family_member.person.employee_roles.first
           election = HbxEnrollment.create_from(
               employee_role: employee_role,
-              coverage_household: family.households.first.coverage_households.first, 
+              coverage_household: family.households.first.coverage_households.first,
               benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
             )
-
+          election.waived_coverage_reason = HbxEnrollment::WaiverReason.names.first
           election.waive_coverage
           election.household.family.save!
           election.to_a
@@ -183,7 +197,7 @@ describe HbxEnrollment do
             benefit_group = employee_role.census_employee.active_benefit_group_assignment.benefit_group
             election = HbxEnrollment.create_from(
                 employee_role: employee_role,
-                coverage_household: family.households.first.coverage_households.first, 
+                coverage_household: family.households.first.coverage_households.first,
                 benefit_group: benefit_group
               )
             election.plan = benefit_group.elected_plans.sample
@@ -194,14 +208,37 @@ describe HbxEnrollment do
           enrollments
         end
 
-        let(:white_collar_enrollment_waivers) do
+        let!(:white_collar_enrollment_waivers) do
+          white_collar_families[0..1].collect do |family|
+            employee_role = family.primary_family_member.person.employee_roles.first
+            election = HbxEnrollment.create_from(
+              employee_role: employee_role,
+              coverage_household: family.households.first.coverage_households.first,
+              benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
+            )
+            election.waived_coverage_reason = HbxEnrollment::WaiverReason.names.first
+            election.waive_coverage
+            election.household.family.save!
+          end
         end
 
-        let(:white_collar_enrollments) do
+        let!(:white_collar_enrollments) do
+          white_collar_families[-3..-1].collect do |family|
+            employee_role = family.primary_family_member.person.employee_roles.first
+            benefit_group = employee_role.census_employee.active_benefit_group_assignment.benefit_group
+            election = HbxEnrollment.create_from(
+                employee_role: employee_role,
+                coverage_household: family.households.first.coverage_households.first,
+                benefit_group: benefit_group
+              )
+            election.plan = benefit_group.elected_plans.sample
+            election.select_coverage if election.can_complete_shopping?
+            election.household.family.save!
+            election
+          end
         end
 
         it "should find all employees who have waived or selected plans" do
-          # TODO doesn't pass because 198 & 201 haven't been implemented yet
           expect(HbxEnrollment.find_by_benefit_group_assignments(all_benefit_group_assignments).size).to eq (blue_collar_employee_count + white_collar_employee_count)
           expect(HbxEnrollment.find_by_benefit_group_assignments(all_benefit_group_assignments).first).to eq blue_collar_enrollment_waivers.first
         end

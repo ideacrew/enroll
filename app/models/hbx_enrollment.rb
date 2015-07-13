@@ -5,6 +5,28 @@ class HbxEnrollment
   include AASM
   include MongoidSupport::AssociationProxies
 
+  class WaiverReason
+    Reasons = {
+      spouse: "Spouse has coverage.",
+      parent: "Parent has coverage.",
+      none: "No other source of coverage",
+    }
+
+    attr_reader :name
+
+    def initialize(name)
+      @name = name
+    end
+
+    def reason
+      Reasons[name]
+    end
+
+    def self.names
+      Reasons.keys
+    end
+  end
+
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
   Authority = [:open_enrollment]
 
@@ -32,6 +54,7 @@ class HbxEnrollment
   field :aasm_state_date, type: Date
   field :updated_by, type: String
   field :is_active, type: Boolean, default: true
+  field :waived_coverage_reason, type: WaiverReason
 
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
@@ -125,6 +148,10 @@ class HbxEnrollment
     @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_profile_id) unless broker_agency_profile_id.blank?
   end
 
+  def waived_coverage_reason=(name)
+    self[:waived_coverage_reason] = WaiverReason.new(name)
+  end
+
   def has_broker_agency_profile?
     broker_agency_profile_id.present?
   end
@@ -196,19 +223,20 @@ class HbxEnrollment
   end
 
   def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
-    id_list = benefit_group_assignments.collect(&:id)
+    id_list = benefit_group_assignments.collect(&:_id)
 
+    families = nil
     if id_list.size == 1
-      families = Family.where(:"households.hbx_enrollments.benefit_group_id" => id_list.first)
+      families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list.first)
     else
-      families = Family.any_in(:"households.hbx_enrollments.benefit_group_id" => id_list )
+      families = Family.any_in(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list )
     end
 
     enrollment_list = []
     families.each do |family|
       family.households.each do |household|
         household.hbx_enrollments.each do |enrollment|
-          enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_id)
+          enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_assignment_id)
         end
       end
     end
