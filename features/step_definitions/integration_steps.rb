@@ -197,7 +197,7 @@ When(/^I complete the matching employee form$/) do
 
   input_field = @browser.divs(class: "selectric-interaction-choice-control-person-addresses-attributes-0-state").first
   input_field.click
-  input_field.li(text: /Virginia/).click
+  input_field.li(text: /VA/).click
   @browser.text_field(name: "person[addresses_attributes][0][zip]").set("20171")
 
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
@@ -345,8 +345,8 @@ When(/^My employer publishes a plan year$/) do
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Washington")
   input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-office-locations-attributes-0-address-attributes-state").first
   input_field.click
-  input_field.li(text: /District of Columbia/).click
-  @browser.select_list(name: "organization[office_locations_attributes][0][address_attributes][state]").select("District of Columbia")
+  input_field.li(text: /DC/).click
+  @browser.select_list(name: "organization[office_locations_attributes][0][address_attributes][state]").select("DC")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("20002")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("202")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("5551212")

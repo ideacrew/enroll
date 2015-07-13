@@ -30,7 +30,12 @@
               </ul>
               <div class="clearfix"></div>
               <ul class="user-info">
-                  <li class="">(ID <%= current_user.try(:person).try(:hbx_id) || current_user.id %>) &nbsp; &nbsp; <strong><%= user_full_name %></strong></li>
+                  <li class="">
+                    <% unless current_user.try(:person).try(:hbx_id).nil? %>
+                      (ID <%= current_user.try(:person).try(:hbx_id) %>) &nbsp; &nbsp;
+                    <% end %>
+                    <strong><%= user_full_name %></strong>
+                  </li>
               </ul>
             <% end %>
           </div>

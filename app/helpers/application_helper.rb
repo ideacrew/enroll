@@ -225,7 +225,7 @@ module ApplicationHelper
   def devise_mapping
     @devise_mapping ||= Devise.mappings[:user]
   end
-  
+
   def get_dependents(family, person)
     members_list = []
     family_members = family.family_members
@@ -252,7 +252,7 @@ module ApplicationHelper
 
   def user_full_name
     if signed_in?
-      current_user.person.try(:full_name) ? current_user.person.full_name : 'User'
+      current_user.person.try(:full_name) ? current_user.person.full_name : current_user.email
     end
   end
 
@@ -292,7 +292,9 @@ module ApplicationHelper
   def portal_display_name(controller)
     if controller == 'welcome'
       "Welcome to the District's Health Insurance Marketplace"
-    elsif controller == 'consumer_profiles' || controller == 'employee_roles'
+    elsif controller == 'employee_roles'
+      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Employee".html_safe
+    elsif controller == 'consumer_profiles'
       "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Individual/Family".html_safe
     elsif controller == 'employer_profiles'
       "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe

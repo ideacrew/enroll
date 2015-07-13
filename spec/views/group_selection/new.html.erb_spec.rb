@@ -37,7 +37,11 @@ RSpec.describe "group_selection/new.html.erb" do
     end
 
     it "should have a disabled checkbox option" do
-      expect(rendered).to have_selector("input[disabled='disabled']", count: 2)
+      expect(rendered).to have_selector("input[disabled='disabled']", count: 1)
+    end
+
+    it "should have a readonly checkbox option" do
+      expect(rendered).to have_selector("input[readonly='readonly']", count: 1)
     end
   end
 
@@ -65,6 +69,7 @@ RSpec.describe "group_selection/new.html.erb" do
         id: "id_#{random_value}",
         dob: 25.years.ago,
         full_name: "full_name_#{random_value}",
+        is_primary_applicant?: true,
         primary_relationship: "self"
       )
     end
@@ -76,6 +81,7 @@ RSpec.describe "group_selection/new.html.erb" do
         id: "id_#{random_value}",
         dob: 3.years.ago,
         full_name: "full_name_#{random_value}",
+        is_primary_applicant?: false,
         primary_relationship: "child"
       )
     end
