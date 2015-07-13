@@ -222,6 +222,27 @@ class HbxEnrollment
     return found_value
   end
 
+  def self.find_by_benefit_groups(benefit_groups = [])
+    id_list = benefit_groups.collect(&:_id).uniq
+
+    families = nil
+    if id_list.size == 1
+      families = Family.where(:"households.hbx_enrollments.benefit_group_id" => id_list.first)
+    else
+      families = Family.any_in(:"households.hbx_enrollments.benefit_group_id" => id_list )
+    end
+
+    enrollment_list = []
+    families.each do |family|
+      family.households.each do |household|
+        household.hbx_enrollments.each do |enrollment|
+          enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_id)
+        end
+      end
+    end
+    enrollment_list
+  end
+
   def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
     id_list = benefit_group_assignments.collect(&:_id)
 

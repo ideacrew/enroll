@@ -219,6 +219,7 @@ describe HbxEnrollment do
             election.waived_coverage_reason = HbxEnrollment::WaiverReason.names.first
             election.waive_coverage
             election.household.family.save!
+            election
           end
         end
 
@@ -239,8 +240,9 @@ describe HbxEnrollment do
         end
 
         it "should find all employees who have waived or selected plans" do
-          expect(HbxEnrollment.find_by_benefit_group_assignments(all_benefit_group_assignments).size).to eq (blue_collar_employee_count + white_collar_employee_count)
-          expect(HbxEnrollment.find_by_benefit_group_assignments(all_benefit_group_assignments).first).to eq blue_collar_enrollment_waivers.first
+          enrollments = HbxEnrollment.find_by_benefit_groups(all_benefit_group_assignments.collect(&:benefit_group))
+          expect(enrollments.size).to eq (blue_collar_employee_count + white_collar_employee_count)
+          expect(enrollments).to match_array(blue_collar_enrollment_waivers + white_collar_enrollment_waivers + blue_collar_enrollments + white_collar_enrollments)
         end
       end
 
