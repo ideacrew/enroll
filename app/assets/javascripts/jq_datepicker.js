@@ -1,5 +1,9 @@
 function applyJQDatePickerSetup(ele) {
     var el = $(ele);
+
+    if (el.is(".jq_datepicker_already_applied")) {
+      return;
+    }
     var yearMax = ((new Date).getFullYear() + 10);
     var yearMin = (new Date).getFullYear()-110;
     var otherFieldSelector = el.attr("data-submission-field");
@@ -69,6 +73,7 @@ function applyJQDatePickerSetup(ele) {
         }
     });
     el.datepicker("refresh");
+    el.addClass("jq_datepicker_already_applied");
 }
 
 function applyJQDatePickers() {
