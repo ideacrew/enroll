@@ -104,4 +104,3 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     end
   end
 end
-

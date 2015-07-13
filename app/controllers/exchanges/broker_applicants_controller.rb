@@ -25,7 +25,6 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   end
 
   def edit
-
     respond_to do |format|
       format.js
     end
@@ -33,8 +32,9 @@ class Exchanges::BrokerApplicantsController < ApplicationController
 
   def update
     broker_role = @broker_applicant.broker_role
-    broker_role.update_attributes(:reason => params[:person][:broker_role_attributes][:reason])
-
+    if params[:person] && params[:person][:broker_role_attributes] && params[:person][:broker_role_attributes][:reason]
+      broker_role.update_attributes(:reason => params[:person][:broker_role_attributes][:reason])
+    end
     if params['deny']
       broker_role.deny!
       flash[:notice] = "Broker applicant denied."
