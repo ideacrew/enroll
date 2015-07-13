@@ -14,7 +14,7 @@ class GroupSelectionController < ApplicationController
       BSON::ObjectId.from_string(family_member_id)
     end
 
-    if keep_existing_plan or change_plan.present?
+    if keep_existing_plan or change_plan.present? or @family.latest_household.try(:hbx_enrollments).try(:present?)
       hbx_enrollment = @family.latest_household.hbx_enrollments.active.last
       hbx_enrollment.rebuild_members_by_coverage_household(coverage_household: @coverage_household)
     else
