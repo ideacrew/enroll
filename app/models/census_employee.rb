@@ -224,13 +224,11 @@ class CensusEmployee < CensusMember
     end
 
     event :link_employee_role do
-      transitions from: :eligible, to: :employee_role_linked,
-              :guard => :has_active_benefit_group_assignment?
+      transitions from: :eligible, to: :employee_role_linked, :guard => :has_active_benefit_group_assignment?
     end
 
     event :delink_employee_role do
-      transitions from: :employee_role_linked, to: :eligible,
-        :after => :clear_employee_role
+      transitions from: :employee_role_linked, to: :eligible, :after => :clear_employee_role
     end
 
     event :terminate_employee_role do
@@ -271,7 +269,8 @@ private
   end
 
   def has_active_benefit_group_assignment?
-    active_benefit_group_assignment.present? && active_benefit_group_assignment.benefit_group.plan_year.published?
+    active_benefit_group_assignment.present? &&
+    %w(published enrolling enrolled active).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)
   end
 
   def clear_employee_role

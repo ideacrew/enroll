@@ -347,7 +347,7 @@ class PlanYear
         "2016-11-01" => '2016,10,12',
         "2016-12-01" => '2016,11,14',
         "2017-01-01" => '2016,12,13'}.each_pair do |k, v|
-          dates_map[k] = TimeKeeper.set_date_of_record_unprotected!(Date.strptime(v, '%Y,%m,%d'))
+          dates_map[k] = Date.strptime(v, '%Y,%m,%d')
         end
 
       dates_map[start_on.strftime('%Y-%m-%d')] || shop_enrollment_timetable(start_on)[:binder_payment_due_date]
@@ -366,7 +366,7 @@ class PlanYear
     state :draft, initial: true
 
     state :publish_pending      # Plan application as submitted has warnings
-    state :eligibility_review   # Plan application was submitted with warnding and is under review by HBX officials
+    state :eligibility_review   # Plan application was submitted with warning and is under review by HBX officials
     state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Plan application was forced-published with warnings
 

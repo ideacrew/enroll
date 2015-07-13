@@ -143,7 +143,6 @@ class Exchanges::HbxProfilesController < ApplicationController
   def set_date
     date_of_record = Date.strptime(params[:time_keeper][:date_of_record], "%m/%d/%Y").strftime('%Y-%m-%d')
     TimeKeeper.set_date_of_record(date_of_record)
-    TimeKeeper.instance.push_date_of_record
     redirect_to exchanges_hbx_profiles_root_path
   end
 

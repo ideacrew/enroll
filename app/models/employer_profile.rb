@@ -208,9 +208,7 @@ class EmployerProfile
 
     def advance_day(new_date)
 
-      # Organization.exists(:"employer_profile.employer_profile_account" => true).only(:"employer_profile.employer_profile_account_id").active
-      # Organization.exists(:"employer_profile.employer_profile_account" => true)
-
+      # Employer activities that take place monthly - on first of month
       if new_date.day == 1
         orgs = Organization.exists(:"employer_profile.employer_profile_account._id" => true).not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
         orgs.each do |org|
@@ -237,8 +235,6 @@ class EmployerProfile
       orgs.each do |org|
         org.employer_profile.today = new_date
         plan_year = org.employer_profile.published_plan_year
-
-        # binding.pry
         plan_year.advance_date! if plan_year && plan_year.may_advance_date?
       end
     end

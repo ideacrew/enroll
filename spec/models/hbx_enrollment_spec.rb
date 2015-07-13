@@ -89,7 +89,7 @@ describe HbxEnrollment do
     end
 
     it "should have a valid plan year in published state" do
-      expect(plan_year.aasm_state).to eq "published"
+      expect(plan_year.aasm_state).to eq "enrolling"
     end
 
     it "should have a roster with all blue and white collar employees" do
@@ -180,14 +180,13 @@ describe HbxEnrollment do
         let!(:blue_collar_enrollments) do
           enrollments = blue_collar_families[1..(blue_collar_employee_count - 1)].collect do |family|
             employee_role = family.primary_family_member.person.employee_roles.first
-            # benefit_group = employee_role.census_employee.active_benefit_group_assignment.benefit_group
+            benefit_group = employee_role.census_employee.active_benefit_group_assignment.benefit_group
             election = HbxEnrollment.create_from(
                 employee_role: employee_role,
                 coverage_household: family.households.first.coverage_households.first, 
                 benefit_group: benefit_group
               )
             election.plan = benefit_group.elected_plans.sample
-# binding.pry
             election.select_coverage if election.can_complete_shopping?
             election.household.family.save!
             election
@@ -202,6 +201,7 @@ describe HbxEnrollment do
         end
 
         it "should find all employees who have waived or selected plans" do
+          # TODO doesn't pass because 198 & 201 haven't been implemented yet
           expect(HbxEnrollment.find_by_benefit_group_assignments(all_benefit_group_assignments).size).to eq (blue_collar_employee_count + white_collar_employee_count)
           expect(HbxEnrollment.find_by_benefit_group_assignments(all_benefit_group_assignments).first).to eq blue_collar_enrollment_waivers.first
         end

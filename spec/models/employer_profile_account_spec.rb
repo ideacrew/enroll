@@ -227,6 +227,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
                   end
 
                   it "should transmit terminations notices to employer"
+                  it "should transmit terminations notices to broker"
                   it "should transmit terminations notices to carrier"
                   it "should transmit terminations notices to employees"
                   it "should place employees in IVL SEPs??"
