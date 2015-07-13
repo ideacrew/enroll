@@ -47,7 +47,7 @@
                 <%= address.text_field :city, class: "floatlabel form-control interaction-field-control-office-location-address-city", required: true, placeholder: 'CITY' %>
               </div>
               <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                <%= address.select(:state, options_for_select(State::NAME_IDS, selected: address.object.state), {include_blank: "SELECT STATE"}, required: true) %>
+                <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE"}, required: true) %>
               </div>
               <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
                 <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP' %>
