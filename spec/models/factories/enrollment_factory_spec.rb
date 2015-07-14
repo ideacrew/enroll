@@ -1,56 +1,71 @@
 require 'rails_helper'
 
 describe Factories::EnrollmentFactory, "starting with unlinked employee_family and employee_role" do
+  def p(model)
+    model.class.find(model.id)
+  end
+
   let(:hired_on) { Date.new(2015,1,15) }
-  let(:terminated_on) { Date.new(2015,3,25) }
+  let(:terminated_on) { Date.new(2015,6,15) }
+  let(:dob) { employee_role.dob }
+  let(:ssn) { employee_role.ssn }
 
-  let(:employer_profile) { EmployerProfile.new }
-  let(:plan_year) {employer_profile.plan_years.build}
-  let(:benefit_group) {plan_year.benefit_groups.build}
-  let(:census_employee) { CensusEmployee.new({
-      :hired_on => hired_on,
-      :employment_terminated_on => terminated_on,
-      :employer_profile => employer_profile,
-      :aasm_state => "eligible"
-    })
+  let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let!(:plan_year) {
+    FactoryGirl.create(:plan_year,
+      employer_profile: employer_profile,
+      aasm_state: "published"
+    )
   }
-  let(:benefit_group_assignment) {
-    BenefitGroupAssignment.new({
-      benefit_group_id: benefit_group.id,
-      :start_on => Date.new(2015,1,1),
-      is_active: true
-    })
+  let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
+  let!(:census_employee) {
+    FactoryGirl.create(:census_employee,
+      hired_on: hired_on,
+      employment_terminated_on: terminated_on,
+      dob: dob,
+      ssn: ssn,
+      employer_profile: employer_profile
+    )
+  }
+  let!(:benefit_group_assignment) {
+    FactoryGirl.create(:benefit_group_assignment,
+      benefit_group: benefit_group,
+      census_employee: census_employee,
+      start_on: Date.new(2015,5,1)
+    )
   }
 
-  let(:employee_role) {
-    EmployeeRole.new
+  let!(:employee_role) {
+    FactoryGirl.create(:employee_role, employer_profile: employer_profile)
   }
 
   describe "After performing the link" do
 
     before(:each) do
-      census_employee.benefit_group_assignments = [benefit_group_assignment]
       Factories::EnrollmentFactory.link_census_employee(census_employee, employee_role, employer_profile)
+      census_employee.save
+      employee_role.save
+      employer_profile.save
     end
 
     it "should set employee role id on the census employee" do
-      expect(census_employee.employee_role_id).to eq employee_role.id
+      expect(p(census_employee).employee_role_id).to eq employee_role.id
     end
 
     it "should set employer profile id on the employee_role" do
-      expect(employee_role.employer_profile_id).to eq employer_profile.id
+      expect(p(employee_role).employer_profile_id).to eq employer_profile.id
     end
 
-    it "should set census family id on the employee_role" do
-      expect(employee_role.census_employee_id).to eq census_employee.id
+    it "should set census employee id on the employee_role" do
+      expect(p(employee_role).census_employee_id).to eq census_employee.id
     end
 
     it "should set hired on on the employee_role" do
-      expect(employee_role.hired_on).to eq hired_on
+      expect(p(employee_role).hired_on).to eq hired_on
     end
 
     it "should set terminated on on the employee_role" do
-      expect(employee_role.terminated_on).to eq terminated_on
+      expect(p(employee_role).terminated_on).to eq terminated_on
     end
   end
 end
