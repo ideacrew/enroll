@@ -1,7 +1,8 @@
 class ConsumerProfilesController < ApplicationController
+
+  before_action :get_family, except: [:inbox, :check_qle_date]
+
   def home
-    @person = current_user.person
-    @family = @person.primary_family
     @family_members = @family.active_family_members if @family.present?
     @employee_roles = @person.employee_roles
     @employer_profile = @employee_roles.first.employer_profile if @employee_roles.any?
@@ -35,23 +36,13 @@ class ConsumerProfilesController < ApplicationController
   end
 
   def plans
-    @person = current_user.person
-    @employee_roles = @person.employee_roles
-    @employer_profile = @employee_roles.first.employer_profile if @employee_roles.any?
-    @current_plan_year = @employer_profile.latest_plan_year if @employer_profile.present?
-    @benefit_group = @current_plan_year.benefit_groups.first if @current_plan_year.present?
-    @plan = @benefit_group.reference_plan
-    @qhp = Products::Qhp.where(standard_component_id: @plan.hios_id[0..13]).to_a.first
+    hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active || []
+    @plan = hbx_enrollments.last.try(:plan)
+    @qhp = Products::Qhp.find_by(standard_component_id: @plan.hios_id[0..13])
     @qhp_benefits = @qhp.qhp_benefits
-    respond_to do |format|
-      format.html
-      format.js
-    end
   end
 
   def personal
-    @person = current_user.person
-    @family = @person.primary_family
     @family_members = @family.active_family_members if @family.present?
     respond_to do |format|
       format.html
@@ -60,8 +51,6 @@ class ConsumerProfilesController < ApplicationController
   end
 
   def family
-    @person = current_user.person
-    @family = @person.primary_family
     @family_members = @family.active_family_members if @family.present?
 
     @qualifying_life_events = QualifyingLifeEventKind.all
@@ -91,8 +80,6 @@ class ConsumerProfilesController < ApplicationController
   end
 
   def purchase
-    @person = current_user.person
-    @family = @person.primary_family
     @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
 
     if @enrollment.present?
@@ -104,5 +91,11 @@ class ConsumerProfilesController < ApplicationController
     else
       redirect_to :back
     end
+  end
+
+  private
+  def get_family
+    @person = current_user.person
+    @family = @person.primary_family
   end
 end
