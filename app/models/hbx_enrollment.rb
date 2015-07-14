@@ -60,6 +60,7 @@ class HbxEnrollment
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
 
+  delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -264,4 +265,11 @@ class HbxEnrollment
     enrollment_list
   end
 
+  private
+
+  def decorated_hbx_enrollment
+    if plan.present? && benefit_group.present?
+      PlanCostDecorator.new(plan, self, benefit_group, benefit_group.reference_plan)
+    end
+  end
 end

@@ -1,51 +1,5 @@
 require 'rails_helper'
 
-# describe HbxEnrollment, "for an employee who does not currently have a life event enrollment period" do
-#   let(:todays_date) { double }
-#   let(:hire_date) { Date.today }
-#   let(:effective_on_date) { Date.today.next_month }
-#   let(:employer_profile) { EmployerProfile.new }
-#   let(:employee_role) { EmployeeRole.new(:hired_on => hire_date, :employer_profile => employer_profile) }
-#   let(:benefit_group) { BenefitGroup.new }
-#
-#   subject { HbxEnrollment.new(:employee_role => employee_role, :benefit_group => benefit_group, :effective_on => effective_on_date) }
-#
-#   describe "and the employer is not in open enrollment" do
-#     describe "and the employee is not shopping within the new-hire window" do
-#       before(:each) do
-#         allow(benefit_group).to receive(:within_new_hire_window?).with(hire_date).and_return(false)
-#         allow(employer_profile).to receive(:within_open_enrollment_for?).with(todays_date, effective_on_date).and_return(false)
-#       end
-#
-#       it "should not be able to complete shopping" do
-#         expect(subject.can_complete_shopping?(todays_date)).to be_falsey
-#       end
-#     end
-#
-#     describe "and the employee is shopping within the new-hire window" do
-#       before(:each) do
-#         allow(benefit_group).to receive(:within_new_hire_window?).with(hire_date).and_return(true)
-#       allow(employer_profile).to receive(:within_open_enrollment_for?).with(todays_date, effective_on_date).and_return(false)
-#       end
-#
-#       it "should be able to complete shoppping" do
-#         expect(subject.can_complete_shopping?(todays_date)).to be_truthy
-#       end
-#     end
-#   end
-#
-#   describe "and the employer is under open enrollment" do
-#     before(:each) do
-#       allow(benefit_group).to receive(:within_new_hire_window?).with(hire_date).and_return(false)
-#       allow(employer_profile).to receive(:within_open_enrollment_for?).with(todays_date, effective_on_date).and_return(true)
-#     end
-#
-#     it "should be able to complete shopping" do
-#       expect(subject.can_complete_shopping?(todays_date)).to be_falsey
-#     end
-#   end
-# end
-
 describe HbxEnrollment do
   context "an employer defines a plan year with multiple benefit groups, adds employees to roster and assigns benefit groups" do
     let(:blue_collar_employee_count)              { 7 }
@@ -97,8 +51,6 @@ describe HbxEnrollment do
                                                      end
                                                      ees
                                                     }
-
-    let(:blue_collar_employees)                   { FactoryGirl.create_list(:employee, employer_profile: employer_profile)}
 
     before do
       plan_year.publish!
@@ -244,6 +196,18 @@ describe HbxEnrollment do
           expect(enrollments.size).to eq (blue_collar_employee_count + white_collar_employee_count)
           expect(enrollments).to match_array(blue_collar_enrollment_waivers + white_collar_enrollment_waivers + blue_collar_enrollments + white_collar_enrollments)
         end
+
+        it "should know the total premium" do
+          expect(blue_collar_enrollments.first.total_premium).to be
+        end
+
+        it "should know the total employee cost" do
+          expect(blue_collar_enrollments.first.total_employee_cost).to be
+        end
+
+        it "should know the total employer contribution" do
+          expect(blue_collar_enrollments.first.total_employer_contribution).to be
+        end
       end
 
     end
@@ -270,7 +234,7 @@ describe HbxEnrollment, dbclean: :after_all do
     end
 
     it "should assign the benefit group assignment" do
-      expect(@enrollment.benefit_group_assignment_id).not_to be_nil
+      expect(enrollment.benefit_group_assignment_id).not_to be_nil
     end
 
     it "should be employer sponsored" do
@@ -296,38 +260,39 @@ describe HbxEnrollment, dbclean: :after_all do
     it "should default to enrolling everyone" do
       expect(enrollment.applicant_ids).to match_array(coverage_household.applicant_ids)
     end
+
+    it "should not return a total premium" do
+      expect{enrollment.total_premium}.not_to raise_error
+    end
+
+    it "should not return an employee cost" do
+      expect{enrollment.total_employee_cost}.not_to raise_error
+    end
+
+    it "should not return an employer contribution" do
+      expect{enrollment.total_employer_contribution}.not_to raise_error
+    end
+
+    context "and the employee enrolls" do
+      before do
+        enrollment.plan = enrollment.benefit_group.reference_plan
+        enrollment.save
+      end
+
+      it "should return a total premium" do
+        expect(enrollment.total_premium).to be
+      end
+
+      it "should return an employee cost" do
+        expect(enrollment.total_employee_cost).to be
+      end
+
+      it "should return an employer contribution" do
+        expect(enrollment.total_employer_contribution).to be
+      end
+    end
   end
 end
-
-#### TODO - move this to Family model.  Indicator for UI
-# describe HbxEnrollment, "#is_eligible_to_enroll?", type: :model do
-#   context "employer_profile is under open enrollment period" do
-#
-#     it "should return true" do
-#     end
-#
-#     context "employee_role is under Special Enrollment Period" do
-#       it "should return true" do
-#       end
-#     end
-#   end
-#
-#   context "employee_role is under Special Enrollment Period" do
-#     it "should return true" do
-#     end
-#   end
-#
-#   context "outside employer_profile open enrollment" do
-#     it "should return false" do
-#     end
-#   end
-#
-#   context "employee_role is not under SEP" do
-#     it "should return false" do
-#     end
-#   end
-# end
-#### END TODO
 
 # describe HbxEnrollment, "#save", type: :model do
 #
