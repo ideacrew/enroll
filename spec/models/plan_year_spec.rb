@@ -696,35 +696,73 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                 end
 
                 context "and three of the six employees have enrolled" do
+                  before do
+                    census_employees[1..employee_count - 4].each do |ee|
+                      ee.active_benefit_group_assignment.select_coverage
+                      ee.save
+                    end
+                  end
+
+                  it "should include all eligible employees" do
+                    expect(workflow_plan_year_with_benefit_group.total_enrolled_count).to eq 3
+                  end
 
                   context "and the plan effective date is Jan 1" do
-                    it "plan year application should be in enrolled state"
-                    it "employer profile should be in registered state"
+                    before do
+                      workflow_plan_year_with_benefit_group.start_on = Date.new(2016, 1, 1)
+                    end
+
+                    it "should NOT raise enrollment errors" do
+                      expect((workflow_plan_year_with_benefit_group.enrollment_errors).size).to eq 0
+                    end
                   end
 
                   context "and the plan effective date is NOT Jan 1" do
-                    it "plan year application should be in canceled state"
-                    it "employer profile should be in applicant state"
+
+                    it "should raise enrollment errors" do
+                      expect((workflow_plan_year_with_benefit_group.enrollment_errors).size).to eq 1
+                      expect(workflow_plan_year_with_benefit_group.enrollment_errors).to include(:enrollment_ratio)
+                    end
                   end
 
                   context "and five of the six employees have enrolled or waived coverage" do
+                    before do
+                      census_employees[employee_count - 1].active_benefit_group_assignment.select_coverage
+                      census_employees[employee_count - 1].save
+                    end
+
+                    it "should NOT raise enrollment errors" do
+                      expect((workflow_plan_year_with_benefit_group.enrollment_errors).size).to eq 0
+                    end
+
+                    context "and open enrollment ends" do
+                      before do
+                        TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
+                      end
+
+                      it "plan year application should be in enrolled state" do
+                        expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "enrolled"
+                      end
+
+                      it "plan year employer profile should be in registered state" do
+                        expect(workflow_plan_year_with_benefit_group.employer_profile.aasm_state).to eq "registered"
+                      end
+
+                      context "and employee signs into portal" do
+                        it "employees should be able to link to census employee roster"
+                        it "employees should be able to browse and purchase plans"
+                        it "employees' ability to purchase plans via OE should be disabled"
+                        it "employees under active SEP should continue to be able to purchase plans"
+                      end
+
+                      context "and enrollment is valid" do
+                        it "plan year application should be in enrolled state"
+                        it "employer profile should be in registered state"
+                      end
+                    end
                   end
                 end
               end
-            end
-          end
-
-          context "and open enrollment ends" do
-            context "and employee signs into portal" do
-              it "employees should be able to link to census employee roster"
-              it "employees should be able to browse and purchase plans"
-              it "employees' ability to purchase plans via OE should be disabled"
-              it "employees under active SEP should continue to be able to purchase plans"
-            end
-
-            context "and enrollment is valid" do
-              it "plan year application should be in enrolled state"
-              it "employer profile should be in registered state"
             end
           end
         end
