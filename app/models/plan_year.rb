@@ -176,7 +176,7 @@ class PlanYear
   end
 
   def eligible_to_enroll_count
-    eligible_to_enroll.count
+    eligible_to_enroll.size
   end
 
   # Employees who selected or waived and are not owners or direct family members of owners
@@ -185,7 +185,7 @@ class PlanYear
   end
 
   def non_business_owner_enrollment_count
-    non_business_owner_enrolled.count
+    non_business_owner_enrolled.size
   end
 
   # Any employee who selected or waived coverage
@@ -194,7 +194,7 @@ class PlanYear
   end
 
   def total_enrolled_count
-    enrolled.count
+    enrolled.size
   end
 
   def enrollment_ratio
@@ -223,8 +223,10 @@ class PlanYear
     end
 
     # At least one employee who isn't an owner or family member of owner must enroll
-    if non_business_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
-      errors.merge!(non_business_owner_enrollment_count: "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
+    if non_business_owner_enrollment_count < eligible_to_enroll_count
+      if non_business_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
+        errors.merge!(non_business_owner_enrollment_count: "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
+      end
     end
 
     # January 1 effective date exemption(s)

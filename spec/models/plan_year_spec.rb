@@ -656,7 +656,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                                           employee_count,
                                           employer_profile_id: workflow_plan_year_with_benefit_group.employer_profile.id
                                         )}
-              let(:family)                    { Family.create }
+              let(:family)            { Family.create }
 
               def benefit_group_assignment
                 BenefitGroupAssignment.new(
@@ -690,7 +690,9 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                 end
 
                 it "should raise enrollment errors" do
-                  expect(workflow_plan_year_with_benefit_group.enrollment_errors.size).to eq 2
+                  expect((workflow_plan_year_with_benefit_group.enrollment_errors).size).to eq 2
+                  expect(workflow_plan_year_with_benefit_group.enrollment_errors).to include(:non_business_owner_enrollment_count)
+                  expect(workflow_plan_year_with_benefit_group.enrollment_errors).to include(:enrollment_ratio)
                 end
 
                 context "and three of the six employees have enrolled" do
