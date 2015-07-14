@@ -87,8 +87,6 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
 
     it "should display dashboard info of employer" do
       expect(rendered).to match(/#{employer_profile.legal_name}/)
-      # expect(rendered).to match(/#{number_to_obscured_fein(employer_profile.fein)}/)
-      expect(rendered).to match(/#{employer_profile.entity_kind}/i)
     end
 
     it "should display office locations" do
