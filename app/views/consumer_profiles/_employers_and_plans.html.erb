@@ -11,8 +11,8 @@
                                   </div>
                                   <% plan = @hbx_enrollments.last.try(:plan) %>
                                   <% hbx_enrollment = @hbx_enrollments.last %>
-                                  <%= plan.try(:carrier_profile).try(:legal_name) %>
 
+                                  <%= plan.try(:carrier_profile).try(:legal_name) %>
                                   <h3><%= plan.try(:name) %></h3>
                                   <div>
                                     Subscriber Id : <%= hbx_enrollment.try(:subscriber).try(:id).try(:to_s) %>
@@ -40,6 +40,10 @@
                                           </tr>
                                       </tbody>
                                   </table>
+                                  <% benefit_group_assignment = hbx_enrollment.try(:benefit_group_assignment) %>
+                                  <% if benefit_group_assignment.present? and benefit_group_assignment.coverage_waived? %>
+                                    <%= render partial: "shared/waive", locals: {benefit_group_assignment: benefit_group_assignment} %>
+                                  <% end %>
                               </div>
                             </div>
                         </div>

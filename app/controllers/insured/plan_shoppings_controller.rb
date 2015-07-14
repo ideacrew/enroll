@@ -35,9 +35,12 @@ class Insured::PlanShoppingsController < ApplicationController
   def waive
     person = current_user.person
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
+    waiver_reason = params.require(:waiver_reason)
 
-    if (hbx_enrollment.shopping? or hbx_enrollment.coverage_selected?) and hbx_enrollment.waive_coverage!
-      hbx_enrollment.update(waiver_reason: params.require(:waiver_reason))
+    if (hbx_enrollment.shopping? or hbx_enrollment.coverage_selected?) and waiver_reason.present? and hbx_enrollment.valid?
+      hbx_enrollment.waive_coverage
+      hbx_enrollment.waiver_reason = waiver_reason 
+      hbx_enrollment.save
       flash[:notice] = "Waive Successful"
     else
       flash[:alert] = "Waive Failure"
