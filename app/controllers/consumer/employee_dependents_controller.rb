@@ -23,6 +23,7 @@ class Consumer::EmployeeDependentsController < ApplicationController
     @dependent = Forms::EmployeeDependent.new(params.require(:dependent))
 
     if @dependent.save
+      @created = true
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }

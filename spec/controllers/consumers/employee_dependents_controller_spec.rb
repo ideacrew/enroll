@@ -77,6 +77,10 @@ RSpec.describe Consumer::EmployeeDependentsController do
         expect(assigns(:dependent)).to eq dependent
       end
 
+      it "should assign the created" do
+        expect(assigns(:created)).to eq true
+      end
+
       it "should render the show template" do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")

@@ -28,7 +28,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   def search_broker_agency
-    orgs = Organization.exists(broker_agency_profile: true).or({legal_name: /#{params[:broker_agency_search]}/i}, {"broker_agency_profile.corporate_npn" => params[:broker_agency_search]})
+    orgs = Organization.exists(broker_agency_profile: true).or({legal_name: /#{params[:broker_agency_search]}/i}, {"broker_agency_profile.corporate_npn" => /#{params[:broker_agency_search]}/i})
 
     @broker_agency_profiles = orgs.present? ? orgs.map(&:broker_agency_profile) : []
   end
