@@ -101,7 +101,7 @@ class Employers::PlanYearsController < ApplicationController
       end
     when @plan_year.published?
       flash[:notice] = "Plan Year successfully published"
-      redirect_to employers_employer_profile_path(@employer_profile)
+      render :js => "window.location = #{employers_employer_profile_path(@employer_profile).to_json}"
     end
   end
 
