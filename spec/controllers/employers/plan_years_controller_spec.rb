@@ -307,8 +307,8 @@ RSpec.describe Employers::PlanYearsController do
       end
 
       it "should be a redirect" do
-        post :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
-        expect(response).to have_http_status(:redirect)
+        xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
+        have_http_status(:success)
       end
     end
 
@@ -320,7 +320,7 @@ RSpec.describe Employers::PlanYearsController do
       end
 
       it "should be a redirect with warnings" do
-        post :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
+        post :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id        
         expect(response).to have_http_status(:redirect)
       end
     end
