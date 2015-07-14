@@ -297,47 +297,45 @@ RSpec.describe Employers::PlanYearsController do
     before :each do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(plan_year_proxy).to receive(:draft?).and_return(false)
+      allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
+      allow(plan_year_proxy).to receive(:application_errors)
     end
 
     context "plan year published sucessfully" do
       before :each do
-        allow(plan_year_proxy).to receive(:draft?).and_return(false)
-        allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
         allow(plan_year_proxy).to receive(:published?).and_return(true)
       end
 
-      it "should be a redirect" do
+      it "should redirect with success message" do
         xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
+        expect(flash[:notice]).to eq "Plan Year successfully published."
+      end
+    end
+
+    context "plan year did not publish due to warnings" do
+      before :each do
+        allow(plan_year_proxy).to receive(:publish_pending?).and_return(true)
+      end
+
+      it "should be a render modal box with warnings" do
+        xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id 
         have_http_status(:success)
       end
     end
 
-    context "plan year did not publish with warnings" do
-      before :each do
-        allow(plan_year_proxy).to receive(:draft?).and_return(false)
-        allow(plan_year_proxy).to receive(:publish_pending?).and_return(true)
-        allow(plan_year_proxy).to receive(:application_warnings)
-      end
-
-      it "should be a redirect with warnings" do
-        post :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id        
-        expect(response).to have_http_status(:redirect)
-      end
-    end
-
-    context "plan year did not publish with errors" do
+    context "plan year did not publish due to errors" do
       before :each do
         allow(plan_year_proxy).to receive(:draft?).and_return(true)
-        allow(plan_year_proxy).to receive(:application_errors)
+        allow(plan_year_proxy).to receive(:published?).and_return(false)
       end
 
-      it "should be a redirect with errors" do
-        post :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
-        expect(response).to have_http_status(:redirect)
+      it "should redirect with errors" do
+        xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
+        expect(flash[:notice]).to match(/Plan Year failed to publish/)
       end
     end
   end
-
 
   describe "POST force publish" do
     let(:plan_year_id) { "plan_year_id"}
