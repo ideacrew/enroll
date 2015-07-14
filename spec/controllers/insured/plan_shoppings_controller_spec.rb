@@ -8,6 +8,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   let(:usermailer) {double}
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
+  let(:employee_role) { EmployeeRole.new }
 
   context "POST checkout" do
     before do
@@ -22,12 +23,22 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:save).and_return(true)
       allow(UserMailer).to receive(:plan_shopping_completed).and_return(usermailer)
       allow(usermailer).to receive(:deliver_now).and_return(true)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
+      allow(employee_role).to receive(:hired_on).and_return(TimeKeeper.date_of_record + 10.days)
     end
 
     it "returns http success" do
       sign_in
       post :checkout, id: "hbx_id", plan_id: "plan_id"
       expect(response).to have_http_status(:redirect)
+    end
+
+    context "employee hire_on date greater than enrollment date" do
+      it "fails" do
+        sign_in
+        post :checkout, id: "hbx_id", plan_id: "plan_id"
+        expect(flash[:error]).to include("You are attempting to purchase coverage prior to your date of hire on record. Please contact your Employer for assistance")
+      end
     end
   end
 
