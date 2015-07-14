@@ -656,17 +656,41 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                                           employee_count,
                                           employer_profile_id: workflow_plan_year_with_benefit_group.employer_profile.id
                                         )}
+              let(:family)                    { Family.create }
+
+              def benefit_group_assignment
+                BenefitGroupAssignment.new(
+                  benefit_group: benefit_group, 
+                  start_on: workflow_plan_year_with_benefit_group.start_on,
+                  hbx_enrollment: hbx_enrollment)
+              end
+
+              def hbx_enrollment
+                HbxEnrollment.create(
+                  household: family.households.first, 
+                  benefit_group_id: benefit_group.id, 
+                  kind: "unassisted_qhp")
+              end
 
               context "and the business owner only has enrolled" do
                 before do
                   census_employees[0].is_business_owner = true
-                  census_employees[0].add_benefit_group_assignment(benefit_group)
+                  census_employees[0].benefit_group_assignments = [benefit_group_assignment]
                   census_employees[0].active_benefit_group_assignment.select_coverage
                   census_employees[0].save
+
+                  census_employees[1..employee_count - 1].each do |ee|
+                    ee.benefit_group_assignments = [benefit_group_assignment]
+                    ee.save
+                  end
+                end
+
+                it "should include all eligible employees" do
+                  expect(workflow_plan_year_with_benefit_group.eligible_to_enroll_count).to eq employee_count
                 end
 
                 it "should raise enrollment errors" do
-                  expect(workflow_plan_year_with_benefit_group.enrollment_errors.size).to eq 3
+                  expect(workflow_plan_year_with_benefit_group.enrollment_errors.size).to eq 2
                 end
 
                 context "and three of the six employees have enrolled" do
