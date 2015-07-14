@@ -28,13 +28,15 @@ RSpec.describe Employers::CensusEmployeesController do
       expect(assigns(:census_employee).class).to eq CensusEmployee
     end
 
-    it "should redirect with no plan_years" do
+    it "should render as normal with no plan_years" do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(employer_profile).to receive(:plan_years).and_return("")
       sign_in(user)
       get :new, :employer_profile_id => employer_profile_id
-      expect(response).to be_redirect
-      expect(flash[:notice]).to eq "Please create a plan year before you create your first census employee."
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("new")
+      #expect(response).to be_redirect
+      #expect(flash[:notice]).to eq "Please create a plan year before you create your first census employee."
     end
   end
 

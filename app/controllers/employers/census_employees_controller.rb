@@ -1,7 +1,7 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
   before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :assignment_benefit_group ]
-  before_action :check_plan_year, only: [:new]
+  #before_action :check_plan_year, only: [:new]
 
   def new
     @census_employee = build_census_employee
