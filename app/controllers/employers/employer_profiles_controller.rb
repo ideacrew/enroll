@@ -90,14 +90,8 @@ class Employers::EmployerProfilesController < ApplicationController
     end
 
     @page_alphabets = page_alphabets(census_employees, "last_name")
-
-    if params[:page].present?
-      page_no = cur_page_no(@page_alphabets.first)
-      @census_employees = census_employees.where("last_name" => /^#{page_no}/i)
-    else
-      @total_census_employees_quantity = census_employees.count
-      @census_employees = census_employees.to_a.first(20)
-    end
+    page_no = cur_page_no(@page_alphabets.first)
+    @census_employees = census_employees.where("last_name" => /^#{page_no}/i)
     @broker_agency_accounts = @employer_profile.broker_agency_accounts
   end
 

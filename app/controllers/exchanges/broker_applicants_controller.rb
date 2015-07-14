@@ -8,16 +8,12 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     status_params = params.permit(:status)
     @status = status_params[:status] || 'applicant'
 
-    # Status Filter can be applicant | certified | deceritifed | denied | all
+    # Searching applicants based on filters (applicant | certified | deceritifed | denied | all)
     @people = @people.send("broker_role_#{@status}") if @people.respond_to?("broker_role_#{@status}")
     @page_alphabets = page_alphabets(@people, "last_name")
 
-    if params[:page].present?
-      page_no = cur_page_no(@page_alphabets.first)
-      @broker_applicants = @people.where("last_name" => /^#{page_no}/i)
-    else
-      @broker_applicants = @people.to_a.first(20)
-    end
+    page_no = cur_page_no(@page_alphabets.first)
+    @broker_applicants = @people.where("last_name" => /^#{page_no}/i)
 
     respond_to do |format|
       format.js
@@ -25,7 +21,6 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   end
 
   def edit
-
     respond_to do |format|
       format.js
     end
@@ -33,8 +28,9 @@ class Exchanges::BrokerApplicantsController < ApplicationController
 
   def update
     broker_role = @broker_applicant.broker_role
-    broker_role.update_attributes(:reason => params[:person][:broker_role_attributes][:reason])
-
+    if params[:person] && params[:person][:broker_role_attributes] && params[:person][:broker_role_attributes][:reason]
+      broker_role.update_attributes(:reason => params[:person][:broker_role_attributes][:reason])
+    end
     if params['deny']
       broker_role.deny!
       flash[:notice] = "Broker applicant denied."

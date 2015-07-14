@@ -9,7 +9,12 @@ module ApplicationHelper
     html_class_list = opts.delete(:class) { |k| "" }
     jq_tag_classes = (html_class_list.split(/\s+/) + ["jq-datepicker"]).join(" ")
     generated_field_name = "jq_datepicker_ignore_#{obj_name}[#{sanitized_field_name}]"
-    generated_target_id = "#{obj_name}_#{sanitized_field_name}_jq_datepicker_plain_field"
+    provided_id = options[:id] || options["id"]
+    generate_target_id = nil
+    if !provided_id.blank?
+      generated_target_id = "#{provided_id}_jq_datepicker_plain_field"
+    end
+    generated_target_id ||= "#{obj_name}_#{sanitized_field_name}_jq_datepicker_plain_field"
     capture do
       concat f.text_field(field_name, opts.merge(:class => html_class_list, :id => generated_target_id, :value=> obj_val.try(:to_s, :db)))
       concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
