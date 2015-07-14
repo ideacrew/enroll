@@ -50,10 +50,6 @@ module ApplicationHelper
     date_value.strftime("%m/%d/%Y") if date_value.respond_to?(:strftime)
   end
 
-  def format_date_with_hyphens(date_value)
-    date_value.strftime("%m-%d-%Y") if date_value.respond_to?(:strftime)
-  end
-
   # Builds a Dropdown button
   def select_dropdown(input_id, list)
     return unless list.is_a? Array
