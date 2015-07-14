@@ -1,6 +1,5 @@
-<% dependents = @census_employee.census_dependents %>
-<% address = @census_employee.address %>
-<% benefit_group_assignment = @census_employee.active_benefit_group_assignment %>
+<% dependents = @census_employee.try(:employee_role).try(:person).try(:primary_family).try(:active_family_members) || @census_employee.census_dependents %>
+<% address =  @census_employee.try(:employee_role).try(:person).try(:addresses).try(:last) || @census_employee.address %>
 <h3>Census Employee Details</h3>
 <div class="row">
   <div class="col-md-6 col-sm-6 col-xs-12">
@@ -48,7 +47,7 @@
                 <%= format_date dependent.dob %>
               </td>
               <td>
-                <%= dependent.employee_relationship %>
+                <%= dependent.try(:relationship) || dependent.try(:employee_relationship) %>
               </td>
               <td>
                 <%= dependent.gender %>
@@ -65,12 +64,52 @@
   <div class="col-md-6 col-sm-6 col-xs-12">
     <h4>Plan</h4>
     <div class="form-border">
-      <p>Benefit Group: <%= benefit_group_assignment.try(:benefit_group).try(:title) %></p>
-      <% if benefit_group_assignment.try(:coverage_waived?) %>
+      <p>Benefit Group: <%= @benefit_group.try(:title) %></p>
+      <% if @benefit_group_assignment.try(:coverage_waived?) %>
         <p>Enrollment Status: Coverage Waived</p>
-        <p>Waiver Reason: <%= benefit_group_assignment.try(:hbx_enrollment).try(:waiver_reason) %></p>
-      <% elsif benefit_group_assignment.try(:coverage_selected?) %>
-        <p>Plan Name: <%= benefit_group_assignment.try(:hbx_enrollment).try(:plan).try(:name) %></p>
+        <p>Waiver Reason: <%= @hbx_enrollment.try(:waiver_reason) %></p>
+      <% elsif @benefit_group_assignment.try(:coverage_selected?) %>
+        <p>Plan Name: <%= @hbx_enrollment.try(:plan).try(:name) %></p>
+        <p>Plan Start: <%= @hbx_enrollment.try(:effective_on) %></p>
+        <% if @census_employee.employee_role.try(:present?) and employee_role = @census_employee.employee_role %>
+          <p>HIRED: <%= employee_role.try(:hired_on) %></p>
+          <p>ELIGIBLE FOR COVERAGE: <em><%= employee_role.try(:effective_on) %></em></p>
+        <% end %>
+        <% if @plan.present? and @hbx_enrollment.present? %>
+          <div class="table-border table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Relationship</th>
+                  <th>Age</th>
+                  <th class="text-right">Premium</th>
+                  <th class="text-right" width="50">Employer Contribution</th>
+                  <th class="text-right" width="50">You Pay</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% @hbx_enrollment.hbx_enrollment_members.each do |member| %>
+                  <tr>
+                    <td><%= member.person.full_name %></td>
+                    <td><%= member.primary_relationship %></td>
+                    <td><%= member.person.age_on(Time.now.utc.to_date) %></td>
+                    <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
+                    <td class="text-right"><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
+                    <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+                  </tr>
+                <% end %>
+                <tr class="gray-row">
+                  <td colspan="3" class="text-right capital"><strong>Totals</strong></td>
+                  <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
+                  <td class="text-right"><strong><%= number_to_currency(@plan.total_employer_contribution) %></strong></td>
+                  <td class="text-right"><strong><%= number_to_currency(@plan.total_employee_cost) %></strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        <% end %>
       <% end %>
     </div>
   </div>
