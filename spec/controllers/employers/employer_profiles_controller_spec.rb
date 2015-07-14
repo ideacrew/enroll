@@ -40,20 +40,35 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(user).to receive(:has_employer_staff_role?)
       employer_profile.plan_years = [plan_year]
       sign_in(user)
-      get :show, id: employer_profile.id
     end
 
     it "should render the show template" do
+      get :show, id: employer_profile.id
       expect(response).to have_http_status(:success)
       expect(response).to render_template("show")
       expect(assigns(:current_plan_year)).to eq employer_profile.published_plan_year
     end
 
     it "should get plan years" do
+      get :show, id: employer_profile.id
       expect(assigns(:plan_years)).to eq employer_profile.plan_years.order(id: :desc)
       expect(assigns(:current_plan_year)).to eq employer_profile.published_plan_year
     end
 
+    it "should get default status" do
+      get :show, id: employer_profile.id
+      expect(assigns(:status)).to eq "active"
+    end
+
+    it "should get 20 census_employees without page params" do
+      30.times do
+        FactoryGirl.create(:census_employee, employer_profile: employer_profile, last_name: "#{('A'..'Z').to_a.sample}last_name")
+      end
+      get :show, id: employer_profile.id
+      expect(assigns(:total_census_employees_quantity)).to eq employer_profile.census_employees.active.count
+      expect(assigns(:census_employees).count).to eq 20
+      expect(assigns(:census_employees)).to eq employer_profile.census_employees.active.sorted.to_a.first(20)
+    end
   end
 
   describe "GET welcome" do
