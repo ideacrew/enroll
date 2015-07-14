@@ -404,7 +404,6 @@ class PlanYear
       transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
-      transitions from: :ineligible, to: :applicant, :guard => :has_ineligible_period_expired?
       transitions from: [:draft, :ineligible, :publish_pending, :published_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
     end
 
@@ -492,11 +491,6 @@ class PlanYear
       (TimeKeeper.date_of_record - HbxProfile::ShopApplicationAppealPeriodMaximum))
   end
 
-  def has_ineligible_period_expired?
-binding.pry
-    ineligible? and (latest_workflow_state_transition.transition_at + 90.days <= TimeKeeper.date_of_record)
-  end
-
   # def shoppable? # is_eligible_to_shop?
   #   (benefit_groups.size > 0) and
   #   ((published? and employer_profile.shoppable?))
@@ -513,7 +507,7 @@ binding.pry
 private
   def is_event_date_valid?
     today = TimeKeeper.date_of_record
-    case aasm_state
+    valid = case aasm_state
     when "published", "draft"
       today == open_enrollment_start_on
     when "enrolling"
@@ -525,6 +519,8 @@ private
     else
       false
     end
+
+    valid
   end
 
   def is_plan_year_end?

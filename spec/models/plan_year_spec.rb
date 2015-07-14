@@ -535,7 +535,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the applicant chooses to submit with application eligibility warnings" do
-          let(:submit_date) { TimeKeeper.date_of_record }
+          let!(:submit_date) { TimeKeeper.date_of_record }
 
           before { workflow_plan_year_with_benefit_group.force_publish! }
 
@@ -550,8 +550,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           context "and the employer doesn't request eligibility review" do
             context "and more than 90 days have elapsed since the ineligible application was submitted" do
               before do
-                TimeKeeper.set_date_of_record(submit_date + 91.days)
-                # binding.pry
+                TimeKeeper.set_date_of_record(submit_date + 90.days)
               end
 
               it "should transition employer profile to applicant status" do
@@ -641,11 +640,12 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
           context "and open enrollment begins" do
             before do
+              # $start_on = workflow_plan_year_with_benefit_group.open_enrollment_start_on
               TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_start_on)
             end
 
             it "plan year application should be in enrolling state" do
-              expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "enrolling"
+              expect(PlanYear.find(workflow_plan_year_with_benefit_group.id).aasm_state).to eq "enrolling"
             end
 
             it "employees should be able to both browse and purchase plans"
@@ -741,7 +741,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                       end
 
                       it "plan year application should be in enrolled state" do
-                        expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "enrolled"
+                        expect(PlanYear.find(workflow_plan_year_with_benefit_group.id).aasm_state).to eq "enrolled"
                       end
 
                       it "plan year employer profile should be in registered state" do

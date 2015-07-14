@@ -222,7 +222,7 @@ class EmployerProfile
         {:"employer_profile.plan_years.end_on" => new_date - 1.day},
         {:"employer_profile.plan_years.open_enrollment_start_on" => new_date},
         {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day},
-        {:"employer_profile.plan_years.workflow_state_transitions".elem_match => {
+        {:"employer_profile.workflow_state_transitions".elem_match => {
             "$and" => [
               {:transition_at.gte => (new_date.beginning_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
               {:transition_at.lte => (new_date.end_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
@@ -232,26 +232,13 @@ class EmployerProfile
         }
       )
 
-      # orgs = Organization.or(
-      #   {:"employer_profile.plan_years.start_on" => new_date},
-      #   {:"employer_profile.plan_years.end_on" => new_date - 1.day},
-      #   {:"employer_profile.plan_years.open_enrollment_start_on" => new_date},
-      #   {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day},
-      #   {:"employer_profile.plan_years.workflow_state_transitions".elem_match => {
-      #       "$and" => [
-      #         {:"employer_profile.plan_years.workflow_state_transitions.transition_at".gte => (new_date.beginning_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum),
-      #          :"employer_profile.plan_years.workflow_state_transitions.transition_at".lte => (new_date.end_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
-      #         {:"employer_profile.plan_years.workflow_state_transitions.to_state" => "ineligible"}
-      #       ]
-      #     }
-      #   }
-      # )
-# binding.pry
-
+# binding.pry if orgs.to_a.present?
       orgs.each do |org|
         org.employer_profile.today = new_date
+        org.employer_profile.advance_date! if org.employer_profile.may_advance_date?
         plan_year = org.employer_profile.published_plan_year
         plan_year.advance_date! if plan_year && plan_year.may_advance_date?
+        plan_year
       end
     end
   end
@@ -279,6 +266,10 @@ class EmployerProfile
     # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
     state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
     state :ineligible                 # Employer is unable to obtain coverage on the HBX per regulation or policy
+
+    event :advance_date do
+      transitions from: :ineligible, to: :applicant, :guard => :has_ineligible_period_expired?
+    end
 
     event :application_accepted, :after => :record_transition do
       transitions from: [:applicant, :ineligible], to: :registered
@@ -363,6 +354,10 @@ class EmployerProfile
   end
 
 private
+  def has_ineligible_period_expired?
+    ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)
+  end
+
   def cancel_benefit
     published_plan_year.cancel
   end
