@@ -120,9 +120,9 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
 
     it "should display plan year and related information" do
       expect(rendered).to match(/<dd>#{current_plan_year.start_on.to_date.year}<\/dd>/m)
-      expect(rendered).to match(/<dd>#{format_date_with_hyphens current_plan_year.start_on}<\/dd>/m)
-      expect(rendered).to match(/#{format_date_with_hyphens current_plan_year.open_enrollment_start_on}/m)
-      expect(rendered).to match(/#{format_date_with_hyphens current_plan_year.open_enrollment_end_on}/m)
+      expect(rendered).to match(/<dd>#{format_date current_plan_year.start_on}<\/dd>/m)
+      expect(rendered).to match(/#{format_date current_plan_year.open_enrollment_start_on}/m)
+      expect(rendered).to match(/#{format_date current_plan_year.open_enrollment_end_on}/m)
       expect(rendered).to match(/<dd>#{current_plan_year.eligible_to_enroll_count}<\/dd>/m)
       expect(rendered).to match(/<dd>#{current_plan_year.total_enrolled_count}<\/dd>/m)
       expect(rendered).to match(/<dd>#{current_plan_year.employee_participation_percent}<\/dd>/m)
