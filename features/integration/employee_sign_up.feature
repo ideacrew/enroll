@@ -19,7 +19,8 @@ Feature: Employee Sign Up
     When I log out
     Then I should see the hbx home page
     When My employer publishes a plan year
-     And My employer logs out
+    Then I should see a published success message
+    And My employer logs out
     Then I should see the hbx home page
     When I log in to the employee account page
     Then I should be logged in

@@ -90,18 +90,14 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     @plan_year.publish!
 
-    case
-    when @plan_year.draft?
-      flash[:notice] = "Plan Year failed to publish: #{@plan_year.application_errors}"
-      redirect_to employers_employer_profile_path(@employer_profile)
-    when @plan_year.publish_pending?
+    if @plan_year.publish_pending?
       respond_to do |format|
-        format.html {  redirect_to employers_employer_profile_path(@employer_profile) }
         format.js
       end
-    when @plan_year.published?
-      flash[:notice] = "Plan Year successfully published"
-      redirect_to employers_employer_profile_path(@employer_profile)
+    else      
+      flash[:notice] = @plan_year.published? ? "Plan Year successfully published."
+                           : "Plan Year failed to publish: #{@plan_year.application_errors}"
+      render :js => "window.location = #{employers_employer_profile_path(@employer_profile).to_json}"
     end
   end
 

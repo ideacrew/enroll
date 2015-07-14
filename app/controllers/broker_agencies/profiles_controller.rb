@@ -25,8 +25,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def show
-    @q = params.permit(:q)[:q]
-    @orgs = Organization.search(@q).exists(employer_profile: true)
+    broker_id = params[:id] #||current_user.person.broker_role.broker_agency_profile_id.to_s
+    profile = BrokerAgencyProfile.find(broker_id)
+    @orgs = Organization.where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => profile._id})
     @page_alphabets = page_alphabets(@orgs, "legal_name")
     page_no = cur_page_no(@page_alphabets.first)
     @organizations = @orgs.where("legal_name" => /^#{page_no}/i)

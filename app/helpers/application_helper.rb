@@ -50,10 +50,6 @@ module ApplicationHelper
     date_value.strftime("%m/%d/%Y") if date_value.respond_to?(:strftime)
   end
 
-  def format_date_with_hyphens(date_value)
-    date_value.strftime("%m-%d-%Y") if date_value.respond_to?(:strftime)
-  end
-
   # Builds a Dropdown button
   def select_dropdown(input_id, list)
     return unless list.is_a? Array
@@ -299,18 +295,27 @@ module ApplicationHelper
   end
 
   def portal_display_name(controller)
-    if controller == 'welcome'
-      "Welcome to the District's Health Insurance Marketplace"
+    if current_user.try(:has_hbx_staff_role?)
+      "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm HBX Staff".html_safe
+    elsif current_user.try(:has_broker_agency_staff_role?)
+      "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe
+    elsif current_user.try(:has_employer_staff_role?)
+      "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe
     elsif controller == 'employee_roles'
       "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Employee".html_safe
     elsif controller == 'consumer_profiles'
       "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Individual/Family".html_safe
-    elsif controller == 'employer_profiles'
-      "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe
-    elsif controller == 'profiles' || controller == 'broker_roles'
-      "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe
-    elsif controller == 'hbx_profiles'
-      "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm HBX Staff".html_safe
+    else
+      "Welcome to the District's Health Insurance Marketplace"
     end
+  end
+  def override_backlink
+    link=''
+    if current_user.try(:has_hbx_staff_role?)
+      link = link_to 'HBX Portal', exchanges_hbx_profile_path(id: 1)
+    elsif current_user.try(:has_broker_agency_staff_role?)
+      link = link_to 'Broker Agency Portal',broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id)
+    end
+    return link
   end
 end

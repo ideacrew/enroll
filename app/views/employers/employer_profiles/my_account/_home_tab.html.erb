@@ -24,11 +24,11 @@
                 <dt>Plan Year</dt>
                 <dd><%= @current_plan_year.start_on.to_date.year %></dd>
                 <dt>Plan Year Start</dt>
-                <dd><%= format_date_with_hyphens @current_plan_year.start_on %></dd>
+                <dd><%= format_date @current_plan_year.start_on %></dd>
                 <dt>Open Enrollment Period</dt>
                 <dd>
-                  <%= format_date_with_hyphens @current_plan_year.open_enrollment_start_on %> /
-                  <%= format_date_with_hyphens @current_plan_year.open_enrollment_end_on %>
+                  <%= format_date @current_plan_year.open_enrollment_start_on %> -
+                  <%= format_date @current_plan_year.open_enrollment_end_on %>
                 </dd>
                 <dt>Eligible Employees on Roster</dt>
                 <dd><%= @current_plan_year.eligible_to_enroll_count %></dd>

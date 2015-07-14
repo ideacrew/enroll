@@ -93,6 +93,7 @@ Then(/^I should be logged in$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
+  sleep 2
   scroll_then_click(@browser.element(class: /interaction-click-control-logout/))
   @browser.element(class: /interaction-click-control-logout/).wait_while_present
 end
@@ -385,4 +386,9 @@ Then(/^I should see my plan/) do
   @browser.element(text: /plan name/i).wait_until_present
   screenshot("my_plan")
   expect(@browser.element(text: /plan name/i).visible?).to be_truthy
+end
+
+When(/^I should see a published success message$/) do
+  @browser.element(class: /mainmenu/).wait_until_present
+  expect(@browser.element(text: /Plan Year successfully published/)).to be_truthy
 end
