@@ -31,11 +31,11 @@
                   <%= format_date_with_hyphens @current_plan_year.open_enrollment_end_on %>
                 </dd>
                 <dt>Eligible Employees on Roster</dt>
-                <dd><%= @current_plan_year.employee_participation_percent %></dd>
+                <dd><%= @current_plan_year.eligible_to_enroll_count %></dd>
                 <dt>Enrolled/Waived Employees</dt>
-                <dd><%= @current_plan_year.employee_participation_percent %></dd>
+                <dd><%= @current_plan_year.total_enrolled_count %></dd>
                 <dt>Participation Percentage</dt>
-                <dd><%= @current_plan_year.employee_participation_percent %></dd>
+                <dd><%=  @current_plan_year.employee_participation_percent %></dd>
               </dl>
               <% else %>
               No Plan Years Found
