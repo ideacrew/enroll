@@ -155,7 +155,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
 
       context "and the open enrollment period is too short" do
-        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1 }
+        let(:invalid_length)  { HbxProfile::ShopOpenEnrollmentPeriodMinimum - 2 }
         let(:open_enrollment_start_on)  { TimeKeeper.date_of_record }
         let(:open_enrollment_end_on)    { open_enrollment_start_on + invalid_length }
 
@@ -407,7 +407,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       context "and employer profile is in enrollment ineligible state" do
         before do
           employer_profile.plan_years = [workflow_plan_year_with_benefit_group]
-          employer_profile.aasm_state = :enrollment_ineligible
+          employer_profile.aasm_state = "ineligible"
         end
 
         it "application should NOT be publishable" do
@@ -539,18 +539,19 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
           before { workflow_plan_year_with_benefit_group.force_publish! }
 
-          it "should transition plan year application into publish_invalid status" do
-            expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "publish_invalid"
+          it "should transition plan year application into published_invalid status" do
+            expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "published_invalid"
           end
 
-          it "should transition applicant employer profile into enrollment enrollment_ineligible status" do
-            expect(employer_profile.aasm_state).to eq "enrollment_ineligible"
+          it "should transition applicant employer profile into enrollment ineligible status" do
+            expect(employer_profile.aasm_state).to eq "ineligible"
           end
 
           context "and the employer doesn't request eligibility review" do
-            context "and 90 days have elapsed since the ineligible application was submitted" do
+            context "and more than 90 days have elapsed since the ineligible application was submitted" do
               before do
-                TimeKeeper.set_date_of_record(submit_date + 90.days)
+                TimeKeeper.set_date_of_record(submit_date + 91.days)
+                # binding.pry
               end
 
               it "should transition employer profile to applicant status" do
@@ -585,8 +586,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               context "and review affirms ineligible application determination" do
                 before { workflow_plan_year_with_benefit_group.deny_eligibility! }
 
-                it "should transition application back into publish_invalid status" do
-                  expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "publish_invalid"
+                it "should transition application back into published_invalid status" do
+                  expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "published_invalid"
                 end
               end
             end
@@ -614,58 +615,90 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
       end
 
+      ## Enrollment Errors
+      context "and the employer submits a valid plan year application" do
+        before do
+          workflow_plan_year_with_benefit_group.publish!
+        end
 
-      # Proceed with enrollment
-      context "and employer submits a valid plan year application" do
-        it "plan year application should be in published state"
-        it "employer profile should be in registered state"
-        it "invitations should go out to employees to sign up on the HBX"
+        it "application should not be valid" do
+          expect(workflow_plan_year_with_benefit_group.is_application_valid?).to be_truthy
+        end
+
+        it "plan year application should be in published state" do
+          expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "published"
+        end
+
+        it "employer profile should be in registered state" do
+          expect(workflow_plan_year_with_benefit_group.employer_profile.aasm_state).to eq "registered"
+        end
+
+        it "email invitations should go out to employees to sign up on the HBX"
 
         context "and employee signs into portal" do
           it "employees should be able to link to census employee roster"
           it "employees should be able to browse, but not purchase plans"
 
           context "and open enrollment begins" do
-            it "plan year application should be in enrolling state"
+            before do
+              TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_start_on)
+            end
+
+            it "plan year application should be in enrolling state" do
+              expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "enrolling"
+            end
+
             it "employees should be able to both browse and purchase plans"
 
-            context "and employee signs into portal" do
-              it "employees should be able to link to census employee roster"
-              it "employees should be able to browse and purchase plans"
+            context "and six employees are eligible to enroll" do
+              let(:employee_count)    { 6 }
+              let(:census_employees)  { FactoryGirl.create_list(:census_employee, 
+                                          employee_count,
+                                          employer_profile_id: workflow_plan_year_with_benefit_group.employer_profile.id
+                                        )}
+
+              context "and the business owner only has enrolled" do
+                before do
+                  census_employees[0].is_business_owner = true
+                  census_employees[0].add_benefit_group_assignment(benefit_group)
+                  census_employees[0].active_benefit_group_assignment.select_coverage
+                  census_employees[0].save
+                end
+
+                it "should raise enrollment errors" do
+                  expect(workflow_plan_year_with_benefit_group.enrollment_errors.size).to eq 3
+                end
+
+                context "and three of the six employees have enrolled" do
+
+                  context "and the plan effective date is Jan 1" do
+                    it "plan year application should be in enrolled state"
+                    it "employer profile should be in registered state"
+                  end
+
+                  context "and the plan effective date is NOT Jan 1" do
+                    it "plan year application should be in canceled state"
+                    it "employer profile should be in applicant state"
+                  end
+
+                  context "and five of the six employees have enrolled or waived coverage" do
+                  end
+                end
+              end
             end
           end
 
-          context "and open enrollment ends and employee signs into portal" do
-            it "employees should be able to link to census employee roster"
-            it "employees should be able to browse and purchase plans"
-            it "employees' ability to purchase plans via OE should be disabled"
-            it "employees under active SEP should continue to be able to purchase plans"
+          context "and open enrollment ends" do
+            context "and employee signs into portal" do
+              it "employees should be able to link to census employee roster"
+              it "employees should be able to browse and purchase plans"
+              it "employees' ability to purchase plans via OE should be disabled"
+              it "employees under active SEP should continue to be able to purchase plans"
+            end
 
             context "and enrollment is valid" do
               it "plan year application should be in enrolled state"
               it "employer profile should be in registered state"
-            end
-
-            context "and 0 emploees enroll" do
-              it "plan year application should be in canceled state"
-              it "employer profile should be in applicant state"
-            end
-
-            context "and at least one non-owner isn't enrolled" do
-              it "plan year application should be in canceled state"
-              it "employer profile should be in applicant state"
-            end
-
-            context "and eligible employee enrollment is less than regulatory minimum" do
-              context "and the plan effective date is Jan 1" do
-                it "plan year application should be in enrolled state"
-                it "employer profile should be in registered state"
-              end
-
-              context "and the plan effective date is NOT Jan 1" do
-                it "plan year application should be in canceled state"
-                it "employer profile should be in applicant state"
-              end
             end
           end
         end
@@ -785,7 +818,6 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     end
   end
-
 
   # context "has registered and enters initial application process" do
   #   let(:benefit_group)         { FactoryGirl.build(:benefit_group)}
@@ -1009,7 +1041,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   
         it "and should provide relevent warning message" do
           expect(plan_year.application_eligibility_warnings[:minimum_employer_contribution].present?).to be_truthy
-          expect(plan_year.application_eligibility_warnings[:minimum_employer_contribution]).to match(/employer contribution percent/)
+          expect(plan_year.application_eligibility_warnings[:minimum_employer_contribution]).to match(/Employer contribution percent/)
         end
   
         it "and plan year should be in publish pending state" do
@@ -1068,7 +1100,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
   
         it "plan year should be in publish invalid state" do
-          expect(plan_year.publish_invalid?).to be_truthy
+          expect(plan_year.published_invalid?).to be_truthy
         end
   
         it "employer_profile should be in ineligible state" do
@@ -1118,36 +1150,36 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         terminated_census_employee.terminate_employment!(TimeKeeper.date_of_record.yesterday)
       end
   
-      context "and all application elements are valid and it is published" do
-        before do
-          @starting_date_of_record = TimeKeeper.date_of_record
-          TimeKeeper.set_date_of_record(plan_year.open_enrollment_start_on - 5.days)
-          plan_year.publish
-        end
+      # context "and all application elements are valid and it is published" do
+      #   before do
+      #     @starting_date_of_record = TimeKeeper.date_of_record
+      #     TimeKeeper.set_date_of_record(plan_year.open_enrollment_start_on - 5.days)
+      #     plan_year.publish
+      #   end
   
-        after do
-          TimeKeeper.set_date_of_record(@starting_date_of_record)
-        end
+      #   after do
+      #     TimeKeeper.set_date_of_record(@starting_date_of_record)
+      #   end
   
-        it "plan year should publish" do
-          expect(plan_year.published?).to be_truthy
-        end
+      #   it "plan year should publish" do
+      #     expect(plan_year.published?).to be_truthy
+      #   end
   
-        it "and employer_profile should be in either registered or enrolling state" do
-          expect(plan_year.employer_profile.registered? || plan_year.employer_profile.enrolling?).to be_truthy
-        end
+      #   it "and employer_profile should be in either registered or enrolling state" do
+      #     expect(plan_year.employer_profile.registered? || plan_year.employer_profile.enrolling?).to be_truthy
+      #   end
   
-        context "and the plan year is changed" do
-          before do
-            plan_year.start_on = plan_year.start_on.next_month
-            plan_year.end_on = plan_year.end_on.next_month
-            plan_year.open_enrollment_start_on = plan_year.open_enrollment_start_on.next_month
-            plan_year.open_enrollment_end_on = plan_year.open_enrollment_end_on.next_month
-          end
+      #   context "and the plan year is changed" do
+      #     before do
+      #       plan_year.start_on = plan_year.start_on.next_month
+      #       plan_year.end_on = plan_year.end_on.next_month
+      #       plan_year.open_enrollment_start_on = plan_year.open_enrollment_start_on.next_month
+      #       plan_year.open_enrollment_end_on = plan_year.open_enrollment_end_on.next_month
+      #     end
   
-          it "should not be valid"
-        end
-      end
+      #     it "should not be valid"
+      #   end
+      # end
     end
   end
   
@@ -1175,216 +1207,216 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
   
-  context "calculate_open_enrollment_date when the earliest effective date is chosen" do
-    let(:new_effective_date) { PlanYear.calculate_start_on_dates.first }
-    let(:calculate_open_enrollment_date) { PlanYear.calculate_open_enrollment_date(new_effective_date) }
+  # context "calculate_open_enrollment_date when the earliest effective date is chosen" do
+  #   let(:new_effective_date) { PlanYear.calculate_start_on_dates.first }
+  #   let(:calculate_open_enrollment_date) { PlanYear.calculate_open_enrollment_date(new_effective_date) }
   
-    context "on the first of the month" do
-      let(:date_of_record_to_use) { Date.new(2015, 7, 1) }
-      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 1) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
-      let(:expected_start_on) { Date.new(2015, 8, 1) }
-      before do
-        TimeKeeper.set_date_of_record(date_of_record_to_use)
-      end
+  #   context "on the first of the month" do
+  #     let(:date_of_record_to_use) { Date.new(2015, 7, 1) }
+  #     let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 1) }
+  #     let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+  #     let(:expected_start_on) { Date.new(2015, 8, 1) }
+  #     before do
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
+  #     end
   
-      it "should suggest correct open enrollment start" do
-        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
-      end
+  #     it "should suggest correct open enrollment start" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+  #     end
   
-      it "should suggest correct open enrollment end" do
-        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
-      end
+  #     it "should suggest correct open enrollment end" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+  #     end
   
-      it "should have the right start on" do
-        expect(new_effective_date).to eq expected_start_on
-      end
-    end
+  #     it "should have the right start on" do
+  #       expect(new_effective_date).to eq expected_start_on
+  #     end
+  #   end
   
-    context "on the second of the month" do
-      let(:date_of_record_to_use) { Date.new(2015, 7, 2) }
-      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 2) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
-      let(:expected_start_on) { Date.new(2015, 8, 1) }
-      before do
-        TimeKeeper.set_date_of_record(date_of_record_to_use)
-      end
+  #   context "on the second of the month" do
+  #     let(:date_of_record_to_use) { Date.new(2015, 7, 2) }
+  #     let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 2) }
+  #     let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+  #     let(:expected_start_on) { Date.new(2015, 8, 1) }
+  #     before do
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
+  #     end
   
-      it "should suggest correct open enrollment start" do
-        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
-      end
+  #     it "should suggest correct open enrollment start" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+  #     end
   
-      it "should suggest correct open enrollment end" do
-        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
-      end
+  #     it "should suggest correct open enrollment end" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+  #     end
   
-      it "should have the right start on" do
-        expect(new_effective_date).to eq expected_start_on
-      end
-    end
+  #     it "should have the right start on" do
+  #       expect(new_effective_date).to eq expected_start_on
+  #     end
+  #   end
   
-    context "on the third of the month" do
-      let(:date_of_record_to_use) { Date.new(2015, 7, 3) }
-      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 3) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
-      let(:expected_start_on) { Date.new(2015, 8, 1) }
-      let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 2.days }
-      let(:expected_open_enrollment_start_on) { date_of_record_to_use }
-      let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
-      before do
-        TimeKeeper.set_date_of_record(date_of_record_to_use)
-      end
+  #   context "on the third of the month" do
+  #     let(:date_of_record_to_use) { Date.new(2015, 7, 3) }
+  #     let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 3) }
+  #     let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+  #     let(:expected_start_on) { Date.new(2015, 8, 1) }
+  #     let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 2.days }
+  #     let(:expected_open_enrollment_start_on) { date_of_record_to_use }
+  #     let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
+  #     before do
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
+  #     end
   
-      it "should suggest correct open enrollment start" do
-        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
-      end
+  #     it "should suggest correct open enrollment start" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+  #     end
   
-      it "should suggest correct open enrollment end" do
-        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
-      end
+  #     it "should suggest correct open enrollment end" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+  #     end
   
-      it "should have the right start on" do
-        expect(new_effective_date).to eq expected_start_on
-      end
-    end
+  #     it "should have the right start on" do
+  #       expect(new_effective_date).to eq expected_start_on
+  #     end
+  #   end
   
-    context "on the fourth of the month" do
-      let(:date_of_record_to_use) { Date.new(2015, 7, 4) }
-      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 4) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
-      let(:expected_start_on) { Date.new(2015, 8, 1) }
-      let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 3.days }
-      let(:expected_open_enrollment_start_on) { date_of_record_to_use }
-      let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
-      before do
-        TimeKeeper.set_date_of_record(date_of_record_to_use)
-      end
+  #   context "on the fourth of the month" do
+  #     let(:date_of_record_to_use) { Date.new(2015, 7, 4) }
+  #     let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 4) }
+  #     let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+  #     let(:expected_start_on) { Date.new(2015, 8, 1) }
+  #     let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 3.days }
+  #     let(:expected_open_enrollment_start_on) { date_of_record_to_use }
+  #     let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
+  #     before do
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
+  #     end
   
-      it "should suggest correct open enrollment start" do
-        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
-      end
+  #     it "should suggest correct open enrollment start" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+  #     end
   
-      it "should suggest correct open enrollment end" do
-        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
-      end
+  #     it "should suggest correct open enrollment end" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+  #     end
   
-      it "should have the right start on" do
-        expect(new_effective_date).to eq expected_start_on
-      end
-    end
+  #     it "should have the right start on" do
+  #       expect(new_effective_date).to eq expected_start_on
+  #     end
+  #   end
   
-    context "on the fifth of the month" do
-      let(:date_of_record_to_use) { Date.new(2015, 7, 5) }
-      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 5) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
-      let(:expected_start_on) { Date.new(2015, 8, 1) }
-      let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 4.days }
-      let(:expected_open_enrollment_start_on) { date_of_record_to_use }
-      let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
-      before do
-        TimeKeeper.set_date_of_record(date_of_record_to_use)
-      end
+  #   context "on the fifth of the month" do
+  #     let(:date_of_record_to_use) { Date.new(2015, 7, 5) }
+  #     let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 5) }
+  #     let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+  #     let(:expected_start_on) { Date.new(2015, 8, 1) }
+  #     let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 4.days }
+  #     let(:expected_open_enrollment_start_on) { date_of_record_to_use }
+  #     let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
+  #     before do
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
+  #     end
   
-      it "should suggest correct open enrollment start" do
-        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
-      end
+  #     it "should suggest correct open enrollment start" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+  #     end
   
-      it "should suggest correct open enrollment end" do
-        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
-      end
+  #     it "should suggest correct open enrollment end" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+  #     end
   
-      it "should have the right start on" do
-        expect(new_effective_date).to eq expected_start_on
-      end
-    end
+  #     it "should have the right start on" do
+  #       expect(new_effective_date).to eq expected_start_on
+  #     end
+  #   end
   
-    context "on the sixth of the month" do
-      let(:date_of_record_to_use) { Date.new(2015, 7, 6) }
-      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 6) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
-      let(:expected_start_on) { Date.new(2015, 9, 1) }
-      before do
-        TimeKeeper.set_date_of_record(date_of_record_to_use)
-      end
+  #   context "on the sixth of the month" do
+  #     let(:date_of_record_to_use) { Date.new(2015, 7, 6) }
+  #     let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 6) }
+  #     let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+  #     let(:expected_start_on) { Date.new(2015, 9, 1) }
+  #     before do
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
+  #     end
   
-      it "should suggest correct open enrollment start" do
-        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
-      end
+  #     it "should suggest correct open enrollment start" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+  #     end
   
-      it "should suggest correct open enrollment end" do
-        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
-      end
+  #     it "should suggest correct open enrollment end" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+  #     end
   
-      it "should have the right start on" do
-        expect(new_effective_date).to eq expected_start_on
-      end
-    end
+  #     it "should have the right start on" do
+  #       expect(new_effective_date).to eq expected_start_on
+  #     end
+  #   end
   
-    context "on the 7th of the month" do
-      let(:date_of_record_to_use) { Date.new(2015, 7, 7) }
-      let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 7) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 8, 10) }
-      let(:expected_start_on) { Date.new(2015, 9, 1) }
-      before do
-        TimeKeeper.set_date_of_record(date_of_record_to_use)
-      end
+  #   context "on the 7th of the month" do
+  #     let(:date_of_record_to_use) { Date.new(2015, 7, 7) }
+  #     let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 7) }
+  #     let(:expected_open_enrollment_end_on) { Date.new(2015, 8, 10) }
+  #     let(:expected_start_on) { Date.new(2015, 9, 1) }
+  #     before do
+  #       TimeKeeper.set_date_of_record(date_of_record_to_use)
+  #     end
   
-      it "should suggest correct open enrollment start" do
-        expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
-      end
+  #     it "should suggest correct open enrollment start" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+  #     end
   
-      it "should suggest correct open enrollment end" do
-        expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
-      end
+  #     it "should suggest correct open enrollment end" do
+  #       expect(calculate_open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+  #     end
   
-      it "should have the right start on" do
-        expect(new_effective_date).to eq expected_start_on
-      end
-    end
+  #     it "should have the right start on" do
+  #       expect(new_effective_date).to eq expected_start_on
+  #     end
+  #   end
   
-    context "on the tenth of the month" do
-    end
+  #   context "on the tenth of the month" do
+  #   end
   
-    context "on the twelfth of the month" do
-    end
+  #   context "on the twelfth of the month" do
+  #   end
   
-    context "on the last day of the month" do
-    end
-  end
+  #   context "on the last day of the month" do
+  #   end
+  # end
   
-  context "map binder_payment_due_date" do
-    it "in interval of map" do
-      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(TimeKeeper.set_date_of_record(Date.new(2015,9,1)))
-      expect(binder_payment_due_date).to eq TimeKeeper.set_date_of_record(Date.new(2015,8,12))
-    end
+  # context "map binder_payment_due_date" do
+  #   it "in interval of map" do
+  #     binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(TimeKeeper.set_date_of_record(Date.new(2015,9,1)))
+  #     expect(binder_payment_due_date).to eq TimeKeeper.set_date_of_record(Date.new(2015,8,12))
+  #   end
   
-    it "out of map" do
-      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(TimeKeeper.set_date_of_record(Date.new(2017,9,1)))
+  #   it "out of map" do
+  #     binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(TimeKeeper.set_date_of_record(Date.new(2017,9,1)))
   
-      expect(binder_payment_due_date).to eq PlanYear.shop_enrollment_timetable(TimeKeeper.set_date_of_record(Date.new(2017,9,1)))[:binder_payment_due_date]
-    end
-  end
+  #     expect(binder_payment_due_date).to eq PlanYear.shop_enrollment_timetable(TimeKeeper.set_date_of_record(Date.new(2017,9,1)))[:binder_payment_due_date]
+  #   end
+  # end
   
-  context "calculate_start_on_options" do
-    it "should return two options" do
-      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
-      date2 = date1.next_month
-      dates = [date1, date2].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
+  # context "calculate_start_on_options" do
+  #   it "should return two options" do
+  #     date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
+  #     date2 = date1.next_month
+  #     dates = [date1, date2].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
   
-      TimeKeeper.set_date_of_record(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 15))
-      expect(PlanYear.calculate_start_on_options).to eq dates
-    end
+  #     TimeKeeper.set_date_of_record(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 15))
+  #     expect(PlanYear.calculate_start_on_options).to eq dates
+  #   end
   
-    it "should return three options" do
-      date1 = TimeKeeper.date_of_record.beginning_of_month.next_month
-      date2 = date1.next_month
-      date3 = date2.next_month
-      dates = [date1, date2, date3].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
+  #   it "should return three options" do
+  #     date1 = TimeKeeper.date_of_record.beginning_of_month.next_month
+  #     date2 = date1.next_month
+  #     date3 = date2.next_month
+  #     dates = [date1, date2, date3].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
   
-      TimeKeeper.set_date_of_record(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 2))
-      expect(PlanYear.calculate_start_on_options).to eq dates
-    end
-  end
+  #     TimeKeeper.set_date_of_record(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 2))
+  #     expect(PlanYear.calculate_start_on_options).to eq dates
+  #   end
+  # end
   
   context "employee_participation_percent" do
     let(:employer_profile) {FactoryGirl.create(:employer_profile)}

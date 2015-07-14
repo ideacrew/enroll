@@ -232,6 +232,22 @@ class EmployerProfile
         }
       )
 
+      # orgs = Organization.or(
+      #   {:"employer_profile.plan_years.start_on" => new_date},
+      #   {:"employer_profile.plan_years.end_on" => new_date - 1.day},
+      #   {:"employer_profile.plan_years.open_enrollment_start_on" => new_date},
+      #   {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day},
+      #   {:"employer_profile.plan_years.workflow_state_transitions".elem_match => {
+      #       "$and" => [
+      #         {:"employer_profile.plan_years.workflow_state_transitions.transition_at".gte => (new_date.beginning_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum),
+      #          :"employer_profile.plan_years.workflow_state_transitions.transition_at".lte => (new_date.end_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
+      #         {:"employer_profile.plan_years.workflow_state_transitions.to_state" => "ineligible"}
+      #       ]
+      #     }
+      #   }
+      # )
+# binding.pry
+
       orgs.each do |org|
         org.employer_profile.today = new_date
         plan_year = org.employer_profile.published_plan_year

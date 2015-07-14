@@ -60,6 +60,12 @@ class PlanYear
   alias_method :effective_date=, :start_on=
   alias_method :effective_date, :start_on
 
+  def hbx_enrollments
+    @hbx_enrollments = [] if benefit_groups.size == 0
+    return @hbx_enrollments if defined? @hbx_enrollments
+    @hbx_enrollments = HbxEnrollment.find_by_benefit_groups(benefit_groups)
+  end
+
   def employee_participation_percent
     if fte_count == 0
       "-"
@@ -142,6 +148,11 @@ class PlanYear
       warnings.merge!({primary_office_location: "Primary office must be located in #{HbxProfile::StateName}"})
     end
 
+    # Employer is in ineligible state from prior enrollment activity
+    if aasm_state == "ineligible"
+      warnings.merge!({ineligible: "Employer is under a period of ineligibility for enrollment on the HBX"})
+    end
+
     # Maximum company size at time of initial registration on the HBX
     if fte_count > HbxProfile::ShopSmallMarketFteCountMaximum
       warnings.merge!({fte_count: "Number of full time equivalents (FTEs) exceeds maximum allowed (#{HbxProfile::ShopSmallMarketFteCountMaximum})"})
@@ -208,7 +219,7 @@ class PlanYear
 
     # At least one employee must be enrollable.
     if eligible_to_enroll_count == 0
-      errors.merge!(eligible_to_enroll_count: "at least 1 employee must be eligible to enroll")
+      errors.merge!(eligible_to_enroll_count: "at least one employee must be eligible to enroll")
     end
 
     # At least one employee who isn't an owner or family member of owner must enroll
@@ -391,6 +402,7 @@ class PlanYear
       transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
+      transitions from: :ineligible, to: :applicant, :guard => :has_ineligible_period_expired?
       transitions from: [:draft, :ineligible, :publish_pending, :published_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
     end
 
@@ -414,7 +426,7 @@ class PlanYear
       transitions from: :publish_pending, to: :published_invalid
     end
 
-    # Employer requests review of ineligible application determination
+    # Employer requests review of invalid application determination
     event :request_eligibility_review, :after => :record_transition do
       transitions from: :published_invalid, to: :eligibility_review, :guard => :is_within_review_period?
     end
@@ -478,11 +490,15 @@ class PlanYear
       (TimeKeeper.date_of_record - HbxProfile::ShopApplicationAppealPeriodMaximum))
   end
 
+  def has_ineligible_period_expired?
+binding.pry
+    ineligible? and (latest_workflow_state_transition.transition_at + 90.days <= TimeKeeper.date_of_record)
+  end
+
   # def shoppable? # is_eligible_to_shop?
   #   (benefit_groups.size > 0) and
   #   ((published? and employer_profile.shoppable?))
   # end
-
 
   def latest_workflow_state_transition
     workflow_state_transitions.order_by(:'transition_at'.desc).limit(1).first
