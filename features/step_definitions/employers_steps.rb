@@ -502,7 +502,3 @@ Then(/^I should see a plan year successfully saved message$/) do
   @browser.element(class: /mainmenu/).wait_until_present
   expect(@browser.element(text: /Plan Year successfully saved/)).to be_truthy
 end
-When(/^I should see a published success message$/) do
-  @browser.element(class: /mainmenu/).wait_until_present
-  expect(@browser.element(text: /Plan Year successfully published/)).to be_truthy
-end
