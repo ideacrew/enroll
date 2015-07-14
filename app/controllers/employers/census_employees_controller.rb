@@ -20,6 +20,11 @@ class Employers::CensusEmployeesController < ApplicationController
         flash[:notice] = "Census Employee is successfully created."
         redirect_to employers_employer_profile_path(@employer_profile)
       else
+        begin
+          missing_kind = census_employee_params['email_attributes']['kind']==''
+          @census_employee.errors['Email']='Kind must be selected' if missing_kind
+          rescue
+        end
         flash[:error] = "Failed to create Census Employee."
         render action: "new"
       end
