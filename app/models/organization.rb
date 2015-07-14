@@ -86,7 +86,8 @@ class Organization
   index({"employer_profile.plan_years.benefit_groups.reference_plan_id" => 1})
 
   index({"employer_profile.workflow_state_transitions.transition_at" => 1,
-         "employer_profile.workflow_state_transitions.to_state" => 1})
+         "employer_profile.workflow_state_transitions.to_state" => 1},
+         { name: "employer_profile_workflow_to_state" })
 
   index({"employer_profile.broker_agency_accounts._id" => 1})
   index({"employer_profile.broker_agency_accounts.is_active" => 1,
