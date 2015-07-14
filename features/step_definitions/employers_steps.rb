@@ -153,7 +153,6 @@ Then(/^I should see the employer information$/) do
   expect(@browser.text.include?("True First Inc")).to be_truthy
   expect(@browser.text.include?("13101 elm tree dr\nxyz\nDunwoody, GA 30027\n(303) 123-0981 x 1231")).to be_truthy
   expect(@browser.text.include?("Enrollment\nNo Plan Years Found")).to be_truthy
-  expect(@browser.text.include?("Company Details\nFEIN **-***3089\nEntity Kind C Corporation")).to be_truthy
 end
 
 When(/^I click on the Employees tab$/) do

@@ -16,14 +16,6 @@
           </div>
 
           <div class="row no-buffer top-pd">
-            <h4>Company Details</h4>
-            <div class="form-border">
-              FEIN <%= number_to_obscured_fein @employer_profile.fein %><br/>
-              Entity Kind <%= @employer_profile.entity_kind.to_s.titleize %>
-            </div>
-          </div>
-
-          <div class="row no-buffer top-pd">
             <h4>Enrollment</h4>
 
             <div class="form-border">
@@ -32,16 +24,18 @@
                 <dt>Plan Year</dt>
                 <dd><%= @current_plan_year.start_on.to_date.year %></dd>
                 <dt>Plan Year Start</dt>
-                <dd><%= format_date @current_plan_year.start_on %></dd>
-                <dt>Open Enroll Start/End</dt>
+                <dd><%= format_date_with_hyphens @current_plan_year.start_on %></dd>
+                <dt>Open Enrollment Period</dt>
                 <dd>
-                  <%= format_date @current_plan_year.open_enrollment_start_on %> /
-                  <%= format_date @current_plan_year.open_enrollment_end_on %>
+                  <%= format_date_with_hyphens @current_plan_year.open_enrollment_start_on %> /
+                  <%= format_date_with_hyphens @current_plan_year.open_enrollment_end_on %>
                 </dd>
-                <dt>Full Time Employees</dt>
-                <dd> <%= @current_plan_year.fte_count %></dd>
-                <dt>Participation Pct</dt>
-                <dd><%= @current_plan_year.employee_participation_percent %></dd>
+                <dt>Eligible Employees on Roster</dt>
+                <dd><%= @current_plan_year.eligible_to_enroll_count %></dd>
+                <dt>Enrolled/Waived Employees</dt>
+                <dd><%= @current_plan_year.total_enrolled_count %></dd>
+                <dt>Participation Percentage</dt>
+                <dd><%=  @current_plan_year.employee_participation_percent %></dd>
               </dl>
               <% else %>
               No Plan Years Found

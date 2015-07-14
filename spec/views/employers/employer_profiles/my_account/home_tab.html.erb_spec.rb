@@ -3,6 +3,8 @@ require "rails_helper"
 RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
   context "employer profile dashboard" do
 
+    let(:start_on){TimeKeeper.date_of_record.beginning_of_year}
+
     def new_organization
       instance_double(
         "Organization",
@@ -41,7 +43,8 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         organization: new_organization,
         fein: "098111000",
         entity_kind: "my entity kind",
-        broker_agency_profile: new_broker_agency_profile
+        broker_agency_profile: new_broker_agency_profile,
+        published_plan_year: plan_year
         )
     end
 
@@ -50,6 +53,18 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         "BrokerAgencyProfile",
         legal_name: "my broker legal name",
         primary_broker_role: broker_role
+        )
+    end
+
+    def plan_year
+      instance_double(
+        "PlanYear",
+        start_on: start_on,
+        open_enrollment_start_on: PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_start_on],
+        open_enrollment_end_on: PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_end_on],
+        eligible_to_enroll_count: 4,
+        total_enrolled_count: 10,
+        employee_participation_percent: 40
         )
     end
 
@@ -78,17 +93,17 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     end
 
     let(:new_office_locations){[office_location,office_location]}
+    let(:current_plan_year){employer_profile.published_plan_year}
 
     before :each do
       assign :employer_profile, employer_profile
+      assign :current_plan_year, employer_profile.published_plan_year
       controller.request.path_parameters[:id] = "11111111"
       render partial: "employers/employer_profiles/my_account/home_tab.html.erb"
     end
 
     it "should display dashboard info of employer" do
       expect(rendered).to match(/#{employer_profile.legal_name}/)
-      # expect(rendered).to match(/#{number_to_obscured_fein(employer_profile.fein)}/)
-      expect(rendered).to match(/#{employer_profile.entity_kind}/i)
     end
 
     it "should display office locations" do
@@ -101,6 +116,16 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     it "should display broker agency name and related information" do
       expect(rendered).to match(/#{employer_profile.broker_agency_profile.legal_name}/)
       expect(rendered).to match(/#{employer_profile.broker_agency_profile.primary_broker_role.person.full_name}/)
+    end
+
+    it "should display plan year and related information" do
+      expect(rendered).to match(/<dd>#{current_plan_year.start_on.to_date.year}<\/dd>/m)
+      expect(rendered).to match(/<dd>#{format_date_with_hyphens current_plan_year.start_on}<\/dd>/m)
+      expect(rendered).to match(/#{format_date_with_hyphens current_plan_year.open_enrollment_start_on}/m)
+      expect(rendered).to match(/#{format_date_with_hyphens current_plan_year.open_enrollment_end_on}/m)
+      expect(rendered).to match(/<dd>#{current_plan_year.eligible_to_enroll_count}<\/dd>/m)
+      expect(rendered).to match(/<dd>#{current_plan_year.total_enrolled_count}<\/dd>/m)
+      expect(rendered).to match(/<dd>#{current_plan_year.employee_participation_percent}<\/dd>/m)
     end
   end
 end

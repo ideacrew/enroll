@@ -42,11 +42,8 @@ class PlanYear
   alias_method :effective_date, :start_on
 
   def employee_participation_percent
-    if fte_count == 0
-      "-"
-    else
-      "#{(employer_profile.census_employees.where(aasm_state: "employee_role_linked").try(:count) / fte_count.to_f * 100).round(2)}%"
-    end
+    return "-" if eligible_to_enroll_count == 0
+    "#{(total_enrolled_count / eligible_to_enroll_count.to_f * 100).round(2)}%"
   end
 
   def editable?

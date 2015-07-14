@@ -13,6 +13,30 @@ RSpec.describe ConsumerProfilesController, :type => :controller do
   let(:household) {double}
   let(:plan_year) {double}
 
+  context "retrieve plan" do
+    let(:qhp){double("Products::Qhp")}
+    let(:qhp_benefits){double("Products::QhpBenefit")}
+    let(:plan) { double(hios_id: "11100000001100") }
+
+    before do
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:latest_household).and_return(household)
+      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:last).and_return(hbx_enrollment)
+      allow(hbx_enrollment).to receive(:plan).and_return(plan)
+      allow(Products::Qhp).to receive(:find_by).and_return(qhp)
+      allow(qhp).to receive(:qhp_benefits).and_return(qhp_benefits)
+    end
+
+    it "returns the enrolled plan of the user" do
+      sign_in user
+      get :plans
+      expect(response).to have_http_status(:success)
+    end
+  end
+
   context "get purchase" do
     before do
       allow(user).to receive(:person).and_return(person)
