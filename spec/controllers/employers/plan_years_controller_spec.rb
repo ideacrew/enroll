@@ -284,7 +284,7 @@ RSpec.describe Employers::PlanYearsController do
       before :each do
         allow(plan_year_proxy).to receive(:draft?).and_return(false)
         allow(plan_year_proxy).to receive(:publish_pending?).and_return(true)
-        allow(plan_year_proxy).to receive(:application_warnings)
+        allow(plan_year_proxy).to receive(:application_eligibility_warnings)
       end
 
       it "should be a redirect with warnings" do

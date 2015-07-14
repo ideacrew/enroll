@@ -87,7 +87,7 @@ class Employers::PlanYearsController < ApplicationController
       redirect_to employers_employer_profile_path(@employer_profile)
     when @plan_year.publish_pending?
       # tell user bad idea
-      flash[:notice] = "Publishing Plan Year is a bad idea because:: #{@plan_year.application_warnings}"
+      flash[:notice] = "Publishing Plan Year is a bad idea because:: #{@plan_year.application_eligibility_warnings}"
       redirect_to employers_employer_profile_path(@employer_profile)
     when @plan_year.published?
       flash[:notice] = "Plan Year successfully published"
@@ -125,7 +125,7 @@ class Employers::PlanYearsController < ApplicationController
                                       ]
     ]
     )
-    plan_year_params["benefit_groups_attributes"].delete_if {|k, v| v.count<2 } 
+    plan_year_params["benefit_groups_attributes"].delete_if {|k, v| v.count<2 }
     plan_year_params
   end
 end
