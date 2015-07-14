@@ -30,7 +30,7 @@ class Family
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups, :households, :broker_agency_accounts
 
   index({person_id: 1})
-  index({e_case_id: 1}, { unique: true, sparse: true })
+  index({e_case_id: 1}, { sparse: true })
   index({is_active: 1})
   index({submitted_at: 1})
 

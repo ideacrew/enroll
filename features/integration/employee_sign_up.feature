@@ -19,7 +19,8 @@ Feature: Employee Sign Up
     When I log out
     Then I should see the hbx home page
     When My employer publishes a plan year
-     And My employer logs out
+    Then I should see a published success message
+    And My employer logs out
     Then I should see the hbx home page
     When I log in to the employee account page
     Then I should be logged in
@@ -47,5 +48,6 @@ Feature: Employee Sign Up
     Then I should see the list of plans
     When I select a plan on the plan shopping page
     Then I should see the coverage summary page
-    When I confirm on the coverage summary page
+    When I click on purchase button on the coverage summary page
+    And I click on continue button on the purchase confirmation pop up
     Then I should see the "my account" page

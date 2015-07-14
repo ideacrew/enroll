@@ -10,6 +10,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
     it "should render the new template" do
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
+      allow(user).to receive(:has_broker_role?).and_return(false)
       sign_in(user)
       get :new
       expect(response).to have_http_status(:success)
@@ -43,6 +44,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:has_broker_role?).and_return(false)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
@@ -68,6 +70,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     context "when no broker role" do
       before(:each) do
         allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
+        allow(user).to receive(:has_broker_role?).and_return(false)
         allow(user).to receive(:person).and_return(person)
         allow(user).to receive(:person).and_return(person)
         sign_in(user)

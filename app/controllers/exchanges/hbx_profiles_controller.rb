@@ -1,7 +1,7 @@
 class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_hbx_staff_role, except: [:welcome]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
-  before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox, :configuration]
+  before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox, :configuration, :show]
 
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
@@ -72,6 +72,8 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def configuration
 
+    @time_keeper = Forms::TimeKeeper.new
+
     respond_to do |format|
       format.html { render partial: "configuration_index" }
       format.js {}
@@ -81,6 +83,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show
+    @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
   end
 
   # GET /exchanges/hbx_profiles/new
@@ -97,6 +100,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def inbox
     @inbox_provider = current_user.person.hbx_staff_role.hbx_profile
     @folder = params[:folder] || 'inbox'
+    @sent_box = true
   end
 
   # POST /exchanges/hbx_profiles
@@ -141,8 +145,13 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def set_date
-    date_of_record = Date.strptime(params[:time_keeper][:date_of_record], "%m/%d/%Y").strftime('%Y-%m-%d')
-    TimeKeeper.set_date_of_record(date_of_record)
+    forms_time_keeper = Forms::TimeKeeper.new(params[:forms_time_keeper])
+    begin
+      forms_time_keeper.set_date_of_record(forms_time_keeper.forms_date_of_record)
+      flash[:notice] = "Date of record set to " + TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+    rescue Exception=>e
+      flash[:error] = "Failed to set date of record, " + e.message
+    end
     redirect_to exchanges_hbx_profiles_root_path
   end
 

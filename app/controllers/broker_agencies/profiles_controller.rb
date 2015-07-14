@@ -25,6 +25,15 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def show
+    broker_id = params[:id] #||current_user.person.broker_role.broker_agency_profile_id.to_s
+    profile = BrokerAgencyProfile.find(broker_id)
+    @orgs = Organization.where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => profile._id})
+    @page_alphabets = page_alphabets(@orgs, "legal_name")
+    page_no = cur_page_no(@page_alphabets.first)
+    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+    @employer_profiles = @organizations.map {|o| o.employer_profile}
+
+    @sent_box = true
     @broker_agency_profile = BrokerAgencyProfile.find(params["id"])
   end
 
@@ -38,6 +47,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def inbox
+    @sent_box = true
     @broker_agency_provider = BrokerAgencyProfile.find(params["id"]||params['profile_id'])
     @folder = (params[:folder] || 'Inbox').capitalize
   end
@@ -51,6 +61,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def check_broker_agency_staff_role
     if current_user.has_broker_agency_staff_role?
       redirect_to broker_agencies_profile_path(:id => current_user.person.broker_agency_staff_roles.first.broker_agency_profile_id)
+    elsif current_user.has_broker_role?
+      redirect_to broker_agencies_profile_path(:id => current_user.person.broker_role.broker_agency_profile_id)
+    else
+      flash[:notice] = "You don't have a Broker Agency Profile associated with your Account!! Please register your Broker Agency first."
     end
   end
 

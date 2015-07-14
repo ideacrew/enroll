@@ -24,13 +24,18 @@
                 <% end %>
                   <li><a href="#">1-855-532-5465</a></li>
                   <li class="hidden-xs">|</li>
-                  <li><a href="#">Help</a></li>
+                  <li><a href="https://dchealthlink.com/help" target="_blank">Help</a></li>
                   <li class="hidden-xs">|</li>
                   <li><%= link_to "LOGOUT", destroy_user_session_path, method: "delete" %></li>
               </ul>
               <div class="clearfix"></div>
               <ul class="user-info">
-                  <li class="">(ID <%= current_user.try(:person).try(:hbx_id) || current_user.id %>) &nbsp; &nbsp; <strong><%= user_full_name %></strong></li>
+                  <li class="">
+                    <% unless current_user.try(:person).try(:hbx_id).nil? %>
+                      (ID <%= current_user.try(:person).try(:hbx_id) %>) &nbsp; &nbsp;
+                    <% end %>
+                    <strong><%= user_full_name %></strong>
+                  </li>
               </ul>
             <% end %>
           </div>

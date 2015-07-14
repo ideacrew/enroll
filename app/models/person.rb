@@ -67,6 +67,7 @@ class Person
 
   validates_presence_of :first_name, :last_name
   validate :date_functional_validations
+  validate :no_changing_my_user, :on => :update
 
   validates :ssn,
     length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
@@ -126,6 +127,12 @@ class Person
 
   scope :active,   ->{ where(is_active: true) }
   scope :inactive, ->{ where(is_active: false) }
+
+  scope :broker_role_having_agency, ->{ where("broker_role.broker_agency_profile_id" => { "$ne" => nil }) }
+  scope :broker_role_applicant, -> { where("broker_role.aasm_state" => { "$eq" => :applicant })}
+  scope :broker_role_certified, -> { where("broker_role.aasm_state" => { "$in" => [:active, :broker_agency_pending]})}
+  scope :broker_role_decertified, -> { where("broker_role.aasm_state" => { "$eq" => :decertified })}
+  scope :broker_role_denied, -> { where("broker_role.aasm_state" => { "$eq" => :denied })}
 
 #  ViewFunctions::Person.install_queries
 
@@ -327,6 +334,16 @@ private
 
   def update_full_name
     full_name
+  end
+
+  def no_changing_my_user
+    if self.persisted? && self.user_id_changed?
+      old_user, new_user= self.user_id_change
+      return if old_user.blank?
+      if (old_user != new_user)
+        errors.add(:base, "you may not change the user_id of a person once it has been set and saved")
+      end
+    end
   end
 
   # Verify basic date rules

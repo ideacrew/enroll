@@ -26,6 +26,19 @@ def scroll_then_click(element)
   element
 end
 
+def enter_office_location(location)
+  @browser.text_field(class: /interaction-field-control-office-location-address-address-1/).set(location[:address1])
+  @browser.text_field(class: /interaction-field-control-office-location-address-address-2/).set(location[:address2])
+  @browser.text_field(class: /interaction-field-control-office-location-address-city/).set(location[:city])
+  input_field = @browser.select(name: /state/).divs(xpath: "ancestor::div")[-2]
+  input_field.click
+  input_field.li(text: /#{location[:state]}/).click
+  @browser.text_field(class: /interaction-field-control-office-location-address-zip/).set(location[:zip])
+  @browser.text_field(class: /interaction-field-control-office-location-phone-area-code/).set(location[:phone_area_code])
+  @browser.text_field(class: /interaction-field-control-office-location-phone-number/).set(location[:phone_number])
+  @browser.text_field(class: /interaction-field-control-office-location-phone-extension/).set(location[:phone_extension])
+end
+
 Before "@watir" do
   extend WatirScreenshots
   @browser = Watir::Browser.new :chrome, switches: ["--test-type"]
@@ -80,6 +93,7 @@ Then(/^I should be logged in$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
+  sleep 2
   scroll_then_click(@browser.element(class: /interaction-click-control-logout/))
   @browser.element(class: /interaction-click-control-logout/).wait_while_present
 end
@@ -165,6 +179,11 @@ When(/^I accept the matched employer$/) do
 end
 
 When(/^I complete the matched employee form$/) do
+  scroll_then_click(@browser.element(class: /interaction-click-control-click-here/))
+  @browser.button(class: /interaction-click-control-close/).wait_until_present
+  scroll_then_click(@browser.element(class: /interaction-click-control-close/))
+  @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").wait_until_present
+
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
   scroll_then_click(@browser.text_field(name: "person[emails_attributes][1][address]"))
   screenshot("personal_info_complete")
@@ -176,7 +195,10 @@ When(/^I complete the matching employee form$/) do
   @browser.text_field(name: "person[addresses_attributes][0][address_1]").set("84 I st")
   @browser.text_field(name: "person[addresses_attributes][0][address_2]").set("Suite 201")
   @browser.text_field(name: "person[addresses_attributes][0][city]").set("Herndon")
-  @browser.text_field(name: "person[addresses_attributes][0][state]").set("VA")
+
+  input_field = @browser.divs(class: "selectric-interaction-choice-control-person-addresses-attributes-0-state").first
+  input_field.click
+  input_field.li(text: /VA/).click
   @browser.text_field(name: "person[addresses_attributes][0][zip]").set("20171")
 
   @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
@@ -204,6 +226,8 @@ end
 
 When(/^I click delete on baby Soren$/) do
   scroll_then_click(@browser.form(id: 'edit_dependent').a())
+  @browser.div(id: 'remove_confirm').wait_until_present
+  scroll_then_click(@browser.a(class: /confirm/))
   @browser.button(text: /Confirm Member/).wait_while_present
 end
 
@@ -248,7 +272,8 @@ end
 
 When(/^I click continue on the group selection page$/) do
   @browser.element(class: /interaction-click-control-continue/, id: /btn-continue/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-continue/, id: /btn-continue/))
+  @browser.execute_script("$('.interaction-click-control-continue').trigger('click')")
+  #scroll_then_click(@browser.element(class: /interaction-click-control-continue/, id: /btn-continue/))
 end
 
 Then(/^I should see the plan shopping welcome page$/) do
@@ -277,14 +302,19 @@ When(/^I select a plan on the plan shopping page$/) do
 end
 
 Then(/^I should see the coverage summary page$/) do
-  @browser.element(id: /btn-continue/).wait_until_present
+  @browser.element(class: /interaction-click-control-purchase/).wait_until_present
   screenshot("summary_page")
   expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
 end
 
-When(/^I confirm on the coverage summary page$/) do
+When(/^I click on purchase button on the coverage summary page$/) do
   @browser.execute_script('$(".interaction-click-control-purchase").trigger("click")')
   #scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
+end
+
+And(/^I click on continue button on the purchase confirmation pop up$/) do
+  @browser.element(class: /interaction-click-control-continue/).wait_until_present
+  @browser.element(class: /interaction-click-control-continue/).click
 end
 
 Then(/^I should see the "my account" page$/) do
@@ -314,7 +344,10 @@ When(/^My employer publishes a plan year$/) do
   input_field.li(text: /C Corporation/).click
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").set("830 I St NE")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Washington")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][state]").set("DC")
+  input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-office-locations-attributes-0-address-attributes-state").first
+  input_field.click
+  input_field.li(text: /DC/).click
+  @browser.select_list(name: "organization[office_locations_attributes][0][address_attributes][state]").select("DC")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("20002")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("202")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("5551212")
@@ -342,4 +375,20 @@ Then(/^I should see the "YOUR LIFE EVENTS" section/) do
   @browser.element(text: /YOUR LIFE EVENTS/i).wait_until_present
   screenshot("your_life_events")
   expect(@browser.element(text: /YOUR LIFE EVENTS/i).visible?).to be_truthy
+end
+
+When(/^I click on the plans tab$/) do
+  @browser.element(class: /interaction-click-control-plans/).wait_until_present
+  scroll_then_click(@browser.element(class: /interaction-click-control-plans/))
+end
+
+Then(/^I should see my plan/) do
+  @browser.element(text: /plan name/i).wait_until_present
+  screenshot("my_plan")
+  expect(@browser.element(text: /plan name/i).visible?).to be_truthy
+end
+
+When(/^I should see a published success message$/) do
+  @browser.element(class: /mainmenu/).wait_until_present
+  expect(@browser.element(text: /Plan Year successfully published/)).to be_truthy
 end

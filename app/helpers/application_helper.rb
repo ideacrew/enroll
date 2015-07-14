@@ -9,7 +9,12 @@ module ApplicationHelper
     html_class_list = opts.delete(:class) { |k| "" }
     jq_tag_classes = (html_class_list.split(/\s+/) + ["jq-datepicker"]).join(" ")
     generated_field_name = "jq_datepicker_ignore_#{obj_name}[#{sanitized_field_name}]"
-    generated_target_id = "#{obj_name}_#{sanitized_field_name}_jq_datepicker_plain_field"
+    provided_id = options[:id] || options["id"]
+    generate_target_id = nil
+    if !provided_id.blank?
+      generated_target_id = "#{provided_id}_jq_datepicker_plain_field"
+    end
+    generated_target_id ||= "#{obj_name}_#{sanitized_field_name}_jq_datepicker_plain_field"
     capture do
       concat f.text_field(field_name, opts.merge(:class => html_class_list, :id => generated_target_id, :value=> obj_val.try(:to_s, :db)))
       concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
@@ -225,7 +230,7 @@ module ApplicationHelper
   def devise_mapping
     @devise_mapping ||= Devise.mappings[:user]
   end
-  
+
   def get_dependents(family, person)
     members_list = []
     family_members = family.family_members
@@ -252,7 +257,7 @@ module ApplicationHelper
 
   def user_full_name
     if signed_in?
-      current_user.person.try(:full_name) ? current_user.person.full_name : 'User'
+      current_user.person.try(:full_name) ? current_user.person.full_name : current_user.email
     end
   end
 
@@ -264,17 +269,22 @@ module ApplicationHelper
       employers_inbox_path(provider, message_id: message.id)
     when "BrokerAgencyProfile"
       broker_agencies_inbox_path(provider, message_id: message.id)
+    when "HbxProfile"
+      exchanges_inbox_path(provider, message_id: message.id)
     end
   end
 
   def retrieve_inbox_path(provider, folder: 'inbox')
     case(provider.model_name.name)
+
     when "EmployerProfile"
       inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
     when "HbxProfile"
       inbox_exchanges_hbx_profile_path(provider, folder: folder)
     when "BrokerAgencyProfile"
       broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
+    when "Person"
+      inbox_consumer_profiles_path(profile_id: provider.id, folder: folder)
     end
   end
 
@@ -285,16 +295,27 @@ module ApplicationHelper
   end
 
   def portal_display_name(controller)
-    if controller == 'welcome'
-      "Welcome to the District's Health Insurance Marketplace"
-    elsif controller == 'consumer_profiles' || controller == 'employee_roles'
-      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Individual/Family".html_safe
-    elsif controller == 'employer_profiles'
-      "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe
-    elsif controller == 'profiles' || controller == 'broker_roles'
-      "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe
-    elsif controller == 'hbx_profiles'
+    if current_user.try(:has_hbx_staff_role?)
       "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm HBX Staff".html_safe
+    elsif current_user.try(:has_broker_agency_staff_role?)
+      "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe
+    elsif current_user.try(:has_employer_staff_role?)
+      "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe
+    elsif controller == 'employee_roles'
+      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Employee".html_safe
+    elsif controller == 'consumer_profiles'
+      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Individual/Family".html_safe
+    else
+      "Welcome to the District's Health Insurance Marketplace"
     end
+  end
+  def override_backlink
+    link=''
+    if current_user.try(:has_hbx_staff_role?)
+      link = link_to 'HBX Portal', exchanges_hbx_profile_path(id: 1)
+    elsif current_user.try(:has_broker_agency_staff_role?)
+      link = link_to 'Broker Agency Portal',broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id)
+    end
+    return link
   end
 end

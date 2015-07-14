@@ -31,7 +31,7 @@ set :pty, true
 set :linked_files, (fetch(:linked_files, []) | ['config/mongoid.yml', 'config/initializers/devise.rb', 'config/secrets.yml', "config/environments/production.rb", "config/symmetric-encryption.yml"])
 
 # Default value for linked_dirs is []
-set :linked_dirs, fetch(:linked_dirs, []).push('log', 'pids', 'eye')
+set :linked_dirs, fetch(:linked_dirs, []).push('log', 'pids', 'eye', "public/sbc")
 
 # capistrano/rails setup
 set :assets_roles, [:web, :app]
@@ -63,7 +63,9 @@ namespace :deploy do
   desc 'Restart application'
   task :restart do
     on roles(:app), in: :sequence, wait: 20 do
+      sudo 'redis-cli "flushall"'
       sudo "service eye_rails reload"
+      sudo 'redis-cli "flushall"'
     end
   end
 

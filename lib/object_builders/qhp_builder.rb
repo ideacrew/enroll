@@ -65,16 +65,24 @@ class QhpBuilder
 
   def associate_plan_with_qhp
     plan_year = @qhp.plan_effective_date.to_date.year
-    plan = Plan.where(active_year: plan_year, hios_id: /.*#{@qhp.standard_component_id}.*/).to_a.first
-    if plan.present?
-      @qhp.plan = plan
-      plan.update_attributes(
+    # puts @qhp.standard_component_id
+    plan = Plan.where(active_year: plan_year, hios_id: /#{@qhp.standard_component_id.strip}-01/).to_a.first
+    plans_to_update = Plan.where(active_year: plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
+    plans_to_update.each do |up_plan|
+      nationwide_str = (@qhp.national_network.blank? ? "" : @qhp.national_network)
+      nationwide_value = nationwide_str.downcase.strip == "yes"
+      up_plan.update_attributes(
+          name: @qhp.plan_marketing_name,
           plan_type: @qhp.plan_type.downcase,
           deductible: @qhp.qhp_cost_share_variance.qhp_deductable.in_network_tier_1_individual,
           family_deductible: @qhp.qhp_cost_share_variance.qhp_deductable.in_network_tier_1_family,
-          nationwide: @qhp.national_network,
+          nationwide: nationwide_value,
           out_of_service_area_coverage: @qhp.out_of_service_area_coverage
-        )
+      )
+      up_plan.save!
+    end
+    if plan.present?
+      @qhp.plan = plan
     else
       @qhp.plan = nil
     end

@@ -151,15 +151,15 @@ describe BenefitGroup, "instance methods" do
     end
 
     it "should have same employer_max_amount" do
-      expect(benefit_list.map(&:employer_max_amt)).to eq Array.new(6, 200)
+      expect(benefit_list.map(&:employer_max_amt)).to eq Array.new(5, 200)
     end
 
     it "should have different premium_pct" do
-      expect(benefit_list.map(&:premium_pct)).to eq [50,20,20,20,20,50]
+      expect(benefit_list.map(&:premium_pct)).to eq [50,20,20,20,50]
     end
 
     it "should have different offered" do
-      expect(benefit_list.map(&:offered)).to eq [true, true, true, true, true, false]
+      expect(benefit_list.map(&:offered)).to eq [true, true, true, true, false]
     end
   end
 end
@@ -178,7 +178,7 @@ describe BenefitGroup, type: :model do
   let(:effective_on_offset_default)   { 0 }
   let(:effective_on_kind_default)     { "date_of_hire" }
   let(:terminate_on_kind_default)     { "end_of_month" }
-  let(:plan_option_kind_default)      { "single_plan" }
+  let(:plan_option_kind_default)      { nil }
 
   let(:elected_plans)                 { [reference_plan] }
 

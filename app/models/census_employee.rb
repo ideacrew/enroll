@@ -1,6 +1,7 @@
 class CensusEmployee < CensusMember
   include AASM
   include Sortable
+  include Validations::EmployeeInfo
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -195,6 +196,13 @@ class CensusEmployee < CensusMember
 
   def published_benefit_group
     published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
+  end
+
+  def active_census_employee_is_unique
+    if CensusEmployee.unscoped.and(employer_profile_id: employer_profile_id, ssn: ssn).active.present?
+      message = "Employee with this identifying information is already active. Update or terminate the active record before adding another."
+      errors.add(:base, message)
+    end
   end
 
   class << self

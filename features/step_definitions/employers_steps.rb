@@ -41,7 +41,9 @@ And(/^I should see an initial form to enter information about my Employer and my
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").set("100 North Street")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_2]").set("Suite 990")
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Washington")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][state]").set("DC")
+  input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-office-locations-attributes-0-address-attributes-state").first
+  input_field.click
+  input_field.li(text: /DC/).click
   @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("20002")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("678")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("1230987")
@@ -151,13 +153,12 @@ Then(/^I should see the employer information$/) do
   expect(@browser.text.include?("True First Inc")).to be_truthy
   expect(@browser.text.include?("13101 elm tree dr\nxyz\nDunwoody, GA 30027\n(303) 123-0981 x 1231")).to be_truthy
   expect(@browser.text.include?("Enrollment\nNo Plan Years Found")).to be_truthy
-  expect(@browser.text.include?("Company Details\nFEIN **-***3089\nEntity Kind C Corporation")).to be_truthy
 end
 
 When(/^I click on the Employees tab$/) do
   @browser.refresh
   @browser.a(text: /Employees/).wait_until_present
-  @browser.a(text: /Employees/).click
+  scroll_then_click(@browser.a(text: /Employees/))
 end
 
 Then(/^I should see the employee family roster$/) do
@@ -190,7 +191,8 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(class: /interaction-field-control-census-employee-name-sfx/).set("Jr")
   @browser.text_field(class: /interaction-field-control-census-employee-dob/).set("01/01/1980")
   @browser.text_field(class: /interaction-field-control-census-employee-ssn/).set("786120965")
-  @browser.radio(class: /interaction-choice-control-value-radio-male/).set
+  #@browser.radio(class: /interaction-choice-control-value-radio-male/).set
+  @browser.radio(id: /radio_male/).fire_event("onclick")
   @browser.text_field(class: /interaction-field-control-census-employee-hired-on/).set("10/10/2014")
   @browser.checkbox(class: /interaction-choice-control-value-census-employee-is-business-owner/).set
   input_field = @browser.divs(class: /selectric-wrapper/).first
@@ -201,14 +203,16 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).set("1026 Potomac")
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-2/).set("apt abc")
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-city/).set("Alpharetta")
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-state/).set("GA")
+  select_state = @browser.divs(text: /SELECT STATE/).last
+  select_state.click
+  scroll_then_click(@browser.li(text: /GA/))
   @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-zip/).set("30228")
   email_kind = @browser.divs(text: /SELECT KIND/).last
   email_kind.click
   @browser.li(text: /home/).click
   @browser.text_field(class: /interaction-field-control-census-employee-email-attributes-address/).set("trey.john@dc.gov")
 
-  @browser.a(text: /Add Dependent/).click
+  @browser.a(text: /Add Family Member/).click
   @browser.div(id: /dependent_info/).wait_until_present
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mary")
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_middle_name/).set("K")
@@ -265,7 +269,10 @@ Then(/^I should see a form to update the contents of the census employee$/) do
   @browser.text_field(id: /jq_datepicker_ignore_census_employee_dob/).set("01/01/1980")
   @browser.text_field(id: /census_employee_ssn/).set("786120965")
   @browser.text_field(id: /census_employee_first_name/).set("Patrick")
-  @browser.text_field(id: /census_employee_address_attributes_state/).set("VA")
+  select_state = @browser.divs(text: /GA/).last
+  select_state.click
+  scroll_then_click(@browser.li(text: /VA/))
+  #@browser.text_field(id: /census_employee_address_attributes_state/).set("VA")
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mariah")
   screenshot("update_census_employee_with_data")
   @browser.button(value: /Update Employee/).click
@@ -363,7 +370,7 @@ And(/^I should see a button to create new plan year$/) do
   @browser.a(text: /Add Plan Year/).click
 end
 
-And(/^I should be able to add information about plan year, benefits and relationship benefits$/) do
+And(/^I should be able to enter plan year, benefits, relationship benefits with high FTE$/) do
 #Plan Year
   @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").wait_until_present
   screenshot("employer_add_plan_year")
@@ -377,12 +384,11 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.h4(text: /Recommend Date/).wait_until_present
   expect(@browser.text.include?("employer initial application earliest submit on")).to be_truthy
   @browser.text_field(name: "plan_year[fte_count]").click
-  @browser.text_field(name: "plan_year[fte_count]").set("35")
+  @browser.text_field(name: "plan_year[fte_count]").set("235")
   @browser.text_field(name: "plan_year[pte_count]").set("15")
   @browser.text_field(name: "plan_year[msp_count]").set("3")
   # Benefit Group
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][employer_max_amt_in_cents]").set(1245)
   elected_field = @browser.div(class: /selectric-wrapper/, text: /Select Plan Offerings/)
   elected_field.click
   elected_field.li(text: /All plans from a given carrier/).click
@@ -401,8 +407,6 @@ And(/^I should be able to add information about plan year, benefits and relation
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').first.set(true)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').first.set(false)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_offered').first.set(false)
-  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_offered').first.set(false)
-  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_5_offered').first.set(false)
   screenshot("employer_add_plan_year_info")
   @browser.button(value: /Create Plan Year/).click
 end
@@ -443,7 +447,7 @@ When(/^I enter combined filter in plan selection page$/) do
   @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("1000")
   @browser.text_field(class: /plan-metal-deductible-to-selection-filter/).set("3900")
   @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("5")
-  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250") 
+  @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250")
   @browser.element(class: /apply-btn/, text: /Apply/).click
 end
 
@@ -465,6 +469,36 @@ Then(/^I should see the plan year$/) do
 end
 
 When(/^I click on publish plan year$/) do
+  @browser.element(class: /interaction-click-control-publish-plan-year/).wait_until_present
   @browser.element(class: /interaction-click-control-publish-plan-year/).click
-  @browser.element(class: /interaction-click-control-publish-plan-year/).wait_while_present
+end
+
+Then(/^I should see Publish Plan Year Modal with warnings$/) do
+
+  @browser.element(class: /modal-body/).wait_until_present
+
+  modal = @browser.div(class: /modal-dialog/)
+  warnings= modal.ul(class: /application-warnings/)
+  expect(warnings.element(text: /number of full time equivalents (FTEs) exceeds maximum allowed/i)).to be_truthy
+end
+
+Then(/^I click on the Cancel button$/) do
+  modal = @browser.div(class: 'modal-dialog')
+  modal.a(class: 'interaction-click-control-cancel').click
+end
+
+Then(/^I should be on the Plan Year Edit page with warnings$/) do
+  @browser.element(id: /plan_year/).present?
+  warnings= @browser.div(class: 'alert-plan-year')
+  expect(warnings.element(text: /number of full time equivalents (FTEs) exceeds maximum allowed/i)).to be_truthy 
+end
+
+Then(/^I update the FTE field with valid input and save plan year$/) do
+  @browser.text_field(name: "plan_year[fte_count]").set("10")
+  scroll_then_click(@browser.element(class: 'interaction-click-control-create-plan-year'))
+end
+
+Then(/^I should see a plan year successfully saved message$/) do
+  @browser.element(class: /mainmenu/).wait_until_present
+  expect(@browser.element(text: /Plan Year successfully saved/)).to be_truthy
 end

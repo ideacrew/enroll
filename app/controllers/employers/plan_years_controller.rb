@@ -34,7 +34,16 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def edit
-    @plan_year = ::Forms::PlanYearForm.new(@employer_profile.find_plan_year(params[:id]))
+    plan_year = @employer_profile.find_plan_year(params[:id])
+    @just_a_warning = false
+    if plan_year.publish_pending?
+      plan_year.withdraw_pending!
+      if !plan_year.is_application_valid?
+        @just_a_warning = true
+        plan_year.application_eligibility_warnings.each_pair(){ |key, value| plan_year.errors.add(:base, value) }
+      end
+    end
+    @plan_year = ::Forms::PlanYearForm.new(plan_year)
     @plan_year.benefit_groups.each do |benefit_group|
       case benefit_group.plan_option_kind
       when "metal_level"
@@ -81,18 +90,36 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     @plan_year.publish!
 
-    case
-    when @plan_year.draft?
-      flash[:notice] = "Plan Year failed to publish: #{@plan_year.application_errors}"
-      redirect_to employers_employer_profile_path(@employer_profile)
-    when @plan_year.publish_pending?
-      # tell user bad idea
-      flash[:notice] = "Publishing Plan Year is a bad idea because:: #{@plan_year.application_eligibility_warnings}"
-      redirect_to employers_employer_profile_path(@employer_profile)
-    when @plan_year.published?
-      flash[:notice] = "Plan Year successfully published"
-      redirect_to employers_employer_profile_path(@employer_profile)
+# <<<<<<< HEAD
+#     case
+#     when @plan_year.draft?
+#       flash[:notice] = "Plan Year failed to publish: #{@plan_year.application_errors}"
+#       redirect_to employers_employer_profile_path(@employer_profile)
+#     when @plan_year.publish_pending?
+#       # tell user bad idea
+#       flash[:notice] = "Publishing Plan Year is a bad idea because:: #{@plan_year.application_eligibility_warnings}"
+#       redirect_to employers_employer_profile_path(@employer_profile)
+#     when @plan_year.published?
+#       flash[:notice] = "Plan Year successfully published."
+#       redirect_to employers_employer_profile_path(@employer_profile)
+# =======
+    if @plan_year.publish_pending?
+      respond_to do |format|
+        format.js
+      end
+    else
+      flash[:notice] = @plan_year.published? ? "Plan Year successfully published."
+                           : "Plan Year failed to publish: #{@plan_year.application_errors}"
+      render :js => "window.location = #{employers_employer_profile_path(@employer_profile).to_json}"
+# >>>>>>> development
     end
+  end
+
+  def force_publish
+    plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
+    plan_year.force_publish!
+    flash[:error] = "As submitted, this application is ineligible for coverage under the DC HealthLink exchange. If information that you provided leading to this determination is inaccurate, you have 30 days from this notice to request a review by DCHL officials."
+    redirect_to employers_employer_profile_path(@employer_profile)
   end
 
   private
@@ -109,7 +136,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def build_plan_year
     plan_year = PlanYear.new
-    benefit_groups = plan_year.benefit_groups.build(plan_option_kind: nil)
+    benefit_groups = plan_year.benefit_groups.build
     ::Forms::PlanYearForm.new(plan_year)
   end
 

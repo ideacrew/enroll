@@ -5,30 +5,18 @@ class HbxEnrollment
   include AASM
   include MongoidSupport::AssociationProxies
 
-  class WaiverReason
-    Reasons = {
-      spouse: "Spouse has coverage.",
-      parent: "Parent has coverage.",
-      none: "No other source of coverage",
-    }
-
-    attr_reader :name
-
-    def initialize(name)
-      @name = name
-    end
-
-    def reason
-      Reasons[name]
-    end
-
-    def self.names
-      Reasons.keys
-    end
-  end
-
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
   Authority = [:open_enrollment]
+  WAIVER_REASONS = [
+    "I have coverage through spouse’s employer health plan",
+    "I have coverage through parent’s employer health plan",
+    "I have coverage through any other employer health plan",
+    "I have coverage through an individual market health plan",
+    "I have coverage through Medicare",
+    "I have coverage through Tricare",
+    "I have coverage through Medicaid",
+    "I do not have other coverage"
+  ]
 
   embedded_in :household
 
@@ -54,13 +42,15 @@ class HbxEnrollment
   field :aasm_state_date, type: Date
   field :updated_by, type: String
   field :is_active, type: Boolean, default: true
-  field :waived_coverage_reason, type: WaiverReason
+  field :waiver_reason, type: String
 
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
 
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
+  
+  scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -86,12 +76,20 @@ class HbxEnrollment
     state :inactive   # :after_enter inform census_employee
 
     event :waive_coverage do
-      transitions from: :shopping, to: :inactive, after: :propogate_waiver
+      transitions from: [:shopping, :coverage_selected], to: :inactive, after: :propogate_waiver
     end
 
     event :select_coverage do
       transitions from: :shopping, to: :coverage_selected, after: :propogate_selection
     end
+
+    event :terminate_coverage do
+      transitions from: :coverage_selected, to: :coverage_terminated, after: :propogate_terminate
+    end
+  end
+
+  def propogate_terminate
+    self.plan_id = nil
   end
 
   def propogate_waiver
@@ -99,9 +97,8 @@ class HbxEnrollment
   end
 
   def propogate_selection
-    #benefit_group_assignment.select_coverage! if benefit_group_assignment
     if benefit_group_assignment
-      benefit_group_assignment.select_coverage
+      benefit_group_assignment.select_coverage unless benefit_group_assignment.coverage_selected?
       benefit_group_assignment.hbx_enrollment = self
       benefit_group_assignment.save
     end
@@ -164,6 +161,18 @@ class HbxEnrollment
 
   def humanized_dependent_summary
     hbx_enrollment_members.count - 1
+  end
+
+  def rebuild_members_by_coverage_household(coverage_household:)
+    applicant_ids = hbx_enrollment_members.map(&:applicant_id)
+    coverage_household.coverage_household_members.each do |coverage_member|
+      next if applicant_ids.include? coverage_member.family_member_id
+      enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
+      enrollment_member.eligibility_date = self.effective_on
+      enrollment_member.coverage_start_on = self.effective_on
+      self.hbx_enrollment_members << enrollment_member
+    end
+    self
   end
 
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer

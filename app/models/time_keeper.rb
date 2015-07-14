@@ -1,20 +1,21 @@
 class TimeKeeper
   include Mongoid::Document
   include Singleton
+  include Acapi::Notifiers
+  extend Acapi::Notifiers
 
-  field :date_of_record, type: Date
+  CACHE_KEY = "timekeeper/date_of_record"
 
   # time zone management
 
   def initialize
-    @mutex  = Mutex.new
-    @date_of_record = Date.current
   end
 
   def self.set_date_of_record(new_date)
     new_date = new_date.to_date
     if instance.date_of_record != new_date
       if instance.date_of_record > new_date
+        log("Attempt made to set date to past: #{new_date}", {:severity => :error})
         raise StandardError, "system may not go backward in time"
       else
         number_of_days = (new_date - instance.date_of_record).to_i
@@ -42,37 +43,31 @@ class TimeKeeper
   end
 
   def set_date_of_record(new_date)
-    with_mutex { @date_of_record = new_date }
+    Rails.cache.write(CACHE_KEY, new_date.strftime("%Y-%m-%d"))
   end
 
   def date_of_record
-    with_mutex { @date_of_record }
+    tl_value = thread_local_date_of_record
+    return tl_value unless tl_value.blank?
+    found_data = Rails.cache.fetch(CACHE_KEY) do
+      log("date_of_record not available for TimeKeeper - using Date.current")
+      Date.current.strftime("%Y-%m-%d")
+    end
+    Date.strptime(found_data, "%Y-%m-%d")
   end
 
   def push_date_of_record
-    EmployerProfile.advance_day(@date_of_record)
-    Family.advance_day(@date_of_record)
-    #HbxProfile.advance_day(@date_of_record)
+    EmployerProfile.advance_day(self.date_of_record)
+    Family.advance_day(self.date_of_record)
   end
 
-private
-
-  def with_mutex
-    @mutex.synchronize { yield }
+  def self.with_cache
+    Thread.current[:time_keeper_local_cached_date] = date_of_record
+    yield
+    Thread.current[:time_keeper_local_cached_date] = nil
   end
 
-
-#   def initialize(*args)
-#     @settings ||= ConfigSetting.first()
-#     if !@settings.nil?
-#       @attributes = @settings.attributes
-#       @settings   = super(@attributes)
-#     else
-#       @settings = super(*args)
-#       self.save!
-#     end
-#     @settings
-#   end
-# end
-
+  def thread_local_date_of_record
+    Thread.current[:time_keeper_local_cached_date]
+  end
 end

@@ -8,12 +8,6 @@
         </a>
       </li>
       <li role="presentation">
-        <a aria-expanded="true" aria-controls="families" data-toggle="tab" role="tab" id="families-tab" href="#families">
-          <span class="hidden-xs">Families</span>
-          <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Families"></span>
-        </a>
-      </li>
-      <li role="presentation">
         <a aria-expanded="true" aria-controls="employers" data-toggle="tab" role="tab" id="employers-tab" href="#employers">
           <span class="hidden-xs">Employers</span>
           <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Employers"></span>
@@ -21,7 +15,8 @@
       </li>
       <li role="presentation">
         <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox" class="hidden-xs interaction-click-control-4-messages">
-        <span class="badge"><%= @broker_agency_profile.inbox.messages.size rescue nil %></span>Messages
+        <span class="badge message-unread"><%=begin; @broker_agency_profile.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
+        Inbox
         </a>
         <a aria-controls="inbox" data-toggle="tab" id="inbox-tab" role="tab" href="#inbox" class="visible-xs interaction-click-control-messages">
           <span aria-hidden="true" class="glyphicon glyphicon-comment"></span>

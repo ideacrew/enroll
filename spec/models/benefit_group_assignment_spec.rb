@@ -180,6 +180,7 @@ describe BenefitGroupAssignment, type: :model do
                 before { hbx_enrollment.employee_role = other_benefit_group }
 
                 it "should be invalid" do
+                  allow(census_employee).to receive(:employee_role_linked?).and_return(true)
                   expect(benefit_group_assignment.valid?).to be_falsey
                   expect(benefit_group_assignment.errors[:hbx_enrollment].any?).to be_truthy
                 end

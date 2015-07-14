@@ -3,7 +3,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   before_action :assign_filter_and_agency_type
 
   def new_broker
-    @person = Forms::BrokerCandidate.new
+    @broker_candidate = Forms::BrokerCandidate.new
 
     respond_to do |format|
       format.html { render 'new' }
@@ -12,7 +12,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   def new_staff_member
-    @person = Forms::BrokerCandidate.new
+    @broker_candidate = Forms::BrokerCandidate.new
 
     respond_to do |format|
       format.js
@@ -28,18 +28,15 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   def search_broker_agency
-    orgs = Organization.exists(broker_agency_profile: true).where(legal_name: /#{params[:broker_agency_search]}/i)
-    broker_agency_profiles_by_name = orgs.present? ? orgs.map(&:broker_agency_profile) : []
+    orgs = Organization.exists(broker_agency_profile: true).or({legal_name: /#{params[:broker_agency_search]}/i}, {"broker_agency_profile.corporate_npn" => /#{params[:broker_agency_search]}/i})
 
-    pers = Person.where({"broker_role.npn" => params[:broker_agency_search]})
-    broker_agency_profiles_by_npn = pers.present? ? pers.map(&:broker_role).map(&:broker_agency_profile) : []
-    @broker_agency_profiles = (broker_agency_profiles_by_name | broker_agency_profiles_by_npn).compact
+    @broker_agency_profiles = orgs.present? ? orgs.map(&:broker_agency_profile) : []
   end
 
   def create
     if params[:person].present?
-      @person = ::Forms::BrokerCandidate.new(applicant_params)
-      if @person.save
+      @broker_candidate = ::Forms::BrokerCandidate.new(applicant_params)
+      if @broker_candidate.save
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
         redirect_to broker_registration_path
       else
@@ -68,7 +65,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   def primary_broker_role_params
     params.require(:organization).permit(
       :first_name, :last_name, :dob, :email, :npn, :legal_name, :dba, 
-      :fein, :entity_kind, :home_page, :market_kind, :languages_spoken, 
+      :fein, :entity_kind, :corporate_npn, :home_page, :market_kind, :languages_spoken,
       :working_hours, :accept_new_clients,
       :office_locations_attributes => [ 
         :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip], 

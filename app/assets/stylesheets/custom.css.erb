@@ -254,7 +254,7 @@ a:hover, a:focus {
 
 /* New Person Signup */
 #new_person_wrapper {
-  padding-bottom: 100px;
+  /*padding-bottom: 100px;*/
 }
 
 #new_person .select-plan, .coverage-options {
@@ -1419,6 +1419,8 @@ a.close-1, a.close-2{
   padding: 20px;
   text-align: center;
   color: red;
+  border: 1px solid #b7b7b7;
+  border-top: none;
 }
 
 #remove_confirm a.cancel {
@@ -2201,9 +2203,9 @@ a.all-filter:hover{
     color: #fff;
     font-size: 10px;
     font-weight: 300;
-    margin-left: 69px;
+    margin-left: 45px;
     margin-top: -9px;
-    padding: 5px 8px;
+    padding: 5px 8px 5px 7px;
     position: absolute;
     text-align: center;
     vertical-align: middle;
@@ -2275,7 +2277,7 @@ a.all-filter:hover{
   background: #fff;
 }
 .coverage-table .heading {
-  background: url("<%= asset_path 'arror-down.png' %>") no-repeat scroll 7px center #009acc;
+  background: url("<%= asset_path 'arrow-down.png' %>") no-repeat scroll 7px center #009acc;
   color: #fff;
   display: block;
   font-weight: bold;
@@ -3544,9 +3546,6 @@ table.table-wrapper a.btn {
 .title-dropdown .form-control .dropdown-menu {
     min-width: 100%;
 }
-.unborder-top {
-    border-top: 0px;
-}
 table.table-list-wp tbody tr td {
     border: 0px;
 }
@@ -3806,7 +3805,12 @@ ul.list-right-section li a img {
 .row-form-wrapper input[type="radio"]:checked + label span {
     background: rgba(0, 0, 0, 0) url("<%= asset_path('icons/check_radio_sheet.png') %>") no-repeat scroll -24px top;
 }
-.selectric .label {font-weight: normal;font-size: 12px !important;}
+
+#office_locations_buttons, .interaction-click-control-create-broker-agency {
+  margin-bottom: 5px;
+}
+
+.selectric .label {font-weight: normal;font-size: 12px !important;text-align: left;}
 .selectric {background: #fff !important;}
 /* Select Plan Page */
 .ct-1 p {
@@ -3955,7 +3959,7 @@ h3.text-blue {
 .personal-info-row{background: #fff;}
 .top-row, .middle-row{border-bottom: 1px solid #b7b7b7;}
 .no-border { border: 0px; }
-.no-border-top { border-top: 0px; }
+.no-border-top { border-top: 0px !important; }
 .no-border-bottom { border-bottom: 0px; }
 
 .content_no_wrap {
@@ -4043,7 +4047,7 @@ span.badge.message-badge {
     border-radius: 0;
 }
 .benefit-group-heading {
-  margin-top: 15px; 
+  margin-top: 15px;
 }
 a.remove {
     float: right;
@@ -4322,3 +4326,169 @@ span.text_style {color: #616161 !important;}
 }
 
 .form-group-actions{margin: 10px 0px;}
+.none_margin_bottom {
+  margin-bottom: 0 !important;
+}
+
+.none_margin_top {
+  margin-top: 0 !important;
+}
+
+.broker_approve_deny_btn {
+  margin-top: 1%;
+}
+
+@media (max-width: 360px) {
+  .new_employer_profile_btn {
+    width: 100%;
+  }
+
+  .families_search_div {
+    width: 100%;
+  }
+
+  .families_search_div .input-group {
+    width: 100%;
+  }
+
+  .select_broker_btn {
+    width: 100%;
+  }
+
+  .sm_full_width {
+    width: 100%;
+  }
+}
+
+.full_width {
+  width: 100%;
+}
+
+.display-on-mobile{display: none;}
+.action-group{margin-top: 5px;}
+.msg_cancel_btn {
+  margin-top: 2%;
+}
+
+@media (max-width: 767px) {
+  .padding_none {
+    padding: 0;
+  }
+
+  #employer-info .text-right {
+    text-align: left !important;
+  }
+
+  #dependent_buttons a {
+    width: 100%;
+  }
+
+  .checkbox-filter-wrapper ul {
+    margin-left: -58px;
+  }
+
+  .compare-wrapper .checkbox {
+    float: none;
+  }
+
+  .no_margin {
+    margin: 0;
+  }
+
+  .create_broker_agency_btn {
+    width: 100%
+  }
+}
+
+@media (max-width: 332px) {
+  .keep_existing_plan {
+    margin-bottom: 2%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 320px) {
+  #select_plan_wrapper a.btn {
+    padding: 6px;
+  }
+
+  .xs_full_width {
+    width: 100%;
+  }
+}
+
+#new_and_existing_broker_form .container, #broker_and_staff_form .container {
+  width: 100%;
+}
+
+@media screen and (min-width:768px) and (max-width:1024px) {
+  .broker-agency-info {
+    float:left;width:50%;
+  }
+  .weekend-hour {
+    padding:0px 0px 0px 60px;
+  }
+  .new_organization .broker-agency-info .checkbox label {
+    font-size:11px;
+  }
+  .broker-agency-info .checkbox  input[type="checkbox"] {
+    margin-left:-16px;
+  }
+}
+
+.broker-agency-info .checkbox label {
+  font-size:12px;
+}
+.modal-backdrop {z-index: -1;}
+.modal {text-align: center;}
+.modal:before {
+  display: inline-block;
+  vertical-align: middle;
+  content: " ";
+  height: 100%;
+}
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+.ct-1 h2 {
+    color: #003260;
+    font-weight: 100;
+    margin-bottom: 20px;
+    margin-top: 0;
+}
+.ct-1 p {
+    font-size: 14px;
+    font-weight: 100;
+    line-height: 25px;
+}
+.msg-inbox-read {
+  background-color: #ccc;
+}
+
+.benefit-group-offset label.title{
+  height: 16px;
+  margin-bottom: 0;
+  color: rgb(131, 135, 128);
+  font-size: 12px;
+  position: absolute;
+  z-index: 1;
+}
+
+.benefit-group-offset .selectric p.label {
+  padding: 14px 0 8px 0;
+  font-size: 14px !important;
+}
+
+a.interaction-click-control-default {
+  float: left;
+  margin: 21px 10px 21px 0;
+}
+
+.dl-horizontal dt {
+  width: 200px;
+}
+.dl-horizontal dd {
+  margin-left: 220px;
+}

@@ -24,6 +24,11 @@ RSpec.describe Employers::PlanYearsController do
     it "should generate carriers" do
       expect(assigns(:carriers)).to eq Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
     end
+
+    it "should generate benefit_group with nil plan_option_kind" do
+      benefit_group = assigns(:plan_year).benefit_groups.first
+      expect(benefit_group.plan_option_kind).to eq nil
+    end
   end
 
   describe "GET edit" do
@@ -33,21 +38,48 @@ RSpec.describe Employers::PlanYearsController do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(employer_profile).to receive(:find_plan_year).and_return(plan_year)
-      get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id
     end
 
-    it "should be a success" do
-      expect(response).to have_http_status(:success)
+    context "when draft state" do
+      before :each do
+        get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id
+      end
+
+      it "should be a success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should render the edit template" do
+        expect(response).to render_template("edit")
+      end
+
+      it "should generate carriers" do
+        expect(assigns(:carriers)).to eq Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
+      end
     end
 
-    it "should render the edit template" do
-      expect(response).to render_template("edit")
-    end
 
-    it "should generate carriers" do
-      expect(assigns(:carriers)).to eq Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
+    context "when publish pending state" do
+      let(:warnings) { { primary_location: "primary location is outside washington dc" } }
+
+      before :each do
+        allow(plan_year).to receive(:publish_pending?).and_return(true)
+        allow(plan_year).to receive(:withdraw_pending!)
+        allow(plan_year).to receive(:is_application_valid?).and_return(false)
+        allow(plan_year).to receive(:application_eligibility_warnings).and_return(warnings)
+        get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id
+      end
+
+      it "should set warnings flag" do
+        expect(assigns(:just_a_warning)).to eq(true)
+      end
+
+      it "should set errors" do
+        expect(plan_year.errors[:base]).to eq ["primary location is outside washington dc"]
+      end
     end
   end
+
 
   describe "POST update" do
     let(:save_result) { false }
@@ -265,44 +297,60 @@ RSpec.describe Employers::PlanYearsController do
     before :each do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(plan_year_proxy).to receive(:draft?).and_return(false)
+      allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
+      allow(plan_year_proxy).to receive(:application_errors)
     end
 
     context "plan year published sucessfully" do
       before :each do
-        allow(plan_year_proxy).to receive(:draft?).and_return(false)
-        allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
         allow(plan_year_proxy).to receive(:published?).and_return(true)
       end
 
-      it "should be a redirect" do
-        post :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
-        expect(response).to have_http_status(:redirect)
+      it "should redirect with success message" do
+        xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
+        expect(flash[:notice]).to eq "Plan Year successfully published."
       end
     end
 
-    context "plan year did not publish with warnings" do
+    context "plan year did not publish due to warnings" do
       before :each do
-        allow(plan_year_proxy).to receive(:draft?).and_return(false)
         allow(plan_year_proxy).to receive(:publish_pending?).and_return(true)
         allow(plan_year_proxy).to receive(:application_eligibility_warnings)
       end
 
-      it "should be a redirect with warnings" do
-        post :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
-        expect(response).to have_http_status(:redirect)
+      it "should be a render modal box with warnings" do
+        xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
+        have_http_status(:success)
       end
     end
 
-    context "plan year did not publish with errors" do
+    context "plan year did not publish due to errors" do
       before :each do
         allow(plan_year_proxy).to receive(:draft?).and_return(true)
-        allow(plan_year_proxy).to receive(:application_errors)
+        allow(plan_year_proxy).to receive(:published?).and_return(false)
       end
 
-      it "should be a redirect with errors" do
-        post :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
-        expect(response).to have_http_status(:redirect)
+      it "should redirect with errors" do
+        xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
+        expect(flash[:notice]).to match(/Plan Year failed to publish/)
       end
+    end
+  end
+
+  describe "POST force publish" do
+    let(:plan_year_id) { "plan_year_id"}
+    let(:plan_year_proxy) { instance_double("PlanYear", publish!: double)}
+
+    before :each do
+      sign_in
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(plan_year_proxy).to receive(:force_publish!)
+      post :force_publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
+    end
+
+    it "should redirect" do
+      expect(response).to have_http_status(:redirect)
     end
   end
 

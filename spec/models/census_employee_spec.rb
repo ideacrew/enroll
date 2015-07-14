@@ -16,7 +16,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   let(:last_name){ "Skynyrd" }
   let(:name_sfx){ "PhD" }
   let(:ssn){ "230987654" }
-  let(:dob){ Date.today - 31.years }
+  let(:dob){ TimeKeeper.date_of_record - 31.years }
   let(:gender){ "male" }
   let(:hired_on){ TimeKeeper.date_of_record - 14.days }
   let(:is_business_owner){ false }
@@ -143,7 +143,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
             context "and the benefit group plan year isn't published" do
               it "the roster instance should not be ready for linking" do
                 expect(initial_census_employee.may_link_employee_role?).to be_falsey
-              end            
+              end
             end
 
             context "and the benefit group plan year is published" do
@@ -347,7 +347,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                 saved_census_employee.employee_role = employee_role
                 saved_census_employee.save
               end
-    
+
               it "existing census employee should be employee_role_linked status" do
                 expect(CensusEmployee.find(saved_census_employee.id).aasm_state).to eq "employee_role_linked"
               end
@@ -397,7 +397,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     before { plan_year.publish! }
 
     it "should be in published status" do
-      expect(plan_year.aasm_state).to eq "published" 
+      expect(plan_year.aasm_state).to eq "published"
     end
 
     context "and a new census employee is added with no benefit group assigned" do
@@ -436,5 +436,78 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.valid?).to be_truthy
       expect(census_employee.errors[:employment_terminated_on].any?).to be_falsey
     end
+  end
+
+  context '.edit' do
+    let(:employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
+    let(:user) {FactoryGirl.create(:user)}
+    let(:hbx_staff) { FactoryGirl.create(:user, :hbx_staff) }
+    let(:employer_staff) { FactoryGirl.create(:user, :employer_staff) }
+
+    context "hbx staff user" do
+      it "can change dob" do
+        allow(User).to receive(:current_user).and_return(hbx_staff)
+        employee.dob = Date.current
+        expect(employee.save).to be_truthy
+      end
+
+      it "can change ssn" do
+        allow(User).to receive(:current_user).and_return(hbx_staff)
+        employee.ssn = "123321456"
+        expect(employee.save).to be_truthy
+      end
+    end
+
+    context "employer staff user" do
+      before do
+        allow(User).to receive(:current_user).and_return(employer_staff)
+      end
+
+      context "not linked" do
+        before do
+          allow(employee).to receive(:employee_role_linked?).and_return(false)
+        end
+
+        it "can change dob" do
+          employee.dob = Date.current
+          expect(employee.save).to be_truthy
+        end
+
+        it "can change ssn" do
+          employee.ssn = "123321456"
+          expect(employee.save).to be_truthy
+        end
+      end
+
+      context "has linked" do
+        before do
+          allow(employee).to receive(:employee_role_linked?).and_return(true)
+        end
+
+        it "can not change dob" do
+          employee.dob = Date.current
+          expect(employee.save).to eq false
+        end
+        it "can not change ssn" do
+          employee.ssn = "123321458"
+          expect(employee.save).to eq false
+        end
+      end
+    end
+
+    context "normal user" do
+      it "can not change dob" do
+        allow(User).to receive(:current_user).and_return(user)
+        employee.dob = Date.current
+        expect(employee.save).to eq false
+      end
+
+      it "can not change ssn" do
+        allow(User).to receive(:current_user).and_return(user)
+        employee.ssn = "123321458"
+        expect(employee.save).to eq false
+      end
+    end
+
   end
 end

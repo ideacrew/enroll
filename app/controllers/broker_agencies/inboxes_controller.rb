@@ -37,6 +37,16 @@ class BrokerAgencies::InboxesController < InboxesController
     end
   end
 
+  def destroy
+    @sent_box = true
+    super
+  end
+
+  def show
+    @sent_box = true
+    super
+  end
+
   def find_inbox_provider
     @broker_agency_provider = BrokerAgencyProfile.find(params["id"]||params['profile_id'])
     @inbox_provider = @broker_agency_provider

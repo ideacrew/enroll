@@ -487,3 +487,36 @@ describe Person, "does not allow two people with the same user ID to be saved" d
   end
   
 end
+
+describe Person, "persisted with no user" do
+  let(:person1){FactoryGirl.create(:person)}
+  let(:user1){FactoryGirl.create(:user)}
+
+  it "should be fine with having a user assigned" do
+    person1.user = user1
+    expect(person1.valid?).to eq(true)
+  end
+end
+
+describe Person, "persisted with a user" do
+  let(:person1){FactoryGirl.create(:person)}
+  let(:user1){FactoryGirl.create(:user)}
+  let(:user2){FactoryGirl.create(:user)}
+
+  before :each do
+    person1.user = user1
+    person1.save!
+  end
+
+  it "should not allow a different user to be assigned" do
+    expect(person1.valid?).to eq(true)
+    person1.user = user2
+    expect(person1.valid?).to eq(false)
+  end
+  it "should allow the same user to be assigned" do
+    expect(person1.valid?).to eq(true)
+    person1.user = nil
+    person1.user = user1
+    expect(person1.valid?).to eq(true)
+  end
+end

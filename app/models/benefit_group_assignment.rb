@@ -82,9 +82,17 @@ class BenefitGroupAssignment
     event :terminate_coverage do
       transitions from: :coverage_selected, to: :coverage_terminated
     end
+
+    event :delink_coverage do
+      transitions from: [:coverage_selected, :coverage_waived, :coverage_terminated], to: :initialized, after: :propogate_delink
+    end
   end
 
 private
+  def propogate_delink
+    self.hbx_enrollment_id = nil
+  end
+
   def model_integrity
     self.errors.add(:benefit_group, "benefit_group required") unless benefit_group.present?
 
@@ -94,7 +102,7 @@ private
 
     if hbx_enrollment.present?
       self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id
-      self.errors.add(:hbx_enrollment, "employee_role missmatch") unless hbx_enrollment.employee_role_id == census_employee.employee_role_id
+      self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?
     end
   end
 

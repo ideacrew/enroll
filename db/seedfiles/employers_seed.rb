@@ -84,6 +84,7 @@ spacely_plan = Plan.create(
 spacely_benefit_group = spacely_plan_year.benefit_groups.build(
     effective_on_kind:  "date_of_hire",
     terminate_on_kind:  "end_of_month",
+    plan_option_kind: "single_plan", 
     effective_on_offset:  30,
     employer_max_amt_in_cents:  1000_00,
     elected_plan_ids: [spacely_plan._id],
@@ -139,6 +140,7 @@ cogswell_plan = Plan.create(
 cogswell_benefit_group = cogswell_plan_year.benefit_groups.build(
     effective_on_kind:  "date_of_hire",
     terminate_on_kind:  "end_of_month",
+    plan_option_kind: "single_plan",
     effective_on_offset:  30,
     employer_max_amt_in_cents:  1000_00,
     elected_plan_ids: [cogswell_plan._id],
@@ -211,6 +213,7 @@ org_1_plan = Plan.create(
 org_1_benefit_group = org_1_plan_year.benefit_groups.build(
     effective_on_kind:  "date_of_hire",
     terminate_on_kind:  "end_of_month",
+    plan_option_kind: "single_plan", 
     effective_on_offset:  30,
     employer_max_amt_in_cents:  500_00,
     elected_plan_ids: [org_1_plan._id],
@@ -281,6 +284,7 @@ org_2_plan = Plan.create(
 org_2_benefit_group = org_2_plan_year.benefit_groups.build(
     effective_on_kind:  "date_of_hire",
     terminate_on_kind:  "end_of_month",
+    plan_option_kind: "single_plan", 
     effective_on_offset:  30,
     employer_max_amt_in_cents:  500_00,
     elected_plan_ids: [org_2_plan._id],

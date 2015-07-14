@@ -10,7 +10,7 @@ class Insured::PlanShoppingsController < ApplicationController
     decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
     # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
-    if (hbx_enrollment.coverage_selected? or hbx_enrollment.select_coverage!) and hbx_enrollment.save
+    if (hbx_enrollment.coverage_selected? or hbx_enrollment.select_coverage) and hbx_enrollment.save
       UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now
       redirect_to home_consumer_profiles_path
     else
@@ -35,8 +35,23 @@ class Insured::PlanShoppingsController < ApplicationController
   def waive
     person = current_user.person
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
+    waiver_reason = params.require(:waiver_reason)
 
-    if hbx_enrollment.waive_coverage!
+    if (hbx_enrollment.shopping? or hbx_enrollment.coverage_selected?) and waiver_reason.present? and hbx_enrollment.valid?
+      hbx_enrollment.waive_coverage
+      hbx_enrollment.waiver_reason = waiver_reason 
+      hbx_enrollment.save
+      flash[:notice] = "Waive Successful"
+    else
+      flash[:alert] = "Waive Failure"
+    end
+    redirect_to home_consumer_profiles_path
+  end
+
+  def terminate
+    hbx_enrollment = HbxEnrollment.find(params.require(:id))
+
+    if hbx_enrollment.coverage_selected? and hbx_enrollment.terminate_coverage!
       redirect_to home_consumer_profiles_path
     else
       redirect_to :back

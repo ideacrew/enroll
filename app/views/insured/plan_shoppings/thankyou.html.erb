@@ -4,17 +4,17 @@
       <div class="col-lg-9 col-md-9 col-sm-10 col-xs-12">
         <div class="col-md-12 col-sm-12 no-pd col-xs-12" id="confirm_plan">
 
-            <h3>Confirm Your Plan Selection</h3>
-            <p>Your current plan selection is displayed below. Click the back button if you want to change your selection. Click Purchase button to complete your enrollment.</p>
-            <p>Your enrollment is not complete until you purchase your plan selection below.</p>
-            <p>
-              <strong><%= @plan.name %></strong><br>
-              Starting on : <%= @enrollment.effective_on.strftime("%m/%d/%Y") %>
-            </p>
+          <h3>Confirm Your Plan Selection</h3>
+          <p>Your current plan selection is displayed below. Click the back button if you want to change your selection. Click Purchase button to complete your enrollment.</p>
+          <p>Your enrollment is not complete until you purchase your plan selection below.</p>
+          <p>
+            <strong><%= @plan.name %></strong><br>
+            Starting on : <%= @enrollment.effective_on.strftime("%m/%d/%Y") %>
+          </p>
 
-            <br>
+          <br>
 
-            <div class="table-border">
+          <div class="table-border table-responsive">
             <table class="table table-striped">
               <thead>
                 <tr>
@@ -51,14 +51,17 @@
               </tbody>
             </table>
           </div><br>
-          </div>
-
-          <%= link_to("Waive", waive_insured_plan_shopping_path(@enrollment, {:plan_id => @plan.id}), {:class => "btn btn-default", :method => :post}) %>
         </div>
 
-        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
-          <%= render  partial: 'shared/signup_progress', locals: {step: '6'} %>
-        </div>
+        <%= link_to 'Waive', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-default' %>
+        <%= render "insured/plan_shoppings/waive_confirmation" %>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
+        <%= render  partial: 'shared/signup_progress', locals: {step: '6'} %>
+      </div>
+
+      <%= render "insured/plan_shoppings/purchase_confirmation" %>
     </div>
   </div>
 </div><br>

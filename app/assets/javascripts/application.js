@@ -39,6 +39,12 @@ $(document).ready(function () {
   });
 
   $('[data-toggle="tooltip"]').tooltip();
+  $("[data-toggle=popover]").popover();
+
+  $('a.back').click(function(){
+    parent.history.back();
+    return false;
+  });
 
   semantic_class(); //Calls semantic class on all input fields & buttons (eg. interaction-click-control-continue)
 
@@ -63,7 +69,7 @@ $(document).ready(function () {
       $(this).datepicker({
         changeMonth: true,
         changeYear: true,
-        dateFormat: 'mm/dd/yy', 
+        dateFormat: 'mm/dd/yy',
         maxDate: "+0d",
         yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear(),
           onSelect: function(dateText, dpInstance) {
@@ -72,10 +78,10 @@ $(document).ready(function () {
 	  }
       });
     }else{
-      $(this).datepicker({ 
+      $(this).datepicker({
         changeMonth: true,
         changeYear: true,
-        dateFormat: 'mm/dd/yy', 
+        dateFormat: 'mm/dd/yy',
         minDate: dateMin,
         maxDate: dateMax,
         yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10),
@@ -88,7 +94,7 @@ $(document).ready(function () {
   });
 
   applyFloatLabels();
-  
+
   $(".address-li").on('click',function(){
     $(".address-span").html($(this).data("address-text"));
     $(".address-row").hide();
@@ -100,7 +106,7 @@ $(document).ready(function () {
   // $('#plan_year input,select').click(function(){
   //   $('#plan_year .alert-error').fadeOut(2000);
   // });
-  
+
   // personal-info-row focus fields
   $(document).on('focusin', 'input.form-control', function() {
     $(this).parents(".row-form-wrapper").addClass("active");
@@ -116,7 +122,7 @@ $(document).ready(function () {
   // Progress Bar
   // $(document).on('click', '#btn-continue', function() {
   //   console.log('continue', $('#btn-search-employer').length, $('#btn_user_contact_info').length, $('#btn_household_continue').length,$('#btn_select_plan_continue').length)
-    
+
   //   if($('#btn-search-employer').length) $('#btn-search-employer').click();
   //   else if($('#btn_user_contact_info').length) $('#btn_user_contact_info').click();
   //   else if($('#btn_household_continue').length) window.location = $('#btn_household_continue').val();
@@ -125,7 +131,7 @@ $(document).ready(function () {
 
   // Employer Registration
   $('.employer_step2').click(function() {
-    
+
     // Display correct sidebar
     $('.credential_info').addClass('hidden');
     $('.name_info').addClass('hidden');
@@ -145,7 +151,7 @@ $(document).ready(function () {
   });
 
   $('.employer_step3').click(function() {
-    
+
     // Display correct sidebar
     $('.emp_contact_info').addClass('hidden');
     $('.coverage_info').addClass('hidden');
@@ -159,22 +165,22 @@ $(document).ready(function () {
     $('#emp_contact_info').addClass('hidden');
     $('#coverage_info').addClass('hidden');
     $('#plan_selection_info').addClass('hidden');
-    
+
     $('#emp_contributions_info').removeClass('hidden');
     $('#eligibility_rules_info').removeClass('hidden');
     $('#broker_info').removeClass('hidden');
   });
-  
+
   $(document).on('click', '.close-fail', function() {
     $(".fail-search").addClass('hidden');
     $(".overlay-in").css("display", "none");
   });
-  
+
   // ----- Focus Effect & Progress -----
   $("body").click(function(e) {
     update_progress();
   });
-  
+
   update_progress(); //Run on page load for dependent_details page.
   function update_progress() {
     var start_progress = $('#initial_progress').length ? parseInt($('#initial_progress').val()) : 0;
@@ -209,15 +215,15 @@ $(document).ready(function () {
     if($('.dependent_list').length) {
       start_progress += 5;
       $("a.six").css("color","#00b420");
-    } 
+    }
 
     if($('#family_member_ids_0').length) {
       $("a.seven").css("color","#00b420");
-    } 
+    }
 
     if($('#all-plans').length) {
       $("a.eight").css("color","#00b420");
-    } 
+    }
 
     if($('#confirm_plan').length) {
       $("a.nine").css("color", "#00b420");
@@ -275,11 +281,11 @@ $(document).ready(function () {
     }
   }
   // ----- Finish Focus Effect & Progress -----
-  
+
   //Employee Dependents Page
   $('#dependents_info #top-pad15, #dependents_info #top-pad30, #dependents_info #top-pad80').hide();
   $("#dependents_info a.one, #dependents_info a.two, #dependents_info a.three, #dependents_info a.four, #dependents_info a.five").css("color","#00b420");
-  
+
   $('.add_member').click(function() {
     $('.fail-search').addClass('hidden');
     $("#dependent_buttons").removeClass('hidden');
@@ -287,22 +293,22 @@ $(document).ready(function () {
     $('#dependent_buttons div:last').removeClass('hidden');
     $('.add-member-buttons').removeClass('hidden');
   });
-  
+
   $(document).on('click', '#cancel_member', function() {
     $("#dependent_buttons").removeClass('hidden');
     $(".dependent_list:last").addClass('hidden');
   });
-  
+
   $('#save_member').click(function() {
     $('.new_family_member:last').submit();
   });
-  
+
   // Add new address
   $('.btn-new-address').click(function(e){
     e.preventDefault();
     $(".new-address-flow").css("display", "block");
   });
-  
+
   $('.new-address-flow .cancel').click(function(){
     $(".new-address-flow").removeAttr("style");
   });
@@ -330,13 +336,13 @@ $(document).ready(function () {
       alert("You cannot remove all addresses.");
     }
   });
-  
+
   // Change Dropdown Address Text
   $('.address-li').on('click', function(){
     $("#dropdownMenu1 label").text($(this).text());
     $('#address_info > .first').attr('id', ($(this).text()));
   });
-  
+
   $(document).on('click', '.filter-btn-row a.all-filter', function(){
     $(".all-filters-row").toggle("fast");
   });
@@ -351,12 +357,12 @@ $(document).ready(function () {
   $(".zip").mask("99999");
   $("#person_ssn").mask("999-99-9999");
   $(".person_ssn").mask("999999999");
-  $(".broker_npn").mask("9999999999");
+  $(".npn_field").mask("9999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
-  
+
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
       $("[for='person_ssn']").css('display', 'none');
@@ -366,7 +372,7 @@ $(document).ready(function () {
       $("[for='person_ssn']").css('opacity', 1);
     }
   });
-  
+
   $('#employer .landing_personal_tab .first').focusin(function(){
     $(this).css('opacity', 1);
   });
@@ -463,7 +469,7 @@ $(document).on('change', "#plan_year_start_on", function() {
       url: target_url
     });
   };
-}); 
+});
 
 $(document).on('change', "input#jq_datepicker_ignore_plan_year_open_enrollment_start_on", function() {
   var date = $(this).val();
@@ -482,3 +488,12 @@ $(document).on('change', "input#jq_datepicker_ignore_plan_year_open_enrollment_e
     $('.recommend #notice').html("");
   };
 });
+
+
+$(document).on('click', 'tr .show_msg', function() {
+  $(this).parent().parent().addClass('msg-inbox-read')
+})
+$(document).on('click', '.btn-danger', function() {
+  var unread = $('.message-badge').text();
+  $('.message-unread').html(unread);
+})
