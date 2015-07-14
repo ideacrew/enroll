@@ -45,7 +45,7 @@ And(/^I should see a third fieldset to enter more office location information$/)
     address1: "623a Spalding Ct",
     address2: "Suite 200",
     city: "McLean",
-    state: "Virginia",
+    state: "VA",
     zip: "22180",
     phone_area_code: "202",
     phone_number: "1110000",
