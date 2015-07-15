@@ -72,7 +72,8 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         open_enrollment_end_on: PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_end_on],
         eligible_to_enroll_count: 4,
         total_enrolled_count: 10,
-        employee_participation_percent: 40
+        employee_participation_percent: 40,
+        non_business_owner_enrollment_count: 10
         )
     end
 
@@ -134,8 +135,8 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
       expect(rendered).to match(/#{format_date current_plan_year.open_enrollment_start_on}/m)
       expect(rendered).to match(/#{format_date current_plan_year.open_enrollment_end_on}/m)
       expect(rendered).to match(/<dd>#{current_plan_year.eligible_to_enroll_count}<\/dd>/m)
-      expect(rendered).to match(/<dd>#{current_plan_year.total_enrolled_count}<\/dd>/m)
-      expect(rendered).to match(/<dd>#{current_plan_year.employee_participation_percent}<\/dd>/m)
+      expect(rendered).to match(/<dd>.*#{current_plan_year.total_enrolled_count}.*<\/dd>/m)
+      expect(rendered).to match(/<dd>#{boolean_to_human(current_plan_year.non_business_owner_enrollment_count > 0)}<\/dd>/m)
     end
   end
 end
