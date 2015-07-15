@@ -125,7 +125,7 @@ class Family
     benefit_group = employee_role.benefit_group
     return [] unless benefit_group
     return [] if benefit_group.effective_on_for(employee_role.hired_on) > benefit_group.start_on
-    return [] unless employer_profile.enrolling?
+    return [] unless employer_profile.published_plan_year.enrolling?
     [EnrollmentEligibilityReason.new(employer_profile)]
   end
 

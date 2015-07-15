@@ -42,18 +42,22 @@ class PlanYear
   end
 
   def start_on=(new_date)
+    new_date = Date.parse(new_date) if new_date.is_a? String
     write_attribute(:start_on, new_date.beginning_of_day)
   end
 
   def end_on=(new_date)
+    new_date = Date.parse(new_date) if new_date.is_a? String
     write_attribute(:end_on, new_date.end_of_day)
   end
 
   def open_enrollment_start_on=(new_date)
+    new_date = Date.parse(new_date) if new_date.is_a? String
     write_attribute(:open_enrollment_start_on, new_date.beginning_of_day)
   end
 
   def open_enrollment_end_on=(new_date)
+    new_date = Date.parse(new_date) if new_date.is_a? String
     write_attribute(:open_enrollment_end_on, new_date.end_of_day)
   end
 

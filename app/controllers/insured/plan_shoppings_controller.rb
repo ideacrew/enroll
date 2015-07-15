@@ -26,7 +26,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @reference_plan = @benefit_group.reference_plan
     @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     @family = @person.primary_family
-    @enrollable = @family.is_eligible_to_enroll? && @benefit_group.plan_year.is_eligible_to_enroll?
+    @enrollable = @family.is_eligible_to_enroll?
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }
     end
