@@ -45,7 +45,7 @@ class BrokerAgencyAccount
 
   def writing_agent
     return @writing_agent if defined? @writing_agent
-    @writing_agent = BrokerRole.find(@writing_agent_id) unless @writing_agent_id.blank?
+    @writing_agent = BrokerRole.find(writing_agent_id)
   end
 
   class << self
@@ -54,6 +54,5 @@ class BrokerAgencyAccount
       org.employer_profile.broker_agency_accounts.detect { |account| account._id == id } unless org.blank?
     end
   end
-
 
 end

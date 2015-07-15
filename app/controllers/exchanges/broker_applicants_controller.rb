@@ -8,12 +8,16 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     status_params = params.permit(:status)
     @status = status_params[:status] || 'applicant'
 
-    # Searching applicants based on filters (applicant | certified | deceritifed | denied | all)
+    # Status Filter can be applicant | certified | deceritifed | denied | all
     @people = @people.send("broker_role_#{@status}") if @people.respond_to?("broker_role_#{@status}")
     @page_alphabets = page_alphabets(@people, "last_name")
 
-    page_no = cur_page_no(@page_alphabets.first)
-    @broker_applicants = @people.where("last_name" => /^#{page_no}/i)
+    if params[:page].present?
+      page_no = cur_page_no(@page_alphabets.first)
+      @broker_applicants = @people.where("last_name" => /^#{page_no}/i)
+    else
+      @broker_applicants = @people.to_a.first(20)
+    end
 
     respond_to do |format|
       format.js

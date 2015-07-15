@@ -93,8 +93,9 @@ class BrokerRole
 
   ## Class methods
   class << self
-    def find(broker_role_id)
-      Person.where("broker_role._id" => broker_role_id).first.broker_role unless broker_role_id.blank?
+    def find(id)
+      people = Person.where("broker_role._id" => BSON::ObjectId.from_string(id))
+      people.any? ? people[0].broker_role : nil
     end
 
     def find_by_npn(npn_value)
@@ -142,6 +143,20 @@ class BrokerRole
       people = Person.where(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id)\
                             .any_in(:"broker_role.aasm_state" => ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"])
       people.collect(&:broker_role)
+    end
+
+    def agency_ids_for_active_brokers
+      # people = Person.and(
+      # :"broker_role.aasm_state"  => "active")
+
+      # people.collect(&:broker_role).map(&:broker_agency_profile_id)  
+
+      Person.collection.raw_aggregate([
+        {"$match" => {"broker_role.aasm_state" => "active"}},
+        {"$group" => {"_id" => "$broker_role.broker_agency_profile_id"}}
+      ]).map do |record|
+        record["_id"]
+      end
     end
   end
 

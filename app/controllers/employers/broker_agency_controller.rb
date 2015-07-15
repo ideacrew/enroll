@@ -6,12 +6,13 @@ class Employers::BrokerAgencyController < ApplicationController
 
   def index
     @q = params.permit(:q)[:q]
-    @orgs = Organization.search(@q).exists(broker_agency_profile: true)
+    @orgs = BrokerAgencyProfile.agencies_with_active_brokers(Organization.search(@q).exists(broker_agency_profile: true))
     @page_alphabets = page_alphabets(@orgs, "legal_name")
     page_no = cur_page_no(@page_alphabets.first)
     @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
 
     @broker_agency_profiles = @organizations.map(&:broker_agency_profile)
+    @broker_agency_accounts = @employer_profile.broker_agency_accounts
   end
 
   def show
@@ -23,40 +24,40 @@ class Employers::BrokerAgencyController < ApplicationController
 
   def create
     broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
+    broker_role_id = params.permit(:broker_role_id)[:broker_role_id]
+
     if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
+      @employer_profile.broker_role_id = broker_role_id
       @employer_profile.broker_agency_profile = broker_agency_profile
       @employer_profile.save!
     end
 
-    flash[:notice] = "Successfully selected broker agency."
+    flash[:notice] = "Successfully associated broker with your account."
     redirect_to employers_employer_profile_path(@employer_profile)
   end
 
   def terminate
-    termination_date = params["termination_date"]
-    if termination_date.present?
-      termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
-    else
-      termination_date = ""
+    termination_date = ""
+    if params["termination_date"].present?
+      termination_date = DateTime.strptime(params["termination_date"], '%m/%d/%Y').try(:to_date)
     end
 
-    last_day_of_work = termination_date
     if termination_date.present?
-      @employer_profile.terminate_active_broker_agency(last_day_of_work)
+      @employer_profile.terminate_active_broker_agency(termination_date)
       @fa = @employer_profile.save!
     end
 
     respond_to do |format|
       format.js {
         if termination_date.present? and @fa
-          flash[:notice] = "Successfully terminated broker agency."
+          flash[:notice] = "Broker terminated successfully."
           render text: true
         else
           render text: false
         end
       }
       format.all {
-        flash[:notice] = "Successfully terminated broker agency."
+        flash[:notice] = "Broker terminated successfully."
         redirect_to employers_employer_profile_path(@employer_profile)
       }
     end

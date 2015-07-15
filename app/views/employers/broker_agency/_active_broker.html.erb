@@ -1,56 +1,45 @@
-<!-- <div id="show_broker_agency"></div>
- -->
+<div class="row no-buffer top-pd">
+  <div class="col-xs-12">
+  <h4>Broker</h4>
+  <div class="form-border">
+    <% if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
+    <% active_broker = @broker_agency_accounts[0].writing_agent %>
+    <dl class="dl-horizontal no-buffer">
+      <dt>Agency Name</dt>
+      <dd><%= @employer_profile.broker_agency_profile.legal_name %></dd>
+      <dt>Broker Name</dt>
+      <dd><%= active_broker.person.full_name %></dd>
+      <dt>Broker NPN</dt>
+      <dd><%= active_broker.npn %></dd>
+      <dt>Hire Date</dt>
+      <dd><%= format_date @broker_agency_accounts[0].start_on %></dd>
+      <dt>Contact Phone</dt>
+      <dd><%= active_broker.person.phones.map(&:to_s).join('/') %></dd>
+      <dt>Email</dt>
+      <dd>
+      <a href="mailto:<%= active_broker.person.emails.first.address %>"><%= active_broker.person.emails.first.address %></a>
+      </dd>
+    </dl>
 
- <div id="active_broker_panel">
-  <div class="row no-buffer top-pd">
-    <h3 class="title-inline">Active Broker</h3>
-  </div>
-
-<!--     <div class="row no-buffer">
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 search-wp">
-        <%= render 'shared/search', url: employers_employer_profiles_path, q: @q, placeholder: 'Name' %>
-      </div>
-    </div> -->
-
-  <div class="row no-buffer bottom-pd">
-    <div class="table-responsive">
-      <table class="table table-wrapper">
-        <thead>
-          <tr>
-            <th>Agency Name</th>
-            <th>Broker Name</th>
-            <th>NPN</th>
-            <th>Hire Date</th>
-            <th width="100"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @broker_agency_accounts.each do |broker_agency_account| %>
-            <% broker_agency_profile = broker_agency_account.broker_agency_profile %>
-            <% if broker_agency_profile.present? %>
-            <tr>
-              <td><%= broker_agency_profile.legal_name %></td>
-              <td><%= broker_agency_profile.primary_broker_role.person.full_name  if broker_agency_profile.primary_broker_role %></td>
-              <td><%= broker_agency_profile.primary_broker_role.npn if broker_agency_profile.primary_broker_role  %></td>
-              <td><%= format_date broker_agency_account.start_on %></td>
-              <td> 
-                <%= link_to '<i class="fa fa-times"></i> Terminate'.html_safe, ('javascript:;'), class: "btn btn-danger show_confirm", id: "show_confirm_#{broker_agency_profile.id}" %>
-              </td>
-            </tr>
-            <tr class="unbrd  remove_<%= broker_agency_profile.id %>">
-              <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= broker_agency_profile.id %>">
-                <div class="confirm-terminate">
-                  <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker"><br/>
-                  <a href="javascript:;" data-link="<%= employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, broker_agency_profile.id) %>" class="delete_confirm" id="remove_<%= broker_agency_profile.id %>"><strong>Submit</strong></a>
-                </div>
-                <%=image_tag "enter_date_termination.png", width: "300", height: "" %>
-              </td>
-            </tr>
-            <% end %>
-          <% end %>
-        </tbody>
-      </table>
-      <%#= render 'shared/alph_paginate', url: employers_employer_profile_broker_agency_index_path, alphs: @page_alphabets, remote: true %>
+    <div class="bottom-pd">
+      <%= link_to '<i class="fa fa-times"></i> Terminate'.html_safe, ('javascript:;'), class: "btn btn-danger show_confirm pull-right", id: "show_confirm_#{@employer_profile.broker_agency_profile.id}" %>
     </div>
+    <table class="table table-wrapper" style="opacity: 1;">
+    <tbody>
+    <tr class="unbrd remove_<%= @employer_profile.broker_agency_profile.id %>">
+      <td id="enter-date" colspan="7" class="confirm-terminate-wrapper show_confirm_<%= @employer_profile.broker_agency_profile.id %>">
+        <div class="confirm-terminate">
+          <input type="text" placeholder="e.g. 5/1/2015" class="text-center date-picker"><br/>
+          <a href="javascript:;" data-link="<%= employers_employer_profile_broker_agency_terminate_path(@employer_profile.id, @employer_profile.broker_agency_profile.id) %>" class="delete_confirm" id="remove_<%= @employer_profile.broker_agency_profile.id %>"><strong>Submit</strong></a>
+          </div>
+          <%= image_tag "enter_date_termination.png", width: "300", height: "" %>
+        </td>
+      </tr>
+    </tbody>  
+    </table>
+    <% else %>
+      No Active Broker
+    <% end %>
   </div>
+</div>
 </div>

@@ -7,6 +7,13 @@ class BrokerAgencyProfile
 
   MARKET_KINDS = %W[individual shop both]
 
+  MARKET_KINDS_OPTIONS = {
+    "Individual & Family Marketplace ONLY" => "individual",
+    "Small Business Marketplace ONLY" => "shop",
+    "Both – Individual & Family AND Small Business Marketplaces" => "both"
+  }
+
+
   field :entity_kind, type: String
   field :market_kind, type: String
   field :corporate_npn, type: String
@@ -145,6 +152,9 @@ class BrokerAgencyProfile
       organizations.size > 0 ? organizations.first.broker_agency_profile : nil
     end
 
+    def agencies_with_active_brokers(query)
+      query.where({ "broker_agency_profile._id" => { "$in" => BrokerRole.agency_ids_for_active_brokers } })
+    end
   end
 
 

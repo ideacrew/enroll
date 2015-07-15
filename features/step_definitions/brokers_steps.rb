@@ -33,7 +33,7 @@ And(/^I should see a second fieldset to enter broker agency information$/) do
 
   practice_area = @browser.div(class: /selectric-interaction-choice-control-broker-agency-practice-area/)
   practice_area.click
-  practice_area.li(text: /Shop/).click
+  practice_area.li(text: /Small Business Marketplace ONLY/).click
   @browser.text_field(class: /interaction-field-control-broker-agency-languages-spoken/).set("English")
   # @browser.checkbox(class: /interaction-choice-control-broker-agency-evening-weekend-hours/).set
   @browser.checkboxes.first.set # evening/weekend hours

@@ -36,6 +36,14 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         )
     end
 
+    def broker_agency_account
+      instance_double(
+        "BrokerAgencyAccount",
+        is_active: true,
+        writing_agent: broker_role
+        )
+    end
+
     def employer_profile
       instance_double(
         "EmployerProfile",
@@ -71,7 +79,8 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     def broker_role
       instance_double(
         "BrokerRole",
-        person: new_person
+        person: new_person,
+        npn: 7232323
         )
     end
 
@@ -98,6 +107,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     before :each do
       assign :employer_profile, employer_profile
       assign :current_plan_year, employer_profile.published_plan_year
+      assign :broker_agency_accounts, [ broker_agency_account ]
       controller.request.path_parameters[:id] = "11111111"
       render partial: "employers/employer_profiles/my_account/home_tab.html.erb"
     end
