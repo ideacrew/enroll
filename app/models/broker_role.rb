@@ -93,7 +93,9 @@ class BrokerRole
 
   ## Class methods
   class << self
+    
     def find(id)
+      return nil if id.blank?
       people = Person.where("broker_role._id" => BSON::ObjectId.from_string(id))
       people.any? ? people[0].broker_role : nil
     end
