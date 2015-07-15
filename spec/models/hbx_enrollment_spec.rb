@@ -137,7 +137,7 @@ describe HbxEnrollment do
               coverage_household: family.households.first.coverage_households.first,
               benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
             )
-          election.waived_coverage_reason = HbxEnrollment::WaiverReason.names.first
+          election.waiver_reason = HbxEnrollment::WAIVER_REASONS.first
           election.waive_coverage
           election.household.family.save!
           election.to_a
@@ -168,7 +168,7 @@ describe HbxEnrollment do
               coverage_household: family.households.first.coverage_households.first,
               benefit_group: employee_role.census_employee.active_benefit_group_assignment.benefit_group
             )
-            election.waived_coverage_reason = HbxEnrollment::WaiverReason.names.first
+            election.waiver_reason = HbxEnrollment::WAIVER_REASONS.first
             election.waive_coverage
             election.household.family.save!
             election

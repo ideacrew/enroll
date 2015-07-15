@@ -49,7 +49,7 @@ class HbxEnrollment
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
 
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
-  
+
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
 
   embeds_many :hbx_enrollment_members
@@ -144,10 +144,6 @@ class HbxEnrollment
   def broker_agency_profile
     return @broker_agency_profile if defined? @broker_agency_profile
     @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_profile_id) unless broker_agency_profile_id.blank?
-  end
-
-  def waived_coverage_reason=(name)
-    self[:waived_coverage_reason] = WaiverReason.new(name)
   end
 
   def has_broker_agency_profile?
