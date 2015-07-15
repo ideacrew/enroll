@@ -5,7 +5,41 @@
       <div class="row top-pd">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="row no-buffer">
-            <h4><%= @employer_profile.legal_name %></h4>
+            <h4><%= @employer_profile.legal_name %> Enrollment</h4>
+            <div class="form-border">
+              <% if @current_plan_year.present? %>
+              <dl class="dl-horizontal no-buffer">
+                <dt>Plan Year</dt>
+                <dd><%= @current_plan_year.start_on.to_date.year %></dd>
+                <dt>Open Enrollment Period</dt>
+                <dd>
+                  <%= format_date @current_plan_year.open_enrollment_start_on %> -
+                  <%= format_date @current_plan_year.open_enrollment_end_on %>
+                </dd>
+                <dt>Plan Year Start</dt>
+                <dd><%= format_date @current_plan_year.start_on %></dd>
+                <dt>Eligible Roster Employees</dt>
+                <dd><%= @current_plan_year.eligible_to_enroll_count %></dd>
+                <dt>Participation Minimum</dt>
+                <dd>
+                  <%=  (@current_plan_year.total_enrolled_count * 2 / 3).to_i %>
+                </dd>
+                <dt>Enrolled or Waived</dt>
+                <dd>
+                  <%=  @current_plan_year.total_enrolled_count %>
+                </dd>
+                <dt>One or More Non-Owners?</dt>
+                <dd><%=  boolean_to_human(@current_plan_year.non_business_owner_enrollment_count > 0) %></dd>
+              </dl>
+              <% else %>
+              No Plan Years Found
+              <% end %>
+            </div>
+
+          </div>
+
+          <div class="row no-buffer top-pd">
+            <h4><%= @employer_profile.legal_name %> Offices</h4>
             <% @employer_profile.organization.office_locations.each do |loc| %>
             <div class="form-border">
               <%= loc.address.kind.capitalize %>
@@ -13,34 +47,10 @@
               <%= loc.phone.to_s %>
             </div>
             <% end %>
-          </div>
 
-          <div class="row no-buffer top-pd">
-            <h4>Enrollment</h4>
 
-            <div class="form-border">
-              <% if @current_plan_year.present? %>
-              <dl class="dl-horizontal no-buffer">
-                <dt>Plan Year</dt>
-                <dd><%= @current_plan_year.start_on.to_date.year %></dd>
-                <dt>Plan Year Start</dt>
-                <dd><%= format_date @current_plan_year.start_on %></dd>
-                <dt>Open Enrollment Period</dt>
-                <dd>
-                  <%= format_date @current_plan_year.open_enrollment_start_on %> -
-                  <%= format_date @current_plan_year.open_enrollment_end_on %>
-                </dd>
-                <dt>Eligible Employees on Roster</dt>
-                <dd><%= @current_plan_year.eligible_to_enroll_count %></dd>
-                <dt>Enrolled/Waived Employees</dt>
-                <dd><%= @current_plan_year.total_enrolled_count %></dd>
-                <dt>Participation Percentage</dt>
-                <dd><%=  @current_plan_year.employee_participation_percent %></dd>
-              </dl>
-              <% else %>
-              No Plan Years Found
-              <% end %>
-            </div>
+
+
           </div>
 
           <div class="row no-buffer top-pd">
