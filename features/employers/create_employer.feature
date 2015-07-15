@@ -80,7 +80,7 @@ Feature: Create Employer
       When I select a plan on the plan shopping page
       Then I should see the coverage summary page
       When I click on purchase button on the coverage summary page
-      And I click on continue button on the purchase confirmation pop up
+      Then I should see the receipt page
       Then I should see the "my account" page
       When I visit consumer profile homepage
       Then I should see the "YOUR LIFE EVENTS" section

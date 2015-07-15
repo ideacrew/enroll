@@ -16,28 +16,11 @@
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <div class="table-responsive">
       <table class="table table-wrapper" style="opacity: 1;">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Rostered EE Ct</th>
-            <th>Broker Agency</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @employer_profiles.each do |er| %>
-            <tr>
-              <td><%= link_to er.legal_name, employers_employer_profile_path(er) %></td>
-              <td><%= er.roster_size %></td>
-              <td><%= er.broker_agency_profile.try(:legal_name) %></td>
-              <%- if @profile %>
-              <td><%= link_to 'Send Secure Message'.html_safe, new_employers_inbox_path(id: er.id, profile_id: @profile._id, to: er.legal_name), class: "btn btn-default", remote: true %></td>
-              <% end %>
-            </tr>
-          <% end %>
-        </tbody>
+
+        <%= render '/employers/employer_profiles/index_table'%>
+
       </table>
-      <%= render 'shared/alph_paginate', url: employers_employer_profiles_path, alphs: @page_alphabets %>
+      <%= render 'shared/alph_paginate_remote', url: employers_employer_profiles_path, alphs: @page_alphabets %>
     </div>
   </div>
 </div>

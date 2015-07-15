@@ -15,10 +15,19 @@ class Insured::PlanShoppingsController < ApplicationController
       redirect_to home_consumer_profiles_path
     elsif (hbx_enrollment.coverage_selected? or hbx_enrollment.select_coverage) and hbx_enrollment.save
       UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now
-      redirect_to home_consumer_profiles_path
+      redirect_to receipt_insured_plan_shopping_path
     else
       redirect_to :back
     end
+  end
+
+  def receipt
+    person = current_user.person
+    @enrollment = HbxEnrollment.find(params.require(:id))
+    plan = @enrollment.plan
+    benefit_group = @enrollment.benefit_group
+    reference_plan = benefit_group.reference_plan
+    @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
   end
 
   def thankyou
