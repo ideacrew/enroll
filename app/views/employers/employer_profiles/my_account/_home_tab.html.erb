@@ -102,23 +102,19 @@
             </a> -->
 
             <% if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
-            <% active_broker = @broker_agency_accounts[0].writing_agent %>
-            <dl class="dl-horizontal no-buffer">
-              <dt>Agency Name</dt>
-              <dd><%= @employer_profile.broker_agency_profile.legal_name %></dd>
-              <dt>Broker Name</dt>
-              <dd><%= active_broker.person.full_name %></dd>
-              <dt>Broker NPN</dt>
-              <dd><%= active_broker.npn %></dd>
-              <!--   <dt>Contact Phone</dt>
-              <dd><%#= extract_phone_number(active_broker.person.phones, 'home') %></dd> -->
-              <dt>Email</dt>
-              <dd><a href="mailto:<%= active_broker.person.emails.first.address %>"><%= active_broker.person.emails.first.address %></a></dd>
-            </dl>
-            <% else %>
-            No Active Broker
-            <% end %>
-          </div>
+              <% active_broker = @broker_agency_accounts[0].writing_agent %>
+              <dl class="dl-horizontal no-buffer">
+                <dt>Agency Name</dt>
+                <dd><%= @employer_profile.broker_agency_profile.legal_name %></dd>
+                <dt>Broker Name</dt>
+                <dd><%= active_broker.person.full_name %></dd>
+                <dt>Email</dt>
+                <dd><a href="mailto:<%= active_broker.person.emails.first.address %>"><%= active_broker.person.emails.first.address %></a></dd>
+              </dl>
+              <% else %>
+              No Active Broker
+              <% end %>
+            </div>
         </div>
       </div>
 
