@@ -1,0 +1,9 @@
+<% remote = remote.blank? ? false : remote %>
+<% status ||= nil %>
+<ul class='pagination'>
+  <% alphs.each do |alph| %>
+    <% alph_url = url + "?page=#{alph}" %>
+    <% alph_url += "&status=#{status}" if status %>
+    <li class="<%= 'active' if alph == params[:page] %>"><%= link_to alph, (alph_url), remote: true %></li>
+  <% end %>
+</ul>

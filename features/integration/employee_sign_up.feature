@@ -47,7 +47,6 @@ Feature: Employee Sign Up
 #    When I click continue on the plan shopping welcome page
     Then I should see the list of plans
     When I select a plan on the plan shopping page
-    Then I should see the coverage summary page
     When I click on purchase button on the coverage summary page
-    And I click on continue button on the purchase confirmation pop up
+    Then I should see the receipt page
     Then I should see the "my account" page

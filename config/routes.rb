@@ -44,6 +44,7 @@ Rails.application.routes.draw do
   namespace :insured do
     resources :plan_shoppings, :only => [:show] do
       member do
+        get 'receipt'
         post 'checkout'
         post 'thankyou'
         post 'waive'
@@ -79,6 +80,7 @@ Rails.application.routes.draw do
     resources :employer_profiles do
       get 'new'
       get 'my_account'
+      get 'show_profile'
 
       collection do
         get 'welcome'
