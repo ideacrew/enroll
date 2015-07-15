@@ -74,5 +74,23 @@ $(document).on('change', '.dependent_info input.dob-picker', function(){
 $(function() {
   $("#publishPlanYear .close").click(function(){
     location.reload();
-  })
+  });
+  setProgressBar();
 })
+
+function setProgressBar(){
+  if($('.form-border .progress-wrapper').length == 0)
+    return;
+
+  maxVal = parseInt($('.progress-val .pull-right').data('value'));
+  dividerVal = parseInt($('.divider-progress').data('value'));
+  currentVal = parseInt($('.progress-bar').data('value'));
+  percentageDivider = dividerVal/maxVal * 100;
+  percentageCurrent = currentVal/maxVal * 100;
+
+  $('.progress-bar').css({'width': percentageCurrent + "%"});
+  $('.divider-progress').css({'left': percentageDivider + "%"});
+
+  barClass = currentVal < dividerVal ? 'progress-bar-danger' : 'progress-bar-success';
+  $('.progress-bar').addClass(barClass);
+}

@@ -4,109 +4,149 @@
     <div class="container">
       <div class="row top-pd">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-          <div class="row no-buffer">
-            <h4><%= @employer_profile.legal_name %> Enrollment</h4>
+          <div class="form-wrapper">            
+            <h3><%= @employer_profile.legal_name %> Offices</h3>
             <div class="form-border">
-              <% if @current_plan_year.present? %>
-              <dl class="dl-horizontal no-buffer">
-                <dt>Plan Year</dt>
-                <dd><%= @current_plan_year.start_on.to_date.year %></dd>
-                <dt>Open Enrollment Period</dt>
-                <dd>
-                  <%= format_date @current_plan_year.open_enrollment_start_on %> -
-                  <%= format_date @current_plan_year.open_enrollment_end_on %>
-                </dd>
-                <dt>Plan Year Start</dt>
-                <dd><%= format_date @current_plan_year.start_on %></dd>
-                <dt>Eligible Roster Employees</dt>
-                <dd><%= @current_plan_year.eligible_to_enroll_count %></dd>
-                <dt>Participation Minimum</dt>
-                <dd>
-                  <%=  (@current_plan_year.total_enrolled_count * 2 / 3).to_i %>
-                </dd>
-                <dt>Enrolled or Waived</dt>
-                <dd>
-                  <%=  @current_plan_year.total_enrolled_count %>
-                </dd>
-                <dt>One or More Non-Owners?</dt>
-                <dd><%=  boolean_to_human(@current_plan_year.non_business_owner_enrollment_count > 0) %></dd>
-              </dl>
+              <%- if @current_plan_year.present? %>
+              <h5>
+                <strong class="pull-left">Employee Enrollment Status</strong>
+                <strong class="pull-right">Enrolling</strong>
+                <div class="clearfix"></div>
+                <div class="progress-wrapper">
+                  <div class="progress">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="<%= @current_plan_year.total_enrolled_count %>" aria-valuemin="0" aria-valuemax="<%= @current_plan_year.eligible_to_enroll_count %>" data-value="<%= @current_plan_year.eligible_to_enroll_count %>">
+                      <span class="sr-only"></span>
+                    </div>
+                    <small class="progress-current">
+                      <%= @current_plan_year.total_enrolled_count %>
+                    </small>
+                    <p class="divider-progress" data-value="<%=  (@current_plan_year.total_enrolled_count * 2 / 3).to_i %>">
+                      <%=  (@current_plan_year.total_enrolled_count * 2 / 3).to_i %><br/> (Minimum)
+                    </p>
+                    <div class="progress-val">
+                      <strong class="pull-left">0</strong>
+                      <strong class="pull-right" data-value="<%= @current_plan_year.eligible_to_enroll_count %>"><%= @current_plan_year.eligible_to_enroll_count %></strong>
+                    </div>
+                  </div>
+                </div>
+              </h5>
+              <hr/>
+              <div class="table-responsive">
+                <table class="table table-no-sytle">
+                  <tr>
+                    <tbody>
+                      <th>Plan Year</th>
+                      <td>:</td>
+                      <td><%= @current_plan_year.start_on.to_date.year %></td>
+                    </tbody>
+                  </tr>
+                  <tr>
+                    <tbody>
+                      <th>Open Enrollment Period</th>
+                      <td>:</td>
+                      <td>
+                        <%= format_date @current_plan_year.open_enrollment_start_on %> -
+                        <%= format_date @current_plan_year.open_enrollment_end_on %>
+                      </td>
+                    </tbody>
+                  </tr>
+                  <tr>
+                    <tbody>
+                      <th>Plan Year Start</th>
+                      <td>:</td>
+                      <td><%= format_date @current_plan_year.start_on %></td>
+                    </tbody>
+                  </tr>
+                  <tr>
+                    <tbody>
+                      <th>Eligible Employees on Roster</th>
+                      <td>:</td>
+                      <td><%= @current_plan_year.eligible_to_enroll_count %></td>
+                    </tbody>
+                  </tr>
+                  <tr>
+                    <tbody>
+                      <th>Enrolled/Waived/Total</th>
+                      <td>:</td>
+                      <td><%= @current_plan_year.total_enrolled_count %></td>
+                    </tbody>
+                  </tr>
+                  <tr>
+                    <tbody>
+                      <th>Participation Minimum/Actual</th>
+                      <td>:</td>
+                      <td><%=  (@current_plan_year.total_enrolled_count * 2 / 3).to_i %></td>
+                    </tbody>
+                  </tr>
+                  <tr>
+                    <tbody>
+                      <th>At Least One Non-Owner Enrolled</th>
+                      <td>:</td>
+                      <td><%=  boolean_to_human(@current_plan_year.non_business_owner_enrollment_count > 0) %></td>
+                    </tbody>
+                  </tr>
+                </table>
+              </div>
               <% else %>
-              No Plan Years Found
+                No Plan Years Found
               <% end %>
+              <br/>
             </div>
-
           </div>
-
-          <div class="row no-buffer top-pd">
-            <h4><%= @employer_profile.legal_name %> Offices</h4>
-            <% @employer_profile.organization.office_locations.each do |loc| %>
-            <div class="form-border">
-              <%= loc.address.kind.capitalize %>
-              <%= loc.address.to_html %>
-              <%= loc.phone.to_s %>
-            </div>
-            <% end %>
-
-
-
-
-          </div>
-
           <div class="row no-buffer top-pd">
             <h4>Broker</h4>
             <div class="form-border">
 <!--               <a class="pull-right" aria-controls="employees" data-toggle="tab" id="broker-agency-tab" role="tab" href="#broker_agency">
               <span class="hidden-xs">Broker Agency</span>
               <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agency"></span>
-              </a> -->
+            </a> -->
 
             <% if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
-              <% active_broker = @broker_agency_accounts[0].writing_agent %>
-              <dl class="dl-horizontal no-buffer">
-                <dt>Agency Name</dt>
-                <dd><%= @employer_profile.broker_agency_profile.legal_name %></dd>
-                <dt>Broker Name</dt>
-                <dd><%= active_broker.person.full_name %></dd>
-                <dt>Broker NPN</dt>
-                <dd><%= active_broker.npn %></dd>
+            <% active_broker = @broker_agency_accounts[0].writing_agent %>
+            <dl class="dl-horizontal no-buffer">
+              <dt>Agency Name</dt>
+              <dd><%= @employer_profile.broker_agency_profile.legal_name %></dd>
+              <dt>Broker Name</dt>
+              <dd><%= active_broker.person.full_name %></dd>
+              <dt>Broker NPN</dt>
+              <dd><%= active_broker.npn %></dd>
               <!--   <dt>Contact Phone</dt>
-                <dd><%#= extract_phone_number(active_broker.person.phones, 'home') %></dd> -->
-                <dt>Email</dt>
-                <dd><a href="mailto:<%= active_broker.person.emails.first.address %>"><%= active_broker.person.emails.first.address %></a></dd>
-              </dl>
-              <% else %>
-              No Active Broker
-              <% end %>
-            </div>
+              <dd><%#= extract_phone_number(active_broker.person.phones, 'home') %></dd> -->
+              <dt>Email</dt>
+              <dd><a href="mailto:<%= active_broker.person.emails.first.address %>"><%= active_broker.person.emails.first.address %></a></dd>
+            </dl>
+            <% else %>
+            No Active Broker
+            <% end %>
           </div>
         </div>
+      </div>
 
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-          <h4>Premium Billing Report 1/22/2015 - 12/12/2015</h4>
-          <div class="form-wrapper">
-            <table class="table table-border">
-              <tbody>
-                <tr>
-                  <th>Total Premium:</th>
-                  <th>$47,434,34</th>
-                </tr>
-                <tr>
-                  <td>Employee Contributions:</td>
-                  <td>$16,434,34</td>
-                </tr>
-                <tr>
-                  <td>Employer Contributions:</td>
-                  <td>$12,434,34</td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="col-md-4 col-md-offset-4 no-pd">
-              <%= link_to 'GET REPORTS', employers_premium_statement_path, remote: true, class: 'btn btn-primary btn-block btn-br' %>
-            </div>
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <h4>Premium Billing Report 1/22/2015 - 12/12/2015</h4>
+        <div class="form-wrapper">
+          <table class="table table-border">
+            <tbody>
+              <tr>
+                <th>Total Premium:</th>
+                <th>$47,434,34</th>
+              </tr>
+              <tr>
+                <td>Employee Contributions:</td>
+                <td>$16,434,34</td>
+              </tr>
+              <tr>
+                <td>Employer Contributions:</td>
+                <td>$12,434,34</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="col-md-4 col-md-offset-4 no-pd">
+            <%= link_to 'GET REPORTS', employers_premium_statement_path, remote: true, class: 'btn btn-primary btn-block btn-br' %>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 </div>
