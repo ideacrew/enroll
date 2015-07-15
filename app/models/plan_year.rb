@@ -241,6 +241,10 @@ class PlanYear
     errors
   end
 
+  def employees_are_matchable?
+    %w(published enrolling enrolled active).include? aasm_state
+  end
+
   class << self
     def find(id)
       organizations = Organization.where("employer_profile.plan_years._id" => BSON::ObjectId.from_string(id))

@@ -212,7 +212,7 @@ class EmployerProfile
       if new_date.day == 1
         orgs = Organization.exists(:"employer_profile.employer_profile_account._id" => true).not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
         orgs.each do |org|
-          org.employer_profile.employer_profile_account.advance_billing_period! 
+          org.employer_profile.employer_profile_account.advance_billing_period!
         end
       end
 
@@ -232,7 +232,6 @@ class EmployerProfile
         }
       )
 
-# binding.pry if orgs.to_a.present?
       orgs.each do |org|
         org.employer_profile.today = new_date
         org.employer_profile.advance_date! if org.employer_profile.may_advance_date?
@@ -384,7 +383,7 @@ private
       self.build_employer_profile_account
       employer_profile_account.next_premium_due_on = (published_plan_year.start_on.last_month) + (HbxProfile::ShopBinderPaymentDueDayOfMonth - 1).days
       employer_profile_account.next_premium_amount = 100
-      # census_employees.covered 
+      # census_employees.covered
       save
     end
   end

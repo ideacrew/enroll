@@ -390,5 +390,5 @@ end
 
 When(/^I should see a published success message$/) do
   @browser.element(class: /mainmenu/).wait_until_present
-  expect(@browser.element(text: /Plan Year successfully published/)).to be_truthy
+  expect(@browser.element(text: /Plan Year successfully published/).visible?).to be_truthy
 end

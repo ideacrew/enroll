@@ -35,15 +35,14 @@ class Household
 
   def add_household_coverage_member(family_member)
     # OPTIMIZE
-    # binding.pry
     if ImmediateFamily.include?(family_member.primary_relationship)
       immediate_family_coverage_household.coverage_household_members.build(
-          family_member: family_member, 
+          family_member: family_member,
           is_subscriber: family_member.is_primary_applicant?
         )
     else
       extended_family_coverage_household.coverage_household_members.build(
-          family_member: family_member, 
+          family_member: family_member,
           is_subscriber: family_member.is_primary_applicant?
         )
     end

@@ -479,6 +479,7 @@ Then(/^I should see Publish Plan Year Modal with warnings$/) do
 
   modal = @browser.div(class: /modal-dialog/)
   warnings= modal.ul(class: /application-warnings/)
+  # TODO:  Add visible? to the next line.  This test is not valid.
   expect(warnings.element(text: /number of full time equivalents (FTEs) exceeds maximum allowed/i)).to be_truthy
 end
 
@@ -490,7 +491,8 @@ end
 Then(/^I should be on the Plan Year Edit page with warnings$/) do
   @browser.element(id: /plan_year/).present?
   warnings= @browser.div(class: 'alert-plan-year')
-  expect(warnings.element(text: /number of full time equivalents (FTEs) exceeds maximum allowed/i)).to be_truthy 
+  # TODO:  Add visible? to the next line.  This test is not valid.
+  expect(warnings.element(text: /number of full time equivalents (FTEs) exceeds maximum allowed/i)).to be_truthy
 end
 
 Then(/^I update the FTE field with valid input and save plan year$/) do
@@ -500,5 +502,6 @@ end
 
 Then(/^I should see a plan year successfully saved message$/) do
   @browser.element(class: /mainmenu/).wait_until_present
+  # TODO:  Add visible? to the next line.  This test is not valid.
   expect(@browser.element(text: /Plan Year successfully saved/)).to be_truthy
 end

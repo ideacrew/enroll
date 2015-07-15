@@ -50,7 +50,7 @@ class EmployerProfileAccount
     state :invoiced                                          # Premium payment up-to-date
     state :past_due                                          # Premium payment 1-29 days past due
     state :delinquent,  :after_enter => :notify_employees    # Premium payment 30-60 days past due - send notices to employees
-    state :suspended,   :after_enter => :suspend_benefit     # Premium payment 61-90 - transmit terms to carriers with retro date   
+    state :suspended,   :after_enter => :suspend_benefit     # Premium payment 61-90 - transmit terms to carriers with retro date
 
     state :canceled,    :after_enter => :cancel_benefit      # Coverage never took effect, through either voluntarily withdrawal or binder non-payment
     state :terminated,  :after_enter => :terminate_benefit   # Premium payment > 90 days past due (day 91) or Employer voluntarily terminates
@@ -120,12 +120,10 @@ private
   end
 
   def revert_state
-    # binding.pry
     self.aasm_state = latest_workflow_state_transition.to_state
   end
 
   def is_before_plan_year_start?
-# binding.pry
     employer_profile.published_plan_year.is_before_start?
   end
 

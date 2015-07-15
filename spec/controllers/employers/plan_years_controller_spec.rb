@@ -329,6 +329,7 @@ RSpec.describe Employers::PlanYearsController do
       before :each do
         allow(plan_year_proxy).to receive(:draft?).and_return(true)
         allow(plan_year_proxy).to receive(:published?).and_return(false)
+        allow(plan_year_proxy).to receive(:enrolling?).and_return(false)
       end
 
       it "should redirect with errors" do
