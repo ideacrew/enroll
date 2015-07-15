@@ -9,10 +9,14 @@ describe "shared/census_dependent_fields.html.erb" do
   end
 
   it "should have enrollment status" do
-    expect(rendered).to match /Enrollment Status: Coverage Waived/
+    expect(rendered).to match /Coverage Waived/
   end
 
   it "should show waiver reason" do
     expect(rendered).to match /Waiver Reason: this is reason/
+  end
+
+  it "should show waiver date" do
+    expect(rendered).to match /Waiver on:/
   end
 end
