@@ -15,24 +15,25 @@ class Employers::CensusEmployeesController < ApplicationController
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
       new_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(benefit_group, @census_employee)
       @census_employee.benefit_group_assignments = new_benefit_group_assignment.to_a
-      @census_employee.employer_profile = @employer_profile
-      if @census_employee.save
-        flash[:notice] = "Census Employee is successfully created."
-        redirect_to employers_employer_profile_path(@employer_profile)
-      else
-        begin
-          missing_kind = census_employee_params['email_attributes']['kind']==''
-          @census_employee.errors['Email']='Kind must be selected' if missing_kind
-          rescue
-        end
-        flash[:error] = "Failed to create Census Employee."
-        render action: "new"
-      end
+    end
+    @census_employee.employer_profile = @employer_profile
+    if @census_employee.save
+      flash[:notice] = "Census Employee is successfully created."
+      redirect_to employers_employer_profile_path(@employer_profile)
     else
-      @census_employee.benefit_group_assignments.build if @census_employee.benefit_group_assignments.blank?
-      flash[:error] = "Please select Benefit Group."
+      begin
+        missing_kind = census_employee_params['email_attributes']['kind']==''
+        @census_employee.errors['Email']='Kind must be selected' if missing_kind
+      rescue
+      end
+      flash[:error] = "Failed to create Census Employee."
       render action: "new"
     end
+    #else
+      #@census_employee.benefit_group_assignments.build if @census_employee.benefit_group_assignments.blank?
+      #flash[:error] = "Please select Benefit Group."
+      #render action: "new"
+    #end
   end
 
   def edit
@@ -47,21 +48,22 @@ class Employers::CensusEmployeesController < ApplicationController
       if @census_employee.active_benefit_group_assignment.try(:benefit_group_id) != new_benefit_group_assignment.benefit_group_id
         @census_employee.add_benefit_group_assignment(new_benefit_group_assignment)
       end
+    end
 
-      @census_employee.attributes = census_employee_params
-      authorize! :update, @census_employee
+    @census_employee.attributes = census_employee_params
+    authorize! :update, @census_employee
 
-      if @census_employee.save
-        flash[:notice] = "Census Employee is successfully updated."
-        redirect_to employers_employer_profile_path(@employer_profile)
-      else
-        flash[:error] = "Failed to update Census Employee."
-        render action: "edit"
-      end
+    if @census_employee.save
+      flash[:notice] = "Census Employee is successfully updated."
+      redirect_to employers_employer_profile_path(@employer_profile)
     else
-      flash[:error] = "Please select Benefit Group."
+      flash[:error] = "Failed to update Census Employee."
       render action: "edit"
     end
+    #else
+      #flash[:error] = "Please select Benefit Group."
+      #render action: "edit"
+    #end
   end
 
   def terminate
@@ -184,7 +186,7 @@ class Employers::CensusEmployeesController < ApplicationController
   private
 
   def benefit_group_id
-    params[:census_employee][:benefit_group_assignments_attributes]["0"][:benefit_group_id]
+    params[:census_employee][:benefit_group_assignments_attributes]["0"][:benefit_group_id] rescue nil
   end
 
   def census_employee_params

@@ -1,2 +1,2 @@
 <% benefit_groups = @employer_profile.plan_years.map(&:benefit_groups).try(:flatten) %>
-<%= f.select :benefit_group_id, benefit_groups.map{|bg| [bg.title, bg.id]}, prompt: "SELECT BENEFIT GROUP", required: true %>
+<%= f.select :benefit_group_id, benefit_groups.map{|bg| [bg.title, bg.id]}, prompt: "SELECT BENEFIT GROUP" %>
