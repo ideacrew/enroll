@@ -18,7 +18,12 @@ class Employers::CensusEmployeesController < ApplicationController
     end
     @census_employee.employer_profile = @employer_profile
     if @census_employee.save
-      flash[:notice] = "Census Employee is successfully created."
+      if benefit_group_id.present?
+        flash[:notice] = "Census Employee is successfully created."
+      else
+        flash[:notice] = "Note: new employee cannot enroll on DC Healthlink until they are assigned a benefit group. "
+        flash[:notice] += "Census Employee is successfully created."
+      end
       redirect_to employers_employer_profile_path(@employer_profile)
     else
       begin
@@ -55,6 +60,12 @@ class Employers::CensusEmployeesController < ApplicationController
 
     if @census_employee.save
       flash[:notice] = "Census Employee is successfully updated."
+      if benefit_group_id.present?
+        flash[:notice] = "Census Employee is successfully updated."
+      else
+        flash[:notice] = "Note: new employee cannot enroll on DC Healthlink until they are assigned a benefit group. "
+        flash[:notice] += "Census Employee is successfully updated."
+      end
       redirect_to employers_employer_profile_path(@employer_profile)
     else
       flash[:error] = "Failed to update Census Employee."
