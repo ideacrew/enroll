@@ -308,12 +308,15 @@ Then(/^I should see the coverage summary page$/) do
 end
 
 When(/^I click on purchase button on the coverage summary page$/) do
-  @browser.execute_script('$(".interaction-click-control-purchase").trigger("click")')
-  #scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
+  # @browser.execute_script('$(".interaction-click-control-purchase").trigger("click")')
+  @browser.element(class: /interaction-click-control-purchase/).wait_until_present
+  scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
 end
 
-And(/^I click on continue button on the purchase confirmation pop up$/) do
+Then(/^I should see the receipt page$/) do
   @browser.element(class: /interaction-click-control-continue/).wait_until_present
+  screenshot("receipt_page")
+  expect(@browser.element(text: /Purchase confirmation/i).visible?).to be_truthy
   @browser.element(class: /interaction-click-control-continue/).click
 end
 
@@ -390,5 +393,5 @@ end
 
 When(/^I should see a published success message$/) do
   @browser.element(class: /mainmenu/).wait_until_present
-  expect(@browser.element(text: /Plan Year successfully published/)).to be_truthy
+  expect(@browser.element(text: /Plan Year successfully published/).visible?).to be_truthy
 end

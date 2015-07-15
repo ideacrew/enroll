@@ -21,12 +21,12 @@ Feature: Create Employer
       Then I should see a form to enter information about employee, address and dependents details
         And I should see employer census family created success message
       #modify linked employee ssn
-      When I click on Edit family button for a census family
-        And I edit ssn and dob on employee detail page after linked
-        And I should see Access Denied
+      #When I click on Edit family button for a census family
+        #And I edit ssn and dob on employee detail page after linked
+        #And I should see Access Denied
       #unlinked modify
-      When I go back
-      And I click on the Employees tab
+      #When I go back
+      #And I click on the Employees tab
       And I click on Edit family button for a census family
       Then I should see a form to update the contents of the census employee
         And I should see employer census family updated success message
@@ -80,7 +80,7 @@ Feature: Create Employer
       When I select a plan on the plan shopping page
       Then I should see the coverage summary page
       When I click on purchase button on the coverage summary page
-      And I click on continue button on the purchase confirmation pop up
+      Then I should see the receipt page
       Then I should see the "my account" page
       When I visit consumer profile homepage
       Then I should see the "YOUR LIFE EVENTS" section

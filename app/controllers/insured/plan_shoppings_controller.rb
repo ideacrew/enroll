@@ -10,12 +10,24 @@ class Insured::PlanShoppingsController < ApplicationController
     decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
     # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
-    if (hbx_enrollment.coverage_selected? or hbx_enrollment.select_coverage) and hbx_enrollment.save
-      UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now
+    if hbx_enrollment.employee_role.hired_on > TimeKeeper.date_of_record
+      flash[:error] = "You are attempting to purchase coverage prior to your date of hire on record. Please contact your Employer for assistance"
       redirect_to home_consumer_profiles_path
+    elsif (hbx_enrollment.coverage_selected? or hbx_enrollment.select_coverage) and hbx_enrollment.save
+      UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now
+      redirect_to receipt_insured_plan_shopping_path
     else
       redirect_to :back
     end
+  end
+
+  def receipt
+    person = current_user.person
+    @enrollment = HbxEnrollment.find(params.require(:id))
+    plan = @enrollment.plan
+    benefit_group = @enrollment.benefit_group
+    reference_plan = benefit_group.reference_plan
+    @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
   end
 
   def thankyou
@@ -26,7 +38,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @reference_plan = @benefit_group.reference_plan
     @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     @family = @person.primary_family
-    @enrollable = @family.is_eligible_to_enroll? && @benefit_group.plan_year.is_eligible_to_enroll?
+    @enrollable = @family.is_eligible_to_enroll?
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }
     end

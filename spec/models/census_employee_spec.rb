@@ -38,7 +38,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     }
   }
 
-  describe ".new" do
+  context "a new instance" do
     context "with no arguments" do
       let(:params) {{}}
 
@@ -50,7 +50,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     context "with no employer_profile" do
       let(:params) {valid_params.except(:employer_profile)}
 
-    it "should fail validation" do
+      it "should fail validation" do
         expect(CensusEmployee.create(**params).errors[:employer_profile_id].any?).to be_truthy
       end
     end
@@ -66,7 +66,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     context "with no dob" do
       let(:params) {valid_params.except(:dob)}
 
-    it "should fail validation" do
+      it "should fail validation" do
         expect(CensusEmployee.create(**params).errors[:dob].any?).to be_truthy
       end
     end
@@ -74,7 +74,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     context "with no hired_on" do
       let(:params) {valid_params.except(:hired_on)}
 
-    it "should fail validation" do
+      it "should fail validation" do
         expect(CensusEmployee.create(**params).errors[:hired_on].any?).to be_truthy
       end
     end
@@ -82,236 +82,341 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     context "with no is owner" do
       let(:params) { valid_params.merge({:is_business_owner => nil}) }
 
-    it "should fail validation" do
+      it "should fail validation" do
         expect(CensusEmployee.create(**params).errors[:is_business_owner].any?).to be_truthy
       end
     end
 
-    context "with all required data" do
-      let(:params) { valid_params }
-      let(:census_employee)         { CensusEmployee.new(**params) }
-      let(:valid_employee_role)     { FactoryGirl.create(:employee_role, ssn: census_employee.ssn, dob: census_employee.dob, employer_profile: employer_profile) }
-      let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
-=begin
-      let(:params2) { valid_params2 = valid_params;
-        valid_params2[:ssn] = "9999999999";
-        valid_params2
-      }
+    context "with all required attributes" do
+      let(:params)                  { valid_params }
+      let(:initial_census_employee) { CensusEmployee.new(**params) }
 
-      let(:params2) { valid_params2 = valid_params;
-      valid_params2[:ssn] = "9999999998";
-      valid_params2
-      }
-=end
+      it "should be valid" do
+        expect(initial_census_employee.valid?).to be_truthy
+      end
 
       it "should save" do
-        expect(census_employee.save).to be_truthy
+        expect(initial_census_employee.save).to be_truthy
       end
 
-=begin
-      context "reusing SSN" do
-
-        let(:census_employee2) {census_employee.clone}
-
-        before do
-          new_ssn = rand.to_s[2..10]
-          census_employee1 = census_employee.clone
-          census_employee1.ssn = new_ssn
-          census_employee1.save
-          census_employee2.ssn = new_ssn
-        end
-
-        it "should fail validation" do
-          expect(census_employee2.valid?).to be_falsey
-          expect(census_employee2.errors.full_messages).to include("Employee with this identifying information is already active. Update or terminate the active record before adding another.")
-
-        end
-      end
-=end
       context "and it is saved" do
-        let!(:saved_census_employee) do
-          ee = CensusEmployee.new(**params)
-          ee.save
-          ee
-        end
+        before { initial_census_employee.save }
 
         it "should be findable by ID" do
-          expect(CensusEmployee.find(saved_census_employee._id)).to eq saved_census_employee
+          expect(CensusEmployee.find(initial_census_employee.id)).to eq initial_census_employee
         end
 
         it "in an unlinked state" do
-          expect(saved_census_employee.eligible?).to be_truthy
+          expect(initial_census_employee.eligible?).to be_truthy
         end
 
         it "and should have the correct associated employer profile" do
-          expect(saved_census_employee.employer_profile._id).to eq census_employee.employer_profile_id
+          expect(initial_census_employee.employer_profile._id).to eq initial_census_employee.employer_profile_id
         end
 
         it "should be findable by employer profile" do
           expect(CensusEmployee.find_all_by_employer_profile(employer_profile).size).to eq 1
-          expect(CensusEmployee.find_all_by_employer_profile(employer_profile).first).to eq saved_census_employee
+          expect(CensusEmployee.find_all_by_employer_profile(employer_profile).first).to eq initial_census_employee
         end
 
-
-        context "and it is assigned to a published plan year" do
-          before do
-            plan_year.employer_profile.census_employees.each do |census_employee|
-              census_employee.benefit_group_assignments = [FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)]
-              census_employee.save
-            end
-            plan_year.publish!
+        context "and a benefit group isn't yet assigned to employee" do
+          it "the roster instance should not be ready for linking" do
+            expect(initial_census_employee.may_link_employee_role?).to be_falsey
           end
 
-          context "and a roster search is performed" do
-            context "using an ssn and dob without a matching roster instance" do
-              it "should return nil" do
-                expect(CensusEmployee.matchable(invalid_employee_role.ssn, invalid_employee_role.dob)).to eq []
-              end
-            end
+          context "and census employee identifying info is edited" do
+            before { initial_census_employee.ssn = "606060606" }
 
-            context "using an ssn and dob with a matching roster instance" do
-              it "should return the roster instance" do
-                expect(CensusEmployee.matchable(valid_employee_role.ssn, valid_employee_role.dob).collect(&:id)).to eq [saved_census_employee.id]
-              end
+            it "should be be valid" do
+              expect(initial_census_employee.valid?).to be_truthy
             end
           end
 
-          context "and a link employee role request is made" do
-            let(:benefit_group)         { FactoryGirl.build(:benefit_group) }
-            let(:plan_year)             { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group])}
-            let(:new_census_employee)   { CensusEmployee.new(**params) }
-            let(:employee_role)         { FactoryGirl.build(:employee_role, employer_profile: employer_profile )}
-            let(:hbx_enrollment)        { HbxEnrollment.new(benefit_group: benefit_group, employee_role: new_census_employee.employee_role ) }
+          context "and the employee is assigned a benefit group" do
+            let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: initial_census_employee) }
 
-            context "and the employee hasn't been assigned to a benefit group" do
+            before do
+              initial_census_employee.benefit_group_assignments = [benefit_group_assignment]
+              initial_census_employee.save
+            end
+
+            context "and the benefit group plan year isn't published" do
               it "the roster instance should not be ready for linking" do
-                expect(new_census_employee.may_link_employee_role?).to be_falsey
+                expect(initial_census_employee.may_link_employee_role?).to be_falsey
               end
             end
 
-            context "and the census employee is assigned an employer_profile" do
-              before do
-                employer_profile.plan_years = [plan_year]
-                new_census_employee.employer_profile = employer_profile
-                new_census_employee.add_benefit_group_assignment(benefit_group)
+            context "and the benefit group plan year is published" do
+              before { plan_year.publish! }
+
+              it "the employee census record should be ready for linking" do
+                expect(initial_census_employee.may_link_employee_role?).to be_truthy
               end
 
-              it "the roster instance should be ready for linking" do
-                expect(new_census_employee.may_link_employee_role?).to be_truthy
-              end
+              context "and a roster match by SSN and DOB is performed" do
+                context "using non-matching ssn and dob" do
+                  let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
 
-              context "and the provided employee role identifying information doesn't match a census employee" do
-
-                it "should raise an error" do
-                  expect{new_census_employee.employee_role = invalid_employee_role}.to raise_error(CensusEmployeeError)
-                end
-              end
-
-              context "and the provided employee role identifying information does match a census employee" do
-
-                before { new_census_employee.employee_role = valid_employee_role }
-
-                it "should link the roster instance and employer role" do
-                  expect(new_census_employee.employee_role_linked?).to be_truthy
-                end
-
-                context "and it is saved" do
-                  let(:new_ssn) {rand.to_s[2..10]}
-
-                    before { new_census_employee.ssn = new_ssn; new_census_employee.save }
-                  it "should no longer be available for linking" do
-                    expect(new_census_employee.may_link_employee_role?).to be_falsey
-                  end
-
-                  it "should be findable by employee role" do
-                    expect(CensusEmployee.find_all_by_employee_role(valid_employee_role).size).to eq 1
-                    expect(CensusEmployee.find_all_by_employee_role(valid_employee_role).first).to eq new_census_employee
-                  end
-
-                  it "and should be delinkable" do
-                    expect(new_census_employee.may_delink_employee_role?).to be_truthy
-                  end
-
-                  it "should have a published benefit group" do
-                    expect(new_census_employee.published_benefit_group).to eq benefit_group
+                  it "should return an empty array" do
+                    expect(CensusEmployee.matchable(invalid_employee_role.ssn, invalid_employee_role.dob)).to eq []
                   end
                 end
 
-                context "and employee is terminated" do
-                  let(:invalid_termination_date)  { (TimeKeeper.date_of_record - HbxProfile::ShopRetroactiveTerminationMaximum).beginning_of_month - 1.day }
-                  let(:valid_termination_date)    { TimeKeeper.date_of_record - HbxProfile::ShopRetroactiveTerminationMaximum }
+                context "using matching ssn and dob" do
+                  let(:valid_employee_role)     { FactoryGirl.create(:employee_role, ssn: initial_census_employee.ssn, dob: initial_census_employee.dob, employer_profile: employer_profile) }
 
-                  it "transition to termination should be valid" do
-                    expect(new_census_employee.may_terminate_employee_role?).to be_truthy
+                  it "should return the roster instance" do
+                    expect(CensusEmployee.matchable(valid_employee_role.ssn, valid_employee_role.dob).collect(&:id)).to eq [initial_census_employee.id]
                   end
 
-                  context "and the termination date exceeds the HBX maximum" do
-                    before { new_census_employee.terminate_employment(invalid_termination_date) }
+                  context "and a link employee role request is received" do
+                    context "and the provided employee role identifying information doesn't match a census employee" do
+                      let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
 
-                    context "and the user is employer rep" do
-                      it "transition to terminated state should fail" do
-                        expect{new_census_employee.terminate_employment!(invalid_termination_date)}.to raise_error CensusEmployeeError
+                      it "should raise an error" do
+                        expect{initial_census_employee.employee_role = invalid_employee_role}.to raise_error(CensusEmployeeError)
                       end
                     end
 
-                    context "and the user is HBX admin" do
-                      it "should permit termination" do
-                        pending("adding cancancan authorization")
-                        fail
-                        # expect((new_census_employee.terminate_employment!(valid_termination_date)).employment_terminated_on).to eq valid_termination_date
+                    context "and the provided employee role identifying information does match a census employee" do
+                      before { initial_census_employee.employee_role = valid_employee_role }
+
+                      it "should link the roster instance and employer role" do
+                        expect(initial_census_employee.employee_role_linked?).to be_truthy
                       end
+
+                      context "and it is saved" do
+                        before { initial_census_employee.save }
+
+                        it "should no longer be available for linking" do
+                          expect(initial_census_employee.may_link_employee_role?).to be_falsey
+                        end
+
+                        it "should be findable by employee role" do
+                          expect(CensusEmployee.find_all_by_employee_role(valid_employee_role).size).to eq 1
+                          expect(CensusEmployee.find_all_by_employee_role(valid_employee_role).first).to eq initial_census_employee
+                        end
+
+                        it "and should be delinkable" do
+                          expect(initial_census_employee.may_delink_employee_role?).to be_truthy
+                        end
+
+                        it "should have a published benefit group" do
+                          expect(initial_census_employee.published_benefit_group).to eq benefit_group
+                        end
+
+                        context "and census employee identifying info is edited" do
+                          before { initial_census_employee.ssn = "606060606" }
+
+                          it "should be invalid" do
+                            expect(initial_census_employee.valid?).to be_falsey
+                            expect(initial_census_employee.errors[:base].first).to match(/An employee's identifying information may change only when/)
+                          end
+
+                        end
+
+                        context "and employee is terminated" do
+                          let(:invalid_termination_date)  { (TimeKeeper.date_of_record - HbxProfile::ShopRetroactiveTerminationMaximum).beginning_of_month - 1.day }
+                          let(:valid_termination_date)    { TimeKeeper.date_of_record - HbxProfile::ShopRetroactiveTerminationMaximum }
+
+                          it "transition to termination should be valid" do
+                            expect(initial_census_employee.may_terminate_employee_role?).to be_truthy
+                          end
+
+                          context "and the termination date exceeds the HBX maximum" do
+                            before { initial_census_employee.terminate_employment(invalid_termination_date) }
+
+                            context "and the user is employer rep" do
+                              it "transition to terminated state should fail" do
+                                expect{initial_census_employee.terminate_employment!(invalid_termination_date)}.to raise_error CensusEmployeeError
+                              end
+                            end
+
+                            context "and the user is HBX admin" do
+                              it "should use cancancan to permit admin termination"
+                            end
+                          end
+
+                          context "and the termination date is within the HBX maximum" do
+                            before { initial_census_employee.terminate_employment!(valid_termination_date) }
+
+                            it "is should transition to terminated state" do
+                              expect(initial_census_employee.employment_terminated?).to be_truthy
+                            end
+
+                            context "and the terminated employee is rehired" do
+                              let!(:rehire)   { initial_census_employee.replicate_for_rehire }
+
+                              it "rehired census employee instance should have same demographic info" do
+                                expect(rehire.first_name).to eq initial_census_employee.first_name
+                                expect(rehire.last_name).to eq initial_census_employee.last_name
+                                expect(rehire.gender).to eq initial_census_employee.gender
+                                expect(rehire.ssn).to eq initial_census_employee.ssn
+                                expect(rehire.dob).to eq initial_census_employee.dob
+                                expect(rehire.employer_profile).to eq initial_census_employee.employer_profile
+                              end
+
+                              it "rehired census employee instance should be initialized state" do
+                                expect(rehire.eligible?).to be_truthy
+                                expect(rehire.hired_on).to_not eq initial_census_employee.hired_on
+                                expect(rehire.active_benefit_group_assignment.present?).to be_falsey
+                                expect(rehire.employee_role.present?).to be_falsey
+                              end
+
+                              it "the previously terminated census employee should be in rehired state" do
+                                expect(initial_census_employee.aasm_state).to eq "rehired"
+                              end
+                            end
+                          end
+                        end
+
+                      end
+
                     end
                   end
 
-                  context "and the termination date is within the HBX maximum" do
-                    before { new_census_employee.terminate_employment!(valid_termination_date) }
-
-                    it "is should transition to terminated state" do
-                      expect(new_census_employee.employment_terminated?).to be_truthy
-                    end
-
-                    context "and the terminated employee is rehired" do
-                      let!(:rehire)   { new_census_employee.replicate_for_rehire }
-
-                      it "rehired census employee instance should have same demographic info" do
-                        expect(rehire.first_name).to eq new_census_employee.first_name
-                        expect(rehire.last_name).to eq new_census_employee.last_name
-                        expect(rehire.gender).to eq new_census_employee.gender
-                        expect(rehire.ssn).to eq new_census_employee.ssn
-                        expect(rehire.dob).to eq new_census_employee.dob
-                        expect(rehire.employer_profile).to eq new_census_employee.employer_profile
-                      end
-
-                      it "rehired census employee instance should be initialized state" do
-                        expect(rehire.eligible?).to be_truthy
-                        expect(rehire.hired_on).to_not eq new_census_employee.hired_on
-                        expect(rehire.active_benefit_group_assignment.present?).to be_falsey
-                        expect(rehire.employee_role.present?).to be_falsey
-                      end
-
-                      it "the previously terminated census employee should be in rehired state" do
-                        expect(new_census_employee.aasm_state).to eq "rehired"
-                      end
-                    end
-                  end
                 end
+
               end
+
             end
 
-            context "and the roster census employee instance is in any state besides unlinked" do
-              let(:employee_role_linked_state)  { saved_census_employee.dup }
-              let(:employment_terminated_state)  { saved_census_employee.dup }
+          end
+        end
+      end
+    end
+
+    context "a census employee is added in the database" do
+      let!(:existing_census_employee)     { CensusEmployee.create(
+                                              first_name: "Paxton",
+                                              last_name: "Thomas",
+                                              ssn: "551345151",
+                                              dob: "2014-04-01".to_date,
+                                              gender: "male",
+                                              employer_profile: employer_profile,
+                                              hired_on: "2014-08-12".to_date
+                                            )}
+      let!(:person)                       { Person.create(
+                                              first_name: existing_census_employee.first_name,
+                                              last_name: existing_census_employee.last_name,
+                                              ssn: existing_census_employee.ssn,
+                                              dob: existing_census_employee.dob,
+                                              gender: existing_census_employee.gender
+                                            )}
+      let!(:employee_role)                { EmployeeRole.create(
+                                              person: person,
+                                              hired_on: existing_census_employee.hired_on,
+                                              employer_profile: existing_census_employee.employer_profile,
+                                            )}
+
+      it "existing record should be findable" do
+        expect(CensusEmployee.find(existing_census_employee.id)).to be_truthy
+      end
+
+      context "and a new census employee instance, with same ssn same employer profile is built" do
+        let!(:duplicate_census_employee)    { existing_census_employee.dup }
+
+        it "should have same identifying info" do
+          expect(duplicate_census_employee.ssn).to eq existing_census_employee.ssn
+          expect(duplicate_census_employee.employer_profile_id).to eq existing_census_employee.employer_profile_id
+        end
+
+        context "and existing census employee is in eligible status" do
+          it "existing record should be eligible status" do
+            expect(CensusEmployee.find(existing_census_employee.id).aasm_state).to eq "eligible"
+          end
+
+          it "new instance should fail validation" do
+            expect(duplicate_census_employee.valid?).to be_falsey
+            expect(duplicate_census_employee.errors[:base].first).to match(/Employee with this identifying information is already active/)
+          end
+
+          context "and assign existing census employee to benefit group" do
+            let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: existing_census_employee) }
+
+            let!(:saved_census_employee) do
+              ee = CensusEmployee.find(existing_census_employee.id)
+              ee.benefit_group_assignments = [benefit_group_assignment]
+              ee.save
+              ee
+            end
+
+            context "and publish the plan year and associate census employee with employee_role" do
               before do
-                employee_role_linked_state.aasm_state = :employee_role_linked
-                employment_terminated_state.aasm_state = :employment_terminated
+                plan_year.publish!
+                saved_census_employee.employee_role = employee_role
+                saved_census_employee.save
               end
 
-              it "should prevent linking with another employee role" do
-                expect(employee_role_linked_state.may_link_employee_role?).to be_falsey
-                expect(employment_terminated_state.may_link_employee_role?).to be_falsey
+              it "existing census employee should be employee_role_linked status" do
+                expect(CensusEmployee.find(saved_census_employee.id).aasm_state).to eq "employee_role_linked"
+              end
+
+              it "new cenesus employee instance should fail validation" do
+                expect(duplicate_census_employee.valid?).to be_falsey
+                expect(duplicate_census_employee.errors[:base].first).to match(/Employee with this identifying information is already active/)
+              end
+
+              context "and existing employee instance is terminated" do
+                before do
+                  saved_census_employee.terminate_employment(TimeKeeper.date_of_record)
+                  saved_census_employee.save
+                end
+
+                it "should be in terminated state" do
+                  expect(saved_census_employee.aasm_state).to eq "employment_terminated"
+                end
+
+                it "new instance should save" do
+                  expect(duplicate_census_employee.save!).to be_truthy
+                end
+              end
+
+              context "and the roster census employee instance is in any state besides unlinked" do
+                let(:employee_role_linked_state)  { saved_census_employee.dup }
+                let(:employment_terminated_state)  { saved_census_employee.dup }
+                before do
+                  employee_role_linked_state.aasm_state = :employee_role_linked
+                  employment_terminated_state.aasm_state = :employment_terminated
+                end
+
+                it "should prevent linking with another employee role" do
+                  expect(employee_role_linked_state.may_link_employee_role?).to be_falsey
+                  expect(employment_terminated_state.may_link_employee_role?).to be_falsey
+                end
               end
             end
           end
+
+        end
+      end
+    end
+  end
+
+  context "a plan year application is submitted" do
+    before { plan_year.publish! }
+
+    it "should be in published status" do
+      expect(plan_year.aasm_state).to eq "published"
+    end
+
+    context "and a new census employee is added with no benefit group assigned" do
+      let!(:new_hire)  { FactoryGirl.create(:census_employee, employer_profile: plan_year.employer_profile) }
+
+      it "census employee should not be ready for linking" do
+        expect(new_hire.may_link_employee_role?).to be_falsey
+      end
+
+      context "and a benefit group is assigned to census_employee" do
+        let(:benefit_group_assignment)  { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group) }
+
+        before do
+          new_hire.benefit_group_assignments = [benefit_group_assignment]
+          new_hire.save
+        end
+
+        it "census employee should be linkable" do
+          expect(new_hire.may_link_employee_role?).to be_truthy
         end
       end
     end
@@ -333,76 +438,84 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context '.edit' do
-    let(:employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
-    let(:user) {FactoryGirl.create(:user)}
-    let(:hbx_staff) { FactoryGirl.create(:user, :hbx_staff) }
-    let(:employer_staff) { FactoryGirl.create(:user, :employer_staff) }
-
-    context "hbx staff user" do
-      it "can change dob" do
-        allow(User).to receive(:current_user).and_return(hbx_staff)
-        employee.dob = Date.current
-        expect(employee.save).to be_truthy
-      end
-
-      it "can change ssn" do
-        allow(User).to receive(:current_user).and_return(hbx_staff)
-        employee.ssn = "123321456"
-        expect(employee.save).to be_truthy
-      end
-    end
-
-    context "employer staff user" do
-      before do
-        allow(User).to receive(:current_user).and_return(employer_staff)
-      end
-
-      context "not linked" do
-        before do
-          allow(employee).to receive(:employee_role_linked?).and_return(false)
-        end
-
-        it "can change dob" do
-          employee.dob = Date.current
-          expect(employee.save).to be_truthy
-        end
-
-        it "can change ssn" do
-          employee.ssn = "123321456"
-          expect(employee.save).to be_truthy
-        end
-      end
-
-      context "has linked" do
-        before do
-          allow(employee).to receive(:employee_role_linked?).and_return(true)
-        end
-
-        it "can not change dob" do
-          employee.dob = Date.current
-          expect(employee.save).to eq false
-        end
-        it "can not change ssn" do
-          employee.ssn = "123321458"
-          expect(employee.save).to eq false
-        end
-      end
-    end
-
-    context "normal user" do
-      it "can not change dob" do
-        allow(User).to receive(:current_user).and_return(user)
-        employee.dob = Date.current
-        expect(employee.save).to eq false
-      end
-
-      it "can not change ssn" do
-        allow(User).to receive(:current_user).and_return(user)
-        employee.ssn = "123321458"
-        expect(employee.save).to eq false
-      end
-    end
-
-  end
+  # context '.edit' do
+  #   let(:employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
+  #   let(:user) {FactoryGirl.create(:user)}
+  #   let(:hbx_staff) { FactoryGirl.create(:user, :hbx_staff) }
+  #   let(:employer_staff) { FactoryGirl.create(:user, :employer_staff) }
+  #
+  #   context "hbx staff user" do
+  #     it "can change dob" do
+  #       allow(User).to receive(:current_user).and_return(hbx_staff)
+  #       employee.dob = Date.current
+  #       expect(employee.save).to be_truthy
+  #       allow(User).to receive(:current_user).and_call_original
+  #     end
+  #
+  #     it "can change ssn" do
+  #       allow(User).to receive(:current_user).and_return(hbx_staff)
+  #       employee.ssn = "123321456"
+  #       expect(employee.save).to be_truthy
+  #       allow(User).to receive(:current_user).and_call_original
+  #     end
+  #   end
+  #
+  #   context "employer staff user" do
+  #     before do
+  #       allow(User).to receive(:current_user).and_return(employer_staff)
+  #     end
+  #
+  #     after do
+  #       allow(User).to receive(:current_user).and_call_original
+  #     end
+  #
+  #     context "not linked" do
+  #       before do
+  #         allow(employee).to receive(:employee_role_linked?).and_return(false)
+  #       end
+  #
+  #       it "can change dob" do
+  #         employee.dob = Date.current
+  #         expect(employee.save).to be_truthy
+  #       end
+  #
+  #       it "can change ssn" do
+  #         employee.ssn = "123321456"
+  #         expect(employee.save).to be_truthy
+  #       end
+  #     end
+  #
+  #     context "has linked" do
+  #       before do
+  #         allow(employee).to receive(:employee_role_linked?).and_return(true)
+  #       end
+  #
+  #       it "can not change dob" do
+  #         employee.dob = Date.current
+  #         expect(employee.save).to eq false
+  #       end
+  #       it "can not change ssn" do
+  #         employee.ssn = "123321458"
+  #         expect(employee.save).to eq false
+  #       end
+  #     end
+  #   end
+  #
+  #   context "normal user" do
+  #     it "can not change dob" do
+  #       allow(User).to receive(:current_user).and_return(user)
+  #       employee.dob = Date.current
+  #       expect(employee.save).to eq false
+  #       allow(User).to receive(:current_user).and_call_original
+  #     end
+  #
+  #     it "can not change ssn" do
+  #       allow(User).to receive(:current_user).and_return(user)
+  #       employee.ssn = "123321458"
+  #       expect(employee.save).to eq false
+  #       allow(User).to receive(:current_user).and_call_original
+  #     end
+  #   end
+  #
+  # end
 end

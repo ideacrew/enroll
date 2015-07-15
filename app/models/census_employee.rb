@@ -1,7 +1,7 @@
 class CensusEmployee < CensusMember
   include AASM
   include Sortable
-  include Validations::EmployeeInfo
+  # include Validations::EmployeeInfo
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -26,7 +26,8 @@ class CensusEmployee < CensusMember
 
   validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_business_owner
   validate :check_employment_terminated_on
-  #validate :active_census_employee_is_unique
+  validate :active_census_employee_is_unique
+  validate :allow_id_info_changes_only_in_eligible_state
 
   index({"aasm_state" => 1})
   index({"employer_profile_id" => 1}, {sparse: true})
@@ -56,8 +57,9 @@ class CensusEmployee < CensusMember
   scope :non_business_owner,      ->{ where(is_business_owner: false) }
   # scope :by_benefit_group_ids,    ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :by_benefit_group_assignment_ids, ->(benefit_group_assignment_ids) { any_in("benefit_group_assignments._id" => benefit_group_assignment_ids) }
-  scope :by_benefit_group_ids, ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
+  scope :by_benefit_group_ids,    ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :by_employer_profile_id,  ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
+  scope :by_ssn,                  ->(ssn) { where(ssn: ssn) }
 
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(ssn: ssn, dob: dob, aasm_state: "eligible")
@@ -66,11 +68,6 @@ class CensusEmployee < CensusMember
     end
     matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
   }
-
-  def email_address
-    return nil unless email.present?
-    email.address
-  end
 
   def initialize(*args)
     super(*args)
@@ -99,10 +96,11 @@ class CensusEmployee < CensusMember
       self.employee_role_id = new_employee_role._id
       self.link_employee_role
       @employee_role = new_employee_role
+      self
     else
-      message =  "Identifying information mismatch error linking employee role: "
-      message << "#{new_employee_role.inspect} "
-      message << "with census employee: #{self.inspect}"
+      message =  "Identifying information mismatch error linking employee role: "\
+                 "#{new_employee_role.inspect} "\
+                 "with census employee: #{self.inspect}"
       Rails.logger.error { message }
       raise CensusEmployeeError, message
     end
@@ -153,6 +151,11 @@ class CensusEmployee < CensusMember
     is_business_owner
   end
 
+  def email_address
+    return nil unless email.present?
+    email.address
+  end
+
   def terminate_employment(terminated_on)
     begin
       terminate_employment!(terminated_on)
@@ -185,15 +188,9 @@ class CensusEmployee < CensusMember
     self
   end
 
-  def check_employment_terminated_on
-    if employment_terminated_on and employment_terminated_on <= hired_on
-      errors.add(:employment_terminated_on, "can't occur before rehiring date")
-    end
-  end
-
   def published_benefit_group_assignment
-    benefit_group_assignment = benefit_group_assignments.detect do |benefit_group_assignment|
-      benefit_group_assignment.benefit_group.plan_year.published?
+    benefit_group_assignments.detect do |benefit_group_assignment|
+      benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
     end
   end
 
@@ -235,13 +232,11 @@ class CensusEmployee < CensusMember
     end
 
     event :link_employee_role do
-      transitions from: :eligible, to: :employee_role_linked,
-        :guard => :has_active_benefit_group_assignment?
+      transitions from: :eligible, to: :employee_role_linked, :guard => :has_active_benefit_group_assignment?
     end
 
     event :delink_employee_role do
-      transitions from: :employee_role_linked, to: :eligible,
-        :after => :clear_employee_role
+      transitions from: :employee_role_linked, to: :eligible, :after => :clear_employee_role
     end
 
     event :terminate_employee_role do
@@ -250,6 +245,29 @@ class CensusEmployee < CensusMember
   end
 
 private
+  def check_employment_terminated_on
+    if employment_terminated_on and employment_terminated_on <= hired_on
+      errors.add(:employment_terminated_on, "can't occur before rehiring date")
+    end
+  end
+
+  def active_census_employee_is_unique
+    potential_dups = CensusEmployee.by_ssn(ssn).by_employer_profile_id(employer_profile_id).active
+    if potential_dups.detect { |dup| dup.id != self.id  }
+      message = "Employee with this identifying information is already active. "\
+                "Update or terminate the active record before adding another."
+      errors.add(:base, message)
+    end
+  end
+
+  # SSN and DOB values may be edited only in pre-linked status
+  def allow_id_info_changes_only_in_eligible_state
+    if (ssn_changed? || dob_changed?) && aasm_state != "eligible"
+      message = "An employee's identifying information may change only when in 'eligible' status. "
+      errors.add(:base, message)
+    end
+  end
+
   def may_terminate_benefit_group_assignment_coverage?
     if active_benefit_group_assignment.present? && active_benefit_group_assignment.may_terminate_coverage?
       return true
@@ -259,7 +277,8 @@ private
   end
 
   def has_active_benefit_group_assignment?
-    active_benefit_group_assignment.present?
+    active_benefit_group_assignment.present? &&
+    %w(published enrolling enrolled active).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)
   end
 
   def clear_employee_role

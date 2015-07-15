@@ -67,6 +67,13 @@ class HbxProfile
   ShopMinimumEnrollmentPeriodAfterRosterEntryInDays = 30
 
   # TODO - turn into struct that includes count, plus effective date range
+  ShopApplicationAppealPeriodMaximum = 30.days
+
+  # After submitting an ineligible plan year application, time period an Employer must wait 
+  #   before submitting a new application
+  ShopApplicationIneligiblePeriodMaximum = 90.days
+
+  # TODO - turn into struct that includes count, plus effective date range
   ShopSmallMarketFteCountMaximum = 50
 
   ## SHOP enrollment-related periods in days

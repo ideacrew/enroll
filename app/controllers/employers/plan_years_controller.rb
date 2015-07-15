@@ -40,7 +40,7 @@ class Employers::PlanYearsController < ApplicationController
       plan_year.withdraw_pending!
       if !plan_year.is_application_valid?
         @just_a_warning = true
-        plan_year.application_warnings.each_pair(){ |key, value| plan_year.errors.add(:base, value) }
+        plan_year.application_eligibility_warnings.each_pair(){ |key, value| plan_year.errors.add(:base, value) }
       end
     end
     @plan_year = ::Forms::PlanYearForm.new(plan_year)
@@ -94,8 +94,8 @@ class Employers::PlanYearsController < ApplicationController
       respond_to do |format|
         format.js
       end
-    else      
-      flash[:notice] = @plan_year.published? ? "Plan Year successfully published."
+    else
+      flash[:notice] = (@plan_year.published? || @plan_year.enrolling?) ? "Plan Year successfully published."
                            : "Plan Year failed to publish: #{@plan_year.application_errors}"
       render :js => "window.location = #{employers_employer_profile_path(@employer_profile).to_json}"
     end
@@ -138,7 +138,7 @@ class Employers::PlanYearsController < ApplicationController
                                       ]
     ]
     )
-    plan_year_params["benefit_groups_attributes"].delete_if {|k, v| v.count<2 } 
+    plan_year_params["benefit_groups_attributes"].delete_if {|k, v| v.count<2 }
     plan_year_params
   end
 end

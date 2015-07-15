@@ -59,15 +59,15 @@ RSpec.describe Employers::PlanYearsController do
     end
 
 
-    context "when publish pending state" do 
+    context "when publish pending state" do
       let(:warnings) { { primary_location: "primary location is outside washington dc" } }
 
       before :each do
         allow(plan_year).to receive(:publish_pending?).and_return(true)
         allow(plan_year).to receive(:withdraw_pending!)
         allow(plan_year).to receive(:is_application_valid?).and_return(false)
-        allow(plan_year).to receive(:application_warnings).and_return(warnings)
-        get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id 
+        allow(plan_year).to receive(:application_eligibility_warnings).and_return(warnings)
+        get :edit, :employer_profile_id => employer_profile_id, id: plan_year_proxy.id
       end
 
       it "should set warnings flag" do
@@ -316,10 +316,11 @@ RSpec.describe Employers::PlanYearsController do
     context "plan year did not publish due to warnings" do
       before :each do
         allow(plan_year_proxy).to receive(:publish_pending?).and_return(true)
+        allow(plan_year_proxy).to receive(:application_eligibility_warnings)
       end
 
       it "should be a render modal box with warnings" do
-        xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id 
+        xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
         have_http_status(:success)
       end
     end
@@ -328,6 +329,7 @@ RSpec.describe Employers::PlanYearsController do
       before :each do
         allow(plan_year_proxy).to receive(:draft?).and_return(true)
         allow(plan_year_proxy).to receive(:published?).and_return(false)
+        allow(plan_year_proxy).to receive(:enrolling?).and_return(false)
       end
 
       it "should redirect with errors" do

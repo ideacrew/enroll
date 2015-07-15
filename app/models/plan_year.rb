@@ -11,7 +11,6 @@ class PlanYear
 
   field :open_enrollment_start_on, type: Date
   field :open_enrollment_end_on, type: Date
-  # field :published, type: Boolean
 
   # Number of full-time employees
   field :fte_count, type: Integer, default: 0
@@ -22,24 +21,54 @@ class PlanYear
   # Number of Medicare Second Payers
   field :msp_count, type: Integer, default: 0
 
-  field :aasm_state, type: String
+  # Workflow attributes
+  field :aasm_state, type: String, default: :draft
 
   embeds_many :benefit_groups, cascade_callbacks: true
-  accepts_nested_attributes_for :benefit_groups, reject_if: :all_blank, allow_destroy: true
+  embeds_many :workflow_state_transitions, as: :transitional
+
+  accepts_nested_attributes_for :benefit_groups, :workflow_state_transitions
 
   validates_presence_of :start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on, :message => "is invalid"
 
   validate :open_enrollment_date_checks
 
-  scope :published, ->{ where(aasm_state: "published") }
+  scope :not_yet_active, ->{ any_in(aasm_state: %w(published enrolling enrolled)) }
+  scope :published, ->{ any_in(aasm_state: %w(published enrolling enrolled active suspended)) }
 
   def parent
     raise "undefined parent employer_profile" unless employer_profile?
     self.employer_profile
   end
 
+  def start_on=(new_date)
+    new_date = Date.parse(new_date) if new_date.is_a? String
+    write_attribute(:start_on, new_date.beginning_of_day)
+  end
+
+  def end_on=(new_date)
+    new_date = Date.parse(new_date) if new_date.is_a? String
+    write_attribute(:end_on, new_date.end_of_day)
+  end
+
+  def open_enrollment_start_on=(new_date)
+    new_date = Date.parse(new_date) if new_date.is_a? String
+    write_attribute(:open_enrollment_start_on, new_date.beginning_of_day)
+  end
+
+  def open_enrollment_end_on=(new_date)
+    new_date = Date.parse(new_date) if new_date.is_a? String
+    write_attribute(:open_enrollment_end_on, new_date.end_of_day)
+  end
+
   alias_method :effective_date=, :start_on=
   alias_method :effective_date, :start_on
+
+  def hbx_enrollments
+    @hbx_enrollments = [] if benefit_groups.size == 0
+    return @hbx_enrollments if defined? @hbx_enrollments
+    @hbx_enrollments = HbxEnrollment.find_by_benefit_groups(benefit_groups)
+  end
 
   def employee_participation_percent
     return "-" if eligible_to_enroll_count == 0
@@ -57,19 +86,6 @@ class PlanYear
   def coverage_period_contains?(date)
     return (start_on <= date) if (end_on.blank?)
     (start_on <= date) && (date <= end_on)
-  end
-
-  def register_employer
-    state_change_successful = employer_profile.publish_plan_year!
-    send_employee_invites if state_change_successful
-  end
-
-  def send_employee_invites
-    benefit_groups.each do |bg|
-      bg.census_employees.each do |ce|
-        Invitation.invite_employee!(ce)
-      end
-    end
   end
 
   def minimum_employer_contribution
@@ -99,7 +115,7 @@ class PlanYear
 
   # is the plan year compliant with all regulations
   def is_application_valid?
-    application_warnings.blank? ? true : false
+    application_eligibility_warnings.blank? ? true : false
   end
 
   # Check plan year for violations of model integrity relative to publishing
@@ -107,38 +123,47 @@ class PlanYear
     errors = {}
 
     if benefit_groups.size == 0
-      errors.merge!({benefit_groups: "at least one benefit group must be defined to publish a plan year"})
+      errors.merge!({benefit_groups: "You must create at least one benefit group to publish a plan year"})
     end
 
     if employer_profile.census_employees.active.to_set != assigned_census_employees.to_set
-      errors.merge!({benefit_groups: "every employee must be assigned to a benefit group defined for the published plan year"})
+      errors.merge!({benefit_groups: "Every employee must be assigned to a benefit group defined for the published plan year"})
+    end
+
+    if employer_profile.ineligible?
+      errors.merge!({employer_profile: "This employer is ineligible to enroll for coverage at this time"})
+    end
+
+    if open_to_publish?
+      errors.merge!({publish: "You may only have one published plan year at a time"})
     end
 
     errors
   end
 
   # Check plan year application for regulatory compliance
-  def application_warnings
+  def application_eligibility_warnings
     warnings = application_errors
 
     unless employer_profile.organization.primary_office_location.address.state.to_s.downcase == HbxProfile::StateAbbreviation.to_s.downcase
-      warnings.merge!({primary_office_location: "primary office must be located in #{HbxProfile::StateName}"})
+      warnings.merge!({primary_office_location: "Primary office must be located in #{HbxProfile::StateName}"})
+    end
+
+    # Employer is in ineligible state from prior enrollment activity
+    if aasm_state == "ineligible"
+      warnings.merge!({ineligible: "Employer is under a period of ineligibility for enrollment on the HBX"})
     end
 
     # Maximum company size at time of initial registration on the HBX
     if fte_count > HbxProfile::ShopSmallMarketFteCountMaximum
-      warnings.merge!({fte_count: "number of full time equivalents (FTEs) exceeds maximum allowed (#{HbxProfile::ShopSmallMarketFteCountMaximum})"})
-    end
-
-    if open_to_publish?
-      warnings.merge!({publish: "You may only have one published plan year at a time"})
+      warnings.merge!({fte_count: "Number of full time equivalents (FTEs) exceeds maximum allowed (#{HbxProfile::ShopSmallMarketFteCountMaximum})"})
     end
 
     # Exclude Jan 1 effective date from certain checks
     unless effective_date.yday == 1
       # Employer contribution toward employee premium must meet minimum
       if benefit_groups.size > 0 && (minimum_employer_contribution < HbxProfile::ShopEmployerContributionPercentMinimum)
-        warnings.merge!({minimum_employer_contribution: "employer contribution percent toward employee premium (#{minimum_employer_contribution}) is less than minimum allowed (#{HbxProfile::ShopEmployerContributionPercentMinimum})"})
+        warnings.merge!({minimum_employer_contribution: "Employer contribution percent toward employee premium (#{minimum_employer_contribution.to_i}%) is less than minimum allowed (#{HbxProfile::ShopEmployerContributionPercentMinimum.to_i}%)"})
       end
     end
 
@@ -152,7 +177,7 @@ class PlanYear
   end
 
   def eligible_to_enroll_count
-    eligible_to_enroll.count
+    eligible_to_enroll.size
   end
 
   # Employees who selected or waived and are not owners or direct family members of owners
@@ -161,7 +186,7 @@ class PlanYear
   end
 
   def non_business_owner_enrollment_count
-    non_business_owner_enrolled.count
+    non_business_owner_enrolled.size
   end
 
   # Any employee who selected or waived coverage
@@ -170,7 +195,7 @@ class PlanYear
   end
 
   def total_enrolled_count
-    enrolled.count
+    enrolled.size
   end
 
   def enrollment_ratio
@@ -185,18 +210,24 @@ class PlanYear
     enrollment_errors.blank? ? true : false
   end
 
+  def is_open_enrollment_closed?
+    open_enrollment_end_on.end_of_day < TimeKeeper.date_of_record.beginning_of_day
+  end
+
   # Determine enrollment composition compliance with HBX-defined guards
   def enrollment_errors
     errors = {}
 
     # At least one employee must be enrollable.
     if eligible_to_enroll_count == 0
-      errors.merge!(eligible_to_enroll_count: "at least 1 employee must be eligible to enroll")
+      errors.merge!(eligible_to_enroll_count: "at least one employee must be eligible to enroll")
     end
 
     # At least one employee who isn't an owner or family member of owner must enroll
-    if non_business_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
-      errors.merge!(non_business_owner_enrollment_count: "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
+    if non_business_owner_enrollment_count < eligible_to_enroll_count
+      if non_business_owner_enrollment_count < HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum
+        errors.merge!(non_business_owner_enrollment_count: "at least #{HbxProfile::ShopEnrollmentNonOwnerParticipationMinimum} non-owner employee must enroll")
+      end
     end
 
     # January 1 effective date exemption(s)
@@ -208,6 +239,10 @@ class PlanYear
     end
 
     errors
+  end
+
+  def employees_are_matchable?
+    %w(published enrolling enrolled active).include? aasm_state
   end
 
   class << self
@@ -248,14 +283,14 @@ class PlanYear
 
     def check_start_on(start_on)
       start_on = start_on.to_date
-      shop_enrollemnt_times = shop_enrollment_timetable(start_on)
+      shop_enrollment_times = shop_enrollment_timetable(start_on)
 
       if start_on.day != 1
         result = "failure"
         msg = "start on must be first day of the month"
-      elsif TimeKeeper.date_of_record > shop_enrollemnt_times[:open_enrollment_latest_start_on]
+      elsif TimeKeeper.date_of_record > shop_enrollment_times[:open_enrollment_latest_start_on]
         result = "failure"
-        msg = "start on must choose a start on date #{(TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + HbxProfile::ShopOpenEnrollmentPeriodMaximum.months).beginning_of_month} or later"
+        msg = "must choose a start on date #{(TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + HbxProfile::ShopOpenEnrollmentPeriodMaximum.months).beginning_of_month} or later"
       end
       {result: (result || "ok"), msg: (msg || "")}
     end
@@ -264,9 +299,9 @@ class PlanYear
       # Today - 5 + 2.months).beginning_of_month
       # July 6 => Sept 1
       # July 1 => Aug 1
-      start_at = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + HbxProfile::ShopOpenEnrollmentPeriodMaximum.months).beginning_of_month
-      end_at = (TimeKeeper.date_of_record + HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum).beginning_of_month
-      dates = (start_at..end_at).select {|t| t == t.beginning_of_month}
+      start_on = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + HbxProfile::ShopOpenEnrollmentPeriodMaximum.months).beginning_of_month
+      end_on = (TimeKeeper.date_of_record + HbxProfile::ShopPlanYearPublishBeforeEffectiveDateMaximum).beginning_of_month
+      dates = (start_on..end_on).select {|t| t == t.beginning_of_month}
     end
 
     def calculate_start_on_options
@@ -275,13 +310,26 @@ class PlanYear
 
     def calculate_open_enrollment_date(start_on)
       start_on = start_on.to_date
+
+      # open_enrollment_start_on = [start_on - 1.month, TimeKeeper.date_of_record].max
+      # candidate_open_enrollment_end_on = Date.new(open_enrollment_start_on.year.to_i, open_enrollment_start_on.month.to_i, HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth)
+
+      # open_enrollment_end_on = if (candidate_open_enrollment_end_on - open_enrollment_start_on) < (HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1)
+      #   candidate_open_enrollment_end_on.next_month
+      # else
+      #   candidate_open_enrollment_end_on
+      # end
+
       open_enrollment_start_on = [(start_on - HbxProfile::ShopOpenEnrollmentPeriodMaximum.months), TimeKeeper.date_of_record].max
+
       candidate_open_enrollment_end_on = Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth)
+
       open_enrollment_end_on = if (candidate_open_enrollment_end_on - open_enrollment_start_on) < (HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1)
         candidate_open_enrollment_end_on.next_month
       else
         candidate_open_enrollment_end_on
       end
+
       binder_payment_due_date = map_binder_payment_due_date_by_start_on(start_on)
 
       {open_enrollment_start_on: open_enrollment_start_on,
@@ -334,49 +382,107 @@ class PlanYear
 
   aasm do
     state :draft, initial: true
-    state :publish_pending # Plan application was submitted has warnings
-    state :published,      # Plan has been finalized and is ready to be enrolled
-          :after_enter => :register_employer
-    state :enrolling       # Published plan has entered open enrollment
-    state :enrolled        # Published plan has completed open enrollment but date is before start of plan year
-    state :canceled        # Non-compliant for enrollment
-    state :active          # Published plan year is in force
-    state :retired         # Published plans are retired following their end on date
-    state :expired         # Non-published plans are expired following their end on date
 
-    event :advance_application_date, :guard => :is_new_plan_year? do
-      transitions from: :draft, to: :expired
-      transitions from: :active, to: :retired
-      transitions from: :published, to: :active
+    state :publish_pending      # Plan application as submitted has warnings
+    state :eligibility_review   # Plan application was submitted with warning and is under review by HBX officials
+    state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
+    state :published_invalid, :after_enter => :decline_application    # Plan application was forced-published with warnings
+
+    state :enrolling                                      # Published plan has entered open enrollment
+    state :enrolled, :after_enter => :ratify_enrollment   # Published plan open enrollment has ended and is eligible for coverage,
+                                                          #   but effective date is in future
+    state :canceled                                       # Published plan open enrollment has ended and is ineligible for coverage
+
+    state :active         # Published plan year is in-force
+
+    state :suspended      # Premium payment is 61-90 days past due and coverage is currently not in effect
+    state :terminated     # Coverage under this application is terminated
+    state :ineligible     # Application is non-compliant for enrollment
+    state :expired        # Non-published plans are expired following their end on date
+
+
+    # Change enrollment state, in-force plan year and clean house on any plan year applications from prior year
+    event :advance_date, :after => :record_transition do
+      transitions from: :enrolled,  to: :active,    :guard  => :is_event_date_valid?
+      transitions from: :published, to: :enrolling, :guard  => :is_event_date_valid?
+      transitions from: :enrolling, to: :enrolled,  :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+      transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment
+
+      transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
+      transitions from: [:draft, :ineligible, :publish_pending, :published_invalid, :eligibility_review], to: :expired, :guard => :is_plan_year_end?
     end
 
-    # Submit application
-    event :publish do
-      transitions from: :draft, to: :draft, :guard => :is_application_unpublishable?, after: :report_unpublishable
+    ## Application eligibility determination process
+
+    # Submit plan year application
+    event :publish, :after => :record_transition do
+      transitions from: :draft, to: :draft,     :guard => :is_application_unpublishable?, :after => :report_unpublishable
+      transitions from: :draft, to: :enrolling, :guard => [:is_application_valid?, :is_event_date_valid?], :after => :accept_application
       transitions from: :draft, to: :published, :guard => :is_application_valid?
       transitions from: :draft, to: :publish_pending
     end
 
     # Returns plan to draft state for edit
-    event :withdraw_pending do
+    event :withdraw_pending, :after => :record_transition do
       transitions from: :publish_pending, to: :draft
     end
 
-    # Plan with application warnings submitted to HBX
-    event :force_publish do
-      transitions from: :publish_pending, to: :published
+    # Plan as submitted failed eligibility check
+    event :force_publish, :after => :record_transition do
+      transitions from: :publish_pending, to: :published_invalid
     end
 
-    # Permanently disable this plan year
-    event :deactivate do
-      transitions from: :draft, to: :expired
-      transitions from: :active, to: :retired
+    # Employer requests review of invalid application determination
+    event :request_eligibility_review, :after => :record_transition do
+      transitions from: :published_invalid, to: :eligibility_review, :guard => :is_within_review_period?
     end
 
-    #
-    event :revert do
-      transitions from: :published, to: :draft
+    # Upon review, application ineligible status overturned and deemed eligible
+    event :grant_eligibility, :after => :record_transition do
+      transitions from: :eligibility_review, to: :published
     end
+
+    # Upon review, submitted application ineligible status verified ineligible
+    event :deny_eligibility, :after => :record_transition do
+      transitions from: :eligibility_review, to: :published_invalid
+    end
+
+    # Enrollment processed stopped due to missing binder payment
+    event :cancel, :after => :record_transition do
+      transitions from: :enrolled, to: :canceled
+    end
+
+    # Coverage disabled due to non-payment
+    event :suspend, :after => :record_transition do
+      transitions from: :active, to: :suspended
+    end
+
+    # Coverage termianted due to non-payment
+    event :terminate, :after => :record_transition do
+      transitions from: [:active, :suspended], to: :terminated
+    end
+
+    # Admin ability to reset application
+    event :revert_application, :after => :record_transition do
+      transitions from: [:ineligible, :published_invalid, :eligibility_review, :published], to: :draft
+    end
+  end
+
+  def accept_application
+    transition_success = employer_profile.application_accepted!
+    send_employee_invites if transition_success
+  end
+
+  def decline_application
+    employer_profile.application_declined!
+  end
+
+  def ratify_enrollment
+    employer_profile.enrollment_ratified!
+  end
+
+  def deny_enrollment
+    employer_profile.enrollment_denied!
   end
 
   def is_eligible_to_match_census_employees?
@@ -384,24 +490,71 @@ class PlanYear
     (published? or enrolling? or enrolled? or active?)
   end
 
+  def is_within_review_period?
+    published_invalid? and
+    (latest_workflow_state_transition.transition_at >
+      (TimeKeeper.date_of_record - HbxProfile::ShopApplicationAppealPeriodMaximum))
+  end
+
   # def shoppable? # is_eligible_to_shop?
   #   (benefit_groups.size > 0) and
   #   ((published? and employer_profile.shoppable?))
   # end
 
-  def is_eligible_to_enroll?
-    (benefit_groups.size > 0) and
-    (published? and employer_profile.is_eligible_to_enroll?)
+  def latest_workflow_state_transition
+    workflow_state_transitions.order_by(:'transition_at'.desc).limit(1).first
+  end
+
+  def is_before_start?
+    TimeKeeper.date_of_record.end_of_day < start_on
   end
 
 private
+  def is_event_date_valid?
+    today = TimeKeeper.date_of_record
+    valid = case aasm_state
+    when "published", "draft"
+      today == open_enrollment_start_on
+    when "enrolling"
+      today.end_of_day >= open_enrollment_end_on
+    when "enrolled"
+      today >= start_on
+    when "active"
+      today >= end_on
+    else
+      false
+    end
+
+    valid
+  end
+
+  def is_plan_year_end?
+    TimeKeeper.date_of_record.end_of_day == end_on
+  end
+
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state,
+      transition_at: Time.now.utc
+    )
+  end
+
+  def send_employee_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.each do |ce|
+        Invitation.invite_employee!(ce)
+      end
+    end
+  end
 
     # attempted to publish but plan year violates publishing plan model integrity
   def report_unpublishable
-    application_warnings.each_pair(){ |key, value| errors.add(key, value) }
+    application_eligibility_warnings.each_pair(){ |key, value| errors.add(key, value) }
   end
 
-  def is_new_plan_year?
+  def within_review_period?
+    (latest_workflow_state_transition.transition_at.end_of_day + HbxProfile::ShopApplicationAppealPeriodMaximum) > TimeKeeper.date_of_record
   end
 
   def duration_in_days(duration)

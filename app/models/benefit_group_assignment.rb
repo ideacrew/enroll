@@ -14,7 +14,7 @@ class BenefitGroupAssignment
   field :start_on, type: Date
   field :end_on, type: Date
   field :coverage_end_on, type: Date
-  field :aasm_state, type: String
+  field :aasm_state, type: String, default: "initialized"
   field :is_active, type: Boolean, default: true
 
   validates_presence_of :benefit_group_id, :start_on, :is_active
@@ -63,11 +63,6 @@ class BenefitGroupAssignment
       self.coverage_end_on = end_on
       terminate_coverage
     end
-  end
-
-  # Catch situations when AASM state isn't yet initialized
-  def aasm_state
-    self[:aasm_state] || "initialized"
   end
 
   aasm do

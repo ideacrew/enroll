@@ -48,6 +48,8 @@ class HbxEnrollment
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
 
+  delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
+
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
 
   embeds_many :hbx_enrollment_members
@@ -150,7 +152,7 @@ class HbxEnrollment
 
   def can_complete_shopping?(t_date = Date.today)
     return false unless benefit_group
-    benefit_group.within_new_hire_window?(employee_role.hired_on)
+    benefit_group.within_new_hire_window?(employee_role.hired_on) || household.family.is_eligible_to_enroll?
   end
 
   def humanized_dependent_summary
@@ -224,5 +226,55 @@ class HbxEnrollment
       raise Mongoid::Errors::DocumentNotFound.new(self, id)
     end
     return found_value
+  end
+
+  def self.find_by_benefit_groups(benefit_groups = [])
+    id_list = benefit_groups.collect(&:_id).uniq
+
+    families = nil
+    if id_list.size == 1
+      families = Family.where(:"households.hbx_enrollments.benefit_group_id" => id_list.first)
+    else
+      families = Family.any_in(:"households.hbx_enrollments.benefit_group_id" => id_list )
+    end
+
+    enrollment_list = []
+    families.each do |family|
+      family.households.each do |household|
+        household.hbx_enrollments.each do |enrollment|
+          enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_id)
+        end
+      end
+    end
+    enrollment_list
+  end
+
+  def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
+    id_list = benefit_group_assignments.collect(&:_id)
+
+    families = nil
+    if id_list.size == 1
+      families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list.first)
+    else
+      families = Family.any_in(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list )
+    end
+
+    enrollment_list = []
+    families.each do |family|
+      family.households.each do |household|
+        household.hbx_enrollments.each do |enrollment|
+          enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_assignment_id)
+        end
+      end
+    end
+    enrollment_list
+  end
+
+  private
+
+  def decorated_hbx_enrollment
+    if plan.present? && benefit_group.present?
+      PlanCostDecorator.new(plan, self, benefit_group, benefit_group.reference_plan)
+    end
   end
 end

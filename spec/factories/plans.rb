@@ -10,13 +10,15 @@ FactoryGirl.define do
     market              "shop"
     ehb                 0.9943
     carrier_profile_id          { BSON::ObjectId.from_time(DateTime.now) }
+    minimum_age         19
+    maximum_age         65
 
     # association :premium_tables, strategy: :build
 
     factory :plan_with_premium_tables do
 
       transient do
-        premium_tables_count 20
+        premium_tables_count 47
       end
 
       after(:create) do |plan, evaluator|
@@ -28,10 +30,10 @@ FactoryGirl.define do
   end
 
   factory :premium_table do
-    sequence(:age, 20)
+    sequence(:age, (19..66).cycle)
     start_on  "2015-01-01"
     end_on  "2015-12-31"
-    sequence(:cost, (110..310).cycle) { |n| n * 5.25 }
+    cost {(age * 1001.0) / 100}
   end
 
 

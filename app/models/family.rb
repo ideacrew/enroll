@@ -45,7 +45,7 @@ class Family
   index({"households.hbx_enrollments.effective_on" => 1})
   index({"households.hbx_enrollments.benefit_group_assignment_id" => 1})
   index({"households.hbx_enrollments.aasm_state" => 1})
-  index({"households.hbx_enrollments.plan_id" => 1}, { unique: true, sparse: true })
+  index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
 
   index({"households.tax_households.hbx_assigned_id" => 1})
   index({"households.tax_households.tax_household_member.financial_statement.submitted_date" => 1})
@@ -125,7 +125,7 @@ class Family
     benefit_group = employee_role.benefit_group
     return [] unless benefit_group
     return [] if benefit_group.effective_on_for(employee_role.hired_on) > benefit_group.start_on
-    return [] unless employer_profile.enrolling?
+    return [] unless employer_profile.published_plan_year.enrolling?
     [EnrollmentEligibilityReason.new(employer_profile)]
   end
 
