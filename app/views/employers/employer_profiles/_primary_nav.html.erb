@@ -51,7 +51,7 @@
         <%- end %>
       </li>
       <li role="presentation">
-          <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, :tab=>'broker_agency'), :remote => true,
+          <%= link_to(active_broker_employers_employer_profile_broker_agency_index_path(:employer_profile_id=>@employer_profile.id), :remote => true,
           "aria-expanded" => "true", "role" => "tab" ) do %> 
             <span class="visible-xs">
               <span class="glyphicon glyphicon-duplicate" title="Broker Agency"></span>

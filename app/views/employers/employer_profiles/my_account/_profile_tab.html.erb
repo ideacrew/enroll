@@ -1,26 +1,14 @@
-<div aria-labelledby="profile-tab" id="profile" class="tab-pane fade" role="tabpanel">
-  <div class="submenu">
-    <div class="container">
-        <ul role="tablist" class="list-unstyled list-inline" id="myTab1">
-          <li class="active" role="presentation">
-            <a aria-expanded="true" aria-controls="company-info" data-toggle="tab" role="tab" id="company-info-tab" href="#company-info">
-              <span class="hidden-xs">Company Information</span>
-              <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Company Information"></span>
-            </a>
-          </li>
-          <li role="presentation">
-            <a aria-controls="contact" data-toggle="tab" id="contact-tab" role="tab" href="#contacts">
-              <span class="hidden-xs">Contacts</span>
-              <span class="glyphicon glyphicon-envelope hidden-md hidden-sm hidden-lg" title="Contacts"></span>
-            </a>
-          </li>
-          <li role="presentation">
-            <a aria-controls="broker" data-toggle="tab" id="broker-tab" role="tab" href="#broker">
-              <span class="hidden-xs">Broker</span>
-              <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Broker"></span>
-            </a>
-          </li>
-        </ul>
-    </div>
+<div class="container">
+<div class="row no-buffer">
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+  <h4><%= @employer_profile.legal_name %></h4>
+  <% @employer_profile.organization.office_locations.each do |loc| %>
+  <div class="form-border">
+    <%= loc.address.kind.capitalize %>
+    <%= loc.address.to_html %>
+    <%= loc.phone.to_s %>
   </div>
+  <% end %>
+  </div>
+</div>
 </div>

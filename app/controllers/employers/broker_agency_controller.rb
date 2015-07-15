@@ -19,6 +19,13 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def active_broker
+    @q = params.permit(:q)[:q]
+    @orgs = BrokerAgencyProfile.agencies_with_active_brokers(Organization.search(@q).exists(broker_agency_profile: true))
+    @page_alphabets = page_alphabets(@orgs, "legal_name")
+    page_no = cur_page_no(@page_alphabets.first)
+    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+
+    @broker_agency_profiles = @organizations.map(&:broker_agency_profile)
     @broker_agency_accounts = @employer_profile.broker_agency_accounts
   end
 
