@@ -31,6 +31,31 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
   end
 
+  context "GET receipt" do
+
+    let(:person) { double("person") }
+    let(:user) { double("User") }
+    let(:enrollment) { double("HbxEnrollment") }
+    let(:plan) { double("HbxEnrollment") }
+    let(:benefit_group) { double("BenefitGroup") }
+    let(:reference_plan) { double("Plan") }
+
+    before do
+      allow(user).to receive(:person).and_return(person)
+      allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
+      allow(enrollment).to receive(:plan).and_return(plan)
+      allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
+      allow(PlanCostDecorator).to receive(:new).and_return(true)
+    end
+
+    it "returns http success" do
+      sign_in(user)
+      get :receipt, id: "id"
+      expect(response).to have_http_status(:success)
+    end
+  end
+
   context "POST terminate" do
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)

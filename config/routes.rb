@@ -44,6 +44,7 @@ Rails.application.routes.draw do
   namespace :insured do
     resources :plan_shoppings, :only => [:show] do
       member do
+        get 'receipt'
         post 'checkout'
         post 'thankyou'
         post 'waive'
