@@ -46,10 +46,11 @@
           <div class="row no-buffer top-pd">
             <h4>Broker</h4>
             <div class="form-border">
-              <a class="pull-right" aria-controls="employees" data-toggle="tab" id="broker-agency-tab" role="tab" href="#broker_agency">
+<!--               <a class="pull-right" aria-controls="employees" data-toggle="tab" id="broker-agency-tab" role="tab" href="#broker_agency">
               <span class="hidden-xs">Broker Agency</span>
               <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agency"></span>
-              </a>
+              </a> -->
+              
             <% if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
               <% active_broker = @broker_agency_accounts[0].writing_agent %>
               <dl class="dl-horizontal no-buffer">
