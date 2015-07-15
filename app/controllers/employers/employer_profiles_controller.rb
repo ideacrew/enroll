@@ -1,5 +1,5 @@
 class Employers::EmployerProfilesController < ApplicationController
-  before_action :find_employer, only: [:show, :destroy, :inbox]
+  before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox]
   before_action :check_admin_staff_role, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
 
@@ -99,7 +99,39 @@ class Employers::EmployerProfilesController < ApplicationController
       @total_census_employees_quantity = census_employees.count
       @census_employees = census_employees.to_a.first(20)
     end
-    @broker_agency_accounts = @employer_profile.broker_agency_accounts 
+    @broker_agency_accounts = @employer_profile.broker_agency_accounts
+  end
+
+  def show_profile
+    @tab = params['tab']
+    @current_plan_year = @employer_profile.published_plan_year
+    @plan_years = @employer_profile.plan_years.order(id: :desc)
+
+    status_params = params.permit(:id, :status)
+    @status = status_params[:status] || 'active'
+
+    census_employees = case @status
+    when 'waived'
+      @employer_profile.census_employees.waived.sorted
+    when 'terminated'
+      @employer_profile.census_employees.terminated.sorted
+    when 'all'
+      @employer_profile.census_employees.sorted
+    else
+      @employer_profile.census_employees.active.sorted
+    end
+
+    @page_alphabets = page_alphabets(census_employees, "last_name")
+
+
+    if params[:page].present?
+      page_no = cur_page_no(@page_alphabets.first)
+      @census_employees = census_employees.where("last_name" => /^#{page_no}/i)
+    else
+      @total_census_employees_quantity = census_employees.count
+      @census_employees = census_employees.to_a.first(20)
+    end
+    @broker_agency_accounts = @employer_profile.broker_agency_accounts
   end
 
   def new

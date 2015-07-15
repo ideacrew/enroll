@@ -80,6 +80,7 @@ Rails.application.routes.draw do
     resources :employer_profiles do
       get 'new'
       get 'my_account'
+      get 'show_profile'
 
       collection do
         get 'welcome'
