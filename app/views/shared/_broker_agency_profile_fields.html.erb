@@ -1,5 +1,5 @@
 <div class="col-md-3 col-xs-12 form-group-lg form-group no-pd broker-agency-info ">
-  <%= f.select(:market_kind, options_for_select(BrokerAgencyProfile::MARKET_KINDS.map {|k| [k.to_s.titleize, k.to_s]}), { prompt: "Select Practice Area"}, { :class => 'interaction-choice-control-broker-agency-practice-area'} ) %>
+  <%= f.select(:market_kind, options_for_select(BrokerAgencyProfile::MARKET_KINDS_OPTIONS.inject([]) {|options, (k, v)| options << [k, v]}), { prompt: "Select Practice Area"}, { :class => 'interaction-choice-control-broker-agency-practice-area'} ) %>
 </div>
 <div class="col-md-3  col-xs-12 form-group-lg form-group no-pd broker-agency-info">
   <%= f.text_field :languages_spoken, class: "floatlabel form-control interaction-field-control-broker-agency-languages-spoken", placeholder: 'LANGUAGES SPOKEN' %>

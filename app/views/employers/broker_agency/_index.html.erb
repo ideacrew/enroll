@@ -24,14 +24,18 @@
           </tr>
         </thead>
         <tbody>
-          <% @broker_agency_profiles.each do |agency_profile| %>
+          <% @broker_agency_profiles.each do |broker_agency| %>
+            <% brokers = broker_agency.active_broker_roles %>
+            <% next if brokers.empty? %>
             <tr>
-              <td><%= agency_profile.legal_name %></td>
-              <td><%= agency_profile.primary_broker_role.person.full_name if agency_profile.primary_broker_role %></td>
-              <td><%= agency_profile.primary_broker_role.npn if agency_profile.primary_broker_role %></td>
-              <td>     
-                <%= link_to 'Show', employers_employer_profile_broker_agency_path(@employer_profile, agency_profile) , class: "btn btn-default", remote: true %>
-              </td>
+              <td <%= "rowspan=#{brokers.size}" %>><%= link_to broker_agency.legal_name, broker_agencies_profile_path(broker_agency) %></td>
+              <%= render "employers/broker_agency/broker", broker: brokers.first, broker_agency: broker_agency %>
+              <% if brokers.size > 1 %>
+                <% brokers.delete_at(0) %>
+                <% brokers.each do |b| %>
+                  <tr><%= render "employers/broker_agency/broker", broker: b, broker_agency: broker_agency %></tr>
+                <% end %>
+              <% end %>
             </tr>
             <% end %>
         </tbody>

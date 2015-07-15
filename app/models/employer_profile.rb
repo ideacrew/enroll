@@ -5,10 +5,13 @@ class EmployerProfile
 
   embedded_in :organization
 
+  attr_accessor :broker_role_id
+
   field :entity_kind, type: String
   field :sic_code, type: String
 
   field :aasm_state, type: String
+
 
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
@@ -86,7 +89,7 @@ class EmployerProfile
       terminate_on = (start_on - 1.day).end_of_day
       terminate_active_broker_agency(terminate_on)
     end
-    broker_agency_accounts.build(broker_agency_profile: new_broker_agency, start_on: start_on)
+    broker_agency_accounts.build(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on)
     @broker_agency_profile = new_broker_agency
   end
 
