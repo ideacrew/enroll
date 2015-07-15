@@ -1,4 +1,4 @@
-$('#show_profile .col-md-10').html("<%= escape_javascript render("show_profile") %>")
+$('#show_profile').html("<%= escape_javascript render("show_profile") %>")
 $('.fade').addClass('in').addClass('active')
 $('#inbox').removeClass('active').removeClass('in')
 semantic_class();
