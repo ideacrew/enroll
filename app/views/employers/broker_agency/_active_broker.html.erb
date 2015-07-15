@@ -13,8 +13,8 @@
       <dd><%= active_broker.npn %></dd>
       <dt>Hire Date</dt>
       <dd><%= format_date @broker_agency_accounts[0].start_on %></dd>
-      <dt>Contact Phone</dt>
-      <dd><%= active_broker.person.phones.map(&:to_s).join('/') %></dd>
+   <!--    <dt>Contact Phone</dt>
+      <dd><%#= active_broker.person.phones.map(&:to_s).join('/') %></dd> -->
       <dt>Email</dt>
       <dd>
       <a href="mailto:<%= active_broker.person.emails.first.address %>"><%= active_broker.person.emails.first.address %></a>
