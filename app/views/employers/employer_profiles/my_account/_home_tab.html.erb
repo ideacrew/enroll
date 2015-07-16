@@ -10,7 +10,7 @@
               <%- if @current_plan_year.present? %>
               <h5>
                 <strong class="pull-left">Employee Enrollment Status</strong>
-                <strong class="pull-right">Enrolling</strong>
+                <strong class="pull-right"><%= @current_plan_year.aasm_state %></strong>
                 <div class="clearfix"></div>
                 <div class="progress-wrapper">
                   <div class="progress">

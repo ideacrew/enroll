@@ -93,4 +93,16 @@ function setProgressBar(){
 
   barClass = currentVal < dividerVal ? 'progress-bar-danger' : 'progress-bar-success';
   $('.progress-bar').addClass(barClass);
+
+  if(maxVal == 0){
+    $('.progress-val strong').html('');
+  }
+
+  if(dividerVal == 0){
+    $('.divider-progress').html('');
+  }
+
+  if(currentVal == 0){
+    $('.progress-current').html('');
+  }
 }
