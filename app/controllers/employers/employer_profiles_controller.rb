@@ -188,7 +188,6 @@ class Employers::EmployerProfilesController < ApplicationController
   private
     def employer_families
       if current_user.try(:has_broker_agency_staff_role?)
-        session[:broker_override] = true
         session[:broker_agency_id] = current_user.person.broker_role.broker_agency_profile_id
       end
       @employees = []

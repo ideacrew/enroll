@@ -95,7 +95,7 @@ class ConsumerProfilesController < ApplicationController
 
   private
   def get_family
-    if session[:broker_override]
+    if current_user.person.try(:broker_role).try(:broker_agency_profile_id)
       @person = Person.find(session[:person_id])
     else
       @person = current_user.person
