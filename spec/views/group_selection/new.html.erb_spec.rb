@@ -104,4 +104,51 @@ RSpec.describe "group_selection/new.html.erb" do
       end
     end
   end
+
+  context "change plan" do
+    let(:person) { FactoryGirl.create(:person) }
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:coverage_household) { double(family_members: []) }
+    let(:hbx_enrollment) {double(coverage_terminated?: false, id: "hbx_id")}
+
+    before :each do
+      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+      assign :person, person
+      assign :employee_role, employee_role
+      assign :coverage_household, coverage_household
+      assign :change_plan, true
+      assign :hbx_enrollment, hbx_enrollment
+    end
+
+    it "should display title" do
+      render file: "group_selection/new.html.erb"
+      expect(rendered).to match(/What do you like to do/)
+    end
+
+    it "should show shop for new plan submit" do
+      allow(benefit_group).to receive(:plan_option_kind).and_return("metal_level")
+      render file: "group_selection/new.html.erb"
+      expect(rendered).to have_selector("input[value='Shop for new plan']")
+    end
+
+    it "should not show shop for new plan submit when single_plan" do
+      allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
+      render file: "group_selection/new.html.erb"
+      expect(rendered).to have_selector("input[value='Shop for new plan']", count: 0)
+    end
+
+    it "when hbx_enrollment not terminated" do
+      render file: "group_selection/new.html.erb"
+      expect(rendered).to have_selector("input[value='Keep existing plan']", count: 1)
+      expect(rendered).to have_selector("a", text: 'Terminate Plan')
+    end
+
+    it "when hbx_enrollment is terminated" do
+      allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
+      render file: "group_selection/new.html.erb"
+      expect(rendered).to have_selector("input[value='Keep existing plan']", count: 0)
+      expect(rendered).to have_selector("a", count: 0)
+    end
+  end
 end
