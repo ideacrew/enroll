@@ -6,33 +6,13 @@
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-wrapper">
             <h3><%= @employer_profile.legal_name %> Enrollment</h3>
+
             <div class="form-border">
-              <%- if @current_plan_year.present? %>
-              <h5>
-                <strong class="pull-left">Employee Enrollment Status</strong>
-                <strong class="pull-right"><%= @current_plan_year.aasm_state.humanize %></strong>
-                <div class="clearfix"></div>
-                <div class="progress-wrapper">
-                  <div class="progress">
-                    <div class="progress-bar" role="progressbar" aria-valuenow="<%= @current_plan_year.total_enrolled_count %>" aria-valuemin="0" aria-valuemax="<%= @current_plan_year.eligible_to_enroll_count %>" data-value="<%= @current_plan_year.total_enrolled_count %>">
-                      <span class="sr-only"></span>
-                    </div>
-                    <small class="progress-current">
-                      <%= @current_plan_year.total_enrolled_count %>
-                    </small>
-                    <p class="divider-progress" data-value="<%= @participation_minimum %>">
-                      <%= @participation_minimum %><br/> (Minimum)
-                    </p>
-                    <div class="progress-val">
-                      <strong class="pull-left">0</strong>
-                      <strong class="pull-right" data-value="<%= @current_plan_year.eligible_to_enroll_count %>"><%= @current_plan_year.eligible_to_enroll_count %></strong>
-                    </div>
-                  </div>
-                </div>
-              </h5>
+              <% if @current_plan_year.present? %>
+                <%= render 'employers/employer_profiles/my_account/enrollment_progress_bar' %>
               <hr/>
 
-            <div >
+              <div>
                 <dl class="dl-horizontal no-buffer">
                   <dt>Plan Year</dt>
                   <dd><%= @current_plan_year.start_on.year %></dd>
@@ -98,7 +78,7 @@
             </div>
         </div>
       </div>
-  
+
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <h4>Premium Billing Report
             <% if @employer_profile.published_plan_year.present? %>

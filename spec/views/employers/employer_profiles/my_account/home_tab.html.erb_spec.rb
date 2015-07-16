@@ -122,6 +122,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
       assign :employer_profile, employer_profile
       assign :hbx_enrollments, [hbx_enrollment]
       assign :current_plan_year, employer_profile.published_plan_year
+      assign :participation_minimum, 0
       assign :broker_agency_accounts, [ broker_agency_account ]
       controller.request.path_parameters[:id] = "11111111"
       render partial: "employers/employer_profiles/my_account/home_tab.html.erb"
