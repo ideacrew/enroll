@@ -73,7 +73,8 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         eligible_to_enroll_count: 4,
         total_enrolled_count: 10,
         employee_participation_percent: 40,
-        non_business_owner_enrollment_count: 10
+        non_business_owner_enrollment_count: 10,
+        aasm_state: 'draft'
         )
     end
 
