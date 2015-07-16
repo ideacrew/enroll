@@ -1,3 +1,5 @@
+require 'ostruct'
+
 class HbxEnrollment
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -275,6 +277,8 @@ class HbxEnrollment
   def decorated_hbx_enrollment
     if plan.present? && benefit_group.present?
       PlanCostDecorator.new(plan, self, benefit_group, benefit_group.reference_plan)
+    else
+      OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
     end
   end
 end
