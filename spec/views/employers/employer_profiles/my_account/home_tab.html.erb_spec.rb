@@ -4,6 +4,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
   context "employer profile dashboard" do
 
     let(:start_on){TimeKeeper.date_of_record.beginning_of_year}
+    let(:end_on){TimeKeeper.date_of_record.end_of_year}
 
     def new_organization
       instance_double(
@@ -68,12 +69,14 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
       instance_double(
         "PlanYear",
         start_on: start_on,
+        end_on: end_on,
         open_enrollment_start_on: PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_start_on],
         open_enrollment_end_on: PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_end_on],
         eligible_to_enroll_count: 4,
         total_enrolled_count: 10,
         employee_participation_percent: 40,
         non_business_owner_enrollment_count: 10,
+        hbx_enrollments: [hbx_enrollment],
         aasm_state: 'draft'
         )
     end
@@ -103,11 +106,21 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         )
     end
 
+    def hbx_enrollment
+      instance_double(
+        "HbxEnrollment",
+        total_premium: double("total_premium"),
+        total_employer_contribution: double("total_employer_contribution"),
+        total_employee_cost: double("total_employee_cost")
+        )
+    end
+
     let(:new_office_locations){[office_location,office_location]}
     let(:current_plan_year){employer_profile.published_plan_year}
 
     before :each do
       assign :employer_profile, employer_profile
+      assign :hbx_enrollments, [hbx_enrollment]
       assign :current_plan_year, employer_profile.published_plan_year
       assign :broker_agency_accounts, [ broker_agency_account ]
       controller.request.path_parameters[:id] = "11111111"
@@ -131,13 +144,12 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     end
 
     it "should display plan year and related information" do
-      # expect(rendered).to match(/<td>#{current_plan_year.start_on.year}<\/td>/m)
-      # expect(rendered).to match(/<td>#{format_date current_plan_year.open_enrollment_start_on} - #{format_date current_plan_year.open_enrollment_end_on}<\/td>/m)
-      # expect(rendered).to match(/<td>#{format_date current_plan_year.start_on}<\/td>/m)
-      # expect(rendered).to match(/<td>#{current_plan_year.eligible_to_enroll_count}<\/td>/m)
-      # expect(rendered).to match(/<td>#{participation_minimum}<\/td>/m)
-      # expect(rendered).to match(/<td>#{current_plan_year.total_enrolled_count}<\/td>/m)
-      # expect(rendered).to match(/<td>#{boolean_to_human(current_plan_year.non_business_owner_enrollment_count > 0)}<\/td>/m)
+      expect(rendered).to match(/<dd>#{current_plan_year.start_on.year}<\/dd>/m)
+      expect(rendered).to match(/<dd>.*#{format_date current_plan_year.open_enrollment_start_on}.*-.*#{format_date current_plan_year.open_enrollment_end_on}.*<\/dd>/m)
+      expect(rendered).to match(/<dd>#{format_date current_plan_year.start_on}<\/dd>/m)
+      expect(rendered).to match(/<dd>#{current_plan_year.eligible_to_enroll_count}<\/dd>/m)
+      expect(rendered).to match(/<dd>.*#{current_plan_year.total_enrolled_count}.*<\/dd>/m)
+      expect(rendered).to match(/<dd>#{boolean_to_human(current_plan_year.non_business_owner_enrollment_count > 0)}<\/dd>/m)
     end
   end
 end

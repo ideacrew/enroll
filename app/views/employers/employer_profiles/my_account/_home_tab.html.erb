@@ -99,27 +99,28 @@
         </div>
       </div>
 
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-        <h4>Premium Billing Report 1/22/2015 - 12/12/2015</h4>
-        <div class="form-wrapper">
-          <table class="table table-border">
-            <tbody>
-              <tr>
-                <th>Total Premium:</th>
-                <th>$47,434,34</th>
-              </tr>
-              <tr>
-                <td>Employee Contributions:</td>
-                <td>$16,434,34</td>
-              </tr>
-              <tr>
-                <td>Employer Contributions:</td>
-                <td>$12,434,34</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="col-md-4 col-md-offset-4 no-pd">
-            <%= link_to 'GET REPORTS', employers_premium_statement_path, remote: true, class: 'btn btn-primary btn-block btn-br' %>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <h4>Premium Billing Report <%= @current_plan_year.start_on %> - <%= @current_plan_year.end_on %></h4>
+          <div class="form-wrapper">
+            <table class="table table-border">
+              <tbody>
+                <tr>
+                  <th>Total Premium:</th>
+                  <th><%= number_to_currency(@current_plan_year.hbx_enrollments.map(&:total_premium).sum) %></th>
+                </tr>
+                <tr>
+                  <td>Employee Contributions:</td>
+                  <th><%= number_to_currency(@current_plan_year.hbx_enrollments.map(&:total_employer_contribution).sum) %></th>
+                </tr>
+                <tr>
+                  <td>Employer Contributions:</td>
+                  <td><%= number_to_currency(@current_plan_year.hbx_enrollments.map(&:total_employee_cost).sum) %></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="col-md-4 col-md-offset-4 no-pd">
+              <%= link_to 'GET REPORTS', employers_premium_statement_path, remote: true, class: 'btn btn-primary btn-block btn-br' %>
+            </div>
           </div>
         </div>
       </div>

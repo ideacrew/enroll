@@ -1,8 +1,7 @@
-<td class="brd-r"><%= mixed_case b[:benefit_type] %></td>
-<td><%= b[:benefit_name] %></td>
-<td><%= b[:issuer_name] %></td>
-<td style="text-align: center;"><%= b[:covered_member_count] %></td>
-<td><%= boolean_to_human b[:is_cobra] %></td>
-<td style="text-align: center;"><%= number_to_currency b[:ee_premium_amount] %></td>
-<td style="text-align: center;"><%= number_to_currency b[:er_premium_amount] %></td>
-<td style="text-align: center;"><%= number_to_currency b[:total_premium_amount] %></td>
+<td class="brd-r"><%= mixed_case "Health" %></td>
+<td><%= benefit_group.title %></td>
+<td><%= enrollment.plan.carrier_profile.legal_name %></td>
+<td style="text-align: center;"><%= enrollment.humanized_dependent_summary %></td>
+<td style="text-align: center;"><%= number_to_currency enrollment.total_employer_contribution %></td>
+<td style="text-align: center;"><%= number_to_currency enrollment.total_employee_cost %></td>
+<td style="text-align: center;"><%= number_to_currency enrollment.total_premium %></td>

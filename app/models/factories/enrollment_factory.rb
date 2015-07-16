@@ -84,6 +84,7 @@ module Factories
         person_details.name_sfx, census_employee.ssn,
         census_employee.dob, person_details.gender
         )
+      return nil, nil if person.blank? and person_new.blank?
       self.build_employee_role(
         person, person_new, census_employee.employer_profile,
         census_employee, census_employee.hired_on
@@ -143,17 +144,32 @@ module Factories
         person.save
         person, is_new = person, false
       when 0
-        person, is_new = Person.create(
-          user: user,
-          name_pfx: name_pfx,
-          first_name: first_name,
-          middle_name: middle_name,
-          last_name: last_name,
-          name_sfx: name_sfx,
-          ssn: ssn,
-          dob: dob,
-          gender: gender,
-        ), true
+        if user.try(:person).try(:present?) 
+          if user.person.first_name == first_name and user.person.last_name = last_name
+            person = user.person
+            person.update(name_sfx: name_sfx,
+                          middle_name: middle_name,
+                          name_pfx: name_pfx,
+                          ssn: ssn,
+                          dob: dob,
+                          gender: gender)
+            is_new = false
+          else
+            return nil, nil
+          end
+        else
+          person, is_new = Person.create(
+            user: user,
+            name_pfx: name_pfx,
+            first_name: first_name,
+            middle_name: middle_name,
+            last_name: last_name,
+            name_sfx: name_sfx,
+            ssn: ssn,
+            dob: dob,
+            gender: gender,
+          ), true
+        end
       else
         # what am I doing here?  More than one person had the same SSN?
         return nil, nil

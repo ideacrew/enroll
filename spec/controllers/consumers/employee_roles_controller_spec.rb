@@ -63,31 +63,50 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     let(:employment_relationship_properties) { { :skllkjasdfjksd => "a3r123rvf" } }
     let(:user) { double }
 
-    before :each do
-      allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
-      allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_employee, employment_relationship).and_return([employee_role, family])
-      allow(benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
-      sign_in(user)
-      post :create, :employment_relationship => employment_relationship_properties
+    context "can construct_employee_role" do
+      before :each do
+        allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
+        allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_employee, employment_relationship).and_return([employee_role, family])
+        allow(benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
+        sign_in(user)
+        post :create, :employment_relationship => employment_relationship_properties
+      end
+
+      it "should render the edit template" do
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(edit_consumer_employee_path(:id => "212342345"))
+      end
+
+      it "should assign the employee_role" do
+        expect(assigns(:employee_role)).to eq employee_role
+      end
+
+      it "should assign the person" do
+        expect(assigns(:person)).to eq person
+      end
+
+      it "should assign the family" do
+        expect(assigns(:family)).to eq family
+      end
     end
 
-    it "should render the edit template" do
-      expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(edit_consumer_employee_path(:id => "212342345"))
-    end
+    context "can not construct_employee_role" do
+      before :each do
+        allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
+        allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_employee, employment_relationship).and_return([nil, nil])
+        request.env["HTTP_REFERER"] = "/"
+        sign_in(user)
+        post :create, :employment_relationship => employment_relationship_properties
+      end
 
-    it "should assign the employee_role" do
-      expect(assigns(:employee_role)).to eq employee_role
-    end
+      it "should redirect" do
+        expect(response).to have_http_status(:redirect)
+      end
 
-    it "should assign the person" do
-      expect(assigns(:person)).to eq person
+      it "should get an alert" do
+        expect(flash[:alert]).to match /You can not enroll as another employee/
+      end
     end
-
-    it "should assign the family" do
-      expect(assigns(:family)).to eq family
-    end
-
   end
 
   describe "GET match" do

@@ -36,10 +36,16 @@ class Consumer::EmployeeRolesController < ApplicationController
   def create
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
     @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(current_user, @employment_relationship.census_employee, @employment_relationship)
-    @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
-    build_nested_models
-    respond_to do |format|
-      format.html { redirect_to :action => "edit", :id => @employee_role.id }
+    if @employee_role.present?
+      @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
+      build_nested_models
+      respond_to do |format|
+        format.html { redirect_to :action => "edit", :id => @employee_role.id }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to :back, alert: "You can not enroll as another employee"}
+      end
     end
   end
 
