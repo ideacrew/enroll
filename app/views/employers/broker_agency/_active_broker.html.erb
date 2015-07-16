@@ -1,9 +1,10 @@
+<div class="container">
 <div class="row no-buffer top-pd">
-  <div class="col-xs-12">
-  <h4>Broker</h4>
+  <div class="col-xs-8">
+  <% if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
+  <% active_broker = @broker_agency_accounts[0].writing_agent %>
+  <h4>Active Broker</h4>
   <div class="form-border">
-    <% if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
-    <% active_broker = @broker_agency_accounts[0].writing_agent %>
     <dl class="dl-horizontal no-buffer">
       <dt>Agency Name</dt>
       <dd><%= @employer_profile.broker_agency_profile.legal_name %></dd>
@@ -13,8 +14,6 @@
       <dd><%= active_broker.npn %></dd>
       <dt>Hire Date</dt>
       <dd><%= format_date @broker_agency_accounts[0].start_on %></dd>
-   <!--    <dt>Contact Phone</dt>
-      <dd><%#= active_broker.person.phones.map(&:to_s).join('/') %></dd> -->
       <dt>Email</dt>
       <dd>
       <a href="mailto:<%= active_broker.person.emails.first.address %>"><%= active_broker.person.emails.first.address %></a>
@@ -37,9 +36,27 @@
       </tr>
     </tbody>  
     </table>
+  </div>
     <% else %>
-      No Active Broker
+  <span>No Active Broker</span>
     <% end %>
+</div>
+</div>
+<div class="container top-pd">
+    <%= link_to 'Select New Broker'.html_safe, ('javascript:;'), class: "btn btn-default", id: "show_active_brokers" %>
+</div>
+   
+<div class="row no-buffer">
+  <div class="col-xs-12">
+  <div id="broker_agencies_panel" style="display:none">
+   <%= render "employers/broker_agency/index" %>
   </div>
 </div>
+</div>
+<script>
+$("#show_active_brokers").click(function(){
+  $("#broker_agencies_panel").toggle();
+})
+</script>
+
 </div>

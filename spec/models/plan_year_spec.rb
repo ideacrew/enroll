@@ -731,8 +731,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                   end
                 end
 
-                it "should include all eligible employees" do
-                  expect(workflow_plan_year_with_benefit_group.eligible_to_enroll_count).to eq employee_count
+                it "should include only eligible employees" do
+                  workflow_plan_year_with_benefit_group.eligible_to_enroll.where(aasm_state:'eligible').update(aasm_state:'employment_terminated') # make 1 ineligible
+                  expect(workflow_plan_year_with_benefit_group.eligible_to_enroll_count).to eq employee_count - 1
+                  workflow_plan_year_with_benefit_group.eligible_to_enroll.where(aasm_state:'employment_terminated').update(aasm_state:'eligible') #set back to original state
                 end
 
                 it "should raise enrollment errors" do

@@ -4,6 +4,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
   context "employer profile dashboard" do
 
     let(:start_on){TimeKeeper.date_of_record.beginning_of_year}
+    let(:end_on){TimeKeeper.date_of_record.end_of_year}
 
     def new_organization
       instance_double(
@@ -68,13 +69,15 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
       instance_double(
         "PlanYear",
         start_on: start_on,
+        end_on: end_on,
         open_enrollment_start_on: PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_start_on],
         open_enrollment_end_on: PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_end_on],
         eligible_to_enroll_count: 4,
         total_enrolled_count: 10,
         employee_participation_percent: 40,
         non_business_owner_enrollment_count: 10,
-        hbx_enrollments: [hbx_enrollment]
+        hbx_enrollments: [hbx_enrollment],
+        aasm_state: 'draft'
         )
     end
 
@@ -141,10 +144,9 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     end
 
     it "should display plan year and related information" do
-      expect(rendered).to match(/<dd>#{current_plan_year.start_on.to_date.year}<\/dd>/m)
+      expect(rendered).to match(/<dd>#{current_plan_year.start_on.year}<\/dd>/m)
+      expect(rendered).to match(/<dd>.*#{format_date current_plan_year.open_enrollment_start_on}.*-.*#{format_date current_plan_year.open_enrollment_end_on}.*<\/dd>/m)
       expect(rendered).to match(/<dd>#{format_date current_plan_year.start_on}<\/dd>/m)
-      expect(rendered).to match(/#{format_date current_plan_year.open_enrollment_start_on}/m)
-      expect(rendered).to match(/#{format_date current_plan_year.open_enrollment_end_on}/m)
       expect(rendered).to match(/<dd>#{current_plan_year.eligible_to_enroll_count}<\/dd>/m)
       expect(rendered).to match(/<dd>.*#{current_plan_year.total_enrolled_count}.*<\/dd>/m)
       expect(rendered).to match(/<dd>#{boolean_to_human(current_plan_year.non_business_owner_enrollment_count > 0)}<\/dd>/m)
