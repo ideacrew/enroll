@@ -79,7 +79,7 @@ class Employers::EmployerProfilesController < ApplicationController
       if @current_plan_year.eligible_to_enroll_count == 0
         @participation_minimum = 0
       else
-        @participation_minimum = ((@current_plan_year.eligible_to_enroll_count * 0.667) + 1).to_i
+        @participation_minimum = ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
       end
     end
 
