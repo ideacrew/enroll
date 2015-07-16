@@ -1,16 +1,10 @@
-  <tr>
-    <td <%= "rowspan=#{ee[:benefits].size}" %>><a href="#"><strong><%= ee[:full_name] %></strong></a></td>
-    <td <%= "rowspan=#{ee[:benefits].size}" %>><%= number_to_obscured_ssn ee[:ssn] %></td>
-    <td <%= "rowspan=#{ee[:benefits].size}" %>><%= format_date ee[:dob] %></td>
-    <td <%= "rowspan=#{ee[:benefits].size}" %>><%= format_date ee[:hired_on] %></td>
-    <td <%= "rowspan=#{ee[:benefits].size}" %>><%= ee[:benefit_group] %></td>
+<tr>
+  <td <%= "rowspan=1" %>><a href="#"><strong><%= census_employee.full_name %></strong></a></td>
+  <td <%= "rowspan=1" %>><%= number_to_obscured_ssn census_employee.ssn %></td>
+  <td <%= "rowspan=1" %>><%= format_date census_employee.dob %></td>
+  <td <%= "rowspan=1" %>><%= format_date census_employee.hired_on %></td>
+  <td <%= "rowspan=1" %>><%= census_employee.published_benefit_group.title %></td>
 
-    <%= render "benefit_line_item_detail", b: ee[:benefits].first %>
+  <%= render "benefit_line_item_detail", census_employee: census_employee, benefit_group: census_employee.published_benefit_group, enrollment: enrollment %>
 
-    <% if ee[:benefits].size > 1 %>
-      <% ee[:benefits].delete_at(0) %>
-      <% ee[:benefits].each do |b| %>
-        <tr><%= render "benefit_line_item_detail", b: b %></tr>
-      <% end %>
-    <% end %>
-  </tr>
+</tr>

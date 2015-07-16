@@ -1,5 +1,3 @@
-<div id="show_broker_agency"></div>
-
 <div>
   <div class="row no-buffer top-pd">
     <h4 class="title-inline">Broker Agencies</h4>
@@ -27,7 +25,10 @@
             <% brokers = broker_agency.active_broker_roles %>
             <% next if brokers.empty? %>
             <tr>
-              <td <%= "rowspan=#{brokers.size}" %>><%= link_to broker_agency.legal_name, broker_agencies_profile_path(broker_agency) %></td>
+              <td <%= "rowspan=#{brokers.size}" %>>
+                <%= link_to broker_agency.legal_name, employers_employer_profile_broker_agency_path(@employer_profile, broker_agency), remote: true %>
+
+              </td>
               <%= render "employers/broker_agency/broker", broker: brokers.first, broker_agency: broker_agency %>
               <% if brokers.size > 1 %>
                 <% brokers.delete_at(0) %>

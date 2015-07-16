@@ -1,0 +1,31 @@
+
+<div class='container'> 
+  <h4> Families </h4>
+  <table class="table table-wrapper" style="opacity: 1;">
+    <thead>
+      <tr>
+        <th>Employee Name</th>
+        <th>SSN</th>
+        <th>DOB</th>
+        <th>Is Active</th>
+        <th>Renewal Consent</th>
+        <th>Manage Family, Shop and Purchase</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @employees.each do |employee| %>
+     <% person = employee.person %>
+      <tr> <td> <%= "#{person.first_name} #{person.last_name} " %>  </td>
+           <td> <%= number_to_obscured_ssn person.ssn %> </td>
+           <td> <%= format_date person.dob%>       </td>
+           <td> <%= person.primary_family.is_active %> </td>
+           <td> <%= person.primary_family.renewal_consent_through_year %> </td>
+           <td>            <%= link_to '<i class="fa fa-pencil"></i> Consumer'.html_safe,
+            employers_employer_profile_consumer_override_path(:person_id=> person.id), class: "btn btn-default"%></td>
+      
+        </tr> 	
+    <% end %>
+    </tbody>
+  </table>
+</div>

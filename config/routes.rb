@@ -81,7 +81,7 @@ Rails.application.routes.draw do
       get 'new'
       get 'my_account'
       get 'show_profile'
-
+      get 'consumer_override'
       collection do
         get 'welcome'
         get 'search'

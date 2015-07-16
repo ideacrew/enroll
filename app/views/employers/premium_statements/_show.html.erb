@@ -1,55 +1,7 @@
-
-  <% benefits = [
-    {
-      benefit_type: "health",
-      benefit_name: "High Value 1000",
-      issuer_name: "Aetna",
-      covered_member_count: 5,
-      is_cobra: false,
-      ee_premium_amount: 1212.12,
-      er_premium_amount: 400.03,
-      total_premium_amount: 1612.15
-    },
-    {
-      benefit_type: "dental",
-      benefit_name: "Pearly Whites Advantage",
-      issuer_name: "Aetna",
-      covered_member_count: 5,
-      is_cobra: false,
-      ee_premium_amount: 135.35,
-      er_premium_amount: 0,
-      total_premium_amount: 135.35
-    }
-  ]
-  %>
-
-  <% employee0 = {
-      full_name: "Joe Cool",
-      ssn: "876543211",
-      dob: TimeKeeper.date_of_record - 34.years,
-      hired_on: (TimeKeeper.date_of_record - 90),
-      start_date: (TimeKeeper.date_of_record - 60).beginning_of_month,
-      benefit_group: "2015 Benefits",
-      benefits: benefits.dup
-    }
-  %>
-
-  <% employee1 = {
-      full_name: "Lucy Brown",
-      ssn: "012345678",
-      dob: TimeKeeper.date_of_record - 39.years,
-      hired_on: (TimeKeeper.date_of_record - 90),
-      start_date: (TimeKeeper.date_of_record - 60).beginning_of_month,
-      benefit_group: "2015 Benefits",
-      benefits: benefits.dup
-    }
-  %>
-
-  <% staff = [employee1.dup, employee0.dup, employee0.dup, employee1.dup, employee0.dup, employee0.dup, employee1.dup] %>
 <br>
 <div class="container">
   <div class="row no-buffer">
-    <h3 class="title-inline">Premium Billing Report 1/22/2015 - 12/12/2015</h3>
+    <h3 class="title-inline">Premium Billing Report <%= @current_plan_year.start_on %> - <%= @current_plan_year.start_on.end_of_month %></h3>
     <a href="#" class="btn btn-danger return_to_home pull-right bottom-mgn-xs"><i class="fa fa-times"></i> Cancel</a>
   </div>
 
@@ -66,15 +18,14 @@
           <th>Name</th>
           <th>Issuer</th>
           <th style="text-align: center;">Covered Ct</th>
-          <th>COBRA?</th>
           <th style="text-align: center;">Employer Contribution</th>
           <th style="text-align: center;">Employee Premium</th>
           <th style="text-align: center;">Total Premium</th>
         </tr>
       </thead>
       <tbody>
-        <% staff.each do |employee| %>
-          <%= render "employee_line_item", ee: employee %>
+        <% @hbx_enrollments.each do |hbx_enrollment| %>
+          <%= render "employee_line_item", census_employee: hbx_enrollment.subscriber.person.employee_roles.first.census_employee, enrollment: hbx_enrollment %>
         <% end %>
       </tbody>
     </table>
