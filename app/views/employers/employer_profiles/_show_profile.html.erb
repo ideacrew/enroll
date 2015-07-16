@@ -12,5 +12,7 @@
     <div class="col-md-10 col-sm-12">
       <%#= render partial: "employers/employer_profiles/my_account/documents" %>
     </div>
+<%- elsif @tab == 'families' %>
+      <%= render partial:  "employers/employer_profiles/my_account/families" %>
 <%- end %>    
      

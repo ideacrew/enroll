@@ -108,6 +108,7 @@ class Employers::EmployerProfilesController < ApplicationController
       @census_employees = census_employees.to_a.first(20)
     end
     @broker_agency_accounts = @employer_profile.broker_agency_accounts
+    employer_families
   end
 
   def show_profile
@@ -140,6 +141,7 @@ class Employers::EmployerProfilesController < ApplicationController
       @census_employees = census_employees.to_a.first(20)
     end
     @broker_agency_accounts = @employer_profile.broker_agency_accounts
+    employer_families
   end
 
   def new
@@ -178,7 +180,22 @@ class Employers::EmployerProfilesController < ApplicationController
     @sent_box = false
   end
 
+  def consumer_override
+    session[:person_id] = params['person_id']
+    redirect_to home_consumer_profiles_path
+  end
+
   private
+    def employer_families
+      if current_user.try(:has_broker_agency_staff_role?)
+        session[:broker_override] = true
+        session[:broker_agency_id] = current_user.person.broker_role.broker_agency_profile_id
+      end
+      @employees = []
+      @employer_profile.employee_roles.each{|ee| @employees << ee}
+
+    end
+
     def check_employer_staff_role
       if current_user.has_employer_staff_role?
         redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
