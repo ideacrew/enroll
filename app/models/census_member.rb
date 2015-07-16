@@ -66,4 +66,14 @@ class CensusMember
     return unless self.dob.present?
     errors.add(:dob, "future date: %{self.dob} is invalid date of birth") if TimeKeeper.date_of_record < self.dob
   end
+
+  def age_on(date)
+    age = date.year - dob.year
+    if date.month == dob.month
+      age -= 1 if date.day < dob.day
+    else
+      age -= 1 if date.month < dob.month
+    end
+    age
+  end
 end

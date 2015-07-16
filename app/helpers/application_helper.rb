@@ -297,6 +297,9 @@ module ApplicationHelper
   def portal_display_name(controller)
     if current_user.try(:has_hbx_staff_role?)
       "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm HBX Staff".html_safe
+    elsif current_user.try(:has_broker_agency_staff_role?) && current_user.person.broker_role
+      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe,
+      broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id)
     elsif current_user.try(:has_broker_agency_staff_role?)
       "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe
     elsif current_user.try(:has_employer_staff_role?)

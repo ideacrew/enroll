@@ -205,6 +205,10 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def employee_relationship
+    "employee"
+  end
+
   class << self
     def find_all_by_employer_profile(employer_profile)
       unscoped.where(employer_profile_id: employer_profile._id).order_name_asc

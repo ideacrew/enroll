@@ -1,5 +1,5 @@
 $(function() {
-  $('div[name=employee_family_tabs] > ').children().each( function() { 
+  $('div[name=employee_family_tabs] > ').children().each( function() {
     $(this).change(function(){
       filter = $(this).val();
       $('#employees_' + filter).siblings().hide();
@@ -89,7 +89,7 @@ function setProgressBar(){
   percentageCurrent = currentVal/maxVal * 100;
 
   $('.progress-bar').css({'width': percentageCurrent + "%"});
-  $('.divider-progress').css({'left': percentageDivider + "%"});
+  $('.divider-progress').css({'left': (percentageDivider - 1) + "%"});
 
   barClass = currentVal < dividerVal ? 'progress-bar-danger' : 'progress-bar-success';
   $('.progress-bar').addClass(barClass);
