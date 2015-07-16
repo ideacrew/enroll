@@ -5,12 +5,12 @@
       <div class="row top-pd">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <div class="form-wrapper">            
-            <h3><%= @employer_profile.legal_name %> Offices</h3>
+            <h3><%= @employer_profile.legal_name %> Enrollment</h3>
             <div class="form-border">
               <%- if @current_plan_year.present? %>
               <h5>
                 <strong class="pull-left">Employee Enrollment Status</strong>
-                <strong class="pull-right"><%= @current_plan_year.aasm_state %></strong>
+                <strong class="pull-right"><%= @current_plan_year.aasm_state.humanize %></strong>
                 <div class="clearfix"></div>
                 <div class="progress-wrapper">
                   <div class="progress">
@@ -20,8 +20,8 @@
                     <small class="progress-current">
                       <%= @current_plan_year.total_enrolled_count %>
                     </small>
-                    <p class="divider-progress" data-value="<%=  (@current_plan_year.total_enrolled_count * 2 / 3).to_i %>">
-                      <%=  (@current_plan_year.total_enrolled_count * 2 / 3).to_i %><br/> (Minimum)
+                    <p class="divider-progress" data-value="<%= @participation_minimum %>">
+                      <%= @participation_minimum %><br/> (Minimum)
                     </p>
                     <div class="progress-val">
                       <strong class="pull-left">0</strong>
@@ -31,65 +31,49 @@
                 </div>
               </h5>
               <hr/>
-              <div class="table-responsive">
-                <table class="table table-no-sytle">
-                  <tr>
-                    <tbody>
-                      <th>Plan Year</th>
-                      <td>:</td>
-                      <td><%= @current_plan_year.start_on.to_date.year %></td>
-                    </tbody>
-                  </tr>
-                  <tr>
-                    <tbody>
-                      <th>Open Enrollment Period</th>
-                      <td>:</td>
-                      <td><%= format_date @current_plan_year.open_enrollment_start_on %> - <%= format_date @current_plan_year.open_enrollment_end_on %></td>
-                    </tbody>
-                  </tr>
-                  <tr>
-                    <tbody>
-                      <th>Plan Year Start</th>
-                      <td>:</td>
-                      <td><%= format_date @current_plan_year.start_on %></td>
-                    </tbody>
-                  </tr>
-                  <tr>
-                    <tbody>
-                      <th>Eligible Employees on Roster</th>
-                      <td>:</td>
-                      <td><%= @current_plan_year.eligible_to_enroll_count %></td>
-                    </tbody>
-                  </tr>
-                  <tr>
-                    <tbody>
-                      <th>Enrolled/Waived/Total</th>
-                      <td>:</td>
-                      <td><%= @current_plan_year.total_enrolled_count %></td>
-                    </tbody>
-                  </tr>
-                  <tr>
-                    <tbody>
-                      <th>Participation Minimum/Actual</th>
-                      <td>:</td>
-                      <td><%=  (@current_plan_year.total_enrolled_count * 2 / 3).to_i %></td>
-                    </tbody>
-                  </tr>
-                  <tr>
-                    <tbody>
-                      <th>At Least One Non-Owner Enrolled</th>
-                      <td>:</td>
-                      <td><%=  boolean_to_human(@current_plan_year.non_business_owner_enrollment_count > 0) %></td>
-                    </tbody>
-                  </tr>
-                </table>
-              </div>
+
+            <div >
+                <dl class="dl-horizontal no-buffer">
+                  <dt>Plan Year</dt>
+                  <dd><%= @current_plan_year.start_on.year %></dd>
+                  <dt>Open Enrollment Period</dt>
+                  <dd>
+                    <%= format_date @current_plan_year.open_enrollment_start_on %> -
+                    <%= format_date @current_plan_year.open_enrollment_end_on %>
+                  </dd>
+                  <dt>Plan Year Start</dt>
+                  <dd><%= format_date @current_plan_year.start_on %></dd>
+                  <dt>Eligible Roster Employees</dt>
+                  <dd><%= @current_plan_year.eligible_to_enroll_count %></dd>
+                  <dt>Participation Minimum</dt>
+                  <dd>
+                    <%= @participation_minimum %>
+                  </dd>
+                  <dt>Enrolled or Waived</dt>
+                  <dd>
+                    <%=  @current_plan_year.total_enrolled_count %>
+                  </dd>
+                  <dt>One or More Non-Owners?</dt>
+                  <dd><%=  boolean_to_human(@current_plan_year.non_business_owner_enrollment_count > 0) %></dd>
+                </dl>
               <% else %>
                 No Plan Years Found
               <% end %>
-              <br/>
+            </div>
             </div>
           </div>
+
+          <div class="row no-buffer top-pd">
+            <h4><%= @employer_profile.legal_name %> Offices</h4>
+            <% @employer_profile.organization.office_locations.each do |loc| %>
+              <div class="form-border">
+                <%= loc.address.kind.capitalize %>
+                <%= loc.address.to_html %>
+                <%= loc.phone.to_s %>
+              </div>
+            <% end %>
+          </div>
+
           <div class="row no-buffer top-pd">
             <h4>Broker</h4>
             <div class="form-border">
