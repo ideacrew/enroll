@@ -1308,8 +1308,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       expect(rsp[:msg]).to eq ""
     end
 
-    it "should failure when current date more than open_enrollment_latest_start_on" do
-      TimeKeeper.set_date_of_record(TimeKeeper.date_of_record.beginning_of_month + 14.days)
+    it "should fail when current date is later than open_enrollment_latest_start_on" do
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + 14.days)
       start_on = (TimeKeeper.date_of_record + 1.month).beginning_of_month
       rsp = PlanYear.check_start_on(start_on)
       expect(rsp[:result]).to eq "failure"
