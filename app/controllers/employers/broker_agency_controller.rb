@@ -16,6 +16,7 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def show
+
   end
 
   def active_broker
@@ -78,6 +79,6 @@ class Employers::BrokerAgencyController < ApplicationController
 
   def find_borker_agency
     id = params[:id] || params[:broker_agency_id]
-    @broker_agency = BrokerAgencyProfile.find(id)
+    @broker_agency_profile = BrokerAgencyProfile.find(id)
   end
 end
