@@ -4,7 +4,7 @@
     <div class="container">
       <div class="row top-pd">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-          <div class="form-wrapper">            
+          <div class="form-wrapper">
             <h3><%= @employer_profile.legal_name %> Enrollment</h3>
             <div class="form-border">
               <%- if @current_plan_year.present? %>
@@ -100,21 +100,24 @@
       </div>
 
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-          <h4>Premium Billing Report <%= @current_plan_year.start_on %> - <%= @current_plan_year.start_on.end_of_month %></h4>
+          <h4>Premium Billing Report
+            <% if @employer_profile.published_plan_year.present? %>
+              <%= @current_plan_year.start_on %> - <%= @current_plan_year.start_on.end_of_month %></h4>
+            <% end %>
           <div class="form-wrapper">
             <table class="table table-border">
               <tbody>
                 <tr>
                   <th>Total Premium:</th>
-                  <th><%= number_to_currency(@current_plan_year.hbx_enrollments.map(&:total_premium).sum) %></th>
+                  <th><%= number_to_currency(@current_plan_year.present? ? @current_plan_year.hbx_enrollments.map(&:total_premium).sum : 0 )%></th>
                 </tr>
                 <tr>
                   <td>Employee Contributions:</td>
-                  <th><%= number_to_currency(@current_plan_year.hbx_enrollments.map(&:total_employer_contribution).sum) %></th>
+                  <th><%= number_to_currency(@current_plan_year.present? ? @current_plan_year.hbx_enrollments.map(&:total_employer_contribution).sum : 0) %></th>
                 </tr>
                 <tr>
                   <td>Employer Contributions:</td>
-                  <td><%= number_to_currency(@current_plan_year.hbx_enrollments.map(&:total_employee_cost).sum) %></td>
+                  <td><%= number_to_currency(@current_plan_year.present? ? @current_plan_year.hbx_enrollments.map(&:total_employee_cost).sum : 0) %></td>
                 </tr>
               </tbody>
             </table>
