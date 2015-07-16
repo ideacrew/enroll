@@ -194,6 +194,27 @@ class BenefitGroup
     false
   end
 
+  def estimated_monthly_employer_contribution
+    plan_year.employer_profile.census_employees.active.collect do |ce|
+      pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      pcd.total_employer_contribution
+    end.sum
+  end
+
+  def estimated_monthly_min_employee_cost
+    plan_year.employer_profile.census_employees.active.collect do |ce|
+      pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      pcd.total_employee_cost
+    end.min
+  end
+
+  def estimated_monthly_max_employee_cost
+    plan_year.employer_profile.census_employees.active.collect do |ce|
+      pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      pcd.total_employee_cost
+    end.max
+  end
+
 private
   def dollars_to_cents(amount_in_dollars)
     Rational(amount_in_dollars) * Rational(100) if amount_in_dollars

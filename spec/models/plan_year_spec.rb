@@ -1544,4 +1544,48 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       expect(plan_year.employee_participation_percent).to eq "#{(4/10.0*100).round(2)}%"
     end
   end
+
+  context "an employer with several families on the roster estimates the cost of a plan year" do
+    def p(obj)
+      obj.class.find(obj.id)
+    end
+
+    let!(:blue_collar_benefit_group) { FactoryGirl.create(:benefit_group, title: "blue collar benefit group") }
+    let!(:plan_year) { blue_collar_benefit_group.plan_year }
+    let!(:employer_profile) { plan_year.employer_profile }
+    let!(:white_collar_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "white collar benefit group") }
+    let!(:blue_collar_large_family_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+    let!(:blue_collar_large_family_dependents) { FactoryGirl.create_list(:census_dependent, 5, census_employee: blue_collar_large_family_employee) }
+    let!(:blue_collar_small_family_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+    let!(:blue_collar_small_family_dependents) { FactoryGirl.create_list(:census_dependent, 2, census_employee: blue_collar_small_family_employee) }
+    let!(:blue_collar_no_family_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+    let!(:blue_collar_employees) { [blue_collar_large_family_employee, blue_collar_small_family_employee, blue_collar_no_family_employee]}
+    let!(:white_collar_large_family_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+    let!(:white_collar_large_family_dependents) { FactoryGirl.create_list(:census_dependent, 5, census_employee: white_collar_large_family_employee) }
+    let!(:white_collar_small_family_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+    let!(:white_collar_small_family_dependents) { FactoryGirl.create_list(:census_dependent, 2, census_employee: white_collar_small_family_employee) }
+    let!(:white_collar_no_family_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+    let!(:white_collar_employees) { [white_collar_large_family_employee, white_collar_small_family_employee, white_collar_no_family_employee]}
+
+    before do
+      blue_collar_employees.each do |ce|
+        FactoryGirl.create(:benefit_group_assignment, census_employee: ce, benefit_group: blue_collar_benefit_group)
+      end
+      white_collar_employees.each do |ce|
+        FactoryGirl.create(:benefit_group_assignment, census_employee: ce, benefit_group: white_collar_benefit_group)
+      end
+    end
+
+    it "should have an estimated monthly max cost" do
+      expect(p(blue_collar_benefit_group).estimated_monthly_employer_contribution).to be_within(0.01).of(4308.30)
+    end
+
+    it "should have an estimated min employee cost" do
+      expect(p(blue_collar_benefit_group).estimated_monthly_min_employee_cost).to be_within(0.01).of(100.10)
+    end
+
+    it "should have an estimated max employee cost" do
+      expect(p(blue_collar_benefit_group).estimated_monthly_max_employee_cost).to be_within(0.01).of(1121.12)
+    end
+  end
 end
