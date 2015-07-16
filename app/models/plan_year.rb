@@ -170,10 +170,10 @@ class PlanYear
     warnings
   end
 
-  # All employees present on the roster with benefit groups belonging to this plan year
+  # All active employees present on the roster with benefit groups belonging to this plan year
   def eligible_to_enroll
     benefit_group_ids = benefit_groups.collect(&:id)
-    CensusEmployee.by_benefit_group_ids(benefit_group_ids)
+    CensusEmployee.by_benefit_group_ids(benefit_group_ids).active
   end
 
   def eligible_to_enroll_count
