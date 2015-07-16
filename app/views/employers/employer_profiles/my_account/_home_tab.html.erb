@@ -100,7 +100,7 @@
       </div>
 
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-          <h4>Premium Billing Report <%= @current_plan_year.start_on %> - <%= @current_plan_year.end_on %></h4>
+          <h4>Premium Billing Report <%= @current_plan_year.start_on %> - <%= @current_plan_year.start_on.end_of_month %></h4>
           <div class="form-wrapper">
             <table class="table table-border">
               <tbody>
