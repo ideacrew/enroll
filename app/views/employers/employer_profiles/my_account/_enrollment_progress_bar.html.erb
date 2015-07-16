@@ -27,7 +27,7 @@
         </small>
       <% end %>
 
-      <% if @current_plan_year.eligible_to_enroll_count > 3 %>
+      <% if @current_plan_year.eligible_to_enroll_count > 2 %>
         <p class="divider-progress" data-value="<%= @participation_minimum %>">
           <%= @participation_minimum %><br/> (Minimum)
         </p>
