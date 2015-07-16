@@ -89,15 +89,15 @@
               <tbody>
                 <tr>
                   <th>Total Premium:</th>
-                  <th>$47,434,34</th>
+                  <th><%= number_to_currency(@current_plan_year.hbx_enrollments.map(&:total_premium).sum) %></th>
                 </tr>
                 <tr>
                   <td>Employee Contributions:</td>
-                  <td>$16,434,34</td>
+                  <th><%= number_to_currency(@current_plan_year.hbx_enrollments.map(&:total_employer_contribution).sum) %></th>
                 </tr>
                 <tr>
                   <td>Employer Contributions:</td>
-                  <td>$12,434,34</td>
+                  <td><%= number_to_currency(@current_plan_year.hbx_enrollments.map(&:total_employee_cost).sum) %></td>
                 </tr>
               </tbody>
             </table>

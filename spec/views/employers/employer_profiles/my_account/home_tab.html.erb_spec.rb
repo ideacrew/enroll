@@ -73,7 +73,8 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         eligible_to_enroll_count: 4,
         total_enrolled_count: 10,
         employee_participation_percent: 40,
-        non_business_owner_enrollment_count: 10
+        non_business_owner_enrollment_count: 10,
+        hbx_enrollments: [hbx_enrollment]
         )
     end
 
@@ -102,11 +103,21 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         )
     end
 
+    def hbx_enrollment
+      instance_double(
+        "HbxEnrollment",
+        total_premium: double("total_premium"),
+        total_employer_contribution: double("total_employer_contribution"),
+        total_employee_cost: double("total_employee_cost")
+        )
+    end
+
     let(:new_office_locations){[office_location,office_location]}
     let(:current_plan_year){employer_profile.published_plan_year}
 
     before :each do
       assign :employer_profile, employer_profile
+      assign :hbx_enrollments, [hbx_enrollment]
       assign :current_plan_year, employer_profile.published_plan_year
       assign :broker_agency_accounts, [ broker_agency_account ]
       controller.request.path_parameters[:id] = "11111111"
