@@ -75,10 +75,12 @@ class Employers::EmployerProfilesController < ApplicationController
     @current_plan_year = @employer_profile.published_plan_year
     @plan_years = @employer_profile.plan_years.order(id: :desc)
 
-    if @current_plan_year.eligible_to_enroll_count == 0
-      @participation_minimum = 0
-    else
-      @participation_minimum = ((@current_plan_year.eligible_to_enroll_count * 0.667) + 1).to_i
+    if @current_plan_year.present? 
+      if @current_plan_year.eligible_to_enroll_count == 0
+        @participation_minimum = 0
+      else
+        @participation_minimum = ((@current_plan_year.eligible_to_enroll_count * 0.667) + 1).to_i
+      end
     end
 
     status_params = params.permit(:id, :status)
