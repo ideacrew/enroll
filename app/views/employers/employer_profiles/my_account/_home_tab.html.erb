@@ -44,10 +44,7 @@
                     <tbody>
                       <th>Open Enrollment Period</th>
                       <td>:</td>
-                      <td>
-                        <%= format_date @current_plan_year.open_enrollment_start_on %> -
-                        <%= format_date @current_plan_year.open_enrollment_end_on %>
-                      </td>
+                      <td><%= format_date @current_plan_year.open_enrollment_start_on %> - <%= format_date @current_plan_year.open_enrollment_end_on %></td>
                     </tbody>
                   </tr>
                   <tr>
