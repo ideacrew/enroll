@@ -56,10 +56,10 @@
                   <dt>One or More Non-Owners?</dt>
                   <dd><%=  boolean_to_human(@current_plan_year.non_business_owner_enrollment_count > 0) %></dd>
                 </dl>
+              </div>
               <% else %>
                 No Plan Years Found
               <% end %>
-            </div>
             </div>
           </div>
 
@@ -98,8 +98,9 @@
             </div>
         </div>
       </div>
-
+  
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <%- if @current_plan_year.present? %>
           <h4>Premium Billing Report <%= @current_plan_year.start_on %> - <%= @current_plan_year.start_on.end_of_month %></h4>
           <div class="form-wrapper">
             <table class="table table-border">
@@ -122,6 +123,7 @@
               <%= link_to 'GET REPORTS', employers_premium_statement_path, remote: true, class: 'btn btn-primary btn-block btn-br' %>
             </div>
           </div>
+          <% end %>
         </div>
       </div>
     </div>
