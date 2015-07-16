@@ -63,7 +63,18 @@
                 <div class='bg-content'>
                   <% plan_year.benefit_groups.each_with_index do |bg, index| %>
                     <table class="table table-wrapper table-condensed bg" id="bg<%= bg.id %>" style="display: <%= index == 0 ? 'block' : 'none' %>">
-                    <tr class="brd-top">
+<!--                     <tr class="brd-top">
+                      <th>Benefit Group :</th>
+                      <th class="no-border" colspan="2">Est. Monthly Employer Contribution</th>
+                      <th class="no-border" colspan="3">Estimated Monthly Employee Cost</th>
+                    </tr> -->
+                    <tr>
+                      <th>Est. Monthly Employer Contribution :</th>
+                      <td> <%= number_to_currency(bg.estimated_monthly_employer_contribution) %> </td>
+                      <th colspan="3">Est. Monthly Employee Cost (Min/Max) :</th>
+                      <td> <%= number_to_currency(bg.estimated_monthly_min_employee_cost) %> / <%= number_to_currency(bg.estimated_monthly_max_employee_cost) %></td>
+                    </tr>
+                    <tr>
                       <th>Benefit Group :</th>
                       <td><%= bg.title %></td>
                       <th class="no-border" colspan="2">Employee Relationship</th>
