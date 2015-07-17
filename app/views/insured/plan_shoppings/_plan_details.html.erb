@@ -3,6 +3,7 @@
       <div class="row">
           <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
             <h3 class="text-blue">
+              <p class="title-inline" style="height: 80px; padding-right: 10px"><%= display_carrier_logo(plan.carrier_profile, {width: 80}) %></p>
               <%= link_to plan.name, summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id}), {:remote => true} %>
               <br/>
               <small><%= (Caches::MongoidCache.lookup(CarrierProfile, plan.carrier_profile_id) { plan.carrier_profile} ).dba %></small>

@@ -321,4 +321,12 @@ module ApplicationHelper
     end
     return link
   end
+
+  def display_carrier_logo(carrier, options = {:width => 50})
+    carrier_name = carrier.legal_name
+    unless carrier_name.nil?
+      image_name = "logo/carrier/#{carrier_name.parameterize.underscore}.jpg"
+      image_tag(image_name, width: options[:width])
+    end
+  end
 end

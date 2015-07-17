@@ -4,7 +4,7 @@
   <div class="row plan">
     <div class="col-md-6 col-sm-6 col-xs-12">
       <div class="page-header"><h4>Selected Plan</h4></div>
-      <p><%= image_tag('blue-cross.jpg', width: 80) %></p>
+      <%= display_carrier_logo(@plan.carrier_profile, {width: 180}) %>
       <h3 class="text-blue"><%= @plan.name %></h3>
       <p><%= (Caches::MongoidCache.lookup(CarrierProfile, @plan.carrier_profile_id) { @plan.carrier_profile} ).dba %></p>
       <ul class="plan-type">
@@ -24,7 +24,7 @@
         </li>
       </ul>
     </div>
-    
+
     <div class="col-md-6 col-sm-6 col-xs-12">
       <div class="row">
         <div class="col-md-4 col-sm-4 col-xs-12">
