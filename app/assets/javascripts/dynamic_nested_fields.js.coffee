@@ -12,7 +12,7 @@ $(document).on 'click', 'form .add_fields', (event) ->
   $(target).children('fieldset:last').find("input.floatlabel").floatlabel slideInput: false
 
   update_delete_buttons()
-
+  applyJQDatePickers()
 
 $(document).on 'click', 'form .remove_fields', (event) ->
   $(this).closest('fieldset').remove()

@@ -217,7 +217,7 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mary")
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_middle_name/).set("K")
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_last_name/).set("Doe")
-  @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_dob/).set("10/12/2012")
+  @browser.text_field(id: /jq_datepicker_ignore_census_employee_census_dependents_attributes_\d+_dob/).set("10/12/2012")
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_ssn/).set("321321321")
   @browser.label(for: /census_employee_census_dependents_attributes_\d+_gender_female/).click
   input_field = @browser.divs(class: "selectric-wrapper").last
@@ -274,6 +274,9 @@ Then(/^I should see a form to update the contents of the census employee$/) do
   scroll_then_click(@browser.li(text: /VA/))
   #@browser.text_field(id: /census_employee_address_attributes_state/).set("VA")
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mariah")
+  input_field = @browser.divs(class: "selectric-wrapper").last
+  input_field.click
+  input_field.li(text: /Child/).click
   screenshot("update_census_employee_with_data")
   @browser.button(value: /Update Employee/).click
 end

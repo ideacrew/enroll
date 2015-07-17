@@ -14,7 +14,8 @@ module ApplicationHelper
     if !provided_id.blank?
       generated_target_id = "#{provided_id}_jq_datepicker_plain_field"
     end
-    generated_target_id ||= "#{obj_name}_#{sanitized_field_name}_jq_datepicker_plain_field"
+    sanitized_object_name = "#{obj_name}_#{sanitized_field_name}".delete(']').tr('^-a-zA-Z0-9:.', "_")
+    generated_target_id ||= "#{sanitized_object_name}_jq_datepicker_plain_field"
     capture do
       concat f.text_field(field_name, opts.merge(:class => html_class_list, :id => generated_target_id, :value=> obj_val.try(:to_s, :db)))
       concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
