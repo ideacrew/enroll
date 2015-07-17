@@ -48,8 +48,6 @@ RSpec.describe ConsumerProfilesController, :type => :controller do
       allow(hbx_enrollment).to receive(:plan=).with(plan).and_return(true)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(:reference_plan)
-      allow(benefit_group).to receive(:plan_year).and_return(plan_year)
-      allow(plan_year).to receive(:is_eligible_to_enroll?).and_return(true)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
       allow(hbx_enrollment).to receive(:select_coverage!).and_return(true)
@@ -68,6 +66,12 @@ RSpec.describe ConsumerProfilesController, :type => :controller do
       sign_in user
       get :purchase
       expect(response).to have_http_status(:redirect)
+    end
+
+    it "return enrollable" do
+      sign_in user
+      get :purchase
+      expect(assigns(:enrollable)).to eq true
     end
   end
 end
