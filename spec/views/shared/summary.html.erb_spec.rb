@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe "shared/_summary.html.erb" do
-  let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name") }
+  let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name") }
   let(:mock_hbx_enrollment) { instance_double("HbxEnrollment", :hbx_enrollment_members => [], :id => "3241251524") }
   let(:mock_plan) { double(
       :name => "A Plan Name",
