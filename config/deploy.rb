@@ -74,4 +74,4 @@ namespace :deploy do
 
 end
 
-after "assets:refresh", "deploy:restart"
+after "deploy:publishing", "deploy:restart"
