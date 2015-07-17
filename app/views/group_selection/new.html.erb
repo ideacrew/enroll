@@ -32,11 +32,11 @@
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', 'change' %>
             <h4><strong>What do you like to do?</strong></h4>
-            <% if @hbx_enrollment.present? and @hbx_enrollment.plan %>
+            <% if @hbx_enrollment.present? and !@hbx_enrollment.try(:coverage_terminated?) %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-lg btn-primary' %>
               &nbsp;
+              <%= link_to("Terminate Plan", terminate_insured_plan_shopping_path(@hbx_enrollment.id), {:class => "btn btn-lg btn-primary", :method => :post}) %>
             <% end %>
-            <%= link_to("Terminate Plan", terminate_insured_plan_shopping_path(@hbx_enrollment.id), {:class => "btn btn-lg btn-primary", :method => :post}) if @hbx_enrollment %>
             <% if @employee_role.benefit_group.plan_option_kind != "single_plan" %>
               &nbsp;
               <%= submit_tag 'Shop for new plan', class: 'btn btn-lg btn-primary' %>

@@ -91,7 +91,11 @@ class HbxEnrollment
   end
 
   def propogate_terminate
-    self.plan_id = nil
+    self.terminated_on = TimeKeeper.date_of_record.end_of_month
+    if benefit_group_assignment
+      benefit_group_assignment.end_benefit(TimeKeeper.date_of_record.end_of_month) 
+      benefit_group_assignment.save
+    end
   end
 
   def propogate_waiver

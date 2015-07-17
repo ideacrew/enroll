@@ -12,39 +12,19 @@
 
                             <% if benefit_group_assignment.present? and benefit_group_assignment.coverage_waived? %>
                               <%= render partial: "shared/waive", locals: {benefit_group_assignment: benefit_group_assignment} %>
+                            <% elsif hbx_enrollment.try(:coverage_terminated?) %>
+                              <div class="page-header">
+                                <h4>Coverage Terminated</h4>
+                              </div>
+                              <p>Terminated on: <%= hbx_enrollment.try(:terminated_on) %></p>
+                              <hr />
+                              <%= render partial: "plan", locals: {hbx_enrollment: hbx_enrollment, plan: plan} %>
                             <% else %>
                               <div class="page-header">
                                 <h4>Your plan</h4>
                               </div>
-
-                              <%= plan.try(:carrier_profile).try(:legal_name) %>
-                              <h3><%= plan.try(:name) %></h3>
-                              <div>
-                                Subscriber Id : <%= hbx_enrollment.try(:subscriber).try(:id).try(:to_s) %>
-                              <br/>
-                              Group Id : <%= hbx_enrollment.try(:benefit_group_id).try(:to_s) %>
-                          </div>
-                          <br/>
-                          <table class="table">
-                            <thead>
-                              <tr>
-                                <th>TYPE</th>
-                                <th>LEVEL</th>
-                                <th>START</th>
-                                <th></th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td><%= plan.try(:plan_type).try(:upcase) %></td>
-                                <% plan_level = plan.try(:metal_level).try(:humanize) %>
-                                <td class="<%= plan_level.try(:downcase) %>"><%= plan_level %></td>
-                                <td><%= hbx_enrollment.try(:effective_on) %></td>
-                                <td></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        <% end %>
+                              <%= render partial: "plan", locals: {hbx_enrollment: hbx_enrollment, plan: plan} %>
+                            <% end %>
                       </div>
                     </div>
                         </div>
