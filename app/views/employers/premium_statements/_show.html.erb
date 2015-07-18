@@ -1,7 +1,10 @@
 <br>
 <div class="container">
   <div class="row no-buffer">
-    <h3 class="title-inline">Premium Billing Report <%= @current_plan_year.start_on %> - <%= @current_plan_year.start_on.end_of_month %></h3>
+    <h3 class="title-inline">Premium Billing Report
+    <% if @current_plan_year.present? %>
+      <%= @current_plan_year.start_on %> - <%= @current_plan_year.start_on.end_of_month %></h3>
+    <% end %>
     <a href="#" class="btn btn-danger return_to_home pull-right bottom-mgn-xs"><i class="fa fa-times"></i> Cancel</a>
   </div>
 
@@ -24,8 +27,12 @@
         </tr>
       </thead>
       <tbody>
-        <% @hbx_enrollments.each do |hbx_enrollment| %>
-          <%= render "employee_line_item", census_employee: hbx_enrollment.subscriber.person.employee_roles.first.census_employee, enrollment: hbx_enrollment %>
+        <% if @hbx_enrollments.present? %>
+          <% @hbx_enrollments.each do |hbx_enrollment| %>
+            <%= render "employee_line_item", census_employee: hbx_enrollment.subscriber.person.employee_roles.first.census_employee, enrollment: hbx_enrollment %>
+          <% end %>
+        <% else %>
+          <tr> <td> No employees enrolled.</td></tr>
         <% end %>
       </tbody>
     </table>

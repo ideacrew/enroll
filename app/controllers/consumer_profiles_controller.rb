@@ -20,21 +20,6 @@ class ConsumerProfilesController < ApplicationController
     end
   end
 
-  def build_nested_models
-
-    ["home","mobile","work","fax"].each do |kind|
-       @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
-    end
-
-    Address::KINDS.each do |kind|
-      @person.addresses.build(kind: kind) if @person.addresses.select{|address| address.kind == kind}.blank?
-    end
-
-    ["home","work"].each do |kind|
-       @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
-    end
-  end
-
   def plans
     hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active || []
     @plan = hbx_enrollments.last.try(:plan)
@@ -52,7 +37,6 @@ class ConsumerProfilesController < ApplicationController
 
   def family
     @family_members = @family.active_family_members if @family.present?
-
     @qualifying_life_events = QualifyingLifeEventKind.all
     @employee_role = @person.employee_roles.first
 

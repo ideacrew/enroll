@@ -1,0 +1,90 @@
+require 'rails_helper'
+
+describe "employers/premium_statements/show.js.erb" do
+  let(:start_on){ TimeKeeper.date_of_record.beginning_of_month }
+  
+  def new_hbx_enrollment
+    random_value = rand(999_999_999)
+    instance_double(
+      "HbxEnrollment",
+      plan: new_plan,
+      humanized_dependent_summary: "hds: #{random_value}",
+      total_employer_contribution: "total_employer_contribution:#{random_value}",
+      total_employee_cost: "total_employee_cost:#{random_value}",
+      total_premium: "total_premium:#{random_value}",
+      subscriber: double("subscriber",
+                    person: new_person(random_value)
+                  )
+    )
+  end
+
+  def new_person(random_value)
+    instance_double(
+      "Person",
+      employee_roles: employee_roles
+    )
+  end
+
+  def new_census_employee
+    instance_double(
+      "CensusEmployee",
+      full_name: "my funny name",
+      ssn: "my funny ssn",
+      dob: "my funny dob",
+      hired_on: "my funny hired_on",
+      published_benefit_group: new_benefit_group
+    )
+  end
+
+  def new_benefit_group
+    instance_double(
+      "BenefitGroup",
+      title: "my benefit group"
+    )
+  end
+
+  def current_plan_year
+    instance_double(
+      "PlanYear",
+      start_on: start_on
+    )
+  end
+
+  let(:new_plan){ instance_double("Plan", carrier_profile: new_carrier_profile) }
+  let(:new_carrier_profile){ instance_double("CarrierProfile", legal_name: "my legal name") }
+  let(:new_employee_role){ instance_double("EmployeeRole", census_employee: new_census_employee) }
+  let(:employee_roles) {[new_employee_role, new_employee_role]}
+  let(:hbx_enrollments){ [new_hbx_enrollment]}
+
+  # let(:current_plan_year){ instance_double("PlanYear")}
+
+  before :each do
+    assign :current_plan_year, current_plan_year
+    assign :hbx_enrollments, hbx_enrollments
+    render file: "employers/premium_statements/show.js.erb"
+  end
+
+  it "should display start on and end on dates of premium billing report" do
+    expect(rendered).to match(/#{current_plan_year.start_on}/m)
+    expect(rendered).to match(/#{current_plan_year.start_on.end_of_month}/m)
+    expect(rendered).to match(/.*Premium Billing Report.*#{current_plan_year.start_on}.*-.*#{current_plan_year.start_on.end_of_month}.*/m)
+  end
+
+  it "should display billing report of a user" do
+    hbx_enrollments.each do |hbx_enrollment|
+      census_employee = hbx_enrollment.subscriber.person.employee_roles.first.census_employee
+      benefit_group = census_employee.published_benefit_group
+      expect(rendered).to match(/#{census_employee.full_name}/)
+      expect(rendered).to match(/#{number_to_obscured_ssn(census_employee.ssn)}/)
+      expect(rendered).to match(/#{format_date(census_employee.dob)}/)
+      expect(rendered).to match(/#{format_date(census_employee.hired_on)}/)
+      expect(rendered).to match(/#{benefit_group.title}/)
+      expect(rendered).to match(/#{hbx_enrollment.plan.carrier_profile.legal_name}/)
+      expect(rendered).to match(/#{hbx_enrollment.humanized_dependent_summary}/)
+      expect(rendered).to match(/#{hbx_enrollment.total_employer_contribution}/)
+      expect(rendered).to match(/#{hbx_enrollment.total_employee_cost}/)
+      expect(rendered).to match(/#{hbx_enrollment.total_premium}/)
+    end
+  end
+
+end

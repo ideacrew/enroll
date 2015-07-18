@@ -69,8 +69,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
   context "POST thankyou" do
 
-    let(:person) { double("Person") }
-    let(:user) { double("User") }
     let(:enrollment) { double("HbxEnrollment") }
     let(:plan) { double("Plan") }
     let(:benefit_group) { double("BenefitGroup") }

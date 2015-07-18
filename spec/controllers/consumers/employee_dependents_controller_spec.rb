@@ -27,6 +27,22 @@ RSpec.describe Consumer::EmployeeDependentsController do
     end
   end
 
+  describe "GET show" do
+    let(:dependent) { double("Dependent") }
+    let(:family_member) {double("FamilyMember", id: double("id"))}
+
+    before(:each) do
+      allow(Forms::EmployeeDependent).to receive(:find).and_return(dependent)
+      sign_in(user)
+      get :show, :id => family_member.id
+    end
+
+    it "should render show templage" do
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("show")
+    end
+  end
+
   describe "GET new" do
     let(:family_id) { "addbedddedtotallyafamiyid" }
     let(:dependent) { double }

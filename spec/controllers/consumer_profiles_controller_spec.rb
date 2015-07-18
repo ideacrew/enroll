@@ -4,14 +4,68 @@ RSpec.describe ConsumerProfilesController, :type => :controller do
   let(:plan) { double }
   let(:hbx_enrollment) { double }
   let(:hbx_enrollments) { double }
-  let(:benefit_group) {double}
-  let(:reference_plan) {double}
-  let(:usermailer) {double}
-  let(:person) {FactoryGirl.create(:person)}
-  let(:user) {FactoryGirl.create(:user)}
-  let(:family) {double}
-  let(:household) {double}
-  let(:plan_year) {double}
+  let(:benefit_group) { double("BenefitGroup") }
+  let(:reference_plan) { double }
+  let(:usermailer) { double("UserMailer") }
+  let(:person) { FactoryGirl.create(:person) }
+  let(:user) { FactoryGirl.create(:user) }
+  let(:family) { double("Family") }
+  let(:household) { double("HouseHold") }
+  let(:plan_year) { double("PlanYear") }
+  let(:family_members){[double("FamilyMember")]}
+
+  context "GET home" do
+    before do
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:active_family_members).and_return(family_members)
+      allow(family).to receive(:latest_household).and_return(household)
+      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
+    end
+
+    it "should return success" do
+      sign_in user
+      get :home
+      expect(response).to have_http_status(:success)
+    end
+  end
+
+  context "GET personal" do
+    before do
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:active_family_members).and_return(family_members)
+    end
+    it "should return success" do
+      sign_in user
+      get :personal
+      expect(response).to have_http_status(:success)
+    end
+  end
+
+  context "GET family" do
+    let(:employee_roles){ [double("EmployeeRole")] }
+    before do
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:active_family_members).and_return(family_members)
+      allow(person).to receive(:employee_roles).and_return(employee_roles)
+    end
+    it "should return success" do
+      sign_in user
+      get :family
+      expect(response).to have_http_status(:success)
+    end
+  end
+
+  context "GET inbox" do
+    it "should return success" do
+      sign_in user
+      xhr :get, :inbox
+      expect(response).to have_http_status(:success)
+    end
+  end
 
   context "retrieve plan" do
     let(:qhp){double("Products::Qhp")}
