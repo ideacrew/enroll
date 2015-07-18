@@ -2,7 +2,7 @@ $('#show_profile').html("<%= escape_javascript render("show_profile") %>")
 $('.fade').addClass('in').addClass('active')
 $('#inbox').removeClass('active').removeClass('in')
 semantic_class();
-
+$('#show_profile').removeClass('hide')
 
 $('div[name=employee_family_tabs] > ').children().each( function() { 
     $(this).change(function(){

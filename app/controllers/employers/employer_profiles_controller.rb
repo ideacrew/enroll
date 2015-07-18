@@ -72,76 +72,14 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show
-    @current_plan_year = @employer_profile.published_plan_year
-    @plan_years = @employer_profile.plan_years.order(id: :desc)
-
-    if @current_plan_year.present? 
-      if @current_plan_year.eligible_to_enroll_count == 0
-        @participation_minimum = 0
-      else
-        @participation_minimum = ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
-      end
-    end
-
-    status_params = params.permit(:id, :status)
-    @status = status_params[:status] || 'active'
-
-    census_employees = case @status
-    when 'waived'
-      @employer_profile.census_employees.waived.sorted
-    when 'terminated'
-      @employer_profile.census_employees.terminated.sorted
-    when 'all'
-      @employer_profile.census_employees.sorted
-    else
-      @employer_profile.census_employees.active.sorted
-    end
-
-    @page_alphabets = page_alphabets(census_employees, "last_name")
-
-
-    if params[:page].present?
-      page_no = cur_page_no(@page_alphabets.first)
-      @census_employees = census_employees.where("last_name" => /^#{page_no}/i)
-    else
-      @total_census_employees_quantity = census_employees.count
-      @census_employees = census_employees.to_a.first(20)
-    end
-    @broker_agency_accounts = @employer_profile.broker_agency_accounts
-    employer_families
+    paginate_employees
+    set_show_variables
   end
 
   def show_profile
     @tab = params['tab']
-    @current_plan_year = @employer_profile.published_plan_year
-    @plan_years = @employer_profile.plan_years.order(id: :desc)
-
-    status_params = params.permit(:id, :status)
-    @status = status_params[:status] || 'active'
-
-    census_employees = case @status
-    when 'waived'
-      @employer_profile.census_employees.waived.sorted
-    when 'terminated'
-      @employer_profile.census_employees.terminated.sorted
-    when 'all'
-      @employer_profile.census_employees.sorted
-    else
-      @employer_profile.census_employees.active.sorted
-    end
-
-    @page_alphabets = page_alphabets(census_employees, "last_name")
-
-
-    if params[:page].present?
-      page_no = cur_page_no(@page_alphabets.first)
-      @census_employees = census_employees.where("last_name" => /^#{page_no}/i)
-    else
-      @total_census_employees_quantity = census_employees.count
-      @census_employees = census_employees.to_a.first(20)
-    end
-    @broker_agency_accounts = @employer_profile.broker_agency_accounts
-    employer_families
+    paginate_employees
+    set_show_variables
   end
 
   def new
@@ -186,7 +124,47 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   private
-    def employer_families
+    def paginate_employees
+      status_params = params.permit(:id, :status)
+      @status = status_params[:status] || 'active'
+
+      census_employees = case @status
+      when 'waived'
+        @employer_profile.census_employees.waived.sorted
+      when 'terminated'
+        @employer_profile.census_employees.terminated.sorted
+      when 'all'
+        @employer_profile.census_employees.sorted
+      else
+        @employer_profile.census_employees.active.sorted
+      end
+      @page_alphabets = page_alphabets(census_employees, "last_name")
+      if params[:page].present?
+        page_no = cur_page_no(@page_alphabets.first)
+        @census_employees = census_employees.where("last_name" => /^#{page_no}/i)
+      else
+        @total_census_employees_quantity = census_employees.count
+        @census_employees = census_employees.to_a.first(20)
+      end
+    end
+
+    def set_show_variables
+      @current_plan_year = @employer_profile.published_plan_year
+      @plan_years = @employer_profile.plan_years.order(id: :desc)
+
+      if @current_plan_year.present?
+        if @current_plan_year.eligible_to_enroll_count == 0
+          @participation_minimum = 0
+        else
+          @participation_minimum = ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
+        end
+      end
+
+      #broker view
+      @broker_agency_accounts = @employer_profile.broker_agency_accounts
+
+      #families view may require cache of broker agency profile id
+      #families defined as employee_roles.each { |ee| ee.person.primary_family }
       if current_user.try(:has_broker_agency_staff_role?)
         session[:broker_agency_id] = current_user.person.broker_role.broker_agency_profile_id
       end

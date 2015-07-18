@@ -2,12 +2,12 @@
   <div class="container">
     <ul role="tablist" class="list-unstyled list-inline" id="myTab">
       <li class="active" role="presentation">
-          <%= link_to(employers_employer_profile_path(:employer_profile_id=>@employer_profile.id), 
+          <%= link_to(employers_employer_profile_path(:employer_profile_id=>@employer_profile.id, :id=>@employer_profile.id),
           "aria-expanded" => "true", "role" => "tab", :class => 'hidden-xs' ) do %> 
             <span class="glyphicon glyphicon-home" aria-hidden="true" title="Home"></span>
           <%- end %>
           
-          <%= link_to(employers_employer_profile_path(:employer_profile_id=>@employer_profile.id), 
+          <%= link_to(employers_employer_profile_path(:employer_profile_id=>@employer_profile.id, :id=>@employer_profile.id),
           "aria-expanded" => "true", "role" => "tab", :class=> 'visible-xs') do %> 
             <span class="glyphicon glyphicon-home" aria-hidden="true" title="Home"></span>
             <small>Home</small>
