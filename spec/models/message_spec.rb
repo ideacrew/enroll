@@ -21,7 +21,10 @@ RSpec.describe Message, :type => :model do
       end
 
       it "should be invalid" do
-        expect(Message.new(**params).valid?).to be_falsey
+        message = Message.new(**params)
+        expect(message.valid?).to be_falsey
+        expect(message.errors.any?).to be_truthy
+        expect(message.errors[:base]).to eq ["message subject and body cannot be blank"]
       end
     end
 

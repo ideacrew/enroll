@@ -31,13 +31,19 @@ RSpec.describe Employers::InboxesController, :type => :controller do
       allow(HbxProfile).to receive(:find).and_return(hbx_profile)
       allow(inbox_provider).to receive(:inbox).and_return(inbox)
       allow(inbox_provider.inbox).to receive(:post_message).and_return(inbox)
-      allow(inbox_provider.inbox).to receive(:save).and_return(true)
       allow(hbx_profile).to receive(:inbox).and_return(inbox)
     end
 
     it "creates new message" do
+      allow(inbox_provider.inbox).to receive(:save).and_return(true)
       post :create, valid_params, id: inbox_provider.id, profile_id: hbx_profile.id
       expect(response).to have_http_status(:redirect)
+    end
+
+    it "renders new" do
+      allow(inbox_provider.inbox).to receive(:save).and_return(false)
+      post :create, valid_params, id: inbox_provider.id, profile_id: hbx_profile.id
+      expect(response).to render_template(:new)
     end
   end
 

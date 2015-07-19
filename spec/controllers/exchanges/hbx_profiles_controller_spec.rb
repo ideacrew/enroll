@@ -2,6 +2,157 @@ require 'rails_helper'
 
 RSpec.describe Exchanges::HbxProfilesController do
 
+  describe "various index" do
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("HbxProfile")}
+
+    before :each do
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      sign_in(user)
+    end
+
+    it "renders index" do
+      get :index
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("exchanges/hbx_profiles/index")
+    end
+
+    it "renders broker_agency_index" do
+      xhr :get, :broker_agency_index
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("exchanges/hbx_profiles/broker_agency_index")
+    end
+
+    it "renders issuer_index" do
+      xhr :get, :issuer_index
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("exchanges/hbx_profiles/issuer_index")
+    end
+
+    it "renders issuer_index" do
+      xhr :get, :product_index
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template("exchanges/hbx_profiles/product_index")
+    end
+  end
+
+  describe "new" do
+    let(:user) { double("User")}
+    let(:person) { double("Person")}
+
+    it "renders new" do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in(user)
+      get :new
+      expect(response).to have_http_status(:success)
+    end
+  end
+
+  describe "inbox" do
+    let(:user) { double("User")}
+    let(:person) { double("Person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("HbxProfile", id: double("id"))}
+
+    it "renders inbox" do
+      allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      sign_in(user)
+      xhr :get, :inbox, id: hbx_profile.id
+      expect(response).to have_http_status(:success)
+    end
+    
+  end
+
+  describe "#create" do
+    let(:user) { double("User")}
+    let(:person) { double("Person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("HbxProfile", id: double("id"))}
+    let(:organization){ Organization.new }
+    let(:organization_params) { {hbx_profile: {organization: organization.attributes}}}
+
+    before :each do
+      sign_in(user)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(Organization).to receive(:new).and_return(organization)
+      allow(organization).to receive(:build_hbx_profile).and_return(hbx_profile)
+    end
+
+    it "create new organization if params valid" do
+      allow(hbx_profile).to receive(:save).and_return(true)
+      post :create, organization_params
+      expect(response).to have_http_status(:redirect)
+    end
+
+    it "renders new if params invalid" do
+      allow(hbx_profile).to receive(:save).and_return(false)
+      post :create, organization_params
+      expect(response).to render_template("exchanges/hbx_profiles/new")
+    end
+  end
+
+  describe "#update" do
+    let(:user) { double("User")}
+    let(:person) { double("Person")}
+    let(:new_hbx_profile){ HbxProfile.new }
+    let(:hbx_profile) { double("HbxProfile", id: double("id")) }
+    let(:hbx_profile_params) { {hbx_profile: new_hbx_profile.attributes, id: hbx_profile.id }}
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(HbxProfile).to receive(:find).and_return(hbx_profile)
+      sign_in(user)
+    end
+
+    it "updates profile" do
+      allow(hbx_profile).to receive(:update).and_return(true)
+      put :update, hbx_profile_params
+      expect(response).to have_http_status(:redirect)
+    end
+
+    it "renders edit if params not valid" do
+      allow(hbx_profile).to receive(:update).and_return(false)
+      put :update, hbx_profile_params
+      expect(response).to render_template("edit")
+    end
+  end
+
+  describe "#destroy" do
+    let(:user){ double("User") }
+    let(:person){ double("Person") }
+    let(:hbx_profile){ double("hbx_profile", id: double("id")) }
+
+    it "destroys hbx_profile" do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(HbxProfile).to receive(:find).and_return(hbx_profile)
+      allow(hbx_profile).to receive(:destroy).and_return(true)
+      sign_in(user)
+      delete :destroy, id: hbx_profile.id
+      expect(response).to have_http_status(:redirect)
+    end
+
+  end
+
+  describe "#check_hbx_staff_role" do
+    let(:user) { double("user")}
+    let(:person) { double("person")}
+
+    it "should render the new template" do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      sign_in(user)
+      get :new
+      expect(response).to have_http_status(:redirect)
+    end
+  end
+
+
   describe "Show" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:person) { double("person")}
@@ -46,8 +197,8 @@ RSpec.describe Exchanges::HbxProfilesController do
   end
 
   describe "GET family index" do
-    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
-    let(:person) { double("person")}
+    let(:user) { double("User")}
+    let(:person) { double("Person")}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
 
