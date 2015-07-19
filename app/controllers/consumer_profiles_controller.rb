@@ -25,6 +25,7 @@ class ConsumerProfilesController < ApplicationController
     @plan = hbx_enrollments.last.try(:plan)
     @qhp = Products::Qhp.find_by(standard_component_id: @plan.hios_id[0..13])
     @qhp_benefits = @qhp.qhp_benefits
+    @benefit_group_assignment = hbx_enrollments.last.try(:benefit_group_assignment)
   end
 
   def personal
