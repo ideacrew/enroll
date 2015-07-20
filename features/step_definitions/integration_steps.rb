@@ -336,10 +336,13 @@ When(/^I click qle event$/) do
   scroll_then_click(@browser.a(id: /btn_household_continue/))
   expect(@browser.element(text: /Covered Family Members/i).visible?).to be_truthy
   scroll_then_click(@browser.element(class: /interaction-click-control-keep-existing-plan/))
+  @browser.element(text: /Confirm Your Plan Selection/i).wait_until_present
   expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
   scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
+  @browser.element(text: /Purchase confirmation/i).wait_until_present
   expect(@browser.element(text: /Purchase confirmation/i).visible?).to be_truthy
   scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
+  @browser.element(text: /Your PLAN/i).wait_until_present
   expect(@browser.element(text: /YOUR PLAN/i).visible?).to be_truthy
 end
 
