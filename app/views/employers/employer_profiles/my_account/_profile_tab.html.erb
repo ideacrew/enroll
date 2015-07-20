@@ -1,7 +1,7 @@
 <div class="container">
 <div class="row no-buffer">
   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-  <h4><%= @employer_profile.legal_name %></h4>
+  <h4><%= @employer_profile.legal_name %> Offices</h4>
   <% @employer_profile.organization.office_locations.each do |loc| %>
   <div class="form-border">
     <%= loc.address.kind.capitalize %>
@@ -10,5 +10,38 @@
   </div>
   <% end %>
   </div>
+
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <h4><%= @employer_profile.legal_name %> Info</h4>
+    <div class="form-border">
+      <dl class="dl-horizontal no-buffer">
+        <dt>Registered legal name</dt>
+        <dd><%= @employer_profile.legal_name %></dd>
+        <dt>Doing Business As</dt>
+        <dd><%= @employer_profile.dba %></dd>
+        <dt>Fein</dt>
+        <dd><%= number_to_obscured_ssn @employer_profile.fein %></dd>
+        <dt>Web URL</dt>
+        <dd><%= @employer_profile.organization.try(:home_page) %></dd>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<div class="row no-buffer">
+  <% if @employer_profile.owner.try(:present?) %>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <h4>Owner</h4>
+      <div class="form-border">
+        <p><%= @employer_profile.owner.full_name %></p>
+        <% @employer_profile.owner.phones.each do |phone| %>
+          <p><%= phone.kind %> phone: <%= phone.to_s %></p>
+        <% end %>
+        <% @employer_profile.owner.emails.each do |email| %>
+          <p><%= email.kind %> email: <%= email.address %></p>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 </div>
 </div>
