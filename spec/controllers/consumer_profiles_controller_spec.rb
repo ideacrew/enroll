@@ -71,6 +71,7 @@ RSpec.describe ConsumerProfilesController, :type => :controller do
     let(:qhp){double("Products::Qhp")}
     let(:qhp_benefits){double("Products::QhpBenefit")}
     let(:plan) { double(hios_id: "11100000001100") }
+    let(:benefit_group_assignment) { double(coverage_waived?: true) }
 
     before do
       allow(user).to receive(:person).and_return(person)
@@ -80,14 +81,20 @@ RSpec.describe ConsumerProfilesController, :type => :controller do
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:last).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:plan).and_return(plan)
+      allow(hbx_enrollment).to receive(:benefit_group_assignment).and_return(benefit_group_assignment)
       allow(Products::Qhp).to receive(:find_by).and_return(qhp)
       allow(qhp).to receive(:qhp_benefits).and_return(qhp_benefits)
+
+      sign_in user
+      get :plans
     end
 
     it "returns the enrolled plan of the user" do
-      sign_in user
-      get :plans
       expect(response).to have_http_status(:success)
+    end
+
+    it "return benefit_group_assignment" do
+      expect(assigns(:benefit_group_assignment)).to eq benefit_group_assignment
     end
   end
 
