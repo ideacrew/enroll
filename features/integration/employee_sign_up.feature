@@ -50,3 +50,4 @@ Feature: Employee Sign Up
     When I click on purchase button on the coverage summary page
     Then I should see the receipt page
     Then I should see the "my account" page
+    When I click qle event 

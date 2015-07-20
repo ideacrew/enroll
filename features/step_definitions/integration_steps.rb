@@ -326,6 +326,23 @@ Then(/^I should see the "my account" page$/) do
   expect(@browser.element(text: /Your Life Events/i).visible?).to be_truthy
 end
 
+When(/^I click qle event$/) do
+  scroll_then_click(@browser.a(text: /Divorce/))
+  @browser.text_field(class: "interaction-field-control-qle-date").set((Date.today + 5).strftime("%m/%d/%Y"))
+  scroll_then_click(@browser.a(class: /interaction-click-control-submit/))
+  expect(@browser.element(text: /You may be eligible for a special enrollment period./i).visible?).to be_truthy
+  scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
+  expect(@browser.element(text: /Family Members/i).visible?).to be_truthy
+  scroll_then_click(@browser.a(id: /btn_household_continue/))
+  expect(@browser.element(text: /Covered Family Members/i).visible?).to be_truthy
+  scroll_then_click(@browser.element(class: /interaction-click-control-keep-existing-plan/))
+  expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
+  scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
+  expect(@browser.element(text: /Purchase confirmation/i).visible?).to be_truthy
+  scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
+  expect(@browser.element(text: /YOUR PLAN/i).visible?).to be_truthy
+end
+
 When(/^My employer publishes a plan year$/) do
   @browser.a(text: /Employer Portal/).wait_until_present
   scroll_then_click(@browser.a(text: /Employer Portal/))
