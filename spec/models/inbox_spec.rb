@@ -19,6 +19,29 @@ RSpec.describe Inbox, :type => :model do
 
   end
 
+  describe "#read_messages" do
+    let(:read_messages) {FactoryGirl.build_list(:message, 3, message_read: true, folder: "inbox")}
+    let(:unread_messages) {FactoryGirl.build_list(:message, 4, message_read: false, folder: "inbox")}
+    let(:messages) {[read_messages + unread_messages]}
+
+    before do
+      inbox.messages << messages
+    end
+
+    context "read_messages" do
+      it "should return correct count of read messages" do
+        expect(inbox.read_messages.count).to eq read_messages.count
+      end
+    end
+
+    context "#unread_messages" do
+      it "should return correct count of unread messages" do
+        expect(inbox.unread_messages.count).to eq unread_messages.count
+      end
+    end
+
+  end
+
   describe "#delete_message" do
     let(:orphan_message) {FactoryGirl.build(:message)}
     let(:message_count) {15}

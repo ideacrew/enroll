@@ -9,6 +9,7 @@ RSpec.describe Employers::PremiumStatementsController do
     let(:hbx_enrollments) { [double("HbxEnrollment")] }
 
     before do
+      allow(user).to receive(:person).and_return(person)
       expect(EmployerProfile).to receive(:find).and_return(employer_profile)
       expect(employer_profile).to receive(:published_plan_year).and_return(current_plan_year)
       expect(current_plan_year).to receive(:hbx_enrollments).and_return(hbx_enrollments)

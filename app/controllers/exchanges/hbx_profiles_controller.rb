@@ -139,7 +139,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def destroy
     @hbx_profile.destroy
     respond_to do |format|
-      format.html { redirect_to hbx_profiles_url, notice: 'HBX Profile was successfully destroyed.' }
+      format.html { redirect_to exchanges_hbx_profiles_path, notice: 'HBX Profile was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
