@@ -50,7 +50,7 @@ describe "employers/premium_statements/show.js.erb" do
     )
   end
 
-  let(:new_plan){ instance_double("Plan", carrier_profile: new_carrier_profile) }
+  let(:new_plan){ instance_double("Plan", carrier_profile: new_carrier_profile, name: "my plan 100") }
   let(:new_carrier_profile){ instance_double("CarrierProfile", legal_name: "my legal name") }
   let(:new_employee_role){ instance_double("EmployeeRole", census_employee: new_census_employee) }
   let(:employee_roles) {[new_employee_role, new_employee_role]}
@@ -79,7 +79,7 @@ describe "employers/premium_statements/show.js.erb" do
       expect(rendered).to match(/#{format_date(census_employee.dob)}/)
       expect(rendered).to match(/#{format_date(census_employee.hired_on)}/)
       expect(rendered).to match(/#{benefit_group.title}/)
-      expect(rendered).to match(/#{hbx_enrollment.plan.carrier_profile.legal_name}/)
+      expect(rendered).to match(/#{hbx_enrollment.plan.name}/)
       expect(rendered).to match(/#{hbx_enrollment.humanized_dependent_summary}/)
       expect(rendered).to match(/#{hbx_enrollment.total_employer_contribution}/)
       expect(rendered).to match(/#{hbx_enrollment.total_employee_cost}/)
