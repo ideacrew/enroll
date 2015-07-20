@@ -438,6 +438,42 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "validation for census_dependents_relationship" do
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+    let(:spouse1) { FactoryGirl.build(:census_dependent, employee_relationship: "spouse") }
+    let(:spouse2) { FactoryGirl.build(:census_dependent, employee_relationship: "spouse") }
+    let(:partner1) { FactoryGirl.build(:census_dependent, employee_relationship: "domestic_partner") }
+    let(:partner2) { FactoryGirl.build(:census_dependent, employee_relationship: "domestic_partner") }
+
+    it "should fail when have tow spouse" do
+      allow(census_employee).to receive(:census_dependents).and_return([spouse1, spouse2])
+      expect(census_employee.valid?).to be_falsey
+      expect(census_employee.errors[:census_dependents].any?).to be_truthy
+    end
+
+    it "should fail when have tow domestic_partner" do
+      allow(census_employee).to receive(:census_dependents).and_return([partner2, partner1])
+      expect(census_employee.valid?).to be_falsey
+      expect(census_employee.errors[:census_dependents].any?).to be_truthy
+    end
+
+    it "should fail when have one spouse and one domestic_partner" do
+      allow(census_employee).to receive(:census_dependents).and_return([spouse1, partner1])
+      expect(census_employee.valid?).to be_falsey
+      expect(census_employee.errors[:census_dependents].any?).to be_truthy
+    end
+
+    it "should success when have no dependents" do
+      allow(census_employee).to receive(:census_dependents).and_return([])
+      expect(census_employee.errors[:census_dependents].any?).to be_falsey
+    end
+
+    it "should success" do
+      allow(census_employee).to receive(:census_dependents).and_return([partner1])
+      expect(census_employee.errors[:census_dependents].any?).to be_falsey
+    end
+  end
+
   # context '.edit' do
   #   let(:employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
   #   let(:user) {FactoryGirl.create(:user)}

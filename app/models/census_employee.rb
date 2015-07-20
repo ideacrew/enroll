@@ -28,6 +28,7 @@ class CensusEmployee < CensusMember
   validate :check_employment_terminated_on
   validate :active_census_employee_is_unique
   validate :allow_id_info_changes_only_in_eligible_state
+  validate :check_census_dependents_relationship
 
   index({"aasm_state" => 1})
   index({"employer_profile_id" => 1}, {sparse: true})
@@ -261,6 +262,15 @@ private
       message = "Employee with this identifying information is already active. "\
                 "Update or terminate the active record before adding another."
       errors.add(:base, message)
+    end
+  end
+
+  def check_census_dependents_relationship
+    return true if census_dependents.blank?
+
+    relationships = census_dependents.map(&:employee_relationship)
+    if relationships.count{|rs| rs=='spouse' || rs=='domestic_partner'} > 1
+      errors.add(:census_dependents, "can't have more than one spouse or domestic partner.")
     end
   end
 

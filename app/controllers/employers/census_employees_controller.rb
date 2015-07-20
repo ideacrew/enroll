@@ -31,7 +31,7 @@ class Employers::CensusEmployeesController < ApplicationController
         @census_employee.errors['Email']='Kind must be selected' if missing_kind
       rescue
       end
-      flash[:error] = "Failed to create Census Employee."
+      @reload = true
       render action: "new"
     end
     #else
@@ -68,7 +68,7 @@ class Employers::CensusEmployeesController < ApplicationController
       end
       redirect_to employers_employer_profile_path(@employer_profile)
     else
-      flash[:error] = "Failed to update Census Employee."
+      @reload = true
       render action: "edit"
     end
     #else

@@ -25,11 +25,18 @@
       <% end %>
       <% page_title = @census_employee.persisted? ? 'Update Employee' : 'Add New Employee' %>
       <div class="row">
-          <h4 class="pull-left"><%= page_title %></h4>
+        <h4 class="pull-left"><%= page_title %></h4>
+        <% if @reload %>
+          <%= link_to employers_employer_profile_path(@employer_profile), class:'remove return_to_employee_roster' do %>
+            <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
+            Cancel
+          <% end %>
+        <% else %>
           <a class="remove return_to_employee_roster" href="#">
             <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
             Cancel
           </a>
+        <% end %>
       </div>
       <div class="row">
           <%= render 'member_fields', f: f %>
