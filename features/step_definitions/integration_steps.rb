@@ -330,10 +330,13 @@ When(/^I click qle event$/) do
   scroll_then_click(@browser.a(text: /Divorce/))
   @browser.text_field(class: "interaction-field-control-qle-date").set((Date.today + 5).strftime("%m/%d/%Y"))
   scroll_then_click(@browser.a(class: /interaction-click-control-submit/))
+  @browser.element(text: /You may be eligible for a special enrollment period./i).wait_until_present
   expect(@browser.element(text: /You may be eligible for a special enrollment period./i).visible?).to be_truthy
   scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
+  @browser.element(text: /Family Members/i).wait_until_present
   expect(@browser.element(text: /Family Members/i).visible?).to be_truthy
   scroll_then_click(@browser.a(id: /btn_household_continue/))
+  @browser.element(text: /Covered Family Members/i).wait_until_present
   expect(@browser.element(text: /Covered Family Members/i).visible?).to be_truthy
   scroll_then_click(@browser.element(class: /interaction-click-control-keep-existing-plan/))
   @browser.element(text: /Confirm Your Plan Selection/i).wait_until_present
