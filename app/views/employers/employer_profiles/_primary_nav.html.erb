@@ -50,17 +50,19 @@
             <span class="hidden-xs">Employees</span>
         <%- end %>
       </li>
-      <li role="presentation">
-          <%= link_to(active_broker_employers_employer_profile_broker_agency_index_path(:employer_profile_id=>@employer_profile.id), :remote => true,
-          "aria-expanded" => "true", "role" => "tab" ) do %> 
-            <span class="visible-xs">
-              <span class="glyphicon glyphicon-duplicate" title="Broker Agency"></span>
-              <small>Broker Agency</small>
-            </span>
+     <% unless current_user.try(:has_broker_agency_staff_role?)%>
+        <li role="presentation">
+            <%= link_to(active_broker_employers_employer_profile_broker_agency_index_path(:employer_profile_id=>@employer_profile.id), :remote => true,
+            "aria-expanded" => "true", "role" => "tab" ) do %>
+              <span class="visible-xs">
+                <span class="glyphicon glyphicon-duplicate" title="Broker Agency"></span>
+                <small>Broker Agency</small>
+              </span>
 
-            <span class="hidden-xs">Broker Agency</span>
-        <%- end %>
-      </li>
+              <span class="hidden-xs">Broker Agency</span>
+          <%- end %>
+        </li>
+      <% end %>
       <li role="presentation">
           <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, :tab=>'documents'), :remote => true,
           "aria-expanded" => "true", "role" => "tab" ) do %> 
