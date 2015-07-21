@@ -73,6 +73,8 @@ class ConsumerProfilesController < ApplicationController
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
       @enrollable = @family.is_eligible_to_enroll?
+
+      @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     else
       redirect_to :back
     end

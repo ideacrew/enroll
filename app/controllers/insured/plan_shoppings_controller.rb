@@ -15,7 +15,7 @@ class Insured::PlanShoppingsController < ApplicationController
       redirect_to home_consumer_profiles_path
     elsif (hbx_enrollment.coverage_selected? or hbx_enrollment.select_coverage) and hbx_enrollment.save
       UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now
-      redirect_to receipt_insured_plan_shopping_path
+      redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan])
     else
       redirect_to :back
     end
@@ -28,6 +28,7 @@ class Insured::PlanShoppingsController < ApplicationController
     benefit_group = @enrollment.benefit_group
     reference_plan = benefit_group.reference_plan
     @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
+    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
   end
 
   def thankyou
@@ -39,6 +40,8 @@ class Insured::PlanShoppingsController < ApplicationController
     @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     @family = @person.primary_family
     @enrollable = @family.is_eligible_to_enroll?
+    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }
     end
