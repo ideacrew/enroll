@@ -12,7 +12,7 @@
       progress_bar_class = (@current_plan_year.total_enrolled_count >= @participation_minimum) ? 'progress-bar-success' : 'progress-bar-danger'
     end
 
-    progress_bar_width = (@current_plan_year.total_enrolled_count * 100)/@current_plan_year.eligible_to_enroll_count
+    progress_bar_width = (@current_plan_year.eligible_to_enroll_count != 0) ? (@current_plan_year.total_enrolled_count * 100)/@current_plan_year.eligible_to_enroll_count : 0
   %>
 
   <div class="progress-wrapper">

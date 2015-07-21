@@ -60,7 +60,11 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       flash[:alert] = "Waive Failure"
     end
-    redirect_to home_consumer_profiles_path
+    redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment)
+  end
+
+  def print_waiver
+    @hbx_enrollment = HbxEnrollment.find(params.require(:id))
   end
 
   def terminate

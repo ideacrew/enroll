@@ -97,6 +97,18 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
   end
 
+  context "GET print_waiver" do
+    let(:enrollment){ double(:HbxEnrollment) }
+
+    it "should return hbx_enrollment to print waiver" do
+      allow(user).to receive(:person).and_return(person)
+      allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
+      sign_in(user)
+      get :print_waiver, id: "id"
+      expect(response).to have_http_status(:success)
+    end
+  end
+
 
   context "POST terminate" do
     before do
