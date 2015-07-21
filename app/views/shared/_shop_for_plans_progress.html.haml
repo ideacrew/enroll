@@ -1,0 +1,25 @@
+- step = (defined? step) ? step.to_i : 1
+- no_purchase = (defined? no_purchase) ? no_purchase : false
+
+- percent_complete = 0
+- percent_complete = (step == 1) ? 33 : ((step == 2) ? 66 : ((step == 3) ? 100 : 0))
+
+%h3= "#{percent_complete}% Complete"
+%ul.list-unstyled.progress-wrapper.hidden-xs
+  %li{class: add_progress_class(1, step)}
+    %span.circle-progress
+    .vertical-line-progress
+    Plan Selection
+  %li{class: add_progress_class(2, step)}
+    %span.circle-progress
+    .vertical-line-progress
+    Review
+  %li{class: add_progress_class(3, step)}
+    %span.circle-progress
+    .vertical-line-progress
+    Complete
+
+- if step == 2 and !no_purchase
+  = link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan), :class => 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue', :method => :post
+- elsif step == 3
+  = link_to 'Continue', home_consumer_profiles_path, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'

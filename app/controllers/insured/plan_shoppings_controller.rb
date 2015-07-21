@@ -15,7 +15,7 @@ class Insured::PlanShoppingsController < ApplicationController
       redirect_to home_consumer_profiles_path
     elsif (hbx_enrollment.coverage_selected? or hbx_enrollment.select_coverage) and hbx_enrollment.save
       UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now
-      redirect_to receipt_insured_plan_shopping_path
+      redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan])
     else
       redirect_to :back
     end
@@ -28,6 +28,7 @@ class Insured::PlanShoppingsController < ApplicationController
     benefit_group = @enrollment.benefit_group
     reference_plan = benefit_group.reference_plan
     @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
+    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
   end
 
   def thankyou
@@ -39,6 +40,8 @@ class Insured::PlanShoppingsController < ApplicationController
     @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     @family = @person.primary_family
     @enrollable = @family.is_eligible_to_enroll?
+    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }
     end
@@ -85,6 +88,17 @@ class Insured::PlanShoppingsController < ApplicationController
     @reference_plan = @benefit_group.reference_plan
     @plans = @benefit_group.elected_plans.entries.collect() do |plan|
       PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
+    end
+
+    # for hsa-eligibility
+    @plan_hsa_status = {}
+    Products::Qhp.in(plan_id: @plans.map(&:id)).map {|qhp| @plan_hsa_status[qhp.plan_id.try(:to_s)] = qhp.hsa_eligibility}
+
+    # for carrier search options
+    if @benefit_group and @benefit_group.plan_option_kind == "metal_level"
+      @carriers = @plans.map{|p| p.try(:carrier_profile).try(:legal_name) }.uniq
+    else
+      @carriers = Array.new(1, @plans.last.try(:carrier_profile).try(:legal_name))
     end
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''

@@ -1,4 +1,4 @@
-<div class="plan-row panel panel-default" data-plan-category="<%= plan.plan_type ? plan.plan_type.downcase : "" %>" data-plan-metal-level="<%= plan.metal_level.downcase %>" data-plan-metal-network="<%= plan.nationwide ? "nationwide" : "dc area network" %>" data-plan-metal-premium="<%= plan.total_employee_cost %>" data-plan-metal-deductible="<%= plan.deductible %>" data-plan-name="<%= plan.name %>" data-plan-carrier="<%= plan.try(:carrier_profile).try(:legal_name) %>">
+<div class="plan-row panel panel-default" data-plan-category="<%= plan.plan_type ? plan.plan_type.downcase : "" %>" data-plan-metal-level="<%= plan.metal_level.downcase %>" data-plan-metal-network="<%= plan.nationwide ? "nationwide" : "dc area network" %>" data-plan-metal-premium="<%= plan.total_employee_cost %>" data-plan-metal-deductible="<%= plan.deductible %>" data-plan-name="<%= plan.name %>" data-plan-carrier="<%= plan.try(:carrier_profile).try(:legal_name) %>" data-plan-hsa-eligibility="<%= @plan_hsa_status[plan.id.to_s] %>">
   <div class="panel-body">
       <div class="row">
           <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
@@ -47,7 +47,7 @@
               </div>
               <div class="text-right">
                 <%= link_to "Details", summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id}), {:class => "btn btn-default", :remote => true} %> &nbsp;
-                <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => plan.id}), {:class => "btn btn-select", :method => :post}) %> &nbsp;
+                <%= link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => plan.id, :change_plan => @change_plan}), {:class => "btn btn-select", :method => :post}) %> &nbsp;
                 <%= link_to("Waive", waive_insured_plan_shopping_path(@hbx_enrollment, {:plan_id => plan.id}), {:class => "btn btn-default", :method => :post}) %>
               </div>
           </div>

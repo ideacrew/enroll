@@ -63,9 +63,9 @@ RSpec.describe GroupSelectionController, :type => :controller do
     end
 
     it "when keep_existing_plan" do
-      post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan'
+      post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change'
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(purchase_consumer_profiles_path)
+      expect(response).to redirect_to(purchase_consumer_profiles_path(change_plan:'change'))
     end
   end
 end

@@ -14,13 +14,15 @@ RSpec.describe "consumer_profiles/_employers_and_plans.html.erb" do
       assign(:employee_role, employee_role)
       assign(:hbx_enrollments, [hbx_enrollment])
       assign(:person, person)
+      assign(:change_plan, 'change')
       sign_in user
       render template: "consumer_profiles/_employers_and_plans.html.erb"
     end
 
     it "should show the link of shop for plan" do
       expect(rendered).to match(/Shop for plans/) 
-      expect(rendered).to have_selector("a[href='/group_selection/new?change_plan=change&employee_role_id=#{employee_role.id}&person_id=#{person.id}']")
+      target = "a[href='/group_selection/new?change_plan=change&employee_role_id=#{employee_role.id}&person_id=#{person.id}']"
+      expect(rendered).to match /#{target}/
     end
 
     it "should show the selected plan" do

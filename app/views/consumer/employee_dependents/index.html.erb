@@ -64,11 +64,13 @@
         </div>
       </div>
 
-      <% if @change_plan.blank? %>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
-        <%= render  partial: 'shared/signup_progress', locals: {step: '4', url: group_selection_url} %>
+        <% if @change_plan.blank? %>
+          <%= render  partial: 'shared/signup_progress', locals: {step: '4', url: group_selection_url} %>
+        <% else %>
+          <%= render partial: 'shared/qle_progress', locals: {step: '1'} %>
+        <% end %>
       </div>
-      <% end %>
 
     </div>
   </div>

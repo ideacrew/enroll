@@ -29,7 +29,7 @@ class GroupSelectionController < ApplicationController
     end
     if hbx_enrollment.save
       if keep_existing_plan
-        redirect_to purchase_consumer_profiles_path
+        redirect_to purchase_consumer_profiles_path(change_plan: change_plan)
       elsif change_plan.present?
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: change_plan)
       else

@@ -99,6 +99,26 @@
         </ul>
     </div>
     <div class="checkbox-filter-wrapper">
+      <h5><strong>Carrier</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="filter by the carrier"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+      <ul class="list-unstyled">
+        <li>
+          <div class="filter-input-block">
+            <%= select_tag :carrier, options_for_select(@carriers), class: "plan-carrier-selection-filter", include_blank: "All" %>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="checkbox-filter-wrapper">
+      <h5><strong>Hsa Eligibility</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="filter by the status of has eligibility"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+      <ul class="list-unstyled">
+        <li>
+          <div class="filter-input-block">
+            <%= select_tag :hsa_eligibility, options_for_select(["Yes", "No"]), class: "plan-hsa-eligibility-selection-filter", include_blank: "All" %>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="checkbox-filter-wrapper">
         <h5><strong>Premium amount</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Will filter by Your Cost"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
         <div class="filter-input-block">
             <input type="text" class="plan-metal-premium-from-selection-filter form-control" placeholder="$10" value='10'>

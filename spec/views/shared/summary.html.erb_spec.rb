@@ -20,6 +20,7 @@ describe "shared/_summary.html.erb" do
   let(:mock_qhp) { instance_double("Products::Qhp", :qhp_benefits => []) }
 
   before :each do
+    Caches::MongoidCache.release(CarrierProfile)
     assign :plan, mock_plan
     assign :hbx_enrollment, mock_hbx_enrollment
     render "shared/summary", :qhp => mock_qhp

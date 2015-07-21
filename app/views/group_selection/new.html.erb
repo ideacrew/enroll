@@ -30,7 +30,7 @@
 
           <br>
           <% if @change_plan.present? %>
-            <%= hidden_field_tag 'change_plan', 'change' %>
+            <%= hidden_field_tag 'change_plan', @change_plan %>
             <h4><strong>What do you like to do?</strong></h4>
             <% if @hbx_enrollment.present? and !@hbx_enrollment.try(:coverage_terminated?) %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-lg btn-primary' %>
@@ -47,12 +47,15 @@
           <% end %>
         </div>
 
-        <% if @change_plan.blank? %>
-          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+          <% if @change_plan.blank? %>
             <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
-          </div>
-        <% end %>
-
+          <% elsif @change_plan == "change" %>
+            <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
+          <% elsif @change_plan == "change_plan" %>
+            <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
+          <% end %>
+        </div>
       </div>
     <% end %>
   </div>

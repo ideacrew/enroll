@@ -1,5 +1,6 @@
 <div class="container bottom-pd">
-  <div id="confirm_plan" class="col-md-8 col-sm-8 col-xs-12">
+  <div class="row">
+  <div id="confirm_plan" class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
     <h3>Confirm Your Plan Selection</h3>
     <p>Your current plan selection is displayed below. Click the back button if you want to change your selection. Click Purchase button to complete your enrollment.</p>
     <p>Your enrollment is not complete until you purchase your plan selection below.</p>
@@ -47,6 +48,15 @@
         </tbody>
       </table>
     </div><br>
-    <%= link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id), class: 'btn btn-primary pull-right', method: :post %>
+    <%= link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, change_plan: @change_plan), class: 'btn btn-primary pull-right', method: :post %>
+  </div>
+
+  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+    <% if @change_plan == "change" %>
+      <%= render partial: 'shared/qle_progress', locals: {step: '3', no_purchase: true} %>
+    <% elsif @change_plan == "change_plan" %>
+      <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '2', no_purchase: true} %>
+    <% end %>
+  </div>
   </div>
 </div>

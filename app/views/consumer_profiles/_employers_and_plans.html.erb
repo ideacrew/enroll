@@ -76,7 +76,7 @@
                     </div>
                   <% end %>
                   <%- if @hbx_enrollments &&  @hbx_enrollments.last %>
-                    <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: 'change') do %>
+                    <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: 'change_plan') do %>
                       <div class="panel panel-default">
                         <div class="panel-body"><br>
                           <div class="row">
