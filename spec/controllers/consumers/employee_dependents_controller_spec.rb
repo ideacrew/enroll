@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe Consumer::EmployeeDependentsController do
-  let(:user) { instance_double("User", :primary_family => family, :person => person) }
   let(:family) { double }
-  let(:person) { double(:employee_roles => []) }
+  let(:user) { instance_double("User", :primary_family => family, :person => person) }
+  let(:person) { double(:employee_roles => [], :primary_family => family) }
   let(:employee_role_id) { "2343" }
 
   describe "GET index" do
