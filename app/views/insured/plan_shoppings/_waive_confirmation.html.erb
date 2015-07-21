@@ -5,7 +5,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">Select Waive Reason</h4>
       </div>
-      <%= form_tag(waive_insured_plan_shopping_path(@enrollment.id), method: :post) do %>
+      <%= form_tag(waive_insured_plan_shopping_path(enrollment.id), method: :post) do %>
         <div class="modal-body">
           <%= select_tag "waiver_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: "Please select waive reason" %>
         </div>
