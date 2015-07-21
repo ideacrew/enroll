@@ -385,7 +385,7 @@ And(/^I should be able to enter plan year, benefits, relationship benefits with 
   start_on_field.click
   start_on_field.li(index: 1).click
   @browser.h4(text: /Recommend Date/).wait_until_present
-  expect(@browser.text.include?("employer initial application earliest submit on")).to be_truthy
+  expect(@browser.text.include?("Employer initial application earliest submit on")).to be_truthy
   @browser.text_field(name: "plan_year[fte_count]").click
   @browser.text_field(name: "plan_year[fte_count]").set("235")
   @browser.text_field(name: "plan_year[pte_count]").set("15")

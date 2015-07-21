@@ -1,19 +1,25 @@
 <h4>Recommend Date</h4>
-<table>
-  <tr>
-    <td>employer initial application earliest start on: </td>
-    <td><%= @schedule[:employer_initial_application_earliest_start_on].to_s %></td>
-  </tr>
-  <tr>
-    <td>employer initial application earliest submit on: </td>
-    <td><%= @schedule[:employer_initial_application_earliest_submit_on].to_s %></td>
-  </tr>
-  <tr>
-    <td>employer initial application latest submit on: </td>
-    <td><%= @schedule[:employer_initial_application_latest_submit_on].to_s %></td>
-  </tr>
-  <tr>
-    <td>binder payment due date: </td>
-    <td><%= @open_enrollment_dates[:binder_payment_due_date].to_s %></td>
-  </tr>
-</table>
+<div class="table-responsive">
+  <table class="table table-border">
+    <tr>
+      <td>Employer initial application earliest start on</td>
+      <td>:</td>
+      <td><%= @schedule[:employer_initial_application_earliest_start_on].to_s %></td>
+    </tr>
+    <tr>
+      <td>Employer initial application earliest submit on</td>
+      <td>:</td>
+      <td><%= @schedule[:employer_initial_application_earliest_submit_on].to_s %></td>
+    </tr>
+    <tr>
+      <td>Employer initial application latest submit on</td>
+      <td>:</td>
+      <td><%= @schedule[:employer_initial_application_latest_submit_on].to_s %></td>
+    </tr>
+    <tr>
+      <td>Binder payment due date</td>
+      <td>:</td>
+      <td><%= @open_enrollment_dates[:binder_payment_due_date].to_s %></td>
+    </tr>
+  </table>
+</div>
