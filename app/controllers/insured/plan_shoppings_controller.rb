@@ -83,6 +83,17 @@ class Insured::PlanShoppingsController < ApplicationController
       PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
     end
 
+    # for hsa-eligibility
+    @plan_hsa_status = {}
+    Products::Qhp.in(plan_id: @plans.map(&:id)).map {|qhp| @plan_hsa_status[qhp.plan_id.try(:to_s)] = qhp.hsa_eligibility}
+
+    # for carrier search options
+    if @benefit_group and @benefit_group.plan_option_kind == "metal_level"
+      @carriers = @plans.map{|p| p.try(:carrier_profile).try(:legal_name) }.uniq
+    else
+      @carriers = Array.new(1, @plans.last.try(:carrier_profile).try(:legal_name))
+    end
+
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
   end
 
