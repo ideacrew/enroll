@@ -20,7 +20,6 @@ RSpec.describe "insured/plan_shoppings/print_waiver.html.erb" do
     expect(rendered).to have_selector('p', text: /You have successfully waived the coverage at #{hbx_enrollment.updated_at}./)
     expect(rendered).to have_selector('p', text: /Waiver Reason : #{hbx_enrollment.waiver_reason}./)
     expect(rendered).to have_selector('p', text: /Please print this page for your records./)
-    expect(rendered).to have_selector('p', text: /A copy of this confirmation has also been emailed to you./)
   end
 
 end
