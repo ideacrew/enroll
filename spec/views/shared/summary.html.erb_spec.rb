@@ -29,4 +29,8 @@ describe "shared/_summary.html.erb" do
   it "should have a link to download the sbc pdf" do
     expect(rendered).to have_selector("a[href='#{root_path + "sbc/THE SBC FILE.PDF"}']")
   end
+
+  it "should have a label 'Summary of Benefits and Coverage (SBC)'" do
+    expect(rendered).to include('Summary of Benefits and Coverage (SBC)')
+  end
 end

@@ -50,6 +50,17 @@
     </div>
   </div>
 
+    <table class="table table-bordered">
+      <tr>
+        <td>Summary of Benefits and Coverage (SBC) PDF</td>
+        <td>
+          <%= link_to(root_path + "sbc/" + @plan.sbc_file, class: "download") do %>
+              <i class="glyphicon glyphicon-download-alt"></i> Download
+          <% end %>
+        </td>
+      </tr>
+    </table>
+
   <div class="details">
     <table class="table table-bordered">
       <thead>
@@ -67,6 +78,7 @@
       </thead>
 
       <tbody>
+
         <% qhp.qhp_benefits.each do |benefit| %>
           <% deductible = benefit.find_deductible %>
           <% if deductible.present? %>
@@ -78,14 +90,6 @@
             </tr>
           <% end %>
         <% end %>
-        <tr>
-          <td>Plan Details (PDF)</td>
-          <td colspan="3" class="text-center">
-            <%= link_to(root_path + "sbc/" + @plan.sbc_file, class: "download") do %>
-              <i class="glyphicon glyphicon-download-alt"></i> Download
-            <% end %>
-          </td>
-        </tr>
         <tr>
           <td></td>
           <td colspan="3" class="text-center"><%= link_to 'Select Plan', '#', class: 'btn btn-primary' %></td>
