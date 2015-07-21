@@ -330,4 +330,9 @@ module ApplicationHelper
       image_tag(image_name, width: options[:width])
     end
   end
+
+  def dob_in_words(age, dob)
+    return age if age > 0
+    time_ago_in_words(dob)
+  end
 end
