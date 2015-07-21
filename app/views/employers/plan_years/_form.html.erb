@@ -35,7 +35,16 @@
             <% end %>
             <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-transparent pull-left xs_full_width' %>
             <div class="row no-buffer">
-              <button type="submit" class="btn btn-primary pull-right xs_full_width">Create Plan Year</button>
+							<button type="submit" class="btn btn-primary pull-right xs_full_width">
+								<% if @plan_year.new_record %>
+									Create Plan Year
+								<% else %>
+								  Save Plan Year
+								<% end %>
+							</button>
+							<%= link_to employers_employer_profile_path(@employer_profile), class:'btn btn-transparent pull-right' do %>
+							  Cancel
+							<% end %>
             </div>
           </div>
       </div>
