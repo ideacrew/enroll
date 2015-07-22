@@ -2,6 +2,7 @@ class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
 
   def checkout
+
     plan = Plan.find(params.require(:plan_id))
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
     hbx_enrollment.plan = plan
@@ -22,7 +23,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def receipt
-    person = current_user.person
+    person = set_current_person
     @enrollment = HbxEnrollment.find(params.require(:id))
     plan = @enrollment.plan
     benefit_group = @enrollment.benefit_group
@@ -32,7 +33,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def thankyou
-    @person = current_user.person
+    set_current_person
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
     @benefit_group = @enrollment.benefit_group
@@ -48,7 +49,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def waive
-    person = current_user.person
+    person = set_current_person
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
     waiver_reason = params.require(:waiver_reason)
 
@@ -82,7 +83,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     Caches::MongoidCache.allocate(CarrierProfile)
 
-    @person = current_user.person
+    set_current_person
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     @benefit_group = @hbx_enrollment.benefit_group
     @reference_plan = @benefit_group.reference_plan
@@ -102,14 +103,6 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-  end
-
-  def find_person(id)
-    begin
-      Person.find(id)
-    rescue
-      nil
-    end
   end
 
   def find_organization(id)

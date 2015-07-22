@@ -83,11 +83,7 @@ class ConsumerProfilesController < ApplicationController
 
   private
   def get_family
-    if current_user.person.try(:broker_role).try(:broker_agency_profile_id)
-      @person = Person.find(session[:person_id])
-    else
-      @person = current_user.person
-    end
+    set_current_person
     @family = @person.primary_family
   end
 end
