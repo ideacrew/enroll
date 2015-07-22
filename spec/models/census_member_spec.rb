@@ -30,4 +30,14 @@ RSpec.describe CensusMember, :type => :model do
       expect(census_employee.date_of_birth).to eq "12/01/1980"
     end
   end
+
+  context "validate of date_of_birth_is_past" do
+    it "should invalid" do
+      dob = (Date.today + 10.days)
+      census_employee.date_of_birth = dob.strftime("%Y-%m-%d")
+      expect(census_employee.save).to be_falsey
+      expect(census_employee.errors[:dob].any?).to be_truthy
+      expect(census_employee.errors[:dob].to_s).to match /future date: #{dob.to_s} is invalid date of birth/
+    end
+  end
 end
