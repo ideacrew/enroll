@@ -1,6 +1,7 @@
 <% remote = remote.blank? ? false : remote %>
 <% status ||= nil %>
 <ul class='pagination'>
+  <li class="<%= 'active' if params[:page].nil? %>"><%= link_to '&nbsp;ALL&nbsp;'.html_safe, employers_employer_profile_path(@employer_profile, status: status), remote: true %></li>
   <% alphs.each do |alph| %>
     <% alph_url = url + "?page=#{alph}" %>
     <% alph_url += "&status=#{status}" if status %>
