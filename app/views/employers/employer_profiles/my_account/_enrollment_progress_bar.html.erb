@@ -3,40 +3,5 @@
   <strong class="pull-right"><%= @current_plan_year.aasm_state.humanize %></strong>
   <div class="clearfix"></div>
 
-  <%
-    if @current_plan_year.eligible_to_enroll_count == 1
-      progress_bar_class = (@current_plan_year.total_enrolled_count > 0) ? 'progress-bar-success' : ''
-    elsif @current_plan_year.eligible_to_enroll_count == 2
-      progress_bar_class = (@current_plan_year.total_enrolled_count > 1) ? 'progress-bar-success' : 'progress-bar-danger'
-    elsif @current_plan_year.eligible_to_enroll_count > 2
-      progress_bar_class = (@current_plan_year.total_enrolled_count >= @participation_minimum) ? 'progress-bar-success' : 'progress-bar-danger'
-    end
-
-    progress_bar_width = (@current_plan_year.eligible_to_enroll_count != 0) ? (@current_plan_year.total_enrolled_count * 100)/@current_plan_year.eligible_to_enroll_count : 0
-  %>
-
-  <div class="progress-wrapper">
-    <div class="progress">
-      <div class="progress-bar <%= progress_bar_class %>" style="width: <%= progress_bar_width %>%;" role="progressbar" aria-valuenow="<%= @current_plan_year.total_enrolled_count %>" aria-valuemin="0" aria-valuemax="<%= @current_plan_year.eligible_to_enroll_count %>" data-value="<%= @current_plan_year.total_enrolled_count %>">
-        <span class="sr-only"></span>
-      </div>
-
-      <% if @current_plan_year.eligible_to_enroll_count > 1 %>
-        <small class="progress-current" style="left: <%= (progress_bar_width - 2) %>%;">
-          <%= @current_plan_year.total_enrolled_count %>
-        </small>
-      <% end %>
-
-      <% if @current_plan_year.eligible_to_enroll_count > 2 %>
-        <p class="divider-progress" data-value="<%= @participation_minimum %>">
-          <%= @participation_minimum %><br/> (Minimum)
-        </p>
-      <% end %>
-
-      <div class="progress-val">
-        <strong class="pull-left">0</strong>
-        <strong class="pull-right" data-value="<%= @current_plan_year.eligible_to_enroll_count %>"><%= @current_plan_year.eligible_to_enroll_count %></strong>
-      </div>
-    </div>
-  </div>
+  <%= enrollment_progress_bar(@current_plan_year, @participation_minimum, minimum: false) %>
 </h5>
