@@ -21,5 +21,10 @@
 
 - if step == 2 and !no_purchase
   = link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan), :class => 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue', :method => :post
+  %ul.list-unstyled.list-right-section
+    %li
+      %a.back{href: '#'}
+        = image_tag 'icons/list.png'
+        PREVIOUS
 - elsif step == 3
   = link_to 'Continue', home_consumer_profiles_path, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'

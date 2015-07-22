@@ -75,6 +75,7 @@ class ConsumerProfilesController < ApplicationController
       @enrollable = @family.is_eligible_to_enroll?
 
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+      @terminate = params[:terminate].present? ? params[:terminate] : ''
     else
       redirect_to :back
     end
