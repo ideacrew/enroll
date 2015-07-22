@@ -33,4 +33,12 @@ describe "shared/_summary.html.erb" do
   it "should have a label 'Summary of Benefits and Coverage (SBC)'" do
     expect(rendered).to include('Summary of Benefits and Coverage (SBC)')
   end
+
+  it "should not have 'having a baby'" do
+    expect(rendered).not_to have_selector("h4", text: "Having a Baby")
+  end
+
+  it "should not have 'managing type diabetes'" do
+    expect(rendered).not_to have_selector("h4", text: "Managing Type 2 Diabetes")
+  end
 end

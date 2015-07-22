@@ -48,7 +48,11 @@
         </tbody>
       </table>
     </div><br>
-    <%= link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, change_plan: @change_plan), class: 'btn btn-primary pull-right', method: :post %>
+    <% if @terminate.present? %>
+      <%= link_to("Terminate Plan", terminate_insured_plan_shopping_path(@enrollment.id), {:class => "btn btn-primary pull-right", :method => :post}) %>
+    <% else %>
+      <%= link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, change_plan: @change_plan), class: 'btn btn-primary pull-right', method: :post %>
+    <% end %>
   </div>
 
   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">

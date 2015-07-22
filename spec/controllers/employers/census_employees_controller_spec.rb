@@ -41,23 +41,46 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "POST create" do
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:benefit_group) { double(id: "5453a544791e4bcd33000121") }
 
     before do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(BenefitGroup).to receive(:find).and_return(benefit_group)
+      allow(BenefitGroupAssignment).to receive(:new_from_group_and_census_employee).and_return([BenefitGroupAssignment.new])
 
       allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
+      allow(CensusEmployee).to receive(:new).and_return(census_employee)
     end
-
-
 
     it "should be redirect when valid" do
       allow(census_employee).to receive(:save).and_return(true)
       post :create, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(response).to be_redirect
+    end
+
+    context "get flash notice" do
+      it "with benefit_group_id" do
+        allow(census_employee).to receive(:save).and_return(true)
+        allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
+        post :create, :employer_profile_id => employer_profile_id, census_employee: {}
+        expect(flash[:notice]).to eq "Census Employee is successfully created."
+      end
+
+      it "with no benefit_group_id" do
+        allow(census_employee).to receive(:save).and_return(true)
+        allow(controller).to receive(:benefit_group_id).and_return(nil)
+        post :create, :employer_profile_id => employer_profile_id, census_employee: {}
+        expect(flash[:notice]).to eq "Note: new employee cannot enroll on DC Healthlink until they are assigned a benefit group. Census Employee is successfully created."
+      end
+    end
+
+    it "should be render when invalid" do
+      allow(census_employee).to receive(:save).and_return(false)
+      post :create, :employer_profile_id => employer_profile_id, census_employee: {}
+      expect(assigns(:reload)).to eq true
+      expect(response).to render_template("new")
     end
   end
 
@@ -73,14 +96,17 @@ RSpec.describe Employers::CensusEmployeesController do
   end
 
   describe "PUT update" do
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:benefit_group) { double(id: "5453a544791e4bcd33000121") }
     let(:plan_year) { FactoryGirl.create(:plan_year) }
     let(:user) { FactoryGirl.create(:user, :employer_staff) }
+
     before do
       sign_in user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
+      allow(BenefitGroup).to receive(:find).and_return(benefit_group)
+      allow(BenefitGroupAssignment).to receive(:new_from_group_and_census_employee).and_return(BenefitGroupAssignment.new)
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
     end
 
@@ -88,6 +114,29 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(census_employee).to receive(:save).and_return(true)
       post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(response).to be_redirect
+    end
+
+    context "get flash notice" do
+      it "with benefit_group_id" do
+        allow(census_employee).to receive(:save).and_return(true)
+        allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
+        post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
+        expect(flash[:notice]).to eq "Census Employee is successfully updated."
+      end
+
+      it "with no benefit_group_id" do
+        allow(census_employee).to receive(:save).and_return(true)
+        allow(controller).to receive(:benefit_group_id).and_return(nil)
+        post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
+        expect(flash[:notice]).to eq "Note: new employee cannot enroll on DC Healthlink until they are assigned a benefit group. Census Employee is successfully updated."
+      end
+    end
+
+    it "should be render when invalid" do
+      allow(census_employee).to receive(:save).and_return(false)
+      post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
+      expect(assigns(:reload)).to eq true
+      expect(response).to render_template("edit")
     end
   end
 

@@ -75,6 +75,7 @@ class ConsumerProfilesController < ApplicationController
       @enrollable = @family.is_eligible_to_enroll?
 
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+      @terminate = params[:terminate].present? ? params[:terminate] : ''
     else
       redirect_to :back
     end
@@ -82,11 +83,7 @@ class ConsumerProfilesController < ApplicationController
 
   private
   def get_family
-    if current_user.person.try(:broker_role).try(:broker_agency_profile_id)
-      @person = Person.find(session[:person_id])
-    else
-      @person = current_user.person
-    end
+    set_current_person
     @family = @person.primary_family
   end
 end

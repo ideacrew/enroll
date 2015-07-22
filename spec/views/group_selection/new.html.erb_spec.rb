@@ -141,7 +141,7 @@ RSpec.describe "group_selection/new.html.erb" do
     it "when hbx_enrollment not terminated" do
       render file: "group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 1)
-      expect(rendered).to have_selector("a", text: 'Terminate Plan')
+      expect(rendered).to have_selector("input[value='Terminate Plan']", count: 1)
     end
 
     it "when hbx_enrollment is terminated" do

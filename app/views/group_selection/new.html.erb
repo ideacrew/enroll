@@ -35,7 +35,7 @@
             <% if @hbx_enrollment.present? and !@hbx_enrollment.try(:coverage_terminated?) %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-lg btn-primary' %>
               &nbsp;
-              <%= link_to("Terminate Plan", terminate_insured_plan_shopping_path(@hbx_enrollment.id), {:class => "btn btn-lg btn-primary", :method => :post}) %>
+              <%= submit_tag 'Terminate Plan', class: 'btn btn-lg btn-primary' %>
             <% end %>
             <% if @employee_role.benefit_group.plan_option_kind != "single_plan" %>
               &nbsp;

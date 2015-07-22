@@ -520,3 +520,27 @@ describe Person, "persisted with a user" do
     expect(person1.valid?).to eq(true)
   end
 end
+
+describe Person, "validation of date_of_birth and date_of_death" do
+  let(:person) { FactoryGirl.create(:person) }
+
+  context "validate of date_of_birth_is_past" do
+    it "should invalid" do
+      dob = (Date.today + 10.days)
+      allow(person).to receive(:dob).and_return(dob)
+      expect(person.save).to be_falsey
+      expect(person.errors[:dob].any?).to be_truthy
+      expect(person.errors[:dob].to_s).to match /future date: #{dob.to_s} is invalid date of birth/
+    end
+  end
+
+  context "date_of_death_is_blank_or_past" do
+    it "should invalid" do
+      date_of_death = (Date.today + 10.days)
+      allow(person).to receive(:date_of_death).and_return(date_of_death)
+      expect(person.save).to be_falsey
+      expect(person.errors[:date_of_death].any?).to be_truthy
+      expect(person.errors[:date_of_death].to_s).to match /future date: #{date_of_death.to_s} is invalid date of death/
+    end
+  end
+end
