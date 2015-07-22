@@ -229,6 +229,7 @@ Then(/^I should see a form to enter information about employee, address and depe
 end
 
 And(/^I should see employer census family created success message$/) do
+  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
   Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully created.") }
   screenshot("employer_census_new_family_success_message")
   @browser.refresh
@@ -282,6 +283,7 @@ Then(/^I should see a form to update the contents of the census employee$/) do
 end
 
 And(/^I should see employer census family updated success message$/) do
+  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
   Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully updated.") }
 end
 
@@ -415,6 +417,7 @@ And(/^I should be able to enter plan year, benefits, relationship benefits with 
 end
 
 And(/^I should see a success message after clicking on create plan year button$/) do
+  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
   Watir::Wait.until(30) {  @browser.text.include?("Plan Year successfully created.") }
   screenshot("employer_plan_year_success_message")
   # TimeKeeper.set_date_of_record_unprotected!("2014-11-01")
@@ -499,8 +502,9 @@ Then(/^I should be on the Plan Year Edit page with warnings$/) do
 end
 
 Then(/^I update the FTE field with valid input and save plan year$/) do
+  @browser.button(class: /interaction-click-control-save-plan-year/).wait_until_present
   @browser.text_field(name: "plan_year[fte_count]").set("10")
-  scroll_then_click(@browser.element(class: 'interaction-click-control-create-plan-year'))
+  scroll_then_click(@browser.button(class: /interaction-click-control-save-plan-year/))
 end
 
 Then(/^I should see a plan year successfully saved message$/) do
