@@ -2,130 +2,108 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                    <div class="row">
-                      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                        <div class="panel panel-default min-h">
-                          <div class="panel-body">
-                            <% plan = @hbx_enrollments.last.try(:plan) %>
-                            <% hbx_enrollment = @hbx_enrollments.last %>
-                            <% benefit_group_assignment = hbx_enrollment.try(:benefit_group_assignment) %>
+        <div class="row">
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <div class="panel panel-default min-h">
+              <div class="panel-body">
+                <% plan = @hbx_enrollments.last.try(:plan) %>
+                <% hbx_enrollment = @hbx_enrollments.last %>
+                <% benefit_group_assignment = hbx_enrollment.try(:benefit_group_assignment) %>
 
-                            <% if benefit_group_assignment.present? and benefit_group_assignment.coverage_waived? %>
-                              <%= render partial: "shared/waive", locals: {benefit_group_assignment: benefit_group_assignment} %>
-                            <% elsif hbx_enrollment.try(:coverage_terminated?) %>
-                              <div class="page-header">
-                                <h4>Coverage Terminated</h4>
-                              </div>
-                              <p>Terminated on: <%= hbx_enrollment.try(:terminated_on) %></p>
-                              <hr />
-                              <%= render partial: "plan", locals: {hbx_enrollment: hbx_enrollment, plan: plan} %>
-                            <% else %>
-                              <div class="page-header">
-                                <h4>Your plan</h4>
-                              </div>
-                              <%= render partial: "plan", locals: {hbx_enrollment: hbx_enrollment, plan: plan} %>
-                            <% end %>
-                      </div>
-                    </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                            <div class="panel panel-default min-h">
-                              <div class="panel-body">
-                                <h3 style="margin-top: 0"><%= @person.full_name %></h3>
-                                <p>(DC Health link ID : <%= current_user.id %>)</p>
-                                <br>
-                                  <div class="page-header">
-                                      <h4>Employer</h4>
-                                  </div>
-
-                                  <h3><%= @employer_profile.try(:dba) %></h3>
-                                  <ul class="list-unstyled list-comp">
-                                      <li>
-                                          HIRED: <EM><%=@employee_role.try(:hired_on) ?  @employee_role.hired_on.strftime("%m/%d/%Y"):  " " %></EM>
-                                      </li>
-                                      <li>
-                                          ELIGIBLE FOR COVERAGE: <EM><%= @employee_role.try(:effective_on) ? @employee_role.try(:effective_on).strftime("%m/%d/%Y") :" " %></EM>
-                                      </li>
-                                  </ul>
-                              </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                      <div class="panel-body">
-                        <%= render 'qles' %>
-                      </div>
-                    </div>
+                <% if benefit_group_assignment.present? and benefit_group_assignment.coverage_waived? %>
+                <%= render partial: "shared/waive", locals: {benefit_group_assignment: benefit_group_assignment} %>
+                <% elsif hbx_enrollment.try(:coverage_terminated?) %>
+                <div class="page-header">
+                  <h4>Coverage Terminated</h4>
+                </div>
+                <p>Terminated on: <%= hbx_enrollment.try(:terminated_on) %></p>
+                <hr />
+                <%= render partial: "plan", locals: {hbx_enrollment: hbx_enrollment, plan: plan} %>
+                <% else %>
+                <div class="page-header">
+                  <h4>Your plan</h4>
+                </div>
+                <%= render partial: "plan", locals: {hbx_enrollment: hbx_enrollment, plan: plan} %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <div class="panel panel-default min-h">
+              <div class="panel-body">
+                <h3 style="margin-top: 0"><%= @person.full_name %></h3>
+                <p>(DC Health link ID : <%= current_user.id %>)</p>
+                <br>
+                <div class="page-header">
+                  <h4>Employer</h4>
                 </div>
 
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                <h3><%= @employer_profile.try(:dba) %></h3>
+                <ul class="list-unstyled list-comp">
+                  <li>
+                    HIRED: <EM><%=@employee_role.try(:hired_on) ?  @employee_role.hired_on.strftime("%m/%d/%Y"):  " " %></EM>
+                  </li>
+                  <li>
+                    ELIGIBLE FOR COVERAGE: <EM><%= @employee_role.try(:effective_on) ? @employee_role.try(:effective_on).strftime("%m/%d/%Y") :" " %></EM>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <%= render 'qles' %>
+          </div>
+        </div>
+      </div>
 
-                  <%= link_to(family_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "family", "role" => "tab" ) do  %>
-                    <div class="panel panel-default">
-                      <div class="panel-body">
-                        <div class="row">
-                              <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                                <%= image_tag 'icons/family_members.png' %>
-                              </div>
-                              <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
-                                  <h3>Manage family members</h3>
-                                  <small>Use this link to add and delete family members or edit your family information.</small>
-                              </div>
-                          </div>
-                      </div>
-                    </div>
-                  <% end %>
-                  <%- if @hbx_enrollments &&  @hbx_enrollments.last %>
-                    <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: 'change_plan') do %>
-                      <div class="panel panel-default">
-                        <div class="panel-body"><br>
-                          <div class="row">
-                                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                                  <%= image_tag 'icons/shop_for_plan.png' %>
-                                </div>
-                                <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
-                                  <h3>Shop for plans</h3>
-                                  <small>Browse plans from carriers in the DC Health Care Exchange.</small>
-                                </div>
-                            </div><br>
-                        </div>
-                      </div>
-                    <% end %>
-                  <% else %>
-                    <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id) do %>
-                      <div class="panel panel-default">
-                        <div class="panel-body"><br>
-                          <div class="row">
-                                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                                  <%= image_tag 'icons/shop_for_plan.png' %>
-                                </div>
-                                <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
-                                   <h3> Shop for Plans </h3> 
-                                  <small>Browse plans from carriers in the DC Health Care Exchange.</small>
-                                </div>
-                            </div><br>
-                          </div>
-                        </div>
-                     <% end %>
-                  <% end %>
-                  <a href="#">
-                    <div class="panel panel-default">
-                      <div class="panel-body">
-                          <div class="row">
-                              <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
-                                <%= image_tag 'icons/find-doctor.png' %>
-                              </div>
-                              <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 info-wrapper">
-                                  <h3>FIND DOCTORS</h3>
-                                  <small>
-                                      Search for doctors by name, location, specialty, health plan participation and more.
-                                  </small>
-                              </div>
-                          </div>
-                      </div>
-                    </div>
-                  </a>
+      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+
+        <%= link_to(family_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "family", "role" => "tab" ) do  %>
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                  <%= image_tag 'icons/family_members.png' %>
                 </div>
+                <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
+                  <h3>Manage family members</h3>
+                  <small>Use this link to add and delete family members or edit your family information.</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        <%- if hbx_enrollment.try(:coverage_terminated?) %>
+          <%= render partial: "shop_for_plans_widget" %>
+        <%- elsif @hbx_enrollments &&  @hbx_enrollments.last %>
+          <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: 'change_plan') do %>
+            <%= render partial: "shop_for_plans_widget" %>
+          <% end %>
+        <% else %>
+          <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id) do %>
+            <%= render partial: "shop_for_plans_widget" %>
+          <% end %>
+        <% end %>
+        <a href="#">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
+                  <%= image_tag 'icons/find-doctor.png' %>
+                </div>
+                <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 info-wrapper">
+                  <h3>FIND DOCTORS</h3>
+                  <small>
+                    Search for doctors by name, location, specialty, health plan participation and more.
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
     </div>
   </div>
 </div>
