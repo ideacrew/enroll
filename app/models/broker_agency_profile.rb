@@ -19,7 +19,7 @@ class BrokerAgencyProfile
   field :corporate_npn, type: String
   field :primary_broker_role_id, type: BSON::ObjectId
 
-  field :languages_spoken, type: String # TODO
+  field :languages_spoken, type: Array, default: [] # TODO
   field :working_hours, type: Boolean
   field :accept_new_clients, type: Boolean
 
