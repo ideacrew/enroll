@@ -87,14 +87,14 @@ describe "User" do
             allow(employee).to receive(:eligible?).and_return(false)
           end
 
-          it "can not update when change dob" do
+          it "can update when change dob" do
             employee.dob = TimeKeeper.date_of_record
-            should_not be_able_to(:update, employee)
+            should be_able_to(:update, employee)
           end
 
-          it "can not update when change ssn" do
+          it "can update when change ssn" do
             employee.ssn = "123321456"
-            should_not be_able_to(:update, employee)
+            should be_able_to(:update, employee)
           end
         end
       end
