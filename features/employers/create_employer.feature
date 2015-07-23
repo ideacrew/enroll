@@ -77,6 +77,8 @@ Feature: Create Employer
       When I enter filter in plan selection page
       When I enter combined filter in plan selection page
       Then I should see the combined filter results
+      When I enter hsa_compatible filter in plan selection page
+      Then I should see the hsa_compatible filter results
       When I select a plan on the plan shopping page
       Then I should see the coverage summary page
       When I click on purchase button on the coverage summary page
