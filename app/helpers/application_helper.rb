@@ -324,10 +324,8 @@ module ApplicationHelper
   end
 
   def display_carrier_logo(carrier, options = {:width => 50})
-    carrier_name = carrier.try(:legal_name)
-    unless carrier_name.nil?
-      image_name = "logo/carrier/#{carrier_name.parameterize.underscore}.jpg" # Displays carrier logo (Delta Dental => delta_dental.jpg)
-      image_tag(image_name, width: options[:width])
+    if carrier_name = carrier.try(:legal_name)
+      image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
     end
   end
 
