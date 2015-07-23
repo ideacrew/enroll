@@ -6,7 +6,7 @@ class Employers::EmployerProfilesController < ApplicationController
   def index
     @q = params.permit(:q)[:q]
     @orgs = Organization.search(@q).exists(employer_profile: true)
- 
+
     if current_user.person.try(:broker_role)
       broker_id = current_user.person.broker_role.broker_agency_profile_id.to_s
       profile = BrokerAgencyProfile.find(broker_id)
@@ -141,10 +141,10 @@ class Employers::EmployerProfilesController < ApplicationController
       @page_alphabets = page_alphabets(census_employees, "last_name")
       if params[:page].present?
         page_no = cur_page_no(@page_alphabets.first)
-        @census_employees = census_employees.where("last_name" => /^#{page_no}/i)
+        @census_employees = census_employees.where("last_name" => /^#{page_no}/i).search_by(params.slice(:employee_name))
       else
         @total_census_employees_quantity = census_employees.count
-        @census_employees = census_employees.to_a.first(20)
+        @census_employees = census_employees.search_by(params.slice(:employee_name)).to_a.first(20)
       end
     end
 

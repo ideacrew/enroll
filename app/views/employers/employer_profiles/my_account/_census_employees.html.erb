@@ -7,7 +7,7 @@
 
         <div id="employee_roster">
           <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <h3 class="title-inline">Employee Roster</h3>
             </div>
 
@@ -33,7 +33,14 @@
               </div>
             </div>
 
-            <div class="col-md-4 text-right">
+            <div class="col-md-3">
+              <%= form_tag employers_employer_profile_path(@employer_profile), method: :get, remote: true, class: 'input-no-pd' do %>
+                <%= hidden_field_tag(:status, 'active') %>
+                <%= text_field_tag(:employee_name, params[:employee_name], placeholder: 'Search employee by name', class: 'form-control') %>
+              <% end %>
+            </div>
+
+            <div class="col-md-2 text-right">
               <% if @employer_profile.plan_years.empty? %>
                 <!--  non javascript click when clicked on new employee -->
                 <%= link_to 'Add Employee', new_employers_employer_profile_census_employee_path(@employer_profile), class: "btn btn-primary btn-br" %>
