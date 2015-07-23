@@ -355,12 +355,12 @@ private
 
   def date_of_death_is_blank_or_past
     return unless self.date_of_death.present?
-    errors.add(:date_of_death, "future date: %{self.date_of_death} is invalid date of death") if Date.today < self.date_of_death
+    errors.add(:date_of_death, "future date: #{self.date_of_death} is invalid date of death") if Date.today < self.date_of_death
   end
 
   def date_of_birth_is_past
     return unless self.dob.present?
-    errors.add(:dob, "future date: %{self.dob} is invalid date of birth") if Date.today < self.dob
+    errors.add(:dob, "future date: #{self.dob} is invalid date of birth") if Date.today < self.dob
   end
 
   def date_of_death_follows_date_of_birth

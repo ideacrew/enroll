@@ -107,5 +107,13 @@ class ApplicationController < ActionController::Base
 
   def set_current_user
     User.current_user = current_user
-  end    
+  end
+
+  def set_current_person
+    if current_user.person.try(:broker_role).try(:broker_agency_profile_id)
+      @person = Person.find(session[:person_id])
+    else
+      @person = current_user.person
+    end
+  end
 end

@@ -5,6 +5,7 @@ RSpec.describe "employers/plan_years/new.html.erb" do
   let(:plan_year){FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
 
   before(:each) do
+    assign(:employer_profile, employer_profile)
     plan_year.benefit_groups.build
     assign(:plan_year, plan_year)
     assign(:carriers, Array.new)

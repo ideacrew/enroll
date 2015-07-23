@@ -25,7 +25,8 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     instance_double(
       "Person",
       full_name: "John Doe:#{random_value}",
-      age_on: double("age_on")
+      age_on: 21,
+      dob: double("dob")
     )
   end
 
@@ -67,7 +68,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     enrollment.hbx_enrollment_members.each do |enr_member|
       expect(rendered).to match(/#{enr_member.person.full_name}/m)
       expect(rendered).to match(/#{enr_member.primary_relationship}/m)
-      expect(rendered).to match(/#{enr_member.person.age_on(Time.now.utc.to_date)}/m)
+      expect(rendered).to match(/#{dob_in_words(enr_member.person.age_on(Time.now.utc.to_date),enr_member.person.dob)}/m)
       expect(rendered).to match(/#{@plan.premium_for(enr_member)}/m)
       expect(rendered).to match(/#{@plan.employer_contribution_for(enr_member)}/m)
       expect(rendered).to match(/#{@plan.employee_cost_for(enr_member)}/m)

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
-  let(:plan) { double }
+  let(:plan) { double(id: "plan_id") }
   let(:hbx_enrollment) { double }
   let(:benefit_group) {double}
   let(:reference_plan) {double}
@@ -97,6 +97,18 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
   end
 
+  context "GET print_waiver" do
+    let(:enrollment){ double(:HbxEnrollment) }
+
+    it "should return hbx_enrollment to print waiver" do
+      allow(user).to receive(:person).and_return(person)
+      allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
+      sign_in(user)
+      get :print_waiver, id: "id"
+      expect(response).to have_http_status(:success)
+    end
+  end
+
 
   context "POST terminate" do
     before do
@@ -142,6 +154,23 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       post :waive, id: "hbx_id", waiver_reason: "waiver"
       expect(flash[:alert]).to eq "Waive Failure"
       expect(response).to be_redirect
+    end
+  end
+
+  context "GET show" do
+    before :each do
+      allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
+      allow(benefit_group).to receive(:elected_plans).and_return([plan])
+      allow(PlanCostDecorator).to receive(:new).and_return(plan)
+      allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
+      sign_in user
+    end
+
+    it "should be success" do
+      get :show, id: "hbx_id"
+      expect(response).to have_http_status(:success)
     end
   end
 end

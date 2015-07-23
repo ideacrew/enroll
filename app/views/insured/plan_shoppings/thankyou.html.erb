@@ -18,13 +18,18 @@
         </div>
 
         <%= link_to 'Waive', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-default' %>
-        <%= render "insured/plan_shoppings/waive_confirmation" %>
+	<%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => { :enrollment => @enrollment } %>
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
-        <%= render  partial: 'shared/signup_progress', locals: {step: '6'} %>
+        <% if @change_plan.blank? %>
+          <%= render  partial: 'shared/signup_progress', locals: {step: '6'} %>
+        <% elsif @change_plan == "change" %>
+          <%= render partial: 'shared/qle_progress', locals: {step: '3'} %>
+        <% elsif @change_plan == "change_plan" %>
+          <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '2'} %>
+        <% end %>
       </div>
-
     </div>
   </div>
 </div><br>

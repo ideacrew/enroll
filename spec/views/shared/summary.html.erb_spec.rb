@@ -20,6 +20,7 @@ describe "shared/_summary.html.erb" do
   let(:mock_qhp) { instance_double("Products::Qhp", :qhp_benefits => []) }
 
   before :each do
+    Caches::MongoidCache.release(CarrierProfile)
     assign :plan, mock_plan
     assign :hbx_enrollment, mock_hbx_enrollment
     render "shared/summary", :qhp => mock_qhp
@@ -27,5 +28,17 @@ describe "shared/_summary.html.erb" do
 
   it "should have a link to download the sbc pdf" do
     expect(rendered).to have_selector("a[href='#{root_path + "sbc/THE SBC FILE.PDF"}']")
+  end
+
+  it "should have a label 'Summary of Benefits and Coverage (SBC)'" do
+    expect(rendered).to include('Summary of Benefits and Coverage (SBC)')
+  end
+
+  it "should not have 'having a baby'" do
+    expect(rendered).not_to have_selector("h4", text: "Having a Baby")
+  end
+
+  it "should not have 'managing type diabetes'" do
+    expect(rendered).not_to have_selector("h4", text: "Managing Type 2 Diabetes")
   end
 end

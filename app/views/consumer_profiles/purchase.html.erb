@@ -1,9 +1,7 @@
 <div class="container bottom-pd">
-  <div id="confirm_plan" class="col-md-8 col-sm-8 col-xs-12">
+  <div class="row">
+  <div id="confirm_plan" class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
     <h3>Confirm Your Plan Selection</h3>
-    <p class="alert alert-info">
-      INFO: This page should display the changes in Total amount after adding or deleting the family member.
-    </p>
     <p>Your current plan selection is displayed below. Click the back button if you want to change your selection. Click Purchase button to complete your enrollment.</p>
     <p>Your enrollment is not complete until you purchase your plan selection below.</p>
     <p>
@@ -31,7 +29,7 @@
             <tr>
               <td><%= member.person.full_name %></td>
               <td><%= member.primary_relationship %></td>
-              <td><%= member.person.age_on(Time.now.utc.to_date) %></td>
+              <td><%= dob_in_words(member.person.age_on(Time.now.utc.to_date), member.person.dob) %></td>
               <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
               <td class="text-right"><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
               <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
@@ -50,6 +48,19 @@
         </tbody>
       </table>
     </div><br>
-    <%= link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id), class: 'btn btn-primary pull-right', method: :post %>
+    <% if @terminate.present? %>
+      <%= link_to("Terminate Plan", terminate_insured_plan_shopping_path(@enrollment.id), {:class => "btn btn-primary pull-right", :method => :post}) %>
+    <% else %>
+      <%= link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, change_plan: @change_plan), class: 'btn btn-primary pull-right', method: :post %>
+    <% end %>
+  </div>
+
+  <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+    <% if @change_plan == "change" %>
+      <%= render partial: 'shared/qle_progress', locals: {step: '3', no_purchase: true} %>
+    <% elsif @change_plan == "change_plan" %>
+      <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '2', no_purchase: true} %>
+    <% end %>
+  </div>
   </div>
 </div>

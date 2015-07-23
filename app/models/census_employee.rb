@@ -199,13 +199,6 @@ class CensusEmployee < CensusMember
     published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
   end
 
-  def active_census_employee_is_unique
-    if CensusEmployee.unscoped.and(employer_profile_id: employer_profile_id, ssn: ssn).active.present?
-      message = "Employee with this identifying information is already active. Update or terminate the active record before adding another."
-      errors.add(:base, message)
-    end
-  end
-
   def employee_relationship
     "employee"
   end

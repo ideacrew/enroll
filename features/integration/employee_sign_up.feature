@@ -29,7 +29,7 @@ Feature: Employee Sign Up
     When I enter the identifying info of Soren White
     Then I should see the matched employee record form
     When I accept the matched employer
-    When I complete the matched employee form
+    When I complete the matched employee form for Soren White
     Then I should see the dependents page
     When I click edit on baby Soren
     Then I should see the edit dependent form
@@ -43,11 +43,9 @@ Feature: Employee Sign Up
     When I click continue on the dependents page
     Then I should see the group selection page
     When I click continue on the group selection page
-#    Then I should see the plan shopping welcome page
-#    When I click continue on the plan shopping welcome page
     Then I should see the list of plans
     When I select a plan on the plan shopping page
     When I click on purchase button on the coverage summary page
     Then I should see the receipt page
     Then I should see the "my account" page
-    When I click qle event 
+    When I click qle event

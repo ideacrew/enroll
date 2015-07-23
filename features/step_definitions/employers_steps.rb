@@ -229,6 +229,7 @@ Then(/^I should see a form to enter information about employee, address and depe
 end
 
 And(/^I should see employer census family created success message$/) do
+  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
   Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully created.") }
   screenshot("employer_census_new_family_success_message")
   @browser.refresh
@@ -282,6 +283,7 @@ Then(/^I should see a form to update the contents of the census employee$/) do
 end
 
 And(/^I should see employer census family updated success message$/) do
+  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
   Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully updated.") }
 end
 
@@ -385,7 +387,7 @@ And(/^I should be able to enter plan year, benefits, relationship benefits with 
   start_on_field.click
   start_on_field.li(index: 1).click
   @browser.h4(text: /Recommend Date/).wait_until_present
-  expect(@browser.text.include?("employer initial application earliest submit on")).to be_truthy
+  expect(@browser.text.include?("Employer initial application earliest submit on")).to be_truthy
   @browser.text_field(name: "plan_year[fte_count]").click
   @browser.text_field(name: "plan_year[fte_count]").set("235")
   @browser.text_field(name: "plan_year[pte_count]").set("15")
@@ -415,6 +417,7 @@ And(/^I should be able to enter plan year, benefits, relationship benefits with 
 end
 
 And(/^I should see a success message after clicking on create plan year button$/) do
+  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
   Watir::Wait.until(30) {  @browser.text.include?("Plan Year successfully created.") }
   screenshot("employer_plan_year_success_message")
   # TimeKeeper.set_date_of_record_unprotected!("2014-11-01")
@@ -428,6 +431,18 @@ When(/^I enter filter in plan selection page$/) do
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(true)
   @browser.element(class: /apply-btn/, text: /Apply/).wait_until_present
   @browser.element(class: /apply-btn/, text: /Apply/).click
+end
+
+When(/^I enter hsa_compatible filter in plan selection page$/) do
+  select_carrier = @browser.div(class: /selectric-plan-carrier-selection-filter/)
+  select_carrier.click
+  select_carrier.li(text: /CareFirst/).click
+  select_hsa = @browser.div(class: /selectric-plan-hsa-eligibility-selection-filter/)
+  select_hsa.click
+  select_hsa.li(text: /Yes/i).click
+  scroll_into_view(@browser.checkboxes(class: /plan-metal-level-selection-filter/)[1])
+  @browser.checkboxes(class: /plan-metal-level-selection-filter/)[1].set(true)
+  scroll_then_click(@browser.element(class: /apply-btn/, text: /Apply/))
 end
 
 When(/^I enter combined filter in plan selection page$/) do
@@ -452,6 +467,14 @@ When(/^I enter combined filter in plan selection page$/) do
   @browser.text_field(class: /plan-metal-premium-from-selection-filter/).set("5")
   @browser.text_field(class: /plan-metal-premium-to-selection-filter/).set("250")
   @browser.element(class: /apply-btn/, text: /Apply/).click
+end
+
+Then(/^I should see the hsa_compatible filter results$/) do
+  @browser.divs(class: /plan-row/).select(&:visible?).first do |plan|
+    expect(plan.text.include?("BlueChoice HMO HSA/HRA $2,000, 80%")).to eq true
+    expect(plan.text.include?("Silver")).to eq true
+    expect(plan.element(text: "$163.47").visible?).to eq true
+  end
 end
 
 Then(/^I should see the combined filter results$/) do
@@ -499,8 +522,9 @@ Then(/^I should be on the Plan Year Edit page with warnings$/) do
 end
 
 Then(/^I update the FTE field with valid input and save plan year$/) do
+  @browser.button(class: /interaction-click-control-save-plan-year/).wait_until_present
   @browser.text_field(name: "plan_year[fte_count]").set("10")
-  scroll_then_click(@browser.element(class: 'interaction-click-control-create-plan-year'))
+  scroll_then_click(@browser.button(class: /interaction-click-control-save-plan-year/))
 end
 
 Then(/^I should see a plan year successfully saved message$/) do

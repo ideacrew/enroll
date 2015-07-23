@@ -1,4 +1,3 @@
-<h4><%= "#{@census_employees.count} out of #{@total_census_employees_quantity}" if @total_census_employees_quantity.present? %></h4>
 <div class="table-responsive" style="overflow-y: hidden;">
   <table class="table table-wrapper" style="opacity: 1;">
     <thead>
@@ -36,11 +35,11 @@
           <span class="glyphicon glyphicon-pencil hidden-md hidden-lg visible-sm visible-xs" aria-hidden="true"></span>
           <% end %>
           <% elsif !census_employee.rehired? %>
-          <%= link_to '<i class="fa fa-pencil"></i> Edit'.html_safe, (edit_employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id)), class: "btn btn-default", remote: true %>
+          <%= link_to '<i class="fa fa-pencil"></i> Edit'.html_safe, (edit_employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id)), class: "btn btn-br btn-default", remote: true %>
 
           <%= link_to '<i class="fa fa-chain-broken"></i> Delink'.html_safe, (employers_employer_profile_census_employee_delink_path(@employer_profile.id, census_employee.id)), class: "btn btn-default", disabled: (!census_employee.employee_role_linked? or cannot? :delink, CensusEmployee) if current_user.has_hbx_staff_role? %>
 
-          <%= link_to '<i class="fa fa-times"></i> Terminate'.html_safe, ('javascript:;'), class: "btn btn-danger show_confirm", id: "show_confirm_#{census_employee.id}" %>
+          <%= link_to '<i class="fa fa-times"></i> Terminate'.html_safe, ('javascript:;'), class: "btn btn-danger btn-br show_confirm", id: "show_confirm_#{census_employee.id}" %>
           <% end %>
         </td>
       </tr>
@@ -69,5 +68,15 @@
     </tbody>
   </table>
 </div>
-<%= link_to 'default', employers_employer_profile_path(@employer_profile, status: @status), remote: true, class: 'btn btn-primary btn-sm' %>
-<%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status %>
+
+<div class="row">
+  <div class="col-md-6">
+    <% if (@total_census_employees_quantity.present? || !params[:page].nil?) && (@total_census_employees_quantity != @census_employees.count) %>
+      <%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status %>
+    <% end %>
+  </div>
+
+  <div class="col-md-6 text-right">
+    <h4><%= "#{@census_employees.count} out of #{@total_census_employees_quantity}" if @total_census_employees_quantity.present? %></h4>
+  </div>
+</div>

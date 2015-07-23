@@ -10,6 +10,8 @@ class GroupSelectionController < ApplicationController
     change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     keep_existing_plan = params[:commit] == "Keep existing plan"
 
+    return redirect_to purchase_consumer_profiles_path(change_plan: change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
+
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
     end
@@ -29,7 +31,7 @@ class GroupSelectionController < ApplicationController
     end
     if hbx_enrollment.save
       if keep_existing_plan
-        redirect_to purchase_consumer_profiles_path
+        redirect_to purchase_consumer_profiles_path(change_plan: change_plan)
       elsif change_plan.present?
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: change_plan)
       else

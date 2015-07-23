@@ -1,0 +1,23 @@
+<div class="container">
+  <div class="employee-welocome">
+    <div class="row">
+      <div class="col-lg-9 col-md-9 col-sm-10 col-xs-12">
+        <div class="col-md-12 col-sm-12 no-pd col-xs-12">
+
+          <h3>Waiver confirmation</h3>
+          <p>You have successfully waived the coverage at <%= @hbx_enrollment.updated_at %>. </p>
+          <p>Waiver Reason : <%= @hbx_enrollment.waiver_reason %>. </p>
+          <p>Please print this page for your records. </p>
+
+        </div>
+
+        <%= link_to 'Print', '#', onclick: 'window.print();return false;', class: "btn btn-default interaction-click-control-print-waiver-confirmation", style: "float:left;" %>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section waiver_receipt">
+        <%= render  partial: 'shared/signup_progress', locals: {step: '7'} %>
+      </div>
+
+    </div>
+  </div>
+</div><br>

@@ -94,7 +94,7 @@
                   <tr>
                     <td><%= member.person.full_name %></td>
                     <td><%= member.primary_relationship %></td>
-                    <td><%= member.person.age_on(Time.now.utc.to_date) %></td>
+                    <td><%= dob_in_words(member.person.age_on(Time.now.utc.to_date), member.person.dob) %></td>
                     <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
                     <td class="text-right"><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
                     <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>

@@ -15,7 +15,21 @@ function combineAllPlanSelectors(planSelectors) {
   }
   combinedSelectors = filterPlanByRange("premium", combinedSelectors);
   combinedSelectors = filterPlanByRange("deductible", combinedSelectors);
+  combinedSelectors = filterPlanBySelect("carrier", combinedSelectors);
+  combinedSelectors = filterPlanBySelect("hsa-eligibility", combinedSelectors);
   combinedSelectors.show();
+}
+
+function filterPlanBySelect(type, combinedSelectors) {
+  var carrier = $("select.plan-"+type+"-selection-filter").val();
+  if (carrier == "" || carrier == undefined) {
+    return combinedSelectors;
+  } else {
+    var selectors = combinedSelectors.filter(function(){
+      return (carrier == $(this).data("plan-"+type));
+    });
+    return selectors;
+  }
 }
 
 function filterPlanByRange(type, combinedSelectors) {
@@ -48,7 +62,7 @@ function applyPlanFilterCBs(cbKlass, cbFilterKlass, planValueTag) {
 }
 
 function applyPlanFilters() {
-  var all_selectors = [ 
+  var all_selectors = [
     applyPlanFilterCBs("plan-type-selection-filter", "data-plan-category-filter", "data-plan-category"),
     applyPlanFilterCBs("plan-metal-level-selection-filter", "data-plan-metal-level-filter", "data-plan-metal-level"),
     applyPlanFilterCBs("plan-metal-network-selection-filter", "data-plan-metal-network-filter", "data-plan-metal-network")
@@ -150,6 +164,8 @@ $(function() {
     $(".filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val("2000");
     $(".filter-sidebar input[type='text'].plan-metal-deductible-from-selection-filter").val("0");
     $(".filter-sidebar input[type='text'].plan-metal-deductible-to-selection-filter").val("2000");
+    $(".filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+    $(".filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
 		applyPlanFilters();
   });
 
@@ -162,7 +178,7 @@ $(document).on("change", "select.elected_plan", function() {
   var target = $(this).parents(".reference-plan-selection-controls");
   $(target).find(".elected-plan-select .hidden_field").hide();
   $(target).find(".reference-plan-select .reference-plan-content").hide();
-  
+
   switch($(this).val()){
     case "single_carrier":
       $(target).find(".carrier_for_elected_plan").show();
@@ -199,7 +215,7 @@ $(document).on("change", "select[name='reference_plan']", function() {
   var reference_plan_id = $(this).val();
   if (reference_plan_id != "" && reference_plan_id != undefined){
     $(this).parents('.reference-plan-select').find("input[type='hidden']").val(reference_plan_id);
-    $(this).parents('fieldset').find('.reference_plan_info h4').html("loading...")
+    $(this).parents('fieldset').find('.reference_plan_info h4').html("Loading...")
     $.ajax({
       type: "GET",
       url: $('a#search_reference_plan_link').data('href'),
@@ -210,7 +226,7 @@ $(document).on("change", "select[name='reference_plan']", function() {
       }
     });
   };
-}); 
+});
 
 $(document).on("click", ".reference_plan_info h4 span", function() {
   $(this).parents(".reference_plan_info").find('.content').toggle();

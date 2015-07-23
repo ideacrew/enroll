@@ -45,6 +45,7 @@ Rails.application.routes.draw do
     resources :plan_shoppings, :only => [:show] do
       member do
         get 'receipt'
+        get 'print_waiver'
         post 'checkout'
         post 'thankyou'
         post 'waive'
