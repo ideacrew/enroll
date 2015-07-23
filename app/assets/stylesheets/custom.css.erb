@@ -1697,10 +1697,12 @@ a.all-filter:hover{
   font-weight: bold;
   margin-right: 5px;
 }
-.select-plan-details ul li.gold i {color: #fabb18;}
-.select-plan-details ul li.platinum i {color: #e5e4e2;}
-.select-plan-details ul li.silver i {color: #cccccc;}
-.select-plan-details ul li.bronze i {color: #cd7f32;}
+
+.gold-icon, .platinum-icon, .silver-icon, .bronze-icon {padding-left: 20px;}
+.gold-icon {background: url("<%= asset_path('icons/gold-circle.png') %>") no-repeat left center;}
+.platinum-icon {background: url("<%= asset_path('icons/platinum-circle.png') %>") no-repeat left center;}
+.silver-icon {background: url("<%= asset_path('icons/silver-circle.png') %>") no-repeat left center;}
+.bronze-icon {background: url("<%= asset_path('icons/bronze-circle.png') %>") no-repeat left center;}
 
 #plan-summary ul.plan-type {list-style: none;padding: 0; font-weight: bold;}
 #plan-summary ul.plan-type li {
@@ -4454,7 +4456,6 @@ span.text_style {color: #616161 !important;}
 .ct-1 h2 {
     color: #003260;
     font-weight: 100;
-    margin-bottom: 20px;
     margin-top: 0;
 }
 .ct-1 p {
@@ -4462,6 +4463,7 @@ span.text_style {color: #616161 !important;}
     font-weight: 100;
     line-height: 25px;
 }
+.ct-1 .checkbox label {padding: 0;}
 .msg-inbox-read {
   background-color: #ccc;
 }
