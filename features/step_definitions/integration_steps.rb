@@ -120,6 +120,7 @@ def people
       last_name: "White",
       dob: "08/13/1979",
       ssn: "670991234",
+      home_phone: "2025551234"
     },
     "Patrick Doe" => {
       first_name: "Patrick",
@@ -142,18 +143,6 @@ When(/^I enter the identifying info of (.*)$/) do |named_person|
   @browser.element(class: /interaction-click-control-continue/).wait_until_present
   scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
 end
-# # TODO: needs to be merged
-# When(/^I enter the identifying information of my existing person$/) do
-#   @browser.text_field(name: "person[first_name]").set("Patrick")
-#   @browser.text_field(name: "person[last_name]").set("Doe")
-#   @browser.text_field(name: "jq_datepicker_ignore_person[dob]").set("01/01/1980")
-#   scroll_then_click(@browser.label(:text=> /FIRST NAME/))
-#   @browser.text_field(name: "person[ssn]").set("786120965")
-#   screenshot("information_entered")
-#   @browser.element(class: /interaction-click-control-continue/).wait_until_present
-#   scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
-#   @browser.element(class: /interaction-click-control-continue/).wait_while_present
-# end
 
 Then(/^I should not see the matched employee record form$/) do
   @browser.element(class: /fa-exclamation-triangle/).wait_until_present
@@ -178,13 +167,19 @@ When(/^I accept the matched employer$/) do
   screenshot("update_personal_info")
 end
 
-When(/^I complete the matched employee form$/) do
+When(/^I complete the matched employee form for (.*)$/) do |named_person|
+  person = people[named_person]
   scroll_then_click(@browser.element(class: /interaction-click-control-click-here/))
   @browser.button(class: /interaction-click-control-close/).wait_until_present
   scroll_then_click(@browser.element(class: /interaction-click-control-close/))
-  @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").wait_until_present
+  @browser.button(class: /interaction-click-control-close/).wait_while_present
 
-  @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set("2025551234")
+  scroll_then_click(@browser.text_field(name: "person[addresses_attributes][0][address_1]"))
+  scroll_then_click(@browser.text_field(name: "person[addresses_attributes][0][address_2]"))
+  scroll_then_click(@browser.text_field(name: "person[addresses_attributes][0][city]"))
+  scroll_then_click(@browser.text_field(name: "person[addresses_attributes][0][zip]"))
+
+  @browser.text_field(name: "person[phones_attributes][0][full_phone_number]").set(person[:home_phone])
   scroll_then_click(@browser.text_field(name: "person[emails_attributes][1][address]"))
   screenshot("personal_info_complete")
   @browser.button(id: /btn-continue/).wait_until_present
