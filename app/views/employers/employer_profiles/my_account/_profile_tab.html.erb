@@ -21,8 +21,11 @@
         <dd><%= @employer_profile.dba %></dd>
         <dt>Fein</dt>
         <dd><%= number_to_obscured_ssn @employer_profile.fein %></dd>
-        <dt>Web URL</dt>
-        <dd><%= @employer_profile.organization.try(:home_page) %></dd>
+        <% home_page = @employer_profile.organization.try(:home_page) %>
+        <% if home_page.present? %>
+          <dt>Web URL</dt>
+          <dd><%= link_to home_page, home_page %></dd>
+        <% end %>
       </dl>
     </div>
   </div>

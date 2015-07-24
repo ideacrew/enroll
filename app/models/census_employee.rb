@@ -1,6 +1,7 @@
 class CensusEmployee < CensusMember
   include AASM
   include Sortable
+  include Searchable
   # include Validations::EmployeeInfo
 
   field :is_business_owner, type: Boolean, default: false
@@ -50,6 +51,8 @@ class CensusEmployee < CensusMember
   scope :enrolled,    ->{ any_in("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
   scope :covered,     ->{ where( "benefit_group_assignments.aasm_state" => "coverage_selected" ) }
   scope :waived,      ->{ where( "benefit_group_assignments.aasm_state" => "coverage_waived" ) }
+
+  scope :employee_name, -> (employee_name) { any_of({first_name: /#{employee_name}/i}, {last_name: /#{employee_name}/i}, first_name: /#{employee_name.split[0]}/i, last_name: /#{employee_name.split[1]}/i) }
 
   scope :sorted,                -> { order(:"census_employee.last_name".asc, :"census_employee.first_name".asc)}
   scope :order_by_last_name,    -> { order(:"census_employee.last_name".asc) }
@@ -184,7 +187,12 @@ class CensusEmployee < CensusMember
     max_coverage_term_on = (TimeKeeper.date_of_record.end_of_day - HbxProfile::ShopRetroactiveTerminationMaximum).end_of_month
     coverage_term_on = [reported_coverage_term_on, max_coverage_term_on].compact.max
 
-    active_benefit_group_assignment.terminate_coverage(coverage_term_on) if active_benefit_group_assignment.try(:may_terminate_coverage?)
+    if active_benefit_group_assignment.try(:may_terminate_coverage?)
+      if active_benefit_group_assignment.hbx_enrollment.try(:may_terminate_coverage?)
+        active_benefit_group_assignment.hbx_enrollment.terminate_coverage!
+      end
+    end
+
     terminate_employee_role
     self
   end

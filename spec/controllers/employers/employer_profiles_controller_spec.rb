@@ -67,7 +67,21 @@ RSpec.describe Employers::EmployerProfilesController do
       get :show, id: employer_profile.id
       expect(assigns(:total_census_employees_quantity)).to eq employer_profile.census_employees.active.count
       expect(assigns(:census_employees).count).to eq 20
-      expect(assigns(:census_employees)).to eq employer_profile.census_employees.active.sorted.to_a.first(20)
+      expect(assigns(:census_employees)).to eq employer_profile.census_employees.active.sorted.search_by(employee_name: '').to_a.first(20)
+    end
+
+    it "search by employee name" do
+      employer_profile.census_employees.delete_all
+      census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile)
+
+      get :show, id: employer_profile.id, employee_name: census_employee.full_name 
+      expect(assigns(:census_employees).count).to eq 1
+      expect(assigns(:census_employees)).to eq [census_employee]
+    end
+
+    it "get avaliable_employee_names for autocomplete employee name" do
+      get :show, id: employer_profile.id
+      expect(assigns(:avaliable_employee_names)).to eq employer_profile.census_employees.sorted.map(&:full_name).uniq
     end
   end
 
