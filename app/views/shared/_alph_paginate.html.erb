@@ -7,7 +7,7 @@
   <% end %>
   <% alphs.each do |alph| %>
     <% alph_url = url + "?page=#{alph}" %>
-    <% alph_url += "&status=#{status}" if status %>
+    <% alph_url += "&status=#{status}" if defined?(status) && status %>
     <li class="<%= 'active' if alph == params[:page] %>"><%= link_to alph, (alph_url), remote: remote %></li>
   <% end %>
 </ul>
