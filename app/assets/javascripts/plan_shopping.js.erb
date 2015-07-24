@@ -260,7 +260,7 @@ function calcEmployerContributions() {
   var location_id = $("#plan_year_benefit_groups_attributes_0_reference_plan_id").parents('fieldset').attr('id');
 
   if (reference_plan_id != "" && reference_plan_id != undefined){
-  $("fieldset#"+ location_id +" .employer_cost_info .content").html("calculating...");
+  $("fieldset#"+ location_id +" .employer_cost_info .loader").toggle();
   $.ajax({
       type: "GET",
       url: $('a#calc_employer_contributions_link').data('href'),
@@ -271,7 +271,9 @@ function calcEmployerContributions() {
         "location_id": location_id,
         "relation_benefits": relation_benefits
       }
-    });
+    }).done(function() {
+      $("fieldset#"+ location_id +" .employer_cost_info .loader").hide();
+    });;
 }
 }
 
