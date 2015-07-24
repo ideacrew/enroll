@@ -35,7 +35,6 @@
                 <p class="text-primary">(DC Health link ID : <%= @person.hbx_id %>)</p>
                 <hr>
                 <div class="page-header"><h4>Employer</h4></div>
-                <%= display_carrier_logo @employer_profile, width: 110 %>
                 <h3><%= @employer_profile.try(:dba) %></h3>
                 <ul class="list-unstyled list-comp">
                   <li>
