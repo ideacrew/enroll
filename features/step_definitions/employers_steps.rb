@@ -386,7 +386,7 @@ And(/^I should be able to enter plan year, benefits, relationship benefits with 
   start_on_field = @browser.div(class: /selectric-wrapper/, text: /SELECT START ON/i)
   start_on_field.click
   start_on_field.li(index: 1).click
-  @browser.h4(text: /Recommend Date/).wait_until_present
+  @browser.h3(text: /Recommend Dates/).wait_until_present
   expect(@browser.text.include?("Employer initial application earliest submit on")).to be_truthy
   @browser.text_field(name: "plan_year[fte_count]").click
   @browser.text_field(name: "plan_year[fte_count]").set("235")
@@ -407,7 +407,7 @@ And(/^I should be able to enter plan year, benefits, relationship benefits with 
   ref_plan.li(index: 5).click # select plan from list.
   # Relationship Benefit
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(51)
-  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
+  # @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]").set(15)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').first.set(true)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').first.set(false)
