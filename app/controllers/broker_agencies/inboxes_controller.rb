@@ -13,9 +13,6 @@ class BrokerAgencies::InboxesController < InboxesController
     @inbox_provider_name = @inbox_provider.legal_name
     @inbox_to_name = "HBX Admin"
     @new_message = @inbox_provider.inbox.messages.build
-    org = nil
-    Organization.each{|o| org=o if o.legal_name=='DC HealthLink'}
-    @profile = org.hbx_profile
   end
 
   def create

@@ -7,6 +7,7 @@
             <%= "#{pluralize(@census_employee.errors.size, "error")} prohibited this person from being saved:" %>
           </h4>
           <ul>
+            <% @census_employee.errors.delete(:address) %>
             <% @census_employee.errors.full_messages.each do |msg| %>
               <li> <%= msg %> </li>
             <% end %>
@@ -14,6 +15,9 @@
               <% dep.errors.full_messages.each do |msg| %>
                 <li> <%= msg %> </li>
               <% end %>
+            <% end %>
+            <% @census_employee.address.errors.full_messages.each do |msg| %>
+              <li> <%= msg %> </li>
             <% end %>
             <% @census_employee.benefit_group_assignments.each do |bg| %>
               <% bg.errors.full_messages.each do |msg| %>
