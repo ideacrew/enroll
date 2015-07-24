@@ -1,3 +1,11 @@
+<% if @search %>
+  <% if @census_employees.present? %>
+    <h4>Results found</h4>
+  <% else %>
+    <h4>No results found</h4>
+  <% end %>
+<% end %>
+
 <div class="table-responsive" style="overflow-y: hidden;">
   <table class="table table-wrapper" style="opacity: 1;">
     <thead>

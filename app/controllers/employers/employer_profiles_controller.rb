@@ -125,8 +125,10 @@ class Employers::EmployerProfilesController < ApplicationController
 
   private
     def paginate_employees
-      status_params = params.permit(:id, :status)
+      status_params = params.permit(:id, :status, :search)
       @status = status_params[:status] || 'active'
+      @search = status_params[:search] || false
+      @avaliable_employee_names = @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
 
       census_employees = case @status
       when 'waived'
