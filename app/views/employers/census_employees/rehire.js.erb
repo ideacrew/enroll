@@ -1,6 +1,6 @@
 <% if @rehiring_date.present? %>
   var notice = "<div class='alert alert-notice'>Successfully rehired Census Employee. Please update benefit group.</div>"
-  $('#add_employee_action').html(notice + "<%= escape_javascript(render "edit") %>");
+  $('#add_employee_action').html(notice + "<%= escape_javascript(render "new") %>");
   $('#employee_roster').hide();
   applyJQDatePickers();
 <% end %>
