@@ -95,6 +95,21 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       post :thankyou, id: "id", plan_id: "plan_id"
       expect(response).to have_http_status(:success)
     end
+
+
+    it "returns http success as BROKER" do
+      person = create(:person)
+      f=FactoryGirl.create(:family,:family_members=>[{:is_primary_applicant=>true, :is_active=>true, :person_id => person.id}])
+      current_broker_user = FactoryGirl.create(:user, :roles => ['broker_agency_staff'],
+        :person => person )
+      current_broker_user.person.broker_role = BrokerRole.new({:broker_agency_profile_id => 99})
+      allow(session).to receive(:[]).and_return(person.id.to_s)
+      sign_in(current_broker_user)
+      post :thankyou, id: "id", plan_id: "plan_id"
+      expect(response).to have_http_status(:success)
+    end
+
+
   end
 
   context "GET print_waiver" do
