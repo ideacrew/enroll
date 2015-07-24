@@ -236,12 +236,13 @@ RSpec.describe Employers::CensusEmployeesController do
           allow(census_employee).to receive(:replicate_for_rehire).and_return(new_census_employee)
           allow(new_census_employee).to receive(:hired_on=).and_return("test")
           allow(new_census_employee).to receive(:employer_profile=).and_return("test")
+          allow(new_census_employee).to receive(:address).and_return(true)
+          allow(new_census_employee).to receive(:benefit_group_assignments).and_return([double])
         end
 
-        it "save success" do
+        it "rehire success" do
           allow(new_census_employee).to receive(:valid?).and_return(true)
           allow(census_employee).to receive(:valid?).and_return(true)
-          allow(new_census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:rehire_employee_role).never
           xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: "05/01/2015", :format => :js
@@ -252,7 +253,6 @@ RSpec.describe Employers::CensusEmployeesController do
         it "when success should return new_census_employee" do
           allow(new_census_employee).to receive(:valid?).and_return(true)
           allow(census_employee).to receive(:valid?).and_return(true)
-          allow(new_census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:save).and_return(true)
           allow(census_employee).to receive(:rehire_employee_role).never
           xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: "05/01/2015", :format => :js
@@ -261,7 +261,7 @@ RSpec.describe Employers::CensusEmployeesController do
           expect(assigns(:census_employee)).to eq new_census_employee
         end
 
-        it "save failure" do
+        it "when new_census_employee invalid" do
           allow(new_census_employee).to receive(:valid?).and_return(false)
           xhr :get, :rehire, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, rehiring_date: "05/01/2015", :format => :js
           expect(response).to have_http_status(:success)
