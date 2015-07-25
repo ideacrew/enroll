@@ -17,4 +17,14 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper">')
     end
   end
+
+  describe "#fein helper methods" do
+    it "returns fein with masked fein" do
+      expect(helper.number_to_obscured_fein("111098222")).to eq "**-***8222"
+    end
+
+    it "returns formatted fein" do
+      expect(helper.number_to_fein("111098222")).to eq "11-1098222"
+    end
+  end
 end
