@@ -106,3 +106,8 @@ function setProgressBar(){
     $('.progress-current').html('');
   }
 }
+
+$(document).on('click', '#census_employee_search_clear', function() {
+  $('form#census_employee_search input#employee_name').val('');
+  $("form#census_employee_search").submit();
+})

@@ -8,7 +8,9 @@ class Products::QhpController < ApplicationController
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     @benefit_group = @hbx_enrollment.benefit_group
     @reference_plan = @benefit_group.reference_plan
-    @qhps = Products::Qhp.where(:standard_component_id.in => found_params).to_a
+    @qhps = Products::Qhp.where(:standard_component_id.in => found_params).to_a.each do |qhp|
+      qhp[:total_employee_cost] = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan).total_employee_cost
+    end
     respond_to do |format|
       format.html
       format.js

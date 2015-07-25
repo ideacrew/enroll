@@ -1,3 +1,11 @@
+<% if @search %>
+  <% if @census_employees.present? %>
+    <h4>Results found</h4>
+  <% else %>
+    <h4>No results found</h4>
+  <% end %>
+<% end %>
+
 <div class="table-responsive" style="overflow-y: hidden;">
   <table class="table table-wrapper" style="opacity: 1;">
     <thead>
@@ -72,7 +80,7 @@
 <div class="row">
   <div class="col-md-6">
     <% if (@total_census_employees_quantity.present? || !params[:page].nil?) && (@total_census_employees_quantity != @census_employees.count) %>
-      <%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, full_index_url: employers_employer_profile_path(@employer_profile, status: status) %>
+      <%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status, full_index_url: employers_employer_profile_path(@employer_profile, status: status) %>
     <% end %>
   </div>
 

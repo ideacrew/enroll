@@ -15,6 +15,7 @@
 //= require jquery-ui
 //= require jquery_ujs
 //= require bootstrap.min
+//= require bootstrap-multiselect
 //= require jquery.selectric.min
 //= require turbolinks
 //= require classie
