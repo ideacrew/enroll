@@ -128,7 +128,7 @@ class Employers::EmployerProfilesController < ApplicationController
       status_params = params.permit(:id, :status, :search)
       @status = status_params[:status] || 'active'
       @search = status_params[:search] || false
-      @avaliable_employee_names = @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+      @avaliable_employee_names ||= @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
 
       census_employees = case @status
       when 'waived'
@@ -140,13 +140,14 @@ class Employers::EmployerProfilesController < ApplicationController
       else
         @employer_profile.census_employees.active.sorted
       end
+      census_employees = census_employees.search_by(params.slice(:employee_name))
       @page_alphabets = page_alphabets(census_employees, "last_name")
       if params[:page].present?
         page_no = cur_page_no(@page_alphabets.first)
-        @census_employees = census_employees.where("last_name" => /^#{page_no}/i).search_by(params.slice(:employee_name))
+        @census_employees = census_employees.where("last_name" => /^#{page_no}/i)
       else
         @total_census_employees_quantity = census_employees.count
-        @census_employees = census_employees.search_by(params.slice(:employee_name)).to_a.first(20)
+        @census_employees = census_employees.to_a.first(20)
       end
     end
 
