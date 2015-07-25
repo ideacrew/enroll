@@ -85,7 +85,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
       allow(person).to receive(:primary_family).and_return(family)
-      allow(family).to receive(:is_eligible_to_enroll?).and_return(true)
+      allow(enrollment).to receive(:can_complete_shopping?).and_return(true)
       allow(benefit_group).to receive(:plan_year).and_return(plan_year)
       allow(plan_year).to receive(:is_eligible_to_enroll?).and_return(true)
     end
@@ -94,6 +94,36 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       sign_in(user)
       post :thankyou, id: "id", plan_id: "plan_id"
       expect(response).to have_http_status(:success)
+    end
+
+    it "should be enrollable" do
+      sign_in(user)
+      post :thankyou, id: "id", plan_id: "plan_id"
+      expect(assigns(:enrollable)).to be_truthy
+    end
+
+    it "should be waivable" do
+      sign_in(user)
+      post :thankyou, id: "id", plan_id: "plan_id"
+      expect(assigns(:waivable)).to be_truthy
+    end
+
+    context "when not eligible to complete shopping" do
+      before do
+        allow(enrollment).to receive(:can_complete_shopping?).and_return(false)
+      end
+
+      it "should not be enrollable" do
+        sign_in(user)
+        post :thankyou, id: "id", plan_id: "plan_id"
+        expect(assigns(:enrollable)).to be_falsey
+      end
+
+      it "should not be waivable" do
+        sign_in(user)
+        post :thankyou, id: "id", plan_id: "plan_id"
+        expect(assigns(:waivable)).to be_falsey
+      end
     end
   end
 
@@ -165,12 +195,29 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(benefit_group).to receive(:elected_plans).and_return([plan])
       allow(PlanCostDecorator).to receive(:new).and_return(plan)
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
+      allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
       sign_in user
     end
 
     it "should be success" do
       get :show, id: "hbx_id"
       expect(response).to have_http_status(:success)
+    end
+
+    it "should be waivable" do
+      get :show, id: "hbx_id"
+      expect(assigns(:waivable)).to be_truthy
+    end
+
+    context "when not eligible to complete shopping" do
+      before do
+        allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(false)
+      end
+
+      it "should not be waivable" do
+        get :show, id: "hbx_id"
+        expect(assigns(:waivable)).to be_falsey
+      end
     end
   end
 end

@@ -39,7 +39,8 @@ class Insured::PlanShoppingsController < ApplicationController
     @reference_plan = @benefit_group.reference_plan
     @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     @family = @person.primary_family
-    @enrollable = @family.is_eligible_to_enroll?
+    @enrollable = @enrollment.can_complete_shopping?
+    @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
 
     respond_to do |format|
@@ -54,7 +55,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if (hbx_enrollment.shopping? or hbx_enrollment.coverage_selected?) and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage
-      hbx_enrollment.waiver_reason = waiver_reason 
+      hbx_enrollment.waiver_reason = waiver_reason
       hbx_enrollment.save
       flash[:notice] = "Waive Successful"
     else
@@ -88,6 +89,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = @benefit_group.elected_plans.entries.collect() do |plan|
       PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
     end
+    @waivable = @hbx_enrollment.can_complete_shopping?
 
     # for hsa-eligibility
     @plan_hsa_status = {}

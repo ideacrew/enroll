@@ -93,7 +93,7 @@ class HbxEnrollment
   def propogate_terminate
     self.terminated_on = TimeKeeper.date_of_record.end_of_month
     if benefit_group_assignment
-      benefit_group_assignment.end_benefit(TimeKeeper.date_of_record.end_of_month) 
+      benefit_group_assignment.end_benefit(TimeKeeper.date_of_record.end_of_month)
       benefit_group_assignment.save
     end
   end
@@ -156,9 +156,8 @@ class HbxEnrollment
     broker_agency_profile_id.present?
   end
 
-  def can_complete_shopping?(t_date = Date.today)
-    return false unless benefit_group
-    benefit_group.within_new_hire_window?(employee_role.hired_on) || household.family.is_eligible_to_enroll?
+  def can_complete_shopping?
+    household.family.is_eligible_to_enroll?
   end
 
   def humanized_dependent_summary
