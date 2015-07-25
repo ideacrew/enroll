@@ -1,0 +1,2 @@
+$("fieldset#<%= @location_id %> .employer_cost_info .content").html("<div>Employer Contribution : <%= number_to_currency(@employer_contribution_amount.to_f) %></div><div>Employee Cost (Min/Max) : <%= number_to_currency(@min_employee_cost.to_f) %>/<%= number_to_currency(@max_employee_cost.to_f) %></div>");
+$("fieldset#<%= @location_id %> .employer_cost_info h4").html("Estimated Monthly Costs");

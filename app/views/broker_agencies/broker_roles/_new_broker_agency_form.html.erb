@@ -1,6 +1,6 @@
+<div id="broker_agency_form" class="container">
 <%= form_for @organization, as: :organization, url: {action: "create"} do |f| %>
 <%= render 'shared/error_messages', :object => @organization %>
-<div class="container">
   <div class="row">
     <%= render "person_info_fields", f: f %><br>
     <div class="row">
@@ -29,5 +29,6 @@
       </div>
     </div>
   </div>
-</div>
 <% end %>
+</div>
+

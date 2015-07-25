@@ -29,8 +29,26 @@ class Employers::PlanYearsController < ApplicationController
   def search_reference_plan
     @location_id = params[:location_id]
     return unless params[:reference_plan_id].present?
+
     @plan = Plan.find(params[:reference_plan_id])
     @premium_tables = @plan.premium_tables.where(start_on: @plan.premium_tables.distinct(:start_on).max)
+  end
+
+  def calc_employer_contributions
+    @location_id = params[:location_id]
+    return unless params[:reference_plan_id].present?
+
+    params.merge!({ plan_year: {
+      start_on: params[:start_on] #PlanYear.calculate_start_on_dates.first.to_s(:db) 
+      }.merge(relationship_benefits) })
+
+    @plan = Plan.find(params[:reference_plan_id])
+    @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
+    @plan_year.benefit_groups[0].reference_plan = @plan
+
+    @employer_contribution_amount = @plan_year.benefit_groups[0].estimated_monthly_employer_contribution
+    @min_employee_cost = @plan_year.benefit_groups[0].estimated_monthly_min_employee_cost
+    @max_employee_cost = @plan_year.benefit_groups[0].estimated_monthly_max_employee_cost
   end
 
   def edit
@@ -138,7 +156,22 @@ class Employers::PlanYearsController < ApplicationController
                                       ]
     ]
     )
-    plan_year_params["benefit_groups_attributes"].delete_if {|k, v| v.count<2 }
+
+    plan_year_params["benefit_groups_attributes"].delete_if {|k, v| v.count < 2 }
     plan_year_params
+  end
+
+  def relationship_benefits
+    { 
+      "benefit_groups_attributes" => 
+      { 
+        "0" => {
+           "title"=>"2015 Employer Benefits",
+           # "carrier_for_elected_plan"=>"53e67210eb899a4603000004",
+           "reference_plan_id" => params[:reference_plan_id],
+           "relationship_benefits_attributes" => params[:relation_benefits]
+        }
+      }
+    }
   end
 end

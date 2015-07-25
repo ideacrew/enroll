@@ -80,15 +80,25 @@ class PlanCostDecorator < SimpleDelegator
     end
   end
 
-  def employer_contribution_percent(member)
+
+  def relationship_benefit_for(member)
     relationship =
-      case member.class
-      when HbxEnrollmentMember
-        (relationship(member))
-      else
-        member.employee_relationship
-      end
-    benefit_group.relationship_benefit_for(relationship).premium_pct
+    case member.class
+    when HbxEnrollmentMember
+      (relationship(member))
+    else
+      member.employee_relationship
+    end
+    benefit_group.relationship_benefit_for(relationship)
+  end
+
+  def employer_contribution_percent(member)
+    relationship_benefit = relationship_benefit_for(member)
+    if relationship_benefit && relationship_benefit.offered?
+      relationship_benefit.premium_pct
+    else
+      0.0
+    end
   end
 
   def reference_premium_for(member)
@@ -96,7 +106,12 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def premium_for(member)
-    __getobj__.premium_for(plan_year_start_on, age_of(member))
+    relationship_benefit = relationship_benefit_for(member)
+    if relationship_benefit && relationship_benefit.offered?
+      __getobj__.premium_for(plan_year_start_on, age_of(member))
+    else
+      0.0
+    end
   end
 
   def max_employer_contribution(member)
