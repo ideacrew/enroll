@@ -16,10 +16,8 @@
   </tr>
   <tr>
     <th>Your Cost</th>
-      <% qhps.each do |qhp|
-         pc = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan)
-      %>
-        <th colspan="2"><%=number_to_currency(pc.total_employee_cost)%></th>
+      <% qhps.each do |qhp|%>
+        <th colspan="2"><%=number_to_currency(qhp[:total_employee_cost])%></th>
       <% end %>
   </tr>
   <tr>

@@ -26,6 +26,11 @@ def scroll_then_click(element)
   element
 end
 
+def click_when_present(element)
+  element.wait_until_present
+  scroll_then_click(element)
+end
+
 def enter_office_location(location)
   @browser.text_field(class: /interaction-field-control-office-location-address-address-1/).set(location[:address1])
   @browser.text_field(class: /interaction-field-control-office-location-address-address-2/).set(location[:address2])
@@ -373,10 +378,15 @@ When(/^My employer publishes a plan year$/) do
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("202")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("5551212")
   scroll_then_click(@browser.button(class: "interaction-click-control-create-employer"))
-  @browser.element(class: /interaction-click-control-benefits/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-benefits/))
-  @browser.element(class: /interaction-click-control-publish-plan-year/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-publish-plan-year/))
+  click_when_present(@browser.element(class: /interaction-click-control-benefits/))
+  click_when_present(@browser.element(class: /interaction-click-control-edit-plan-year/))
+  start_on = @browser.element(class: /selectric-interaction-choice-control-plan-year-start-on/)
+  click_when_present(start_on)
+  click_when_present(start_on.lis()[1])
+  click_when_present(@browser.element(class: /interaction-click-control-save-plan-year/))
+  @browser.element(class: /alert-notice/, text: /Plan Year successfully saved./).wait_until_present
+  click_when_present(@browser.element(class: /interaction-click-control-benefits/))
+  click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))
 end
 
 When(/^I log in to the employee account page$/) do

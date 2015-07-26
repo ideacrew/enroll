@@ -17,7 +17,6 @@
           <%= render "insured/plan_shoppings/coverage_information" %>
         </div>
 
-        <%= link_to 'Waive', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-default' %>
 	<%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => { :enrollment => @enrollment } %>
       </div>
 

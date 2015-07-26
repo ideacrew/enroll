@@ -42,7 +42,8 @@
   %br
   = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-transparent'
 - elsif step == 6
-  = link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id), :class => 'btn btn-lg btn-waive btn-br btn-block', id: 'btn-continue', :method => :post
+  -
+  = link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id), :class => 'btn btn-lg btn-waive btn-br btn-block', id: 'btn-continue', :method => :post, :disabled => !@enrollable
   %br
   = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-round btn-transparent'
 - elsif step == 7
