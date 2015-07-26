@@ -456,3 +456,6 @@ DEPENDENCIES
   unicorn (~> 4.8.3)
   watir
   web-console (~> 2.0)
+
+BUNDLED WITH
+   1.10.5
