@@ -1,17 +1,29 @@
 <div class="modal fade" id="waive_confirm" tabindex="-1" role="dialog" aria-labelledby="waiveConfirm" role="document">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Select Waive Reason</h4>
-      </div>
-      <%= form_tag(waive_insured_plan_shopping_path(enrollment.id), method: :post) do %>
+      <% if @waivable %>
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Select Waive Reason</h4>
+        </div>
+        <%= form_tag(waive_insured_plan_shopping_path(enrollment.id), method: :post) do %>
+          <div class="modal-body">
+            <%= select_tag "waiver_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: "Please select waive reason" %>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <%= submit_tag "Submit", class: 'btn btn-primary' %>
+          </div>
+        <% end %>
+      <% else # not @waivable %>
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Unable to Waive Coverage</h4>
+        </div>
         <div class="modal-body">
-          <%= select_tag "waiver_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: "Please select waive reason" %>
+          You cannot waive coverage unless you’re in Open Enrollment or a Special Enrollment Period.
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <%= submit_tag "Submit", class: 'btn btn-primary' %>
         </div>
       <% end %>
     </div>
