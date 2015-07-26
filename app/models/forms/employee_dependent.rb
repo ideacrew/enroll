@@ -137,8 +137,8 @@ module Forms
       return if family.blank? or family.family_members.blank?
 
       relationships = family.family_members.where(is_active: true).map(&:relationship) << self.relationship
-      if relationships.group_by(&:to_s).any? { |k, v| k == "spouse" and v.length > 1 }
-        self.errors.add(:base, "can not have multiple spouse")
+      if relationships.count{|rs| rs=='spouse' || rs=='life_partner'} > 1
+        self.errors.add(:base, "can not have multiple spouse or life partner")
       end
     end
   end
