@@ -2,8 +2,6 @@
   <%= f.select(:market_kind, options_for_select(BrokerAgencyProfile::MARKET_KINDS_OPTIONS.inject([]) {|options, (k, v)| options << [k, v]}), { prompt: "Select Practice Area"}, { :class => 'interaction-choice-control-broker-agency-practice-area'} ) %>
 </div>
 <div class="col-md-3  col-xs-12 form-group-lg form-group no-pd broker-agency-info">
-  <%#= f.text_field :languages_spoken, class: "floatlabel form-control interaction-field-control-broker-agency-languages-spoken", placeholder: 'LANGUAGES SPOKEN' %>
-
   <div class="language_multi_select">
     <%= f.select(:languages_spoken, options_from_collection_for_select(LanguageList::COMMON_LANGUAGES, "iso_639_1", "name"), { }, { id: 'broker_agency_language_select', multiple: "multiple", class: "floatlabel form-control interaction-field-control-broker-agency-languages-spoken" } ) %>
   </div>

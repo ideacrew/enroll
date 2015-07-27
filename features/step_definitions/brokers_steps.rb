@@ -42,10 +42,14 @@ And(/^I enter broker agency information$/) do
   practice_area.click
   practice_area.li(text: /Small Business Marketplace ONLY/).click
 
-  @browser.text_field(class: /interaction-field-control-broker-agency-languages-spoken/).set("English")
+  language_multi_select = @browser.element(class: "language_multi_select").element(class: "multiselect")
+  language_multi_select.wait_until_present
+  language_multi_select.click
+  @browser.checkbox(:value => 'bn').set
+  @browser.checkbox(:value => 'fr').set
   
-  # Select evening/weekend hours, accept new clients checkboxes
-  @browser.checkboxes.each {|checkbox| checkbox.set }
+  @browser.checkbox(:name => "organization[working_hours]").set
+  @browser.checkbox(:name => "organization[accept_new_clients]").set
 end
 
 And(/^I enter office locations information$/) do
