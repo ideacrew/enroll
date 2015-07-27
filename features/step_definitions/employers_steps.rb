@@ -439,9 +439,10 @@ When(/^I enter hsa_compatible filter in plan selection page$/) do
   select_carrier.li(text: /CareFirst/).click
   select_hsa = @browser.div(class: /selectric-plan-hsa-eligibility-selection-filter/)
   select_hsa.click
-  select_hsa.li(text: /Yes/i).click
+  select_hsa.li(text: /No/i).click
   scroll_into_view(@browser.checkboxes(class: /plan-metal-level-selection-filter/)[1])
   @browser.checkboxes(class: /plan-metal-level-selection-filter/)[1].set(true)
+  @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("2000")
   scroll_then_click(@browser.element(class: /apply-btn/, text: /Apply/))
 end
 
@@ -471,9 +472,9 @@ end
 
 Then(/^I should see the hsa_compatible filter results$/) do
   @browser.divs(class: /plan-row/).select(&:visible?).first do |plan|
-    expect(plan.text.include?("BlueChoice HMO HSA/HRA $2,000, 80%")).to eq true
+    expect(plan.text.include?("BlueChoice Plus $2000")).to eq true
     expect(plan.text.include?("Silver")).to eq true
-    expect(plan.element(text: "$163.47").visible?).to eq true
+    expect(plan.element(text: "$237.15").visible?).to eq true
   end
 end
 

@@ -31,6 +31,29 @@ RSpec.describe Employers::PlanYearsController do
     end
   end
 
+  describe "GET calc_employer_contributions" do
+    let(:employer_profile){ double("EmployerProfile") }
+    let(:reference_plan){ FactoryGirl.create(:plan) }
+    let(:plan_years){ [double("PlanYear")] }
+    let(:benefit_groups){ [
+      double(
+        "BenefitGroup",
+        estimated_monthly_employer_contribution: 56.2,
+        estimated_monthly_min_employee_cost: 200.21,
+        estimated_monthly_max_employee_cost: 500.32
+        )] }
+    let(:plan){ double("Plan") }
+    it "should calculate employer contributions" do
+      allow(EmployerProfile).to receive(:find).with("id").and_return(employer_profile)
+      allow(Forms::PlanYearForm).to receive(:build).and_return(plan_years.first)
+      allow(plan_years.first).to receive(:benefit_groups).and_return(benefit_groups)
+      allow(benefit_groups.first).to receive(:reference_plan=).and_return(plan)
+      sign_in
+      xhr :get, :calc_employer_contributions, employer_profile_id: "id", reference_plan_id: reference_plan.id
+      expect(response).to have_http_status(:success)
+    end
+  end
+
   describe "GET edit" do
     let(:plan_year) {FactoryGirl.build(:plan_year)}
 

@@ -474,6 +474,38 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "scope employee_name" do
+    let(:employer_profile) {FactoryGirl.create(:employer_profile)}
+    let(:census_employee1) {FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "Amy", last_name: "Frank")}
+    let(:census_employee2) {FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "Javert", last_name: "Burton")}
+    let(:census_employee3) {FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "Burt", last_name: "Love")}
+
+    before :each do
+      CensusEmployee.delete_all
+      census_employee1
+      census_employee2
+      census_employee3
+    end
+
+    it "search by first_name" do
+      expect(CensusEmployee.employee_name("Javert")).to eq [census_employee2]
+    end
+
+    it "search by last_name" do
+      expect(CensusEmployee.employee_name("Frank")).to eq [census_employee1]
+    end
+
+    it "search by full_name" do
+      expect(CensusEmployee.employee_name("Amy Frank")).to eq [census_employee1]
+    end
+
+    it "search by part of name" do
+      expect(CensusEmployee.employee_name("Bur").count).to eq 2
+      expect(CensusEmployee.employee_name("Bur")).to include census_employee2
+      expect(CensusEmployee.employee_name("Bur")).to include census_employee3
+    end
+  end
+
   # context '.edit' do
   #   let(:employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
   #   let(:user) {FactoryGirl.create(:user)}
