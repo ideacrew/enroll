@@ -94,9 +94,7 @@ class CensusEmployee < CensusMember
     return false unless self.may_link_employee_role?
 
     # Guard against linking employee roles with different employer/identifying information
-    if (self.ssn == new_employee_role.ssn) && (self.dob == new_employee_role.dob) &&
-       (self.employer_profile_id == new_employee_role.employer_profile._id)
-
+    if (self.employer_profile_id == new_employee_role.employer_profile._id)
       self.employee_role_id = new_employee_role._id
       self.link_employee_role
       @employee_role = new_employee_role
@@ -106,7 +104,7 @@ class CensusEmployee < CensusMember
                  "#{new_employee_role.inspect} "\
                  "with census employee: #{self.inspect}"
       Rails.logger.error { message }
-      raise CensusEmployeeError, message
+      #raise CensusEmployeeError, message
     end
   end
 
