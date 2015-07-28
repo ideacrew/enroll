@@ -21,14 +21,36 @@ Feature: Create Primary Broker and Broker Agency
     Then I should see the broker application
     When I click on approve broker button
     Then I should see the broker successfully approved message
+    And I should receive an invitation email
+    And I log out
 
-    Given the current broker receives the activation link
-    Then the broker click on the activation link
-    Then I should the login page
+    When I visit invitation url in email
+    Then I should see the login page
     When I click on Create Account
-    Then I should see User registration form
-    When I enter login and password 
-    And create account
-    Then I should see login successful message
-    And I should broker agency home page
+    When I register with valid information
+    Then I should see successful message with broker agency home page
+    And I log out
+
+    Given I haven't signed up as an HBX user
+    When I visit the Employer portal
+    And I sign up with valid user data
+    Then I should see a successful sign up message
+    And I should see an initial form to enter information about my Employer and myself
+    
+    When I click on the Broker Agency tab
+    Then I should see no active broker
+    When I click on Browse Borkers button
+    Then I should see broker agencies index view
+    When I search broker agency by name
+    Then I should see broker agency
+    When I click select broker button
+    Then I should see confirm modal dialog box
+    When I confirm broker selection
+    Then I should see broker selected successful message
+    When I click on the Broker Agency tab
+    Then I should see broker active for the employer
+    When I terminate broker
+    Then I should see broker terminated message
+    When I click on the Broker Agency tab
+    Then I should see no active broker
 
