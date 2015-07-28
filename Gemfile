@@ -108,6 +108,8 @@ group :test do
   gem 'cucumber-rails', '~> 1.4.2', :require => false
   gem 'database_cleaner', '1.3.0'
   gem 'shoulda-matchers', require: false
+  gem 'email_spec'
+  gem 'action_mailer_cache_delivery', '~> 0.3.7'
 #  gem 'headless'
 end
 
