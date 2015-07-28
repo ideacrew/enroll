@@ -1,5 +1,9 @@
 class UserMailer < ApplicationMailer
-  self.delivery_method = :soa_mailer
+
+  Rails.env.production? do
+   self.delivery_method = :soa_mailer
+ end
+
   def welcome(user)
     mail({to: user.email, subject: "Thank you for registering."}) do |format|
       format.text

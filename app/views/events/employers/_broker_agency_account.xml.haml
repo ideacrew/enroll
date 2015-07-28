@@ -1,0 +1,16 @@
+%broker_account
+  %broker_agency
+    %id
+      %id= broker_agency_account.broker_agency_profile.corporate_npn
+    %name= broker_agency_account.broker_agency_profile.legal_name
+    %npn= broker_agency_account.broker_agency_profile.corporate_npn
+  %writing_agent
+    %id
+      %id= broker_agency_account.writing_agent.hbx_id
+    %person
+      %id= broker_agency_account.writing_agent.hbx_id
+      = render :partial => "events/shared/person_name", :object => broker_agency_account.writing_agent.person
+    %npn= broker_agency_account.writing_agent.npn
+  %start_on= simple_date_for(broker_agency_account.start_on)
+  - if !broker_agency_account.end_on.blank?
+    %end_on= simple_date_for(broker_agency_account.end_on)

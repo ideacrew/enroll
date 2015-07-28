@@ -141,6 +141,11 @@ module Factories
       when 1
         person = people.first
         person.user = user if user
+        if person.ssn.nil?
+          #matched on last_name and dob
+          person.ssn = ssn
+          person.gender = gender
+        end
         person.save
         person, is_new = person, false
       when 0

@@ -84,6 +84,7 @@ class QhpBuilder
     if plan.present?
       @qhp.plan = plan
     else
+      puts "Plan Not Saved! Hios: #{@qhp.standard_component_id}, Plan Name: #{@qhp.plan_marketing_name}"
       @qhp.plan = nil
     end
   end

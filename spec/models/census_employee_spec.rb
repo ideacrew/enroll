@@ -174,7 +174,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                       let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
 
                       it "should raise an error" do
-                        expect{initial_census_employee.employee_role = invalid_employee_role}.to raise_error(CensusEmployeeError)
+                        initial_census_employee.employee_role = invalid_employee_role
+                        expect(initial_census_employee.employee_role_linked?).to be_falsey
                       end
                     end
 

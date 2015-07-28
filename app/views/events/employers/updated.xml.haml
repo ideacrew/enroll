@@ -1,0 +1,18 @@
+!!! XML
+%organization{ :xmlns => "http://openhbx.org/api/terms/1.0" }
+  %id
+    %id= employer.hbx_id
+  %name= employer.legal_name.strip
+  - if !employer.dba.blank?
+    %dba= employer.dba.strip
+  %fein= employer.fein.strip
+  %is_active= employer.is_active.to_s
+  %employer_profile
+    %business_entity_kind= nil # TODO: Fix this to use the right mapping
+    - if !employer.sic_code.blank?
+      %sic_code= employer.sic_code
+    %plan_years
+      = render :partial => "events/employers/plan_year", :collection => employer.plan_years
+    %brokers
+      = render :partial => "events/employers/broker_agency_account", :collection => employer.broker_agency_accounts
+  = render :partial => "events/shared/versioned_resource", :object => employer
