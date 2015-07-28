@@ -1,15 +1,3 @@
-Given(/^I haven't signed up as an HBX user$/) do
-end
-
-When(/^I visit the Employer portal$/) do
-  @browser.goto("http://localhost:3000/")
-  @browser.a(text: /Employer Portal/).wait_until_present
-  @browser.a(text: /Employer Portal/).click
-  screenshot("employer_start")
-  @browser.a(text: /Create account/).wait_until_present
-  @browser.a(text: /Create account/).click
-end
-
 And(/^I sign up with valid user data$/) do
   @browser.text_field(name: "user[password_confirmation]").wait_until_present
   @browser.text_field(name: "user[email]").set("trey.evans#{rand(100)}@dc.gov")
@@ -17,12 +5,6 @@ And(/^I sign up with valid user data$/) do
   @browser.text_field(name: "user[password_confirmation]").set("12345678")
   screenshot("employer_create_account")
   @browser.input(value: /Create account/).click
-end
-
-Then(/^I should see a successful sign up message$/) do
-  Watir::Wait.until(30) { @browser.element(text: /Welcome! Your account has been created./).present? }
-  screenshot("employer_sign_up_welcome")
-  expect(@browser.element(text: /Welcome! Your account has been created./).visible?).to be_truthy
 end
 
 And(/^I should see an initial form to enter information about my Employer and myself$/) do

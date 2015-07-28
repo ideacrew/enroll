@@ -231,6 +231,39 @@ Then(/^I should see broker terminated message$/) do
 end
 
 
+And(/^I sign up as a new employer$/) do
+  fill_user_registration_form({email: "tim.wood@example.com", password: "12345678"})
+  @browser.input(value: /Create account/).click
+end
+
+
+When(/^I create new employer profile$/) do
+
+  office_location = {
+      address1: "609 H ST SW",
+      address2: "Suite 200",
+      city: "Washington DC",
+      state: "DC",
+      zip: "20005",
+      phone_area_code: "202",
+      phone_number: "7030000",
+      phone_extension: "1000"
+     }
+
+  enter_employer_profile( {
+    first_name: "Tim",
+    last_name: "Wood",
+    dob: "08/13/1979",
+    legal_name: "Legal LLC",
+    dba: "Legal LLC",
+    fein: "890000223",
+    office_location: office_location
+  } )
+
+  scroll_then_click(@browser.button(class: "interaction-click-control-create-employer"))
+end
+
+
 
 
 

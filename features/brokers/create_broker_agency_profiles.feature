@@ -33,9 +33,9 @@ Feature: Create Primary Broker and Broker Agency
 
     Given I haven't signed up as an HBX user
     When I visit the Employer portal
-    And I sign up with valid user data
+    And I sign up as a new employer
     Then I should see a successful sign up message
-    And I should see an initial form to enter information about my Employer and myself
+    And I create new employer profile
     
     When I click on the Broker Agency tab
     Then I should see no active broker
