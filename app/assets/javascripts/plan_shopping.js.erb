@@ -68,6 +68,7 @@ function applyPlanFilters() {
     applyPlanFilterCBs("plan-metal-network-selection-filter", "data-plan-metal-network-filter", "data-plan-metal-network")
   ];
   combineAllPlanSelectors(all_selectors);
+  $("strong#plans-count").text($(".plan-row:visible").length);
 }
 
 var plansToCompareArray = new Array();
@@ -164,10 +165,10 @@ $(function() {
 
   $(".all-filters-row .reset-btn").on('click', function() {
     $(".filter-sidebar input[type='checkbox']").attr("checked", false);
-    $(".filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("10");
-    $(".filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val("2000");
+    $(".filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("0");
+    $(".filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val($('#max_total_employee_cost').val());
     $(".filter-sidebar input[type='text'].plan-metal-deductible-from-selection-filter").val("0");
-    $(".filter-sidebar input[type='text'].plan-metal-deductible-to-selection-filter").val("2000");
+    $(".filter-sidebar input[type='text'].plan-metal-deductible-to-selection-filter").val($('#max_deductible').val());
     $(".filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
     $(".filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
 		applyPlanFilters();

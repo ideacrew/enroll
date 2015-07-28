@@ -43,6 +43,10 @@ RSpec.describe "group_selection/new.html.erb" do
     it "should have a readonly checkbox option" do
       expect(rendered).to have_selector("input[readonly='readonly']", count: 1)
     end
+
+    it "should have a 'not eligible'" do
+      expect(rendered).to have_selector('td', text: 'not eligible')
+    end
   end
 
   context "family member" do

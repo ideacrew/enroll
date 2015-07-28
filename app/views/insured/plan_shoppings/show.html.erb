@@ -11,7 +11,7 @@
                     Individual: <strong><%= @person.full_name %></strong> &nbsp;&nbsp;
                     Dependents: <strong><%= @hbx_enrollment.humanized_dependent_summary %></strong> &nbsp;&nbsp;
                     Employer: <strong><%= @benefit_group.plan_year.employer_profile.dba %></strong> &nbsp;&nbsp;
-                    Plans: <strong><%= @plans.count %></strong>
+                    Plans: <strong id='plans-count'><%= @plans.count %></strong>
               </p>
 
               <p class="pull-right">

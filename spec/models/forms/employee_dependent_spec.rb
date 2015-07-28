@@ -240,4 +240,20 @@ describe Forms::EmployeeDependent, "relationship validation" do
       expect(subject.errors.to_hash[:base]).to include("can not have multiple spouse or life partner") 
     end
   end
+
+  context "change to spouse from life_partner" do
+    let(:relationship) { "spouse" }
+
+    it "should success" do
+      allow(family_member).to receive(:relationship).and_return("life_partner")
+      allow(family_member).to receive(:reactivate!).and_return(true)
+      allow(FamilyMember).to receive(:find).and_return(family_member)
+
+      dependent = Forms::EmployeeDependent.find(family_member.id)
+      dependent.update_attributes(person_properties.merge({:family_id => family.id, :relationship => relationship, :id => family_member.id }))
+
+      expect(dependent.valid?).to be true
+      expect(dependent.errors[:base].any?).to be_falsey
+    end
+  end
 end

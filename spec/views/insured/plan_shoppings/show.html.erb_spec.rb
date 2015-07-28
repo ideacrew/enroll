@@ -49,6 +49,7 @@ RSpec.describe "insured/show" do
     expect(rendered).to have_selector('p', text:  @benefit_group.plan_year.employer_profile.dba)
 
   end
+
   it 'should not identify Broker control in the header when signed in as Consumer' do
     sign_in consumer_user
     render :template => 'layouts/_header.html.erb'
@@ -56,4 +57,9 @@ RSpec.describe "insured/show" do
     expect(rendered).to match(/Welcome|Family/)
   end
 
+  it "should get the plans-count" do
+    sign_in consumer_user
+    render :template => "insured/plan_shoppings/show.html.erb"
+    expect(rendered).to have_selector('strong#plans-count')
+  end
 end

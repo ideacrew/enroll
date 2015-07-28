@@ -108,8 +108,8 @@
                       <th>Plan Option Kind</th>
                       <td><%= "#{bg.plan_option_kind.titleize}" %></td>
                       <td colspan="2"><%= bg.relationship_benefits[4].relationship.try(:humanize) %></td>
-                      <td></td>
-                      <td></td>
+                      <td><%= bg.relationship_benefits[4].offered ? "Yes" : "No" %></td>
+                      <td><%= number_to_percentage bg.relationship_benefits[4].premium_pct, precision: 0 %></td>
                     </tr>
                     </table>
                     <br>
