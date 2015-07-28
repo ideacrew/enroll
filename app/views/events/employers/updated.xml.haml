@@ -1,0 +1,13 @@
+!!! XML
+%employer{ :xmlns => "http://openhbx.org/api/terms/1.0" }
+  %id
+    %id= employer.hbx_id
+  %name= employer.legal_name.strip
+  - if !employer.dba.blank?
+    %dba= employer.dba.strip
+  %fein= employer.fein.strip
+  %plan_years
+    = render :partial => "events/employers/plan_year", :collection => employer.plan_years
+  %is_active= employer.is_active.to_s
+  = render :partial => "events/shared/versioned_resource", :object => employer
+  %business_entity_kind= nil # TODO add business entity kind mapping

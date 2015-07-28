@@ -1,0 +1,4 @@
+%created_at= xml_iso8601_for(versioned_resource.created_at)
+%modified_at= xml_iso8601_for(versioned_resource.updated_at)
+- if versioned_resource.respond_to?(:resource_version)
+  %version= versioned_resource.resource_version

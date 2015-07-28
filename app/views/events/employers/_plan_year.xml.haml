@@ -1,0 +1,9 @@
+%plan_year
+  %plan_year_start= simple_date_for(plan_year.start_on)
+  %plan_year_end= simple_date_for(plan_year.end_on)
+  %fte_count= plan_year.fte_count
+  %pte_count= plan_year.pte_count
+  %open_enrollment_start= simple_date_for(plan_year.open_enrollment_start_on)
+  %open_enrollment_end= simple_date_for(plan_year.open_enrollment_end_on)
+  %plans
+  = render :partial => "events/shared/versioned_resource", :object => plan_year
