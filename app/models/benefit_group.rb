@@ -176,11 +176,6 @@ class BenefitGroup
     return found_value
   end
 
-  # TODO -- fix
-  def within_new_hire_window?(hire_date)
-    false
-  end
-
   def estimated_monthly_employer_contribution
     plan_year.employer_profile.census_employees.active.collect do |ce|
       pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)

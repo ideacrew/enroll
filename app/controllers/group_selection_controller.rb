@@ -23,7 +23,7 @@ class GroupSelectionController < ApplicationController
       hbx_enrollment = HbxEnrollment.new_from(
         employee_role: @employee_role,
         coverage_household: @coverage_household,
-        benefit_group: find_benefit_group(@employee_role))
+        benefit_group: @employee_role.benefit_group)
     end
 
     hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
@@ -56,7 +56,4 @@ class GroupSelectionController < ApplicationController
     @hbx_enrollment = (@family.latest_household.try(:hbx_enrollments).active || []).last
   end
 
-  def find_benefit_group(employee_role)
-    employee_role.benefit_group
-  end
 end

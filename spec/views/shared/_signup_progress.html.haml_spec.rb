@@ -56,12 +56,24 @@ RSpec.describe "shared/_signup_progress.html.haml" do
     let(:plan) { instance_double("Plan", id: "plan id") }
     before :each do
       assign(:enrollment, hbx_enrollment)
+      assign(:enrollable, true)
       assign(:plan, plan)
-      render "shared/signup_progress", step: 6
     end
 
     it "should display the waive button" do
+      render "shared/signup_progress", step: 6
       expect(rendered).to have_selector('a', text: /Waive/)
+    end
+
+    context "when enrollment cannot be completed" do
+      before :each do
+        assign(:enrollable, false)
+      end
+
+      it "should disable the purchase button" do
+        render "shared/signup_progress", step: 6
+        expect(rendered).to match /<a[^>]*disabled="disabled"[^>]*>Purchase/
+      end
     end
   end
 

@@ -7,7 +7,7 @@
 
         <div id="employee_roster">
           <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <h3 class="title-inline">Employee Roster</h3>
             </div>
 
@@ -33,7 +33,30 @@
               </div>
             </div>
 
-            <div class="col-md-4 text-right">
+            <div class="col-md-3">
+              <%= form_tag employers_employer_profile_path(@employer_profile), method: :get, remote: true, class: 'input-no-pd', id: 'census_employee_search' do %>
+                <%= hidden_field_tag(:status, 'active') %>
+                <%= hidden_field_tag(:search, true) %>
+                <div class="input-group">
+                  <%= text_field_tag(:employee_name, params[:employee_name], placeholder: 'Employee Name', class: 'form-control') %>
+                  <div class="input-group-btn">
+                    <div class="btn btn-default" id='census_employee_search_clear'>
+                      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </div>
+                    <%= submit_tag "Search", class: 'btn btn-default' %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+            <script>
+              $(function() {
+                $( "#employee_name" ).autocomplete({
+                  source: <%= raw @avaliable_employee_names.to_s %>
+                });
+              });
+            </script>
+
+            <div class="col-md-2 text-right">
               <% if @employer_profile.plan_years.empty? %>
                 <!--  non javascript click when clicked on new employee -->
                 <%= link_to 'Add Employee', new_employers_employer_profile_census_employee_path(@employer_profile), class: "btn btn-primary btn-br" %>

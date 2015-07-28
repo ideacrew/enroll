@@ -1,7 +1,6 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
   before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :assignment_benefit_group ]
-  #before_action :check_plan_year, only: [:new]
 
   def new
     @census_employee = build_census_employee
@@ -119,9 +118,10 @@ class Employers::CensusEmployeesController < ApplicationController
         new_census_employee.hired_on = @rehiring_date
         if new_census_employee.valid? and @census_employee.valid?
           @census_employee.save
-          @census_employee.build_address unless @census_employee.address.present?
-          @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
-          new_census_employee.save
+
+          # for new_census_employee
+          new_census_employee.build_address if new_census_employee.address.blank?
+          new_census_employee.benefit_group_assignments.build if new_census_employee.benefit_group_assignments.blank?
           @census_employee = new_census_employee
           flash[:notice] = "Successfully rehired Census Employee."
         else
@@ -244,13 +244,6 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.build_email
     @census_employee.benefit_group_assignments.build
     @census_employee
-  end
-
-  def check_plan_year
-    if @employer_profile.plan_years.empty?
-      flash[:notice] = "Please create a plan year before you create your first census employee."
-      redirect_to new_employers_employer_profile_plan_year_path(@employer_profile)
-    end
   end
 
 end

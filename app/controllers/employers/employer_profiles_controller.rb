@@ -6,7 +6,7 @@ class Employers::EmployerProfilesController < ApplicationController
   def index
     @q = params.permit(:q)[:q]
     @orgs = Organization.search(@q).exists(employer_profile: true)
- 
+
     if current_user.person.try(:broker_role)
       broker_id = current_user.person.broker_role.broker_agency_profile_id.to_s
       profile = BrokerAgencyProfile.find(broker_id)
@@ -125,8 +125,10 @@ class Employers::EmployerProfilesController < ApplicationController
 
   private
     def paginate_employees
-      status_params = params.permit(:id, :status)
+      status_params = params.permit(:id, :status, :search)
       @status = status_params[:status] || 'active'
+      @search = status_params[:search] || false
+      @avaliable_employee_names ||= @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
 
       census_employees = case @status
       when 'waived'
@@ -138,6 +140,7 @@ class Employers::EmployerProfilesController < ApplicationController
       else
         @employer_profile.census_employees.active.sorted
       end
+      census_employees = census_employees.search_by(params.slice(:employee_name))
       @page_alphabets = page_alphabets(census_employees, "last_name")
       if params[:page].present?
         page_no = cur_page_no(@page_alphabets.first)

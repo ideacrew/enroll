@@ -32,12 +32,9 @@
             <div class="panel panel-default min-h">
               <div class="panel-body">
                 <h3 style="margin-top: 0"><%= @person.full_name %></h3>
-                <p>(DC Health link ID : <%= current_user.id %>)</p>
-                <br>
-                <div class="page-header">
-                  <h4>Employer</h4>
-                </div>
-
+                <p class="text-primary">(DC Health link ID : <%= @person.hbx_id %>)</p>
+                <hr>
+                <div class="page-header"><h4>Employer</h4></div>
                 <h3><%= @employer_profile.try(:dba) %></h3>
                 <ul class="list-unstyled list-comp">
                   <li>

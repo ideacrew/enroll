@@ -1,7 +1,7 @@
 <div class="col-lg-3 col-md-3 co-sm-3 col-xs-12 filter-sidebar input-no-pd">
     <h3 class="header-title">Filter Results</h3>
     <div class="checkbox-filter-wrapper">
-        <h5><strong>Metallic Level</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Sample information"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+        <h5><strong>Metal Level</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Sample information"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
 
         <ul class="list-unstyled">
             <li>
@@ -119,11 +119,12 @@
       </ul>
     </div>
     <div class="checkbox-filter-wrapper">
-        <h5><strong>Premium amount</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Will filter by Your Cost"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+        <h5><strong>Premium Amount</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="Will filter by Your Cost"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
         <div class="filter-input-block">
-            <input type="text" class="plan-metal-premium-from-selection-filter form-control" placeholder="$10" value='10'>
+            <input type="text" class="plan-metal-premium-from-selection-filter form-control" placeholder="$0" value='0'>
             <small>To</small>
-            <input type="text" class="plan-metal-premium-to-selection-filter form-control" placeholder="$2000" value='2000'>
+            <input type="text" class="plan-metal-premium-to-selection-filter form-control" placeholder="$<%= @max_total_employee_cost || 2000 %>" value='<%= @max_total_employee_cost || 2000 %>'>
+            <%= hidden_field_tag :max_total_employee_cost, (@max_total_employee_cost || 2000) %>
         </div>
         <br/>
         <br/>
@@ -131,7 +132,8 @@
         <div class="filter-input-block">
             <input type="text" class="plan-metal-deductible-from-selection-filter form-control" placeholder="$0" value='0'>
             <small>To</small>
-            <input type="text" class="plan-metal-deductible-to-selection-filter form-control" placeholder="$5000" value='5000'>
+            <input type="text" class="plan-metal-deductible-to-selection-filter form-control" placeholder="$<%= @max_deductible || 5000 %>" value='<%= @max_deductible || 5000 %>'>
+            <%= hidden_field_tag :max_deductible, (@max_deductible || 5000) %>
         </div>
     </div>
     <div class="checkbox-filter-wrapper">

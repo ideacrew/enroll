@@ -63,10 +63,11 @@
                 <th>Application Status:</th>
                 <td><%= @broker_applicant.broker_role.current_state %></td>
               </tr> 
+              <% disabled = (@broker_applicant.broker_role.active? || @broker_applicant.broker_role.agency_pending?) ? true : false %>
               <%= f.fields_for :broker_role do |broker_role_fields| %>
               <tr>
                 <th style="vertical-align: top;">Reason<span class="text-danger"></span>:</th>
-                <td><%= broker_role_fields.text_area :reason, class: "floatlabel form-control", placeholder: 'Write here...', rows: 6, disabled: (!@broker_applicant.broker_role.applicant? && !@broker_applicant.broker_role.approved_or_pending? ? true : false) %></td>
+                <td><%= broker_role_fields.text_area :reason, class: "floatlabel form-control", placeholder: 'Write here...', rows: 6, disabled: disabled %></td>
               </tr>
               <% end %>
             </tbody>

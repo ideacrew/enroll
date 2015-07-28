@@ -1,6 +1,6 @@
 class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
-
+  before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show]
   def checkout
 
     plan = Plan.find(params.require(:plan_id))
@@ -23,7 +23,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def receipt
-    person = set_current_person
+    person = @person
     @enrollment = HbxEnrollment.find(params.require(:id))
     plan = @enrollment.plan
     benefit_group = @enrollment.benefit_group
@@ -33,14 +33,14 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def thankyou
-    set_current_person
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
     @benefit_group = @enrollment.benefit_group
     @reference_plan = @benefit_group.reference_plan
     @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     @family = @person.primary_family
-    @enrollable = @family.is_eligible_to_enroll?
+    @enrollable = @enrollment.can_complete_shopping?
+    @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
 
     respond_to do |format|
@@ -49,13 +49,13 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def waive
-    person = set_current_person
+    person = @person
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
     waiver_reason = params.require(:waiver_reason)
 
     if (hbx_enrollment.shopping? or hbx_enrollment.coverage_selected?) and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage
-      hbx_enrollment.waiver_reason = waiver_reason 
+      hbx_enrollment.waiver_reason = waiver_reason
       hbx_enrollment.save
       flash[:notice] = "Waive Successful"
     else
@@ -83,13 +83,13 @@ class Insured::PlanShoppingsController < ApplicationController
 
     Caches::MongoidCache.allocate(CarrierProfile)
 
-    set_current_person
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     @benefit_group = @hbx_enrollment.benefit_group
     @reference_plan = @benefit_group.reference_plan
     @plans = @benefit_group.elected_plans.entries.collect() do |plan|
       PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
     end
+    @waivable = @hbx_enrollment.can_complete_shopping?
 
     # for hsa-eligibility
     @plan_hsa_status = {}
@@ -101,6 +101,8 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       @carriers = Array.new(1, @plans.last.try(:carrier_profile).try(:legal_name))
     end
+    @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).max)
+    @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.gsub(/[$,]/, '').to_i}.max)
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
   end
@@ -122,5 +124,11 @@ class Insured::PlanShoppingsController < ApplicationController
     HbxEnrollment.new_from(employer_profile: organization.employer_profile,
                            coverage_household: person.primary_family.households.first.coverage_households.first,
                            benefit_group: benefit_group)
+  end
+
+  private
+  def thousand_ceil(num)
+    return 0 if num.blank?
+    (num.fdiv 1000).ceil * 1000
   end
 end

@@ -386,7 +386,7 @@ And(/^I should be able to enter plan year, benefits, relationship benefits with 
   start_on_field = @browser.div(class: /selectric-wrapper/, text: /SELECT START ON/i)
   start_on_field.click
   start_on_field.li(index: 1).click
-  @browser.h4(text: /Recommend Date/).wait_until_present
+  @browser.h3(text: /Recommend Dates/).wait_until_present
   expect(@browser.text.include?("Employer initial application earliest submit on")).to be_truthy
   @browser.text_field(name: "plan_year[fte_count]").click
   @browser.text_field(name: "plan_year[fte_count]").set("235")
@@ -407,7 +407,7 @@ And(/^I should be able to enter plan year, benefits, relationship benefits with 
   ref_plan.li(index: 5).click # select plan from list.
   # Relationship Benefit
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(51)
-  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
+  # @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]").set(15)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').first.set(true)
   @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').first.set(false)
@@ -439,9 +439,10 @@ When(/^I enter hsa_compatible filter in plan selection page$/) do
   select_carrier.li(text: /CareFirst/).click
   select_hsa = @browser.div(class: /selectric-plan-hsa-eligibility-selection-filter/)
   select_hsa.click
-  select_hsa.li(text: /Yes/i).click
+  select_hsa.li(text: /No/i).click
   scroll_into_view(@browser.checkboxes(class: /plan-metal-level-selection-filter/)[1])
   @browser.checkboxes(class: /plan-metal-level-selection-filter/)[1].set(true)
+  @browser.text_field(class: /plan-metal-deductible-from-selection-filter/).set("2000")
   scroll_then_click(@browser.element(class: /apply-btn/, text: /Apply/))
 end
 
@@ -471,9 +472,9 @@ end
 
 Then(/^I should see the hsa_compatible filter results$/) do
   @browser.divs(class: /plan-row/).select(&:visible?).first do |plan|
-    expect(plan.text.include?("BlueChoice HMO HSA/HRA $2,000, 80%")).to eq true
+    expect(plan.text.include?("BlueChoice Plus $2000")).to eq true
     expect(plan.text.include?("Silver")).to eq true
-    expect(plan.element(text: "$163.47").visible?).to eq true
+    expect(plan.element(text: "$237.15").visible?).to eq true
   end
 end
 

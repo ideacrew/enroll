@@ -174,7 +174,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                       let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
 
                       it "should raise an error" do
-                        expect{initial_census_employee.employee_role = invalid_employee_role}.to raise_error(CensusEmployeeError)
+                        initial_census_employee.employee_role = invalid_employee_role
+                        expect(initial_census_employee.employee_role_linked?).to be_falsey
                       end
                     end
 
@@ -471,6 +472,38 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     it "should success" do
       allow(census_employee).to receive(:census_dependents).and_return([partner1])
       expect(census_employee.errors[:census_dependents].any?).to be_falsey
+    end
+  end
+
+  context "scope employee_name" do
+    let(:employer_profile) {FactoryGirl.create(:employer_profile)}
+    let(:census_employee1) {FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "Amy", last_name: "Frank")}
+    let(:census_employee2) {FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "Javert", last_name: "Burton")}
+    let(:census_employee3) {FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "Burt", last_name: "Love")}
+
+    before :each do
+      CensusEmployee.delete_all
+      census_employee1
+      census_employee2
+      census_employee3
+    end
+
+    it "search by first_name" do
+      expect(CensusEmployee.employee_name("Javert")).to eq [census_employee2]
+    end
+
+    it "search by last_name" do
+      expect(CensusEmployee.employee_name("Frank")).to eq [census_employee1]
+    end
+
+    it "search by full_name" do
+      expect(CensusEmployee.employee_name("Amy Frank")).to eq [census_employee1]
+    end
+
+    it "search by part of name" do
+      expect(CensusEmployee.employee_name("Bur").count).to eq 2
+      expect(CensusEmployee.employee_name("Bur")).to include census_employee2
+      expect(CensusEmployee.employee_name("Bur")).to include census_employee3
     end
   end
 

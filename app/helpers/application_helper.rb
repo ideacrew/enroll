@@ -1,11 +1,11 @@
 module ApplicationHelper
 
-  def datepicker_control(f, field_name, options = {})
+  def datepicker_control(f, field_name, options = {}, value = "")
     sanitized_field_name = field_name.to_s.sub(/\?$/,"")
     opts = options.dup
     obj_name = f.object_name
     obj_val = f.object.send(field_name.to_sym)
-    current_value = obj_val.blank? ? "" : obj_val.is_a?(DateTime) ? obj_val.strftime("%m/%d/%Y") : obj_val
+    current_value = obj_val.blank? ? value : obj_val.is_a?(DateTime) ? obj_val.strftime("%m/%d/%Y") : obj_val
     html_class_list = opts.delete(:class) { |k| "" }
     jq_tag_classes = (html_class_list.split(/\s+/) + ["jq-datepicker"]).join(" ")
     generated_field_name = "jq_datepicker_ignore_#{obj_name}[#{sanitized_field_name}]"

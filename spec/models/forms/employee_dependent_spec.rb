@@ -193,7 +193,6 @@ describe Forms::EmployeeDependent, "relationship validation" do
   let(:family_members) { family.family_members}
   let(:ssn) { nil }
   let(:dob) { "2007-06-09" }
-  let(:relationship) { "spouse" }
 
   let(:person_properties) {
     {
@@ -208,17 +207,53 @@ describe Forms::EmployeeDependent, "relationship validation" do
     }
   }
 
-  subject { Forms::EmployeeDependent.new(person_properties.merge({:family_id => family.id, :relationship => relationship })) }
-
   before(:each) do
     allow(Family).to receive(:find).with(family.id).and_return(family)
     allow(family).to receive(:family_members).and_return(family_members)
     allow(family_members).to receive(:where).and_return([family_member])
-    allow(family_member).to receive(:relationship).and_return("spouse")
   end
 
-  it "should fail with multiple spouse" do
-    expect(subject.valid?).to be false
-    expect(subject.errors.to_hash[:base]).to include("can not have multiple spouse") 
+  context "spouse" do
+    let(:relationship) { "spouse" }
+    subject { Forms::EmployeeDependent.new(person_properties.merge({:family_id => family.id, :relationship => relationship })) }
+
+    it "should fail with multiple spouse" do
+      allow(family_member).to receive(:relationship).and_return("spouse")
+      expect(subject.valid?).to be false
+      expect(subject.errors.to_hash[:base]).to include("can not have multiple spouse or life partner") 
+    end
+
+    it "should fail with spouse and life_partner" do
+      allow(family_member).to receive(:relationship).and_return("life_partner")
+      expect(subject.valid?).to be false
+      expect(subject.errors.to_hash[:base]).to include("can not have multiple spouse or life partner") 
+    end
+  end
+
+  context "life_partner" do
+    let(:relationship) { "life_partner" }
+    subject { Forms::EmployeeDependent.new(person_properties.merge({:family_id => family.id, :relationship => relationship })) }
+
+    it "should fail with multiple life_partner" do
+      allow(family_member).to receive(:relationship).and_return("life_partner")
+      expect(subject.valid?).to be false
+      expect(subject.errors.to_hash[:base]).to include("can not have multiple spouse or life partner") 
+    end
+  end
+
+  context "change to spouse from life_partner" do
+    let(:relationship) { "spouse" }
+
+    it "should success" do
+      allow(family_member).to receive(:relationship).and_return("life_partner")
+      allow(family_member).to receive(:reactivate!).and_return(true)
+      allow(FamilyMember).to receive(:find).and_return(family_member)
+
+      dependent = Forms::EmployeeDependent.find(family_member.id)
+      dependent.update_attributes(person_properties.merge({:family_id => family.id, :relationship => relationship, :id => family_member.id }))
+
+      expect(dependent.valid?).to be true
+      expect(dependent.errors[:base].any?).to be_falsey
+    end
   end
 end

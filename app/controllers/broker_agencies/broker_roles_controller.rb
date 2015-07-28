@@ -45,6 +45,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
       end
     else
       @organization = ::Forms::BrokerAgencyProfile.new(primary_broker_role_params)
+      @organization.languages_spoken = params.require(:organization)[:languages_spoken].reject!(&:empty?) if params.require(:organization)[:languages_spoken].present?
       if @organization.save
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
         redirect_to broker_registration_path
@@ -56,6 +57,11 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   private
+
+  # def convert_to_string(languages_spoken)
+  #   # return languages_spoken unless languages_spoken.respond_to?(:join)
+  #   languages_spoken.reject!(&:empty?) #.join(',')
+  # end
 
   def assign_filter_and_agency_type
     @filter = params[:filter] || 'broker'

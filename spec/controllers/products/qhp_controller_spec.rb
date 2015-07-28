@@ -3,9 +3,15 @@ require 'rails_helper'
 RSpec.describe Products::QhpController, :type => :controller do
   let(:user) { double("User") }
   let(:person) { double("Person")}
+  let(:hbx_enrollment){double("HbxEnrollment")}
+  let(:benefit_group){double("BenefitGroup")}
+  let(:reference_plan){double("Plan")}
   context "GET comparison" do
     before do
       allow(user).to receive(:person).and_return(person)
+      allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
     end
     it "should return comparison of multiple plans" do
       sign_in(user)

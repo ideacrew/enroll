@@ -15,6 +15,28 @@
     <% end %>
   </tr>
   <tr>
+    <th>Your Cost</th>
+      <% qhps.each do |qhp|%>
+        <th colspan="2"><%=number_to_currency(qhp[:total_employee_cost])%></th>
+      <% end %>
+  </tr>
+  <tr>
+    <th>Provider Network</th>
+      <% qhps.each do |qhp|%>
+        <th colspan="2"><%= qhp.plan.nationwide ? "Nationwide" : "DC Area Network" %></th>
+      <% end %>
+  </tr>
+  <tr>
+    <th>SBC Link</th>
+    <% qhps.each do |qhp|%>
+      <th colspan="2">
+        <%= link_to(root_path + "sbc/" + qhp.plan.sbc_file, class: "download") do %>
+          <i class="glyphicon glyphicon-download-alt"> <%=qhp.plan.sbc_file%></i>
+        <% end %>
+      </th>
+    <% end %>
+  </tr>
+  <tr>
 	  <th>Plan Benefits</th>
     <% qhps.each do |qhp|%>
       <th>In Network</th>

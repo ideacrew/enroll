@@ -1,7 +1,6 @@
 class Consumer::EmployeeDependentsController < ApplicationController
+  before_action :set_current_person, :set_family
   def index
-    set_current_person
-    @family = @person.primary_family
     emp_role_id = params.require(:employee_role_id)
     @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
 
@@ -10,7 +9,6 @@ class Consumer::EmployeeDependentsController < ApplicationController
   end
 
   def new
-    set_current_person
     @dependent = Forms::EmployeeDependent.new(:family_id => params.require(:family_id))
     respond_to do |format|
       format.html
@@ -19,7 +17,6 @@ class Consumer::EmployeeDependentsController < ApplicationController
   end
 
   def create
-    set_current_person
     @dependent = Forms::EmployeeDependent.new(params.require(:dependent))
 
     if @dependent.save
@@ -37,8 +34,6 @@ class Consumer::EmployeeDependentsController < ApplicationController
   end
 
   def destroy
-    set_current_person
-    @family = @person.primary_family
     @dependent = Forms::EmployeeDependent.find(params.require(:id))
     @dependent.destroy!
 
@@ -49,8 +44,6 @@ class Consumer::EmployeeDependentsController < ApplicationController
   end
 
   def show
-    set_current_person
-    @family = @person.primary_family
     @dependent = Forms::EmployeeDependent.find(params.require(:id))
 
     respond_to do |format|
@@ -60,8 +53,6 @@ class Consumer::EmployeeDependentsController < ApplicationController
   end
 
   def edit
-    set_current_person
-    @family = @person.primary_family
     @dependent = Forms::EmployeeDependent.find(params.require(:id))
 
     respond_to do |format|
@@ -71,7 +62,6 @@ class Consumer::EmployeeDependentsController < ApplicationController
   end
 
   def update
-    set_current_person
     @family = @person.primary_family
     @dependent = Forms::EmployeeDependent.find(params.require(:id))
 
@@ -86,5 +76,9 @@ class Consumer::EmployeeDependentsController < ApplicationController
         format.js { render 'edit' }
       end
     end
+  end
+private
+  def set_family
+    @family = @person.try(:primary_family)
   end
 end

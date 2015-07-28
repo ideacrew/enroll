@@ -93,7 +93,7 @@ module Forms
         :middle_name => found_family_member.middle_name,
         :name_pfx => found_family_member.name_pfx,
         :name_sfx => found_family_member.name_sfx,
-        :dob => found_family_member.dob,
+        :dob => (found_family_member.dob.is_a?(Date) ? found_family_member.dob.try(:strftime, "%Y-%m-%d") : found_family_member.dob),
         :gender => found_family_member.gender,
         :ssn => found_family_member.ssn
       })
@@ -136,9 +136,11 @@ module Forms
     def relationship_validation
       return if family.blank? or family.family_members.blank?
 
-      relationships = family.family_members.where(is_active: true).map(&:relationship) << self.relationship
-      if relationships.group_by(&:to_s).any? { |k, v| k == "spouse" and v.length > 1 }
-        self.errors.add(:base, "can not have multiple spouse")
+      relationships = Hash.new
+      family.active_family_members.each{|fm| relationships[fm._id.to_s]=fm.relationship}
+      relationships[self.id.to_s] = self.relationship
+      if relationships.values.count{|rs| rs=='spouse' || rs=='life_partner'} > 1
+        self.errors.add(:base, "can not have multiple spouse or life partner")
       end
     end
   end
