@@ -101,6 +101,8 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       @carriers = Array.new(1, @plans.last.try(:carrier_profile).try(:legal_name))
     end
+    @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).max)
+    @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.gsub(/[$,]/, '').to_i}.max)
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
   end
@@ -122,5 +124,11 @@ class Insured::PlanShoppingsController < ApplicationController
     HbxEnrollment.new_from(employer_profile: organization.employer_profile,
                            coverage_household: person.primary_family.households.first.coverage_households.first,
                            benefit_group: benefit_group)
+  end
+
+  private
+  def thousand_ceil(num)
+    return 0 if num.blank?
+    (num.fdiv 1000).ceil * 1000
   end
 end

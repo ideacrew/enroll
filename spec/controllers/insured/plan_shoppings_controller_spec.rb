@@ -208,6 +208,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(PlanCostDecorator).to receive(:new).and_return(plan)
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
+      allow(plan).to receive(:total_employee_cost).and_return(2000)
+      allow(plan).to receive(:deductible).and_return("$998")
       sign_in user
     end
 
