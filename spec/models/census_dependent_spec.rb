@@ -3,17 +3,17 @@ require 'rails_helper'
 RSpec.describe CensusDependent, :type => :model do
   it { should validate_presence_of :employee_relationship }
 
-  it 'properly intantiates the class' do
-    first_name = "Lynyrd"
-    middle_name = "R"
-    last_name = "Skynyrd"
-    name_sfx = "PhD"
-    ssn = "230987654"
-    dob = Date.today
-    gender = "male"
-    employee_relationship = "spouse"
+  let(:first_name) { "Lynyrd" }   
+  let(:middle_name) { "R" }   
+  let(:last_name) { "Skynyrd" }   
+  let(:name_sfx) { "PhD" }   
+  let(:dob) { Date.today }
+  let(:ssn) { "230987654" }
+  let(:gender) { "male" }
+  let(:employee_relationship) { "spouse" }
 
-    dependent = CensusDependent.new(
+  let(:dependent) {
+    CensusDependent.new(
         first_name: first_name,
         middle_name: middle_name,
         last_name: last_name,
@@ -23,7 +23,9 @@ RSpec.describe CensusDependent, :type => :model do
         gender: gender,
         employee_relationship: employee_relationship
       )
+  }
 
+  it 'properly intantiates the class' do
     expect(dependent.first_name).to eq first_name
     expect(dependent.middle_name).to eq middle_name
     expect(dependent.last_name).to eq last_name
@@ -36,7 +38,15 @@ RSpec.describe CensusDependent, :type => :model do
     expect(dependent.errors.messages.size).to eq 0
   end
 
-  it 'fails unless provided with a proper gender'
+  it 'fails unless provided with a proper gender' do
+    dependent.gender = "SOME GARBAGE OMG NOT A GENDER"
+    expect(dependent.valid?).to eq false
+    expect(dependent).to have_errors_on(:gender)
+  end
 
-  it 'fails unless provided with a proper employee_relationship'
+  it 'fails unless provided with a proper employee_relationship' do
+    dependent.employee_relationship = nil
+    expect(dependent.valid?).to eq false
+    expect(dependent).to have_errors_on(:employee_relationship)
+  end
 end
