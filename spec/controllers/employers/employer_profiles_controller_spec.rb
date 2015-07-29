@@ -351,14 +351,15 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(controller).to receive(:employer_profile_params).and_return({})
     end
 
-    it "should not redirect" do
+    it "should redirect" do
       allow(user).to receive(:save).and_return(true)
       allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
       sign_in(user)
       expect(Organization).to receive(:find)
+      expect(EmployerStaffRole).to receive(:create)
       expect(user).to receive(:roles)
       put :update, id: organization.id
-      expect(response).to render_template("edit")
+      expect(response).to be_redirect
     end
 
     context "given current user is invalid" do
