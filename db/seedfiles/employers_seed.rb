@@ -51,13 +51,13 @@ jetson_0 = CensusEmployee.new(
         employer_profile: spacely_employer_profile, is_business_owner: true,
     census_dependents: [
       CensusDependent.new(
-        last_name: "Jetson", first_name: "Jane", dob: "04/01/1981", ssn: 987654322, employee_relationship: "spouse"
+        last_name: "Jetson", first_name: "Jane", dob: "04/01/1981", ssn: 987654322, employee_relationship: "spouse", gender: "female"
         ),
       CensusDependent.new(
-        last_name: "Jetson", first_name: "Judy", dob: "04/01/2000", ssn: 987654323, employee_relationship: "child_under_26"
+        last_name: "Jetson", first_name: "Judy", dob: "04/01/2000", ssn: 987654323, employee_relationship: "child_under_26", gender: "female"
         ),
       CensusDependent.new(
-        last_name: "Jetson", first_name: "Elroy", dob: "04/01/2008", ssn: 987654324, employee_relationship: "child_under_26"
+        last_name: "Jetson", first_name: "Elroy", dob: "04/01/2008", ssn: 987654324, employee_relationship: "child_under_26", gender: "male"
         )
     ]
   ).save!
@@ -180,13 +180,13 @@ org_1_jetson = CensusEmployee.new(
         employer_profile: org_1_employer_profile, is_business_owner: true,
     census_dependents: [
       CensusDependent.new(
-        last_name: "Doe", first_name: "Matt", dob: "01/12/2011", ssn: "022233311", employee_relationship: "child_under_26"
+        last_name: "Doe", first_name: "Matt", dob: "01/12/2011", ssn: "022233311", employee_relationship: "child_under_26", gender: "male"
         ),
       CensusDependent.new(
-        last_name: "Doe", first_name: "Jessica", dob: "03/12/1985", ssn: "021233311", employee_relationship: "spouse"
+        last_name: "Doe", first_name: "Jessica", dob: "03/12/1985", ssn: "021233311", employee_relationship: "spouse", gender: "female"
         ),
       CensusDependent.new(
-        last_name: "Doe", first_name: "Caroline", dob: "04/01/2008", ssn: "021233321", employee_relationship: "child_under_26"
+        last_name: "Doe", first_name: "Caroline", dob: "04/01/2008", ssn: "021233321", employee_relationship: "child_under_26", gender: "female"
         )
     ]
   ).save!
@@ -246,18 +246,18 @@ org_2_employer_profile = org_2.create_employer_profile(
   )
 
 org_2_jetson = CensusEmployee.new(
-      last_name: "Johnson", first_name: "Patricia", dob: "01/12/1980", ssn: "311222331", hired_on: "03/20/2015", gender: "male",
+      last_name: "Johnson", first_name: "Patricia", dob: "01/12/1980", ssn: "311222331", hired_on: "03/20/2015", gender: "female",
       email: Email.new(kind: "work", address: "patricia.johnson@example.com"),
       employer_profile: org_2_employer_profile, is_business_owner: false,
     census_dependents: [
       CensusDependent.new(
-        last_name: "Johnson", first_name: "Matt", dob: "01/12/2011", ssn: "422233311", employee_relationship: "child_under_26"
+        last_name: "Johnson", first_name: "Matt", dob: "01/12/2011", ssn: "422233311", employee_relationship: "child_under_26", gender: "male"
         ),
       CensusDependent.new(
-        last_name: "Johnson", first_name: "Mark", dob: "03/12/1978", ssn: "521233311", employee_relationship: "spouse"
+        last_name: "Johnson", first_name: "Mark", dob: "03/12/1978", ssn: "521233311", employee_relationship: "spouse", gender: "male"
         ),
       CensusDependent.new(
-        last_name: "Johnson", first_name: "Caroline", dob: "04/01/2008", ssn: "621233321", employee_relationship: "child_under_26"
+        last_name: "Johnson", first_name: "Caroline", dob: "04/01/2008", ssn: "621233321", employee_relationship: "child_under_26", gender: "female"
         )
     ]
   ).save!
