@@ -2,8 +2,13 @@
   <div class="row">
   <div id="confirm_plan" class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
     <h3>Confirm Your Plan Selection</h3>
-    <p>Your current plan selection is displayed below. Click the back button if you want to change your selection. Click Purchase button to complete your enrollment.</p>
-    <p>Your enrollment is not complete until you purchase your plan selection below.</p>
+    <% if @terminate.present? %>
+      <p>Click Terminate Plan button to complete your termination from coverage.</p>
+      <p>You will remain enrolled in coverage until you terminate your plan selection below.</p>
+    <% else %>
+      <p>Your current plan selection is displayed below. Click the back button if you want to change your selection. Click Purchase button to complete your enrollment.</p>
+      <p>Your enrollment is not complete until you purchase your plan selection below.</p>
+    <% end %>
     <p>
       <strong><%= @plan.name %></strong><br>
       Starting on : <%= @enrollment.effective_on.strftime("%m/%d/%Y") %>

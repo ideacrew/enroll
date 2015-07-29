@@ -46,5 +46,10 @@ RSpec.describe "consumer_profiles/purchase.html.erb" do
       expect(rendered).to have_selector('a', text: 'Terminate Plan')
       expect(rendered).not_to have_selector('a', text: 'Purchase')
     end
+
+    it "should display the terminate message" do
+      expect(rendered).to have_selector('p', text: 'You will remain enrolled in coverage until you terminate your plan selection below.')
+      expect(rendered).to have_selector('p', text: 'Click Terminate Plan button to complete your termination from coverage.')
+    end
   end
 end
