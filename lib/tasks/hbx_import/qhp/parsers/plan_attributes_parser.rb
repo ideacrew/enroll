@@ -64,9 +64,9 @@ module Parser
         health_care_specialist_referral_type: health_care_specialist_referral_type.gsub(/\n/,'').strip,
         insurance_plan_benefit_exclusion_text: insurance_plan_benefit_exclusion_text.gsub(/\n/,'').strip,
         indian_plan_variation: indian_plan_variation.gsub(/\n/,'').strip,
-        hsa_eligibility: hsa_eligibility.gsub(/\n/,'').strip,
-        employer_hsa_hra_contribution_indicator: employer_hsa_hra_contribution_indicator.gsub(/\n/,'').strip,
-        emp_contribution_amount_for_hsa_or_hra: emp_contribution_amount_for_hsa_or_hra.gsub(/\n/,'').strip,
+        hsa_eligibility: (hsa_eligibility.gsub(/\n/,'').strip rescue ""),
+        employer_hsa_hra_contribution_indicator: (employer_hsa_hra_contribution_indicator.gsub(/\n/,'').strip  rescue ""),
+        emp_contribution_amount_for_hsa_or_hra: (emp_contribution_amount_for_hsa_or_hra.gsub(/\n/,'').strip  rescue ""),
         child_only_offering: child_only_offering.gsub(/\n/,'').strip,
         child_only_plan_id: child_only_plan_id.gsub(/\n/,'').strip,
         is_wellness_program_offered: is_wellness_program_offered.gsub(/\n/,'').strip,
@@ -84,9 +84,9 @@ module Parser
         out_of_service_area_coverage: out_of_service_area_coverage.gsub(/\n/,'').strip,
         out_of_service_area_coverage_description: out_of_service_area_coverage_description.gsub(/\n/,'').strip,
         national_network: national_network.gsub(/\n/,'').strip,
-        summary_benefit_and_coverage_url: summary_benefit_and_coverage_url.gsub(/\n/,'').strip,
+        summary_benefit_and_coverage_url: (summary_benefit_and_coverage_url.gsub(/\n/,'').strip rescue ""),
         enrollment_payment_url: enrollment_payment_url.gsub(/\n/,'').strip,
-        plan_brochure: plan_brochure.gsub(/\n/,'').strip
+        plan_brochure: (plan_brochure.gsub(/\n/,'').strip rescue "")
       }
     end
   end

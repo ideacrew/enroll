@@ -33,8 +33,8 @@ module Parser
         exclusion: exclusion.gsub(/\n/,'').strip,
         explanation: explanation.gsub(/\n/,'').strip,
         ehb_variance_reason: ehb_variance_reason.gsub(/\n/,'').strip,
-        subject_to_deductible_tier_1: subject_to_deductible_tier_1.gsub(/\n/,'').strip,
-        subject_to_deductible_tier_2: subject_to_deductible_tier_2.gsub(/\n/,'').strip,
+        subject_to_deductible_tier_1: (subject_to_deductible_tier_1.gsub(/\n/,'').strip rescue ""),
+        subject_to_deductible_tier_2: (subject_to_deductible_tier_2.gsub(/\n/,'').strip rescue ""),
         excluded_in_network_moop: excluded_in_network_moop.gsub(/\n/,'').strip,
         excluded_out_of_network_moop: excluded_out_of_network_moop.gsub(/\n/,'').strip
       }
