@@ -1,6 +1,10 @@
 require 'date'
 module Forms
   class BrokerAgencyProfile < ::Forms::OrganizationSignup
+
+    include ActiveModel::Validations
+    include Validations::Email
+
     attr_accessor :broker_agency_profile
     attr_accessor :market_kind, :languages_spoken
     attr_accessor :working_hours, :accept_new_clients, :home_page, :corporate_npn
@@ -10,6 +14,8 @@ module Forms
     validates :market_kind,
       inclusion: { in: ::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid market kind" },
       allow_blank: false
+
+    validates :email, :email => true, :allow_blank => false
 
     class OrganizationAlreadyMatched < StandardError; end
 

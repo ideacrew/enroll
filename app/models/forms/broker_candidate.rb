@@ -1,8 +1,11 @@
 module Forms
   class BrokerCandidate < ::Forms::PersonSignup
     include ActiveModel::Validations
+    include Validations::Email
+
     include PeopleNames
     include NpnField
+
 
     attr_accessor :broker_agency_id, :broker_applicant_type
 
@@ -15,12 +18,16 @@ module Forms
       numericality: true,
       :if => Proc.new {|p| p.broker_applicant_type != 'staff'}
 
+    validates :email, :email => true, :allow_blank => false
+
+
     def save
       return false unless valid?
 
       begin
         match_or_create_person
         person.save!
+  
       rescue TooManyMatchingPeople
         errors.add(:base, "too many people match the criteria provided for your identity.  Please contact HBX.")
         return false      
