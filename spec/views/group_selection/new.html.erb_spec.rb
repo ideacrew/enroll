@@ -45,7 +45,7 @@ RSpec.describe "group_selection/new.html.erb" do
     end
 
     it "should have a 'not eligible'" do
-      expect(rendered).to have_selector('td', text: 'not eligible')
+      expect(rendered).to have_selector('td', text: 'ineligible relationship')
     end
   end
 
