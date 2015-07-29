@@ -76,15 +76,10 @@ class Products::Qhp
 
   field :plan_id, type: BSON::ObjectId
 
-  validates_presence_of :issuer_id, :state_postal_code,
-                        :standard_component_id, :plan_marketing_name, :hios_product_id, :network_id, 
-                        :service_area_id, :formulary_id, :is_new_plan, :plan_type, :metal_level,
-                        :unique_plan_design, :qhp_or_non_qhp, :insurance_plan_pregnancy_notice_req_ind, 
-                        :is_specialist_referral_required, :hsa_eligibility, :emp_contribution_amount_for_hsa_or_hra,
-                        :child_only_offering, :is_wellness_program_offered, :plan_effective_date,
-                        :out_of_country_coverage, :out_of_service_area_coverage, :national_network #,
-#                        :summary_benefit_and_coverage_url
-
+  validates_presence_of :issuer_id, :state_postal_code, :standard_component_id, :plan_marketing_name, :hios_product_id,
+                        :network_id, :service_area_id, :is_new_plan, :plan_type, :metal_level,
+                        :qhp_or_non_qhp, :emp_contribution_amount_for_hsa_or_hra, :child_only_offering,
+                        :plan_effective_date, :out_of_country_coverage, :out_of_service_area_coverage, :national_network
 
   embeds_many :qhp_benefits,
     class_name: "Products::QhpBenefit",
