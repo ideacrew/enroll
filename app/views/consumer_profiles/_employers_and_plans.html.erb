@@ -35,15 +35,17 @@
                 <p class="text-primary">(DC Health link ID : <%= @person.hbx_id %>)</p>
                 <hr>
                 <div class="page-header"><h4>Employer</h4></div>
-                <h3><%= @employer_profile.try(:dba) %></h3>
-                <ul class="list-unstyled list-comp">
-                  <li>
-                    HIRED: <EM><%=@employee_role.try(:hired_on) ?  @employee_role.hired_on.strftime("%m/%d/%Y"):  " " %></EM>
-                  </li>
-                  <li>
-                    ELIGIBLE FOR COVERAGE: <EM><%= @employee_role.try(:effective_on) ? @employee_role.try(:effective_on).strftime("%m/%d/%Y") :" " %></EM>
-                  </li>
-                </ul>
+                <% unless @employee_role.census_employee.try(:employment_terminated?) %>
+                  <h3><%= @employer_profile.try(:dba) %></h3>
+                  <ul class="list-unstyled list-comp">
+                    <li>
+                      HIRED: <EM><%=@employee_role.try(:hired_on) ?  @employee_role.hired_on.strftime("%m/%d/%Y"):  " " %></EM>
+                    </li>
+                    <li>
+                      ELIGIBLE FOR COVERAGE: <EM><%= @employee_role.try(:effective_on) ? @employee_role.try(:effective_on).strftime("%m/%d/%Y") :" " %></EM>
+                    </li>
+                  </ul>
+                <% end %>
               </div>
             </div>
           </div>

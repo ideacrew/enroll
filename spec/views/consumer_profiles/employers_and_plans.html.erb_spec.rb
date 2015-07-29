@@ -65,4 +65,44 @@ RSpec.describe "consumer_profiles/_employers_and_plans.html.erb" do
       expect(rendered).to match(/Terminated on/) 
     end
   end
+
+  context "when employment_terminated" do
+    let(:census_employee) {double(employment_terminated?: true)}
+    let(:employee_role) {double(effective_on: Date.new(2015,8,8), census_employee: census_employee, id: 'employee_role')}
+    let(:benefit_group_assignment) { double(coverage_waived?: false) }
+
+    before :each do
+      assign(:employee_role, employee_role)
+      assign(:hbx_enrollments, [hbx_enrollment])
+      assign(:person, person)
+      assign(:employee_role, employee_role)
+      sign_in user
+      render template: "consumer_profiles/_employers_and_plans.html.erb"
+    end
+
+    it "should not show employer info" do
+      expect(rendered).not_to match(/HIRED/) 
+      expect(rendered).not_to match(/ELIGIBLE FOR COVERAGE/) 
+    end
+  end
+
+  context "when not employment_terminated" do
+    let(:census_employee) {double(employment_terminated?: false)}
+    let(:employee_role) {double(effective_on: Date.new(2015,8,8), census_employee: census_employee, id: 'employee_role')}
+    let(:benefit_group_assignment) { double(coverage_waived?: false) }
+
+    before :each do
+      assign(:employee_role, employee_role)
+      assign(:hbx_enrollments, [hbx_enrollment])
+      assign(:person, person)
+      assign(:employee_role, employee_role)
+      sign_in user
+      render template: "consumer_profiles/_employers_and_plans.html.erb"
+    end
+
+    it "should show employer info" do
+      expect(rendered).to match(/HIRED/) 
+      expect(rendered).to match(/ELIGIBLE FOR COVERAGE/) 
+    end
+  end
 end
