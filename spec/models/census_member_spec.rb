@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe CensusMember, :type => :model do
+RSpec.describe CensusMember, :db_clean => :after_all do
   it { should validate_presence_of :first_name }
   it { should validate_presence_of :last_name }
   it { should validate_presence_of :dob }
@@ -38,6 +38,15 @@ RSpec.describe CensusMember, :type => :model do
       expect(census_employee.save).to be_falsey
       expect(census_employee.errors[:dob].any?).to be_truthy
       expect(census_employee.errors[:dob].to_s).to match /future date: #{dob.to_s} is invalid date of birth/
+    end
+  end
+
+  context "without a gender" do
+    it "should be invalid" do
+      expect(census_employee.valid?).to eq true
+      census_employee.gender = nil
+      expect(census_employee.valid?).to eq false
+      expect(census_employee).to have_errors_on(:gender)
     end
   end
 end
