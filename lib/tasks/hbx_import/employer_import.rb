@@ -356,7 +356,7 @@ module HbxImport
       if @carrier_plans.has_key?(key)
         @carrier_plans[key]
       else
-        @carrier_plans[key] = carrier_profile.plans.where(active_year: year, market: "shop").collect(&:_id)
+        @carrier_plans[key] = carrier_profile.plans.where(active_year: year, market: "shop", coverage_kind: "health").collect(&:_id)
       end
     end
 
@@ -366,7 +366,7 @@ module HbxImport
       if @metal_plans.has_key?(key)
         @metal_plans[key]
       else
-        @metal_plans[key] = Plan.shop_market.where(metal_level: metal_level).and(active_year: year).collect(&:_id)
+        @metal_plans[key] = Plan.shop_market.where(metal_level: metal_level).and(active_year: year, coverage_kind: "health").collect(&:_id)
       end
     end
 

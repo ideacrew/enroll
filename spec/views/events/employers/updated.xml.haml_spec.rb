@@ -23,7 +23,6 @@ RSpec.describe "events/employer/updated.haml.erb" do
     end
 
     it "should have one plan year" do
-      puts rendered
       expect(rendered).to have_xpath("//plan_years/plan_year")
     end
 

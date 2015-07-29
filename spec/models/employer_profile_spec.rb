@@ -217,6 +217,7 @@ describe EmployerProfile, "given an unlinked, linkable census employee with a fa
   let(:census_employee) { CensusEmployee.new(
     :ssn => census_ssn,
     :dob => census_dob,
+    :gender => "male",
     :employer_profile_id => "1111",
     :first_name => "Roger",
     :last_name => "Martin",

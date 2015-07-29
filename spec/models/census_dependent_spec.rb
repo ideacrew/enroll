@@ -25,7 +25,7 @@ RSpec.describe CensusDependent, :type => :model do
       )
   }
 
-  it 'properly intantiates the class' do
+  it 'properly instantiates the class' do
     expect(dependent.first_name).to eq first_name
     expect(dependent.middle_name).to eq middle_name
     expect(dependent.last_name).to eq last_name
@@ -38,8 +38,14 @@ RSpec.describe CensusDependent, :type => :model do
     expect(dependent.errors.messages.size).to eq 0
   end
 
-  it 'fails unless provided with a proper gender' do
-    dependent.gender = "SOME GARBAGE OMG NOT A GENDER"
+  it 'fails unless provided with a gender' do
+    dependent.gender = nil
+    expect(dependent.valid?).to eq false
+    expect(dependent).to have_errors_on(:gender)
+  end
+
+  it 'fails when provided a bogus gender' do
+    dependent.gender = "OMG SO NOT A GENDER DUDE"
     expect(dependent.valid?).to eq false
     expect(dependent).to have_errors_on(:gender)
   end
