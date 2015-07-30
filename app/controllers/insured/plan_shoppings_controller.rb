@@ -101,8 +101,8 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       @carriers = Array.new(1, @plans.last.try(:carrier_profile).try(:legal_name))
     end
-    @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).max)
-    @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.gsub(/[$,]/, '').to_i}.max)
+    @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
+    @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
   end
