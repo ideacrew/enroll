@@ -129,6 +129,12 @@ Rails.application.routes.draw do
     end
     resources :profiles, only: [:new, :create, :show, :index] do
       get :inbox
+
+      collection do
+        get :employers
+        get :brokers
+        get :messages
+      end  
     end
     resources :broker_roles, only: [:create] do
       root 'broker_roles#new_broker'
