@@ -3,7 +3,7 @@
     <div class="row tab-row">
       <%= render 'employer_menu' %>
 
-      <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(@organization, form: params[:action]), method: :put} do |f| %>
+      <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(@organization), method: :put} do |f| %>
 
         <%#= render "shared/error_messages", object: f.object %>
         <% if @organization.errors.any? %>
@@ -45,18 +45,18 @@
               <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location| %>
                 <%= render partial: 'shared/office_location_fields', locals: {f: office_location} %>
               <% end %>
-              <br/>
+
+                <br/>
+
               <div class="form-inputs">
                 <%= link_to_add_fields '<i class="fa fa-user-plus"></i> Add Office Location'.html_safe, f, :office_locations, 'btn btn-success pull-right' %>
+                <br/>
               </div>
 
               <div class="row top-row no-border">
-                <% button_name = @organization.persisted? ? 'Save' : 'Create' %>
-                <button type="submit" class="btn btn-primary pull-left sm_full_width">
-                  <%= "#{button_name}".html_safe %>
-                </button> &nbsp;&nbsp;
-                <%= link_to "Cancel", employers_employer_profile_path(@organization.employer_profile), class:'btn btn-transparent pull-left' %>
+                <%= f.submit "Create", class: "btn btn-save" %>
               </div>
+
             </div>
           </div>
         </div>
