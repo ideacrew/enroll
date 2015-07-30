@@ -462,6 +462,7 @@ Then(/^I should see my plan/) do
 end
 
 When(/^I should see a published success message$/) do
-  @browser.element(class: /mainmenu/).wait_until_present
+  # @browser.element(class: /mainmenu/).wait_until_present
+  @browser.element(text: /turner agency.*inc enrollment/i).wait_until_present
   expect(@browser.element(text: /Plan Year successfully published/).visible?).to be_truthy
 end
