@@ -74,18 +74,6 @@ Then(/^I should see broker registration successful message$/) do
   expect(@browser.element(text: /Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed./).visible?).to be_truthy
 end
 
-
-When(/^I login as an Hbx Admin$/) do
-  @browser.goto("http://localhost:3000/")
-  @browser.a(class: /interaction-click-control-hbx-portal/).wait_until_present
-  @browser.a(class: /interaction-click-control-hbx-portal/).click
-  @browser.element(class: /interaction-click-control-sign-in/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-user-email/).set("admin@dc.gov")
-  @browser.text_field(class: /interaction-field-control-user-password/).set("password")
-  @browser.element(class: /interaction-click-control-sign-in/).click
-end
-
-
 And(/^I click on brokers tab$/) do
   @browser.element(class: /interaction-click-control-brokers/).wait_until_present
   scroll_then_click(@browser.element(class: /interaction-click-control-brokers/))
@@ -159,7 +147,7 @@ Then(/^I should see no active broker$/) do
   expect(@browser.element(text: /No Active Broker/).visible?).to be_truthy
 end
 
-When(/^I click on Browse Borkers button$/) do
+When(/^I click on Browse Brokers button$/) do
   @browser.a(text: /Browse Brokers/).wait_until_present
   @browser.a(text: /Browse Brokers/).click
 end
@@ -263,11 +251,152 @@ When(/^I create new employer profile$/) do
   scroll_then_click(@browser.button(class: "interaction-click-control-create-employer"))
 end
 
+When(/([^ ]+) logs on to ([^ ]+)/) do |signon, portal|
+  user,password = signon.split('/')
+  @browser.goto("http://localhost:3000/")
+  portal_class = "interaction-click-control-#{portal.downcase}"
+  @browser.a(class: portal_class).wait_until_present
+  @browser.a(class: portal_class).click
+  @browser.element(class: /interaction-click-control-sign-in/).wait_until_present
+  @browser.text_field(class: /interaction-field-control-user-email/).set(user)
+  @browser.text_field(class: /interaction-field-control-user-password/).set(password)
+  @browser.element(class: /interaction-click-control-sign-in/).click
+end
 
+When(/^I click on the (\w+) tab$/) do |tab_name|
+  @browser.element(text: /#{tab_name}/).wait_until_present
+  scroll_then_click(@browser.a(text: /#{tab_name}/))
+end 
 
+Then(/^I should see Employer and click on legal name$/) do
+  @browser.a(text: /Legal LLC/).wait_until_present
+  @browser.a(text: /Legal LLC/).click
+end
 
+Then(/^I should see the Employer Profile page as Broker$/) do
+  wait_and_confirm_text(/Premium Billing Report/)
+  expect(@browser.element(text: /I'm a Broker/).visible?).to be_truthy
+end
 
+Then(/^I publish a Plan Year as Broker$/) do
+  click_when_present(@browser.element(class: /interaction-click-control-benefits/))
+  click_when_present(@browser.element(class: /interaction-click-control-add-plan-year/))
+  start_on = @browser.element(class: /selectric-interaction-choice-control-plan-year-start-on/)
+  click_when_present(start_on)
+  click_when_present(start_on.lis()[1])
+  id="plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_premium_pct"
+  @browser.text_field(id: id).set(50)
 
+  select_plan_class ="selectric-interaction-choice-control-plan-year-benefit-groups-attributes-0-plan-option-kind"
+  select_plan = @browser.element(class: select_plan_class)
+  click_when_present(select_plan)
+  click_when_present(select_plan.lis()[3])
 
+  f=@browser.element(class: 'form-inputs')
+  benefit_form = @browser.element(class: 'form-inputs')
+  select_carrier = benefit_form.element(text: 'SELECT CARRIER').parent.parent.parent
+  scroll_then_click(select_carrier)
+  click_when_present(select_carrier.lis()[1])
+  
+  select_reference = benefit_form.element(text: 'SELECT REFERENCE PLAN').parent.parent.parent
+  scroll_then_click(select_reference)
+  click_when_present(select_reference.lis()[1])
+  benefit_form.click
+  scroll_then_click(@browser.element(class: /interaction-click-control-create-plan-year/))
+  @browser.element(class: /alert-notice/, text: /Plan Year successfully created./).wait_until_present
+  click_when_present(@browser.element(class: /interaction-click-control-benefits/))
+  click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))
+end
 
+Then(/^Broker clicks on the add employee button$/) do
 
+  @browser.element(text: /Add Employee/).wait_until_present
+  @browser.a(text: /Add Employee/).click
+end 
+
+Then(/^Broker creates a roster employee$/) do
+  @browser.text_field(class: /interaction-field-control-census-employee-first-name/).wait_until_present
+  @browser.element(class: /interaction-click-control-create-employee/).wait_until_present
+  screenshot("create_census_employee")
+  @browser.text_field(class: /interaction-field-control-census-employee-first-name/).set("Broker")
+  @browser.text_field(class: /interaction-field-control-census-employee-last-name/).set("Assisted")
+  @browser.text_field(name: "jq_datepicker_ignore_census_employee[dob]").set('05/02/1976')
+  #@browser.text_field(class: /interaction-field-control-census-employee-dob/).set("01/01/1980")
+  @browser.text_field(class: /interaction-field-control-census-employee-ssn/).set("761234567")
+  #@browser.radio(class: /interaction-choice-control-value-radio-male/).set
+  @browser.radio(id: /radio_male/).fire_event("onclick")
+  @browser.text_field(name: "jq_datepicker_ignore_census_employee[hired_on]").set((Time.now-1.day).strftime('%m/%d/%Y'))
+  #@browser.text_field(class: /interaction-field-control-census-employee-hired-on/).set("10/10/2014")
+  @browser.checkbox(class: /interaction-choice-control-value-census-employee-is-business-owner/).set
+  input_field = @browser.divs(class: /selectric-wrapper/).first
+  input_field.click
+  click_when_present(input_field.lis()[1])
+  # Address
+  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).wait_until_present
+  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).set("1026 Potomac")
+  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-2/).set("apt abc")
+  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-city/).set("Alpharetta")
+  select_state = @browser.divs(text: /SELECT STATE/).last
+  select_state.click
+  scroll_then_click(@browser.li(text: /GA/))
+  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-zip/).set("30228")
+  email_kind = @browser.divs(text: /SELECT KIND/).last
+  email_kind.click
+  @browser.li(text: /home/).click
+  @browser.text_field(class: /interaction-field-control-census-employee-email-attributes-address/).set("broker.assist@dc.gov")
+  screenshot("broker_create_census_employee_with_data")
+  @browser.element(class: /interaction-click-control-create-employee/).click
+end
+
+Then(/^Broker sees employer census family created$/) do
+  wait_and_confirm_text(/successfully created/)
+end
+
+Then(/^Broker Customer should see the matched employee record form$/) do
+  @browser.dd(text: /Legal LLC/).wait_until_present
+  screenshot("broker_employer_search_results")
+  expect(@browser.dd(text: /Legal LLC/).visible?).to be_truthy
+end
+
+Then(/^Broker Assisted is a family$/) do
+  wait_and_confirm_text(/Broker Assisted/)
+end
+
+Then(/^Broker goes to the Consumer page$/) do
+  broker_assist_row = @browser.td(text: /Broker Assisted/).parent
+  broker_assist_row.a(text: /Consumer/).click
+  screenshot("broker_on_consumer_home_page")
+end
+Then(/^Broker is on the consumer home page$/) do
+  @browser.a(class: 'interaction-click-control-shop-for-plans').wait_until_present
+end
+
+Then(/^Broker shops for plans$/) do
+  @browser.a(class: 'interaction-click-control-shop-for-plans').click 
+end
+
+Then(/^Broker sees covered family members$/) do
+  wait_and_confirm_text(/Covered Family Members/)
+  @browser.element(id: 'btn-continue').click
+end
+
+Then(/^Broker choses a healthcare plan$/) do
+  wait_and_confirm_text(/Choose a healthcare plan/)
+  wait_and_confirm_text(/Apply/)
+  plan = @browser.a(class: 'interaction-click-control-select-plan')
+  plan.click
+end
+
+Then(/^Broker confirms plan selection$/) do
+  wait_and_confirm_text(/Confirm Your Plan Selection/)
+  @browser.a(text: /Purchase/).click
+end
+
+Then(/^Broker sees purchase confirmation$/) do
+  wait_and_confirm_text(/Purchase confirmation/)
+end
+
+Then(/^Broker continues to the consumer home page$/) do
+  wait_and_confirm_text(/Continue/)
+  @browser.a(text: /Continue/).click
+end
