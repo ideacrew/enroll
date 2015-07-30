@@ -73,6 +73,8 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         open_enrollment_start_on: PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_start_on],
         open_enrollment_end_on: PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_end_on],
         eligible_to_enroll_count: 4,
+        covered_count: 4,
+        waived_count: 4,
         total_enrolled_count: 10,
         employee_participation_percent: 40,
         non_business_owner_enrollment_count: 10,
