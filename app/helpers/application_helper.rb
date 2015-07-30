@@ -342,9 +342,12 @@ module ApplicationHelper
     eligible = plan_year.eligible_to_enroll_count
     enrolled = plan_year.total_enrolled_count
     non_owner = plan_year.non_business_owner_enrollment_count
+    covered = plan_year.covered_count
+    waived = plan_year.waived_count
 
     unless eligible.zero?
       condition = (eligible <= 2) ? ((enrolled > (eligible - 1)) && (non_owner > 0)) : ((enrolled >= p_min) && (non_owner > 0))
+      condition = false if covered == 0 && waived > 0
       progress_bar_class = condition ? 'progress-bar-success' : 'progress-bar-danger'
       progress_bar_width = (enrolled * 100)/eligible
     end
