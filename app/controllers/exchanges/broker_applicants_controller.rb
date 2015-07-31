@@ -43,11 +43,11 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       flash[:notice] = "Broker applicant decertified."
     else
       broker_role.approve!
-      broker_role.reload
       if broker_role.active?
+        broker_role.reload
         Invitation.invite_broker!(broker_role)
       else
-        send_secure_message_to_broker_agency(broker_role)
+        send_secure_message_to_broker_agency(broker_role) if broker_role.broker_agency_profile
       end
       flash[:notice] = "Broker applicant approved successfully."
     end
@@ -64,7 +64,6 @@ class Exchanges::BrokerApplicantsController < ApplicationController
 
     subject = "Received new broker application - #{broker_role.person.full_name}"
     body = "<br><p>Following are broker details<br>Broker Name : #{broker_role.person.full_name}<br>Broker NPN  : #{broker_role.npn}</p>"
-
     secure_message(hbx_admin, broker_agency, subject, body)
   end
 
