@@ -6,7 +6,7 @@ RSpec.describe Consumer::EmployeeRolesHelper, :type => :helper do
       it "with now month less than dob month" do
         now = Date.today
         dob = Date.today - 10.years
-        expect(helper.calculate_age_by_dob(dob)).to eq 9
+        expect(helper.calculate_age_by_dob(dob)).to eq 10
       end
 
       it "with now month more than dob month" do
@@ -19,7 +19,7 @@ RSpec.describe Consumer::EmployeeRolesHelper, :type => :helper do
         it "and now day less than dob day" do
           now = Date.today
           dob = Date.today - 10.years
-          expect(helper.calculate_age_by_dob(dob)).to eq 9
+          expect(helper.calculate_age_by_dob(dob)).to eq 10
         end
 
         it "and now day more than dob day" do
