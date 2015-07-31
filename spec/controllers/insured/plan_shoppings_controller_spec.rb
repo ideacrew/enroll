@@ -208,29 +208,59 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(PlanCostDecorator).to receive(:new).and_return(plan)
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
-      allow(plan).to receive(:total_employee_cost).and_return(2000)
-      allow(plan).to receive(:deductible).and_return("$998")
       sign_in user
     end
 
-    it "should be success" do
-      get :show, id: "hbx_id"
-      expect(response).to have_http_status(:success)
-    end
+    context "normal" do
+      before :each do
+        allow(plan).to receive(:total_employee_cost).and_return(2000)
+        allow(plan).to receive(:deductible).and_return("$998")
+        get :show, id: "hbx_id"
+      end
 
-    it "should be waivable" do
-      get :show, id: "hbx_id"
-      expect(assigns(:waivable)).to be_truthy
+      it "should be success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should be waivable" do
+        expect(assigns(:waivable)).to be_truthy
+      end
+
+      it "should get max_total_employee_cost" do
+        expect(assigns(:max_total_employee_cost)).to eq 2000
+      end
+
+      it "should get max_deductible" do
+        expect(assigns(:max_deductible)).to eq 1000
+      end
     end
 
     context "when not eligible to complete shopping" do
       before do
+        allow(plan).to receive(:total_employee_cost).and_return(2000)
+        allow(plan).to receive(:deductible).and_return("$998")
         allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(false)
+        get :show, id: "hbx_id"
       end
 
       it "should not be waivable" do
-        get :show, id: "hbx_id"
         expect(assigns(:waivable)).to be_falsey
+      end
+    end
+
+    context "when innormal total_employee_cost and deductible" do
+      before :each do
+        allow(plan).to receive(:total_employee_cost).and_return(nil)
+        allow(plan).to receive(:deductible).and_return(nil)
+        get :show, id: "hbx_id"
+      end
+
+      it "should get max_total_employee_cost and return 0" do
+        expect(assigns(:max_total_employee_cost)).to eq 0
+      end
+
+      it "should get max_deductible and return 0" do
+        expect(assigns(:max_deductible)).to eq 0
       end
     end
   end

@@ -5,32 +5,32 @@ RSpec.describe Consumer::EmployeeRolesHelper, :type => :helper do
     context "return age by dob" do
       it "with now month less than dob month" do
         now = Date.today
-        dob = Date.new(now.year-10, now.month+1, now.day)
-        expect(helper.calculate_age_by_dob(dob)).to eq 9
+        dob = Date.today - 10.years - 1.month
+        expect(helper.calculate_age_by_dob(dob)).to eq 10
       end
 
       it "with now month more than dob month" do
         now = Date.today
-        dob = Date.new(now.year-10, now.month-1, now.day)
-        expect(helper.calculate_age_by_dob(dob)).to eq 10
+        dob = Date.today - 10.years + 1.month
+        expect(helper.calculate_age_by_dob(dob)).to eq 9
       end
 
       context "with now month equal dob month" do
         it "and now day less than dob day" do
           now = Date.today
-          dob = Date.new(now.year-10, now.month, now.day+1)
-          expect(helper.calculate_age_by_dob(dob)).to eq 9
+          dob = Date.today - 10.years - 1.day
+          expect(helper.calculate_age_by_dob(dob)).to eq 10
         end
 
         it "and now day more than dob day" do
           now = Date.today
-          dob = Date.new(now.year-10, now.month, now.day-1)
-          expect(helper.calculate_age_by_dob(dob)).to eq 10
+          dob = Date.today - 10.years + 1.day
+          expect(helper.calculate_age_by_dob(dob)).to eq 9
         end
 
         it "and now day equal dob day" do
           now = Date.today
-          dob = Date.new(now.year-10, now.month, now.day)
+          dob = Date.today - 10.years
           expect(helper.calculate_age_by_dob(dob)).to eq 10
         end
       end
