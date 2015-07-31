@@ -132,9 +132,10 @@ Rails.application.routes.draw do
 
       collection do
         get :employers
-        get :brokers
         get :messages
-      end  
+      end
+
+      resources :applicants
     end
     resources :broker_roles, only: [:create] do
       root 'broker_roles#new_broker'
