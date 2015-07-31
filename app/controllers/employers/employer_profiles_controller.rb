@@ -72,13 +72,11 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show
-    paginate_employees
     set_show_variables
   end
 
   def show_profile
     @tab = params['tab']
-    paginate_employees
     set_show_variables
   end
 
@@ -156,29 +154,28 @@ class Employers::EmployerProfilesController < ApplicationController
       end
     end
 
+    def paginate_families
+      @employees = @employer_profile.employee_roles.to_a
+    end
+
     def set_show_variables
-      @current_plan_year = @employer_profile.published_plan_year
-      @plan_years = @employer_profile.plan_years.order(id: :desc)
+      if @tab != 'employees' && @tab != 'families'
+        @current_plan_year = @employer_profile.published_plan_year
+        @plan_years = @employer_profile.plan_years.order(id: :desc)
 
-      if @current_plan_year.present?
-        if @current_plan_year.eligible_to_enroll_count == 0
-          @participation_minimum = 0
-        else
-          @participation_minimum = ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
+        if @current_plan_year.present?
+          if @current_plan_year.eligible_to_enroll_count == 0
+            @participation_minimum = 0
+          else
+            @participation_minimum = ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
+          end
         end
+        @broker_agency_accounts = @employer_profile.broker_agency_accounts
       end
 
-      #broker view
-      @broker_agency_accounts = @employer_profile.broker_agency_accounts
-
-      #families view may require cache of broker agency profile id
+      paginate_employees if @tab == 'employees'
       #families defined as employee_roles.each { |ee| ee.person.primary_family }
-      if current_user.try(:has_broker_agency_staff_role?)
-        session[:broker_agency_id] = current_user.person.broker_role.broker_agency_profile_id
-      end
-      @employees = []
-      @employer_profile.employee_roles.each{|ee| @employees << ee}
-
+      paginate_families if @tab == 'families'
     end
 
     def check_employer_staff_role
