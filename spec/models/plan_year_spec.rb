@@ -1447,7 +1447,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "on the sixth of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 6) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 6) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 8, 10) }
       let(:expected_start_on) { Date.new(2015, 9, 1) }
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
