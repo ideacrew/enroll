@@ -1,0 +1,12 @@
+  <div class="container">
+    <div class="row">
+      <%= render 'inbox' %>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 no-pd">
+     <%= link_to 'Send Secure Message to DC HealthLink'.html_safe,
+     broker_agencies_inbox_msg_to_portal_path(inbox_id: @broker_agency_profile.id,
+       to: 'HBX_Admin',
+       from: @broker_agency_profile.legal_name),
+       class: "btn btn-primary", remote: true %></td>
+     </div>
+   </div>
