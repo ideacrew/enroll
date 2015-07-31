@@ -5,8 +5,8 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     model.class.find(model.id)
   end
 
-  let(:hired_on) { Date.new(2015,1,15) }
-  let(:terminated_on) { Date.new(2015,6,15) }
+  let(:hired_on) { Date.today - 30.days }
+  let(:terminated_on) { Date.today - 1.days }
   let(:dob) { employee_role.dob }
   let(:ssn) { employee_role.ssn }
 
@@ -31,7 +31,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     FactoryGirl.create(:benefit_group_assignment,
       benefit_group: benefit_group,
       census_employee: census_employee,
-      start_on: Date.new(2015,5,1)
+      start_on: Date.today - 40.days
     )
   }
 
