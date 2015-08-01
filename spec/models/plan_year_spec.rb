@@ -1382,9 +1382,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 3) }
       let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
-      let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 2.days }
-      let(:expected_open_enrollment_start_on) { date_of_record_to_use }
-      let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
+
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
       end
@@ -1407,9 +1405,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 4) }
       let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
-      let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 3.days }
-      let(:expected_open_enrollment_start_on) { date_of_record_to_use }
-      let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
+
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
       end
@@ -1432,9 +1428,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 5) }
       let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
-      let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 4.days }
-      let(:expected_open_enrollment_start_on) { date_of_record_to_use }
-      let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
+
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
       end
