@@ -7,9 +7,9 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   it { should validate_presence_of :open_enrollment_end_on }
 
   let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
-  let(:valid_plan_year_start_on)        { Date.new(2015, 9, 1) }
+  let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
   let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
-  let(:valid_open_enrollment_start_on)  { Date.new(2015, 8, 1) }
+  let(:valid_open_enrollment_start_on)  { TimeKeeper.date_of_record.end_of_month + 1.day }
   let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 9.days }
   let(:valid_fte_count)                 { 5 }
   let(:max_fte_count)                   { HbxProfile::ShopSmallMarketFteCountMaximum }
@@ -24,6 +24,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       open_enrollment_end_on: valid_open_enrollment_end_on,
       fte_count: valid_fte_count
     }
+  end
+
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(Date.current)
   end
 
   context ".new" do
@@ -78,6 +82,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "with all valid arguments" do
       let(:params) { valid_params }
       let(:plan_year) { PlanYear.new(**params) }
+
+      it "should be valid" do
+        expect(plan_year.valid?).to be_truthy
+      end
 
       it "should save" do
         expect(plan_year.save).to be_truthy
