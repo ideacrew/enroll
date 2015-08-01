@@ -5,6 +5,7 @@ class Employers::PremiumStatementsController < ApplicationController
     @employer_profile = EmployerProfile.find(params.require(:id))
     @current_plan_year = @employer_profile.published_plan_year
     @hbx_enrollments = @current_plan_year.hbx_enrollments rescue []
+    @hbx_enrollments = HbxEnrollment.covered(@hbx_enrollments)
 
     respond_to do |format| 
       format.html
