@@ -95,11 +95,11 @@
                 </tr>
                 <tr>
                   <td>Employee Contributions:</td>
-                  <th><%= number_to_currency(@current_plan_year.present? ? @current_plan_year.hbx_enrollments.map(&:total_employer_contribution).sum : 0) %></th>
+                  <td><%= number_to_currency(@current_plan_year.present? ? @current_plan_year.hbx_enrollments.map(&:total_employee_cost).sum : 0) %></td>
                 </tr>
                 <tr>
                   <td>Employer Contributions:</td>
-                  <td><%= number_to_currency(@current_plan_year.present? ? @current_plan_year.hbx_enrollments.map(&:total_employee_cost).sum : 0) %></td>
+                  <th><%= number_to_currency(@current_plan_year.present? ? @current_plan_year.hbx_enrollments.map(&:total_employer_contribution).sum : 0) %></th>
                 </tr>
               </tbody>
             </table>

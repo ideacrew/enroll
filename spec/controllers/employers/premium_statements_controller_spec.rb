@@ -42,6 +42,7 @@ RSpec.describe Employers::PremiumStatementsController do
       allow(EmployerProfile).to receive(:find).and_return(employer_profile)
       allow(employer_profile).to receive(:published_plan_year).and_return(current_plan_year)
       allow(current_plan_year).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+      allow(HbxEnrollment).to receive(:covered).and_return(hbx_enrollments)
     end
 
     it "should return contribution" do
@@ -63,6 +64,7 @@ RSpec.describe Employers::PremiumStatementsController do
       allow(subscriber).to receive(:person).and_return(person)
       allow(person).to receive(:employee_roles).and_return(employee_roles)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
+      allow(HbxEnrollment).to receive(:covered).and_return(hbx_enrollments)
     end
     it "returns a text/csv content type" do
       sign_in(user)

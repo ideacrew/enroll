@@ -36,6 +36,38 @@ class BrokerAgencyStaffRole
     end
   end
 
+  def certified_date
+    if self.workflow_state_transitions.any?
+      transition = workflow_state_transitions.detect do |transition|
+        transition.from_state == 'applicant' && ( transition.to_state == 'active' || transition.to_state == 'broker_agency_pending')
+      end
+    end
+    return unless transition
+    transition.transition_at
+  end
+
+  def current_state
+    aasm_state.gsub(/\_/,' ').camelcase
+  end
+
+  def email
+    parent.emails.detect { |email| email.kind == "work" }
+  end
+
+  def email_address
+    return nil unless email.present?
+    email.address
+  end
+
+  def parent
+    # raise "undefined parent: Person" unless self.person?
+    self.person
+  end
+
+  def agency_pending?
+    false
+  end
+  
 private
 
   def initial_transition

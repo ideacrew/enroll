@@ -133,6 +133,7 @@ class Person
   scope :broker_role_certified, -> { where("broker_role.aasm_state" => { "$in" => [:active, :broker_agency_pending]})}
   scope :broker_role_decertified, -> { where("broker_role.aasm_state" => { "$eq" => :decertified })}
   scope :broker_role_denied, -> { where("broker_role.aasm_state" => { "$eq" => :denied })}
+ 
 
 #  ViewFunctions::Person.install_queries
 
@@ -211,6 +212,15 @@ class Person
       people.flat_map(&:employee_roles)
     end
 
+    def find_all_brokers_or_staff_members_by_agency(broker_agency)
+      Person.or({:"broker_role.broker_agency_profile_id" => broker_agency.id},
+               {:"broker_agency_staff_roles.broker_agency_profile_id" => broker_agency.id})
+    end
+
+    def sans_primary_broker(broker_agency)
+      where(:"broker_role._id".nin => [broker_agency.primary_broker_role_id])
+    end
+
     def find_all_staff_roles_by_employer_profile(employer_profile)
       where(:'employer_staff_role.employer_profile_id' => employer_profile.id)
     end
@@ -227,6 +237,15 @@ class Person
       matches.concat Person.active.where(ssn: ssn_query).to_a unless ssn_query.blank?
       matches.concat Person.where(last_name: last_name, dob: dob_query).active.to_a unless (dob_query.blank? || last_name.blank?)
       matches.uniq
+    end
+
+    def brokers_or_agency_staff_with_status(query, status)
+      query.and( 
+           Person.or( 
+              { :"broker_agency_staff_roles.aasm_state" => status }, 
+              { :"broker_role.aasm_state" => status } 
+            ).selector
+         )
     end
   end
 

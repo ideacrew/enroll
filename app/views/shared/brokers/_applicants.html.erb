@@ -1,0 +1,52 @@
+ <div class="table-border table-responsive">
+  <table class="table">
+    <thead>
+      <th>Applicant Type</th>
+      <th>Applicant Name</th>
+      <th>Applicant NPN</th>
+      <th>Agency Name</th>
+      <th>Status</th>
+      <th>Certified Date</th>
+      <th></th>
+    </thead>
+    <% if @broker_applicants.any? %>
+    <% @broker_applicants.each do |applicant| %>
+
+    <% broker_role = applicant.broker_role %>
+    <% edit_path = edit_exchanges_broker_applicant_path(applicant) %>
+
+    <% if @broker_agency_profile.present? %>
+      <% if applicant.broker_role.nil?  %>
+         <% broker_role = applicant.broker_agency_staff_roles[0] %>
+      <% end %>
+      <% edit_path = edit_broker_agencies_profile_applicant_path(@broker_agency_profile, applicant) %>
+    <% end %>
+    
+    <% if broker_role.broker_agency_profile %>
+    <tbody>
+      <td>
+        <% if broker_role.class.to_s == 'BrokerRole' %>
+        <%= broker_role.is_primary_broker? ? 'Primary Broker' : 'Broker' %>
+        <% else %>
+        Broker Agency Staff
+        <% end %>
+      </td>
+      <td><%= applicant.full_name %></td>
+      <td><%= broker_role.npn if broker_role.respond_to?(:npn) %></td>
+      <td><%= broker_role.broker_agency_profile.legal_name %></td>
+      <td><%= broker_role.current_state %></td>
+      <td><%= format_date broker_role.certified_date %></td>
+      
+      <td>
+        <%= link_to 'Show'.html_safe,
+        edit_path, class: "btn btn-default interaction-click-control-broker-show", method: :get, remote: true %>
+      </td>
+    </tbody>
+    <% end %> 
+    <% end %>
+    <% else %>
+    <tbody><td>No Applicants found.</td></tbody>
+    <% end %>
+  </table>
+</div>
+<%= render 'shared/alph_paginate', url: url, alphs: @page_alphabets, remote: true, status: @status %>

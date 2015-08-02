@@ -68,4 +68,31 @@ RSpec.describe "employers/census_employees/_details.html.erb" do
     render template: "employers/census_employees/_details.html.erb"
     expect(rendered).to match /ELIGIBLE FOR COVERAGE/
   end
+
+  context "dependents" do
+    let(:census_dependent1) {double(relationship: 'child_under_26', first_name: 'jack', last_name: 'White', dob: Date.today, gender: 'male')}
+    let(:census_dependent2) {double(relationship: 'child_26_and_over', first_name: 'jack', last_name: 'White', dob: Date.today, gender: 'male')}
+    before :each do
+      allow(benefit_group_assignment).to receive(:coverage_waived?).and_return(true)
+      allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(hbx_enrollment)
+    end
+
+    it "should get dependents title" do
+      render template: "employers/census_employees/_details.html.erb"
+      expect(rendered).to match /Dependents/
+    end
+
+    it "should get child relationship when child_under_26" do
+      allow(census_employee).to receive(:census_dependents).and_return([census_dependent1])
+      render template: "employers/census_employees/_details.html.erb"
+      expect(rendered).to match /child/
+      expect(rendered).not_to match /child_under_26/
+    end
+
+    it "should get child_26_and_over relationship" do
+      allow(census_employee).to receive(:census_dependents).and_return([census_dependent2])
+      render template: "employers/census_employees/_details.html.erb"
+      expect(rendered).to match /child_26_and_over/
+    end
+  end
 end

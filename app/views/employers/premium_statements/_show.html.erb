@@ -29,7 +29,7 @@
       <tbody>
         <% if @hbx_enrollments.present? %>
           <% @hbx_enrollments.each do |hbx_enrollment| %>
-            <%= render "employee_line_item", census_employee: hbx_enrollment.subscriber.person.employee_roles.first.census_employee, enrollment: hbx_enrollment %>
+            <%= render "employee_line_item", census_employee: hbx_enrollment.try(:subscriber).try(:person).try(:employee_roles).try(:first).try(:census_employee), enrollment: hbx_enrollment %>
           <% end %>
         <% else %>
           <tr> <td> No employees enrolled.</td></tr>

@@ -38,9 +38,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @employer_profiles = @organizations.map {|o| o.employer_profile}
   end
 
-  def brokers
-  end
-
   def messages
     @sent_box = true
     @broker_agency_profile = BrokerAgencyProfile.find(params[:id])

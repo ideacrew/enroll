@@ -21,6 +21,8 @@
           </a>
       </div>
 
+      <% broker_or_staff_role = @broker_applicant.broker_role.nil? ? @broker_applicant.broker_agency_staff_roles[0] : @broker_applicant.broker_role %>
+
       <div class="row">
         <div class="table-responsive">
           <table class="table table-message-wrapper none_margin_bottom none_margin_top">
@@ -30,22 +32,24 @@
                 <th>Applicant Name:</th>
                 <td><%= @broker_applicant.full_name %></td>
               </tr>
+              <% if broker_or_staff_role.respond_to?(:npn) %>
               <tr>
                 <th>NPN:</th>
-                <td><%= @broker_applicant.broker_role.npn %></td>
+                <td><%= broker_or_staff_role.npn %></td>
               </tr>
+              <% end %>
               <tr>
                 <th>Email:</th>
-                <td><%= @broker_applicant.broker_role.email_address %></td>
+                <td><%= broker_or_staff_role.email_address %></td>
               </tr>
               <tr>
                 <th>Broker:</th>
-                <td><%= @broker_applicant.broker_role.broker_agency_profile.legal_name %></td>
+                <td><%= broker_or_staff_role.broker_agency_profile.legal_name %></td>
               </tr>
               <tr>
                 <th>Office Locations:</th>
                 <td>
-                    <% @broker_applicant.broker_role.broker_agency_profile.organization.office_locations.each do |office_location| %>
+                    <% broker_or_staff_role.broker_agency_profile.organization.office_locations.each do |office_location| %>
                       <%= office_location.address.to_html %>
                     <% end %>
                   
@@ -54,16 +58,16 @@
               <tr>
                 <th>History</th> 
                 <td>
-                    <% @broker_applicant.broker_role.workflow_state_transitions.each do |transition| %>
+                    <% broker_or_staff_role.workflow_state_transitions.each do |transition| %>
                       <%= transition.to_html %>
                     <% end %>
                 </td>
               </tr> 
               <tr>
                 <th>Application Status:</th>
-                <td><%= @broker_applicant.broker_role.current_state %></td>
+                <td><%= broker_or_staff_role.current_state %></td>
               </tr> 
-              <% disabled = (@broker_applicant.broker_role.active? || @broker_applicant.broker_role.agency_pending?) ? true : false %>
+              <% disabled = (broker_or_staff_role.active? || broker_or_staff_role.agency_pending?) ? true : false %>
               <%= f.fields_for :broker_role do |broker_role_fields| %>
               <tr>
                 <th style="vertical-align: top;">Reason<span class="text-danger"></span>:</th>
@@ -76,14 +80,26 @@
 
        <div class="row top-row no-border">
         <div class="col-xs-12 text-center broker_approve_deny_btn">
-          <% if @broker_applicant.broker_role.may_approve? %>
-            <%= submit_tag 'Approve', class: "btn btn-primary interaction-click-control-broker-approve" %>
-          <% end %>
-          <% if @broker_applicant.broker_role.may_deny? %>
-            <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary interaction-click-control-broker-deny" %>
-          <% end %>
-          <% if @broker_applicant.broker_role.may_decertify? %>
-            <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary interaction-click-control-broker-decertify" %>
+          <% if @broker_agency_profile.present? %>
+            <% if broker_or_staff_role.may_broker_agency_accept? %>
+              <%= submit_tag 'Accept', class: "btn btn-primary interaction-click-control-broker-approve" %>
+            <% end %>
+            <% if broker_or_staff_role.may_broker_agency_decline? %>
+              <%= submit_tag 'Decline', name: 'decline', class: "btn btn-primary interaction-click-control-broker-deny" %>
+            <% end %>
+            <% if broker_or_staff_role.may_broker_agency_terminate? %>
+              <%= submit_tag 'Terminate', name: 'terminate', class: "btn btn-primary interaction-click-control-broker-decertify" %>
+            <% end %>
+          <% else %>
+            <% if broker_or_staff_role.may_approve? %>
+              <%= submit_tag 'Approve', class: "btn btn-primary interaction-click-control-broker-approve" %>
+            <% end %>
+            <% if broker_or_staff_role.may_deny? %>
+              <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary interaction-click-control-broker-deny" %>
+            <% end %>
+            <% if broker_or_staff_role.may_decertify? %>
+              <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary interaction-click-control-broker-decertify" %>
+            <% end %>
           <% end %>
         </div>
       </div>

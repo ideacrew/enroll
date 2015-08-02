@@ -349,13 +349,15 @@ class PlanYear
 
       open_enrollment_start_on = [(start_on - HbxProfile::ShopOpenEnrollmentPeriodMaximum.months), TimeKeeper.date_of_record].max
 
-      candidate_open_enrollment_end_on = Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth)
+      #candidate_open_enrollment_end_on = Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, HbxProfile::ShopOpenEnrollmentEndDueDayOfMonth)
 
-      open_enrollment_end_on = if (candidate_open_enrollment_end_on - open_enrollment_start_on) < (HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1)
-        candidate_open_enrollment_end_on.next_month
-      else
-        candidate_open_enrollment_end_on
-      end
+      #open_enrollment_end_on = if (candidate_open_enrollment_end_on - open_enrollment_start_on) < (HbxProfile::ShopOpenEnrollmentPeriodMinimum - 1)
+      #  candidate_open_enrollment_end_on.next_month
+      #else
+      #  candidate_open_enrollment_end_on
+      #end
+
+      open_enrollment_end_on = shop_enrollment_timetable(start_on)[:open_enrollment_latest_end_on]
 
       binder_payment_due_date = map_binder_payment_due_date_by_start_on(start_on)
 
