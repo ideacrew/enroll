@@ -829,12 +829,12 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       context "and employer submits a valid plan year application with today as start open enrollment" do
         before do
-          TimeKeeper.set_date_of_record(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
+          TimeKeeper.set_date_of_record(Date.current.beginning_of_month.next_month)
           workflow_plan_year_with_benefit_group.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
           workflow_plan_year_with_benefit_group.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
           workflow_plan_year_with_benefit_group.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
           workflow_plan_year_with_benefit_group.end_on = workflow_plan_year_with_benefit_group.start_on + 1.year - 1.day
-          TimeKeeper.set_date_of_record(TimeKeeper.date_of_record + 1.day)
+          TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_start_on)
           workflow_plan_year_with_benefit_group.publish!
         end
 
@@ -855,12 +855,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             before do
               owner_census_employee.add_benefit_group_assignment(benefit_group, workflow_plan_year_with_benefit_group.start_on)
               owner_census_employee.save!
-              # non_owner_census_families.each do |census_employee|
-              #   owner_census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
-              #   owner_census_employee.save!
-              # end
-              TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
-              # workflow_plan_year_with_benefit_group.advance_enrollment_date
+              persisted_plan_year = PlanYear.find(workflow_plan_year_with_benefit_group.id)
+              TimeKeeper.set_date_of_record(persisted_plan_year.open_enrollment_end_on + 1.day)
             end
 
             it "enrollment should be invalid" do
@@ -869,6 +865,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               expect(workflow_plan_year_with_benefit_group.enrollment_errors[:non_business_owner_enrollment_count]).to match(/non-owner employee must enroll/)
             end
 
+            ## TODO - Re-enable
             it "should advance state to canceled" do
               expect(PlanYear.find(workflow_plan_year_with_benefit_group.id).aasm_state).to eq "canceled"
             end
