@@ -121,18 +121,20 @@ class Organization
   end
 
   def office_location_kinds
-    location_kinds = self.office_locations.select{|l| !l.persisted?}.flat_map(&:address).flat_map(&:kind)
+    location_kinds = self.office_locations.select{|l| !l.persisted?}.flat_map(&:address).compact.flat_map(&:kind)
     # should validate only office location which are not persisted AND kinds ie. primary, mailing, branch 
-    return if location_kinds.detect{|kind| kind == 'work' || kind == 'home'}
-    if location_kinds.count('primary').zero?
-      errors.add(:base, "must select one primary address")
-    elsif location_kinds.count('primary') > 1
-      errors.add(:base, "can't have multiple primary addresses")
-    elsif location_kinds.count('mailing') > 1
-      errors.add(:base, "can't have more than one mailing address")
-    end
-    unless errors.any? # this means that the validation succeeded and we can delete all the persisted ones
-      self.office_locations.delete_if{|l| l.persisted?}
+    return if no_primary = location_kinds.detect{|kind| kind == 'work' || kind == 'home'}
+    unless location_kinds.empty?
+      if location_kinds.count('primary').zero?
+        errors.add(:base, "must select one primary address")
+      elsif location_kinds.count('primary') > 1
+        errors.add(:base, "can't have multiple primary addresses")
+      elsif location_kinds.count('mailing') > 1
+        errors.add(:base, "can't have more than one mailing address")
+      end
+      if !errors.any?# this means that the validation succeeded and we can delete all the persisted ones
+        self.office_locations.delete_if{|l| l.persisted?}
+      end
     end
   end
 end

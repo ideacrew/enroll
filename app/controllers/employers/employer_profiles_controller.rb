@@ -110,6 +110,7 @@ class Employers::EmployerProfilesController < ApplicationController
       flash[:notice] = 'Employer successfully Updated.'
       redirect_to employers_employer_profile_path(@employer_profile)
     else
+      @organization.reload
       respond_to do |format|
         format.js { render "edit" }
         format.html { render "edit" }
@@ -213,25 +214,14 @@ class Employers::EmployerProfilesController < ApplicationController
     end
 
     def employer_profile_params
-      if params[:form].eql?('edit')
-        params.require(:organization).permit(
-          :employer_profile_attributes => [ :entity_kind, :dba, :fein, :legal_name, :id],
-          :office_locations_attributes => [
-            :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id],
-            :phone_attributes => [:kind, :area_code, :number, :extension,:id],
-            :email_attributes => [:kind, :address, :id]
-          ]
-        )
-      else
-        params.require(:organization).permit(
-          :employer_profile_attributes => [ :entity_kind, :dba, :fein, :legal_name],
-          :office_locations_attributes => [
-            :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
-            :phone_attributes => [:kind, :area_code, :number, :extension],
-            :email_attributes => [:kind, :address]
-          ]
-        )
-      end
+      params.require(:organization).permit(
+        :employer_profile_attributes => [ :entity_kind, :dba, :fein, :legal_name],
+        :office_locations_attributes => [
+          :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
+          :phone_attributes => [:kind, :area_code, :number, :extension],
+          :email_attributes => [:kind, :address]
+        ]
+      )
     end
 
     def build_organization

@@ -3,7 +3,7 @@
     <div class="row tab-row">
       <%= render 'employer_menu' %>
 
-      <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(@organization, form: params[:action]), method: :put} do |f| %>
+      <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(@organization), method: :put} do |f| %>
 
         <%#= render "shared/error_messages", object: f.object %>
         <% if @organization.errors.any? %>
