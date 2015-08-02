@@ -48,6 +48,9 @@ class Plan
   index({ coverage_kind: 1 })
   index({ metal_level: 1 })
   index({ market: 1 })
+  index({ active_year: 1 })
+
+  index({ active_year: 1,  market: 1, coverage_kind: 1, metal_level: 1 })
 
   index({ carrier_profile_id: 1 })
   index({ active_year: 1, hios_id: 1}, {unique: true})
