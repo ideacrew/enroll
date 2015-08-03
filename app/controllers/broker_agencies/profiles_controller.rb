@@ -29,7 +29,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def employers
-    puts params.inspect
     profile = BrokerAgencyProfile.find(params[:id])
     @orgs = Organization.where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => profile._id})
     @page_alphabets = page_alphabets(@orgs, "legal_name")
