@@ -7,9 +7,9 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   it { should validate_presence_of :open_enrollment_end_on }
 
   let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
-  let(:valid_plan_year_start_on)        { Date.new(2015, 9, 1) }
+  let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
   let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
-  let(:valid_open_enrollment_start_on)  { Date.new(2015, 8, 1) }
+  let(:valid_open_enrollment_start_on)  { TimeKeeper.date_of_record.end_of_month + 1.day }
   let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 9.days }
   let(:valid_fte_count)                 { 5 }
   let(:max_fte_count)                   { HbxProfile::ShopSmallMarketFteCountMaximum }
@@ -24,6 +24,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       open_enrollment_end_on: valid_open_enrollment_end_on,
       fte_count: valid_fte_count
     }
+  end
+
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(Date.current)
   end
 
   context ".new" do
@@ -78,6 +82,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "with all valid arguments" do
       let(:params) { valid_params }
       let(:plan_year) { PlanYear.new(**params) }
+
+      it "should be valid" do
+        expect(plan_year.valid?).to be_truthy
+      end
 
       it "should save" do
         expect(plan_year.save).to be_truthy
@@ -821,12 +829,12 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       context "and employer submits a valid plan year application with today as start open enrollment" do
         before do
-          TimeKeeper.set_date_of_record(TimeKeeper.date_of_record.beginning_of_month.next_month + 8.days)
+          TimeKeeper.set_date_of_record(Date.current.beginning_of_month.next_month)
           workflow_plan_year_with_benefit_group.open_enrollment_start_on = TimeKeeper.date_of_record + 1.day
           workflow_plan_year_with_benefit_group.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
           workflow_plan_year_with_benefit_group.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
           workflow_plan_year_with_benefit_group.end_on = workflow_plan_year_with_benefit_group.start_on + 1.year - 1.day
-          TimeKeeper.set_date_of_record(TimeKeeper.date_of_record + 1.day)
+          TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_start_on)
           workflow_plan_year_with_benefit_group.publish!
         end
 
@@ -847,12 +855,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             before do
               owner_census_employee.add_benefit_group_assignment(benefit_group, workflow_plan_year_with_benefit_group.start_on)
               owner_census_employee.save!
-              # non_owner_census_families.each do |census_employee|
-              #   owner_census_employee.add_benefit_group_assignment(benefit_group, plan_year.start_on)
-              #   owner_census_employee.save!
-              # end
-              TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
-              # workflow_plan_year_with_benefit_group.advance_enrollment_date
+              persisted_plan_year = PlanYear.find(workflow_plan_year_with_benefit_group.id)
+              TimeKeeper.set_date_of_record(persisted_plan_year.open_enrollment_end_on + 1.day)
             end
 
             it "enrollment should be invalid" do
@@ -861,6 +865,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               expect(workflow_plan_year_with_benefit_group.enrollment_errors[:non_business_owner_enrollment_count]).to match(/non-owner employee must enroll/)
             end
 
+            ## TODO - Re-enable
             it "should advance state to canceled" do
               expect(PlanYear.find(workflow_plan_year_with_benefit_group.id).aasm_state).to eq "canceled"
             end
@@ -1374,9 +1379,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 3) }
       let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
-      let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 2.days }
-      let(:expected_open_enrollment_start_on) { date_of_record_to_use }
-      let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
+
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
       end
@@ -1399,9 +1402,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 4) }
       let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
-      let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 3.days }
-      let(:expected_open_enrollment_start_on) { date_of_record_to_use }
-      let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
+
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
       end
@@ -1424,9 +1425,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 5) }
       let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
-      let(:date_of_record_to_use) { TimeKeeper.date_of_record.beginning_of_month + 4.days }
-      let(:expected_open_enrollment_start_on) { date_of_record_to_use }
-      let(:expected_open_enrollment_end_on) { Date.new(date_of_record_to_use.year, date_of_record_to_use.month, 10) }
+
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
       end

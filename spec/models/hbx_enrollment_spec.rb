@@ -140,6 +140,7 @@ describe HbxEnrollment do
           election.waiver_reason = HbxEnrollment::WAIVER_REASONS.first
           election.waive_coverage
           election.household.family.save!
+          election.save!
           election.to_a
         end
 
@@ -155,6 +156,7 @@ describe HbxEnrollment do
             election.plan = benefit_group.elected_plans.sample
             election.select_coverage if election.can_complete_shopping?
             election.household.family.save!
+            election.save!
             election
           end
           enrollments
@@ -171,6 +173,7 @@ describe HbxEnrollment do
             election.waiver_reason = HbxEnrollment::WAIVER_REASONS.first
             election.waive_coverage
             election.household.family.save!
+            election.save!
             election
           end
         end
@@ -187,6 +190,7 @@ describe HbxEnrollment do
             election.plan = benefit_group.elected_plans.sample
             election.select_coverage if election.can_complete_shopping?
             election.household.family.save!
+            election.save!
             election
           end
         end
@@ -207,6 +211,11 @@ describe HbxEnrollment do
 
         it "should know the total employer contribution" do
           expect(blue_collar_enrollments.first.total_employer_contribution).to be
+        end
+
+        it "should return only covered enrollments count" do
+          enrollments = white_collar_enrollments + white_collar_enrollment_waivers + blue_collar_enrollments + blue_collar_enrollment_waivers
+          expect(HbxEnrollment.covered(enrollments).size).to eq 9
         end
       end
 

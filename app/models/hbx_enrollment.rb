@@ -20,6 +20,8 @@ class HbxEnrollment
     "I do not have other coverage"
   ]
 
+  ENROLLED_STATUSES = ["coverage_selected", "enrollment_transmitted_to_carrier", "coverage_enrolled"]
+
   embedded_in :household
 
   field :coverage_household_id, type: String
@@ -273,6 +275,10 @@ class HbxEnrollment
       end
     end
     enrollment_list
+  end
+
+  def self.covered(enrollments)
+    enrollments.select{|e| ENROLLED_STATUSES.include?(e.aasm_state)}
   end
 
   private
