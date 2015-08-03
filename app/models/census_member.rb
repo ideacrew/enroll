@@ -25,7 +25,7 @@ class CensusMember
 
   validates :gender,
     allow_blank: false,
-    inclusion: { in: GENDER_KINDS, message: "%{value} is not a valid gender" }
+    inclusion: { in: GENDER_KINDS, message: "must be selected" }
 
   validates :ssn,
     length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
