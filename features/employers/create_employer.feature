@@ -88,36 +88,3 @@ Feature: Create Employer
       Then I should see the "YOUR LIFE EVENTS" section
       When I click on the plans tab
       Then I should see my plan
-
-    @wip
-    Scenario: Employer Representative has previously signed up on HBX
-      Given I have signed up previously through consumer, broker agency or previous visit to the Employer portal
-      When I visit the Employer portal to sign in
-        And I sign in with valid user data
-      Then I should see a welcome page with successful sign in message
-      #Then I should see fields to search for person and employer
-        #And I should see an initial fieldset to enter my name, ssn and dob
-        #And My user data from existing the fieldset values are prefilled using data from my existing account
-        And I should see a form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone
-        And I should see a successful creation message
-
-    @wip
-    Scenario: Employer Representative provides a valid FEIN
-      Given I complete the Employer initial form with a valid FEIN
-      When I submit the form
-      Then My form information is saved to the database
-        And My FEIN is compared against the list of HBX-registered FEINs
-      When My FEIN match succeeds
-      Then My record is updated to include Employer Representative Role
-        And My Employer's record is created
-        And My Employer Role is set as the Employer administrator
-        And My Employer's FEIN is linked to my Employer Reprsentative Role
-        And I see my Employer's landing page
-    @wip
-    Scenario: Employer Representative  provides an unrecognized FEIN
-      Given I complete the Employer initial form with an invalid FEIN
-      When I submit the form
-      Then My form information is saved to the database
-        And the supplied FEIN is compared against the list of registered FEINs
-      When The FEIN match fails
-      Then I see a message explaining the error and instructing me to either: correct the FEIN and resubmit, or contact reprentatives at the HBX

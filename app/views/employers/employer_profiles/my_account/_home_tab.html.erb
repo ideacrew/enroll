@@ -48,11 +48,13 @@
             
             
             <% @employer_profile.organization.office_locations.each do |loc| %>
-              <div class="form-border">
-                <%= loc.address.kind.capitalize %>
-                <%= loc.address.to_html %>
-                <%= loc.phone.to_s %>
-              </div>
+              <%if loc.address.kind.eql?("primary")%>
+                <div class="form-border">
+                  <%= loc.address.kind.capitalize %>
+                  <%= loc.address.to_html %>
+                  <%= loc.phone.to_s %>
+                </div>
+              <% end %>
             <% end %>
           </div>
 
