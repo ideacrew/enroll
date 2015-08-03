@@ -70,6 +70,12 @@ class BrokerAgencyStaffRole
   
 private
 
+  def last_state_transition_date
+    if self.workflow_state_transitions.any?
+      self.workflow_state_transitions.first.transition_at
+    end
+  end
+
   def initial_transition
     return if workflow_state_transitions.size > 0
     self.workflow_state_transitions = [WorkflowStateTransition.new(
