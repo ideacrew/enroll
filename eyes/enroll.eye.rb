@@ -42,4 +42,26 @@ Eye.application 'eye_enroll' do
       check :memory, :every => 30, :below => 400.megabytes, :times => [4,7]
     end
   end
+
+  process("enroll_remote_event_listener") do
+    working_dir BUS_DIRECTORY
+    pid_file "pids/enroll_remote_event_listener.pid"
+    start_command "bundle exec rails runner -e production script/remote_event_listener.rb"
+    stdall "log/enroll_remote_event_listener.log"
+    daemonize true
+
+    # stop signals:
+    #     # http://unicorn.bogomips.org/SIGNALS.html
+    stop_signals [:TERM, 10.seconds]
+    #
+    #             # soft restart
+    #    restart_command "kill -USR2 {PID}"
+    #
+    # check :cpu, :every => 30, :below => 80, :times => 3
+    # check :memory, :every => 30, :below => 150.megabytes, :times => [3,5]
+    #
+    start_timeout 30.seconds
+    restart_grace 30.seconds
+    stop_timeout 10.seconds
+  end
 end
