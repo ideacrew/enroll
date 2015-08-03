@@ -85,7 +85,11 @@ class Employers::EmployerProfilesController < ApplicationController
   def new
     @organization = Forms::EmployerProfile.new
   end
-
+  
+  def edit
+    @organization = Organization.find(params[:id])
+  end
+   
   def create
     params.permit!
     @organization = Forms::EmployerProfile.new(params[:organization])
@@ -103,9 +107,10 @@ class Employers::EmployerProfilesController < ApplicationController
     current_user.person.employer_contact = @employer_profile
     if !@employer_profile.owner.present? && @organization.update_attributes(employer_profile_params) && current_user.save
       current_user.person.employer_staff_roles << EmployerStaffRole.create(person: current_user.person, employer_profile_id: @employer_profile.id, is_owner: true)
-      flash[:notice] = 'Employer successfully created.'
+      flash[:notice] = 'Employer successfully Updated.'
       redirect_to employers_employer_profile_path(@employer_profile)
     else
+      @organization.reload
       respond_to do |format|
         format.js { render "edit" }
         format.html { render "edit" }

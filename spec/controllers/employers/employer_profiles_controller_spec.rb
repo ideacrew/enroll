@@ -351,7 +351,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(controller).to receive(:employer_profile_params).and_return({})
     end
 
-    it "should redirect" do
+    it "should not redirect" do
       allow(user).to receive(:save).and_return(true)
       allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
       sign_in(user)

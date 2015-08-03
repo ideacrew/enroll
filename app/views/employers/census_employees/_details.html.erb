@@ -47,7 +47,8 @@
                 <%= format_date dependent.dob %>
               </td>
               <td>
-                <%= dependent.try(:relationship) || dependent.try(:employee_relationship) %>
+                <% relationship = dependent.try(:relationship) || dependent.try(:employee_relationship) %>
+                <%= relationship == "child_under_26" ? "child" : relationship %>
               </td>
               <td>
                 <%= dependent.gender %>

@@ -40,6 +40,30 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+
+  def secure_message(from_provider, to_provider, subject, body)
+    message_params = {
+      sender_id: from_provider.id,
+      parent_message_id: to_provider.id,
+      from: from_provider.legal_name,
+      to: to_provider.legal_name,
+      subject: subject,
+      body: body
+    }
+
+    create_secure_message(message_params, to_provider, :inbox)
+    create_secure_message(message_params, from_provider, :sent)
+  end
+
+  def create_secure_message(message_params, inbox_provider, folder)
+    message = Message.new(message_params)
+    message.folder =  Message::FOLDER_TYPES[folder]
+    msg_box = inbox_provider.inbox 
+    msg_box.post_message(message)
+    msg_box.save
+  end
+
   def set_locale
     requested_locale = params[:locale] || user_preferred_language || extract_locale_from_accept_language_header || I18n.default_locale
     requested_locale = I18n.default_locale unless I18n.available_locales.include? requested_locale.try(:to_sym)

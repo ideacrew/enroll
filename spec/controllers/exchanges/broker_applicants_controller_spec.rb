@@ -44,6 +44,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
   describe ".update" do
     let(:user) { instance_double("User", :has_hbx_staff_role? => true) }
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
     let(:broker_role) {FactoryGirl.create(:broker_role)}
 
     before :each do
@@ -65,12 +66,16 @@ RSpec.describe Exchanges::BrokerApplicantsController do
     end
 
     context 'when application approved and applicant is not primary broker' do
+
       before :each do
+        FactoryGirl.create(:hbx_profile)
         put :update, id: broker_role.person.id, approve: true, format: :js
         broker_role.reload
       end
 
       it "should approve and change status to broker agency pending" do
+        allow(broker_role).to receive(:broker_agency_profile).and_return(broker_agency_profile)
+
         expect(assigns(:broker_applicant))
         expect(broker_role.aasm_state).to eq 'broker_agency_pending'
         expect(response).to have_http_status(:redirect)

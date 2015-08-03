@@ -45,18 +45,18 @@
               <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location| %>
                 <%= render partial: 'shared/office_location_fields', locals: {f: office_location} %>
               <% end %>
-
-                <br/>
-
+              <br/>
               <div class="form-inputs">
                 <%= link_to_add_fields '<i class="fa fa-user-plus"></i> Add Office Location'.html_safe, f, :office_locations, 'btn btn-success pull-right' %>
-                <br/>
               </div>
 
               <div class="row top-row no-border">
-                <%= f.submit "Create", class: "btn btn-save" %>
+                <% button_name = @organization.persisted? ? 'Save' : 'Create' %>
+                <button type="submit" class="btn btn-primary pull-left sm_full_width">
+                  <%= "#{button_name}".html_safe %>
+                </button> &nbsp;&nbsp;
+                <%= link_to "Cancel", employers_employer_profile_path(@organization.employer_profile), class:'btn btn-transparent pull-left' %>
               </div>
-
             </div>
           </div>
         </div>
