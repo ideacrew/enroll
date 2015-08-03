@@ -2,7 +2,9 @@ module Forms
   class PlanYearForm < SimpleDelegator
      def initialize(py)
        super(py)
-       @all_plans = ::Plan.where(active_year: Time.now.year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS}).to_a
+       @all_plans = Rails.cache.fetch("plans-for-#{::TimeKeeper.date_of_record.year}") do
+         ::Plan.where(active_year: ::TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS}).to_a
+       end
      end
 
      def carrier_plans_for(c_profile_id)

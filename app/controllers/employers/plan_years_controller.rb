@@ -135,7 +135,17 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_carriers_and_plans
-    @carriers = Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
+    @carriers = Rails.cache.fetch("carriers-for-#{TimeKeeper.date_of_record.year}", expires_in: 1.hour) do
+      @carriers = Organization.exists(carrier_profile: true).inject([]) do |carriers, org|
+        carriers << org.carrier_profile if Plan.where(carrier_profile_id: org.carrier_profile.id, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS}).exists?
+        carriers
+      end
+    end
+
+    @carrier_names = Hash.new
+    @carriers.each do |carrier|
+      @carrier_names[carrier.id.to_s] = carrier.legal_name
+    end
   end
 
   def build_plan_year
