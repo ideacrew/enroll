@@ -195,5 +195,20 @@ class Plan
       result
     end
 
+    def valid_shop_health_plans(carrier_profile_id=nil)
+      year = ::TimeKeeper.date_of_record.year
+
+      if carrier_profile_id.present?
+        plans =Rails.cache.fetch("plans-#{Plan.count}-for-#{carrier_profile_id.to_s}-at-#{year}", expires_in: 1.hour) do
+          Plan.where(carrier_profile_id: carrier_profile_id, active_year: year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS}).to_a
+        end
+      else
+        plans =Rails.cache.fetch("plans-#{Plan.count}-at-#{year}", expires_in: 1.hour) do
+          Plan.where(active_year: year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS}).to_a
+        end
+      end
+
+      plans
+    end
   end
 end

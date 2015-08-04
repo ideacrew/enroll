@@ -248,8 +248,11 @@ private
     aasm_state == 'active'
   end
 
-
-
+  def last_state_transition_date
+    if self.workflow_state_transitions.any?
+      self.workflow_state_transitions.first.transition_at
+    end
+  end
 
   def certified_date
     if self.workflow_state_transitions.any?

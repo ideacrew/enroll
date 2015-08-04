@@ -334,6 +334,30 @@ module ApplicationHelper
     time_ago_in_words(dob)
   end
 
+  def date_col_name_for_broker_roaster
+    if controller_name == 'applicants'
+      case @status
+      when 'active'
+        'Accepted Date'
+      when 'broker_agency_terminated'
+        'Terminated Date'
+      when 'broker_agency_declined'
+        'Declined Date'
+      else
+      end
+    else
+      case @status
+      when 'certified'
+        'Certified Date'
+      when 'decertified'
+        'Decertified Date'
+      when 'denied'
+        'Denied Date'
+      else
+      end
+    end
+  end
+
   def enrollment_progress_bar(plan_year, p_min, options = {:minimum => true})
     progress_bar_width = 0
     progress_bar_class = ''

@@ -135,7 +135,15 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_carriers_and_plans
-    @carriers = Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
+    @carriers = Organization.exists(carrier_profile: true).inject([]) do |carriers, org|
+      carriers << org.carrier_profile if Plan.valid_shop_health_plans(org.carrier_profile.id).present?
+      carriers
+    end
+
+    @carrier_names = Hash.new
+    @carriers.each do |carrier|
+      @carrier_names[carrier.id.to_s] = carrier.legal_name
+    end
   end
 
   def build_plan_year

@@ -46,7 +46,6 @@
           <div class="row no-buffer top-pd">
             <h4><%= @employer_profile.legal_name %> Offices<%= link_to "Edit Details", edit_employers_employer_profile_path(@employer_profile.organization), class: 'btn pull-right' %></h4>
             
-            
             <% @employer_profile.organization.office_locations.each do |loc| %>
               <div class="form-border">
                 <%= loc.address.kind.capitalize %>
