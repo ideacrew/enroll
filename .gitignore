@@ -44,3 +44,5 @@ db/seedfiles/*.yml
 __MACOSX
 .project
 tags
+
+spec/vocabularies
