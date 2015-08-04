@@ -173,9 +173,9 @@ class Employers::EmployerProfilesController < ApplicationController
         @broker_agency_accounts = @employer_profile.broker_agency_accounts
       end
 
-      paginate_employees if @tab == 'employees'
+      paginate_employees #if @tab == 'employees'
       #families defined as employee_roles.each { |ee| ee.person.primary_family }
-      paginate_families if @tab == 'families'
+      paginate_families #if @tab == 'families'
     end
 
     def check_employer_staff_role
