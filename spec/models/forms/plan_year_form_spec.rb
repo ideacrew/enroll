@@ -20,6 +20,7 @@ describe ::Forms::PlanYearForm, "when newly created" do
 
     before :each do
       Plan.delete_all
+      Rails.cache.clear
       @plan = FactoryGirl.create(:plan, active_year: Time.now.year, market: "shop", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "silver")
       @excluded_metal_level_plan = FactoryGirl.create(:plan, active_year: Time.now.year, market: "shop", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "catastrophic")
       @excluded_market_plan = FactoryGirl.create(:plan, active_year: Time.now.year, market: "individual", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "silver")
