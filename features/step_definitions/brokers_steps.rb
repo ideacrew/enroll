@@ -65,7 +65,7 @@ end
 
 And(/^I click on Create Broker Agency$/) do
   @browser.element(class: /interaction-click-control-create-broker-agency/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-create-broker-agency/))
+  scroll_then_click(@browser.button(class: /interaction-click-control-create-broker-agency/))
 end
 
 
@@ -264,7 +264,7 @@ When(/([^ ]+) logs on to ([^ ]+)/) do |signon, portal|
 end
 
 When(/^I click on the (\w+) tab$/) do |tab_name|
-  @browser.element(text: /#{tab_name}/).wait_until_present
+  @browser.a(text: /#{tab_name}/).wait_until_present
   scroll_then_click(@browser.a(text: /#{tab_name}/))
 end 
 
@@ -302,10 +302,16 @@ Then(/^I publish a Plan Year as Broker$/) do
   scroll_then_click(select_reference)
   click_when_present(select_reference.lis()[1])
   benefit_form.click
-  scroll_then_click(@browser.element(class: /interaction-click-control-create-plan-year/))
+  scroll_then_click(@browser.button(class: /interaction-click-control-create-plan-year/))
   @browser.element(class: /alert-notice/, text: /Plan Year successfully created./).wait_until_present
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))
+end
+
+When(/^I click on Employees tab$/) do
+  @browser.h3(text: /Legal LLC Enrollment/).wait_until_present
+  @browser.a(text: /Employees/).wait_until_present
+  scroll_then_click(@browser.a(text: /Employees/))
 end
 
 Then(/^Broker clicks on the add employee button$/) do
