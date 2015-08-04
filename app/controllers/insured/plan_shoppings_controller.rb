@@ -43,6 +43,10 @@ class Insured::PlanShoppingsController < ApplicationController
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
 
+    if @person.employee_roles.any?
+      @employer_profile = @person.employee_roles.first.employer_profile
+    end
+
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }
     end
