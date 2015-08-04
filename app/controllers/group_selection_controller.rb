@@ -20,6 +20,9 @@ class GroupSelectionController < ApplicationController
       employee_role: @employee_role,
       coverage_household: @coverage_household,
       benefit_group: @employee_role.benefit_group)
+
+    hbx_enrollment.plan = @hbx_enrollment.plan if keep_existing_plan and @hbx_enrollment.present?
+
     hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
       family_member_ids.include? member.applicant_id
     end
