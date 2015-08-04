@@ -240,7 +240,7 @@ module Factories
       case census_relationship
       when "spouse"
         "spouse"
-      when "domestic_parter"
+      when "domestic_partner"
         "life_partner"
       when "child_under_26", "child_26_and_over", "disabled_child_26_and_over"
         "child"
