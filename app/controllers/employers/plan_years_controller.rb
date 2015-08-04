@@ -135,11 +135,9 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_carriers_and_plans
-    @carriers = Rails.cache.fetch("carriers-for-#{TimeKeeper.date_of_record.year}", expires_in: 1.hour) do
-      @carriers = Organization.exists(carrier_profile: true).inject([]) do |carriers, org|
-        carriers << org.carrier_profile if Plan.valid_shop_health_plans(org.carrier_profile.id).present? #Plan.where(carrier_profile_id: org.carrier_profile.id, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS}).exists?
-        carriers
-      end
+    @carriers = Organization.exists(carrier_profile: true).inject([]) do |carriers, org|
+      carriers << org.carrier_profile if Plan.valid_shop_health_plans(org.carrier_profile.id).present?
+      carriers
     end
 
     @carrier_names = Hash.new

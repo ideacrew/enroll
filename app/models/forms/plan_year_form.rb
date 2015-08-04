@@ -3,9 +3,6 @@ module Forms
      def initialize(py)
        super(py)
        @all_plans = ::Plan.valid_shop_health_plans
-       #@all_plans = Rails.cache.fetch("plans-for-#{::TimeKeeper.date_of_record.year}-#{Plan.count}") do
-       #  ::Plan.valid_shop_health_plans.to_a
-       #end
      end
 
      def carrier_plans_for(c_profile_id)
