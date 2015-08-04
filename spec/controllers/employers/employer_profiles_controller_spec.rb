@@ -56,7 +56,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
 
     it "should get default status" do
-      get :show, id: employer_profile.id
+      xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees'}
       expect(assigns(:status)).to eq "active"
     end
 
@@ -64,7 +64,7 @@ RSpec.describe Employers::EmployerProfilesController do
       30.times do
         FactoryGirl.create(:census_employee, employer_profile: employer_profile, last_name: "#{('A'..'Z').to_a.sample}last_name")
       end
-      get :show, id: employer_profile.id
+      xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees'}
       expect(assigns(:total_census_employees_quantity)).to eq employer_profile.census_employees.active.count
       expect(assigns(:census_employees).count).to eq 20
       expect(assigns(:census_employees)).to eq employer_profile.census_employees.active.sorted.search_by(employee_name: '').to_a.first(20)
@@ -74,13 +74,13 @@ RSpec.describe Employers::EmployerProfilesController do
       employer_profile.census_employees.delete_all
       census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile)
 
-      get :show, id: employer_profile.id, employee_name: census_employee.full_name 
+      xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees'}
       expect(assigns(:census_employees).count).to eq 1
       expect(assigns(:census_employees)).to eq [census_employee]
     end
 
     it "get avaliable_employee_names for autocomplete employee name" do
-      get :show, id: employer_profile.id
+      xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees'}
       expect(assigns(:avaliable_employee_names)).to eq employer_profile.census_employees.sorted.map(&:full_name).uniq
     end
   end
