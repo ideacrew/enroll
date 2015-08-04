@@ -6,6 +6,7 @@ class Invitation
   INVITE_TYPES = {
     "census_employee" => "employee_role",
     "broker_role" => "broker_role",
+    "broker_agency_staff_role" => "broker_agency_staff_role",
     "employer_staff_role" => "employer_staff_role"
   }
   ROLES = INVITE_TYPES.values
@@ -48,6 +49,8 @@ class Invitation
       claim_employee_role(user_obj, redirection_obj)
     when "broker_role"
       claim_broker_role(user_obj, redirection_obj)
+    when "broker_agency_staff_role"
+      claim_broker_agency_staff_role(user_obj, redirection_obj)
     when "employer_staff_role"
       claim_employer_staff_role(user_obj, redirection_obj)
     else
@@ -83,6 +86,17 @@ class Invitation
     redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
   end
 
+  def claim_broker_agency_staff_role(user_obj, redirection_obj)
+    staff_role = BrokerAgencyStaffRole.find(source_id)
+    person = staff_role.person
+    person.user = user_obj
+    person.save!
+    broker_agency_profile = staff_role.broker_agency_profile
+    user_obj.roles << "broker_agency_staff" unless user_obj.roles.include?("broker_agency_staff")
+    user_obj.save!
+    redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
+  end
+
   def allowed_invite_types
     result_type = INVITE_TYPES[self.source_kind]
     check_role = result_type.blank? ? nil : result_type.downcase
@@ -108,7 +122,6 @@ class Invitation
     end
   end
 
-
   def self.invite_broker!(broker_role)
     if !broker_role.email_address.blank?
       invitation = self.create(
@@ -120,4 +133,17 @@ class Invitation
       invitation.send_invitation!(broker_role.parent.full_name)
     end
   end
+
+  def self.invite_broker_agency_staff!(broker_role)
+    if !broker_role.email_address.blank?
+      invitation = self.create(
+        :role => "broker_agency_staff_role",
+        :source_kind => "broker_agency_staff_role",
+        :source_id => broker_role.id,
+        :invitation_email => broker_role.email_address
+      )
+      invitation.send_invitation!(broker_role.parent.full_name)
+    end
+  end
+
 end
