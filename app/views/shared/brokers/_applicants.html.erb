@@ -8,7 +8,11 @@
       <th>Applicant NPN</th>
       <th>Agency Name</th>
       <th>Status</th>
-      <th>Certified Date</th>
+      <% if date_col_name_for_broker_roaster.present? %>
+        <th>
+          <%= date_col_name_for_broker_roaster %>
+        </th>
+      <% end %>
     </thead>
     <% if @broker_applicants.any? %>
     <% @broker_applicants.each do |applicant| %>
@@ -41,7 +45,9 @@
       <td><%= broker_role.npn if broker_role.respond_to?(:npn) %></td>
       <td><%= broker_role.broker_agency_profile.legal_name %></td>
       <td><%= broker_role.current_state %></td>
-      <td><%= format_date broker_role.certified_date %></td>
+      <% if date_col_name_for_broker_roaster.present? %>
+      <td><%= format_date broker_role.last_state_transition_date %></td>
+      <% end %>
     </tbody>
     <% end %> 
     <% end %>
@@ -50,4 +56,16 @@
     <% end %>
   </table>
 </div>
-<%= render 'shared/alph_paginate', url: url, alphs: @page_alphabets, remote: true, status: @status %>
+<div class="row">
+<div class="col-md-6">
+  <% if params[:page].present? || (@people.count != @broker_applicants.count) %>
+    <%= render 'shared/alph_paginate', url: url, full_index_url: index_url, alphs: @page_alphabets, remote: true, status: @status %>
+    <%#= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status, full_index_url: employers_employer_profile_path(@employer_profile, status: status, employee_name: params[:employee_name]) %>
+  <% end %>
+</div>
+
+<div class="col-md-6 text-right">
+  <h4><%= "#{@broker_applicants.count} out of #{@people.count}" %></h4>
+</div>
+</div>
+
