@@ -31,4 +31,27 @@ RSpec.describe "events/employer/updated.haml.erb" do
     end
 
   end
+
+  (1..15).to_a.each do |rnd|
+
+    describe "given a generated employer, round #{rnd}" do
+      include AcapiVocabularySpecHelpers
+
+      before(:all) do
+        download_vocabularies
+      end
+
+      let(:employer) { FactoryGirl.build_stubbed :generative_employer_profile }
+
+      before :each do
+        render :template => "events/employers/updated", :locals => { :employer => employer }
+      end
+
+      it "should be schema valid" do
+        expect(validate_with_schema(Nokogiri::XML(rendered))).to eq []
+      end
+
+    end
+
+  end
 end
