@@ -102,6 +102,16 @@ FactoryGirl.define do
     }
   end
 
+  factory(:generative_owner_person, {class: Person}) do
+
+  end
+
+  factory(:generative_owner, {class: EmployerStaffRole}) do
+    person { FactoryGirl.build_stubbed :generative_owner_person }
+    is_owner true
+    is_active true
+  end
+
   factory(:generative_employer_profile, {class: EmployerProfile}) do
     entity_kind { 
       pick_list = Organization::ENTITY_KINDS
@@ -115,5 +125,10 @@ FactoryGirl.define do
         FactoryGirl.build_stubbed :generative_plan_year
       end
     }
+
+    after(:stub) do |obj|
+      extend RSpec::Mocks::ExampleMethods
+      allow(obj).to receive(:owner).and_return([(FactoryGirl.build_stubbed :generative_owner)])
+    end
   end
 end
