@@ -1,4 +1,36 @@
 FactoryGirl.define do
+  factory(:generative_phone, {class: Phone}) do
+    full_phone_number "19234"
+  end
+
+  factory(:generative_address, {class: Address}) do
+    address_1 Forgery('address').street_address
+    address_2 { 
+      if Forgery('basic').boolean
+        Forgery('address').street_address
+      else
+        nil
+      end
+    }
+    state Forgery('address').state_abbrev
+    zip Forgery('address').zip
+    city Forgery('address').city
+  end
+
+  factory(:generative_office_location, {class:OfficeLocation}) do
+    is_primary { Forgery('basic').boolean }
+    address {
+      if Forgery('basic').boolean
+        FactoryGirl.build_stubbed :generative_address
+      else
+        nil
+      end
+    }
+    phone {
+      FactoryGirl.build_stubbed :generative_phone
+    }
+  end
+
   factory(:generative_organization, {class: Organization}) do
     legal_name  { Forgery('name').company_name + " " + Forgery('name').industry }
     dba { "A string" }
@@ -7,6 +39,12 @@ FactoryGirl.define do
     updated_at { DateTime.new }
     created_at { DateTime.new }
     is_active { Forgery('basic').boolean }
+    office_locations {
+      example_count = Random.rand(4)
+      (0..example_count).to_a.map do |e|
+        FactoryGirl.build_stubbed :generative_office_location
+      end
+    }
   end
 
   factory(:generative_carrier_profile, {class: CarrierProfile}) do
