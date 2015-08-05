@@ -18,7 +18,6 @@ class Address
   field :state, type: String
   field :location_state_code, type: String
   field :zip, type: String
-  field :zip_extension, type: String
   field :country_name, type: String, default: ""
   field :full_text, type: String
 
@@ -89,6 +88,24 @@ class Address
 
   def zip=(new_zip)
     write_attribute(:zip, new_zip.to_s.squish)
+  end
+
+  def zip_without_extension
+    return nil if zip.blank?
+    if zip =~ /-/
+      zip.split("-").first
+    else
+      zip
+    end
+  end
+
+  def zip_extension
+    return nil if zip.blank?
+    if zip =~ /-/
+      zip.split("-").last
+    else
+      nil
+    end
   end
 
   def home?
