@@ -114,7 +114,7 @@ RSpec.describe "group_selection/new.html.erb" do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:coverage_household) { double(family_members: []) }
-    let(:hbx_enrollment) {double(coverage_terminated?: false, id: "hbx_id")}
+    let(:hbx_enrollment) {double(coverage_selected?: true, id: "hbx_id")}
 
     before :each do
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
@@ -149,7 +149,7 @@ RSpec.describe "group_selection/new.html.erb" do
     end
 
     it "when hbx_enrollment is terminated" do
-      allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
+      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(false)
       render file: "group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 0)
       expect(rendered).to have_selector("a", count: 0)

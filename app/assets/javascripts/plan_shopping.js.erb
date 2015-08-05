@@ -179,43 +179,7 @@ $(function() {
   });
 });
 
-$(document).on("change", "select.elected_plan", function() {
-  var target = $(this).parents(".reference-plan-selection-controls");
-  $(target).find(".elected-plan-select .hidden_field").hide();
-  $(target).find(".reference-plan-select .reference-plan-content").hide();
-  
-  switch($(this).val()){
-    case "single_carrier":
-      $(target).find(".carrier_for_elected_plan").show();
-      $(target).find(".reference-plan-select .carrier-select").show()
-      break;
-    case "metal_level":
-      $(target).find(".metal_level_for_elected_plan").show();
-      $(target).find(".reference-plan-select .metal-level-select").show()
-      break;
-    case "single_plan":
-      $(target).find(".carrier_for_elected_plan").show();
-      $(target).find(".reference-plan-select .carrier-select").show()
-      break;
-  };
-});
-
-$(document).on("change", ".elected-plan-select .carrier", function() {
-  console.log(".carrier");
-  var target = $(this).parents(".reference-plan-selection-controls").find(".reference-plan-select");
-  var txt = $(this).val();
-  $(target).find(".carrier-select .carrier-content").hide();
-  $(target).find(".carrier-select .carrier-" + txt).show();
-});
-
-$(document).on("change", ".elected-plan-select .metal-level", function() {
-  console.log(".metal");
-  var target = $(this).parents(".reference-plan-selection-controls").find(".reference-plan-select");
-  var txt = $(this).val();
-  $(target).find(".metal-level-select .metal-level-content").hide();
-  $(target).find(".metal-level-select .metal-level-" + txt).show();
-});
-
+//for plan_year
 $(document).on("change", "select[name='reference_plan']", function() {
   var reference_plan_id = $(this).val();
   if (reference_plan_id != "" && reference_plan_id != undefined){

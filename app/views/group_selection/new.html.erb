@@ -33,7 +33,7 @@
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', @change_plan %>
             <h4><strong>What do you like to do?</strong></h4>
-            <% if @hbx_enrollment.present? and !@hbx_enrollment.try(:coverage_terminated?) %>
+            <% if @hbx_enrollment.present? and @hbx_enrollment.try(:coverage_selected?) %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-lg btn-primary' %>
               &nbsp;
               <%= submit_tag 'Terminate Plan', class: 'btn btn-lg btn-primary' %>

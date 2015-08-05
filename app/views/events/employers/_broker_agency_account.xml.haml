@@ -8,7 +8,8 @@
     %id
       %id= broker_agency_account.writing_agent.hbx_id
     %person
-      %id= broker_agency_account.writing_agent.hbx_id
+      %id
+        %id= broker_agency_account.writing_agent.hbx_id
       = render :partial => "events/shared/person_name", :object => broker_agency_account.writing_agent.person
     %npn= broker_agency_account.writing_agent.npn
   %start_on= simple_date_for(broker_agency_account.start_on)
