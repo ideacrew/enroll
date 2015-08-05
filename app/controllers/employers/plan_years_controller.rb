@@ -1,6 +1,6 @@
 class Employers::PlanYearsController < ApplicationController
   before_action :find_employer, except: [:recommend_dates]
-  before_action :generate_carriers_and_plans, except: [:recommend_dates]
+  before_action :generate_carriers_and_plans, except: [:recommend_dates, :prepare_plans_cache]
 
   def new
     @plan_year = build_plan_year
@@ -24,6 +24,37 @@ class Employers::PlanYearsController < ApplicationController
     else
       render action: "new"
     end
+  end
+
+  def prepare_plans_cache
+    if Rails.cache.read("plans-#{Plan.count}-at-#{::TimeKeeper.date_of_record.year}").blank?
+      Organization.exists(carrier_profile: true).map do |org|
+        ::Plan.valid_shop_health_plans(org.carrier_profile.id)
+      end
+      ::Plan.valid_shop_health_plans
+    end
+
+    render json: {status: 'success'}
+  end
+
+  def reference_plan_options
+    @plan_year = build_plan_year
+
+    plans = case params[:kind]
+            when "carrier"
+              @plan_year.carrier_plans_for(params[:key])
+            when "metal-level"
+              @plan_year.metal_level_plans_for(params[:key])
+            else
+              []
+            end
+
+    options = "<option>SELECT REFERENCE PLAN</option>"
+    plans.each do |plan|
+      options += "<option value='#{plan.id}'>#{@carrier_names[plan.carrier_profile_id.to_s]} - #{plan.name}</option>"
+    end
+
+    render json: {status: 'ok', result: options}
   end
 
   def search_reference_plan

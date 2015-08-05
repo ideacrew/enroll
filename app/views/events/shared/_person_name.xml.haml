@@ -1,6 +1,6 @@
 %person_name
   %person_surname= person_name.last_name
-  %person_given_name= person_name.given_name
+  %person_given_name= person_name.first_name
   - if !person_name.middle_name.blank?
     %person_middle_name= person_name.middle_name
   - if !person_name.name_pfx.blank?

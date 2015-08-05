@@ -71,8 +71,10 @@ class BenefitGroupAssignment
     state :coverage_waived
     state :coverage_terminated
 
+    #FIXME create new hbx_enrollment need to create a new benefitgroup_assignment
+    #then we will not need from coverage_terminated to coverage_selected
     event :select_coverage do
-      transitions from: [:initialized, :coverage_waived], to: :coverage_selected
+      transitions from: [:initialized, :coverage_waived, :coverage_terminated], to: :coverage_selected
     end
 
     event :waive_coverage do

@@ -313,6 +313,42 @@ RSpec.describe Employers::PlanYearsController do
     end
   end
 
+  describe "GET prepare_plans_cache" do
+    before :each do
+      sign_in
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      xhr :get, :prepare_plans_cache, employer_profile_id: employer_profile_id, format: :js
+    end
+
+    it "should be a success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should got json response" do
+      resp = JSON.parse(response.body, symbolize_names:true)
+      expect(resp[:status]).to eq 'success'
+    end
+  end
+
+  describe "GET reference_plan_options" do
+    before :each do
+      sign_in
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+    end
+
+    it "should be a success" do
+      xhr :get, :reference_plan_options, employer_profile_id: employer_profile_id, kind: 'carrier', format: :js
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should got json" do
+      xhr :get, :reference_plan_options, employer_profile_id: employer_profile_id, kind: 'carrier', format: :js
+      resp = JSON.parse(response.body, symbolize_names:true)
+      expect(resp[:status]).to eq 'ok'
+      expect(resp[:result]).to match '<option>SELECT REFERENCE PLAN</option>'
+    end
+  end
+
   describe "POST publish" do
     let(:plan_year_id) { "plan_year_id"}
     let(:plan_year_proxy) { instance_double("PlanYear", publish!: double)}

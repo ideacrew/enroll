@@ -2,13 +2,15 @@ require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   let(:plan) { double(id: "plan_id") }
-  let(:hbx_enrollment) { double }
+  let(:hbx_enrollment) { double(id: "hbx_id") }
   let(:benefit_group) {double}
   let(:reference_plan) {double}
   let(:usermailer) {double}
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:employee_role) { EmployeeRole.new }
+  let(:household) {double(hbx_enrollments: hbx_enrollments)}
+  let(:hbx_enrollments) {double}
 
   context "POST checkout" do
     before do
@@ -18,13 +20,19 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(:reference_plan)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
-      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_select_coverage?).and_return(true)
       allow(hbx_enrollment).to receive(:select_coverage!).and_return(true)
       allow(hbx_enrollment).to receive(:save).and_return(true)
       allow(UserMailer).to receive(:plan_shopping_completed).and_return(usermailer)
       allow(usermailer).to receive(:deliver_now).and_return(true)
       allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
       allow(employee_role).to receive(:hired_on).and_return(TimeKeeper.date_of_record + 10.days)
+      allow(hbx_enrollment).to receive(:household).and_return(household)
+      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:where).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:ne).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:update_all).and_return(true)
     end
 
     it "returns http success" do
@@ -155,9 +163,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   context "POST terminate" do
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
-      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
-      allow(hbx_enrollment).to receive(:terminate_coverage).and_return(true)
-      allow(hbx_enrollment).to receive(:save).and_return(true)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
+      #allow(hbx_enrollment).to receive(:terminate_coverage!).and_return(true)
+      allow(hbx_enrollment).to receive(:household).and_return(household)
+      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:where).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:update_all).and_return(true)
+      allow(hbx_enrollment).to receive(:propogate_terminate).and_return(true)
       sign_in
     end
 
@@ -168,7 +180,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     it "goes back" do
       request.env["HTTP_REFERER"] = terminate_insured_plan_shopping_url(1)
-      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(false)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(false)
       post :terminate, id: "hbx_id"
       expect(response).to redirect_to(:back)
     end
@@ -177,7 +189,12 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   context "POST waive" do
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
-      allow(hbx_enrollment).to receive(:shopping?).and_return(true)
+      allow(hbx_enrollment).to receive(:may_waive_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:household).and_return(household)
+      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:where).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:update_all).and_return(true)
+      allow(hbx_enrollment).to receive(:propogate_waiver).and_return(true)
       sign_in user
     end
 

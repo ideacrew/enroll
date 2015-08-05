@@ -180,6 +180,11 @@ class Plan
     end
   end
 
+  def is_dental_only?
+    return false if self.coverage_kind.blank?
+    self.coverage_kind.downcase == "dental"
+  end
+
   class << self
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)

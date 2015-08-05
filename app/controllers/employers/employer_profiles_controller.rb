@@ -171,11 +171,13 @@ class Employers::EmployerProfilesController < ApplicationController
           end
         end
         @broker_agency_accounts = @employer_profile.broker_agency_accounts
+
+        @no_plans_cache = Rails.cache.read("plans-#{Plan.count}-at-#{::TimeKeeper.date_of_record.year}").blank?
       end
 
-      paginate_employees if @tab == 'employees'
+      paginate_employees #if @tab == 'employees'
       #families defined as employee_roles.each { |ee| ee.person.primary_family }
-      paginate_families if @tab == 'families'
+      paginate_families #if @tab == 'families'
     end
 
     def check_employer_staff_role
