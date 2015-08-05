@@ -31,6 +31,7 @@
           <div class='form-inputs'>
             <a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
             <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
+            <a href="#" data-href="<%= reference_plan_options_employers_employer_profile_plan_years_path %>" id='reference_plan_options_link' style='display:none;'></a>
             <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
               <%= render "shared/benefit_group_fields", f: bg %><br>
             <% end %>
