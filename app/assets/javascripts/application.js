@@ -357,6 +357,7 @@ $(document).ready(function () {
   $(".phone_number").mask("(999) 999-9999");
   $(".zip").mask("99999");
   $("#person_ssn").mask("999-99-9999");
+  $(".fien_field").mask("99-9999999");
   $(".person_ssn").mask("999999999");
   $(".npn_field").mask("9999999999");
   $(".address-state").mask("AA");
