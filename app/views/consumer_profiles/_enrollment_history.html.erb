@@ -1,0 +1,31 @@
+<div>
+  <div class="page-header">
+    <h4>Your Enrollment History </h4>
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Policy</th>
+        <th>Carrier</th>
+        <th>Covered Members</th>
+        <th>Premium</th>
+        <th>Enrollment Date</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% enrollments = @employee_role.families.households.flat_map(&:hbx_enrollments) if @employee_role.try(:families).try(:households) %>
+      <% enrollments.each do |enrollment|%>
+
+      <tr>
+        <td><%= enrollment.plan.name %></td>
+        <td><%= enrollment.plan.carrier_profile.legal_name %></td>
+        <td class="col-md-4"><%= enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:full_name).join(', ') %></td>
+        <td><%= number_to_currency(enrollment.total_premium) %></td>
+        <td><%= enrollment.created_at.to_date %></td>
+      </tr>
+      <% end if enrollments %>
+
+      </tbody>
+    </table>
+
+  </div>
+</div>
