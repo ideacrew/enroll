@@ -298,8 +298,8 @@ Then(/^I publish a Plan Year as Broker$/) do
   scroll_then_click(select_carrier)
   click_when_present(select_carrier.lis()[1])
   
-  benefit_form.element(text: 'SELECT REFERENCE PLAN').parent.parent.parent.wait_until_present
   sleep 3
+  benefit_form.element(text: 'SELECT REFERENCE PLAN').parent.parent.parent.wait_until_present
   select_reference = benefit_form.element(text: 'SELECT REFERENCE PLAN').parent.parent.parent
   scroll_then_click(select_reference)
   benefit_form.element(text: 'SELECT REFERENCE PLAN').parent.parent.parent.lis()[1].wait_until_present

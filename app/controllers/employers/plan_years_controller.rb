@@ -95,9 +95,9 @@ class Employers::PlanYearsController < ApplicationController
                                     when "single_plan"
                                       Plan.where(id: benefit_group.reference_plan_id).first
                                     when "single_carrier"
-                                      @plan_year.carrier_plans_for(benefit_group.carrier_for_elected_plan)
+                                      Plan.valid_shop_health_plans("carrier", benefit_group.carrier_for_elected_plan)
                                     when "metal_level"
-                                      @plan_year.metal_level_plans_for(benefit_group.metal_level_for_elected_plan)
+                                      Plan.valid_shop_health_plans("metal_level", benefit_group.metal_level_for_elected_plan)
                                     end
     end
     if @plan_year.save
