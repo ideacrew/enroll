@@ -18,11 +18,4 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       expect(rendered).to have_selector("td", text: "#{pct.to_i}%")
     end
   end
-
-  it "should have script for prepare_plans_cache" do
-    assign(:no_plans_cache, true)
-    controller.request.path_parameters[:employer_profile_id] = employer_profile.id
-    render "employers/employer_profiles/my_account/benefits"
-    expect(rendered).to match /script/
-  end
 end
