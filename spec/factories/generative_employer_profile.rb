@@ -102,6 +102,34 @@ FactoryGirl.define do
     }
   end
 
+  factory(:generative_person, {class: Person}) do
+    first_name { Forgery(:name).first_name }
+    last_name { Forgery(:name).first_name }
+  end
+
+  factory(:generative_owner, {class: EmployerStaffRole}) do
+    person { FactoryGirl.build_stubbed :generative_person}
+    is_owner true
+    is_active true
+  end
+
+  factory(:generative_broker_agency_profile, {class: BrokerAgencyProfile }) {
+    organization { FactoryGirl.build_stubbed :generative_organization }
+  }
+
+  factory(:generative_broker_role, {class: BrokerRole}) do
+    person { FactoryGirl.build_stubbed :generative_person}
+  end
+
+  factory(:generative_broker_agency_account, {class: BrokerAgencyAccount}) {
+    start_on { DateTime.now }
+    end_on { DateTime.now }
+    broker_agency_profile {
+      FactoryGirl.build_stubbed :generative_broker_agency_profile
+    }
+    writing_agent { FactoryGirl.build_stubbed :generative_broker_role }
+  }
+
   factory(:generative_employer_profile, {class: EmployerProfile}) do
     entity_kind { 
       pick_list = Organization::ENTITY_KINDS
@@ -115,5 +143,16 @@ FactoryGirl.define do
         FactoryGirl.build_stubbed :generative_plan_year
       end
     }
+    broker_agency_accounts {
+      example_count = Random.rand(2)
+      (0..example_count).to_a.map do |e|
+        FactoryGirl.build_stubbed :generative_broker_agency_account
+      end
+    }
+
+    after(:stub) do |obj|
+      extend RSpec::Mocks::ExampleMethods
+      allow(obj).to receive(:owner).and_return([(FactoryGirl.build_stubbed :generative_owner)])
+    end
   end
 end
