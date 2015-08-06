@@ -205,9 +205,13 @@ class Plan
     end
 
     def valid_shop_health_plans(type="carrier", key=nil)
-      Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{TimeKeeper.date_of_record.year}", expires_in: 1.hour) do
+      Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{TimeKeeper.date_of_record.year}", expires_in: 5.hour) do
         Plan.public_send("valid_shop_by_#{type}", key.to_s).to_a
       end
+    end
+
+    def reference_plan_metal_level_for_options
+      REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
   end
 end
