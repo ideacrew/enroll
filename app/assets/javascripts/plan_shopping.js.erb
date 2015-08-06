@@ -181,6 +181,10 @@ $(function() {
 
 //for plan_year
 $(document).on("change", "select[name='reference_plan']", function() {
+  var start_date = $("#plan_year_start_on").val();
+  if (start_date == "") {
+    return
+  }
   var reference_plan_id = $(this).val();
   if (reference_plan_id != "" && reference_plan_id != undefined){
     $(this).parents('.reference-plan-select').find("input[type='hidden']").val(reference_plan_id);
@@ -190,6 +194,7 @@ $(document).on("change", "select[name='reference_plan']", function() {
       url: $('a#search_reference_plan_link').data('href'),
       dataType: 'script',
       data: {
+        "start_on": $("#plan_year_start_on").val(),
         "reference_plan_id": reference_plan_id,
         "location_id": $(this).parents('fieldset').attr('id')
       }
@@ -208,6 +213,15 @@ $(function() {
 });
 
 function calcEmployerContributions() {
+  var reference_plan_id = $("#plan_year_benefit_groups_attributes_0_reference_plan_id").val();
+  if (reference_plan_id == "" || reference_plan_id == undefined) {
+    return
+  }
+
+  var start_date = $("#plan_year_start_on").val();
+  if (start_date == "") {
+    return
+  }
 
   var relation_benefits = { 
     "0": { 
@@ -237,10 +251,8 @@ function calcEmployerContributions() {
     }
   }
 
-  var reference_plan_id = $("#plan_year_benefit_groups_attributes_0_reference_plan_id").val();
   var location_id = $("#plan_year_benefit_groups_attributes_0_reference_plan_id").parents('fieldset').attr('id');
 
-  if (reference_plan_id != "" && reference_plan_id != undefined){
   $("fieldset#"+ location_id +" .employer_cost_info .loader").toggle();
   $.ajax({
       type: "GET",
@@ -255,7 +267,6 @@ function calcEmployerContributions() {
     }).done(function() {
       $("fieldset#"+ location_id +" .employer_cost_info .loader").hide();
     });;
-}
 }
 
 $(document).on("click", ".reference_plan_info h4 span", function() {
