@@ -27,4 +27,63 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.number_to_fein("111098222")).to eq "11-1098222"
     end
   end
+
+  describe "date_col_name_for_broker_roaster" do
+    context "for applicants controller" do
+      before do
+        expect(helper).to receive(:controller_name).and_return("applicants")
+      end
+      it "should return accepted date" do
+        assign(:status, "active")
+        expect(helper.date_col_name_for_broker_roaster).to eq 'Accepted Date'
+      end
+      it "should return terminated date" do
+        assign(:status, "broker_agency_terminated")
+        expect(helper.date_col_name_for_broker_roaster).to eq 'Terminated Date'
+      end
+      it "should return declined_date" do
+        assign(:status, "broker_agency_declined")
+        expect(helper.date_col_name_for_broker_roaster).to eq 'Declined Date'
+      end
+    end
+    context "for other than applicants controller" do
+      before do
+        expect(helper).to receive(:controller_name).and_return("test")
+      end
+      it "should return certified" do
+        assign(:status, "certified")
+        expect(helper.date_col_name_for_broker_roaster).to eq 'Certified Date'
+      end
+      it "should return decertified" do
+        assign(:status, "decertified")
+        expect(helper.date_col_name_for_broker_roaster).to eq 'Decertified Date'
+      end
+      it "should return denied" do
+        assign(:status, "denied")
+        expect(helper.date_col_name_for_broker_roaster).to eq 'Denied Date'
+      end
+    end
+  end
+
+  describe "#can_edit" do
+    # let(:user){FactoryGirl.create(:user)}
+    let(:user){ double("User")}
+    let(:census_employee){ double("CensusEmployee") }
+    before do
+      expect(helper).to receive(:current_user).and_return(user)
+    end
+    it "census_employee can edit if it is new record" do
+      expect(user).to receive(:roles).and_return(["employee"])
+      expect(helper.can_edit(CensusEmployee.new)).to eq false # readonly -> false
+    end
+    it "census_employee cannot edit if linked to an employer" do
+      expect(user).to receive(:roles).and_return(["employee"])
+      expect(census_employee).to receive(:employee_role_linked?).and_return(true)
+      expect(helper.can_edit(census_employee)).to eq true # readonly -> true
+    end
+    it "hbx admin edit " do
+      expect(user).to receive(:roles).and_return(["hbx_staff"])
+      expect(helper.can_edit(CensusEmployee.new)).to eq false # readonly -> false
+    end
+  end
 end
