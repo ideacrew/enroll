@@ -51,6 +51,7 @@ class Plan
   index({ active_year: 1 })
 
   index({ active_year: 1,  market: 1, coverage_kind: 1, metal_level: 1 })
+  index({ active_year: 1,  market: 1, coverage_kind: 1, metal_level: 1, carrier_profile_id: 1 })
 
   index({ carrier_profile_id: 1 })
   index({ active_year: 1, hios_id: 1}, {unique: true})
@@ -110,7 +111,10 @@ class Plan
   scope :shop_market,          ->{ where(market: "shop") }
   scope :individual_market,    ->{ where(market: "individual") }
 
-  scope :by_active_year, -> {where(active_year: Time.now.year)}
+  scope :by_active_year, -> {where(active_year: TimeKeeper.date_of_record.year)}
+
+  scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
+  scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: metal_level)}
 
   # Carriers: use class method (which may be chained)
   def self.find_by_carrier_profile(carrier_profile)
@@ -168,13 +172,16 @@ class Plan
     given_age
   end
 
+  def premium_table_for(schedule_date)
+    self.premium_tables.select do |pt|
+      (pt.start_on <= schedule_date) && (pt.end_on >= schedule_date)
+    end
+  end
+
   def premium_for(schedule_date, age)
     bound_age_val = bound_age(age)
     begin
-    self.premium_tables.detect do |pt|
-      pt.age == bound_age_val &&
-        (pt.start_on <= schedule_date) && (pt.end_on >= schedule_date)
-    end.cost
+      premium_table_for(schedule_date).detect {|pt| pt.age == bound_age_val }.cost
     rescue
       raise [self.id, bound_age_val, schedule_date, age].inspect
     end
@@ -200,20 +207,14 @@ class Plan
       result
     end
 
-    def valid_shop_health_plans(carrier_profile_id=nil)
-      year = ::TimeKeeper.date_of_record.year
-
-      if carrier_profile_id.present?
-        plans =Rails.cache.fetch("plans-#{Plan.count}-for-#{carrier_profile_id.to_s}-at-#{year}", expires_in: 1.hour) do
-          Plan.where(carrier_profile_id: carrier_profile_id, active_year: year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS}).to_a
-        end
-      else
-        plans =Rails.cache.fetch("plans-#{Plan.count}-at-#{year}", expires_in: 1.hour) do
-          Plan.where(active_year: year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS}).to_a
-        end
+    def valid_shop_health_plans(type="carrier", key=nil)
+      Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{TimeKeeper.date_of_record.year}", expires_in: 5.hour) do
+        Plan.public_send("valid_shop_by_#{type}", key.to_s).to_a
       end
+    end
 
-      plans
+    def reference_plan_metal_level_for_options
+      REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
   end
 end

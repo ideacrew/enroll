@@ -380,6 +380,11 @@ Then(/^I should see the "my account" page$/) do
   expect(@browser.element(text: /Your Life Events/i).visible?).to be_truthy
 end
 
+Then(/^I should see the "Your Enrollment History" section/) do
+  @browser.element(text: /YOUR ENROLLMENT HISTORY/i).wait_until_present
+  expect(@browser.element(text: /YOUR ENROLLMENT HISTORY/i).visible?).to be_truthy
+end
+
 When(/^I click qle event$/) do
   scroll_then_click(@browser.a(text: /Divorce/))
   @browser.text_field(class: "interaction-field-control-qle-date").set((Date.today + 5).strftime("%m/%d/%Y"))

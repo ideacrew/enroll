@@ -175,8 +175,6 @@ class Employers::EmployerProfilesController < ApplicationController
           end
         end
         @broker_agency_accounts = @employer_profile.broker_agency_accounts
-
-        @no_plans_cache = Rails.cache.read("plans-#{Plan.count}-at-#{::TimeKeeper.date_of_record.year}").blank?
       end
 
       paginate_employees #if @tab == 'employees'

@@ -384,8 +384,8 @@ And(/^I should be able to enter plan year, benefits, relationship benefits with 
   input_field.click
   sleep(1)
   input_field.li(text: /CareFirst/).click
-  @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last.wait_until_present
   sleep(3)
+  @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last.wait_until_present
   ref_plan = @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last
   ref_plan.click
   @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last.li(index: 5).wait_until_present

@@ -1,6 +1,6 @@
 class Employers::PlanYearsController < ApplicationController
   before_action :find_employer, except: [:recommend_dates]
-  before_action :generate_carriers_and_plans, except: [:recommend_dates, :prepare_plans_cache]
+  before_action :generate_carriers_and_plans, except: [:recommend_dates]
 
   def new
     @plan_year = build_plan_year
@@ -13,9 +13,9 @@ class Employers::PlanYearsController < ApplicationController
                                     when "single_plan"
                                       Plan.where(id: benefit_group.reference_plan_id).first
                                     when "single_carrier"
-                                      @plan_year.carrier_plans_for(benefit_group.carrier_for_elected_plan)
+                                      Plan.valid_shop_health_plans("carrier", benefit_group.carrier_for_elected_plan)
                                     when "metal_level"
-                                      @plan_year.metal_level_plans_for(benefit_group.metal_level_for_elected_plan)
+                                      Plan.valid_shop_health_plans("metal_level", benefit_group.metal_level_for_elected_plan)
                                     end
     end
     if @plan_year.save
@@ -26,53 +26,31 @@ class Employers::PlanYearsController < ApplicationController
     end
   end
 
-  def prepare_plans_cache
-    if Rails.cache.read("plans-#{Plan.count}-at-#{::TimeKeeper.date_of_record.year}").blank?
-      Organization.exists(carrier_profile: true).map do |org|
-        ::Plan.valid_shop_health_plans(org.carrier_profile.id)
-      end
-      ::Plan.valid_shop_health_plans
-    end
-
-    render json: {status: 'success'}
-  end
-
   def reference_plan_options
-    @plan_year = build_plan_year
+    @kind = params[:kind]
+    @key = params[:key]
+    @target = params[:target]
 
-    plans = case params[:kind]
+    @plans = case @kind
             when "carrier"
-              @plan_year.carrier_plans_for(params[:key])
+              Plan.valid_shop_health_plans("carrier", @key)
             when "metal-level"
-              @plan_year.metal_level_plans_for(params[:key])
+              Plan.valid_shop_health_plans("metal_level", @key)
             else
               []
             end
-
-    options = "<option>SELECT REFERENCE PLAN</option>"
-    plans.each do |plan|
-      options += "<option value='#{plan.id}'>#{@carrier_names[plan.carrier_profile_id.to_s]} - #{plan.name}</option>"
-    end
-
-    render json: {status: 'ok', result: options}
   end
 
   def search_reference_plan
     @location_id = params[:location_id]
-    return unless params[:reference_plan_id].present?
-
     @plan = Plan.find(params[:reference_plan_id])
-    @premium_tables = @plan.premium_tables.where(start_on: @plan.premium_tables.distinct(:start_on).max)
+    @premium_tables = @plan.premium_table_for(Date.parse(params[:start_on]))
   end
 
   def calc_employer_contributions
     @location_id = params[:location_id]
-    return unless params[:reference_plan_id].present?
-
-    params.merge!({ plan_year: {
-      start_on: params[:start_on] #PlanYear.calculate_start_on_dates.first.to_s(:db) 
-      }.merge(relationship_benefits) })
-
+    params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
+    
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups[0].reference_plan = @plan
@@ -111,9 +89,9 @@ class Employers::PlanYearsController < ApplicationController
                                     when "single_plan"
                                       Plan.where(id: benefit_group.reference_plan_id).first
                                     when "single_carrier"
-                                      @plan_year.carrier_plans_for(benefit_group.carrier_for_elected_plan)
+                                      Plan.valid_shop_health_plans("carrier", benefit_group.carrier_for_elected_plan)
                                     when "metal_level"
-                                      @plan_year.metal_level_plans_for(benefit_group.metal_level_for_elected_plan)
+                                      Plan.valid_shop_health_plans("metal_level", benefit_group.metal_level_for_elected_plan)
                                     end
     end
     if @plan_year.save
@@ -170,20 +148,13 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_carriers_and_plans
-    @carriers = Organization.exists(carrier_profile: true).inject([]) do |carriers, org|
-      carriers << org.carrier_profile if Plan.valid_shop_health_plans(org.carrier_profile.id).present?
-      carriers
-    end
-
-    @carrier_names = Hash.new
-    @carriers.each do |carrier|
-      @carrier_names[carrier.id.to_s] = carrier.legal_name
-    end
+    @carrier_names = Organization.valid_carrier_names
+    @carriers_array = Organization.valid_carrier_names_for_options
   end
 
   def build_plan_year
     plan_year = PlanYear.new
-    benefit_groups = plan_year.benefit_groups.build
+    plan_year.benefit_groups.build
     ::Forms::PlanYearForm.new(plan_year)
   end
 
