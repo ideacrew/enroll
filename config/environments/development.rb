@@ -40,7 +40,7 @@ Rails.application.configure do
 
   config.acapi.publish_amqp_events = :log
   config.acapi.app_id = "enroll"
-  config.acapi.add_subscription(Acapi::Subscribers::Edi)
+  config.acapi.add_subscription(Events::EmployersController)
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 

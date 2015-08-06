@@ -9,7 +9,8 @@ describe "shared/_reference_plans_list.html.erb" do
     helper.extend ActionDispatch::Routing::PolymorphicRoutes
     helper.extend ActionView::Helpers::FormOptionsHelper
     mock_form = ActionView::Helpers::FormBuilder.new(:benefit_group, mock_benefit_group, helper, {})
-    assign :carriers, []
+    assign :carriers_array, []
+    assign :carrier_names, {}
     assign :plan_year, mock_plan_year
     render "shared/reference_plans_list", :f => mock_form
   end

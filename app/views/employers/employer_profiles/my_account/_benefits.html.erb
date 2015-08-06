@@ -125,17 +125,3 @@
     </div>
   </div>
 </div>
-
-<% if @no_plans_cache %>
-  <script type="text/javascript">
-    $(document).ready(function(){
-      $.ajax({
-        url: "<%= prepare_plans_cache_employers_employer_profile_plan_years_path %>",
-        type: 'GET',
-        success: function(response){
-          console.log("prepare plans cache " + response.status);
-        }
-      });
-    });
-  </script>
-<% end %>

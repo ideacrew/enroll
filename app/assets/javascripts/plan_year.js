@@ -29,10 +29,7 @@ $(document).on("change", ".elected-plan-select .carrier", function() {
     $.ajax({
       url: $('a#reference_plan_options_link').data('href'),
       type: 'GET',
-      data: {kind: 'carrier', key: txt},
-      success: function(response){
-        $(target).find(".carrier-select .carrier-" + txt + " select").html(response.result).selectric('refresh');
-      }
+      data: {kind: 'carrier', key: txt, target: $(this).parents("fieldset.benefit-group-fields").attr('id')}
     });
   }
 });
@@ -47,10 +44,7 @@ $(document).on("change", ".elected-plan-select .metal-level", function() {
     $.ajax({
       url: $('a#reference_plan_options_link').data('href'),
       type: 'GET',
-      data: {kind: 'metal-level', key: txt},
-      success: function(response){
-        $(target).find(".metal-level-select .metal-level-" + txt + " select").html(response.result).selectric('refresh');
-      }
+      data: {kind: 'metal-level', key: txt, target: $(this).parents("fieldset.benefit-group-fields").attr('id')}
     });
   }
 });
