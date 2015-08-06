@@ -2,15 +2,14 @@ module Forms
   class PlanYearForm < SimpleDelegator
      def initialize(py)
        super(py)
-       @all_plans = ::Plan.valid_shop_health_plans
      end
 
      def carrier_plans_for(c_profile_id)
-       @all_plans.select { |pl| pl.carrier_profile_id.to_s == c_profile_id.to_s }
+       ::Plan.valid_shop_health_plans("carrier", c_profile_id)
      end
 
      def metal_level_plans_for(metal_level)
-       @all_plans.select { |pl| pl.metal_level == metal_level }
+       ::Plan.valid_shop_health_plans("metal_level", metal_level)
      end
 
      def self.model_name
