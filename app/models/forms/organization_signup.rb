@@ -125,6 +125,11 @@ module Forms
     def dob=(val)
       @dob = Date.strptime(val,"%Y-%m-%d") rescue nil
     end
+    
+    # Strip non-numeric characters
+    def fein=(new_fein)
+      @fein =  new_fein.to_s.gsub(/\D/, '') rescue nil
+    end
 
     def regex_for(str)
       Regexp.compile(Regexp.escape(str.to_s))
