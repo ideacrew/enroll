@@ -103,16 +103,20 @@ class Employers::EmployerProfilesController < ApplicationController
     @employer_profile = @organization.employer_profile
     current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
     current_user.person.employer_contact = @employer_profile
-    if !@employer_profile.owner.present? && @organization.update_attributes(employer_profile_params) && current_user.save
-      current_user.person.employer_staff_roles << EmployerStaffRole.create(person: current_user.person, employer_profile_id: @employer_profile.id, is_owner: true)
-      flash[:notice] = 'Employer successfully Updated.'
-      redirect_to employers_employer_profile_path(@employer_profile)
-    else
-      @organization.reload
-      respond_to do |format|
-        format.js { render "edit" }
-        format.html { render "edit" }
+    if current_user.has_employer_staff_role? #&& @employer_profile.owner == current_user
+      if !@employer_profile.owner.present? && @organization.update_attributes(employer_profile_params) && current_user.save
+        current_user.person.employer_staff_roles << EmployerStaffRole.create(person: current_user.person, employer_profile_id: @employer_profile.id, is_owner: true)
+        flash[:notice] = 'Employer successfully Updated.'
+        redirect_to employers_employer_profile_path(@employer_profile)
+      else
+        @organization.reload
+        respond_to do |format|
+          format.js { render "edit" }
+          format.html { render "edit" }
+        end
       end
+    else
+      flash[:error] = 'You do not have permissions to update the details'
     end
   end
 
