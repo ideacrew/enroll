@@ -123,25 +123,6 @@ class Insured::PlanShoppingsController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
   end
 
-  def find_organization(id)
-    begin
-      Organization.find(id)
-    rescue
-      nil
-    end
-  end
-
-  def find_benefit_group(person, organization)
-    organization.employer_profile.latest_plan_year.benefit_groups.first
-    # person.employee_roles.first.benefit_group
-  end
-
-  def new_hbx_enrollment(person, organization, benefit_group)
-    HbxEnrollment.new_from(employer_profile: organization.employer_profile,
-                           coverage_household: person.primary_family.households.first.coverage_households.first,
-                           benefit_group: benefit_group)
-  end
-
   private
   def thousand_ceil(num)
     return 0 if num.blank?
