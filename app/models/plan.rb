@@ -172,13 +172,16 @@ class Plan
     given_age
   end
 
+  def premium_table_for(schedule_date)
+    self.premium_tables.select do |pt|
+      (pt.start_on <= schedule_date) && (pt.end_on >= schedule_date)
+    end
+  end
+
   def premium_for(schedule_date, age)
     bound_age_val = bound_age(age)
     begin
-    self.premium_tables.detect do |pt|
-      pt.age == bound_age_val &&
-        (pt.start_on <= schedule_date) && (pt.end_on >= schedule_date)
-    end.cost
+      premium_table_for(schedule_date).detect {|pt| pt.age == bound_age_val }.cost
     rescue
       raise [self.id, bound_age_val, schedule_date, age].inspect
     end

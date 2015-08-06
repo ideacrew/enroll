@@ -404,7 +404,7 @@ RSpec.describe Employers::PlanYearsController do
     let(:plan) {FactoryGirl.create(:plan)}
     before :each do
       sign_in
-      xhr :get, :search_reference_plan, employer_profile_id: employer_profile_id, location_id: "test", reference_plan_id: plan.id, format: :js
+      xhr :get, :search_reference_plan, employer_profile_id: employer_profile_id, location_id: "test", reference_plan_id: plan.id, start_on: "2015-10-01", format: :js
     end
 
     it "should be a success" do
