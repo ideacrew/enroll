@@ -100,6 +100,7 @@ group :development, :test do
   # Keep these in Development and Test environments for access by rails generators
   gem 'rspec-rails', '~> 3.1.0'
   gem 'factory_girl_rails', "~> 4.0"
+  gem 'forgery'
 end
 
 group :test do
@@ -110,7 +111,6 @@ group :test do
   gem 'shoulda-matchers', require: false
   gem 'email_spec'
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
-  gem 'forgery'
 #  gem 'headless'
 end
 
