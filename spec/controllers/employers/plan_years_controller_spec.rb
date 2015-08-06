@@ -379,7 +379,7 @@ RSpec.describe Employers::PlanYearsController do
 
       it "should redirect with errors" do
         xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
-        expect(flash[:notice]).to match(/Plan Year failed to publish/)
+        expect(flash[:error]).to match(/Plan Year failed to publish/)
       end
     end
   end
