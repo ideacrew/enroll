@@ -38,7 +38,7 @@ Feature: Create Primary Broker and Broker Agency
     Then I should see successful message with broker agency home page
     And I log out
 
-    Given I haven't signed up as an HBX user
+    Given Employer has not signed up as an HBX user
     When I visit the Employer portal
     And I sign up as a new employer
     Then I should see a successful sign up message

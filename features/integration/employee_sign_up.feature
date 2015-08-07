@@ -1,18 +1,15 @@
 @watir @screenshots
-Feature: Employee Sign Up when Employer already exists with a matching roster employer
-  The Employee wants Insurance
-  My Employer exists and Employee is on the Employee Roster
-  Given my Employer exists with an unpublished Plan Year
-  The Employee cannot match employer
+Feature: Employee Sign Up when Employer exists and has a matching roster employer
+  In order for the Employee to purchase insurance
+  Given my Employer exists and Employee is on the Employee Roster
+  Given my Employer has an unpublished Plan Year
+  The Employee should not be able to match Employer
   When my Employer publishes the Plan Year
-  The Employee should match Employer
-  The Employee should purchase Insurance
+  The Employee should be able to match Employer
+  The Employee should be able to purchase Insurance
 
   Scenario: New employee with existing person
-    Given I do not exist as a user
-    And I have an existing employee record
-    And I have an existing person record
-    And I am employed by an employer with no published plan year
+    Given Employee has not signed up as an HBX user
     When I go to the employee account creation page
     When I enter my new account information
     Then I should be logged in

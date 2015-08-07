@@ -27,26 +27,7 @@ After "@watir" do
   @take_screens = false if @take_screens
 end
 
-
-
-
-Given(/^I do not exist as a user$/) do
-end
-
 Given(/^(.+) has not signed up as an HBX user$/) do |actor|
-end
-
-
-Given(/^I have an existing employee record$/) do
-end
-
-Given(/^I have an existing person record$/) do
-end
-
-Given(/^I am employed by an employer with no published plan year$/) do
-end
-
-Given(/^I haven't signed up as an HBX user$/) do
 end
 
 When(/^I visit the Employer portal$/) do

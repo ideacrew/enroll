@@ -1,16 +1,17 @@
 @watir @screenshots
 Feature: Create Employer
   In order for Employers to create and manage an account on the HBX for their organization
+  In order for Employees to purchase insurance
   An Employer Representative should be able to create an Employer account
   Employer should be able to enter an incorrect plan year
   Employer should be able to add a roster employee with family
-  Employer should be able to publish a corrected plan year
-  After logoff
-  Employee should be able to create an account, match employer and roster family
+  Employer should be able to correct and publish a plan year
+  Then
+  Employee should be able to create an account, match to their employer and roster family
   Employee should be able to  purchase insurance
 
     Scenario: An Employer Representative has not signed up on the HBX
-      Given I haven't signed up as an HBX user
+      Given Employer has not signed up as an HBX user
       When I visit the Employer portal
         And I sign up with valid user data
       Then I should see a successful sign up message
@@ -42,9 +43,7 @@ Feature: Create Employer
       Then I should see a published success message
 
       When I log out
-      Given I do not exist as a user
-      And I have an existing employee record
-      And I have an existing person record
+      Given Employee has not signed up as an HBX user
       When I go to the employee account creation page
       When I enter my new account information
       Then I should be logged in
