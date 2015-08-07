@@ -1,0 +1,16 @@
+%id
+  %id= individual.hbx_id
+%person
+  %id
+    %id= individual.hbx_id
+  = render :partial => "events/shared/person_name", :object => individual
+  - if individual.addresses.any?
+    %addresses
+      = render :partial => "events/addresses/address", :collection => individual.addresses
+  - if individual.emails.any?
+    %emails
+      = render :partial => "events/emails/email", :collection => individual.emails
+  - if individual.phones.any?
+    %phones
+      = render :partial => "events/phones/phone", :collection => individual.phones
+= render :partial => "events/individuals/person_demographics", :object => individual
