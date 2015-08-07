@@ -125,7 +125,8 @@ class Employers::PlanYearsController < ApplicationController
       if (@plan_year.published? || @plan_year.enrolling?) 
         flash[:notice] = "Plan Year successfully published."
       else
-        flash[:error] = "Plan Year failed to publish. Every employee must be assigned to a benefit group defined for the published plan year."
+        errors = @plan_year.application_errors.try(:values)
+        flash[:error] = "Plan Year failed to publish. #{('<li>' + errors.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
       end
       render :js => "window.location = #{employers_employer_profile_path(@employer_profile).to_json}"
     end
