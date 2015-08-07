@@ -55,10 +55,10 @@ When(/^I go to the employee account creation page$/) do
   scroll_then_click(@browser.a(text: "Create account"))
 end
 
-When(/^I enter my new account information$/) do
+When(/^(.+) enters? new account information$/) do #deprecated
   @browser.text_field(name: "user[password_confirmation]").wait_until_present
   screenshot("create_account")
-  @email = "swhite#{rand(100)}@example.com"
+  @email = "any.person#{rand(100)}@example.com"
   @password = "12345678"
   @browser.text_field(name: "user[email]").set(@email)
   @browser.text_field(name: "user[password]").set(@password)
@@ -67,6 +67,7 @@ When(/^I enter my new account information$/) do
 end
 
 Then(/^I should be logged in$/) do
+    screenshot("logged_in_welcome")
   @browser.a(href: /consumer.employee.search/).wait_until_present
   screenshot("logged_in_welcome")
   expect(@browser.a(href: /consumer.employee.search/).visible?).to be_truthy
@@ -76,9 +77,6 @@ When (/^(.*) logs? out$/) do |someone|
   sleep 2
   scroll_then_click(@browser.element(class: /interaction-click-control-logout/))
   @browser.element(class: /interaction-click-control-logout/).wait_while_present
-end
-
-Then(/^I should see the hbx home page$/) do
   @browser.element(class: /interaction-click-control-employee-portal/).wait_until_present
 end
 
@@ -125,10 +123,25 @@ def people
       password: 'password'
     },
     "Primary Broker" => {
-      email: 'ricky.martin@exmaple.com',
+      email: 'ricky.martin@example.com',
       password: '12345678'
     }
   }
+end
+
+When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
+  log_on(people[named_person], portal)
+end  
+
+When(/^(.*) creates an HBX account$/) do |named_person|
+  person = people[named_person]
+
+  @browser.text_field(name: "user[password_confirmation]").wait_until_present
+  @browser.text_field(name: "user[email]").set(person[:email])
+  @browser.text_field(name: "user[password]").set(person[:password])
+  @browser.text_field(name: "user[password_confirmation]").set(person[:password])
+  screenshot("create_account")
+  scroll_then_click(@browser.input(value: "Create account"))
 end
 
 When(/^I enter the identifying info of (.*)$/) do |named_person|
@@ -350,13 +363,16 @@ When(/^I click qle event$/) do
   expect(@browser.element(text: /YOUR PLAN/i).visible?).to be_truthy
 end
 
-When(/^My employer publishes a plan year$/) do
+When(/^XI logon as Employer$/) do
   @browser.a(text: /Employer Portal/).wait_until_present
   scroll_then_click(@browser.a(text: /Employer Portal/))
   @browser.element(class: /interaction-field-control-user-email/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set(@email)
   @browser.text_field(class: /interaction-field-control-user-password/).set(@password)
   scroll_then_click(@browser.element(class: /interaction-click-control-sign-in/))
+end
+
+When(/^XI create the Employer Organization?/) do
   @browser.text_field(name: "organization[first_name]").wait_until_present
   @browser.text_field(name: "organization[first_name]").set("Soren")
   @browser.text_field(name: "organization[last_name]").set("White")
@@ -379,6 +395,8 @@ When(/^My employer publishes a plan year$/) do
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("202")
   @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("5551212")
   scroll_then_click(@browser.button(class: "interaction-click-control-create-employer"))
+end
+When(/^My employer publishes a plan year$/) do  
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-edit-plan-year/))
   start_on = @browser.element(class: /selectric-interaction-choice-control-plan-year-start-on/)
@@ -388,15 +406,6 @@ When(/^My employer publishes a plan year$/) do
   @browser.element(class: /alert-notice/, text: /Plan Year successfully saved./).wait_until_present
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))
-end
-
-When(/^I log in to the employee account page$/) do
-  @browser.a(text: /Employee Portal/).wait_until_present
-  scroll_then_click(@browser.a(text: /Employee Portal/))
-  @browser.element(class: /interaction-field-control-user-email/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-user-email/).set(@email)
-  @browser.text_field(class: /interaction-field-control-user-password/).set(@password)
-  scroll_then_click(@browser.element(class: /interaction-click-control-sign-in/))
 end
 
 When(/^I visit consumer profile homepage$/) do

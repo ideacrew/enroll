@@ -45,7 +45,7 @@ Feature: Create Employer
       When I log out
       Given Employee has not signed up as an HBX user
       When I go to the employee account creation page
-      When I enter my new account information
+      Then Patrick Doe creates an HBX account
       Then I should be logged in
       When I go to register as an employee
       Then I should see the employee search page

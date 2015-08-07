@@ -11,19 +11,19 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
   Scenario: New employee with existing person
     Given Employee has not signed up as an HBX user
     When I go to the employee account creation page
-    When I enter my new account information
+    Then Soren White creates an HBX account
     Then I should be logged in
     When I go to register as an employee
     Then I should see the employee search page
     When I enter the identifying info of Soren White
     Then I should not see the matched employee record form
-    When I log out
-    Then I should see the hbx home page
+    Then Soren White logs out
+    When Soren White logs on to the Employer Portal
+    When XI create the Employer Organization
     When My employer publishes a plan year
     Then I should see a published success message
-    And My employer logs out
-    Then I should see the hbx home page
-    When I log in to the employee account page
+    Then My employer logs out
+    When Soren White logs on to the Employee Portal
     Then I should be logged in
     When I go to register as an employee
     Then I should see the employee search page

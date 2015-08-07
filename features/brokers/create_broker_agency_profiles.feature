@@ -21,7 +21,7 @@ Feature: Create Primary Broker and Broker Agency
     And I click on Create Broker Agency
     Then I should see broker registration successful message
 
-    Then admin@dc.gov/password logs on to hbx-portal
+    Then Hbx Admin logs on to the Hbx Portal
     And I click on brokers tab
     Then I should see the list of broker applicants
     When I click on the current broker applicant show button
@@ -71,7 +71,7 @@ Feature: Create Primary Broker and Broker Agency
     Then I should see broker selected successful message
     And I log out
 
-    Then ricky.martin@example.com/12345678 logs on to broker-agency-portal
+    Then Primary Broker logs on to the Broker Agency Portal
     And I click on the Employers tab
 
     Then I should see Employer and click on legal name
@@ -85,7 +85,7 @@ Feature: Create Primary Broker and Broker Agency
     And I log out
 
     When I go to the employee account creation page
-    When I enter my new account information
+    When Broker Assisted creates an HBX account
     Then I should be logged in
     When I go to register as an employee
     Then I should see the employee search page
@@ -95,7 +95,7 @@ Feature: Create Primary Broker and Broker Agency
     Then I complete the matched employee form for Broker Assisted
     And I log out
 
-    Then ricky.martin@example.com/12345678 logs on to broker-agency-portal
+    Then Primary Broker logs on to the Broker Agency Portal
     And I click on the Employers tab
 
     Then I should see Employer and click on legal name

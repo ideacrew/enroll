@@ -251,18 +251,6 @@ When(/^I create new employer profile$/) do
   scroll_then_click(@browser.button(class: "interaction-click-control-create-employer"))
 end
 
-When(/([^ ]+) logs on to ([^ ]+)/) do |signon, portal|
-  user,password = signon.split('/')
-  @browser.goto("http://localhost:3000/")
-  portal_class = "interaction-click-control-#{portal.downcase}"
-  @browser.a(class: portal_class).wait_until_present
-  @browser.a(class: portal_class).click
-  @browser.element(class: /interaction-click-control-sign-in/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-user-email/).set(user)
-  @browser.text_field(class: /interaction-field-control-user-password/).set(password)
-  @browser.element(class: /interaction-click-control-sign-in/).click
-end
-
 When(/^I click on the (\w+) tab$/) do |tab_name|
   @browser.a(text: /#{tab_name}/).wait_until_present
   scroll_then_click(@browser.a(text: /#{tab_name}/))

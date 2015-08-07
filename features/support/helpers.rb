@@ -59,4 +59,14 @@ module Helpers
 
     enter_office_location(employer[:office_location])
   end
+  def log_on(person, portal)
+    @browser.goto("http://localhost:3000/")
+    portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
+    @browser.a(class: portal_class).wait_until_present
+    @browser.a(class: portal_class).click
+    @browser.element(class: /interaction-click-control-sign-in/).wait_until_present
+    @browser.text_field(class: /interaction-field-control-user-email/).set(person[:email])
+    @browser.text_field(class: /interaction-field-control-user-password/).set(person[:password])
+    @browser.element(class: /interaction-click-control-sign-in/).click
+  end
 end
