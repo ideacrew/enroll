@@ -9,5 +9,5 @@
   - if office_location.phone.present?
     %phone
       %type= "urn:openhbx:terms:v1:phone_type#work"
-      %full_phone_number
+      %full_phone_number= office_location.phone.full_phone_number
       %is_preferred= (office_location.phone.primary.blank? ? false : office_location.phone.primary)
