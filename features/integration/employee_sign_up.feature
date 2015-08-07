@@ -48,4 +48,5 @@ Feature: Employee Sign Up
     When I click on purchase button on the coverage summary page
     Then I should see the receipt page
     Then I should see the "my account" page
+    Then I should see the "Your Enrollment History" section
     When I click qle event

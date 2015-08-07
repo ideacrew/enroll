@@ -142,6 +142,75 @@ RSpec.describe Plan, dbclean: :after_each do
     end
   end
 
+  describe ".premium_table_for" do
+    let(:valid_plan_params) do
+      {
+          name: name,
+          active_year: active_year,
+          hios_id: hios_id,
+          carrier_profile_id: carrier_profile_id,
+          metal_level: metal_level,
+          coverage_kind: coverage_kind,
+          market: market,
+          premium_tables: [ premium_table_entry1,
+                            premium_table_entry2,
+                            premium_table_entry3,
+                            premium_table_entry4 ]
+      }
+    end
+
+    let(:premium_table_entry1) { {
+      start_on: "2015-01-01",
+      end_on: "2015-05-31",
+      cost: 500,
+      age: 32 
+      } }
+
+    let(:premium_table_entry2) { {
+      start_on: "2015-06-01",
+      end_on: "2015-08-31",
+      cost: 502,
+      age: 32
+      } }
+
+    let(:premium_table_entry3) { {
+      start_on: "2015-09-01",
+      end_on: "2015-12-31",
+      cost: 504,
+      age: 32
+      } }
+
+    let(:premium_table_entry4) { {
+      start_on: "2015-09-01",
+      end_on: "2015-12-31",
+      cost: 574,
+      age: 34
+      } }
+
+
+    context "valid arguments" do
+
+      def plan;
+        Plan.new(valid_plan_params);
+      end
+
+      def premium_table_hash(premium_table)
+        {
+          start_on: premium_table.start_on.try(:strftime, "%Y-%m-%d"),
+          end_on: premium_table.end_on.try(:strftime, "%Y-%m-%d"),
+          cost: premium_table.cost,
+          age: premium_table.age
+        }
+      end
+
+      it "should return premium tables" do
+        expect(plan.premium_table_for(Date.parse("2015-10-01")).size).to eq 2
+        expect(premium_table_hash(plan.premium_table_for(Date.parse("2015-10-01"))[0])).to eq premium_table_entry3
+        expect(premium_table_hash(plan.premium_table_for(Date.parse("2015-10-01"))[1])).to eq premium_table_entry4
+      end
+    end
+  end
+
   describe ".premium_for" do
     let(:valid_plan_params) do
       {
@@ -184,7 +253,7 @@ RSpec.describe Plan, dbclean: :after_each do
       end
 
       it "should compute premium" do
-        expect(plan.premium_for(Date.today.at_beginning_of_month, plan_params[:premium_tables][0][:age])).to eq(plan_params[:premium_tables][0][:cost])
+        expect(plan.premium_for(Date.parse("2015-10-01"), plan_params[:premium_tables][0][:age])).to eq(plan_params[:premium_tables][0][:cost])
       end
     end
   end
