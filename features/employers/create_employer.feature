@@ -1,8 +1,13 @@
 @watir @screenshots
 Feature: Create Employer
-  In order to offer health and dental insurance benefits to my employees, employers must create and manage an account on the HBX for their organization.  Such organizations are referred to as an Employer
-  An Employer Representative
-  Should be able to create an Employer account
+  In order for Employers to create and manage an account on the HBX for their organization
+  An Employer Representative should be able to create an Employer account
+  Employer should be able to enter an incorrect plan year
+  Employer should be able to add a roster employee with family
+  Employer should be able to publish a corrected plan year
+  After logoff
+  Employee should be able to create an account, match employer and roster family
+  Employee should be able to  purchase insurance
 
     Scenario: An Employer Representative has not signed up on the HBX
       Given I haven't signed up as an HBX user
@@ -20,27 +25,9 @@ Feature: Create Employer
       When I click on add employee button
       Then I should see a form to enter information about employee, address and dependents details
         And I should see employer census family created success message
-      #modify linked employee ssn
-      #When I click on Edit family button for a census family
-        #And I edit ssn and dob on employee detail page after linked
-        #And I should see Access Denied
-      #unlinked modify
-      #When I go back
-      #And I click on the Employees tab
       And I click on Edit family button for a census family
       Then I should see a form to update the contents of the census employee
         And I should see employer census family updated success message
-      #terminate
-      #  And I click on the Employees tab
-      #  And I click on terminate button for a census family
-      #Then The census family should be terminated and move to terminated tab
-        #And I should see the census family is successfully terminated message
-        #And I logout from employer portal
-      #Rehire
-      #When I click on Rehire button for a census family on terminated tab
-      #Then A new instance of the census family should be created
-      #  And I click on the Employees tab
-      #  And I click on terminate button for rehired census employee
       When I go to the benefits tab
       Then I should see the plan year
       When I click on publish plan year

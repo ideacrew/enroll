@@ -13,6 +13,20 @@ module WatirScreenshots
   end
 end
 
+Before "@watir" do
+  extend WatirScreenshots
+  @browser = Watir::Browser.new :chrome, switches: ["--test-type"]
+  @browser.window.resize_to(1440, 900)
+  @screen_count = 0
+  @take_screens = ENV.has_key?("DISABLE_WATIR_SCREENSHOTS") ? false : true
+  @keep_browser_open = ENV.has_key?("KEEP_WATIR_BROWSERS_OPEN") ? true : false
+end
+
+After "@watir" do
+  @browser.close unless @keep_browser_open
+  @take_screens = false if @take_screens
+end
+
 def scroll_into_view(element)
   @browser.execute_script(
     'arguments[0].scrollIntoView(false);',
@@ -73,19 +87,6 @@ def enter_employer_profile(employer)
   enter_office_location(employer[:office_location])
 end
 
-Before "@watir" do
-  extend WatirScreenshots
-  @browser = Watir::Browser.new :chrome, switches: ["--test-type"]
-  @browser.window.resize_to(1440, 900)
-  @screen_count = 0
-  @take_screens = ENV.has_key?("DISABLE_WATIR_SCREENSHOTS") ? false : true
-  @keep_browser_open = ENV.has_key?("KEEP_WATIR_BROWSERS_OPEN") ? true : false
-end
-
-After "@watir" do
-  @browser.close unless @keep_browser_open
-  @take_screens = false if @take_screens
-end
 
 Given(/^I do not exist as a user$/) do
 end
@@ -172,19 +173,33 @@ def people
       last_name: "White",
       dob: "08/13/1979",
       ssn: "670991234",
-      home_phone: "2025551234"
+      home_phone: "2025551234", 
+      email: 'soren@dc.gov',
+      password: '12345678'
     },
     "Patrick Doe" => {
       first_name: "Patrick",
       last_name: "Doe",
       dob: "01/01/1980",
       ssn: "786120965",
+      email: 'patrick.doe@dc.gov',
+      password: '12345678'
     },
     "Broker Assisted" => {
       first_name: 'Broker',
       last_name: 'Assisted',
       dob: "05/02/1976",
-      ssn: "761234567"
+      ssn: "761234567",
+      email: 'broker.assisted@dc.gov',
+      password: '12345678'
+    }
+    "Hbx Admin" => {
+      email: 'admin@dc.gov',
+      password: 'password'
+    }
+    "Primary Broker" => {
+      email: 'ricky.martin@exmaple.com'
+      password: '12345678'
     }
   }
 end

@@ -1,8 +1,12 @@
 @watir @screenshots
-Feature: Employee Sign Up
-  In order to get access to the site
-  As an employee
-  I need to create an account and match an existing record
+Feature: Employee Sign Up when Employer already exists with a matching roster employer
+  The Employee wants Insurance
+  My Employer exists and Employee is on the Employee Roster
+  Given my Employer exists with an unpublished Plan Year
+  The Employee cannot match employer
+  When my Employer publishes the Plan Year
+  The Employee should match Employer
+  The Employee should purchase Insurance
 
   Scenario: New employee with existing person
     Given I do not exist as a user

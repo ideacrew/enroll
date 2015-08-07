@@ -1,10 +1,17 @@
 @watir @screenshots
 Feature: Create Primary Broker and Broker Agency
-  In order to support individual and SHOP market clients, brokers must create and manage an account on the HBX for their organization.  Such organizations are referred to as a Broker Agency
-  A Broker Representative
-  Should be able to create a Broker Agency account
+  In order for Brokers to help individuals and SHOP employees
+  The Primary Broker must create and manage an account on the HBX for their organization.  
+  Such organizations are referred to as a Broker Agency
+  The Primary Broker should be able to create a Broker Agency account application
+  The HBX Admin should be able to approve the application and send an email invite
+  The Primary Broker should receive the invite and create an Account
+  The Employer should be able to select a Broker
+  The Primary Broker should be able to manage that Employer
+  The Primary Broker should be able to select a family covered by that Employer
+  The Primary Broker should be able to purchase insurance for the familyg
 
-  Scenario: Broker Representative has not signed up on the HBX
+  Scenario: Primary Broker has not signed up on the HBX
     When I visit the HBX Broker Registration form
     And I click on New Broker Agency Tab
     Then I should see the New Broker Agency form
