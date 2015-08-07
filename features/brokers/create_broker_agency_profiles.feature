@@ -6,10 +6,10 @@ Feature: Create Primary Broker and Broker Agency
   The Primary Broker should be able to create a Broker Agency account application
   The HBX Admin should be able to approve the application and send an email invite
   The Primary Broker should receive the invite and create an Account
-  The Employer should be able to select a Broker
-  The Primary Broker should be able to manage that Employer
-  The Primary Broker should be able to select a family covered by that Employer
-  The Primary Broker should be able to purchase insurance for the familyg
+  The Employer should be able to select the Primary Broker as their Broker
+  The Broker should be able to manage that Employer
+  The Broker should be able to select a family covered by that Employer
+  The Broker should be able to purchase insurance for that family
 
   Scenario: Primary Broker has not signed up on the HBX
     When I visit the HBX Broker Registration form
@@ -37,7 +37,6 @@ Feature: Create Primary Broker and Broker Agency
     When I register with valid information
     Then I should see successful message with broker agency home page
     And I log out
-
 
     Given I haven't signed up as an HBX user
     When I visit the Employer portal
