@@ -25,5 +25,16 @@ RSpec.describe "insured/plan_shoppings/_waive_confirmation.html.erb" do
     it "should prompt for the waiver reason" do
       expect(rendered).to have_selector('h4', text: /Select Waive Reason/)
     end
+
+    it "should have waiver reason options" do
+      HbxEnrollment::WAIVER_REASONS.each do |w_reason|
+        expect(rendered).to have_selector(:option, text: w_reason)
+      end
+    end
+
+    it "should have disabled submit" do
+      expect(rendered).to have_selector("input[disabled=disabled]", count: 1)
+      expect(rendered).to have_selector("input[value='Submit']", count: 1)
+    end
   end
 end
