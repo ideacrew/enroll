@@ -49,19 +49,9 @@ And(/^I enter broker agency information$/) do
   @browser.checkbox(:name => "organization[accept_new_clients]").set
 end
 
-And(/^I enter office locations information$/) do
-  enter_office_location({
-    address1: "623a Spalding Ct",
-    address2: "Suite 200",
-    city: "McLean",
-    state: "VA",
-    zip: "22180",
-    phone_area_code: "202",
-    phone_number: "1110000",
-    phone_extension: "1111"
-    })
+And(/^(.+) enters? office locations information$/) do |named_person|
+  enter_office_location(default_office_location)
 end
-
 
 And(/^I click on Create Broker Agency$/) do
   @browser.element(class: /interaction-click-control-create-broker-agency/).wait_until_present
@@ -225,29 +215,8 @@ And(/^I sign up as a new employer$/) do
 end
 
 
-When(/^I create new employer profile$/) do
-
-  office_location = {
-      address1: "609 H ST SW",
-      address2: "Suite 200",
-      city: "Washington DC",
-      state: "DC",
-      zip: "20005",
-      phone_area_code: "202",
-      phone_number: "7030000",
-      phone_extension: "1000"
-     }
-
-  enter_employer_profile( {
-    first_name: "Tim",
-    last_name: "Wood",
-    dob: "08/13/1979",
-    legal_name: "Legal LLC",
-    dba: "Legal LLC",
-    fein: "890000223",
-    office_location: office_location
-  } )
-
+When(/^(.+) creates? a new employer profile$/) do |named_person|
+  enter_employer_profile( people[named_person])
   scroll_then_click(@browser.button(class: "interaction-click-control-create-employer"))
 end
 

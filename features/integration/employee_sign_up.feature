@@ -10,7 +10,7 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
 
   Scenario: New employee with existing person
     Given Employee has not signed up as an HBX user
-    When I go to the employee account creation page
+    When Employee goes to the employee account creation page
     Then Soren White creates an HBX account
     Then Soren White should be logged on as an unlinked employee
     When I go to register as an employee

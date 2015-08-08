@@ -39,13 +39,13 @@ When(/^I visit the Employer portal$/) do
   @browser.a(text: /Create account/).click
 end
 
-Then(/^I should see a successful sign up message$/) do
+Then(/^(?:.+) should see a successful sign up message$/) do
   Watir::Wait.until(30) { @browser.element(text: /Welcome! Your account has been created./).present? }
   screenshot("employer_sign_up_welcome")
   expect(@browser.element(text: /Welcome! Your account has been created./).visible?).to be_truthy
 end
 
-When(/^I go to the employee account creation page$/) do
+When(/^(?:.+) go(?:es)? to the employee account creation page$/) do
   @browser.goto("http://localhost:3000/")
   @browser.a(text: "Employee Portal").wait_until_present
   screenshot("start")
@@ -55,7 +55,7 @@ When(/^I go to the employee account creation page$/) do
   scroll_then_click(@browser.a(text: "Create account"))
 end
 
-When(/^(.+) enters? new account information$/) do #deprecated
+When(/^(?:.+) enters? new account information$/) do #deprecated
   @browser.text_field(name: "user[password_confirmation]").wait_until_present
   screenshot("create_account")
   @email = "any.person#{rand(100)}@example.com"
@@ -130,6 +130,14 @@ def people
       email: 'joe.employer@example.com',
       password: '12345678'
 
+    },
+    "Tim Wood" => {
+      first_name: "Tim",
+      last_name: "Wood",
+      dob: "08/13/1979",
+      legal_name: "Legal LLC",
+      dba: "Legal LLC",
+      fein: "890000223"
     },
   }
 end
@@ -390,15 +398,7 @@ When(/^XI create the Employer Organization?/) do
   input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-entity-kind").first
   input_field.click
   input_field.li(text: /C Corporation/).click
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").set("830 I St NE")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Washington")
-  input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-office-locations-attributes-0-address-attributes-state").first
-  input_field.click
-  input_field.li(text: /DC/).click
-  @browser.select_list(name: "organization[office_locations_attributes][0][address_attributes][state]").select("DC")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("20002")
-  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("202")
-  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("5551212")
+  enter_office_location(default_office_location)
   scroll_then_click(@browser.button(class: "interaction-click-control-create-employer"))
 end
 When(/^My employer publishes a plan year$/) do  

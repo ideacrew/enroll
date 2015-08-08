@@ -42,7 +42,7 @@ Feature: Create Primary Broker and Broker Agency
     When I visit the Employer portal
     And I sign up as a new employer
     Then I should see a successful sign up message
-    And I create new employer profile
+    And Tim Wood creates a new employer profile
     
     When I click on the Broker Agency tab
     Then I should see no active broker

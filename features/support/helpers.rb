@@ -1,5 +1,8 @@
 
 module Helpers
+
+
+
   def scroll_into_view(element)
     @browser.execute_script(
       'arguments[0].scrollIntoView(false);',
@@ -29,6 +32,19 @@ module Helpers
     @browser.text_field(name: "user[password]").set(credentials[:password])
     @browser.text_field(name: "user[password_confirmation]").set(credentials[:password])
   end
+    
+  def default_office_location
+    {
+    address1: "623a Spalding Ct",
+    address2: "Suite 200",
+    city: "Washington",
+    state: "DC",
+    zip: "20001",
+    phone_area_code: "202",
+    phone_number: "1110000",
+    phone_extension: "1111"
+    }
+  end
 
   def enter_office_location(location)
     @browser.text_field(class: /interaction-field-control-office-location-address-address-1/).set(location[:address1])
@@ -57,7 +73,7 @@ module Helpers
     input_field.click
     input_field.li(text: /C Corporation/).click
 
-    enter_office_location(employer[:office_location])
+    enter_office_location(default_office_location)
   end
   def log_on(person, portal)
     @browser.goto("http://localhost:3000/")
