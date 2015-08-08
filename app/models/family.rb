@@ -116,9 +116,9 @@ class Family
 
   def current_eligible_open_enrollments
     return [] unless primary_applicant
-    person = primary_applicant.person
-    return [] unless person
-    employee_role = person.employee_roles.first
+    pri_person = primary_applicant.person
+    return [] unless pri_person
+    employee_role = pri_person.employee_roles.first
     return [] unless employee_role
     employer_profile = employee_role.employer_profile
     return [] unless employer_profile

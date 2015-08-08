@@ -27,12 +27,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(usermailer).to receive(:deliver_now).and_return(true)
       allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
       allow(employee_role).to receive(:hired_on).and_return(TimeKeeper.date_of_record + 10.days)
-      allow(hbx_enrollment).to receive(:household).and_return(household)
-      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:where).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:ne).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:update_all).and_return(true)
+      allow(hbx_enrollment).to receive(:update_current).and_return(true)
+      allow(hbx_enrollment).to receive(:inactive_related_hbxs).and_return(true)
     end
 
     it "returns http success" do
@@ -165,10 +161,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       #allow(hbx_enrollment).to receive(:terminate_coverage!).and_return(true)
-      allow(hbx_enrollment).to receive(:household).and_return(household)
-      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:where).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:update_all).and_return(true)
+      allow(hbx_enrollment).to receive(:update_current).and_return(true)
       allow(hbx_enrollment).to receive(:propogate_terminate).and_return(true)
       sign_in
     end
@@ -190,10 +183,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:may_waive_coverage?).and_return(true)
-      allow(hbx_enrollment).to receive(:household).and_return(household)
-      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:where).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:update_all).and_return(true)
+      allow(hbx_enrollment).to receive(:update_current).and_return(true)
       allow(hbx_enrollment).to receive(:propogate_waiver).and_return(true)
       sign_in user
     end

@@ -143,6 +143,8 @@ class EmployerProfile
     plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
+  #TODO - this code will not able to support enrolling plan year
+  #there should be one published and one enrolling or enrolled plan year
   def published_plan_year
     plan_years.published.first
   end
