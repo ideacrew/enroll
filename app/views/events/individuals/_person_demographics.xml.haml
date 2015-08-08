@@ -1,0 +1,6 @@
+%person_demographics
+  - unless person_demographics.ssn.blank?
+    %ssn= person.ssn
+  %sex= "urn:openhbx:terms:v1:gender##{person_demographics.gender}"
+  %birth_date= simple_date_for(person_demographics.dob)
+  = render :partial => "events/shared/versioned_resource", :object => person_demographics

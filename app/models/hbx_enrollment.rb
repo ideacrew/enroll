@@ -240,12 +240,14 @@ class HbxEnrollment
   def self.find_by_benefit_groups(benefit_groups = [])
     id_list = benefit_groups.collect(&:_id).uniq
 
-    families = nil
-    if id_list.size == 1
-      families = Family.where(:"households.hbx_enrollments.benefit_group_id" => id_list.first)
-    else
-      families = Family.any_in(:"households.hbx_enrollments.benefit_group_id" => id_list )
-    end
+    # families = nil
+    # if id_list.size == 1
+    #   families = Family.where(:"households.hbx_enrollments.benefit_group_id" => id_list.first)
+    # else
+    #   families = Family.any_in(:"households.hbx_enrollments.benefit_group_id" => id_list )
+    # end
+
+    families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
 
     enrollment_list = []
     families.each do |family|
@@ -261,12 +263,14 @@ class HbxEnrollment
   def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
     id_list = benefit_group_assignments.collect(&:_id)
 
-    families = nil
-    if id_list.size == 1
-      families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list.first)
-    else
-      families = Family.any_in(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list )
-    end
+    # families = nil
+    # if id_list.size == 1
+    #   families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list.first)
+    # else
+    #   families = Family.any_in(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list )
+    # end
+
+    families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id".in => id_list)
 
     enrollment_list = []
     families.each do |family|

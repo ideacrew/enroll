@@ -4,12 +4,12 @@
     <h3 class="title-inline">Employers</h3>
 
     <div class="form-inline button-group-wrapper">
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 search-wp">
+      <div class="col-xs-12 search-wp">
         <%= render 'shared/search', url: employers_employer_profiles_path, q: @q, placeholder: 'Name', remote: true %>
       </div>
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 no-pd">
-        <%= link_to 'New Employer Profile'.html_safe, new_employers_employer_profile_path, class: "btn btn-primary pull-right new_emp_button new_employer_profile new_employer_profile_btn" %>
-      </div>
+<!--       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 no-pd">
+        <%#= link_to 'New Employer Profile'.html_safe, new_employers_employer_profile_path, class: "btn btn-primary pull-right new_emp_button new_employer_profile new_employer_profile_btn" %>
+      </div> -->
     </div>
   </div>
 
