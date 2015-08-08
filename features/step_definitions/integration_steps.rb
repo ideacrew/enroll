@@ -66,9 +66,9 @@ When(/^(.+) enters? new account information$/) do #deprecated
   scroll_then_click(@browser.input(value: "Create account"))
 end
 
-Then(/^I should be logged in$/) do
+Then(/^(?:.+) should be logged on as an unlinked employee$/) do
     screenshot("logged_in_welcome")
-  @browser.a(href: /consumer.employee.search/).wait_until_present
+  @browser.a(href: /consumer\/employee\/search/).wait_until_present
   screenshot("logged_in_welcome")
   expect(@browser.a(href: /consumer.employee.search/).visible?).to be_truthy
 end
@@ -125,7 +125,12 @@ def people
     "Primary Broker" => {
       email: 'ricky.martin@example.com',
       password: '12345678'
-    }
+    },
+    "Joe Employer" => {
+      email: 'joe.employer@example.com',
+      password: '12345678'
+
+    },
   }
 end
 

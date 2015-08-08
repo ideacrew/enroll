@@ -86,7 +86,7 @@ Feature: Create Primary Broker and Broker Agency
 
     When I go to the employee account creation page
     When Broker Assisted creates an HBX account
-    Then I should be logged in
+    Then Broker Assisted should be logged on as an unlinked employee
     When I go to register as an employee
     Then I should see the employee search page
     When I enter the identifying info of Broker Assisted

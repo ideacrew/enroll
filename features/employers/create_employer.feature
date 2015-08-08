@@ -13,7 +13,7 @@ Feature: Create Employer
     Scenario: An Employer Representative has not signed up on the HBX
       Given Employer has not signed up as an HBX user
       When I visit the Employer portal
-        And I sign up with valid user data
+      Then Joe Employer creates an HBX account
       Then I should see a successful sign up message
         And I should see an initial form to enter information about my Employer and myself
       When I go to the benefits tab I should see plan year information
@@ -46,7 +46,7 @@ Feature: Create Employer
       Given Employee has not signed up as an HBX user
       When I go to the employee account creation page
       Then Patrick Doe creates an HBX account
-      Then I should be logged in
+      Then Patrick Doe should be logged on as an unlinked employee
       When I go to register as an employee
       Then I should see the employee search page
       When I enter the identifying info of Patrick Doe

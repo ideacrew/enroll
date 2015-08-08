@@ -12,7 +12,7 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
     Given Employee has not signed up as an HBX user
     When I go to the employee account creation page
     Then Soren White creates an HBX account
-    Then I should be logged in
+    Then Soren White should be logged on as an unlinked employee
     When I go to register as an employee
     Then I should see the employee search page
     When I enter the identifying info of Soren White
@@ -24,7 +24,7 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
     Then I should see a published success message
     Then My employer logs out
     When Soren White logs on to the Employee Portal
-    Then I should be logged in
+    Then Soren White should be logged on as an unlinked employee
     When I go to register as an employee
     Then I should see the employee search page
     When I enter the identifying info of Soren White
