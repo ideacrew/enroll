@@ -77,6 +77,7 @@ Feature: Create Primary Broker and Broker Agency
     Then I should see Employer and click on legal name
     Then I should see the Employer Profile page as Broker
     When Broker creates and publishes a plan year
+    Then Broker should see a published success message
     When Broker clicks on the Employees tab
     Then Broker clicks on the add employee button
     Then Broker creates a roster employee

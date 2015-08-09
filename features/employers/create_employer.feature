@@ -40,7 +40,7 @@ Feature: Create Employer
       Then I should see a plan year successfully saved message
       When I go to the benefits tab I should see plan year information
       Then I click on publish plan year
-      Then I should see a published success message
+      Then Employer should see a published success message
 
       When I log out
       Given Employee has not signed up as an HBX user
@@ -52,7 +52,7 @@ Feature: Create Employer
       When I enter the identifying info of Patrick Doe
       Then I should see the matching employee record form
       When I accept the matched employer
-      When I complete the matching employee form
+      When I complete the matched employee form for Patrick Doe
       Then I should see the dependents page
       Then I should see 1 dependent
       When I click continue on the dependents page
