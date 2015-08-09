@@ -214,12 +214,6 @@ And(/^I sign up as a new employer$/) do
   @browser.input(value: /Create account/).click
 end
 
-
-When(/^(.+) creates? a new employer profile$/) do |named_person|
-  enter_employer_profile( people[named_person])
-  scroll_then_click(@browser.button(class: "interaction-click-control-create-employer"))
-end
-
 When(/^I click on the (\w+) tab$/) do |tab_name|
   @browser.a(text: /#{tab_name}/).wait_until_present
   scroll_then_click(@browser.a(text: /#{tab_name}/))

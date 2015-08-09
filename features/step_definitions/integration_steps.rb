@@ -100,7 +100,10 @@ def people
       ssn: "670991234",
       home_phone: "2025551234", 
       email: 'soren@dc.gov',
-      password: '12345678'
+      password: '12345678',
+      legal_name: "Acme Inc.",
+      dba: "Acme Inc.",
+      fein: "764141112"
     },
     "Patrick Doe" => {
       first_name: "Patrick",
@@ -376,31 +379,11 @@ When(/^I click qle event$/) do
   expect(@browser.element(text: /YOUR PLAN/i).visible?).to be_truthy
 end
 
-When(/^XI logon as Employer$/) do
-  @browser.a(text: /Employer Portal/).wait_until_present
-  scroll_then_click(@browser.a(text: /Employer Portal/))
-  @browser.element(class: /interaction-field-control-user-email/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-user-email/).set(@email)
-  @browser.text_field(class: /interaction-field-control-user-password/).set(@password)
-  scroll_then_click(@browser.element(class: /interaction-click-control-sign-in/))
-end
-
-When(/^XI create the Employer Organization?/) do
-  @browser.text_field(name: "organization[first_name]").wait_until_present
-  @browser.text_field(name: "organization[first_name]").set("Soren")
-  @browser.text_field(name: "organization[last_name]").set("White")
-  @browser.text_field(name: "jq_datepicker_ignore_organization[dob]").set("08/13/1979")
-  scroll_then_click(@browser.text_field(name: "organization[first_name]"))
-
-  @browser.text_field(name: "organization[legal_name]").set("Acme Inc.")
-  @browser.text_field(name: "organization[dba]").set("Acme Inc.")
-  @browser.text_field(name: "organization[fein]").set("764141112")
-  input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-entity-kind").first
-  input_field.click
-  input_field.li(text: /C Corporation/).click
-  enter_office_location(default_office_location)
+When(/^(.+) creates? a new employer profile$/) do |named_person|
+  enter_employer_profile( people[named_person])
   scroll_then_click(@browser.button(class: "interaction-click-control-create-employer"))
 end
+
 When(/^My employer publishes a plan year$/) do  
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-edit-plan-year/))

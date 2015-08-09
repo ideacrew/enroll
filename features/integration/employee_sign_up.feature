@@ -19,7 +19,7 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
     Then I should not see the matched employee record form
     Then Soren White logs out
     When Soren White logs on to the Employer Portal
-    When XI create the Employer Organization
+    Then Soren White creates a new employer profile
     When My employer publishes a plan year
     Then I should see a published success message
     Then My employer logs out
