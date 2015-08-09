@@ -37,6 +37,10 @@ class BrokerRole
     inclusion: { in: PROVIDER_KINDS, message: "%{value} is not a valid provider kind" }
 
 
+  scope :active,    ->{ any_in(aasm_state: ["applicant", "active", "broker_agency_pending"]) }
+  scope :inactive,  ->{ any_in(aasm_state: ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"]) }
+
+
   def email_address
     return nil unless email.present?
     email.address
@@ -161,6 +165,7 @@ class BrokerRole
       end
     end
   end
+
 
   aasm do
     state :applicant, initial: true
