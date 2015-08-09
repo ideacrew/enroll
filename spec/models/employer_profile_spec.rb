@@ -515,6 +515,20 @@ describe EmployerProfile, "roster size" do
   end
 end
 
+describe EmployerProfile, "when a binder premium is credited" do
+  let(:employer) { EmployerProfile.new(:aasm_state => :eligible) }
+
+  it "should send the notification broadcast" do
+    @employer = nil
+    subber = ActiveSupport::Notifications.subscribe(EmployerProfile::BINDER_PREMIUM_PAID_EVENT_NAME) do |e_name, s_at, e_at, m_id, payload|
+      @employer = payload.stringify_keys["employer"]
+    end
+    employer.binder_credited
+    ActiveSupport::Notifications.unsubscribe(subber)
+    expect(@employer).to eq employer
+  end
+end
+
 # describe "#advance_day" do
 #   let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }
 #   let(:end_on) {start_on + 1.year - 1 }

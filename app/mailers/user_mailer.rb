@@ -1,6 +1,6 @@
 class UserMailer < ApplicationMailer
 
-  Rails.env.production? do
+ if Rails.env.production?
    self.delivery_method = :soa_mailer
  end
 

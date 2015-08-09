@@ -59,13 +59,6 @@ class User
     broker_agency_staff: "broker_agency_staff"
   }
 
-  PROFILES = {
-    employer_profile: "employer_profile",
-    broker_agency_profile: "broker_agency_profile",
-    hbx_profile: "hbx_profile",
-    carrier_profile: "carrier_profile"
-  }
-
   # Enable polymorphic associations
   belongs_to :profile, polymorphic: true
 

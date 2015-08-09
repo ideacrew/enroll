@@ -10,6 +10,7 @@ RSpec.describe Employers::PlanYearsController do
     before :each do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(Organization).to receive(:valid_carrier_names).and_return({id: "legal_name"})
       get :new, :employer_profile_id => employer_profile_id
     end
 
@@ -22,7 +23,7 @@ RSpec.describe Employers::PlanYearsController do
     end
 
     it "should generate carriers" do
-      expect(assigns(:carriers)).to eq Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
+      expect(assigns(:carrier_names)).to eq({id: "legal_name"})
     end
 
     it "should generate benefit_group with nil plan_option_kind" do
@@ -61,6 +62,7 @@ RSpec.describe Employers::PlanYearsController do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(employer_profile).to receive(:find_plan_year).and_return(plan_year)
+      allow(Organization).to receive(:valid_carrier_names).and_return({id: "legal_name"})
     end
 
     context "when draft state" do
@@ -77,7 +79,7 @@ RSpec.describe Employers::PlanYearsController do
       end
 
       it "should generate carriers" do
-        expect(assigns(:carriers)).to eq Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
+        expect(assigns(:carrier_names)).to eq({id: "legal_name"})
       end
     end
 
@@ -166,6 +168,7 @@ RSpec.describe Employers::PlanYearsController do
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)
+      allow(Organization).to receive(:valid_carrier_names).and_return({id: "legal_name"})
       post :update, :employer_profile_id => employer_profile_id, id: plan_year.id, :plan_year => plan_year_request_params
     end
 
@@ -183,7 +186,7 @@ RSpec.describe Employers::PlanYearsController do
       end
 
       it "should generate carriers" do
-        expect(assigns(:carriers)).to eq Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
+        expect(assigns(:carrier_names)).to eq({id: 'legal_name'})
       end
     end
 
@@ -263,6 +266,7 @@ RSpec.describe Employers::PlanYearsController do
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)
+      allow(Organization).to receive(:valid_carrier_names).and_return({id: "legal_name"})
       post :create, :employer_profile_id => employer_profile_id, :plan_year => plan_year_request_params
     end
 
@@ -280,7 +284,7 @@ RSpec.describe Employers::PlanYearsController do
       end
 
       it "should generate carriers" do
-        expect(assigns(:carriers)).to eq Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
+        expect(assigns(:carrier_names)).to eq({id: 'legal_name'})
       end
     end
 
@@ -310,6 +314,24 @@ RSpec.describe Employers::PlanYearsController do
 
     it "should be a success" do
       expect(response).to have_http_status(:success)
+    end
+  end
+
+  describe "GET reference_plan_options" do
+    before :each do
+      sign_in
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+    end
+
+    it "should be a success" do
+      xhr :get, :reference_plan_options, employer_profile_id: employer_profile_id, kind: 'carrier', format: :js
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should got attributes" do
+      xhr :get, :reference_plan_options, employer_profile_id: employer_profile_id, kind: 'carrier', key: 'carrier_profile_id', format: :js
+      expect(assigns(:kind)).to eq 'carrier'
+      expect(assigns(:key)).to eq 'carrier_profile_id'
     end
   end
 
@@ -357,7 +379,7 @@ RSpec.describe Employers::PlanYearsController do
 
       it "should redirect with errors" do
         xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
-        expect(flash[:notice]).to match(/Plan Year failed to publish/)
+        expect(flash[:error]).to match(/Plan Year failed to publish/)
       end
     end
   end
@@ -382,7 +404,7 @@ RSpec.describe Employers::PlanYearsController do
     let(:plan) {FactoryGirl.create(:plan)}
     before :each do
       sign_in
-      xhr :get, :search_reference_plan, employer_profile_id: employer_profile_id, location_id: "test", reference_plan_id: plan.id, format: :js
+      xhr :get, :search_reference_plan, employer_profile_id: employer_profile_id, location_id: "test", reference_plan_id: plan.id, start_on: "2015-10-01", format: :js
     end
 
     it "should be a success" do

@@ -142,6 +142,75 @@ RSpec.describe Plan, dbclean: :after_each do
     end
   end
 
+  describe ".premium_table_for" do
+    let(:valid_plan_params) do
+      {
+          name: name,
+          active_year: active_year,
+          hios_id: hios_id,
+          carrier_profile_id: carrier_profile_id,
+          metal_level: metal_level,
+          coverage_kind: coverage_kind,
+          market: market,
+          premium_tables: [ premium_table_entry1,
+                            premium_table_entry2,
+                            premium_table_entry3,
+                            premium_table_entry4 ]
+      }
+    end
+
+    let(:premium_table_entry1) { {
+      start_on: "2015-01-01",
+      end_on: "2015-05-31",
+      cost: 500,
+      age: 32 
+      } }
+
+    let(:premium_table_entry2) { {
+      start_on: "2015-06-01",
+      end_on: "2015-08-31",
+      cost: 502,
+      age: 32
+      } }
+
+    let(:premium_table_entry3) { {
+      start_on: "2015-09-01",
+      end_on: "2015-12-31",
+      cost: 504,
+      age: 32
+      } }
+
+    let(:premium_table_entry4) { {
+      start_on: "2015-09-01",
+      end_on: "2015-12-31",
+      cost: 574,
+      age: 34
+      } }
+
+
+    context "valid arguments" do
+
+      def plan;
+        Plan.new(valid_plan_params);
+      end
+
+      def premium_table_hash(premium_table)
+        {
+          start_on: premium_table.start_on.try(:strftime, "%Y-%m-%d"),
+          end_on: premium_table.end_on.try(:strftime, "%Y-%m-%d"),
+          cost: premium_table.cost,
+          age: premium_table.age
+        }
+      end
+
+      it "should return premium tables" do
+        expect(plan.premium_table_for(Date.parse("2015-10-01")).size).to eq 2
+        expect(premium_table_hash(plan.premium_table_for(Date.parse("2015-10-01"))[0])).to eq premium_table_entry3
+        expect(premium_table_hash(plan.premium_table_for(Date.parse("2015-10-01"))[1])).to eq premium_table_entry4
+      end
+    end
+  end
+
   describe ".premium_for" do
     let(:valid_plan_params) do
       {
@@ -184,7 +253,7 @@ RSpec.describe Plan, dbclean: :after_each do
       end
 
       it "should compute premium" do
-        expect(plan.premium_for(Date.today.at_beginning_of_month, plan_params[:premium_tables][0][:age])).to eq(plan_params[:premium_tables][0][:cost])
+        expect(plan.premium_for(Date.parse("2015-10-01"), plan_params[:premium_tables][0][:age])).to eq(plan_params[:premium_tables][0][:cost])
       end
     end
   end
@@ -226,20 +295,39 @@ RSpec.describe Plan, dbclean: :after_each do
     let(:individual_count) { individual_silver_count + bronze_count + catastrophic_count }
     let(:carrier_profile_0_count) { platinum_count + gold_count + bronze_count }
     let(:carrier_profile_1_count) { shop_silver_count + individual_silver_count + catastrophic_count }
+    let(:current_year) {TimeKeeper.date_of_record.year}
 
     context "with plans loaded" do
       before do
-        FactoryGirl.create_list(:plan, platinum_count, metal_level: "platinum", market: "shop", plan_type: "ppo", carrier_profile: carrier_profile_0)
-        FactoryGirl.create_list(:plan, gold_count, metal_level: "gold", market: "shop", plan_type: "pos", carrier_profile: carrier_profile_0)
-        FactoryGirl.create_list(:plan, shop_silver_count, metal_level: "silver", plan_type: "ppo", market: "shop", carrier_profile: carrier_profile_1)
-        FactoryGirl.create_list(:plan, individual_silver_count, metal_level: "silver", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1)
-        FactoryGirl.create_list(:plan, bronze_count, metal_level: "bronze", market: "individual", plan_type: "epo", carrier_profile: carrier_profile_0)
-        FactoryGirl.create_list(:plan, catastrophic_count, metal_level: "catastrophic", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1)
+        FactoryGirl.create_list(:plan, platinum_count, metal_level: "platinum", market: "shop", plan_type: "ppo", carrier_profile: carrier_profile_0, active_year: current_year-1)
+        FactoryGirl.create_list(:plan, gold_count, metal_level: "gold", market: "shop", plan_type: "pos", carrier_profile: carrier_profile_0, active_year: current_year)
+        FactoryGirl.create_list(:plan, shop_silver_count, metal_level: "silver", plan_type: "ppo", market: "shop", carrier_profile: carrier_profile_1, active_year: current_year)
+        FactoryGirl.create_list(:plan, individual_silver_count, metal_level: "silver", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year)
+        FactoryGirl.create_list(:plan, bronze_count, metal_level: "bronze", market: "individual", plan_type: "epo", carrier_profile: carrier_profile_0, active_year: current_year)
+        FactoryGirl.create_list(:plan, catastrophic_count, metal_level: "catastrophic", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year)
       end
 
       context "with no referenced scope" do
         it "should return all loaded plans" do
           expect(Plan.all.count).to eq total_plan_count
+        end
+      end
+
+      context "by_active_year" do
+        it "should return all plans of this year" do
+          expect(Plan.by_active_year.count).to eq (total_plan_count - platinum_count)
+        end
+      end
+
+      context "valid_shop_by_carrier" do
+        it "should return all carrier_profile_1 plans this year" do
+          expect(Plan.valid_shop_by_carrier(carrier_profile_1.id).count).to eq shop_silver_count
+        end
+      end
+
+      context "valid_shop_by_metal_level" do
+        it "should return all silver plans this year" do
+          expect(Plan.valid_shop_by_metal_level('silver').count).to eq shop_silver_count
         end
       end
 
@@ -280,6 +368,12 @@ RSpec.describe Plan, dbclean: :after_each do
           expect(Plan.find_by_carrier_profile(carrier_profile_0).shop_market.count).to eq platinum_count + gold_count
         end
       end
+    end
+  end
+
+  describe "class method" do
+    it "reference_plan_metal_level_for_options" do
+      expect(Plan.reference_plan_metal_level_for_options).to eq Plan::REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
   end
 end

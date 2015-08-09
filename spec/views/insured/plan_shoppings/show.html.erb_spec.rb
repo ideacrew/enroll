@@ -32,7 +32,7 @@ RSpec.describe "insured/show" do
     sign_in current_broker_user
     render :template => "insured/plan_shoppings/show.html.erb"
     expect(rendered).to have_selector('p', text:  @person.full_name)
-    expect(rendered).to have_selector('p', text:  @benefit_group.plan_year.employer_profile.dba)
+    expect(rendered).to have_selector('p', text:  @benefit_group.plan_year.employer_profile.legal_name)
 
   end
   it 'should be identify Broker control in the header when signed in as Broker' do
@@ -46,7 +46,7 @@ RSpec.describe "insured/show" do
     sign_in consumer_user
     render :template => "insured/plan_shoppings/show.html.erb"
     expect(rendered).to have_selector('p', text:  @person.full_name)
-    expect(rendered).to have_selector('p', text:  @benefit_group.plan_year.employer_profile.dba)
+    expect(rendered).to have_selector('p', text:  @benefit_group.plan_year.employer_profile.legal_name)
 
   end
 

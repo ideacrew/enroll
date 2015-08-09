@@ -2,15 +2,18 @@ module Forms
   class PlanYearForm < SimpleDelegator
      def initialize(py)
        super(py)
-       @all_plans = ::Plan.where(active_year: Time.now.year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS}).to_a
      end
 
      def carrier_plans_for(c_profile_id)
-       @all_plans.select { |pl| pl.carrier_profile_id.to_s == c_profile_id.to_s }
+       Rails.cache.fetch("plans-for-carrier-#{c_profile_id.to_s}-at-#{::TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
+         ::Plan.valid_shop_health_plans("carrier", c_profile_id).map{|plan| ["#{::Organization.valid_carrier_names[plan.carrier_profile_id.to_s]} - #{plan.name}", plan.id.to_s]}
+       end
      end
 
      def metal_level_plans_for(metal_level)
-       @all_plans.select { |pl| pl.metal_level == metal_level }
+       Rails.cache.fetch("plans-for-metal-level-#{metal_level}-at-#{::TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
+         ::Plan.valid_shop_health_plans("metal_level", metal_level).map{|plan| ["#{::Organization.valid_carrier_names[plan.carrier_profile_id.to_s]} - #{plan.name}", plan.id.to_s]}
+       end
      end
 
      def self.model_name

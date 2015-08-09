@@ -1,7 +1,10 @@
 class EmployerProfile
+  BINDER_PREMIUM_PAID_EVENT_NAME = "local.enroll.employer.binder_premium_paid"
+
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
+  include Acapi::Notifiers
 
   embedded_in :organization
 
@@ -135,6 +138,8 @@ class EmployerProfile
     plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
+  #TODO - this code will not able to support enrolling plan year
+  #there should be one published and one enrolling or enrolled plan year
   def published_plan_year
     plan_years.published.first
   end
@@ -258,7 +263,7 @@ class EmployerProfile
     state :applicant, initial: true
     state :registered                 # Employer has submitted valid application
     state :eligible                   # Employer has completed enrollment and is eligible for coverage
-    state :binder_paid
+    state :binder_paid, :after_enter => :notify_binder_paid
     state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
     # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
     state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
@@ -348,6 +353,10 @@ class EmployerProfile
 
   def is_eligible_to_enroll?
     published_plan_year.enrolling?
+  end
+
+  def notify_binder_paid
+    notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer => self})
   end
 
 private

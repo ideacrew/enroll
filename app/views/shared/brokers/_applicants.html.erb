@@ -1,13 +1,18 @@
  <div class="table-border table-responsive">
   <table class="table">
     <thead>
-      <th>Applicant Type</th>
       <th>Applicant Name</th>
+      <% if controller_name == 'applicants' %>
+        <th>Application Type</th>
+      <% end %>
       <th>Applicant NPN</th>
       <th>Agency Name</th>
       <th>Status</th>
-      <th>Certified Date</th>
-      <th></th>
+      <% if date_col_name_for_broker_roaster.present? %>
+        <th>
+          <%= date_col_name_for_broker_roaster %>
+        </th>
+      <% end %>
     </thead>
     <% if @broker_applicants.any? %>
     <% @broker_applicants.each do |applicant| %>
@@ -25,22 +30,24 @@
     <% if broker_role.broker_agency_profile %>
     <tbody>
       <td>
+        <%= link_to applicant.full_name,
+        edit_path, class: "interaction-click-control-broker-show", method: :get, remote: true %>
+      </td>
+      <% if controller_name == 'applicants' %>
+      <td>
         <% if broker_role.class.to_s == 'BrokerRole' %>
         <%= broker_role.is_primary_broker? ? 'Primary Broker' : 'Broker' %>
         <% else %>
         Broker Agency Staff
         <% end %>
       </td>
-      <td><%= applicant.full_name %></td>
+      <% end %>
       <td><%= broker_role.npn if broker_role.respond_to?(:npn) %></td>
       <td><%= broker_role.broker_agency_profile.legal_name %></td>
       <td><%= broker_role.current_state %></td>
-      <td><%= format_date broker_role.certified_date %></td>
-      
-      <td>
-        <%= link_to 'Show'.html_safe,
-        edit_path, class: "btn btn-default interaction-click-control-broker-show", method: :get, remote: true %>
-      </td>
+      <% if date_col_name_for_broker_roaster.present? %>
+      <td><%= format_date broker_role.last_state_transition_date %></td>
+      <% end %>
     </tbody>
     <% end %> 
     <% end %>
@@ -49,4 +56,16 @@
     <% end %>
   </table>
 </div>
-<%= render 'shared/alph_paginate', url: url, alphs: @page_alphabets, remote: true, status: @status %>
+<div class="row">
+<div class="col-md-6">
+  <% if params[:page].present? || (@people.count != @broker_applicants.count) %>
+    <%= render 'shared/alph_paginate', url: url, full_index_url: index_url, alphs: @page_alphabets, remote: true, status: @status %>
+    <%#= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status, full_index_url: employers_employer_profile_path(@employer_profile, status: status, employee_name: params[:employee_name]) %>
+  <% end %>
+</div>
+
+<div class="col-md-6 text-right">
+  <h4><%= "#{@broker_applicants.count} out of #{@people.count}" %></h4>
+</div>
+</div>
+

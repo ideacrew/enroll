@@ -67,8 +67,24 @@ class BrokerAgencyStaffRole
   def agency_pending?
     false
   end
+
+  ## Class methods
+  class << self
+    
+    def find(id)
+      return nil if id.blank?
+      people = Person.where("broker_agency_staff_roles._id" => BSON::ObjectId.from_string(id))
+      people.any? ? people[0].broker_agency_staff_roles.detect{|x| x.id == id} : nil
+    end
+  end
   
 private
+
+  def last_state_transition_date
+    if self.workflow_state_transitions.any?
+      self.workflow_state_transitions.first.transition_at
+    end
+  end
 
   def initial_transition
     return if workflow_state_transitions.size > 0

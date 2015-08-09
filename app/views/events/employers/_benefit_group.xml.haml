@@ -1,0 +1,17 @@
+%benefit_group
+  %name= benefit_group.title
+  %reference_plan
+    %id
+      %id= benefit_group.reference_plan.hios_id
+    %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{benefit_group.reference_plan.coverage_kind}"
+    %carrier
+      %id
+        %id= benefit_group.reference_plan.carrier_profile.fein
+      %name= benefit_group.reference_plan.carrier_profile.legal_name
+    %plan_year= benefit_group.reference_plan.active_year
+    %name= benefit_group.reference_plan.name
+    %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{benefit_group.reference_plan.metal_level.downcase}"
+    %is_dental_only= benefit_group.reference_plan.is_dental_only?
+  %relationship_benefits
+    = render :partial => "events/employers/relationship_benefit", :collection => benefit_group.relationship_benefits
+

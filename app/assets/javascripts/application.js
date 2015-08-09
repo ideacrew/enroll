@@ -357,6 +357,7 @@ $(document).ready(function () {
   $(".phone_number").mask("(999) 999-9999");
   $(".zip").mask("99999");
   $("#person_ssn").mask("999-99-9999");
+  $(".fien_field").mask("99-9999999");
   $(".person_ssn").mask("999999999");
   $(".npn_field").mask("9999999999");
   $(".address-state").mask("AA");
@@ -497,4 +498,12 @@ $(document).on('click', 'tr .show_msg', function() {
 $(document).on('click', '.btn-danger', function() {
   var unread = $('.message-badge').text();
   $('.message-unread').html(unread);
+})
+
+$(document).on('change', '#waive_confirm select#waiver_reason', function() {
+  if($(this).val() == undefined || $(this).val() == ""){
+    $('#waiver_reason_submit').attr("disabled",true);
+  }else{
+    $('#waiver_reason_submit').attr("disabled",false);
+  }
 })

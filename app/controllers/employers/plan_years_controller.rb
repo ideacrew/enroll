@@ -13,9 +13,9 @@ class Employers::PlanYearsController < ApplicationController
                                     when "single_plan"
                                       Plan.where(id: benefit_group.reference_plan_id).first
                                     when "single_carrier"
-                                      @plan_year.carrier_plans_for(benefit_group.carrier_for_elected_plan)
+                                      Plan.valid_shop_health_plans("carrier", benefit_group.carrier_for_elected_plan)
                                     when "metal_level"
-                                      @plan_year.metal_level_plans_for(benefit_group.metal_level_for_elected_plan)
+                                      Plan.valid_shop_health_plans("metal_level", benefit_group.metal_level_for_elected_plan)
                                     end
     end
     if @plan_year.save
@@ -26,22 +26,31 @@ class Employers::PlanYearsController < ApplicationController
     end
   end
 
+  def reference_plan_options
+    @kind = params[:kind]
+    @key = params[:key]
+    @target = params[:target]
+
+    @plans = case @kind
+            when "carrier"
+              Plan.valid_shop_health_plans("carrier", @key)
+            when "metal-level"
+              Plan.valid_shop_health_plans("metal_level", @key)
+            else
+              []
+            end
+  end
+
   def search_reference_plan
     @location_id = params[:location_id]
-    return unless params[:reference_plan_id].present?
-
     @plan = Plan.find(params[:reference_plan_id])
-    @premium_tables = @plan.premium_tables.where(start_on: @plan.premium_tables.distinct(:start_on).max)
+    @premium_tables = @plan.premium_table_for(Date.parse(params[:start_on]))
   end
 
   def calc_employer_contributions
     @location_id = params[:location_id]
-    return unless params[:reference_plan_id].present?
-
-    params.merge!({ plan_year: {
-      start_on: params[:start_on] #PlanYear.calculate_start_on_dates.first.to_s(:db) 
-      }.merge(relationship_benefits) })
-
+    params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
+    
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups[0].reference_plan = @plan
@@ -80,9 +89,9 @@ class Employers::PlanYearsController < ApplicationController
                                     when "single_plan"
                                       Plan.where(id: benefit_group.reference_plan_id).first
                                     when "single_carrier"
-                                      @plan_year.carrier_plans_for(benefit_group.carrier_for_elected_plan)
+                                      Plan.valid_shop_health_plans("carrier", benefit_group.carrier_for_elected_plan)
                                     when "metal_level"
-                                      @plan_year.metal_level_plans_for(benefit_group.metal_level_for_elected_plan)
+                                      Plan.valid_shop_health_plans("metal_level", benefit_group.metal_level_for_elected_plan)
                                     end
     end
     if @plan_year.save
@@ -113,8 +122,12 @@ class Employers::PlanYearsController < ApplicationController
         format.js
       end
     else
-      flash[:notice] = (@plan_year.published? || @plan_year.enrolling?) ? "Plan Year successfully published."
-                           : "Plan Year failed to publish: #{@plan_year.application_errors}"
+      if (@plan_year.published? || @plan_year.enrolling?) 
+        flash[:notice] = "Plan Year successfully published."
+      else
+        errors = @plan_year.application_errors.try(:values)
+        flash[:error] = "Plan Year failed to publish. #{('<li>' + errors.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
+      end
       render :js => "window.location = #{employers_employer_profile_path(@employer_profile).to_json}"
     end
   end
@@ -135,12 +148,13 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_carriers_and_plans
-    @carriers = Organization.all.map{|o|o.carrier_profile}.compact.reject{|c| c.plans.where(active_year: Time.now.year, market: "shop", coverage_kind: "health").blank? }
+    @carrier_names = Organization.valid_carrier_names
+    @carriers_array = Organization.valid_carrier_names_for_options
   end
 
   def build_plan_year
     plan_year = PlanYear.new
-    benefit_groups = plan_year.benefit_groups.build
+    plan_year.benefit_groups.build
     ::Forms::PlanYearForm.new(plan_year)
   end
 

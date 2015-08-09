@@ -72,20 +72,28 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show
-    paginate_employees
     set_show_variables
+    if @current_plan_year.present?
+      enrollments = HbxEnrollment.covered(@current_plan_year.hbx_enrollments)
+      @premium_amt_total = enrollments.map(&:total_premium).sum
+      @employee_cost_total = enrollments.map(&:total_employee_cost).sum
+      @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
+    end
   end
 
   def show_profile
     @tab = params['tab']
-    paginate_employees
     set_show_variables
   end
 
   def new
     @organization = Forms::EmployerProfile.new
   end
-
+  
+  def edit
+    @organization = Organization.find(params[:id])
+  end
+   
   def create
     params.permit!
     @organization = Forms::EmployerProfile.new(params[:organization])
@@ -101,15 +109,20 @@ class Employers::EmployerProfilesController < ApplicationController
     @employer_profile = @organization.employer_profile
     current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
     current_user.person.employer_contact = @employer_profile
-    if !@employer_profile.owner.present? && @organization.update_attributes(employer_profile_params) && current_user.save
-      current_user.person.employer_staff_roles << EmployerStaffRole.create(person: current_user.person, employer_profile_id: @employer_profile.id, is_owner: true)
-      flash[:notice] = 'Employer successfully created.'
-      redirect_to employers_employer_profile_path(@employer_profile)
-    else
-      respond_to do |format|
-        format.js { render "edit" }
-        format.html { render "edit" }
+    if current_user.has_employer_staff_role? #&& @employer_profile.owner == current_user
+      if !@employer_profile.owner.present? && @organization.update_attributes(employer_profile_params) && current_user.save
+        current_user.person.employer_staff_roles << EmployerStaffRole.create(person: current_user.person, employer_profile_id: @employer_profile.id, is_owner: true)
+        flash[:notice] = 'Employer successfully Updated.'
+        redirect_to employers_employer_profile_path(@employer_profile)
+      else
+        @organization.reload
+        respond_to do |format|
+          format.js { render "edit" }
+          format.html { render "edit" }
+        end
       end
+    else
+      flash[:error] = 'You do not have permissions to update the details'
     end
   end
 
@@ -151,29 +164,28 @@ class Employers::EmployerProfilesController < ApplicationController
       end
     end
 
+    def paginate_families
+      @employees = @employer_profile.employee_roles.to_a
+    end
+
     def set_show_variables
-      @current_plan_year = @employer_profile.published_plan_year
-      @plan_years = @employer_profile.plan_years.order(id: :desc)
+      if @tab != 'employees' && @tab != 'families'
+        @current_plan_year = @employer_profile.published_plan_year
+        @plan_years = @employer_profile.plan_years.order(id: :desc)
 
-      if @current_plan_year.present?
-        if @current_plan_year.eligible_to_enroll_count == 0
-          @participation_minimum = 0
-        else
-          @participation_minimum = ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
+        if @current_plan_year.present?
+          if @current_plan_year.eligible_to_enroll_count == 0
+            @participation_minimum = 0
+          else
+            @participation_minimum = ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
+          end
         end
+        @broker_agency_accounts = @employer_profile.broker_agency_accounts
       end
 
-      #broker view
-      @broker_agency_accounts = @employer_profile.broker_agency_accounts
-
-      #families view may require cache of broker agency profile id
+      paginate_employees #if @tab == 'employees'
       #families defined as employee_roles.each { |ee| ee.person.primary_family }
-      if current_user.try(:has_broker_agency_staff_role?)
-        session[:broker_agency_id] = current_user.person.broker_role.broker_agency_profile_id
-      end
-      @employees = []
-      @employer_profile.employee_roles.each{|ee| @employees << ee}
-
+      paginate_families #if @tab == 'families'
     end
 
     def check_employer_staff_role

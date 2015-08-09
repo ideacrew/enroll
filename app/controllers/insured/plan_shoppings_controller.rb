@@ -1,11 +1,14 @@
 class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show]
-  def checkout
 
+  def checkout
     plan = Plan.find(params.require(:plan_id))
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    hbx_enrollment.plan = plan
+
+    hbx_enrollment.update_current(plan_id: plan.id)
+    hbx_enrollment.inactive_related_hbxs
+
     benefit_group = hbx_enrollment.benefit_group
     reference_plan = benefit_group.reference_plan
     decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
@@ -14,7 +17,10 @@ class Insured::PlanShoppingsController < ApplicationController
     if hbx_enrollment.employee_role.hired_on > TimeKeeper.date_of_record
       flash[:error] = "You are attempting to purchase coverage prior to your date of hire on record. Please contact your Employer for assistance"
       redirect_to home_consumer_profiles_path
-    elsif (hbx_enrollment.coverage_selected? or hbx_enrollment.select_coverage) and hbx_enrollment.save
+    elsif hbx_enrollment.may_select_coverage?
+      hbx_enrollment.update_current(aasm_state: "coverage_selected")
+      hbx_enrollment.propogate_selection
+
       UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now
       redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan])
     else
@@ -43,6 +49,10 @@ class Insured::PlanShoppingsController < ApplicationController
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
 
+    if @person.employee_roles.any?
+      @employer_profile = @person.employee_roles.first.employer_profile
+    end
+
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }
     end
@@ -51,17 +61,15 @@ class Insured::PlanShoppingsController < ApplicationController
   def waive
     person = @person
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    waiver_reason = params.require(:waiver_reason)
+    waiver_reason = params[:waiver_reason]
 
-    if (hbx_enrollment.shopping? or hbx_enrollment.coverage_selected?) and waiver_reason.present? and hbx_enrollment.valid?
-      hbx_enrollment.waive_coverage
-      hbx_enrollment.waiver_reason = waiver_reason
-      hbx_enrollment.save
-      flash[:notice] = "Waive Successful"
+    if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
+      hbx_enrollment.update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
+      hbx_enrollment.propogate_waiver
+      redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Successful"
     else
-      flash[:alert] = "Waive Failure"
+      redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), alert: "Waive Failure"
     end
-    redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment)
   end
 
   def print_waiver
@@ -71,7 +79,10 @@ class Insured::PlanShoppingsController < ApplicationController
   def terminate
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
 
-    if hbx_enrollment.coverage_selected? and hbx_enrollment.terminate_coverage and hbx_enrollment.save
+    if hbx_enrollment.may_terminate_coverage?
+      hbx_enrollment.update_current(aasm_state: "coverage_terminated", terminated_on: TimeKeeper.date_of_record.end_of_month)
+      hbx_enrollment.propogate_terminate
+
       redirect_to home_consumer_profiles_path
     else
       redirect_to :back
@@ -105,25 +116,6 @@ class Insured::PlanShoppingsController < ApplicationController
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-  end
-
-  def find_organization(id)
-    begin
-      Organization.find(id)
-    rescue
-      nil
-    end
-  end
-
-  def find_benefit_group(person, organization)
-    organization.employer_profile.latest_plan_year.benefit_groups.first
-    # person.employee_roles.first.benefit_group
-  end
-
-  def new_hbx_enrollment(person, organization, benefit_group)
-    HbxEnrollment.new_from(employer_profile: organization.employer_profile,
-                           coverage_household: person.primary_family.households.first.coverage_households.first,
-                           benefit_group: benefit_group)
   end
 
   private

@@ -49,12 +49,13 @@ class Organization
 
   validates_presence_of :legal_name, :fein, :office_locations #, :updated_by
 
-  validate :office_location_kinds
-
   validates :fein,
     length: { is: 9, message: "%{value} is not a valid FEIN" },
     numericality: true,
     uniqueness: true
+    
+  validate :office_location_kinds
+    
 
 
   index({ hbx_id: 1 }, { unique: true })
@@ -119,17 +120,34 @@ class Organization
     }
   end
 
-  def office_location_kinds
-    location_kinds = self.office_locations.flat_map(&:address).flat_map(&:kind)
-    # should validate only office location kinds ie. primary, mailing, branch
-    return if location_kinds.detect{|kind| kind == 'work' || kind == 'home'}
+  def self.valid_carrier_names
+    Rails.cache.fetch("carrier-names-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
+      Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
+        carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_health_plans("carrier", org.carrier_profile.id).present?
+        carrier_names
+      end
+    end
+  end
 
-    if location_kinds.count('primary').zero?
-      errors.add(:base, "must select one primary address")
-    elsif location_kinds.count('primary') > 1
-      errors.add(:base, "can't have multiple primary addresses")
-    elsif location_kinds.count('mailing') > 1
-      errors.add(:base, "can't have more than one mailing address")
+  def self.valid_carrier_names_for_options
+    Organization.valid_carrier_names.invert.to_a
+  end
+
+  def office_location_kinds
+    location_kinds = self.office_locations.select{|l| !l.persisted?}.flat_map(&:address).compact.flat_map(&:kind)
+    # should validate only office location which are not persisted AND kinds ie. primary, mailing, branch 
+    return if no_primary = location_kinds.detect{|kind| kind == 'work' || kind == 'home'}
+    unless location_kinds.empty?
+      if location_kinds.count('primary').zero?
+        errors.add(:base, "must select one primary address")
+      elsif location_kinds.count('primary') > 1
+        errors.add(:base, "can't have multiple primary addresses")
+      elsif location_kinds.count('mailing') > 1
+        errors.add(:base, "can't have more than one mailing address")
+      end
+      if !errors.any?# this means that the validation succeeded and we can delete all the persisted ones
+        self.office_locations.delete_if{|l| l.persisted?}
+      end
     end
   end
 end

@@ -1,67 +1,57 @@
-<div class="container-fluid no-pd-left">
-  <div class="panel panel-default" style="border:none; box-shadow: none;">
-    <div class="row tab-row">
-      <%= render 'employer_menu' %>
+<div class="container top-pd">
+  <div class="row">
+    <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(@organization), method: :put} do |f| %>
 
-      <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(@organization), method: :put} do |f| %>
-
-        <%#= render "shared/error_messages", object: f.object %>
-        <% if @organization.errors.any? %>
-          <div class="alert alert-error">
-            <h4>
-              <%= "#{pluralize(@organization.errors.size, "error")} prohibited this form from being saved:" %>
-            </h4>
-            <ul>
-              <% @organization.errors.full_messages.each do |msg| %>
-                <li>
-                  <%= msg %>
-                </li>
-              <% end %>
-              <% office_loc = @organization.office_locations.last %>
-              <% office_loc.phone.errors.full_messages.each do |msg| %>
-                <li>
-                  <%= msg %>
-                </li>
-              <% end %>
-              <% office_loc.address.errors.full_messages.each do |msg| %>
-                <li>
-                  <%= msg %>
-                </li>
-              <% end %>
-            </ul>
-          </div>
+      <%#= render "shared/error_messages", object: f.object %>
+      <% if @organization.errors.any? %>
+        <div class="alert alert-error">
+          <h4>
+            <%= "#{pluralize(@organization.errors.size, "error")} prohibited this form from being saved:" %>
+          </h4>
+          <ul>
+            <% @organization.errors.full_messages.each do |msg| %>
+              <li>
+                <%= msg %>
+              </li>
+            <% end %>
+            <% office_loc = @organization.office_locations.last %>
+            <% office_loc.phone.errors.full_messages.each do |msg| %>
+              <li>
+                <%= msg %>
+              </li>
+            <% end %>
+            <% office_loc.address.errors.full_messages.each do |msg| %>
+              <li>
+                <%= msg %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+      <div class="col-md-9 col-sm-9 col-xs-12">
+        <h4> Employer Information</h4>
+        <div class="row no-buffer row-form-wrapper">
+          <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp|  %>
+            <%= render "shared/employer_profile_fields", f: emp %><br>
+          <% end %>
+        </div>
+        <h4> Office Locations </h4>
+        <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location| %>
+          <%= render partial: 'shared/office_location_fields', locals: {f: office_location} %>
         <% end %>
-
-
-        <div class="col-md-12 col-sm-12 col-xs-12">
-          <div class="row landing-row">
-            <div class="col-md-8 col-sm-8 col-xs-12 left-side">
-              <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp|  %>
-                <h4> Employer information</h4>
-                <%= render "shared/employer_profile_fields", f: emp %><br>
-              <% end %>
-              <br/><br/>
-              <h4> Office Locations </h4>
-              <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location| %>
-                <%= render partial: 'shared/office_location_fields', locals: {f: office_location} %>
-              <% end %>
-
-                <br/>
-
-              <div class="form-inputs">
-                <%= link_to_add_fields '<i class="fa fa-user-plus"></i> Add Office Location'.html_safe, f, :office_locations, 'btn btn-success pull-right' %>
-                <br/>
-              </div>
-
-              <div class="row top-row no-border">
-                <%= f.submit "Create", class: "btn btn-save" %>
-              </div>
-
-            </div>
-          </div>
+        <br/>
+        <div class="form-inputs">
+          <%= link_to_add_fields '<i class="fa fa-user-plus"></i> Add Office Location'.html_safe, f, :office_locations, 'btn btn-success pull-right' %>
         </div>
 
-      <% end %>
-    </div>
+        <div class="row top-row no-border">
+          <% button_name = @organization.persisted? ? 'Save' : 'Create' %>
+          <button type="submit" class="btn btn-primary pull-left sm_full_width">
+            <%= "#{button_name}".html_safe %>
+          </button> &nbsp;&nbsp;
+          <%= link_to "Cancel", employers_employer_profile_path(@organization.employer_profile), class:'btn btn-transparent pull-left' %>
+        </div>
+      </div>
+    <% end %>
   </div>
-</div><br><br>
+</div>

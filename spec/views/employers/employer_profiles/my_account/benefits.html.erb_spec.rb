@@ -9,11 +9,10 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
     allow(plan_year).to receive(:benefit_groups).and_return([benefit_group])
     assign(:plan_years, [plan_year])
     assign(:employer_profile, employer_profile)
-
-    render "employers/employer_profiles/my_account/benefits"
   end
 
   it "should display contribution pct by integer" do
+    render "employers/employer_profiles/my_account/benefits"
     expect(rendered).to match(/Plan Year/)
     plan_year.benefit_groups.first.relationship_benefits.map(&:premium_pct).each do |pct|
       expect(rendered).to have_selector("td", text: "#{pct.to_i}%")

@@ -1,10 +1,12 @@
 require 'rails_helper'
 
 describe "employers/census_employees/rehire.js.erb" do
+  let(:user){ FactoryGirl.create(:user, roles: ["hbx_staff"]) }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
 
   before :each do
+    sign_in user
     assign(:employer_profile, employer_profile)
     assign(:census_employee, census_employee)
     assign(:rehiring_date, Date.today)
