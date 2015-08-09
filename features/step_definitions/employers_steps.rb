@@ -7,32 +7,6 @@ And(/^I sign up with valid user data$/) do
   @browser.input(value: /Create account/).click
 end
 
-And(/^I should see an initial form to enter information about my Employer and myself$/) do
-  @browser.text_field(name: "organization[first_name]").wait_until_present
-  @browser.text_field(name: "organization[first_name]").set("Doe")
-  @browser.text_field(name: "organization[last_name]").set("John")
-  @browser.text_field(name: "jq_datepicker_ignore_organization[dob]").set("10/11/1982")
-  @browser.text_field(name: "organization[first_name]").click
-
-  @browser.text_field(name: "organization[legal_name]").set("Turner Agency, Inc")
-  @browser.text_field(name: "organization[dba]").set("Turner Agency, Inc")
-  @browser.text_field(name: "organization[fein]").set("123456999")
-  input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-entity-kind").first
-  input_field.click
-  input_field.li(text: /C Corporation/).click
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_1]").set("100 North Street")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][address_2]").set("Suite 990")
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][city]").set("Washington")
-  input_field = @browser.divs(class: "selectric-interaction-choice-control-organization-office-locations-attributes-0-address-attributes-state").first
-  input_field.click
-  input_field.li(text: /DC/).click
-  @browser.text_field(name: "organization[office_locations_attributes][0][address_attributes][zip]").set("20002")
-  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][area_code]").set("678")
-  @browser.text_field(name: "organization[office_locations_attributes][0][phone_attributes][number]").set("1230987")
-  screenshot("employer_portal_person_data_new")
-  @browser.button(class: "interaction-click-control-create-employer").click
-end
-
 Given(/^I have signed up previously through consumer, broker agency or previous visit to the Employer portal$/) do
 end
 

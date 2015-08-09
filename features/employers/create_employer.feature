@@ -13,9 +13,9 @@ Feature: Create Employer
     Scenario: An Employer Representative has not signed up on the HBX
       Given Employer has not signed up as an HBX user
       When I visit the Employer portal
-      Then Joe Employer creates an HBX account
+      Then John Doe creates an HBX account
       Then I should see a successful sign up message
-        And I should see an initial form to enter information about my Employer and myself
+        Then John Doe creates a new employer profile
       When I go to the benefits tab I should see plan year information
         And I should see a button to create new plan year
         And I should be able to enter plan year, benefits, relationship benefits with high FTE

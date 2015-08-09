@@ -129,8 +129,15 @@ def people
       email: 'ricky.martin@example.com',
       password: '12345678'
     },
-    "Joe Employer" => {
-      email: 'joe.employer@example.com',
+    "John Doe" => {
+      first_name: "John",
+      last_name: "Doe",
+      dob: "10/11/1985",
+      legal_name: "Turner Agency, Inc",
+      dba: "Turner Agency, Inc",
+      fein: '123456999',
+      ssn: '111000999',
+      email: 'john.doe@example.com',
       password: '12345678'
 
     },
