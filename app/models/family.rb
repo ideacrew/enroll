@@ -19,8 +19,13 @@ class Family
 
   before_save :clear_blank_fields
 
-  # All current and former members of this group
   belongs_to  :person
+
+  # has_many    :benefit_sponsors
+
+  # Collection of insured:  employees, consumers, residents
+
+  # All current and former members of this group
   embeds_many :family_members, cascade_callbacks: true
   embeds_many :special_enrollment_periods, cascade_callbacks: true
   embeds_many :irs_groups, cascade_callbacks: true
