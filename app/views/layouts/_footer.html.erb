@@ -1,20 +1,26 @@
 <footer class="footer-wrapper">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6"><p>© 2015 DC Health Link. All Rights Reserved.</p></div>
-            <div class="col-md-6">
-                <ul class="list-unstylesd list-inline pull-right">
-                    <li>
-                        <a href="#"><%= image_tag 'icons/phone.png' %> &nbsp;(855) 532-5465</a>
-                    </li>
-                    <li>
-                        <a href="#"><%= image_tag 'icons/mail.png' %> &nbsp;info@dchealthlink.com</a>
-                    </li>
-                    <li>
-                        <a href="#"><%= image_tag 'icons/message.png' %> &nbsp;FAQs</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6"><p>© 2015 DC Health Link. All Rights Reserved.</p></div>
+      <div class="col-md-6">
+        <ul class="list-unstylesd list-inline pull-right">
+          <li>
+            <% if controller_name == "plan_shoppings" && action_name == "show" %>
+              <%= link_to "Help with my plan selection".html_safe, new_message_to_broker_consumer_employee_index_path, remote: true %>
+            <% end %>
+            <!-- <a href="#"><%= image_tag 'icons/phone.png' %> &nbsp;(855) 532-5465</a> -->
+          </li>
+          <li>
+            <a href="#"><%= image_tag 'icons/phone.png' %> &nbsp;(855) 532-5465</a>
+          </li>
+          <li>
+            <a href="#"><%= image_tag 'icons/mail.png' %> &nbsp;info@dchealthlink.com</a>
+          </li>
+          <li>
+            <a href="#"><%= image_tag 'icons/message.png' %> &nbsp;FAQs</a>
+          </li>
+        </ul>
+      </div>
     </div>
+  </div>
 </footer>

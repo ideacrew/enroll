@@ -22,4 +22,10 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def message_to_broker(person, broker, params)
+    mail({to: broker.email_address, subject: params[:subject], from: person.user.email}) do |format|
+      format.html { render "message_to_broker", :locals => { :person => person, :broker => broker, :message_body => params[:body] }}
+    end
+  end
+
 end 
