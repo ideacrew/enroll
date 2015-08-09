@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
-  let(:carrier_profile) { instance_double("CarrierProfile", id: "carrier profile id", dba: "dba") }
+  let(:carrier_profile) { instance_double("CarrierProfile", id: "carrier profile id", legal_name: "legal_name") }
   let(:plan) do
     double(plan_type: nil, metal_level: "bronze",
       nationwide: nil, total_employee_cost: 100, deductible: 500,
