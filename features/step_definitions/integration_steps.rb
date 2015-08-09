@@ -413,11 +413,6 @@ Then(/^I should see the "YOUR LIFE EVENTS" section/) do
   expect(@browser.element(text: /YOUR LIFE EVENTS/i).visible?).to be_truthy
 end
 
-When(/^I click on the plans tab$/) do
-  @browser.element(class: /interaction-click-control-plans/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-plans/))
-end
-
 Then(/^I should see my plan/) do
   @browser.element(text: /plan name/i).wait_until_present
   screenshot("my_plan")
@@ -428,4 +423,19 @@ When(/^I should see a published success message$/) do
   # @browser.element(class: /mainmenu/).wait_until_present
   @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
   expect(@browser.element(text: /Plan Year successfully published/).visible?).to be_truthy
+end
+
+When(/^(?:.+) clicks? on the add employee button$/) do
+  @browser.a(text: /Add Employee/).wait_until_present
+  @browser.a(text: /Add Employee/).click
+end
+
+When(/^.+ clicks? on the (.+) tab$/) do |tab_name|
+  @browser.a(text: /#{tab_name}/).wait_until_present
+  scroll_then_click(@browser.a(text: /#{tab_name}/))
+end 
+
+When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
+  @browser.element(class: /interaction-click-control-#{tab_name}/).wait_until_present
+  scroll_then_click(@browser.element(class: /interaction-click-control-#{tab_name}/))
 end

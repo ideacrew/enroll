@@ -111,12 +111,6 @@ Then(/^I should see the employer information$/) do
   expect(@browser.text.include?("Enrollment\nNo Plan Years Found")).to be_truthy
 end
 
-When(/^I click on the Employees tab$/) do
-  @browser.refresh
-  @browser.a(text: /Employees/).wait_until_present
-  scroll_then_click(@browser.a(text: /Employees/))
-end
-
 Then(/^I should see the employee family roster$/) do
   @browser.a(text: /Add Employee/).wait_until_present
   screenshot("employer_census_family")
@@ -129,11 +123,6 @@ And(/^It should default to active tab$/) do
   expect(@browser.radio(id: "terminated_yes").set?).to be_falsey
   expect(@browser.radio(id: "family_waived").set?).to be_falsey
   expect(@browser.radio(id: "family_all").set?).to be_falsey
-end
-
-When(/^I click on add employee button$/) do
-  @browser.a(text: /Add Employee/).wait_until_present
-  @browser.a(text: /Add Employee/).click
 end
 
 Then(/^I should see a form to enter information about employee, address and dependents details$/) do

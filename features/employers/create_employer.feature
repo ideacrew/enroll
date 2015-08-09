@@ -20,10 +20,10 @@ Feature: Create Employer
         And I should see a button to create new plan year
         And I should be able to enter plan year, benefits, relationship benefits with high FTE
         And I should see a success message after clicking on create plan year button
-      When I click on the Employees tab
+      When Employer clicks on the Employees tab
       Then I should see the employee family roster
         And It should default to active tab
-      When I click on add employee button
+      When Employer clicks on the add employee button
       Then I should see a form to enter information about employee, address and dependents details
         And I should see employer census family created success message
       And I click on Edit family button for a census family
@@ -72,5 +72,5 @@ Feature: Create Employer
       Then I should see the "my account" page
       When I visit consumer profile homepage
       Then I should see the "YOUR LIFE EVENTS" section
-      When I click on the plans tab
+      When Employee clicks on the tab for plans
       Then I should see my plan

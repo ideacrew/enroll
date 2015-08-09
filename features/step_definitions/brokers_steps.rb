@@ -64,11 +64,6 @@ Then(/^I should see broker registration successful message$/) do
   expect(@browser.element(text: /Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed./).visible?).to be_truthy
 end
 
-And(/^I click on brokers tab$/) do
-  @browser.element(class: /interaction-click-control-brokers/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-brokers/))
-end
-
 And(/^I should see the list of broker applicants$/) do
 end
 
@@ -125,11 +120,6 @@ Then(/^I should see successful message with broker agency home page$/) do
 
   @browser.h3(text: /Broker Agency \: Logistics Inc/).wait_until_present
   expect(@browser.h3(text: /Broker Agency \: Logistics Inc/).visible?).to be_truthy
-end
-
-When(/^I click on the Broker Agency tab$/) do
-  @browser.a(text: /Broker Agency/).wait_until_present
-  scroll_then_click(@browser.a(text: /Broker Agency/))
 end
 
 Then(/^I should see no active broker$/) do
@@ -214,11 +204,6 @@ And(/^I sign up as a new employer$/) do
   @browser.input(value: /Create account/).click
 end
 
-When(/^I click on the (\w+) tab$/) do |tab_name|
-  @browser.a(text: /#{tab_name}/).wait_until_present
-  scroll_then_click(@browser.a(text: /#{tab_name}/))
-end 
-
 Then(/^I should see Employer and click on legal name$/) do
   @browser.a(text: /Legal LLC/).wait_until_present
   @browser.a(text: /Legal LLC/).click
@@ -229,7 +214,7 @@ Then(/^I should see the Employer Profile page as Broker$/) do
   expect(@browser.element(text: /I'm a Broker/).visible?).to be_truthy
 end
 
-Then(/^I publish a Plan Year as Broker$/) do
+Then(/^Broker creates and publishes a plan year$/) do
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-add-plan-year/))
   start_on = @browser.element(class: /selectric-interaction-choice-control-plan-year-start-on/)
@@ -261,18 +246,6 @@ Then(/^I publish a Plan Year as Broker$/) do
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))
 end
-
-When(/^I click on Employees tab$/) do
-  @browser.h3(text: /Legal LLC Enrollment/).wait_until_present
-  @browser.a(text: /Employees/).wait_until_present
-  scroll_then_click(@browser.a(text: /Employees/))
-end
-
-Then(/^Broker clicks on the add employee button$/) do
-
-  @browser.element(text: /Add Employee/).wait_until_present
-  @browser.a(text: /Add Employee/).click
-end 
 
 Then(/^Broker creates a roster employee$/) do
   @browser.text_field(class: /interaction-field-control-census-employee-first-name/).wait_until_present

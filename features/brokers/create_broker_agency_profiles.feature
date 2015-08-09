@@ -22,7 +22,7 @@ Feature: Create Primary Broker and Broker Agency
     Then I should see broker registration successful message
 
     Then Hbx Admin logs on to the Hbx Portal
-    And I click on brokers tab
+    And Hbx Admin clicks on the Brokers tab
     Then I should see the list of broker applicants
     When I click on the current broker applicant show button
     Then I should see the broker application
@@ -44,7 +44,7 @@ Feature: Create Primary Broker and Broker Agency
     Then I should see a successful sign up message
     And Tim Wood creates a new employer profile
     
-    When I click on the Broker Agency tab
+    When Employer clicks on the Broker Agency tab
     Then I should see no active broker
     When I click on Browse Brokers button
     Then I should see broker agencies index view
@@ -54,11 +54,11 @@ Feature: Create Primary Broker and Broker Agency
     Then I should see confirm modal dialog box
     When I confirm broker selection
     Then I should see broker selected successful message
-    When I click on the Broker Agency tab
+    When Employer clicks on the Broker Agency tab
     Then I should see broker active for the employer
     When I terminate broker
     Then I should see broker terminated message
-    When I click on the Broker Agency tab
+    When Employer clicks on the Broker Agency tab
     Then I should see no active broker
 
     When I click on Browse Brokers button
@@ -72,12 +72,12 @@ Feature: Create Primary Broker and Broker Agency
     And I log out
 
     Then Primary Broker logs on to the Broker Agency Portal
-    And I click on the Employers tab
+    And Primary Broker clicks on the Employers tab
 
     Then I should see Employer and click on legal name
     Then I should see the Employer Profile page as Broker
-    When I publish a Plan Year as Broker
-    When I click on Employees tab
+    When Broker creates and publishes a plan year
+    When Broker clicks on the Employees tab
     Then Broker clicks on the add employee button
     Then Broker creates a roster employee
 
