@@ -1,5 +1,5 @@
 module Validations
-  class USDate
+  class UsDate
     def self.on(prop_name, allow_blank = false)
       mod = Module.new
       mod.define_singleton_method :included do |klass|

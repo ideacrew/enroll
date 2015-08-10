@@ -1,6 +1,7 @@
 <%= render "insured/plan_shoppings/detail_modal" %>
 
-<div class="container">
+<div id= 'message_form'></div>
+<div class="container" id="plan_shoppings_show_form">
 	<div id="select_plan_wrapper">
 		<div class="row">
 			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
@@ -10,7 +11,7 @@
               <p class="pull-left">
                     Individual: <strong><%= @person.full_name %></strong> &nbsp;&nbsp;
                     Dependents: <strong><%= @hbx_enrollment.humanized_dependent_summary %></strong> &nbsp;&nbsp;
-                    Employer: <strong><%= @benefit_group.plan_year.employer_profile.dba %></strong> &nbsp;&nbsp;
+                    Employer: <strong><%= @benefit_group.plan_year.employer_profile.legal_name %></strong> &nbsp;&nbsp;
                     Plans: <strong id='plans-count'><%= @plans.count %></strong>
               </p>
 

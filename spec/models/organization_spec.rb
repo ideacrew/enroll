@@ -108,6 +108,31 @@ RSpec.describe Organization, dbclean: :after_each do
         expect(Organization.create(**params).errors[:fein]).to eq [fein_error_message]
       end
     end
+  end
 
+  describe "class method", dbclean: :after_each do
+    let(:organization1) {FactoryGirl.create(:organization, legal_name: "Acme Inc")}
+    let(:carrier_profile_1) {FactoryGirl.create(:carrier_profile, organization: organization1)}
+    let(:organization2) {FactoryGirl.create(:organization, legal_name: "Turner Inc")}
+    let(:carrier_profile_2) {FactoryGirl.create(:carrier_profile, organization: organization2)}
+
+    before :each do
+      allow(Plan).to receive(:valid_shop_health_plans).and_return(true)
+      carrier_profile_1
+      carrier_profile_2
+      Rails.cache.clear
+    end
+
+    it "valid_carrier_names" do
+      carrier_names = {}
+      carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+      carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
+      expect(Organization.valid_carrier_names).to eq carrier_names
+    end
+
+    it "valid_carrier_names_for_options" do
+      carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s]]
+      expect(Organization.valid_carrier_names_for_options).to eq carriers
+    end
   end
 end

@@ -16,7 +16,6 @@ class EmployerProfile
   # Workflow attributes
   field :aasm_state, type: String, default: "applicant"
 
-
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
   delegate :dba, :dba=, to: :organization, allow_nil: true
@@ -52,12 +51,8 @@ class EmployerProfile
   after_initialize :build_nested_models
   after_save :save_associated_nested_models
 
-  scope :all_active,             ->{ where(:is_active => true) }
-
-  scope :enrollments_applicant,  ->{  where(aasm_state: "applicant") }
-  scope :enrollments_active,     ->{ any_in(aasm_state: %w(applicant registered eligible binder_allocated enrolled)) }
-  scope :enrollments_inactive,   ->{ any_in(aasm_state: %w(suspended canceled ineligible)) }
-
+  scope :active,      ->{ any_in(aasm_state: ["applicant", "registered", "eligible", "binder_paid", "enrolled"]) }
+  scope :inactive,    ->{ any_in(aasm_state: ["suspended", "ineligible"]) }
 
   alias_method :is_active?, :is_active
 
@@ -143,6 +138,8 @@ class EmployerProfile
     plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
+  #TODO - this code will not able to support enrolling plan year
+  #there should be one published and one enrolling or enrolled plan year
   def published_plan_year
     plan_years.published.first
   end

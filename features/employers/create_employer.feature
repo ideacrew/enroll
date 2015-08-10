@@ -10,6 +10,8 @@ Feature: Create Employer
         And I sign up with valid user data
       Then I should see a successful sign up message
         And I should see an initial form to enter information about my Employer and myself
+      When I go to the Profile tab
+      Then I should see Edit Details link
       When I go to the benefits tab I should see plan year information
         And I should see a button to create new plan year
         And I should be able to enter plan year, benefits, relationship benefits with high FTE

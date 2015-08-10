@@ -12,7 +12,7 @@
       </tr>
       </thead>
       <tbody>
-      <% enrollments = @employee_role.families.households.flat_map(&:hbx_enrollments) if @employee_role.try(:families).try(:households) %>
+      <% enrollments = @employee_role.families.households.flat_map(&:hbx_enrollments).select{|hbx| hbx.plan.present?} if @employee_role.try(:families).try(:households) %>
       <% enrollments.each do |enrollment|%>
 
       <tr>

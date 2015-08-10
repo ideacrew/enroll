@@ -499,3 +499,11 @@ $(document).on('click', '.btn-danger', function() {
   var unread = $('.message-badge').text();
   $('.message-unread').html(unread);
 })
+
+$(document).on('change', '#waive_confirm select#waiver_reason', function() {
+  if($(this).val() == undefined || $(this).val() == ""){
+    $('#waiver_reason_submit').attr("disabled",true);
+  }else{
+    $('#waiver_reason_submit').attr("disabled",false);
+  }
+})

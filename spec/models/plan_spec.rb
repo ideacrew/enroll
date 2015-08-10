@@ -295,20 +295,39 @@ RSpec.describe Plan, dbclean: :after_each do
     let(:individual_count) { individual_silver_count + bronze_count + catastrophic_count }
     let(:carrier_profile_0_count) { platinum_count + gold_count + bronze_count }
     let(:carrier_profile_1_count) { shop_silver_count + individual_silver_count + catastrophic_count }
+    let(:current_year) {TimeKeeper.date_of_record.year}
 
     context "with plans loaded" do
       before do
-        FactoryGirl.create_list(:plan, platinum_count, metal_level: "platinum", market: "shop", plan_type: "ppo", carrier_profile: carrier_profile_0)
-        FactoryGirl.create_list(:plan, gold_count, metal_level: "gold", market: "shop", plan_type: "pos", carrier_profile: carrier_profile_0)
-        FactoryGirl.create_list(:plan, shop_silver_count, metal_level: "silver", plan_type: "ppo", market: "shop", carrier_profile: carrier_profile_1)
-        FactoryGirl.create_list(:plan, individual_silver_count, metal_level: "silver", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1)
-        FactoryGirl.create_list(:plan, bronze_count, metal_level: "bronze", market: "individual", plan_type: "epo", carrier_profile: carrier_profile_0)
-        FactoryGirl.create_list(:plan, catastrophic_count, metal_level: "catastrophic", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1)
+        FactoryGirl.create_list(:plan, platinum_count, metal_level: "platinum", market: "shop", plan_type: "ppo", carrier_profile: carrier_profile_0, active_year: current_year-1)
+        FactoryGirl.create_list(:plan, gold_count, metal_level: "gold", market: "shop", plan_type: "pos", carrier_profile: carrier_profile_0, active_year: current_year)
+        FactoryGirl.create_list(:plan, shop_silver_count, metal_level: "silver", plan_type: "ppo", market: "shop", carrier_profile: carrier_profile_1, active_year: current_year)
+        FactoryGirl.create_list(:plan, individual_silver_count, metal_level: "silver", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year)
+        FactoryGirl.create_list(:plan, bronze_count, metal_level: "bronze", market: "individual", plan_type: "epo", carrier_profile: carrier_profile_0, active_year: current_year)
+        FactoryGirl.create_list(:plan, catastrophic_count, metal_level: "catastrophic", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year)
       end
 
       context "with no referenced scope" do
         it "should return all loaded plans" do
           expect(Plan.all.count).to eq total_plan_count
+        end
+      end
+
+      context "by_active_year" do
+        it "should return all plans of this year" do
+          expect(Plan.by_active_year.count).to eq (total_plan_count - platinum_count)
+        end
+      end
+
+      context "valid_shop_by_carrier" do
+        it "should return all carrier_profile_1 plans this year" do
+          expect(Plan.valid_shop_by_carrier(carrier_profile_1.id).count).to eq shop_silver_count
+        end
+      end
+
+      context "valid_shop_by_metal_level" do
+        it "should return all silver plans this year" do
+          expect(Plan.valid_shop_by_metal_level('silver').count).to eq shop_silver_count
         end
       end
 
@@ -349,6 +368,12 @@ RSpec.describe Plan, dbclean: :after_each do
           expect(Plan.find_by_carrier_profile(carrier_profile_0).shop_market.count).to eq platinum_count + gold_count
         end
       end
+    end
+  end
+
+  describe "class method" do
+    it "reference_plan_metal_level_for_options" do
+      expect(Plan.reference_plan_metal_level_for_options).to eq Plan::REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
   end
 end

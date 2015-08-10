@@ -14,7 +14,9 @@ class Message
   field :created_at, type: DateTime
   field :from, type: String
   field :to, type: String
-  after_initialize :set_timestamp
+
+  before_create :set_timestamp
+
   validate :message_has_content
 
   scope :by_message_id, ->(id){where(:id => id)}

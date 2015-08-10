@@ -178,6 +178,17 @@ class HbxEnrollment
     self
   end
 
+  def update_current(updates)
+    household.hbx_enrollments.where(id: id).update_all(updates)
+  end
+
+  def inactive_related_hbxs
+    hbxs = household.hbx_enrollments.ne(id: id).select do |hbx|
+      hbx.employee_role.present? and hbx.employee_role.employer_profile_id == employee_role.employer_profile_id
+    end
+    household.hbx_enrollments.any_in(id: hbxs.map(&:_id)).update_all(is_active: false)
+  end
+
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer
   #       This should probably be done by comparing the hired_on date with todays date.
   #       Also needs to ignore any that were already terminated before a certain date.
