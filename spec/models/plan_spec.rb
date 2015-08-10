@@ -375,5 +375,20 @@ RSpec.describe Plan, dbclean: :after_each do
     it "reference_plan_metal_level_for_options" do
       expect(Plan.reference_plan_metal_level_for_options).to eq Plan::REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
+
+    context "valid_shop_health_plans" do
+      let(:carrier_profile) {FactoryGirl.create(:carrier_profile)}
+      before :each do 
+        Rails.cache.clear
+      end
+
+      it "for carrier" do
+        expect(Plan.valid_shop_health_plans('carrier', carrier_profile.id)).to eq Plan.valid_shop_by_carrier(carrier_profile.id).to_a
+      end
+
+      it "for metal_level" do
+        expect(Plan.valid_shop_health_plans('metal_level', 'gold')).to eq Plan.valid_shop_by_metal_level('gold').to_a
+      end
+    end
   end
 end

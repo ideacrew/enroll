@@ -8,4 +8,8 @@ module EventsHelper
     return nil if date_time.blank?
     date_time.strftime("%Y%m%d")
   end
+
+  def vocab_relationship_map(rel)
+    rel.gsub(" ", "_")
+  end
 end
