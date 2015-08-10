@@ -1,55 +1,40 @@
 class ConsumerRole
   include Mongoid::Document
   include Mongoid::Timestamps
-  # include AASM
 
   embedded_in :person
 
-  CITIZEN_STATUS_KINDS = %W[
-      us_citizen
-      naturalized_citizen
-      alien_lawfully_present
-      lawful_permanent_resident
-      indian_tribe_member
-      undocumented_immigrant
-      not_lawfully_present_in_us
-  ]
-
-  field :ethnicity, type: String
-  field :race, type: String
   field :birth_location, type: String
   field :marital_status, type: String
-
-  field :citizen_status, type: String
-  field :is_state_resident, type: Boolean
-  field :is_incarcerated, type: Boolean
-  field :is_applicant, type: Boolean
-  field :is_disabled, type: Boolean
-
-  field :is_tobacco_user, type: String, default: "unknown"
-  field :language_code, type: String
-
-  field :application_state, type: String
   field :is_active, type: Boolean, default: true
-
-  ## Move these to Family model
-  # # Writing agent credited for enrollment and transmitted on 834
-  # field :writing_agent_id, type: BSON::ObjectId
-
-  # # Agency representing this employer
-  # field :broker_agency_id, type: BSON::ObjectId
+  field :is_applicant, type: Boolean
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
-  delegate :ssn, :ssn=, to: :person, allow_nil: true
-  delegate :dob, :dob=, to: :person, allow_nil: true
+  delegate :ssn,    :ssn=,    to: :person, allow_nil: true
+  delegate :dob,    :dob=,    to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
-  validates_presence_of :ssn, :dob, :gender, :is_incarcerated, :is_applicant, :is_state_resident, :citizen_status
+  delegate :vlp_authority,      :vlp_authority=,     to: :person, allow_nil: true
+  delegate :vlp_document_id,    :vlp_document_id=,   to: :person, allow_nil: true
+  delegate :vlp_evidences,      :vlp_evidences=,     to: :person, allow_nil: true
 
-  validates :citizen_status,
-    inclusion: { in: ConsumerRole::CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" },
-    allow_blank: false
+  delegate :citizen_status,     :citizen_status=,    to: :person, allow_nil: true
+  delegate :is_state_resident,  :is_state_resident=, to: :person, allow_nil: true
+  delegate :is_incarcerated,    :is_incarcerated=,   to: :person, allow_nil: true
 
+  delegate :identity_verified_state,      :identity_verified_state=,      to: :person, allow_nil: false
+  delegate :identity_verified_date,       :identity_verified_date=,       to: :person, allow_nil: true
+  delegate :identity_verified_evidences,  :identity_verified_evidences=,  to: :person, allow_nil: true
+  delegate :identity_final_decision_code, :identity_final_decision_code=, to: :person, allow_nil: true
+  delegate :identity_response_code,       :identity_response_code=,       to: :person, allow_nil: true
+  delegate :verify_identity, to: :person
+  delegate :import_identity, to: :person
+
+  delegate :race,               :race=,              to: :person, allow_nil: true
+  delegate :ethnicity,          :ethnicity=,         to: :person, allow_nil: true
+  delegate :is_disabled,        :is_disabled=,       to: :person, allow_nil: true
+
+  validates_presence_of :ssn, :dob, :gender, :identity_verified_state
 
   scope :all_under_age_twenty_six, ->{ gt(:'dob' => (Date.today - 26.years))}
   scope :all_over_age_twenty_six,  ->{lte(:'dob' => (Date.today - 26.years))}
@@ -58,33 +43,21 @@ class ConsumerRole
   scope :all_over_or_equal_age, ->(age) {lte(:'dob' => (Date.today - age.years))}
   scope :all_under_or_equal_age, ->(age) {gte(:'dob' => (Date.today - age.years))}
 
+  alias_method :is_state_resident?, :is_state_resident
+  alias_method :is_incarcerated?,   :is_incarcerated
+
+  def is_aca_enrollment_eligible?
+    is_hbx_enrollment_eligible? && 
+    Person::ACA_ELIGIBLE_CITIZEN_STATUS_KINDS.include?(citizen_status)
+  end
+
+  def is_hbx_enrollment_eligible?
+    is_state_resident? && !is_incarcerated?
+  end
+
   def parent
     raise "undefined parent: Person" unless person?
     self.person
-  end
-
-  # belongs_to writing agent (broker_role)
-  def writing_agent=(new_writing_agent)
-    raise ArgumentError.new("expected BrokerRole class") unless new_writing_agent.is_a? BrokerRole
-    self.new_writing_agent_id = new_writing_agent._id
-    @writing_agent = new_writing_agent
-  end
-
-  def writing_agent
-    return @writing_agent if defined? @writing_agent
-    @writing_agent = BrokerRole.find(self.writing_agent_id) unless writing_agent_id.blank?
-  end
-
-  # belongs_to BrokerAgencyProfile
-  def broker_agency_profile=(new_broker_agency)
-    raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency.is_a? BrokerAgencyProfile
-    self.broker_agency_id = new_broker_agency._id
-    @broker_agency_profile = new_broker_agency
-  end
-
-  def broker_agency_profile
-    return @broker_agency_profile if defined? @broker_agency_profile
-    @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_id) unless broker_agency_id.blank?
   end
 
   def families
@@ -115,22 +88,6 @@ class ConsumerRole
     return @person_find if defined? @person_find
     @person_find = Person.where("consumer_role._id" => consumer_role_id).first.consumer_role unless consumer_role_id.blank?
   end
-
-
-
-  # aasm column: "application_state" do
-  #   state :enrollment_closed, initial: true
-  #   state :open_enrollment_period
-  #   state :special_enrollment_period
-  #   state :open_and_special_enrollment_period
-
-  #   event :open_enrollment do
-  #     transitions from: :open_enrollment_period, to: :open_enrollment_period
-  #     transitions from: :special_enrollment_period, to: :open_and_special_enrollment_period
-  #     transitions from: :open_and_special_enrollment_period, to: :open_and_special_enrollment_period
-  #     transitions from: :enrollment_closed, to: :open_enrollment_period
-  #   end
-  # end
 
   def is_active?
     self.is_active

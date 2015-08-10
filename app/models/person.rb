@@ -2,6 +2,8 @@ class Person
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Versioning
+  include AASM
+
   include Notify
   include UnsetableSparseFields
 
@@ -11,6 +13,63 @@ class Person
   IDENTIFYING_INFO_ATTRIBUTES = %w(first_name last_name ssn dob)
   ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
   RELATIONSHIP_CHANGE_ATTRIBUTES = %w(person_relationships)
+
+  VLP_AUTHORITY_KINDS = %w(ssa dhs hbx)
+  CITIZEN_STATUS_KINDS = %w(
+      us_citizen
+      naturalized_citizen
+      alien_lawfully_present
+      lawful_permanent_resident
+      indian_tribe_member
+      undocumented_immigrant
+      not_lawfully_present_in_us
+  )
+
+  ACA_ELIGIBLE_CITIZEN_STATUS_KINDS = %W(
+      us_citizen
+      naturalized_citizen
+      indian_tribe_member
+  )
+
+  ## Verified Lawful Presence (VLP)
+
+  # Alien number (A Number):  9 character string
+  # CitizenshipNumber:        7-12 character string
+  # I-94:                     11 character string
+  # NaturalizationNumber:     7-12 character string
+  # PassportNumber:           6-12 character string
+  # ReceiptNumber:            13 character string, first 3 alpha, remaining 10 string
+  # SevisID:                  11 digit string, first char is "N"
+  # VisaNumber:               8 character string
+
+  VLP_DOCUMENT_IDENTIFICATION_KINDS = [
+      "A Number",
+      "I-94 Number",
+      "SEVIS ID",
+      "Visa Number",
+      "Passport Number",
+      "Receipt Number",
+      "Naturalization Number",
+      "Citizenship Number"
+    ]
+
+  VLP_DOCUMENT_KINDS = [
+      "I-327 (Reentry Permit)",
+      "I-551 (Permanent Resident Card)",
+      "I-571 (Refugee Travel Document)",
+      "I-766 (Employment Authorization Card)",
+      "Certificate of Citizenship",
+      "Naturalization Certificate",
+      "Machine Readable Immigrant Visa (with Temporary I-551 Language)",
+      "Temporary I-551 Stamp (on passport or I-94)",
+      "I-94 (Arrival/Departure Record)",
+      "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport",
+      "Unexpired Foreign Passport",
+      "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)",
+      "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)"
+    ]
+
+# FiveYearBarApplicabilityIndicator ??
 
   field :hbx_id, type: String
   field :name_pfx, type: String
@@ -26,6 +85,28 @@ class Person
   field :dob, type: Date
   field :gender, type: String
   field :date_of_death, type: Date
+
+  field :identity_verified_state, type: String, default: "unverified"
+  field :identity_verified_date, type: Date
+  field :identity_verified_evidences, type: Array, default: []
+  field :identity_final_decision_code, type: String
+  field :identity_response_code, type: String
+  field :identity_response_description_text, type: String
+
+  field :vlp_authority, type: String
+  field :vlp_document_id, type: String
+  field :vlp_evidences, type: Array, default: []
+
+  field :citizen_status, type: String
+  field :is_state_resident, type: Boolean
+  field :is_incarcerated, type: Boolean
+  
+  field :is_disabled, type: Boolean
+  field :ethnicity, type: String
+  field :race, type: String
+
+  field :is_tobacco_user, type: String, default: "unknown"
+  field :language_code, type: String
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
@@ -75,18 +156,29 @@ class Person
     uniqueness: true,
     allow_blank: true
 
+  validate :is_ssn_composition_correct?
+
   validates :gender,
     allow_blank: true,
     inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
 
+  validates :vlp_authority,
+    allow_blank: true,
+    inclusion: { in: Person::VLP_AUTHORITY_KINDS, message: "%{value} is not a valid identity authority" }
 
-  before_save :update_full_name
+  validates :citizen_status,
+    allow_blank: true,
+    inclusion: { in: Person::CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
+
+
   before_save :generate_hbx_id
+  before_save :update_full_name
   before_save :strip_empty_fields
   after_create :create_inbox
 
   index({hbx_id: 1}, {sparse:true, unique: true})
   index({user_id: 1}, {sparse:true, unique: true})
+  index({identity_verified_state: 1})
 
   index({last_name:  1})
   index({first_name: 1})
@@ -139,15 +231,17 @@ class Person
 
   after_save :update_family_search_collection
 
+  # before_save :notify_change
+  # def notify_change
+  #   notify_change_event(self, {"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES, "address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
+  # end
+
   def update_family_search_collection
   #  ViewFunctions::Person.run_after_save_search_update(self.id)
   end
 
   def generate_hbx_id
-
-    if hbx_id.blank?
-      write_attribute(:hbx_id, HbxIdGenerator.generate)
-    end
+    write_attribute(:hbx_id, HbxIdGenerator.generate) if hbx_id.blank?
   end
 
   def strip_empty_fields
@@ -162,7 +256,6 @@ class Person
   # Strip non-numeric chars from ssn
   # SSN validation rules, see: http://www.ssa.gov/employer/randomizationfaqs.html#a0=12
   def ssn=(new_ssn)
-    ssn_val = new_ssn.to_s.gsub(/\D/, '')
     if !new_ssn.blank?
       write_attribute(:ssn, new_ssn.to_s.gsub(/\D/, ''))
     else
@@ -203,7 +296,81 @@ class Person
     end
   end
 
+  def dob_to_string
+    dob.blank? ? "" : dob.strftime("%Y%m%d")
+  end
+
+  def is_active?
+    is_active
+  end
+
+  def relatives
+    person_relationships.reject do |p_rel|
+      p_rel.relative_id.to_s == self.id.to_s
+    end.map(&:relative)
+  end
+
+  def find_relationship_with(other_person)
+    if self.id == other_person.id
+      "self"
+    else
+      person_relationship_for(other_person).try(:kind)
+    end
+  end
+
+  def person_relationship_for(other_person)
+    person_relationships.detect do |person_relationship|
+      person_relationship.relative_id == other_person.id
+    end
+  end
+
+  def ensure_relationship_with(person, relationship)
+    existing_relationship = self.person_relationships.detect do |rel|
+      rel.relative_id.to_s == person.id.to_s
+    end
+    if existing_relationship
+      existing_relationship.update_attributes(:kind => relationship)
+    else
+      self.person_relationships << PersonRelationship.new({
+        :kind => relationship,
+        :relative_id => person.id
+      })
+    end
+  end
+
+  def add_work_email(email)
+   existing_email = self.emails.detect do |e|
+     (e.kind == 'work') &&
+       (e.address.downcase == email.downcase)
+   end
+   return nil if existing_email.present?
+   self.emails << ::Email.new(:kind => 'work', :address => email)
+  end
+
   class << self
+    def default_search_order
+      [[:last_name, 1],[:first_name, 1]]
+    end
+
+    def search_hash(s_str)
+     clean_str = s_str.strip
+     s_rex = Regexp.new(Regexp.escape(clean_str), true)
+     additional_exprs = []
+     if clean_str.include?(" ")
+       parts = clean_str.split(" ").compact
+       first_re = Regexp.new(Regexp.escape(parts.first), true)
+       last_re = Regexp.new(Regexp.escape(parts.last), true)
+       additional_exprs << {:first_name => first_re, :last_name => last_re}
+     end
+     {
+       "$or" => ([
+         {"first_name" => s_rex},
+         {"last_name" => s_rex},
+         {"hbx_id" => s_rex},
+         {"ssn" => s_rex}
+       ] + additional_exprs)
+     }
+    end
 
     # Find all employee_roles.  Since person has_many employee_roles, person may show up
     # employee_role.person may not be unique in returned set
@@ -225,7 +392,12 @@ class Person
       where(:'employer_staff_role.employer_profile_id' => employer_profile.id)
     end
 
-  # Return an instance list of active People who match identifying information criteria
+    def match_existing_person(personish)
+      return nil if personish.ssn.blank?
+      Person.where(:ssn => personish.ssn, :dob => personish.dob).first
+    end
+
+    # Return an instance list of active People who match identifying information criteria
     def match_by_id_info(options)
       ssn_query = options[:ssn]
       dob_query = options[:dob]
@@ -249,92 +421,61 @@ class Person
     end
   end
 
-  def dob_to_string
-    dob.blank? ? "" : dob.strftime("%Y%m%d")
-  end
+  aasm :column => 'identity_verified_state' do
+    state :unverified, initial: true
+    state :verified
+    state :followup_pending
+    state :identity_invalid
 
-  def is_active?
-    is_active
-  end
+    event :verify_identity do
+      transitions from: [:unverified, :followup_pending], to: :verified, :guard => :verification_success?
+      transitions from: :unverified, to: :followup_pending, :guard => :verification_pending?
+    end
 
-  def find_relationship_with(other_person)
-    if self.id == other_person.id
-      "self"
-    else
-      person_relationship_for(other_person).try(:kind)
+    event :import_identity, :guards => [:identity_metadata_provided?] do
+      transitions from: :unverified, to: :verified, :guard => :verification_success?
+      transitions from: :unverified, to: :followup_pending, :guard => :verification_pending?
+    end
+
+    event :fail_identity do
+      transitions from: [:unverified, :followup_pending], to: :identity_invalid
     end
   end
-
-  def person_relationship_for(other_person)
-    person_relationships.detect do |person_relationship|
-      person_relationship.relative_id == other_person.id
-    end
-  end
-
-  def self.match_existing_person(personish)
-    return nil if personish.ssn.blank?
-    Person.where(:ssn => personish.ssn, :dob => personish.dob).first
-  end
-
-  def ensure_relationship_with(person, relationship)
-    existing_relationship = self.person_relationships.detect do |rel|
-      rel.relative_id.to_s == person.id.to_s
-    end
-    if existing_relationship
-      existing_relationship.update_attributes(:kind => relationship)
-    else
-      self.person_relationships << PersonRelationship.new({
-        :kind => relationship,
-        :relative_id => person.id
-      })
-    end
-  end
-
-  before_save :notify_change
-  def notify_change
-#    notify_change_event(self, {"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES, "address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
-  end
-
-  def relatives
-    person_relationships.reject do |p_rel|
-      p_rel.relative_id.to_s == self.id.to_s
-    end.map(&:relative)
-  end
-
-  def self.default_search_order
-    [[:last_name, 1],[:first_name, 1]]
-  end
-
- def self.search_hash(s_str)
-   clean_str = s_str.strip
-   s_rex = Regexp.new(Regexp.escape(clean_str), true)
-   additional_exprs = []
-   if clean_str.include?(" ")
-     parts = clean_str.split(" ").compact
-     first_re = Regexp.new(Regexp.escape(parts.first), true)
-     last_re = Regexp.new(Regexp.escape(parts.last), true)
-     additional_exprs << {:first_name => first_re, :last_name => last_re}
-   end
-   {
-     "$or" => ([
-       {"first_name" => s_rex},
-       {"last_name" => s_rex},
-       {"hbx_id" => s_rex},
-       {"ssn" => s_rex}
-     ] + additional_exprs)
-   }
- end
-
- def add_work_email(email)
-   existing_email = self.emails.detect do |e|
-     (e.kind == 'work') &&
-       (e.address.downcase == email.downcase)
-   end
-   return nil if existing_email.present?
-   self.emails << ::Email.new(:kind => 'work', :address => email)
- end
 
 private
+  def verification_success?
+    identity_final_decision_code.to_s.downcase == "acc"
+  end
+
+  def verification_pending?
+    identity_final_decision_code.to_s.downcase == "ref" && identity_response_code.present?
+  end
+
+  def identity_metadata_provided?
+    identity_final_decision_code.present? && identity_response_code.present?
+  end
+
+  def is_ssn_composition_correct?
+    # Invalid compositions:
+    #   All zeros or 000, 666, 900-999 in the area numbers (first three digits); 
+    #   00 in the group number (fourth and fifth digit); or 
+    #   0000 in the serial number (last four digits)
+
+    if ssn.present?
+      invalid_area_numbers = %w(000 666)
+      invalid_area_range = 900..999
+      invalid_group_numbers = %w(00)
+      invalid_serial_numbers = %w(0000)
+
+      return false if ssn.to_s.blank?
+      return false if invalid_area_numbers.include?(ssn.to_s[0,3])
+      return false if invalid_area_range.include?(ssn.to_s[0,3].to_i)
+      return false if invalid_group_numbers.include?(ssn.to_s[3,2])
+      return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
+    end
+    
+    true
+  end
 
   def create_inbox
     welcome_subject = "Welcome to DC HealthLink"
