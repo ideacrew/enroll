@@ -372,6 +372,7 @@ module ApplicationHelper
     non_owner = plan_year.non_business_owner_enrollment_count
     covered = plan_year.covered_count
     waived = plan_year.waived_count
+    p_min = 0 if p_min.nil?
 
     unless eligible.zero?
       condition = (eligible <= 2) ? ((enrolled > (eligible - 1)) && (non_owner > 0)) : ((enrolled >= p_min) && (non_owner > 0))
