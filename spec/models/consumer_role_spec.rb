@@ -6,19 +6,7 @@ describe ConsumerRole, dbclean: :after_each do
   it { should delegate_method(:dob).to :person }
   it { should delegate_method(:gender).to :person }
 
-  it { should delegate_method(:vlp_authority).to :person }
-  it { should delegate_method(:vlp_document_id).to :person }
-  it { should delegate_method(:vlp_evidences).to :person }
-
-  it { should delegate_method(:citizen_status).to :person }
-  it { should delegate_method(:is_state_resident).to :person }
   it { should delegate_method(:is_incarcerated).to :person }
-
-  it { should delegate_method(:identity_verified_state).to :person }
-  it { should delegate_method(:identity_verified_date).to :person }
-  it { should delegate_method(:identity_verified_evidences).to :person }
-  it { should delegate_method(:identity_final_decision_code).to :person }
-  it { should delegate_method(:identity_response_code).to :person }
 
   it { should delegate_method(:race).to :person }
   it { should delegate_method(:ethnicity).to :person }
@@ -29,22 +17,16 @@ describe ConsumerRole, dbclean: :after_each do
   it { should validate_presence_of :dob }
   it { should validate_presence_of :identity_verified_state }
 
-  let(:address) {FactoryGirl.build(:address)}
-  let(:saved_person) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789")}
+  let(:address)       {FactoryGirl.build(:address)}
+  let(:saved_person)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789")}
 
-  let(:is_incarcerated) {false}
-  let(:is_applicant) {true}
-  let(:is_state_resident) {true}
-  let(:citizen_status) {"us_citizen"}
-  let(:citizen_error_message) {"test citizen_status is not a valid citizen status"}
+  let(:is_applicant)          { true }
+  let(:citizen_error_message) { "test citizen_status is not a valid citizen status" }
 
   describe ".new" do
     let(:valid_params) do
       {
-        is_incarcerated: is_incarcerated,
         is_applicant: is_applicant,
-        is_state_resident: is_state_resident,
-        citizen_status: citizen_status,
         person: saved_person
       }
     end
@@ -53,12 +35,12 @@ describe ConsumerRole, dbclean: :after_each do
       let(:params) {valid_params.except(:person)}
 
       it "should raise" do
-        expect{ConsumerRole.create(**params)}.to raise_error(Module::DelegationError)
+        expect(ConsumerRole.new(**params).valid?).to be_falsey
       end
     end
 
     context "with all valid arguments" do
-      let(:consumer_role) {saved_person.build_consumer_role(valid_params)}
+      let(:consumer_role) { saved_person.build_consumer_role(valid_params) }
 
       it "should save" do
         expect(consumer_role.save).to be_truthy
@@ -123,7 +105,7 @@ describe ConsumerRole, dbclean: :after_each do
               end
 
               it "identity state should stay in unverified status" do
-                expect(consumer_role.person.may_import_identity?).to be_falsey
+                expect(consumer_role.may_import_identity?).to be_falsey
               end
             end
 

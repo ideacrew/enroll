@@ -1,40 +1,106 @@
 class ConsumerRole
   include Mongoid::Document
   include Mongoid::Timestamps
+  include AASM
 
   embedded_in :person
 
+  VLP_AUTHORITY_KINDS = %w(ssa dhs hbx)
+  CITIZEN_STATUS_KINDS = %w(
+      us_citizen
+      naturalized_citizen
+      alien_lawfully_present
+      lawful_permanent_resident
+      indian_tribe_member
+      undocumented_immigrant
+      not_lawfully_present_in_us
+  )
+
+  ACA_ELIGIBLE_CITIZEN_STATUS_KINDS = %W(
+      us_citizen
+      naturalized_citizen
+      indian_tribe_member
+  )
+
+  ## Verified Lawful Presence (VLP)
+
+  # Alien number (A Number):  9 character string
+  # CitizenshipNumber:        7-12 character string
+  # I-94:                     11 character string
+  # NaturalizationNumber:     7-12 character string
+  # PassportNumber:           6-12 character string
+  # ReceiptNumber:            13 character string, first 3 alpha, remaining 10 string
+  # SevisID:                  11 digit string, first char is "N"
+  # VisaNumber:               8 character string
+
+  VLP_DOCUMENT_IDENTIFICATION_KINDS = [
+      "A Number",
+      "I-94 Number",
+      "SEVIS ID",
+      "Visa Number",
+      "Passport Number",
+      "Receipt Number",
+      "Naturalization Number",
+      "Citizenship Number"
+    ]
+
+  VLP_DOCUMENT_KINDS = [
+      "I-327 (Reentry Permit)",
+      "I-551 (Permanent Resident Card)",
+      "I-571 (Refugee Travel Document)",
+      "I-766 (Employment Authorization Card)",
+      "Certificate of Citizenship",
+      "Naturalization Certificate",
+      "Machine Readable Immigrant Visa (with Temporary I-551 Language)",
+      "Temporary I-551 Stamp (on passport or I-94)",
+      "I-94 (Arrival/Departure Record)",
+      "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport",
+      "Unexpired Foreign Passport",
+      "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)",
+      "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)"
+    ]
+
+  # FiveYearBarApplicabilityIndicator ??
+
+  field :identity_verified_state, type: String, default: "unverified"
+  field :identity_verified_date, type: Date
+  field :identity_verified_evidences, type: Array, default: []
+  field :identity_final_decision_code, type: String
+  field :identity_response_code, type: String
+  field :identity_response_description_text, type: String
+
+  field :vlp_authority, type: String
+  field :vlp_document_id, type: String
+  field :vlp_evidences, type: Array, default: []
+
+  field :citizen_status, type: String
+  field :is_state_resident, type: Boolean
+
+  field :is_applicant, type: Boolean  # Consumer is applying for benefits coverage
   field :birth_location, type: String
   field :marital_status, type: String
   field :is_active, type: Boolean, default: true
-  field :is_applicant, type: Boolean
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
   delegate :dob,    :dob=,    to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
-  delegate :vlp_authority,      :vlp_authority=,     to: :person, allow_nil: true
-  delegate :vlp_document_id,    :vlp_document_id=,   to: :person, allow_nil: true
-  delegate :vlp_evidences,      :vlp_evidences=,     to: :person, allow_nil: true
-
-  delegate :citizen_status,     :citizen_status=,    to: :person, allow_nil: true
-  delegate :is_state_resident,  :is_state_resident=, to: :person, allow_nil: true
   delegate :is_incarcerated,    :is_incarcerated=,   to: :person, allow_nil: true
-
-  delegate :identity_verified_state,      :identity_verified_state=,      to: :person, allow_nil: false
-  delegate :identity_verified_date,       :identity_verified_date=,       to: :person, allow_nil: true
-  delegate :identity_verified_evidences,  :identity_verified_evidences=,  to: :person, allow_nil: true
-  delegate :identity_final_decision_code, :identity_final_decision_code=, to: :person, allow_nil: true
-  delegate :identity_response_code,       :identity_response_code=,       to: :person, allow_nil: true
-  delegate :verify_identity, to: :person
-  delegate :import_identity, to: :person
 
   delegate :race,               :race=,              to: :person, allow_nil: true
   delegate :ethnicity,          :ethnicity=,         to: :person, allow_nil: true
   delegate :is_disabled,        :is_disabled=,       to: :person, allow_nil: true
 
-  validates_presence_of :ssn, :dob, :gender, :identity_verified_state
+  validates_presence_of :ssn, :dob, :gender, :is_applicant, :identity_verified_state
+
+  validates :vlp_authority,
+    allow_blank: true,
+    inclusion: { in: VLP_AUTHORITY_KINDS, message: "%{value} is not a valid identity authority" }
+
+  validates :citizen_status,
+    allow_blank: true,
+    inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
 
   scope :all_under_age_twenty_six, ->{ gt(:'dob' => (Date.today - 26.years))}
   scope :all_over_age_twenty_six,  ->{lte(:'dob' => (Date.today - 26.years))}
@@ -92,5 +158,40 @@ class ConsumerRole
   def is_active?
     self.is_active
   end
+
+  aasm :column => 'identity_verified_state' do
+    state :unverified, initial: true
+    state :verified
+    state :followup_pending
+    state :identity_invalid
+
+    event :verify_identity do
+      transitions from: [:unverified, :followup_pending], to: :verified, :guard => :verification_success?
+      transitions from: :unverified, to: :followup_pending, :guard => :verification_pending?
+    end
+
+    event :import_identity, :guards => [:identity_metadata_provided?] do
+      transitions from: :unverified, to: :verified, :guard => :verification_success?
+      transitions from: :unverified, to: :followup_pending, :guard => :verification_pending?
+    end
+
+    event :fail_identity do
+      transitions from: [:unverified, :followup_pending], to: :identity_invalid
+    end
+  end
+
+private
+  def verification_success?
+    identity_final_decision_code.to_s.downcase == "acc"
+  end
+
+  def verification_pending?
+    identity_final_decision_code.to_s.downcase == "ref" && identity_response_code.present?
+  end
+
+  def identity_metadata_provided?
+    identity_final_decision_code.present? && identity_response_code.present?
+  end
+
 
 end

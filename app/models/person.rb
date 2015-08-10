@@ -2,7 +2,6 @@ class Person
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Versioning
-  include AASM
 
   include Notify
   include UnsetableSparseFields
@@ -13,63 +12,6 @@ class Person
   IDENTIFYING_INFO_ATTRIBUTES = %w(first_name last_name ssn dob)
   ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
   RELATIONSHIP_CHANGE_ATTRIBUTES = %w(person_relationships)
-
-  VLP_AUTHORITY_KINDS = %w(ssa dhs hbx)
-  CITIZEN_STATUS_KINDS = %w(
-      us_citizen
-      naturalized_citizen
-      alien_lawfully_present
-      lawful_permanent_resident
-      indian_tribe_member
-      undocumented_immigrant
-      not_lawfully_present_in_us
-  )
-
-  ACA_ELIGIBLE_CITIZEN_STATUS_KINDS = %W(
-      us_citizen
-      naturalized_citizen
-      indian_tribe_member
-  )
-
-  ## Verified Lawful Presence (VLP)
-
-  # Alien number (A Number):  9 character string
-  # CitizenshipNumber:        7-12 character string
-  # I-94:                     11 character string
-  # NaturalizationNumber:     7-12 character string
-  # PassportNumber:           6-12 character string
-  # ReceiptNumber:            13 character string, first 3 alpha, remaining 10 string
-  # SevisID:                  11 digit string, first char is "N"
-  # VisaNumber:               8 character string
-
-  VLP_DOCUMENT_IDENTIFICATION_KINDS = [
-      "A Number",
-      "I-94 Number",
-      "SEVIS ID",
-      "Visa Number",
-      "Passport Number",
-      "Receipt Number",
-      "Naturalization Number",
-      "Citizenship Number"
-    ]
-
-  VLP_DOCUMENT_KINDS = [
-      "I-327 (Reentry Permit)",
-      "I-551 (Permanent Resident Card)",
-      "I-571 (Refugee Travel Document)",
-      "I-766 (Employment Authorization Card)",
-      "Certificate of Citizenship",
-      "Naturalization Certificate",
-      "Machine Readable Immigrant Visa (with Temporary I-551 Language)",
-      "Temporary I-551 Stamp (on passport or I-94)",
-      "I-94 (Arrival/Departure Record)",
-      "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport",
-      "Unexpired Foreign Passport",
-      "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)",
-      "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)"
-    ]
-
-# FiveYearBarApplicabilityIndicator ??
 
   field :hbx_id, type: String
   field :name_pfx, type: String
@@ -86,19 +28,6 @@ class Person
   field :gender, type: String
   field :date_of_death, type: Date
 
-  field :identity_verified_state, type: String, default: "unverified"
-  field :identity_verified_date, type: Date
-  field :identity_verified_evidences, type: Array, default: []
-  field :identity_final_decision_code, type: String
-  field :identity_response_code, type: String
-  field :identity_response_description_text, type: String
-
-  field :vlp_authority, type: String
-  field :vlp_document_id, type: String
-  field :vlp_evidences, type: Array, default: []
-
-  field :citizen_status, type: String
-  field :is_state_resident, type: Boolean
   field :is_incarcerated, type: Boolean
   
   field :is_disabled, type: Boolean
@@ -162,15 +91,6 @@ class Person
     allow_blank: true,
     inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
 
-  validates :vlp_authority,
-    allow_blank: true,
-    inclusion: { in: Person::VLP_AUTHORITY_KINDS, message: "%{value} is not a valid identity authority" }
-
-  validates :citizen_status,
-    allow_blank: true,
-    inclusion: { in: Person::CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
-
-
   before_save :generate_hbx_id
   before_save :update_full_name
   before_save :strip_empty_fields
@@ -178,7 +98,6 @@ class Person
 
   index({hbx_id: 1}, {sparse:true, unique: true})
   index({user_id: 1}, {sparse:true, unique: true})
-  index({identity_verified_state: 1})
 
   index({last_name:  1})
   index({first_name: 1})
@@ -202,6 +121,7 @@ class Person
 
   # Consumer child model indexes
   index({"consumer_role._id" => 1})
+  index({"consumer_role.identity_verified_state" => 1})
   index({"consumer_role.is_active" => 1})
 
   # Employee child model indexes
@@ -421,40 +341,7 @@ class Person
     end
   end
 
-  aasm :column => 'identity_verified_state' do
-    state :unverified, initial: true
-    state :verified
-    state :followup_pending
-    state :identity_invalid
-
-    event :verify_identity do
-      transitions from: [:unverified, :followup_pending], to: :verified, :guard => :verification_success?
-      transitions from: :unverified, to: :followup_pending, :guard => :verification_pending?
-    end
-
-    event :import_identity, :guards => [:identity_metadata_provided?] do
-      transitions from: :unverified, to: :verified, :guard => :verification_success?
-      transitions from: :unverified, to: :followup_pending, :guard => :verification_pending?
-    end
-
-    event :fail_identity do
-      transitions from: [:unverified, :followup_pending], to: :identity_invalid
-    end
-  end
-
 private
-  def verification_success?
-    identity_final_decision_code.to_s.downcase == "acc"
-  end
-
-  def verification_pending?
-    identity_final_decision_code.to_s.downcase == "ref" && identity_response_code.present?
-  end
-
-  def identity_metadata_provided?
-    identity_final_decision_code.present? && identity_response_code.present?
-  end
-
   def is_ssn_composition_correct?
     # Invalid compositions:
     #   All zeros or 000, 666, 900-999 in the area numbers (first three digits); 
