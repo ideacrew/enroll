@@ -295,7 +295,7 @@ class HbxEnrollment
   end
 
   def self.covered(enrollments)
-    enrollments.select{|e| ENROLLED_STATUSES.include?(e.aasm_state)}
+    enrollments.select{|e| ENROLLED_STATUSES.include?(e.aasm_state) && e.is_active? }
   end
 
   private

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Employers::PlanYearsController do
+RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   let(:employer_profile_id) { EmployerProfile.new.id}
   let(:plan_year_proxy) { double(id: "id") }
   let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy) }
@@ -10,7 +10,7 @@ RSpec.describe Employers::PlanYearsController do
     before :each do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(Organization).to receive(:valid_carrier_names).and_return({id: "legal_name"})
+      allow(Organization).to receive(:valid_carrier_names).and_return({'id' => "legal_name"})
       get :new, :employer_profile_id => employer_profile_id
     end
 
@@ -23,7 +23,8 @@ RSpec.describe Employers::PlanYearsController do
     end
 
     it "should generate carriers" do
-      expect(assigns(:carrier_names)).to eq({id: "legal_name"})
+      expect(assigns(:carrier_names)).to eq({'id' => "legal_name"})
+      expect(assigns(:carriers_array)).to eq [['legal_name', 'id']]
     end
 
     it "should generate benefit_group with nil plan_option_kind" do
@@ -62,7 +63,7 @@ RSpec.describe Employers::PlanYearsController do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(employer_profile).to receive(:find_plan_year).and_return(plan_year)
-      allow(Organization).to receive(:valid_carrier_names).and_return({id: "legal_name"})
+      allow(Organization).to receive(:valid_carrier_names).and_return({"id"=> "legal_name"})
     end
 
     context "when draft state" do
@@ -79,7 +80,8 @@ RSpec.describe Employers::PlanYearsController do
       end
 
       it "should generate carriers" do
-        expect(assigns(:carrier_names)).to eq({id: "legal_name"})
+        expect(assigns(:carrier_names)).to eq({"id"=> "legal_name"})
+        expect(assigns(:carriers_array)).to eq [["legal_name", "id"]]
       end
     end
 
@@ -168,7 +170,7 @@ RSpec.describe Employers::PlanYearsController do
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)
-      allow(Organization).to receive(:valid_carrier_names).and_return({id: "legal_name"})
+      allow(Organization).to receive(:valid_carrier_names).and_return({"id"=> "legal_name"})
       post :update, :employer_profile_id => employer_profile_id, id: plan_year.id, :plan_year => plan_year_request_params
     end
 
@@ -186,7 +188,8 @@ RSpec.describe Employers::PlanYearsController do
       end
 
       it "should generate carriers" do
-        expect(assigns(:carrier_names)).to eq({id: 'legal_name'})
+        expect(assigns(:carrier_names)).to eq({"id"=> 'legal_name'})
+        expect(assigns(:carriers_array)).to eq [['legal_name', 'id']]
       end
     end
 
@@ -266,7 +269,7 @@ RSpec.describe Employers::PlanYearsController do
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)
-      allow(Organization).to receive(:valid_carrier_names).and_return({id: "legal_name"})
+      allow(Organization).to receive(:valid_carrier_names).and_return({'id' => "legal_name"})
       post :create, :employer_profile_id => employer_profile_id, :plan_year => plan_year_request_params
     end
 
@@ -284,7 +287,8 @@ RSpec.describe Employers::PlanYearsController do
       end
 
       it "should generate carriers" do
-        expect(assigns(:carrier_names)).to eq({id: 'legal_name'})
+        expect(assigns(:carrier_names)).to eq({'id' => 'legal_name'})
+        expect(assigns(:carriers_array)).to eq [['legal_name', 'id']]
       end
     end
 
@@ -318,9 +322,11 @@ RSpec.describe Employers::PlanYearsController do
   end
 
   describe "GET reference_plan_options" do
+    let(:carrier_profile) { FactoryGirl.create(:carrier_profile) }
     before :each do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(Organization).to receive(:valid_carrier_names).and_return({'id' => "legal_name"})
     end
 
     it "should be a success" do
@@ -328,10 +334,38 @@ RSpec.describe Employers::PlanYearsController do
       expect(response).to have_http_status(:success)
     end
 
-    it "should got attributes" do
+    it "should get attributes" do
       xhr :get, :reference_plan_options, employer_profile_id: employer_profile_id, kind: 'carrier', key: 'carrier_profile_id', format: :js
       expect(assigns(:kind)).to eq 'carrier'
       expect(assigns(:key)).to eq 'carrier_profile_id'
+    end
+
+    context "get plans" do
+      it "should get empty" do
+        xhr :get, :reference_plan_options, employer_profile_id: employer_profile_id, kind: 'other', format: :js
+        expect(assigns(:kind)).to eq 'other'
+        expect(assigns(:plans)).to eq []
+      end
+
+      it "should get plans by metal_level" do
+        xhr :get, :reference_plan_options, employer_profile_id: employer_profile_id, kind: 'metal_level', key: 'gold', format: :js
+        expect(assigns(:kind)).to eq 'metal_level'
+        expect(assigns(:key)).to eq 'gold'
+        expect(assigns(:plans)).to eq Plan.valid_shop_health_plans('metal_level', 'gold')
+      end
+
+      it "should get plans by carrier" do
+        xhr :get, :reference_plan_options, employer_profile_id: employer_profile_id, kind: 'carrier', key: carrier_profile.id.to_s, format: :js
+        expect(assigns(:kind)).to eq 'carrier'
+        expect(assigns(:key)).to eq carrier_profile.id.to_s
+        expect(assigns(:plans)).to eq Plan.valid_shop_health_plans('carrier', carrier_profile.id.to_s)
+      end
+    end
+
+    it "should generate carriers" do
+      xhr :get, :reference_plan_options, employer_profile_id: employer_profile_id, kind: 'carrier', format: :js
+      expect(assigns(:carrier_names)).to eq({'id' => "legal_name"})
+      expect(assigns(:carriers_array)).to eq [['legal_name', 'id']]
     end
   end
 
