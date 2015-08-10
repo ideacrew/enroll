@@ -55,17 +55,6 @@ When(/^(?:.+) go(?:es)? to the employee account creation page$/) do
   scroll_then_click(@browser.a(text: "Create account"))
 end
 
-When(/^(?:.+) enters? new account information$/) do #deprecated
-  @browser.text_field(name: "user[password_confirmation]").wait_until_present
-  screenshot("create_account")
-  @email = "any.person#{rand(100)}@example.com"
-  @password = "12345678"
-  @browser.text_field(name: "user[email]").set(@email)
-  @browser.text_field(name: "user[password]").set(@password)
-  @browser.text_field(name: "user[password_confirmation]").set(@password)
-  scroll_then_click(@browser.input(value: "Create account"))
-end
-
 Then(/^(?:.+) should be logged on as an unlinked employee$/) do
     screenshot("logged_in_welcome")
   @browser.a(href: /consumer\/employee\/search/).wait_until_present
@@ -147,7 +136,9 @@ def people
       dob: "08/13/1979",
       legal_name: "Legal LLC",
       dba: "Legal LLC",
-      fein: "890000223"
+      fein: "890000223",
+      email: 'tim.wood@example.com',
+      password: '12345678'
     },
   }
 end

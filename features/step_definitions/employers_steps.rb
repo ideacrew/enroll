@@ -1,35 +1,4 @@
-And(/^I sign up with valid user data$/) do
-  @browser.text_field(name: "user[password_confirmation]").wait_until_present
-  @browser.text_field(name: "user[email]").set("trey.evans#{rand(100)}@dc.gov")
-  @browser.text_field(name: "user[password]").set("12345678")
-  @browser.text_field(name: "user[password_confirmation]").set("12345678")
-  screenshot("employer_create_account")
-  @browser.input(value: /Create account/).click
-end
-
-Given(/^I have signed up previously through consumer, broker agency or previous visit to the Employer portal$/) do
-end
-
-When(/^I visit the Employer portal to sign in$/) do
-  @browser.goto("http://localhost:3000/")
-  screenshot("employer_start")
-  @browser.a(text: /Employer Portal/).wait_until_present
-  @browser.a(text: /Employer Portal/).click
-end
-
-And(/^I sign in with valid user data$/) do
-  @browser.input(value: /Sign in/).wait_until_present
-  user = FactoryGirl.create(:user)
-  user.build_person(first_name: "John", last_name: "Doe", ssn: "111000999", dob: "10/10/1985")
-  user.save
-
-  @browser.text_field(name: "user[email]").set(user.email)
-  @browser.text_field(name: "user[password]").set(user.password)
-  screenshot("employer_portal_sign_in")
-  @browser.input(value: /Sign in/).click
-end
-
-Then(/^I should see a welcome page with successful sign in message$/) do
+Then(/^.+ should see a welcome page with successful sign in message$/) do
   Watir::Wait.until(30) { @browser.text.include?(/Signed in successfully./) }
   screenshot("employer_portal_sign_in_welcome")
   expect(@browser.text.include?("Signed in successfully.")).to be_truthy
@@ -38,13 +7,13 @@ Then(/^I should see a welcome page with successful sign in message$/) do
   @browser.a(text: /Continue/).click
 end
 
-Then(/^I should see fields to search for person and employer$/) do
+Then(/^.+ should see fields to search for person and employer$/) do
   Watir::Wait.until(30) { @browser.text.include?(/Personal Information/) }
   screenshot("employer_portal_person_search")
   expect(@browser.text.include?(/Personal Information/)).to be_truthy
 end
 
-Then(/^I should see an initial fieldset to enter my name, ssn and dob$/) do
+Then(/^.+ should see an initial fieldset to enter my name, ssn and dob$/) do
   @browser.text_field(name: "person[first_name]").wait_until_present
   @browser.text_field(name: "person[first_name]").set("John")
   @browser.text_field(name: "person[last_name]").set("Doe")
@@ -77,7 +46,7 @@ And(/^My user data from existing the fieldset values are prefilled using data fr
   @browser.button(id: /continue-employer/).click
 end
 
-And(/^I should see a form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
+And(/^.+ should see a form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
   @browser.button(value: /Search Employers/).wait_until_present
   screenshot("employer_portal_employer_search_form")
   @employer_profile = FactoryGirl.create(:employer_profile)
@@ -99,19 +68,19 @@ And(/^I should see a successful creation message$/) do
   expect(@browser.text.include?("Employer successfully created.")).to be_truthy
 end
 
-When(/^I click on an employer in the employer list$/) do
+When(/^.+ click on an employer in the employer list$/) do
   @browser.a(text: /True First Inc/).wait_until_present
   @browser.a(text: /True First Inc/).click
 end
 
-Then(/^I should see the employer information$/) do
+Then(/^.+ should see the employer information$/) do
   @browser.text.include?("True First Inc").wait_until_present
   expect(@browser.text.include?("True First Inc")).to be_truthy
   expect(@browser.text.include?("13101 elm tree dr\nxyz\nDunwoody, GA 30027\n(303) 123-0981 x 1231")).to be_truthy
   expect(@browser.text.include?("Enrollment\nNo Plan Years Found")).to be_truthy
 end
 
-Then(/^I should see the employee family roster$/) do
+Then(/^.+ should see the employee family roster$/) do
   @browser.a(text: /Add Employee/).wait_until_present
   screenshot("employer_census_family")
   expect(@browser.a(text: /Add Employee/).visible?).to be_truthy
@@ -125,7 +94,7 @@ And(/^It should default to active tab$/) do
   expect(@browser.radio(id: "family_all").set?).to be_falsey
 end
 
-Then(/^I should see a form to enter information about employee, address and dependents details$/) do
+Then(/^.+ should see a form to enter information about employee, address and dependents details$/) do
   @browser.element(class: /interaction-click-control-create-employee/).wait_until_present
   screenshot("create_census_employee")
   # Census Employee
@@ -173,7 +142,7 @@ Then(/^I should see a form to enter information about employee, address and depe
   @browser.element(class: /interaction-click-control-create-employee/).click
 end
 
-And(/^I should see employer census family created success message$/) do
+And(/^.+ should see employer census family created success message$/) do
   @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
   Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully created.") }
   screenshot("employer_census_new_family_success_message")
@@ -186,12 +155,12 @@ And(/^I should see employer census family created success message$/) do
   expect(@browser.a(text: /Terminate/).visible?).to be_truthy
 end
 
-When(/^I click on Edit family button for a census family$/) do
+When(/^.+ clicks? on Edit family button for a census family$/) do
   @browser.a(text: /Edit/).wait_until_present
   @browser.a(text: /Edit/).click
 end
 
-When(/^I edit ssn and dob on employee detail page after linked$/) do
+When(/^.+ edits? ssn and dob on employee detail page after linked$/) do
   Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.link_employee_role!
   @browser.button(value: /Update Employee/).wait_until_present
   @browser.text_field(id: /jq_datepicker_ignore_census_employee_dob/).set("01/01/1981")
@@ -200,16 +169,16 @@ When(/^I edit ssn and dob on employee detail page after linked$/) do
 end
 
 
-Then(/^I should see Access Denied$/) do
+Then(/^.+ should see Access Denied$/) do
   @browser.element(text: /Access Denied!/).wait_until_present
   @browser.element(text: /Access Denied!/).visible?
 end
 
-When(/^I go back$/) do
+When(/^.+ go back$/) do
   @browser.execute_script('window.history.back()')
 end
 
-Then(/^I should see a form to update the contents of the census employee$/) do
+Then(/^.+ should see a form to update the contents of the census employee$/) do
   #Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.delink_employee_role!
   @browser.button(value: /Update Employee/).wait_until_present
   @browser.text_field(id: /jq_datepicker_ignore_census_employee_dob/).set("01/01/1980")
@@ -227,19 +196,12 @@ Then(/^I should see a form to update the contents of the census employee$/) do
   @browser.button(value: /Update Employee/).click
 end
 
-And(/^I should see employer census family updated success message$/) do
+And(/^.+ should see employer census family updated success message$/) do
   @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
   Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully updated.") }
 end
 
-And(/^I logout from employer portal$/) do
-  @browser.goto("http://localhost:3000/")
-  @browser.a(text: /Logout/).wait_until_present
-  @browser.a(text: /Logout/).click
-end
-
-
-When(/^I click on terminate button for a census family$/) do
+When(/^.+ clicks on terminate button for a census family$/) do
   # ce = Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.dup
   # ce.save
   @browser.a(text: /Terminate/).wait_until_present
@@ -252,7 +214,7 @@ When(/^I click on terminate button for a census family$/) do
   @browser.a(text: /Submit/).click
 end
 
-When(/^I click on terminate button for rehired census employee$/) do
+When(/^.+ clicks on terminate button for rehired census employee$/) do
   @browser.a(text: /Terminate/).wait_until_present
   @browser.execute_script("$('.interaction-click-control-terminate').last().trigger('click')")
   terminated_date = (TimeKeeper.date_of_record + 60.days).strftime("%m/%d/%Y")
@@ -276,11 +238,11 @@ Then(/^The census family should be terminated and move to terminated tab$/) do
   #@browser.a(text: /Rehire/).wait_until_present
 end
 
-And(/^I should see the census family is successfully terminated message$/) do
+And(/^.+ should see the census family is successfully terminated message$/) do
   Watir::Wait.until(30) {  @browser.text.include?("Successfully terminated family.") }
 end
 
-When(/^I click on Rehire button for a census family on terminated tab$/) do
+When(/^.+ clicks? on Rehire button for a census family on terminated tab$/) do
   # Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.where(aasm_state: "employment_terminated").update(name_sfx: "Sr", first_name: "Polly")
   @browser.a(text: /Rehire/).wait_until_present
   @browser.a(text: /Rehire/).click
@@ -303,24 +265,24 @@ Then(/^A new instance of the census family should be created$/) do
   expect(@browser.a(text: /Terminate/).visible?).to be_truthy
 end
 
-And(/^I should see the census family is successfully rehired message$/) do
+And(/^.+ should see the census family is successfully rehired message$/) do
   Watir::Wait.until(30) {  @browser.text.include?("Successfully rehired family.") }
 end
 
 
-When(/^I go to the benefits tab I should see plan year information$/) do
+When(/^.+ go[es]+ to the benefits tab I should see plan year information$/) do
   @browser.a(text: /Benefits/).wait_until_present
   @browser.a(text: /Benefits/).click
 end
 
 
-And(/^I should see a button to create new plan year$/) do
+And(/^.+ should see a button to create new plan year$/) do
   @browser.a(text: /Add Plan Year/).wait_until_present
   screenshot("employer_plan_year")
   @browser.a(text: /Add Plan Year/).click
 end
 
-And(/^I should be able to enter plan year, benefits, relationship benefits with high FTE$/) do
+And(/^.+ should be able to enter plan year, benefits, relationship benefits with high FTE$/) do
 #Plan Year
   @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").wait_until_present
   screenshot("employer_add_plan_year")
@@ -364,7 +326,7 @@ And(/^I should be able to enter plan year, benefits, relationship benefits with 
   @browser.button(value: /Create Plan Year/).click
 end
 
-And(/^I should see a success message after clicking on create plan year button$/) do
+And(/^.+ should see a success message after clicking on create plan year button$/) do
   @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
   Watir::Wait.until(30) {  @browser.text.include?("Plan Year successfully created.") }
   screenshot("employer_plan_year_success_message")
@@ -372,7 +334,7 @@ And(/^I should see a success message after clicking on create plan year button$/
   # Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.plan_years.first.update(start_on: '2015-01-01', end_on: '2015-12-31', open_enrollment_start_on: '2014-11-01', open_enrollment_end_on: '2014-11-30')
 end
 
-When(/^I enter filter in plan selection page$/) do
+When(/^.+ enters filter in plan selection page$/) do
   Watir::Wait.until(30) { @browser.element(text: /Filter Results/).present? }
   # @browser.a(text: /All Filters/).wait_until_present
   # @browser.a(text: /All Filters/).click
@@ -381,7 +343,7 @@ When(/^I enter filter in plan selection page$/) do
   @browser.element(class: /apply-btn/, text: /Apply/).click
 end
 
-When(/^I enter hsa_compatible filter in plan selection page$/) do
+When(/^.+ enters? hsa_compatible filter in plan selection page$/) do
   select_carrier = @browser.div(class: /selectric-plan-carrier-selection-filter/)
   select_carrier.click
   select_carrier.li(text: /CareFirst/).click
@@ -394,7 +356,7 @@ When(/^I enter hsa_compatible filter in plan selection page$/) do
   scroll_then_click(@browser.element(class: /apply-btn/, text: /Apply/))
 end
 
-When(/^I enter combined filter in plan selection page$/) do
+When(/^.+ enters? combined filter in plan selection page$/) do
   #@browser.a(text: /All Filters/).wait_until_present
   #@browser.a(text: /All Filters/).click
   # @browser.checkboxes(class: /plan-type-selection-filter/).first.wait_until_present
@@ -418,7 +380,7 @@ When(/^I enter combined filter in plan selection page$/) do
   @browser.element(class: /apply-btn/, text: /Apply/).click
 end
 
-Then(/^I should see the hsa_compatible filter results$/) do
+Then(/^.+ should see the hsa_compatible filter results$/) do
   @browser.divs(class: /plan-row/).select(&:visible?).first do |plan|
     expect(plan.text.include?("BlueChoice Plus $2000")).to eq true
     expect(plan.text.include?("Silver")).to eq true
@@ -426,7 +388,7 @@ Then(/^I should see the hsa_compatible filter results$/) do
   end
 end
 
-Then(/^I should see the combined filter results$/) do
+Then(/^.+ should see the combined filter results$/) do
   @browser.divs(class: /plan-row/).select(&:visible?).first do |plan|
     expect(plan.text.include?("BlueChoice Plus HSA/HRA $3500")).to eq true
     expect(plan.text.include?("Bronze")).to eq true
@@ -434,21 +396,21 @@ Then(/^I should see the combined filter results$/) do
   end
 end
 
-When(/^I go to the benefits tab$/) do
+When(/^.+ go(?:es)? to the benefits tab$/) do
   @browser.element(class: /interaction-click-control-benefits/).wait_until_present
   @browser.element(class: /interaction-click-control-benefits/).click
 end
 
-Then(/^I should see the plan year$/) do
+Then(/^.+ should see the plan year$/) do
   @browser.element(class: /interaction-click-control-publish-plan-year/).wait_until_present
 end
 
-When(/^I click on publish plan year$/) do
+When(/^.+ clicks? on publish plan year$/) do
   @browser.element(class: /interaction-click-control-publish-plan-year/).wait_until_present
   @browser.element(class: /interaction-click-control-publish-plan-year/).click
 end
 
-Then(/^I should see Publish Plan Year Modal with warnings$/) do
+Then(/^.+ should see Publish Plan Year Modal with warnings$/) do
 
   @browser.element(class: /modal-body/).wait_until_present
 
@@ -458,25 +420,25 @@ Then(/^I should see Publish Plan Year Modal with warnings$/) do
   expect(warnings.element(text: /number of full time equivalents (FTEs) exceeds maximum allowed/i)).to be_truthy
 end
 
-Then(/^I click on the Cancel button$/) do
+Then(/^.+ clicks? on the Cancel button$/) do
   modal = @browser.div(class: 'modal-dialog')
   modal.a(class: 'interaction-click-control-cancel').click
 end
 
-Then(/^I should be on the Plan Year Edit page with warnings$/) do
+Then(/^.+ should be on the Plan Year Edit page with warnings$/) do
   @browser.element(id: /plan_year/).present?
   warnings= @browser.div(class: 'alert-plan-year')
   # TODO:  Add visible? to the next line.  This test is not valid.
   expect(warnings.element(text: /number of full time equivalents (FTEs) exceeds maximum allowed/i)).to be_truthy
 end
 
-Then(/^I update the FTE field with valid input and save plan year$/) do
+Then(/^.+ updates? the FTE field with valid input and save plan year$/) do
   @browser.button(class: /interaction-click-control-save-plan-year/).wait_until_present
   @browser.text_field(name: "plan_year[fte_count]").set("10")
   scroll_then_click(@browser.button(class: /interaction-click-control-save-plan-year/))
 end
 
-Then(/^I should see a plan year successfully saved message$/) do
+Then(/^.+ should see a plan year successfully saved message$/) do
   @browser.element(class: /mainmenu/).wait_until_present
   # TODO:  Add visible? to the next line.  This test is not valid.
   expect(@browser.element(text: /Plan Year successfully saved/)).to be_truthy
