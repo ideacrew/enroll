@@ -241,11 +241,6 @@ Then(/^Primary Broker creates and publishes a plan year$/) do
   click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))
 end
 
-Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
-  person = people[named_person]
-  create_roster_employee(person)
-end
-
 Then(/^.+ sees employer census family created$/) do
   wait_and_confirm_text(/successfully created/)
 end

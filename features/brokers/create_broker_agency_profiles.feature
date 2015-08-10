@@ -17,11 +17,11 @@ Feature: Create Primary Broker and Broker Agency
         Then Primary Broker should see the New Broker Agency form
         When Primary Broker enters personal information
         And Primary Broker enters broker agency information
-        And Primary Broker enters office locations information
+        And Primary Broker enters office location for default_office_location
         And Primary Broker clicks on Create Broker Agency
         Then Primary Broker should see broker registration successful message
 
-    Then Hbx Admin logs on to the Hbx Portal
+    When Hbx Admin logs on to the Hbx Portal
         And Hbx Admin clicks on the Brokers tab
         Then Hbx Admin should see the list of broker applicants
         When Hbx Admin clicks on the current broker applicant show button
@@ -30,7 +30,7 @@ Feature: Create Primary Broker and Broker Agency
         Then Hbx Admin should see the broker successfully approved message
         And Hbx Admin logs out
 
-    And Primary Broker should receive an invitation email
+    Then Primary Broker should receive an invitation email
         When Primary Broker visits invitation url in email
         Then Primary Broker should see the login page
         When Primary Broker clicks on Create Account
