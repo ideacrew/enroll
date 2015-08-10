@@ -13,66 +13,65 @@ Feature: Create Employer
     Scenario: An Employer Representative has not signed up on the HBX
       Given Employer has not signed up as an HBX user
       When I visit the Employer portal
-      Then John Doe creates an HBX account
-      Then I should see a successful sign up message
-        Then John Doe creates a new employer profile
-        When I go to the Profile tab
-        Then I should see Edit Details link
-      When Employer goes to the benefits tab I should see plan year information
-        And Employer should see a button to create new plan year
-        And Employer should be able to enter plan year, benefits, relationship benefits with high FTE
-        And Employer should see a success message after clicking on create plan year button
-      When Employer clicks on the Employees tab
-      Then Employer should see the employee family roster
-        And It should default to active tab
-      When Employer clicks on the add employee button
-      Then Employer should see a form to enter information about employee, address and dependents details
-        And Employer should see employer census family created success message
-      And Employer clicks on Edit family button for a census family
-      Then Employer should see a form to update the contents of the census employee
-        And Employer should see employer census family updated success message
-      When Employer goes to the benefits tab
-      Then Employer should see the plan year
-      When Employer clicks on publish plan year
-      Then Employer should see Publish Plan Year Modal with warnings
-      When Employer clicks on the Cancel button
-      Then Employer should be on the Plan Year Edit page with warnings
-      When Employer updates the FTE field with valid input and save plan year
+        Then John Doe creates an HBX account
+        Then I should see a successful sign up message
+          Then John Doe creates a new employer profile
+          When I go to the Profile tab
+          Then I should see Edit Details link
+        When Employer goes to the benefits tab I should see plan year information
+          And Employer should see a button to create new plan year
+          And Employer should be able to enter plan year, benefits, relationship benefits with high FTE
+          And Employer should see a success message after clicking on create plan year button
+        When Employer clicks on the Employees tab
+        Then Employer should see the employee family roster
+          And It should default to active tab
+        When Employer clicks on the add employee button
+        Then Employer should see a form to enter information about employee, address and dependents details
+          And Employer should see employer census family created success message
+        And Employer clicks on Edit family button for a census family
+        Then Employer should see a form to update the contents of the census employee
+          And Employer should see employer census family updated success message
+        When Employer goes to the benefits tab
+        Then Employer should see the plan year
+        When Employer clicks on publish plan year
+        Then Employer should see Publish Plan Year Modal with warnings
+        When Employer clicks on the Cancel button
+        Then Employer should be on the Plan Year Edit page with warnings
+        When Employer updates the FTE field with valid input and save plan year
+        Then Employer should see a plan year successfully saved message
+        When Employer goes to the benefits tab I should see plan year information
+        Then Employer clicks on publish plan year
+        Then Employer should see a published success message
+        When Employer logs out
 
-      Then Employer should see a plan year successfully saved message
-      When Employer goes to the benefits tab I should see plan year information
-      Then Employer clicks on publish plan year
-      Then Employer should see a published success message
-
-      When Employer logs out
       Given Employee has not signed up as an HBX user
-      When I go to the employee account creation page
-      Then Patrick Doe creates an HBX account
-      Then Patrick Doe should be logged on as an unlinked employee
-      When Employee go to register as an employee
-      Then Employee should see the employee search page
-      When Employee enters the identifying info of Patrick Doe
-      Then Employee should see the matching employee record form
-      When Employee accepts the matched employer
-      When Employee completes the matched employee form for Patrick Doe
-      Then Employee should see the dependents page
-      Then Employee should see 1 dependent
-      When Employee clicks continue on the dependents page
-      Then Employee should see the group selection page
-      When Employee clicks continue on the group selection page
-      Then Employee should see the plan shopping welcome page
-      Then Employee should see the list of plans
-      When Employee enters filter in plan selection page
-      When Employee enters combined filter in plan selection page
-      Then Employee should see the combined filter results
-      When Employee enters hsa_compatible filter in plan selection page
-      Then Employee should see the hsa_compatible filter results
-      When Employee selects a plan on the plan shopping page
-      Then Employee should see the coverage summary page
-      When Employee clicks on purchase button on the coverage summary page
-      Then Employee should see the receipt page
-      Then Employee should see the "my account" page
-      When Employee visits consumer profile homepage
-      Then Employee should see the "YOUR LIFE EVENTS" section
-      When Employee clicks on the tab for plans
-      Then Employee should see my plan
+        When I go to the employee account creation page
+        Then Patrick Doe creates an HBX account
+        Then Patrick Doe should be logged on as an unlinked employee
+        When Employee go to register as an employee
+        Then Employee should see the employee search page
+        When Employee enters the identifying info of Patrick Doe
+        Then Employee should see the matching employee record form
+        When Employee accepts the matched employer
+        When Employee completes the matched employee form for Patrick Doe
+        Then Employee should see the dependents page
+        Then Employee should see 1 dependent
+        When Employee clicks continue on the dependents page
+        Then Employee should see the group selection page
+        When Employee clicks continue on the group selection page
+        Then Employee should see the plan shopping welcome page
+        Then Employee should see the list of plans
+        When Employee enters filter in plan selection page
+        When Employee enters combined filter in plan selection page
+        Then Employee should see the combined filter results
+        When Employee enters hsa_compatible filter in plan selection page
+        Then Employee should see the hsa_compatible filter results
+        When Employee selects a plan on the plan shopping page
+        Then Employee should see the coverage summary page
+        When Employee clicks on purchase button on the coverage summary page
+        Then Employee should see the receipt page
+        Then Employee should see the "my account" page
+        When Employee visits consumer profile homepage
+        Then Employee should see the "YOUR LIFE EVENTS" section
+        When Employee clicks on the tab for plans
+        Then Employee should see my plan

@@ -1,4 +1,4 @@
-When(/^Primary Broker visits the HBX Broker Registration form$/) do
+When(/^.+ visits the HBX Broker Registration form$/) do
   @browser.goto("http://localhost:3000/")
   @browser.element(class: /interaction-click-control-broker-registration/).wait_until_present
   @browser.element(class: /interaction-click-control-broker-registration/).click
@@ -241,38 +241,9 @@ Then(/^Primary Broker creates and publishes a plan year$/) do
   click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))
 end
 
-Then(/^Primary Broker creates a roster employee$/) do
-  @browser.text_field(class: /interaction-field-control-census-employee-first-name/).wait_until_present
-  @browser.element(class: /interaction-click-control-create-employee/).wait_until_present
-  screenshot("create_census_employee")
-  @browser.text_field(class: /interaction-field-control-census-employee-first-name/).set("Broker")
-  @browser.text_field(class: /interaction-field-control-census-employee-last-name/).set("Assisted")
-  @browser.text_field(name: "jq_datepicker_ignore_census_employee[dob]").set('05/02/1976')
-  #@browser.text_field(class: /interaction-field-control-census-employee-dob/).set("01/01/1980")
-  @browser.text_field(class: /interaction-field-control-census-employee-ssn/).set("761234567")
-  #@browser.radio(class: /interaction-choice-control-value-radio-male/).set
-  @browser.radio(id: /radio_male/).fire_event("onclick")
-  @browser.text_field(name: "jq_datepicker_ignore_census_employee[hired_on]").set((Time.now-1.week).strftime('%m/%d/%Y'))
-  #@browser.text_field(class: /interaction-field-control-census-employee-hired-on/).set("10/10/2014")
-  @browser.checkbox(class: /interaction-choice-control-value-census-employee-is-business-owner/).set
-  input_field = @browser.divs(class: /selectric-wrapper/).first
-  input_field.click
-  click_when_present(input_field.lis()[1])
-  # Address
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-1/).set("1026 Potomac")
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-address-2/).set("apt abc")
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-city/).set("Alpharetta")
-  select_state = @browser.divs(text: /SELECT STATE/).last
-  select_state.click
-  scroll_then_click(@browser.li(text: /GA/))
-  @browser.text_field(class: /interaction-field-control-census-employee-address-attributes-zip/).set("30228")
-  email_kind = @browser.divs(text: /SELECT KIND/).last
-  email_kind.click
-  @browser.li(text: /home/).click
-  @browser.text_field(class: /interaction-field-control-census-employee-email-attributes-address/).set("broker.assist@dc.gov")
-  screenshot("broker_create_census_employee_with_data")
-  @browser.element(class: /interaction-click-control-create-employee/).click
+Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
+  person = people[named_person]
+  create_roster_employee(person)
 end
 
 Then(/^.+ sees employer census family created$/) do

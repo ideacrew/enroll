@@ -80,69 +80,6 @@ Then(/^.+ should see the employee search page$/) do
   expect(@browser.text_field(class: /interaction-field-control-person-first-name/).visible?).to be_truthy
 end
 
-def people
-  {
-    "Soren White" => {
-      first_name: "Soren",
-      last_name: "White",
-      dob: "08/13/1979",
-      ssn: "670991234",
-      home_phone: "2025551234", 
-      email: 'soren@dc.gov',
-      password: '12345678',
-      legal_name: "Acme Inc.",
-      dba: "Acme Inc.",
-      fein: "764141112"
-    },
-    "Patrick Doe" => {
-      first_name: "Patrick",
-      last_name: "Doe",
-      dob: "01/01/1980",
-      ssn: "786120965",
-      email: 'patrick.doe@dc.gov',
-      password: '12345678'
-    },
-    "Broker Assisted" => {
-      first_name: 'Broker',
-      last_name: 'Assisted',
-      dob: "05/02/1976",
-      ssn: "761234567",
-      email: 'broker.assisted@dc.gov',
-      password: '12345678'
-    },
-    "Hbx Admin" => {
-      email: 'admin@dc.gov',
-      password: 'password'
-    },
-    "Primary Broker" => {
-      email: 'ricky.martin@example.com',
-      password: '12345678'
-    },
-    "John Doe" => {
-      first_name: "John",
-      last_name: "Doe",
-      dob: "10/11/1985",
-      legal_name: "Turner Agency, Inc",
-      dba: "Turner Agency, Inc",
-      fein: '123456999',
-      ssn: '111000999',
-      email: 'john.doe@example.com',
-      password: '12345678'
-
-    },
-    "Tim Wood" => {
-      first_name: "Tim",
-      last_name: "Wood",
-      dob: "08/13/1979",
-      legal_name: "Legal LLC",
-      dba: "Legal LLC",
-      fein: "890000223",
-      email: 'tim.wood@example.com',
-      password: '12345678'
-    },
-  }
-end
-
 When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   log_on(people[named_person], portal)
 end  
