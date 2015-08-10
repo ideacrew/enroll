@@ -64,14 +64,12 @@ class ConsumerRole
 
   field :aasm_state, type: String, default: "identity_unverified"
   field :identity_verified_date, type: Date
-  field :identity_verified_evidences, type: Array, default: []
   field :identity_final_decision_code, type: String
   field :identity_response_code, type: String
   field :identity_response_description_text, type: String
 
   field :vlp_verified_state, type: String, default: "identity_unverified"
   field :vlp_verified_date, type: Date
-  field :vlp_evidences, type: Array, default: []
   field :vlp_authority, type: String
   field :vlp_document_id, type: String
 
@@ -93,6 +91,8 @@ class ConsumerRole
   delegate :race,               :race=,              to: :person, allow_nil: true
   delegate :ethnicity,          :ethnicity=,         to: :person, allow_nil: true
   delegate :is_disabled,        :is_disabled=,       to: :person, allow_nil: true
+
+  embeds_many :documents, as: :documentable
 
   validates_presence_of :ssn, :dob, :gender, :is_applicant
 
