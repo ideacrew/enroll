@@ -372,6 +372,7 @@ module ApplicationHelper
     non_owner = plan_year.non_business_owner_enrollment_count
     covered = plan_year.covered_count
     waived = plan_year.waived_count
+    p_min = 0 if p_min.nil?
 
     unless eligible.zero?
       condition = (eligible <= 2) ? ((enrolled > (eligible - 1)) && (non_owner > 0)) : ((enrolled >= p_min) && (non_owner > 0))
@@ -407,5 +408,12 @@ module ApplicationHelper
     return false if current_user.roles.include?("hbx_staff") # can edit, employer census roster
     return true if object.try(:employee_role_linked?)  # cannot edit, employer census roster
     return !(object.new_record? or object.try(:eligible?)) # employer census roster
+  end
+
+  def calculate_participation_minimum
+    if @current_plan_year.present?
+      return 0 if @current_plan_year.eligible_to_enroll_count == 0
+      return ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
+    end
   end
 end

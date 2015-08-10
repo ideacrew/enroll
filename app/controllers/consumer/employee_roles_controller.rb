@@ -87,6 +87,26 @@ class Consumer::EmployeeRolesController < ApplicationController
     end
   end
 
+  def new_message_to_broker
+    @person = current_user.person
+    @family = @person.primary_family
+    @hbx_enrollment = (@family.latest_household.try(:hbx_enrollments).active || []).last
+    @employee_role = @person.employee_roles.first
+    @employer_profile = @employee_role.employer_profile
+    @broker_agency_accounts = @employer_profile.broker_agency_accounts
+    @broker = @broker_agency_accounts.first.writing_agent
+  end
+
+  def send_message_to_broker
+    @person = current_user.person
+    @employee_role = @person.employee_roles.first
+    @employer_profile = @employee_role.employer_profile
+    @broker_agency_accounts = @employer_profile.broker_agency_accounts
+    @broker = @broker_agency_accounts.first.writing_agent
+    UserMailer.message_to_broker(@person, @broker, params).deliver_now
+    redirect_to insured_plan_shopping_path(:id => params[:hbx_enrollment_id])
+  end
+
   def build_nested_models
     ["home","mobile","work","fax"].each do |kind|
       @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?

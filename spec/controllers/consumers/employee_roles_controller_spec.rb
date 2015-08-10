@@ -46,6 +46,75 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
       end
     end
   end
+
+  describe "message to broker" do
+    let(:user) { double("User", email: "test1@example.com") }
+    let(:person) { double("Person", full_name: "test test") }
+    let(:employee_role) { double("EmployeeRole") }
+    let(:employer_profile) { double("EmployerProfile") }
+    let(:broker_role) { double(
+      "BrokerRole",
+      email_address: "test@example.com"
+      ) }
+    let(:broker_agency_account) { double("BrokerAgencyAccount", writing_agent: broker_role) }
+    let(:broker_agency_accounts) { [broker_agency_account] }
+    let(:employee_roles) { [employee_role] }
+    let(:family) { double("Family") }
+    let(:household) { double("Household") }
+    let(:hbx_enrollment) { double("HbxEnrollment", id: double("id"))}
+    let(:hbx_enrollments) {double(:active => [hbx_enrollment])}
+    before do
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:employee_roles).and_return(employee_roles)
+      allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
+      allow(employer_profile).to receive(:broker_agency_accounts).and_return(broker_agency_accounts)
+    end
+    context "message to broker" do
+      it "NEW, should intialize new message form" do
+        allow(person).to receive(:primary_family).and_return(family)
+        allow(family).to receive(:latest_household).and_return(household)
+        allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+        sign_in user
+        xhr :get, :new_message_to_broker
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("new_message_to_broker")
+      end
+      it "POST, send_message_to_broker" do
+        allow(person).to receive(:user).and_return(user)
+        allow(broker_role).to receive(:person).and_return(person)
+        sign_in user
+        post :send_message_to_broker, hbx_enrollment_id: hbx_enrollment.id
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(insured_plan_shopping_path(:id => hbx_enrollment.id))
+      end
+    end
+  end
+
+  describe "PUT update" do
+    let(:user) { double("User") }
+    let(:person) { double("Person") }
+    let(:census_employee) { double("CensusEmployee") }
+    let(:address) { double("Address") }
+    let(:addresses) { [address] }
+    let(:employee_role) { double("EmployeeRole", id: double("id")) }
+    let(:family) { double("Family") }
+    let(:id){ EmployeeRole.new.id }
+    it "should render edit template" do
+      allow(EmployeeRole).to receive(:find).and_return(employee_role)
+      allow(user).to receive(:person).and_return(person)
+      allow(Forms::EmployeeRole).to receive(:new).and_return(person)
+      allow(employee_role).to receive(:new_census_employee).and_return(census_employee)
+      allow(census_employee).to receive(:address).and_return(address)
+      allow(person).to receive(:addresses).and_return(addresses)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(controller).to receive(:build_nested_models).and_return(true)
+      sign_in user
+      get :edit, id: employee_role.id
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:edit)
+    end
+  end
+
   describe "POST create" do
     let(:person) { Person.new }
     let(:hired_on) { double }

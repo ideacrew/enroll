@@ -1,11 +1,12 @@
 class ConsumerRole
   include Mongoid::Document
   include Mongoid::Timestamps
-  # include AASM
+  include AASM
 
   embedded_in :person
 
-  CITIZEN_STATUS_KINDS = %W[
+  VLP_AUTHORITY_KINDS = %w(ssa dhs hbx)
+  CITIZEN_STATUS_KINDS = %w(
       us_citizen
       naturalized_citizen
       alien_lawfully_present
@@ -13,43 +14,95 @@ class ConsumerRole
       indian_tribe_member
       undocumented_immigrant
       not_lawfully_present_in_us
-  ]
+  )
 
-  field :ethnicity, type: String
-  field :race, type: String
-  field :birth_location, type: String
-  field :marital_status, type: String
+  ACA_ELIGIBLE_CITIZEN_STATUS_KINDS = %W(
+      us_citizen
+      naturalized_citizen
+      indian_tribe_member
+  )
+
+  ## Verified Lawful Presence (VLP)
+
+  # Alien number (A Number):  9 character string
+  # CitizenshipNumber:        7-12 character string
+  # I-94:                     11 character string
+  # NaturalizationNumber:     7-12 character string
+  # PassportNumber:           6-12 character string
+  # ReceiptNumber:            13 character string, first 3 alpha, remaining 10 string
+  # SevisID:                  11 digit string, first char is "N"
+  # VisaNumber:               8 character string
+
+  VLP_DOCUMENT_IDENTIFICATION_KINDS = [
+      "A Number",
+      "I-94 Number",
+      "SEVIS ID",
+      "Visa Number",
+      "Passport Number",
+      "Receipt Number",
+      "Naturalization Number",
+      "Citizenship Number"
+    ]
+
+  VLP_DOCUMENT_KINDS = [
+      "I-327 (Reentry Permit)",
+      "I-551 (Permanent Resident Card)",
+      "I-571 (Refugee Travel Document)",
+      "I-766 (Employment Authorization Card)",
+      "Certificate of Citizenship",
+      "Naturalization Certificate",
+      "Machine Readable Immigrant Visa (with Temporary I-551 Language)",
+      "Temporary I-551 Stamp (on passport or I-94)",
+      "I-94 (Arrival/Departure Record)",
+      "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport",
+      "Unexpired Foreign Passport",
+      "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)",
+      "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)"
+    ]
+
+  # FiveYearBarApplicabilityIndicator ??
+
+  field :aasm_state, type: String, default: "identity_unverified"
+  field :identity_verified_date, type: Date
+  field :identity_verified_evidences, type: Array, default: []
+  field :identity_final_decision_code, type: String
+  field :identity_response_code, type: String
+  field :identity_response_description_text, type: String
+
+  field :vlp_verified_state, type: String, default: "identity_unverified"
+  field :vlp_verified_date, type: Date
+  field :vlp_evidences, type: Array, default: []
+  field :vlp_authority, type: String
+  field :vlp_document_id, type: String
 
   field :citizen_status, type: String
   field :is_state_resident, type: Boolean
-  field :is_incarcerated, type: Boolean
-  field :is_applicant, type: Boolean
-  field :is_disabled, type: Boolean
 
-  field :is_tobacco_user, type: String, default: "unknown"
-  field :language_code, type: String
-
-  field :application_state, type: String
+  field :is_applicant, type: Boolean  # Consumer is applying for benefits coverage
+  field :birth_location, type: String
+  field :marital_status, type: String
   field :is_active, type: Boolean, default: true
 
-  ## Move these to Family model
-  # # Writing agent credited for enrollment and transmitted on 834
-  # field :writing_agent_id, type: BSON::ObjectId
-
-  # # Agency representing this employer
-  # field :broker_agency_id, type: BSON::ObjectId
-
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
-  delegate :ssn, :ssn=, to: :person, allow_nil: true
-  delegate :dob, :dob=, to: :person, allow_nil: true
+  delegate :ssn,    :ssn=,    to: :person, allow_nil: true
+  delegate :dob,    :dob=,    to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
-  validates_presence_of :ssn, :dob, :gender, :is_incarcerated, :is_applicant, :is_state_resident, :citizen_status
+  delegate :is_incarcerated,    :is_incarcerated=,   to: :person, allow_nil: true
+
+  delegate :race,               :race=,              to: :person, allow_nil: true
+  delegate :ethnicity,          :ethnicity=,         to: :person, allow_nil: true
+  delegate :is_disabled,        :is_disabled=,       to: :person, allow_nil: true
+
+  validates_presence_of :ssn, :dob, :gender, :is_applicant
+
+  validates :vlp_authority,
+    allow_blank: true,
+    inclusion: { in: VLP_AUTHORITY_KINDS, message: "%{value} is not a valid identity authority" }
 
   validates :citizen_status,
-    inclusion: { in: ConsumerRole::CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" },
-    allow_blank: false
-
+    allow_blank: true,
+    inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
 
   scope :all_under_age_twenty_six, ->{ gt(:'dob' => (Date.today - 26.years))}
   scope :all_over_age_twenty_six,  ->{lte(:'dob' => (Date.today - 26.years))}
@@ -58,33 +111,21 @@ class ConsumerRole
   scope :all_over_or_equal_age, ->(age) {lte(:'dob' => (Date.today - age.years))}
   scope :all_under_or_equal_age, ->(age) {gte(:'dob' => (Date.today - age.years))}
 
+  alias_method :is_state_resident?, :is_state_resident
+  alias_method :is_incarcerated?,   :is_incarcerated
+
+  def is_aca_enrollment_eligible?
+    is_hbx_enrollment_eligible? && 
+    Person::ACA_ELIGIBLE_CITIZEN_STATUS_KINDS.include?(citizen_status)
+  end
+
+  def is_hbx_enrollment_eligible?
+    is_state_resident? && !is_incarcerated?
+  end
+
   def parent
     raise "undefined parent: Person" unless person?
     self.person
-  end
-
-  # belongs_to writing agent (broker_role)
-  def writing_agent=(new_writing_agent)
-    raise ArgumentError.new("expected BrokerRole class") unless new_writing_agent.is_a? BrokerRole
-    self.new_writing_agent_id = new_writing_agent._id
-    @writing_agent = new_writing_agent
-  end
-
-  def writing_agent
-    return @writing_agent if defined? @writing_agent
-    @writing_agent = BrokerRole.find(self.writing_agent_id) unless writing_agent_id.blank?
-  end
-
-  # belongs_to BrokerAgencyProfile
-  def broker_agency_profile=(new_broker_agency)
-    raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency.is_a? BrokerAgencyProfile
-    self.broker_agency_id = new_broker_agency._id
-    @broker_agency_profile = new_broker_agency
-  end
-
-  def broker_agency_profile
-    return @broker_agency_profile if defined? @broker_agency_profile
-    @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_id) unless broker_agency_id.blank?
   end
 
   def families
@@ -116,24 +157,70 @@ class ConsumerRole
     @person_find = Person.where("consumer_role._id" => consumer_role_id).first.consumer_role unless consumer_role_id.blank?
   end
 
-
-
-  # aasm column: "application_state" do
-  #   state :enrollment_closed, initial: true
-  #   state :open_enrollment_period
-  #   state :special_enrollment_period
-  #   state :open_and_special_enrollment_period
-
-  #   event :open_enrollment do
-  #     transitions from: :open_enrollment_period, to: :open_enrollment_period
-  #     transitions from: :special_enrollment_period, to: :open_and_special_enrollment_period
-  #     transitions from: :open_and_special_enrollment_period, to: :open_and_special_enrollment_period
-  #     transitions from: :enrollment_closed, to: :open_enrollment_period
-  #   end
-  # end
-
   def is_active?
     self.is_active
   end
+
+  # RIDP and Verify Lawful Presence workflow.  IVL Consumer primary applicant must be in identity_verified state 
+  # to proceed with application.  Each IVL Consumer enrolled for benefit coverage must (eventually) pass 
+
+  aasm do
+    state :identity_unverified, initial: true
+    state :identity_verified
+    state :identity_followup_pending
+    state :identity_invalid
+    state :lawful_presence_verified
+    state :fdsh_service_error
+    state :lawful_presence_followup_pending
+    state :not_lawfully_present
+
+    event :verify_identity do
+      transitions from: [:identity_unverified, :identity_followup_pending], to: :identity_verified, :guard => :identity_verification_success?
+      transitions from: :identity_unverified, to: :identity_followup_pending, :guard => :identity_verification_pending?
+    end
+
+    event :import_identity, :guard => :identity_metadata_provided? do
+      transitions from: :identity_unverified, to: :identity_verified, :guard => :identity_verification_success?
+      transitions from: :identity_unverified, to: :identity_followup_pending, :guard => :identity_verification_pending?
+    end
+
+    event :verify_lawful_presence do
+      transitions from: :identity_verified, to: :lawful_presence_verified
+      transitions from: :identity_verified, to: :fdsh_service_error
+      transitions from: :identity_verified, to: :not_lawfully_present
+    end
+
+    event :retry_fdsh_service do
+      transitions from: :fdsh_service_error, to: :lawful_presence_followup_pending
+      transitions from: :fdsh_service_error, to: :lawful_presence_verified, :guard => :identity_verification_success?
+      transitions from: :fdsh_service_error, to: :not_lawfully_present
+    end
+
+    event :submit_documentation do
+      transitions from: :not_lawfully_present, to: :lawful_presence_followup_pending
+    end
+
+    event :grant_vlp_status do
+      transitions from: :lawful_presence_followup_pending, to: :lawful_presence_verified
+    end
+
+    event :deny_vlp_status do
+      transitions from: :lawful_presence_followup_pending, to: :not_lawfully_present
+    end
+  end
+
+private
+  def identity_verification_success?
+    identity_final_decision_code.to_s.downcase == "acc"
+  end
+
+  def identity_verification_pending?
+    identity_final_decision_code.to_s.downcase == "ref" && identity_response_code.present?
+  end
+
+  def identity_metadata_provided?
+    identity_final_decision_code.present? && identity_response_code.present?
+  end
+
 
 end
