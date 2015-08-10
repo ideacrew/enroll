@@ -73,6 +73,12 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def show
     set_show_variables
+    if @current_plan_year.present?
+      enrollments = HbxEnrollment.covered(@current_plan_year.hbx_enrollments)
+      @premium_amt_total = enrollments.map(&:total_premium).sum
+      @employee_cost_total = enrollments.map(&:total_employee_cost).sum
+      @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
+    end
   end
 
   def show_profile
@@ -166,14 +172,6 @@ class Employers::EmployerProfilesController < ApplicationController
       if @tab != 'employees' && @tab != 'families'
         @current_plan_year = @employer_profile.published_plan_year
         @plan_years = @employer_profile.plan_years.order(id: :desc)
-
-        if @current_plan_year.present?
-          if @current_plan_year.eligible_to_enroll_count == 0
-            @participation_minimum = 0
-          else
-            @participation_minimum = ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
-          end
-        end
         @broker_agency_accounts = @employer_profile.broker_agency_accounts
       end
 

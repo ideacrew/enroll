@@ -16,6 +16,8 @@ Feature: Create Employer
       Then John Doe creates an HBX account
       Then I should see a successful sign up message
         Then John Doe creates a new employer profile
+        When I go to the Profile tab
+        Then I should see Edit Details link
       When Employer goes to the benefits tab I should see plan year information
         And Employer should see a button to create new plan year
         And Employer should be able to enter plan year, benefits, relationship benefits with high FTE

@@ -6,7 +6,7 @@
       <div class="page-header"><h4>Selected Plan</h4></div>
       <%= display_carrier_logo(@plan.carrier_profile, {width: 180}) %>
       <h3 class="text-blue"><%= @plan.name %></h3>
-      <p><%= (Caches::MongoidCache.lookup(CarrierProfile, @plan.carrier_profile_id) { @plan.carrier_profile} ).dba %></p>
+      <p><%= (Caches::MongoidCache.lookup(CarrierProfile, @plan.carrier_profile_id) { @plan.carrier_profile} ).legal_name %></p>
       <ul class="plan-type">
         <% plan_level = @plan.metal_level.humanize %>
         <li class="<%= plan_level.downcase %>"><small>Level</small><br><i class="fa fa-circle-o"></i> <%= plan_level.humanize %></li>

@@ -269,6 +269,15 @@ And(/^.+ should see the census family is successfully rehired message$/) do
   Watir::Wait.until(30) {  @browser.text.include?("Successfully rehired family.") }
 end
 
+When(/^I go to the Profile tab$/) do
+  @browser.a(text: /Profile/).wait_until_present
+  @browser.a(text: /Profile/).click
+end
+
+Then(/^I should see Edit Details link$/) do
+  @browser.a(text: /Edit Details/).wait_until_present
+  @browser.element(text: /Edit Details/).visible?
+end
 
 When(/^.+ go[es]+ to the benefits tab I should see plan year information$/) do
   @browser.a(text: /Benefits/).wait_until_present

@@ -86,4 +86,19 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.is_readonly(CensusEmployee.new)).to eq false # readonly -> false
     end
   end
+
+  describe "#calculate_participation_minimum" do
+    let(:plan_year_1){ double("PlanYear", eligible_to_enroll_count: 5) }
+    before do
+      @current_plan_year = plan_year_1
+    end
+    it "should  return 0 when eligible_to_enroll_count is zero" do
+      expect(@current_plan_year).to receive(:eligible_to_enroll_count).and_return(0)
+      expect(helper.calculate_participation_minimum).to eq 0
+    end
+
+    it "should calculate eligible_to_enroll_count when not zero" do
+      expect(helper.calculate_participation_minimum).to eq 3
+    end
+  end
 end

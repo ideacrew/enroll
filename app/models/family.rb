@@ -19,8 +19,13 @@ class Family
 
   before_save :clear_blank_fields
 
-  # All current and former members of this group
   belongs_to  :person
+
+  # has_many    :benefit_sponsors
+
+  # Collection of insured:  employees, consumers, residents
+
+  # All current and former members of this group
   embeds_many :family_members, cascade_callbacks: true
   embeds_many :special_enrollment_periods, cascade_callbacks: true
   embeds_many :irs_groups, cascade_callbacks: true
@@ -116,9 +121,9 @@ class Family
 
   def current_eligible_open_enrollments
     return [] unless primary_applicant
-    person = primary_applicant.person
-    return [] unless person
-    employee_role = person.employee_roles.first
+    pri_person = primary_applicant.person
+    return [] unless pri_person
+    employee_role = pri_person.employee_roles.first
     return [] unless employee_role
     employer_profile = employee_role.employer_profile
     return [] unless employer_profile

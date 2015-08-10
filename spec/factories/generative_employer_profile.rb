@@ -1,21 +1,4 @@
 FactoryGirl.define do
-  factory(:generative_phone, {class: Phone}) do
-    full_phone_number "19234"
-  end
-
-  factory(:generative_address, {class: Address}) do
-    address_1 Forgery('address').street_address
-    address_2 { 
-      if Forgery('basic').boolean
-        Forgery('address').street_address
-      else
-        nil
-      end
-    }
-    state Forgery('address').state_abbrev
-    zip Forgery('address').zip
-    city Forgery('address').city
-  end
 
   factory(:generative_office_location, {class:OfficeLocation}) do
     is_primary { Forgery('basic').boolean }

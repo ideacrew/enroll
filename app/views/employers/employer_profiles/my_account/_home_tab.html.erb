@@ -27,7 +27,7 @@
                   <dd><%= @current_plan_year.eligible_to_enroll_count %></dd>
                   <dt>Participation Minimum</dt>
                   <dd>
-                    <%= @participation_minimum %>
+                    <%= calculate_participation_minimum %>
                   </dd>
                   <dt>Enrolled or Waived</dt>
                   <dd>
@@ -90,15 +90,15 @@
               <tbody>
                 <tr>
                   <th>Total Premium:</th>
-                  <th><%= number_to_currency(@current_plan_year.present? ? @current_plan_year.hbx_enrollments.map(&:total_premium).sum : 0 )%></th>
+                  <th><%= number_to_currency(@premium_amt_total || 0)%></th>
                 </tr>
                 <tr>
                   <td>Employee Contributions:</td>
-                  <td><%= number_to_currency(@current_plan_year.present? ? @current_plan_year.hbx_enrollments.map(&:total_employee_cost).sum : 0) %></td>
+                  <td><%= number_to_currency(@employee_cost_total || 0) %></td>
                 </tr>
                 <tr>
                   <td>Employer Contributions:</td>
-                  <th><%= number_to_currency(@current_plan_year.present? ? @current_plan_year.hbx_enrollments.map(&:total_employer_contribution).sum : 0) %></th>
+                  <th><%= number_to_currency(@employer_contribution_total || 0) %></th>
                 </tr>
               </tbody>
             </table>

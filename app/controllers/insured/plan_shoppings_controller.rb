@@ -6,11 +6,8 @@ class Insured::PlanShoppingsController < ApplicationController
     plan = Plan.find(params.require(:plan_id))
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
 
-    household = hbx_enrollment.household
-    household.hbx_enrollments.where(id: hbx_enrollment.id).update_all(plan_id: plan.id)
-    #FIXME employee should have more than one active hbx_enrollment(individual or dental plan)
-    #should only inactive  the other hbx_enrollment for the same company
-    household.hbx_enrollments.active.ne(id: hbx_enrollment.id).update_all(is_active: false)
+    hbx_enrollment.update_current(plan_id: plan.id)
+    hbx_enrollment.inactive_related_hbxs
 
     benefit_group = hbx_enrollment.benefit_group
     reference_plan = benefit_group.reference_plan
@@ -21,7 +18,7 @@ class Insured::PlanShoppingsController < ApplicationController
       flash[:error] = "You are attempting to purchase coverage prior to your date of hire on record. Please contact your Employer for assistance"
       redirect_to home_consumer_profiles_path
     elsif hbx_enrollment.may_select_coverage?
-      household.hbx_enrollments.where(id: hbx_enrollment.id).update_all(aasm_state: "coverage_selected")
+      hbx_enrollment.update_current(aasm_state: "coverage_selected")
       hbx_enrollment.propogate_selection
 
       UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now
@@ -64,11 +61,10 @@ class Insured::PlanShoppingsController < ApplicationController
   def waive
     person = @person
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    household = hbx_enrollment.household
     waiver_reason = params[:waiver_reason]
 
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
-      household.hbx_enrollments.where(id: hbx_enrollment.id).update_all(aasm_state: "inactive", waiver_reason: waiver_reason)
+      hbx_enrollment.update_current(aasm_state: "inactive", waiver_reason: waiver_reason)
       hbx_enrollment.propogate_waiver
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Successful"
     else
@@ -82,10 +78,9 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def terminate
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    household = hbx_enrollment.household
 
     if hbx_enrollment.may_terminate_coverage?
-      household.hbx_enrollments.where(id: hbx_enrollment.id).update_all(aasm_state: "coverage_terminated", terminated_on: TimeKeeper.date_of_record.end_of_month)
+      hbx_enrollment.update_current(aasm_state: "coverage_terminated", terminated_on: TimeKeeper.date_of_record.end_of_month)
       hbx_enrollment.propogate_terminate
 
       redirect_to home_consumer_profiles_path
