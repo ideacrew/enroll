@@ -252,7 +252,7 @@ Then(/^Primary Broker creates a roster employee$/) do
   @browser.text_field(class: /interaction-field-control-census-employee-ssn/).set("761234567")
   #@browser.radio(class: /interaction-choice-control-value-radio-male/).set
   @browser.radio(id: /radio_male/).fire_event("onclick")
-  @browser.text_field(name: "jq_datepicker_ignore_census_employee[hired_on]").set((Time.now-1.day).strftime('%m/%d/%Y'))
+  @browser.text_field(name: "jq_datepicker_ignore_census_employee[hired_on]").set((Time.now-1.week).strftime('%m/%d/%Y'))
   #@browser.text_field(class: /interaction-field-control-census-employee-hired-on/).set("10/10/2014")
   @browser.checkbox(class: /interaction-choice-control-value-census-employee-is-business-owner/).set
   input_field = @browser.divs(class: /selectric-wrapper/).first
