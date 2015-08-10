@@ -4,14 +4,13 @@ class EmployeeRenewalNotice < ShopNotice
     super
     @employee = employee
     @to = "raghuramg83@gmail.com"
-    @from = "no-reply@shop.dchealthlink.com"
     @subject = "Employee Renewal notice"
     @template = "user_mailer/welcome.text.erb"
     build
   end
 
   def build
-    @locals = {}
+    @notice_data = {}
   end
 end
 

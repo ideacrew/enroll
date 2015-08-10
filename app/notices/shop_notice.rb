@@ -1,16 +1,16 @@
 class ShopNotice
 
-  attr_accessor :from, :to, :subject, :template, :locals
+  attr_accessor :from, :to, :subject, :template, :notice_data
 
   def initialize(recipient, args = {})
     @template = args[:template]
     @email_notice = args[:email_notice] || true
     @paper_notice = args[:paper_notice] || true
-    @mailer = args[:mailer] || EmployerMailer
+    @mailer = args[:mailer] || ApplicationMailer
   end
 
   def html
-    ApplicationController.new.render_to_string template: @template, locals: @locals
+    ApplicationController.new.render_to_string template: @template, locals: @notice_data
   end
 
   def pdf
