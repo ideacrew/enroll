@@ -11,14 +11,14 @@ FactoryGirl.define do
     ehb                 0.9943
     carrier_profile_id          { BSON::ObjectId.from_time(DateTime.now) }
     minimum_age         19
-    maximum_age         65
+    maximum_age         66
 
     # association :premium_tables, strategy: :build
 
     factory :plan_with_premium_tables do
 
       transient do
-        premium_tables_count 47
+        premium_tables_count 48
       end
 
       after(:create) do |plan, evaluator|
