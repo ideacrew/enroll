@@ -17,7 +17,7 @@ RSpec.describe Message, :type => :model do
       let(:params) {{}}
 
       it "should set created_at attribute" do
-        expect(Message.new(**params).created_at).to_not be_nil
+        expect(Message.new(**params).created_at).to be_nil
       end
 
       it "should be invalid" do

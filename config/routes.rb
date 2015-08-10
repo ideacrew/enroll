@@ -172,6 +172,8 @@ Rails.application.routes.draw do
 
     resources :employee, :controller=>"employee_roles" do
       collection do
+        get 'new_message_to_broker'
+        post 'send_message_to_broker'
         get :match
         get 'welcome'
         get 'search'
