@@ -12,8 +12,16 @@ class HbxIdGenerator
     provider.generate_member_id
   end
 
+  def generate_policy_id
+    provider.generate_policy_id
+  end
+
   def self.slug!
     self.instance.provider = SlugSource
+  end
+
+  def self.generate_policy_id
+    self.instance.generate_policy_id
   end
 
   def self.generate_member_id
@@ -29,9 +37,17 @@ class HbxIdGenerator
     def self.generate_member_id
       generate_id_from_sequence("member_id")
     end
+
+    def self.generate_policy_id
+      generate_id_from_sequence("policy_id")
+    end
   end
 
   class SlugSource
+    def self.generate_policy_id
+      random_uuid
+    end
+
     def self.generate_member_id
       random_uuid
     end
