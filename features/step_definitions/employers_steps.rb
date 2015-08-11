@@ -90,7 +90,7 @@ And(/^It should default to active tab$/) do
   @browser.radio(id: "terminated_no").wait_until_present
   expect(@browser.radio(id: "terminated_no").set?).to be_truthy
   expect(@browser.radio(id: "terminated_yes").set?).to be_falsey
-  expect(@browser.radio(id: "family_waived").set?).to be_falsey
+  #expect(@browser.radio(id: "family_waived").set?).to be_falsey
   expect(@browser.radio(id: "family_all").set?).to be_falsey
 end
 
