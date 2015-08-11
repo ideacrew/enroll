@@ -257,31 +257,33 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
   end
 
   context "search_broker_agency" do
-    let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
-    let(:organization) {broker_agency_profile.organization}
+    before :all do 
+      @organization = FactoryGirl.create(:organization)
+      @broker_agency_profile = @organization.broker_agency_profile
+    end
 
     context "with full" do
       context "search by legal_name" do
         before do
-          xhr :get, :search_broker_agency, broker_agency_search: organization.legal_name, format: :js
+          xhr :get, :search_broker_agency, broker_agency_search: @organization.legal_name, format: :js
         end
 
         it "should be a success" do
           expect(response).to have_http_status(:success)
           expect(response).to render_template("search_broker_agency")
-          expect(assigns(:broker_agency_profiles)).to eq [broker_agency_profile]
+          expect(assigns(:broker_agency_profiles)).to eq [@broker_agency_profile]
         end
       end
 
       context "search by npn" do
         before do
-          xhr :get, :search_broker_agency, broker_agency_search: broker_agency_profile.corporate_npn, format: :js
+          xhr :get, :search_broker_agency, broker_agency_search: @broker_agency_profile.corporate_npn, format: :js
         end
 
         it "should be a success" do
           expect(response).to have_http_status(:success)
           expect(response).to render_template("search_broker_agency")
-          expect(assigns(:broker_agency_profiles)).to eq [broker_agency_profile]
+          expect(assigns(:broker_agency_profiles)).to eq [@broker_agency_profile]
         end
       end
     end
@@ -289,26 +291,25 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
     context "with partial" do
       context "search by legal_name" do
         before do
-          Organization.delete_all
-          xhr :get, :search_broker_agency, broker_agency_search: organization.legal_name.last(5), format: :js
+          xhr :get, :search_broker_agency, broker_agency_search: @organization.legal_name.last(5), format: :js
         end
 
         it "should be a success" do
           expect(response).to have_http_status(:success)
           expect(response).to render_template("search_broker_agency")
-          expect(assigns(:broker_agency_profiles)).to eq [broker_agency_profile]
+          expect(assigns(:broker_agency_profiles)).to eq [@broker_agency_profile]
         end
       end
 
       context "search by npn" do
         before do
-          xhr :get, :search_broker_agency, broker_agency_search: broker_agency_profile.corporate_npn.last(5), format: :js
+          xhr :get, :search_broker_agency, broker_agency_search: @broker_agency_profile.corporate_npn.last(5), format: :js
         end
 
         it "should be a success" do
           expect(response).to have_http_status(:success)
           expect(response).to render_template("search_broker_agency")
-          expect(assigns(:broker_agency_profiles)).to eq [broker_agency_profile]
+          expect(assigns(:broker_agency_profiles)).to eq [@broker_agency_profile]
         end
       end
     end

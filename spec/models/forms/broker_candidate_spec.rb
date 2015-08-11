@@ -2,7 +2,6 @@ require "rails_helper"
 
 describe Forms::BrokerCandidate do
 
-  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
   let(:broker_role) { FactoryGirl.build(:broker_role, npn: '234567890') }
   let(:person_obj) { FactoryGirl.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
 
@@ -13,7 +12,7 @@ describe Forms::BrokerCandidate do
     dob: "1993-06-03",
     email: "useraccount@gmail.com", 
     npn: "234567895",
-    broker_agency_id: broker_agency_profile.id
+    broker_agency_id: @broker_agency_profile.id
     }.merge(other_attributes) }
 
   let(:other_attributes) { { } }
@@ -21,6 +20,10 @@ describe Forms::BrokerCandidate do
   subject {
     Forms::BrokerCandidate.new(attributes)
   }
+
+  before (:all) do
+    @broker_agency_profile = FactoryGirl.create(:organization).broker_agency_profile
+  end
 
   context 'when data missing' do 
 

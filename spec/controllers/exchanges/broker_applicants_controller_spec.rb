@@ -44,10 +44,14 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
   describe ".update" do
     let(:user) { instance_double("User", :has_hbx_staff_role? => true) }
-    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
     let(:broker_role) {FactoryGirl.create(:broker_role)}
 
+    before :all do 
+      @broker_agency_profile = FactoryGirl.create(:organization).broker_agency_profile
+    end
+
     before :each do
+      @broker_agency_profile.update_attributes({ primary_broker_role: broker_role })
       sign_in(user)
     end
 
@@ -74,7 +78,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
       end
 
       it "should approve and change status to broker agency pending" do
-        allow(broker_role).to receive(:broker_agency_profile).and_return(broker_agency_profile)
+        allow(broker_role).to receive(:broker_agency_profile).and_return(@broker_agency_profile)
 
         expect(assigns(:broker_applicant))
         expect(broker_role.aasm_state).to eq 'broker_agency_pending'
@@ -88,7 +92,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
       context 'when application is approved' do
         before :each do
-          broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id })
+          broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
           put :update, id: broker_role.person.id, approve: true, format: :js
           broker_role.reload
         end
@@ -103,7 +107,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
       context 'when application is decertified' do
         before :each do
-          broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id })
+          broker_role.update_attributes({ broker_agency_profile_id: @broker_agency_profile.id })
           broker_role.approve!
           put :update, id: broker_role.person.id, decertify: true, format: :js
           broker_role.reload
