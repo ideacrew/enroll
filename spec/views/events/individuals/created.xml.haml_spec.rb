@@ -18,7 +18,7 @@ RSpec.describe "events/individuals/created.haml.erb" do
       end
 
       it "should be schema valid" do
-        #expect(validate_with_schema(Nokogiri::XML(rendered))).to eq []
+        expect(validate_with_schema(Nokogiri::XML(rendered))).to eq []
       end
 
     end
