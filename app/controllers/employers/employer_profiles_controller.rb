@@ -144,8 +144,6 @@ class Employers::EmployerProfilesController < ApplicationController
       @avaliable_employee_names ||= @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
 
       census_employees = case @status
-      when 'waived'
-        @employer_profile.census_employees.waived.sorted
       when 'terminated'
         @employer_profile.census_employees.terminated.sorted
       when 'all'
