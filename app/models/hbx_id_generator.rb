@@ -16,6 +16,10 @@ class HbxIdGenerator
     provider.generate_policy_id
   end
 
+  def generate_organization_id
+    provider.generate_organization_id
+  end
+
   def self.slug!
     self.instance.provider = SlugSource
   end
@@ -26,6 +30,10 @@ class HbxIdGenerator
 
   def self.generate_member_id
     self.instance.generate_member_id
+  end
+
+  def self.generate_organization_id
+    self.instance.generate_organization_id
   end
 
   class AmqpSource
@@ -41,9 +49,17 @@ class HbxIdGenerator
     def self.generate_policy_id
       generate_id_from_sequence("policy_id")
     end
+
+    def self.generate_organization_id
+      generate_id_from_sequence("organization_id")
+    end
   end
 
   class SlugSource
+    def self.generate_organization_id
+      random_uuid
+    end
+
     def self.generate_policy_id
       random_uuid
     end
