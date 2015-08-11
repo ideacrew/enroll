@@ -98,6 +98,7 @@ FactoryGirl.define do
 
   factory(:generative_broker_agency_profile, {class: BrokerAgencyProfile }) {
     organization { FactoryGirl.build_stubbed :generative_organization }
+    corporate_npn "11234234"
   }
 
   factory(:generative_broker_role, {class: BrokerRole}) do

@@ -1578,7 +1578,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     it "should have an estimated monthly max cost" do
-      expect(p(blue_collar_benefit_group).estimated_monthly_employer_contribution).to be_within(0.01).of(4308.30)
+      expect(p(blue_collar_benefit_group).estimated_monthly_employer_contribution).to be_within(0.01).of(4308.304)
     end
 
     it "should have an estimated min employee cost" do
