@@ -8,7 +8,7 @@ class EnrollmentPeriod
   field :end_on, type: Date
 
   validates_presence_of :start_on, :end_on, :message => "is invalid"
-  validate :end_date_follows_begin_date
+  validate :end_date_follows_start_date
 
   def start_on=(new_date)
     new_date = Date.parse(new_date) if new_date.is_a? String
@@ -25,10 +25,10 @@ class EnrollmentPeriod
 
 private
 
-  def end_date_follows_begin_date
+  def end_date_follows_start_date
     return unless self.end_on.present?
     # Passes validation if end_on == start_date
-    errors.add(:end_on, "end_on cannot preceed begin_on date") if self.end_on < self.begin_on
+    errors.add(:end_on, "end_on cannot preceed start_on date") if self.end_on < self.start_on
   end
 
 
