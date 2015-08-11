@@ -161,7 +161,7 @@ class Person
   end
 
   def generate_hbx_id
-    write_attribute(:hbx_id, HbxIdGenerator.generate) if hbx_id.blank?
+    write_attribute(:hbx_id, HbxIdGenerator.generate_member_id) if hbx_id.blank?
   end
 
   def strip_empty_fields

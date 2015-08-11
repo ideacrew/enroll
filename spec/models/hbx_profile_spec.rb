@@ -4,12 +4,13 @@ RSpec.describe HbxProfile, :type => :model do
   let(:organization) { FactoryGirl.create(:organization) }
 
   let(:cms_id)  { "DC0" }
+  let(:us_state_abbreviation)  { "DC" }
   let(:markets) { %w(shop unassisted_individual assisted_individual non_aca) }
   let(:valid_params) {
     {
       organization: organization,
       cms_id: cms_id,
-      markets: markets
+      us_state_abbreviation: us_state_abbreviation
     }
   }
 
@@ -18,7 +19,7 @@ RSpec.describe HbxProfile, :type => :model do
       let(:params) {valid_params.except(:organization)}
 
       it "should raise" do
-        expect{HbxProfile.new(**params).save}.to raise_error(Mongoid::Errors::NoParent)
+        expect{HbxProfile.create(**params)}.to raise_error(Mongoid::Errors::NoParent)
       end
     end
 
