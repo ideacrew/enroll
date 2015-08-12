@@ -15,7 +15,6 @@ describe ConsumerRole, dbclean: :after_each do
   it { should validate_presence_of :gender }
   it { should validate_presence_of :ssn }
   it { should validate_presence_of :dob }
-  it { should validate_presence_of :identity_verified_state }
 
   let(:address)       {FactoryGirl.build(:address)}
   let(:saved_person)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789")}
@@ -55,10 +54,10 @@ describe ConsumerRole, dbclean: :after_each do
           expect(ConsumerRole.find(consumer_role.id).id).to eq consumer_role.id
         end
 
-        context "and the consumer's should not have a verified identity" do
+        context "and the consumer's should not have a identity_verified identity" do
 
-          it "identity state should be unverified" do
-            expect(consumer_role.identity_verified_state).to eq "unverified"
+          it "identity state should be unidentity_verified" do
+            expect(consumer_role.aasm_state).to eq "identity_unverified"
           end
 
           context "and a recognized authority verifies the consumer's identity" do
@@ -68,8 +67,8 @@ describe ConsumerRole, dbclean: :after_each do
               consumer_role.verify_identity
             end
 
-            it "identity state should transition to verified status" do
-              expect(consumer_role.identity_verified_state).to eq "verified"
+            it "identity state should transition to identity verified status" do
+              expect(consumer_role.aasm_state).to eq "identity_verified"
             end
           end
 
@@ -81,7 +80,7 @@ describe ConsumerRole, dbclean: :after_each do
             end
 
             it "identity state should transition to followup pending status" do
-              expect(consumer_role.identity_verified_state).to eq "followup_pending"
+              expect(consumer_role.aasm_state).to eq "identity_followup_pending"
             end
 
             context "and authority is subsequently able to verify consumer's identity" do
@@ -91,8 +90,8 @@ describe ConsumerRole, dbclean: :after_each do
                 consumer_role.verify_identity
               end
 
-              it "identity state should transition to verified status" do
-                expect(consumer_role.identity_verified_state).to eq "verified"
+              it "identity state should transition to identity verified status" do
+                expect(consumer_role.aasm_state).to eq "identity_verified"
               end
             end
           end
@@ -104,24 +103,24 @@ describe ConsumerRole, dbclean: :after_each do
                 consumer_role.identity_response_code = ""
               end
 
-              it "identity state should stay in unverified status" do
+              it "identity state should stay in identity_unverified status" do
                 expect(consumer_role.may_import_identity?).to be_falsey
               end
             end
 
-            context "and the consumer's identity is verified" do
+            context "and the consumer's identity is identity_verified" do
               before do
                 consumer_role.identity_final_decision_code = "ACC"
                 consumer_role.identity_response_code = "xyz321abc"
                 consumer_role.import_identity
               end
 
-              it "identity state should transition to verified status" do
-                expect(consumer_role.identity_verified_state).to eq "verified"
+              it "identity state should transition to identity verified status" do
+                expect(consumer_role.aasm_state).to eq "identity_verified"
               end
             end
 
-            context "and the consumer's identity isn't verified" do
+            context "and the consumer's identity isn't identity verified" do
               before do
                 consumer_role.identity_final_decision_code = "REF"
                 consumer_role.identity_response_code = "xyz321abc"
@@ -129,7 +128,7 @@ describe ConsumerRole, dbclean: :after_each do
               end
 
               it "identity state should transition to followup pending status" do
-                expect(consumer_role.identity_verified_state).to eq "followup_pending"
+                expect(consumer_role.aasm_state).to eq "identity_followup_pending"
               end
             end
 

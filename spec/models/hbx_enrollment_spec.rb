@@ -213,9 +213,20 @@ describe HbxEnrollment do
           expect(blue_collar_enrollments.first.total_employer_contribution).to be
         end
 
-        it "should return only covered enrollments count" do
-          enrollments = white_collar_enrollments + white_collar_enrollment_waivers + blue_collar_enrollments + blue_collar_enrollment_waivers
-          expect(HbxEnrollment.covered(enrollments).size).to eq 9
+        context "covered" do
+          before :each do
+            @enrollments = white_collar_enrollments + white_collar_enrollment_waivers + blue_collar_enrollments + blue_collar_enrollment_waivers
+          end
+          it "should return only covered enrollments count" do
+            expect(HbxEnrollment.covered(@enrollments).size).to eq 9
+          end
+
+          it "should return only active enrollments" do
+            white_collar_enrollments.each do |hbx|
+              allow(hbx).to receive(:is_active).and_return(false)
+            end
+            expect(HbxEnrollment.covered(@enrollments).size).to eq (9-white_collar_enrollments.size)
+          end
         end
       end
 
@@ -334,6 +345,10 @@ describe HbxEnrollment, dbclean: :after_all do
         )
         @enrollment3.save
         @enrollment3.inactive_related_hbxs
+      end
+
+      it "should have an assigned hbx_id" do
+        expect(@enrollment3.hbx_id).not_to eq nil
       end
 
       it "enrollment and enrollment3 should have same household" do

@@ -18,7 +18,7 @@
 
     <div class="row row-form-wrapper no-buffer">
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= datepicker_control f, :dob, {:class => "floatlabel form-control interaction-field-control-census-employee-dob", :placeholder => "BIRTHDATE",
+        <%= datepicker_control f, :dob, {:class => "floatlabel form-control _date-picker interaction-field-control-census-employee-dob", :placeholder => "BIRTHDATE",
                                          :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, readonly: is_readonly(f.object)} %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
@@ -44,5 +44,16 @@
 <script type="text/javascript">
   $(document).ready(function(){
     $('.field_with_errors > *').unwrap();
+    $('.floatlabel').floatlabel({
+         slideInput: false
+    });
+  });
+  $(document).on('change', "input._date-picker", function() {
+    var date = $(this).val();
+    if(check_dateformat(date) != true) {
+      $('.alert_row').html("<div class='alert alert-error'><h4>"+$(this).attr('placeholder')+": Invalid date format!</h4></div>");
+    } else {
+      $('.alert_row').html("");
+    };
   });
 </script>

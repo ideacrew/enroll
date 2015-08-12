@@ -22,6 +22,6 @@ describe "shared/census_dependent_fields.html.erb" do
   end
 
   it "should have an dob-picker input" do
-    expect(rendered).to have_selector("input.dob-picker", count: 1)
+    expect(rendered).to have_selector("input._date-picker", count: 1)
   end
 end

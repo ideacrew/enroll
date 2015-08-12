@@ -62,16 +62,16 @@ class ConsumerRole
 
   # FiveYearBarApplicabilityIndicator ??
 
-  field :identity_verified_state, type: String, default: "unverified"
+  field :aasm_state, type: String, default: "identity_unverified"
   field :identity_verified_date, type: Date
-  field :identity_verified_evidences, type: Array, default: []
   field :identity_final_decision_code, type: String
   field :identity_response_code, type: String
   field :identity_response_description_text, type: String
 
+  field :vlp_verified_state, type: String, default: "identity_unverified"
+  field :vlp_verified_date, type: Date
   field :vlp_authority, type: String
   field :vlp_document_id, type: String
-  field :vlp_evidences, type: Array, default: []
 
   field :citizen_status, type: String
   field :is_state_resident, type: Boolean
@@ -92,7 +92,9 @@ class ConsumerRole
   delegate :ethnicity,          :ethnicity=,         to: :person, allow_nil: true
   delegate :is_disabled,        :is_disabled=,       to: :person, allow_nil: true
 
-  validates_presence_of :ssn, :dob, :gender, :is_applicant, :identity_verified_state
+  embeds_many :documents, as: :documentable
+
+  validates_presence_of :ssn, :dob, :gender, :is_applicant
 
   validates :vlp_authority,
     allow_blank: true,
@@ -159,33 +161,60 @@ class ConsumerRole
     self.is_active
   end
 
-  aasm :column => 'identity_verified_state' do
-    state :unverified, initial: true
-    state :verified
-    state :followup_pending
+  # RIDP and Verify Lawful Presence workflow.  IVL Consumer primary applicant must be in identity_verified state 
+  # to proceed with application.  Each IVL Consumer enrolled for benefit coverage must (eventually) pass 
+
+  aasm do
+    state :identity_unverified, initial: true
+    state :identity_verified
+    state :identity_followup_pending
     state :identity_invalid
+    state :lawful_presence_verified
+    state :fdsh_service_error
+    state :lawful_presence_followup_pending
+    state :not_lawfully_present
 
     event :verify_identity do
-      transitions from: [:unverified, :followup_pending], to: :verified, :guard => :verification_success?
-      transitions from: :unverified, to: :followup_pending, :guard => :verification_pending?
+      transitions from: [:identity_unverified, :identity_followup_pending], to: :identity_verified, :guard => :identity_verification_success?
+      transitions from: :identity_unverified, to: :identity_followup_pending, :guard => :identity_verification_pending?
     end
 
-    event :import_identity, :guards => [:identity_metadata_provided?] do
-      transitions from: :unverified, to: :verified, :guard => :verification_success?
-      transitions from: :unverified, to: :followup_pending, :guard => :verification_pending?
+    event :import_identity, :guard => :identity_metadata_provided? do
+      transitions from: :identity_unverified, to: :identity_verified, :guard => :identity_verification_success?
+      transitions from: :identity_unverified, to: :identity_followup_pending, :guard => :identity_verification_pending?
     end
 
-    event :fail_identity do
-      transitions from: [:unverified, :followup_pending], to: :identity_invalid
+    event :verify_lawful_presence do
+      transitions from: :identity_verified, to: :lawful_presence_verified
+      transitions from: :identity_verified, to: :fdsh_service_error
+      transitions from: :identity_verified, to: :not_lawfully_present
+    end
+
+    event :retry_fdsh_service do
+      transitions from: :fdsh_service_error, to: :lawful_presence_followup_pending
+      transitions from: :fdsh_service_error, to: :lawful_presence_verified, :guard => :identity_verification_success?
+      transitions from: :fdsh_service_error, to: :not_lawfully_present
+    end
+
+    event :submit_documentation do
+      transitions from: :not_lawfully_present, to: :lawful_presence_followup_pending
+    end
+
+    event :grant_vlp_status do
+      transitions from: :lawful_presence_followup_pending, to: :lawful_presence_verified
+    end
+
+    event :deny_vlp_status do
+      transitions from: :lawful_presence_followup_pending, to: :not_lawfully_present
     end
   end
 
 private
-  def verification_success?
+  def identity_verification_success?
     identity_final_decision_code.to_s.downcase == "acc"
   end
 
-  def verification_pending?
+  def identity_verification_pending?
     identity_final_decision_code.to_s.downcase == "ref" && identity_response_code.present?
   end
 

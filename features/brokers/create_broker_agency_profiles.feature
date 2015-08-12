@@ -1,109 +1,111 @@
 @watir @screenshots
 Feature: Create Primary Broker and Broker Agency
-  In order to support individual and SHOP market clients, brokers must create and manage an account on the HBX for their organization.  Such organizations are referred to as a Broker Agency
-  A Broker Representative
-  Should be able to create a Broker Agency account
+  In order for Brokers to help individuals and SHOP employees
+  The Primary Broker must create and manage an account on the HBX for their organization.  
+  Such organizations are referred to as a Broker Agency
+  The Primary Broker should be able to create a Broker Agency account application
+  The HBX Admin should be able to approve the application and send an email invite
+  The Primary Broker should receive the invite and create an Account
+  The Employer should be able to select the Primary Broker as their Broker
+  The Broker should be able to manage that Employer
+  The Broker should be able to select a family covered by that Employer
+  The Broker should be able to purchase insurance for that family
 
-  Scenario: Broker Representative has not signed up on the HBX
-    When I visit the HBX Broker Registration form
-    And I click on New Broker Agency Tab
-    Then I should see the New Broker Agency form
-    When I enter personal information
-    And I enter broker agency information
-    And I enter office locations information
-    And I click on Create Broker Agency
-    Then I should see broker registration successful message
+  Scenario: Primary Broker has not signed up on the HBX
+    When Primary Broker visits the HBX Broker Registration form
+        And Primary Broker clicks on New Broker Agency Tab
+        Then Primary Broker should see the New Broker Agency form
+        When Primary Broker enters personal information
+        And Primary Broker enters broker agency information
+        And Primary Broker enters office location for default_office_location
+        And Primary Broker clicks on Create Broker Agency
+        Then Primary Broker should see broker registration successful message
 
-    Then admin@dc.gov/password logs on to hbx-portal
-    And I click on brokers tab
-    Then I should see the list of broker applicants
-    When I click on the current broker applicant show button
-    Then I should see the broker application
-    When I click on approve broker button
-    Then I should see the broker successfully approved message
-    And I should receive an invitation email
-    And I log out
+    When Hbx Admin logs on to the Hbx Portal
+        And Hbx Admin clicks on the Brokers tab
+        Then Hbx Admin should see the list of broker applicants
+        When Hbx Admin clicks on the current broker applicant show button
+        Then Hbx Admin should see the broker application
+        When Hbx Admin clicks on approve broker button
+        Then Hbx Admin should see the broker successfully approved message
+        And Hbx Admin logs out
 
-    When I visit invitation url in email
-    Then I should see the login page
-    When I click on Create Account
-    When I register with valid information
-    Then I should see successful message with broker agency home page
-    And I log out
+    Then Primary Broker should receive an invitation email
+        When Primary Broker visits invitation url in email
+        Then Primary Broker should see the login page
+        When Primary Broker clicks on Create Account
+        When Primary Broker registers with valid information
+        Then Primary Broker should see successful message with broker agency home page
+        And Primary Broker logs out
 
+    Given Employer has not signed up as an HBX user
+        When I visit the Employer portal
+        Then Tim Wood creates an HBX account
+        Then Tim Wood should see a successful sign up message
+        And Tim Wood creates a new employer profile
+        When Employer clicks on the Broker Agency tab
+        Then Employer should see no active broker
+        When Employer click on Browse Brokers button
+        Then Employer should see broker agencies index view
+        When Employer searches broker agency by name
+        Then Employer should see broker agency
+        When Employer clicks select broker button
+        Then Employer should see confirm modal dialog box
+        When Employer confirms broker selection
+        Then Employer should see broker selected successful message
+        When Employer clicks on the Broker Agency tab
+        Then Employer should see broker active for the employer
+        When Employer terminates broker
+        Then Employer should see broker terminated message
+        When Employer clicks on the Broker Agency tab
+        Then Employer should see no active broker
+        When Employer clicks on Browse Brokers button
+        Then Employer should see broker agencies index view
+        When Employer searches broker agency by name
+        Then Employer should see broker agency
+        When Employer clicks select broker button
+        Then Employer should see confirm modal dialog box
+        When Employer confirms broker selection
+        Then Employer should see broker selected successful message
+        And Employer logs out
 
-    Given I haven't signed up as an HBX user
-    When I visit the Employer portal
-    And I sign up as a new employer
-    Then I should see a successful sign up message
-    And I create new employer profile
-    
-    When I click on the Broker Agency tab
-    Then I should see no active broker
-    When I click on Browse Brokers button
-    Then I should see broker agencies index view
-    When I search broker agency by name
-    Then I should see broker agency
-    When I click select broker button
-    Then I should see confirm modal dialog box
-    When I confirm broker selection
-    Then I should see broker selected successful message
-    When I click on the Broker Agency tab
-    Then I should see broker active for the employer
-    When I terminate broker
-    Then I should see broker terminated message
-    When I click on the Broker Agency tab
-    Then I should see no active broker
-
-    When I click on Browse Brokers button
-    Then I should see broker agencies index view
-    When I search broker agency by name
-    Then I should see broker agency
-    When I click select broker button
-    Then I should see confirm modal dialog box
-    When I confirm broker selection
-    Then I should see broker selected successful message
-    And I log out
-
-    Then ricky.martin@example.com/12345678 logs on to broker-agency-portal
-    And I click on the Employers tab
-
-    Then I should see Employer and click on legal name
-    Then I should see the Employer Profile page as Broker
-    When I publish a Plan Year as Broker
-    When I click on Employees tab
-    Then Broker clicks on the add employee button
-    Then Broker creates a roster employee
-
-    Then Broker sees employer census family created
-    And I log out
+    Then Primary Broker logs on to the Broker Agency Portal
+        And Primary Broker clicks on the Employers tab
+        Then Primary Broker should see Employer and click on legal name
+        Then Primary Broker should see the Employer Profile page as Broker
+        When Primary Broker creates and publishes a plan year
+        Then Primary Broker should see a published success message
+        When Primary Broker clicks on the Employees tab
+        Then Primary Broker clicks on the add employee button
+        Then Primary Broker creates Broker Assisted as a roster employee
+        Then Primary Broker sees employer census family created
+        And I log out
 
     When I go to the employee account creation page
-    When I enter my new account information
-    Then I should be logged in
-    When I go to register as an employee
-    Then I should see the employee search page
-    When I enter the identifying info of Broker Assisted
-    Then Broker Customer should see the matched employee record form
-    When I accept the matched employer
-    Then I complete the matched employee form for Broker Assisted
-    And I log out
+        When Broker Assisted creates an HBX account
+        Then Broker Assisted should be logged on as an unlinked employee
+        When Broker Assisted goes to register as an employee
+        Then Broker Assisted should see the employee search page
+        When Broker Assisted enter the identifying info of Broker Assisted
+        Then Broker Assisted should see the matched employee record form
+        When Broker Assisted accepts the matched employer
+        Then Broker Assisted completes the matched employee form for Broker Assisted
+        And I log out
 
-    Then ricky.martin@example.com/12345678 logs on to broker-agency-portal
-    And I click on the Employers tab
-
-    Then I should see Employer and click on legal name
-    Then I should see the Employer Profile page as Broker
-    When I click on the Families tab
-    Then Broker Assisted is a family
-    Then Broker goes to the Consumer page
-    Then Broker is on the consumer home page
-    Then Broker shops for plans
-    Then Broker sees covered family members
-    Then Broker choses a healthcare plan
-    And Broker confirms plan selection
-    And Broker sees purchase confirmation
-    Then Broker continues to the consumer home page
-    And I log out
+    Then Primary Broker logs on to the Broker Agency Portal
+        And Primary Broker clicks on the Employers tab
+        Then Primary Broker should see Employer and click on legal name
+        Then Primary should see the Employer Profile page as Broker
+        When Primary Broker clicks on the Families tab
+        Then Broker Assisted is a family
+        Then Primary Broker goes to the Consumer page
+        Then Primary Broker is on the consumer home page
+        Then Primary Broker shops for plans
+        Then Primary Broker sees covered family members
+        Then Primary Broker should see the list of plans
+        Then Primary Broker selects a plan on the plan shopping page
+        And Primary Broker clicks on purchase button on the coverage summary page
+        And Primary Broker should see the receipt page
+        Then Primary Broker logs out
 
 

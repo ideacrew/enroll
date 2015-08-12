@@ -34,9 +34,58 @@ FactoryGirl.define do
         end
       end
     }
+    broker_role {
+      FactoryGirl.build_stubbed :generative_person_broker_role, :person_obj => self
+    }
+    employee_roles {
+      address_count = Random.rand(4)
+      if address_count == 0
+        []
+      else
+        (1..address_count).to_a.map do |idx|
+          FactoryGirl.build_stubbed :generative_person_employee_role, :person_obj => self
+        end
+      end
+    }
+    person_relationships {
+      address_count = Random.rand(4)
+      if address_count == 0
+        []
+      else
+        (1..address_count).to_a.map do |idx|
+          FactoryGirl.build_stubbed :generative_person_relationship
+        end
+      end
+    }
+  end
+
+  factory(:generative_person_relationship, {class: PersonRelationship}) do
+    kind {
+      pick_list = PersonRelationship::Kinds - ["head of household", "self", "unrelated"]
+      max = pick_list.length
+      pick_list[Random.rand(max)]
+    }
+    relative {
+      FactoryGirl.build_stubbed :generative_person
+    }
+  end
+
+  factory(:generative_person_employee_role, {class: EmployeeRole}) do
+    transient do
+      person_obj nil
+    end
+    person { person_obj }
   end
 
   factory(:generative_person_broker_role, {class: BrokerRole}) do
-    person { FactoryGirl.build_stubbed :generative_person}
+    transient do
+      person_obj nil
+    end
+    person { person_obj }
+    npn "123432423"
+    broker_agency_profile {
+      FactoryGirl.build_stubbed :generative_broker_agency_profile
+    }
   end
+
 end

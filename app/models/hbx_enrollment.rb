@@ -39,6 +39,7 @@ class HbxEnrollment
   field :employee_role_id, type: BSON::ObjectId
   field :benefit_group_id, type: BSON::ObjectId
   field :benefit_group_assignment_id, type: BSON::ObjectId
+  field :hbx_id, type: String
 
   field :submitted_at, type: DateTime
 
@@ -90,6 +91,12 @@ class HbxEnrollment
     event :terminate_coverage do
       transitions from: :coverage_selected, to: :coverage_terminated, after: :propogate_terminate
     end
+  end
+
+  before_save :generate_hbx_id
+
+  def generate_hbx_id
+    write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
 
   def propogate_terminate
@@ -295,7 +302,7 @@ class HbxEnrollment
   end
 
   def self.covered(enrollments)
-    enrollments.select{|e| ENROLLED_STATUSES.include?(e.aasm_state)}
+    enrollments.select{|e| ENROLLED_STATUSES.include?(e.aasm_state) && e.is_active? }
   end
 
   private
