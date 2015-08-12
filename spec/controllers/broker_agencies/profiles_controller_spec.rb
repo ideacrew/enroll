@@ -20,11 +20,16 @@ RSpec.describe BrokerAgencies::ProfilesController do
   describe "GET show" do
     let(:user) { double("user")}
     let(:person) { double("person")}
-    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    
+    before(:all) do 
+      organization = FactoryGirl.create(:organization)
+      @broker_agency_profile = organization.broker_agency_profile
+    end
+
     before(:each) do
       allow(user).to receive(:has_broker_role?)
       sign_in(user)
-      get :show, id: broker_agency_profile.id
+      get :show, id: @broker_agency_profile.id
     end
 
     it "returns http success" do

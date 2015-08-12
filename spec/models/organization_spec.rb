@@ -35,6 +35,10 @@ RSpec.describe Organization, dbclean: :after_each do
         organization.valid?
       end
 
+      it "should have assigned an hbx_id" do
+        expect(organization.hbx_id).not_to eq nil
+      end
+
       context "and a second organization is created with the same fein" do
         let(:organization2) {Organization.create(**params)}
         before do

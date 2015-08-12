@@ -1,22 +1,58 @@
 class HbxProfile
+
   include Mongoid::Document
   include Mongoid::Timestamps
 
   embedded_in :organization
-  embeds_many :hbx_staff_roles
-  embeds_many :enrollment_periods
-  embeds_one :inbox, as: :recipient
-  accepts_nested_attributes_for :inbox
 
   field :cms_id, type: String
-  field :markets, type: Array, default: []
+  field :us_state_abbreviation, type: String
 
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
   delegate :dba, :dba=, to: :organization, allow_nil: true
   delegate :fein, :fein=, to: :organization, allow_nil: true
   delegate :entity_kind, :entity_kind=, to: :organization, allow_nil: true
 
+  embeds_many :hbx_staff_roles
+  embeds_many :enrollment_periods
+
+  embeds_one :benefit_sponsorship, cascade_callbacks: true
+  embeds_one :inbox, as: :recipient, cascade_callbacks: true
+
+  accepts_nested_attributes_for :inbox, :benefit_sponsorship
+
+  validates_presence_of :us_state_abbreviation, :cms_id
+
   after_initialize :build_nested_models
+
+
+  def active_employers
+    EmployerProfile.active
+  end
+
+  def inactive_employers
+    EmployerProfile.inactive
+  end
+
+  def active_employees
+    CensusEmployee.active
+  end
+
+  def active_broker_agencies
+    BrokerAgencyProfile.active
+  end
+
+  def inactive_broker_agencies
+    BrokerAgencyProfile.inactive
+  end
+
+  def active_brokers
+    BrokerRole.active
+  end
+
+  def inactive_brokers
+    BrokerRole.inactive
+  end
 
   class << self
     def find(id)
