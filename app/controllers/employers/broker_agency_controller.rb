@@ -6,14 +6,19 @@ class Employers::BrokerAgencyController < ApplicationController
 
   def index
     @q = params.permit(:q)[:q]
-    @orgs = BrokerAgencyProfile.agencies_with_active_brokers(Organization.search(@q).exists(broker_agency_profile: true))
-    @page_alphabets = page_alphabets(@orgs, "legal_name")
 
-    if params[:page].present?
-      page_no = cur_page_no(@page_alphabets.first)
-      @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+    if @q.blank?
+      @orgs = Organization.broker_agencies_having_active_brokers
+      @page_alphabets = page_alphabets(@orgs, "legal_name")
+
+      if params[:page].present?
+        page_no = cur_page_no(@page_alphabets.first)
+        @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+      else
+        @organizations = @orgs.to_a.first(10)
+      end
     else
-      @organizations = @orgs.to_a.first(10)
+      @organizations = Organization.broker_agencies_with_matching_agency_or_broker(@q)
     end
 
     @broker_agency_profiles = @organizations.map(&:broker_agency_profile)

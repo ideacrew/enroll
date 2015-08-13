@@ -4,7 +4,7 @@
 
     <div class="pull-right broker_agencies_search">
       <div class="search-wp">
-        <%= render 'shared/search', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", q: @q, remote: true, placeholder: 'Agency Name' %>
+        <%= render 'shared/search', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", q: @q, remote: true, placeholder: 'Agency/Broker Name' %>
       </div>
     </div>
   </div>
@@ -41,5 +41,7 @@
         </tbody>
       </table>
     </div>
+    <% if @page_alphabets.present? %>
     <%= render 'shared/alph_paginate', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", alphs: @page_alphabets, remote: true %>
+    <% end %>
 </div>
