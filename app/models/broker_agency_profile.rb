@@ -155,10 +155,6 @@ class BrokerAgencyProfile
       organizations = Organization.where("broker_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
       organizations.size > 0 ? organizations.first.broker_agency_profile : nil
     end
-
-    def agencies_with_active_brokers(query)
-      query.where({ "broker_agency_profile._id" => { "$in" => BrokerRole.agency_ids_for_active_brokers } })
-    end
   end
 
   aasm do #no_direct_assignment: true do
