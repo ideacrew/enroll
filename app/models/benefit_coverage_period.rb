@@ -15,7 +15,7 @@ class BenefitCoveragePeriod
   field :open_enrollment_start_on, type: Date
   field :open_enrollment_end_on, type: Date
 
-  # Second Lowest Cost Silver Plan, by rating area (only on rating area in DC)
+  # Second Lowest Cost Silver Plan, by rating area (only one rating area in DC)
   field :slcsp, type: BSON::ObjectId
 
   # embeds_many :open_enrollment_periods, class_name: "EnrollmentPeriod"
@@ -31,6 +31,10 @@ class BenefitCoveragePeriod
   validate :end_date_follows_start_date
 
   before_save :set_title
+
+  # The universe of products this sponsor may offer during this time period
+  def benefit_products
+  end
 
   def start_on=(new_date)
     new_date = Date.parse(new_date) if new_date.is_a? String
