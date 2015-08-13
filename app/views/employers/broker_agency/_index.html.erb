@@ -4,10 +4,13 @@
 
     <div class="pull-right broker_agencies_search">
       <div class="search-wp">
-        <%= render 'shared/search', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", q: @q, remote: true, placeholder: 'Agency/Broker Name' %>
+        <%= render 'shared/search', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", q: @q, remote: true, placeholder: 'Agency/Broker Name, NPN' %>
+        <span class="pull-right"><a href="#">Advanced Options</a></span>
       </div>
     </div>
   </div>
+
+
 
   <div class="row no-buffer">
     <div class="table-responsive">
@@ -15,6 +18,8 @@
         <thead>
           <tr>
             <th>Agency Name</th>
+            <th>Evening/Weekend Hours</th>
+            <th>Language(s) spoken</th>
             <th>Broker Name</th>
             <th>NPN</th>
             <th></th>
@@ -29,12 +34,15 @@
                 <%= link_to broker_agency.legal_name, employers_employer_profile_broker_agency_path(@employer_profile, broker_agency), remote: true %>
 
               </td>
-              <%= render "employers/broker_agency/broker", broker: brokers.first, broker_agency: broker_agency %>
-              <% if brokers.size > 1 %>
-                <% brokers.delete_at(0) %>
-                <% brokers.each do |b| %>
-                  <tr><%= render "employers/broker_agency/broker", broker: b, broker_agency: broker_agency %></tr>
-                <% end %>
+              <td <%= "rowspan=#{brokers.size}" %>>
+                Yes
+              </td>
+              <td <%= "rowspan=#{brokers.size}" %>>
+                English
+              </td>
+              <%= render "employers/broker_agency/broker", broker: brokers.delete(broker_agency.primary_broker_role), broker_agency: broker_agency %>
+              <% brokers.each do |b| %>
+                <tr><%= render "employers/broker_agency/broker", broker: b, broker_agency: broker_agency %></tr>
               <% end %>
             </tr>
             <% end %>
