@@ -43,22 +43,15 @@
 </div>
 
 <div class="container top-pd" id="browse_brokers">
-    <%= link_to 'Browse Brokers'.html_safe, ('javascript:;'), class: "btn btn-danger", id: "show_active_brokers" %>
+    <%= link_to 'Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-danger" %>
 </div>
 
 <div class="row no-buffer">
   <div class="col-xs-12"> 
   <div id="show_broker_agency"></div>
-  <div id="broker_agencies_panel" style="display:none">
-   <%= render "employers/broker_agency/index" %>
+  <div id="broker_agencies_panel">
   </div>
 </div>
 </div>
-
-<script>
-$("#show_active_brokers").click(function(){
-  $("#broker_agencies_panel").toggle();
-})
-</script>
 
 </div>

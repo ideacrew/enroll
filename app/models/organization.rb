@@ -17,7 +17,7 @@ class Organization
     "foreign_embassy_or_consulate"
   ]
 
-  auto_increment :hbx_id, type: Integer
+  field :hbx_id, type: String
 
   # Registered legal name
   field :legal_name, type: String
@@ -97,6 +97,11 @@ class Organization
   index({"employer_profile.broker_agency_accounts.is_active" => 1,
          "employer_profile.broker_agency_accounts.writing_agent_id" => 1 },
          { name: "active_broker_accounts_writing_agent" })
+  before_save :generate_hbx_id
+
+  def generate_hbx_id
+    write_attribute(:hbx_id, HbxIdGenerator.generate_organization_id) if hbx_id.blank?
+  end
 
   # Strip non-numeric characters
   def fein=(new_fein)

@@ -347,6 +347,10 @@ describe HbxEnrollment, dbclean: :after_all do
         @enrollment3.inactive_related_hbxs
       end
 
+      it "should have an assigned hbx_id" do
+        expect(@enrollment3.hbx_id).not_to eq nil
+      end
+
       it "enrollment and enrollment3 should have same household" do
         expect(@enrollment3.household).to eq enrollment.household
       end

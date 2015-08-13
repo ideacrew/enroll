@@ -6,5 +6,9 @@ FactoryGirl.define do
     home_page   "http://www.example.com"
     office_locations  { [FactoryGirl.build(:office_location),
                          FactoryGirl.build(:office_location, is_primary: false)] }
+
+    after(:create) do |organization|
+      FactoryGirl.create(:broker_agency_profile, organization: organization)
+    end
   end
 end

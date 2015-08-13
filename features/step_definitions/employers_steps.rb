@@ -90,7 +90,7 @@ And(/^It should default to active tab$/) do
   @browser.radio(id: "terminated_no").wait_until_present
   expect(@browser.radio(id: "terminated_no").set?).to be_truthy
   expect(@browser.radio(id: "terminated_yes").set?).to be_falsey
-  expect(@browser.radio(id: "family_waived").set?).to be_falsey
+  #expect(@browser.radio(id: "family_waived").set?).to be_falsey
   expect(@browser.radio(id: "family_all").set?).to be_falsey
 end
 
@@ -293,7 +293,8 @@ end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits with high FTE$/) do
 #Plan Year
-  @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").wait_until_present
+  # @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").wait_until_present
+  @browser.text_field(id: /plan_year_fte_count/).wait_until_present
   screenshot("employer_add_plan_year")
   @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").set("91/96/2017")
   @browser.h3(text: /Plan Year/).click

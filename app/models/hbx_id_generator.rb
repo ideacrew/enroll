@@ -8,27 +8,67 @@ class HbxIdGenerator
     @provider = AmqpSource
   end
 
-  def generate
-    provider.generate
+  def generate_member_id
+    provider.generate_member_id
+  end
+
+  def generate_policy_id
+    provider.generate_policy_id
+  end
+
+  def generate_organization_id
+    provider.generate_organization_id
   end
 
   def self.slug!
     self.instance.provider = SlugSource
   end
 
-  def self.generate
-    self.instance.generate
+  def self.generate_policy_id
+    self.instance.generate_policy_id
+  end
+
+  def self.generate_member_id
+    self.instance.generate_member_id
+  end
+
+  def self.generate_organization_id
+    self.instance.generate_organization_id
   end
 
   class AmqpSource
-    def self.generate
-      request_result = Acapi::Requestor.request("sequence.next", {:sequence_name => "member_id"})
+    def self.generate_id_from_sequence(sequence_name)
+      request_result = Acapi::Requestor.request("sequence.next", {:sequence_name => sequence_name})
       JSON.load(request_result.stringify_keys["body"]).first.to_s
+    end
+
+    def self.generate_member_id
+      generate_id_from_sequence("member_id")
+    end
+
+    def self.generate_policy_id
+      generate_id_from_sequence("policy_id")
+    end
+
+    def self.generate_organization_id
+      generate_id_from_sequence("organization_id")
     end
   end
 
   class SlugSource
-    def self.generate
+    def self.generate_organization_id
+      random_uuid
+    end
+
+    def self.generate_policy_id
+      random_uuid
+    end
+
+    def self.generate_member_id
+      random_uuid
+    end
+
+    def self.random_uuid
       SecureRandom.uuid.gsub("-","")
     end
   end
