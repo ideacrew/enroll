@@ -25,12 +25,12 @@
       <ridp:question_text>If somehow there was another question</ridp:question_text>
       <ridp:response_options>
         <ridp:response_option>
-          <ridp:response_id>A</ridp:response_id>
-          <ridp:response_text>pick answer 2 A</ridp:response_text>
+          <ridp:response_id>C</ridp:response_id>
+          <ridp:response_text>pick answer C</ridp:response_text>
         </ridp:response_option>
         <ridp:response_option>
-          <ridp:response_id>B</ridp:response_id>
-          <ridp:response_text>pick answer 2 B</ridp:response_text>
+          <ridp:response_id>D</ridp:response_id>
+          <ridp:response_text>pick answer D</ridp:response_text>
         </ridp:response_option>
       </ridp:response_options>
     </ridp:question>
