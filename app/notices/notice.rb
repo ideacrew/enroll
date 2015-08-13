@@ -11,20 +11,24 @@ class Notice
 
   def html
     ApplicationController.new.render_to_string({ 
-      template: @template, 
-      locals: @notice_data
-      })
+      :template => @template,
+      :layout => false,
+      :locals => @notice_data
+    })
   end
 
   def pdf
     WickedPdf.new.pdf_from_string(
-      self.html
-      # margin:  {  
-      #   top: 10,
-      #   bottom: 10,
-      #   left: 20,
-      #   right: 20 
-      # },
+      self.html,
+      margin:  {  
+        top: 10,
+        bottom: 10,
+        left: 25,
+        right: 25 
+      },
+      page_size: 'Letter',
+      formats: :html, 
+      encoding: 'utf8'
       # header:  {   
       #   :center => "Center",
       #   :left => "Left",

@@ -1,11 +1,11 @@
-class EmployeeRenewalNotice < ShopNotice
+class EmployeeRenewalNotice < Notice
 
   def initialize(employee, args = {})
     super
     @employee = employee
     @to = "raghuramg83@gmail.com"
     @subject = "Employee Renewal notice"
-    @template = "user_mailer/welcome.text.erb"
+    @template = "notices/ivl/cover.html.erb"
     build
   end
 
