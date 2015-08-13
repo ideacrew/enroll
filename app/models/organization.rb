@@ -155,4 +155,23 @@ class Organization
       end
     end
   end
+
+
+  class << self
+
+    def broker_agencies
+      Organization.exists(broker_agency_profile: true)
+    end
+
+    def broker_agencies_having_active_brokers
+      broker_agencies.where({ "broker_agency_profile._id" => { "$in" => BrokerRole.agency_ids_for_active_brokers } }) 
+    end
+
+    def broker_agencies_with_matching_agency_or_broker(search_str)
+      return broker_agencies if search_str.blank?
+      orgs1 = broker_agencies_having_active_brokers.search(search_str)
+      orgs2 = broker_agencies.where({ "broker_agency_profile._id" => { "$in" => BrokerRole.brokers_matching_search_criteria(search_str) } })
+      orgs1.concat(orgs2)
+    end
+  end
 end

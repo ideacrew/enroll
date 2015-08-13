@@ -41,5 +41,7 @@
         </tbody>
       </table>
     </div>
+    <% if @page_alphabets.present? %>
     <%= render 'shared/alph_paginate', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", alphs: @page_alphabets, remote: true %>
+    <% end %>
 </div>
