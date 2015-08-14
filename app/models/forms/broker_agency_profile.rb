@@ -17,6 +17,8 @@ module Forms
 
     validates :email, :email => true, :allow_blank => false
 
+    validate :validate_duplicate_npn
+
     class OrganizationAlreadyMatched < StandardError; end
 
     def self.model_name
@@ -95,6 +97,12 @@ module Forms
         }),
         :office_locations => office_locations
       )
+    end
+
+    def validate_duplicate_npn
+      if Person.where("broker_role.npn" => npn).any?
+        errors.add(:base, "NPN has already been claimed by another broker. Please contact HBX.")
+      end
     end
 
     def check_existing_organization

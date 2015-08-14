@@ -3,7 +3,6 @@ class BrokerRole
   include Mongoid::Timestamps
   include AASM
 
-
   PROVIDER_KINDS = %W[broker assister]
 
   embedded_in :person
@@ -35,7 +34,6 @@ class BrokerRole
   validates :provider_kind,
     allow_blank: false,
     inclusion: { in: PROVIDER_KINDS, message: "%{value} is not a valid provider kind" }
-
 
   scope :active,    ->{ any_in(aasm_state: ["applicant", "active", "broker_agency_pending"]) }
   scope :inactive,  ->{ any_in(aasm_state: ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"]) }
@@ -152,13 +150,19 @@ class BrokerRole
     end
 
     def agency_ids_for_active_brokers
-      # people = Person.and(
-      # :"broker_role.aasm_state"  => "active")
-
-      # people.collect(&:broker_role).map(&:broker_agency_profile_id)  
-
       Person.collection.raw_aggregate([
         {"$match" => {"broker_role.aasm_state" => "active"}},
+        {"$group" => {"_id" => "$broker_role.broker_agency_profile_id"}}
+      ]).map do |record|
+        record["_id"]
+      end
+    end
+
+    def brokers_matching_search_criteria(search_str)
+      broker_role_ids = Person.exists(broker_role: true).search(search_str).map(&:broker_role).map(&:id)
+
+      Person.collection.raw_aggregate([
+        {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},
         {"$group" => {"_id" => "$broker_role.broker_agency_profile_id"}}
       ]).map do |record|
         record["_id"]

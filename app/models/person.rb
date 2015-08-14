@@ -339,6 +339,15 @@ class Person
             ).selector
          )
     end
+
+    def search_first_name_last_name_npn(s_str, query=self)
+      s_rex = Regexp.new(Regexp.escape(s_str.strip), true)
+      query.where({"$or" => ([
+         {"first_name" => s_rex},
+         {"last_name" => s_rex},
+         {"broker_role.npn" => s_rex}
+       ])})
+    end
   end
 
 private

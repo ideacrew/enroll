@@ -15,6 +15,8 @@ class BenefitSponsorship
 
   accepts_nested_attributes_for :benefit_coverage_periods, :geographic_rating_areas
 
+  validates_presence_of :service_markets
+
 # effective_coverage_period
 # HBX: Jan-Dec
 # Employers: year-over-year, e.g. Jun-May

@@ -9,8 +9,8 @@ module Forms
 
     attr_accessor :broker_agency_id, :broker_applicant_type
 
-    validate :broker_agency_presence
-    validate :broker_with_same_npn, :if => Proc.new {|p| p.broker_applicant_type != 'staff'}
+    validate :validate_broker_agency
+    validate :validate_duplicate_npn, :if => Proc.new {|p| p.broker_applicant_type != 'staff'}
 
     validates :npn,
       length: { maximum: 10, message: "%{value} is not a valid NPN" },
@@ -47,7 +47,7 @@ module Forms
       true
     end
 
-    def broker_agency_presence
+    def validate_broker_agency
       if self.broker_agency_id.blank?
         errors.add(:base, "Please select your broker agency.")
       elsif ::BrokerAgencyProfile.find(self.broker_agency_id).blank?
@@ -55,8 +55,8 @@ module Forms
       end
     end
 
-    def broker_with_same_npn
-      if Person.where("broker_role.npn" => npn).count > 0
+    def validate_duplicate_npn
+      if Person.where("broker_role.npn" => npn).any?
         errors.add(:base, "NPN has already been claimed by another broker. Please contact HBX.")
       end
     end
