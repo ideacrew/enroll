@@ -1,4 +1,4 @@
-= form_for(@interactive_verification, :url => insured_interactive_identity_verifications_path) do |f|
+= form_for(@interactive_verification, :as => :interactive_verification, :url => insured_interactive_identity_verifications_path) do |f|
   = f.hidden_field :session_id
   = f.hidden_field :transaction_id
   = f.fields_for :questions do |qf|

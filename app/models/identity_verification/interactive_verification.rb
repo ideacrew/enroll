@@ -17,6 +17,10 @@ module IdentityVerification
 
       validates_presence_of :response_id, :message => "You must select a response."
 
+      def answer
+        @responses.detect { |r| r.response_id == response_id }
+      end
+
       def unanswered?
         @response_id.blank?
       end
