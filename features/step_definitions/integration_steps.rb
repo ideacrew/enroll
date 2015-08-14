@@ -289,8 +289,9 @@ When(/^.+ enters? the identifying info of (.*)$/) do |named_person|
 end
 
 Then(/^.+ should not see the matched employee record form$/) do
-  @browser.element(class: /fa-exclamation-triangle/).wait_until_present
-  expect(@browser.element(class: /interaction-click-control-this-is-my-employer/).exists?).to be_falsey
+  @browser.text_field(id: /person_first_name/).wait_until_present
+  expect(@browser.url.include?("consumer_role")).to be_truthy
+  # expect(@browser.element(class: /interaction-click-control-this-is-my-employer/).exists?).to be_falsey
 end
 
 Then(/^Employee should see the matched employee record form$/) do

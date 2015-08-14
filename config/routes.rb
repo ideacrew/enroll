@@ -182,6 +182,8 @@ Rails.application.routes.draw do
       end
     end
     root 'employee_roles#show'
+
+    resources :consumer_role, controller: 'consumer_roles'
   end
 
   # used to select which people are going to be covered before plan selection
