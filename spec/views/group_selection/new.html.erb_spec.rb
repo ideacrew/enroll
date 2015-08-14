@@ -32,8 +32,8 @@ RSpec.describe "group_selection/new.html.erb" do
       expect(rendered).to have_selector("input[type='checkbox']", count: 3)
     end
 
-    it "should have a checked checkbox option" do
-      expect(rendered).to have_selector("input[checked='checked']", count: 2)
+    it "should have a checked checkbox option and a checked radio button" do
+      expect(rendered).to have_selector("input[checked='checked']", count: 3)
     end
 
     it "should have a disabled checkbox option" do
