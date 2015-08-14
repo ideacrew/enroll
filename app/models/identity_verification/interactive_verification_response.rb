@@ -10,6 +10,11 @@ module IdentityVerification
 
     element "session", "IdentityVerification::InteractiveVerificationSession"
 
+    def successful?
+      return false if verification_result.nil?
+      "urn:openhbx:terms:v1:interactive_identity_verification#SUCCESS" == response_code
+    end
+
     def failed?
       "urn:openhbx:terms:v1:interactive_identity_verification#FAILURE" == response_code
     end
