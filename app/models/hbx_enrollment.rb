@@ -7,7 +7,7 @@ class HbxEnrollment
   include AASM
   include MongoidSupport::AssociationProxies
 
-  Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
+  Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip individual]
   Authority = [:open_enrollment]
   WAIVER_REASONS = [
     "I have coverage through spouse’s employer health plan",
@@ -40,6 +40,9 @@ class HbxEnrollment
   field :benefit_group_id, type: BSON::ObjectId
   field :benefit_group_assignment_id, type: BSON::ObjectId
   field :hbx_id, type: String
+
+  field :consumer_role_id, type: BSON::ObjectId
+  field :benefit_package_id, type: BSON::ObjectId
 
   field :submitted_at, type: DateTime
 
@@ -190,8 +193,17 @@ class HbxEnrollment
   end
 
   def inactive_related_hbxs
-    hbxs = household.hbx_enrollments.ne(id: id).select do |hbx|
-      hbx.employee_role.present? and hbx.employee_role.employer_profile_id == employee_role.employer_profile_id
+    hbxs = if employee_role.present?
+      household.hbx_enrollments.ne(id: id).select do |hbx|
+        hbx.employee_role.present? and hbx.employee_role.employer_profile_id == employee_role.employer_profile_id
+      end
+    elsif consumer_role_id.present?
+      #FIXME when have more than one individual hbx
+      household.hbx_enrollments.ne(id: id).select do |hbx|
+        hbx.consumer_role_id.present? and hbx.consumer_role_id == consumer_role_id
+      end
+    else
+      []
     end
     household.hbx_enrollments.any_in(id: hbxs.map(&:_id)).update_all(is_active: false)
   end
@@ -216,6 +228,23 @@ class HbxEnrollment
     #it will be better to create a new benefit_group_assignment
     benefit_group_assignment = census_employee.benefit_group_assignments.by_benefit_group_id(benefit_group.id).first
     enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+    coverage_household.coverage_household_members.each do |coverage_member|
+      enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
+      enrollment_member.eligibility_date = enrollment.effective_on
+      enrollment_member.coverage_start_on = enrollment.effective_on
+      enrollment.hbx_enrollment_members << enrollment_member
+    end
+    enrollment
+  end
+
+  def self.ivl_from(consumer_role: nil, coverage_household:, benefit_package: nil)
+    enrollment = HbxEnrollment.new
+    enrollment.household = coverage_household.household
+    enrollment.kind = "individual" #if consumer_role.present?
+    enrollment.consumer_role_id = consumer_role.id if consumer_role.present?
+    #FIXME benefit_package.benefit_coverage_period.start_on
+    enrollment.effective_on = TimeKeeper.date_of_record.beginning_of_year
+    enrollment.benefit_package_id = benefit_package.id if benefit_package.present?
     coverage_household.coverage_household_members.each do |coverage_member|
       enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
       enrollment_member.eligibility_date = enrollment.effective_on

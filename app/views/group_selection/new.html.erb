@@ -30,6 +30,17 @@
           </div>
 
           <br>
+          <div id="coverage_kinds" class='row no-buffer'>
+            <div class="col-md-3 col-lg-3 col-sm-6">
+              <%= radio_button_tag 'coverage_kind', 'health', true, id: 'coverage_kind_health' %>
+              <label for="coverage_kind_health">Health</label>
+            </div>
+            <div class="col-md-3 col-lg-3 col-sm-6">
+              <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental' %>
+              <label for="coverage_kind_dental">Dental</label>
+            </div>
+          </div>
+          <%= hidden_field_tag 'market_kind', @market_kind %>
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', @change_plan %>
             <h4><strong>What do you like to do?</strong></h4>

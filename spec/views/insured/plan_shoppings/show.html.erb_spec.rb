@@ -22,6 +22,8 @@ RSpec.describe "insured/show" do
     @reference_plan = @benefit_group.reference_plan
     @plan = PlanCostDecorator.new(plan, hbx_enrollment, @benefit_group, @reference_plan)
     @plans=[]
+    assign(:market_kind, "shop")
+    assign(:coverage_kind, "health")
     stub_template "insured/plan_shoppings/_plan_details.html.erb" => []
     stub_template "shared/_signup_progress.html.erb" => ''
     stub_template "insured/_plan_filters.html.erb" => ''
