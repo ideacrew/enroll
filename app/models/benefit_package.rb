@@ -4,19 +4,19 @@ class BenefitPackage
 
   embedded_in :benefit_coverage_period
 
-  ELIGIBLE_RELATIONSHIP_CATEGORY_KINDS = [
-      :self,
-      :spouse,
-      :domestic_partner,
-      :children_under_26,
-      :disabled_children_26_and_over,
-      :children_26_and_over,
-      :dependents
-    ]
+  ELIGIBLE_RELATIONSHIP_CATEGORY_KINDS = %w(
+      self
+      spouse
+      domestic_partner
+      children_under_26
+      disabled_children_26_and_over
+      children_26_and_over
+      dependents
+    )
 
   BENEFIT_BEGIN_OFFSET_PERIOD_KINDS = [0, 30, 60, 90]
-  BENEFIT_EFFECTIVE_DATE_KINDS      = [:date_of_event, :first_of_month]
-  BENEFIT_TERMINATION_DATE_KINDS    = [:date_of_event, :end_of_month]
+  BENEFIT_EFFECTIVE_DATE_KINDS      = %w(date_of_event first_of_month)
+  BENEFIT_TERMINATION_DATE_KINDS    = %w(date_of_event end_of_month)
 
   # Premium Credit Strategies
   # 1. Unassisted: subscriber is responsible for total premium cost
@@ -25,7 +25,7 @@ class BenefitPackage
   # 4. Percentage contribution: contribution ratio applied to each eligible relationship category 
   # 5. Indexed percentage contribution (e.g. DCHL SHOP method): using selected reference benefit, contribution ratio applied to each eligible relationship category 
   # 6. (congress)
-  PREMIUM_CREDIT_STRATEGY_KINDS  = [:unassisted, :lump_sum_contribution, :allocated_lump_sum_credit, :percentage_contribution, :indexed_percentage_contribution]
+  PREMIUM_CREDIT_STRATEGY_KINDS  = %w(unassisted lump_sum_contribution allocated_lump_sum_credit percentage_contribution indexed_percentage_contribution)
 
   field :title, type: String, default: ""
 
@@ -34,7 +34,7 @@ class BenefitPackage
   field :benefit_effective_dates, type: Array, default: []
   field :benefit_termination_dates, type: Array, default: []
 
-  field :premium_credit_strategy, type: String
+  field :elected_premium_credit_strategy, type: String
   field :index_benefit_id, type: BSON::ObjectId
   field :benefit_ids, type: Array, default: []
 
@@ -42,35 +42,35 @@ class BenefitPackage
 
   embeds_one :premium_credit_strategy
 
-  validates :eligible_relationship_categories,
-    allow_blank: false,
-    inclusion: {
-      in: ELIGIBLE_RELATIONSHIP_CATEGORY_KINDS,
-      message: "%{value} is not a valid eligble relationship category kind"
-    }
+  # validates :eligible_relationship_categories,
+  #   allow_blank: false,
+  #   inclusion: {
+  #     in: ELIGIBLE_RELATIONSHIP_CATEGORY_KINDS,
+  #     message: "%{value} is not a valid eligble relationship category kind"
+  #   }
 
-  validates :benefit_begin_offset_periods,
-    allow_blank: false,
-    inclusion: {
-      in: BENEFIT_BEGIN_OFFSET_PERIOD_KINDS,
-      message: "%{value} is not a valid benefit begin offset period kind"
-    }
+  # validates :benefit_begin_offset_periods,
+  #   allow_blank: false,
+  #   inclusion: {
+  #     in: BENEFIT_BEGIN_OFFSET_PERIOD_KINDS,
+  #     message: "%{value} is not a valid benefit begin offset period kind"
+  #   }
 
-  validates :benefit_effective_dates,
-    allow_blank: false,
-    inclusion: {
-      in: BENEFIT_EFFECTIVE_DATE_KINDS,
-      message: "%{value} is not a valid benefit effective date kind"
-    }
+  # validates :benefit_effective_dates,
+  #   allow_blank: false,
+  #   inclusion: {
+  #     in: BENEFIT_EFFECTIVE_DATE_KINDS,
+  #     message: "%{value} is not a valid benefit effective date kind"
+  #   }
 
-  validates :benefit_termination_dates,
-    allow_blank: false,
-    inclusion: {
-      in: BENEFIT_TERMINATION_DATE_KINDS,
-      message: "%{value} is not a valid benefit termination date kind"
-    }
+  # validates :benefit_termination_dates,
+  #   allow_blank: false,
+  #   inclusion: {
+  #     in: BENEFIT_TERMINATION_DATE_KINDS,
+  #     message: "%{value} is not a valid benefit termination date kind"
+  #   }
 
-  validates :premium_credit_strat,
+  validates :elected_premium_credit_strategy,
     allow_blank: false,
     inclusion: {
       in: PREMIUM_CREDIT_STRATEGY_KINDS,
