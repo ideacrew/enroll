@@ -18,13 +18,14 @@ class BenefitPackage
   BENEFIT_EFFECTIVE_DATE_KINDS      = [:date_of_event, :first_of_month]
   BENEFIT_TERMINATION_DATE_KINDS    = [:date_of_event, :end_of_month]
 
-
-  # Premium Credit Models
-  # Lump sum contribution: fixed dollar amount applied toward total premium cost
-  # Allocated lump sum credit (e.g. APTC): fixed dollar amount apportioned among eligible relationship categories
-  # Percentage contribution: contribution ratio applied to each eligible relationship category 
-  # Indexed percentage contribution: using selected reference benefit, contribution ratio applied to each eligible relationship category 
-  PREMIUM_CREDIT_MODEL_KINDS  = [:none, :lump_sum_contribution, :allocated_lump_sum_credit, :percentage_contribution, :indexed_percentage_contribution]
+  # Premium Credit Strategies
+  # 1. Unassisted: subscriber is responsible for total premium cost
+  # 2. Lump sum contribution: fixed dollar amount applied toward subscriber's total premium cost
+  # 3. Allocated lump sum credit (e.g. APTC): fixed dollar amount apportioned among eligible relationship categories
+  # 4. Percentage contribution: contribution ratio applied to each eligible relationship category 
+  # 5. Indexed percentage contribution (e.g. DCHL SHOP method): using selected reference benefit, contribution ratio applied to each eligible relationship category 
+  # 6. (congress)
+  PREMIUM_CREDIT_STRATEGY_KINDS  = [:unassisted, :lump_sum_contribution, :allocated_lump_sum_credit, :percentage_contribution, :indexed_percentage_contribution]
 
   field :title, type: String, default: ""
 
@@ -33,12 +34,13 @@ class BenefitPackage
   field :benefit_effective_dates, type: Array, default: []
   field :benefit_termination_dates, type: Array, default: []
 
-  field :premium_credit_model, type: String
+  field :premium_credit_strategy, type: String
   field :index_benefit_id, type: BSON::ObjectId
-
-  field :elected_benefit_ids, type: Array, default: []
+  field :benefit_ids, type: Array, default: []
 
   delegate :start_on, :end_on, to: :benefit_coverage_period
+
+  embeds_one :premium_credit_strategy
 
   validates :eligible_relationship_categories,
     allow_blank: false,
@@ -68,11 +70,11 @@ class BenefitPackage
       message: "%{value} is not a valid benefit termination date kind"
     }
 
-  validates :premium_credit_model,
+  validates :premium_credit_strat,
     allow_blank: false,
     inclusion: {
-      in: PREMIUM_CREDIT_MODEL_KINDS,
-      message: "%{value} is not a valid premium credit model kind"
+      in: PREMIUM_CREDIT_STRATEGY_KINDS,
+      message: "%{value} is not a valid premium credit strategy kind"
     }
 
 end
