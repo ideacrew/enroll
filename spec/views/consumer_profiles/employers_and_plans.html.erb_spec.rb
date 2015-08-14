@@ -5,11 +5,13 @@ RSpec.describe "consumer_profiles/_employers_and_plans.html.erb" do
   let(:user) {FactoryGirl.create(:user, :person=>person)}
   let(:employee_role) { FactoryGirl.create(:employee_role) }
   let(:subscriber){ double("HbxEnrollmentMember", id: double("my id")) }
-  let(:hbx_enrollment) { double(benefit_group_assignment: benefit_group_assignment,
+  let(:shop_hbx_enrollment) { double(benefit_group_assignment: benefit_group_assignment,
     plan: plan,
     subscriber: subscriber,
     benefit_group_id: "my benefit group id",
-    effective_on: "10/01/2015"
+    effective_on: "10/01/2015",
+    coverage_selected?: true,
+    kind: "employer_sponsored"
     ) }
   let(:carrier_profile){ instance_double("CarrierProfile", legal_name: "My legal name") }
   let(:plan) { double(name: "my select plan",
@@ -24,7 +26,7 @@ RSpec.describe "consumer_profiles/_employers_and_plans.html.erb" do
     before :each do
       allow(employee_role).to receive(:effective_on).and_return(Date.new(2015,8,8))
       assign(:employee_role, employee_role)
-      assign(:hbx_enrollments, [hbx_enrollment])
+      assign(:hbx_enrollments, [shop_hbx_enrollment])
       assign(:person, person)
       assign(:change_plan, 'change')
       assign(:employer_profile, employer_profile)
@@ -42,13 +44,13 @@ RSpec.describe "consumer_profiles/_employers_and_plans.html.erb" do
       expect(rendered).to match(/#{plan.name}/)
       expect(rendered).to match(/#{plan.plan_type}/i)
       expect(rendered).to match(/#{plan.metal_level.humanize}/)
-      expect(rendered).to match(/#{hbx_enrollment.subscriber.id.to_s}/)
-      expect(rendered).to match(/#{hbx_enrollment.benefit_group_id.to_s}/)
-      expect(rendered).to match(/#{hbx_enrollment.effective_on}/)
+      expect(rendered).to match(/#{shop_hbx_enrollment.subscriber.id.to_s}/)
+      expect(rendered).to match(/#{shop_hbx_enrollment.benefit_group_id.to_s}/)
+      expect(rendered).to match(/#{shop_hbx_enrollment.effective_on}/)
     end
 
     it "should show the link of shop for plan" do
-      expect(rendered).to match(/Shop for plans/)
+      expect(rendered).to match(/Update Plan/)
       target = "a[href='/group_selection/new?change_plan=change&employee_role_id=#{employee_role.id}&person_id=#{person.id}']"
       expect(rendered).to match /#{target}/
     end
@@ -64,7 +66,7 @@ RSpec.describe "consumer_profiles/_employers_and_plans.html.erb" do
     before :each do
       allow(employee_role).to receive(:effective_on).and_return(Date.new(2015,8,8))
       assign(:employee_role, employee_role)
-      assign(:hbx_enrollments, [hbx_enrollment])
+      assign(:hbx_enrollments, [shop_hbx_enrollment])
       assign(:person, person)
       sign_in user
       render template: "consumer_profiles/_employers_and_plans.html.erb"
@@ -80,9 +82,9 @@ RSpec.describe "consumer_profiles/_employers_and_plans.html.erb" do
     let(:benefit_group_assignment) { double(coverage_waived?: false) }
     before :each do
       allow(employee_role).to receive(:effective_on).and_return(Date.new(2015,8,8))
-      allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
+      allow(shop_hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
       assign(:employee_role, employee_role)
-      assign(:hbx_enrollments, [hbx_enrollment])
+      assign(:hbx_enrollments, [shop_hbx_enrollment])
       assign(:person, person)
       sign_in user
       render template: "consumer_profiles/_employers_and_plans.html.erb"
@@ -101,7 +103,7 @@ RSpec.describe "consumer_profiles/_employers_and_plans.html.erb" do
 
     before :each do
       assign(:employee_role, employee_role)
-      assign(:hbx_enrollments, [hbx_enrollment])
+      assign(:hbx_enrollments, [shop_hbx_enrollment])
       assign(:person, person)
       assign(:employee_role, employee_role)
       sign_in user
@@ -121,7 +123,7 @@ RSpec.describe "consumer_profiles/_employers_and_plans.html.erb" do
 
     before :each do
       assign(:employee_role, employee_role)
-      assign(:hbx_enrollments, [hbx_enrollment])
+      assign(:hbx_enrollments, [shop_hbx_enrollment])
       assign(:person, person)
       assign(:employee_role, employee_role)
       sign_in user
