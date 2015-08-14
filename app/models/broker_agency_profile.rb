@@ -132,6 +132,12 @@ class BrokerAgencyProfile
     self.is_approved?
   end
 
+  def languages
+    if languages_spoken.any?
+      return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name}.join(",")
+    end
+  end
+
   ## Class methods
   class << self
     def list_embedded(parent_list)

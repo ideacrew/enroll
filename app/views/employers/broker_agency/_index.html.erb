@@ -5,12 +5,53 @@
     <div class="pull-right broker_agencies_search">
       <div class="search-wp">
         <%= render 'shared/search', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", q: @q, remote: true, placeholder: 'Agency/Broker Name, NPN' %>
-        <span class="pull-right"><a href="#">Advanced Options</a></span>
+        <span class="pull-right">
+          <a class="search-options" style="cursor: pointer;">Advanced Options</a>
+        </span>
+      </div>
+
+      <div id="advanced_options" style="display: none;">
+          <div class="language_multi_select">
+             <%= select_tag(:languages_spoken, options_from_collection_for_select(LanguageList::COMMON_LANGUAGES.sort_by {|lan| lan.common_name}, "iso_639_1", "common_name"), { id: 'broker_agency_language_select', multiple: "multiple" } ) %>
+          </div>
+          <div>
+            <label>
+              <%= check_box_tag :working_hours, {id: 'working_hours'} %> Evening/Weekend Availability
+            </label>
+          </div>
       </div>
     </div>
   </div>
 
+<script type="text/javascript">
+    $(function() {
+      $(".search-options").click(function () {
+        $("#advanced_options").toggle();
+      });
+  
+      $('select').selectric();
 
+      $('#broker_agency_language_select').on('selectric-init', function(element){
+        $('#broker_agency_language_select').selectric('destroy'); 
+        $('#broker_agency_language_select').multiselect({
+           nonSelectedText: 'Language(s) spoken',
+           maxHeight: 300
+        });
+      });
+    });
+</script>
+
+<style type="text/css">
+ .language_multi_select .multiselect {
+    border: none;
+    font-size: 12px;
+    line-height: 30px;
+ }
+
+ .language_multi_select .multiselect .caret {
+    color: #bbb;
+ }
+</style>
 
   <div class="row no-buffer">
     <div class="table-responsive">
@@ -35,10 +76,10 @@
 
               </td>
               <td <%= "rowspan=#{brokers.size}" %>>
-                Yes
+                <%= broker_agency.working_hours ? "Yes" : "No" %>
               </td>
               <td <%= "rowspan=#{brokers.size}" %>>
-                English
+                <%= broker_agency.languages %>
               </td>
               <%= render "employers/broker_agency/broker", broker: brokers.delete(broker_agency.primary_broker_role), broker_agency: broker_agency %>
               <% brokers.each do |b| %>
