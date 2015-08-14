@@ -159,7 +159,7 @@ class BrokerRole
     end
 
     def brokers_matching_search_criteria(search_str)
-      broker_role_ids = Person.exists(broker_role: true).search(search_str).map(&:broker_role).map(&:id)
+      broker_role_ids = Person.exists(broker_role: true).search_first_name_last_name_npn(search_str).map(&:broker_role).map(&:id)
 
       Person.collection.raw_aggregate([
         {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},

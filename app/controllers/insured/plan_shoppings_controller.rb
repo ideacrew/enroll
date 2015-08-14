@@ -36,6 +36,9 @@ class Insured::PlanShoppingsController < ApplicationController
     reference_plan = benefit_group.reference_plan
     @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    if @person.employee_roles.any?
+      @employer_profile = @person.employee_roles.first.employer_profile
+    end
   end
 
   def thankyou
