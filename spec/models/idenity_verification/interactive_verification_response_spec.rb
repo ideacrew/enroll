@@ -147,6 +147,49 @@ describe IdentityVerification::InteractiveVerificationResponse do
           end
         end
       end
+
+      describe "which can be converted to a form model" do
+        let(:model) { subject.to_model  }
+
+        it "should have 2 questions" do
+          expect(model.questions.length).to eq 2
+        end
+
+        describe "the first question" do
+          let(:expected_question_id) { "First Question" }
+          let(:expected_question_text) { "If you had to answer a question" }
+          let(:question) { model.questions.first }
+
+          it "should have the correct question id" do
+            expect(question.question_id).to eq expected_question_id
+          end
+
+          it "should have the correct question text" do
+            expect(question.question_text).to eq expected_question_text
+          end
+
+          describe "with responses" do
+            it "should have 2 response options" do
+              expect(question.responses.length).to eq 2
+            end
+
+            describe "with response option 1" do
+              let(:expected_response_id) { "A" }
+              let(:expected_response_text) { "pick answer A" }
+              let(:response_option) { question.responses.first }
+
+              it "should have the correct response_id" do
+                expect(response_option.response_id).to eq expected_response_id
+              end
+
+              it "should have the correct response_text" do
+                expect(response_option.response_text).to eq expected_response_text
+              end
+            end
+
+          end
+        end
+      end
     end
   end
 end

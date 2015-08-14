@@ -46,5 +46,28 @@ module IdentityVerification
     def continue_session?
       !session.nil?
     end
+
+    def to_model
+      question_attributes = {}
+      questions.each_with_index do |q, idx|
+        response_attributes = {}
+        q.response_options.each_with_index do |ro, r_idx|
+          response_attributes[r_idx] = {
+            response_id: ro.response_id,
+            response_text: ro.response_text
+          }
+        end
+        question_attributes[idx.to_s] = {
+          question_id: q.question_id,
+          question_text: q.question_text,
+          response_attributes: response_attributes
+        }
+      end
+      ::IdentityVerification::InteractiveVerification.new(
+        :session_id => session_id,
+        :transaction_id => transaction_id,
+        :questions_attributes => question_attributes
+      )
+    end
   end
 end
