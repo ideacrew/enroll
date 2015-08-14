@@ -15,6 +15,7 @@ organization.xsd
 plan.xsd
 policy.xsd
 premium.xsd
+verification_services.xsd
 vocabulary.xsd
   )
 
