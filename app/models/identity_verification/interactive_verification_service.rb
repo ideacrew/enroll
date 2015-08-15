@@ -22,7 +22,7 @@ module IdentityVerification
     end
 
     def self.requestor
-      @@requestor = Acapi::Requestor
+      @@requestor ||= Acapi::Requestor
     end
 
     def initiate_session(payload)
