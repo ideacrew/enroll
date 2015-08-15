@@ -27,7 +27,7 @@ module Insured
           render "service_unavailable"
         else
           if service_response.successful?
-            process_successful_interactive_verification(@interactive_verification)
+            process_successful_interactive_verification(@interactive_verification, service_response)
           else
             @verification_response = service_response
             render "failed_validation" 
@@ -38,7 +38,14 @@ module Insured
       end
     end
 
-    def process_successful_interactive_verification(verification_response)
+    def process_successful_interactive_verification(interactive_verification, service_response)
+      consumer_role = @person.consumer_role
+      consumer_role.identity_final_decision_code = ConsumerRole::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+      consumer_role.identity_response_code = ConsumerRole::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+      consumer_role.identity_response_description_text = service_response.response_text
+      consumer_role.identity_final_decision_transaction_id = service_response.transaction_id
+      consumer_role.identity_verified_date = Date.today
+      consumer_role.verify_identity!
       redirect_to root_path
     end
 
