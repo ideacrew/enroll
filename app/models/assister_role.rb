@@ -24,7 +24,7 @@ class AssisterRole
     # TODO; return as chainable Mongoid::Criteria
     def all
       # criteria = Mongoid::Criteria.new(Person)
-      list_assisters(Person.where(assister_role: true))
+      list_assisters(Person.where(assister_role: {:$exists => true}))
     end
 
     def first

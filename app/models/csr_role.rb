@@ -25,7 +25,7 @@ class CsrRole
     # TODO; return as chainable Mongoid::Criteria
     def all
       # criteria = Mongoid::Criteria.new(Person)
-      list_csrs(Person.where(csr_role: true))
+      list_csrs(Person.where(csr_role: {:$exists => true}))
     end
 
     def first

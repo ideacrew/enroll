@@ -16,6 +16,7 @@ Rails.application.routes.draw do
         get :product_index
         get :configuration
         post :set_date
+        get :staff_index
       end
 
       member do
