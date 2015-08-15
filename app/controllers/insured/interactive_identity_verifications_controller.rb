@@ -3,38 +3,46 @@ module Insured
     before_action :set_current_person
 
     def new
-        service = ::IdentityVerification::InteractiveVerificationService.new
-        service_response = service.initiate_session(render_session_start)
-        if service_response.blank?
-          render "service_unavailable"
-        else
-          if service_response.failed?
-            @verification_response = service_response
-            render "failed_validation" 
+      service = ::IdentityVerification::InteractiveVerificationService.new
+      service_response = service.initiate_session(render_session_start)
+      respond_to do |format|
+        format.html do
+          if service_response.blank?
+            render "service_unavailable"
           else
-            @interactive_verification = service_response.to_model
-            render :new
+            if service_response.failed?
+              @verification_response = service_response
+              render "failed_validation" 
+            else
+              @interactive_verification = service_response.to_model
+              render :new
+            end
           end
         end
+      end
     end
 
     def create
       @interactive_verification = ::IdentityVerification::InteractiveVerification.new(params.require(:interactive_verification).permit!)
-      if @interactive_verification.valid?
-        service = ::IdentityVerification::InteractiveVerificationService.new
-        service_response = service.respond_to_questions(render_question_responses(@interactive_verification))
-        if service_response.blank?
-          render "service_unavailable"
-        else
-          if service_response.successful?
-            process_successful_interactive_verification(@interactive_verification, service_response)
+      respond_to do |format|
+        format.html do
+          if @interactive_verification.valid?
+            service = ::IdentityVerification::InteractiveVerificationService.new
+            service_response = service.respond_to_questions(render_question_responses(@interactive_verification))
+            if service_response.blank?
+              render "service_unavailable"
+            else
+              if service_response.successful?
+                process_successful_interactive_verification(@interactive_verification, service_response)
+              else
+                @verification_response = service_response
+                render "failed_validation" 
+              end
+            end
           else
-            @verification_response = service_response
-            render "failed_validation" 
+            render "new"
           end
         end
-      else
-        render "new"
       end
     end
 
