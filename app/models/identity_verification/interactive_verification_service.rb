@@ -49,7 +49,7 @@ module IdentityVerification
         when "503"
           ["503", nil] 
         else
-          [result_code.to_s, r["body"]]
+          [result_code.to_s, result_hash["body"]]
         end
       rescue Timeout::Error => e
         ["503", nil]
