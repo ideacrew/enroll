@@ -264,6 +264,12 @@ class HbxEnrollment
     enrollment
   end
 
+  def covered_members_first_names
+    hbx_enrollment_members.inject([]) do |names, member|
+      names << member.person.first_name
+    end
+  end
+
   def self.find(id)
     id = BSON::ObjectId.from_string(id) if id.is_a? String
     families = Family.where({

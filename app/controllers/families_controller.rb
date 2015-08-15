@@ -1,6 +1,8 @@
 class FamiliesController < ApplicationController
-  before_action :set_family, only: [:index, :show, :new, :create, :edit, :update]
-  before_action :check_hbx_staff_role, except: [:welcome]
+  before_action :set_family #, only: [:index, :show, :new, :create, :edit, :update]
+  # before_action :check_hbx_staff_role, except: [:welcome]
+
+  layout "two_column"
 
   def index
     # @q = params.permit(:q)[:q]
@@ -51,6 +53,8 @@ class FamiliesController < ApplicationController
 private
   # Use callbacks to share common setup or constraints between actions.
   def set_family
+    set_current_person
+    @family = @person.primary_family
     # @family = Family.find(params[:id])
   end
 
