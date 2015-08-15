@@ -15,8 +15,16 @@
       <dd><%= format_date @broker_agency_accounts[0].start_on %></dd>
       <dt>Email</dt>
       <dd>
-      <a href="mailto:<%= active_broker.person.emails.first.address %>"><%= active_broker.person.emails.first.address %></a>
+      <a href="mailto:<%= active_broker.person.emails.first.address %>">
+        <%= active_broker.person.emails.first.address %>
+      </a>
       </dd>
+      <% if active_broker.person.phones.any? %>
+      <dt>Phone</dt>
+      <dd>
+        <%= active_broker.person.phones[0].to_s %>
+      </dd>
+      <% end %>
     </dl>
 
     <div class="bottom-pd">

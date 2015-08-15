@@ -54,7 +54,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resource :interactive_identity_verifications, only: [:create]
+    resource :interactive_identity_verifications, only: [:create, :new]
 
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do

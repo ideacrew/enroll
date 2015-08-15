@@ -5,9 +5,10 @@ class Employers::BrokerAgencyController < ApplicationController
 
 
   def index
-    @q = params.permit(:q)[:q]
+    @filter_criteria = params.permit(:q, :working_hours, :languages => [])
+    @advanced = params.permit(:advanced)[:advanced] if params.permit(:advanced)
 
-    if @q.blank?
+    if @advanced.blank? && params.permit(:q).blank?
       @orgs = Organization.broker_agencies_having_active_brokers
       @page_alphabets = page_alphabets(@orgs, "legal_name")
 
@@ -18,10 +19,10 @@ class Employers::BrokerAgencyController < ApplicationController
         @organizations = @orgs.to_a.first(10)
       end
     else
-      @organizations = Organization.broker_agencies_with_matching_agency_or_broker(@q)
+      @organizations = Organization.broker_agencies_with_matching_agency_or_broker(@filter_criteria)
     end
 
-    @broker_agency_profiles = @organizations.map(&:broker_agency_profile)
+    @broker_agency_profiles = @organizations.map(&:broker_agency_profile).uniq
   end
 
   def show

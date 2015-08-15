@@ -101,7 +101,7 @@ module Forms
 
     def validate_duplicate_npn
       if Person.where("broker_role.npn" => npn).any?
-        errors.add(:base, "NPN has already been claimed by another broker. Please contact HBX.")
+        errors.add(:base, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
       end
     end
 
