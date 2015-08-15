@@ -65,7 +65,7 @@ module IdentityVerification
         question_attributes[idx.to_s] = {
           question_id: q.question_id,
           question_text: q.question_text,
-          response_attributes: response_attributes
+          responses_attributes: response_attributes
         }
       end
       ::IdentityVerification::InteractiveVerification.new(

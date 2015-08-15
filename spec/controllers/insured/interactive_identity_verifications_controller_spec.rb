@@ -95,7 +95,7 @@ describe Insured::InteractiveIdentityVerificationsController do
               "question_id" => "1",
               "question_text" => "some text here",
               "response_id" => "234566",
-              "response_attributes" => {
+              "responses_attributes" => {
                 "0" => {
                   "response_text" => "r_text",
                   "response_id" => "r_id"
