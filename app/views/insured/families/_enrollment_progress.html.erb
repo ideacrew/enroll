@@ -1,0 +1,32 @@
+<% step = (defined? step) ? step.to_i : 1 %>
+<% percent_complete = 0 %>
+<% percent_complete = (step == 1) ? 25 : ((step == 2) ? 50 : ((step == 3) ? 75 : ((step == 4) ? 100 : 0))) %>
+
+<div class="family-plan-selection">
+  <div class="status">
+    <h4>Status</h4>
+    <div><%= percent_complete %>% Complete</div>
+  </div>
+  <ul class="list-unstyled progress-wrapper hidden-xs">
+    <li class="<%= add_progress_class(1, step) %>">
+      Submitted
+      <span class="circle-progress"></span>
+      <div class="vertical-line-progress"></div>
+    </li>
+    <li class="<%= add_progress_class(2, step) %>">
+      Received
+      <span class="circle-progress"></span>
+      <div class="vertical-line-progress"></div>
+    </li>
+    <li class="<%= add_progress_class(3, step) %>">
+      Approved
+      <span class="circle-progress"></span>
+      <div class="vertical-line-progress"></div>
+    </li>
+    <li class="<%= add_progress_class(4, step) %>">
+      Enrolled
+      <span class="circle-progress"></span>
+      <div class="vertical-line-progress"></div>
+    </li>
+  </ul>
+</div>

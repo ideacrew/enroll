@@ -1,0 +1,19 @@
+<div class="mainmenu">
+  <ul>
+    <li>
+      <%= link_to("My DC Health Link",  insured_family_home_path(@family)) %>
+    </li>
+    <li>
+      <a href="#">Documents</a>
+    </li>
+    <li>
+      <%= link_to(inbox_consumer_profiles_path) do  %>
+      <span class="badge message-unread"><%= @person.inbox.unread_messages.try(:count) %></span>
+      Messages
+      <% end %>
+    </li>
+    <li>
+      <a href="#">Life Events</a>
+    </li>
+  </ul>
+</div>

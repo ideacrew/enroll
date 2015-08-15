@@ -56,6 +56,7 @@ Rails.application.routes.draw do
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
       get 'new'
+      get 'home'
 
       resources :people do
         collection do
@@ -216,6 +217,8 @@ Rails.application.routes.draw do
     end
   end
 
+  match 'families/home', to: 'insured/families#home', via:[:get]
+
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
 
@@ -239,6 +242,7 @@ Rails.application.routes.draw do
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
