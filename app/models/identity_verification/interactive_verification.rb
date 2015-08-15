@@ -29,8 +29,9 @@ module IdentityVerification
         @responses ||= []
       end
       def response_attributes=(vals)
-        @responses = vals.map do |k, v|
-          ::IdentityVerification::InteractiveVerification::Response.new(v)
+        @responses = []
+        vals.map do |k, v|
+          @responses << ::IdentityVerification::InteractiveVerification::Response.new(v)
         end
       end
     end
@@ -54,8 +55,9 @@ module IdentityVerification
     end
 
     def questions_attributes=(vals)
-      @questions = vals.map do |k, v|
-        ::IdentityVerification::InteractiveVerification::Question.new(v)
+      @questions = []
+      vals.each do |k, v|
+        @questions << ::IdentityVerification::InteractiveVerification::Question.new(v)
       end
     end
   end
