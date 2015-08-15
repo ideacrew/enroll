@@ -46,7 +46,9 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       employee_cost_for: double("employee_cost_for"),
       total_premium: double("total_premium"),
       total_employer_contribution: double("total_employer_contribution"),
-      total_employee_cost: double("total_employee_cost")
+      total_employee_cost: double("total_employee_cost"),
+      carrier_profile: double(legal_name: "carefirst"),
+      metal_level: "Silver"
     )
   end
 

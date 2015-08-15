@@ -136,7 +136,7 @@ describe Forms::BrokerCandidate do
       end
 
       it 'should raise an error' do
-        expect(subject.errors.to_hash[:base]).to include("too many people match the criteria provided for your identity.  Please contact HBX.")
+        expect(subject.errors.to_hash[:base]).to include("too many people match the criteria provided for your identity.  Please contact HBX-Customer Service - Call (855) 532-5465.")
       end
     end
 

@@ -20,7 +20,7 @@ class BrokerAgencyProfile
   field :primary_broker_role_id, type: BSON::ObjectId
 
   field :languages_spoken, type: Array, default: [] # TODO
-  field :working_hours, type: Boolean
+  field :working_hours, type: Boolean, default: false
   field :accept_new_clients, type: Boolean
 
   field :aasm_state, type: String
@@ -130,6 +130,12 @@ class BrokerAgencyProfile
 
   def is_active?
     self.is_approved?
+  end
+
+  def languages
+    if languages_spoken.any?
+      return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name}.join(",")
+    end
   end
 
   ## Class methods

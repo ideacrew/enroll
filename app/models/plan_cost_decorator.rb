@@ -18,7 +18,12 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def plan_year_start_on
-    benefit_group.plan_year.start_on
+    #FIXME only for temp ivl
+    if @benefit_group.present?
+      benefit_group.plan_year.start_on
+    else
+      TimeKeeper.date_of_record.beginning_of_year
+    end
   end
 
   def age_of(member)
@@ -123,7 +128,11 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def employee_cost_for(member)
-    premium_for(member) - employer_contribution_for(member)
+    if @benefit_group.present?
+      premium_for(member) - employer_contribution_for(member)
+    else
+      __getobj__.premium_for(plan_year_start_on, age_of(member))
+    end
   end
 
   def total_premium

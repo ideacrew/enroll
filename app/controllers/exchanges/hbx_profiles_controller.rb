@@ -25,6 +25,19 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def staff_index
+    @q = params.permit(:q)[:q]
+    @staff = Person.where(:$or => [{csr_role: {:$exists => true}}, {assister_role: {:$exists => true}}])
+    @page_alphabets = page_alphabets(@staff, "last_name")
+    page_no = cur_page_no(@page_alphabets.first)
+    if @q.nil?
+      @staff = @staff.where(last_name: /^#{page_no}/i)
+    else
+      @staff = @staff.where(last_name: @q)
+    end
+  end
+
+
   def family_index
     @q = params.permit(:q)[:q]
     page_string = params.permit(:families_page)[:families_page]

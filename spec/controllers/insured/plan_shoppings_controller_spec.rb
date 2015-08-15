@@ -48,7 +48,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
   context "GET receipt" do
 
-    let(:person) { double("Person") }
     let(:user) { double("User") }
     let(:enrollment) { double("HbxEnrollment") }
     let(:plan) { double("Plan") }

@@ -213,11 +213,15 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
 
       context "but with no found employee" do
         let(:found_census_employees) { [] }
+        let(:person){ double("Person") }
+        let(:consumer_role){ double("ConsumerRole", id: "test") }
+        let(:person_parameters){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111"}}
 
-        it "renders the 'no_match' template" do
-          expect(response).to have_http_status(:success)
-          expect(response).to render_template("no_match")
-          expect(assigns[:employee_candidate]).to eq mock_employee_candidate
+        it "redirects to 'consumer role' flow" do
+          allow(Person).to receive(:new).and_return(person)
+          allow(person).to receive(:build_consumer_role).and_return(consumer_role)
+          allow(person).to receive(:save).and_return(true)
+          expect(response).to have_http_status(:redirect)
         end
 
         context "that find a matching employee" do

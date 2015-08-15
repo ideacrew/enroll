@@ -16,6 +16,7 @@ Rails.application.routes.draw do
         get :product_index
         get :configuration
         post :set_date
+        get :staff_index
       end
 
       member do
@@ -52,6 +53,8 @@ Rails.application.routes.draw do
         post 'terminate'
       end
     end
+
+    resource :interactive_identity_verifications, only: [:create, :new]
 
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
@@ -180,6 +183,8 @@ Rails.application.routes.draw do
       end
     end
     root 'employee_roles#show'
+
+    resources :consumer_role, controller: 'consumer_roles'
   end
 
   # used to select which people are going to be covered before plan selection

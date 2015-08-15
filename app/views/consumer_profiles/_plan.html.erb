@@ -1,11 +1,22 @@
-<%= plan.try(:carrier_profile).try(:legal_name) %>
-<h3><%= plan.try(:name) %></h3>
-<div>
-  Subscriber Id : <%= hbx_enrollment.try(:subscriber).try(:id).try(:to_s) %>
+ <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+  <%= plan.try(:carrier_profile).try(:legal_name) %>
+
+  <h3><%= plan.try(:name) %></h3>
+  <div>
+    Subscriber Id : <%= hbx_enrollment.try(:subscriber).try(:id).try(:to_s) %>
+    <br/>
+    Group Id : <%= hbx_enrollment.try(:benefit_group_id).try(:to_s) %>
+  </div>
   <br/>
-  Group Id : <%= hbx_enrollment.try(:benefit_group_id).try(:to_s) %>
 </div>
-<br/>
+
+<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+  <% if hbx_enrollment.coverage_selected? && hbx_enrollment.kind == "employer_sponsored" %>
+    <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: 'change_plan') do %>
+      <%= render partial: "update_plan_widget" %>
+    <% end %>
+  <% end %>
+</div>
 
 <table class="table">
   <thead>

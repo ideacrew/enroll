@@ -12,13 +12,18 @@ class Consumer::EmployeeRolesController < ApplicationController
   end
 
   def match
-    @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person).merge({user_id: current_user.id}))
+    @person_params = params.require(:person).merge({user_id: current_user.id})
+    @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
     @person = @employee_candidate
     if @employee_candidate.valid?
       found_census_employees = @employee_candidate.match_census_employees
       if found_census_employees.empty?
+        @person = Person.match_by_id_info(params[:person]).first
+        @person = Person.new(params[:person].except(:user_id).permit!) unless @person.present?
+        @consumer_role = @person.build_consumer_role(is_applicant: true)
+        @person.save
         respond_to do |format|
-          format.html { render 'no_match' }
+          format.html { redirect_to edit_consumer_consumer_role_path(@consumer_role.id) }
         end
       else
         @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees.first)

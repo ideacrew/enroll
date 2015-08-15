@@ -9,6 +9,14 @@
           <p>Please print this page for your records.</p>
           <p>A copy of this confirmation has also been emailed to you. </p>
 
+          <p>
+            <% if @employer_profile.present? %>
+            <strong><%= @employer_profile.legal_name %></strong><br>
+            <% end %>
+            <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
+            Metal level : <%= @plan.metal_level %>
+          </p>
+          
           <%= render "insured/plan_shoppings/coverage_information" %>
         </div>
 

@@ -154,6 +154,7 @@ class ConsumerRole
 
   def self.find(consumer_role_id)
     return @person_find if defined? @person_find
+    consumer_role_id = BSON::ObjectId.from_string(consumer_role_id) if consumer_role_id.is_a? String
     @person_find = Person.where("consumer_role._id" => consumer_role_id).first.consumer_role unless consumer_role_id.blank?
   end
 
