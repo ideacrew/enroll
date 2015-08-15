@@ -42,6 +42,7 @@ module IdentityVerification
     def invoke_request(key, payload, timeout)
       begin
         r = self.class.requestor.request("identity_verification.interactive_verification.initiate_session", {:body => payload}, 5)
+        return ["503", nil] if r.nil?
         result_hash = r.stringify_keys
         result_code = result_hash["return_status"]
         case result_code.to_s
