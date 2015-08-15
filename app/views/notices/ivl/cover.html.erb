@@ -24,7 +24,6 @@
     }
 
 
-
     p.utf-8 {
       font-size: 7pt;
     }
@@ -37,6 +36,36 @@
     ul.languages.a{
       list-style-type: circle;
     }
+
+    .page-break { 
+      display: block;
+      clear: both;
+      page-break-before: always;
+    }
+
+    html {
+      position: relative;
+      min-height: 100%;
+    }
+
+body {
+    margin: 0 0 100px;
+    padding: 25px;
+}
+
+div.blank-sheet{
+    height: 500px;
+}
+
+footer {
+    background-color: orange;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 100px;
+    width: 100%;
+    overflow:hidden;
+}
 
     </style>
   </head>
@@ -84,6 +113,12 @@
           <p>Nếu cần được giúp đỡ để hiểu rõ thông báo này, xin gọi số 1-855-532-5465. Chún tôi sẽ giải thích thông báo này cho quý vị bằng ngôn ngữ quý vị chọn. Quý vị cũng có thể gởi điện sao (fax) đến chúng tôi theo số 202-671-4400.</p>
         </li>
       </ul>
-    </div>
+
+      
+      <%= render partial: "notices/ivl/blank_sheet" %>
+      <%= render partial: "notices/ivl/blank_sheet" %>
+      <%= render partial: "notices/ivl/blank_sheet" %>
+
+      </div>
   </body>
 </html>
