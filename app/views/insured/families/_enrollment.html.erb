@@ -1,60 +1,66 @@
 <% plan = hbx_enrollment.try(:plan) %>
-<div class="family-enrollment-container">
+<div class="family-enrollment-container panel panel-default min-h">
+  <div class="panel-heading">Panel heading without title</div>
 
-  <div class="row">
-    <div class="col-xs-8">
-      <div><%= display_carrier_logo(plan.carrier_profile, {width: 110}) %></div>
-      <h4><strong><%= link_to plan.name, summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id:hbx_enrollment.id}), {:remote => true} %></strong>
-      </h4>
-      <div>
-        <label class="text-uppercase"><%= plan.try(:plan_type).try(:upcase) %></label>
-        <% plan_level = plan.try(:metal_level).try(:humanize) %>
-        <label class="<%= plan_level.try(:downcase) %>-icon"><%= plan_level %></label>
-      </div>
-      <div>
-        <label class="text-uppercase">Premium:</label> <%= number_to_currency(hbx_enrollment.total_premium) %>
-        <label class="text-uppercase">Member ID:</label> <%#= hbx_enrollment.try(:subscriber).try(:id).try(:to_s) %>
-        <label class="text-uppercase">Group ID:</label> <%#= hbx_enrollment.try(:benefit_group_id).try(:to_s) %>
-      </div>
-      <% names = hbx_enrollment.covered_members_first_names %>
-      <div>
-        <label class="text-uppercase pull-left">Covered:</label>
-        <div class="covered-members"> 
-          <%= names.delete_at(0).camelcase %>
-          <% names.each do |name| %>
-          <span class="covered-member"><%= name.camelcase %></span>
-          <% end %>
+  <div class="panel-body">
+
+    <div class="row">
+      <div class="col-xs-8">
+        <div><%= display_carrier_logo(plan.carrier_profile, {width: 110}) %></div>
+        <h4><strong><%= link_to plan.name, summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id:hbx_enrollment.id}), {:remote => true} %></strong>
+        </h4>
+        <div>
+          <p><label><%= plan.try(:plan_type).try(:upcase) %></label>
+            <% plan_level = plan.try(:metal_level).try(:humanize) %>
+            <label class="<%= plan_level.try(:downcase) %>-icon"><%= plan_level %></label></p>
+          </div>
+          <div>
+            <p> 
+              <label>Premium:</label> <%= number_to_currency(hbx_enrollment.total_premium) %>
+              <label>Member ID:</label> <%#= hbx_enrollment.try(:subscriber).try(:id).try(:to_s) %>
+              <label>Group ID:</label> <%#= hbx_enrollment.try(:benefit_group_id).try(:to_s) %></p>
+            </div>
+            <% names = hbx_enrollment.covered_members_first_names %>
+            <div>
+              <p>
+                <label class="pull-left">Covered:</label>
+                <span class="covered-members"> 
+                  <%= names.delete_at(0).camelcase %>
+                  <% names.each do |name| %>
+                  <span><%= name.camelcase %></span>
+                  <% end %>
+                </span>
+              </p>
+            </div>
+          </div>
+          <div class="col-xs-4">
+            <%= render partial: "enrollment_progress", locals: {step: 2} %>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-8">
+            <div class="row">
+              <div class="col-xs-6">
+                Summary of Benefits and Coverage
+              </div>
+              <div class="col-xs-6">
+                Carrier Contact Info
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-4">
+            <button type="button" class="btn btn-danger btn-md">VIEW DETAILS</button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="col-xs-4">
-      <%= render partial: "enrollment_progress", locals: {step: 2} %>
-    </div>
-  </div>
 
-  <div class="row">
-    <div class="col-xs-8">
-      <div class="row">
-        <div class="col-xs-6">
-          Summary of Benefits and Coverage
-        </div>
-        <div class="col-xs-6">
-          Carrier Contact Info
-        </div>
+      <div class="alert alert-warning alert-dismissible panel-footer" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
+        </button>
+        <strong>Important:</strong>Your enrollment application requires information that needs to be verified. <a href="#">Learn more</a>
       </div>
     </div>
-    <div class="col-xs-4">
-      <button type="button" class="btn btn-danger btn-md">VIEW DETAILS</button>
-    </div>
-  </div>
-
-  <div class="alert alert-warning alert-dismissible" role="alert" style="margin-bottom: 0px; margin-top: 20px;">
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
-    </button>
-    <strong>Important:</strong>Your enrollment application requires information that needs to be verified. <a href="#">Learn more</a>
-  </div>
-</div>
-
 
 
 
