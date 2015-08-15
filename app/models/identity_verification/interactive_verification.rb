@@ -44,7 +44,7 @@ module IdentityVerification
     validate :questions_have_responses
 
     def questions_have_responses
-      if questions.any?(:unanswered?)
+      if questions.any?(&:unanswered?)
         errors.add(:base, "You must answer all questions")
       end
     end
