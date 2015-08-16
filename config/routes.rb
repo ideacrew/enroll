@@ -16,6 +16,7 @@ Rails.application.routes.draw do
         get :product_index
         get :configuration
         post :set_date
+        get :staff_index
       end
 
       member do
@@ -42,6 +43,9 @@ Rails.application.routes.draw do
   end
 
   namespace :insured do
+    get 'verification_documents/upload', to: 'verification_documents#upload'
+    post 'verification_documents/upload', to: 'verification_documents#upload'
+
     resources :plan_shoppings, :only => [:show] do
       member do
         get 'receipt'
@@ -154,6 +158,16 @@ Rails.application.routes.draw do
 
   resources :translations
 
+  namespace :api, :defaults => {:format => 'xml'} do
+    namespace :v1 do
+      resources :slcsp, :only => []  do
+        collection do
+          post :plan
+        end
+      end
+    end
+  end
+
   ############################# TO DELETE BELOW ##############################
 
   # FIXME: Do this properly later
@@ -211,6 +225,7 @@ Rails.application.routes.draw do
 
   resources :consumer_profiles, :only => [] do
     collection do
+      get 'documents'
       get 'home'
       get 'plans'
       get 'personal'
@@ -246,6 +261,8 @@ Rails.application.routes.draw do
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
+
+
 
 
   # The priority is based upon order of creation: first created -> highest priority.

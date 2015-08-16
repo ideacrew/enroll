@@ -54,7 +54,13 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
       :name_sfx => "eee",
       :ssn => "123456778",
       :gender => "male",
-      :dob => dob
+      :dob => dob,
+      :race => "race",
+      :ethnicity => "ethnicity",
+      :language_code => "english",
+      :is_tobacco_user => "no",
+      :is_incarcerated => "no",
+      :is_disabled => "no"
     }
   }
 
@@ -135,7 +141,13 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
       :name_sfx => "eee",
       :ssn => "123456778",
       :gender => "male",
-      :dob => Date.strptime(dob, "%Y-%m-%d")
+      :dob => Date.strptime(dob, "%Y-%m-%d"),
+      :race => "race",
+      :ethnicity => "ethnicity",
+      :language_code => "english",
+      :is_tobacco_user => "no",
+      :is_incarcerated => "no",
+      :is_disabled => "no"
     }
   }
   let(:person) { double(:errors => double(:has_key? => false)) }

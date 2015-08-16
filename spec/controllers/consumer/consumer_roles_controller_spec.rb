@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe Consumer::ConsumerRolesController, :type => :controller do
   let(:user){ double("User", email: "test@example.com") }
   let(:person){ double("Person") }
+  let(:family){ double("Family") }
+  let(:family_member){ double("FamilyMember") }
   let(:consumer_role){ double("ConsumerRole", id: double("id")) }
 
   context "GET new" do
@@ -21,9 +23,10 @@ RSpec.describe Consumer::ConsumerRolesController, :type => :controller do
   context "POST create" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
     before(:each) do
-      allow(Person).to receive(:new).and_return(person)
-      allow(person).to receive(:build_consumer_role).and_return(consumer_role)
-      allow(person).to receive(:save).and_return(true)
+      allow(user).to receive(:person=).and_return(person)
+      allow(user).to receive(:save).and_return(true)
+      allow(user).to receive(:roles).and_return(["consumer"])
+      allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(person)
     end
     it "should create new person/consumer role object" do
       sign_in user

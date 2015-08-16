@@ -50,8 +50,10 @@
   		      <%= link_to 'Add Member'.html_safe, new_consumer_employee_dependent_path(:family_id => @family.id), :remote => true, :class => "btn btn-select" %>
             <% if @change_plan.present? %>
               <% group_selection_url = group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: 'change') %>
-            <% else %>
+            <% elsif @type == "employee" %>
               <% group_selection_url = group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id) %>
+            <% else %>
+              <% group_selection_url = group_selection_new_path(person_id: @person.id, consumer_role_id: @consumer_role.id) %>
             <% end %>
             <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">
             
@@ -65,7 +67,9 @@
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
-        <% if @change_plan.blank? %>
+        <% if @consumer_role.present? %>
+          <%= render  partial: 'shared/individual_progress', locals: {step: '3', url: group_selection_url} %>
+        <% elsif @change_plan.blank? %>
           <%= render  partial: 'shared/signup_progress', locals: {step: '4', url: group_selection_url} %>
         <% else %>
           <%= render partial: 'shared/qle_progress', locals: {step: '1'} %>

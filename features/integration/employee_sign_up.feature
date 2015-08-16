@@ -12,7 +12,7 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
     Given Employee has not signed up as an HBX user
         When Employee goes to the employee account creation page
         Then Soren White creates an HBX account
-        Then Soren White should be logged on as an unlinked employee
+        #Then Soren White should be logged on as an unlinked employee
         When Employee goes to register as an employee
         Then Employee should see the employee search page
         When Employee enters the identifying info of Soren White
@@ -25,8 +25,8 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
         Then Employer should see a published success message
         Then Employer logs out
 
-    When Soren White logs on to the Employee Portal
-        Then Soren White should be logged on as an unlinked employee
+    When Soren White logs on to the Insured Portal
+        #Then Soren White should be logged on as an unlinked employee
         When Employee goes to register as an employee
         Then Employee should see the employee search page
         When Employee enters the identifying info of Soren White

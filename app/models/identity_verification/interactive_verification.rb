@@ -28,9 +28,10 @@ module IdentityVerification
       def responses
         @responses ||= []
       end
-      def response_attributes=(vals)
-        @responses = vals.map do |k, v|
-          ::IdentityVerification::InteractiveVerification::Response.new(v)
+      def responses_attributes=(vals)
+        @responses = []
+        vals.each_pair do |k, v|
+          @responses << ::IdentityVerification::InteractiveVerification::Response.new(v)
         end
       end
     end
@@ -44,7 +45,7 @@ module IdentityVerification
     validate :questions_have_responses
 
     def questions_have_responses
-      if questions.any?(:unanswered?)
+      if questions.any?(&:unanswered?)
         errors.add(:base, "You must answer all questions")
       end
     end
@@ -54,8 +55,9 @@ module IdentityVerification
     end
 
     def questions_attributes=(vals)
-      @questions = vals.map do |k, v|
-        ::IdentityVerification::InteractiveVerification::Question.new(v)
+      @questions = []
+      vals.each_pair do |k, v|
+        @questions << ::IdentityVerification::InteractiveVerification::Question.new(v)
       end
     end
   end

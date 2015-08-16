@@ -59,13 +59,17 @@ describe Insured::InteractiveIdentityVerificationsController do
   end
 
   describe "POST #create" do
-    let(:mock_person) { double }
+    let(:mock_consumer_role) { instance_double("ConsumerRole", id: "test") }
+    let(:mock_person) { double(:consumer_role => mock_consumer_role) }
     let(:mock_user) { double(:person => mock_person) }
     let(:mock_service) { instance_double("::IdentityVerification::InteractiveVerificationService") }
-    let(:mock_service_result) { double(:successful? => service_succeeded) }
+    let(:mock_response_description_text) { double }
+    let(:mock_transaction_id) { double }
+    let(:mock_service_result) { double(:successful? => service_succeeded, :response_text => mock_response_description_text, :transaction_id => mock_transaction_id) }
     let(:mock_session) { instance_double("::IdentityVerification::InteractiveVerification", :valid? => valid_verification) }
     let(:mock_template_result) { double }
     let(:expected_params) { verification_params }
+    let(:mock_today) { double }
 
     before :each do
       sign_in(mock_user)
@@ -91,7 +95,7 @@ describe Insured::InteractiveIdentityVerificationsController do
               "question_id" => "1",
               "question_text" => "some text here",
               "response_id" => "234566",
-              "response_attributes" => {
+              "responses_attributes" => {
                 "0" => {
                   "response_text" => "r_text",
                   "response_id" => "r_id"
@@ -135,6 +139,13 @@ describe Insured::InteractiveIdentityVerificationsController do
       describe "when verification is successful" do
         let(:service_succeeded) { true }
         it "should redirect the user" do
+          allow(Date).to receive(:today).and_return(mock_today)
+          expect(mock_consumer_role).to receive(:identity_final_decision_code=).with(ConsumerRole::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE)
+          expect(mock_consumer_role).to receive(:identity_response_code=).with(ConsumerRole::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE)
+          expect(mock_consumer_role).to receive(:identity_response_description_text=).with(mock_response_description_text)
+          expect(mock_consumer_role).to receive(:identity_final_decision_transaction_id=).with(mock_transaction_id)
+          expect(mock_consumer_role).to receive(:identity_verified_date=).with(mock_today)
+          expect(mock_consumer_role).to receive(:verify_identity!)
           post :create, { "interactive_verification" => verification_params }
           expect(response).to be_redirect
         end
