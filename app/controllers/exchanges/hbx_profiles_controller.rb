@@ -1,5 +1,6 @@
 class Exchanges::HbxProfilesController < ApplicationController
-  before_action :check_hbx_staff_role, except: [:welcome, :request_help, :staff_index, :assister_index]
+
+  before_action :check_hbx_staff_role, except: [:welcome, :show, :csr_landing,:request_help, :staff_index, :assister_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox, :configuration, :show]
 
@@ -145,9 +146,19 @@ end
     end
   end
 
+  def csr_landing
+    @cac = current_user.person.csr_role.cac 
+  end
+
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show
+    if current_user.has_csr_role?
+      redirect_to csr_landing_exchanges_hbx_profiles_path
+      return
+    else
+      check_hbx_staff_role
+    end
     @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
   end
 
@@ -224,7 +235,7 @@ end
 private
 
   def find_hbx_profile
-    @profile = current_user.person.hbx_staff_role.hbx_profile
+    @profile = current_user.person.try(:hbx_staff_role).try(:hbx_profile)
   end
 
   # Use callbacks to share common setup or constraints between actions.

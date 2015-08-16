@@ -19,6 +19,7 @@ Rails.application.routes.draw do
         get :staff_index
         get :assister_index
         get :request_help
+        get :csr_landing
       end
 
       member do

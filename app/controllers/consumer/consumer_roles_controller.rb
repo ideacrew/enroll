@@ -1,6 +1,7 @@
 class Consumer::ConsumerRolesController < ApplicationController
 
   def new
+    binding.pry
     @person = current_user.build_person
     build_nested_models
   end
