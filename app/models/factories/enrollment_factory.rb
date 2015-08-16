@@ -34,6 +34,18 @@ module Factories
 
     end
 
+    def self.construct_consumer_role(person_params, user)
+      person = Person.match_by_id_info(params[:person]).first
+      person = Person.new(params[:person].except(:user_id).permit!) if !person.present?
+      person.build_consumer_role(is_applicant: true)  if  !person.consumer_role.present?
+      person.save
+      family,applicant = self.initialize_family(person, [])
+      family.save
+      current_user.person = person
+      current_user.save
+      person
+    end
+
     def self.add_broker_role(person:, new_kind:, new_npn:, new_mailing_address:)
 
       [:new_kind, :new_npn, :new_mailing_address].each do |value|
