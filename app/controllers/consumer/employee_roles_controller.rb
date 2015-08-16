@@ -146,7 +146,7 @@ class Consumer::EmployeeRolesController < ApplicationController
   private
     def check_employee_role
       if current_user.has_employee_role?
-        redirect_to home_consumer_profiles_path
+        redirect_to family_account_path
       end
     end
 end

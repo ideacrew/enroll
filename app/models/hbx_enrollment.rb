@@ -98,6 +98,11 @@ class HbxEnrollment
 
   before_save :generate_hbx_id
 
+
+  def benefit_sponsored?
+    employer_profile.present?
+  end
+
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
@@ -139,7 +144,7 @@ class HbxEnrollment
   end
 
   def employer_profile
-    employee_role.employer_profile
+    self.try(:employee_role).employer_profile
   end
 
   def plan=(new_plan)

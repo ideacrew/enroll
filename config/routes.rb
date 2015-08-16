@@ -221,7 +221,7 @@ Rails.application.routes.draw do
     end
   end
 
-  match 'families/home', to: 'insured/families#home', via:[:get]
+  match 'families/home', to: 'insured/families#home', via:[:get], as: "family_account"
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
