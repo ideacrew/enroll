@@ -53,7 +53,7 @@ $(document).ready(function () {
         dateMin = $(this).attr("data-date-min");
         dateMax = $(this).attr("data-date-max");
 
-        if ($(".qle-details-title").html() === "\"I've had a baby\"" || $(".qle-details-title").html() === "\"Death\"") {
+        if ($(".qle-details-title").html() === "I've had a baby" || $(".qle-details-title").html() === "Death") {
             dateMax = "+0d";
         }
 

@@ -1,6 +1,7 @@
 class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show]
+  before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show]
 
   def checkout
     plan = Plan.find(params.require(:plan_id))
@@ -44,9 +45,14 @@ class Insured::PlanShoppingsController < ApplicationController
   def thankyou
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
-    @benefit_group = @enrollment.benefit_group
-    @reference_plan = @benefit_group.reference_plan
-    @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
+
+    if @market_kind == 'shop' and @coverage_kind == 'health'
+      @benefit_group = @enrollment.benefit_group
+      @reference_plan = @benefit_group.reference_plan
+      @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
+    else
+      @plan = PlanCostDecorator.new(@plan, @enrollment, nil, nil)
+    end
     @family = @person.primary_family
     @enrollable = @enrollment.can_complete_shopping?
     @waivable = @enrollment.can_complete_shopping?
@@ -94,8 +100,6 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def show
     hbx_enrollment_id = params.require(:id)
-    @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
-    @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
 
     Caches::MongoidCache.allocate(CarrierProfile)
 
@@ -141,5 +145,10 @@ class Insured::PlanShoppingsController < ApplicationController
   def thousand_ceil(num)
     return 0 if num.blank?
     (num.fdiv 1000).ceil * 1000
+  end
+
+  def set_kind_for_market_and_coverage
+    @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
+    @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
   end
 end
