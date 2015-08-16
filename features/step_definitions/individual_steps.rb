@@ -81,6 +81,7 @@ end
 When(/Individual clicks on add member button/) do
   @browser.a(text: /Add Member/).wait_until_present
   @browser.a(text: /Add Member/).click
+  @browser.text_field(id: /dependent_first_name/).wait_until_present
   @browser.text_field(id: /dependent_first_name/).set("Mary")
   @browser.text_field(id: /dependent_middle_name/).set("K")
   @browser.text_field(id: /dependent_last_name/).set("York")
