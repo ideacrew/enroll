@@ -20,12 +20,15 @@ class BenefitPackage
 
   # Premium Credit Strategies
   # 1. Unassisted: subscriber is responsible for total premium cost
-  # 2. Lump sum contribution: fixed dollar amount applied toward subscriber's total premium cost
-  # 3. Allocated lump sum credit (e.g. APTC): fixed dollar amount apportioned among eligible relationship categories
-  # 4. Percentage contribution: contribution ratio applied to each eligible relationship category 
-  # 5. Indexed percentage contribution (e.g. DCHL SHOP method): using selected reference benefit, contribution ratio applied to each eligible relationship category 
-  # 6. (congress)
-  PREMIUM_CREDIT_STRATEGY_KINDS  = %w(unassisted lump_sum_contribution allocated_lump_sum_credit percentage_contribution indexed_percentage_contribution)
+  # 2. Employer fixed cost: employer fixed dollar amount applied toward employee's total premium cost
+  # 3. Employee fixed cost: employee costs defined, regardless of age, and employer pays the difference
+  # 4. Allocated lump sum credit (e.g. APTC): fixed dollar amount apportioned among eligible relationship categories
+  # 5. Percentage contribution: contribution ratio applied to each eligible relationship category 
+  # 6. Indexed percentage contribution (e.g. DCHL SHOP method): using selected reference benefit, contribution ratio applied to each eligible relationship category 
+  # 7. Federal Employee Health Benefits (FEHB - congress): percentage contribution, with employer cost cap
+
+  PREMIUM_CREDIT_STRATEGY_KINDS  = %w(unassisted employer_fixed_cost employee_fixed_cost allocated_lump_sum_credit 
+                                      percentage_contribution indexed_percentage_contribution, federal_employee_health_benefit)
 
   field :title, type: String, default: ""
 
@@ -46,7 +49,7 @@ class BenefitPackage
   #   allow_blank: false,
   #   inclusion: {
   #     in: ELIGIBLE_RELATIONSHIP_CATEGORY_KINDS,
-  #     message: "%{value} is not a valid eligble relationship category kind"
+  #     message: "%{value} is not a valid eligible relationship category kind"
   #   }
 
   # validates :benefit_begin_offset_periods,

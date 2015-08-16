@@ -61,14 +61,19 @@ class GroupSelectionController < ApplicationController
 
   def initialize_common_vars
     person_id = params.require(:person_id)
-    emp_role_id = params.require(:employee_role_id)
     @person = Person.find(person_id)
     @family = @person.primary_family
-    @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
     @coverage_household = @family.active_household.immediate_family_coverage_household
     @hbx_enrollment = (@family.latest_household.try(:hbx_enrollments).active || []).last
-
+    if params[:employee_role_id].present?
+      emp_role_id = params.require(:employee_role_id)
+      @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
+    else
+      @consumer_role = @person.consumer_role
+      params["market_kind"] = "individual"
+    end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
   end
 end

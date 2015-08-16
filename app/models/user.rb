@@ -56,7 +56,9 @@ class User
     web_service: "web_service",
     hbx_staff: "hbx_staff",
     employer_staff: "employer_staff",
-    broker_agency_staff: "broker_agency_staff"
+    broker_agency_staff: "broker_agency_staff",
+    assister: 'assister',
+    csr: 'csr',
   }
 
   # Enable polymorphic associations

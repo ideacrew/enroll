@@ -37,6 +37,13 @@ class FamilyMember
   delegate :dob, to: :person, allow_nil: true
   delegate :ssn, to: :person, allow_nil: true
   delegate :gender, to: :person, allow_nil: true
+  # consumer fields
+  delegate :race, to: :person, allow_nil: true
+  delegate :ethnicity, to: :person, allow_nil: true
+  delegate :language_code, to: :person, allow_nil: true
+  delegate :is_tobacco_user, to: :person, allow_nil: true
+  delegate :is_incarcerated, to: :person, allow_nil: true
+  delegate :is_disabled, to: :person, allow_nil: true
 
   validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
 
