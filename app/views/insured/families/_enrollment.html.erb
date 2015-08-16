@@ -1,10 +1,9 @@
 <% plan = hbx_enrollment.try(:plan) %>
 <div class="hbx-enrollment-panel">
-<h1>My DC Health Link</h1>  
 <div class="panel panel-default min-h">
 
   <div class="panel-heading">
-    <h4>2015 Health Coverage <span class="separator">DC HBX</span></h3>
+    <h4>2015 Health Coverage <span class="separator">DCHL</span></h4>
   </div>
 
   <div class="panel-body">
@@ -23,16 +22,16 @@
           <div>
             <p> 
               <label>Premium:</label> <strong><%= number_to_currency(hbx_enrollment.total_premium) %></strong>/month
-              <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong>992231212</strong><%#= hbx_enrollment.try(:subscriber).person. %>
+              <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong><%= hbx_enrollment.try(:subscriber).person.hbx_id %></strong>
             </p>
           </div>
             <% names = hbx_enrollment.covered_members_first_names %>
             <div class="family-members">
               <p>
                 <label>Covered:</label>
-                  <%= names.delete_at(0).camelcase %>
+                  <a href="#"><%= names.delete_at(0).camelcase %></a>
                   <% names.each do |name| %>
-                    <span class="separator"><%= name.camelcase %></span>
+                    <span class="separator"><a href="#"><%= name.camelcase %></a></span>
                   <% end %>
               </p>
             </div>
@@ -44,13 +43,13 @@
 
         <div class="row">
           <div class="col-xs-5">
-            <p><i class="fa fa-file-pdf-o fa-lg"></i>&nbsp;Summary of Benefits and Coverage</p>
+            <a href="#"><i class="fa fa-file-pdf-o fa-lg"></i>&nbsp;Summary of Benefits and Coverage</a>
           </div>
           <div class="col-xs-4">
-            <p><i class="fa fa-phone fa-lg"></i>&nbsp;Carrier Contact Info</p>
+            <a href="#"><i class="fa fa-phone fa-lg"></i>&nbsp;Carrier Contact Info</a>
           </div>
           <div class="col-xs-3">
-            <button type="button" class="btn btn-danger btn-md pull-right">VIEW DETAILS</button>
+            <button type="button" class="btn btn-primary btn-md pull-right">VIEW DETAILS</button>
           </div>
         </div>
       </div>
@@ -58,7 +57,7 @@
       <div class="alert alert-warning alert-dismissible panel-footer" role="alert">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
         </button>
-        <strong>Important:</strong>Your enrollment application requires information that needs to be verified. <a href="#">Learn more</a>
+        <strong>Important:</strong> Your enrollment application requires information that needs to be verified. <a href="#">Learn more</a>
       </div>
     </div>
 </div>

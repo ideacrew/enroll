@@ -1,5 +1,5 @@
-<div class="panel panel-default">
-  <div class="panel-body">
+<div class="qles-panel panel panel-default">
+  <div class="panel-heading">
     <div class="row" id='qle-header'>
       <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
         <%= image_tag 'icons/life-event.png', style: 'width: 100%' %>
@@ -11,10 +11,11 @@
         </small>
       </div>
     </div>
-    <hr />
-
+    <hr>
+  </div>
+  <div class="panel-body">
     <div id="qle-menu">
-      <h5>TOP LIFE CHANGES</h5>
+      <h5>TOP LIFE EVENTS</h5>
       <div class="row">
         <div id="carousel-qles" class="carousel slide" data-ride="carousel">
           <% if @qualifying_life_events %>		
@@ -54,4 +55,12 @@
       </div>
     </div>
   </div>
+
+  <script type="text/javascript">
+  $(function() {
+  $('.carousel').carousel({
+    interval: false
+  })
+});
+  </script>
 </div>

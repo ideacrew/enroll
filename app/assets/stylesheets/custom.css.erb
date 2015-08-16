@@ -54,6 +54,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {font-weight: 300; line-height: 1.6em;}
+
 .navbar-default {
     background-color: #eee;
     background-image: none;
@@ -83,6 +84,7 @@ ul.brd-left li:first-child {
 }
 
 a {
+    color: #007BC4;
     transition: all 0.3s ease 0s;
 }
 .full {
@@ -3841,17 +3843,27 @@ ul.list-right-section li a img {
 
 .hbx-enrollment-panel .family-members p{ 
     color: #007BC4;
-    font-weight: 500 !important;
-    font-size: 10pt;
 }
 
 .hbx-enrollment-panel .alert{
   margin-bottom: 0;
 }
 
-.hbx-enrollment-panel .panel-heading{
+.hbx-enrollment-panel .panel-heading, .qles-panel .panel-heading{
   background-image: none;
   padding-bottom: 0;
+}
+
+.qles-panel .panel-heading{
+  border-bottom: 0;
+}
+
+.qles-panel .panel-heading hr{
+  margin-bottom: 0;
+}
+
+.qles-panel .panel-body{
+  padding-top: 5px;
 }
 
 .hbx-enrollment-panel .btn{
@@ -3875,12 +3887,12 @@ ul.list-right-section li a img {
     text-transform: uppercase;
 }
 
-.hbx-enrollment-panel h1{
+.my-account-page h1{
     color: #003260;
     font-family: Open Sans;
     font-size: 23pt;
     font-weight: lighter !important;
-    margin-bottom: 10px;
+    margin-bottom: 0;
     margin-top: 0;
 }
 
@@ -3891,9 +3903,6 @@ ul.list-right-section li a img {
     font-weight: Regular !important;
 }
 
-.hbx-enrollment-panel a{
-    color: #007BC4;
-}
 
 .hbx-enrollment-panel h3{
     color: #7b7b7b;
@@ -4445,8 +4454,8 @@ span.text_style {color: #616161 !important;}
 }
 
 .btn-primary:hover, .btn-primary:focus {
-  background-color: #c9302c;
-  border-color: #ac2925;
+  background-color: #b7191b;
+  border-color: #b7191b;
 }
 
 .btn-primary.disabled, .btn-primary.disabled.active, .btn-primary.disabled.focus, .btn-primary.disabled:active, .btn-primary.disabled:focus, .btn-primary.disabled:hover, .btn-primary[disabled], .btn-primary.active[disabled], .btn-primary.focus[disabled], .btn-primary[disabled]:active, .btn-primary[disabled]:focus, .btn-primary[disabled]:hover, fieldset[disabled] .btn-primary, fieldset[disabled] .btn-primary.active, fieldset[disabled] .btn-primary.focus, fieldset[disabled] .btn-primary:active, fieldset[disabled] .btn-primary:focus, fieldset[disabled] .btn-primary:hover {
