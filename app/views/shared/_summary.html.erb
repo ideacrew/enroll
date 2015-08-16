@@ -27,13 +27,15 @@
 
     <div class="col-md-6 col-sm-6 col-xs-12">
       <div class="row">
-        <div class="col-md-4 col-sm-4 col-xs-12">
-          <h3><%= number_to_currency(@plan.total_premium) %></h3><small>Premium</small>
-        </div>
+        <% if @market_kind == 'shop' and @coverage_kind == 'health' %>
+          <div class="col-md-4 col-sm-4 col-xs-12">
+            <h3><%= number_to_currency(@plan.total_premium) %></h3><small>Premium</small>
+          </div>
 
-        <div class="col-md-4 col-sm-4 col-xs-12">
-          <h3><%= number_to_currency(@plan.total_employer_contribution) %></h3><small>Employer</small>
-        </div>
+          <div class="col-md-4 col-sm-4 col-xs-12">
+            <h3><%= number_to_currency(@plan.total_employer_contribution) %></h3><small>Employer</small>
+          </div>
+        <% end %>
 
         <div class="col-md-4 col-sm-4 col-xs-12">
           <div class="pull-right">
@@ -54,7 +56,7 @@
       <tr>
         <td>Summary of Benefits and Coverage (SBC) PDF</td>
         <td>
-          <%= link_to(root_path + "sbc/" + @plan.sbc_file, class: "download") do %>
+          <%= link_to(root_path + "sbc/#{@plan.sbc_file}", class: "download") do %>
               <i class="glyphicon glyphicon-download-alt"></i> Download
           <% end %>
         </td>
