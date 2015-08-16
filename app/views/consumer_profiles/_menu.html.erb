@@ -35,7 +35,7 @@
         <% end %>
       </li>
 
-      <% if @person.try(:consumer_role) %>
+      <% if @person.try(:consumer_role).present? %>
         <li role="presentation"<%= menu_tab_class(active_tab, "documents-tab") %>>
           <%= link_to(documents_consumer_profiles_path, :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "documents", "role" => "tab" ) do  %>
             Documents

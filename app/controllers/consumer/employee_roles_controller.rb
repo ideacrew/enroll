@@ -1,5 +1,8 @@
 class Consumer::EmployeeRolesController < ApplicationController
-  before_action :check_employee_role, only: [:new]
+  before_action :check_employee_role, only: [:new, :welcome]
+
+  def welcome
+  end
 
   def search
     @person = Forms::EmployeeCandidate.new

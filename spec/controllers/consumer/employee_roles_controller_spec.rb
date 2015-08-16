@@ -187,7 +187,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     let(:hired_on) { double }
     let(:employment_relationships) { double }
     let(:user_id) { "SOMDFINKETHING_ID"}
-    let(:user) { double(id: user_id ) }
+    let(:user) { double("User",id: user_id ) }
 
     before(:each) do
       sign_in(user)
@@ -217,13 +217,6 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
         let(:consumer_role){ double("ConsumerRole", id: "test") }
         let(:person_parameters){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111"}}
 
-        it "redirects to 'consumer role' flow" do
-          allow(Person).to receive(:new).and_return(person)
-          allow(person).to receive(:build_consumer_role).and_return(consumer_role)
-          allow(person).to receive(:save).and_return(true)
-          expect(response).to have_http_status(:redirect)
-        end
-
         context "that find a matching employee" do
           let(:found_census_employees) { [census_employee] }
 
@@ -234,6 +227,28 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
             expect(assigns[:employment_relationships]).to eq employment_relationships
           end
         end
+      end
+    end
+  end
+
+  describe "#match consumer_flow" do
+    let(:found_census_employees) { [] }
+    let(:user){double("User", id: "test")}
+    let(:person){double("Person")}
+    let(:consumer_role){ double("ConsumerRole", id: "test") }
+    let(:person_parameters){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111"}}
+    context "#match" do
+      it "redirects to 'consumer role' flow" do
+        # allow(Person).to receive(:new).and_return(person)
+        # allow(user).to receive(:person=).and_return(person)
+        # allow(person).to receive(:build_consumer_role).and_return(consumer_role)
+        # allow(person).to receive(:save).and_return(true)
+        allow(user).to receive(:person=).and_return(person)
+        allow(user).to receive(:save).and_return(true)
+        allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(person)
+        sign_in user
+        get :match, person: person_parameters
+        expect(response).to have_http_status(:redirect)
       end
     end
   end
