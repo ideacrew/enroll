@@ -40,6 +40,7 @@ module Factories
       person.build_consumer_role(is_applicant: true)  if  !person.consumer_role.present?
       person.save
       family,applicant = self.initialize_family(person, [])
+      family.person = person
       family.save
       user.person = person
       user.save

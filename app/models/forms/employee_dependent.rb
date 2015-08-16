@@ -7,6 +7,7 @@ module Forms
     attr_accessor :gender, :relationship
     attr_writer :family
     include ::Forms::PeopleNames
+    include ::Forms::ConsumerFields
     include ::Forms::SsnField
     #include ::Forms::DateOfBirthField
     #include Validations::USDate.on(:date_of_birth)
@@ -64,7 +65,13 @@ module Forms
         :name_sfx => name_sfx,
         :gender => gender,
         :dob => dob,
-        :ssn => ssn
+        :ssn => ssn,
+        :race => race,
+        :ethnicity => ethnicity,
+        :language_code => language_code,
+        :is_tobacco_user => is_tobacco_user,
+        :is_incarcerated => is_incarcerated,
+        :is_disabled => is_disabled
       }
     end
 
@@ -95,7 +102,13 @@ module Forms
         :name_sfx => found_family_member.name_sfx,
         :dob => (found_family_member.dob.is_a?(Date) ? found_family_member.dob.try(:strftime, "%Y-%m-%d") : found_family_member.dob),
         :gender => found_family_member.gender,
-        :ssn => found_family_member.ssn
+        :ssn => found_family_member.ssn,
+        :race => found_family_member.race,
+        :ethnicity => found_family_member.ethnicity,
+        :language_code => found_family_member.language_code,
+        :is_tobacco_user => found_family_member.is_tobacco_user,
+        :is_incarcerated => found_family_member.is_incarcerated,
+        :is_disabled => found_family_member.is_disabled,
       })
     end
 
