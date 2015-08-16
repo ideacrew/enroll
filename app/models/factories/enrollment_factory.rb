@@ -35,14 +35,14 @@ module Factories
     end
 
     def self.construct_consumer_role(person_params, user)
-      person = Person.match_by_id_info(params[:person]).first
-      person = Person.new(params[:person].except(:user_id).permit!) if !person.present?
+      person = Person.match_by_id_info(person_params[:person]).first
+      person = Person.new(person_params[:person].except(:user_id).permit!) if !person.present?
       person.build_consumer_role(is_applicant: true)  if  !person.consumer_role.present?
       person.save
       family,applicant = self.initialize_family(person, [])
       family.save
-      current_user.person = person
-      current_user.save
+      user.person = person
+      user.save
       person
     end
 

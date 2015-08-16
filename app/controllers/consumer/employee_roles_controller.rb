@@ -15,14 +15,7 @@ class Consumer::EmployeeRolesController < ApplicationController
     if @employee_candidate.valid?
       found_census_employees = @employee_candidate.match_census_employees
       if found_census_employees.empty?
-        @person = Person.match_by_id_info(params[:person]).first
-        @person = Person.new(params[:person].except(:user_id).permit!) unless @person.present?
-        @person.build_consumer_role(is_applicant: true)  unless @person.consumer_role.present?
-        @person.save
-        family,applicant = Factories::EnrollmentFactory.initialize_family(@person, [])
-        family.save
-        current_user.person = @person
-        current_user.save
+        @person = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
 
         respond_to do |format|
           format.html { redirect_to edit_consumer_consumer_role_path(@person.consumer_role.id) }

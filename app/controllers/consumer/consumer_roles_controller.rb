@@ -6,7 +6,7 @@ class Consumer::ConsumerRolesController < ApplicationController
   end
 
   def create
-    @person = Factories::EnrollmentFactory.construct_consumer_role(params.require[:person].permit!, current_user)
+    @person = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
 
     respond_to do |format|
       format.html { redirect_to :action => "edit", :id => @person.consumer_role.id }
