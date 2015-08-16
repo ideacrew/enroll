@@ -269,7 +269,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
       sign_in(user)
       get :welcome
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(home_consumer_profiles_path)
+      expect(response).to redirect_to(family_account_path)
     end
 
   end

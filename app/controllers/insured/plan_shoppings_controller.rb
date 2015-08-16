@@ -17,7 +17,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if hbx_enrollment.employee_role.hired_on > TimeKeeper.date_of_record
       flash[:error] = "You are attempting to purchase coverage prior to your date of hire on record. Please contact your Employer for assistance"
-      redirect_to home_consumer_profiles_path
+      redirect_to family_account_path
     elsif hbx_enrollment.may_select_coverage?
       hbx_enrollment.update_current(aasm_state: "coverage_selected")
       hbx_enrollment.propogate_selection
@@ -92,7 +92,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.update_current(aasm_state: "coverage_terminated", terminated_on: TimeKeeper.date_of_record.end_of_month)
       hbx_enrollment.propogate_terminate
 
-      redirect_to home_consumer_profiles_path
+      redirect_to family_account_path
     else
       redirect_to :back
     end

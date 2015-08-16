@@ -38,7 +38,7 @@
 - elsif step == 5
   = link_to 'Submit Enrollment', individual_checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id), :class => 'btn btn-lg btn-primary', id: 'btn-continue', :method => :post
 - elsif step == 6
-  = link_to 'GO TO MY ACCOUNT', home_consumer_profiles_path, class: 'btn btn-lg btn-primary', id: 'btn-continue'
+  = link_to 'GO TO MY ACCOUNT', family_account_path, class: 'btn btn-lg btn-primary', id: 'btn-continue'
 - else
   %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{type: 'submit'}
     CONTINUE

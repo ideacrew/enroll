@@ -3,11 +3,11 @@
     <ul role="tablist" class="list-unstyled list-inline" id="myTab">
 
       <li role="presentation"<%= menu_tab_class(active_tab, "home-tab") %>>
-        <%= link_to(home_consumer_profiles_path, :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
+        <%= link_to(family_account_path, :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
           <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
         <% end %>
 
-        <%= link_to(home_consumer_profiles_path, :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
+        <%= link_to(family_account_path, :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
               <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
               <small>Home</small>
           <% end %>
