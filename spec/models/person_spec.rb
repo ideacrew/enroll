@@ -236,8 +236,36 @@ describe Person do
         end
       end
 
-    end
+      context "has_active_employee_roles" do
+        let(:person) {FactoryGirl.build(:person)}
+        let(:employee_roles) {double(active: true)}
 
+        it "should return true" do
+          allow(person).to receive(:employee_roles).and_return(employee_roles)
+          expect(person.has_active_employee_roles).to eq true
+        end
+
+        it "should return false" do
+          allow(person).to receive(:employee_roles).and_return([])
+          expect(person.has_active_employee_roles).to eq false
+        end
+      end
+
+      context "has_active_consumer_role" do
+        let(:person) {FactoryGirl.build(:person)}
+        let(:consumer_role) {double(is_active?: true)}
+
+        it "should return true" do
+          allow(person).to receive(:consumer_role).and_return(consumer_role)
+          expect(person.has_active_consumer_role).to eq true
+        end
+
+        it "should return false" do
+          allow(person).to receive(:consumer_role).and_return(nil)
+          expect(person.has_active_consumer_role).to eq false
+        end
+      end
+    end
   end
 
   describe '.match_by_id_info' do
