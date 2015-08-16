@@ -25,6 +25,7 @@ RSpec.describe Consumer::ConsumerRolesController, :type => :controller do
     before(:each) do
       allow(user).to receive(:person=).and_return(person)
       allow(user).to receive(:save).and_return(true)
+      allow(user).to receive(:roles).and_return(["consumer"])
       allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(person)
     end
     it "should create new person/consumer role object" do

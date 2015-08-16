@@ -43,6 +43,7 @@ module Factories
       family.person = person
       family.save
       user.person = person
+      user.roles << "consumer" unless user.roles.include?("consumer")
       user.save
       person
     end
