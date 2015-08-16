@@ -41,7 +41,8 @@ puts "*"*80
 # require File.join(File.dirname(__FILE__),'seedfiles', 'premiums')
 
 puts "*"*80
-puts "Loading constructed people, broker agencies, employers, and employees."
+puts "Loading constructed geographic areas, people, broker agencies, employers, and employees."
+require File.join(File.dirname(__FILE__),'seedfiles', 'us_counties_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'admins_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'people_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'broker_agencies_seed')
