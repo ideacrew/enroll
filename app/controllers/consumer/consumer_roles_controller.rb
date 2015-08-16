@@ -10,6 +10,8 @@ class Consumer::ConsumerRolesController < ApplicationController
     @person = Person.new(params[:person].except(:user_id).permit!) unless @person.present?
     @person.build_consumer_role(is_applicant: true) unless @person.consumer_role.present?
     @person.save
+    family,applicant = Factories::EnrollmentFactory.initialize_family(@person, [])
+    family.save
     current_user.person = @person
     current_user.save
 

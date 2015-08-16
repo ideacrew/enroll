@@ -1,11 +1,17 @@
 class Consumer::EmployeeDependentsController < ApplicationController
   before_action :set_current_person, :set_family
   def index
-    emp_role_id = params.require(:employee_role_id)
-    @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
+    @type = params[:type]
+    if @type == "employee"
+      emp_role_id = params.require(:employee_role_id)
+      @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
 
-    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-    @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
+      @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+      @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
+    else
+      con_role_id = params.require(:consumer_role_id)
+      @consumer_role = @person.consumer_role
+    end
   end
 
   def new
