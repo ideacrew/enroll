@@ -1,8 +1,5 @@
 class Consumer::EmployeeRolesController < ApplicationController
-  before_action :check_employee_role, only: [:new, :welcome]
-
-  def welcome
-  end
+  before_action :check_employee_role, only: [:new]
 
   def search
     @person = Forms::EmployeeCandidate.new
@@ -20,10 +17,13 @@ class Consumer::EmployeeRolesController < ApplicationController
       if found_census_employees.empty?
         @person = Person.match_by_id_info(params[:person]).first
         @person = Person.new(params[:person].except(:user_id).permit!) unless @person.present?
-        @consumer_role = @person.build_consumer_role(is_applicant: true)
+        @person.build_consumer_role(is_applicant: true)  unless @person.consumer_role.present?
         @person.save
+        current_user.person = @person
+        current_user.save
+
         respond_to do |format|
-          format.html { redirect_to edit_consumer_consumer_role_path(@consumer_role.id) }
+          format.html { redirect_to edit_consumer_consumer_role_path(@person.consumer_role.id) }
         end
       else
         @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees.first)

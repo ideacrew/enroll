@@ -9,19 +9,15 @@
         <%= render 'shared/person/personal_information', f: f %>
         <br>
 
-        <div id="address_info" class="row no-buffer focus_effect personal-info-row">
-          <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-            <%= render 'shared/address_fields', f: f %>
-          </div>
-        </div>
-        <br>
-        <%= render 'shared/phone_fields', f: f %> <br>
+        <%= render 'shared/home_address_fields', f: f %><br>
+        <%= render 'shared/phone_fields', f: f %><br>
 
         <div id="email_info" class="row row-form-wrapper no-buffer">
           <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
             <%= render 'shared/email_fields', f: email %>
           <% end %>
         </div>
+
         <br>
         <%= render partial: "consumer/employee_roles/no_match" %>
       </div>

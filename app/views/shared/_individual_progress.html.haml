@@ -12,28 +12,32 @@
   %li{class: add_progress_class(2, step)}
     %span.circle-progress
     .vertical-line-progress
-    Household Info
+    Verify Identity
   %li{class: add_progress_class(3, step)}
     %span.circle-progress
     .vertical-line-progress
-    Choose Plan
+    Household Info
   %li{class: add_progress_class(4, step)}
     %span.circle-progress
     .vertical-line-progress
-    Confirm
+    Choose Plan
   %li{class: add_progress_class(5, step)}
+    %span.circle-progress
+    .vertical-line-progress
+    Confirm
+  %li{class: add_progress_class(6, step)}
     %span.circle-progress
     .vertical-line-progress
     Complete
 
 - if defined? url
   = link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
-- elsif step == 3
+- elsif step == 4
   %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{disabled: true}
     CONTINUE
-- elsif step == 4
-  = link_to 'Submit Enrollment', individual_checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id), :class => 'btn btn-lg btn-primary', id: 'btn-continue', :method => :post
 - elsif step == 5
+  = link_to 'Submit Enrollment', individual_checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id), :class => 'btn btn-lg btn-primary', id: 'btn-continue', :method => :post
+- elsif step == 6
   = link_to 'GO TO MY ACCOUNT', home_consumer_profiles_path, class: 'btn btn-lg btn-primary', id: 'btn-continue'
 - else
   %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{type: 'submit'}
