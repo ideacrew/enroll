@@ -19,7 +19,7 @@ class Consumer::EmployeeRolesController < ApplicationController
         @person = Person.new(params[:person].except(:user_id).permit!) unless @person.present?
         @person.build_consumer_role(is_applicant: true)  unless @person.consumer_role.present?
         @person.save
-        family,applicant = Factories::EnrollmentFactory.initialize_family(person, [])
+        family,applicant = Factories::EnrollmentFactory.initialize_family(@person, [])
         family.save
         current_user.person = @person
         current_user.save
@@ -77,7 +77,7 @@ class Consumer::EmployeeRolesController < ApplicationController
         end
       else
         respond_to do |format|
-          format.html { redirect_to consumer_employee_dependents_path(employee_role_id: @employee_role.id, type: "employee") }
+          format.html { redirect_to consumer_employee_dependents_path(employee_role_id: @employee_role.id) }
         end
       end
     else

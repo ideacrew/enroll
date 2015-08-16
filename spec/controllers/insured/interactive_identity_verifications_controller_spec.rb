@@ -59,7 +59,7 @@ describe Insured::InteractiveIdentityVerificationsController do
   end
 
   describe "POST #create" do
-    let(:mock_consumer_role) { instance_double("ConsumerRole") }
+    let(:mock_consumer_role) { instance_double("ConsumerRole", id: "test") }
     let(:mock_person) { double(:consumer_role => mock_consumer_role) }
     let(:mock_user) { double(:person => mock_person) }
     let(:mock_service) { instance_double("::IdentityVerification::InteractiveVerificationService") }

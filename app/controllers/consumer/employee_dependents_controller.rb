@@ -1,7 +1,7 @@
 class Consumer::EmployeeDependentsController < ApplicationController
   before_action :set_current_person, :set_family
   def index
-    @type = params[:type]
+    @type = params[:employee_role_id].present? ? "employee" : "consumer"
     if @type == "employee"
       emp_role_id = params.require(:employee_role_id)
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
