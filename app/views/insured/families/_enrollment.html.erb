@@ -23,8 +23,7 @@
           <div>
             <p> 
               <label>Premium:</label> <strong><%= number_to_currency(hbx_enrollment.total_premium) %></strong>/month
-              <label class="bullet-separator">Member ID:</label> <%#= hbx_enrollment.try(:subscriber).try(:id).try(:to_s) %>
-              <label class="bullet-separator">Group ID:</label> <%#= hbx_enrollment.try(:benefit_group_id).try(:to_s) %>
+              <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong>992231212</strong><%#= hbx_enrollment.try(:subscriber).person. %>
             </p>
           </div>
             <% names = hbx_enrollment.covered_members_first_names %>
