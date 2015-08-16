@@ -3,7 +3,8 @@
 <div class="panel panel-default min-h">
 
   <div class="panel-heading">
-    <h4>2015 Health Coverage <span class="separator">DCHL</span></h4>
+    <h4>2015 Health Coverage <span class="separator">DCHL</span>
+    </h4>
   </div>
 
   <div class="panel-body">
@@ -40,18 +41,28 @@
             </div>
           </div>
           <div class="col-xs-4">
-            <%= render partial: "enrollment_progress", locals: {step: 2} %>
+            <div class="family-plan-selection">
+             <div class="status">
+            <% if false %>
+                <h4>Enrolled</h4>
+                <label>Coverage Start <%= "06/01/2015" %></label>
+                <label>Coverage End <%= "11/15/2015" %></label>
+            <% else %> 
+              <%= render partial: "enrollment_progress", locals: {step: 2} %>
+            <% end %>
+               </div>
+             </div>
           </div>
         </div>
 
         <div class="row">
-          <div class="col-xs-5">
-            <a href="#"><i class="fa fa-file-pdf-o fa-lg"></i>&nbsp;Summary of Benefits and Coverage</a>
+          <div class="col-xs-4" style="display: flex;">
+            <a href="#"><span style="vertical-align:top;"><i class="fa fa-file-pdf-o fa-2x" style="padding-top: 4px;"></i></span>&nbsp;<div style="margin-left: 8px; vertical-align: top;">Summary of Benefits and Coverage</a></div>
+          </div>
+          <div class="col-xs-4" style="display: flex;">
+            <a href="#"><span style="vertical-align:top;"><i class="fa fa-phone fa-2x"></i></span>&nbsp;<div>Carrier Contact Info</a></div>
           </div>
           <div class="col-xs-4">
-            <a href="#"><i class="fa fa-phone fa-lg"></i>&nbsp;Carrier Contact Info</a>
-          </div>
-          <div class="col-xs-3">
             <button type="button" class="btn btn-primary btn-md pull-right">VIEW DETAILS</button>
           </div>
         </div>
