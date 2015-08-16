@@ -47,6 +47,10 @@ class ConsumerProfilesController < ApplicationController
     end
   end
 
+  def documents
+    @consumer_wrapper = Forms::ConsumerRole.new(@person.consumer_role)
+  end
+
   def check_qle_date
     qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = TimeKeeper.date_of_record - 30.days
