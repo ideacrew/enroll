@@ -16,7 +16,10 @@
             <p>
             <label><%= plan.try(:plan_type).try(:upcase) %></label>
             <% plan_level = plan.try(:metal_level).try(:humanize) %>
-            <label class="<%= plan_level.try(:downcase) %>-icon"><%= plan_level %></label>
+            <label><span class="separator">&nbsp;&nbsp;<span class="<%= plan_level.try(:downcase) %>-icon"><%= plan_level %></span></span></label>
+            <% if plan.nationwide %>
+            <label class="separator">NATIONWIDE NETWORK</label>
+            <% end %>
             </p>
           </div>
           <div>
