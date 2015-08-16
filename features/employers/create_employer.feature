@@ -47,7 +47,7 @@ Feature: Create Employer
       Given Employee has not signed up as an HBX user
         When I go to the employee account creation page
         Then Patrick Doe creates an HBX account
-        Then Patrick Doe should be logged on as an unlinked employee
+        #Then Patrick Doe should be logged on as an unlinked employee
         When Employee go to register as an employee
         Then Employee should see the employee search page
         When Employee enters the identifying info of Patrick Doe

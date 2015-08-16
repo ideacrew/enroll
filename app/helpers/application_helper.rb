@@ -309,10 +309,10 @@ module ApplicationHelper
       "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe
     elsif current_user.try(:has_employer_staff_role?)
       "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe
-    elsif controller == 'employee_roles'
-      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Employee".html_safe
+    elsif controller == 'employee_roles' || controller == "consumer_roles"
+      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Insured".html_safe
     elsif controller == 'consumer_profiles'
-      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Individual/Family".html_safe
+      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Insured".html_safe
     else
       "Welcome to the District's Health Insurance Marketplace"
     end
