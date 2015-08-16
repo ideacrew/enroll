@@ -5,7 +5,7 @@
 <div class="family-plan-selection">
   <div class="status">
     <h4>Status</h4>
-    <div><%= percent_complete %>% Complete</div>
+    <label><%= percent_complete %>% Complete</label>
   </div>
   <ul class="list-unstyled progress-wrapper hidden-xs">
     <li class="<%= add_progress_class(1, step) %>">
@@ -26,7 +26,6 @@
     <li class="<%= add_progress_class(4, step) %>">
       Enrolled
       <span class="circle-progress"></span>
-      <div class="vertical-line-progress"></div>
     </li>
   </ul>
 </div>

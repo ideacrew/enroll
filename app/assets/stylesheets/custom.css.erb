@@ -3732,7 +3732,7 @@ ul.progress-wrapper li.active span.circle-progress {
 .vertical-line-progress {
     background-color: #cacaca;
     width: 2px;
-    height: 30px;
+    height: 28px;
     position: absolute;
     z-index: -1;
     left: 15px;
@@ -3741,12 +3741,10 @@ ul.progress-wrapper li.active span.circle-progress {
 ul.progress-wrapper li.complete .vertical-line-progress {
     background-color: #007bc4;
 }
-ul.progress-wrapper li.active .vertical-line-progress {
+ul.progress-wrapper li .vertical-line-progress {
     background-color: #cacaca;
 }
-ul.progress-wrapper li:last-child .vertical-line-progress {
-    display: none;
-}
+
 ul.list-right-section {
     margin-top: 20px;
 }
@@ -3766,82 +3764,84 @@ ul.list-right-section li a img {
 }
 
 .family-plan-selection ul.progress-wrapper {
-    margin: 10px 0px 30px;
+    margin: 10px 17px 30px;
+    padding-right: 10px;
+    width: 140px;
+    height: 100px;
 }
 
-.family-plan-selection span.circle-progress {
-    border: 2px solid #99CC00;
-    left: 88%;
+.family-plan-selection ul.progress-wrapper {
+    margin: 10px 17px 30px;
+    padding-right: 10px;
+    float: right;
+}
+
+.family-plan-selection ul.progress-wrapper li {
+    text-align: right;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    color: #909090;
+    font-family: Open Sans;
+    font-size: 9pt;
 }
 
 .family-plan-selection ul.progress-wrapper li.complete {
     color: #99CC00;
 }
 
-.family-plan-selection ul.progress-wrapper li.complete span.circle-progress {
-    background-color: #99CC00;
-    width: 12px;
-    left: 88%;
-    height: 12px;
-}
-
 .family-plan-selection ul.progress-wrapper li.active {
-    padding-top: 2px;
-    padding-bottom: 2px;
-    list-style: none;
-    padding-right: 28px;
-    font-weight: bold;
     color: #99CC00;
 }
 
+.family-plan-selection ul.progress-wrapper li.complete span.circle-progress {
+    background-color: #99CC00;
+}
 .family-plan-selection ul.progress-wrapper li.active span.circle-progress {
-    background-color: #ffffff;
     border: 2px solid #99CC00;
-    width: 12px;
-    left: 88%;
-    height: 12px;
 }
 
-.family-plan-selection ul.progress-wrapper li {
-    text-align: right;
-    padding-right: 28px;
-    font-size: 13px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+.family-plan-selection .vertical-line-progress {
+    background-color: #cacaca;
+    height: 21px;
+    left: 15px;
+    margin-top: -5px;
+    position: absolute;
+    width: 2px;
+    z-index: 0;
+    left: 140px;
 }
 
+.family-plan-selection ul.progress-wrapper li span.circle-progress {
+   z-index: 1;
+   left: 135px;
+   width: 12px;
+   height: 12px;
+}
+
+.family-plan-selection ul.progress-wrapper li.complete .vertical-line-progress {
+    background-color: #99CC00;
+}
 
 .family-plan-selection .status{
     text-align: right;
     padding-right: 11px;
 }
 
+.family-plan-selection .status label{
+    text-transform: none;
+    padding-right: 0px;
+}
+
 .family-plan-selection .status h4{
     margin-bottom: 0;
     color: #99CC00;
-    font-weight: bold;
-}
-
-.family-plan-selection .vertical-line-progress {
-    z-index: 0;
-    left: 160px;
-    margin-top: -4px;
-    height: 12px;
+    font-weight: 600 !important;
 }
 
 
-.family-plan-selection ul.progress-wrapper li.complete .vertical-line-progress {
-    background-color: #99CC00;
-}
-
-.hbx-enrollment-panel .covered-members{ 
-    display: inline; 
-    margin-left: 5px; 
+.hbx-enrollment-panel .family-members p{ 
     color: #007BC4;
-}
-
-.hbx-enrollment-panel a{
-  color: #007BC4;
+    font-weight: 600 !important;
 }
 
 .hbx-enrollment-panel .alert{
@@ -3850,24 +3850,96 @@ ul.list-right-section li a img {
 
 .hbx-enrollment-panel .panel-heading{
   background-image: none;
+  padding-bottom: 0;
 }
 
 .hbx-enrollment-panel .btn{
   margin-right: 10px;
 }
 
-.hbx-enrollment-panel .dot-separator{
-  position: absolute; 
-  bottom: 14px; 
-  left: 162px;"
+.hbx-enrollment-panel span.separator:before{ 
+  content:'\2022 \2003'; 
 }
 
 .hbx-enrollment-panel .panel-body{
   padding-top: 0;
 }
 
+.hbx-enrollment-panel label{
+    color: #909090;
+    font-family: Open Sans;
+    font-size: 9pt;
+    font-weight: 600 !important;
+    padding-right: 5px;
+    text-transform: uppercase;
+}
 
+.hbx-enrollment-panel h1{
+    color: #003260;
+    font-family: Open Sans;
+    font-size: 23pt;
+    font-weight: lighter !important;
+    margin-bottom: 10px;
+    margin-top: 0;
+}
 
+.hbx-enrollment-panel h2{
+    font-family: Open Sans;
+    color: #414141;
+    font-size: 24pt;
+    font-weight: Regular !important;
+}
+
+.hbx-enrollment-panel a{
+    color: #007BC4;
+}
+
+.hbx-enrollment-panel h3{
+    color: #7b7b7b;
+    font-family: Open Sans;
+    font-size: 18pt;
+    font-weight: 600 !important;
+}
+
+.hbx-enrollment-panel h4{
+    color: #7b7b7b;
+    font-family: Open Sans;
+    font-size: 13pt;
+    font-weight: 600 !important;
+}
+
+.hbx-enrollment-panel .panel-heading h4{
+    font-variant: super;
+    margin-bottom: 0;
+    margin-top: 0;
+    text-transform: uppercase;
+}
+
+.hbx-enrollment-panel p{
+    font-family: Open Sans;
+    color: #414141;
+}
+
+.hbx-enrollment-panel p strong{
+    font-weight: 600 !important;
+}
+
+.hbx-enrollment-panel .icons p{
+  margin-left: 20px;
+}
+
+.hbx-enrollment-panel .options .fa {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.hbx-enrollment-panel .options span p {
+    display: inline-block;
+}
+
+.hbx-enrollment-panel .options span{
+    width: 50px;
+}
 
 /* Form Elements */
 .row-form-wrapper {border: 1px solid #b7b7b7;border-top: none;padding: 3px; background-color: #fff; transition: all 0.2s ease-in-out 0s;}
