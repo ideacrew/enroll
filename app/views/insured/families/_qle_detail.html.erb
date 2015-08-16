@@ -1,15 +1,23 @@
 <div id="qle-details" class='hidden'>
   <div class="hbx-enrollment-panel panel panel-default min-h">
     <div class="panel-heading">
-      <strong>REPORT LIFE CHANGES - </strong>
-      <strong id='event-title'>address CHANGE</strong>
+      <div class="row">
+      <div class="col-xs-11">
+      <h4>REPORT LIFE CHANGES -
+      <span id='event-title'>address CHANGE</span>
+      </h4>
+      </div>
+      <div class="col-xs-1">
       <a class="close-popup" href="javascript:void(0);"><span aria-hidden="true" class="glyphicon glyphicon-remove"></span></a>
+    </div>
+  </div>
     </div>
 
     <div class="panel-body">
       <div class="row">
         <%= form_tag '/consumer/employee_dependents', method: :get, class: 'input-no-pd', id: 'qle_form' do %>
-          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 qle-form-wrapper">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
             <div class='qle-form'>
               <h3 class="qle-details-title">I got married</h3>
               <h5>Enter the date of the event.</h5>
@@ -18,7 +26,7 @@
                   <%= text_field_tag 'qle_date', '', :'data-date-max'=> "+30d", :'data-date-min'=> "-30d", placeholder: "mm/dd/yyyy",
                     class: "required date-picker qle-date-picker form-control", required: true %>
                 </div>
-                <%= link_to 'CONTINUE', 'javascript:;', class: 'btn btn-danger', id: 'qle_submit' %>
+                <div class="form-group"><button type="button" class="btn btn-primary btn-md">CONTINUE</button></div>
               </div>
             </div>
 
@@ -41,6 +49,7 @@
         <% end %>
       </div>
     </div>
+
     <div class="alert alert-warning alert-dismissible panel-footer" role="alert">
       <p>QUALIFYING LIFE EVENT</p>
       <p>
