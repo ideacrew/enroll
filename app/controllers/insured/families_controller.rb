@@ -7,10 +7,9 @@ class Insured::FamiliesController < FamiliesController
     # @current_plan_year = @employer_profile.latest_plan_year if @employer_profile.present?
     # @benefit_groups = @current_plan_year.benefit_groups if @current_plan_year.present?
     # @benefit_group = @current_plan_year.benefit_groups.first if @current_plan_year.present?
-    # @qualifying_life_events = QualifyingLifeEventKind.all
+    @qualifying_life_events = QualifyingLifeEventKind.all
     @hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active || []
-
-    # @employee_role = @employee_roles.first
+    @employee_role = @person.employee_roles.try(:first)
 
     respond_to do |format|
       format.html

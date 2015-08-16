@@ -1,11 +1,20 @@
 class GroupSelectionController < ApplicationController
   def new
     initialize_common_vars
+
+    if @person.try(:has_active_employee_roles) and !@person.try(:has_active_consumer_role)
+      @market_kind = 'shop'
+    elsif !@person.try(:has_active_employee_roles) and @person.try(:has_active_consumer_role)
+      @market_kind = 'individual'
+    else
+      @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
+    end
   end
 
   def create
     initialize_common_vars
     keep_existing_plan = params[:commit] == "Keep existing plan"
+    @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
 
     return redirect_to purchase_consumer_profiles_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
@@ -60,7 +69,6 @@ class GroupSelectionController < ApplicationController
     @hbx_enrollment = (@family.latest_household.try(:hbx_enrollments).active || []).last
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-    @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
   end
 end

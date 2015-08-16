@@ -10,8 +10,8 @@
   <div class="panel-body">
     <div class="row">
       <div class="col-xs-8">
-        <div><%= display_carrier_logo(plan.carrier_profile, {width: 110}) %></div>
-        <h4><strong><%= link_to plan.name, summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id:hbx_enrollment.id}), {:remote => true} %></strong>
+        <div><%= display_carrier_logo(plan.try(:carrier_profile), {width: 110}) %></div>
+        <h4><strong><%= link_to plan.try(:name), summary_products_plans_path({:standard_component_id => plan.try(:hios_id), hbx_enrollment_id:hbx_enrollment.id}), {:remote => true} %></strong>
         </h4>
           <div>
             <p>
