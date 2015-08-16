@@ -224,11 +224,11 @@ private
   
   def notify_the_user
     if is_hbx_enrollment_eligible? && identity_verified_date
-      IvlNotificationMailer.lawful_presence_verified(parent)
+      IvlNotificationMailer.lawful_presence_verified(self)
     elsif is_hbx_enrollment_eligible? && identity_verification_pending?
-      IvlNotificationMailer.lawful_presence_unverified(parent)
+      IvlNotificationMailer.lawful_presence_unverified(self)
     elsif !is_hbx_enrollment_eligible?
-      IvlNotificationMailer.lawfully_ineligible(parent)
+      IvlNotificationMailer.lawfully_ineligible(self)
     end
   end
 
