@@ -184,13 +184,13 @@ class ConsumerRole
       transitions from: :identity_unverified, to: :identity_followup_pending, :guard => :identity_verification_pending?
     end
 
-    event :verify_lawful_presence do
+    event :verify_lawful_presence, :after_commit => :notify_the_user do
       transitions from: :identity_verified, to: :lawful_presence_verified
       transitions from: :identity_verified, to: :fdsh_service_error
       transitions from: :identity_verified, to: :not_lawfully_present
     end
 
-    event :retry_fdsh_service do
+    event :retry_fdsh_service, :after_commit => :notify_the_user do
       transitions from: :fdsh_service_error, to: :lawful_presence_followup_pending
       transitions from: :fdsh_service_error, to: :lawful_presence_verified, :guard => :identity_verification_success?
       transitions from: :fdsh_service_error, to: :not_lawfully_present
@@ -220,6 +220,16 @@ private
 
   def identity_metadata_provided?
     identity_final_decision_code.present? && identity_response_code.present?
+  end
+  
+  def notify_the_user
+    if is_hbx_enrollment_eligible? && identity_verified_date
+      IvlNotificationMailer.lawful_presence_verified(parent)
+    elsif is_hbx_enrollment_eligible? && identity_verification_pending?
+      IvlNotificationMailer.lawful_presence_unverified(parent)
+    elsif !is_hbx_enrollment_eligible?
+      IvlNotificationMailer.lawfully_ineligible(parent)
+    end
   end
 
 
