@@ -43,6 +43,9 @@ Rails.application.routes.draw do
   end
 
   namespace :insured do
+    get 'verification_documents/upload', to: 'verification_documents#upload'
+    post 'verification_documents/upload', to: 'verification_documents#upload'
+
     resources :plan_shoppings, :only => [:show] do
       member do
         get 'receipt'
@@ -211,6 +214,7 @@ Rails.application.routes.draw do
 
   resources :consumer_profiles, :only => [] do
     collection do
+      get 'documents'
       get 'home'
       get 'plans'
       get 'personal'
