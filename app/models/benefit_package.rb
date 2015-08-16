@@ -14,7 +14,7 @@ class BenefitPackage
       dependents
     )
 
-  BENEFIT_BEGIN_OFFSET_PERIOD_KINDS = [0, 30, 60, 90]
+  BENEFIT_BEGIN_AFTER_EVENT_OFFSET_KINDS = [0, 30, 60, 90]
   BENEFIT_EFFECTIVE_DATE_KINDS      = %w(date_of_event first_of_month)
   BENEFIT_TERMINATION_DATE_KINDS    = %w(date_of_event end_of_month)
 
@@ -33,7 +33,7 @@ class BenefitPackage
   field :title, type: String, default: ""
 
   field :eligible_relationship_categories, type: Array, default: []
-  field :benefit_begin_offset_periods, type: Array, default: []
+  field :benefit_begin_after_event_offsets, type: Array, default: []
   field :benefit_effective_dates, type: Array, default: []
   field :benefit_termination_dates, type: Array, default: []
 
@@ -43,7 +43,7 @@ class BenefitPackage
 
   delegate :start_on, :end_on, to: :benefit_coverage_period
 
-  embeds_one :premium_credit_strategy
+  # embeds_one :premium_credit_strategy
 
   # validates :eligible_relationship_categories,
   #   allow_blank: false,
@@ -52,10 +52,10 @@ class BenefitPackage
   #     message: "%{value} is not a valid eligible relationship category kind"
   #   }
 
-  # validates :benefit_begin_offset_periods,
+  # validates :benefit_begin_after_event_offsets,
   #   allow_blank: false,
   #   inclusion: {
-  #     in: BENEFIT_BEGIN_OFFSET_PERIOD_KINDS,
+  #     in: BENEFIT_BEGIN_AFTER_EVENT_OFFSET_KINDS,
   #     message: "%{value} is not a valid benefit begin offset period kind"
   #   }
 
