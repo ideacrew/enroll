@@ -32,7 +32,6 @@ load_tasks = %w(
   seed:families
   hbx:employers:add[db/seedfiles/employers.csv,db/seedfiles/blacklist.csv]
   hbx:employers:census:add[db/seedfiles/census.csv]
-  seed:slcsp
 )
 puts "*"*80
 puts "Loading sanitized plans, people, families, employers, and census."
