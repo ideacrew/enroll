@@ -5,6 +5,8 @@ class ConsumerRole
 
   embedded_in :person
 
+  INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
+
   VLP_AUTHORITY_KINDS = %w(ssa dhs hbx)
   CITIZEN_STATUS_KINDS = %w(
       us_citizen
@@ -65,6 +67,7 @@ class ConsumerRole
   field :aasm_state, type: String, default: "identity_unverified"
   field :identity_verified_date, type: Date
   field :identity_final_decision_code, type: String
+  field :identity_final_decision_transaction_id, type: String
   field :identity_response_code, type: String
   field :identity_response_description_text, type: String
 
@@ -212,7 +215,7 @@ class ConsumerRole
 
 private
   def identity_verification_success?
-    identity_final_decision_code.to_s.downcase == "acc"
+    identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
   end
 
   def identity_verification_pending?

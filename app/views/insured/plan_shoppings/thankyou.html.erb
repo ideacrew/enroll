@@ -17,7 +17,11 @@
 
           <br>
 
-          <%= render "insured/plan_shoppings/coverage_information" %>
+          <% if @market_kind == 'shop' and @coverage_kind == 'health' %>
+            <%= render "insured/plan_shoppings/coverage_information" %>
+          <% else %>
+            <%= render "insured/plan_shoppings/individual_coverage_information" %>
+          <% end %>
         </div>
 
 	<%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => { :enrollment => @enrollment } %>

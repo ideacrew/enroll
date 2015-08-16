@@ -16,6 +16,7 @@ Rails.application.routes.draw do
         get :product_index
         get :configuration
         post :set_date
+        get :staff_index
       end
 
       member do
@@ -243,6 +244,16 @@ Rails.application.routes.draw do
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
+
+  namespace :api, :defaults => {:format => 'xml'} do
+    namespace :v1 do
+      resources :slcsp, :only => []  do
+        collection do
+          post :plan
+        end
+      end
+    end
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
