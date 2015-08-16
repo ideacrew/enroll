@@ -1,4 +1,5 @@
 class Products::QhpController < ApplicationController
+  before_action :set_kind_for_market_and_coverage, only: [:comparison, :summary]
 
   def comparison
     new_params = params.permit(:standard_component_id, :hbx_enrollment_id)
@@ -6,10 +7,17 @@ class Products::QhpController < ApplicationController
     found_params = params["standard_component_ids"].map { |str| str[0..13] }
     hbx_enrollment_id = new_params[:hbx_enrollment_id]
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
-    @benefit_group = @hbx_enrollment.benefit_group
-    @reference_plan = @benefit_group.reference_plan
-    @qhps = Products::Qhp.where(:standard_component_id.in => found_params).to_a.each do |qhp|
-      qhp[:total_employee_cost] = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan).total_employee_cost
+
+    if @market_kind == 'shop' and @coverage_kind == 'health'
+      @benefit_group = @hbx_enrollment.benefit_group
+      @reference_plan = @benefit_group.reference_plan
+      @qhps = Products::Qhp.where(:standard_component_id.in => found_params).to_a.each do |qhp|
+        qhp[:total_employee_cost] = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan).total_employee_cost
+      end
+    else
+      @qhps = Products::Qhp.where(:standard_component_id.in => found_params).to_a.each do |qhp|
+        qhp[:total_employee_cost] = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, nil, nil).total_employee_cost
+      end
     end
     respond_to do |format|
       format.html
@@ -22,13 +30,24 @@ class Products::QhpController < ApplicationController
     hbx_enrollment_id = new_params[:hbx_enrollment_id]
     sc_id = new_params[:standard_component_id][0..13]
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
-    @benefit_group = @hbx_enrollment.benefit_group
-    @reference_plan = @benefit_group.reference_plan
     @qhp = Products::Qhp.where(standard_component_id: sc_id).to_a.first
-    @plan = PlanCostDecorator.new(@qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan)
+
+    if @market_kind == 'shop' and @coverage_kind == 'health'
+      @benefit_group = @hbx_enrollment.benefit_group
+      @reference_plan = @benefit_group.reference_plan
+      @plan = PlanCostDecorator.new(@qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan)
+    else
+      @plan = PlanCostDecorator.new(@qhp.plan, @hbx_enrollment, nil, nil)
+    end
     respond_to do |format|
       format.html
       format.js
     end
+  end
+
+  private
+  def set_kind_for_market_and_coverage
+    @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
+    @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
   end
 end
