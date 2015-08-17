@@ -42,6 +42,11 @@ class TimeKeeper
     instance.date_of_record
   end
 
+  def self.datetime_of_record
+    instant = Time.current
+    date_of_record.to_datetime.utc + instant.hour.hours + instant.min.minutes + instant.sec.seconds
+  end
+
   def set_date_of_record(new_date)
     Rails.cache.write(CACHE_KEY, new_date.strftime("%Y-%m-%d"))
   end
