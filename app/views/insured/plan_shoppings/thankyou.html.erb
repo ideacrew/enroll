@@ -17,7 +17,7 @@
 
           <br>
 
-          <% if @market_kind == 'shop' and @coverage_kind == 'health' %>
+          <% if @enrollment.employee_role.present? %>
             <%= render "insured/plan_shoppings/coverage_information" %>
           <% else %>
             <%= render "insured/plan_shoppings/individual_coverage_information" %>

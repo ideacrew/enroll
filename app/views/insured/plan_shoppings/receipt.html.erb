@@ -11,13 +11,13 @@
 
           <p>
             <% if @employer_profile.present? %>
-            <strong><%= @employer_profile.legal_name %></strong><br>
+              <strong><%= @employer_profile.legal_name %></strong><br>
             <% end %>
             <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
             Metal level : <%= @plan.metal_level %>
           </p>
           
-          <% if @enrollment.employee_role.present?%>
+          <% if @enrollment.employee_role.present? %>
             <%= render "insured/plan_shoppings/coverage_information" %>
           <%else%>
             <%= render "insured/plan_shoppings/individual_coverage_information" %>

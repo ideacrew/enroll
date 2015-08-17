@@ -14,6 +14,7 @@ RSpec.describe "group_selection/new.html.erb" do
       assign(:person, person)
       assign(:employee_role, employee_role)
       assign(:coverage_household, coverage_household)
+      assign(:market_kind, 'individual')
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
       allow(family_member1).to receive(:is_primary_applicant?).and_return(true)
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
@@ -33,7 +34,7 @@ RSpec.describe "group_selection/new.html.erb" do
     end
 
     it "should have a checked checkbox option and a checked radio button" do
-      expect(rendered).to have_selector("input[checked='checked']", count: 3+1)
+      expect(rendered).to have_selector("input[checked='checked']", count: 3)
     end
 
     it "should have a disabled checkbox option" do
@@ -135,6 +136,7 @@ RSpec.describe "group_selection/new.html.erb" do
       assign :person, person
       assign :employee_role, employee_role
       assign :coverage_household, coverage_household
+      assign :market_kind, 'individual'
       assign :change_plan, true
       assign :hbx_enrollment, hbx_enrollment
     end

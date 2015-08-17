@@ -1,5 +1,5 @@
 class Exchanges::HbxProfilesController < ApplicationController
-  before_action :check_hbx_staff_role, except: [:welcome]
+  before_action :check_hbx_staff_role, except: [:welcome, :request_help, :staff_index, :assister_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox, :configuration, :show]
 
@@ -37,6 +37,58 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def assister_index
+    @q = params.permit(:q)[:q]
+    @staff = Person.where(assister_role: {:$exists =>true})
+    @page_alphabets = page_alphabets(@staff, "last_name")
+    page_no = cur_page_no(@page_alphabets.first)
+    if @q.nil?
+      @staff = @staff.where(last_name: /^#{page_no}/i)
+    else
+      @staff = @staff.where(last_name: @q)
+    end
+  end
+
+  def request_help
+    requester = Person.find(params[:person])
+    if params[:type]
+      cac = params[:type] == 'CAC'
+      staff = Person.where(:'csr_role.cac' => cac)
+      match = staff.where(:$and => [{first_name: params[:firstname].strip},{last_name: params[:lastname].strip}])
+      if match.count > 0
+        status_text = 'A message has been sent to the Certified Applicant Counselor.' if cac
+        status_text = 'A message has been sent to the Customer Service representative.' if !cac
+        hbx_profile = Organization.where(:hbx_profile =>{:$exists => true}).first.hbx_profile
+        message_params = {
+          sender_id: hbx_profile.id,
+          parent_message_id: hbx_profile.id,
+          from: 'Plan Shopping Automatic Message',
+          to: "HBX ADMIN",
+          subject: "Plan Shopping Help Request for #{params[:type]}",
+          body: 
+            "Please contact #{requester.first_name} #{requester.last_name}.  " +
+            "Plan Shopping help request from Person Id #{requester.id}, email #{requester.try(:user).try(:email)}. " 
+        }
+        create_secure_message message_params, hbx_profile, 'inbox'
+      else
+        status_text = call_customer_service
+      end  
+    else
+      if params[:broker] && params[:broker] != ''
+        @broker = Person.find(params[:broker]).broker_role.email
+        sender = Person.where(hbx_staff_role: {:$exists=> true}).first
+        body ={body: "please contact #{requester.first_name} #{requester.last_name}"}
+        UserMailer.message_to_broker(sender, @broker, body)
+        status_text = 'Message send to Broker'
+      else
+        @assister = Person.find(params[:assister])
+        sender = Person.where(hbx_staff_role: {:$exists=> true}).first
+        UserMailer.message_to_assister(requester, @assister)
+        status_text = 'Message sent to Assister'
+      end
+    end
+    render :text =>status_text, layout: false
+end  
 
   def family_index
     @q = params.permit(:q)[:q]
@@ -193,5 +245,9 @@ private
     unless current_user.has_hbx_staff_role?
       redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
     end
+  end
+
+  def call_customer_service
+    "No match found.  Please call Customer Service at: (855)532-5465 for assistance."
   end
 end

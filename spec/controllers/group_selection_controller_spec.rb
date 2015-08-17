@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe GroupSelectionController, :type => :controller do
   let(:person) {FactoryGirl.create(:person)}
   let(:employee_role) {FactoryGirl.create(:employee_role)}
-  let(:coverage_household) {double}
   let(:household) {double(:immediate_family_coverage_household=> coverage_household, :hbx_enrollments => hbx_enrollments)}
+  let(:coverage_household) {double}
   let(:family) {Family.new}
   let(:hbx_enrollment) {HbxEnrollment.create}
   let(:hbx_enrollments) {double(:active => [hbx_enrollment])}
@@ -42,7 +42,8 @@ RSpec.describe GroupSelectionController, :type => :controller do
     let(:employee_roles){ [double("EmployeeRole")] }
 
     before do
-      allow(HbxEnrollment).to receive(:new_from).and_return(hbx_enrollment)
+      allow(coverage_household).to receive(:household).and_return(household)
+      allow(household).to receive(:new_hbx_enrollment_from).and_return(hbx_enrollment)
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
       allow(hbx_enrollment).to receive(:rebuild_members_by_coverage_household).with(coverage_household: coverage_household).and_return(true)

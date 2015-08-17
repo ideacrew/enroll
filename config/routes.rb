@@ -17,6 +17,8 @@ Rails.application.routes.draw do
         get :configuration
         post :set_date
         get :staff_index
+        get :assister_index
+        get :request_help
       end
 
       member do
@@ -142,6 +144,7 @@ Rails.application.routes.draw do
       collection do
         get :employers
         get :messages
+        get :staff_index
       end
 
       resources :applicants
