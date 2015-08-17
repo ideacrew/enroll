@@ -34,17 +34,32 @@ RSpec.describe WorkflowStateTransition, type: :model do
     end
 
     context "with no transition_at" do
-      let(:params) {valid_params.except(:transition_at)}
+      let(:params)                    {valid_params.except(:transition_at)}
+      let(:workflow_state_transition) { WorkflowStateTransition.new(**params) }
+      let(:current_time)              { TimeKeeper.datetime_of_record }
 
-      it "should invalid" do
-        expect(WorkflowStateTransition.new(**params).valid?).to be_falsey
+      before do
+        workflow_state_transition.valid?
+      end
+
+      it "should set the transition_at value before validation" do
+        expect(workflow_state_transition.valid?).to be_truthy
+        expect(workflow_state_transition.transition_at).to be_within(0.1).of(current_time)
       end
     end
 
     context "with all valid data" do
+      let(:params)                    { valid_params }
+      let(:workflow_state_transition) { WorkflowStateTransition.new(**params) }
+
       it "should be valid" do
-        expect(WorkflowStateTransition.new(**valid_params).valid?).to be_truthy
+        expect(workflow_state_transition.valid?).to be_truthy
       end
+
+      it "should use the passed value for transition_at" do
+        expect(workflow_state_transition.transition_at).to eq transition_at
+      end
+
     end
   end
 end
