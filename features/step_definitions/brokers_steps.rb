@@ -256,13 +256,13 @@ Then(/^Broker Assisted is a family$/) do
 end
 
 Then(/^.+ goes to the Consumer page$/) do
-  broker_assist_row = @browser.td(text: /Broker Assisted/).parent
-  broker_assist_row.a(text: /Consumer/).click
-  screenshot("broker_on_consumer_home_page")
+  wait_and_confirm_text(/My DC Health Link/)
 end
-Then(/^.+ is on the consumer home page$/) do
-  @browser.a(class: 'interaction-click-control-shop-for-plans').wait_until_present
-end
+
+# Then(/^.+ is on the consumer home page$/) do
+#   binding.pry
+#   @browser.a(class: 'interaction-click-control-shop-for-plans').wait_until_present
+# end
 
 Then(/^.+ shops for plans$/) do
   @browser.a(class: 'interaction-click-control-shop-for-plans').click 

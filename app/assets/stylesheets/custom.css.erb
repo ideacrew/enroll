@@ -3741,10 +3741,13 @@ ul.progress-wrapper li.active span.circle-progress {
     margin-top: 5px;
 }
 ul.progress-wrapper li.complete .vertical-line-progress {
-    background-color: #468847;
+    background-color: #007bc4;
 }
-ul.progress-wrapper li .vertical-line-progress {
+ul.progress-wrapper li.active .vertical-line-progress {
     background-color: #cacaca;
+}
+ul.progress-wrapper li:last-child .vertical-line-progress {
+   display: none;
 }
 
 ul.list-right-section {
@@ -3821,7 +3824,7 @@ ul.list-right-section li a img {
 }
 
 .family-plan-selection ul.progress-wrapper li.complete .vertical-line-progress {
-    background-color: #468847`;
+    background-color: #468847;
 }
 
 .family-plan-selection .status{

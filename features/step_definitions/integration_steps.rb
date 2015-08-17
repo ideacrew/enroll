@@ -442,9 +442,7 @@ Then(/^.+ should see the receipt page$/) do
 end
 
 Then(/^.+ should see the "my account" page$/) do
-  @browser.element(text: /Your Life Events/i).wait_until_present
-  screenshot("my_account_page")
-  expect(@browser.element(text: /Your Life Events/i).visible?).to be_truthy
+  wait_and_confirm_text(/My DC Health Link/)
 end
 
 Then(/^.+ should see the "Your Enrollment History" section/) do

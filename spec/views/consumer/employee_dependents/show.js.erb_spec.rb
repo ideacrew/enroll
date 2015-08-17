@@ -14,6 +14,7 @@ describe "consumer/employee_dependents/show.js.erb" do
       allow(Family).to receive(:find_family_member).with(family_member.id).and_return(family_member)
       allow(family_member).to receive(:primary_relationship).and_return("self")
       assign(:dependent, Forms::EmployeeDependent.find(family_member.id))
+      @request.env['HTTP_REFERER'] = 'consumer_role_id'
 
       stub_template "consumer/employee_dependents/dependent" => '' 
       render file: "consumer/employee_dependents/show.js.erb"

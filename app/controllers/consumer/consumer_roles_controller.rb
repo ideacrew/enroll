@@ -21,6 +21,7 @@ class Consumer::ConsumerRolesController < ApplicationController
 
   def update
     @consumer_role = ConsumerRole.find(params.require(:id))
+    params[:person].delete(:is_consumer_role)
     @person = @consumer_role.person
     @person.addresses = []
     @person.phones = []
