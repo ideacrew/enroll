@@ -17,7 +17,8 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       updated_at: TimeKeeper.date_of_record,
       hbx_enrollment_members: members,
       effective_on: TimeKeeper.date_of_record.beginning_of_month,
-      plan: new_plan
+      plan: new_plan,
+      employee_role: double("EmployeeRole")
     )
   end
 

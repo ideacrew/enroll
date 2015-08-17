@@ -269,6 +269,14 @@ class Person
    self.emails << ::Email.new(:kind => 'work', :address => email)
   end
 
+  def has_active_consumer_role
+    consumer_role.present? and consumer_role.is_active?
+  end
+
+  def has_active_employee_roles
+    employee_roles.present? and employee_roles.active.present?
+  end
+
   class << self
     def default_search_order
       [[:last_name, 1],[:first_name, 1]]

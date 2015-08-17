@@ -3,10 +3,11 @@ module Forms
     include ActiveModel::Model
     include ActiveModel::Validations
 
-    attr_accessor :id, :family_id
+    attr_accessor :id, :family_id, :is_consumer_role
     attr_accessor :gender, :relationship
     attr_writer :family
     include ::Forms::PeopleNames
+    include ::Forms::ConsumerFields
     include ::Forms::SsnField
     #include ::Forms::DateOfBirthField
     #include Validations::USDate.on(:date_of_birth)
@@ -37,6 +38,7 @@ module Forms
       existing_person = Person.match_existing_person(self)
       if existing_person
         family_member = family.relate_new_member(existing_person, self.relationship)
+        family_member.family.build_consumer_role(family_member) if self.is_consumer_role == "true"
         family_member.save!
         self.id = family_member.id
         return true
@@ -44,6 +46,7 @@ module Forms
       person = Person.new(extract_person_params)
       return false unless try_create_person(person)
       family_member = family.relate_new_member(person, self.relationship)
+      family_member.family.build_consumer_role(family_member) if self.is_consumer_role == "true"
       family.save!
       self.id = family_member.id
       true
@@ -64,7 +67,13 @@ module Forms
         :name_sfx => name_sfx,
         :gender => gender,
         :dob => dob,
-        :ssn => ssn
+        :ssn => ssn,
+        :race => race,
+        :ethnicity => ethnicity,
+        :language_code => language_code,
+        :is_tobacco_user => is_tobacco_user,
+        :is_incarcerated => is_incarcerated,
+        :is_disabled => is_disabled
       }
     end
 
@@ -95,7 +104,13 @@ module Forms
         :name_sfx => found_family_member.name_sfx,
         :dob => (found_family_member.dob.is_a?(Date) ? found_family_member.dob.try(:strftime, "%Y-%m-%d") : found_family_member.dob),
         :gender => found_family_member.gender,
-        :ssn => found_family_member.ssn
+        :ssn => found_family_member.ssn,
+        :race => found_family_member.race,
+        :ethnicity => found_family_member.ethnicity,
+        :language_code => found_family_member.language_code,
+        :is_tobacco_user => found_family_member.is_tobacco_user,
+        :is_incarcerated => found_family_member.is_incarcerated,
+        :is_disabled => found_family_member.is_disabled,
       })
     end
 
@@ -127,6 +142,7 @@ module Forms
       assign_attributes(attr)
       return false unless valid?
       return false unless try_update_person(family_member.person)
+      family_member.family.build_consumer_role(family_member) if attr["is_consumer_role"] == "true"
       family_member.update_relationship(relationship)
       family_member.save!
       true

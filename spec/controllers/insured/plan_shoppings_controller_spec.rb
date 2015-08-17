@@ -53,12 +53,14 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:plan) { double("Plan") }
     let(:benefit_group) { double("BenefitGroup") }
     let(:reference_plan) { double("Plan") }
+    let(:employee_role) { double("EmployeeRole") }
 
     before do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
       allow(enrollment).to receive(:plan).and_return(plan)
       allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(enrollment).to receive(:employee_role).and_return(employee_role)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
     end

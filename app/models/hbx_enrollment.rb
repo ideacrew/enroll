@@ -55,6 +55,7 @@ class HbxEnrollment
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
+  associated_with_one :consumer_role, :consumer_role_id, "ConsumerRole"
 
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
 
@@ -98,6 +99,11 @@ class HbxEnrollment
 
   before_save :generate_hbx_id
 
+
+  def benefit_sponsored?
+    employer_profile.present?
+  end
+
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
@@ -139,7 +145,7 @@ class HbxEnrollment
   end
 
   def employer_profile
-    employee_role.employer_profile
+    self.try(:employee_role).employer_profile
   end
 
   def plan=(new_plan)
@@ -262,6 +268,12 @@ class HbxEnrollment
     )
     enrollment.save
     enrollment
+  end
+
+  def covered_members_first_names
+    hbx_enrollment_members.inject([]) do |names, member|
+      names << member.person.first_name
+    end
   end
 
   def self.find(id)

@@ -133,7 +133,7 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def consumer_override
     session[:person_id] = params['person_id']
-    redirect_to home_consumer_profiles_path
+    redirect_to family_account_path
   end
 
   private

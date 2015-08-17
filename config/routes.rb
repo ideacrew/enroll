@@ -45,6 +45,9 @@ Rails.application.routes.draw do
   end
 
   namespace :insured do
+    get 'verification_documents/upload', to: 'verification_documents#upload'
+    post 'verification_documents/upload', to: 'verification_documents#upload'
+
     resources :plan_shoppings, :only => [:show] do
       member do
         get 'receipt'
@@ -61,6 +64,7 @@ Rails.application.routes.draw do
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
       get 'new'
+      get 'home'
 
       resources :people do
         collection do
@@ -157,6 +161,16 @@ Rails.application.routes.draw do
 
   resources :translations
 
+  namespace :api, :defaults => {:format => 'xml'} do
+    namespace :v1 do
+      resources :slcsp, :only => []  do
+        collection do
+          post :plan
+        end
+      end
+    end
+  end
+
   ############################# TO DELETE BELOW ##############################
 
   # FIXME: Do this properly later
@@ -214,6 +228,7 @@ Rails.application.routes.draw do
 
   resources :consumer_profiles, :only => [] do
     collection do
+      get 'documents'
       get 'home'
       get 'plans'
       get 'personal'
@@ -223,6 +238,8 @@ Rails.application.routes.draw do
       get 'purchase'
     end
   end
+
+  match 'families/home', to: 'insured/families#home', via:[:get], as: "family_account"
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
@@ -248,15 +265,8 @@ Rails.application.routes.draw do
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
 
-  namespace :api, :defaults => {:format => 'xml'} do
-    namespace :v1 do
-      resources :slcsp, :only => []  do
-        collection do
-          post :plan
-        end
-      end
-    end
-  end
+
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
