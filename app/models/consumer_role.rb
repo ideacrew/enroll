@@ -230,11 +230,11 @@ class ConsumerRole
 
 private
   def identity_verification_succeeded?
-    identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCEeded_CODE
+    identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
   end
 
   def identity_verification_denied?
-    identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCEeded_CODE
+    identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
   end
 
   def identity_verification_pending?

@@ -26,6 +26,7 @@
       <div class="checkbox">
         <label>
           <%= f.check_box :is_disabled %> DISABLED?
+          <%= f.hidden_field :is_consumer_role, value: true %>
         </label>
       </div>
     </div>

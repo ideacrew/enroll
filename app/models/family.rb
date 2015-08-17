@@ -317,6 +317,13 @@ class Family
     end
   end
 
+  def build_consumer_role(family_member)
+    person = family_member.person
+    return if person.consumer_role.present?
+    person.build_consumer_role(:is_applicant => false)
+    person.save!
+  end
+
 private
   def build_household
     if households.size == 0
