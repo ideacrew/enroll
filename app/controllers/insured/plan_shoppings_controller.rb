@@ -27,7 +27,6 @@ class Insured::PlanShoppingsController < ApplicationController
     elsif hbx_enrollment.may_select_coverage?
       hbx_enrollment.update_current(aasm_state: "coverage_selected")
       hbx_enrollment.propogate_selection
-
       UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now if hbx_enrollment.employee_role.present?
       redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan])
     elsif hbx_enrollment.consumer_role_id.present?
