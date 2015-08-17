@@ -5,7 +5,7 @@ class ConsumerRole
 
   embedded_in :person
 
-  INTERACTIVE_IDENTITY_VERIFICATION_SUCCEeded_CODE = "acc"
+  INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
 
   VLP_AUTHORITY_KINDS = %w(ssa dhs hbx)
   CITIZEN_STATUS_KINDS = %w(
