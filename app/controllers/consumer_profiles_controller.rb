@@ -80,6 +80,18 @@ class ConsumerProfilesController < ApplicationController
       redirect_to :back
     end
   end
+  
+  def notification
+    if params[:view].eql?("lawful_presence_verified")
+      html_view = "notices/9cindividual.html.erb"
+    elsif params[:view].eql?("lawful_presence_unverified")
+      html_view = "notices/9findividual.html.erb"
+    elsif params[:view].eql?("lawfully_ineligible")
+      html_view = "notices/11individual.html.erb"
+    end
+    notice = Notice.new(current_user.email, {:notice_data => {:user => current_user}, :template => html_view})
+    render :text => notice.html.html_content
+  end
 
   private
   def get_family
