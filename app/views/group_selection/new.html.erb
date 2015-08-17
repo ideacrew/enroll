@@ -17,7 +17,7 @@
               <tr>
                 <td width="20">
                   <% is_coverage = @employee_role.present? ? coverage_relationship_check(offered_relationship_benefits, family_member) : true
-                     is_primary = @employee_role.present? ? false : family_member.is_primary_applicant?
+                     is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
                   %>
                 <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_coverage, disabled: !is_coverage, readonly: is_primary, onclick: "return #{!is_primary};") %>
                 </td>
