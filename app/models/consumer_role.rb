@@ -96,6 +96,9 @@ class ConsumerRole
   delegate :is_disabled,        :is_disabled=,       to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
+  embeds_many :workflow_state_transitions, as: :transitional
+
+  accepts_nested_attributes_for :person, :workflow_state_transitions
 
   validates_presence_of :ssn, :dob, :gender, :is_applicant
 
@@ -183,52 +186,59 @@ class ConsumerRole
     state :vlp_documentation_review_pending
     state :not_lawfully_present                 # Federal Hub returned negative result
 
-    event :verify_identity do
+    event :verify_identity, :after => :record_transition  do
       transitions from: [:identity_unverified, :identity_followup_pending], to: :identity_verified, :guard => :identity_verification_succeeded?
       transitions from: :identity_unverified, to: :identity_followup_pending, :guard => :identity_verification_pending?
     end
 
-    event :import_identity, :guard => :identity_metadata_provided? do
+    event :import_identity, :guard => :identity_metadata_provided?, :after => :record_transition  do
       transitions from: :identity_unverified, to: :identity_verified, :guard => :identity_verification_succeeded?
       transitions from: :identity_unverified, to: :identity_followup_pending, :guard => :identity_verification_pending?
     end
 
-    event :revoke_identity do
+    event :revoke_identity, :after => :record_transition  do
       transitions from: [:identity_unverified, :identity_followup_pending, :identity_verified], to: :identity_invalid
     end
 
-    event :request_vlp_service do
+    event :request_vlp_service, :after => :record_transition  do
       transitions from: :identity_unverified, to: :vlp_request_pending
       transitions from: :identity_verified,   to: :vlp_request_pending
     end
 
-    event :verify_lawful_presence do
+    event :verify_lawful_presence, :after => :record_transition  do
       transitions from: :vlp_request_pending, to: :lawful_presence_verified, :guard => :vlp_succeeded?
       transitions from: :vlp_request_pending, to: :not_lawfully_present, :guard => :vlp_denied?
       transitions from: :vlp_request_pending, to: :fdsh_service_error
     end
 
-    event :retry_fdsh_service do
+    event :retry_fdsh_service, :after => :record_transition  do
       transitions from: :fdsh_service_error, to: :lawful_presence_verified, :guard => :vlp_succeeded?
       transitions from: :fdsh_service_error, to: :not_lawfully_present, :guard => :vlp_denied?
       transitions from: :fdsh_service_error, to: :lawful_presence_followup_pending, :guard => :retry_period_expired?
     end
 
-    event :submit_documentation do
+    event :submit_documentation, :after => :record_transition  do
       transitions from: :lawful_presence_followup_pending, to: :vlp_documentation_review_pending
       transitions from: :not_lawfully_present, to: :vlp_documentation_review_pending
     end
 
-    event :grant_vlp_status do
+    event :grant_vlp_status, :after => :record_transition  do
       transitions from: :vlp_documentation_review_pending, to: :lawful_presence_verified
     end
 
-    event :deny_vlp_status do
+    event :deny_vlp_status, :after => :record_transition  do
       transitions from: :vlp_documentation_review_pending, to: :not_lawfully_present
     end
   end
 
 private
+  def record_transition
+    workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state
+    )
+  end
+
   def identity_verification_succeeded?
     identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
   end
