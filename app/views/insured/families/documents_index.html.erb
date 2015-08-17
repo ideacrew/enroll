@@ -1,0 +1,17 @@
+<% content_for :navigation do %>
+  <%= render 'navigation' %>
+<% end %>
+
+<div class="row">
+  <div class= "col-md-8">
+    <h1>Documents</h1>
+  </div>
+  <div class="col-md-4">
+    <br>
+    <br>
+    <%= link_to "Upload Document", document_upload_insured_families_path , class: "btn btn-primary" %>
+  </div>
+  <div class="col-md-12">
+    <%= render partial: "documents_index" %>
+  </div>
+</div>
