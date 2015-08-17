@@ -1,0 +1,17 @@
+<div class="table-border table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Terms and Agreement</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><%= check_box_tag 'vote_check_thank_you' %> &nbsp;Register to Vote</td>
+      </tr>
+      <tr>
+        <td><%= check_box_tag 'terms_check_thank_you' %> &nbsp;By checking this box and selecting SUBMIT ENROLLMENT, I acknowledge that I have read and agree to the summary and the entire <%= link_to "Terms and Conditions", "#"%> for use of this website and I have reviewed the <%= link_to "Privacy Statement", "#" %> for this website. <br><br> By entertaing my name below, I cerfity that all of the information I entered is true and complete to the best of my knowledge. <br><br><%= text_field_tag 'first_name_thank_you', 'First Name'%> <%= text_field_tag 'last_name_thank_you', 'Last Name'%></td>
+      </tr>
+    </tbody>
+  </table>
+</div><br>
