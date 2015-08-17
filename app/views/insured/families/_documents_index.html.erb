@@ -16,11 +16,11 @@
       </tr>
     <% else %>
       <% if @person.consumer_role.documents.present? %>
-        <% @person.consumer_role.documents.each do |doc| %>
+        <% @person.consumer_role.documents.uniq.each do |doc| %>
           <tr>
             <td><%= doc.title %></td>
             <td><%= doc.type %></td>
-            <td><%= doc.created_at %></td>
+            <td><%= doc.created_at.try(:to_date) %></td>
           </tr>
         <% end %>
       <% end %>
