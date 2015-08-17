@@ -1,5 +1,5 @@
 class Consumer::EmployeeRolesController < ApplicationController
-  before_action :check_employee_role, only: [:new, :welcome]
+  before_action :check_employee_role, only: [:new, :welcome, :search]
 
   def welcome
   end
@@ -143,7 +143,7 @@ class Consumer::EmployeeRolesController < ApplicationController
 
   private
     def check_employee_role
-      if current_user.has_employee_role?
+      if current_user.has_employee_role? || current_user.has_consumer_role?
         redirect_to family_account_path
       end
     end
