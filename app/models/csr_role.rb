@@ -10,6 +10,11 @@ class CsrRole
   field :organization, type: String
   field :shift, type: String
   field :cac, type: Boolean, default: false
+
+  def parent
+    person
+  end
+
   class << self
     
     def find(id)

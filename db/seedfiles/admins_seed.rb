@@ -78,15 +78,6 @@ cac = [
 ]
 
 
-csr =[
- {last_name: "Bell",first_name: "Valerie",shift: "10:00AM-6:30PM",organization: "ASHLIN",email: "valerie.bell5@dc.gov", cac: false, role: 'csr'},
- {last_name: "Bradica",first_name: "Catherine",shift: "07:45AM-04:15PM",organization: "KIDD",email: "catherine.bradica@dc.gov", cac: false, role: 'csr'},
- {last_name: "Brown",first_name: "Steven",shift: "08:00AM-04:30PM",organization: "VANTIX",email: "steven.brown2@dc.gov", cac: false, role: 'csr'},
- {last_name: "Buckner", first_name: "Sherry",shift: "08:30AM-05:00PM", organization: "ASHLIN",email: "sherry.buckner@dc.gov", cac: false, role: 'csr'},
- {last_name: "Curtis",first_name: "Antonio",shift: "09:00AM-5:30PM",organization: "VANTIX",email: "antonio.curtis@dc.gov", cac: false, role: 'csr'},
- {last_name: "Franklin,",first_name: "Nikia",shift: "11:30AM-8:00PM",organization: "ASHLIN",email: "nikia.franklin@dc.gov", cac: false, role: 'csr'}
-]
-
 staff = assisters + csr + cac
 staff.each{|member| create_staff member}
 
