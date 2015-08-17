@@ -17,7 +17,6 @@ class Insured::FamiliesController < FamiliesController
 
     respond_to do |format|
       format.html
-      format.js
     end
   end
 
@@ -25,7 +24,6 @@ class Insured::FamiliesController < FamiliesController
     @family_members = @family.active_family_members
     respond_to do |format|
       format.html
-      format.js
     end
   end
 
