@@ -35,17 +35,32 @@ module Factories
     end
 
     def self.construct_consumer_role(person_params, user)
-      person = Person.match_by_id_info(person_params[:person]).first
-      person = Person.new(person_params[:person].except(:user_id).permit!) if !person.present?
-      person.build_consumer_role(is_applicant: true)  if  !person.consumer_role.present?
-      person.save
-      family,applicant = self.initialize_family(person, [])
-      family.person = person
-      family.save
-      user.person = person
-      user.roles << "consumer" unless user.roles.include?("consumer")
-      user.save
-      person
+      person_params = person_params[:person]
+      person, person_new = initialize_person(
+        user, person_params["name_pfx"], person_params["first_name"],
+        person_params["middle_name"] , person_params["last_name"],
+        person_params["name_fx"], person_params["ssn"].gsub("-",""),
+        person_params["dob"], person_params["gender"], "consumer"
+        )
+      return nil, nil if person.blank? and person_new.blank?
+      role = build_consumer_role(person, person_new)
+    end
+
+    def self.build_consumer_role(person, person_new)
+      role = find_or_build_consumer_role(person)
+      family, primary_applicant =  initialize_family(person,[])
+      saved = save_all_or_delete_new(family, primary_applicant, role)
+      if saved
+        role
+      elsif person_new
+        person.delete
+      end
+      return role
+    end
+
+    def self.find_or_build_consumer_role(person)
+      return person.consumer_role if person.consumer_role.present?
+      person.build_consumer_role(is_applicant: true)
     end
 
     def self.add_broker_role(person:, new_kind:, new_npn:, new_mailing_address:)
@@ -96,7 +111,7 @@ module Factories
         user, person_details.name_pfx, person_details.first_name,
         person_details.middle_name, person_details.last_name,
         person_details.name_sfx, census_employee.ssn,
-        census_employee.dob, person_details.gender
+        census_employee.dob, person_details.gender, "employee"
         )
       return nil, nil if person.blank? and person_new.blank?
       self.build_employee_role(
@@ -110,7 +125,7 @@ module Factories
           ssn:, dob:, gender:, hired_on:
       )
       person, person_new = initialize_person(user, name_pfx, first_name, middle_name,
-                                             last_name, name_sfx, ssn, dob, gender)
+                                             last_name, name_sfx, ssn, dob, gender, "employee")
 
       census_employee = EmployerProfile.find_census_employee_by_person(person).first
 
@@ -148,7 +163,7 @@ module Factories
     end
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
-                               last_name, name_sfx, ssn, dob, gender)
+                               last_name, name_sfx, ssn, dob, gender, role_type)
       people = Person.match_by_id_info(ssn: ssn, dob: dob, last_name: last_name)
       person, is_new = nil, nil
       case people.count
@@ -163,7 +178,7 @@ module Factories
         person.save
         person, is_new = person, false
       when 0
-        if user.try(:person).try(:present?) 
+        if user.try(:person).try(:present?)
           if user.person.first_name == first_name and user.person.last_name = last_name
             person = user.person
             person.update(name_sfx: name_sfx,
@@ -194,7 +209,7 @@ module Factories
         return nil, nil
       end
       if user.present?
-        user.roles << "employee"
+        user.roles << role_type unless user.roles.include?(role_type)
         user.save
         unless person.emails.count > 0
           person.emails.build(kind: "home", address: user.email)
@@ -244,7 +259,7 @@ module Factories
       person, new_person = initialize_person(nil, nil, dependent.first_name,
                                  dependent.middle_name, dependent.last_name,
                                  dependent.name_sfx, dependent.ssn,
-                                 dependent.dob, dependent.gender)
+                                 dependent.dob, dependent.gender, "employee")
       relationship = person_relationship_for(dependent.employee_relationship)
       primary.ensure_relationship_with(person, relationship)
       family.add_family_member(person) unless family.find_family_member_by_person(person)
