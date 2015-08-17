@@ -238,9 +238,13 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
   end
 
   describe "GET search" do
+    let(:user) { double("user") }
+    let(:person) { double("person")}
 
     before(:each) do
-      sign_in
+      allow(user).to receive(:has_employee_role?).and_return(false)
+      allow(user).to receive(:has_consumer_role?).and_return(false)
+      sign_in(user)
       get :search
     end
 
@@ -257,6 +261,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
 
     it "renders the 'welcome' template when user has no employee role" do
       allow(user).to receive(:has_employee_role?).and_return(false)
+      allow(user).to receive(:has_consumer_role?).and_return(false)
       sign_in(user)
       get :welcome
       expect(response).to have_http_status(:success)
