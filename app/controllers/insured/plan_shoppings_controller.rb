@@ -10,19 +10,29 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment.update_current(plan_id: plan.id)
     hbx_enrollment.inactive_related_hbxs
 
-    benefit_group = hbx_enrollment.benefit_group
-    reference_plan = benefit_group.reference_plan
-    decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
+    if hbx_enrollment.employee_role.present?
+      #FIXME need send a params of market_kind
+      benefit_group = hbx_enrollment.benefit_group
+      reference_plan = benefit_group.reference_plan
+      decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
+    else
+      decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, nil, nil)
+
+    end
     # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
-    if hbx_enrollment.employee_role.hired_on > TimeKeeper.date_of_record
+    if hbx_enrollment.employee_role.present? && hbx_enrollment.employee_role.hired_on > TimeKeeper.date_of_record
       flash[:error] = "You are attempting to purchase coverage prior to your date of hire on record. Please contact your Employer for assistance"
       redirect_to family_account_path
     elsif hbx_enrollment.may_select_coverage?
       hbx_enrollment.update_current(aasm_state: "coverage_selected")
       hbx_enrollment.propogate_selection
 
-      UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now
+      UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now if hbx_enrollment.employee_roles.present?
+      redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan])
+    elsif hbx_enrollment.consumer_role_id.present?
+      hbx_enrollment.update_current(aasm_state: "coverage_selected")
+      hbx_enrollment.propogate_selection
       redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan])
     else
       redirect_to :back
@@ -33,9 +43,13 @@ class Insured::PlanShoppingsController < ApplicationController
     person = @person
     @enrollment = HbxEnrollment.find(params.require(:id))
     plan = @enrollment.plan
-    benefit_group = @enrollment.benefit_group
-    reference_plan = benefit_group.reference_plan
-    @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
+    if @enrollment.employee_role.present?
+      benefit_group = @enrollment.benefit_group
+      reference_plan = benefit_group.reference_plan
+      @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
+    else
+      @plan = PlanCostDecorator.new(plan, @enrollment, nil, nil)
+    end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile
@@ -54,7 +68,8 @@ class Insured::PlanShoppingsController < ApplicationController
       @plan = PlanCostDecorator.new(@plan, @enrollment, nil, nil)
     end
     @family = @person.primary_family
-    @enrollable = @enrollment.can_complete_shopping?
+    #FIXME need to implement can_complete_shopping? for individual
+    @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
 
