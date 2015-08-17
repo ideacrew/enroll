@@ -187,7 +187,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     let(:hired_on) { double }
     let(:employment_relationships) { double }
     let(:user_id) { "SOMDFINKETHING_ID"}
-    let(:user) { double(id: user_id ) }
+    let(:user) { double("User",id: user_id ) }
 
     before(:each) do
       sign_in(user)
@@ -217,11 +217,10 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
         let(:consumer_role){ double("ConsumerRole", id: "test") }
         let(:person_parameters){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111"}}
 
-        it "redirects to 'consumer role' flow" do
-          allow(Person).to receive(:new).and_return(person)
-          allow(person).to receive(:build_consumer_role).and_return(consumer_role)
-          allow(person).to receive(:save).and_return(true)
-          expect(response).to have_http_status(:redirect)
+        it "renders the 'no_match' template" do
+          expect(response).to have_http_status(:success)
+          expect(response).to render_template("no_match")
+          expect(assigns[:employee_candidate]).to eq mock_employee_candidate
         end
 
         context "that find a matching employee" do
@@ -239,9 +238,13 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
   end
 
   describe "GET search" do
+    let(:user) { double("user") }
+    let(:person) { double("person")}
 
     before(:each) do
-      sign_in
+      allow(user).to receive(:has_employee_role?).and_return(false)
+      allow(user).to receive(:has_consumer_role?).and_return(false)
+      sign_in(user)
       get :search
     end
 
@@ -258,6 +261,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
 
     it "renders the 'welcome' template when user has no employee role" do
       allow(user).to receive(:has_employee_role?).and_return(false)
+      allow(user).to receive(:has_consumer_role?).and_return(false)
       sign_in(user)
       get :welcome
       expect(response).to have_http_status(:success)
@@ -270,7 +274,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
       sign_in(user)
       get :welcome
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(home_consumer_profiles_path)
+      expect(response).to redirect_to(family_account_path)
     end
 
   end

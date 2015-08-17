@@ -1,0 +1,34 @@
+<div id="consumer_fields" class="focus_effect">
+
+  <div class="row row-form-wrapper no-buffer">
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :race, class: "floatlabel form-control", placeholder: 'RACE' %>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :ethnicity, class: "required floatlabel form-control", required: true, placeholder: 'ETHNICITY' %>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :language_code, class: "required floatlabel form-control", required: true, placeholder: 'LANGUAGE CODE' %>
+    </div>
+  </div>
+  <div class="row row-form-wrapper no-buffer">
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :is_tobacco_user, class: "required floatlabel form-control", required: true, placeholder: 'TOBACCO USER?' %>
+    </div>
+    <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg">
+      <div class="checkbox">
+        <label>
+          <%= f.check_box :is_incarcerated %> INCARCERATED?
+        </label>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg">
+      <div class="checkbox">
+        <label>
+          <%= f.check_box :is_disabled %> DISABLED?
+          <%= f.hidden_field :is_consumer_role, value: true %>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>

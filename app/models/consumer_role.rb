@@ -168,53 +168,72 @@ class ConsumerRole
   # RIDP and Verify Lawful Presence workflow.  IVL Consumer primary applicant must be in identity_verified state 
   # to proceed with application.  Each IVL Consumer enrolled for benefit coverage must (eventually) pass 
 
+  ## TODO: Move RIDP to user model
   aasm do
     state :identity_unverified, initial: true
-    state :identity_verified
-    state :identity_followup_pending
+    state :identity_followup_pending            # Identity unconfirmed due to service failure or negative response
+    state :identity_verified                    # Identity confirmed via RIDP services or subsequent followup
     state :identity_invalid
+
+    # state :lawful_presence_unverified
+    state :vlp_request_pending, :after_enter => :vlp_request_submitted
     state :lawful_presence_verified
     state :fdsh_service_error
-    state :lawful_presence_followup_pending
-    state :not_lawfully_present
+    state :lawful_presence_followup_pending     # Federal hub non-reponsive
+    state :vlp_documentation_review_pending
+    state :not_lawfully_present                 # Federal Hub returned negative result
 
     event :verify_identity do
-      transitions from: [:identity_unverified, :identity_followup_pending], to: :identity_verified, :guard => :identity_verification_success?
+      transitions from: [:identity_unverified, :identity_followup_pending], to: :identity_verified, :guard => :identity_verification_succeeded?
       transitions from: :identity_unverified, to: :identity_followup_pending, :guard => :identity_verification_pending?
     end
 
     event :import_identity, :guard => :identity_metadata_provided? do
-      transitions from: :identity_unverified, to: :identity_verified, :guard => :identity_verification_success?
+      transitions from: :identity_unverified, to: :identity_verified, :guard => :identity_verification_succeeded?
       transitions from: :identity_unverified, to: :identity_followup_pending, :guard => :identity_verification_pending?
     end
 
+    event :revoke_identity do
+      transitions from: [:identity_unverified, :identity_followup_pending, :identity_verified], to: :identity_invalid
+    end
+
+    event :request_vlp_service do
+      transitions from: :identity_unverified, to: :vlp_request_pending
+      transitions from: :identity_verified,   to: :vlp_request_pending
+    end
+
     event :verify_lawful_presence do
-      transitions from: :identity_verified, to: :lawful_presence_verified
-      transitions from: :identity_verified, to: :fdsh_service_error
-      transitions from: :identity_verified, to: :not_lawfully_present
+      transitions from: :vlp_request_pending, to: :lawful_presence_verified, :guard => :vlp_succeeded?
+      transitions from: :vlp_request_pending, to: :not_lawfully_present, :guard => :vlp_denied?
+      transitions from: :vlp_request_pending, to: :fdsh_service_error
     end
 
     event :retry_fdsh_service do
-      transitions from: :fdsh_service_error, to: :lawful_presence_followup_pending
-      transitions from: :fdsh_service_error, to: :lawful_presence_verified, :guard => :identity_verification_success?
-      transitions from: :fdsh_service_error, to: :not_lawfully_present
+      transitions from: :fdsh_service_error, to: :lawful_presence_verified, :guard => :vlp_succeeded?
+      transitions from: :fdsh_service_error, to: :not_lawfully_present, :guard => :vlp_denied?
+      transitions from: :fdsh_service_error, to: :lawful_presence_followup_pending, :guard => :retry_period_expired?
     end
 
     event :submit_documentation do
-      transitions from: :not_lawfully_present, to: :lawful_presence_followup_pending
+      transitions from: :lawful_presence_followup_pending, to: :vlp_documentation_review_pending
+      transitions from: :not_lawfully_present, to: :vlp_documentation_review_pending
     end
 
     event :grant_vlp_status do
-      transitions from: :lawful_presence_followup_pending, to: :lawful_presence_verified
+      transitions from: :vlp_documentation_review_pending, to: :lawful_presence_verified
     end
 
     event :deny_vlp_status do
-      transitions from: :lawful_presence_followup_pending, to: :not_lawfully_present
+      transitions from: :vlp_documentation_review_pending, to: :not_lawfully_present
     end
   end
 
 private
-  def identity_verification_success?
+  def identity_verification_succeeded?
+    identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+  end
+
+  def identity_verification_denied?
     identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
   end
 
@@ -224,6 +243,15 @@ private
 
   def identity_metadata_provided?
     identity_final_decision_code.present? && identity_response_code.present?
+  end
+
+  def vlp_succeeded?
+  end
+
+  def vlp_denied?
+  end
+
+  def retry_period_expired?
   end
 
 

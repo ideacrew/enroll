@@ -1,5 +1,5 @@
 class Consumer::EmployeeRolesController < ApplicationController
-  before_action :check_employee_role, only: [:new, :welcome]
+  before_action :check_employee_role, only: [:new, :welcome, :search]
 
   def welcome
   end
@@ -18,12 +18,10 @@ class Consumer::EmployeeRolesController < ApplicationController
     if @employee_candidate.valid?
       found_census_employees = @employee_candidate.match_census_employees
       if found_census_employees.empty?
-        @person = Person.match_by_id_info(params[:person]).first
-        @person = Person.new(params[:person].except(:user_id).permit!) unless @person.present?
-        @consumer_role = @person.build_consumer_role(is_applicant: true)
-        @person.save
+        # @person = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
+
         respond_to do |format|
-          format.html { redirect_to edit_consumer_consumer_role_path(@consumer_role.id) }
+          format.html { render 'no_match' }
         end
       else
         @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees.first)
@@ -145,8 +143,8 @@ class Consumer::EmployeeRolesController < ApplicationController
 
   private
     def check_employee_role
-      if current_user.has_employee_role?
-        redirect_to home_consumer_profiles_path
+      if current_user.has_employee_role? || current_user.has_consumer_role?
+        redirect_to family_account_path
       end
     end
 end

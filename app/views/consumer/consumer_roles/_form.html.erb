@@ -8,22 +8,19 @@
         <%= render "shared/error_messages", object: f.object %>
         <%= render 'shared/person/personal_information', f: f %>
         <br>
-
-        <div id="address_info" class="row no-buffer focus_effect personal-info-row">
-          <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-            <%= render 'shared/address_fields', f: f %>
-          </div>
-        </div>
+        <%= render 'shared/consumer_fields', f: f %>
         <br>
-        <%= render 'shared/phone_fields', f: f %> <br>
+
+        <%= render 'shared/home_address_fields', f: f %><br>
+        <%= render 'shared/phone_fields', f: f %><br>
 
         <div id="email_info" class="row row-form-wrapper no-buffer">
           <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
             <%= render 'shared/email_fields', f: email %>
           <% end %>
         </div>
+
         <br>
-        <%= render partial: "consumer/employee_roles/no_match" %>
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">

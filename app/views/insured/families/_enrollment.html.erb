@@ -1,0 +1,79 @@
+<% plan = hbx_enrollment.try(:plan) %>
+<div class="hbx-enrollment-panel">
+<div class="panel panel-default min-h">
+
+  <div class="panel-heading">
+    <h4>2015 Health Coverage <span class="separator">DCHL</span>
+    </h4>
+  </div>
+
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-xs-8">
+        <div><%= display_carrier_logo(plan.try(:carrier_profile), {width: 110}) %></div>
+        <h4><strong><%= link_to plan.try(:name), summary_products_plans_path({:standard_component_id => plan.try(:hios_id), hbx_enrollment_id:hbx_enrollment.id}), {:remote => true} %></strong>
+        </h4>
+          <div>
+            <p>
+            <label><%= plan.try(:plan_type).try(:upcase) %></label>
+            <% plan_level = plan.try(:metal_level).try(:humanize) %>
+            <label><span class="separator">&nbsp;&nbsp;<span class="<%= plan_level.try(:downcase) %>-icon"><%= plan_level %></span></span></label>
+            <% if plan.nationwide %>
+            <label class="separator">NATIONWIDE NETWORK</label>
+            <% end %>
+            </p>
+          </div>
+          <div>
+            <p> 
+              <label>Premium:</label> <strong><%= number_to_currency(hbx_enrollment.total_premium) %></strong>/month
+              <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong><%= hbx_enrollment.try(:subscriber).person.hbx_id %></strong>
+            </p>
+          </div>
+            <% names = hbx_enrollment.covered_members_first_names %>
+            <div class="family-members">
+              <p>
+                <label>Covered:</label>
+                  <a href="#"><%= names.delete_at(0).camelcase %></a>
+                  <% names.each do |name| %>
+                    <span class="separator"><a href="#"><%= name.camelcase %></a></span>
+                  <% end %>
+              </p>
+            </div>
+          </div>
+          <div class="col-xs-4">
+            <div class="family-plan-selection">
+             <div class="status">
+            <% if false %>
+                <h4>Enrolled</h4>
+                <label>Coverage Start <%= "06/01/2015" %></label>
+                <label>Coverage End <%= "11/15/2015" %></label>
+            <% else %> 
+              <%= render partial: "enrollment_progress", locals: {step: 2} %>
+            <% end %>
+               </div>
+             </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-4" style="display: flex;">
+            <a href="#"><span style="vertical-align:top;"><i class="fa fa-file-pdf-o fa-2x" style="padding-top: 4px;"></i></span>&nbsp;<div style="margin-left: 8px; vertical-align: top;">Summary of Benefits and Coverage</a></div>
+          </div>
+          <div class="col-xs-4" style="display: flex;">
+            <a href="#"><span style="vertical-align:top;"><i class="fa fa-phone fa-2x"></i></span>&nbsp;<div>Carrier Contact Info</a></div>
+          </div>
+          <div class="col-xs-4">
+            <button type="button" class="btn btn-primary btn-md pull-right">VIEW DETAILS</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-warning alert-dismissible panel-footer" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
+        </button>
+        <strong>Important:</strong> Your enrollment application requires information that needs to be verified. <a href="#">Learn more</a>
+      </div>
+    </div>
+</div>
+
+

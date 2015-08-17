@@ -19,7 +19,7 @@
             <% if signed_in? %>
               <ul class="navbar-nav top-menu">
                 <% if @person.present? && @person.persisted? %>
-                  <li><%= link_to "My Account", home_consumer_profiles_path %></li>
+                  <li><%= link_to "My Account", family_account_path %></li>
                   <li class="hidden-xs">|</li>
                 <% end %>
                   <li><a href="#">1-855-532-5465</a></li>

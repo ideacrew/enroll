@@ -54,6 +54,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {font-weight: 300; line-height: 1.6em;}
+
 .navbar-default {
     background-color: #eee;
     background-image: none;
@@ -83,6 +84,7 @@ ul.brd-left li:first-child {
 }
 
 a {
+    color: #007BC4;
     transition: all 0.3s ease 0s;
 }
 .full {
@@ -3732,7 +3734,7 @@ ul.progress-wrapper li.active span.circle-progress {
 .vertical-line-progress {
     background-color: #cacaca;
     width: 2px;
-    height: 30px;
+    height: 28px;
     position: absolute;
     z-index: -1;
     left: 15px;
@@ -3745,8 +3747,9 @@ ul.progress-wrapper li.active .vertical-line-progress {
     background-color: #cacaca;
 }
 ul.progress-wrapper li:last-child .vertical-line-progress {
-    display: none;
+   display: none;
 }
+
 ul.list-right-section {
     margin-top: 20px;
 }
@@ -3763,6 +3766,202 @@ ul.list-right-section li a {
 }
 ul.list-right-section li a img {
     padding-right: 6px;
+}
+
+.family-plan-selection ul.progress-wrapper {
+    margin: 10px 17px 30px;
+    padding-right: 10px;
+    width: 140px;
+    height: 100px;
+}
+
+.family-plan-selection ul.progress-wrapper {
+    margin: 10px 17px 30px;
+    padding-right: 10px;
+    float: right;
+}
+
+.family-plan-selection ul.progress-wrapper li {
+    text-align: right;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    color: #909090;
+    font-family: Open Sans;
+    font-size: 9pt;
+}
+
+.family-plan-selection ul.progress-wrapper li.complete {
+    color: #468847;
+}
+
+.family-plan-selection ul.progress-wrapper li.active {
+    color: #468847;
+}
+
+.family-plan-selection ul.progress-wrapper li.complete span.circle-progress {
+    background-color: #468847;
+}
+.family-plan-selection ul.progress-wrapper li.active span.circle-progress {
+    border: 2px solid #468847;
+}
+
+.family-plan-selection .vertical-line-progress {
+    background-color: #cacaca;
+    height: 21px;
+    left: 15px;
+    margin-top: -5px;
+    position: absolute;
+    width: 2px;
+    z-index: 0;
+    left: 140px;
+}
+
+.family-plan-selection ul.progress-wrapper li span.circle-progress {
+   z-index: 1;
+   left: 135px;
+   width: 12px;
+   height: 12px;
+}
+
+.family-plan-selection ul.progress-wrapper li.complete .vertical-line-progress {
+    background-color: #468847;
+}
+
+.family-plan-selection .status{
+    text-align: right;
+    padding-right: 11px;
+}
+
+.family-plan-selection .status label{
+    text-transform: none;
+    padding-right: 0;
+    margin-bottom: 0;
+}
+
+.family-plan-selection .status h4{
+    margin-bottom: 0;
+    color: #468847;
+    font-weight: 600 !important;
+}
+
+
+.hbx-enrollment-panel .family-members p{ 
+    color: #007BC4;
+}
+
+.hbx-enrollment-panel .alert{
+  margin-bottom: 0;
+}
+
+.hbx-enrollment-panel .panel-heading, .qles-panel .panel-heading{
+  background-image: none;
+  padding-bottom: 0;
+}
+
+#qle-details .hbx-enrollment-panel .panel-heading h4{
+  color: #468847;
+}
+
+
+.qles-panel .panel-heading{
+  border-bottom: 0;
+}
+
+.qles-panel .panel-heading hr{
+  margin-bottom: 0;
+}
+
+.qles-panel .panel-body{
+  padding-top: 5px;
+}
+
+.hbx-enrollment-panel .btn{
+  margin-right: 10px;
+}
+
+.hbx-enrollment-panel .separator:before{ 
+  content:'\2022 \2003'; 
+}
+
+.hbx-enrollment-panel .panel-body{
+  padding-top: 0;
+}
+
+.hbx-enrollment-panel label{
+    color: #909090;
+    font-family: Open Sans;
+    font-size: 9pt;
+    font-weight: 600 !important;
+    padding-right: 5px;
+    text-transform: uppercase;
+}
+
+.my-account-page h1{
+    color: #003260;
+    font-family: Open Sans;
+    font-size: 23pt;
+    font-weight: lighter !important;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.hbx-enrollment-panel h2{
+    font-family: Open Sans;
+    color: #414141;
+    font-size: 24pt;
+    font-weight: Regular !important;
+}
+
+
+.hbx-enrollment-panel h3{
+    color: #7b7b7b;
+    font-family: Open Sans;
+    font-size: 18pt;
+    font-weight: 600 !important;
+}
+
+.hbx-enrollment-panel h4{
+    color: #7b7b7b;
+    font-family: Open Sans;
+    font-size: 13pt;
+    font-weight: 600 !important;
+}
+
+.hbx-enrollment-panel .panel-heading h4{
+    font-variant: super;
+    margin-bottom: 0;
+    margin-top: 0;
+    text-transform: uppercase;
+}
+
+.hbx-enrollment-panel p{
+    font-family: Open Sans;
+    color: #414141;
+}
+
+.hbx-enrollment-panel p strong{
+    font-weight: 600 !important;
+}
+
+.hbx-enrollment-panel .icons p{
+  margin-left: 20px;
+}
+
+.hbx-enrollment-panel .options .fa {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.hbx-enrollment-panel .options span p {
+    display: inline-block;
+}
+
+.hbx-enrollment-panel .options span{
+    width: 50px;
+}
+
+.hbx-enrollment-panel .qle-form{
+    text-align: center;
 }
 
 /* Form Elements */
@@ -4268,8 +4467,8 @@ span.text_style {color: #616161 !important;}
 }
 
 .btn-primary:hover, .btn-primary:focus {
-  background-color: #c9302c;
-  border-color: #ac2925;
+  background-color: #b7191b;
+  border-color: #b7191b;
 }
 
 .btn-primary.disabled, .btn-primary.disabled.active, .btn-primary.disabled.focus, .btn-primary.disabled:active, .btn-primary.disabled:focus, .btn-primary.disabled:hover, .btn-primary[disabled], .btn-primary.active[disabled], .btn-primary.focus[disabled], .btn-primary[disabled]:active, .btn-primary[disabled]:focus, .btn-primary[disabled]:hover, fieldset[disabled] .btn-primary, fieldset[disabled] .btn-primary.active, fieldset[disabled] .btn-primary.focus, fieldset[disabled] .btn-primary:active, fieldset[disabled] .btn-primary:focus, fieldset[disabled] .btn-primary:hover {
@@ -4589,4 +4788,63 @@ table.table.table-no-sytle td {
 .carrier-logo {
    height: 80px;
    padding-right: 10px;
+}
+
+.carousel-indicators li {
+  border-color: #337ab7;
+}
+
+.carousel-indicators .active {
+  background-color: #337ab7;
+}
+
+.carousel-control {
+  width: 10%;
+}
+
+.carousel-inner .item {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+#qle-header .info-wrapper {
+  padding-left: 0;
+}
+
+#qle-header .info-wrapper h4{
+  margin: 0;
+  color:#007BC4;
+  line-height: 1.4em;
+}
+
+#qle-menu h5 {
+  text-align: center;
+  margin:0;
+}
+
+/*#qle-details .panel-heading strong {
+  color: #468847`;
+  text-transform:uppercase;
+}
+
+#qle-details #qle_submit {
+  color: white;
+}
+
+#qle-details .qle-form-wrapper .form-group {
+  margin: 0;
+}
+
+#qle-details .qle-form-wrapper{
+  padding: 30px 20px;
+}
+
+.panel hr {
+  margin: 10px 0;
+}*/
+
+#qle-details .success-info, #qle-details .error-info {
+  width: 80%;
+  margin: 30px auto 0 auto;
 }
