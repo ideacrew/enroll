@@ -62,6 +62,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(enrollment).to receive(:employee_role).and_return(employee_role)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
+      allow(enrollment).to receive(:employee_role).and_return(double)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
     end
 
@@ -91,6 +92,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(PlanCostDecorator).to receive(:new).and_return(true)
       allow(person).to receive(:primary_family).and_return(family)
       allow(enrollment).to receive(:can_complete_shopping?).and_return(true)
+      allow(enrollment).to receive(:employee_role).and_return(double)
       allow(benefit_group).to receive(:plan_year).and_return(plan_year)
       allow(plan_year).to receive(:is_eligible_to_enroll?).and_return(true)
     end

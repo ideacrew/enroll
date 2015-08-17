@@ -1,19 +1,24 @@
-= form_for(@interactive_verification, :as => :interactive_verification, :url => insured_interactive_identity_verifications_path) do |f|
-  = f.hidden_field :session_id
-  = f.hidden_field :transaction_id
-  = f.fields_for :questions do |qf|
-    = qf.hidden_field :question_id
-    = qf.hidden_field :question_text
-    = qf.fields_for :responses do |qr|
-      = qr.hidden_field :response_id
-      = qr.hidden_field :response_text
-    .form-group
-      %p= qf.object.question_text
-      - qf.object.responses.each do |r|
-        .radio
-          = qf.label :response_id do
-            = qf.radio_button :response_id, r.response_id
-            = r.response_text
-  = f.submit "Submit"
-.col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
-  = render  partial: 'shared/individual_progress', locals: {step: '2'}
+.container
+  .row
+    .col-lg-7.col-md-7.col-sm-8.col-xs-12
+      %br
+      = form_for(@interactive_verification, :as => :interactive_verification, :url => insured_interactive_identity_verifications_path) do |f|
+        = f.hidden_field :session_id
+        = f.hidden_field :transaction_id
+        = f.fields_for :questions do |qf|
+          = qf.hidden_field :question_id
+          = qf.hidden_field :question_text
+          = qf.fields_for :responses do |qr|
+            = qr.hidden_field :response_id
+            = qr.hidden_field :response_text
+          .form-group
+            %p= qf.object.question_text
+            - qf.object.responses.each do |r|
+              .radio
+                = qf.label :response_id do
+                  = qf.radio_button :response_id, r.response_id
+                  %span= r.response_text
+        %br
+        = f.submit "Submit", class: 'btn btn-lg btn-primary'
+    .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
+      = render  partial: 'shared/individual_progress', locals: {step: '2'}

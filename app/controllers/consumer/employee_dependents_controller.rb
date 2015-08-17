@@ -5,13 +5,11 @@ class Consumer::EmployeeDependentsController < ApplicationController
     if @type == "employee"
       emp_role_id = params.require(:employee_role_id)
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
-
-      @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-      @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
     else
-      #con_role_id = params.require(:consumer_role_id)
       @consumer_role = @person.consumer_role
     end
+    @change_plan = params[:change_plan].present? ? 'change' : ''
+    @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
   end
 
   def new

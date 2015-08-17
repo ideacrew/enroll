@@ -113,6 +113,7 @@ RSpec.describe ConsumerProfilesController, :type => :controller do
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
       allow(hbx_enrollment).to receive(:select_coverage!).and_return(true)
       allow(hbx_enrollment).to receive(:save).and_return(true)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(double)
     end
 
     it "returns http success" do
