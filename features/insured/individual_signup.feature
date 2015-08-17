@@ -12,5 +12,8 @@ Feature: Insured Plan Shopping on Individual market
       When Individual clicks on continue button
       Then Individual should see identity verification page and clicks on submit
       Then Individual should see the dependents form
-      When Individual clicks on add member button
+      And Individual clicks on add member button
+      And I click on continue button on household info form
+      And I click on continue button on group selection page
+
 

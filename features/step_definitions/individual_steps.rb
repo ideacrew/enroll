@@ -42,12 +42,9 @@ end
 
 Then(/Individual should see a form to enter personal information/) do
   @browser.button(class: /interaction-click-control-continue/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-person-race/).set("Test")
-  @browser.text_field(class: /interaction-field-control-person-ethnicity/).set("Test2")
-  @browser.text_field(class: /interaction-field-control-person-language-code/).set("Eng")
-  @browser.text_field(class: /interaction-field-control-person-is-tobacco-user/).set("No")
-  @browser.checkbox(class: /interaction-choice-control-value-person-is-incarcerated/).set
-  @browser.checkbox(class: /interaction-choice-control-value-person-is-disabled/).set
+  @browser.radio(class: /interaction-choice-control-value-person-us-citizen-true/).fire_event("onclick")
+  @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).wait_while_present
+  @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).fire_event("onclick")
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-1/).set("4900 USAA BLVD")
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-2/).set("Suite 220")
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-city/).set("Sacramento")
@@ -60,8 +57,7 @@ Then(/Individual should see a form to enter personal information/) do
 end
 
 When(/Individual clicks on continue button/) do
-  @browser.button(class: /interaction-click-control-continue/).wait_until_present
-  @browser.button(class: /interaction-click-control-continue/).click
+  click_when_present(@browser.button(class: /interaction-click-control-continue/))
 end
 
 Then("Individual should see identity verification page and clicks on submit") do
@@ -77,7 +73,7 @@ Then(/Individual should see the dependents form/) do
   expect(@browser.a(text: /Add Member/).visible?).to be_truthy
 end
 
-When(/Individual clicks on add member button/) do
+And(/Individual clicks on add member button/) do
   @browser.a(text: /Add Member/).wait_until_present
   @browser.a(text: /Add Member/).click
   @browser.text_field(id: /dependent_first_name/).wait_until_present
@@ -90,12 +86,17 @@ When(/Individual clicks on add member button/) do
   input_field.click
   input_field.li(text: /Child/).click
   @browser.radio(id: /radio_female/).fire_event("onclick")
-  @browser.text_field(id: /dependent_race/).set('test')
-  @browser.text_field(id: /dependent_ethnicity/).set('test2')
-  @browser.text_field(id: /dependent_language_code/).set('eng')
-  @browser.text_field(id: /dependent_is_tobacco_user/).set('No')
-  @browser.checkbox(id: /dependent_is_incarcerated/).set
-  @browser.checkbox(id: /dependent_is_disabled/).set
+  @browser.radio(id: /dependent_us_citizen_true/).fire_event("onclick")
+  @browser.radio(id: /dependent_naturalized_citizen_false/).wait_while_present
+  @browser.radio(id: /dependent_naturalized_citizen_false/).fire_event("onclick")
   scroll_then_click(@browser.button(text: /Confirm Member/))
   @browser.button(text: /Confirm Member/).wait_while_present
+end
+
+And(/I click on continue button on household info form/) do
+  click_when_present(@browser.a(text: /continue/i))
+end
+
+And(/I click on continue button on group selection page/) do
+  click_when_present(@browser.button(class: /interaction-click-control-continue/))
 end
