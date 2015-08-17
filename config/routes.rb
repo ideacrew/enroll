@@ -69,6 +69,7 @@ Rails.application.routes.draw do
         get 'home'
         get 'manage_family'
         get 'personal'
+        get 'inbox'
       end
 
       resources :people do
