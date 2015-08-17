@@ -214,8 +214,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
-      allow(benefit_group).to receive(:elected_plans).and_return([plan])
-      allow(PlanCostDecorator).to receive(:new).and_return(plan)
+      allow(benefit_group).to receive(:decorated_elected_plans).and_return([plan])
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
       sign_in user
