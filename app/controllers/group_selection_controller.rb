@@ -33,7 +33,7 @@ class GroupSelectionController < ApplicationController
                        @coverage_household.household.new_hbx_enrollment_from(
                          consumer_role: @person.consumer_role,
                          coverage_household: @coverage_household,
-                         benefit_package: @benefit_package)
+                         benefit_package: @benefit_package || nil)
                      end
 
     hbx_enrollment.plan = @hbx_enrollment.plan if keep_existing_plan and @hbx_enrollment.present?
@@ -54,7 +54,7 @@ class GroupSelectionController < ApplicationController
       end
     else
       flash[:error] = "You must select the primary applicant to enroll in the healthcare plan"
-      redirect_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: @change_plan, market_kind: @market_kind)
+      redirect_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind)
     end
   end
 
@@ -71,10 +71,8 @@ class GroupSelectionController < ApplicationController
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
     else
       @consumer_role = @person.consumer_role
-      params["market_kind"] = "individual"
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-    @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
   end
 end

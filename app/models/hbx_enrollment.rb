@@ -203,11 +203,11 @@ class HbxEnrollment
       household.hbx_enrollments.ne(id: id).select do |hbx|
         hbx.employee_role.present? and hbx.employee_role.employer_profile_id == employee_role.employer_profile_id
       end
-    elsif consumer_role_id.present?
-      #FIXME when have more than one individual hbx
-      household.hbx_enrollments.ne(id: id).select do |hbx|
-        hbx.consumer_role_id.present? and hbx.consumer_role_id == consumer_role_id
-      end
+    #elsif consumer_role_id.present?
+    #  #FIXME when have more than one individual hbx
+    #  household.hbx_enrollments.ne(id: id).select do |hbx|
+    #    hbx.consumer_role_id.present? and hbx.consumer_role_id == consumer_role_id
+    #  end
     else
       []
     end
@@ -227,7 +227,7 @@ class HbxEnrollment
     when employee_role.present?
       raise unless benefit_group.present?
       enrollment.household = coverage_household.household
-      enrollment_kind = "employer_sponsored"
+      enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
       enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
       # benefit_group.plan_year.start_on
@@ -245,10 +245,10 @@ class HbxEnrollment
       end
     when consumer_role.present?
       enrollment.household = coverage_household.household
-      enrollment_kind = "individual"
+      enrollment.kind = "individual"
       enrollment.consumer_role = consumer_role
-      enrollment.effective_on = nil # FIXME
-      enrollment.benefit_package = benefit_package
+      enrollment.benefit_package_id = benefit_package.try(:id)
+      enrollment.effective_on = TimeKeeper.date_of_record.beginning_of_year # FIXME
       coverage_household.coverage_household_members.each do |coverage_member|
         enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
         enrollment_member.eligibility_date = enrollment.effective_on
