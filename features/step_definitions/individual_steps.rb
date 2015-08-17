@@ -22,8 +22,8 @@ When(/user goes to register as an individual$/) do
   @browser.text_field(class: /interaction-field-control-person-middle-name/).set("K")
   @browser.text_field(class: /interaction-field-control-person-last-name/).set("York")
   @browser.text_field(class: /interaction-field-control-person-name-sfx/).set("Jr")
-  @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-person-dob/).set("10/01/1985")
-  @browser.text_field(class: /interaction-field-control-person-ssn/).set("001991234")
+  @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-person-dob/).set("05/23/1969")
+  @browser.text_field(class: /interaction-field-control-person-ssn/).set("677991234")
   @browser.text_field(class: /interaction-field-control-person-ssn/).click
   @browser.radio(class: /interaction-choice-control-value-radio-male/).fire_event("onclick")
   @browser.button(class: /interaction-click-control-continue/).click
