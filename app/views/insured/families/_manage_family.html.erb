@@ -1,0 +1,73 @@
+<div class="panel panel-default" id="profile-content">
+<%= render "profile_submenu", :active_subtab => "family-tab" %>
+<br>
+<div class="tab-content" id="myTabContent1">
+  <div class="container" id="dependents_info">
+    <div class="row">
+      <div class="col-md-9 col-sm-12">
+        <div class="row row-form-wrapper no-buffer">
+          <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
+            <div class="col-md-6 col-sm-6 no-pd form-group form-group-lg no-pd">
+              <label class="static_label label-floatlabel" for="name">NAME</label>
+              <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %></span>
+            </div>
+            <div class="col-md-6 col-sm-6 no-pd form-group form-group-lg no-pd">
+              <label class="static_label label-floatlabel" for="relation">RELATION</label>
+              <span class="field_value floatlabel form-control active-floatlabel" id="relation">Self</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><br>
+
+    <div class="row">
+      <div class="col-md-9 col-sm-12">
+        <ul class="" id="dependent_ul">
+          <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
+            <%= render "consumer/employee_dependents/dependent", dependent: dependent, person: @person %>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+
+    <div id="qle_flow_info" class="hidden">
+      <div class="row coverage-table">
+        <div class="col-md-9 col-sm-12">
+          <div class="initial-info notification-error-wrapper">
+            <div class="row no-buffer">
+              <div class="col-md-8">
+                <center><strong>You have added/removed a family member to your profile. <br>You may qualify for a special enrollment period.</strong></center>
+              </div>
+              <div class="col-md-4">
+                <%= button_tag 'Continue', class: 'btn btn-default', id: 'qle_continue_button' %>
+              </div>
+            </div>
+          </div>
+
+          <div class="qle-info notification-error-wrapper hidden">
+            <div class="row no-buffer">
+              <%= render 'qles' %>
+            </div>
+          </div>
+
+          <%= link_to image_tag('member-close.png'), 'javascript:;', class: 'close-fail', style: 'margin: 7px 15px;', onclick: "$('#qle_flow_info').hide();" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-9 col-sm-12">
+        <div id="dependent_buttons" class="focus_effect personal-info-row">
+          <div class="col-md-12 no-pd col-sm-12 col-xs-12" id="add-member-btn">
+            <%=
+              link_to new_consumer_employee_dependent_path(:family_id => @family.id), :remote => true, :class => "btn btn-primary" do
+                '<i class="fa fa-user-plus"></i> Add Member'.html_safe
+              end
+              %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

@@ -63,7 +63,8 @@ Rails.application.routes.draw do
     resources :families, only: [:show] do
       get 'new'
       get 'home'
-
+      get 'manage_family'
+      
       resources :people do
         collection do
           get 'search'

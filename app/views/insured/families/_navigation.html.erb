@@ -1,7 +1,7 @@
 <div>
   <ul class="nav nav-pills nav-stacked">
     <li>
-      <%= link_to("My DC Health Link",  insured_family_home_path(@family)) %>
+      <%= link_to "My DC Health Link",  family_account_path %>
     </li>
     <li>
       <a href="#">Documents</a>
@@ -12,7 +12,7 @@
       <% end %>
     </li>
     <li>
-      <%= link_to "Manage Family", family_consumer_profiles_path %>
+      <%= link_to "Manage Family", insured_family_manage_family_path(@family) %>
     </li>
   </ul>
 </div>

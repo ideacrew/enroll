@@ -13,7 +13,16 @@ class Insured::FamiliesController < FamiliesController
 
     respond_to do |format|
       format.html
-      format.js
     end
   end 
+
+  def manage_family
+    @family_members = @family.active_family_members
+    @qualifying_life_events = QualifyingLifeEventKind.all
+    # @employee_role = @person.employee_roles.first
+
+    respond_to do |format|
+      format.html
+    end
+  end
 end
