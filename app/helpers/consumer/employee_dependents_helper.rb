@@ -9,9 +9,9 @@ module Consumer::EmployeeDependentsHelper
 
   def employee_dependent_submission_options_for(model)
     if model.persisted?
-      { :remote => true, method: :put, :url => {:action => "update"}, :as => :dependent }
+      { :remote => true, method: :put, :url => {:action => "update"}, :as => :dependent, html: { multipart: true } }
     else
-      { :remote => true, method: :post, :url => {:action => "create"}, :as => :dependent }
+      { :remote => true, method: :post, :url => {:action => "create"}, :as => :dependent, html: { multipart: true } }
     end
   end
 end

@@ -213,6 +213,10 @@ class ConsumerRole
     end
   end
 
+  def self.naturalization_document_types
+    ["Certificate of Citizenship", "Naturalization Certificate"]
+  end
+
 private
   def identity_verification_success?
     identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE

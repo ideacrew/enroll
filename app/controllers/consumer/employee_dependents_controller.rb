@@ -19,7 +19,14 @@ class Consumer::EmployeeDependentsController < ApplicationController
   def create
     @dependent = Forms::EmployeeDependent.new(params.require(:dependent))
 
+
     if @dependent.save
+      if params[:tribal_document]
+        doc_id = Aws::S3Storage.save(params[:tribal_document].tempfile.path, 'dchbx-id-verification')
+        @dependent.person.consumer_role.documents.build({identifier: doc_id, title: params[:tribal_document].original_filename}) if doc_id
+        @dependent.person.consumer_role.save!
+      end
+
       @created = true
       respond_to do |format|
         format.html { render 'show' }
