@@ -29,8 +29,6 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
-  end
-
   def documents_index
 
   end
