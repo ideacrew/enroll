@@ -2,9 +2,6 @@
 <% percent_complete = 0 %>
 <% percent_complete = (step == 1) ? 25 : ((step == 2) ? 50 : ((step == 3) ? 75 : ((step == 4) ? 100 : 0))) %>
 <h4>
-  <% if hbx_enrollment.coverage_selected? %>
-    <%= link_to "Change Plan", group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan'), class: "btn btn-primary" %>
-  <% end %>
   Status
 </h4>
 
