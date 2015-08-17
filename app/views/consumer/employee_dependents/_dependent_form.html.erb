@@ -72,7 +72,7 @@
         </div>
       </div>
     </div>
-    <% if f.object.try(:family).try(:person).try(:consumer_role).present? %>
+    <% if request.referer.include?("consumer_role_id") %>
       <%= render 'shared/consumer_fields', f: f %>
     <% end %>
 
