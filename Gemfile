@@ -119,3 +119,5 @@ group :production do
   gem 'unicorn', '~> 4.8.3'
   gem 'eye'
 end
+
+gem 'aws-sdk', '~> 2'

@@ -7,6 +7,10 @@ RSpec.describe "consumer/consumer_roles/edit.html.erb" do
   before :each do
     assign(:person, person)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
+    allow(consumer_role).to receive(:citizen_status)
+    allow(consumer_role ).to receive(:persisted?)
+    allow(consumer_role ).to receive(:vlp_document_id)
+
     render template: "consumer/consumer_roles/edit.html.erb"
   end
 
