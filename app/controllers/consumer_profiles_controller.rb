@@ -1,5 +1,4 @@
 class ConsumerProfilesController < ApplicationController
-
   before_action :get_family, except: [:inbox, :check_qle_date]
 
   def home
@@ -73,9 +72,13 @@ class ConsumerProfilesController < ApplicationController
 
     if @enrollment.present?
       plan = @enrollment.try(:plan)
-      @benefit_group = @enrollment.benefit_group
-      @reference_plan = @benefit_group.reference_plan
-      @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
+      if @enrollment.employee_role.present?
+        @benefit_group = @enrollment.benefit_group
+        @reference_plan = @benefit_group.reference_plan
+        @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
+      else
+        @plan = PlanCostDecorator.new(plan, @enrollment, nil, nil)
+      end
       @enrollable = @family.is_eligible_to_enroll?
 
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''

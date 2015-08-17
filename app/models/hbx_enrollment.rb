@@ -198,16 +198,17 @@ class HbxEnrollment
     household.hbx_enrollments.where(id: id).update_all(updates)
   end
 
+  # FIXME: not sure what this is or if it should be removed - Sean
   def inactive_related_hbxs
     hbxs = if employee_role.present?
       household.hbx_enrollments.ne(id: id).select do |hbx|
         hbx.employee_role.present? and hbx.employee_role.employer_profile_id == employee_role.employer_profile_id
       end
-    elsif consumer_role_id.present?
-      #FIXME when have more than one individual hbx
-      household.hbx_enrollments.ne(id: id).select do |hbx|
-        hbx.consumer_role_id.present? and hbx.consumer_role_id == consumer_role_id
-      end
+    #elsif consumer_role_id.present?
+    #  #FIXME when have more than one individual hbx
+    #  household.hbx_enrollments.ne(id: id).select do |hbx|
+    #    hbx.consumer_role_id.present? and hbx.consumer_role_id == consumer_role_id
+    #  end
     else
       []
     end
@@ -221,19 +222,31 @@ class HbxEnrollment
     benefit_group.effective_on_for(employee_role.hired_on)
   end
 
-  def self.new_from(employee_role: nil, coverage_household:, benefit_group:)
+  def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil)
     enrollment = HbxEnrollment.new
-    enrollment.household = coverage_household.household
-    enrollment.kind = "employer_sponsored" if employee_role.present?
-    enrollment.employee_role = employee_role
-    enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
-    # benefit_group.plan_year.start_on
-    enrollment.benefit_group = benefit_group
-    census_employee = employee_role.census_employee
-    #FIXME creating hbx_enrollment from the fist benefit_group_assignment need to change 
-    #it will be better to create a new benefit_group_assignment
-    benefit_group_assignment = census_employee.benefit_group_assignments.by_benefit_group_id(benefit_group.id).first
-    enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+    case
+    when employee_role.present?
+      raise unless benefit_group.present?
+      enrollment.household = coverage_household.household
+      enrollment.kind = "employer_sponsored"
+      enrollment.employee_role = employee_role
+      enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+      # benefit_group.plan_year.start_on
+      enrollment.benefit_group = benefit_group
+      census_employee = employee_role.census_employee
+      #FIXME creating hbx_enrollment from the fist benefit_group_assignment need to change
+      #it will be better to create a new benefit_group_assignment
+      benefit_group_assignment = census_employee.benefit_group_assignments.by_benefit_group_id(benefit_group.id).first
+      enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+    when consumer_role.present?
+      enrollment.household = coverage_household.household
+      enrollment.kind = "individual"
+      enrollment.consumer_role = consumer_role
+      enrollment.benefit_package_id = benefit_package.try(:id)
+      enrollment.effective_on = HbxProfile.all.first.benefit_sponsorship.benefit_coverage_periods.first.earliest_effective_date # FIXME
+    else
+      raise "either employee_role or consumer_role is required"
+    end
     coverage_household.coverage_household_members.each do |coverage_member|
       enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
       enrollment_member.eligibility_date = enrollment.effective_on
@@ -243,28 +256,13 @@ class HbxEnrollment
     enrollment
   end
 
-  def self.ivl_from(consumer_role: nil, coverage_household:, benefit_package: nil)
-    enrollment = HbxEnrollment.new
-    enrollment.household = coverage_household.household
-    enrollment.kind = "individual" #if consumer_role.present?
-    enrollment.consumer_role_id = consumer_role.id if consumer_role.present?
-    #FIXME benefit_package.benefit_coverage_period.start_on
-    enrollment.effective_on = TimeKeeper.date_of_record.beginning_of_year
-    enrollment.benefit_package_id = benefit_package.id if benefit_package.present?
-    coverage_household.coverage_household_members.each do |coverage_member|
-      enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
-      enrollment_member.eligibility_date = enrollment.effective_on
-      enrollment_member.coverage_start_on = enrollment.effective_on
-      enrollment.hbx_enrollment_members << enrollment_member
-    end
-    enrollment
-  end
-
-  def self.create_from(employee_role: nil, coverage_household:, benefit_group:)
+  def self.create_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil)
     enrollment = self.new_from(
       employee_role: employee_role,
       coverage_household: coverage_household,
-      benefit_group: benefit_group
+      benefit_group: benefit_group,
+      consumer_role: consumer_role,
+      benefit_package: benefit_package
     )
     enrollment.save
     enrollment

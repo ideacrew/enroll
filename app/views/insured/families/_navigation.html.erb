@@ -1,21 +1,18 @@
 <div>
   <ul class="nav nav-pills nav-stacked">
     <li>
-      <%= link_to("My DC Health Link",  insured_family_home_path(@family)) %>
+      <%= link_to "My DC Health Link",  family_account_path %>
     </li>
     <li>
-      <a href="#">Documents</a>
+      <%= link_to "Documents",  documents_index_insured_families_path %>
     </li>
     <li>
-      <%= link_to(inbox_consumer_profiles_path) do  %>
+      <%= link_to(inbox_insured_families_path) do  %>
       Messages <span class="badge message-unread"><%= @person.inbox.unread_messages.try(:count) %></span>
       <% end %>
     </li>
     <li>
-      <a href="#">Life Events</a>
-    </li>
-    <li>
-      <a href="#">Manage Family</a>
+      <%= link_to "Manage Family", manage_family_insured_families_path %>
     </li>
   </ul>
 </div>

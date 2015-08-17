@@ -24,12 +24,13 @@ class GroupSelectionController < ApplicationController
 
     hbx_enrollment = case @market_kind
                      when 'shop'
-                       HbxEnrollment.new_from(
+                       @coverage_household.household.new_hbx_enrollment_from(
                          employee_role: @employee_role,
                          coverage_household: @coverage_household,
-                         benefit_group: @employee_role.benefit_group)
+                         benefit_group: @employee_role.benefit_group
+                       )
                      when 'individual'
-                       HbxEnrollment.ivl_from(
+                       @coverage_household.household.new_hbx_enrollment_from(
                          consumer_role: @person.consumer_role,
                          coverage_household: @coverage_household,
                          benefit_package: @benefit_package)
@@ -42,18 +43,19 @@ class GroupSelectionController < ApplicationController
     end
 
     if hbx_enrollment.save
-      hbx_enrollment.inactive_related_hbxs
+      hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
         redirect_to purchase_consumer_profiles_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind)
       elsif @change_plan.present?
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind)
       else
+        # FIXME: models should update relationships, not the controller
         hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind)
       end
     else
       flash[:error] = "You must select the primary applicant to enroll in the healthcare plan"
-      redirect_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: @change_plan, market_kind: @market_kind)
+      redirect_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind)
     end
   end
 
@@ -70,10 +72,8 @@ class GroupSelectionController < ApplicationController
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
     else
       @consumer_role = @person.consumer_role
-      params["market_kind"] = "individual"
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-    @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
   end
 end

@@ -22,11 +22,10 @@ RSpec.describe Consumer::ConsumerRolesController, :type => :controller do
 
   context "POST create" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
+    let(:user){FactoryGirl.create(:user)}
     before(:each) do
-      allow(user).to receive(:person=).and_return(person)
-      allow(user).to receive(:save).and_return(true)
-      allow(user).to receive(:roles).and_return(["consumer"])
-      allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(person)
+      allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(consumer_role)
+      allow(consumer_role).to receive(:person).and_return(person)
     end
     it "should create new person/consumer role object" do
       sign_in user

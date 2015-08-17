@@ -17,6 +17,8 @@ Rails.application.routes.draw do
         get :configuration
         post :set_date
         get :staff_index
+        get :assister_index
+        get :request_help
       end
 
       member do
@@ -62,7 +64,14 @@ Rails.application.routes.draw do
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
       get 'new'
-      get 'home'
+      collection do
+        get 'home'
+        get 'manage_family'
+        get 'personal'
+        get 'inbox'
+        get 'documents_index'
+        get 'document_upload'
+      end
 
       resources :people do
         collection do
@@ -141,6 +150,7 @@ Rails.application.routes.draw do
       collection do
         get :employers
         get :messages
+        get :staff_index
       end
 
       resources :applicants

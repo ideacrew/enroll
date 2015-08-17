@@ -27,6 +27,20 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def show
     @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
   end
+ 
+  def staff_index
+    @q = params.permit(:q)[:q]
+    @staff = Person.where(broker_role: {:$exists => true})
+    #brokers = brokers.where(:'broker_role.aasm_state'=> 'active')   #FIXME TODO
+    @page_alphabets = page_alphabets(@staff, "last_name")
+    page_no = cur_page_no(@page_alphabets.first)
+    if @q.nil?
+      @staff = @staff.where(last_name: /^#{page_no}/i)
+    else
+      @staff = @staff.where(last_name: @q)
+    end 
+  end
+
 
   def employers
     profile = BrokerAgencyProfile.find(params[:id])

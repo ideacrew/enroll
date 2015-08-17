@@ -1,7 +1,7 @@
 class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show]
-  before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show]
+  before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :checkout, :receipt]
 
   def checkout
     plan = Plan.find(params.require(:plan_id))
@@ -11,13 +11,11 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment.inactive_related_hbxs
 
     if hbx_enrollment.employee_role.present?
-      #FIXME need send a params of market_kind
       benefit_group = hbx_enrollment.benefit_group
       reference_plan = benefit_group.reference_plan
       decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
     else
       decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, nil, nil)
-
     end
     # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
@@ -28,10 +26,6 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.update_current(aasm_state: "coverage_selected")
       hbx_enrollment.propogate_selection
       UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now if hbx_enrollment.employee_role.present?
-      redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan])
-    elsif hbx_enrollment.consumer_role_id.present?
-      hbx_enrollment.update_current(aasm_state: "coverage_selected")
-      hbx_enrollment.propogate_selection
       redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan])
     else
       redirect_to :back
@@ -59,7 +53,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
 
-    if @market_kind == 'shop' and @coverage_kind == 'health'
+    if @enrollment.employee_role.present?
       @benefit_group = @enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
@@ -121,20 +115,21 @@ class Insured::PlanShoppingsController < ApplicationController
     if @market_kind == 'shop' and @coverage_kind == 'health'
       @benefit_group = @hbx_enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
-      @plans = @benefit_group.elected_plans.entries.collect() do |plan|
-        PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
-      end
-    elsif @market_kind == 'individual' and @coverage_kind == 'health'
-      elected_plans = Plan.where(market: "individual", active_year: TimeKeeper.date_of_record.year).select{|p| p.premium_tables.present?}
-      #FIXME need benefit_package and reference_plan for individual
+      @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
+      # @plans = @benefit_group.elected_plans.entries.collect() do |plan|
+      #   PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
+      # end
+    elsif @market_kind == 'individual'
+      elected_plans = Plan.where(market: @market_kind, coverage_kind: @coverage_kind, active_year: TimeKeeper.date_of_record.year).select{|p| p.premium_tables.present?}
+      #FIXME need benefit_package for individual
       @plans = elected_plans.collect() do |plan|
-        PlanCostDecorator.new(plan, @hbx_enrollment, nil, nil)
+        UnassistedPlanCostDecorator.new(plan, @hbx_enrollment)
       end
-    elsif @coverage_kind == 'dental'
-      elected_plans = Plan.where(coverage_kind: "dental", active_year: TimeKeeper.date_of_record.year).select{|p| p.premium_tables.present?}
-      @plans = elected_plans.collect() do |plan|
-        PlanCostDecorator.new(plan, @hbx_enrollment, nil, nil)
-      end
+    # elsif @coverage_kind == 'dental'
+    #   elected_plans = Plan.where(coverage_kind: "dental", active_year: TimeKeeper.date_of_record.year).select{|p| p.premium_tables.present?}
+    #   @plans = elected_plans.collect() do |plan|
+    #     PlanCostDecorator.new(plan, @hbx_enrollment, nil, nil)
+    #   end
     end
 
     @waivable = @hbx_enrollment.can_complete_shopping?

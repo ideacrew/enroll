@@ -18,13 +18,13 @@
             <label><%= plan.try(:plan_type).try(:upcase) %></label>
             <% plan_level = plan.try(:metal_level).try(:humanize) %>
             <label><span class="separator">&nbsp;&nbsp;<span class="<%= plan_level.try(:downcase) %>-icon"><%= plan_level %></span></span></label>
-            <% if plan.nationwide %>
+            <% if plan.try(:nationwide) %>
             <label class="separator">NATIONWIDE NETWORK</label>
             <% end %>
             </p>
           </div>
           <div>
-            <p> 
+            <p>
               <label>Premium:</label> <strong><%= number_to_currency(hbx_enrollment.total_premium) %></strong>/month
               <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong><%= hbx_enrollment.try(:subscriber).person.hbx_id %></strong>
             </p>
@@ -47,8 +47,8 @@
                 <h4>Enrolled</h4>
                 <label>Coverage Start <%= "06/01/2015" %></label>
                 <label>Coverage End <%= "11/15/2015" %></label>
-            <% else %> 
-              <%= render partial: "enrollment_progress", locals: {step: 2} %>
+            <% else %>
+              <%= render partial: "enrollment_progress", locals: {step: 2, hbx_enrollment: hbx_enrollment} %>
             <% end %>
                </div>
              </div>
@@ -63,7 +63,7 @@
             <a href="#"><span style="vertical-align:top;"><i class="fa fa-phone fa-2x"></i></span>&nbsp;<div>Carrier Contact Info</a></div>
           </div>
           <div class="col-xs-4">
-            <button type="button" class="btn btn-primary btn-md pull-right">VIEW DETAILS</button>
+            <button type="button" class="btn btn-primary btn-md ">VIEW DETAILS</button>
           </div>
         </div>
       </div>

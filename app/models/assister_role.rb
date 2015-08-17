@@ -9,6 +9,10 @@ class AssisterRole
   accepts_nested_attributes_for :person
   field :organization, type: String
   
+  def parent
+    person
+  end
+
   class << self
     
     def find(id)
