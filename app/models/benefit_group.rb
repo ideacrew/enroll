@@ -93,6 +93,14 @@ class BenefitGroup
     @elected_plans ||= Plan.where(:id => {"$in" => elected_plan_ids}).to_a
   end
 
+  def decorated_elected_plans(member_provider)
+    elected_plans.collect(){|plan| decorated_plan(plan, member_provider)}
+  end
+
+  def decorated_plan(plan, member_provider)
+    PlanCostDecorator.new(plan, member_provider, self, reference_plan)
+  end
+
   def elected_plans=(new_plans)
     if new_plans.is_a? Array
       self.elected_plan_ids = new_plans.reduce([]) { |list, plan| list << plan._id }

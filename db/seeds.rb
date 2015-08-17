@@ -25,6 +25,7 @@ puts "*"*80
 puts "Loading carriers and QLE kinds."
 require File.join(File.dirname(__FILE__),'seedfiles', 'carriers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
+require File.join(File.dirname(__FILE__),'seedfiles', 'ivl_life_events_seed')
 
 load_tasks = %w(
   seed:plans

@@ -198,6 +198,7 @@ class HbxEnrollment
     household.hbx_enrollments.where(id: id).update_all(updates)
   end
 
+  # FIXME: not sure what this is or if it should be removed - Sean
   def inactive_related_hbxs
     hbxs = if employee_role.present?
       household.hbx_enrollments.ne(id: id).select do |hbx|
@@ -233,30 +234,24 @@ class HbxEnrollment
       # benefit_group.plan_year.start_on
       enrollment.benefit_group = benefit_group
       census_employee = employee_role.census_employee
-      #FIXME creating hbx_enrollment from the fist benefit_group_assignment need to change 
+      #FIXME creating hbx_enrollment from the fist benefit_group_assignment need to change
       #it will be better to create a new benefit_group_assignment
       benefit_group_assignment = census_employee.benefit_group_assignments.by_benefit_group_id(benefit_group.id).first
       enrollment.benefit_group_assignment_id = benefit_group_assignment.id
-      coverage_household.coverage_household_members.each do |coverage_member|
-        enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
-        enrollment_member.eligibility_date = enrollment.effective_on
-        enrollment_member.coverage_start_on = enrollment.effective_on
-        enrollment.hbx_enrollment_members << enrollment_member
-      end
     when consumer_role.present?
       enrollment.household = coverage_household.household
       enrollment.kind = "individual"
       enrollment.consumer_role = consumer_role
       enrollment.benefit_package_id = benefit_package.try(:id)
-      enrollment.effective_on = TimeKeeper.date_of_record.beginning_of_year # FIXME
-      coverage_household.coverage_household_members.each do |coverage_member|
-        enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
-        enrollment_member.eligibility_date = enrollment.effective_on
-        enrollment_member.coverage_start_on = enrollment.effective_on
-        enrollment.hbx_enrollment_members << enrollment_member
-      end
+      enrollment.effective_on = HbxProfile.all.first.benefit_sponsorship.benefit_coverage_periods.first.earliest_effective_date # FIXME
     else
       raise "either employee_role or consumer_role is required"
+    end
+    coverage_household.coverage_household_members.each do |coverage_member|
+      enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
+      enrollment_member.eligibility_date = enrollment.effective_on
+      enrollment_member.coverage_start_on = enrollment.effective_on
+      enrollment.hbx_enrollment_members << enrollment_member
     end
     enrollment
   end
