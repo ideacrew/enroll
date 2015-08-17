@@ -100,3 +100,28 @@ end
 And(/I click on continue button on group selection page/) do
   click_when_present(@browser.button(class: /interaction-click-control-continue/))
 end
+
+And(/I select a plan on plan shopping page/) do
+  click_when_present(@browser.a(class: /interaction-click-control-select-plan/))
+end
+
+And(/I click on purchase button on confirmation page/) do
+  click_when_present(@browser.checkbox(class: /interaction-choice-control-value-terms-check-thank-you/))
+  @browser.text_field(class: /interaction-field-control-first-name-thank-you/).set("Taylor")
+  @browser.text_field(class: /interaction-field-control-last-name-thank-you/).set("York")
+  click_when_present(@browser.a(text: /purchase/i))
+end
+
+And(/I click on continue button to go to the individual home page/) do
+  click_when_present(@browser.a(text: /continue/i))
+end
+
+And(/I should see the individual home page/) do
+  @browser.element(text: /my dc health link/i).wait_until_present
+  click_when_present(@browser.a(class: /interaction-click-control-documents/))
+  expect(@browser.element(text: /Documents/i).visible?).to be_truthy
+  click_when_present(@browser.a(class: /interaction-click-control-manage-family/))
+  expect(@browser.element(text: /manage family/i).visible?).to be_truthy
+  click_when_present(@browser.a(class: /interaction-click-control-my-dc-health-link/))
+  expect(@browser.element(text: /my dc health link/i).visible?).to be_truthy
+end
