@@ -1,5 +1,4 @@
-<div class="submenu">
-  <div class="container">
+  <div>
     <ul role="tablist" class="list-unstyled list-inline" id="myTab1">
       <li role="presentation"<%= menu_tab_class(active_subtab, "personal-tab") %>>
         <%= link_to(personal_insured_families_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "personal", "role" => "tab" ) do  %>
@@ -12,5 +11,10 @@
         <% end %>
       </li>
     </ul>
-  </div>
-</div>
+ </div>
+
+<!-- <ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a href="#">Home</a></li>
+  <li role="presentation"><a href="#">Profile</a></li>
+  <li role="presentation"><a href="#">Messages</a></li>
+</ul> -->

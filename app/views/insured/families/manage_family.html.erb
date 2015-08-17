@@ -8,6 +8,9 @@
   </div>
 
   <div class="col-md-12">
-    <%= render 'manage_family' %>
+    <%= render "profile_submenu", :active_subtab => "family-tab" %>
+    <div id="profile-content">
+      <%= render 'family' %>
+    </div>
   </div>
 </div>
