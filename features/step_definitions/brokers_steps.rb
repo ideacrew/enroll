@@ -256,6 +256,8 @@ Then(/^Broker Assisted is a family$/) do
 end
 
 Then(/^.+ goes to the Consumer page$/) do
+  broker_assist_row = @browser.td(text: /Broker Assisted/).parent
+  broker_assist_row.a(text: /Consumer/).click
   wait_and_confirm_text(/My DC Health Link/)
 end
 
