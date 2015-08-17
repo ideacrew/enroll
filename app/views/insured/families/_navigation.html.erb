@@ -7,7 +7,7 @@
       <a href="#">Documents</a>
     </li>
     <li>
-      <%= link_to(inbox_consumer_profiles_path) do  %>
+      <%= link_to(inbox_insured_families_path) do  %>
       Messages <span class="badge message-unread"><%= @person.inbox.unread_messages.try(:count) %></span>
       <% end %>
     </li>

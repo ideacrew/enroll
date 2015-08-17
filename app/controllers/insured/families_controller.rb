@@ -34,4 +34,9 @@ class Insured::FamiliesController < FamiliesController
       format.js
     end
   end
+
+  def inbox
+    @folder = params[:folder] || 'Inbox'
+    @sent_box = false
+  end
 end
