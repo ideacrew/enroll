@@ -1,0 +1,39 @@
+<% content_for :navigation do %>
+  <%= render 'navigation' %>
+<% end %>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 col-xs-10 col-sm-10">
+      <h3>Additional Documentation Required</h3>
+      <p>We need the following documentation to verify the information you enetered into your application. You may submit documentation now or within <strong>90 days</strong> after you submit your application. <%= link_to 'Learn why we need additional documentation', '#' %></p>
+
+      <%= form_for @consumer_wrapper, :url => insured_verification_documents_upload_path , method: :post do |f| %>
+
+        <div class="row">
+          <div class="col-md-6 col-xs-6 col-sm-6">
+            <%= f.select(:vlp_document_kinds) do %>
+              <% @consumer_wrapper.vlp_document_kinds.each do |c| -%>
+                <%= content_tag(:option, c, value: c) %>
+              <% end %>
+            <% end %>
+          </div>
+
+          <div class="col-md-6 col-xs-6 col-sm-6">
+            <%= f.label "Document Number/Id" %>
+            <%= f.text_field :vlp_document_id %>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-xs-6 col-sm-6">
+          <%= f.file_field :file %>
+        </div>
+
+        <div class="col-md-4 colx-xs-4 col-sm-4">
+          <br>
+          <%= f.submit "Submit Documentation", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

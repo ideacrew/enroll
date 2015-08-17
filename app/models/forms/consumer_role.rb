@@ -1,12 +1,13 @@
 module Forms
   class ConsumerRole < SimpleDelegator
+    include ActiveModel::Validations
 
-    def create_document(file_path)
-      documents.build
-    end
+    attr_accessor :kind, :doc_number
+
+    validates_presence_of :doc_number
 
     def vlp_document_kinds
-      ConsumerRole::VLP_DOCUMENT_KINDS
+      ::ConsumerRole::VLP_DOCUMENT_KINDS
     end
 
     def self.model_name
