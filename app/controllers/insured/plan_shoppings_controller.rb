@@ -120,7 +120,7 @@ class Insured::PlanShoppingsController < ApplicationController
       #   PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
       # end
     elsif @market_kind == 'individual'
-      elected_plans = Plan.where(market: @market_kind, coverage_kind: @coverage_kind, active_year: TimeKeeper.date_of_record.year).select{|p| p.premium_tables.present?}
+      elected_plans = Plan.where(market: @market_kind, coverage_kind: @coverage_kind, active_year: TimeKeeper.date_of_record.year).select{|p| p.premium_tables.present? && p.hios_id =~ /-01$/}
       #FIXME need benefit_package for individual
       @plans = elected_plans.collect() do |plan|
         UnassistedPlanCostDecorator.new(plan, @hbx_enrollment)
