@@ -24,12 +24,13 @@ class GroupSelectionController < ApplicationController
 
     hbx_enrollment = case @market_kind
                      when 'shop'
-                       HbxEnrollment.new_from(
+                       @coverage_household.household.new_hbx_enrollment_from(
                          employee_role: @employee_role,
                          coverage_household: @coverage_household,
-                         benefit_group: @employee_role.benefit_group)
+                         benefit_group: @employee_role.benefit_group
+                       )
                      when 'individual'
-                       HbxEnrollment.ivl_from(
+                       @coverage_household.household.new_hbx_enrollment_from(
                          consumer_role: @person.consumer_role,
                          coverage_household: @coverage_household,
                          benefit_package: @benefit_package)
