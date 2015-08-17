@@ -51,6 +51,6 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
         When Employee clicks on purchase button on the coverage summary page
         Then Employee should see the receipt page
         Then Employee should see the "my account" page
-        Then Employee should see the "Your Enrollment History" section
-        When Employee clicks a qle event
-        Then Employee can purchase a plan
+        # Then Employee should see the "Your Enrollment History" section
+        # When Employee clicks a qle event
+        # Then Employee can purchase a plan

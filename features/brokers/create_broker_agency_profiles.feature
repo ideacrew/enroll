@@ -99,13 +99,13 @@ Feature: Create Primary Broker and Broker Agency
         When Primary Broker clicks on the Families tab
         Then Broker Assisted is a family
         Then Primary Broker goes to the Consumer page
-        Then Primary Broker is on the consumer home page
-        Then Primary Broker shops for plans
-        Then Primary Broker sees covered family members
-        Then Primary Broker should see the list of plans
-        Then Primary Broker selects a plan on the plan shopping page
-        And Primary Broker clicks on purchase button on the coverage summary page
-        And Primary Broker should see the receipt page
+        # Then Primary Broker is on the consumer home page
+        # Then Primary Broker shops for plans
+        # Then Primary Broker sees covered family members
+        # Then Primary Broker should see the list of plans
+        # Then Primary Broker selects a plan on the plan shopping page
+        # And Primary Broker clicks on purchase button on the coverage summary page
+        # And Primary Broker should see the receipt page
         Then Primary Broker logs out
 
 
