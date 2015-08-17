@@ -213,6 +213,7 @@ Rails.application.routes.draw do
       get 'check_qle_date'
       get 'inbox'
       get 'purchase'
+      get 'notification'
     end
   end
 

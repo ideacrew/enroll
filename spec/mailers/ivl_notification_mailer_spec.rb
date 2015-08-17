@@ -3,7 +3,7 @@ require "rails_helper"
 describe IvlNotificationMailer do
   describe "new_user" do
     before(:each) do
-      @census_employee = FactoryGirl.create(:census_employee)
+      @census_employee = FactoryGirl.create(:consumer_role)
     end
 
     let(:mail) { IvlNotificationMailer.lawful_presence_verified(@census_employee) }
