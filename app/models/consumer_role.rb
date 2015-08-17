@@ -8,6 +8,17 @@ class ConsumerRole
   INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
 
   VLP_AUTHORITY_KINDS = %w(ssa dhs hbx)
+  NATURALIZED_CITIZEN_STATUS = "naturalized_citizen"
+  INDIAN_TRIBE_MEMBER_STATUS = "indian_tribe_member"
+  US_CITIZEN_STATUS = "us_citizen"
+  NOT_LAWFULLY_PRESENT_STATUS = "not_lawfully_present_in_us"
+  ALIEN_LAWFULLY_PRESENT_STATUS = "alien_lawfully_present"
+
+  US_CITIZEN_STATUS_KINDS = %W(
+  us_citizen
+  naturalized_citizen
+  indian_tribe_member
+  )
   CITIZEN_STATUS_KINDS = %w(
       us_citizen
       naturalized_citizen
@@ -163,6 +174,10 @@ class ConsumerRole
 
   def is_active?
     self.is_active
+  end
+
+  def self.naturalization_document_types
+    ["Certificate of Citizenship", "Naturalization Certificate"]
   end
 
   # RIDP and Verify Lawful Presence workflow.  IVL Consumer primary applicant must be in identity_verified state 

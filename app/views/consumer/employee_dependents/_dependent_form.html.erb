@@ -4,6 +4,7 @@
 
   <div id="add_info_<%= dependent.id %>">
     <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
+      <%= token_tag form_authenticity_token %>
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
         <div class="dependent_notice_div_<%= dependent.id%>"></div>
         <div class="row row-form-wrapper no-buffer">
