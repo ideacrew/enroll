@@ -17,7 +17,11 @@
             Metal level : <%= @plan.metal_level %>
           </p>
           
-          <%= render "insured/plan_shoppings/coverage_information" %>
+          <% if @enrollment.employee_role.present?%>
+            <%= render "insured/plan_shoppings/coverage_information" %>
+          <%else%>
+            <%= render "insured/plan_shoppings/individual_coverage_information" %>
+          <% end %>
         </div>
 
         <%= link_to 'Print', '#', onclick: 'window.print();return false;', class: "btn btn-default interaction-click-control-print-purchase-confirmation", style: "float:right;" %>
