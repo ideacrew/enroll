@@ -23,6 +23,15 @@ class Insured::FamiliesController < FamiliesController
 
     respond_to do |format|
       format.html
+      format.js
+    end
+  end
+
+  def personal
+    @family_members = @family.active_family_members
+    respond_to do |format|
+      format.html
+      format.js
     end
   end
 end

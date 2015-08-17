@@ -64,9 +64,13 @@ Rails.application.routes.draw do
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
       get 'new'
-      get 'home'
-      get 'manage_family'
       
+      collection do
+        get 'home'
+        get 'manage_family'
+        get 'personal'
+      end
+
       resources :people do
         collection do
           get 'search'
