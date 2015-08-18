@@ -8,10 +8,6 @@ class AssisterRole
 
   accepts_nested_attributes_for :person
   field :organization, type: String
-
-  def parent
-    self.person
-  end
   
   def parent
     person

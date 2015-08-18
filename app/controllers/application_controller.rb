@@ -134,10 +134,19 @@ class ApplicationController < ActionController::Base
   end
 
   def set_current_person
-    if current_user.person.try(:broker_role).try(:broker_agency_profile_id)
+    if current_user.person && current_user.person.proxy?
       @person = Person.find(session[:person_id])
     else
       @person = current_user.person
     end
+  end
+ 
+  def actual_user
+    if current_user.person && current_user.person.proxy?
+      real_user = nil
+    else
+      real_user = current_user
+    end
+    real_user
   end
 end

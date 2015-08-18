@@ -4,7 +4,10 @@ class Consumer::EmployeeDependentsController < ApplicationController
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
     if @type == "employee"
       emp_role_id = params.require(:employee_role_id)
-      @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
+      @employee_role = EmployeeRole.find(params.require(:employee_role_id))
+      #@employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
+      @person = @employee_role.person
+      @family = @person.primary_family 
     else
       @consumer_role = @person.consumer_role
     end

@@ -429,4 +429,10 @@ private
       errors.add(:dob, "date of birth cannot follow date of death")
     end
   end
+
+
+  def proxy?
+    proxy = self.csr_role || self.assister_role || self.broker_role
+    !!proxy
+  end
 end

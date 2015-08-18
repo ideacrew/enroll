@@ -1,14 +1,14 @@
 class Consumer::ConsumerRolesController < ApplicationController
 
   def new
-    binding.pry
     @person = current_user.build_person
     build_nested_models
   end
 
   def create
-    @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
+    @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
     @person = @consumer_role.person
+    session[:person_id] = @person.id
     respond_to do |format|
       format.html { redirect_to :action => "edit", :id => @consumer_role.id }
     end
