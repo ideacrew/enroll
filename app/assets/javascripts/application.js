@@ -552,21 +552,8 @@ $(document).on('click', '#terms_check_thank_you', function() {
     $('#btn-continue').addClass('disabled');
   }
 })
-$(document).on('blur', '#first_name_thank_you', function() {
-  first_name_thank_you = $("#first_name_thank_you").val();
-  last_name_thank_you = $("#last_name_thank_you").val();
-  
-  if(first_name_thank_you == ""){
-    $('#btn-continue').addClass('disabled');
-  }else{
-  if($("#terms_check_thank_you").prop("checked") == true){    
-    if( first_name_thank_you != "" && last_name_thank_you != ""){
-      $('#btn-continue').removeClass('disabled');
-    }
-    }
-  }
-})
-$(document).on('blur', '#last_name_thank_you', function() {
+
+$(document).on('blur keyup', 'input.thank_you_field', function() {
   first_name_thank_you = $("#first_name_thank_you").val();
   last_name_thank_you = $("#last_name_thank_you").val();
   

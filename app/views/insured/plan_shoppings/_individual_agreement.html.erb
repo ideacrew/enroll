@@ -10,7 +10,7 @@
         <td><%= check_box_tag 'vote_check_thank_you' %> &nbsp;Register to Vote</td>
       </tr>
       <tr>
-        <td><%= check_box_tag 'terms_check_thank_you' %> &nbsp;By checking this box and selecting SUBMIT ENROLLMENT, I acknowledge that I have read and agree to the summary and the entire <%= link_to "Terms and Conditions", "#"%> for use of this website and I have reviewed the <%= link_to "Privacy Statement", "#" %> for this website. <br><br> By entertaing my name below, I certify that all of the information I entered is true and complete to the best of my knowledge. <br><br><%= text_field_tag 'first_name_thank_you', "", :placeholder=>'First Name'%> <%= text_field_tag 'last_name_thank_you', "", :placeholder => 'Last Name'%></td>
+        <td><%= check_box_tag 'terms_check_thank_you' %> &nbsp;By checking this box and selecting SUBMIT ENROLLMENT, I acknowledge that I have read and agree to the summary and the entire <%= link_to "Terms and Conditions", "#"%> for use of this website and I have reviewed the <%= link_to "Privacy Statement", "#" %> for this website. <br><br> By entertaing my name below, I certify that all of the information I entered is true and complete to the best of my knowledge. <br><br><%= text_field_tag 'first_name_thank_you', "", :placeholder=>'First Name', :class=>"thank_you_field"%> <%= text_field_tag 'last_name_thank_you', "", :placeholder => 'Last Name', :class=>"thank_you_field"%></td>
       </tr>
     </tbody>
   </table>
