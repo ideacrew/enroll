@@ -83,11 +83,9 @@ class ConsumerRole
   field :identity_response_description_text, type: String
 
   field :vlp_verified_state, type: String, default: "identity_unverified"
-  field :vlp_verified_date, type: Date
-  field :vlp_authority, type: String
-  field :vlp_document_id, type: String
+  delegate :citizen_status,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
+  delegate :citizen_status=,:vlp_verified_date=, :vlp_authority=, :vlp_document_id=, to: :lawful_presence_determination_instance
 
-  field :citizen_status, type: String
   field :is_state_resident, type: Boolean
 
   field :is_applicant, type: Boolean  # Consumer is applying for benefits coverage
@@ -130,6 +128,15 @@ class ConsumerRole
 
   alias_method :is_state_resident?, :is_state_resident
   alias_method :is_incarcerated?,   :is_incarcerated
+
+  embeds_one :lawful_presence_determination
+
+  def lawful_presence_determination_instance
+    unless self.lawful_presence_determination.present?
+      self.lawful_presence_determination = LawfulPresenceDetermination.new
+    end
+    self.lawful_presence_determination
+  end
 
   def is_aca_enrollment_eligible?
     is_hbx_enrollment_eligible? && 
@@ -192,13 +199,9 @@ class ConsumerRole
     state :identity_verified                    # Identity confirmed via RIDP services or subsequent followup
     state :identity_invalid
 
-    # state :lawful_presence_unverified
-    state :vlp_request_pending, :after_enter => :vlp_request_submitted
-    state :lawful_presence_verified
-    state :fdsh_service_error
-    state :lawful_presence_followup_pending     # Federal hub non-reponsive
-    state :vlp_documentation_review_pending
-    state :not_lawfully_present                 # Federal Hub returned negative result
+    state :verifications_pending
+    state :outstanding_verifications
+    state :fully_verified
 
     event :verify_identity, :after => :record_transition  do
       transitions from: [:identity_unverified, :identity_followup_pending], to: :identity_verified, :guard => :identity_verification_succeeded?
@@ -214,35 +217,6 @@ class ConsumerRole
       transitions from: [:identity_unverified, :identity_followup_pending, :identity_verified], to: :identity_invalid
     end
 
-    event :request_vlp_service, :after => :record_transition  do
-      transitions from: :identity_unverified, to: :vlp_request_pending
-      transitions from: :identity_verified,   to: :vlp_request_pending
-    end
-
-    event :verify_lawful_presence, :after => :record_transition  do
-      transitions from: :vlp_request_pending, to: :lawful_presence_verified, :guard => :vlp_succeeded?
-      transitions from: :vlp_request_pending, to: :not_lawfully_present, :guard => :vlp_denied?
-      transitions from: :vlp_request_pending, to: :fdsh_service_error
-    end
-
-    event :retry_fdsh_service, :after => :record_transition  do
-      transitions from: :fdsh_service_error, to: :lawful_presence_verified, :guard => :vlp_succeeded?
-      transitions from: :fdsh_service_error, to: :not_lawfully_present, :guard => :vlp_denied?
-      transitions from: :fdsh_service_error, to: :lawful_presence_followup_pending, :guard => :retry_period_expired?
-    end
-
-    event :submit_documentation, :after => :record_transition  do
-      transitions from: :lawful_presence_followup_pending, to: :vlp_documentation_review_pending
-      transitions from: :not_lawfully_present, to: :vlp_documentation_review_pending
-    end
-
-    event :grant_vlp_status, :after => :record_transition  do
-      transitions from: :vlp_documentation_review_pending, to: :lawful_presence_verified
-    end
-
-    event :deny_vlp_status, :after => :record_transition  do
-      transitions from: :vlp_documentation_review_pending, to: :not_lawfully_present
-    end
   end
 
 private
