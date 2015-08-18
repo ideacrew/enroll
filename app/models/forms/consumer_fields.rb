@@ -60,7 +60,7 @@ module Forms
             @citizen_status = ::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS
           elsif (!eligible_immigration_status.nil?)
             @citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
-          elsif
+          else
             @citizen_status = nil
           end
         end
