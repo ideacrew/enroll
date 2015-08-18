@@ -1,7 +1,6 @@
 require "rails_helper"
 
 RSpec.describe "insured/show" do
-
   let(:employee_role){FactoryGirl.create(:employee_role)}
   let(:plan){FactoryGirl.create(:plan)}
   let(:benefit_group){ FactoryGirl.build(:benefit_group) }
@@ -35,8 +34,8 @@ RSpec.describe "insured/show" do
     render :template => "insured/plan_shoppings/show.html.erb"
     expect(rendered).to have_selector('p', text:  @person.full_name)
     expect(rendered).to have_selector('p', text:  @benefit_group.plan_year.employer_profile.legal_name)
-
   end
+
   it 'should be identify Broker control in the header when signed in as Broker' do
     sign_in current_broker_user
     render :template => 'layouts/_header.html.erb'
@@ -63,5 +62,21 @@ RSpec.describe "insured/show" do
     sign_in consumer_user
     render :template => "insured/plan_shoppings/show.html.erb"
     expect(rendered).to have_selector('strong#plans-count')
+  end
+
+  it "should not render waive_confirmation partial" do
+    sign_in current_broker_user
+    allow(@hbx_enrollment).to receive(:employee_role).and_return(false)
+    render :template => "insured/plan_shoppings/show.html.erb"
+    expect(rendered).not_to have_selector('div#waive_confirm')
+    expect(response).not_to render_template(partial: "insured/plan_shoppings/waive_confirmation", locals: {enrollment: hbx_enrollment})
+  end
+
+  it 'should render waive_confirmation partial' do
+    sign_in current_broker_user
+    allow(@hbx_enrollment).to receive(:employee_role).and_return(double)
+    render :template => "insured/plan_shoppings/show.html.erb"
+    expect(rendered).to have_selector('div#waive_confirm')
+    expect(response).to render_template(partial: "insured/plan_shoppings/waive_confirmation", locals: {enrollment: hbx_enrollment})
   end
 end

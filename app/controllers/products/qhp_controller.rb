@@ -16,7 +16,7 @@ class Products::QhpController < ApplicationController
       end
     else
       @qhps = Products::Qhp.where(:standard_component_id.in => found_params).to_a.each do |qhp|
-        qhp[:total_employee_cost] = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, nil, nil).total_employee_cost
+        qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.plan, @hbx_enrollment).total_employee_cost
       end
     end
     respond_to do |format|
@@ -37,7 +37,7 @@ class Products::QhpController < ApplicationController
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan)
     else
-      @plan = PlanCostDecorator.new(@qhp.plan, @hbx_enrollment, nil, nil)
+      @plan = UnassistedPlanCostDecorator.new(@qhp.plan, @hbx_enrollment)
     end
     respond_to do |format|
       format.html
