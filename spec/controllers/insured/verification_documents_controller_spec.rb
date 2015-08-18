@@ -9,7 +9,6 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
 
   context "Fails to upload file" do
     it "redirects" do
-      allow(Forms::ConsumerRole).to receive(:initialize).with(anything).and_return(consumer_wrapper)
       allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
       allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:person_consumer_role)
       sign_in user
@@ -29,8 +28,6 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       it "redirects" do
         allow(file).to receive(:tempfile).and_return(temp_file)
         allow(temp_file).to receive(:path)
-        #allow(doc_id).to receive(:present?).and_return(true)
-        allow(Forms::ConsumerRole).to receive(:initialize).with(anything).and_return(consumer_wrapper)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:build_document).with(anything).and_return(double)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:save_consumer_role).with(anything).and_return(true)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
