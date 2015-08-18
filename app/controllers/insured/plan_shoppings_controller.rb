@@ -42,6 +42,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
     else
       @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
+      @market_kind = "individual"
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     if @person.employee_roles.any?

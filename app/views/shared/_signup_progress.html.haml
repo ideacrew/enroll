@@ -42,12 +42,8 @@
   - if step ==5
     %br
     = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-transparent' if @hbx_enrollment and @hbx_enrollment.employee_role.present?
-    .btn.btn-waive.btn-transparent{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
-      I need help with
-      %br
-      Plan shopping
 - elsif step == 6
-  = link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-waive btn-br btn-block', id: 'btn-continue', :method => :post, :disabled => !@enrollable
+  = link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue', :method => :post, :disabled => !@enrollable
   %br
   = link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-round btn-transparent' if @enrollment and @enrollment.employee_role.present?
 - elsif step == 7
