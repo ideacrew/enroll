@@ -8,8 +8,8 @@ class Insured::VerificationDocumentsController < ApplicationController
       doc_id = Aws::S3Storage.save(file_path, 'dchbx-id-verification')
 
       if doc_id.present?
-        doc = build_document
-        if save_consumer_role
+        doc = build_document(doc_id)
+        if save_consumer_role(doc)
           flash[:notice] = "File Saved"
         else
           flash[:error] = "Could not save file"
@@ -38,7 +38,7 @@ class Insured::VerificationDocumentsController < ApplicationController
     params.require(:consumer_role).permit(:file)[:file].tempfile.path
   end
 
-  def build_document
+  def build_document(doc_id)
     @person.consumer_role.documents.build({
                                               identifier: doc_id,
                                               subject: @consumer_wrapper.kind,
@@ -47,7 +47,7 @@ class Insured::VerificationDocumentsController < ApplicationController
                                           })
   end
 
-  def save_consumer_role
+  def save_consumer_role(doc)
     doc.save && @person.consumer_role.save
   end
 end
