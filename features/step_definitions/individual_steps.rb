@@ -113,7 +113,7 @@ And(/I click on purchase button on confirmation page/) do
 end
 
 And(/I click on continue button to go to the individual home page/) do
-  click_when_present(@browser.a(text: /continue/i))
+  click_when_present(@browser.a(text: /go to my account/i))
 end
 
 And(/I should see the individual home page/) do

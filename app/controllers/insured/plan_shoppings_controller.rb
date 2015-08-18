@@ -41,6 +41,7 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
     else
+      @market_kind = "individual"
       @plan = PlanCostDecorator.new(plan, @enrollment, nil, nil)
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
