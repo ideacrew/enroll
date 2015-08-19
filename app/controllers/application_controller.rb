@@ -134,7 +134,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_current_person
-    if current_user.person && current_user.person.proxy?
+    if current_user.try(:person).try(:agent?)
       @person = Person.find(session[:person_id])
     else
       @person = current_user.person
@@ -142,7 +142,7 @@ class ApplicationController < ActionController::Base
   end
  
   def actual_user
-    if current_user.person && current_user.person.proxy?
+    if current_user.try(:person).try(:agent?)
       real_user = nil
     else
       real_user = current_user

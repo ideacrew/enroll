@@ -146,15 +146,11 @@ end
     end
   end
 
-  def csr_landing
-    @cac = current_user.person.csr_role.cac 
-  end
-
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show
     if current_user.has_csr_role?
-      redirect_to csr_landing_exchanges_hbx_profiles_path
+      redirect_to home_exchanges_agents_path
       return
     else
       check_hbx_staff_role

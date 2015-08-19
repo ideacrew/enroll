@@ -1,10 +1,10 @@
 <html>
   <body>
-    Hello <%= assister.last_name %>,
+    Hello <%= person.last_name %>,
     <br />
-    You received message from <%= person.last_name %> with help regarding plan shopping page.
+    You enrolled with assistance from  <%= current_user.person.last_name %> 
     <br />
-    Please contact them
+    Please contact them by email <%= current_user.email %>
     <br />
     Standard Boilerplate
   </body>

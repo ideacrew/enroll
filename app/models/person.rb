@@ -360,6 +360,11 @@ class Person
     end
   end
 
+  def agent?
+    agent = self.csr_role || self.assister_role || self.broker_role
+    !!agent
+  end
+
 private
   def is_ssn_composition_correct?
     # Invalid compositions:
@@ -430,9 +435,4 @@ private
     end
   end
 
-
-  def proxy?
-    proxy = self.csr_role || self.assister_role || self.broker_role
-    !!proxy
-  end
 end

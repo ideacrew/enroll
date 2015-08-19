@@ -19,7 +19,6 @@ Rails.application.routes.draw do
         get :staff_index
         get :assister_index
         get :request_help
-        get :csr_landing
       end
 
       member do
@@ -33,6 +32,13 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :agents do
+      collection do
+        get :home
+        get :begin_enrollment
+        get :send_enrollment_confirmation
+      end
+    end
 
     resources :broker_applicants
 
