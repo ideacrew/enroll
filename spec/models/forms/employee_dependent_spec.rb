@@ -58,9 +58,7 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
       :race => "race",
       :ethnicity => "ethnicity",
       :language_code => "english",
-      :is_tobacco_user => "no",
-      :is_incarcerated => "no",
-      :is_disabled => "no"
+      :is_incarcerated => "no"
     }
   }
 
@@ -145,9 +143,7 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
       :race => "race",
       :ethnicity => "ethnicity",
       :language_code => "english",
-      :is_tobacco_user => "no",
-      :is_incarcerated => "no",
-      :is_disabled => "no"
+      :is_incarcerated => "no"
     }
   }
   let(:person) { double(:errors => double(:has_key? => false)) }
