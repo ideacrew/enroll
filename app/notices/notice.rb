@@ -11,7 +11,6 @@ class Notice
   end
 
   def html
-    
     ApplicationController.new.render_to_string({ 
       :template => @template,
       :layout => false,
@@ -24,22 +23,16 @@ class Notice
       self.html,
       margin:  {  
         top: 10,
-        bottom: 10,
+        bottom: 30,
         left: 25,
         right: 25 
       },
       page_size: 'Letter',
       formats: :html, 
-      encoding: 'utf8'
-      # header:  {   
-      #   :center => "Center",
-      #   :left => "Left",
-      #   :right => "Right"      },   
-      # footer: {
-      #   :center => "Center",
-      #   :left => "Left",
-      #   :right => "Right"
-      # }
+      encoding: 'utf8',
+      footer: { 
+        content: ApplicationController.new.render_to_string( { template: "notices/ivl/footer.html.erb", layout: false }) 
+      }
     )
   end
 
@@ -57,6 +50,12 @@ class Notice
     File.open(notice_path, 'wb') do |file|
       file << self.pdf
     end
+
+    join_pdf = CombinePDF.new
+    join_pdf << CombinePDF.load(notice_path)
+    join_pdf << CombinePDF.load(Rails.root.join('lib/pdf_templates', 'dchl_rights.pdf'))
+
+    join_pdf.save "notice_template.pdf"
   end
 
   def save_html
