@@ -79,10 +79,10 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(assigns(:census_employees)).to eq [census_employee]
     end
 
-    it "get avaliable_employee_names for autocomplete employee name" do
-      xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees'}
-      expect(assigns(:avaliable_employee_names)).to eq employer_profile.census_employees.sorted.map(&:full_name).uniq
-    end
+    #it "get avaliable_employee_names for autocomplete employee name" do
+    #  xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees'}
+    #  expect(assigns(:avaliable_employee_names)).to eq employer_profile.census_employees.sorted.map(&:full_name).uniq
+    #end
   end
 
   describe "GET welcome" do
