@@ -230,7 +230,7 @@ class PeopleController < ApplicationController
 
   def create
     sanitize_person_params
-    @person = Person.find_or_initialize_by(ssn: params[:person][:ssn], date_of_birth: params[:person][:dob])
+    @person = Person.find_or_initialize_by(encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]), date_of_birth: params[:person][:dob])
 
     # Delete old sub documents
     @person.addresses.each {|address| address.delete}
