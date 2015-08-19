@@ -77,7 +77,7 @@ class ConsumerProfilesController < ApplicationController
         @reference_plan = @benefit_group.reference_plan
         @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
       else
-        @plan = PlanCostDecorator.new(plan, @enrollment, nil, nil)
+        @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
       end
       @enrollable = @family.is_eligible_to_enroll?
 

@@ -15,7 +15,7 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
     else
-      decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, nil, nil)
+      decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
     end
     # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
@@ -41,8 +41,8 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
     else
+      @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
       @market_kind = "individual"
-      @plan = PlanCostDecorator.new(plan, @enrollment, nil, nil)
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     if @person.employee_roles.any?
@@ -59,7 +59,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     else
-      @plan = PlanCostDecorator.new(@plan, @enrollment, nil, nil)
+      @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment)
     end
     @family = @person.primary_family
     #FIXME need to implement can_complete_shopping? for individual

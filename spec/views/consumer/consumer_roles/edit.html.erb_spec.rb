@@ -15,6 +15,12 @@ RSpec.describe "consumer/consumer_roles/edit.html.erb" do
   end
 
   it "should display the page info" do
+    expect(rendered).to match(/#{person.first_name}/)
+    expect(rendered).to match(/#{person.last_name}/)
+    expect(rendered).to match(/#{person.dob}/)
+    expect(rendered).to match(/#{person.ssn}/)
+    expect(rendered).to match(/#{person.gender}/)
+    expect(rendered).to match(/#{person.emails.last.address}/mi)
     expect(rendered).to match(/Let’s begin by entering your personal information. This will take approximately 10 minutes. When you finish, select CONTINUE./)
     expect(rendered).to have_selector('h3', text: 'Enroll - let\'s get you signed up for healthcare')
   end
