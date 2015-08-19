@@ -1,12 +1,13 @@
 $(function () {
-	$(document).on('click', 'a.qle-menu-item', function() {
-		//$('#qle-menu').hide();
-		$('.qle-details-title').html($(this).html());
+  $(document).on('click', 'a.qle-menu-item', function() {
+    //$('#qle-menu').hide();
+    $('.qle-details-title').html($(this).html());
     $('#event-title').html($(this).html());
-		$('#change_plan').val($(this).html());
-		$('#qle-details').removeClass('hidden');
+    $('#change_plan').val($(this).html());
+    init_datepicker_for_qle_date();
+    $('#qle-details').removeClass('hidden');
     $('.qle-form').removeClass('hidden');
-	});
+  });
 
 	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
 		$('#qle-details').addClass('hidden');
@@ -58,6 +59,25 @@ $(function () {
       data:{date_val: $("#qle_date").val(), qle_type: qle_type},
       url: "/consumer_profiles/check_qle_date.js"
     });
+  }
+
+  function init_datepicker_for_qle_date() {
+    var target = $('.qle-date-picker');
+    var dateMin = $(target).attr("data-date-min");
+    var dateMax = $(target).attr("data-date-max");
+    var cur_qle_title = $('.qle-details-title').html();
+    if (cur_qle_title === "I've had a baby" || cur_qle_title === "Death" || cur_qle_title === "I've married") {
+      dateMax = "+0d";
+    }
+
+    $(target).val('');
+    $(target).datepicker('destroy');
+    $(target).datepicker({
+      changeMonth: true,
+      changeYear: true,
+      dateFormat: 'mm/dd/yy',
+      minDate: dateMin,
+      maxDate: dateMax});
   }
 
 	$(document).on('click', '#qle_continue_button', function() {
