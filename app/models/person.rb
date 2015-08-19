@@ -23,7 +23,7 @@ class Person
   field :alternate_name, type: String
 
   # Sub-model in-common attributes
-  field :ssn, type: String
+  field :encrypted_ssn, type: String
   field :dob, type: Date
   field :gender, type: String
   field :date_of_death, type: Date
@@ -84,8 +84,9 @@ class Person
   validates :ssn,
     length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
     numericality: true,
-    uniqueness: true,
     allow_blank: true
+
+  validates :encrypted_ssn, uniqueness: true, allow_blank: true
 
   validate :is_ssn_composition_correct?
 
@@ -106,7 +107,7 @@ class Person
   index({last_name: 1, first_name: 1})
   index({first_name: 1, last_name: 1})
 
-  index({ssn: 1}, {sparse: true, unique: true})
+  index({encrypted_ssn: 1}, {sparse: true, unique: true})
   index({dob: 1}, {sparse: true})
 
   index({last_name: 1, dob: 1}, {sparse: true})
@@ -152,6 +153,17 @@ class Person
 #  ViewFunctions::Person.install_queries
 
   after_save :update_family_search_collection
+  after_validation :move_encrypted_ssn_errors
+
+  def move_encrypted_ssn_errors
+    deleted_messages = errors.delete(:encrypted_ssn)
+    if !deleted_messages.blank?
+      deleted_messages.each do |dm|
+        errors.add(:ssn, dm)
+      end
+    end
+    true
+  end
 
   delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
 
@@ -161,7 +173,7 @@ class Person
   # end
 
   def update_family_search_collection
-  #  ViewFunctions::Person.run_after_save_search_update(self.id)
+    #  ViewFunctions::Person.run_after_save_search_update(self.id)
   end
 
   def generate_hbx_id
@@ -169,21 +181,45 @@ class Person
   end
 
   def strip_empty_fields
-    if ssn.blank?
-      unset_sparse("ssn")
+    if encrypted_ssn.blank?
+      unset_sparse("encrypted_ssn")
     end
     if user_id.blank?
       unset_sparse("user_id")
     end
+  end
+  def ssn_changed?
+    encrypted_ssn_changed?
+  end
+
+  def self.encrypt_ssn(val)
+    if val.blank?
+      return nil
+    end
+    ssn_val = val.to_s.gsub(/\D/, '')
+    SymmetricEncryption.encrypt(ssn_val)
+  end
+
+  def self.decrypt_ssn(val)
+    SymmetricEncryption.decrypt(val)
   end
 
   # Strip non-numeric chars from ssn
   # SSN validation rules, see: http://www.ssa.gov/employer/randomizationfaqs.html#a0=12
   def ssn=(new_ssn)
     if !new_ssn.blank?
-      write_attribute(:ssn, new_ssn.to_s.gsub(/\D/, ''))
+      write_attribute(:encrypted_ssn, Person.encrypt_ssn(new_ssn))
     else
-      unset("ssn")
+      unset_sparse("encrypted_ssn")
+    end
+  end
+
+  def ssn
+    ssn_val = read_attribute(:encrypted_ssn)
+    if !ssn_val.blank?
+      Person.decrypt_ssn(ssn_val)
+    else
+      nil
     end
   end
 
@@ -263,12 +299,12 @@ class Person
   end
 
   def add_work_email(email)
-   existing_email = self.emails.detect do |e|
-     (e.kind == 'work') &&
-       (e.address.downcase == email.downcase)
-   end
-   return nil if existing_email.present?
-   self.emails << ::Email.new(:kind => 'work', :address => email)
+    existing_email = self.emails.detect do |e|
+      (e.kind == 'work') &&
+        (e.address.downcase == email.downcase)
+    end
+    return nil if existing_email.present?
+    self.emails << ::Email.new(:kind => 'work', :address => email)
   end
 
   def has_active_consumer_role
@@ -285,23 +321,23 @@ class Person
     end
 
     def search_hash(s_str)
-     clean_str = s_str.strip
-     s_rex = Regexp.new(Regexp.escape(clean_str), true)
-     additional_exprs = []
-     if clean_str.include?(" ")
-       parts = clean_str.split(" ").compact
-       first_re = Regexp.new(Regexp.escape(parts.first), true)
-       last_re = Regexp.new(Regexp.escape(parts.last), true)
-       additional_exprs << {:first_name => first_re, :last_name => last_re}
-     end
-     {
-       "$or" => ([
-         {"first_name" => s_rex},
-         {"last_name" => s_rex},
-         {"hbx_id" => s_rex},
-         {"ssn" => s_rex}
-       ] + additional_exprs)
-     }
+      clean_str = s_str.strip
+      s_rex = Regexp.new(Regexp.escape(clean_str), true)
+      additional_exprs = []
+      if clean_str.include?(" ")
+        parts = clean_str.split(" ").compact
+        first_re = Regexp.new(Regexp.escape(parts.first), true)
+        last_re = Regexp.new(Regexp.escape(parts.last), true)
+        additional_exprs << {:first_name => first_re, :last_name => last_re}
+      end
+      {
+        "$or" => ([
+          {"first_name" => s_rex},
+          {"last_name" => s_rex},
+          {"hbx_id" => s_rex},
+          {"encrypted_ssn" => encrypt_ssn(s_rex)}
+        ] + additional_exprs)
+      }
     end
 
     # Find all employee_roles.  Since person has_many employee_roles, person may show up
@@ -313,7 +349,7 @@ class Person
 
     def find_all_brokers_or_staff_members_by_agency(broker_agency)
       Person.or({:"broker_role.broker_agency_profile_id" => broker_agency.id},
-               {:"broker_agency_staff_roles.broker_agency_profile_id" => broker_agency.id})
+                {:"broker_agency_staff_roles.broker_agency_profile_id" => broker_agency.id})
     end
 
     def sans_primary_broker(broker_agency)
@@ -326,7 +362,7 @@ class Person
 
     def match_existing_person(personish)
       return nil if personish.ssn.blank?
-      Person.where(:ssn => personish.ssn, :dob => personish.dob).first
+      Person.where(:encrypted_ssn => encrypt_ssn(personish.ssn), :dob => personish.dob).first
     end
 
     # Return an instance list of active People who match identifying information criteria
@@ -338,27 +374,27 @@ class Person
       raise ArgumentError, "must provide an ssn, last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank?))
 
       matches = Array.new
-      matches.concat Person.active.where(ssn: ssn_query).to_a unless ssn_query.blank?
+      matches.concat Person.active.where(encrypted_ssn: encrypt_ssn(ssn_query)).to_a unless ssn_query.blank?
       matches.concat Person.where(last_name: last_name, dob: dob_query).active.to_a unless (dob_query.blank? || last_name.blank?)
       matches.uniq
     end
 
     def brokers_or_agency_staff_with_status(query, status)
       query.and( 
-           Person.or( 
-              { :"broker_agency_staff_roles.aasm_state" => status }, 
-              { :"broker_role.aasm_state" => status } 
-            ).selector
-         )
+                Person.or( 
+                          { :"broker_agency_staff_roles.aasm_state" => status }, 
+                          { :"broker_role.aasm_state" => status } 
+                         ).selector
+               )
     end
 
     def search_first_name_last_name_npn(s_str, query=self)
       s_rex = Regexp.new(Regexp.escape(s_str.strip), true)
       query.where({"$or" => ([
-         {"first_name" => s_rex},
-         {"last_name" => s_rex},
-         {"broker_role.npn" => s_rex}
-       ])})
+        {"first_name" => s_rex},
+        {"last_name" => s_rex},
+        {"broker_role.npn" => s_rex}
+      ])})
     end
   end
 
@@ -440,7 +476,7 @@ class Person
   # TODO: Never emulate this behaviour - this is something terrible Trey did to unblock our progress -
   #       and needs to be revisited and refactored
 
-private
+  private
   def is_ssn_composition_correct?
     # Invalid compositions:
     #   All zeros or 000, 666, 900-999 in the area numbers (first three digits); 
@@ -459,7 +495,7 @@ private
       return false if invalid_group_numbers.include?(ssn.to_s[3,2])
       return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
     end
-    
+
     true
   end
 
