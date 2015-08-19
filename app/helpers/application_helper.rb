@@ -313,7 +313,7 @@ module ApplicationHelper
     elsif current_user.try(:person).try(:csr_role) && !current_user.person.csr_role.cac
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Customer Service Representative".html_safe,
       home_exchanges_agents_path
-    elsif current_user.person.assister_role
+    elsif current_user.try(:person).try(:assister_role)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm an In Person Assister".html_safe,
       home_exchanges_agents_path
     elsif current_user.try(:has_broker_agency_staff_role?)
