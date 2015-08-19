@@ -50,7 +50,6 @@ class Consumer::ConsumerRolesController < ApplicationController
       :language_code,
       :is_incarcerated,
       :race,
-      :is_tobacco_user,
       :is_consumer_role,
       :ethnicity
     ]

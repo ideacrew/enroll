@@ -79,9 +79,7 @@ module Forms
         :race => race,
         :ethnicity => ethnicity,
         :language_code => language_code,
-        :is_tobacco_user => is_tobacco_user,
         :is_incarcerated => is_incarcerated,
-        :is_disabled => is_disabled,
         :citizen_status => @citizen_status
       }
     end
@@ -117,9 +115,7 @@ module Forms
         :race => found_family_member.race,
         :ethnicity => found_family_member.ethnicity,
         :language_code => found_family_member.language_code,
-        :is_tobacco_user => found_family_member.is_tobacco_user,
         :is_incarcerated => found_family_member.is_incarcerated,
-        :is_disabled => found_family_member.is_disabled,
         :citizen_status => found_family_member.citizen_status
       })
     end

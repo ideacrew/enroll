@@ -50,7 +50,9 @@ RSpec.describe Consumer::ConsumerRolesController, :type => :controller do
   end
 
   context "PUT update" do
-    let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
+    let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz"}}
+    let(:person){ FactoryGirl.build(:person) }
+
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
       allow(consumer_role).to receive(:person).and_return(person)
@@ -61,14 +63,12 @@ RSpec.describe Consumer::ConsumerRolesController, :type => :controller do
     end
     it "should update existing person" do
       allow(person).to receive(:update_attributes).and_return(true)
-      # sign_in user
       put :update, person: person_params, id: "test"
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(new_insured_interactive_identity_verifications_path)
     end
 
     it "should not update the person" do
-      allow(controller).to receive(:build_nested_models).and_return(true)
       allow(person).to receive(:update_attributes).and_return(false)
       put :update, person: person_params, id: "test"
       expect(response).to have_http_status(:success)
