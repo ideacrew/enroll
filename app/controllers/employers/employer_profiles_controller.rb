@@ -74,10 +74,11 @@ class Employers::EmployerProfilesController < ApplicationController
   def show
     set_show_variables
     if @current_plan_year.present?
-      enrollments = HbxEnrollment.covered(@current_plan_year.hbx_enrollments)
-      @premium_amt_total = enrollments.map(&:total_premium).sum
-      @employee_cost_total = enrollments.map(&:total_employee_cost).sum
-      @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
+      #FIXME commeted out for performance test 
+      #enrollments = HbxEnrollment.covered(@current_plan_year.hbx_enrollments)
+      @premium_amt_total = 0 #enrollments.map(&:total_premium).sum
+      @employee_cost_total = 0 #enrollments.map(&:total_employee_cost).sum
+      @employer_contribution_total = 0 #enrollments.map(&:total_employer_contribution).sum
     end
   end
 
