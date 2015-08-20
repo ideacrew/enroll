@@ -6,15 +6,15 @@ class Notice
     @template = args[:template]
     @notice_data = args[:notice_data]
     @email_notice = args[:email_notice] || true
-    @paper_notice = args[:paper_notice] || true
+    @pdf_notice = args[:pdf_notice] || true
     @mailer = args[:mailer] || ApplicationMailer
   end
 
   def html
     ApplicationController.new.render_to_string({ 
       :template => @template,
-      :layout => false,
-      :locals => @notice_data
+      :layout => 'ivl_layout',
+      :locals => { notice: @notice }
     })
   end
 
