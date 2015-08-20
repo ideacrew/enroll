@@ -4,9 +4,6 @@ source 'https://rubygems.org'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.0'
 
-# New Relic gem
-gem 'newrelic_rpm'
-
 # Use SCSS for stylesheets
 # gem 'sass-rails', '~> 5.0'
 
@@ -121,4 +118,8 @@ group :production do
   # Use Unicorn as the app server
   gem 'unicorn', '~> 4.8.3'
   gem 'eye'
+
+  # New Relic gem
+  gem 'newrelic_rpm'
+
 end
