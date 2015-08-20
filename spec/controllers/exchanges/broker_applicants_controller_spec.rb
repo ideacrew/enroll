@@ -47,7 +47,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
     let(:broker_role) {FactoryGirl.create(:broker_role)}
 
     before :all do 
-      @broker_agency_profile = FactoryGirl.create(:organization).broker_agency_profile
+      @broker_agency_profile = FactoryGirl.create(:broker_agency).broker_agency_profile
     end
 
     before :each do
