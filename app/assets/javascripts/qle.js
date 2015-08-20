@@ -1,21 +1,21 @@
 $(function () {
-	$(document).on('click', 'a.qle-menu-item', function() {
-		//$('#qle-menu').hide();
-		$('.qle-details-title').html($(this).html());
+  $(document).on('click', 'a.qle-menu-item', function() {
+    $('#qle_flow_info #qle-menu').hide();
+    $('.qle-details-title').html($(this).html());
     $('#event-title').html($(this).html());
-		$('#change_plan').val($(this).html());
-		$('#qle-details').removeClass('hidden');
+    $('#change_plan').val($(this).html());
+    init_datepicker_for_qle_date();
+    $('#qle-details').removeClass('hidden');
     $('.qle-form').removeClass('hidden');
-	});
+  });
 
 	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
 		$('#qle-details').addClass('hidden');
 		$('#qle-details .success-info, #qle-details .error-info').addClass('hidden');
     $('#qle-details .qle-form').removeClass('hidden');
     $("#qle_date").val("");
-		//$('#qle-details .default-info').removeClass('hidden');
 
-		//$('#qle-menu').show();
+		$('#qle_flow_info #qle-menu').show();
 	});
 
 	// Disable form submit on pressing Enter, instead click Submit link
@@ -32,14 +32,11 @@ $(function () {
 	$(document).on('click', '#qle_submit', function() {
 		if(check_qle_date()) {
 			$('#qle_date').removeClass('input-error');
-			//$('#qle-input-info').html('Enter the date of the event.')
 			get_qle_date();
 		} else {
-			//$('#qle-input-info').html('Enter a valid date.');
 			$('#qle_date').addClass('input-error');
 			$('.success-info').addClass('hidden');
 			$('.error-info').addClass('hidden');
-			//$('.default-info').removeClass('hidden');
 		}
 	});
 
@@ -58,6 +55,25 @@ $(function () {
       data:{date_val: $("#qle_date").val(), qle_type: qle_type},
       url: "/consumer_profiles/check_qle_date.js"
     });
+  }
+
+  function init_datepicker_for_qle_date() {
+    var target = $('.qle-date-picker');
+    var dateMin = $(target).attr("data-date-min");
+    var dateMax = $(target).attr("data-date-max");
+    var cur_qle_title = $('.qle-details-title').html();
+    if (cur_qle_title === "I've had a baby" || cur_qle_title === "Death" || cur_qle_title === "I've married") {
+      dateMax = "+0d";
+    }
+
+    $(target).val('');
+    $(target).datepicker('destroy');
+    $(target).datepicker({
+      changeMonth: true,
+      changeYear: true,
+      dateFormat: 'mm/dd/yy',
+      minDate: dateMin,
+      maxDate: dateMax});
   }
 
 	$(document).on('click', '#qle_continue_button', function() {

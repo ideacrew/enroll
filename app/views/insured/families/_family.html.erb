@@ -39,13 +39,15 @@
 				</div>
 			</div>
 
-			<div class="qle-info notification-error-wrapper hidden">
+			<div class="qle-info notification-error-wrapper hidden" style='padding-top:35px;'>
 				<div class="row no-buffer">
 					<%= render 'qles' %>
 				</div>
 			</div>
 
-			<%= link_to image_tag('member-close.png'), 'javascript:;', class: 'close-fail', style: 'margin: 7px 15px;', onclick: "$('#qle_flow_info').hide();" %>
+      <%= link_to 'javascript:;', class: 'close-fail', style: 'margin: 0px 8px;', onclick: "$('#qle_flow_info').hide();" do %>
+        <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
+      <% end %>
 		</div>
 	</div>
 </div>
