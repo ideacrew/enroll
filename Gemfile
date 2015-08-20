@@ -118,6 +118,10 @@ group :production do
   # Use Unicorn as the app server
   gem 'unicorn', '~> 4.8.3'
   gem 'eye'
+
+  # New Relic gem
+  gem 'newrelic_rpm'
+
 end
 
 gem 'aws-sdk', '~> 2'
