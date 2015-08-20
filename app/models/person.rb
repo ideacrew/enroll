@@ -36,7 +36,6 @@ class Person
 
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
-
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
 
@@ -361,7 +360,7 @@ class Person
   end
 
   def agent?
-    agent = self.csr_role || self.assister_role || self.broker_role
+    agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role
     !!agent
   end
 
