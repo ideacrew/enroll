@@ -13,16 +13,7 @@
         <div><%= display_carrier_logo(plan.try(:carrier_profile), {width: 110}) %></div>
         <h4><strong><%= link_to plan.try(:name), summary_products_plans_path({:standard_component_id => plan.try(:hios_id), hbx_enrollment_id:hbx_enrollment.id}) %></strong>
         </h4>
-          <div>
-            <p>
-            <label><%= plan.try(:plan_type).try(:upcase) %></label>
-            <% plan_level = plan.try(:metal_level).try(:humanize) %>
-            <label><span class="separator">&nbsp;&nbsp;<span class="<%= plan_level.try(:downcase) %>-icon"><%= plan_level %></span></span></label>
-            <% if plan.try(:nationwide) %>
-            <label class="separator">NATIONWIDE NETWORK</label>
-            <% end %>
-            </p>
-          </div>
+          <div><p><%= render_plan_type_details(plan) %></p></div>
           <div>
             <p>
               <label>Premium:</label> <strong><%= number_to_currency(hbx_enrollment.total_premium) %></strong>/month
@@ -50,12 +41,15 @@
         </div>
 
         <div class="row">
-          <div class="col-xs-4" style="display: flex;">
-            <%= link_to(root_path + "sbc/#{plan.sbc_file}", class: "download") do %><span style="vertical-align:top;"><i class="fa fa-file-pdf-o fa-2x" style="padding-top: 4px;"></i></span>&nbsp;<div style="margin-left: 8px; vertical-align: top;">Summary of Benefits and Coverage</a></div>
+          <div class="col-xs-4 fa-icon-link">
+            <%= link_to(root_path + "sbc/#{plan.sbc_file}", class: "download") do %>
+               <i class="fa fa-file-pdf-o fa-2x pull-left" style="padding-top: 0.15em"></i><div class="fa-icon-label">Summary of Benefits and Coverage</div>
+            <% end %>
           </div>
-          <% end %>
-          <div class="col-xs-4" style="display: flex;">
-            <a href="#"><span style="vertical-align:top;"><i class="fa fa-phone fa-2x"></i></span>&nbsp;<div>Carrier Contact Info</a></div>
+          <div class="col-xs-4">
+            <a href="#">
+              <i class="fa fa-phone fa-2x pull-left"></i><div class="fa-icon-label">Carrier Contact Info</div>
+            </a>
           </div>
           <div class="col-xs-4">
             <%= link_to "VIEW DETAILS", '#', class: 'btn btn-primary btn-md pull-right' %>
