@@ -19,7 +19,7 @@
         <% @person.consumer_role.documents.uniq.each do |doc| %>
           <tr>
             <td><%= doc.title %></td>
-            <td><%= doc.type %></td>
+            <td><%= doc.subject %></td>
             <td><%= doc.created_at.try(:to_date) %></td>
           </tr>
         <% end %>
