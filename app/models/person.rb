@@ -307,6 +307,14 @@ class Person
     self.emails << ::Email.new(:kind => 'work', :address => email)
   end
 
+  def home_email
+    emails.detect { |adr| adr.kind == "home" }
+  end
+
+  def work_email
+    emails.detect { |adr| adr.kind == "home" }
+  end
+
   def has_active_consumer_role
     consumer_role.present? and consumer_role.is_active?
   end

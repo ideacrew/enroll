@@ -20,19 +20,19 @@
   </tbody>
   
 </table>
-<table class="total_table" border="0">
+<table class="total_table" border="0" style="margin-left: 20px;">
   <tbody>
     <tr class="mar20">
-      <td>Raghuram Ganjala</td>
+      <td><%= notice.primary_fullname %></td>
     </tr>
     <tr>
-      <td>609 H ST NE</td>
+      <td><%= notice.primary_address.street_1 %></td>
     </tr>
     <tr>
-      <td>Suite 400</td>
+      <td><%= notice.primary_address.street_2 %></td>
     </tr>
     <tr class="fssize">
-      <td>Washington DC 20002</td>
+      <td><%= notice.primary_address.city %> <%= notice.primary_address.state %> <%= notice.primary_address.zip %></td>
     </tr>
     <tr>
       <td>

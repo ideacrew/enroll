@@ -416,4 +416,10 @@ module ApplicationHelper
       return ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
     end
   end
+
+  def notice_eligible_enrolles(notice)
+    notice.enrollments.inject([]) do |enrollees, enrollment|
+      enrollees += enrollment.enrollees
+    end.uniq
+  end
 end

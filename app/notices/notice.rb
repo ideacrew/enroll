@@ -13,7 +13,7 @@ class Notice
   def html
     ApplicationController.new.render_to_string({ 
       :template => @template,
-      :layout => 'ivl_layout',
+      :layout => 'pdf_notice_layout',
       :locals => { notice: @notice }
     })
   end
@@ -22,16 +22,16 @@ class Notice
     WickedPdf.new.pdf_from_string(
       self.html,
       margin:  {  
-        top: 10,
-        bottom: 30,
-        left: 25,
-        right: 25 
+        top: 15,
+        bottom: 40,
+        left: 10,
+        right: 10 
       },
       page_size: 'Letter',
       formats: :html, 
       encoding: 'utf8',
       footer: { 
-        content: ApplicationController.new.render_to_string( { template: "notices/ivl/footer.html.erb", layout: false }) 
+        content: ApplicationController.new.render_to_string( { template: "notices/ivl/footer.html.erb", layout: false })
       }
     )
   end
