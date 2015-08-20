@@ -25,6 +25,7 @@ puts "*"*80
 puts "Loading carriers and QLE kinds."
 require File.join(File.dirname(__FILE__),'seedfiles', 'carriers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
+require File.join(File.dirname(__FILE__),'seedfiles', 'ivl_life_events_seed')
 
 load_tasks = %w(
   seed:plans
@@ -41,12 +42,15 @@ puts "*"*80
 # require File.join(File.dirname(__FILE__),'seedfiles', 'premiums')
 
 puts "*"*80
-puts "Loading constructed people, broker agencies, employers, and employees."
+puts "Loading constructed geographic areas, people, broker agencies, employers, and employees."
+require File.join(File.dirname(__FILE__),'seedfiles', 'us_counties_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'admins_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'people_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'broker_agencies_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
+require File.join(File.dirname(__FILE__),'seedfiles', 'slcsp_seed')
+
 puts "*"*80
 
 puts "*"*80

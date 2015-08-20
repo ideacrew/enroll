@@ -19,3 +19,9 @@ en:
         paragraph3: "Ready?  Click the button to continue."
         notice: "By using this site, you acknowledge that your have read and agree with the privacy policy and terms of use found here: "
         link: "DCHBX Privacy Policy & Terms of Use."
+  insured:
+    interactive_identity_verifications:
+        service_unavailable:
+          try_again_later: "The Identity Proofing service is currently unavailable, please try again later."
+        failed_validation:
+          contact_information: "You have not passed identity validation.  To proceed please contact the exchange at #XXX-XXX-XXXX, and provide them with reference number #%{ref_number}."

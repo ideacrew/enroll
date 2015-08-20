@@ -88,7 +88,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "divorce", 
+    title: "I've divorced", 
     kind: "drop",
     reason: " ",
     edi_code: "01-DIVORCE", 
@@ -102,7 +102,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "death", 
+    title: "A family member has died", 
     kind: "drop",
     reason: " ",
     edi_code: "03-DEATH", 
@@ -116,7 +116,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "child_age_off", 
+    title: "My child has lost coverage due to age", 
     kind: "drop",
     reason: "child_age_off",
     edi_code: "33-CHILD AGE OFF", 

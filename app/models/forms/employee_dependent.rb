@@ -3,10 +3,11 @@ module Forms
     include ActiveModel::Model
     include ActiveModel::Validations
 
-    attr_accessor :id, :family_id
+    attr_accessor :id, :family_id, :is_consumer_role, :vlp_document_id
     attr_accessor :gender, :relationship
     attr_writer :family
     include ::Forms::PeopleNames
+    include ::Forms::ConsumerFields
     include ::Forms::SsnField
     #include ::Forms::DateOfBirthField
     #include Validations::USDate.on(:date_of_birth)
@@ -26,6 +27,7 @@ module Forms
     end
 
     def save
+      assign_citizen_status
       return false unless valid?
       existing_inactive_family_member = family.find_matching_inactive_member(self)
       if existing_inactive_family_member
@@ -37,6 +39,7 @@ module Forms
       existing_person = Person.match_existing_person(self)
       if existing_person
         family_member = family.relate_new_member(existing_person, self.relationship)
+        family_member.family.build_consumer_role(family_member) if self.is_consumer_role == "true"
         family_member.save!
         self.id = family_member.id
         return true
@@ -44,6 +47,7 @@ module Forms
       person = Person.new(extract_person_params)
       return false unless try_create_person(person)
       family_member = family.relate_new_member(person, self.relationship)
+      family_member.family.build_consumer_role(family_member, extract_consumer_role_params) if self.is_consumer_role == "true"
       family.save!
       self.id = family_member.id
       true
@@ -55,6 +59,13 @@ module Forms
       end
     end
 
+    def extract_consumer_role_params
+      {
+        :citizen_status => @citizen_status,
+        :vlp_document_id => vlp_document_id
+      }
+    end
+
     def extract_person_params
       {
         :first_name => first_name,
@@ -64,7 +75,12 @@ module Forms
         :name_sfx => name_sfx,
         :gender => gender,
         :dob => dob,
-        :ssn => ssn
+        :ssn => ssn,
+        :race => race,
+        :ethnicity => ethnicity,
+        :language_code => language_code,
+        :is_incarcerated => is_incarcerated,
+        :citizen_status => @citizen_status
       }
     end
 
@@ -83,7 +99,7 @@ module Forms
 
     def self.find(family_member_id)
       found_family_member = FamilyMember.find(family_member_id)
-      self.new({
+      record = self.new({
         :relationship => found_family_member.primary_relationship,
         :id => family_member_id,
         :family => found_family_member.family,
@@ -95,7 +111,12 @@ module Forms
         :name_sfx => found_family_member.name_sfx,
         :dob => (found_family_member.dob.is_a?(Date) ? found_family_member.dob.try(:strftime, "%Y-%m-%d") : found_family_member.dob),
         :gender => found_family_member.gender,
-        :ssn => found_family_member.ssn
+        :ssn => found_family_member.ssn,
+        :race => found_family_member.race,
+        :ethnicity => found_family_member.ethnicity,
+        :language_code => found_family_member.language_code,
+        :is_incarcerated => found_family_member.is_incarcerated,
+        :citizen_status => found_family_member.citizen_status
       })
     end
 
@@ -125,8 +146,10 @@ module Forms
 
     def update_attributes(attr)
       assign_attributes(attr)
+      assign_citizen_status
       return false unless valid?
       return false unless try_update_person(family_member.person)
+      family_member.family.build_consumer_role(family_member, attr["vlp_document_id"]) if attr["is_consumer_role"] == "true"
       family_member.update_relationship(relationship)
       family_member.save!
       true

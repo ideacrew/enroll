@@ -14,6 +14,7 @@ RSpec.describe "group_selection/new.html.erb" do
       assign(:person, person)
       assign(:employee_role, employee_role)
       assign(:coverage_household, coverage_household)
+      assign(:market_kind, 'individual')
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
       allow(family_member1).to receive(:is_primary_applicant?).and_return(true)
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
@@ -32,8 +33,8 @@ RSpec.describe "group_selection/new.html.erb" do
       expect(rendered).to have_selector("input[type='checkbox']", count: 3)
     end
 
-    it "should have a checked checkbox option" do
-      expect(rendered).to have_selector("input[checked='checked']", count: 2)
+    it "should have a checked checkbox option and a checked radio button" do
+      expect(rendered).to have_selector("input[checked='checked']", count: 3)
     end
 
     it "should have a disabled checkbox option" do
@@ -46,6 +47,20 @@ RSpec.describe "group_selection/new.html.erb" do
 
     it "should have a 'not eligible'" do
       expect(rendered).to have_selector('td', text: 'ineligible relationship')
+    end
+
+    it "should have coverage_kinds area" do
+      expect(rendered).to match /Coverage Kind/
+    end
+
+    it "should have health radio button" do
+      expect(rendered).to have_selector('input[value="health"]')
+      expect(rendered).to have_selector('label', text: 'Health')
+    end
+
+    it "should have dental radio button" do
+      expect(rendered).to have_selector('input[value="dental"]')
+      expect(rendered).to have_selector('label', text: 'Dental')
     end
   end
 
@@ -121,6 +136,7 @@ RSpec.describe "group_selection/new.html.erb" do
       assign :person, person
       assign :employee_role, employee_role
       assign :coverage_household, coverage_household
+      assign :market_kind, 'individual'
       assign :change_plan, true
       assign :hbx_enrollment, hbx_enrollment
     end
@@ -153,6 +169,47 @@ RSpec.describe "group_selection/new.html.erb" do
       render file: "group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 0)
       expect(rendered).to have_selector("a", count: 0)
+    end
+  end
+
+  context "market_kind" do
+    let(:person) { FactoryGirl.create(:person) }
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:coverage_household) { double(family_members: []) }
+    let(:hbx_enrollment) {double(coverage_selected?: true, id: "hbx_id")}
+
+    before :each do
+      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+      assign :person, person
+      assign :employee_role, employee_role
+      assign :coverage_household, coverage_household
+      assign :change_plan, true
+      assign :hbx_enrollment, hbx_enrollment
+    end
+
+    it "when present" do
+      assign :market_kind, "shop"
+      render file: "group_selection/new.html.erb"
+      expect(rendered).to have_selector("input[type='hidden']")
+      expect(rendered).to have_selector("input[value='shop']")
+    end
+
+    context "when blank" do
+      before :each do
+        assign :market_kind, ""
+        render file: "group_selection/new.html.erb"
+      end
+
+      it "should have title" do
+        expect(rendered).to match /Market Kind/
+      end
+
+      it "should have options" do
+        Plan::MARKET_KINDS.each do |kind|
+          expect(rendered).to have_selector("input[value='#{kind}']")
+        end
+      end
     end
   end
 end

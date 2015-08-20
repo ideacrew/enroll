@@ -1,10 +1,14 @@
 class Consumer::EmployeeDependentsController < ApplicationController
   before_action :set_current_person, :set_family
   def index
-    emp_role_id = params.require(:employee_role_id)
-    @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
-
-    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
+    if @type == "employee"
+      emp_role_id = params.require(:employee_role_id)
+      @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
+    else
+      @consumer_role = @person.consumer_role
+    end
+    @change_plan = params[:change_plan].present? ? 'change' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
   end
 
@@ -17,7 +21,8 @@ class Consumer::EmployeeDependentsController < ApplicationController
   end
 
   def create
-    @dependent = Forms::EmployeeDependent.new(params.require(:dependent))
+
+    @dependent = Forms::EmployeeDependent.new(params.require(:dependent).permit!)
 
     if @dependent.save
       @created = true

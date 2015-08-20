@@ -182,7 +182,7 @@ describe BrokerRole, dbclean: :after_each do
 
   describe BrokerRole, '.find_by_broker_agency_profile', :dbclean => :after_each do
     before :each do 
-      @ba = FactoryGirl.create(:organization).broker_agency_profile
+      @ba = FactoryGirl.create(:broker_agency).broker_agency_profile
     end
 
     it 'returns Broker instance for the specified National Producer Number' do
@@ -208,7 +208,7 @@ describe BrokerRole, dbclean: :after_each do
   # Instance methods
   describe BrokerRole, :dbclean => :after_each do
     before :all do 
-      @ba = FactoryGirl.create(:organization).broker_agency_profile
+      @ba = FactoryGirl.create(:broker_agency).broker_agency_profile
     end
 
     it '#broker_agency_profile sets agency' do

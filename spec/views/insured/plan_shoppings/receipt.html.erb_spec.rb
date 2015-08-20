@@ -17,7 +17,8 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       updated_at: TimeKeeper.date_of_record,
       hbx_enrollment_members: members,
       effective_on: TimeKeeper.date_of_record.beginning_of_month,
-      plan: new_plan
+      plan: new_plan,
+      employee_role: double("EmployeeRole")
     )
   end
 
@@ -46,7 +47,9 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       employee_cost_for: double("employee_cost_for"),
       total_premium: double("total_premium"),
       total_employer_contribution: double("total_employer_contribution"),
-      total_employee_cost: double("total_employee_cost")
+      total_employee_cost: double("total_employee_cost"),
+      carrier_profile: double(legal_name: "carefirst"),
+      metal_level: "Silver"
     )
   end
 

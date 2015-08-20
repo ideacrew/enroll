@@ -1,3 +1,4 @@
+$('#qle-details .qle-form').addClass('hidden');
 <% if @qualified_date %>
   $('#qle-details .success-info').removeClass('hidden');
   $('#qle-details .error-info').addClass('hidden');

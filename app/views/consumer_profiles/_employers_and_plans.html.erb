@@ -3,58 +3,45 @@
     <div class="row">
       <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
         <div class="row">
-          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-            <div class="panel panel-default min-h">
-              <div class="panel-body">
-                <% plan = @hbx_enrollments.last.try(:plan) %>
-                <% hbx_enrollment = @hbx_enrollments.last %>
-                <% benefit_group_assignment = hbx_enrollment.try(:benefit_group_assignment) %>
+          <% @hbx_enrollments.each do |hbx_enrollment|%>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div class="panel panel-default min-h">
+                <div class="panel-body">
+                  <% plan = hbx_enrollment.try(:plan) %>
+                  <% benefit_group_assignment = hbx_enrollment.try(:benefit_group_assignment) %>
 
-                <% if benefit_group_assignment.present? and benefit_group_assignment.coverage_waived? %>
-                <%= render partial: "shared/waive", locals: {benefit_group_assignment: benefit_group_assignment} %>
-                <% elsif hbx_enrollment.try(:coverage_terminated?) %>
-                <div class="page-header">
-                  <h4>Coverage Terminated</h4>
+                  <% if benefit_group_assignment.present? and benefit_group_assignment.coverage_waived? %>
+                  <%= render partial: "shared/waive", locals: {benefit_group_assignment: benefit_group_assignment} %>
+                  <% elsif hbx_enrollment.try(:coverage_terminated?) %>
+                  <div class="page-header">
+                    <h4>Coverage Terminated</h4>
+                  </div>
+                  <p>Terminated on: <%= hbx_enrollment.try(:terminated_on) %></p>
+                  <hr />
+                  <%= render partial: "plan", locals: {hbx_enrollment: hbx_enrollment, plan: plan} %>
+                  <% else %>
+                  <div class="page-header">
+                    <h4>Your plan</h4>
+                  </div>
+                  <%= render partial: "plan", locals: {hbx_enrollment: hbx_enrollment, plan: plan} %>
+                  <% end %>
                 </div>
-                <p>Terminated on: <%= hbx_enrollment.try(:terminated_on) %></p>
-                <hr />
-                <%= render partial: "plan", locals: {hbx_enrollment: hbx_enrollment, plan: plan} %>
-                <% else %>
-                <div class="page-header">
-                  <h4>Your plan</h4>
-                </div>
-                <%= render partial: "plan", locals: {hbx_enrollment: hbx_enrollment, plan: plan} %>
-                <% end %>
               </div>
             </div>
-          </div>
-          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-            <div class="panel panel-default min-h">
-              <div class="panel-body">
-                <h3 style="margin-top: 0"><%= @person.full_name %></h3>
-                <p class="text-primary">(DC Health link ID : <%= @person.hbx_id %>)</p>
-                <hr>
-                <div class="page-header"><h4>Employer</h4></div>
-                <% unless @employee_role.census_employee.try(:employment_terminated?) %>
-                  <h3><%= @employer_profile.try(:legal_name) %></h3>
-                  <ul class="list-unstyled list-comp">
-                    <li>
-                      HIRED: <EM><%=@employee_role.try(:hired_on) ?  @employee_role.hired_on.strftime("%m/%d/%Y"):  " " %></EM>
-                    </li>
-                    <li>
-                      ELIGIBLE FOR COVERAGE: <EM><%= @employee_role.try(:effective_on) ? @employee_role.try(:effective_on).strftime("%m/%d/%Y") :" " %></EM>
-                    </li>
-                  </ul>
-                <% end %>
-              </div>
-            </div>
-          </div>
+          <% end %>
         </div>
-        <div class="panel panel-default">
-          <div class="panel-body">
-            <%= render 'qles' %>
-          </div>
-        </div>
+
+        <% #if elligible to shop? (links for shop)%>
+        <%- if @hbx_enrollments && @hbx_enrollments.last %>
+          <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: 'change_plan') do %>
+            <%= render partial: "shop_for_plans_widget" %>
+          <% end %>
+        <% else %>
+          <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id) do %>
+            <%= render partial: "shop_for_plans_widget" %>
+          <% end %>
+        <% end %>
+
         <div class="panel panel-default">
           <div class="panel-body">
             <%= render 'enrollment_history'%>
@@ -63,6 +50,26 @@
       </div>
 
       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+
+        <div class="panel panel-default min-h">
+          <div class="panel-body">
+            <h3 style="margin-top: 0"><%= @person.full_name %></h3>
+            <p class="text-primary">(DC Health link ID : <%= @person.hbx_id %>)</p>
+            <hr>
+            <div class="page-header"><h4>Employer</h4></div>
+            <% unless @employee_role.census_employee.try(:employment_terminated?) %>
+              <h3><%= @employer_profile.try(:legal_name) %></h3>
+              <ul class="list-unstyled list-comp">
+                <li>
+                  HIRED: <EM><%=@employee_role.try(:hired_on) ?  @employee_role.hired_on.strftime("%m/%d/%Y"):  " " %></EM>
+                </li>
+                <li>
+                  ELIGIBLE FOR COVERAGE: <EM><%= @employee_role.try(:effective_on) ? @employee_role.try(:effective_on).strftime("%m/%d/%Y") :" " %></EM>
+                </li>
+              </ul>
+            <% end %>
+          </div>
+        </div>
 
         <%= link_to(family_consumer_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "family", "role" => "tab" ) do  %>
           <div class="panel panel-default">
@@ -79,17 +86,13 @@
             </div>
           </div>
         <% end %>
-        <%- if hbx_enrollment.try(:coverage_terminated?) %>
-          <%= render partial: "shop_for_plans_widget" %>
-        <%- elsif @hbx_enrollments &&  @hbx_enrollments.last %>
-          <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: 'change_plan') do %>
-            <%= render partial: "shop_for_plans_widget" %>
-          <% end %>
-        <% else %>
-          <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id) do %>
-            <%= render partial: "shop_for_plans_widget" %>
-          <% end %>
-        <% end %>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <%= render 'qles' %>
+          </div>
+        </div>
+
         <a href="#">
           <div class="panel panel-default">
             <div class="panel-body">

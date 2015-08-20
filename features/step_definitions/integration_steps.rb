@@ -231,9 +231,9 @@ end
 
 When(/^(?:.+) go(?:es)? to the employee account creation page$/) do
   @browser.goto("http://localhost:3000/")
-  @browser.a(text: "Employee Portal").wait_until_present
+  @browser.a(text: "Insured Portal").wait_until_present
   screenshot("start")
-  scroll_then_click(@browser.a(text: "Employee Portal"))
+  scroll_then_click(@browser.a(text: "Insured Portal"))
   @browser.a(text: "Create account").wait_until_present
   screenshot("employee_portal")
   scroll_then_click(@browser.a(text: "Create account"))
@@ -250,7 +250,7 @@ When (/^(.*) logs? out$/) do |someone|
   sleep 2
   scroll_then_click(@browser.element(class: /interaction-click-control-logout/))
   @browser.element(class: /interaction-click-control-logout/).wait_while_present
-  @browser.element(class: /interaction-click-control-employee-portal/).wait_until_present
+  @browser.element(class: /interaction-click-control-insured-portal/).wait_until_present
 end
 
 When(/^.+ go(?:es)? to register as an employee$/) do
@@ -442,9 +442,7 @@ Then(/^.+ should see the receipt page$/) do
 end
 
 Then(/^.+ should see the "my account" page$/) do
-  @browser.element(text: /Your Life Events/i).wait_until_present
-  screenshot("my_account_page")
-  expect(@browser.element(text: /Your Life Events/i).visible?).to be_truthy
+  wait_and_confirm_text(/My DC Health Link/)
 end
 
 Then(/^.+ should see the "Your Enrollment History" section/) do

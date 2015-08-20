@@ -1,0 +1,29 @@
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Document Title</th>
+      <th>Document Type</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% unless @person.has_consumer_role? %>
+      <tr>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td>N/A</td>
+      </tr>
+    <% else %>
+      <% if @person.consumer_role.documents.present? %>
+        <% @person.consumer_role.documents.uniq.each do |doc| %>
+          <tr>
+            <td><%= doc.title %></td>
+            <td><%= doc.type %></td>
+            <td><%= doc.created_at.try(:to_date) %></td>
+          </tr>
+        <% end %>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>

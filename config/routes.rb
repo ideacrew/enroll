@@ -16,6 +16,9 @@ Rails.application.routes.draw do
         get :product_index
         get :configuration
         post :set_date
+        get :staff_index
+        get :assister_index
+        get :request_help
       end
 
       member do
@@ -42,6 +45,9 @@ Rails.application.routes.draw do
   end
 
   namespace :insured do
+    get 'verification_documents/upload', to: 'verification_documents#upload'
+    post 'verification_documents/upload', to: 'verification_documents#upload'
+
     resources :plan_shoppings, :only => [:show] do
       member do
         get 'receipt'
@@ -53,10 +59,20 @@ Rails.application.routes.draw do
       end
     end
 
+    resource :interactive_identity_verifications, only: [:create, :new]
+
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
       get 'new'
-      get 'home'
+
+      collection do
+        get 'home'
+        get 'manage_family'
+        get 'personal'
+        get 'inbox'
+        get 'documents_index'
+        get 'document_upload'
+      end
 
       resources :people do
         collection do
@@ -135,6 +151,7 @@ Rails.application.routes.draw do
       collection do
         get :employers
         get :messages
+        get :staff_index
       end
 
       resources :applicants
@@ -151,6 +168,16 @@ Rails.application.routes.draw do
   end
 
   resources :translations
+
+  namespace :api, :defaults => {:format => 'xml'} do
+    namespace :v1 do
+      resources :slcsp, :only => []  do
+        collection do
+          post :plan
+        end
+      end
+    end
+  end
 
   ############################# TO DELETE BELOW ##############################
 
@@ -181,6 +208,8 @@ Rails.application.routes.draw do
       end
     end
     root 'employee_roles#show'
+
+    resources :consumer_role, controller: 'consumer_roles'
   end
 
   # used to select which people are going to be covered before plan selection
@@ -207,6 +236,7 @@ Rails.application.routes.draw do
 
   resources :consumer_profiles, :only => [] do
     collection do
+      get 'documents'
       get 'home'
       get 'plans'
       get 'personal'
@@ -218,7 +248,7 @@ Rails.application.routes.draw do
     end
   end
 
-  match 'families/home', to: 'insured/families#home', via:[:get]
+  match 'families/home', to: 'insured/families#home', via:[:get], as: "family_account"
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
@@ -243,7 +273,6 @@ Rails.application.routes.draw do
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
-
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

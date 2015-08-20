@@ -48,19 +48,21 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
   context "GET receipt" do
 
-    let(:person) { double("Person") }
     let(:user) { double("User") }
     let(:enrollment) { double("HbxEnrollment") }
     let(:plan) { double("Plan") }
     let(:benefit_group) { double("BenefitGroup") }
     let(:reference_plan) { double("Plan") }
+    let(:employee_role) { double("EmployeeRole") }
 
     before do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
       allow(enrollment).to receive(:plan).and_return(plan)
       allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(enrollment).to receive(:employee_role).and_return(employee_role)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
+      allow(enrollment).to receive(:employee_role).and_return(double)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
     end
 
@@ -90,6 +92,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(PlanCostDecorator).to receive(:new).and_return(true)
       allow(person).to receive(:primary_family).and_return(family)
       allow(enrollment).to receive(:can_complete_shopping?).and_return(true)
+      allow(enrollment).to receive(:employee_role).and_return(double)
       allow(benefit_group).to receive(:plan_year).and_return(plan_year)
       allow(plan_year).to receive(:is_eligible_to_enroll?).and_return(true)
     end
@@ -211,8 +214,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
-      allow(benefit_group).to receive(:elected_plans).and_return([plan])
-      allow(PlanCostDecorator).to receive(:new).and_return(plan)
+      allow(benefit_group).to receive(:decorated_elected_plans).and_return([plan])
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
       sign_in user

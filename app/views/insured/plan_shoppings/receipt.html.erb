@@ -9,14 +9,28 @@
           <p>Please print this page for your records.</p>
           <p>A copy of this confirmation has also been emailed to you. </p>
 
-          <%= render "insured/plan_shoppings/coverage_information" %>
+          <p>
+            <% if @employer_profile.present? %>
+              <strong><%= @employer_profile.legal_name %></strong><br>
+            <% end %>
+            <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
+            Metal level : <%= @plan.metal_level %>
+          </p>
+          
+          <% if @enrollment.employee_role.present? %>
+            <%= render "insured/plan_shoppings/coverage_information" %>
+          <%else%>
+            <%= render "insured/plan_shoppings/individual_coverage_information" %>
+          <% end %>
         </div>
 
         <%= link_to 'Print', '#', onclick: 'window.print();return false;', class: "btn btn-default interaction-click-control-print-purchase-confirmation", style: "float:right;" %>
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section plan_receipt">
-        <% if @change_plan.blank? %>
+        <% if @change_plan.blank? && @market_kind == "individual" %>
+          <%= render  partial: 'shared/individual_progress', locals: {step: '6'} %>
+        <% elsif @change_plan.blank? %>
           <%= render  partial: 'shared/signup_progress', locals: {step: '7'} %>
         <% elsif @change_plan == "change" %>
           <%= render partial: 'shared/qle_progress', locals: {step: '4'} %>

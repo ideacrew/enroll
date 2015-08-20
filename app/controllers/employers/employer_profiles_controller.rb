@@ -74,10 +74,11 @@ class Employers::EmployerProfilesController < ApplicationController
   def show
     set_show_variables
     if @current_plan_year.present?
-      enrollments = HbxEnrollment.covered(@current_plan_year.hbx_enrollments)
-      @premium_amt_total = enrollments.map(&:total_premium).sum
-      @employee_cost_total = enrollments.map(&:total_employee_cost).sum
-      @employer_contribution_total = enrollments.map(&:total_employer_contribution).sum
+      #FIXME commeted out for performance test 
+      #enrollments = HbxEnrollment.covered(@current_plan_year.hbx_enrollments)
+      @premium_amt_total = 0 #enrollments.map(&:total_premium).sum
+      @employee_cost_total = 0 #enrollments.map(&:total_employee_cost).sum
+      @employer_contribution_total = 0 #enrollments.map(&:total_employer_contribution).sum
     end
   end
 
@@ -133,7 +134,7 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def consumer_override
     session[:person_id] = params['person_id']
-    redirect_to home_consumer_profiles_path
+    redirect_to family_account_path
   end
 
   private
@@ -141,7 +142,8 @@ class Employers::EmployerProfilesController < ApplicationController
       status_params = params.permit(:id, :status, :search)
       @status = status_params[:status] || 'active'
       @search = status_params[:search] || false
-      @avaliable_employee_names ||= @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+      #@avaliable_employee_names ||= @employer_profile.census_employees.sorted.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
+      #@avaliable_employee_names ||= @employer_profile.census_employees.where(last_name: => /^#{page_no}/i).limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
 
       census_employees = case @status
       when 'terminated'
@@ -153,12 +155,15 @@ class Employers::EmployerProfilesController < ApplicationController
       end
       census_employees = census_employees.search_by(params.slice(:employee_name))
       @page_alphabets = page_alphabets(census_employees, "last_name")
+
       if params[:page].present?
         page_no = cur_page_no(@page_alphabets.first)
         @census_employees = census_employees.where("last_name" => /^#{page_no}/i)
+        #@avaliable_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
       else
         @total_census_employees_quantity = census_employees.count
         @census_employees = census_employees.to_a.first(20)
+        #@avaliable_employee_names ||= @census_employees.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
       end
     end
 

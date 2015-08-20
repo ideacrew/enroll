@@ -94,7 +94,7 @@ describe Forms::EmployeeCandidate, "asked to match a person" do
 
   let(:search_params) { {
     :dob => Date.new(2012, 10, 12),
-    :ssn => "123456789"
+    :encrypted_ssn => Person.encrypt_ssn("123456789")
   } }
 
   let(:user) { nil }

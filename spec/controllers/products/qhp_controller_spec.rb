@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Products::QhpController, :type => :controller do
   let(:user) { double("User") }
   let(:person) { double("Person")}
-  let(:hbx_enrollment){double("HbxEnrollment")}
+  let(:hbx_enrollment){double("HbxEnrollment", kind: "shop")}
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
   context "GET comparison" do
@@ -21,7 +21,7 @@ RSpec.describe Products::QhpController, :type => :controller do
   end
 
   context "GET summary" do
-    let(:hbx_enrollment){ double("HbxEnrollment", id: double("id")) }
+    let(:hbx_enrollment){ double("HbxEnrollment", id: double("id"), kind: "shop") }
     let(:benefit_group){ double("BenefitGroup") }
     let(:reference_plan){ double("Plan") }
     let(:qhp) { [double("Qhp", plan: double("Plan"))] }

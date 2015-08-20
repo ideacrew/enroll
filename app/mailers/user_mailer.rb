@@ -24,4 +24,10 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def message_to_assister(person, assister)
+    mail({to: person.user.email_address, subject: "Plan Selection Help", from: person.user.email}) do |format|
+      format.html { render "message_to_assister", :locals => { :person => person, :assister => assister}}
+    end
+  end
+
 end 

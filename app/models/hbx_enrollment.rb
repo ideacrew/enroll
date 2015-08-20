@@ -7,7 +7,7 @@ class HbxEnrollment
   include AASM
   include MongoidSupport::AssociationProxies
 
-  Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip]
+  Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip individual]
   Authority = [:open_enrollment]
   WAIVER_REASONS = [
     "I have coverage through spouse’s employer health plan",
@@ -41,6 +41,9 @@ class HbxEnrollment
   field :benefit_group_assignment_id, type: BSON::ObjectId
   field :hbx_id, type: String
 
+  field :consumer_role_id, type: BSON::ObjectId
+  field :benefit_package_id, type: BSON::ObjectId
+
   field :submitted_at, type: DateTime
 
   field :aasm_state, type: String
@@ -52,6 +55,7 @@ class HbxEnrollment
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
   associated_with_one :employee_role, :employee_role_id, "EmployeeRole"
+  associated_with_one :consumer_role, :consumer_role_id, "ConsumerRole"
 
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
 
@@ -95,6 +99,11 @@ class HbxEnrollment
 
   before_save :generate_hbx_id
 
+
+  def benefit_sponsored?
+    employer_profile.present?
+  end
+
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
@@ -136,7 +145,7 @@ class HbxEnrollment
   end
 
   def employer_profile
-    employee_role.employer_profile
+    self.try(:employee_role).employer_profile
   end
 
   def plan=(new_plan)
@@ -189,9 +198,19 @@ class HbxEnrollment
     household.hbx_enrollments.where(id: id).update_all(updates)
   end
 
+  # FIXME: not sure what this is or if it should be removed - Sean
   def inactive_related_hbxs
-    hbxs = household.hbx_enrollments.ne(id: id).select do |hbx|
-      hbx.employee_role.present? and hbx.employee_role.employer_profile_id == employee_role.employer_profile_id
+    hbxs = if employee_role.present?
+      household.hbx_enrollments.ne(id: id).select do |hbx|
+        hbx.employee_role.present? and hbx.employee_role.employer_profile_id == employee_role.employer_profile_id
+      end
+    #elsif consumer_role_id.present?
+    #  #FIXME when have more than one individual hbx
+    #  household.hbx_enrollments.ne(id: id).select do |hbx|
+    #    hbx.consumer_role_id.present? and hbx.consumer_role_id == consumer_role_id
+    #  end
+    else
+      []
     end
     household.hbx_enrollments.any_in(id: hbxs.map(&:_id)).update_all(is_active: false)
   end
@@ -203,19 +222,31 @@ class HbxEnrollment
     benefit_group.effective_on_for(employee_role.hired_on)
   end
 
-  def self.new_from(employee_role: nil, coverage_household:, benefit_group:)
+  def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil)
     enrollment = HbxEnrollment.new
-    enrollment.household = coverage_household.household
-    enrollment.kind = "employer_sponsored" if employee_role.present?
-    enrollment.employee_role = employee_role
-    enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
-    # benefit_group.plan_year.start_on
-    enrollment.benefit_group = benefit_group
-    census_employee = employee_role.census_employee
-    #FIXME creating hbx_enrollment from the fist benefit_group_assignment need to change 
-    #it will be better to create a new benefit_group_assignment
-    benefit_group_assignment = census_employee.benefit_group_assignments.by_benefit_group_id(benefit_group.id).first
-    enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+    case
+    when employee_role.present?
+      raise unless benefit_group.present?
+      enrollment.household = coverage_household.household
+      enrollment.kind = "employer_sponsored"
+      enrollment.employee_role = employee_role
+      enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+      # benefit_group.plan_year.start_on
+      enrollment.benefit_group = benefit_group
+      census_employee = employee_role.census_employee
+      #FIXME creating hbx_enrollment from the fist benefit_group_assignment need to change
+      #it will be better to create a new benefit_group_assignment
+      benefit_group_assignment = census_employee.benefit_group_assignments.by_benefit_group_id(benefit_group.id).first
+      enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+    when consumer_role.present?
+      enrollment.household = coverage_household.household
+      enrollment.kind = "individual"
+      enrollment.consumer_role = consumer_role
+      enrollment.benefit_package_id = benefit_package.try(:id)
+      enrollment.effective_on = HbxProfile.all.first.benefit_sponsorship.benefit_coverage_periods.first.earliest_effective_date # FIXME
+    else
+      raise "either employee_role or consumer_role is required"
+    end
     coverage_household.coverage_household_members.each do |coverage_member|
       enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
       enrollment_member.eligibility_date = enrollment.effective_on
@@ -225,11 +256,13 @@ class HbxEnrollment
     enrollment
   end
 
-  def self.create_from(employee_role: nil, coverage_household:, benefit_group:)
+  def self.create_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil)
     enrollment = self.new_from(
       employee_role: employee_role,
       coverage_household: coverage_household,
-      benefit_group: benefit_group
+      benefit_group: benefit_group,
+      consumer_role: consumer_role,
+      benefit_package: benefit_package
     )
     enrollment.save
     enrollment
@@ -316,6 +349,8 @@ class HbxEnrollment
   def decorated_hbx_enrollment
     if plan.present? && benefit_group.present?
       PlanCostDecorator.new(plan, self, benefit_group, benefit_group.reference_plan)
+    elsif plan.present? && consumer_role.present?
+      UnassistedPlanCostDecorator.new(plan, self)
     else
       OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
     end

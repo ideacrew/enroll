@@ -18,6 +18,7 @@ namespace :production do
     Rake::Task["hbx:employers:add"].invoke("tmp/employers.csv","db/seedfiles/blacklist.csv")
     Rake::Task["hbx:employers:census:add"].invoke("tmp/census.csv")
     require File.join(Rails.root, "db/seedfiles/admins_seed")
+    require File.join(Rails.root, "db/seedfiles/slcsp_seed")
   end
 
 end

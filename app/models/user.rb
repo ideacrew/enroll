@@ -56,7 +56,9 @@ class User
     web_service: "web_service",
     hbx_staff: "hbx_staff",
     employer_staff: "employer_staff",
-    broker_agency_staff: "broker_agency_staff"
+    broker_agency_staff: "broker_agency_staff",
+    assister: 'assister',
+    csr: 'csr',
   }
 
   # Enable polymorphic associations
@@ -127,6 +129,10 @@ class User
     has_role?(:employee)
   end
 
+  def has_consumer_role?
+    has_role?(:consumer)
+  end
+
   def has_employer_staff_role?
     has_role?(:employer_staff)
   end
@@ -192,7 +198,7 @@ private
     unset("email") if email.blank?
     unset("oim_id") if oim_id.blank?
   end
-  
+
   def generate_authentication_token
     loop do
       token = Devise.friendly_token

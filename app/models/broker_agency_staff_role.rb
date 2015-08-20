@@ -4,7 +4,7 @@ class BrokerAgencyStaffRole
   include AASM
 
   embedded_in :person
-  field :aasm_state, type: String
+  field :aasm_state, type: String, default: "broker_agency_pending"
   field :reason, type: String
   field :broker_agency_profile_id, type: BSON::ObjectId
   embeds_many :workflow_state_transitions, as: :transitional
@@ -15,7 +15,7 @@ class BrokerAgencyStaffRole
 
   accepts_nested_attributes_for :person, :workflow_state_transitions
 
-  after_initialize :initial_transition
+  # after_initialize :initial_transition
 
   aasm do
     state :broker_agency_pending, initial: true
@@ -36,18 +36,8 @@ class BrokerAgencyStaffRole
     end
   end
 
-  def certified_date
-    if self.workflow_state_transitions.any?
-      transition = workflow_state_transitions.detect do |transition|
-        transition.from_state == 'applicant' && ( transition.to_state == 'active' || transition.to_state == 'broker_agency_pending')
-      end
-    end
-    return unless transition
-    transition.transition_at
-  end
-
   def current_state
-    aasm_state.gsub(/\_/,' ').camelcase
+    aasm_state.humanize.titleize
   end
 
   def email
@@ -79,28 +69,16 @@ class BrokerAgencyStaffRole
   end
   
 private
-
   def last_state_transition_date
     if self.workflow_state_transitions.any?
       self.workflow_state_transitions.first.transition_at
     end
   end
 
-  def initial_transition
-    return if workflow_state_transitions.size > 0
-    self.workflow_state_transitions = [WorkflowStateTransition.new(
-      from_state: nil,
-      to_state: aasm.to_state || "broker_agency_pending",
-      transition_at: Time.now.utc
-    )]
-  end
-
   def record_transition
-    # byebug
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
-      to_state: aasm.to_state,
-      transition_at: Time.now.utc
+      to_state: aasm.to_state
     )
   end
 end

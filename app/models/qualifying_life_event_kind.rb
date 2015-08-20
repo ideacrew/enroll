@@ -49,6 +49,11 @@ class QualifyingLifeEventKind
   field :post_event_sep_in_days, type: Integer
   field :ordinal_position, type: Integer
 
+  field :is_active, type: Boolean, default: true
+  field :start_on, type: Date 
+  field :end_on, type: Date
+
+
   index({kind:  1})
   index({market:  1})
   index({sep_start_date:  1})

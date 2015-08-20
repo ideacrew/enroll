@@ -11,12 +11,14 @@
               <p class="pull-left">
                     Individual: <strong><%= @person.full_name %></strong> &nbsp;&nbsp;
                     Dependents: <strong><%= @hbx_enrollment.humanized_dependent_summary %></strong> &nbsp;&nbsp;
-                    Employer: <strong><%= @benefit_group.plan_year.employer_profile.legal_name %></strong> &nbsp;&nbsp;
+                    <% if @market_kind == 'shop' and @coverage_kind == 'health' %>
+                      Employer: <strong><%= @benefit_group.plan_year.employer_profile.legal_name %></strong> &nbsp;&nbsp;
+                    <% end %>
                     Plans: <strong id='plans-count'><%= @plans.count %></strong>
               </p>
 
               <p class="pull-right">
-                <a href="javascript:void(0);" style="display: none;" class="btn btn-select compare-selected-plans-link", data-uri="<%= comparison_products_plans_path %>">
+                <a href="javascript:void(0);" style="display: none;" class="btn btn-select compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
                   COMPARE PLANS
                 </a>
               </p>
@@ -58,7 +60,9 @@
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
-        <% if @change_plan.blank? %>
+        <% if @change_plan.blank? && @market_kind == "individual" %>
+          <%= render  partial: 'shared/individual_progress', locals: {step: '4'} %>
+        <% elsif @change_plan.blank? %>
           <%= render  partial: 'shared/signup_progress', locals: {step: '5'} %>
         <% elsif @change_plan == "change" %>
           <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
@@ -87,4 +91,7 @@
 	</div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } %>
+<%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if @hbx_enrollment.employee_role.present? %>
+
+<%= render :partial => "insured/plan_shoppings/help_with_plan", :locals => {:enrollment => @hbx_enrollment } %>
+

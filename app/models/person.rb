@@ -23,7 +23,7 @@ class Person
   field :alternate_name, type: String
 
   # Sub-model in-common attributes
-  field :ssn, type: String
+  field :encrypted_ssn, type: String
   field :dob, type: Date
   field :gender, type: String
   field :date_of_death, type: Date
@@ -57,6 +57,8 @@ class Person
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
   embeds_one :responsible_party, cascade_callbacks: true, validate: true
+  embeds_one :csr_role, cascade_callbacks: true, validate: true
+  embeds_one :assister_role, cascade_callbacks: true, validate: true
   embeds_one :inbox, as: :recipient
 
   embeds_many :employer_staff_roles, cascade_callbacks: true, validate: true
@@ -82,8 +84,9 @@ class Person
   validates :ssn,
     length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
     numericality: true,
-    uniqueness: true,
     allow_blank: true
+
+  validates :encrypted_ssn, uniqueness: true, allow_blank: true
 
   validate :is_ssn_composition_correct?
 
@@ -104,7 +107,7 @@ class Person
   index({last_name: 1, first_name: 1})
   index({first_name: 1, last_name: 1})
 
-  index({ssn: 1}, {sparse: true, unique: true})
+  index({encrypted_ssn: 1}, {sparse: true, unique: true})
   index({dob: 1}, {sparse: true})
 
   index({last_name: 1, dob: 1}, {sparse: true})
@@ -150,6 +153,19 @@ class Person
 #  ViewFunctions::Person.install_queries
 
   after_save :update_family_search_collection
+  after_validation :move_encrypted_ssn_errors
+
+  def move_encrypted_ssn_errors
+    deleted_messages = errors.delete(:encrypted_ssn)
+    if !deleted_messages.blank?
+      deleted_messages.each do |dm|
+        errors.add(:ssn, dm)
+      end
+    end
+    true
+  end
+
+  delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
 
   # before_save :notify_change
   # def notify_change
@@ -157,7 +173,7 @@ class Person
   # end
 
   def update_family_search_collection
-  #  ViewFunctions::Person.run_after_save_search_update(self.id)
+    #  ViewFunctions::Person.run_after_save_search_update(self.id)
   end
 
   def generate_hbx_id
@@ -165,21 +181,45 @@ class Person
   end
 
   def strip_empty_fields
-    if ssn.blank?
-      unset_sparse("ssn")
+    if encrypted_ssn.blank?
+      unset_sparse("encrypted_ssn")
     end
     if user_id.blank?
       unset_sparse("user_id")
     end
+  end
+  def ssn_changed?
+    encrypted_ssn_changed?
+  end
+
+  def self.encrypt_ssn(val)
+    if val.blank?
+      return nil
+    end
+    ssn_val = val.to_s.gsub(/\D/, '')
+    SymmetricEncryption.encrypt(ssn_val)
+  end
+
+  def self.decrypt_ssn(val)
+    SymmetricEncryption.decrypt(val)
   end
 
   # Strip non-numeric chars from ssn
   # SSN validation rules, see: http://www.ssa.gov/employer/randomizationfaqs.html#a0=12
   def ssn=(new_ssn)
     if !new_ssn.blank?
-      write_attribute(:ssn, new_ssn.to_s.gsub(/\D/, ''))
+      write_attribute(:encrypted_ssn, Person.encrypt_ssn(new_ssn))
     else
-      unset("ssn")
+      unset_sparse("encrypted_ssn")
+    end
+  end
+
+  def ssn
+    ssn_val = read_attribute(:encrypted_ssn)
+    if !ssn_val.blank?
+      Person.decrypt_ssn(ssn_val)
+    else
+      nil
     end
   end
 
@@ -259,12 +299,20 @@ class Person
   end
 
   def add_work_email(email)
-   existing_email = self.emails.detect do |e|
-     (e.kind == 'work') &&
-       (e.address.downcase == email.downcase)
-   end
-   return nil if existing_email.present?
-   self.emails << ::Email.new(:kind => 'work', :address => email)
+    existing_email = self.emails.detect do |e|
+      (e.kind == 'work') &&
+        (e.address.downcase == email.downcase)
+    end
+    return nil if existing_email.present?
+    self.emails << ::Email.new(:kind => 'work', :address => email)
+  end
+
+  def has_active_consumer_role
+    consumer_role.present? and consumer_role.is_active?
+  end
+
+  def has_active_employee_roles
+    employee_roles.present? and employee_roles.active.present?
   end
 
   class << self
@@ -273,23 +321,23 @@ class Person
     end
 
     def search_hash(s_str)
-     clean_str = s_str.strip
-     s_rex = Regexp.new(Regexp.escape(clean_str), true)
-     additional_exprs = []
-     if clean_str.include?(" ")
-       parts = clean_str.split(" ").compact
-       first_re = Regexp.new(Regexp.escape(parts.first), true)
-       last_re = Regexp.new(Regexp.escape(parts.last), true)
-       additional_exprs << {:first_name => first_re, :last_name => last_re}
-     end
-     {
-       "$or" => ([
-         {"first_name" => s_rex},
-         {"last_name" => s_rex},
-         {"hbx_id" => s_rex},
-         {"ssn" => s_rex}
-       ] + additional_exprs)
-     }
+      clean_str = s_str.strip
+      s_rex = Regexp.new(Regexp.escape(clean_str), true)
+      additional_exprs = []
+      if clean_str.include?(" ")
+        parts = clean_str.split(" ").compact
+        first_re = Regexp.new(Regexp.escape(parts.first), true)
+        last_re = Regexp.new(Regexp.escape(parts.last), true)
+        additional_exprs << {:first_name => first_re, :last_name => last_re}
+      end
+      {
+        "$or" => ([
+          {"first_name" => s_rex},
+          {"last_name" => s_rex},
+          {"hbx_id" => s_rex},
+          {"encrypted_ssn" => encrypt_ssn(s_rex)}
+        ] + additional_exprs)
+      }
     end
 
     # Find all employee_roles.  Since person has_many employee_roles, person may show up
@@ -301,7 +349,7 @@ class Person
 
     def find_all_brokers_or_staff_members_by_agency(broker_agency)
       Person.or({:"broker_role.broker_agency_profile_id" => broker_agency.id},
-               {:"broker_agency_staff_roles.broker_agency_profile_id" => broker_agency.id})
+                {:"broker_agency_staff_roles.broker_agency_profile_id" => broker_agency.id})
     end
 
     def sans_primary_broker(broker_agency)
@@ -314,7 +362,7 @@ class Person
 
     def match_existing_person(personish)
       return nil if personish.ssn.blank?
-      Person.where(:ssn => personish.ssn, :dob => personish.dob).first
+      Person.where(:encrypted_ssn => encrypt_ssn(personish.ssn), :dob => personish.dob).first
     end
 
     # Return an instance list of active People who match identifying information criteria
@@ -326,31 +374,109 @@ class Person
       raise ArgumentError, "must provide an ssn, last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank?))
 
       matches = Array.new
-      matches.concat Person.active.where(ssn: ssn_query).to_a unless ssn_query.blank?
+      matches.concat Person.active.where(encrypted_ssn: encrypt_ssn(ssn_query)).to_a unless ssn_query.blank?
       matches.concat Person.where(last_name: last_name, dob: dob_query).active.to_a unless (dob_query.blank? || last_name.blank?)
       matches.uniq
     end
 
     def brokers_or_agency_staff_with_status(query, status)
       query.and( 
-           Person.or( 
-              { :"broker_agency_staff_roles.aasm_state" => status }, 
-              { :"broker_role.aasm_state" => status } 
-            ).selector
-         )
+                Person.or( 
+                          { :"broker_agency_staff_roles.aasm_state" => status }, 
+                          { :"broker_role.aasm_state" => status } 
+                         ).selector
+               )
     end
 
     def search_first_name_last_name_npn(s_str, query=self)
       s_rex = Regexp.new(Regexp.escape(s_str.strip), true)
       query.where({"$or" => ([
-         {"first_name" => s_rex},
-         {"last_name" => s_rex},
-         {"broker_role.npn" => s_rex}
-       ])})
+        {"first_name" => s_rex},
+        {"last_name" => s_rex},
+        {"broker_role.npn" => s_rex}
+      ])})
     end
   end
 
-private
+  # HACK
+  # FIXME
+  # TODO: Move this out of here
+  attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
+
+  attr_accessor :tribal_id, :is_consumer_role
+
+  before_save :assign_citizen_status_from_consumer_role
+
+  def assign_citizen_status_from_consumer_role
+    if is_consumer_role.to_s=="true"
+      assign_citizen_status
+    end
+  end
+
+  def us_citizen=(val)
+    @us_citizen = (val.to_s == "true")
+  end
+
+  def naturalized_citizen=(val)
+    @naturalized_citizen = (val.to_s == "true")
+  end
+
+  def indian_tribe_member=(val)
+    @indian_tribe_member = (val.to_s == "1")
+  end
+
+  def eligible_immigration_status=(val)
+    @eligible_immigration_status = (val.to_s == "true")
+  end
+
+  def us_citizen
+    return @us_citizen if !@us_citizen.nil?
+    return nil if citizen_status.blank?
+    @us_citizen ||= ::ConsumerRole::US_CITIZEN_STATUS_KINDS.include?(citizen_status)
+  end
+
+  def naturalized_citizen
+    return @naturalized_citizen if !@naturalized_citizen.nil?
+    return nil if citizen_status.blank?
+    @naturalized_citizen ||= (::ConsumerRole::NATURALIZED_CITIZEN_STATUS == citizen_status)
+  end
+
+  def indian_tribe_member
+    return @indian_tribe_member if !@indian_tribe_member.nil?
+    return nil if citizen_status.blank?
+    @indian_tribe_member ||= (::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS == citizen_status)
+  end
+
+  def eligible_immigration_status
+    return @eligible_immigration_status if !@eligible_immigration_status.nil?
+    return nil if @us_citizen.nil?
+    return nil if @us_citizen
+    return nil if citizen_status.blank?
+    @eligible_immigration_status ||= (::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS == citizen_status)
+  end
+
+  def assign_citizen_status
+    if indian_tribe_member
+      self.citizen_status = ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS
+    elsif naturalized_citizen
+      self.citizen_status = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS
+    elsif us_citizen
+      self.citizen_status = ::ConsumerRole::US_CITIZEN_STATUS
+    elsif eligible_immigration_status
+      self.citizen_status = ::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS
+    elsif (!eligible_immigration_status.nil?)
+      self.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
+    elsif
+      self.citizen_status = nil
+    end
+  end
+
+  # HACK
+  # FIXME
+  # TODO: Never emulate this behaviour - this is something terrible Trey did to unblock our progress -
+  #       and needs to be revisited and refactored
+
+  private
   def is_ssn_composition_correct?
     # Invalid compositions:
     #   All zeros or 000, 666, 900-999 in the area numbers (first three digits); 
@@ -369,7 +495,7 @@ private
       return false if invalid_group_numbers.include?(ssn.to_s[3,2])
       return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
     end
-    
+
     true
   end
 

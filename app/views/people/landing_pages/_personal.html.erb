@@ -54,11 +54,12 @@
   %><br>
 
 
-  <div id="email_info" class="row row-form-wrapper no-buffer">
     <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+      <div id="email_info" class="row row-form-wrapper no-buffer">
       <%= render 'shared/email_fields', f: email %>
+        </div><br>
+
     <% end %>
-  </div><br>
 
   <div class="row no-buffer">
     <button type="submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Save</button>

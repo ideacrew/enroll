@@ -1,0 +1,35 @@
+<div class="modal fade" id="help_with_plan_shopping" role="dialog"  role="document">
+  <div class="modal-dialog" style='min-height: 700px'>
+    <div class="modal-content">
+       <div class="modal-header"> 
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>  
+          <h4> Ask for Help with Plan Selection: <span id='help_type'></span></h4>
+       </div>
+       <div class='modal-body'  style='min-height: 500px'>
+
+          <ul id='help_list'  >
+            <li>  <%=link_to 'Help from a broker', 
+                  staff_index_broker_agencies_profiles_path, remote: true %></li>
+            <li>   <%=link_to 'Help from an In-Person Assister', 
+               assister_index_exchanges_hbx_profiles_path, remote: true%></li>
+            <li class='name_search_only' id='CSR'> <a href= '#'>   Help from a Customer Service Representative </a></li>
+            <li class='name_search_only' id='CAC'> <a href= '#'> Help from a Certified Applicant Counselor (CAC) </a></li>
+          </ul>
+           <div id='help_search' class='help_reset'>      
+                First name:<br>
+                <input type="text" id="help_first_name">
+                <br>
+                Last name:<br>
+                <input type="text" id="help_last_name">
+                <div class='btn btn-primary' id='search_for_plan_shopping_help'> Search for Help</div>
+                 <br/>
+                <h4 id='help_status'></h4>  
+                <div class= 'hide' id='help_requestor'><%= @person.id%></div>
+                <div class='hide' id='help_type'> </div>
+          </div>
+          <div id='inbox' class='help_reset'><div class='col-md-10'></div>
+
+        </div>
+    </div>
+  </div>
+</div>

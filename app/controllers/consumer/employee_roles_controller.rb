@@ -1,5 +1,5 @@
 class Consumer::EmployeeRolesController < ApplicationController
-  before_action :check_employee_role, only: [:new, :welcome]
+  before_action :check_employee_role, only: [:new, :welcome, :search]
 
   def welcome
   end
@@ -12,11 +12,14 @@ class Consumer::EmployeeRolesController < ApplicationController
   end
 
   def match
-    @employee_candidate = Forms::EmployeeCandidate.new(params.require(:person).merge({user_id: current_user.id}))
+    @person_params = params.require(:person).merge({user_id: current_user.id})
+    @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
     @person = @employee_candidate
     if @employee_candidate.valid?
       found_census_employees = @employee_candidate.match_census_employees
       if found_census_employees.empty?
+        # @person = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
+
         respond_to do |format|
           format.html { render 'no_match' }
         end
@@ -140,8 +143,8 @@ class Consumer::EmployeeRolesController < ApplicationController
 
   private
     def check_employee_role
-      if current_user.has_employee_role?
-        redirect_to home_consumer_profiles_path
+      if current_user.has_employee_role? || current_user.has_consumer_role?
+        redirect_to family_account_path
       end
     end
 end

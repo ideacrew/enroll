@@ -415,7 +415,7 @@ class PlanYear
     state :publish_pending      # Plan application as submitted has warnings
     state :eligibility_review   # Plan application was submitted with warning and is under review by HBX officials
     state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
-    state :published_invalid, :after_enter => :decline_application    # Plan application was forced-published with warnings
+    state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
     state :enrolling                                      # Published plan has entered open enrollment
     state :enrolled, :after_enter => :ratify_enrollment   # Published plan open enrollment has ended and is eligible for coverage,
@@ -564,8 +564,7 @@ private
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
-      to_state: aasm.to_state,
-      transition_at: Time.now.utc
+      to_state: aasm.to_state
     )
   end
 

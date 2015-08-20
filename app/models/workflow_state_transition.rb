@@ -1,5 +1,6 @@
 class WorkflowStateTransition
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   embedded_in :transitional, polymorphic: true
 
@@ -9,6 +10,8 @@ class WorkflowStateTransition
   field :reason, type: String
   field :comment, type: String
   field :user_id, type: BSON::ObjectId
+
+  before_validation :set_transition_timestamp
 
   default_scope   ->{ order(:"transition_at".desc) }
 
@@ -21,5 +24,10 @@ class WorkflowStateTransition
     else
       "<div>#{transition_at.strftime("%m/%d/%Y")} - State changed from <b>#{from_state.camelcase}</b> to <b>#{to_state.camelcase}</b>.</div>".html_safe
     end
+  end
+
+private
+  def set_transition_timestamp
+    self.transition_at ||= TimeKeeper.datetime_of_record
   end
 end

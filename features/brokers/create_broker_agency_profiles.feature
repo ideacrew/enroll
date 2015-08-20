@@ -83,7 +83,7 @@ Feature: Create Primary Broker and Broker Agency
 
     When I go to the employee account creation page
         When Broker Assisted creates an HBX account
-        Then Broker Assisted should be logged on as an unlinked employee
+        #Then Broker Assisted should be logged on as an unlinked employee
         When Broker Assisted goes to register as an employee
         Then Broker Assisted should see the employee search page
         When Broker Assisted enter the identifying info of Broker Assisted
@@ -99,13 +99,13 @@ Feature: Create Primary Broker and Broker Agency
         When Primary Broker clicks on the Families tab
         Then Broker Assisted is a family
         Then Primary Broker goes to the Consumer page
-        Then Primary Broker is on the consumer home page
-        Then Primary Broker shops for plans
-        Then Primary Broker sees covered family members
-        Then Primary Broker should see the list of plans
-        Then Primary Broker selects a plan on the plan shopping page
-        And Primary Broker clicks on purchase button on the coverage summary page
-        And Primary Broker should see the receipt page
+        # Then Primary Broker is on the consumer home page
+        # Then Primary Broker shops for plans
+        # Then Primary Broker sees covered family members
+        # Then Primary Broker should see the list of plans
+        # Then Primary Broker selects a plan on the plan shopping page
+        # And Primary Broker clicks on purchase button on the coverage summary page
+        # And Primary Broker should see the receipt page
         Then Primary Broker logs out
 
 

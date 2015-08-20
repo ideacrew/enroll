@@ -5,51 +5,81 @@
     <div class="pull-right broker_agencies_search">
       <div class="search-wp">
         <%= render 'shared/search', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", q: @q, remote: true, placeholder: 'Agency/Broker Name, NPN' %>
-        <span class="pull-right"><a href="#">Advanced Options</a></span>
+        <span class="pull-right">
+          <a class="search-options" style="cursor: pointer;">Advanced Options</a>
+        </span>
+      </div>
+      <%= hidden_field_tag "broker_search_url", employers_employer_profile_broker_agency_index_path(@employer_profile) %>
+
+      <div id="advanced_options" style="display: none;">
+          <div class="language_multi_select pull-right">
+             <%= select_tag(:languages_spoken, options_from_collection_for_select(LanguageList::COMMON_LANGUAGES.sort_by {|lan| lan.common_name}, "iso_639_1", "common_name"), { id: 'broker_agency_language_select', multiple: "multiple" } ) %>
+          </div>
+          <div>
+            <label class="pull-right">
+              <%= check_box_tag :working_hours, {id: 'working_hours'} %> Evening/Weekend Availability
+            </label>
+          </div>
       </div>
     </div>
   </div>
 
+<script type="text/javascript">
+    $(function() {
+      $(".search-options").click(function () {
+        $("#advanced_options").toggle();
+      });
 
+      function searchAgencies(){
+        var url = $("#broker_search_url").val();
+        var weekend = $("#working_hours").is(":checked") ? "true" : "false";
+        var languages = $("div.language_multi_select select").val();
 
-  <div class="row no-buffer">
-    <div class="table-responsive">
-      <table class="table table-wrapper" style="opacity: 1;">
-        <thead>
-          <tr>
-            <th>Agency Name</th>
-            <th>Evening/Weekend Hours</th>
-            <th>Language(s) spoken</th>
-            <th>Broker Name</th>
-            <th>NPN</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @broker_agency_profiles.each do |broker_agency| %>
-            <% brokers = broker_agency.active_broker_roles %>
-            <% next if brokers.empty? %>
-            <tr>
-              <td <%= "rowspan=#{brokers.size}" %>>
-                <%= link_to broker_agency.legal_name, employers_employer_profile_broker_agency_path(@employer_profile, broker_agency), remote: true %>
+        $.ajax({
+          url: url,
+          type: "GET",
+          data : { 
+            'q': $("div.search-wp input#q").val(),
+            'working_hours': weekend, 
+            'languages': languages,
+            'advanced': 'true'
+          }
+        });
+      }
 
-              </td>
-              <td <%= "rowspan=#{brokers.size}" %>>
-                Yes
-              </td>
-              <td <%= "rowspan=#{brokers.size}" %>>
-                English
-              </td>
-              <%= render "employers/broker_agency/broker", broker: brokers.delete(broker_agency.primary_broker_role), broker_agency: broker_agency %>
-              <% brokers.each do |b| %>
-                <tr><%= render "employers/broker_agency/broker", broker: b, broker_agency: broker_agency %></tr>
-              <% end %>
-            </tr>
-            <% end %>
-        </tbody>
-      </table>
-    </div>
-    <% if @page_alphabets.present? %>
-    <%= render 'shared/alph_paginate', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", alphs: @page_alphabets, remote: true %>
-    <% end %>
+      $("div.language_multi_select select").change(function(){
+        searchAgencies();
+      })
+
+      $("#working_hours").change(function(){
+        searchAgencies();
+      })
+
+      $('#broker_agency_language_select').selectric();
+
+      $('#broker_agency_language_select').on('selectric-init', function(element){
+        $('#broker_agency_language_select').selectric('destroy');
+        $('#broker_agency_language_select').multiselect({
+           nonSelectedText: 'Language(s) spoken',
+           maxHeight: 300
+        });
+      });
+
+    });
+</script>
+
+<style type="text/css">
+ .language_multi_select .multiselect {
+    border: none;
+    font-size: 12px;
+    line-height: 30px;
+ }
+
+ .language_multi_select .multiselect .caret {
+    color: #bbb;
+ }
+</style>
+
+<div class="row no-buffer" id="broker_agencies_listing">
+<%= render "broker_agencies_listing" %>
 </div>

@@ -32,21 +32,7 @@
 
         <tbody>
           <%- if provider.try(:inbox).try(:messages) %>
-          <% provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.each do |message| %>
-            <tr class='<%=message.message_read==true ? "msg-inbox-read" : ""%>'>
-              <td> <%= message.try(:from) if @folder == 'Inbox' %>
-                   <%= message.try(:to)   if @folder == 'Sent'%>
-              </td>
-              <td> <%=message.created_at %>
-              <td> <%= message.try(:subject) %> </td>
-              <td> <%#= link_to "show", polymorphic_path([:insured, :family, provider.inbox, message]), class: "btn btn-primary", remote: true %>
-                <%= link_to "show", retrieve_show_path(provider, message), class: "btn btn-primary show_msg", remote: true %>
-                <%- if @folder != 'Deleted' %>
-                  <%= link_to "Delete", retrieve_show_path(provider, message), class: "btn btn-transparent btn-sm", remote: true, method: :delete %>
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
+          <%= render partial: "shared/inboxes/individual_message", :collection => provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }, :as => :message, locals: {provider: provider} %>
           <% end %>
         </tbody>
       </table>
