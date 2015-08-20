@@ -19,14 +19,14 @@ class ShopNotice
 
   def deliver
     send_email_notice if @email_notice
-    send_paper_notice if @paper_notice
+    send_pdf_notice if @paper_notice
   end
 
   def send_email_notice
     @mailer.notice_email(self).deliver_now
   end
 
-  def send_paper_notice
+  def send_pdf_notice
     notice_path = Rails.root.join('pdfs','notice.pdf')
     File.open(notice_path, 'wb') do |file|
       file << pdf
