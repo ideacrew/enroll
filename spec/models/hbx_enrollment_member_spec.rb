@@ -44,6 +44,20 @@ describe HbxEnrollmentMember, dbclean: :after_all do
         expect(@enrollment.hbx_enrollment_members.first.errors[:is_subscriber].any?).to be_truthy
       end
 
+      context "should not raise error if employee_role is blank" do
+        it "when subscriber is selected during enrollment" do
+          allow(@enrollment).to receive(:employee_role).and_return(nil)
+          expect(@enrollment.valid?).to be_truthy
+          expect(@enrollment.hbx_enrollment_members.first.errors[:is_subscriber].any?).to be_falsey
+        end
+
+        it "when subscriber is not selected during enrollment" do
+          enrollment_members.reject!{ |a| a._id == subscriber._id }
+          allow(@enrollment).to receive(:employee_role).and_return(nil)
+          expect(@enrollment.valid?).to be_truthy
+          expect(@enrollment.hbx_enrollment_members.first.errors[:is_subscriber].any?).to be_falsey
+        end
+      end
     end
   end
 end

@@ -9,8 +9,8 @@ describe Forms::ConsumerRole do
     )
   }
 
-  it "should return the list of vlp document kinds" do
-    expect(subject.vlp_document_kinds).to eq ::ConsumerRole::VLP_DOCUMENT_KINDS
+  it "should respond to vlp_document_kind and doc_number" do
+    expect(subject).to respond_to(:vlp_document_kind, :doc_number)
   end
 
   it "should return the model name" do

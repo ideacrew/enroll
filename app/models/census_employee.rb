@@ -39,9 +39,9 @@ class CensusEmployee < CensusMember
   index({"last_name" => 1})
   index({"hired_on" => -1})
   index({"is_business_owner" => 1})
-  index({"ssn" => 1})
+  index({"encrypted_ssn" => 1})
   index({"dob" => 1})
-  index({"ssn" => 1, "dob" => 1, "aasm_state" => 1})
+  index({"encrypted_ssn" => 1, "dob" => 1, "aasm_state" => 1})
   index({"benefit_group_assignments._id" => 1})
   index({"benefit_group_assignments.benefit_group_id" => 1})
   index({"benefit_group_assignments.aasm_state" => 1})
@@ -65,10 +65,10 @@ class CensusEmployee < CensusMember
   scope :by_benefit_group_assignment_ids, ->(benefit_group_assignment_ids) { any_in("benefit_group_assignments._id" => benefit_group_assignment_ids) }
   scope :by_benefit_group_ids,    ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :by_employer_profile_id,  ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
-  scope :by_ssn,                  ->(ssn) { where(ssn: ssn) }
+  scope :by_ssn,                  ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
 
   scope :matchable, ->(ssn, dob) {
-    matched = unscoped.and(ssn: ssn, dob: dob, aasm_state: "eligible")
+    matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: "eligible")
     benefit_group_assignment_ids = matched.flat_map() do |ee|
       ee.published_benefit_group_assignment ? ee.published_benefit_group_assignment.id : []
     end

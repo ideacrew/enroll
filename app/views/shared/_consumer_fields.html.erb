@@ -3,7 +3,7 @@
   <div class="row row-form-wrapper no-buffer">
 
     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      Are you a US Citizen or US National?
+      Are you a US Citizen or US National? *
     </div>
     <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
@@ -27,7 +27,7 @@
   <div class="row row-form-wrapper no-buffer" id="naturalized_citizen_container" style="display: none">
 
     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      Are you a naturalized citizen?
+      Are you a naturalized citizen? *
     </div>
 
     <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
@@ -121,45 +121,6 @@
   </div>
 </div>
 
-What is your race/ethnicity? (optional)
-<div>
-  White <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Chinese <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Filipino <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Japanese <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Korean <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Vietnamese <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Other Asian <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Native Hawaiian <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Samon <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Black or African American <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Asian Indian <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Guamanion or Chamorro <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Other pacific islander <input type="checkbox" name="ethnicity">
-</div>
+<%= render partial: "shared/race_and_ethnicity_options"%>
 
 <%= f.hidden_field :is_consumer_role, value: 'true' %>

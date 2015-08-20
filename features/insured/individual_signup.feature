@@ -19,5 +19,13 @@ Feature: Insured Plan Shopping on Individual market
       And I click on purchase button on confirmation page
       And I click on continue button to go to the individual home page
       And I should see the individual home page
+      When I click the "I've married" in qle carousel
+      And I select qle date
+      And I click on continue button on household info form
+      And I click on "shop for new plan" button on household info page
+      And I select a plan on plan shopping page
+      And I click on purchase button on confirmation page
+      When I click on continue on qle confirmation page
+      And I should see the individual home page
 
 
