@@ -3,11 +3,13 @@ class CensusEmployee < CensusMember
   include Sortable
   include Searchable
   # include Validations::EmployeeInfo
+  include Autocomplete
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
   field :employment_terminated_on, type: Date
   field :aasm_state, type: String
+  field :autocomplete_slug, type: String
 
   # Employer for this employee
   field :employer_profile_id, type: BSON::ObjectId
@@ -32,7 +34,7 @@ class CensusEmployee < CensusMember
   validate :check_census_dependents_relationship
 
   index({"aasm_state" => 1})
-  index({"employer_profile_id" => 1}, {sparse: true})
+  index({"employer_profile_id" => 1})
   index({"employee_role_id" => 1}, {sparse: true})
   index({"last_name" => 1})
   index({"hired_on" => -1})
@@ -76,6 +78,16 @@ class CensusEmployee < CensusMember
   def initialize(*args)
     super(*args)
     write_attribute(:employee_relationship, "self")
+  end
+
+  def first_name=(new_last_name)
+    super new_last_name
+    set_autocomplete_slug
+  end
+
+  def last_name=(new_last_name)
+    super new_last_name
+    set_autocomplete_slug
   end
 
   def employer_profile=(new_employer_profile)
@@ -239,7 +251,7 @@ class CensusEmployee < CensusMember
       transitions from: :eligible, to: :employee_role_linked, :guard => :has_active_benefit_group_assignment?
     end
 
-    event :delink_employee_role do
+    event :delink_employee_role, :guard => :has_no_hbx_enrollments? do
       transitions from: :employee_role_linked, to: :eligible, :after => :clear_employee_role
     end
 
@@ -249,6 +261,16 @@ class CensusEmployee < CensusMember
   end
 
 private
+  def set_autocomplete_slug
+    self.autocomplete_slug = first_name.concat(" #{last_name}")
+  end
+
+  def has_no_hbx_enrollments?
+    return true if employee_role.blank?
+    !benefit_group_assignments.detect { |bga| bga.hbx_enrollment.present? }
+  end
+
+
   def check_employment_terminated_on
     if employment_terminated_on and employment_terminated_on <= hired_on
       errors.add(:employment_terminated_on, "can't occur before rehiring date")
@@ -295,8 +317,10 @@ private
   end
 
   def clear_employee_role
+    # employee_role.
     self.employee_role_id = nil
     unset("employee_role_id")
+    self.benefit_group_assignments = []
     @employee_role = nil
   end
 end

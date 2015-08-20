@@ -21,6 +21,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   let(:hired_on){ TimeKeeper.date_of_record - 14.days }
   let(:is_business_owner){ false }
   let(:address) { Address.new(kind: "home", address_1: "221 R St, NW", city: "Washington", state: "DC", zip: "20001") }
+  let(:autocomplete) { " lynyrd skynyrd" }
 
   let(:valid_params){
     {
@@ -104,6 +105,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
         it "should be findable by ID" do
           expect(CensusEmployee.find(initial_census_employee.id)).to eq initial_census_employee
+        end
+
+        it "should have a valid autocomplete" do
+          expect(initial_census_employee.autocomplete).to eq autocomplete
         end
 
         it "in an unlinked state" do
