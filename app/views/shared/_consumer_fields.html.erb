@@ -121,45 +121,6 @@
   </div>
 </div>
 
-What is your race/ethnicity? (optional)
-<div>
-  White <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Chinese <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Filipino <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Japanese <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Korean <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Vietnamese <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Other Asian <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Native Hawaiian <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Samon <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Black or African American <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Asian Indian <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Guamanion or Chamorro <input type="checkbox" name="ethnicity">
-</div>
-<div>
-  Other pacific islander <input type="checkbox" name="ethnicity">
-</div>
+<%= render partial: "shared/race_and_ethnicity_options"%>
 
 <%= f.hidden_field :is_consumer_role, value: 'true' %>
