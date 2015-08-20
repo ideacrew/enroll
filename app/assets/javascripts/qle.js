@@ -1,6 +1,6 @@
 $(function () {
   $(document).on('click', 'a.qle-menu-item', function() {
-    //$('#qle-menu').hide();
+    $('#qle_flow_info #qle-menu').hide();
     $('.qle-details-title').html($(this).html());
     $('#event-title').html($(this).html());
     $('#change_plan').val($(this).html());
@@ -14,9 +14,8 @@ $(function () {
 		$('#qle-details .success-info, #qle-details .error-info').addClass('hidden');
     $('#qle-details .qle-form').removeClass('hidden');
     $("#qle_date").val("");
-		//$('#qle-details .default-info').removeClass('hidden');
 
-		//$('#qle-menu').show();
+		$('#qle_flow_info #qle-menu').show();
 	});
 
 	// Disable form submit on pressing Enter, instead click Submit link
@@ -33,14 +32,11 @@ $(function () {
 	$(document).on('click', '#qle_submit', function() {
 		if(check_qle_date()) {
 			$('#qle_date').removeClass('input-error');
-			//$('#qle-input-info').html('Enter the date of the event.')
 			get_qle_date();
 		} else {
-			//$('#qle-input-info').html('Enter a valid date.');
 			$('#qle_date').addClass('input-error');
 			$('.success-info').addClass('hidden');
 			$('.error-info').addClass('hidden');
-			//$('.default-info').removeClass('hidden');
 		}
 	});
 
