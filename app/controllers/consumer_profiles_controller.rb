@@ -55,8 +55,14 @@ class ConsumerProfilesController < ApplicationController
     start_date = TimeKeeper.date_of_record - 30.days
     end_date = TimeKeeper.date_of_record + 30.days
 
-    if ["I've had a baby", "Death"].include? params[:qle_type]
+    if ["I've had a baby", "A family member has died", "I've married"].include? params[:qle_type]
+      start_date = TimeKeeper.date_of_record - 60.days
       end_date = TimeKeeper.date_of_record + 0.days
+    end
+
+    if ["Myself or a family member has lost other coverage", "Mid-month loss of mec", "My employer failed to pay cobra premiums on time", "I've moved into the district of columbia"].include? params[:qle_type]
+      start_date = TimeKeeper.date_of_record - 60.days
+      end_date = TimeKeeper.date_of_record + 60.days
     end
 
     @qualified_date = (start_date <= qle_date && qle_date <= end_date) ? true : false

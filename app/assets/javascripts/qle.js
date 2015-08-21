@@ -47,8 +47,7 @@ $(function () {
 	}
 
   function get_qle_date() {
-    qle_string = $(".qle-details-title").html();
-    qle_type = qle_string.substring(1, qle_string.length-1);
+    qle_type = $(".qle-details-title").text();
 
     $.ajax({
       type: "GET",
@@ -62,9 +61,14 @@ $(function () {
     var dateMin = $(target).attr("data-date-min");
     var dateMax = $(target).attr("data-date-max");
     var cur_qle_title = $('.qle-details-title').html();
-    if (cur_qle_title === "I've had a baby" || cur_qle_title === "Death" || cur_qle_title === "I've married") {
+    if (cur_qle_title === "I've had a baby" || cur_qle_title === "A family member has died" || cur_qle_title === "I've married") {
+      dateMin = "-60d";
       dateMax = "+0d";
-    }
+    };
+    if (cur_qle_title === "Myself or a family member has lost other coverage" || cur_qle_title === "Mid-month loss of mec" || cur_qle_title === "My employer failed to pay cobra premiums on time" || cur_qle_title === "I've moved into the district of columbia") {
+      dateMin = "-60d";
+      dateMax = "+60d";
+    };
 
     $(target).val('');
     $(target).datepicker('destroy');

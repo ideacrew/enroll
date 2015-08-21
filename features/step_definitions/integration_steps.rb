@@ -545,6 +545,18 @@ end
 When(/^I select qle date$/) do
   @browser.text_field(class: "interaction-field-control-qle-date").set((Date.today + 5).strftime("%m/%d/%Y"))
   scroll_then_click(@browser.a(class: /interaction-click-control-continue/))
+end
+
+Then(/^I should see not qualify message$/) do
+  expect(@browser.element(text: /The date you submitted does not qualify for special enrollment/i).visible?).to be_truthy
+end
+
+When(/^I select a past qle date$/) do
+  @browser.text_field(class: "interaction-field-control-qle-date").set((Date.today - 5).strftime("%m/%d/%Y"))
+  scroll_then_click(@browser.a(class: /interaction-click-control-continue/))
+end
+
+Then(/^I should see confirmation and continue$/) do
   expect(@browser.element(text: /Based on the information you entered, you may be eligible/i).visible?).to be_truthy
   scroll_then_click(@browser.button(class: /interaction-click-control-continue/))
 end
