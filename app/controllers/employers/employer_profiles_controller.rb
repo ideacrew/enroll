@@ -158,16 +158,17 @@ class Employers::EmployerProfilesController < ApplicationController
 
       if params[:page].present?
         page_no = cur_page_no(@page_alphabets.first)
-        @census_employees = census_employees.where("last_name" => /^#{page_no}/i)
+        @census_employees = census_employees.where("last_name" => /^#{page_no}/i).page(params[:pagina])
         #@avaliable_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
       else
         @total_census_employees_quantity = census_employees.count
-        @census_employees = census_employees.to_a.first(20)
+        @census_employees = census_employees.limit(20).to_a
         #@avaliable_employee_names ||= @census_employees.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
       end
     end
 
     def paginate_families
+      #FIXME add paginate
       @employees = @employer_profile.employee_roles.to_a
     end
 
@@ -180,7 +181,7 @@ class Employers::EmployerProfilesController < ApplicationController
 
       paginate_employees #if @tab == 'employees'
       #families defined as employee_roles.each { |ee| ee.person.primary_family }
-      paginate_families #if @tab == 'families'
+      paginate_families if @tab == 'families'
     end
 
     def check_employer_staff_role
