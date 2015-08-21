@@ -262,14 +262,13 @@ class CensusEmployee < CensusMember
 
 private
   def set_autocomplete_slug
-    self.autocomplete_slug = first_name.concat(" #{last_name}")
+    self.autocomplete_slug = first_name.concat(" #{last_name}") if first_name.present?
   end
 
   def has_no_hbx_enrollments?
     return true if employee_role.blank?
     !benefit_group_assignments.detect { |bga| bga.hbx_enrollment.present? }
   end
-
 
   def check_employment_terminated_on
     if employment_terminated_on and employment_terminated_on <= hired_on

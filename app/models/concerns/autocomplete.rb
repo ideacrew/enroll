@@ -13,10 +13,12 @@ module Autocomplete
 
     # Autocomplete will resolve on following attribute value in you model
     # Note: Mongoid will not use index on this attribute
+
+    return if self.autocomplete_slug.blank?
     slug = self.autocomplete_slug
 
     slug = slug.truncate(45, omission: "", separator: " ") if slug.length > 45
-    write_attribute(:autocomplete, Autocomplete.normalize(slug))
+    write_attribute(:autocomplete, Autocomplete.normalize(slug)) 
   end
 
   # turn strings into autocomplete keys
