@@ -13,4 +13,17 @@ module Employers::EmployerHelper
       ""
     end
   end
+
+  def render_plan_offerings(benefit_group)
+    plan_offerings = "1 Plan Only"
+    if benefit_group.plan_option_kind != "single_plan"
+      reference_plan = benefit_group.reference_plan
+      if benefit_group.plan_option_kind == "single_carrier"
+        plan_offerings = "All #{reference_plan.carrier_profile.legal_name} Plans (#{benefit_group.elected_plan_ids.count})"
+      else
+        plan_offerings = "#{reference_plan.metal_level.titleize} Plans (#{benefit_group.elected_plan_ids.count})"
+      end
+    end
+    plan_offerings
+  end
 end

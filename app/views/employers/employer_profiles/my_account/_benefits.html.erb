@@ -24,6 +24,7 @@
               </div>
              
               <%= render "employers/plan_years/publish_modal", plan_year: plan_year %>
+
               
               <div class="table-responsive unmgn plan-years-content">
                 <table class="table table-wrapper table-condensed">
@@ -48,6 +49,11 @@
                     </tr>
                   </tbody>
                 </table>
+              <div>
+                <div class="pull-right bottom-mgn-xs">
+                    <%= link_to "PY Cost Impact", employers_employer_profile_plan_year_cost_analysis_path(@employer_profile,plan_year), class: "btn btn-select"%>
+                </div>
+              </div>
                 <div class="dropdown benefit-group-heading">
                   <button aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" type="button" id="bLabel">
                       Benefit Group
