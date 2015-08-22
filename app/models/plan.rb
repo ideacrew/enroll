@@ -12,17 +12,17 @@ class Plan
 
   field :hbx_id, type: Integer
   field :active_year, type: Integer
+  field :market, type: String
+  field :coverage_kind, type: String
+  field :carrier_profile_id, type: BSON::ObjectId
+  field :metal_level, type: String
   field :hios_id, type: String
+
   field :name, type: String
   field :abbrev, type: String
   field :provider, type: String
   field :ehb, type: Float, default: 0.0
 
-  field :coverage_kind, type: String
-  field :metal_level, type: String
-  field :market, type: String
-
-  field :carrier_profile_id, type: BSON::ObjectId
   field :renewal_plan_id, type: BSON::ObjectId
 
   field :minimum_age, type: Integer, default: 0
@@ -42,20 +42,28 @@ class Plan
   field :nationwide, type: Boolean # Nationwide
   field :out_of_service_area_coverage, type: Boolean # DC In-Network or not
 
-  default_scope -> {order("name ASC")}
-
   index({ hbx_id: 1 })
+  index({ active_year: 1}, {unique: true})
+  index({ active_year: 1, hios_id: 1}, {unique: true})
   index({ coverage_kind: 1 })
   index({ metal_level: 1 })
   index({ market: 1 })
   index({ active_year: 1 })
-
-  index({ active_year: 1,  market: 1, coverage_kind: 1, metal_level: 1 })
-  index({ active_year: 1,  market: 1, coverage_kind: 1, metal_level: 1, carrier_profile_id: 1 })
-
   index({ carrier_profile_id: 1 })
-  index({ active_year: 1, hios_id: 1}, {unique: true})
   index({ renewal_plan_id: 1 })
+  index({ name: 1 })
+
+  # 2015, individual, health, gold
+  index({ active_year: 1, market: 1, coverage_kind: 1, metal_level: 1 })
+
+  # 2015, individual, health, uhc
+  index({ active_year: 1, market: 1, coverage_kind: 1, carrier_profile_id: 1 })
+
+  # 2015, individual, health, uhc, gold
+  index({ active_year: 1, market: 1, coverage_kind: 1, carrier_profile_id: 1, metal_level: 1 })
+
+  # 2015, 92479DC0020002, 32, 2015-04-01, 2015-06-30
+  index({ active_year: 1, hios_id: 1, "premium_tables.age": 1, "premium_tables.start_on": 1, "premium_tables.end_on": 1 }, {name: "plan_premium_age"})
 
   index({ "premium_tables.age" => 1 })
   index({ "premium_tables.age" => 1, "premium_tables.start_on" => 1, "premium_tables.end_on" => 1 })
@@ -88,6 +96,8 @@ class Plan
     message: "%{value} is an invalid active year"
 
   ## Scopes
+  default_scope -> {order("name ASC")}
+
   # Metal level
   scope :platinum_level,      ->{ where(metal_level: "platinum") }
   scope :gold_level,          ->{ where(metal_level: "gold") }
@@ -107,11 +117,15 @@ class Plan
   # DC In-Network ?
   scope :dc_in_network, ->{ where(out_of_service_area_coverage: "false") }
 
-  # Marketplace
-  scope :shop_market,          ->{ where(market: "shop") }
-  scope :individual_market,    ->{ where(market: "individual") }
+  scope :by_active_year,        ->{where(active_year: TimeKeeper.date_of_record.year)}
+  scope :by_year,               ->(year) {where(active_year: year)}
 
-  scope :by_active_year, -> {where(active_year: TimeKeeper.date_of_record.year)}
+  # Marketplace
+  scope :shop_market,           ->{ where(market: "shop") }
+  scope :individual_market,     ->{ where(market: "individual") }
+
+  scope :health_coverage,       ->{ where(coverage_kind: "health") }
+  scope :dental_coverage,       ->{ where(coverage_kind: "dental") }
 
   scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
   scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: metal_level)}
