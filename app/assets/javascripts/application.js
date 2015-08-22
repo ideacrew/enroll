@@ -412,6 +412,7 @@ $(document).ready(function () {
 
   $(document).on('click', '.all-plans', function() {
     $("#plan-summary").hide();
+    $("#account-detail").show();
     $("#all-plans").show();
   });
 });
