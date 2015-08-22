@@ -7,13 +7,22 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
 reset_tasks = %w(
+  tmp:clear
+)
+
+puts "*"*80
+puts "Clearing session, cache and socket files from tmp/"
+system "rake #{reset_tasks.join(" ")}"
+puts "*"*80
+
+db_tasks = %w(
   db:mongoid:purge
   db:mongoid:remove_indexes
   db:mongoid:create_indexes
 )
 puts "*"*80
 puts "Purging Database"
-system "rake #{reset_tasks.join(" ")}"
+system "rake #{db_tasks.join(" ")}"
 puts "*"*80
 
 puts "*"*80
