@@ -139,7 +139,30 @@ class Employers::PlanYearsController < ApplicationController
     redirect_to employers_employer_profile_path(@employer_profile)
   end
 
+  def cost_analysis
+    @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
+    if params[:benefit_group_id]
+      @benefit_group = @plan_year.benefit_groups.where("_id" => BSON::ObjectId.from_string(params[:benefit_group_id])).first
+    else
+      @benefit_group = @plan_year.benefit_groups.first
+    end
+    @benefit_group_costs = build_employees_for_benefit_group(@benefit_group)
+  end
+
   private
+
+  def build_employees_for_benefit_group(benefit_group)
+    benefit_group.census_employees.active.inject({}) do |census_employees, employee|
+      costs = {
+        ref_plan_cost: 0
+      }
+      if benefit_group.plan_option_kind != "single_plan"
+        costs.merge!({ lowest_plan_cost: 0, highest_plan_cost: 0 }) 
+      end
+      census_employees[employee.id] = costs
+      census_employees
+    end
+  end
 
   def find_employer
     id_params = params.permit(:id, :employer_profile_id)
