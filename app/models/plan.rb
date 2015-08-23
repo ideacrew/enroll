@@ -43,7 +43,7 @@ class Plan
   field :out_of_service_area_coverage, type: Boolean # DC In-Network or not
 
   index({ hbx_id: 1 })
-  index({ active_year: 1}, {unique: true})
+  index({ active_year: 1})
   index({ active_year: 1, hios_id: 1}, {unique: true})
   index({ coverage_kind: 1 })
   index({ metal_level: 1 })
