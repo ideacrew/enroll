@@ -107,9 +107,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           expect(CensusEmployee.find(initial_census_employee.id)).to eq initial_census_employee
         end
 
-        it "should have a valid autocomplete" do
-          expect(initial_census_employee.autocomplete).to eq autocomplete
-        end
+        # it "should have a valid autocomplete" do
+        #   expect(initial_census_employee.autocomplete).to eq autocomplete
+        # end
 
         it "in an unlinked state" do
           expect(initial_census_employee.eligible?).to be_truthy

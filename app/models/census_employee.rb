@@ -9,7 +9,6 @@ class CensusEmployee < CensusMember
   field :hired_on, type: Date
   field :employment_terminated_on, type: Date
   field :aasm_state, type: String
-  field :autocomplete_slug, type: String
 
   # Employer for this employee
   field :employer_profile_id, type: BSON::ObjectId
@@ -80,15 +79,15 @@ class CensusEmployee < CensusMember
     write_attribute(:employee_relationship, "self")
   end
 
-  def first_name=(new_last_name)
-    super new_last_name
-    set_autocomplete_slug
-  end
+  # def first_name=(new_first_name)
+  #   write_attribute(:first_name, new_first_name)
+  #   set_autocomplete_slug
+  # end
 
-  def last_name=(new_last_name)
-    super new_last_name
-    set_autocomplete_slug
-  end
+  # def last_name=(new_last_name)
+  #   write_attribute(:last_name, new_last_name)
+  #   set_autocomplete_slug
+  # end
 
   def employer_profile=(new_employer_profile)
     raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(EmployerProfile)
@@ -262,7 +261,8 @@ class CensusEmployee < CensusMember
 
 private
   def set_autocomplete_slug
-    self.autocomplete_slug = first_name.concat(" #{last_name}") if first_name.present?
+    return unless (first_name.present? && last_name.present?)
+    @autocomplete_slug = first_name.concat(" #{last_name}")
   end
 
   def has_no_hbx_enrollments?
