@@ -31,6 +31,8 @@ class BenefitGroup
   # Non-congressional
   # belongs_to :reference_plan, class_name: "Plan"
   field :reference_plan_id, type: BSON::ObjectId
+  field :lowest_cost_plan_id, type: BSON::ObjectId
+  field :highest_cost_plan_id, type: BSON::ObjectId
 
   # Employer contribution amount as percentage of reference plan premium
   field :employer_max_amt_in_cents, type: Integer, default: 0
@@ -81,11 +83,66 @@ class BenefitGroup
     raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
     self.reference_plan_id = new_reference_plan._id
     @reference_plan = new_reference_plan
+    set_bounding_cost_plans if plan_integrity == true
   end
 
   def reference_plan
     return @reference_plan if defined? @reference_plan
     @reference_plan = Plan.find(reference_plan_id) unless reference_plan_id.nil?
+  end
+
+  def set_bounding_cost_plans
+    return if reference_plan_id.nil?
+
+    if plan_option_kind == "single_plan"
+      plans = reference_plan_id.to_a
+    else
+      if plan_option_kind == "single_carrier"
+        # search by carrier
+        plans = Plan.and({
+            active_year: reference_plan.active_year,
+            market: reference_plan.market,
+            coverage_kind: reference_plan.coverage_kind,
+            carrier_profile_id: reference_plan.carrier_profile_id
+          })
+      else  
+        # search by metal_level
+        plans = Plan.and({
+            active_year: reference_plan.active_year,
+            market: reference_plan.market,
+            coverage_kind: reference_plan.coverage_kind,
+            metal_level: reference_plan.metal_level
+          })
+      end
+
+      bounding_plans = plans.reduce({}) do | plan_set, plan |
+        plan_cost = plan.premium_tables.first.cost
+
+        if defined?(low_plan)
+          low_plan  = { low_plan_id: plan._id, premium: plan_cost }  if low_plan[:premium]  > plan_cost
+          high_plan = { high_plan_id: plan._id, premium: plan_cost } if high_plan[:premium] < plan_cost
+        else
+          low_plan  = { low_plan_id: plan._id, premium: plan_cost } 
+          high_plan = { high_plan_id: plan._id, premium: plan_cost }
+        end
+
+        plan_set = low_plan.merge!(high_plan)
+      end
+
+      self.lowest_cost_plan_id  = bounding_plans[:low_plan_id]
+      self.highest_cost_plan_id = bounding_plans[:high_plan_id]
+    end
+
+    @lowest_cost_plan  = Plan.find(lowest_cost_plan_id)
+    @highest_cost_plan = Plan.find(highest_cost_plan_id)
+  end
+
+  def lowest_cost_plan
+    return @lowest_cost_plan if defined? @lowest_cost_plan
+  end
+
+  def highest_cost_plan
+    return @highest_cost_plan if defined? @highest_cost_plan
   end
 
   def elected_plans
