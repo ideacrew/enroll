@@ -205,6 +205,31 @@ class BenefitGroup
     end.max
   end
 
+  def monthly_employer_contribution_amount
+    census_employees.active.collect do |ce|
+      pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      pcd.total_employer_contribution
+    end.sum
+  end
+
+  def monthly_min_employee_cost
+    census_employees.active.collect do |ce|
+      pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      pcd.total_employee_cost
+    end.min
+  end
+
+  def monthly_max_employee_cost
+    census_employees.active.collect do |ce|
+      pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+      pcd.total_employee_cost
+    end.max
+  end
+
+  def single_plan_type?
+    plan_option_kind == "single_plan"
+  end
+
 private
   def dollars_to_cents(amount_in_dollars)
     Rational(amount_in_dollars) * Rational(100) if amount_in_dollars
