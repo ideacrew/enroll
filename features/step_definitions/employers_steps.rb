@@ -325,6 +325,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   ref_plan.click
   @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last.li(index: 5).wait_until_present
   ref_plan.li(index: 5).click # select plan from list.
+  sleep(2)
   # Relationship Benefit
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(51)
   # @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
