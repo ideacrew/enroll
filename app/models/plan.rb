@@ -42,28 +42,28 @@ class Plan
   field :nationwide, type: Boolean # Nationwide
   field :out_of_service_area_coverage, type: Boolean # DC In-Network or not
 
-  index({ hbx_id: 1 })
-  index({ active_year: 1})
-  # index({ active_year: 1, hios_id: 1}, {unique: true})
-  index({ active_year: 1, hios_id: 1})
-  index({ coverage_kind: 1 })
-  index({ metal_level: 1 })
-  index({ market: 1 })
-  index({ carrier_profile_id: 1 })
-  index({ renewal_plan_id: 1 })
+  # In MongoDB, the order of fields in an index should be:
+  #   First: fields queried for exact values, in an order that most quickly reduces set 
+  #   Second: fields used to sort
+  #   Third: fields queried for a range of values
+
+  index({ hbx_id: 1, name: 1 })
+  index({ hios_id: 1, active_year: 1, name: 1 })
+  index({ active_year: 1, market: 1, coverage_kind: 1, nationwide: 1, name: 1 })
+  index({ renewal_plan_id: 1, name: 1 })
   index({ name: 1 })
 
   # 2015, individual, health, gold
-  index({ active_year: 1, market: 1, coverage_kind: 1, metal_level: 1 })
+  index({ active_year: 1, market: 1, coverage_kind: 1, metal_level: 1, name: 1 })
 
   # 2015, individual, health, uhc
-  index({ active_year: 1, market: 1, coverage_kind: 1, carrier_profile_id: 1 })
+  index({ active_year: 1, market: 1, coverage_kind: 1, carrier_profile_id: 1, name: 1 })
 
   # 2015, individual, health, uhc, gold
-  index({ active_year: 1, market: 1, coverage_kind: 1, carrier_profile_id: 1, metal_level: 1 })
+  index({ active_year: 1, market: 1, coverage_kind: 1, carrier_profile_id: 1, metal_level: 1, name: 1 })
 
-  # 2015, 92479DC0020002, 32, 2015-04-01, 2015-06-30
-  index({ active_year: 1, hios_id: 1, "premium_tables.age": 1, "premium_tables.start_on": 1, "premium_tables.end_on": 1 }, {name: "plan_premium_age"})
+  # 92479DC0020002, 2015, 32, 2015-04-01, 2015-06-30
+  index({ hios_id: 1, active_year: 1, "premium_tables.age": 1, "premium_tables.start_on": 1, "premium_tables.end_on": 1 }, {name: "plan_premium_age"})
 
   index({ "premium_tables.age" => 1 })
   index({ "premium_tables.age" => 1, "premium_tables.start_on" => 1, "premium_tables.end_on" => 1 })
@@ -117,8 +117,7 @@ class Plan
   # DC In-Network ?
   scope :dc_in_network, ->{ where(out_of_service_area_coverage: "false") }
 
-  scope :by_active_year,        ->{where(active_year: TimeKeeper.date_of_record.year)}
-  scope :by_year,               ->(year) {where(active_year: year)}
+  scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }
@@ -130,14 +129,49 @@ class Plan
   scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
   scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: metal_level)}
 
+  scope :shop_health_by_active_year, ->(active_year) {  
+      where(
+          active_year: active_year, 
+          market: "shop", 
+          coverage_kind: "health"
+        )
+    }
+
+  scope :shop_dental_by_active_year, ->(active_year) {  
+      where(
+          active_year: active_year, 
+          market: "shop", 
+          coverage_kind: "dental"
+        )
+    }
+
+  scope :individual_health_by_active_year, ->(active_year) {  
+      where(
+          active_year: active_year, 
+          market: "individual", 
+          coverage_kind: "health"
+        )
+    } 
+
+  scope :individual_dental_by_active_year, ->(active_year) {  
+      where(
+          active_year: active_year, 
+          market: "individual", 
+          coverage_kind: "dental"
+        )
+    } 
+
+  scope :by_health_metal_levels,                ->(metal_levels)    { any_in(metal_level: metal_levels) }
+  scope :by_carrier_profile,                    ->(carrier_profile) { where(carrier_profile_id: carrier_profile._id) }
+
+  scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
+  scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }
+  scope :health_metal_nin_catastropic,          ->{ not_in(metal_level: "catastrophic") }
+
   # Carriers: use class method (which may be chained)
   def self.find_by_carrier_profile(carrier_profile)
     where(carrier_profile_id: carrier_profile._id)
   end
-
-  # scope :named, ->(name){ where(name: name) }
-  # where(carrier_profile_id: carrier_profile._id)
-
 
   def metal_level=(new_metal_level)
     write_attribute(:metal_level, new_metal_level.to_s.downcase)
