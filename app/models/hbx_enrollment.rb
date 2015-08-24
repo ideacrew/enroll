@@ -61,6 +61,7 @@ class HbxEnrollment
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
+  scope :coverage_selected, ->{where(aasm_state: "coverage_selected")}
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -350,6 +351,8 @@ class HbxEnrollment
   def decorated_hbx_enrollment
     if plan.present? && benefit_group.present?
       PlanCostDecorator.new(plan, self, benefit_group, benefit_group.reference_plan)
+    elsif plan.present? && consumer_role.present?
+      UnassistedPlanCostDecorator.new(plan, self)
     else
       OpenStruct.new(:total_premium => 0.00, :total_employer_contribution => 0.00, :total_employee_cost => 0.00)
     end

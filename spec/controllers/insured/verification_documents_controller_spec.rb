@@ -1,21 +1,44 @@
 require 'rails_helper'
 
 RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
-  let(:person) {FactoryGirl.create(:person)}
-  let(:consumer_role) {FactoryGirl.creat(:consumer_role)}
-  let(:consumer_wrapper) {Forms::ConsumerRole.new(consumer_role)}
+  let(:user) { FactoryGirl.create(:user) }
+  let(:person) { double }
+  let(:consumer_role) { {consumer_role: ''} }
+  let(:consumer_wrapper) { double }
 
 
-  context "POST upload" do
+  context "Fails to upload file" do
+    it "redirects" do
+      allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
+      allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:person_consumer_role)
+      sign_in user
+      post :upload, consumer_role: consumer_role
+      expect(flash[:error]).to be_present
+    end
+  end
 
-    context "AWS returns nil" do
+  context "Succeeds to save file" do
+
+    describe "" do
+      let(:file) { double }
+      let(:temp_file) { double }
+      let(:consumer_role) { {consumer_role: '', file: file} }
+      let(:doc_id) { 'erewrewrewr234214' }
+      let(:file_path) {File.dirname(__FILE__)} # a sample file path
+
       it "redirects" do
-        post :upload
-        expect(response).to have_http_status(:redirect)
+        allow(file).to receive(:tempfile).and_return(temp_file)
+        allow(temp_file).to receive(:path)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:build_document).with(doc_id, file_path).and_return(double)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:save_consumer_role).with(anything).and_return(true)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:person_consumer_role)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_path).and_return(file_path)
+        allow(Aws::S3Storage).to receive(:save).with(anything, anything).and_return(doc_id)
+        sign_in user
+        post :upload, consumer_role: consumer_role
+        expect(flash[:notice]).to be_present
       end
     end
-
-    context "save success"
-
   end
 end

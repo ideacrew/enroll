@@ -35,7 +35,7 @@ module Forms
     def match_person
       Person.where({
         :dob => dob,
-        :ssn => ssn
+        :encrypted_ssn => Person.encrypt_ssn(ssn)
       }).first
     end
 

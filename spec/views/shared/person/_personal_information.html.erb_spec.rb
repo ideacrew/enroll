@@ -18,4 +18,11 @@ describe "shared/person/_personal_information.html.erb" do
   it "should have a required input field" do
     expect(rendered).to have_selector('input[required="required"]', count: 6)
   end
+
+  it "should have required input fields with asterisk" do
+    expect(rendered).to have_selector('input[placeholder="FIRST NAME *"]')
+    expect(rendered).to have_selector('input[placeholder="LAST NAME *"]')
+    expect(rendered).to have_selector('input[placeholder="BIRTHDATE *"]')
+    expect(rendered).to have_selector('input[placeholder="SOCIAL SECURITY *"]')
+  end
 end

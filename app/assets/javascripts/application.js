@@ -49,19 +49,6 @@ $(document).ready(function () {
 
   semantic_class(); //Calls semantic class on all input fields & buttons (eg. interaction-click-control-continue)
 
-    $(document).on("click", "[class~='qle-date-picker']", function(e) {
-        dateMin = $(this).attr("data-date-min");
-        dateMax = $(this).attr("data-date-max");
-
-        if ($(".qle-details-title").html() === "I've had a baby" || $(".qle-details-title").html() === "Death") {
-            dateMax = "+0d";
-        }
-
-        $(this).datepicker('option', 'maxDate', dateMax);
-        $(this).datepicker('show');
-
-    });
-
   $(document).on("focus", "[class~='date-picker']", function(e){
     dateMin = $(this).attr("data-date-min");
     dateMax = $(this).attr("data-date-max");
@@ -74,9 +61,9 @@ $(document).ready(function () {
         maxDate: "+0d",
         yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear(),
           onSelect: function(dateText, dpInstance) {
-	    $(this).datepicker("hide");
+      $(this).datepicker("hide");
       $(this).trigger('change');
-	  }
+    }
       });
     }else{
       $(this).datepicker({
@@ -87,9 +74,9 @@ $(document).ready(function () {
         maxDate: dateMax,
         yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10),
           onSelect: function(dateText, dpInstance) {
-	    $(this).datepicker("hide");
+      $(this).datepicker("hide");
       $(this).trigger('change');
-	  }
+    }
       });
     }
   });
@@ -229,7 +216,7 @@ $(document).ready(function () {
     if($('#confirm_plan').length) {
       $("a.nine").css("color", "#00b420");
     } else {
-//	    $("a.six").css("color","#999");
+//      $("a.six").css("color","#999");
     }
 
     $('#top-pad').html(start_progress + '% Complete');
@@ -425,6 +412,7 @@ $(document).ready(function () {
 
   $(document).on('click', '.all-plans', function() {
     $("#plan-summary").hide();
+    $("#account-detail").show();
     $("#all-plans").show();
   });
 });
@@ -538,3 +526,32 @@ $(document).on('click', '.name_search_only', function() {
   $('#help_type').html(this.id)
 })
 $(document).on('click', '[data-target="#help_with_plan_shopping"]',function(){$('.help_reset').addClass("hide"); $('#help_list').removeClass("hide") })
+
+
+$(document).on('click', '#terms_check_thank_you', function() {
+  first_name_thank_you = $("#first_name_thank_you").val();
+  last_name_thank_you = $("#last_name_thank_you").val();
+  
+  if($(this).prop("checked") == true){    
+    if( first_name_thank_you != "" && last_name_thank_you != ""){
+      $('#btn-continue').removeClass('disabled');
+    }
+    }else if($(this).prop("checked") == false){ 
+    $('#btn-continue').addClass('disabled');
+  }
+})
+
+$(document).on('blur keyup', 'input.thank_you_field', function() {
+  first_name_thank_you = $("#first_name_thank_you").val();
+  last_name_thank_you = $("#last_name_thank_you").val();
+  
+  if(last_name_thank_you == ""){
+    $('#btn-continue').addClass('disabled');
+  }else{
+  if($("#terms_check_thank_you").prop("checked") == true){    
+    if( first_name_thank_you != "" && last_name_thank_you != ""){
+      $('#btn-continue').removeClass('disabled');
+    }
+    }
+  }
+})

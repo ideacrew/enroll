@@ -524,3 +524,55 @@ When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
   @browser.element(class: /interaction-click-control-#{tab_name}/).wait_until_present
   scroll_then_click(@browser.element(class: /interaction-click-control-#{tab_name}/))
 end
+
+When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
+  click_when_present(@browser.a(text: /#{qle_event}/))
+end
+
+When(/^I click on "(.*?)" button on household info page$/) do |select_action|
+  @browser.element(text: /Covered Family Members/i).wait_until_present
+  expect(@browser.element(text: /Covered Family Members/i).visible?).to be_truthy
+  scroll_then_click(@browser.button(class: /interaction-click-control-shop-for-new-plan/))
+end
+
+When(/^I click on continue on qle confirmation page$/) do
+  @browser.element(text: /Purchase confirmation/i).wait_until_present
+  expect(@browser.element(text: /Purchase confirmation/i).visible?).to be_truthy
+  scroll_then_click(@browser.a(class: /interaction-click-control-continue/))
+end
+
+
+When(/^I select qle date$/) do
+  @browser.text_field(class: "interaction-field-control-qle-date").set((Date.today + 5).strftime("%m/%d/%Y"))
+  scroll_then_click(@browser.a(class: /interaction-click-control-continue/))
+end
+
+Then(/^I should see not qualify message$/) do
+  expect(@browser.element(text: /The date you submitted does not qualify for special enrollment/i).visible?).to be_truthy
+end
+
+When(/^I select a past qle date$/) do
+  @browser.text_field(class: "interaction-field-control-qle-date").set((Date.today - 5).strftime("%m/%d/%Y"))
+  scroll_then_click(@browser.a(class: /interaction-click-control-continue/))
+end
+
+Then(/^I should see confirmation and continue$/) do
+  expect(@browser.element(text: /Based on the information you entered, you may be eligible/i).visible?).to be_truthy
+  scroll_then_click(@browser.button(class: /interaction-click-control-continue/))
+end
+
+Then(/^I should see the dependents and group selection page$/) do
+  #@browser.element(text: /Family Members/i).wait_until_present
+  expect(@browser.element(text: /Family Members/i).visible?).to be_truthy
+  @browser.element(class: /interaction-click-control-continue/).wait_until_present
+  @browser.execute_script("$('.interaction-click-control-continue')[1].click();")
+  @browser.element(text: /Covered Family Members/i).wait_until_present
+  expect(@browser.element(text: /Covered Family Members/i).visible?).to be_truthy
+  scroll_then_click(@browser.button(class: /interaction-click-control-shop-for-new-plan/))
+  @browser.element(text: /Choose a healthcare plan/i).wait_until_present
+  expect(@browser.element(text: /Choose a healthcare plan/i).visible?).to be_truthy
+  @browser.execute_script("$('.interaction-click-control-select-plan')[1].click()")
+  @browser.element(text: /Confirm Your Plan Selection/i).wait_until_present
+  expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
+  scroll_then_click(@browser.a(class: /interaction-click-control-purchase/))
+end

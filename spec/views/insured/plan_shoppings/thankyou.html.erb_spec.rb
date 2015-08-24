@@ -45,20 +45,36 @@ RSpec.describe "insured/thankyou.html.erb" do
       @enrollment = hbx_enrollment
       @benefit_group = @enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
-      allow(@enrollment).to receive(:employee_role).and_return(false)
-      allow(@plan).to receive(:carrier_profile).and_return(carrier_profile)
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
-      render :template => "insured/plan_shoppings/thankyou.html.erb"
+      allow(@plan).to receive(:carrier_profile).and_return(carrier_profile)
     end
 
     it 'should display the correct plan selection text' do
+      allow(@enrollment).to receive(:employee_role).and_return(false)
+      render :template => "insured/plan_shoppings/thankyou.html.erb"
       expect(rendered).to have_selector('h3', text: 'Confirm Your Plan Selection')
       expect(rendered).to have_selector('p', text: 'Your current plan selection is displayed below. Click the Previous button if you want to change your selection. Click Purchase button to complete your enrollment.')
       expect(rendered).to have_selector('p', text: 'Your enrollment is not complete until you purchase your plan selection below.')
     end
 
     it 'should render agreement partial' do
+      allow(@enrollment).to receive(:employee_role).and_return(false)
+      render :template => "insured/plan_shoppings/thankyou.html.erb"
       expect(response).to render_template(:partial => "insured/plan_shoppings/_individual_agreement")
+    end
+
+    it 'should render waive_confirmation partial' do
+      allow(@enrollment).to receive(:employee_role).and_return(double)
+      render :template => "insured/plan_shoppings/thankyou.html.erb"
+      expect(rendered).to have_selector('div#waive_confirm')
+      expect(response).to render_template(partial: "insured/plan_shoppings/waive_confirmation", locals: {enrollment: hbx_enrollment})
+    end
+
+    it "should not render waive_confirmation partial" do
+      allow(@enrollment).to receive(:employee_role).and_return(false)
+      render :template => "insured/plan_shoppings/thankyou.html.erb"
+      expect(rendered).not_to have_selector('div#waive_confirm')
+      expect(response).not_to render_template(partial: "insured/plan_shoppings/waive_confirmation", locals: {enrollment: hbx_enrollment})
     end
   end
 end

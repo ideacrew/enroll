@@ -1,4 +1,5 @@
 class Consumer::ConsumerRolesController < ApplicationController
+  before_action :find_consumer_role_and_person, only: [:edit, :update]
 
   def new
     @person = current_user.build_person
@@ -15,15 +16,10 @@ class Consumer::ConsumerRolesController < ApplicationController
   end
 
   def edit
-    @consumer_role = ConsumerRole.find(params.require(:id))
-    @person = @consumer_role.person
     build_nested_models
   end
 
   def update
-    @consumer_role = ConsumerRole.find(params.require(:id))
-    params[:person].delete(:is_consumer_role)
-    @person = @consumer_role.person
     @person.addresses = []
     @person.phones = []
     @person.emails = []
@@ -43,26 +39,26 @@ class Consumer::ConsumerRolesController < ApplicationController
     [
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
       { :phones_attributes => [:kind, :full_phone_number] },
-      { :email_attributes => [:kind, :address] },
+      { :emails_attributes => [:kind, :address] },
       :first_name,
       :last_name,
       :middle_name,
       :name_pfx,
       :name_sfx,
-      :date_of_birth,
+      :dob,
       :ssn,
       :gender,
       :language_code,
       :is_incarcerated,
+      :is_disabled,
       :race,
-      :is_tobacco_user,
       :is_consumer_role,
       :ethnicity
     ]
   end
 
   def build_nested_models
-    Phone::KINDS.delete_if{|kind| kind == "work"}.each do |kind|
+    ["home", "mobile"].each do |kind|
       @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
     end
 
@@ -73,5 +69,10 @@ class Consumer::ConsumerRolesController < ApplicationController
     Email::KINDS.each do |kind|
       @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
     end
+  end
+
+  def find_consumer_role_and_person
+    @consumer_role = ConsumerRole.find(params.require(:id))
+    @person = @consumer_role.person
   end
 end

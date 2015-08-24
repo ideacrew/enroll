@@ -2,8 +2,8 @@ puts "*"*80
 puts "::: Creating HBX Admin:::"
 
 
-address  = Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002")
-phone    = Phone.new(kind: "main", area_code: "202", number: "555-9999")
+address  = Address.new(kind: "work", address_1: "1225 I St, NW", city: "Washington", state: "DC", zip: "20002")
+phone    = Phone.new(kind: "main", area_code: "855", number: "532-5465")
 email    = Email.new(kind: "work", address: "admin@dc.gov")
 office_location = OfficeLocation.new(is_primary: true, address: address, phone: phone)
 geographic_rating_area = GeographicRatingArea.new(
@@ -27,7 +27,7 @@ geographic_rating_area = GeographicRatingArea.new(
 
 organization = Organization.new(
       dba: "DCHL",
-      legal_name: "DC HealthLink",
+      legal_name: "DC Health Link",
       fein: 123123456,
       office_locations: [office_location]
     )

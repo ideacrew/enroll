@@ -12,8 +12,8 @@
 
         <div class="row">
           <div class="col-md-6 col-xs-6 col-sm-6">
-            <%= f.select(:vlp_document_kinds) do %>
-              <% @consumer_wrapper.vlp_document_kinds.each do |c| -%>
+            <%= f.select(:vlp_document_kind) do %>
+              <% ::ConsumerRole::VLP_DOCUMENT_KINDS.each do |c| -%>
                 <%= content_tag(:option, c, value: c) %>
               <% end %>
             <% end %>
@@ -21,7 +21,7 @@
 
           <div class="col-md-6 col-xs-6 col-sm-6">
             <%= f.label "Document Number/Id" %>
-            <%= f.text_field :vlp_document_id %>
+            <%= f.text_field :doc_number %>
           </div>
         </div>
 

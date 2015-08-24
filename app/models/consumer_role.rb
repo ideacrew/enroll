@@ -8,6 +8,17 @@ class ConsumerRole
   INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
 
   VLP_AUTHORITY_KINDS = %w(ssa dhs hbx)
+  NATURALIZED_CITIZEN_STATUS = "naturalized_citizen"
+  INDIAN_TRIBE_MEMBER_STATUS = "indian_tribe_member"
+  US_CITIZEN_STATUS = "us_citizen"
+  NOT_LAWFULLY_PRESENT_STATUS = "not_lawfully_present_in_us"
+  ALIEN_LAWFULLY_PRESENT_STATUS = "alien_lawfully_present"
+
+  US_CITIZEN_STATUS_KINDS = %W(
+  us_citizen
+  naturalized_citizen
+  indian_tribe_member
+  )
   CITIZEN_STATUS_KINDS = %w(
       us_citizen
       naturalized_citizen
@@ -71,13 +82,11 @@ class ConsumerRole
   field :identity_response_code, type: String
   field :identity_response_description_text, type: String
 
-  field :vlp_verified_state, type: String, default: "identity_unverified"
-  field :vlp_verified_date, type: Date
-  field :vlp_authority, type: String
-  field :vlp_document_id, type: String
+  delegate :citizen_status,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
+  delegate :citizen_status=,:vlp_verified_date=, :vlp_authority=, :vlp_document_id=, to: :lawful_presence_determination_instance
 
-  field :citizen_status, type: String
   field :is_state_resident, type: Boolean
+  field :residency_determined_at, type: DateTime
 
   field :is_applicant, type: Boolean  # Consumer is applying for benefits coverage
   field :birth_location, type: String
@@ -119,6 +128,21 @@ class ConsumerRole
 
   alias_method :is_state_resident?, :is_state_resident
   alias_method :is_incarcerated?,   :is_incarcerated
+
+  embeds_one :lawful_presence_determination
+
+  after_initialize :setup_lawful_determination_instance
+
+  def setup_lawful_determination_instance
+    unless self.lawful_presence_determination.present?
+      self.lawful_presence_determination = LawfulPresenceDetermination.new
+    end
+  end
+
+  def lawful_presence_determination_instance
+    setup_lawful_determination_instance
+    self.lawful_presence_determination
+  end
 
   def is_aca_enrollment_eligible?
     is_hbx_enrollment_eligible? && 
@@ -167,6 +191,10 @@ class ConsumerRole
     self.is_active
   end
 
+  def self.naturalization_document_types
+    ["Certificate of Citizenship", "Naturalization Certificate"]
+  end
+
   # RIDP and Verify Lawful Presence workflow.  IVL Consumer primary applicant must be in identity_verified state 
   # to proceed with application.  Each IVL Consumer enrolled for benefit coverage must (eventually) pass 
 
@@ -177,13 +205,9 @@ class ConsumerRole
     state :identity_verified                    # Identity confirmed via RIDP services or subsequent followup
     state :identity_invalid
 
-    # state :lawful_presence_unverified
-    state :vlp_request_pending, :after_enter => :vlp_request_submitted
-    state :lawful_presence_verified
-    state :fdsh_service_error
-    state :lawful_presence_followup_pending     # Federal hub non-reponsive
-    state :vlp_documentation_review_pending
-    state :not_lawfully_present                 # Federal Hub returned negative result
+    state :verifications_pending
+    state :verifications_outstanding
+    state :fully_verified
 
     event :verify_identity, :after => :record_transition  do
       transitions from: [:identity_unverified, :identity_followup_pending], to: :identity_verified, :guard => :identity_verification_succeeded?
@@ -199,39 +223,86 @@ class ConsumerRole
       transitions from: [:identity_unverified, :identity_followup_pending, :identity_verified], to: :identity_invalid
     end
 
-    event :request_vlp_service, :after => :record_transition  do
-      transitions from: :identity_unverified, to: :vlp_request_pending
-      transitions from: :identity_verified,   to: :vlp_request_pending
+    event :deny_lawful_presence, :after => [:record_transition, :mark_lp_denied] do
+      transitions from: :verifications_pending, to: :verifications_pending, guard: :residency_pending?
+      transitions from: :verifications_pending, to: :verifications_outstanding
+      transitions from: :verifications_outstanding, to: :verifications_outstanding
     end
 
-    event :verify_lawful_presence, :after => :record_transition  do
-      transitions from: :vlp_request_pending, to: :lawful_presence_verified, :guard => :vlp_succeeded?
-      transitions from: :vlp_request_pending, to: :not_lawfully_present, :guard => :vlp_denied?
-      transitions from: :vlp_request_pending, to: :fdsh_service_error
+    event :authorize_lawful_presence, :after => [:record_transition, :mark_lp_authorized] do
+      transitions from: :verifications_pending, to: :verifications_pending, guard: :residency_pending?
+      transitions from: :verifications_pending, to: :fully_verified, guard: :residency_verified?
+      transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :residency_denied?
+      transitions from: :verifications_outstanding, to: :fully_verified, guard: :residency_verified?
     end
 
-    event :retry_fdsh_service, :after => :record_transition  do
-      transitions from: :fdsh_service_error, to: :lawful_presence_verified, :guard => :vlp_succeeded?
-      transitions from: :fdsh_service_error, to: :not_lawfully_present, :guard => :vlp_denied?
-      transitions from: :fdsh_service_error, to: :lawful_presence_followup_pending, :guard => :retry_period_expired?
+    event :authorize_residency, :after => [:record_transition, :mark_residency_authorized] do
+      transitions from: :verifications_pending, to: :verifications_pending, guard: :lawful_presence_pending?
+      transitions from: :verifications_pending, to: :fully_verified, guard: :lawful_presence_verified?
+      transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :lawful_presence_outstanding?
+      transitions from: :verifications_outstanding, to: :fully_verified, guard: :lawful_presence_authorized?
     end
 
-    event :submit_documentation, :after => :record_transition  do
-      transitions from: :lawful_presence_followup_pending, to: :vlp_documentation_review_pending
-      transitions from: :not_lawfully_present, to: :vlp_documentation_review_pending
-    end
-
-    event :grant_vlp_status, :after => :record_transition  do
-      transitions from: :vlp_documentation_review_pending, to: :lawful_presence_verified
-    end
-
-    event :deny_vlp_status, :after => :record_transition  do
-      transitions from: :vlp_documentation_review_pending, to: :not_lawfully_present
+    event :deny_residency, :after => [:record_transition, :mark_residency_denied] do
+      transitions from: :verifications_pending, to: :verifications_pending, guard: :lawful_presence_pending?
+      transitions from: :verifications_pending, to: :verifications_outstanding
+      transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :lawful_presence_outstanding?
+      transitions from: :verifications_outstanding, to: :fully_verified, guard: :lawful_presence_authorized?
     end
   end
 
 private
-  def record_transition
+  def mark_residency_denied(*args)
+    self.residency_determined_at = Time.now
+    self.is_state_resident = false
+  end
+
+  def mark_residency_authorized(*args)
+    self.residency_determined_at = Time.now
+    self.is_state_resident = true
+  end
+
+  def lawful_presence_pending?
+    lawful_presence_determination.verification_pending?
+  end
+
+  def lawful_presence_outstanding?
+    lawful_presence_determination.verification_outstanding?
+  end
+
+  def lawful_presence_authorized?
+    lawful_presence_determination.verification_successful?
+  end
+
+  def residency_pending?
+    is_state_resident.nil?
+  end
+
+  def residency_denied?
+    (!is_state_resident.nil?) && (!is_state_resident)
+  end
+
+  def residency_verified?
+    is_state_resident?
+  end
+
+  def mark_lp_authorized(*args)
+    if aasm.current_event == :authorize_lawful_presence!
+      lawful_presence_determination.authorize!(*args)
+    else
+      lawful_presence_determination.authorize(*args)
+    end
+  end
+
+  def mark_lp_denied(*args)
+    if aasm.current_event == :deny_lawful_presence!
+      lawful_presence_determination.deny!(*args)
+    else
+      lawful_presence_determination.deny(*args)
+    end
+  end
+
+  def record_transition(*args)
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state
@@ -253,15 +324,5 @@ private
   def identity_metadata_provided?
     identity_final_decision_code.present? && identity_response_code.present?
   end
-
-  def vlp_succeeded?
-  end
-
-  def vlp_denied?
-  end
-
-  def retry_period_expired?
-  end
-
 
 end

@@ -58,9 +58,7 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
       :race => "race",
       :ethnicity => "ethnicity",
       :language_code => "english",
-      :is_tobacco_user => "no",
-      :is_incarcerated => "no",
-      :is_disabled => "no"
+      :is_incarcerated => "no"
     }
   }
 
@@ -113,13 +111,13 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
 
     it "should create a new person" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
-      expect(Person).to receive(:new).with(person_properties).and_return(new_person)
+      expect(Person).to receive(:new).with(person_properties.merge({:citizen_status=>nil})).and_return(new_person)
       subject.save
     end
 
     it "should create a new family member" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
-      allow(Person).to receive(:new).with(person_properties).and_return(new_person)
+      allow(Person).to receive(:new).with(person_properties.merge({:citizen_status=>nil})).and_return(new_person)
       subject.save
       expect(subject.id).to eq new_family_member_id
     end
@@ -145,9 +143,7 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
       :race => "race",
       :ethnicity => "ethnicity",
       :language_code => "english",
-      :is_tobacco_user => "no",
-      :is_incarcerated => "no",
-      :is_disabled => "no"
+      :is_incarcerated => "no"
     }
   }
   let(:person) { double(:errors => double(:has_key? => false)) }
@@ -162,6 +158,7 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
 
   before(:each) do
     allow(FamilyMember).to receive(:find).with(family_member_id).and_return(family_member)
+    allow(family_member).to receive(:citizen_status)
     allow(subject).to receive(:valid?).and_return(true)
   end
 
@@ -186,13 +183,13 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
 
   describe "when updated" do
     it "should update the relationship of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties).and_return(true)
+      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil})).and_return(true)
       expect(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
 
     it "should update the attributes of the person" do
-      expect(person).to receive(:update_attributes).with(person_properties)
+      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end

@@ -77,7 +77,7 @@ private
   end
 
   def check_primary_applicant_selected_during_enrollment
-    if self.hbx_enrollment.subscriber.nil?
+    if self.hbx_enrollment.employee_role.present? and self.hbx_enrollment.subscriber.nil?
       self.errors.add(:is_subscriber, "You must select the primary applicant to enroll in the healthcare plan.")
     end
   end

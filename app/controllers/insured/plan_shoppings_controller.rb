@@ -15,7 +15,7 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
     else
-      decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, nil, nil)
+      decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
     end
     # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
@@ -41,7 +41,8 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
     else
-      @plan = PlanCostDecorator.new(plan, @enrollment, nil, nil)
+      @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
+      @market_kind = "individual"
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     if @person.employee_roles.any?
@@ -58,7 +59,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     else
-      @plan = PlanCostDecorator.new(@plan, @enrollment, nil, nil)
+      @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment)
     end
     @family = @person.primary_family
     #FIXME need to implement can_complete_shopping? for individual
@@ -120,7 +121,7 @@ class Insured::PlanShoppingsController < ApplicationController
       #   PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
       # end
     elsif @market_kind == 'individual'
-      elected_plans = Plan.where(market: @market_kind, coverage_kind: @coverage_kind, active_year: TimeKeeper.date_of_record.year).select{|p| p.premium_tables.present?}
+      elected_plans = Plan.where(market: @market_kind, coverage_kind: @coverage_kind, active_year: TimeKeeper.date_of_record.year).select{|p| p.premium_tables.present? && p.hios_id =~ /-01$/}
       #FIXME need benefit_package for individual
       @plans = elected_plans.collect() do |plan|
         UnassistedPlanCostDecorator.new(plan, @hbx_enrollment)

@@ -21,7 +21,8 @@ class Consumer::EmployeeDependentsController < ApplicationController
   end
 
   def create
-    @dependent = Forms::EmployeeDependent.new(params.require(:dependent))
+
+    @dependent = Forms::EmployeeDependent.new(params.require(:dependent).permit!)
 
     if @dependent.save
       @created = true

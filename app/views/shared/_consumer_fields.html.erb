@@ -1,34 +1,126 @@
 <div id="consumer_fields" class="focus_effect">
 
   <div class="row row-form-wrapper no-buffer">
+
     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :race, class: "floatlabel form-control", placeholder: 'RACE' %>
+      Are you a US Citizen or US National? *
     </div>
-    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :ethnicity, class: "required floatlabel form-control", required: true, placeholder: 'ETHNICITY' %>
-    </div>
-    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :language_code, class: "required floatlabel form-control", required: true, placeholder: 'LANGUAGE CODE' %>
-    </div>
-  </div>
-  <div class="row row-form-wrapper no-buffer">
-    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :is_tobacco_user, class: "required floatlabel form-control", required: true, placeholder: 'TOBACCO USER?' %>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg">
-      <div class="checkbox">
-        <label>
-          <%= f.check_box :is_incarcerated %> INCARCERATED?
-        </label>
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :us_citizen, true, required: true, class: "required floatlabel" %>
+        <%= f.label :us_citizen, :value => true do %>
+            <span>Yes</span>
+        <% end %>
       </div>
     </div>
-    <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg">
-      <div class="checkbox">
-        <label>
-          <%= f.check_box :is_disabled %> DISABLED?
-          <%= f.hidden_field :is_consumer_role, value: true %>
-        </label>
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :us_citizen, false, required: true, class: "required floatlabel" %>
+        <%= f.label :us_citizen, :value => false do %>
+            <span>No</span>
+        <% end %>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row row-form-wrapper no-buffer" id="naturalized_citizen_container" style="display: none">
+
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+      Are you a naturalized citizen? *
+    </div>
+
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :naturalized_citizen, true, required: true, class: "required floatlabel" %>
+        <%= f.label :naturalized_citizen, :value => true do %>
+            <span>Yes</span>
+        <% end %>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :naturalized_citizen, false, required: true,  class: "required floatlabel" %>
+        <%= f.label :naturalized_citizen, :value => false do %>
+            <span>No</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="row row-form-wrapper no-buffer" id="immigration_status_container" style="display: none">
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      Do you have eligible immigration status?
+    </div>
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :eligible_immigration_status, true, class: "required floatlabel" %>
+        <%= f.label :eligible_immigration_status, :value => true do %>
+            <span>Yes</span>
+        <% end %>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :eligible_immigration_status, false, class: "required floatlabel" %>
+        <%= f.label :eligible_immigration_status, :value => false do %>
+            <span>No</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="row row-form-wrapper no-buffer" id="vlp_document_id_container" style="display: none">
+
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      Select your document type
+    </div>
+
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <%= select_tag :naturalization_doc_type, options_for_select(ConsumerRole.naturalization_document_types) %>
+    </div>
+
+    <% if f.object.is_a?(Person) %>
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <%= f.fields_for :consumer_role do |cr| %>
+          <%= cr.text_field :vlp_document_id, :placeholder => "Document Id" %>
+      <% end %>
+    </div>
+    <% else %>
+        <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+           <%= f.text_field :vlp_document_id, :placeholder => "Document Id" %>
+        </div>
+    <% end %>
+  </div>
+
+
+  <div class="row row-form-wrapper no-buffer" id="vlp_document_id_container">
+
+    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 form-group form-group-lg no-pd">
+      Are you a member of an American Indian tribe or Alaskan Native?
+    </div>
+    <div style="text-align: center" class="col-lg-1 col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd">
+
+      <%= f.check_box :indian_tribe_member %>
+    </div>
+
+    <div id="tribal_container" style="display: none">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :tribal_id, class: "required floatlabel form-control", placeholder: 'TRIBAL ID' %>
       </div>
     </div>
   </div>
 </div>
+
+<div class="row row-form-wrapper no-buffer" id="vlp_document_id_container">
+  <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 form-group form-group-lg no-pd">
+    Are you currently Incarcerated?
+  </div>
+  <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 form-group form-group-lg no-pd">
+    <%= f.check_box :is_incarcerated %> Yes
+  </div>
+</div>
+
+<%= render partial: "shared/race_and_ethnicity_options"%>
+
+<%= f.hidden_field :is_consumer_role, value: 'true' %>

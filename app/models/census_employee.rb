@@ -3,6 +3,7 @@ class CensusEmployee < CensusMember
   include Sortable
   include Searchable
   # include Validations::EmployeeInfo
+  include Autocomplete
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -32,14 +33,14 @@ class CensusEmployee < CensusMember
   validate :check_census_dependents_relationship
 
   index({"aasm_state" => 1})
-  index({"employer_profile_id" => 1}, {sparse: true})
+  index({"employer_profile_id" => 1})
   index({"employee_role_id" => 1}, {sparse: true})
   index({"last_name" => 1})
   index({"hired_on" => -1})
   index({"is_business_owner" => 1})
-  index({"ssn" => 1})
+  index({"encrypted_ssn" => 1})
   index({"dob" => 1})
-  index({"ssn" => 1, "dob" => 1, "aasm_state" => 1})
+  index({"encrypted_ssn" => 1, "dob" => 1, "aasm_state" => 1})
   index({"benefit_group_assignments._id" => 1})
   index({"benefit_group_assignments.benefit_group_id" => 1})
   index({"benefit_group_assignments.aasm_state" => 1})
@@ -63,10 +64,10 @@ class CensusEmployee < CensusMember
   scope :by_benefit_group_assignment_ids, ->(benefit_group_assignment_ids) { any_in("benefit_group_assignments._id" => benefit_group_assignment_ids) }
   scope :by_benefit_group_ids,    ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :by_employer_profile_id,  ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
-  scope :by_ssn,                  ->(ssn) { where(ssn: ssn) }
+  scope :by_ssn,                  ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
 
   scope :matchable, ->(ssn, dob) {
-    matched = unscoped.and(ssn: ssn, dob: dob, aasm_state: "eligible")
+    matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: "eligible")
     benefit_group_assignment_ids = matched.flat_map() do |ee|
       ee.published_benefit_group_assignment ? ee.published_benefit_group_assignment.id : []
     end
@@ -77,6 +78,16 @@ class CensusEmployee < CensusMember
     super(*args)
     write_attribute(:employee_relationship, "self")
   end
+
+  # def first_name=(new_first_name)
+  #   write_attribute(:first_name, new_first_name)
+  #   set_autocomplete_slug
+  # end
+
+  # def last_name=(new_last_name)
+  #   write_attribute(:last_name, new_last_name)
+  #   set_autocomplete_slug
+  # end
 
   def employer_profile=(new_employer_profile)
     raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(EmployerProfile)
@@ -239,7 +250,7 @@ class CensusEmployee < CensusMember
       transitions from: :eligible, to: :employee_role_linked, :guard => :has_active_benefit_group_assignment?
     end
 
-    event :delink_employee_role do
+    event :delink_employee_role, :guard => :has_no_hbx_enrollments? do
       transitions from: :employee_role_linked, to: :eligible, :after => :clear_employee_role
     end
 
@@ -249,6 +260,16 @@ class CensusEmployee < CensusMember
   end
 
 private
+  def set_autocomplete_slug
+    return unless (first_name.present? && last_name.present?)
+    @autocomplete_slug = first_name.concat(" #{last_name}")
+  end
+
+  def has_no_hbx_enrollments?
+    return true if employee_role.blank?
+    !benefit_group_assignments.detect { |bga| bga.hbx_enrollment.present? }
+  end
+
   def check_employment_terminated_on
     if employment_terminated_on and employment_terminated_on <= hired_on
       errors.add(:employment_terminated_on, "can't occur before rehiring date")
@@ -295,8 +316,10 @@ private
   end
 
   def clear_employee_role
+    # employee_role.
     self.employee_role_id = nil
     unset("employee_role_id")
+    self.benefit_group_assignments = []
     @employee_role = nil
   end
 end

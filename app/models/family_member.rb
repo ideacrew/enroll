@@ -44,6 +44,7 @@ class FamilyMember
   delegate :is_tobacco_user, to: :person, allow_nil: true
   delegate :is_incarcerated, to: :person, allow_nil: true
   delegate :is_disabled, to: :person, allow_nil: true
+  delegate :citizen_status, to: :person, allow_nil: true
 
   validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
 

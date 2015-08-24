@@ -55,7 +55,7 @@ class Document
 
   field :tags, type: Array, default: []
 
-  validates_presence_of :title, :creator, :publisher, :type, :format, :identifier, :source, :language, :rights
+  validates_presence_of :title, :creator, :publisher, :type, :format, :identifier, :source, :language
 
   validates :rights,
     allow_blank: true,

@@ -62,12 +62,12 @@
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
-        <% if @consumer_role.present? %>
-          <%= render  partial: 'shared/individual_progress', locals: {step: '3', url: group_selection_url} %>
-        <% elsif @change_plan.blank? %>
-          <%= render  partial: 'shared/signup_progress', locals: {step: '4', url: group_selection_url} %>
-        <% else %>
+        <% if @change_plan.present? %>
           <%= render partial: 'shared/qle_progress', locals: {step: '1'} %>
+        <% elsif @consumer_role.present? %>
+          <%= render  partial: 'shared/individual_progress', locals: {step: '3', url: group_selection_url} %>
+        <% else %>
+          <%= render  partial: 'shared/signup_progress', locals: {step: '4', url: group_selection_url} %>
         <% end %>
       </div>
 

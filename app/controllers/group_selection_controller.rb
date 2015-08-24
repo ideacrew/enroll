@@ -18,6 +18,7 @@ class GroupSelectionController < ApplicationController
 
     return redirect_to purchase_consumer_profiles_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
+    raise "You must select at least one applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
     end
@@ -59,9 +60,11 @@ class GroupSelectionController < ApplicationController
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind)
       end
     else
-      flash[:error] = "You must select the primary applicant to enroll in the healthcare plan"
-      redirect_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind)
+      raise "You must select the primary applicant to enroll in the healthcare plan"
     end
+  rescue Exception => error
+    flash[:error] = error.message
+    return redirect_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind)
   end
 
   private

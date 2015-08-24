@@ -17,10 +17,6 @@ class BenefitGroup
   ]
 
   field :title, type: String, default: ""
-
-  embeds_many :relationship_benefits, cascade_callbacks: true
-  accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
-
   field :effective_on_kind, type: String, default: "date_of_hire"
   field :terminate_on_kind, type: String, default: "end_of_month"
   field :plan_option_kind, type: String
@@ -31,6 +27,8 @@ class BenefitGroup
   # Non-congressional
   # belongs_to :reference_plan, class_name: "Plan"
   field :reference_plan_id, type: BSON::ObjectId
+  field :lowest_cost_plan_id, type: BSON::ObjectId
+  field :highest_cost_plan_id, type: BSON::ObjectId
 
   # Employer contribution amount as percentage of reference plan premium
   field :employer_max_amt_in_cents, type: Integer, default: 0
@@ -39,6 +37,10 @@ class BenefitGroup
   field :elected_plan_ids, type: Array, default: []
 
   delegate :start_on, :end_on, to: :plan_year
+  # accepts_nested_attributes_for :plan_year
+  
+  embeds_many :relationship_benefits, cascade_callbacks: true
+  accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
 
   attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
 
@@ -73,9 +75,9 @@ class BenefitGroup
   validate :check_employer_contribution_for_employee
   validate :check_offered_for_employee
 
-  def plan_option_kind=(new_plan_option_kind)
-    super new_plan_option_kind.to_s
-  end
+  # def plan_option_kind=(new_plan_option_kind)
+  #   super new_plan_option_kind.to_s
+  # end
 
   def reference_plan=(new_reference_plan)
     raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
@@ -86,6 +88,51 @@ class BenefitGroup
   def reference_plan
     return @reference_plan if defined? @reference_plan
     @reference_plan = Plan.find(reference_plan_id) unless reference_plan_id.nil?
+  end
+
+  def set_bounding_cost_plans
+    return if reference_plan_id.nil?
+
+    if plan_option_kind == "single_plan"
+      plans = [reference_plan]
+    else
+      if plan_option_kind == "single_carrier"
+        plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
+      else  
+        plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
+      end
+    end
+
+    if plans.size > 0
+      plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
+
+      self.lowest_cost_plan_id  = plans_by_cost.first.id
+      @lowest_cost_plan = plans_by_cost.first
+
+      self.highest_cost_plan_id = plans_by_cost.last.id
+      @highest_cost_plan = plans_by_cost.last
+    end
+  end
+
+  def lowest_cost_plan
+    return @lowest_cost_plan if defined? @lowest_cost_plan
+  end
+
+  def highest_cost_plan
+    return @highest_cost_plan if defined? @highest_cost_plan
+  end
+
+  def elected_plans=(new_plans)
+    return unless new_plans.present?
+
+    if new_plans.is_a? Array
+      self.elected_plan_ids = new_plans.reduce([]) { |list, plan| list << plan._id }
+    else
+      self.elected_plan_ids = Array.new(1, new_plans.try(:_id))
+    end
+
+    set_bounding_cost_plans 
+    @elected_plans = new_plans
   end
 
   def elected_plans
@@ -99,15 +146,6 @@ class BenefitGroup
 
   def decorated_plan(plan, member_provider)
     PlanCostDecorator.new(plan, member_provider, self, reference_plan)
-  end
-
-  def elected_plans=(new_plans)
-    if new_plans.is_a? Array
-      self.elected_plan_ids = new_plans.reduce([]) { |list, plan| list << plan._id }
-    else
-      self.elected_plan_ids = Array.new(1, new_plans.try(:_id))
-    end
-    @elected_plans = new_plans
   end
 
   def benefit_group_assignments

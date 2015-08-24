@@ -171,3 +171,176 @@ describe ConsumerRole, dbclean: :after_each do
   end
 
 end
+
+shared_examples_for "a ConsumerRole which hasn't left pending verifications" do
+  it "should still be in verifications_pending" do
+    expect(subject.verifications_pending?).to eq true
+  end
+end
+
+describe ConsumerRole, "in the verifications_pending state" do
+  subject { ConsumerRole.new(:aasm_state => :verifications_pending) }
+
+  describe "with residency authorized" do
+    before(:each) do
+      subject.is_state_resident = true
+    end
+    describe "when lawful_presence fails" do
+      let(:mock_lp_denial) { double({ :determined_at => Time.now, :vlp_authority => "ssa" }) }
+      before(:each) do
+        subject.is_state_resident = true
+        subject.deny_lawful_presence(mock_lp_denial)
+      end
+      it "should be in verifications_outstanding" do
+        expect(subject.verifications_outstanding?).to eq true
+      end
+    end
+  end
+
+  describe "with lawful_presence authorized" do
+    before :each do
+      subject.lawful_presence_determination = LawfulPresenceDetermination.new(
+        :aasm_state => :verification_successful
+      )
+    end
+    describe "when residency fails" do
+      before(:each) do
+        subject.deny_residency
+      end
+      it "should be in verifications_outstanding" do
+        expect(subject.verifications_outstanding?).to eq true
+      end
+    end
+  end
+
+  describe "with residency and lawful_presence pending" do
+    describe "which fails residency" do
+      before(:each) do
+        subject.deny_residency
+      end
+      it_should_behave_like "a ConsumerRole which hasn't left pending verifications"
+    end
+
+    describe "which passes residency" do
+      before(:each) do
+        subject.authorize_residency
+      end
+      it_should_behave_like "a ConsumerRole which hasn't left pending verifications"
+    end
+
+    describe "which fails lawful_presence" do
+      let(:mock_lp_denial) { double({ :determined_at => Time.now, :vlp_authority => "ssa" }) }
+      before(:each) do
+        subject.deny_lawful_presence(mock_lp_denial)
+      end
+      it_should_behave_like "a ConsumerRole which hasn't left pending verifications"
+    end
+
+    describe "which passes lawful_presence" do
+      let(:mock_lp_approval) { double({ :determined_at => Time.now, :vlp_authority => "ssa", :citizen_status => "a mock citizen status" }) }
+      before(:each) do
+        subject.authorize_lawful_presence(mock_lp_approval)
+      end
+      it_should_behave_like "a ConsumerRole which hasn't left pending verifications"
+    end
+
+    describe "when both residency and lawful presence fail" do
+      let(:mock_lp_denial) { double({ :determined_at => Time.now, :vlp_authority => "ssa" }) }
+      before(:each) do
+        subject.deny_residency
+        subject.deny_lawful_presence(mock_lp_denial)
+      end
+
+      it "should be in verifications_outstanding" do
+        expect(subject.verifications_outstanding?).to eq true
+      end
+    end
+
+    describe "when both residency and lawful presence are authorized" do
+      let(:mock_lp_approval) { double({ :determined_at => Time.now, :vlp_authority => "ssa", :citizen_status => "a mock citizen status" }) }
+      before(:each) do
+        subject.authorize_residency
+        subject.authorize_lawful_presence(mock_lp_approval)
+      end
+
+      it "should be fully_verified" do
+        expect(subject.fully_verified?).to eq true
+      end
+    end
+  end
+end
+
+describe ConsumerRole, "in the verifications_outstanding state" do
+  subject { ConsumerRole.new(:aasm_state => :verifications_outstanding, :lawful_presence_determination => lawful_presence_determination, :is_state_resident => state_resident_value) }
+
+  describe "with a failed residency, and successful lawful presence" do
+    let(:lawful_presence_determination) {
+      LawfulPresenceDetermination.new(
+        :aasm_state => :verification_successful
+      )
+    }
+    let(:state_resident_value) { false }
+    describe "when residency is authorized" do
+      before :each do
+        subject.authorize_residency
+      end
+      it "should be fully_verified" do
+        expect(subject.fully_verified?).to eq true
+      end
+    end
+  end
+
+  describe "with a successful residency, and failed lawful presence" do
+    let(:lawful_presence_determination) {
+      LawfulPresenceDetermination.new(
+        :aasm_state => :verification_outstanding
+      )
+    }
+    let(:state_resident_value) { true }
+    describe "when lawful_presence is authorized" do
+      let(:mock_lp_approval) { double({ :determined_at => Time.now, :vlp_authority => "ssa", :citizen_status => "a mock citizen status" }) }
+      before(:each) do
+        subject.authorize_lawful_presence(mock_lp_approval)
+      end
+      it "should be fully_verified" do
+        expect(subject.fully_verified?).to eq true
+      end
+    end
+  end
+
+  describe "with a failed residency and failed lawful_presence" do
+    let(:lawful_presence_determination) {
+      LawfulPresenceDetermination.new(
+        :aasm_state => :verification_outstanding
+      )
+    }
+    let(:state_resident_value) { false }
+    describe "when residency is authorized" do
+      it "should be in verifications_outstanding" do
+        expect(subject.verifications_outstanding?).to eq true
+      end
+    end
+    describe "when lawful_presence is authorized" do
+      let(:mock_lp_approval) { double({ :determined_at => Time.now, :vlp_authority => "ssa", :citizen_status => "a mock citizen status" }) }
+      before(:each) do
+        subject.authorize_lawful_presence(mock_lp_approval)
+      end
+      it "should be in verifications_outstanding" do
+        expect(subject.verifications_outstanding?).to eq true
+      end
+    end
+    describe "when both residency and lawful presence are authorized" do
+      let(:mock_lp_approval) { double({ :determined_at => Time.now, :vlp_authority => "ssa", :citizen_status => "a mock citizen status" }) }
+      before(:each) do
+        subject.authorize_residency
+        subject.authorize_lawful_presence(mock_lp_approval)
+      end
+
+      it "should be fully_verified" do
+        expect(subject.fully_verified?).to eq true
+      end
+
+    end
+
+  end
+end
