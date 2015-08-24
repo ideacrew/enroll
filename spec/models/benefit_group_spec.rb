@@ -1,15 +1,5 @@
 require 'rails_helper'
 
-describe BenefitGroup, type: :model do
-  it { should validate_presence_of :relationship_benefits }
-  it { should validate_presence_of :effective_on_kind }
-  it { should validate_presence_of :terminate_on_kind }
-  it { should validate_presence_of :effective_on_offset }
-  it { should validate_presence_of :reference_plan_id }
-  it { should validate_presence_of :elected_plan_ids }
-  it { should validate_uniqueness_of :title }
-end
-
 describe BenefitGroup, dbclean: :after_each do
   context "an employer profile with census_employees exists" do
     let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
@@ -46,6 +36,7 @@ describe BenefitGroup, dbclean: :after_each do
           end
         end
       end
+
       context "starting on 4/1/2015" do
         let(:start_plan_year) {Date.new(2015, 4, 1)}
         context "and a benefit_group_exists" do
@@ -77,6 +68,9 @@ describe BenefitGroup, "instance methods" do
     [1,2].collect do
       FactoryGirl.create(:census_employee, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment] )
     end.sort_by(&:id)
+  end
+
+  context "" do
   end
 
   context "census_employees and benefit_group.census_employees" do
@@ -167,10 +161,10 @@ end
 
 describe BenefitGroup, type: :model do
 
+  let(:title)                   { "Employee Perks" }
   let(:plan_year)               { FactoryGirl.build(:plan_year) }
   let(:reference_plan)          { FactoryGirl.build(:plan) }
-  let(:plan_option_kind)        { :single_plan }
-  let(:title)                   { "Employee Perks" }
+  let(:plan_option_kind)        { "single_plan" }
   let(:effective_on_kind)       { "first_of_month" }
   let(:effective_on_offset)     { 30 }
   let(:terminate_on_kind)       { "end_of_month" }
@@ -178,9 +172,8 @@ describe BenefitGroup, type: :model do
   let(:effective_on_offset_default)   { 0 }
   let(:effective_on_kind_default)     { "date_of_hire" }
   let(:terminate_on_kind_default)     { "end_of_month" }
-  let(:plan_option_kind_default)      { nil }
 
-  let(:elected_plans)                 { [reference_plan] }
+  let(:elected_plans)                 { reference_plan.to_a }
 
 
   let(:relationship_benefits) do
@@ -197,10 +190,10 @@ describe BenefitGroup, type: :model do
   let(:valid_params) do
     {
         plan_year: plan_year,
-        reference_plan: reference_plan,
-        relationship_benefits: relationship_benefits,
-        elected_plans: elected_plans,
         title: title,
+        relationship_benefits: relationship_benefits,
+        reference_plan: reference_plan,
+        elected_plans: elected_plans,
         plan_option_kind: plan_option_kind,
         effective_on_kind: effective_on_kind,
         effective_on_offset: effective_on_offset,
@@ -208,7 +201,7 @@ describe BenefitGroup, type: :model do
     }
   end
 
-  context ".new" do
+  context "a new instance" do
     context "with no arguments" do
       let(:params) {{}}
 
@@ -236,13 +229,8 @@ describe BenefitGroup, type: :model do
     context "with no plan option kind" do
       let(:params) {valid_params.except(:plan_option_kind)}
 
-      # TODO - Remove default value?
-      # it "should be invalid" do
-      #   expect(BenefitGroup.create(**params).errors[:plan_option_kind].any?).to be_truthy
-      # end
-
-      it "should initialize with default value" do
-        expect(BenefitGroup.new(**params).plan_option_kind).to eq plan_option_kind_default
+      it "should be invalid" do
+        expect(BenefitGroup.create(**params).errors[:plan_option_kind].any?).to be_truthy
       end
     end
 
@@ -314,12 +302,30 @@ describe BenefitGroup, type: :model do
   end
 
   context "and a reference plan is selected" do
-    let(:params) {valid_params}
-    let(:benefit_group)  { BenefitGroup.new(**params) }
+    let(:params)                { valid_params }
+    let(:benefit_group)         { BenefitGroup.new(**params) }
+    let(:reference_plan_choice) { Plan.first }
 
-    context "and the 'single plan' option is offered" do
+    context "and the 'single plan' option is chosen" do
+      before do
+        benefit_group.plan_option_kind = "single_plan"
+        benefit_group.reference_plan = reference_plan_choice
+        benefit_group.elected_plans  = reference_plan_choice.to_a
+      end
+
+      it "elected plans should be the reference plan" do
+        expect(benefit_group.elected_plans).to eq reference_plan_choice.to_a
+      end
+
+      it "the lowest cost plan should be reference plan" do
+        expect(benefit_group.lowest_cost_plan).to eq reference_plan_choice
+      end
+
+      it "the highest cost plan should be reference plan" do
+        expect(benefit_group.highest_cost_plan).to eq reference_plan_choice
+      end
+
       context "and the elected plan is not the reference plan" do
-        let(:reference_plan_choice)   { FactoryGirl.build(:plan) }
         let(:elected_plan_choice)     { FactoryGirl.build(:plan) }
 
         before do
@@ -336,9 +342,13 @@ describe BenefitGroup, type: :model do
     end
 
     context "and the 'metal level' option is offered" do
+      let(:reference_plan_choice)   { FactoryGirl.build(:plan) }
+      let(:elected_plan_choice)     { FactoryGirl.build(:plan) }
+
+      context "and " do
+      end
+
       context "and elected plans are not all of the same metal level as reference plan" do
-        let(:reference_plan_choice)   { FactoryGirl.build(:plan) }
-        let(:elected_plan_choice)     { FactoryGirl.build(:plan) }
         before do
           benefit_group.plan_option_kind = :metal_level
           benefit_group.reference_plan = reference_plan_choice
@@ -353,13 +363,14 @@ describe BenefitGroup, type: :model do
     end
 
     context "and the 'carrier plans' option is offered" do
-      let(:carrier_profile_id_0)    { BSON::ObjectId.from_time(DateTime.now) }
-      let(:carrier_profile_id_1)    { BSON::ObjectId.from_time(DateTime.now + 1.day) }
-      let(:reference_plan_choice)   { FactoryGirl.create(:plan, carrier_profile_id: carrier_profile_id_0) }
-      let(:elected_plan_choice)     { FactoryGirl.create(:plan, carrier_profile_id: carrier_profile_id_1) }
+      let(:organization)            { FactoryGirl.create(:organization) }
+      let(:carrier_profile)         { FactoryGirl.create(:carrier_profile) }
+      let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile, organization: organization) }
+      let(:reference_plan_choice)   { FactoryGirl.create(:plan_with_premium_tables, carrier_profile: carrier_profile) }
+      let(:elected_plan_choice)     { FactoryGirl.create(:plan_with_premium_tables, carrier_profile: carrier_profile_1) }
       let(:elected_plan_set) do
         plans = [1, 2, 3].collect do
-          FactoryGirl.create(:plan, carrier_profile_id: carrier_profile_id_0)
+          FactoryGirl.create(:plan_with_premium_tables, carrier_profile: carrier_profile)
         end
         plans.concat([reference_plan_choice, elected_plan_choice])
         plans
@@ -397,7 +408,7 @@ describe BenefitGroup, type: :model do
   end
 
   context "and relationship benefit values are specified" do
-    let(:play_year) { FactoryGirl.create(:plan_year) }
+    let(:plan_year) { FactoryGirl.create(:plan_year) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
 
     context "and employer contribution for employee" do
