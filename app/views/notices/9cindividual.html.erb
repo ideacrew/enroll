@@ -1,13 +1,162 @@
+<head>
+    <title>DCHealthLink Confirmation</title>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta content="telephone=no" name="format-detection" />
+    <style type="text/css">
+      /*<![CDATA[*/
+      /* RESET */ 
+      #outlook a {
+        padding:0
+      }
+
+      body {
+        width:100%!important;
+        -webkit-text-size-adjust:100%;
+        -ms-text-size-adjust:100%;
+        margin:0;
+        padding:0;
+        mso-line-height-rule:exactly
+        font-size:14px;
+  color:rgb(0,0,0);
+  font-family: "Times New Roman", Times, serif;
+
+      }
+
+table td {
+  border-collapse:collapse;
+  font-size:14px;
+  font-family: "Times New Roman", Times, serif;
+}
+table {
+  border-collapse: collapse;
+}
+table td {
+  border-collapse: collapse;
+}
+h3, h4 {
+  margin:15px 0;
+}
+img {
+  outline:none;
+  text-decoration:none;
+  -ms-interpolation-mode:bicubic
+}
+a img {
+  border:none
+}
+a {
+  text-decoration:underline;
+}
+ul li {
+  padding:3px 0;
+}
+.addrs td {
+  display:block;
+  margin-bottom:2px;
+  font-size:14px;
+}
+.fssize {
+  font-size:14px;
+  float:left;
+}
+.fssizeuser {
+  font-size:15px;
+  float:left;
+}
+.fssizeuser td {
+  padding-right:5px;
+}
+.fssize td {
+  padding-right:20px;
+}
+.mar20 {
+  margin-top:10px;
+  display:block;
+}
+.fssize1 {
+  font-size:14px;
+}
+.fssize1 td {
+  display:block;
+}
+.total_table {
+  width:100%;
+}
+.list1 {
+  margin:20px 0;
+  padding:0 15px;
+  font-size:15px;
+}
+.list1 li {
+  margin-bottom:20px;
+  font-size:14x;
+}
+.wid50 {
+  width:100%;
+}
+.wid50 td {
+  width:50%;
+  font-size:14px;
+}
+.wid100 td {
+  width:100%;
+}
+h3 {
+  font-size:16px;
+  font-weight:bold;
+}
+.widn {
+  width:100%;
+  display:block;
+  float:left;
+  margin-top:20px;
+}
+.col-red {
+  color:rgb(255,0,0);
+}
+.mar10 {
+  margin-top:10px;
+}
+.tableformat {
+  float:left;
+  border:1px solid #000;
+}
+.tableNew tr td {
+  padding:3px 10px;
+}
+.para td {
+  width:40%;
+  float:left;
+  padding-bottom:5px;
+  padding-right:4%;
+}
+.para td p {
+  margin:0 0 2px 0;
+  font-size:12px;
+}
+.page-break-before {
+  display: block;
+  clear: both;
+  page-break-before: always;
+}
+
+</style>
+</head>
+<body>
+
+<div class="page_break">
 <table class="total_table" border="0">
   <tbody>
-    <tr><td></br></br></td></tr>
+  <tr><td></br></br></td></tr>
     <tr>
-      <td colspan="2" align="center">
-        <a href="https://dchealthlink.com/" target="_blank"><%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top;", width: "250"  %></a>
-      </td>
-    </tr>
-    <tr>
-      <td></br></br></td>
+      <td colspan="2" align="center"><a href=
+                                    "https://dchealthlink.com/"
+                                    target=
+                                    "_blank">
+                                    <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top;", width: "250"  %>
+                                  </a></td>
     </tr>
   </tbody>
 </table>
@@ -17,27 +166,12 @@
   <td></br></td>
   </tr>
     <tr class="wid50">
-      <td align="left"><%= format_date(Date.today) %></td>
-      <td align="right">500023232</td>
+      <td align="left">Date of Notice</td>
+      <td  align="right">AccountID</td>
     </tr>
   </tbody>
 </table>
-<table class="total_table address" border="0">
-  <tbody>
-    <tr class="fssize mar20">
-      <td><%= notice.primary_fullname %></td>
-    </tr>
-    <tr class="fssize1">
-      <td><%= notice.primary_address.street_1 %></td>
-    </tr>
-    <tr class="fssize1">
-      <td><%= notice.primary_address.street_2 %></td>
-    </tr>
-    <tr class="fssize">
-      <td colspan="1"><%= notice.primary_address.city %> <%= notice.primary_address.state %> <%= notice.primary_address.zip %></td>
-    </tr>
-  </tbody>
-</table>
+<%= render partial: "notices/ivl/inner_address", :locals => {notice: notice} %>
 <table class="total_table" border="0">
   <tbody>
     <tr>
@@ -53,15 +187,15 @@
     <tr class="widn">
       <td><strong>Congratulations!</strong> Based on the health insurance application you submitted and we processed on <%= format_date(Date.today) %>, the following person(s) qualify for health coverage through DC Health Link.</td>
     </tr>
-<tr>
-      <td><br></td>
-    </tr>
   </tbody>
 </table>
 <table class="total_table" border="0">
   <tbody>
-    <% notice_eligible_enrolles(notice).each do |name| %>
-    <tr class="mar20" style="margin-top: 5px;"><td><%= name %></td></tr>
+     <% notice_eligible_enrolles(notice).each do |name| %>
+    <tr class="fssizeuser mar20">
+    
+      <td><%= name %></td>
+    </tr>
     <% end %>
   </tbody>
 </table>
@@ -87,26 +221,26 @@
     <% end %>
   </tbody>
 </table>
+
+
 <% if notice.enrollments.size > 1%>
 <table class="total_table" border="0">
   <tbody>
-    <tr class="fssize mar20">
-      <td >Additionally, the following individual(s) selected the <%= notice.enrollments[1].plan_name %> health insurance plan.</td>
-    </tr>
-    <tr>
-      <td><br></td>
-    </tr>
-    <% notice.enrollments[1].enrollees.each do |name| %>
-    <tr class="mar20" style="padding-left:5%; margin-top: 5px;">
-      <td><%= name %></td>
-    </tr>
-    <% end %>
-<tr>
-      <td><br></td>
-    </tr>
+      <tr class="fssizeuser">
+        <td class="col-red"><strong>Additionally, the following individual(s) selected the <%= notice.enrollments[1].plan_name %> health insurance plan.</strong></td>
+       
+      </tr>
+    
+      <% notice.enrollments[1].enrollees.each do |name| %>
+     <tr class="fssizeuser">
+        <td><%= name %></td>
+      </tr>
+      <% end %>
+    
   </tbody>
 </table>
 <% end %>
+
 
 <table class="total_table" border="0">
   <tbody>
@@ -178,11 +312,6 @@
 
   </tbody>
 </table>
-<table>
-<tr><td></br></br></td>
-</tr>
-</table>
-</div>
 </div>
 <div class="page_break">
 <table class="mar20" border="0">
@@ -246,17 +375,13 @@
     <tr>
       <td>45 C.F.R. §155.420</td>
     </tr>
-<tr>
-      <td>
-</td></tr>
+
   </tbody>
 </table>
-
+</div>
+<div class="page_break">
 <table class="mar20" border="0">
   <tbody>
-<tr>
-<td>
-</td></tr>
     <tr>
       <td><h3 style="color:rgb(54,95,145);">Ending Your Health Insurance Coverage</h3></td>
     </tr>
@@ -294,11 +419,11 @@
       <td><h3 style="color:rgb(54,95,145);">If You Think We Made a Mistake</h3></td>
     </tr>
     <tr>
-      <td>If you disagree with this determination, you have the right to appeal to an independent administrative law judge. You may request an appeal by phone, in person, online, and by mail. You must request an appeal<strong> by <%= format_date(Date.today + 95) %></strong>.   DC Health Link will work to resolve your appeal as quickly as possible, but appeals can take between 30 and 90 days to resolve. <strong> See the insert for more information on your appeal rights.</strong> 45 C.F.R. §155.520 </td>
+      <td>If you disagree with this determination, you have the right to appeal to an independent administrative law judge. You may request an appeal by phone, in person, online, and by mail. You must request an appeal<strong> by «Date of Notice+95 calendar days»</strong>.   DC Health Link will work to resolve your appeal as quickly as possible, but appeals can take between 30 and 90 days to resolve. <strong> See the insert for more information on your appeal rights.</strong>45 C.F.R. §155.520 </td>
     </tr>
-<tr>
-      <td>
-</td></tr>
+
   </tbody>
 </table>
 </div>
+</body>
+</html>
