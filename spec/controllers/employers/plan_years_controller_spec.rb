@@ -40,10 +40,11 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:benefit_groups){ [
       double(
         "BenefitGroup",
-        estimated_monthly_employer_contribution: 56.2,
-        estimated_monthly_min_employee_cost: 200.21,
-        estimated_monthly_max_employee_cost: 500.32
+        monthly_employer_contribution_amount: 56.2,
+        monthly_min_employee_cost: 200.21,
+        monthly_max_employee_cost: 500.32
         )] }
+
     let(:plan){ double("Plan") }
     it "should calculate employer contributions" do
       allow(EmployerProfile).to receive(:find).with("id").and_return(employer_profile)
