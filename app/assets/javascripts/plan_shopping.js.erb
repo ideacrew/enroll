@@ -181,7 +181,7 @@ $(function() {
 
 //for plan_year
 $(document).on("change", "select[name='reference_plan']", function() {
-  $(".employer_cost_info .btn").removeClass('disabled');
+  $("#employer_cost_info_btn .btn").removeClass('disabled');
   var start_date = $("#plan_year_start_on").val();
   if (start_date == "") {
     return
@@ -213,7 +213,7 @@ $(function() {
     });
   });
 
-  $(".employer_cost_info .btn").click(function(){
+  $("#employer_cost_info_btn .btn").click(function(){
     var reference_plan_id = $("#plan_year_benefit_groups_attributes_0_reference_plan_id").val();
     if (reference_plan_id == "" || reference_plan_id == undefined) {
       return
