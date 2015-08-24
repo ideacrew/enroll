@@ -9,7 +9,7 @@ FactoryGirl.define do
     metal_level         "silver"
     market              "shop"
     ehb                 0.9943
-    carrier_profile_id          { BSON::ObjectId.from_time(DateTime.now) }
+    carrier_profile         { FactoryGirl.create(:carrier_profile)  } #{ BSON::ObjectId.from_time(DateTime.now) }
     minimum_age         19
     maximum_age         66
 
