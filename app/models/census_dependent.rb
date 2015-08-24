@@ -12,5 +12,4 @@ class CensusDependent < CensusMember
               in: EMPLOYEE_RELATIONSHIP_KINDS,
               message: "'%{value}' is not a valid employee relationship"
             }
-
 end
