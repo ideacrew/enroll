@@ -139,8 +139,7 @@ class Employers::PlanYearsController < ApplicationController
     redirect_to employers_employer_profile_path(@employer_profile)
   end
 
-  def cost_analysis
-
+  def employee_costs
     @location_id = params[:location_id]
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
     
@@ -159,7 +158,6 @@ class Employers::PlanYearsController < ApplicationController
     #   @benefit_group = @plan_year.benefit_groups.first
     # end
     # @page = params[:page]
-
 
     @benefit_group_costs = build_employee_costs_for_benefit_group
     @benefit_group_costs.merge!({
