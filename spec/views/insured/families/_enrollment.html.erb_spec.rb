@@ -17,7 +17,4 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     expect(rendered).to have_selector("a[href='/products/plans/summary?hbx_enrollment_id=#{hbx_enrollment.id}&standard_component_id=#{plan.hios_id}']", text: "VIEW DETAILS")
   end
 
-  it "should display the progress bar" do
-    expect(rendered).to have_selector('.progress-current')
-  end
 end
