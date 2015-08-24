@@ -55,9 +55,9 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups[0].reference_plan = @plan
 
-    @employer_contribution_amount = @plan_year.benefit_groups[0].estimated_monthly_employer_contribution
-    @min_employee_cost = @plan_year.benefit_groups[0].estimated_monthly_min_employee_cost
-    @max_employee_cost = @plan_year.benefit_groups[0].estimated_monthly_max_employee_cost
+    @employer_contribution_amount = @plan_year.benefit_groups[0].monthly_employer_contribution_amount
+    @min_employee_cost = @plan_year.benefit_groups[0].monthly_min_employee_cost
+    @max_employee_cost = @plan_year.benefit_groups[0].monthly_max_employee_cost
   end
 
   def edit
@@ -146,6 +146,7 @@ class Employers::PlanYearsController < ApplicationController
     else
       @benefit_group = @plan_year.benefit_groups.first
     end
+    @page = params[:page]
     @benefit_group_costs = build_employees_for_benefit_group(@benefit_group)
   end
 

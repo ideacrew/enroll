@@ -241,27 +241,6 @@ class BenefitGroup
     return found_value
   end
 
-  def estimated_monthly_employer_contribution
-    plan_year.employer_profile.census_employees.active.collect do |ce|
-      pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
-      pcd.total_employer_contribution
-    end.sum
-  end
-
-  def estimated_monthly_min_employee_cost
-    plan_year.employer_profile.census_employees.active.collect do |ce|
-      pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
-      pcd.total_employee_cost
-    end.min
-  end
-
-  def estimated_monthly_max_employee_cost
-    plan_year.employer_profile.census_employees.active.collect do |ce|
-      pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
-      pcd.total_employee_cost
-    end.max
-  end
-
   def monthly_employer_contribution_amount
     census_employees.active.collect do |ce|
       pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
