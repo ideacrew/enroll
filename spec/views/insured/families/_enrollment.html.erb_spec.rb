@@ -2,7 +2,8 @@ require 'rails_helper'
 
 RSpec.describe "insured/families/_enrollment.html.erb" do
   let(:plan) {FactoryGirl.build(:plan)}
-  let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, covered_members_first_names: ["name"], shopping?: false)}
+  let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, covered_members_first_names: ["name"], can_complete_shopping?: false)}
+
 
   before :each do
     render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment

@@ -99,26 +99,65 @@ RSpec.describe Employers::CensusEmployeesController do
     let(:benefit_group) { double(id: "5453a544791e4bcd33000121") }
     let(:plan_year) { FactoryGirl.create(:plan_year) }
     let(:user) { FactoryGirl.create(:user, :employer_staff) }
+    let(:census_employee_delete_params) {
+      {
+        "first_name" => "aqzz",
+        "middle_name" => "",
+        "last_name" => "White",
+        "dob" => "05/01/2015",
+        "ssn" => "123-12-3112",
+        "gender" => "male",
+        "is_business_owner" => true,
+        "hired_on" => "05/02/2015",
+        "employer_profile_id" => employer_profile_id,
+        "census_dependents_attributes" => [
+          {
+            "id" => child1.id,
+            "first_name" => child1.first_name,
+            "last_name" => child1.last_name,
+            "dob" => child1.dob,
+            "gender" => child1.gender,
+            "employee_relationship" => child1.employee_relationship,
+            "ssn" => child1.ssn,
+            "_destroy" => true
+          }
+        ]
+      }
+    }
+    let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333) }
+
 
     before do
       sign_in user
+      census_employee.census_dependents << child1
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       allow(BenefitGroup).to receive(:find).and_return(benefit_group)
       allow(BenefitGroupAssignment).to receive(:new_from_group_and_census_employee).and_return(BenefitGroupAssignment.new)
-      allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
     end
 
     it "should be redirect when valid" do
       allow(census_employee).to receive(:save).and_return(true)
+      allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
       post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(response).to be_redirect
+    end
+
+    context "delete dependent params" do
+      it "should delete dependents" do
+        allow(census_employee).to receive(:save).and_return(true)
+        allow(controller).to receive(:census_employee_params).and_return(census_employee_delete_params)
+        post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: census_employee_delete_params
+        # expect(census_employee).to receive(:census_dependents)
+        expect(response).to be_redirect
+      end
     end
 
     context "get flash notice" do
       it "with benefit_group_id" do
         allow(census_employee).to receive(:save).and_return(true)
+        allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
         allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
         post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
         expect(flash[:notice]).to eq "Census Employee is successfully updated."
@@ -126,6 +165,7 @@ RSpec.describe Employers::CensusEmployeesController do
 
       it "with no benefit_group_id" do
         allow(census_employee).to receive(:save).and_return(true)
+        allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
         allow(controller).to receive(:benefit_group_id).and_return(nil)
         post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
         expect(flash[:notice]).to eq "Note: new employee cannot enroll on DC Healthlink until they are assigned a benefit group. Census Employee is successfully updated."
@@ -134,6 +174,7 @@ RSpec.describe Employers::CensusEmployeesController do
 
     it "should be render when invalid" do
       allow(census_employee).to receive(:save).and_return(false)
+      allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
       post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(assigns(:reload)).to eq true
       expect(response).to render_template("edit")

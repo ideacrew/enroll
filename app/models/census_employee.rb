@@ -31,6 +31,7 @@ class CensusEmployee < CensusMember
   validate :active_census_employee_is_unique
   validate :allow_id_info_changes_only_in_eligible_state
   validate :check_census_dependents_relationship
+  validate :no_duplicate_census_dependent_ssns
 
   index({"aasm_state" => 1})
   index({"employer_profile_id" => 1})
@@ -273,6 +274,12 @@ private
   def check_employment_terminated_on
     if employment_terminated_on and employment_terminated_on <= hired_on
       errors.add(:employment_terminated_on, "can't occur before rehiring date")
+    end
+  end
+
+  def no_duplicate_census_dependent_ssns
+    if census_dependents.map(&:ssn).uniq.length != census_dependents.map(&:ssn).length
+      errors.add(:base, "SSN's must be unique for each dependent")
     end
   end
 
