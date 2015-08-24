@@ -36,6 +36,15 @@
       </div>
     </div>
 
+    <div class="col-md-12 col-sm-12 col-xs-12 pull-right">
+      <div class="btn btn-select disabled">
+        Employee Costs
+      </div>
+      <%= link_to "Employee Costs", cost_analysis_employers_employer_profile_plan_years_path(@employer_profile), id: "employee_costs_link", class: "hidden" %>
+    </div>
+
+    <%= render "employers/plan_years/employee_costs_modal" %>
+
     <div class="col-md-12 col-sm-12 col-xs-12">
       <h3> Relationship Benefits</h3>
       <div class='form-inputs'>

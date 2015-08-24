@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" >
   <h3>PY Cost Impact</h3>
   <ul class="nav nav-tabs">
     <% @plan_year.benefit_groups.each do |benefit_group| %>
@@ -8,7 +8,7 @@
     <% end %>
   </ul>
 
-  <div id="benefit_group_costs">
+  <div id="benefit_group_costs" class="top-pd">
     <%= render partial: "benefit_group" %>
   </div>
 </div>

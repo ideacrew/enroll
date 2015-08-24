@@ -112,7 +112,7 @@ Rails.application.routes.draw do
         post 'force_publish'
         get 'search_reference_plan', on: :collection
         get 'calc_employer_contributions', on: :collection
-        get 'cost_analysis'
+        get 'cost_analysis', on: :collection
       end
 
       resources :broker_agency, only: [:index, :show, :create] do

@@ -140,25 +140,49 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def cost_analysis
-    @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
-    if params[:benefit_group_id]
-      @benefit_group = @plan_year.benefit_groups.where("_id" => BSON::ObjectId.from_string(params[:benefit_group_id])).first
-    else
-      @benefit_group = @plan_year.benefit_groups.first
-    end
-    @page = params[:page]
-    @benefit_group_costs = build_employees_for_benefit_group(@benefit_group)
+
+    @location_id = params[:location_id]
+    params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
+    
+    @plan = Plan.find(params[:reference_plan_id])
+    @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
+    @plan_year.benefit_groups[0].reference_plan = @plan
+    @plan_year.benefit_groups[0].plan_option_kind = params[:plan_option_kind]
+
+    @benefit_group = @plan_year.benefit_groups[0]
+    @benefit_group.set_bounding_cost_plans
+
+    # @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
+    # if params[:benefit_group_id]
+    #   @benefit_group = @plan_year.benefit_groups.where("_id" => BSON::ObjectId.from_string(params[:benefit_group_id])).first
+    # else
+    #   @benefit_group = @plan_year.benefit_groups.first
+    # end
+    # @page = params[:page]
+
+
+    @benefit_group_costs = build_employee_costs_for_benefit_group
+    @benefit_group_costs.merge!({
+      ref_plan_employer_cost: @benefit_group.monthly_employer_contribution_amount,
+      lowest_plan_employer_cost: @benefit_group.monthly_employer_contribution_amount(@benefit_group.lowest_cost_plan),
+      highest_plan_employer_cost: @benefit_group.monthly_employer_contribution_amount(@benefit_group.highest_cost_plan)
+    })
   end
 
   private
 
-  def build_employees_for_benefit_group(benefit_group)
-    benefit_group.census_employees.active.inject({}) do |census_employees, employee|
+  def build_employee_costs_for_benefit_group
+    # @benefit_group.census_employees.active.inject({}) do |census_employees, employee|
+
+    @plan_year.employer_profile.census_employees.active.inject({}) do |census_employees, employee|
       costs = {
-        ref_plan_cost: 0
+        ref_plan_cost: @benefit_group.employee_cost_for_plan(employee)
       }
-      if benefit_group.plan_option_kind != "single_plan"
-        costs.merge!({ lowest_plan_cost: 0, highest_plan_cost: 0 }) 
+      if @benefit_group.plan_option_kind != "single_plan"
+        costs.merge!({ 
+          lowest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.lowest_cost_plan), 
+          highest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.highest_cost_plan)
+          })
       end
       census_employees[employee.id] = costs
       census_employees
