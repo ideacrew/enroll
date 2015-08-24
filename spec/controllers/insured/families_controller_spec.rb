@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Insured::FamiliesController do
 
-  let(:hbx_enrollments) { double }
+  let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user) }
   let(:family) { double("Family") }
@@ -22,6 +22,7 @@ RSpec.describe Insured::FamiliesController do
       allow(family).to receive(:latest_household).and_return(household)
       allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:shopping_completed).and_return(hbx_enrollments)
     end
 
     context "for SHOP market" do    
