@@ -132,6 +132,7 @@ class Insured::PlanShoppingsController < ApplicationController
     #     PlanCostDecorator.new(plan, @hbx_enrollment, nil, nil)
     #   end
     end
+    @plans = @plans.sort_by(&:total_employee_cost)
 
     @waivable = @hbx_enrollment.can_complete_shopping?
 

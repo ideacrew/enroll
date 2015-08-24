@@ -30,7 +30,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         allow(file).to receive(:tempfile).and_return(temp_file)
         allow(temp_file).to receive(:path)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:build_document).with(doc_id, file_path).and_return(double)
-        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:save_consumer_role).with(anything).and_return(true)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:save_consumer_role).and_return(true)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:person_consumer_role)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_path).and_return(file_path)

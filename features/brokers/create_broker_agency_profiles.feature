@@ -47,7 +47,7 @@ Feature: Create Primary Broker and Broker Agency
         Then Employer should see no active broker
         When Employer click on Browse Brokers button
         Then Employer should see broker agencies index view
-        When Employer searches broker agency by name
+        # When Employer searches broker agency by name
         Then Employer should see broker agency
         When Employer clicks select broker button
         Then Employer should see confirm modal dialog box
@@ -61,7 +61,7 @@ Feature: Create Primary Broker and Broker Agency
         Then Employer should see no active broker
         When Employer clicks on Browse Brokers button
         Then Employer should see broker agencies index view
-        When Employer searches broker agency by name
+        # When Employer searches broker agency by name
         Then Employer should see broker agency
         When Employer clicks select broker button
         Then Employer should see confirm modal dialog box

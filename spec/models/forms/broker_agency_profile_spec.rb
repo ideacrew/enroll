@@ -36,7 +36,7 @@ end
 
 describe Forms::BrokerAgencyProfile, ".save" do
 
-  let(:persist_organization) { FactoryGirl.create(:organization, fein: "223230323") }
+  let(:persist_organization) { FactoryGirl.create(:broker_agency, fein: "223230323") }
 
   let(:attributes) { {
     first_name: 'joe',

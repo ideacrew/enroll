@@ -159,7 +159,11 @@ class Organization
 
   class << self
 
-    def search_agencies_by_criteria(query, search_params)
+    def active_broker_agencies
+      Organization.exists(broker_agency_profile: true).where({ "broker_agency_profile._id" => { "$in" => BrokerRole.agency_ids_for_active_brokers } }) 
+    end
+
+    def search_agencies_by_criteria(search_params)
       query_params = []
 
       if search_params[:q].present?
@@ -175,22 +179,14 @@ class Organization
         query_params << {"broker_agency_profile.working_hours" => eval(search_params[:working_hours])}
       end
 
-      query.where({"$or" => (query_params)})
-    end
-
-    def broker_agencies
-      Organization.exists(broker_agency_profile: true)
-    end
-
-    def broker_agencies_having_active_brokers
-      broker_agencies.where({ "broker_agency_profile._id" => { "$in" => BrokerRole.agency_ids_for_active_brokers } }) 
+      self.active_broker_agencies.where({"$or" => (query_params)})
     end
 
     def broker_agencies_with_matching_agency_or_broker(search_params)
-      # return broker_agencies_having_active_brokers if search_str.blank?
-      orgs1 = self.search_agencies_by_criteria(self.broker_agencies_having_active_brokers, search_params)
+      orgs1 = self.search_agencies_by_criteria(search_params)
       return orgs1 unless search_params[:q].present?
-      orgs2 = self.broker_agencies_having_active_brokers.where({ 
+
+      orgs2 = self.active_broker_agencies.where({ 
         "broker_agency_profile._id" => { 
           "$in" => BrokerRole.brokers_matching_search_criteria(search_params[:q]) 
         }

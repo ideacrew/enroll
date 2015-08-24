@@ -9,7 +9,7 @@ class Employers::BrokerAgencyController < ApplicationController
     @advanced = params.permit(:advanced)[:advanced] if params.permit(:advanced)
 
     if @advanced.blank? && params.permit(:q).blank?
-      @orgs = Organization.broker_agencies_having_active_brokers
+      @orgs = Organization.active_broker_agencies
       @page_alphabets = page_alphabets(@orgs, "legal_name")
 
       if params[:page].present?

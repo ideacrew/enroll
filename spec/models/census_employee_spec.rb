@@ -21,6 +21,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   let(:hired_on){ TimeKeeper.date_of_record - 14.days }
   let(:is_business_owner){ false }
   let(:address) { Address.new(kind: "home", address_1: "221 R St, NW", city: "Washington", state: "DC", zip: "20001") }
+  let(:autocomplete) { " lynyrd skynyrd" }
 
   let(:valid_params){
     {
@@ -99,12 +100,27 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         expect(initial_census_employee.save).to be_truthy
       end
 
+      context "with duplicate ssn's on dependents" do
+        let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333) }
+        let(:child2) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: 333333333) }
+
+        it "should have errors" do
+          initial_census_employee.census_dependents = [child1,child2]
+          expect(initial_census_employee.save).to be_falsey
+          expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent/)
+        end
+      end
+
       context "and it is saved" do
         before { initial_census_employee.save }
 
         it "should be findable by ID" do
           expect(CensusEmployee.find(initial_census_employee.id)).to eq initial_census_employee
         end
+
+        # it "should have a valid autocomplete" do
+        #   expect(initial_census_employee.autocomplete).to eq autocomplete
+        # end
 
         it "in an unlinked state" do
           expect(initial_census_employee.eligible?).to be_truthy

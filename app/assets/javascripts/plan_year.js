@@ -20,7 +20,6 @@ $(document).on("change", "select.elected_plan", function() {
 });
 
 $(document).on("change", ".elected-plan-select .carrier", function() {
-  console.log(".carrier");
   var target = $(this).parents(".reference-plan-selection-controls").find(".reference-plan-select");
   var txt = $(this).val();
   $(target).find(".carrier-select .carrier-content").hide();
