@@ -1,1 +1,5 @@
-$('#benefit_group_costs').html("<%= escape_javascript(render "benefit_group") %>");
+<% if @page %>
+  $('#employee_index_scroll').append("<%= escape_javascript(render "employee_costs") %>");
+<% else %>
+  $('#benefit_group_costs').html("<%= escape_javascript(render "benefit_group") %>");
+<% end %>

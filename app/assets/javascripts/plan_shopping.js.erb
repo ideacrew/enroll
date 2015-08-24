@@ -181,6 +181,8 @@ $(function() {
 
 //for plan_year
 $(document).on("change", "select[name='reference_plan']", function() {
+  calcEmployerContributions();
+
   var start_date = $("#plan_year_start_on").val();
   if (start_date == "") {
     return
@@ -198,9 +200,10 @@ $(document).on("change", "select[name='reference_plan']", function() {
         "reference_plan_id": reference_plan_id,
         "location_id": $(this).parents('fieldset').attr('id')
       }
-    }).done(function() {
-      calcEmployerContributions();
-    });
+    })
+    // .done(function() {
+    //   calcEmployerContributions();
+    // });
   };
 });
 
