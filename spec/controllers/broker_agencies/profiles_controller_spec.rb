@@ -22,7 +22,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:person) { double("person")}
     
     before(:all) do 
-      organization = FactoryGirl.create(:organization)
+      organization = FactoryGirl.create(:broker_agency)
       @broker_agency_profile = organization.broker_agency_profile
     end
 

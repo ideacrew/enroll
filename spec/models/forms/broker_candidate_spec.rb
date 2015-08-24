@@ -22,7 +22,7 @@ describe Forms::BrokerCandidate do
   }
 
   before (:all) do
-    @broker_agency_profile = FactoryGirl.create(:organization).broker_agency_profile
+    @broker_agency_profile = FactoryGirl.create(:broker_agency).broker_agency_profile
   end
 
   context 'when data missing' do 
