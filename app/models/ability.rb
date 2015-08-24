@@ -63,6 +63,15 @@ class Ability
       can :read, :all
     end
 
+    if user.has_role? :assister
+      can :read, :all
+      can :update, :all
+    end
+
+    if user.has_role? :csr
+      can :read, :all
+      can :update, :all
+    end
   end
 
   #For controller action call authorize! :edit_plan_year

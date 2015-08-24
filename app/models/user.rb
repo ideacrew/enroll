@@ -149,6 +149,12 @@ class User
     has_role?(:hbx_staff)
   end
 
+  def has_csr_role?
+    has_role?(:csr)
+  end
+  def has_assister_role?
+    has_role(:assister)
+  end
   def ensure_authentication_token
     if authentication_token.blank?
       self.authentication_token = generate_authentication_token
