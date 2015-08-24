@@ -18,6 +18,6 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   end
 
   it "should display the progress bar" do
-    expect(rendered).to have_selector('.progress-bar')
+    expect(rendered).to have_selector('.progress-current')
   end
 end
