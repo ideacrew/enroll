@@ -32,6 +32,13 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :agents do
+      collection do
+        get :home
+        get :begin_enrollment
+        get :send_enrollment_confirmation
+      end
+    end
 
     resources :broker_applicants
 

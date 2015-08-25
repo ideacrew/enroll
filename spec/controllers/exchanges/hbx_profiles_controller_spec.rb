@@ -154,7 +154,7 @@ RSpec.describe Exchanges::HbxProfilesController do
 
 
   describe "Show" do
-    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :has_csr_role? => false)}
     let(:person) { double("person")}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile", inbox: double("inbox", unread_messages: double("test")))}
@@ -171,6 +171,24 @@ RSpec.describe Exchanges::HbxProfilesController do
     it "renders 'show' " do
       expect(response).to have_http_status(:success)
       expect(response).to render_template("exchanges/hbx_profiles/show")
+    end
+  end
+
+  describe "CSR redirection from Show" do
+    let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false, :has_csr_role? => true)}
+    let(:person) { double("person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("hbx_profile", inbox: double("inbox", unread_messages: double("test")))}
+
+    before :each do
+      allow(user).to receive(:has_csr_role?).and_return(true)
+      allow(user).to receive(:person).and_return(person)
+      sign_in(user)
+      get :show
+    end
+
+    it "redirects to agents/home " do
+      expect(response).to have_http_status(:redirect)
     end
   end
 

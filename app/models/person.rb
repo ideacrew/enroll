@@ -471,6 +471,11 @@ class Person
     end
   end
 
+  def agent?
+    agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role
+    !!agent
+  end
+
   # HACK
   # FIXME
   # TODO: Never emulate this behaviour - this is something terrible Trey did to unblock our progress -
