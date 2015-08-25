@@ -6,9 +6,8 @@ class Employers::BrokerAgencyController < ApplicationController
 
   def index
     @filter_criteria = params.permit(:q, :working_hours, :languages => [])
-    @advanced = params.permit(:advanced)[:advanced] if params.permit(:advanced)
 
-    if @advanced.blank? && params.permit(:q).blank?
+    if @filter_criteria.empty?
       @orgs = Organization.active_broker_agencies
       @page_alphabets = page_alphabets(@orgs, "legal_name")
 
