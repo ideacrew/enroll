@@ -1,157 +1,4 @@
-<html>
-<head>
-    <title>DCHealthLink Confirmation</title>
-    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
-    <meta content="telephone=no" name="format-detection" />
-    <style type="text/css">
-      /*<![CDATA[*/
-      /* RESET */ 
-      #outlook a {
-        padding:0
-      }
-
-      body {
-        width:100%!important;
-        -webkit-text-size-adjust:100%;
-        -ms-text-size-adjust:100%;
-        margin:0;
-        padding:0;
-        mso-line-height-rule:exactly
-        font-size:14px;
-  color:rgb(0,0,0);
-  font-family: "Times New Roman", Times, serif;
-
-      }
-
-table td {
-  border-collapse:collapse;
-  font-size:14px;
-  font-family: "Times New Roman", Times, serif;
-}
-table {
-  border-collapse: collapse;
-}
-table td {
-  border-collapse: collapse;
-}
-h3, h4 {
-  margin:15px 0;
-}
-img {
-  outline:none;
-  text-decoration:none;
-  -ms-interpolation-mode:bicubic
-}
-a img {
-  border:none
-}
-a {
-  text-decoration:underline;
-}
-ul li {
-  padding:3px 0;
-}
-.addrs td {
-  display:block;
-  margin-bottom:2px;
-  font-size:14px;
-}
-.fssize {
-  font-size:14px;
-  float:left;
-}
-.fssizeuser {
-  font-size:15px;
-  float:left;
-}
-.fssizeuser td {
-  padding-right:5px;
-}
-.fssize td {
-  padding-right:20px;
-}
-.mar20 {
-  margin-top:10px;
-  display:block;
-}
-.fssize1 {
-  font-size:14px;
-}
-.fssize1 td {
-  display:block;
-}
-.total_table {
-  width:100%;
-}
-.list1 {
-  margin:20px 0;
-  padding:0 15px;
-  font-size:15px;
-}
-.list1 li {
-  margin-bottom:20px;
-  font-size:14x;
-}
-.wid50 {
-  width:100%;
-}
-.wid50 td {
-  width:50%;
-  font-size:14px;
-}
-.wid100 td {
-  width:100%;
-}
-h3 {
-  font-size:16px;
-  font-weight:bold;
-}
-.widn {
-  width:100%;
-  display:block;
-  float:left;
-  margin-top:20px;
-}
-.col-red {
-  color:rgb(255,0,0);
-}
-.mar10 {
-  margin-top:10px;
-}
-.tableformat {
-  float:left;
-  border:1px solid #000;
-}
-.tableNew tr td {
-  padding:3px 10px;
-}
-.para td {
-  width:40%;
-  float:left;
-  padding-bottom:5px;
-  padding-right:4%;
-}
-.para td p {
-  margin:0 0 2px 0;
-  font-size:12px;
-}
-.page-break-before {
-  display: block;
-  clear: both;
-  page-break-before: always;
-}
-
-</style>
-</head>
-
-<body>
- 
-<%= render partial: "notices/ivl/languages", :locals => {user: user} %>
-<%= render partial: "notices/ivl/blank_sheet" %>
-
- <div class="page_break">
+<div class="page_break">
 <table class="total_table" border="0">
   <tbody>
   <tr><td></br></br></td></tr>
@@ -172,7 +19,7 @@ h3 {
   <table class="total_table" border="0">
     <tbody>
       <tr class="wid50">
-        <td align="left">Date of Notice</td>
+        <td align="left"> <%= format_date(Date.today) %></td>
         <td  align="right">AccountID</td>
       </tr>
     </tbody>
@@ -184,9 +31,7 @@ h3 {
         <td><h4>Subject:  Conditional Eligibility for Health Insurance, Confirmation of Plan Selection</h4></td>
       </tr>
       <tr class="fssizeuser">
-        <td>Dear</td>
-        <td><%= user.first_name%></td>
-        <td><%= user.last_name%></td>
+        <td>Dear <%= notice.primary_fullname.strip %>,</td>
       </tr>
     
     </tbody>
@@ -194,7 +39,7 @@ h3 {
   <table class="total_table" border="0">
     <tbody>
       <tr class="widn">
-        <td><strong>Congratulations!</strong> Based on the health insurance application you submitted on <span style="width:150px; display:block;"></span></td>
+        <td><strong>Congratulations!</strong> Based on the health insurance application you submitted on  <%= format_date(Date.today) %></td>
       </tr>
       <tr>
       <td></br></td>
@@ -264,7 +109,7 @@ h3 {
         <td><h3 style="color:rgb(54,95,145);">Your Private Health Plan Selection</h3></td>
       </tr>
       <tr>
-        <td>On <span>date of plan selection</span>, the following individual(s) selected the <span>plan 1 name</span> health insurance plan.</td>
+        <td>On  <%= format_date(Date.today) %>, the following individual(s) selected the <%= notice.enrollments[0].plan_name %> health insurance plan.</td>
       </tr>
      
     </tbody>
@@ -273,26 +118,34 @@ h3 {
 </div>
 
 <div class="page_break">
-  <table class="total_table" border="0">
-    <tbody>
-     <tr class="fssizeuser mar20" style="padding-left:5%;">
-        <td><span>Plan 1 Enrollee First Name</span><span>Plan 1 Enrollee Last Name</span><span style="color:rgb(255,0,0)"><strong>[IF More than One Enrollee in Plan 1]</strong></span><span>Plan 1 Enrollee 2 First Name</span><span>Plan 1 Enrollee 2 Last Name</span></td>
+<table class="total_table" border="0">
+  <tbody>
+    <% notice.enrollments[0].enrollees.each do |name| %>
+    <tr class="mar20" style="padding-left:5%;margin-top: 5px;">
+      <td><%= name %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<% if notice.enrollments.size > 1%>
+<table class="total_table" border="0">
+  <tbody>
+      <tr class="fssizeuser">
+        <td class="col-red"><strong>Additionally, the following individual(s) selected the <%= notice.enrollments[1].plan_name %> health insurance plan.</strong></td>
+       
       </tr>
-      <tr class="fssizeuser mar20"  style="padding-left:5%;">
-        <td>Plan 1 Enrollee First Name</td>
-        <td>Plan 1 Enrollee Last Name</td>
+    
+      <% notice.enrollments[1].enrollees.each do |name| %>
+     <tr class="fssizeuser">
+        <td><%= name %></td>
       </tr>
-    </tbody>
-  </table>
-  <table class="total_table" border="0">
-    <tbody>
-      <tr class="fssizeuser"   style="padding-left:5%;">
-        <td class="col-red"><span><strong>[IF More than One Enrollee in Plan 1]</strong></span><span>Plan 1 Enrollee 2 First Name</span><span>Plan 1 Enrollee 2 Last Name</span></td>
-        <td></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
+      <% end %>
+    
+  </tbody>
+</table>
+<% end %>
+
   <table>
     <tbody>
 <tr>
@@ -308,11 +161,11 @@ h3 {
       <tr class="mar20">
         <td>For any questions about your health plan's covered services and providers, you need to contact:</td>
       </tr>
-        <tr class="fssizeuser mar20">
-        <td>plan 1 name</td>
-            <td>at</td>
-            <td>plan 1 main phone number</td>
-      </tr>
+    <% notice.enrollments.each do |enrollment| %>
+    <tr class="mar20" style="padding-left:5%;margin-top: 5px;">
+      <td><span><%= enrollment.plan_name %></span>&nbsp;&nbsp;at&nbsp;&nbsp;<span><%= "7032030000" %></span></td>
+    </tr>
+    <% end %>
     </tbody>
   </table>
   <table class="total_table" border="0">
@@ -814,6 +667,4 @@ h3 {
    
     </div>
   <%= render partial: "notices/ivl/blank_sheet" %>
-</body>
-</html>
 
