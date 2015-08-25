@@ -210,9 +210,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   context "GET show" do
-    let(:plan1) {double(id: '10', deductible: '$10', total_employee_cost: 1000)}
-    let(:plan2) {double(id: '11', deductible: '$20', total_employee_cost: 2000)}
-    let(:plan3) {double(id: '12', deductible: '$30', total_employee_cost: 3000)}
+    let(:plan1) {double(id: '10', deductible: '$10', total_employee_cost: 1000, carrier_profile_id: '12345')}
+    let(:plan2) {double(id: '11', deductible: '$20', total_employee_cost: 2000, carrier_profile_id: '12346')}
+    let(:plan3) {double(id: '12', deductible: '$30', total_employee_cost: 3000, carrier_profile_id: '12347')}
     
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)

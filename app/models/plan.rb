@@ -129,6 +129,8 @@ class Plan
   scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
   scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: metal_level)}
 
+  scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
+
   scope :shop_health_by_active_year, ->(active_year) {  
       where(
           active_year: active_year, 
@@ -263,6 +265,10 @@ class Plan
 
     def reference_plan_metal_level_for_options
       REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
+    end
+
+    def individual_plans(coverage_kind:, active_year:)
+      Plan.public_send("individual_#{coverage_kind}_by_active_year", active_year).with_premium_tables.where(hios_id: /-01$/)
     end
   end
 end

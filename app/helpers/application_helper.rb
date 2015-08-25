@@ -327,8 +327,8 @@ module ApplicationHelper
     return link
   end
 
-  def display_carrier_logo(carrier, options = {:width => 50})
-    if carrier_name = carrier.try(:legal_name)
+  def display_carrier_logo(carrier_name, options = {:width => 50})
+    if carrier_name.present?
       image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
     end
   end
