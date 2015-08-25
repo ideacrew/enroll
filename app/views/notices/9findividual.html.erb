@@ -24,7 +24,7 @@
       </tr>
     </tbody>
   </table>
-  <%= render partial: "notices/ivl/inner_address", :locals => {user: user} %>
+  <%= render partial: "notices/ivl/inner_address", :locals => {notice: notice} %>
   <table class="total_table" border="0">
     <tbody>
       <tr>
@@ -46,75 +46,7 @@
     </tr>
     </tbody>
   </table>
-  <table class="total_table" border="0">
-    <tbody>
-      <tr class="fssizeuser mar20">
-        <td class="col-red"><span><strong>[IF Anyone Does not have Inconsistencies]</strong></span><span>The following person(s) qualify for health coverage through DC Health Link.</span></td>
-      </tr>
-    </tbody>
-  </table>
-  <table class="total_table" border="0">
-    <tbody>
-      <tr class="fssizeuser mar20">
-        <td>UnAssisted 1 First Name</td>
-        <td>UnAssisted 1 Last Name</td>
-      </tr>
-    </tbody>
-  </table>
-  <table class="total_table" border="0">
-    <tbody>
-   
-      <tr class="fssizeuser mar20">
-        <td class="col-red"><span><strong>[IF Person N field populated]</strong></span><span>UnAssisted N First Name</span><span>UnAssisted N Last Name</span></td>
-       
-      </tr>
-    </tbody>
-  </table>
-  <table class="total_table" border="0">
-    <tbody>
-      <tr class="fssizeuser mar20">
-        <td class="col-red"><span><strong>[IF Anyone Has Inconsistencies]</strong></span><span>The following person(s) <strong>conditionally</strong> qualify for health coverage through DC Health Link.</span></td>
-      </tr>
-    </tbody>
-  </table>
-  <table class="total_table" border="0">
-    <tbody>
-      <tr class="fssizeuser mar20">
-        <td><span>Conditional UnAssisted 1 First Name</span></td>
-        <td><span>Conditional UnAssisted 1 Last Name</span></td>
-      </tr>
-    </tbody>
-  </table>
-  <table class="total_table" border="0">
-    <tbody>
-      <tr class="fssizeuser">
-        <td ><span style="color:rgb(255,0,0);"><strong>[IF Person N field populated]</strong></span><span>Conditional UnAssisted N First Name</span><span>Conditional UnAssisted N Last Name</span></td>
-      </tr>
-      
-    </tbody>
-  </table>
-  <table class="total_table mar20" border="0">
-    <tbody>
-      <tr>
-        <td>Your eligibility has been approved <strong>conditionally</strong> until the discrepancies between the information you provided and our records have been resolved. To resolve these discrepancies, <span class="underline">we need documentation from you</span>. (See sections below).  If you do not provide this information, <span class="underline">your health insurance may be cancelled</span>.</td>
-      </tr>
-    </tbody>
-  </table>
-  <table class="total_table" border="0">
-    <tbody>
-<tr>
-<td></br></td>
-</tr>
-      <tr>
-        <td><h3 style="color:rgb(54,95,145);">Your Private Health Plan Selection</h3></td>
-      </tr>
-      <tr>
-        <td>On  <%= format_date(Date.today) %>, the following individual(s) selected the <%= notice.enrollments[0].plan_name %> health insurance plan.</td>
-      </tr>
-     
-    </tbody>
-  </table>
- 
+    <%= render partial: "notices/ivl/enrolles_information", :locals => {notice: notice} %> 
 </div>
 
 <div class="page_break">
