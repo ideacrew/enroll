@@ -168,16 +168,16 @@ class Organization
     def build_query_params(search_params)
       query_params = []
 
-      if search_params[:q].present?
+      if !search_params[:q].blank?
         q = Regexp.new(Regexp.escape(search_params[:q].strip), true)
         query_params << {"legal_name" => q}
       end
 
-      if search_params[:languages].present?
+      if !search_params[:languages].blank?
         query_params << {"broker_agency_profile.languages_spoken" => { "$in" => search_params[:languages]} }
       end
 
-      if search_params[:working_hours].present?
+      if !search_params[:working_hours].blank?
         query_params << {"broker_agency_profile.working_hours" => eval(search_params[:working_hours])}
       end
 
@@ -185,9 +185,12 @@ class Organization
     end
 
     def search_agencies_by_criteria(search_params)
-      self.active_broker_agencies.where({
-        "$and" => build_query_params(search_params)
-        })
+      query_params = build_query_params(search_params)
+      if query_params.any?
+        self.active_broker_agencies.where({ "$and" => build_query_params(search_params) })
+      else
+        self.active_broker_agencies
+      end
     end
 
     def broker_agencies_with_matching_agency_or_broker(search_params)

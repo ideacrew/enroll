@@ -323,6 +323,17 @@ class Person
     def search_hash(s_str)
       clean_str = s_str.strip
       s_rex = Regexp.new(Regexp.escape(clean_str), true)
+      {
+        "$or" => ([
+          {"first_name" => s_rex},
+          {"last_name" => s_rex},
+          {"hbx_id" => s_rex},
+          {"encrypted_ssn" => encrypt_ssn(s_rex)}
+        ] + additional_exprs(clean_str))
+      }
+    end
+
+    def additional_exprs(clean_str)
       additional_exprs = []
       if clean_str.include?(" ")
         parts = clean_str.split(" ").compact
@@ -330,14 +341,19 @@ class Person
         last_re = Regexp.new(Regexp.escape(parts.last), true)
         additional_exprs << {:first_name => first_re, :last_name => last_re}
       end
-      {
+      additional_exprs
+    end
+
+    def search_first_name_last_name_npn(s_str, query=self)
+      clean_str = s_str.strip
+      s_rex = Regexp.new(Regexp.escape(s_str.strip), true)
+      query.where({
         "$or" => ([
           {"first_name" => s_rex},
           {"last_name" => s_rex},
-          {"hbx_id" => s_rex},
-          {"encrypted_ssn" => encrypt_ssn(s_rex)}
-        ] + additional_exprs)
-      }
+          {"broker_role.npn" => s_rex}
+          ] + additional_exprs(clean_str))
+        })
     end
 
     # Find all employee_roles.  Since person has_many employee_roles, person may show up
@@ -386,15 +402,6 @@ class Person
                           { :"broker_role.aasm_state" => status } 
                          ).selector
                )
-    end
-
-    def search_first_name_last_name_npn(s_str, query=self)
-      s_rex = Regexp.new(Regexp.escape(s_str.strip), true)
-      query.where({"$or" => ([
-        {"first_name" => s_rex},
-        {"last_name" => s_rex},
-        {"broker_role.npn" => s_rex}
-      ])})
     end
   end
 

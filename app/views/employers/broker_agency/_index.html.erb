@@ -7,7 +7,7 @@
       <div class="search-wp">
         <%= render 'shared/search', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", q: @q, remote: true, placeholder: 'Agency/Broker Name, NPN' %>
         <span class="pull-right">
-          <a class="search-options" style="cursor: pointer;">Advanced Options</a>
+          <a class="broker-advanced-search-options" style="cursor: pointer;">Advanced Options</a>
         </span>
       </div>
 
@@ -32,59 +32,50 @@
 </div>
 
 <script type="text/javascript">
-    $(function() {
+$(function() {
 
-      $(".search-options").click(function () {
-        $('#broker_agency_language_select').selectric('destroy');
-        $("#advanced_options").toggle();
-      });
+  $(".broker-advanced-search-options").click(function () {
+    $("#advanced_options").toggle();
+  });
 
-      function searchAgencies(){
-        var url = $("#broker_search_url").val();
-        var weekend = $("#working_hours").is(":checked") ? "true" : "false";
-        var languages = $("div.language_multi_select select").val();
+  function searchAgencies(){
+    var url = $("#broker_search_url").val();
 
-        $.ajax({
-          url: url,
-          type: "GET",
-          data : { 
-            'q': $("div.search-wp input#q").val(),
-            'working_hours': weekend, 
-            'languages': languages,
-            'advanced': 'true'
-          }
-        });
+    var options = {};
 
-        return true;
-      }
+    if ($("div.language_multi_select select").val()){
+      options['languages'] = $("div.language_multi_select select").val();
+    }
 
-      $("div.language_multi_select select").change(function(){
-        searchAgencies();
-      })
+    options['q'] = $("div.search-wp input#q").val();
 
-      $("#working_hours").change(function(){
-        searchAgencies();
-      })
+    if ($("#working_hours").is(":checked")){
+      options['working_hours'] = 'true';
+    }
 
-      $('#broker_agency_language_select').multiselect({
-          nonSelectedText: 'Language(s) spoken',
-          maxHeight: 300
-      });
-
-      $('#broker_agency_language_select').on('selectric-init', function(element){
-        $('.language_multi_select .selectric-wrapper').hide();
-      });
+    $.ajax({
+      url: url,
+      type: "GET",
+      data : options
     });
+  }
+
+  $("div.language_multi_select select").change(function(){
+    searchAgencies();
+  })
+
+  $("#working_hours").change(function(){
+    searchAgencies();
+  })
+
+  $('#broker_agency_language_select').multiselect({
+    nonSelectedText: 'Language(s) spoken',
+    maxHeight: 300
+  });
+
+  $('#broker_agency_language_select').on('selectric-init', function(event){
+    $('.language_multi_select .selectric-wrapper').hide();
+  });
+
+});
 </script>
-
-<style type="text/css">
- .language_multi_select .multiselect {
-    border: none;
-    font-size: 12px;
-    line-height: 30px;
- }
-
- .language_multi_select .multiselect .caret {
-    color: #bbb;
- }
-</style>
