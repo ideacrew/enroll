@@ -114,7 +114,8 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     if @market_kind == 'shop' and @coverage_kind == 'health'
-      @plans = @hbx_enrollment.benefit_group.decorated_elected_plans(@hbx_enrollment)
+      @benefit_group = @hbx_enrollment.benefit_group
+      @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
     elsif @market_kind == 'individual'
       elected_plans = Plan.individual_plans(coverage_kind: @coverage_kind, active_year: TimeKeeper.date_of_record.year)
       #FIXME need benefit_package for individual
