@@ -543,7 +543,7 @@ private
     today = TimeKeeper.date_of_record
     valid = case aasm_state
     when "published", "draft"
-      today == open_enrollment_start_on
+      today >= open_enrollment_start_on
     when "enrolling"
       today.end_of_day >= open_enrollment_end_on
     when "enrolled"
