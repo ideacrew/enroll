@@ -17,4 +17,5 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   it "should display the link of view detail" do
     expect(rendered).to have_selector("a[href='/products/plans/summary?hbx_enrollment_id=#{hbx_enrollment.id}&standard_component_id=#{plan.hios_id}']", text: "VIEW DETAILS")
   end
+
 end
