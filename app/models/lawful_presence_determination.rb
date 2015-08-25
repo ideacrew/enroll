@@ -1,7 +1,10 @@
 class LawfulPresenceDetermination
+  SSA_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.lawful_presence.ssa_verification_request"
+
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
+  include Acapi::Notifiers
 
   embedded_in :consumer_role
   field :vlp_verified_at, type: DateTime
@@ -25,6 +28,10 @@ class LawfulPresenceDetermination
       transitions from: :verification_pending, to: :verification_outstanding, after: :record_denial_information
       transitions from: :verification_outstanding, to: :verification_outstanding, after: :record_denial_information
     end
+  end
+
+  def start_ssa_process
+    notify(SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.consumer_role.person})
   end
 
   private
