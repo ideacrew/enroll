@@ -43,6 +43,11 @@ class GroupSelectionController < ApplicationController
       family_member_ids.include? member.applicant_id
     end
 
+    hbx_enrollment.writing_agent_id = current_user.id
+    hbx_enrollment.original_application_type = session[:original_application_type]
+    broker_role = current_user.person.broker_role
+    hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
+
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan

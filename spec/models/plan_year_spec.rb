@@ -826,6 +826,20 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
       end
 
+      context "and employer submits a valid plan year application with open enrollment before today" do
+        before do
+          TimeKeeper.set_date_of_record(Date.current.beginning_of_month.next_month)
+          workflow_plan_year_with_benefit_group.open_enrollment_start_on = TimeKeeper.date_of_record - 1.day
+          workflow_plan_year_with_benefit_group.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
+          workflow_plan_year_with_benefit_group.start_on = TimeKeeper.date_of_record.beginning_of_month.next_month
+          workflow_plan_year_with_benefit_group.end_on = workflow_plan_year_with_benefit_group.start_on + 1.year - 1.day
+          workflow_plan_year_with_benefit_group.publish!
+        end
+
+        it "should transition directly to enrolling state" do
+          expect(workflow_plan_year_with_benefit_group.aasm_state).to eq("enrolling")
+        end
+      end
 
       context "and employer submits a valid plan year application with today as start open enrollment" do
         before do
