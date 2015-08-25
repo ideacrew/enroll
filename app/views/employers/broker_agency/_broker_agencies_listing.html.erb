@@ -12,22 +12,23 @@
         </thead>
         <tbody>
           <% @broker_agency_profiles.each do |broker_agency| %>
-            <% brokers = broker_agency.active_broker_roles %>
-            <% next if brokers.empty? %>
+            <% broker_roles = broker_agency.active_broker_roles %>
+            <% broker_roles = (broker_roles & @filtered_broker_roles) if @filtered_broker_roles.present? %>
+            <% next if broker_roles.empty? %>
             <tr>
-              <td <%= "rowspan=#{brokers.size}" %>>
+              <td <%= "rowspan=#{broker_roles.size}" %>>
                 <%= link_to broker_agency.legal_name, employers_employer_profile_broker_agency_path(@employer_profile, broker_agency), remote: true %>
 
               </td>
-              <td <%= "rowspan=#{brokers.size}" %>>
+              <td <%= "rowspan=#{broker_roles.size}" %>>
                 <%= broker_agency.working_hours ? "Yes" : "No" %>
               </td>
-              <td <%= "rowspan=#{brokers.size}" %>>
+              <td <%= "rowspan=#{broker_roles.size}" %>>
                 <%= broker_agency.languages %>
               </td>
-              <%= render "employers/broker_agency/broker", broker: brokers.delete(broker_agency.primary_broker_role), broker_agency: broker_agency %>
-              <% brokers.each do |b| %>
-                <tr><%= render "employers/broker_agency/broker", broker: b, broker_agency: broker_agency %></tr>
+              <%= render "employers/broker_agency/broker", broker: broker_roles.delete(broker_agency.primary_broker_role), broker_agency: broker_agency %>
+              <% broker_roles.each do |broker_role| %>
+                <tr><%= render "employers/broker_agency/broker", broker: broker_role, broker_agency: broker_agency %></tr>
               <% end %>
             </tr>
             <% end %>

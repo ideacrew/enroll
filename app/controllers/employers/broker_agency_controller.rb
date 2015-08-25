@@ -18,11 +18,16 @@ class Employers::BrokerAgencyController < ApplicationController
       else
         @organizations = @orgs.to_a.first(10)
       end
+      @broker_agency_profiles = @organizations.map(&:broker_agency_profile).uniq
     else
-      @organizations = Organization.broker_agencies_with_matching_agency_or_broker(@filter_criteria)
+      results = Organization.broker_agencies_with_matching_agency_or_broker(@filter_criteria)
+      if results.first.is_a?(Person)
+        @filtered_broker_roles  = results.map(&:broker_role)
+        @broker_agency_profiles = results.map{|broker| broker.broker_role.broker_agency_profile}.uniq
+      else
+        @broker_agency_profiles = results.map(&:broker_agency_profile).uniq
+      end
     end
-
-    @broker_agency_profiles = @organizations.map(&:broker_agency_profile).uniq
   end
 
   def show
