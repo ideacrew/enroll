@@ -96,7 +96,7 @@ class ConsumerRole
   field :marital_status, type: String
   field :is_active, type: Boolean, default: true
 
-  field :raw_event_responses, type: Array, default: []
+    field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
