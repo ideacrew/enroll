@@ -40,7 +40,6 @@ RSpec.describe GroupSelectionController, :type => :controller do
     let(:benefit_group) {FactoryGirl.create(:benefit_group)}
     let(:benefit_group_assignment) {double(update: true)}
     let(:employee_roles){ [double("EmployeeRole")] }
-
     before do
       allow(coverage_household).to receive(:household).and_return(household)
       allow(household).to receive(:new_hbx_enrollment_from).and_return(hbx_enrollment)
@@ -54,6 +53,8 @@ RSpec.describe GroupSelectionController, :type => :controller do
     end
 
     it "should redirect" do
+      user=FactoryGirl.create(:user, id: 99, person: person)
+      sign_in user
       allow(hbx_enrollment).to receive(:save).and_return(true)
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)
@@ -61,6 +62,8 @@ RSpec.describe GroupSelectionController, :type => :controller do
     end
 
     it "with change_plan" do
+      user = FactoryGirl.create(:user, id: 98, person: FactoryGirl.create(:person))
+      sign_in user 
       allow(hbx_enrollment).to receive(:save).and_return(true)
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, change_plan: 'change'
       expect(response).to have_http_status(:redirect)
@@ -68,6 +71,8 @@ RSpec.describe GroupSelectionController, :type => :controller do
     end
 
     it "when keep_existing_plan" do
+      user = FactoryGirl.create(:user, id: 97, person: FactoryGirl.create(:person))
+      sign_in user 
       allow(hbx_enrollment).to receive(:save).and_return(true)
       allow(hbx_enrollment).to receive(:plan=).and_return(true)
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change'
@@ -76,6 +81,8 @@ RSpec.describe GroupSelectionController, :type => :controller do
     end
 
     it "should render group selection page if not valid" do
+      user = FactoryGirl.create(:user, id: 96, person: FactoryGirl.create(:person))
+      sign_in user 
       allow(person).to receive(:employee_roles).and_return([employee_role])
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)

@@ -154,5 +154,9 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
       expect(rendered).to match(/<dd>.*#{current_plan_year.total_enrolled_count}.*<\/dd>/m)
       expect(rendered).to match(/<dd>#{boolean_to_human(current_plan_year.non_business_owner_enrollment_count > 0)}<\/dd>/m)
     end
+
+    it "should display a progress bar" do
+      expect(rendered).to have_selector('.progress-bar')
+    end   
   end
 end

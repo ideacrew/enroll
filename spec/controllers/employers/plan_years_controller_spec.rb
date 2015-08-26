@@ -40,10 +40,11 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:benefit_groups){ [
       double(
         "BenefitGroup",
-        estimated_monthly_employer_contribution: 56.2,
-        estimated_monthly_min_employee_cost: 200.21,
-        estimated_monthly_max_employee_cost: 500.32
+        monthly_employer_contribution_amount: 56.2,
+        monthly_min_employee_cost: 200.21,
+        monthly_max_employee_cost: 500.32
         )] }
+
     let(:plan){ double("Plan") }
     it "should calculate employer contributions" do
       allow(EmployerProfile).to receive(:find).with("id").and_return(employer_profile)
@@ -451,6 +452,33 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
     it "should be get plan" do
       expect(assigns(:plan)).to eq plan
+    end
+  end
+
+  describe "GET employee_costs" do
+    let(:plan_year){ double }
+    let(:benefit_group) { FactoryGirl.build(:benefit_group) }
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+    let(:census_employees) { double }
+
+    before do
+      @employer_profile = FactoryGirl.create(:employer_profile)
+      @reference_plan = FactoryGirl.create(:plan_with_premium_tables)
+      @census_employees = [census_employee, census_employee]
+    end
+
+    it "should calculate employer contributions" do
+      allow(EmployerProfile).to receive(:find).with(@employer_profile.id).and_return(@employer_profile)
+      allow(Forms::PlanYearForm).to receive(:build).and_return(plan_year)
+      allow(plan_year).to receive(:benefit_groups).and_return(benefit_group.to_a)
+      allow(@employer_profile).to receive(:census_employees).and_return(census_employees)
+      allow(census_employees).to receive(:active).and_return(@census_employees)
+      allow(plan_year).to receive(:employer_profile).and_return(@employer_profile)
+
+      sign_in
+      xhr :get, :employee_costs, employer_profile_id: @employer_profile.id, reference_plan_id: @reference_plan.id
+
+      expect(response).to have_http_status(:success)
     end
   end
 end

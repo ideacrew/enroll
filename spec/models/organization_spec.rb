@@ -139,4 +139,164 @@ RSpec.describe Organization, dbclean: :after_each do
       expect(Organization.valid_carrier_names_for_options).to eq carriers
     end
   end
+
+  describe "Broker Agency Search" do
+
+    before do
+      @agency1 = FactoryGirl.create(:broker_agency, legal_name: "Health Brokers Inc")
+      @agency2 = FactoryGirl.create(:broker_agency, legal_name: "DC Health Inc")
+    end
+
+    context ".active_broker_agencies" do
+      context 'when there is no active broker agency' do
+        it 'should return empty set' do 
+          agencies = Organization.active_broker_agencies
+          expect(agencies.count).to eq(0)
+        end
+      end
+
+      context 'when there is active broker agency' do
+        before do
+          @agency2.broker_agency_profile.primary_broker_role.update_attributes(broker_agency_profile_id: @agency2.broker_agency_profile.id) 
+          @agency2.broker_agency_profile.primary_broker_role.approve!
+        end
+
+        it 'should return empty set' do 
+          agencies = Organization.active_broker_agencies
+          expect(agencies.count).to eq(1)
+          expect(agencies.first.legal_name).to eq(@agency2.legal_name)
+        end
+      end
+    end
+
+    context 'with advanced options' do 
+
+      before do 
+        @agency1.broker_agency_profile.primary_broker_role.update_attributes(broker_agency_profile_id: @agency1.broker_agency_profile.id)
+        @agency1.broker_agency_profile.update_attributes(languages_spoken: ['en', 'fr', 'de'])
+        @agency1.broker_agency_profile.primary_broker_role.approve!
+        @agent1 = @agency1.broker_agency_profile.primary_broker_role.person
+
+        @agency2.broker_agency_profile.primary_broker_role.update_attributes(broker_agency_profile_id: @agency2.broker_agency_profile.id)
+        @agency2.broker_agency_profile.update_attributes({languages_spoken: ['bn', 'hi'], working_hours: true}) 
+        @agency2.broker_agency_profile.primary_broker_role.approve!
+        @agent2 = @agency2.broker_agency_profile.primary_broker_role.person
+      end
+
+      context ".search_agencies_by_criteria" do
+        context 'when searched with legal name' do 
+          it 'should return matching agency' do
+            agencies = Organization.search_agencies_by_criteria({q: 'DC'})
+            expect(agencies.count).to eq(1)
+            expect(agencies.first.legal_name).to eq(@agency2.legal_name)
+          end
+        end
+
+        context 'when searched with multiple languages' do 
+          it 'should return matching agency' do
+            agencies = Organization.search_agencies_by_criteria({languages: ['de', 'en']})
+            expect(agencies.count).to eq(1)
+            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+
+            agencies = Organization.search_agencies_by_criteria({languages: ['bn', 'de']})
+            expect(agencies.count).to eq(2)
+            expect(agencies.map(&:legal_name)).to eq([@agency2.legal_name, @agency1.legal_name])
+          end
+        end
+
+        context 'when searched with weekend hours' do 
+          it 'should return matching agency' do
+            agencies = Organization.search_agencies_by_criteria({working_hours: 'true'})
+            expect(agencies.count).to eq(1)
+            expect(agencies.first.legal_name).to eq(@agency2.legal_name)
+          end
+        end
+
+        context 'when searched by name, languages, weekend hours' do 
+          it 'should return matching agency' do
+            agencies = Organization.search_agencies_by_criteria({ q: 'Brokers', working_hours: 'true' })
+            expect(agencies.count).to eq(0)
+
+            agencies = Organization.search_agencies_by_criteria({ q: 'Brokers', working_hours: 'false' })
+            expect(agencies.count).to eq(1)
+            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+
+            agencies = Organization.search_agencies_by_criteria({ q: 'Health', languages: ['bn'], working_hours: 'true' })
+            expect(agencies.count).to eq(1)
+            expect(agencies.first.legal_name).to eq(@agency2.legal_name)
+
+            agencies = Organization.search_agencies_by_criteria({ q: 'Health', languages: ['bn', 'en'] })
+            expect(agencies.count).to eq(2)
+            expect(agencies.map(&:legal_name)).to eq([@agency2.legal_name, @agency1.legal_name])
+
+            agencies = Organization.search_agencies_by_criteria({ q: 'Health', languages: ['bn', 'en'], working_hours: 'false' })
+            expect(agencies.count).to eq(1)
+            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+
+            agencies = Organization.search_agencies_by_criteria({ languages: ['bn', 'en'], working_hours: 'false' })
+            expect(agencies.count).to eq(1)
+            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+          end
+        end
+      end
+
+      context ".broker_agencies_with_matching_agency_or_broker" do
+        context 'when searching by broker name and npn' do 
+          it 'should return matching broker instead of agency' do
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({q: @agent2.last_name})
+            expect(agencies.count).to eq(1)
+            expect(agencies.first).to eq(@agent2)
+
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({q: @agent1.broker_role.npn})
+            expect(agencies.count).to eq(1)
+            expect(agencies.first).to eq(@agent1)
+          end
+        end
+
+        context 'when searching by broker name and agency languages' do 
+          it 'should return matching broker with matching agency criteria' do
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({q: @agent1.first_name})
+            expect(agencies.count).to eq(2)
+
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({q: @agent1.first_name, languages: ['bn'], working_hours: 'true'})
+            expect(agencies.count).to eq(1)
+            expect(agencies.first).to eq(@agent2)
+
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({q: @agent1.first_name, working_hours: 'false'})
+            expect(agencies.count).to eq(1)
+            expect(agencies.first).to eq(@agent1)
+
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({q: @agent1.first_name, languages: ['bn', 'en']})
+            expect(agencies.count).to eq(2)
+            expect(agencies).to include(@agent1)
+            expect(agencies).to include(@agent2)
+          end
+        end
+
+        context 'when searching by broker agency name, languages, hours' do 
+          it 'should return matching agencies' do
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({ q: 'Brokers', working_hours: 'false' })
+            expect(agencies.count).to eq(1)
+            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({ q: 'Health', languages: ['bn'], working_hours: 'true' })
+            expect(agencies.count).to eq(1)
+            expect(agencies.first.legal_name).to eq(@agency2.legal_name)
+
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({ q: 'Health', languages: ['bn', 'en'] })
+            expect(agencies.count).to eq(2)
+            expect(agencies.map(&:legal_name)).to eq([@agency2.legal_name, @agency1.legal_name])
+
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({ q: 'Health', languages: ['bn', 'en'], working_hours: 'false' })
+            expect(agencies.count).to eq(1)
+            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({ languages: ['bn', 'en'], working_hours: 'false' })
+            expect(agencies.count).to eq(1)
+            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+          end
+        end
+      end
+    end
+  end
 end

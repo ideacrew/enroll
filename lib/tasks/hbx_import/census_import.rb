@@ -11,7 +11,7 @@ module HbxImport
     def run
       census_employees_from_csv = []
       CSV.foreach(file_name, headers: true) do |row|
-        census_employees_from_csv << CensusRecord.from_row(row)
+        census_employees_from_csv << CensusRecord.from_row(row.fields)
       end
       census_employees_from_csv = census_employees_from_csv.reject(&:nil?).sort.uniq
       puts "Found #{census_employees_from_csv.size} unique census records in #{census_employees_from_csv.collect(&:fein).uniq.size} employers."
@@ -86,7 +86,8 @@ module HbxImport
   end
 
   CensusRecord = Struct.new(
-    :dba, :fein, :first_name, :last_name, :ssn, :dob, :doh, :dot, :work_email,
+    :dba, :fein, :first_name, :last_name, :ssn, 
+    :dob, :doh, :dot, :work_email,
     :person_email, :individual_external_id, :employee_external_id,
     :record_start_date, :record_end_date, :gender
   ) do
@@ -103,9 +104,15 @@ module HbxImport
 
     def self.from_row(row)
       ee = CensusRecord.new
-      %w[itself to_digits itself itself to_digits to_date_safe to_date_safe to_date_safe itself
-         itself itself itself itself itself itself].each_with_index do |conversion, index|
-        ee.send("#{ee.members[index]}=", row[index].send(conversion))
+      %w[itself to_digits itself itself to_digits 
+         to_date_safe to_date_safe to_date_safe itself
+         itself itself itself
+         itself itself downcase].each_with_index do |conversion, index|
+        begin
+          ee.send("#{ee.members[index]}=", row[index].send(conversion))
+        rescue
+          raise row.inspect
+        end
       end
       ee = nil if ee.fein.nil? || ee.ssn.nil? || ee.dob.nil? || ee.doh.nil?
       ee

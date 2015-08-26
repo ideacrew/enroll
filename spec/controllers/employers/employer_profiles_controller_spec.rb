@@ -70,6 +70,22 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(assigns(:census_employees)).to eq employer_profile.census_employees.active.sorted.search_by(employee_name: '').to_a.first(20)
     end
 
+   it "should get employees with names starting with C and then B" do
+      10.times do
+        FactoryGirl.create(:census_employee, employer_profile: employer_profile, last_name: "A#{('A'..'Z').to_a.sample}last_name")
+      end
+      15.times do
+        FactoryGirl.create(:census_employee, employer_profile: employer_profile, last_name: "B#{('A'..'Z').to_a.sample}last_name")
+      end
+      11.times do
+        FactoryGirl.create(:census_employee, employer_profile: employer_profile, last_name: "C#{('A'..'Z').to_a.sample}last_name")
+      end
+      xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees', page: 'C'}
+      expect(assigns(:census_employees).count).to eq 11
+      xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees', page: 'B'}
+      expect(assigns(:census_employees).count).to eq 15
+    end
+
     it "search by employee name" do
       employer_profile.census_employees.delete_all
       census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile)

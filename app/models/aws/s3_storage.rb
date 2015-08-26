@@ -2,35 +2,43 @@ module Aws
   class S3Storage
 
     def initialize
-      client=Aws::S3::Client.new
-      @resource= Aws::S3::Resource.new(client: client)
+      setup
     end
 
-    def save(file, bucket_name, key=SecureRandom.uuid)
+    # If success, return URI which has the s3 bucket key
+    # else return nil
+    def save(file_path, bucket_name, key=SecureRandom.uuid)
+      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:<#{bucket_name}>##{key}"
       begin
-        object = @resource.bucket(bucket_name).object(key)
-        object.upload_file(file)
-        SecureRandom.uuid
+        object = get_object(bucket_name, key)
+        if object.upload_file(file_path)
+          uri
+        else
+          nil
+        end
       rescue Exception => e
         nil
       end
     end
 
-    def self.save(file, bucket_name, key=SecureRandom.uuid)
+    # If success, return URI which has the s3 bucket key
+    # else return nil
+    def self.save(file_path, bucket_name, key=SecureRandom.uuid)
+      Aws::S3Storage.new.save(file_path, bucket_name, key)
+    end
+
+    def self.find
+
+    end
+
+    private
+    def get_object(bucket_name, key)
+      @resource.bucket(bucket_name).object(key)
+    end
+
+    def setup
       client=Aws::S3::Client.new
-      @resource= Aws::S3::Resource.new(client: client)
-      begin
-        object = @resource.bucket(bucket_name).object(key)
-        object.upload_file(file)
-        key
-      rescue Exception => e
-        false
-      end
+      @resource=Aws::S3::Resource.new(client: client)
     end
-
-    def find
-
-    end
-
   end
 end

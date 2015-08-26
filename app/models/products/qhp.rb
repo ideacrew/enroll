@@ -125,4 +125,11 @@ class Products::Qhp
     "Specialty Drugs"
   ]
 
+
+  def self.plan_hsa_status_map(plan_ids:)
+    plan_hsa_status = {}
+    ::Products::Qhp.in(plan_id: plan_ids).map {|qhp| plan_hsa_status[qhp.plan_id.try(:to_s)] = qhp.hsa_eligibility}
+
+    plan_hsa_status
+  end
 end

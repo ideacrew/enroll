@@ -72,19 +72,33 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show
-    set_show_variables
-    if @current_plan_year.present?
-      #FIXME commeted out for performance test 
-      #enrollments = HbxEnrollment.covered(@current_plan_year.hbx_enrollments)
-      @premium_amt_total = 0 #enrollments.map(&:total_premium).sum
-      @employee_cost_total = 0 #enrollments.map(&:total_employee_cost).sum
-      @employer_contribution_total = 0 #enrollments.map(&:total_employer_contribution).sum
+   if params[:q] || params[:page] || params[:commit] || params[:status]      
+     paginate_employees
+   else
+      @current_plan_year = @employer_profile.published_plan_year
+      @plan_years = @employer_profile.plan_years.order(id: :desc)
+      @broker_agency_accounts = @employer_profile.broker_agency_accounts
+      if @current_plan_year.present?
+        #FIXME commeted out for performance test 
+        #enrollments = HbxEnrollment.covered(@current_plan_year.hbx_enrollments)
+        @premium_amt_total = 0 #enrollments.map(&:total_premium).sum
+        @employee_cost_total = 0 #enrollments.map(&:total_employee_cost).sum
+        @employer_contribution_total = 0 #enrollments.map(&:total_employer_contribution).sum
+      end
     end
   end
 
   def show_profile
     @tab = params['tab']
-    set_show_variables
+    if @tab == 'benefits'
+      @current_plan_year = @employer_profile.published_plan_year
+      @plan_years = @employer_profile.plan_years.order(id: :desc)
+    elsif @tab == 'employees'
+      paginate_employees
+    elsif @tab == 'families'
+     #families defined as employee_roles.each { |ee| ee.person.primary_family }
+     paginate_families
+    end
   end
 
   def new
@@ -158,29 +172,18 @@ class Employers::EmployerProfilesController < ApplicationController
 
       if params[:page].present?
         page_no = cur_page_no(@page_alphabets.first)
-        @census_employees = census_employees.where("last_name" => /^#{page_no}/i)
+        @census_employees = census_employees.where("last_name" => /^#{page_no}/i).page(params[:pagina])
         #@avaliable_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
       else
         @total_census_employees_quantity = census_employees.count
-        @census_employees = census_employees.to_a.first(20)
+        @census_employees = census_employees.limit(20).to_a
         #@avaliable_employee_names ||= @census_employees.map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
       end
     end
 
     def paginate_families
+      #FIXME add paginate
       @employees = @employer_profile.employee_roles.to_a
-    end
-
-    def set_show_variables
-      if @tab != 'employees' && @tab != 'families'
-        @current_plan_year = @employer_profile.published_plan_year
-        @plan_years = @employer_profile.plan_years.order(id: :desc)
-        @broker_agency_accounts = @employer_profile.broker_agency_accounts
-      end
-
-      paginate_employees #if @tab == 'employees'
-      #families defined as employee_roles.each { |ee| ee.person.primary_family }
-      paginate_families #if @tab == 'families'
     end
 
     def check_employer_staff_role

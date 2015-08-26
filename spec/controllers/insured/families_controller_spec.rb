@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Insured::FamiliesController do
 
-  let(:hbx_enrollments) { double }
+  let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user) }
   let(:family) { double("Family") }
@@ -22,6 +22,7 @@ RSpec.describe Insured::FamiliesController do
       allow(family).to receive(:latest_household).and_return(household)
       allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:coverage_selected).and_return(hbx_enrollments)
     end
 
     context "for SHOP market" do    
@@ -39,9 +40,13 @@ RSpec.describe Insured::FamiliesController do
       end
 
       it "should assign variables" do
-        expect(assigns(:qualifying_life_events)).to be_an_instance_of(Mongoid::Criteria)
+        expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
         expect(assigns(:hbx_enrollments)).to eq(hbx_enrollments)
         expect(assigns(:employee_role)).to eq(employee_roles[0])
+      end
+
+      it "should get shop market events" do
+        expect(assigns(:qualifying_life_events)).to eq QualifyingLifeEventKind.shop_market_events
       end
     end
 
@@ -60,9 +65,13 @@ RSpec.describe Insured::FamiliesController do
       end
 
       it "should assign variables" do
-        expect(assigns(:qualifying_life_events)).to be_an_instance_of(Mongoid::Criteria)
+        expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
         expect(assigns(:hbx_enrollments)).to eq(hbx_enrollments)
         expect(assigns(:employee_role)).to be_nil
+      end
+
+      it "should get individual market events" do
+        expect(assigns(:qualifying_life_events)).to eq QualifyingLifeEventKind.individual_market_events
       end
     end
   end
@@ -82,7 +91,7 @@ RSpec.describe Insured::FamiliesController do
     end
 
     it "should assign variables" do
-      expect(assigns(:qualifying_life_events)).to be_an_instance_of(Mongoid::Criteria)
+      expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
       expect(assigns(:family_members)).to eq(family_members)
     end
   end

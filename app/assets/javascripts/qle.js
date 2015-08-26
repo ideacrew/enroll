@@ -1,6 +1,6 @@
 $(function () {
   $(document).on('click', 'a.qle-menu-item', function() {
-    //$('#qle-menu').hide();
+    $('#qle_flow_info #qle-menu').hide();
     $('.qle-details-title').html($(this).html());
     $('#event-title').html($(this).html());
     $('#change_plan').val($(this).html());
@@ -14,9 +14,8 @@ $(function () {
 		$('#qle-details .success-info, #qle-details .error-info').addClass('hidden');
     $('#qle-details .qle-form').removeClass('hidden');
     $("#qle_date").val("");
-		//$('#qle-details .default-info').removeClass('hidden');
 
-		//$('#qle-menu').show();
+		$('#qle_flow_info #qle-menu').show();
 	});
 
 	// Disable form submit on pressing Enter, instead click Submit link
@@ -33,14 +32,11 @@ $(function () {
 	$(document).on('click', '#qle_submit', function() {
 		if(check_qle_date()) {
 			$('#qle_date').removeClass('input-error');
-			//$('#qle-input-info').html('Enter the date of the event.')
 			get_qle_date();
 		} else {
-			//$('#qle-input-info').html('Enter a valid date.');
 			$('#qle_date').addClass('input-error');
 			$('.success-info').addClass('hidden');
 			$('.error-info').addClass('hidden');
-			//$('.default-info').removeClass('hidden');
 		}
 	});
 
@@ -51,8 +47,7 @@ $(function () {
 	}
 
   function get_qle_date() {
-    qle_string = $(".qle-details-title").html();
-    qle_type = qle_string.substring(1, qle_string.length-1);
+    qle_type = $(".qle-details-title").text();
 
     $.ajax({
       type: "GET",
@@ -66,9 +61,14 @@ $(function () {
     var dateMin = $(target).attr("data-date-min");
     var dateMax = $(target).attr("data-date-max");
     var cur_qle_title = $('.qle-details-title').html();
-    if (cur_qle_title === "I've had a baby" || cur_qle_title === "Death" || cur_qle_title === "I've married") {
+    if (cur_qle_title === "I've had a baby" || cur_qle_title === "A family member has died" || cur_qle_title === "I've married") {
+      dateMin = "-60d";
       dateMax = "+0d";
-    }
+    };
+    if (cur_qle_title === "Myself or a family member has lost other coverage" || cur_qle_title === "Mid-month loss of mec" || cur_qle_title === "My employer failed to pay cobra premiums on time" || cur_qle_title === "I've moved into the district of columbia") {
+      dateMin = "-60d";
+      dateMax = "+60d";
+    };
 
     $(target).val('');
     $(target).datepicker('destroy');

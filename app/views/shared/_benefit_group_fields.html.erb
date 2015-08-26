@@ -23,33 +23,46 @@
         <%= render "shared/reference_plans_list", f: f %>
       </div>
     </div>
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="employer_cost_info" style='clear: both;'>
+        <div class='loader' style="display:none">
+          <button class="btn btn-md btn-warning">
+            <span class="glyphicon glyphicon-refresh spinning"></span> Loading...    
+          </button>
+        </div>
+        <h4></h4>  
+        <div class="content"></div>
+      </div>
+    </div>
+
+    <div id="employer_cost_info_btn" class="col-md-12 col-sm-12 col-xs-12">
+      <div class="btn btn-select disabled pull-right">
+        Employee Costs
+      </div>
+      <%= link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "employee_costs_link", class: "hidden" %>
+    </div>
+
+    <%= render "employers/plan_years/employee_costs_modal" %>
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <h3> Relationship Benefits</h3>
+      <div class='form-inputs'>
+        <% f.object.relationship_benefits = generate_relationship_benefits(f.object) %>
+        <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
+        <%= render "shared/relationship_benefit_fields", f: rb %>
+        <% end %>
+      </div>
+    </div>
+
     <div class="col-md-12 col-sm-12 col-xs-12 top-pd">
       <div class="reference_plan_info" style='clear: both;'>
         <h4></h4>
         <div class="content"></div>
       </div>
     </div>
-    <div class="col-md-12 col-sm-12 col-xs-12 top-pd">
-    <div class="employer_cost_info" style='clear: both;'>
-      <div class='loader' style="display:none">
-        <button class="btn btn-md btn-warning">
-          <span class="glyphicon glyphicon-refresh spinning"></span> Loading...    
-        </button>
-      </div>
-      <h4></h4>  
-      <div class="content"></div>
-    </div>
-    </div>
+
   </div>
 
-  <div class="top-pd">
-    <h3> Relationship Benefits</h3>
-    <div class='form-inputs'>
-      <% f.object.relationship_benefits = generate_relationship_benefits(f.object) %>
-      <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
-        <%= render "shared/relationship_benefit_fields", f: rb %>
-      <% end %>
-    </div>
-  </div>
 </fieldset>
 <div class="clear"></div>

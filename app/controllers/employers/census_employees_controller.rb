@@ -55,9 +55,18 @@ class Employers::CensusEmployeesController < ApplicationController
     end
 
     @census_employee.attributes = census_employee_params
+
+    destroyed_dependent_ids = census_employee_params[:census_dependents_attributes].delete_if{|k,v| v.has_key?("_destroy") }.values.map{|x| x[:id]} if census_employee_params[:census_dependents_attributes]
+
     authorize! :update, @census_employee
 
     if @census_employee.save
+      if destroyed_dependent_ids.present?
+        destroyed_dependent_ids.each do |g|
+          census_dependent = @census_employee.census_dependents.find(g)
+          census_dependent.delete
+        end
+      end
       flash[:notice] = "Census Employee is successfully updated."
       if benefit_group_id.present?
         flash[:notice] = "Census Employee is successfully updated."
@@ -156,7 +165,7 @@ class Employers::CensusEmployeesController < ApplicationController
       user.roles.delete("employee")
     end
     benefit_group_assignment = @census_employee.benefit_group_assignments.last
-    hbx_enrollment = benefit_group_assignment.hbx_enrollment 
+    hbx_enrollment = benefit_group_assignment.hbx_enrollment
     benefit_group_assignment.delink_coverage
     @census_employee.delink_employee_role
 

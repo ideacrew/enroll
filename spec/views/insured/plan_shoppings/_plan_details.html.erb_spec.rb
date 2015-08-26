@@ -25,6 +25,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
     allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
     assign(:plan_hsa_status, plan_hsa_status)
     assign(:hbx_enrollment, hbx_enrollment)
+    assign(:carrier_names_map, {})
     render "insured/plan_shoppings/plan_details", plan: plan
   end
 

@@ -24,24 +24,24 @@ describe Forms::EmployeeCandidate do
 end
 
 describe Forms::EmployeeCandidate, "asked to match a census employee" do
-  let(:fake_plan_year) { instance_double("PlanYear")}
-  let(:census_employee) { instance_double("CensusEmployee", :first_name => "Tom", :last_name => "Baker", :gender => "male", :ssn => "123456789", :dob => Date.new(2012,10,12), :aasm_state => "eligible", :eligible? => true ) }
+  let(:fake_plan_year) { instance_double("PlanYear") }
+  let(:census_employee) { instance_double("CensusEmployee", :first_name => "Tom", :last_name => "Baker", :gender => "male", :ssn => "123456789", :dob => Date.new(2012, 10, 12), :aasm_state => "eligible", :eligible? => true) }
   let(:fake_employer) { instance_double("EmployerProfile", :census_employees => [census_employee], :plan_years => [fake_plan_year]) }
   let(:fake_org) { instance_double("Organization", :employer_profile => fake_employer) }
 
   subject {
     Forms::EmployeeCandidate.new({
-      :dob => "2012-10-12",
-      :ssn => "123-45-6789",
-      :first_name => "Tom",
-      :last_name => "Baker",
-      :gender => "male"
-    })
+                                     :dob => "2012-10-12",
+                                     :ssn => "123-45-6789",
+                                     :first_name => "Tom",
+                                     :last_name => "Baker",
+                                     :gender => "male"
+                                 })
   }
 
   let(:search_params) { {
-    :dob => Date.new(2012, 10, 12),
-    :ssn => "123456789"
+      :dob => Date.new(2012, 10, 12),
+      :ssn => "123456789"
   } }
 
   it "should return nothing if that employee does not exist" do
@@ -83,18 +83,18 @@ describe Forms::EmployeeCandidate, "asked to match a person" do
 
   subject {
     Forms::EmployeeCandidate.new({
-      :dob => "2012-10-12",
-      :ssn => "123-45-6789",
-      :first_name => "yo",
-      :last_name => "guy",
-      :gender => "m",
-      :user_id => 20
-    })
+                                     :dob => "2012-10-12",
+                                     :ssn => "123-45-6789",
+                                     :first_name => "yo",
+                                     :last_name => "guy",
+                                     :gender => "m",
+                                     :user_id => 20
+                                 })
   }
 
   let(:search_params) { {
-    :dob => Date.new(2012, 10, 12),
-    :encrypted_ssn => Person.encrypt_ssn("123456789")
+      :dob => Date.new(2012, 10, 12),
+      :encrypted_ssn => Person.encrypt_ssn("123456789")
   } }
 
   let(:user) { nil }
@@ -133,6 +133,14 @@ describe Forms::EmployeeCandidate, "asked to match a person" do
       allow(Person).to receive(:where).with(search_params).and_return(people)
       subject.valid?
       expect(subject).to have_errors_on(:base)
+    end
+  end
+
+  context "future date of birth" do
+    it "gives error on dob" do
+      subject.dob = "2022-10-12"
+      expect(subject.valid?).to be_falsey
+      expect(subject).to have_errors_on(:dob)
     end
   end
 end
