@@ -33,18 +33,19 @@ class CensusEmployee < CensusMember
   validate :check_census_dependents_relationship
   validate :no_duplicate_census_dependent_ssns
 
-  index({"aasm_state" => 1})
-  index({"employer_profile_id" => 1})
-  index({"employee_role_id" => 1}, {sparse: true})
-  index({"last_name" => 1})
-  index({"hired_on" => -1})
-  index({"is_business_owner" => 1})
-  index({"encrypted_ssn" => 1})
-  index({"dob" => 1})
-  index({"encrypted_ssn" => 1, "dob" => 1, "aasm_state" => 1})
+  index({aasm_state: 1})
+  index({employer_profile_id: 1, last_name: 1, first_name: 1 })
+  index({employer_profile_id: 1, hired_on: 1, last_name: 1, first_name: 1 })
+  index({encrypted_ssn: 1, dob: 1, aasm_state: 1})
+  index({employee_role_id: 1}, {sparse: true})
+  index({last_name: 1})
+  index({hired_on: -1})
+  index({is_business_owner: 1})
+  index({dob: 1})
   index({"benefit_group_assignments._id" => 1})
   index({"benefit_group_assignments.benefit_group_id" => 1})
   index({"benefit_group_assignments.aasm_state" => 1})
+
 
   scope :active,      ->{ any_in(aasm_state: ["eligible", "employee_role_linked"]) }
   scope :terminated,  ->{ any_in(aasm_state: ["employment_terminated", "rehired"]) }
@@ -60,12 +61,11 @@ class CensusEmployee < CensusMember
   scope :order_by_last_name,    -> { order(:"census_employee.last_name".asc) }
   scope :order_by_first_name,   -> { order(:"census_employee.first_name".asc) }
 
-  scope :non_business_owner,      ->{ where(is_business_owner: false) }
-  # scope :by_benefit_group_ids,    ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
+  scope :by_employer_profile_id,          ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
+  scope :non_business_owner,              ->{ where(is_business_owner: false) }
   scope :by_benefit_group_assignment_ids, ->(benefit_group_assignment_ids) { any_in("benefit_group_assignments._id" => benefit_group_assignment_ids) }
-  scope :by_benefit_group_ids,    ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
-  scope :by_employer_profile_id,  ->(employer_profile_id) { where(employer_profile_id: employer_profile_id) }
-  scope :by_ssn,                  ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
+  scope :by_benefit_group_ids,            ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
+  scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
 
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: "eligible")
