@@ -25,3 +25,4 @@ en:
           try_again_later: "The Identity Proofing service is currently unavailable, please try again later."
         failed_validation:
           contact_information: "You have not passed identity validation.  To proceed please contact the exchange at #XXX-XXX-XXXX, and provide them with reference number #%{ref_number}."
+          override: "Please click here once you have contacted the exchange and been told to proceed."

@@ -14,7 +14,7 @@ class Document
   # Entity responsible for making the resource - person, organization or service
   field :creator, type: String, default: "dchl"
 
-  # Controlled vocabulary w/classification codes
+  # Controlled vocabulary w/classification codes. Mapped to ConsumerRole::VLP_DOCUMENT_KINDS
   field :subject, type: String
 
   # May include but is not limited to: an abstract, a table of contents, a graphical representation, or a free-text account of the resource
@@ -54,6 +54,15 @@ class Document
   field :rights, type: String
 
   field :tags, type: Array, default: []
+
+  # Mapped to VLP_DOCUMENT_IDENTIFICATION_KINDS value
+  field :document_number, type:String
+
+  # date of expiration of the document. e.g. passport expiration date
+  field :expiration_date, type:Date
+
+  # country which issued the document. e.g. passport issuing country
+  field :issuing_country, type:String
 
   validates_presence_of :title, :creator, :publisher, :type, :format, :identifier, :source, :language
 

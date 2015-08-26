@@ -77,7 +77,7 @@ class ConsumerRole
     ]
 
   # FiveYearBarApplicabilityIndicator ??
-
+  field :five_year_bar, type: Boolean, default: false
   field :aasm_state, type: String, default: "identity_unverified"
   field :identity_verified_date, type: Date
   field :identity_final_decision_code, type: String
