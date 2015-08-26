@@ -5,16 +5,20 @@ module Subscribers
     end
 
     def call(event_name, e_start, e_end, msg_id, payload)
-      stringed_key_payload = payload.stringify_keys
-      process_response(stringed_key_payload['body'], stringed_key_payload['individual_id'])
+      process_response(payload)
     end
 
     private
-    def process_response(xml, person_hbx_id)
+    def process_response(payload)
+      stringed_key_payload = payload.stringify_keys
+      xml = stringed_key_payload['body']
+      person_hbx_id = stringed_key_payload['individual_id']
+
       person = find_person(person_hbx_id)
       return if person.nil? || person.consumer_role.nil?
 
       consumer_role = person.consumer_role
+      consumer_role.raw_event_responses << {:lawful_presence_response => payload}
       xml_hash = xml_to_hash(xml)
 
       update_consumer_role(consumer_role, xml_hash)
@@ -33,6 +37,8 @@ module Subscribers
         args.citizen_status = get_citizen_status(xml_hash[:lawful_presence_determination][:legal_status])
         consumer_role.authorize_lawful_presence(args)
       end
+
+      consumer_role.save
     end
 
     def get_citizen_status(legal_status)
