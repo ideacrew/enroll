@@ -66,6 +66,8 @@ Then("Individual should see identity verification page and clicks on submit") do
   @browser.radio(class: /interaction-choice-control-value-interactive-verification-questions-attributes-1-response-id-c/).set
   @browser.button(class: /interaction-click-control-submit/).wait_until_present
   @browser.button(class: /interaction-click-control-submit/).click
+  @browser.button(class: /interaction-click-control-override-identity-verification/).wait_until_present
+  @browser.button(class: /interaction-click-control-override-identity-verification/).click
 end
 
 Then(/Individual should see the dependents form/) do

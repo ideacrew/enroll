@@ -24,7 +24,7 @@ class Consumer::ConsumerRolesController < ApplicationController
     @person.phones = []
     @person.emails = []
     if @person.update_attributes(params.require(:person).permit(*person_parameters_list))
-      redirect_to new_insured_interactive_identity_verifications_path
+      redirect_to new_insured_interactive_identity_verification_path
     else
       build_nested_models
       respond_to do |format|
