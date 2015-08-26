@@ -38,9 +38,10 @@ class Consumer::EmployeeRolesController < ApplicationController
 
   def create
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
-    @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(current_user, @employment_relationship.census_employee, @employment_relationship)
+    @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(actual_user, @employment_relationship.census_employee, @employment_relationship)
     if @employee_role.present? && @employee_role.try(:census_employee).try(:employee_role_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
+      session[:person_id] = @person.id
       build_nested_models
       respond_to do |format|
         format.html { redirect_to :action => "edit", :id => @employee_role.id }
@@ -54,7 +55,7 @@ class Consumer::EmployeeRolesController < ApplicationController
 
   def edit
     @employee_role = EmployeeRole.find(params.require(:id))
-    @person = Forms::EmployeeRole.new(current_user.person, @employee_role)
+    @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     @person.addresses << @employee_role.new_census_employee.address if @employee_role.new_census_employee.address.present?
     @family = @person.primary_family
     build_nested_models

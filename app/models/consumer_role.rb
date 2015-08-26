@@ -1,7 +1,10 @@
 class ConsumerRole
+  RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.residency.verification_request"
+
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
+  include Acapi::Notifiers
 
   embedded_in :person
 
@@ -133,6 +136,10 @@ class ConsumerRole
 
   after_initialize :setup_lawful_determination_instance
 
+  def start_residency_verification_process
+    notify(RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.person})
+  end
+
   def setup_lawful_determination_instance
     unless self.lawful_presence_determination.present?
       self.lawful_presence_determination = LawfulPresenceDetermination.new
@@ -145,7 +152,7 @@ class ConsumerRole
   end
 
   def is_aca_enrollment_eligible?
-    is_hbx_enrollment_eligible? && 
+    is_hbx_enrollment_eligible? &&
     Person::ACA_ELIGIBLE_CITIZEN_STATUS_KINDS.include?(citizen_status)
   end
 
@@ -195,8 +202,8 @@ class ConsumerRole
     ["Certificate of Citizenship", "Naturalization Certificate"]
   end
 
-  # RIDP and Verify Lawful Presence workflow.  IVL Consumer primary applicant must be in identity_verified state 
-  # to proceed with application.  Each IVL Consumer enrolled for benefit coverage must (eventually) pass 
+  # RIDP and Verify Lawful Presence workflow.  IVL Consumer primary applicant must be in identity_verified state
+  # to proceed with application.  Each IVL Consumer enrolled for benefit coverage must (eventually) pass
 
   ## TODO: Move RIDP to user model
   aasm do

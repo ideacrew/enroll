@@ -109,46 +109,32 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def show
     hbx_enrollment_id = params.require(:id)
-
+    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     Caches::MongoidCache.allocate(CarrierProfile)
 
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     if @market_kind == 'shop' and @coverage_kind == 'health'
       @benefit_group = @hbx_enrollment.benefit_group
-      @reference_plan = @benefit_group.reference_plan
       @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
-      # @plans = @benefit_group.elected_plans.entries.collect() do |plan|
-      #   PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
-      # end
     elsif @market_kind == 'individual'
-      elected_plans = Plan.where(market: @market_kind, coverage_kind: @coverage_kind, active_year: TimeKeeper.date_of_record.year).select{|p| p.premium_tables.present? && p.hios_id =~ /-01$/}
+      elected_plans = Plan.individual_plans(coverage_kind: @coverage_kind, active_year: TimeKeeper.date_of_record.year)
       #FIXME need benefit_package for individual
       @plans = elected_plans.collect() do |plan|
         UnassistedPlanCostDecorator.new(plan, @hbx_enrollment)
       end
-    # elsif @coverage_kind == 'dental'
-    #   elected_plans = Plan.where(coverage_kind: "dental", active_year: TimeKeeper.date_of_record.year).select{|p| p.premium_tables.present?}
-    #   @plans = elected_plans.collect() do |plan|
-    #     PlanCostDecorator.new(plan, @hbx_enrollment, nil, nil)
-    #   end
     end
+    @plans = @plans.sort_by(&:total_employee_cost)
 
     @waivable = @hbx_enrollment.can_complete_shopping?
-
-    # for hsa-eligibility
-    @plan_hsa_status = {}
-    Products::Qhp.in(plan_id: @plans.map(&:id)).map {|qhp| @plan_hsa_status[qhp.plan_id.try(:to_s)] = qhp.hsa_eligibility}
+    @plan_hsa_status = Products::Qhp.plan_hsa_status_map(plan_ids: @plans.map(&:id))
 
     # for carrier search options
-    if @benefit_group and @benefit_group.plan_option_kind == "metal_level"
-      @carriers = @plans.map{|p| p.try(:carrier_profile).try(:legal_name) }.uniq
-    else
-      @carriers = Array.new(1, @plans.last.try(:carrier_profile).try(:legal_name))
-    end
+    carrier_profile_ids = @plans.map(&:carrier_profile_id).map(&:to_s).uniq
+    @carrier_names_map = Organization.valid_carrier_names.select{|k, v| carrier_profile_ids.include?(k)}
+    @carriers = @carrier_names_map.values
+
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
-
-    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
   end
 
   private

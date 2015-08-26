@@ -40,6 +40,7 @@ class HbxEnrollment
   field :benefit_group_id, type: BSON::ObjectId
   field :benefit_group_assignment_id, type: BSON::ObjectId
   field :hbx_id, type: String
+  field :original_application_type, type: String
 
   field :consumer_role_id, type: BSON::ObjectId
   field :benefit_package_id, type: BSON::ObjectId
@@ -60,6 +61,7 @@ class HbxEnrollment
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
+  scope :coverage_selected, ->{where(aasm_state: "coverage_selected")}
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true

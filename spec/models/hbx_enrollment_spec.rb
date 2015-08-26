@@ -24,7 +24,7 @@ describe HbxEnrollment do
                                                       census_employees.flat_map(&:benefit_group_assignments)
                                                     end
                                                   }
-    let(:plan_year)                               { py = FactoryGirl.create(:plan_year,
+    let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
                                                       start_on: plan_year_start_on,
                                                       end_on: plan_year_end_on,
                                                       open_enrollment_start_on: Date.current,
@@ -35,6 +35,7 @@ describe HbxEnrollment do
                                                     white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
                                                     py.benefit_groups = [blue, white]
                                                     py.save
+                                                    py.publish!
                                                     py
                                                   }
     let!(:blue_collar_census_employees)            { ees = FactoryGirl.create_list(:census_employee, blue_collar_employee_count, employer_profile: employer_profile)
@@ -51,10 +52,6 @@ describe HbxEnrollment do
                                                      end
                                                      ees
                                                     }
-
-    before do
-      plan_year.publish!
-    end
 
     it "should have a valid plan year in published state" do
       expect(plan_year.aasm_state).to eq "enrolling"
@@ -214,18 +211,17 @@ describe HbxEnrollment do
         end
 
         context "covered" do
-          before :each do
-            @enrollments = white_collar_enrollments + white_collar_enrollment_waivers + blue_collar_enrollments + blue_collar_enrollment_waivers
-          end
+          let!(:enrollments) {white_collar_enrollments + white_collar_enrollment_waivers + blue_collar_enrollments + blue_collar_enrollment_waivers}
+
           it "should return only covered enrollments count" do
-            expect(HbxEnrollment.covered(@enrollments).size).to eq 9
+            expect(HbxEnrollment.covered(enrollments).size).to eq 9
           end
 
           it "should return only active enrollments" do
             white_collar_enrollments.each do |hbx|
               allow(hbx).to receive(:is_active).and_return(false)
             end
-            expect(HbxEnrollment.covered(@enrollments).size).to eq (9-white_collar_enrollments.size)
+            expect(HbxEnrollment.covered(enrollments).size).to eq (9-white_collar_enrollments.size)
           end
         end
       end
@@ -294,7 +290,7 @@ describe HbxEnrollment, dbclean: :after_all do
     end
 
     context "and the employee enrolls" do
-      before do
+      before :all do
         enrollment.plan = enrollment.benefit_group.reference_plan
         enrollment.save
       end
@@ -313,7 +309,7 @@ describe HbxEnrollment, dbclean: :after_all do
     end
 
     context "update_current" do
-      before :each do
+      before :all do
         @enrollment2 = household.create_hbx_enrollment_from(
           employee_role: mikes_employee_role,
           coverage_household: coverage_household,
@@ -337,7 +333,7 @@ describe HbxEnrollment, dbclean: :after_all do
     end
 
     context "inactive_related_hbxs" do
-      before :each do
+      before :all do
         @enrollment3 = household.create_hbx_enrollment_from(
           employee_role: mikes_employee_role,
           coverage_household: coverage_household,

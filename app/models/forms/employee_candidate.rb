@@ -18,8 +18,9 @@ module Forms
 
     validate :does_not_match_a_different_users_person
     validates :ssn,
-              length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
+              length: {minimum: 9, maximum: 9, message: "SSN must be 9 digits"},
               numericality: true
+    validate :dob_not_in_future
 
     attr_reader :dob
 
@@ -34,25 +35,34 @@ module Forms
 
     def match_person
       Person.where({
-        :dob => dob,
-        :encrypted_ssn => Person.encrypt_ssn(ssn)
-      }).first
+                       :dob => dob,
+                       :encrypted_ssn => Person.encrypt_ssn(ssn)
+                   }).first
     end
 
-  def does_not_match_a_different_users_person
-    matched_person = match_person
-    if matched_person.present?
-      if matched_person.user.present?
-        if matched_person.user.id.to_s != self.user_id.to_s
-          errors.add(
-            :base,
-            "An account already exists for #{first_name} #{last_name}."
-          )
+    def does_not_match_a_different_users_person
+      matched_person = match_person
+      if matched_person.present?
+        if matched_person.user.present?
+          if matched_person.user.id.to_s != self.user_id.to_s
+            errors.add(
+                :base,
+                "An account already exists for #{first_name} #{last_name}."
+            )
+          end
         end
       end
+      true
     end
-    true
-  end
+
+    def dob_not_in_future
+      if self.dob && self.dob > ::TimeKeeper.date_of_record
+        errors.add(
+            :dob,
+            "#{dob} can't be in the future.")
+        self.dob=""
+      end
+    end
 
     def persisted?
       false

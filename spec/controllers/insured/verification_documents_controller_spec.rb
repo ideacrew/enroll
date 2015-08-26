@@ -24,15 +24,16 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       let(:temp_file) { double }
       let(:consumer_role) { {consumer_role: '', file: file} }
       let(:doc_id) { 'erewrewrewr234214' }
+      let(:file_path) {File.dirname(__FILE__)} # a sample file path
 
       it "redirects" do
         allow(file).to receive(:tempfile).and_return(temp_file)
         allow(temp_file).to receive(:path)
-        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:build_document).with(anything).and_return(double)
-        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:save_consumer_role).with(anything).and_return(true)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:build_document).with(doc_id, file_path).and_return(double)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:save_consumer_role).and_return(true)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:person_consumer_role)
-        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_path).and_return('')
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_path).and_return(file_path)
         allow(Aws::S3Storage).to receive(:save).with(anything, anything).and_return(doc_id)
         sign_in user
         post :upload, consumer_role: consumer_role

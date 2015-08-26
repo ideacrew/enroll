@@ -210,20 +210,24 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   context "GET show" do
+    let(:plan1) {double(id: '10', deductible: '$10', total_employee_cost: 1000, carrier_profile_id: '12345')}
+    let(:plan2) {double(id: '11', deductible: '$20', total_employee_cost: 2000, carrier_profile_id: '12346')}
+    let(:plan3) {double(id: '12', deductible: '$30', total_employee_cost: 3000, carrier_profile_id: '12347')}
+    
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
-      allow(benefit_group).to receive(:decorated_elected_plans).and_return([plan])
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
+      allow(benefit_group).to receive(:decorated_elected_plans).with(hbx_enrollment).and_return([plan1, plan2, plan3])
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
       sign_in user
     end
 
     context "normal" do
       before :each do
-        allow(plan).to receive(:total_employee_cost).and_return(2000)
-        allow(plan).to receive(:deductible).and_return("$998")
+        allow(plan3).to receive(:total_employee_cost).and_return(3333)
+        allow(plan3).to receive(:deductible).and_return("$998")
         get :show, id: "hbx_id"
       end
 
@@ -236,18 +240,22 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       end
 
       it "should get max_total_employee_cost" do
-        expect(assigns(:max_total_employee_cost)).to eq 2000
+        expect(assigns(:max_total_employee_cost)).to eq 4000
       end
 
       it "should get max_deductible" do
         expect(assigns(:max_deductible)).to eq 1000
       end
+
+      it "should get plans which order by premium" do
+        expect(assigns(:plans)).to eq [plan1, plan2, plan3]
+      end
     end
 
     context "when not eligible to complete shopping" do
       before do
-        allow(plan).to receive(:total_employee_cost).and_return(2000)
-        allow(plan).to receive(:deductible).and_return("$998")
+        allow(plan3).to receive(:total_employee_cost).and_return(3333)
+        allow(plan3).to receive(:deductible).and_return("$998")
         allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(false)
         get :show, id: "hbx_id"
       end
@@ -259,8 +267,10 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     context "when innormal total_employee_cost and deductible" do
       before :each do
-        allow(plan).to receive(:total_employee_cost).and_return(nil)
-        allow(plan).to receive(:deductible).and_return(nil)
+        [plan1, plan2, plan3].each do |plan|
+          allow(plan).to receive(:total_employee_cost).and_return(nil)
+          allow(plan).to receive(:deductible).and_return(nil)
+        end
         get :show, id: "hbx_id"
       end
 

@@ -300,11 +300,22 @@ module ApplicationHelper
   end
 
   def portal_display_name(controller)
-    if current_user.try(:has_hbx_staff_role?)
+    if current_user.nil?
+      "Welcome to the District's Health Insurance Marketplace"
+    elsif current_user.try(:has_hbx_staff_role?)
       "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm HBX Staff".html_safe
     elsif current_user.try(:has_broker_agency_staff_role?) && current_user.person.broker_role
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe,
       broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id)
+    elsif current_user.try(:person).try(:csr_role) && current_user.person.csr_role.cac
+      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Certified Applicant Counselor".html_safe,
+      home_exchanges_agents_path
+    elsif current_user.try(:person).try(:csr_role) && !current_user.person.csr_role.cac
+      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Customer Service Representative".html_safe,
+      home_exchanges_agents_path
+    elsif current_user.try(:person).try(:assister_role)
+      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm an In Person Assister".html_safe,
+      home_exchanges_agents_path
     elsif current_user.try(:has_broker_agency_staff_role?)
       "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe
     elsif current_user.try(:has_employer_staff_role?)
@@ -327,8 +338,8 @@ module ApplicationHelper
     return link
   end
 
-  def display_carrier_logo(carrier, options = {:width => 50})
-    if carrier_name = carrier.try(:legal_name)
+  def display_carrier_logo(carrier_name, options = {:width => 50})
+    if carrier_name.present?
       image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
     end
   end

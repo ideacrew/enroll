@@ -6,7 +6,7 @@ class IvlNotificationMailer < ApplicationMailer
     @user = user
     @view_type = "lawful_presence_verified"
     notice = Notice.new(user.email, {:notice_data => {:user => user}, :template => "notices/9cindividual.html.erb"})    
-    attachments["notice.pdf"] = File.read(notice.send_paper_notice)
+    attachments["notice.pdf"] = File.read(notice.send_pdf_notice)
     mail({to: user.email.address, subject: "DCHealthLink Notification"}) do |format|
       format.html { render "ivl_notification", :locals => { :user => user, :link => _link}}
     end
@@ -16,7 +16,7 @@ class IvlNotificationMailer < ApplicationMailer
     @user = user
     @view_type = "lawful_presence_unverified"
     notice = Notice.new(user.email, {:notice_data => {:user => user}, :template => "notices/9findividual.html.erb"})
-    attachments["notice.pdf"] = File.read(notice.send_paper_notice)
+    attachments["notice.pdf"] = File.read(notice.send_pdf_notice)
     mail({to: user.email.address, subject: "DCHealthLink Notification"}) do |format|
       format.html { render "ivl_notification", :locals => { :user => user}}
     end
@@ -26,7 +26,7 @@ class IvlNotificationMailer < ApplicationMailer
     @user = user
     @view_type = "lawfully_ineligible"
     notice = Notice.new(user.email, {:notice_data => {:user => user}, :template => "notices/11individual.html.erb"})
-    attachments["notice.pdf"] = File.read(notice.send_paper_notice)
+    attachments["notice.pdf"] = File.read(notice.send_pdf_notice)
     mail({to: user.email.address, subject: "DCHealthLink Notification"}) do |format|
       format.html { render "ivl_notification", :locals => { :user => user}}
     end

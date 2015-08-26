@@ -32,6 +32,13 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :agents do
+      collection do
+        get :home
+        get :begin_enrollment
+        get :send_enrollment_confirmation
+      end
+    end
 
     resources :broker_applicants
 
@@ -113,6 +120,7 @@ Rails.application.routes.draw do
         post 'force_publish'
         get 'search_reference_plan', on: :collection
         get 'calc_employer_contributions', on: :collection
+        get 'employee_costs', on: :collection
       end
 
       resources :broker_agency, only: [:index, :show, :create] do

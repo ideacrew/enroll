@@ -12,17 +12,17 @@ class Plan
 
   field :hbx_id, type: Integer
   field :active_year, type: Integer
+  field :market, type: String
+  field :coverage_kind, type: String
+  field :carrier_profile_id, type: BSON::ObjectId
+  field :metal_level, type: String
   field :hios_id, type: String
+
   field :name, type: String
   field :abbrev, type: String
   field :provider, type: String
   field :ehb, type: Float, default: 0.0
 
-  field :coverage_kind, type: String
-  field :metal_level, type: String
-  field :market, type: String
-
-  field :carrier_profile_id, type: BSON::ObjectId
   field :renewal_plan_id, type: BSON::ObjectId
 
   field :minimum_age, type: Integer, default: 0
@@ -42,20 +42,28 @@ class Plan
   field :nationwide, type: Boolean # Nationwide
   field :out_of_service_area_coverage, type: Boolean # DC In-Network or not
 
-  default_scope -> {order("name ASC")}
+  # In MongoDB, the order of fields in an index should be:
+  #   First: fields queried for exact values, in an order that most quickly reduces set 
+  #   Second: fields used to sort
+  #   Third: fields queried for a range of values
 
-  index({ hbx_id: 1 })
-  index({ coverage_kind: 1 })
-  index({ metal_level: 1 })
-  index({ market: 1 })
-  index({ active_year: 1 })
+  index({ hbx_id: 1, name: 1 })
+  index({ hios_id: 1, active_year: 1, name: 1 })
+  index({ active_year: 1, market: 1, coverage_kind: 1, nationwide: 1, name: 1 })
+  index({ renewal_plan_id: 1, name: 1 })
+  index({ name: 1 })
 
-  index({ active_year: 1,  market: 1, coverage_kind: 1, metal_level: 1 })
-  index({ active_year: 1,  market: 1, coverage_kind: 1, metal_level: 1, carrier_profile_id: 1 })
+  # 2015, individual, health, gold
+  index({ active_year: 1, market: 1, coverage_kind: 1, metal_level: 1, name: 1 })
 
-  index({ carrier_profile_id: 1 })
-  index({ active_year: 1, hios_id: 1}, {unique: true})
-  index({ renewal_plan_id: 1 })
+  # 2015, individual, health, uhc
+  index({ active_year: 1, market: 1, coverage_kind: 1, carrier_profile_id: 1, name: 1 })
+
+  # 2015, individual, health, uhc, gold
+  index({ active_year: 1, market: 1, coverage_kind: 1, carrier_profile_id: 1, metal_level: 1, name: 1 })
+
+  # 92479DC0020002, 2015, 32, 2015-04-01, 2015-06-30
+  index({ hios_id: 1, active_year: 1, "premium_tables.age": 1, "premium_tables.start_on": 1, "premium_tables.end_on": 1 }, {name: "plan_premium_age"})
 
   index({ "premium_tables.age" => 1 })
   index({ "premium_tables.age" => 1, "premium_tables.start_on" => 1, "premium_tables.end_on" => 1 })
@@ -88,6 +96,8 @@ class Plan
     message: "%{value} is an invalid active year"
 
   ## Scopes
+  default_scope -> {order("name ASC")}
+
   # Metal level
   scope :platinum_level,      ->{ where(metal_level: "platinum") }
   scope :gold_level,          ->{ where(metal_level: "gold") }
@@ -107,23 +117,63 @@ class Plan
   # DC In-Network ?
   scope :dc_in_network, ->{ where(out_of_service_area_coverage: "false") }
 
-  # Marketplace
-  scope :shop_market,          ->{ where(market: "shop") }
-  scope :individual_market,    ->{ where(market: "individual") }
+  scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
 
-  scope :by_active_year, -> {where(active_year: TimeKeeper.date_of_record.year)}
+  # Marketplace
+  scope :shop_market,           ->{ where(market: "shop") }
+  scope :individual_market,     ->{ where(market: "individual") }
+
+  scope :health_coverage,       ->{ where(coverage_kind: "health") }
+  scope :dental_coverage,       ->{ where(coverage_kind: "dental") }
 
   scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
   scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: metal_level)}
+
+  scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
+
+  scope :shop_health_by_active_year, ->(active_year) {  
+      where(
+          active_year: active_year, 
+          market: "shop", 
+          coverage_kind: "health"
+        )
+    }
+
+  scope :shop_dental_by_active_year, ->(active_year) {  
+      where(
+          active_year: active_year, 
+          market: "shop", 
+          coverage_kind: "dental"
+        )
+    }
+
+  scope :individual_health_by_active_year, ->(active_year) {  
+      where(
+          active_year: active_year, 
+          market: "individual", 
+          coverage_kind: "health"
+        )
+    } 
+
+  scope :individual_dental_by_active_year, ->(active_year) {  
+      where(
+          active_year: active_year, 
+          market: "individual", 
+          coverage_kind: "dental"
+        )
+    } 
+
+  scope :by_health_metal_levels,                ->(metal_levels)    { any_in(metal_level: metal_levels) }
+  scope :by_carrier_profile,                    ->(carrier_profile) { where(carrier_profile_id: carrier_profile._id) }
+
+  scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
+  scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }
+  scope :health_metal_nin_catastropic,          ->{ not_in(metal_level: "catastrophic") }
 
   # Carriers: use class method (which may be chained)
   def self.find_by_carrier_profile(carrier_profile)
     where(carrier_profile_id: carrier_profile._id)
   end
-
-  # scope :named, ->(name){ where(name: name) }
-  # where(carrier_profile_id: carrier_profile._id)
-
 
   def metal_level=(new_metal_level)
     write_attribute(:metal_level, new_metal_level.to_s.downcase)
@@ -215,6 +265,10 @@ class Plan
 
     def reference_plan_metal_level_for_options
       REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
+    end
+
+    def individual_plans(coverage_kind:, active_year:)
+      Plan.public_send("individual_#{coverage_kind}_by_active_year", active_year).with_premium_tables.where(hios_id: /-01$/)
     end
   end
 end
