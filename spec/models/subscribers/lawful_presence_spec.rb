@@ -6,6 +6,15 @@ describe Subscribers::LawfulPresence do
     expect(Subscribers::LawfulPresence.subscription_details).to eq ["local.enroll.lawful_presence.lawful_presence_response"]
   end
 
+  it "should return the correct citizenship status" do
+    expect(subject.send(:get_citizen_status, "citizen")).to eq("us_citizen")
+    expect(subject.send(:get_citizen_status, "refugee")).to eq("alien_lawfully_present")
+    expect(subject.send(:get_citizen_status, "student")).to eq("alien_lawfully_present")
+    expect(subject.send(:get_citizen_status, "non_immigrant")).to eq("alien_lawfully_present")
+    expect(subject.send(:get_citizen_status, "asylum_application_pending")).to eq("alien_lawfully_present")
+    expect(subject.send(:get_citizen_status, "lawful_permanent_resident")).to eq("lawful_permanent_resident")
+  end
+
   describe "given a ssa verification message to handle" do
     let(:individual_id) { "121211" }
     let(:xml) { double }

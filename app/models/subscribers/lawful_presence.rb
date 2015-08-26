@@ -37,6 +37,8 @@ module Subscribers
 
     def get_citizen_status(legal_status)
       return "us_citizen" if legal_status.eql? "citizen"
+      return "lawful_permanent_resident" if legal_status.eql? "lawful_permanent_resident"
+      return "alien_lawfully_present" if ["asylee", "refugee", "non_immigrant", "application_pending", "student", "asylum_application_pending", "daca" ].include? legal_status
     end
 
     def xml_to_hash(xml)
