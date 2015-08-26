@@ -31,7 +31,7 @@ class Person
   field :is_incarcerated, type: Boolean
   
   field :is_disabled, type: Boolean
-  field :ethnicity, type: String
+  field :ethnicity, type: Array
   field :race, type: String
 
   field :is_tobacco_user, type: String, default: "unknown"
