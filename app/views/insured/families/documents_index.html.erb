@@ -7,7 +7,7 @@
     <h1>Documents</h1>
   </div>
   <div class="col-md-4" style="margin-top: 5px;">
-    <%= link_to "Upload Document", document_upload_insured_families_path , class: "btn btn-primary" %>
+    <%= link_to "Upload Document", document_upload_insured_families_path , class: "btn btn-primary" if @person.try(:consumer_role).present? %>
   </div>
   <div class="col-md-12">
     <%= render partial: "documents_index" %>
