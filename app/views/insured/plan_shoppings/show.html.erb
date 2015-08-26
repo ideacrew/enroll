@@ -42,8 +42,8 @@
                   </div>
                 </div>
 
-		<div id="plans">
-			<%= render :partial => "insured/plan_shoppings/plan_details", :collection => @plans, :as => :plan %>
+                <div id="plans">
+                  <h3>Loading...</h3>
                 </div>
               </div>
             </div>
@@ -95,3 +95,11 @@
 
 <%= render :partial => "insured/plan_shoppings/help_with_plan", :locals => {:enrollment => @hbx_enrollment } %>
 
+<script type="text/javascript">
+  window.onload = function() {
+    $.ajax({
+      url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind) %>",
+      type: "GET"
+    });
+  };
+</script>
