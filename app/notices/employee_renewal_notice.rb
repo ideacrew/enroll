@@ -13,11 +13,3 @@ class EmployeeRenewalNotice < Notice
     @notice_data = {}
   end
 end
-
-
-
-
-
-
-
-

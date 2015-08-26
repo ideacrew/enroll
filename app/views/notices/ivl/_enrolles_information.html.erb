@@ -1,34 +1,9 @@
 <table class="total_table" border="0">
   <tbody>
-    <tr class="fssizeuser mar20">
-      <td class="col-red"><span><strong>
-        <% if (x = notice.enrollments[0].enrollees.detect { |e| !e.is_active? }).empty? %>
-          <% msg = "The following person(s) qualify for health coverage through DC Health Link." %>
-          <!-- [IF Anyone Does not have Inconsistencies] -->
-        <% else %>
-          <% msg = "The following person(s) <strong>conditionally</strong> qualify for health coverage through DC Health Link.".html_safe %>
-        <% end %>
-        </strong></span>
-        <span>
-          <%= msg%>
-        </span></td>
-    </tr>
-  </tbody>
-</table>
-
-<table class="total_table" border="0">
-  <tbody>
-    <% notice.enrollments[0].enrollees.each do |name| %>
+    <% enrollees.each do |name| %>
       <tr class="fssizeuser mar20">
         <td><%= name %></td>
       </tr>
     <% end %>
-  </tbody>
-</table>
-<table class="total_table mar20" border="0">
-  <tbody>
-    <tr>
-      <td>Your eligibility has been approved <strong>conditionally</strong> until the discrepancies between the information you provided and our records have been resolved. To resolve these discrepancies, <span class="underline">we need documentation from you</span>. (See sections below).  If you do not provide this information, <span class="underline">your health insurance may be cancelled</span>.</td>
-    </tr>
   </tbody>
 </table>

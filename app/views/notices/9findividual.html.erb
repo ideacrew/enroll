@@ -46,7 +46,50 @@
     </tr>
     </tbody>
   </table>
-    <%= render partial: "notices/ivl/enrolles_information", :locals => {notice: notice} %> 
+  <% if notice.active_members.try(:any) %>
+    <table class="total_table" border="0">
+        <tbody>
+          <tr class="fssizeuser mar20">
+            <td class="col-red">
+              <span>
+                The following person(s) qualify for health coverage through DC Health Link.
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.active_members} %>
+    <% end %>
+    <% if notice.inconsistent_members.try(:any) %>
+      <table class="total_table" border="0">
+        <tbody>
+          <tr class="fssizeuser mar20">
+            <td class="col-red">The following person(s) <strong>conditionally</strong> qualify for health coverage through DC Health Link.</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.inconsistent_members} %>
+      <table class="total_table mar20" border="0">
+        <tbody>
+          <tr>
+            <td>Your eligibility has been approved <strong>conditionally</strong> until the discrepancies between the information you provided and our records have been resolved. To resolve these discrepancies, <span class="underline">we need documentation from you</span>. (See sections below).  If you do not provide this information, <span class="underline">your health insurance may be cancelled</span>.</td>
+          </tr>
+        </tbody>
+      </table>
+    <% end %>
+    <table class="total_table" border="0">
+      <tbody>
+        <tr>
+          <td></br></td>
+        </tr>
+        <tr>
+          <td><h3 style="color:rgb(54,95,145);">Your Private Health Plan Selection</h3></td>
+        </tr>
+        <tr>
+          <td>On  <%= format_date(Date.today) %>, the following individual(s) selected the <%= notice.enrollments[0].plan_name %> health insurance plan.</td>
+          </tr>
+        </tbody>
+      </table>
 </div>
 
 <div class="page_break">
@@ -100,25 +143,18 @@
     <% end %>
     </tbody>
   </table>
+  
+  <% if notice.members_with_more_plans.try(:any?) %>
   <table class="total_table" border="0">
     <tbody>
       <tr class="fssizeuser mar20">
-        <td><span style="color:rgb(255,0,0);"><strong>[IF More than One Plan Selected]</strong></span><span>Additionally, the following individual(s) selected the <plan N name> health insurance plan.</span></td>
+        <td><span>Additionally, the following individual(s) selected the <plan N name> health insurance plan.</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
-   <table>
-    <tbody>
-    <tr class="fssizeuser mar20" style="padding-left:5%;">
-      <td>Plan N Enrollee First Name</td>
-      <td>Plan N Enrollee Last Name</td>
-    </tr>
-    <tr class="fssizeuser" style="padding-left:5%;">
-      <td><span style="color:rgb(255,0,0);"><strong>[IF More than One Enrollee in Plan N]</strong></span><span>Plan N Enrollee 2 First Name</span><span>Plan N Enrollee 2 Last Name</span></td>
-    </tr>
-    <tbody>
-  </table>
+  <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.members_with_more_plans} %>
+
   <table>
     <tbody>
     <tr class="fssizeuser mar20">
@@ -161,7 +197,7 @@
 
     </tbody>
   </table>
- 
+<% end %>
 </div>
 <div class="page_break">
   <table class="total_table" border="0">
@@ -257,73 +293,37 @@
    
 </div>
 <div class="page_break">
+  <% if notice.unverfied_ssn_members.try(:any) %>
   <table  class="total_table" border="0">
     <tbody>
     <tr class="mar20">
       <td>
-        <strong><span style="color:rgb(255,0,0);">[IF SSN Unverified]</span><i> Documents Showing Social Security Number.</i></strong>. The Social Security Administration could not confirm that the Social Security Number provided for the following applicant household members is correct:
+        <strong><i> Documents Showing Social Security Number.</i></strong>. The Social Security Administration could not confirm that the Social Security Number provided for the following applicant household members is correct:
       </td>
     </tr>
     </tbody>
     </table>
-    <table>
-    <tbody>
-    <tr class="fssizeuser mar20">
-      <td>First SSN Inconsistent First Name</td>
-      <td>First SSN Inconsistent Last Name</td>
-    </tr>
-    </tbody>
-    </table>
-    <table>
-    <tbody>
-    <tr class="fssizeuser">
-      <td><span style="color:rgb(255,0,0);"><strong>IF Person N field populated</strong></span><span>Person NSSN Inconsistent First Name</span><span>Person NSSN Inconsistent Last Name</span></td>
-    
-    </tr>
-    </tbody>
-    </table>
-    <table>
-    <tbody>
-    <tr class="mar20">
-      <td>Under federal law, 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number of every person who is applying for DC Health Link. We will only use your Social Security Number to verify the information you told us on your application. We will check your information in the District and Federal databases, and the databases of other District, Federal agencies, and a consumer reporting agency.</td>
-    </tr>
-    <tr class="mar20">
-      <td>You can use a Social Security card to verify the Social Security Number(s) you provided to us.  If you do not have a Social Security Number or cannot remember you social security number, we can help you obtain one. You may not need to provide a Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact DC Health Link Customer Service at 1-855-532-5465.</td>
-    </tr>
-    <tr class="mar20">
-      <td>
-        <strong><span style="color:rgb(255,0,0);">[IF Citizenship/Immigration Unverified]</span> <i>Documents of Citizenship or Immigration Status.</i></strong>. We need proof of the U.S. citizenship or immigration status for the following applicant household members is correct:
-      </td>
-    </tr>
-    </tbody>
-    </table>
-    <table>
-    <tbody>
-    <tr class="fssizeuser mar20">
-      <td>First Citizen/Immigration Inconsistent First Name</td>
-      <td>First Citizen/Immigration Inconsistent Last Name</td>
-    </tr>
-    <tr class="fssizeuser">
-      <td><span style="color:rgb(255,0,0);"><strong>IF Person N field populated</strong></span><span>Person NCitizen/Immigration Inconsistent First Name</span><span>Person NCitizen/Immigration Inconsistent Last Name</span></td>
-    </tr>
-    </tbody>
-    </table>
-    <table>
-    <tbody>
-    <tr class="fssizeuser mar20">
-      <td>First Citizen/ImmigrationInconsistent First Name</td>
-      <td>First Citizen/Immigration Inconsistent Last Name</td>
-    </tr>
-    </tbody>
-    </table>
-    <table>
-    <tbody>
-    <tr class="fssizeuser">
-      <td><span style="color:rgb(255,0,0);"><strong>IF Person N field populated</strong></span><span>Person NCitizen/Immigration Inconsistent First Name</span><span>Person NCitizen/Immigration Inconsistent Last Name</span></td>
-    
-    </tr>
-    </tbody>
-    </table>
+    <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.unverfied_ssn_members} %>
+    <% end %>
+
+    <% if notice.unverfied_citizenship_members.try(:any) %>
+      <table>
+      <tbody>
+      <tr class="mar20">
+        <td>Under federal law, 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number of every person who is applying for DC Health Link. We will only use your Social Security Number to verify the information you told us on your application. We will check your information in the District and Federal databases, and the databases of other District, Federal agencies, and a consumer reporting agency.</td>
+      </tr>
+      <tr class="mar20">
+        <td>You can use a Social Security card to verify the Social Security Number(s) you provided to us.  If you do not have a Social Security Number or cannot remember you social security number, we can help you obtain one. You may not need to provide a Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact DC Health Link Customer Service at 1-855-532-5465.</td>
+      </tr>
+      <tr class="mar20">
+        <td>
+          <strong><i>Documents of Citizenship or Immigration Status.</i></strong>. We need proof of the U.S. citizenship or immigration status for the following applicant household members is correct:
+        </td>
+      </tr>
+      </tbody>
+      </table>
+      <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.unverfied_citizenship_members} %>
+    <% end %>
     <table>
     <tbody>
     <tr class="mar20">
