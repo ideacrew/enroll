@@ -3,7 +3,7 @@ require "rails_helper"
 describe Events::ResidencyVerificationRequestsController do
   describe "#call with a person" do
     let(:person) { double(hbx_id: "123") }
-    let(:outbound_event_name) { "acapi.info.events.residency.residency_verification_request" }
+    let(:outbound_event_name) { "acapi.info.events.residency.verification_request" }
     let(:rendered_template) { double }
     let(:mock_end_time) { (mock_now + 24.hours).to_i }
     let(:mock_now) { Time.mktime(2015,5,21,12,29,39) }
