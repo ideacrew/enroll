@@ -1,7 +1,7 @@
 class PlanCostDecorator < SimpleDelegator
   attr_reader :member_provider, :benefit_group, :reference_plan
 
-  def initialize(plan, member_provider, benefit_group, reference_plan, member_contribution, max_cont_cache = {})
+  def initialize(plan, member_provider, benefit_group, reference_plan, max_cont_cache = {})
     super(plan)
     @member_provider = member_provider
     @benefit_group = benefit_group
