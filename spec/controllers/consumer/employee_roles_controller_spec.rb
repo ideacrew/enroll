@@ -96,7 +96,7 @@ RSpec.describe Consumer::EmployeeRolesController, :dbclean => :after_each do
     let(:census_employee) { double("CensusEmployee") }
     let(:address) { double("Address") }
     let(:addresses) { [address] }
-    let(:employee_role) { double("EmployeeRole", id: double("id"), person: double("person")) }
+    let(:employee_role) { double("EmployeeRole", id: double("id"), :person => person) }
     let(:family) { double("Family") }
     let(:id){ EmployeeRole.new.id }
     it "should render edit template" do
