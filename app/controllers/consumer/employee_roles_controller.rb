@@ -56,9 +56,11 @@ class Consumer::EmployeeRolesController < ApplicationController
   def edit
     @employee_role = EmployeeRole.find(params.require(:id))
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
-    @person.addresses << @employee_role.new_census_employee.address if @employee_role.new_census_employee.address.present?
-    @family = @person.primary_family
-    build_nested_models
+    if @person.present?
+      @person.addresses << @employee_role.new_census_employee.address if @employee_role.new_census_employee.address.present?
+      @family = @person.primary_family
+      build_nested_models
+    end
   end
 
   def update
