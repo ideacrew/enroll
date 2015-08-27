@@ -1,6 +1,6 @@
-
 QualifyingLifeEventKind.create!(
   title: "Dependent loss of ESI due to employee gaining Medicare",
+  tool_tip: "A dependent is losing access to ESI coverage because the employee is enrolling in Medicare",
   action_kind: "add_benefit",
   event_kind_label: "Coverage end date",
   market_kind: "individual",
@@ -393,26 +393,9 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Dependent loss of ESI due to employee gaining Medicare",
-  description: "A dependent is losing access to ESI coverage because the employee is enrolling in Medicare",
-  kind: "add",
-  market_kind: "individual",
-  ordinal_position: 100,
-  reason: " ",
-  edi_code: " ",
-  effective_on_kind: "first_of_month",
-  pre_event_sep_in_days: 0,
-  post_event_sep_in_days: 60,
-  is_self_attested: false,
-    # event_kind: "coverage end date",
-    # start_of_sep: "60 days before loss of MEC",
-    # coverage_effective_date: "If before loss of coverage: First day of the month after MEC will end. If after loss of MEC: First day of the month following plan selection (not following 15th of month rule)")
-  )
-
-QualifyingLifeEventKind.create!(
   title: "My Employer failed to pay premiums on time",
-  description: "Consumer loses access to COBRA because the employer responsible for submitting premiums fails to submit them on time",
-  kind: "add",
+  tool_tip: "Consumer loses access to COBRA because the employer responsible for submitting premiums fails to submit them on time",
+  action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
   reason: " ",
