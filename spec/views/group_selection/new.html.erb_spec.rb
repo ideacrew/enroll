@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "group_selection/new.html.erb" do
   context "coverage selction" do
-    let(:person) { FactoryGirl.create(:person) }
+    let(:person) { FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) }
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:family_member1) { double(id: "family_member", primary_relationship: "self", dob: Date.new(1990,10,10), full_name: "member") }
@@ -20,12 +20,17 @@ RSpec.describe "group_selection/new.html.erb" do
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
 
+      allow(family_member1).to receive(:person).and_return(person)
+      allow(family_member2).to receive(:person).and_return(person)
+      allow(family_member3).to receive(:person).and_return(person)
+
       controller.request.path_parameters[:person_id] = person.id
       controller.request.path_parameters[:employee_role_id] = employee_role.id
       render :template => "group_selection/new.html.erb"
     end
 
     it "should show the title of family members" do
+
       expect(rendered).to match /Family Members/
     end
 
@@ -89,7 +94,8 @@ RSpec.describe "group_selection/new.html.erb" do
         dob: 25.years.ago,
         full_name: "full_name_#{random_value}",
         is_primary_applicant?: true,
-        primary_relationship: "self"
+        primary_relationship: "self",
+        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) 
       )
     end
 
@@ -101,7 +107,8 @@ RSpec.describe "group_selection/new.html.erb" do
         dob: 3.years.ago,
         full_name: "full_name_#{random_value}",
         is_primary_applicant?: false,
-        primary_relationship: "child"
+        primary_relationship: "child",
+        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) 
       )
     end
 
