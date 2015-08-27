@@ -18,7 +18,7 @@ module Subscribers
       return if person.nil? || person.consumer_role.nil?
 
       consumer_role = person.consumer_role
-      consumer_role.raw_event_responses << {:lawful_presence_response => payload}
+      consumer_role.raw_event_responses << {:local_residency_response => payload}
       residency_verification_hash = xml_to_hash(xml)
 
       if residency_verification_hash[:residency_verification_response].eql? 'ADDRESS_NOT_IN_AREA'
