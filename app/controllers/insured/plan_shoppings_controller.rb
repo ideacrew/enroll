@@ -93,12 +93,13 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment_id = params.require(:id)
 
     Caches::MongoidCache.allocate(CarrierProfile)
+    max_contribution_cache = Hash.new
 
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     @benefit_group = @hbx_enrollment.benefit_group
     @reference_plan = @benefit_group.reference_plan
     @plans = @benefit_group.elected_plans.entries.collect() do |plan|
-      PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
+      PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan, max_contribution_cache)
     end
     @waivable = @hbx_enrollment.can_complete_shopping?
 
