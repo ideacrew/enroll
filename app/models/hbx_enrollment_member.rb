@@ -33,11 +33,13 @@ class HbxEnrollmentMember
   end
 
   def primary_relationship
-    family_member.primary_relationship
+    return @primary_relationship unless @primary_relationship.blank?
+    @primary_relationship = family_member.primary_relationship
   end
 
   def person
-    family_member.person
+    return @person unless @person.blank?
+    @person = family_member.person
   end
 
   def age_on_effective_date
