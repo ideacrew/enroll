@@ -18,9 +18,8 @@ describe "consumer/employee_dependents/_dependent_form.html.erb" do
       expect(rendered).to have_selector("li.dependent_list")
     end
 
-    it "should have required for ssn" do
-      expect(rendered).to have_selector('input[placeholder="SOCIAL SECURITY *"]')
-      expect(rendered).to have_selector('input[required="required"]')
+    it "should not have required for ssn" do
+      expect(rendered).not_to have_selector('input[placeholder="SOCIAL SECURITY *"]')
     end
 
     it "should have consumer_fields area" do
