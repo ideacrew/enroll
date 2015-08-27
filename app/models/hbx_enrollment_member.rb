@@ -41,6 +41,7 @@ class HbxEnrollmentMember
   end
 
   def age_on_effective_date
+    return @age_on_effective_date unless @age_on_effective_date.blank?
     person = Rails.cache.fetch("hbx_enrollment_member/person_age/#{family_member.person_id}") { family_member.person }
     dob = person.dob
     return unless coverage_start_on.present?
@@ -53,7 +54,7 @@ class HbxEnrollmentMember
       age -= 1 if coverage_start_on.month < dob.month
     end
 
-    age
+    @age_on_effective_date = age
   end
 
   def is_subscriber?
