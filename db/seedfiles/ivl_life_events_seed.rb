@@ -401,7 +401,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "My Employer failed to pay COBRA premiums on time",
+  title: "My Employer failed to pay premiums on time",
   description: "Consumer loses access to COBRA because the employer responsible for submitting premiums fails to submit them on time",
   kind: "add",
   market_kind: "individual",
