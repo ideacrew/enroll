@@ -17,6 +17,7 @@ policy.xsd
 premium.xsd
 verification_services.xsd
 vocabulary.xsd
+verification_services.xsd
   )
 
   def download_vocabularies
