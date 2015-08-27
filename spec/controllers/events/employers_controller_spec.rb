@@ -9,7 +9,7 @@ describe Events::EmployersController do
     it "should send out a message to the bus with the rendered employer object" do
       @event_name = ""
       @body = nil
-      subber = ActiveSupport::Notifications.subscribe(outbound_event_name) do |e_name, s_at, e_at, m_id, payload|
+      event_subscriber = ActiveSupport::Notifications.subscribe(outbound_event_name) do |e_name, s_at, e_at, m_id, payload|
         @event_name = e_name
         @body = payload.stringify_keys["body"]
       end
@@ -18,7 +18,7 @@ describe Events::EmployersController do
          :employer => employer_profile
         }}).and_return(rendered_template)
       controller.call(EmployerProfile::BINDER_PREMIUM_PAID_EVENT_NAME, nil, nil, nil, {:employer => employer_profile})
-      ActiveSupport::Notifications.unsubscribe(subber)
+      ActiveSupport::Notifications.unsubscribe(event_subscriber)
       expect(@event_name).to eq outbound_event_name
       expect(@body).to eq rendered_template
     end
