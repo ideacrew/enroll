@@ -538,7 +538,7 @@ end
 When(/^I click on continue on qle confirmation page$/) do
   @browser.element(text: /Purchase confirmation/i).wait_until_present
   expect(@browser.element(text: /Purchase confirmation/i).visible?).to be_truthy
-  scroll_then_click(@browser.a(class: /interaction-click-control-continue/))
+  click_when_present(@browser.a(text: /go to my account/i))
 end
 
 

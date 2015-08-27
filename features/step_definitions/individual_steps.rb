@@ -104,7 +104,7 @@ And(/I click on continue button on group selection page/) do
 end
 
 And(/I select a plan on plan shopping page/) do
-  click_when_present(@browser.a(class: /interaction-click-control-select-plan/))
+  click_when_present(@browser.a(text: /Select Plan/))
 end
 
 And(/I click on purchase button on confirmation page/) do
