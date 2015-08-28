@@ -324,6 +324,10 @@ class Family
     person.save!
   end
 
+  def enrolled_hbx_enrollments
+    latest_household.try(:enrolled_hbx_enrollments)
+  end
+
 private
   def build_household
     if households.size == 0

@@ -175,4 +175,8 @@ class Household
       c_household.remove_family_member(member)
     end
   end
+
+  def enrolled_hbx_enrollments
+    HbxEnrollment.covered(hbx_enrollments)
+  end
 end

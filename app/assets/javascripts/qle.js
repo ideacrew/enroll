@@ -65,7 +65,7 @@ $(function () {
       dateMin = "-60d";
       dateMax = "+0d";
     };
-    if (cur_qle_title === "Myself or a family member has lost other coverage" || cur_qle_title === "Mid-month loss of mec" || cur_qle_title === "My employer failed to pay cobra premiums on time" || cur_qle_title === "I've moved into the district of columbia") {
+    if (cur_qle_title === "Myself or a family member has lost other coverage" || cur_qle_title === "Mid-month loss of mec" || cur_qle_title === "My employer failed to pay premiums on time" || cur_qle_title === "I've moved into the district of columbia") {
       dateMin = "-60d";
       dateMax = "+60d";
     };

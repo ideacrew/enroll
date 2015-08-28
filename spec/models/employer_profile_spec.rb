@@ -520,11 +520,11 @@ describe EmployerProfile, "when a binder premium is credited" do
 
   it "should send the notification broadcast" do
     @employer = nil
-    subber = ActiveSupport::Notifications.subscribe(EmployerProfile::BINDER_PREMIUM_PAID_EVENT_NAME) do |e_name, s_at, e_at, m_id, payload|
+    event_subscriber = ActiveSupport::Notifications.subscribe(EmployerProfile::BINDER_PREMIUM_PAID_EVENT_NAME) do |e_name, s_at, e_at, m_id, payload|
       @employer = payload.stringify_keys["employer"]
     end
     employer.binder_credited
-    ActiveSupport::Notifications.unsubscribe(subber)
+    ActiveSupport::Notifications.unsubscribe(event_subscriber)
     expect(@employer).to eq employer
   end
 end

@@ -53,7 +53,12 @@ class Consumer::ConsumerRolesController < ApplicationController
       :is_disabled,
       :race,
       :is_consumer_role,
-      :ethnicity
+      :ethnicity,
+      :us_citizen,
+      :naturalized_citizen,
+      :eligible_immigration_status,
+      :indian_tribe_member,
+      :tribal_id,
     ]
   end
 

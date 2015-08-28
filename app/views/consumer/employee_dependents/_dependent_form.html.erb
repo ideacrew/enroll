@@ -1,4 +1,3 @@
-<% is_ivl_flow = request.referer.include?("consumer_role_id") %>
 <li id="<%= employee_dependent_form_id(dependent) %>" class="dependent_list">
 
   <%= render 'shared/error_messages', :object => dependent %>
@@ -49,7 +48,7 @@
 
       <div class="col-md-3 col-sm-3 no-pd">
         <div class="form-group form-group-lg">
-          <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", placeholder: "SOCIAL SECURITY #{'*' if is_ivl_flow}", required: is_ivl_flow %>
+          <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", placeholder: "SOCIAL SECURITY" %>
         </div>
       </div>
 
@@ -74,7 +73,7 @@
         </div>
       </div>
     </div>
-    <% if is_ivl_flow %>
+    <% if request.referer.include?("consumer_role_id") %>
       <%= render 'shared/consumer_fields', f: f %>
     <% end %>
 

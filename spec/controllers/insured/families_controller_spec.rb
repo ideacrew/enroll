@@ -19,10 +19,7 @@ RSpec.describe Insured::FamiliesController do
 
   describe "GET home" do
     before :each do 
-      allow(family).to receive(:latest_household).and_return(household)
-      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:coverage_selected).and_return(hbx_enrollments)
+      allow(family).to receive(:enrolled_hbx_enrollments).and_return(hbx_enrollments)
     end
 
     context "for SHOP market" do    
