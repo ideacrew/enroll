@@ -159,28 +159,3 @@ And(/I should see the individual home page/) do
   click_when_present(@browser.a(class: /interaction-click-control-my-dc-health-link/))
   expect(@browser.element(text: /my dc health link/i).visible?).to be_truthy
 end
-
-When(/I click the fancy links, I should see text changes/) do
-  @browser.element(text: /I've started a new job/i).wait_until_present
-  click_when_present(@browser.a(class: /right carousel-control/))
-  sleep(1)
-  click_when_present(@browser.a(class: /right carousel-control/))
-  sleep(1)
-  click_when_present(@browser.a(class: /right carousel-control/))
-  sleep(1)
-  click_when_present(@browser.a(class: /right carousel-control/))
-  @browser.element(text: /Change in aptc\/csr/i).wait_until_present
-  click_when_present(@browser.a(class: /qle-menu-item interaction-click-control-change-in-aptc\/csr/))
-  expect(@browser.element(text: /Please call us at 1-855-532-5465/i).visible?).to be_truthy
-  @browser.element(text: /My immigration status has changed/i).wait_until_present
-  click_when_present(@browser.a(class: /qle-menu-item interaction-click-control-my-immigration-status-has-changed/))
-  expect(@browser.element(text: /Please call us at 1-855-532-5465/i).visible?).to be_truthy
-  @browser.element(text: /Being native american/i).wait_until_present
-  click_when_present(@browser.a(class: /qle-menu-item interaction-click-control-being-native-american/))
-  expect(@browser.element(text: /Please call us at 1-855-532-5465/i).visible?).to be_truthy
-  click_when_present(@browser.a(class: /right carousel-control/))
-  sleep(1)
-  @browser.element(text: /Health insurance carrier error/i).wait_until_present
-  click_when_present(@browser.a(class: /qle-menu-item interaction-click-control-health-insurance-carrier-error/))
-  expect(@browser.element(text: /Enter the date of the event/i).visible?).to be_truthy
-end
