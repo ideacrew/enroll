@@ -15,6 +15,17 @@ describe Family, "given a primary applicant and a dependent" do
     subject.remove_family_member(dependent)
   end
 
+  context "with enrolled hbx enrollments" do
+    let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
+    before do
+      allow(household).to receive(:enrolled_hbx_enrollments).and_return([mock_hbx_enrollment])
+    end
+
+    it "enrolled hbx enrollments should come from latest household" do
+      expect(subject.enrolled_hbx_enrollments).to eq subject.latest_household.enrolled_hbx_enrollments
+    end
+  end
+
 end
 
 describe Family, type: :model, dbclean: :after_each do
@@ -60,6 +71,10 @@ describe Family, type: :model, dbclean: :after_each do
 
         it "should not be valid" do
           expect(family.errors[:family_members].any?).to be_truthy
+        end
+
+        it "should have no enrolled hbx enrollments" do
+          expect(family.enrolled_hbx_enrollments).to eq []
         end
       end
 
