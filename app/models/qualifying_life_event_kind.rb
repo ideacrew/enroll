@@ -5,7 +5,6 @@ class QualifyingLifeEventKind
   # Model Changes to support IVL needs
   ## effective_on_kinds -- type changed to Array to support multiple choices (view to provide choice when size > 1)
   ### added enumerations to EffectiveOnKinds with following definitions:
-  ###   first_of_this_month: event_on date first day
   ###   first_of_next_month: event_on date first day of following month
   ## populated reason code in some instances -- use to call class method for business rules when present
   ## ordinal_position -- set and use these values to determine sort order in view
@@ -18,7 +17,7 @@ class QualifyingLifeEventKind
   MarketKinds = %w[shop individual]
 
   # first_of_next_month: not subject to 15th of month effective date rule
-  EffectiveOnKinds = %w(date_of_event first_of_month first_of_this_month first_of_next_month)
+  EffectiveOnKinds = %w(date_of_event first_of_month first_of_next_month)
 
   Reasons = [
     "initial_enrollment",
