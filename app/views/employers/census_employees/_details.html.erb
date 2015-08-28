@@ -15,12 +15,8 @@
         Hired On:
         <%= format_date @census_employee.hired_on %>
         <br/>
-        Owner:
-        <% if @census_employee.is_business_owner %>
-          YES
-        <% else %>
-          NO
-        <% end %> 
+        Owner: 
+        <%= @census_employee.try(:is_business_owner) ? "Yes" : "No" %>
       </p>
     </div>
   </div>
