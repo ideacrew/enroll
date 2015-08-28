@@ -18,10 +18,15 @@ module Subscribers
       return if person.nil? || person.consumer_role.nil?
 
       consumer_role = person.consumer_role
-      consumer_role.raw_event_responses << {:local_residency_response => payload}
-      residency_verification_hash = xml_to_hash(xml)
+      consumer_role.local_residency_responses.build({received_at: Time.now, body: payload}).save
 
-      if residency_verification_hash[:residency_verification_response].eql? 'ADDRESS_NOT_IN_AREA'
+      xml_hash = xml_to_hash(xml)
+
+      update_consumer_role(consumer_role, xml_hash)
+    end
+
+    def update_consumer_role(consumer_role, xml_hash)
+      if xml_hash[:residency_verification_response].eql? 'ADDRESS_NOT_IN_AREA'
         consumer_role.deny_residency
       else
         consumer_role.authorize_residency

@@ -136,6 +136,8 @@ class ConsumerRole
 
   embeds_one :lawful_presence_determination
 
+  embeds_many :local_residency_responses, class_name:"EventResponse"
+
   after_initialize :setup_lawful_determination_instance
 
   def start_residency_verification_process

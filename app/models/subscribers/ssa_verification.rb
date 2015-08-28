@@ -18,7 +18,7 @@ module Subscribers
       return if person.nil? || person.consumer_role.nil?
 
       consumer_role = person.consumer_role
-      consumer_role.raw_event_responses << {:ssa_verification_response => payload}
+      consumer_role.lawful_presence_determination.ssa_verifcation_responses.build({received_at: Time.now, body: payload}).save
 
       xml_hash = xml_to_hash(xml)
 
