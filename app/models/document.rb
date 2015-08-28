@@ -55,15 +55,6 @@ class Document
 
   field :tags, type: Array, default: []
 
-  # Mapped to VLP_DOCUMENT_IDENTIFICATION_KINDS value
-  field :document_number, type:String
-
-  # date of expiration of the document. e.g. passport expiration date
-  field :expiration_date, type:Date
-
-  # country which issued the document. e.g. passport issuing country
-  field :issuing_country, type:String
-
   validates_presence_of :title, :creator, :publisher, :type, :format, :identifier, :source, :language
 
   validates :rights,

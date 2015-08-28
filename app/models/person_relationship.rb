@@ -43,18 +43,6 @@ class PersonRelationship
     "unrelated",
     "ward"
   ]
-  
-  SmallRelationships = [
-    "spouse",
-    "child",
-    "domestic_partner",
-    "parent",
-    "sibling",
-    "ward",
-    "guardian",
-    "unrelated",
-    "other tax dependent"
-  ]
 
   InverseMap = {
     "child" => "parent",
