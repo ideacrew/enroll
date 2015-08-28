@@ -17,7 +17,8 @@ module Forms
     validates_presence_of :gender, :allow_blank => nil
     validates_presence_of :family_id, :allow_blank => nil
     validates_presence_of :dob
-    validates_inclusion_of :relationship, :in => ::PersonRelationship::Relationships, :allow_blank => nil
+    # validates_inclusion_of :relationship, :in => ::PersonRelationship::Relationships, :allow_blank => nil
+    validates_inclusion_of :relationship, :in => ::PersonRelationship::SmallRelationships, :allow_blank => nil
     validate :relationship_validation
 
     attr_reader :dob
