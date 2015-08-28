@@ -40,6 +40,7 @@ class CensusEmployee < CensusMember
   index({"is_business_owner" => 1})
   index({"encrypted_ssn" => 1})
   index({"dob" => 1})
+  index({"encrypted_ssn" => 1, "dob" => 1})
   index({"encrypted_ssn" => 1, "dob" => 1, "aasm_state" => 1})
   index({"benefit_group_assignments._id" => 1})
   index({"benefit_group_assignments.benefit_group_id" => 1})

@@ -107,6 +107,7 @@ class Person
 
   index({encrypted_ssn: 1}, {sparse: true, unique: true})
   index({dob: 1}, {sparse: true})
+  index({dob: 1, encrypted_ssn: 1})
 
   index({last_name: 1, dob: 1}, {sparse: true})
 
