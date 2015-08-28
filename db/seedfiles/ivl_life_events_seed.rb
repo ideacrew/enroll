@@ -7,7 +7,7 @@ QualifyingLifeEventKind.create!(
   ordinal_position: 100,
   reason: "employee_gaining_medicare",
   edi_code: "33-LOST ACCESS TO MEC", 
-  effective_on_kinds: ["first_of_this_month", "first_of_next_month"],
+  effective_on_kinds: ["first_of_next_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
   is_self_attested: true,
@@ -281,7 +281,7 @@ QualifyingLifeEventKind.create!(
 
 QualifyingLifeEventKind.create!(
   title: "Exceptional circumstance due to a natural disaster",
-  tool_tip: "(HBX)   A natural disaster prevented consumer from enrolling during open enrollment or an SEP",
+  tool_tip: "(HBX) A natural disaster prevented consumer from enrolling during open enrollment or an SEP",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
