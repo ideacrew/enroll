@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "group_selection/new.html.erb" do
-  context "coverage selction" do
+  context "coverage selection" do
     let(:person) { FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) }
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
@@ -67,6 +67,48 @@ RSpec.describe "group_selection/new.html.erb" do
       expect(rendered).to have_selector('input[value="dental"]')
       expect(rendered).to have_selector('label', text: 'Dental')
     end
+  end
+  context "coverage selection with incarcerated" do
+    let(:person) { FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) }
+    let(:jail_person) { FactoryGirl.create(:person, is_incarcerated: true, us_citizen: true) }
+    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:family_member2) { double(id: "family_member", primary_relationship: "parent", dob: Date.new(1990,10,10), full_name: "member") }
+    let(:family_member3) { double(id: "family_member", primary_relationship: "spouse", dob: Date.new(1990,10,10), full_name: "member") }
+    let(:family_member4) { double(id: "family_member", primary_relationship: "spouse", dob: Date.new(1990,10,10), full_name: "member") }
+    let(:coverage_household_jail) { double(family_members: [family_member4, family_member2, family_member3]) }
+    before(:each) do
+      assign(:person, person)
+      assign(:employee_role, employee_role)
+      assign(:coverage_household, coverage_household_jail)
+      assign(:market_kind, 'individual')
+      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+      allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
+      allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
+      allow(family_member4).to receive(:is_primary_applicant?).and_return(true)
+      allow(person).to receive(:consumer_role).and_return(true)
+      allow(jail_person).to receive(:consumer_role).and_return(true)
+      allow(family_member2).to receive(:person).and_return(person)
+      allow(family_member3).to receive(:person).and_return(person)
+      allow(family_member4).to receive(:person).and_return(jail_person)
+      controller.request.path_parameters[:person_id] = person.id
+      controller.request.path_parameters[:employee_role_id] = employee_role.id
+      render :template => "group_selection/new.html.erb"
+    end
+
+    it "should show the title of family members" do
+
+      expect(rendered).to match /Family Members/
+    end
+
+    it "should have three checkbox option" do
+      expect(rendered).to have_selector("input[type='checkbox']", count: 2)
+    end
+
+    it "should have a checked checkbox option and a checked radio button" do
+      expect(rendered).to have_selector("input[checked='checked']", count: 2)
+    end
+    
   end
 
   context "family member" do
