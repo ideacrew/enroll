@@ -71,7 +71,3 @@ Feature: Create Employer
         When Employee clicks on purchase button on the coverage summary page
         Then Employee should see the receipt page
         Then Employee should see the "my account" page
-        When Employee visits consumer profile homepage
-        Then Employee should see the "YOUR LIFE EVENTS" section
-        When Employee clicks on the tab for plans
-        Then Employee should see my plan

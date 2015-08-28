@@ -8,7 +8,7 @@ module Aws
     # If success, return URI which has the s3 bucket key
     # else return nil
     def save(file_path, bucket_name, key=SecureRandom.uuid)
-      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:<#{bucket_name}>##{key}"
+      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{key}"
       begin
         object = get_object(bucket_name, key)
         if object.upload_file(file_path)
@@ -27,8 +27,10 @@ module Aws
       Aws::S3Storage.new.save(file_path, bucket_name, key)
     end
 
-    # The uri has information about the bucket name and key e.g. "urn:openhbx:terms:v1:file_storage:s3:bucket:<#{bucket_name}>##{key}"
-    # The returned object can be streamed by controller e.g. send_data Aws::S3Storage.find(uri), :stream => true, :buffer_size => ‘4096’
+    # The uri has information about the bucket name and key
+    # e.g. "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{key}"
+    # The returned object can be streamed by controller
+    # e.g. send_data Aws::S3Storage.find(uri), :stream => true, :buffer_size => ‘4096’
     def find(uri)
       begin
         bucket_and_key = uri.split(':').last
@@ -41,8 +43,10 @@ module Aws
     end
 
     # The param uri is present in Document model. Document.identifier
-    # The uri has information about the bucket name and key e.g. "urn:openhbx:terms:v1:file_storage:s3:bucket:<#{bucket_name}>##{key}"
-    # The returned object can be streamed by controller e.g. send_data Aws::S3Storage.find(uri), :stream => true, :buffer_size => ‘4096’
+    # The uri has information about the bucket name and key
+    # e.g. "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{key}"
+    # The returned object can be streamed by controller
+    # e.g. send_data Aws::S3Storage.find(uri), :stream => true, :buffer_size => ‘4096’
     def self.find(uri)
       Aws::S3Storage.new.find(uri)
     end

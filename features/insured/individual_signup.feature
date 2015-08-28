@@ -20,7 +20,7 @@ Feature: Insured Plan Shopping on Individual market
       And I click on continue button to go to the individual home page
       And I should see the individual home page
       When I click the "I've married" in qle carousel
-      And I select qle date
+      And I select a future qle date
       Then I should see not qualify message
       When I click the "I've married" in qle carousel
       And I select a past qle date
