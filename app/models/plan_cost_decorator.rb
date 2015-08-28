@@ -109,7 +109,6 @@ class PlanCostDecorator < SimpleDelegator
   def premium_for(member)
     relationship_benefit = relationship_benefit_for(member)
     if relationship_benefit && relationship_benefit.offered?
-      __getobj__.premium_for(plan_year_start_on, age_of(member))
       Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member))
     else
       0.0
