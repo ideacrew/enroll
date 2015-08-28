@@ -13,67 +13,33 @@ class PersonRelationship
                               foster\ child daughter-in-law sister-in-law mother-in-law sister ward
                               stepdaughter child sponsored\ dependent dependent\ of\ a\ minor\ dependent
                               guardian court\ appointed\ guardian collateral\ dependent life\ partner)
-  Relationships = [
+    Relationships = [
     "spouse",
-    "life_partner",
     "child",
-    "adopted_child",
-    "annuitant", # no inverse
-    "aunt_or_uncle",
-    "brother_or_sister_in_law",
-    "collateral_dependent",
-    "court_appointed_guardian",
-    "daughter_or_son_in_law",
-    "dependent_of_a_minor_dependent",
-    "father_or_mother_in_law",
-    "foster_child",
-    "grandchild",
-    "grandparent",
-    "great_grandchild",
-    "great_grandparent",
-    "guardian",
-    "nephew_or_niece",
-    "other_relationship",
+    "domestic_partner",
     "parent",
     "sibling",
-    "sponsored_dependent",
-    "stepchild",
-    "stepparent",
-    "trustee", # no inverse
+    "ward",
+    "guardian",
     "unrelated",
-    "ward"
+    "other tax dependent"
   ]
 
   InverseMap = {
     "child" => "parent",
     "parent" => "child",
-    "grandparent" => "grandchild",
-    "grandchild" => "grandparent",
-    "great_grandparent" => "great_grandchild",
-    "great_grandchild" => "great_grandparent",
-    "stepparent" => "stepchild",
-    "stepchild" => "stepparent",
-    "aunt_or_uncle" => "nephew_or_niece",
-    "nephew_or_niece" => "aunt_or_uncle",
-    "father_or_mother_in_law" => "daughter_or_son_in_law",
-    "daughter_or_son_in_law" => "father_or_mother_in_law",
     "guardian" => "ward",
     "ward" => "guardian",
 
     # bi directional
     "self" => "self",
-    "brother_or_sister_in_law" => "brother_or_sister_in_law",
     "sibling" => "sibling",
-    "life_partner" => "life_partner",
+    "domestic_partner" => "domestic_partner",
     "spouse" => "spouse",
-    "other_relationship" => "other_relationship",
-    "cousin" => "cousin",
     "unrelated" => "unrelated",
+    "other tax dependent" => "other tax dependent"
 
     #one directional
-    "foster_child" => "guardian",
-    "court_appointed_guardian" => "ward",
-    "adopted_child" => "parent"
   }
 
   SymmetricalRelationships = %W[head\ of\ household spouse ex-spouse cousin ward trustee annuitant other\ relationship other\ relative self]
