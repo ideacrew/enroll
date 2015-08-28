@@ -103,6 +103,27 @@ And(/Individual clicks on add member button/) do
   @browser.button(text: /Confirm Member/).wait_while_present
 end
 
+And(/Individual again clicks on add member button/) do
+  @browser.a(text: /Add Member/).wait_until_present
+  @browser.a(text: /Add Member/).click
+  @browser.text_field(id: /dependent_first_name/).wait_until_present
+  @browser.text_field(id: /dependent_first_name/).set("Robert")
+  @browser.text_field(id: /dependent_middle_name/).set("K")
+  @browser.text_field(id: /dependent_last_name/).set("York")
+  @browser.text_field(name: 'jq_datepicker_ignore_dependent[dob]').set('01/15/2013')
+  @browser.text_field(id: /dependent_ssn/).set("198021122")
+  input_field = @browser.div(class: /selectric-wrapper/)
+  input_field.click
+  input_field.li(text: /Child/).click
+  @browser.radio(id: /radio_male/).fire_event("onclick")
+  @browser.radio(id: /dependent_us_citizen_false/).fire_event("onclick")
+  @browser.radio(id: /dependent_eligible_immigration_status_true/).wait_while_present
+  @browser.radio(id: /dependent_eligible_immigration_status_true/).fire_event("onclick")
+  scroll_then_click(@browser.button(text: /Confirm Member/))
+  @browser.button(text: /Confirm Member/).wait_while_present
+end
+
+
 And(/I click on continue button on household info form/) do
   click_when_present(@browser.a(text: /continue/i))
 end
