@@ -94,6 +94,7 @@ class QualifyingLifeEventKind
   validates_presence_of :title, :market_kind, :effective_on_kinds, :pre_event_sep_in_days,
                         :post_event_sep_in_days
 
+  scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :desc) }
 
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage: 
@@ -137,11 +138,11 @@ class QualifyingLifeEventKind
 
   class << self
     def shop_market_events
-      where(:market_kind => "shop").to_a
+      where(:market_kind => "shop").active.to_a
     end
 
     def individual_market_events
-      where(:market_kind => "individual").to_a
+      where(:market_kind => "individual").active.to_a
     end
   end
 

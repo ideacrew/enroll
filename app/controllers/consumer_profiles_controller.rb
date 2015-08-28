@@ -54,6 +54,7 @@ class ConsumerProfilesController < ApplicationController
     qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = TimeKeeper.date_of_record - 30.days
     end_date = TimeKeeper.date_of_record + 30.days
+    @qle = QualifyingLifeEventKind.find(params[:qle_id]) if params[:qle_id].present?
 
     if ["I've had a baby", "A family member has died", "I've married"].include? params[:qle_type]
       start_date = TimeKeeper.date_of_record - 60.days
