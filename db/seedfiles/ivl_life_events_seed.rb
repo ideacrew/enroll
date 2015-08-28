@@ -51,7 +51,7 @@ QualifyingLifeEventKind.create!(
 
 QualifyingLifeEventKind.create!(
   title: "I've adopted a child",
-  tool_tip: "Household adds a member due to marriage, birth, adoption, placement for adoption, or placement in foster care",
+  tool_tip: "A child has been adopted, placed for adoption, or placed in foster care",
   action_kind: "add_member",
   market_kind: "individual",
   event_kind_label: "Date of adoption",
@@ -67,7 +67,7 @@ QualifyingLifeEventKind.create!(
 
 QualifyingLifeEventKind.create!(
   title: "I've married",
-  tool_tip: "Household adds a member due to marriage, birth, adoption, placement for adoption, or placement in foster care",
+  tool_tip: " ",
   action_kind: "add_member",
   market_kind: "individual",
   event_kind_label: "Date of marriage",
@@ -86,11 +86,11 @@ QualifyingLifeEventKind.create!(
   tool_tip: "Entering a domestic partnership as permitted or recognized by the District of Columbia",
   action_kind: "add_member",
   market_kind: "individual",
-  event_kind_label: "Date of legal domestic partnership",
+  event_kind_label: "Date of domestic partnership",
   ordinal_position: 100,
   reason: " ",
   edi_code: "33-ENTERING DOMESTIC PARTNERSHIP", 
-  effective_on_kinds: ["first_of_month"],
+  effective_on_kinds: ["first_of_next_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: true,
@@ -100,7 +100,7 @@ QualifyingLifeEventKind.create!(
 
 QualifyingLifeEventKind.create!(
   title: "I've divorced or ended domestic partnership",
-  tool_tip: "Consumer divorces, ends domestic partnership or legally separates",
+  tool_tip: "Someone has divorced, ended a domestic partnership, or legally separated",
   action_kind: "drop_member",
   market_kind: "individual",
   event_kind_label: "Divorce or partnership end date",
@@ -116,8 +116,8 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "I've moved into the District of Columbia",
-  tool_tip: "Consumer or a member of the consumer’s tax household moves to the District",
+  title: "I'm moving to the District of Columbia",
+  tool_tip: " ",
   action_kind: "add_benefit",
   market_kind: "individual",
   event_kind_label: "Date of move",
@@ -125,7 +125,7 @@ QualifyingLifeEventKind.create!(
   reason: "move_to_state",
   edi_code: "43-CHANGE OF LOCATION", 
   effective_on_kinds: ["first_of_next_month"],
-  pre_event_sep_in_days: 0,
+  pre_event_sep_in_days: 60,
   post_event_sep_in_days: 60,
   is_self_attested: true,
     # start_of_sep: "Date of move    ",
@@ -145,14 +145,14 @@ QualifyingLifeEventKind.create!(
   effective_on_kinds: ["first_of_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
-  is_self_attested: true,
+  is_self_attested: false,
     # start_of_sep: "Date of eligibility redetermination (NOTE: this is not necessarily the date the customer reported the change)",
     # coverage_effective_date: "Regular effective date")
   )
 
 QualifyingLifeEventKind.create!(
   title: "My immigration status has changed",
-  tool_tip: "Consumer gains status as citizen, national, or lawfully present immigrant",
+  tool_tip: ": Someone gains a status that makes them newly eligible to enroll in coverage through DC Health Link",
   action_kind: "add_benefit",
   market_kind: "individual",
   event_kind_label: "Date of change",
@@ -169,7 +169,7 @@ QualifyingLifeEventKind.create!(
 
 QualifyingLifeEventKind.create!(
   title: "I'm a Native American",
-  tool_tip: "American Indians/Alaskan Natives can enroll in a plan at any time",
+  tool_tip: " ",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
@@ -178,20 +178,20 @@ QualifyingLifeEventKind.create!(
   effective_on_kinds: ["first_of_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 30,
-  is_self_attested: true,
+  is_self_attested: false,
     # start_of_sep: "Date approved by HBX",    
     # coverage_effective_date: "Regular effective date")
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Erroneous enrollment, HBX/HHS",
-  tool_tip: "Enrollment or non-enrollment in QHP unintentional, inadvertent, or erroneous and is result of error, misrepresentation, or inaction by an agent of HBX or HHS",
+  title: "Problem with my enrollment caused by DC Health Link",
+  tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by DC Health Link or the Department of Health and Human Services",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
   reason: " ",
   edi_code: " ",
-  effective_on_kinds: ["first_of_month"],
+  effective_on_kinds: ["first_of_next_month", "first_of_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
@@ -200,14 +200,14 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Erroneous enrollment, QHP issuer",
-  tool_tip: "Enrollment or non-enrollment in QHP unintentional, inadvertent, or erroneous and is result of error, misrepresentation, or inaction by an agent of a QHP issuer (as determined by DISB)",
+  title: "Problem with my enrollment caused by my health insurance company",
+  tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by your insurance company",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
   reason: " ",
   edi_code: " ",
-  effective_on_kinds: ["first_of_month"],
+  effective_on_kinds: ["first_of_next_month", "first_of_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
@@ -216,14 +216,14 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Misconduct of non-Exchange entity providing enrollment assistance",
-  tool_tip: "Consumer was not enrolled, was enrolled in the wrong plan, or was eligible for but did not receive APTC or CSR due to misconduct by a non-Exchange entity providing enrollment assistance",
+  title: "Problem with my enrollment caused by someone providing me with enrollment assistance",
+  tool_tip: "You are not enrolled or are enrolled in the wrong plan because of an error made by a broker, in-person assister, or another expert trained by DC Health Link",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
   reason: " ",
   edi_code: " ",
-  effective_on_kinds: ["first_of_month"],
+  effective_on_kinds: ["first_of_next_month", "first_of_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
@@ -232,8 +232,8 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "QHP violated its contract",
-  tool_tip: "The QHP the person enrolled in substantially violated a material provision of its contract with the consumer",
+  title: "My health plan violated its contract",
+  tool_tip: " ",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
@@ -248,7 +248,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Found ineligible for Medicaid after open enrollment ended",
+  title: "I applied during open enrollment but got my Medicaid denial after open enrollment ended",
   tool_tip: "Consumer had pending Medicaid eligibility at the end of open enrollment, but was found ineligible after open enrollment.",
   action_kind: "add_member",
   market_kind: "individual",
@@ -264,7 +264,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Consumer’s employer applied to SHOP exchange but was found ineligible",
+  title: "My employer applied for small business coverage during open enrollment but was denied after open enrollment ended",
   tool_tip: "Consumer did not enroll in a QHP because consumer’s employer was applying to provide coverage through SHOP during open enrollment. Consumer’s employer was found ineligible to participate in SHOP after the end of open enrollment",
   action_kind: "add_member",
   market_kind: "individual",
@@ -280,8 +280,8 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Exceptional circumstance due to a natural disaster",
-  tool_tip: "(HBX) A natural disaster prevented consumer from enrolling during open enrollment or an SEP",
+  title: "A natural disaster prevented me from enrolling",
+  tool_tip: "A natural disaster during open enrollment or a special enrollment period prevented me from enrolling",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
@@ -290,14 +290,14 @@ QualifyingLifeEventKind.create!(
   effective_on_kinds: ["first_of_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
-  is_self_attested: true,
+  is_self_attested: false,
     # start_of_sep: "Day of disaster (or last day of multi-day disaster)",
     # coverage_effective_date: "Regular effective date")
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Exceptional circumstance due to medical emergency",
-  tool_tip: "A serious medical condition prevented consumer from enrolling during open enrollment or an SEP",
+  title: "A medical emergency prevented me from enrolling",
+  tool_tip: "A serious medical emergency during open enrollment or a special enrollment period prevented me from enrolling",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
@@ -312,8 +312,8 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Exceptional circumstance due to system outages around plan selection deadlines",
-  tool_tip: "DC Health Link outage or outage of federal or local data sources around the plan selection deadline prevented consumer from enrolling during open enrollment or an SEP",
+  title: "I was unable to enroll because of a system outage",
+  tool_tip: "A DC Health Link outage or outage in federal and local data sources close to an open enrollment or special enrollment period deadline prevented me from enrolling",
   action_kind: "add_member",
   market_kind: "individual",
   ordinal_position: 100,
@@ -328,10 +328,11 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Exceptional circumstances due to being a victim of domestic abuse",
+  title: "I have experienced domestic abuse",
   tool_tip: "A person is leaving an abusive spouse or domestic partner",
   action_kind: "add_member",
   market_kind: "individual",
+  event_kind_label: "Date you left the household",
   ordinal_position: 100,
   reason: " ",
   edi_code: " ",
@@ -344,63 +345,66 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Exceptional circumstances due to loss of eligibility for hardship exemption",
-  tool_tip: "Consumer who received a certificate of exemption from the individual mandate for a month or months during the coverage year who loses eligibility for the exemption.",
+  title: "I lost eligibility for a hardship exemption",
+  tool_tip: "I had a certificate of exemption from the individual mandate for this year but have lost eligibility for that exemption",
   action_kind: "add_member",
   market_kind: "individual",
+  event_kind_label: "Date hardship exemption ends",
   ordinal_position: 100,
   reason: " ",
   edi_code: " ",
   effective_on_kinds: ["first_of_month"],
-  pre_event_sep_in_days: 0,
-  post_event_sep_in_days: 60,
+  pre_event_sep_in_days: 30,
+  post_event_sep_in_days: 30,
   is_self_attested: false,
     # start_of_sep: "30 days prior to date of ineligibility for exemption",
     # coverage_effective_date: "Regular effective date")
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Exceptional circumstance for those beginning or ending AmeriCorps State and National, VISTA, or NCCC service",
+  title: "I am beginning or ending service with AmeriCorps State and National, VISTA, or NCCC",
   tool_tip: "An individual is a member of AmeriCorps State and National, VISTA, or NCCC.",
   action_kind: "add_member",
   market_kind: "individual",
+  event_kind_label: "Date service begins or ends",
   ordinal_position: 100,
   reason: " ",
   edi_code: " ",
   effective_on_kinds: ["first_of_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
-  is_self_attested: false,
+  is_self_attested: true,
     # start_of_sep: "Date person begins or ends service in one of the three programs",
     # coverage_effective_date: "Regular effective date")
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Medical coverage order (mandate)",
-  tool_tip: "A person is required by a court (through a medical insurance coverage order) for themselves or someone else",
+  title: ": I’ve been ordered by a court to provide coverage for someone",
+  tool_tip: "I have a medical insurance coverage order from a court",
   action_kind: "add_member",
   market_kind: "individual",
-  event_kind_label: "Court-ordered coverage start date",
+  event_kind_label: "Date that court orders that coverage starts",
   ordinal_position: 100,
   reason: " ",
   edi_code: " ",
-  effective_on_kinds: ["first_of_month"],
+  effective_on_kinds: ["exact_date"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
-  is_self_attested: false,
+  is_self_attested: true,
     # start_of_sep: "Date of the court order",
     # coverage_effective_date: "Regular effective date")
   )
 
 QualifyingLifeEventKind.create!(
-  title: "My Employer failed to pay premiums on time",
-  tool_tip: "Consumer loses access to COBRA because the employer responsible for submitting premiums fails to submit them on time",
+  title: "My employer did not pay my premiums on time",
+  tool_tip: "Employer coverage is ending due to employer’s failure to make payments",
   action_kind: "add_member",
   market_kind: "individual",
+  event_kind_label: "Date of notice of plan termination",
   ordinal_position: 100,
   reason: " ",
   edi_code: " ",
-  effective_on_kinds: ["first_of_month"],
+  effective_on_kinds: ["first_of_next_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
