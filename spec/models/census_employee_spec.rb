@@ -107,7 +107,18 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         it "should have errors" do
           initial_census_employee.census_dependents = [child1,child2]
           expect(initial_census_employee.save).to be_falsey
-          expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent/)
+          expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent and subscriber/)
+        end
+      end
+
+      context "with ssn matching subscribers" do
+        let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: initial_census_employee.ssn) }
+
+        it "should have errors" do
+          initial_census_employee.census_dependents = [child1]
+          puts [initial_census_employee.ssn, child1.ssn]
+          expect(initial_census_employee.save).to be_falsey
+          expect(initial_census_employee.errors[:base].first).to match(/SSN's must be unique for each dependent and subscriber/)
         end
       end
 
