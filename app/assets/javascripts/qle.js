@@ -1,14 +1,22 @@
-$(function () {
   $(document).on('click', 'a.qle-menu-item', function() {
-    $('#qle_flow_info #qle-menu').hide();
-    $('.qle-details-title').html($(this).html());
+    qle_text = $(this).text();
     $('#event-title').html($(this).html());
-    $('#change_plan').val($(this).html());
-    init_datepicker_for_qle_date();
-    $('#qle-details').removeClass('hidden');
-    $('.qle-form').removeClass('hidden');
+  	$('#qle-details').removeClass('hidden');
+  	if(qle_text.toLowerCase() == "change in aptc/csr" || qle_text.toLowerCase() == "being native american" || qle_text.toLowerCase() == "my immigration status has changed" || qle_text.toLowerCase() == "hbx (exchange)/hhs error"){
+  		$('#qle-panel-body').addClass('hidden');
+  		$('#qle-default-footer').addClass('hidden');
+  		$('#qle-special-footer').removeClass('hidden');
+  	}
+  	else {	
+      $('.qle-details-title').html($(this).html());
+      $('#change_plan').val($(this).html());
+      init_datepicker_for_qle_date();
+      $('#qle-panel-body').removeClass('hidden');
+      $('#qle-special-footer').addClass('hidden');
+  		$('#qle-default-footer').removeClass('hidden');
+    }
   });
-
+  
 	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
 		$('#qle-details').addClass('hidden');
 		$('#qle-details .success-info, #qle-details .error-info').addClass('hidden');

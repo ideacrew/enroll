@@ -175,7 +175,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Erroneous enrollment, HBX/HHS",
+  title: "HBX (Exchange)/HHS error",
   description: "Enrollment or non-enrollment in QHP unintentional, inadvertent, or erroneous and is result of error, misrepresentation, or inaction by an agent of HBX or HHS",
   kind: "add",
   market_kind: "individual",
@@ -191,7 +191,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "Erroneous enrollment, QHP issuer",
+  title: "Health insurance carrier error",
   description: "Enrollment or non-enrollment in QHP unintentional, inadvertent, or erroneous and is result of error, misrepresentation, or inaction by an agent of a QHP issuer (as determined by DISB)",
   kind: "add",
   market_kind: "individual",
@@ -401,7 +401,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: "My Employer failed to pay premiums on time",
+  title: "My Employer failed to pay COBRA premiums on time",
   description: "Consumer loses access to COBRA because the employer responsible for submitting premiums fails to submit them on time",
   kind: "add",
   market_kind: "individual",

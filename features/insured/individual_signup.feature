@@ -32,5 +32,4 @@ Feature: Insured Plan Shopping on Individual market
       And I click on purchase button on confirmation page
       When I click on continue on qle confirmation page
       And I should see the individual home page
-
-
+      When I click the fancy links, I should see text changes
