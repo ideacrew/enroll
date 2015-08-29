@@ -30,12 +30,17 @@ module Subscribers
 
       if xml_hash[:ssn_verification_failed].eql?("true")
         args.determined_at = Time.now
-        args.vlp_authority = 'vlp'
+        args.vlp_authority = 'ssa'
         consumer_role.deny_lawful_presence!(args)
       elsif xml_hash[:ssn_verified].eql?("true") && xml_hash[:citizenship_verified].eql?("true")
         args.determined_at = Time.now
-        args.vlp_authority = 'vlp'
+        args.vlp_authority = 'ssa'
         args.citizen_status = ::ConsumerRole::US_CITIZEN_STATUS
+        consumer_role.authorize_lawful_presence!(args)
+      elsif xml_hash[:ssn_verified].eql?("true") && xml_hash[:citizenship_verified].eql?("false")
+        args.determined_at = Time.now
+        args.vlp_authority = 'ssa'
+        args.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
         consumer_role.authorize_lawful_presence!(args)
       end
 
