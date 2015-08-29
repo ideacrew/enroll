@@ -12,21 +12,17 @@
           <div class="table-responsive table-border">
             <table class="table table-wrapper table-condensed group-selection-tbl">
               <tbody>
-                <% offered_relationship_benefits = @employee_role.present? ? @employee_role.benefit_group.relationship_benefits.select(&:offered).map(&:relationship) : nil 
-                %>
-                <% @coverage_household.family_members.each_with_index do |family_member, index| %>
-                  <tr class="<%='ineligible_row' if family_member.person.ineligible_ivl%>">
-                    <td width="20">
-                      <% is_coverage = @employee_role.present? ? coverage_relationship_check(offered_relationship_benefits, family_member) : true
-                         is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
+                <% @coverage_household.family_members.each_with_index do |family_member, index|
+                   is_coverage = @eligibility.satisfied(family_member)
+                    is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
                       %>
-                    <% unless family_member.person.ineligible_ivl %>
+                  <tr class="<%='ineligible_row' if !is_coverage && !@employee_role.present? %>">
+                    <td width="20">
+
                       <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_coverage, disabled: !is_coverage, readonly: is_primary, onclick: "return #{!is_primary};") %>
-                    <% end %>
                     </td>
                     <td><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></td>
-                    <td><%= "ineligible relationship" unless is_coverage  %></td>
-                    <td><%= "ineligible due to legal status" if family_member.person.ineligible_ivl %></td>
+                    <td><%= "ineligible relationship" if !is_coverage && @employee_role.present?  %></td>
                   </tr>
                 <% end %>
               </tbody>

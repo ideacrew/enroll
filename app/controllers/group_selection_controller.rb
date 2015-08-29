@@ -9,6 +9,7 @@ class GroupSelectionController < ApplicationController
     else
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
     end
+    @eligibility = InsuredEligibleToEnrollRule.new(@role, @market_kind)
   end
 
   def create
@@ -78,8 +79,10 @@ class GroupSelectionController < ApplicationController
     if params[:employee_role_id].present?
       emp_role_id = params.require(:employee_role_id)
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
+      @role = @employee_role
     else
       @consumer_role = @person.consumer_role
+      @role = @consumer_role
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
