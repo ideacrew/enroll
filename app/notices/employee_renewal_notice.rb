@@ -5,7 +5,7 @@ class EmployeeRenewalNotice < Notice
     @employee = employee
     @to = "raghuramg83@gmail.com"
     @subject = "Employee Renewal notice"
-    @template = "notices/9cindividual.html.erb"
+    @template = "notices/renewal_1b.html.erb"
     build
   end
 
