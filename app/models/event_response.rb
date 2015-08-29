@@ -3,6 +3,6 @@ class EventResponse
   include Mongoid::Timestamps
 
   field :received_at, type: DateTime
-  field :body, type: String #the payload in the event response
+  field :body, type: String #the payload[:body] in the event response
 
 end

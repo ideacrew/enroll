@@ -1,7 +1,7 @@
 module Subscribers
   class SsaVerification < ::Acapi::Subscription
     def self.subscription_details
-      ["local.enroll.lawful_presence.ssa_verification_response"]
+      ["acapi.info.events.lawful_presence.ssa_verification_response"]
     end
 
     def call(event_name, e_start, e_end, msg_id, payload)
@@ -18,7 +18,7 @@ module Subscribers
       return if person.nil? || person.consumer_role.nil?
 
       consumer_role = person.consumer_role
-      consumer_role.lawful_presence_determination.ssa_verifcation_responses.build({received_at: Time.now, body: payload}).save
+      consumer_role.lawful_presence_determination.ssa_verifcation_responses.build({received_at: Time.now, body: xml}).save
 
       xml_hash = xml_to_hash(xml)
 
@@ -30,13 +30,13 @@ module Subscribers
 
       if xml_hash[:ssn_verification_failed].eql?("true")
         args.determined_at = Time.now
-        args.vlp_authority = 'ssa'
-        consumer_role.deny_lawful_presence(args)
+        args.vlp_authority = 'vlp'
+        consumer_role.deny_lawful_presence!(args)
       elsif xml_hash[:ssn_verified].eql?("true") && xml_hash[:citizenship_verified].eql?("true")
         args.determined_at = Time.now
-        args.vlp_authority = 'ssa'
+        args.vlp_authority = 'vlp'
         args.citizen_status = ::ConsumerRole::US_CITIZEN_STATUS
-        consumer_role.authorize_lawful_presence(args)
+        consumer_role.authorize_lawful_presence!(args)
       end
 
       consumer_role.save
