@@ -94,5 +94,11 @@ RSpec.describe "employers/census_employees/_details.html.erb" do
       render template: "employers/census_employees/_details.html.erb"
       expect(rendered).to match /child_26_and_over/
     end
+    
+    it "should get the Owner info" do
+      render template: "employers/census_employees/_details.html.erb"
+      expect(rendered).to match /Owner:/
+    end
+  
   end
 end

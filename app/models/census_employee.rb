@@ -278,8 +278,9 @@ private
   end
 
   def no_duplicate_census_dependent_ssns
-    if census_dependents.map(&:ssn).uniq.length != census_dependents.map(&:ssn).length
-      errors.add(:base, "SSN's must be unique for each dependent")
+    if census_dependents.map(&:ssn).uniq.length != census_dependents.map(&:ssn).length ||
+       census_dependents.map(&:ssn).any?{|dep_ssn| dep_ssn==self.ssn}
+      errors.add(:base, "SSN's must be unique for each dependent and subscriber")
     end
   end
 

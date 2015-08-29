@@ -177,6 +177,6 @@ class Household
   end
 
   def enrolled_hbx_enrollments
-    HbxEnrollment.covered(hbx_enrollments)
+    hbx_enrollments.my_enrolled_plans
   end
 end

@@ -433,7 +433,7 @@ module ApplicationHelper
       ["White", "Black or African American", "Asian Indian" ],
       ["Chinese", "Filipino", "Japanese", "Korean"], 
       ["Vietnamese", "Other Asian", "Native Hawaiian", "Samon" ],
-      ["Guamanion or Chamorro", "Other pacific islander"]
+      ["Guamanion or Chamorro", "Other pacific islander", "Other"]
     ].inject([]){ |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
     }
@@ -443,7 +443,7 @@ module ApplicationHelper
     [
       ["Mexican", "Mexican American"],
       ["Chicano/a", "Puerto Rican"],
-      ["Cuban"]
+      ["Cuban", "Other"]
     ].inject([]){ |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
     }
