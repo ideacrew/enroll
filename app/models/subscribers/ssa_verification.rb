@@ -41,7 +41,7 @@ module Subscribers
         args.determined_at = Time.now
         args.vlp_authority = 'ssa'
         args.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
-        consumer_role.authorize_lawful_presence!(args)
+        consumer_role.deny_lawful_presence!(args)
       end
 
       consumer_role.save
