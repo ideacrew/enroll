@@ -27,7 +27,7 @@
                   <ul class="list-qle">
                     <% qles.each do |qle| %>
                       <p>
-                        <a class="qle-menu-item" href="javascript:void(0)" data-toggle="tooltip" title="<%= qle.description %>"><%= qle.title.humanize %></a>
+                        <a class="qle-menu-item" href="javascript:void(0)" data-toggle="tooltip" title="<%= qle.tool_tip %>" data-title='<%= qle.title %>' data-id='<%= qle.id %>' data-label='<%= qle.event_kind_label %>'><%= qle.title.humanize %></a>
                       </p>
                     <% end %>
                   </ul>

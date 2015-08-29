@@ -61,7 +61,7 @@ class HbxEnrollment
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, to: :decorated_hbx_enrollment, allow_nil: true
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
-  scope :coverage_selected, ->{where(aasm_state: "coverage_selected")}
+  scope :my_enrolled_plans, -> { where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -224,7 +224,16 @@ class HbxEnrollment
     benefit_group.effective_on_for(employee_role.hired_on)
   end
 
-  def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil)
+  def self.calculate_start_date_by_qle(household)
+    special_enrollment_period = household.family.special_enrollment_periods.last
+    if special_enrollment_period.present?
+      special_enrollment_period.effective_on
+    else
+      TimeKeeper.date_of_record
+    end
+  end
+
+  def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false)
     enrollment = HbxEnrollment.new
     case
     when employee_role.present?
@@ -245,7 +254,11 @@ class HbxEnrollment
       enrollment.kind = "individual"
       enrollment.consumer_role = consumer_role
       enrollment.benefit_package_id = benefit_package.try(:id)
-      enrollment.effective_on = HbxProfile.all.first.benefit_sponsorship.benefit_coverage_periods.first.earliest_effective_date # FIXME
+      if qle
+        enrollment.effective_on = calculate_start_date_by_qle(coverage_household.household)
+      else
+        enrollment.effective_on = HbxProfile.all.first.benefit_sponsorship.benefit_coverage_periods.first.earliest_effective_date # FIXME
+      end
     else
       raise "either employee_role or consumer_role is required"
     end

@@ -225,3 +225,7 @@ perspective effects (not including the modals and the overlay).
 		padding-top: 10px;
 	}
 }
+
+.ineligible_row {
+  background-color: #e0e0e0;	
+}

@@ -64,7 +64,7 @@
           <%= render  partial: 'shared/individual_progress', locals: {step: '4'} %>
         <% elsif @change_plan.blank? %>
           <%= render  partial: 'shared/signup_progress', locals: {step: '5'} %>
-        <% elsif @change_plan == "change" %>
+        <% elsif @change_plan == "change_by_qle" %>
           <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
         <% elsif @change_plan == "change_plan" %>
           <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>

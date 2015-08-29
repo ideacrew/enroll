@@ -34,7 +34,8 @@ class GroupSelectionController < ApplicationController
                        @coverage_household.household.new_hbx_enrollment_from(
                          consumer_role: @person.consumer_role,
                          coverage_household: @coverage_household,
-                         benefit_package: @benefit_package)
+                         benefit_package: @benefit_package,
+                         qle: @change_plan == 'change_by_qle')
                      end
 
     hbx_enrollment.plan = @hbx_enrollment.plan if keep_existing_plan and @hbx_enrollment.present?

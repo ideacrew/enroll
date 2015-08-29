@@ -1,9 +1,12 @@
 $(function () {
   $(document).on('click', 'a.qle-menu-item', function() {
     $('#qle_flow_info #qle-menu').hide();
-    $('.qle-details-title').html($(this).html());
-    $('#event-title').html($(this).html());
-    $('#change_plan').val($(this).html());
+    $('.qle-details-title').html($(this).data('title'));
+    $('#event-title').html($(this).data('title'));
+    $('.qle-label').html($(this).data('label'))
+    $('#change_plan').val($(this).data('title'));
+    $('#qle_id').val($(this).data('id'));
+
     init_datepicker_for_qle_date();
     $('#qle-details').removeClass('hidden');
     $('.qle-form').removeClass('hidden');
@@ -51,7 +54,7 @@ $(function () {
 
     $.ajax({
       type: "GET",
-      data:{date_val: $("#qle_date").val(), qle_type: qle_type},
+      data:{date_val: $("#qle_date").val(), qle_type: qle_type, qle_id: $("#qle_id").val()},
       url: "/consumer_profiles/check_qle_date.js"
     });
   }

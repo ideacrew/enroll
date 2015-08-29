@@ -5,25 +5,27 @@ RSpec.describe Consumer::EmployeeDependentsController do
   let(:user) { instance_double("User", :primary_family => family, :person => person) }
   let(:person) { double(:employee_roles => [], :primary_family => family) }
   let(:employee_role_id) { "2343" }
+  let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind) }
 
   describe "GET index" do
+    context 'normal' do
+      before(:each) do
+        sign_in(user)
+        get :index, :employee_role_id => employee_role_id
+      end
 
-    before(:each) do
-      sign_in(user)
-      get :index, :employee_role_id => employee_role_id
-    end
+      it "renders the 'index' template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("index")
+      end
 
-    it "renders the 'index' template" do
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template("index")
-    end
+      it "assigns the person" do
+        expect(assigns(:person)).to eq person
+      end
 
-    it "assigns the person" do
-      expect(assigns(:person)).to eq person
-    end
-
-    it "assigns the family" do
-      expect(assigns(:family)).to eq family
+      it "assigns the family" do
+        expect(assigns(:family)).to eq family
+      end
     end
   end
 
