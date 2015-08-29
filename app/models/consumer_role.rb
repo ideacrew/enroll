@@ -8,8 +8,6 @@ class ConsumerRole
 
   embedded_in :person
 
-  INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
-
   VLP_AUTHORITY_KINDS = %w(ssa dhs hbx)
   NATURALIZED_CITIZEN_STATUS = "naturalized_citizen"
   INDIAN_TRIBE_MEMBER_STATUS = "indian_tribe_member"
@@ -41,12 +39,7 @@ class ConsumerRole
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
   field :requested_coverage_start_date, type: Date, default: Date.today
-  field :aasm_state, type: String, default: "identity_unverified"
-  field :identity_verified_date, type: Date
-  field :identity_final_decision_code, type: String
-  field :identity_final_decision_transaction_id, type: String
-  field :identity_response_code, type: String
-  field :identity_response_description_text, type: String
+  field :aasm_state, type: String, default: "verifications_pending"
 
   delegate :citizen_status,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
   delegate :citizen_status=,:vlp_verified_date=, :vlp_authority=, :vlp_document_id=, to: :lawful_presence_determination_instance
@@ -171,28 +164,9 @@ class ConsumerRole
 
   ## TODO: Move RIDP to user model
   aasm do
-    state :identity_unverified, initial: true
-    state :identity_followup_pending            # Identity unconfirmed due to service failure or negative response
-    state :identity_verified                    # Identity confirmed via RIDP services or subsequent followup
-    state :identity_invalid
-
-    state :verifications_pending
+    state :verifications_pending, initial: true
     state :verifications_outstanding
     state :fully_verified
-
-    event :verify_identity, :after => :record_transition  do
-      transitions from: [:identity_unverified, :identity_followup_pending], to: :identity_verified, :guard => :identity_verification_succeeded?
-      transitions from: :identity_unverified, to: :identity_followup_pending, :guard => :identity_verification_pending?
-    end
-
-    event :import_identity, :guard => :identity_metadata_provided?, :after => :record_transition  do
-      transitions from: :identity_unverified, to: :identity_verified, :guard => :identity_verification_succeeded?
-      transitions from: :identity_unverified, to: :identity_followup_pending, :guard => :identity_verification_pending?
-    end
-
-    event :revoke_identity, :after => :record_transition  do
-      transitions from: [:identity_unverified, :identity_followup_pending, :identity_verified], to: :identity_invalid
-    end
 
     event :deny_lawful_presence, :after => [:record_transition, :mark_lp_denied] do
       transitions from: :verifications_pending, to: :verifications_pending, guard: :residency_pending?
@@ -278,22 +252,6 @@ private
       from_state: aasm.from_state,
       to_state: aasm.to_state
     )
-  end
-
-  def identity_verification_succeeded?
-    identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
-  end
-
-  def identity_verification_denied?
-    identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
-  end
-
-  def identity_verification_pending?
-    identity_final_decision_code.to_s.downcase == "ref" && identity_response_code.present?
-  end
-
-  def identity_metadata_provided?
-    identity_final_decision_code.present? && identity_response_code.present?
   end
 
 end

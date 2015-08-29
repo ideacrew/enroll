@@ -106,3 +106,28 @@ RSpec.describe User, :type => :model do
     end
   end
 end
+
+describe User do
+  subject { User.new(:identity_final_decision_code => decision_code_value) }
+
+  describe "with no identity final decision code" do
+    let(:decision_code_value) { nil }
+    it "should not be considered identity_verified" do
+      expect(subject.identity_verified?).to eq false
+    end
+  end
+
+  describe "with a non-successful final decision code" do
+    let(:decision_code_value) { "lkdsjfaoifudjfnnkadjlkfajlafkl;f" }
+    it "should not be considered identity_verified" do
+      expect(subject.identity_verified?).to eq false
+    end
+  end
+
+  describe "with a successful decision code" do
+    let(:decision_code_value) { User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE }
+    it "should be considered identity_verified" do
+      expect(subject.identity_verified?).to eq true
+    end
+  end
+end
