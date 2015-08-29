@@ -31,11 +31,16 @@ module Subscribers
         args.determined_at = Time.now
         args.vlp_authority = 'vlp'
         consumer_role.deny_lawful_presence!(args)
-      elsif xml_hash[:lawful_presence_determination].present?
+      elsif xml_hash[:lawful_presence_determination].present? && xml_hash[:lawful_presence_determination][:response_code].eql?("lawfully_present")
         args.determined_at = Time.now
         args.vlp_authority = 'vlp'
         args.citizen_status = get_citizen_status(xml_hash[:lawful_presence_determination][:legal_status])
         consumer_role.authorize_lawful_presence!(args)
+      elsif xml_hash[:lawful_presence_determination].present? && xml_hash[:lawful_presence_determination][:response_code].eql?("not_lawfully_present")
+      args.determined_at = Time.now
+      args.vlp_authority = 'vlp'
+      args.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
+      consumer_role.deny_lawful_presence!(args)
       end
 
       consumer_role.save
