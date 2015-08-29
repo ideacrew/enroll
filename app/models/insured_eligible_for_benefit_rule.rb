@@ -1,7 +1,8 @@
-class InsuredEligibleToEnrollRule
-  include Mongoid::Document
+class InsuredEligibleForBenefitRule
   include Consumer::EmployeeRolesHelper
-  attr_reader :role, :market
+  attr_reader :role, :benefit_package
+
+  # Insured can be: employee_role, consumer_role, resident_role
 
   ACA_ELIGIBLE_CITIZEN_STATUS_KINDS = %W(
       us_citizen
@@ -11,16 +12,16 @@ class InsuredEligibleToEnrollRule
       lawful_permanent_resident
   )
 
-  def initialize(role, market)
+  def initialize(role, benefit_package)
     @role = role
-    @market = market.to_s.downcase
+    @benefit_package = benefit_package
     if @role.class.name == "EmployeeRole"
       @offered_relationship_benefits = @role.benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
     end
   end
 
-  def satisfied(family_member)
-    if @role.class.name == "ConsumerRole" && @market == "individual"
+  def satisfied?(family_member)
+    if @role.class.name == "ConsumerRole" && @benefit_package == "individual"
       member_role = family_member.person.consumer_role
       #hbx = HbxProfile.find_by_state_abbreviation("dc")
 
@@ -31,11 +32,29 @@ class InsuredEligibleToEnrollRule
         #( # family is under SEP )
         #)
 
-    elsif @role.class.name == "EmployeeRole" && @market == "shop"
+    elsif @role.class.name == "EmployeeRole" && @benefit_package == "shop"
       # employee_role is under open enrollment || employee_role family is under SEP
       coverage_relationship_check(@offered_relationship_benefits, family_member)
     else
-      # raise error for role/market mismatch
+      # raise error for role/benefit_package mismatch
     end
   end
+
+  def determination_result
+    # eligible
+    ## Benefit package's benefit coverage period 
+    # no_open_enrollment_period_active
+    ## Benefit package
+    # no_benefit_for_relationship
+    # no_benefit_for_age
+    # invalid_relationship_and_age_combination
+    ## Role
+    # not_a_resident
+    # incarcerated
+    # unverified_lawful_presence
+    # not_lawfully_present
+    ## Role's Family
+    # no_special_enrollment_period_active
+  end
+
 end
