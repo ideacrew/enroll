@@ -3,7 +3,7 @@ require "rails_helper"
 describe Subscribers::LocalResidency do
 
   it "should subscribe to the correct event" do
-    expect(Subscribers::LocalResidency.subscription_details).to eq ["acapi.info.events.residency_verification.vlp_verification_response"]
+    expect(Subscribers::LocalResidency.subscription_details).to eq ["acapi.info.events.residency.verification_response"]
   end
 
   describe "given a residency verification message to handle" do
@@ -28,6 +28,7 @@ describe Subscribers::LocalResidency do
         subject.call(nil, nil, nil, nil, payload)
         expect(person.consumer_role.aasm_state).to eq('verifications_pending')
         expect(person.consumer_role.local_residency_responses.count).to eq(1)
+        expect(person.consumer_role.local_residency_responses.first.body).to eq(payload[:body])
       end
     end
 
@@ -38,6 +39,7 @@ describe Subscribers::LocalResidency do
         subject.call(nil, nil, nil, nil, payload)
         expect(person.consumer_role.aasm_state).to eq('verifications_pending') #since lawful_presence_verified? is false
         expect(person.consumer_role.local_residency_responses.count).to eq(1)
+        expect(person.consumer_role.local_residency_responses.first.body).to eq(payload[:body])
       end
     end
   end

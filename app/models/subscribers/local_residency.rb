@@ -1,7 +1,7 @@
 module Subscribers
   class LocalResidency < ::Acapi::Subscription
     def self.subscription_details
-      ["acapi.info.events.residency_verification.vlp_verification_response"]
+      ["acapi.info.events.residency.verification_response"]
     end
 
     def call(event_name, e_start, e_end, msg_id, payload)
@@ -18,7 +18,7 @@ module Subscribers
       return if person.nil? || person.consumer_role.nil?
 
       consumer_role = person.consumer_role
-      consumer_role.local_residency_responses.build({received_at: Time.now, body: payload}).save
+      consumer_role.local_residency_responses.build({received_at: Time.now, body: xml}).save
 
       xml_hash = xml_to_hash(xml)
 
@@ -27,9 +27,9 @@ module Subscribers
 
     def update_consumer_role(consumer_role, xml_hash)
       if xml_hash[:residency_verification_response].eql? 'ADDRESS_NOT_IN_AREA'
-        consumer_role.deny_residency
+        consumer_role.deny_residency!
       else
-        consumer_role.authorize_residency
+        consumer_role.authorize_residency!
       end
 
       consumer_role.save
