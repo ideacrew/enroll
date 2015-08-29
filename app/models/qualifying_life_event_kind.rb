@@ -108,27 +108,31 @@ class QualifyingLifeEventKind
   # If coverage ends on date other than last day of month and plan selected before the month in which coverage ends: 
   #   effective date is consumer chooses between 1st of the month when coverage ends (allowing overlap - but no APTC for overlapping month) 
   #   or the first of the month following the month when coverage ends
-  def employee_gaining_medicare(consumer_coverage_effective_on = nil)
-    coverage_end_last_day_of_month = Date.new(event_on.year, event_on.month, event_on.end_of_month)
-    if event_on == coverage_end_last_day_of_month
-      if TimeKeeper.date_of_record <= event_on
+  def employee_gaining_medicare(coverage_end_on, consumer_coverage_effective_on = nil)
+    coverage_end_last_day_of_month = Date.new(coverage_end_on.year, coverage_end_on.month, coverage_end_on.end_of_month)
+    if coverage_end_on == coverage_end_last_day_of_month
+      if TimeKeeper.date_of_record <= coverage_end_on
         coverage_effective_on = coverage_end_last_day_of_month + 1.day
       else
         coverage_effective_on = TimeKeeper.date_of_record.end_of_month + 1.day
       end
     else
       if TimeKeeper.date_of_record < (coverage_end_last_day_of_month - 1.month).end_of_month
-
+        #FIXME here need a special UI to allowd consumer to choose fixed_first_of_month or fixed_firs_of_next_month
+        coverage_effective_on = coverage_end_last_day_of_month + 1.day
       else
         coverage_effective_on = TimeKeeper.date_of_record.end_of_month + 1.day
       end
-        if (consumer_coverage_effective_on >= event_on.first_of_month) && 
-           (consumer_coverage_effective_on <= (event_on.first_of_month + 1.month))
-          coverage_effective_on = consumer_coverage_effective_on
-        else
-          # raise invalid effective date error
-        end
+
+      #FIXME what's this consumer_coverage_effective_on for, this is no rules for EmployeeGainingMedicare to allowd consumer to choose a particular timing.
+      #if (consumer_coverage_effective_on >= coverage_end_on.first_of_month) && 
+      #  (consumer_coverage_effective_on <= (coverage_end_on.first_of_month + 1.month))
+      #  coverage_effective_on = consumer_coverage_effective_on
+      #else
+      #  # raise invalid effective date error
+      #end
     end
+    coverage_effective_on
   end
 
   # Business rules for MoveToState
@@ -137,6 +141,13 @@ class QualifyingLifeEventKind
     # raise_error if move_date > TimeKeeper.date_of_record.end_of_month + 1.day
   end
 
+  def is_dependent_loss_of_esi?
+    title == "Dependent loss of ESI due to employee gaining Medicare"
+  end
+
+  def is_moved_to_dc?
+    title == "I'm moving to the District of Columbia"
+  end
 
   class << self
     def shop_market_events
