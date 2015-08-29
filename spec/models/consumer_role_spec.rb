@@ -54,87 +54,9 @@ describe ConsumerRole, dbclean: :after_each do
           expect(ConsumerRole.find(consumer_role.id).id).to eq consumer_role.id
         end
 
-        context "and the consumer's should not have a identity_verified identity" do
-
-          it "identity state should be unidentity_verified" do
-            expect(consumer_role.aasm_state).to eq "identity_unverified"
-          end
-
-          context "and a recognized authority verifies the consumer's identity" do
-            before do
-              consumer_role.identity_final_decision_code = "ACC"
-              consumer_role.identity_response_code = "xyz321abc"
-              consumer_role.verify_identity
-            end
-
-            it "identity state should transition to identity verified status" do
-              expect(consumer_role.aasm_state).to eq "identity_verified"
-            end
-          end
-
-          context "and a recognized authority is unable to verify the consumer's identity" do
-            before do
-              consumer_role.identity_final_decision_code = "REF"
-              consumer_role.identity_response_code = "xyz321abc"
-              consumer_role.verify_identity
-            end
-
-            it "identity state should transition to followup pending status" do
-              expect(consumer_role.aasm_state).to eq "identity_followup_pending"
-            end
-
-            context "and authority is subsequently able to verify consumer's identity" do
-              before do
-                consumer_role.identity_final_decision_code = "ACC"
-                consumer_role.identity_response_code = "xyz321abc"
-                consumer_role.verify_identity
-              end
-
-              it "identity state should transition to identity verified status" do
-                expect(consumer_role.aasm_state).to eq "identity_verified"
-              end
-            end
-          end
-
-          context "and the identity verification status is imported from a trusted source" do
-            context "and trusted source doesn't pass sufficient verification content" do
-              before do
-                consumer_role.identity_final_decision_code = ""
-                consumer_role.identity_response_code = ""
-              end
-
-              it "identity state should stay in identity_unverified status" do
-                expect(consumer_role.may_import_identity?).to be_falsey
-              end
-            end
-
-            context "and the consumer's identity is identity_verified" do
-              before do
-                consumer_role.identity_final_decision_code = "ACC"
-                consumer_role.identity_response_code = "xyz321abc"
-                consumer_role.import_identity
-              end
-
-              it "identity state should transition to identity verified status" do
-                expect(consumer_role.aasm_state).to eq "identity_verified"
-              end
-            end
-
-            context "and the consumer's identity isn't identity verified" do
-              before do
-                consumer_role.identity_final_decision_code = "REF"
-                consumer_role.identity_response_code = "xyz321abc"
-                consumer_role.import_identity
-              end
-
-              it "identity state should transition to followup pending status" do
-                expect(consumer_role.aasm_state).to eq "identity_followup_pending"
-              end
-            end
-
-          end
+        it "should have a state of verifications_pending" do
+          expect(consumer_role.aasm_state).to eq "verifications_pending"
         end
-
       end
     end
 

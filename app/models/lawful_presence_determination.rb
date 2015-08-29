@@ -8,6 +8,9 @@ class LawfulPresenceDetermination
   include Acapi::Notifiers
 
   embedded_in :consumer_role
+  embeds_many :ssa_verifcation_responses, class_name:"EventResponse"
+  embeds_many :vlp_responses, class_name:"EventResponse"
+
   field :vlp_verified_at, type: DateTime
   field :vlp_authority, type: String
   field :vlp_document_id, type: String

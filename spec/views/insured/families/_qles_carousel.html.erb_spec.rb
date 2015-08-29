@@ -22,7 +22,7 @@ RSpec.describe "insured/families/_qles_carousel.html.erb" do
 
   it "should have qle options" do
     QualifyingLifeEventKind.all.each do |qle|
-      expect(rendered).to have_selector('a.qle-menu-item', text: qle.title.humanize)
+      expect(rendered).to have_selector('a.qle-menu-item', text: qle.title)
     end
   end
 
