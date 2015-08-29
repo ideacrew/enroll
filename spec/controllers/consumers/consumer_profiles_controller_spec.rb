@@ -83,7 +83,7 @@ RSpec.describe ConsumerProfilesController do
         it "should return true" do
           sign_in user
           date = (TimeKeeper.date_of_record + 32.days).strftime("%m/%d/%Y")
-          ["Myself or a family member has lost other coverage", "Mid-month loss of mec", "My employer failed to pay cobra premiums on time", "I've moved into the district of columbia"].each do |qle_type|
+          ["Myself or a family member has lost other coverage", "Mid-month loss of mec", "My employer failed to pay premiums on time", "I've moved into the district of columbia"].each do |qle_type|
             xhr :get, :check_qle_date, date_val: date, qle_type: qle_type, format: :js
             expect(response).to have_http_status(:success)
             expect(assigns(:qualified_date)).to eq true
@@ -93,7 +93,7 @@ RSpec.describe ConsumerProfilesController do
         it "should return false" do
           sign_in user
           date = (TimeKeeper.date_of_record + 64.days).strftime("%m/%d/%Y")
-          ["Myself or a family member has lost other coverage", "Mid-month loss of mec", "My employer failed to pay cobra premiums on time", "I've moved into the district of columbia"].each do |qle_type|
+          ["Myself or a family member has lost other coverage", "Mid-month loss of mec", "My employer failed to pay premiums on time", "I've moved into the district of columbia"].each do |qle_type|
             xhr :get, :check_qle_date, date_val: date, qle_type: qle_type, format: :js
             expect(response).to have_http_status(:success)
             expect(assigns(:qualified_date)).to eq false

@@ -31,7 +31,7 @@ class Person
   field :is_incarcerated, type: Boolean
   
   field :is_disabled, type: Boolean
-  field :ethnicity, type: String
+  field :ethnicity, type: Array
   field :race, type: String
 
   field :is_tobacco_user, type: String, default: "unknown"
@@ -481,6 +481,11 @@ class Person
   def agent?
     agent = self.csr_role || self.assister_role || self.broker_role || self.hbx_staff_role
     !!agent
+  end
+
+  def ineligible_ivl
+    return false unless self.try(:consumer_role)
+    is_incarcerated || (!us_citizen && !eligible_immigration_status)
   end
 
   # HACK

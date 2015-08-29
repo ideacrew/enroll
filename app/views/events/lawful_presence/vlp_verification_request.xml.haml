@@ -1,0 +1,57 @@
+!!! XML
+%lawful_presence_request{ :xmlns => "http://openhbx.org/api/terms/1.0" }
+  %individual
+    %id
+      %id= individual.id
+    = render :partial => "events/individuals/person", :object => individual
+    = render :partial => "events/individuals/person_demographics", :object => individual
+  %immigration_information
+    %also_known_as=individual.full_name
+    - if true
+      %alien_number="string"
+    - if true
+      %i94_number="string"
+    - if true
+      %citizenship_number="string"
+    - if true
+      %visa_number="string"
+    - if true
+      %sevis_id="string"
+    - if true
+      %naturalization_number="string"
+    %documents
+      %has_document_I327=true
+      %has_document_I571=true
+      %has_document_cert_of_citizenship=true
+      %has_document_cert_of_naturalization=true
+      %has_document_temp_I551=true
+      %has_document_I94=true
+      %has_document_I20=true
+      %has_document_DS2019=true
+      - if true
+        %document_I551_receipt_number="string"
+      - if true
+        %document_I766
+          %receipt_number="string"
+          %expiration_date=simple_date_for(Date.today)
+      - if true
+        %document_mac_read_I551
+          %issuing_country="string"
+          %passport_number="string"
+          %expiration_date=simple_date_for(Date.today)
+      - if true
+        %document_foreign_passport_I94
+          %issuing_country="string"
+          %passport_number="string"
+          %expiration_date=simple_date_for(Date.today)
+      - if true
+        %document_foreign_passport
+          %issuing_country="string"
+          %passport_number="string"
+          %expiration_date=simple_date_for(Date.today)
+      - if true
+        %other_case_1_document_description="string"
+      - if true
+        %other_case_2_document_description="string"
+  %check_five_year_bar=false
+  %requested_coverage_start_date=simple_date_for(Date.today)

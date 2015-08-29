@@ -147,7 +147,7 @@ class Household
     true
   end
 
-  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, consumer_role: nil, benefit_package: nil)
+  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false)
     coverage_household = latest_coverage_household unless coverage_household.present?
     HbxEnrollment.new_from(
       employee_role: employee_role,
@@ -155,6 +155,7 @@ class Household
       benefit_group: benefit_group,
       consumer_role: consumer_role,
       benefit_package: benefit_package,
+      qle: qle
     )
   end
 
@@ -174,5 +175,9 @@ class Household
     coverage_households.each do |c_household|
       c_household.remove_family_member(member)
     end
+  end
+
+  def enrolled_hbx_enrollments
+    hbx_enrollments.my_enrolled_plans
   end
 end

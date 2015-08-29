@@ -57,6 +57,7 @@ Rails.application.routes.draw do
 
     resources :plan_shoppings, :only => [:show] do
       member do
+        get 'plans'
         get 'receipt'
         get 'print_waiver'
         post 'checkout'
@@ -66,7 +67,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resource :interactive_identity_verifications, only: [:create, :new]
+    resources :interactive_identity_verifications, only: [:create, :new, :update]
 
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do

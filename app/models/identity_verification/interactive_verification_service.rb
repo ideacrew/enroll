@@ -6,7 +6,9 @@ module IdentityVerification
         when "identity_verification.interactive_verification.initiate_session"
           { :return_status => 200, :body => File.read(File.join(Rails.root, "spec", "test_data", "ridp_payloads", "successful_start_response.xml")) }
         when "identity_verification.interactive_verification.respond_to_questions"
-          { :return_status => 200, :body => File.read(File.join(Rails.root, "spec", "test_data", "ridp_payloads", "successful_question_response.xml")) }
+          { :return_status => 200, :body => File.read(File.join(Rails.root, "spec", "test_data", "ridp_payloads", "failed_start_response.xml")) }
+        when "identity_verification.interactive_verification.override"
+          { :return_status => 200, :body => File.read(File.join(Rails.root, "spec", "test_data", "ridp_payloads", "successful_fars_response.xml")) }
         else
           raise "I don't understand this request!"
         end
@@ -37,6 +39,12 @@ module IdentityVerification
       code, body = invoke_request("identity_verification.interactive_verification.respond_to_questions", payload, 5)
       return nil if code == "503"
       IdentityVerification::InteractiveVerificationResponse.parse(body, :single => true)
+    end
+
+    def check_override(payload) 
+      code, body = invoke_request("identity_verification.interactive_verification.override", payload, 5)
+      return nil if code == "503"
+      IdentityVerification::InteractiveVerificationOverrideResponse.parse(body, :single => true)
     end
 
     def invoke_request(key, payload, timeout)

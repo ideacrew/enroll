@@ -529,29 +529,37 @@ $(document).on('click', '[data-target="#help_with_plan_shopping"]',function(){$(
 
 
 $(document).on('click', '#terms_check_thank_you', function() {
-  first_name_thank_you = $("#first_name_thank_you").val();
-  last_name_thank_you = $("#last_name_thank_you").val();
+  first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
+  last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
+  subscriber_first_name = $("#subscriber_first_name").val();
+  subscriber_last_name = $("#subscriber_last_name").val();
   
   if($(this).prop("checked") == true){    
-    if( first_name_thank_you != "" && last_name_thank_you != ""){
+    if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
       $('#btn-continue').removeClass('disabled');
+    } else {
+      $('#btn-continue').addClass('disabled');
     }
-    }else if($(this).prop("checked") == false){ 
+  }else if($(this).prop("checked") == false){ 
     $('#btn-continue').addClass('disabled');
   }
 })
 
 $(document).on('blur keyup', 'input.thank_you_field', function() {
-  first_name_thank_you = $("#first_name_thank_you").val();
-  last_name_thank_you = $("#last_name_thank_you").val();
+  first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
+  last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
+  subscriber_first_name = $("#subscriber_first_name").val();
+  subscriber_last_name = $("#subscriber_last_name").val();
   
   if(last_name_thank_you == ""){
     $('#btn-continue').addClass('disabled');
   }else{
-  if($("#terms_check_thank_you").prop("checked") == true){    
-    if( first_name_thank_you != "" && last_name_thank_you != ""){
-      $('#btn-continue').removeClass('disabled');
-    }
+    if($("#terms_check_thank_you").prop("checked") == true){    
+      if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
+        $('#btn-continue').removeClass('disabled');
+      } else {
+        $('#btn-continue').addClass('disabled');
+      }
     }
   }
 })

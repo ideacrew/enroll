@@ -1,0 +1,7 @@
+<% if @qle.effective_on_kinds.count > 1 %>
+  <div style='margin: 0 auto;max-width:250px;'>
+    <%= select_tag 'effective_on_kind', options_for_select(@qle.effective_on_kinds), include_blank: 'SELECT EFFECTIVE ON KIND' %>
+  </div>
+<% else %>
+  <%= hidden_field_tag 'effective_on_kind', @qle.effective_on_kinds.first %>
+<% end %>

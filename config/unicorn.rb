@@ -7,7 +7,7 @@ stderr_path shared_path + "/log/unicorn.log"
 stdout_path shared_path + "/log/unicorn.log"
 
 listen "/tmp/unicorn_enroll.ap.sock"
-worker_processes 16
+worker_processes 25
 timeout 30
 preload_app false
 

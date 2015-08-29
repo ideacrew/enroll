@@ -24,7 +24,7 @@ class Consumer::ConsumerRolesController < ApplicationController
     @person.phones = []
     @person.emails = []
     if @person.update_attributes(params.require(:person).permit(*person_parameters_list))
-      redirect_to new_insured_interactive_identity_verifications_path
+      redirect_to new_insured_interactive_identity_verification_path
     else
       build_nested_models
       respond_to do |format|
@@ -53,7 +53,12 @@ class Consumer::ConsumerRolesController < ApplicationController
       :is_disabled,
       :race,
       :is_consumer_role,
-      :ethnicity
+      :ethnicity,
+      :us_citizen,
+      :naturalized_citizen,
+      :eligible_immigration_status,
+      :indian_tribe_member,
+      :tribal_id,
     ]
   end
 

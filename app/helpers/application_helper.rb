@@ -427,4 +427,25 @@ module ApplicationHelper
       return ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
     end
   end
+
+  def ethnicity_collection
+    [
+      ["White", "Black or African American", "Asian Indian" ],
+      ["Chinese", "Filipino", "Japanese", "Korean"], 
+      ["Vietnamese", "Other Asian", "Native Hawaiian", "Samon" ],
+      ["Guamanion or Chamorro", "Other pacific islander", "Other"]
+    ].inject([]){ |sets, ethnicities|
+      sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
+    }
+  end
+
+  def latino_collection
+    [
+      ["Mexican", "Mexican American"],
+      ["Chicano/a", "Puerto Rican"],
+      ["Cuban", "Other"]
+    ].inject([]){ |sets, ethnicities|
+      sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
+    }
+  end
 end

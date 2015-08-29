@@ -13,6 +13,7 @@ Feature: Insured Plan Shopping on Individual market
       Then Individual should see identity verification page and clicks on submit
       Then Individual should see the dependents form
       And Individual clicks on add member button
+      And Individual again clicks on add member button
       And I click on continue button on household info form
       And I click on continue button on group selection page
       And I select a plan on plan shopping page
@@ -20,7 +21,7 @@ Feature: Insured Plan Shopping on Individual market
       And I click on continue button to go to the individual home page
       And I should see the individual home page
       When I click the "I've married" in qle carousel
-      And I select qle date
+      And I select a future qle date
       Then I should see not qualify message
       When I click the "I've married" in qle carousel
       And I select a past qle date

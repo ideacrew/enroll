@@ -54,13 +54,14 @@ class ConsumerProfilesController < ApplicationController
     qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = TimeKeeper.date_of_record - 30.days
     end_date = TimeKeeper.date_of_record + 30.days
+    @qle = QualifyingLifeEventKind.find(params[:qle_id]) if params[:qle_id].present?
 
     if ["I've had a baby", "A family member has died", "I've married"].include? params[:qle_type]
       start_date = TimeKeeper.date_of_record - 60.days
       end_date = TimeKeeper.date_of_record + 0.days
     end
 
-    if ["Myself or a family member has lost other coverage", "Mid-month loss of mec", "My employer failed to pay cobra premiums on time", "I've moved into the district of columbia"].include? params[:qle_type]
+    if ["Myself or a family member has lost other coverage", "Mid-month loss of mec", "My employer failed to pay premiums on time", "I've moved into the district of columbia"].include? params[:qle_type]
       start_date = TimeKeeper.date_of_record - 60.days
       end_date = TimeKeeper.date_of_record + 60.days
     end

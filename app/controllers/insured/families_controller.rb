@@ -2,7 +2,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :init_qualifying_life_events, only: [:home, :manage_family]
 
   def home
-    @hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active.coverage_selected || []
+    @hbx_enrollments = @family.enrolled_hbx_enrollments || []
     @employee_role = @person.employee_roles.try(:first)
 
     respond_to do |format|

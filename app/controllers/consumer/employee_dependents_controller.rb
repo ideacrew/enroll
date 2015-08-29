@@ -8,8 +8,16 @@ class Consumer::EmployeeDependentsController < ApplicationController
     else
       @consumer_role = @person.consumer_role
     end
-    @change_plan = params[:change_plan].present? ? 'change' : ''
+    @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
+
+    if params[:qle_id].present?
+      qle = QualifyingLifeEventKind.find(params[:qle_id])
+      special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
+      special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
+      special_enrollment_period.qualifying_life_event_kind = qle
+      special_enrollment_period.save
+    end
   end
 
   def new

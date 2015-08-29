@@ -3,8 +3,8 @@ class ConsumerRole
 
   include Mongoid::Document
   include Mongoid::Timestamps
-  include AASM
   include Acapi::Notifiers
+  include AASM
 
   embedded_in :person
 
@@ -38,46 +38,9 @@ class ConsumerRole
       indian_tribe_member
   )
 
-  ## Verified Lawful Presence (VLP)
-
-  # Alien number (A Number):  9 character string
-  # CitizenshipNumber:        7-12 character string
-  # I-94:                     11 character string
-  # NaturalizationNumber:     7-12 character string
-  # PassportNumber:           6-12 character string
-  # ReceiptNumber:            13 character string, first 3 alpha, remaining 10 string
-  # SevisID:                  11 digit string, first char is "N"
-  # VisaNumber:               8 character string
-
-  VLP_DOCUMENT_IDENTIFICATION_KINDS = [
-      "A Number",
-      "I-94 Number",
-      "SEVIS ID",
-      "Visa Number",
-      "Passport Number",
-      "Receipt Number",
-      "Naturalization Number",
-      "Citizenship Number"
-    ]
-
-  VLP_DOCUMENT_KINDS = [
-      "I-327 (Reentry Permit)",
-      "I-551 (Permanent Resident Card)",
-      "I-571 (Refugee Travel Document)",
-      "I-766 (Employment Authorization Card)",
-      "Certificate of Citizenship",
-      "Naturalization Certificate",
-      "Machine Readable Immigrant Visa (with Temporary I-551 Language)",
-      "Temporary I-551 Stamp (on passport or I-94)",
-      "I-94 (Arrival/Departure Record)",
-      "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport",
-      "Unexpired Foreign Passport",
-      "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)",
-      "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)"
-    ]
-
   # FiveYearBarApplicabilityIndicator ??
-
+  field :five_year_bar, type: Boolean, default: false
+  field :requested_coverage_start_date, type: Date, default: Date.today
   field :aasm_state, type: String, default: "identity_unverified"
   field :identity_verified_date, type: Date
   field :identity_final_decision_code, type: String
@@ -110,6 +73,7 @@ class ConsumerRole
   delegate :is_disabled,        :is_disabled=,       to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
+  embeds_many :vlp_documents, as: :documentable
   embeds_many :workflow_state_transitions, as: :transitional
 
   accepts_nested_attributes_for :person, :workflow_state_transitions
@@ -203,7 +167,7 @@ class ConsumerRole
   end
 
   def self.naturalization_document_types
-    ["Certificate of Citizenship", "Naturalization Certificate"]
+    VlpDocument::NATURALIZATION_DOCUMENT_TYPES
   end
 
   # RIDP and Verify Lawful Presence workflow.  IVL Consumer primary applicant must be in identity_verified state
