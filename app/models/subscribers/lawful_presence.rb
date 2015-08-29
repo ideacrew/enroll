@@ -1,7 +1,7 @@
 module Subscribers
   class LawfulPresence < ::Acapi::Subscription
     def self.subscription_details
-      ["local.enroll.lawful_presence.lawful_presence_response"]
+      ["acapi.info.events.lawful_presence.vlp_verification_response"]
     end
 
     def call(event_name, e_start, e_end, msg_id, payload)
@@ -18,7 +18,7 @@ module Subscribers
       return if person.nil? || person.consumer_role.nil?
 
       consumer_role = person.consumer_role
-      consumer_role.lawful_presence_determination.vlp_responses.build({received_at: Time.now, body: payload}).save
+      consumer_role.lawful_presence_determination.vlp_responses.build({received_at: Time.now, body: xml}).save
       xml_hash = xml_to_hash(xml)
 
       update_consumer_role(consumer_role, xml_hash)
@@ -29,13 +29,13 @@ module Subscribers
 
       if xml_hash[:lawful_presence_indeterminate].present?
         args.determined_at = Time.now
-        args.vlp_authority = 'ssa'
-        consumer_role.deny_lawful_presence(args)
+        args.vlp_authority = 'vlp'
+        consumer_role.deny_lawful_presence!(args)
       elsif xml_hash[:lawful_presence_determination].present?
         args.determined_at = Time.now
-        args.vlp_authority = 'ssa'
+        args.vlp_authority = 'vlp'
         args.citizen_status = get_citizen_status(xml_hash[:lawful_presence_determination][:legal_status])
-        consumer_role.authorize_lawful_presence(args)
+        consumer_role.authorize_lawful_presence!(args)
       end
 
       consumer_role.save

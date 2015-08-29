@@ -3,7 +3,7 @@ require "rails_helper"
 describe Subscribers::LawfulPresence do
 
   it "should subscribe to the correct event" do
-    expect(Subscribers::LawfulPresence.subscription_details).to eq ["local.enroll.lawful_presence.lawful_presence_response"]
+    expect(Subscribers::LawfulPresence.subscription_details).to eq ["acapi.info.events.lawful_presence.vlp_verification_response"]
   end
 
   it "should return the correct citizenship status" do
@@ -17,7 +17,8 @@ describe Subscribers::LawfulPresence do
 
   describe "given a ssa verification message to handle" do
     let(:individual_id) { "121211" }
-    let(:xml) { double }
+    let(:xml) { File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response.xml")) }
+    let(:xml2) { File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response2.xml")) }
     let(:xml_hash2) {{:case_number=>"12121", :lawful_presence_indeterminate=>{:response_code=>"invalid_information",
                                                                               :response_text=>"Complete information."}}}
     let(:xml_hash) { {:case_number=>"12121", :lawful_presence_determination =>{
@@ -41,40 +42,29 @@ describe Subscribers::LawfulPresence do
     person
     }
 
-    let(:payload) { {:individual_id => individual_id, :body => xml} }
-
     context "lawful_presence_determination" do
+      let(:payload) { {:individual_id => individual_id, :body => xml} }
       it "should approve lawful presence" do
         allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash)
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
         expect(person.consumer_role.aasm_state).to eq('fully_verified')
-      end
-
-
-      it "should save the response" do
-        allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash)
-        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
-        allow(person.consumer_role).to receive(:valid?).and_return(true)
-        subject.call(nil, nil, nil, nil, payload)
+        expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('vlp')
         expect(person.consumer_role.lawful_presence_determination.vlp_responses.count).to eq(1)
+        expect(person.consumer_role.lawful_presence_determination.vlp_responses.first.body).to eq(payload[:body])
       end
     end
 
     context "lawful_presence_indeterminate" do
+      let(:payload) { {:individual_id => individual_id, :body => xml2} }
       it "should deny lawful presence" do
-        allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash2)
+        allow(subject).to receive(:xml_to_hash).with(xml2).and_return(xml_hash2)
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
         expect(person.consumer_role.aasm_state).to eq('verifications_outstanding')
-      end
-
-      it "should save the response" do
-        allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash2)
-        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
-        allow(person.consumer_role).to receive(:valid?).and_return(true)
-        subject.call(nil, nil, nil, nil, payload)
+        expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('vlp')
         expect(person.consumer_role.lawful_presence_determination.vlp_responses.count).to eq(1)
+        expect(person.consumer_role.lawful_presence_determination.vlp_responses.first.body).to eq(payload[:body])
       end
     end
 
