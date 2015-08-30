@@ -20,6 +20,75 @@ RSpec.describe Consumer::ConsumerRolesController, :type => :controller do
     end
   end
 
+  describe "Get search" do
+    let(:user) { double("User" ) }
+    let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", ssn: "333224444", dob: "08/15/1975") }
+
+    before(:each) do
+      sign_in user
+      allow(Forms::EmployeeCandidate).to receive(:new).and_return(mock_employee_candidate)
+    end
+
+    it "should render search template" do
+      get :search
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:search)
+    end
+
+  end
+
+  describe "GET match" do
+    let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
+    let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result, ssn: "333224444", dob: "08/15/1975") }
+    let(:user_id) { "SOMDFINKETHING_ID"}
+    let(:found_person){ [] }
+    let(:person){ instance_double("Person") }
+    let(:user) { double("User",id: user_id ) }
+
+    before(:each) do
+      sign_in(user)
+      allow(mock_employee_candidate).to receive(:match_person).and_return(found_person)
+      allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
+      get :match, :person => person_parameters
+    end
+
+    context "given invalid parameters" do
+      let(:validation_result) { false }
+      let(:found_person) { [] }
+
+      it "renders the 'search' template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("search")
+        expect(assigns[:employee_candidate]).to eq mock_employee_candidate
+      end
+    end
+
+    context "given valid parameters" do
+      let(:validation_result) { true }
+
+      context "but with no found employee" do
+        let(:found_person) { [] }
+        let(:person){ double("Person") }
+        let(:person_parameters){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111"}}
+
+        it "renders the 'no_match' template" do
+          expect(response).to have_http_status(:success)
+          expect(response).to render_template("no_match")
+          expect(assigns[:employee_candidate]).to eq mock_employee_candidate
+        end
+
+        context "that find a matching employee" do
+          let(:found_person) { [person] }
+
+          it "renders the 'match' template" do
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("match")
+            expect(assigns[:employee_candidate]).to eq mock_employee_candidate
+          end
+        end
+      end
+    end
+  end
   context "POST create" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
     let(:user){FactoryGirl.create(:user)}
