@@ -28,15 +28,16 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def message_to_assister(person, assister)
+  def new_client_notification(person, assister)
     mail({to: person.user.email_address, subject: "Plan Selection Help", from: person.user.email}) do |format|
       format.html { render "message_to_assister", :locals => { :person => person, :assister => assister}}
     end
   end
- 
-  def message_to_enrolled_by_agent(person, assister)
-    mail({to: person.emails.first.address, subject: "Your Enrollment Progress", from: person.user.email}) do |format|
-      format.html { render "message_to_enrollee", :locals => { :person => person, :assister => assister}}
+
+  def generic_consumer_welcome(first_name, hbx_id, email)
+
+    message = mail({to: email, subject: 'DC HealthLink', from: 'no-reply@individual.dchealthlink.com'}) do |format|
+      format.html {render "generic_consumer", locals: {first_name: first_name, hbx_id: hbx_id}}
     end
   end
 
