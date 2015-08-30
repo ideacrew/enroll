@@ -5,10 +5,14 @@ $(function () {
     $('.qle-label').html($(this).data('label'))
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
+    var pre_event_sep_in_days = '-'+$(this).data('pre-event-sep-in-days')+'d';
+    var post_event_sep_in_days = '+'+$(this).data('post-event-sep-in-days')+'d';
 
-    init_datepicker_for_qle_date();
+    init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days);
     $('#qle-details').removeClass('hidden');
     $('.qle-form').removeClass('hidden');
+    $('form#qle_form.success-info').addClass('hidden');
+    $('form#qle_form.error-info').addClass('hidden');
   });
 
 	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
@@ -58,19 +62,11 @@ $(function () {
     });
   }
 
-  function init_datepicker_for_qle_date() {
+  function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days) {
     var target = $('.qle-date-picker');
-    var dateMin = $(target).attr("data-date-min");
-    var dateMax = $(target).attr("data-date-max");
+    var dateMax = post_event_sep_in_days;
+    var dateMin = pre_event_sep_in_days;
     var cur_qle_title = $('.qle-details-title').html();
-    if (cur_qle_title === "I've had a baby" || cur_qle_title === "A family member has died" || cur_qle_title === "I've married") {
-      dateMin = "-60d";
-      dateMax = "+0d";
-    };
-    if (cur_qle_title === "Myself or a family member has lost other coverage" || cur_qle_title === "Mid-month loss of mec" || cur_qle_title === "My employer failed to pay premiums on time" || cur_qle_title === "I've moved into the district of columbia") {
-      dateMin = "-60d";
-      dateMax = "+60d";
-    };
 
     $(target).val('');
     $(target).datepicker('destroy');
