@@ -68,6 +68,12 @@
             </div>
           <% end %>
 
+          <div class='row top-pd'>
+            <div class="col-sm-12">
+              <p>If you enroll today, coverage will begin Oct 1. Do you need coverage earlier?  Check <a href="<%= find_sep_insured_families_path %>">am I eligible for a Special Enrollment Period</a> to see if you qualify</p>
+            </div>
+          </div>
+
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', @change_plan %>
             <h4><strong>What do you like to do?</strong></h4>
