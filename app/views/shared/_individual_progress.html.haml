@@ -30,7 +30,10 @@
     .vertical-line-progress
     Complete
 
-- if defined? url
+- if step == 1
+  %button.btn.btn-lg.btn-primary.btn-br.btn-block.interaction-click-control-continue{type: 'submit'}
+    CONTINUE
+- elsif defined? url
   = link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
 - elsif step == 4
   %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{disabled: true}

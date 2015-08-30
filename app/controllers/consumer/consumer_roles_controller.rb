@@ -3,6 +3,31 @@ class Consumer::ConsumerRolesController < ApplicationController
 
   before_action :find_consumer_role_and_person, only: [:edit, :update]
 
+  def search
+    @person = Forms::EmployeeCandidate.new
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def match
+    @person_params = params.require(:person).merge({user_id: current_user.id})
+    @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
+    @person = @employee_candidate
+    respond_to do |format|
+      if @employee_candidate.valid?
+        found_person = @employee_candidate.match_person
+        if found_person.present?
+          format.html { render 'match' }
+        else
+          format.html { render 'no_match' }
+        end
+      else
+        format.html { render 'search' }
+      end
+    end
+  end
+
   def new
     @person = current_user.build_person
     build_nested_models

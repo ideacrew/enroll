@@ -8,5 +8,7 @@ FactoryGirl.define do
     is_incarcerated 'yes'
     is_applicant 'yes'
 
+    vlp_documents {[FactoryGirl.build(:vlp_document)]}
+
   end
 end

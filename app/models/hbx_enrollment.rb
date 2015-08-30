@@ -128,6 +128,11 @@ class HbxEnrollment
       benefit_group_assignment.hbx_enrollment = self
       benefit_group_assignment.save
     end
+    if consumer_role.present?
+      hbx_enrollment_members.each do |hem|
+        hem.person.consumer_role.start_individual_market_eligibility!
+      end
+    end
   end
 
   def is_active?

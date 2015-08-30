@@ -379,7 +379,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-  title: ": I’ve been ordered by a court to provide coverage for someone",
+  title: "I’ve been ordered by a court to provide coverage for someone",
   tool_tip: "I have a medical insurance coverage order from a court",
   action_kind: "add_member",
   market_kind: "individual",
