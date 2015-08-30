@@ -231,9 +231,9 @@ end
 
 When(/^(?:.+) go(?:es)? to the employee account creation page$/) do
   @browser.goto("http://localhost:3000/")
-  @browser.a(text: "Insured Portal").wait_until_present
+  @browser.a(text: /employee portal/i).wait_until_present
   screenshot("start")
-  scroll_then_click(@browser.a(text: "Insured Portal"))
+  scroll_then_click(@browser.a(text: /employee portal/i))
   @browser.a(text: "Create account").wait_until_present
   screenshot("employee_portal")
   scroll_then_click(@browser.a(text: "Create account"))
@@ -250,7 +250,7 @@ When (/^(.*) logs? out$/) do |someone|
   sleep 2
   scroll_then_click(@browser.element(class: /interaction-click-control-logout/))
   @browser.element(class: /interaction-click-control-logout/).wait_while_present
-  @browser.element(class: /interaction-click-control-insured-portal/).wait_until_present
+  @browser.element(class: /interaction-click-control-employee-portal/).wait_until_present
 end
 
 When(/^.+ go(?:es)? to register as an employee$/) do
