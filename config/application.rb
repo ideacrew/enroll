@@ -40,6 +40,9 @@ module Enroll
     unless Rails.env.test?
       config.acapi.add_subscription("Events::ResidencyVerificationRequestsController")
       config.acapi.add_subscription("Events::SsaVerificationRequestsController")
+      config.acapi.add_async_subscription("Subscribers::SsaVerification")
+      config.acapi.add_async_subscription("Subscribers::LawfulPresence")
+      config.acapi.add_async_subscription("Subscribers::LocalResidency")
     end
   end
 end
