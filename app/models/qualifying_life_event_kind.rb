@@ -96,7 +96,7 @@ class QualifyingLifeEventKind
   validates_presence_of :title, :market_kind, :effective_on_kinds, :pre_event_sep_in_days,
                         :post_event_sep_in_days
 
-  scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :desc) }
+  scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
 
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage: 
