@@ -200,6 +200,15 @@ class ConsumerRole
     end
   end
 
+  def start_individual_market_eligibility!
+    if lawful_presence_pending?
+      lawful_presence_determination.start_determination_process
+    end
+    if residency_pending?
+      start_residency_verification_process
+    end
+  end
+
 private
   def mark_residency_denied(*args)
     self.residency_determined_at = Time.now
