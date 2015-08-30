@@ -1,7 +1,7 @@
 When(/I visit the Insured portal$/) do
   @browser.goto("http://localhost:3000/")
-  @browser.a(text: /Insured Portal/).wait_until_present
-  @browser.a(text: /Insured Portal/).click
+  @browser.a(text: /consumer\/family portal/i).wait_until_present
+  @browser.a(text: /consumer\/family portal/i).click
   screenshot("individual_start")
   @browser.a(text: /Create account/).wait_until_present
   @browser.a(text: /Create account/).click
@@ -30,16 +30,15 @@ When(/user goes to register as an individual$/) do
   @browser.button(class: /interaction-click-control-continue/).click
 end
 
-Then(/user should see the no match form with individual market option/) do
-  @browser.element(class: /fa-exclamation-triangle/).wait_until_present
-  @browser.a(class: /interaction-click-control-individual-market/).wait_until_present
+Then(/user should see button to continue as an individual/) do
+  @browser.a(text: /continue as an individual/i).wait_until_present
   screenshot("no_match")
-  expect(@browser.a(class: /interaction-click-control-individual-market/).visible?).to be_truthy
+  expect(@browser.a(text: /continue as an individual/i).visible?).to be_truthy
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do
-  @browser.a(class: /interaction-click-control-individual-market/).wait_until_present
-  @browser.a(class: /interaction-click-control-individual-market/).click
+  @browser.a(text: /continue as an individual/i).wait_until_present
+  @browser.a(text: /continue as an individual/i).click
 end
 
 Then(/Individual should see a form to enter personal information/) do

@@ -6,7 +6,7 @@ Feature: Insured Plan Shopping on Individual market
       Then Individual creates HBX account
       Then I should see a successful sign up message
       When user goes to register as an individual
-      Then user should see the no match form with individual market option
+      Then user should see button to continue as an individual
       Then Individual should click on Individual market for plan shopping
       Then Individual should see a form to enter personal information
       When Individual clicks on continue button
