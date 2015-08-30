@@ -217,7 +217,10 @@ Rails.application.routes.draw do
     end
     root 'employee_roles#show'
 
-    resources :consumer_role, controller: 'consumer_roles'
+    resources :consumer_role, controller: 'consumer_roles' do
+      get :search, on: :collection
+      get :match, on: :collection
+    end
   end
 
   # used to select which people are going to be covered before plan selection
