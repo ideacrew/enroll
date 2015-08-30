@@ -1,4 +1,5 @@
 class VlpDocument < Document
+  include Mongoid::Document
 
   NATURALIZATION_DOCUMENT_TYPES = ["Certificate of Citizenship", "Naturalization Certificate"]
 
@@ -48,19 +49,21 @@ class VlpDocument < Document
   # country which issued the document. e.g. passport issuing country
   field :issuing_country, type: String
 
-  field :vlp_document_kind, type: String
-
-  validates :vlp_document_kind,
+  validates :subject,
         inclusion: { in: VLP_DOCUMENT_KINDS, message: "%{value} is not a valid vlp document kind" },
         allow_blank: false
 
-  validates :alien_number, length: { is: 9 }
-  validates :citizenship_number, length: { within: 7..9 }
-  validates :i94_number, length: { is: 11 }
-  validates :naturalization_number, length: { within: 7..12 }
-  validates :passport_number, length: { within: 6..12 }
-  validates :sevis_id, length: { is: 11 } #first char is N
-  validates :visa_number, length: { is: 8 }
+  validates :alien_number, length: { is: 9 }, :allow_blank => true
+  validates :citizenship_number, length: { within: 7..9 }, :allow_blank => true
+  validates :i94_number, length: { is: 11 }, :allow_blank => true
+  validates :naturalization_number, length: { within: 7..12 }, :allow_blank => true
+  validates :passport_number, length: { within: 6..12 }, :allow_blank => true
+  validates :sevis_id, length: { is: 11 } , :allow_blank => true #first char is N
+  validates :visa_number, length: { is: 8 }, :allow_blank => true
   # ReceiptNumber: 13 character string, first 3 alpha, remaining 10 string
+
+  def title
+    subject
+  end
 
 end

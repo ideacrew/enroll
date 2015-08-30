@@ -15,6 +15,18 @@ function applyListeners(){
         }
     });
 
+    $("#naturalization_doc_type").change(function(){
+        console.log($(this).val());
+
+        if ($(this).val()=='Certificate of Citizenship') {
+            $('#citizenship_cert_container').show();
+            $('#naturalization_cert_container').hide();
+        }
+        else if ($(this).val()=='Naturalization Certificate') {
+            $('#naturalization_cert_container').show();
+            $('#citizenship_cert_container').hide();
+        }
+    });
 
     $("input[name='dependent[naturalized_citizen]']").change(function(){
 		
