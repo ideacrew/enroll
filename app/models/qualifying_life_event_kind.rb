@@ -118,7 +118,7 @@ class QualifyingLifeEventKind
       end
     else
       if TimeKeeper.date_of_record < (coverage_end_last_day_of_month - 1.month).end_of_month
-        #FIXME here need a special UI to allowd consumer to choose fixed_first_of_month or fixed_firs_of_next_month
+        #FIXME here need a special UI to allowd consumer to choose first_of_month or first_of_next_month
         coverage_effective_on = coverage_end_last_day_of_month + 1.day
       else
         coverage_effective_on = TimeKeeper.date_of_record.end_of_month + 1.day
