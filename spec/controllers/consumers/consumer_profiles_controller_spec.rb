@@ -74,6 +74,18 @@ RSpec.describe ConsumerProfilesController do
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq false
         end
+
+        it "should have effective_on_options" do
+          sign_in user
+          date = (TimeKeeper.date_of_record - 8.days).strftime("%m/%d/%Y")
+          effective_on_options = [TimeKeeper.date_of_record, TimeKeeper.date_of_record - 10.days]
+          allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
+          allow(qle).to receive(:is_dependent_loss_of_esi?).and_return(true)
+          allow(qle).to receive(:employee_gaining_medicare).and_return(effective_on_options)
+          xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+          expect(response).to have_http_status(:success)
+          expect(assigns(:effective_on_options)).to eq effective_on_options
+        end
       end
     end
   end
