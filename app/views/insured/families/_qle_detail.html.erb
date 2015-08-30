@@ -2,15 +2,14 @@
   <div class="hbx-enrollment-panel panel panel-default">
     <div class="panel-heading">
       <div class="row">
-      <div class="col-xs-11">
-      <h4>REPORT LIFE CHANGES -
-      <span id='event-title'>address CHANGE</span>
-      </h4>
+        <div class="col-xs-11">
+          <h4>REPORT LIFE CHANGES</h4>
+        </div>
+        <div class="col-xs-1">
+          <a class="close-popup" href="javascript:void(0);"><span aria-hidden="true" class="glyphicon glyphicon-remove"></span></a>
+        </div>
       </div>
-      <div class="col-xs-1">
-      <a class="close-popup" href="javascript:void(0);"><span aria-hidden="true" class="glyphicon glyphicon-remove"></span></a>
-    </div>
-  </div>
+      <hr>
     </div>
 
     <div class="panel-body">
@@ -20,7 +19,7 @@
 
             <div class='qle-form'>
               <h3 class="qle-details-title">I got married</h3>
-              <h5>Enter the date of the event.</h5>
+              <h5 class='qle-label'>Enter the date of the event.</h5>
               <div class="form-inline">
                 <div class="form-group">
                   <%= text_field_tag 'qle_date', '', :'data-date-max'=> "+30d", :'data-date-min'=> "-30d", placeholder: "mm/dd/yyyy",
@@ -38,7 +37,10 @@
               </p>
 
               <%= hidden_field_tag 'change_plan' %>
+              <%= hidden_field_tag 'qle_id' %>
               <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || "None" %>
+              <div class="effective_on_kinds">
+              </div>
 
               <div class="center">
                 <%= submit_tag 'Continue', class: 'btn btn-primary' %>

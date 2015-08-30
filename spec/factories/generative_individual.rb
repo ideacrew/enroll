@@ -4,7 +4,7 @@ FactoryGirl.define do
     last_name { Forgery(:name).first_name }
     gender { Forgery(:personal).gender }
     dob { Date.today }
-    addresses { 
+    addresses {
       address_count = Random.rand(4)
       if address_count == 0
         []
@@ -14,7 +14,7 @@ FactoryGirl.define do
         end
       end
     }
-    phones { 
+    phones {
       address_count = Random.rand(4)
       if address_count == 0
         []
@@ -24,7 +24,7 @@ FactoryGirl.define do
         end
       end
     }
-    emails { 
+    emails {
       address_count = Random.rand(4)
       if address_count == 0
         []
@@ -57,6 +57,7 @@ FactoryGirl.define do
         end
       end
     }
+    consumer_role
   end
 
   factory(:generative_person_relationship, {class: PersonRelationship}) do

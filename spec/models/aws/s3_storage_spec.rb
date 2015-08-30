@@ -9,7 +9,7 @@ describe Aws::S3Storage do
   let(:bucket_name) { 'test-bucket' }
   let(:file_path) { File.dirname(__FILE__) }
   let(:key) { SecureRandom.uuid }
-  let(:uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:<#{bucket_name}>##{key}" }
+  let(:uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{key}" }
   let(:invalid_url) { "urn:openhbx:terms:v1:file_storage:s3:bucket:" }
   let(:file_content) { "test content" }
 
