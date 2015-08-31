@@ -8,6 +8,7 @@
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:employee_role_id, @employee_role.try(:id)) %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
+          <%= hidden_field_tag(:sep_indicator, 'false') %>
 
           <div class="table-responsive table-border">
             <table class="table table-wrapper table-condensed group-selection-tbl">
@@ -70,7 +71,7 @@
 
           <div class='row top-pd'>
             <div class="col-sm-12">
-              <p>If you enroll today, coverage will begin Oct 1. Do you need coverage earlier?  Check <a href="<%= find_sep_insured_families_path %>">am I eligible for a Special Enrollment Period</a> to see if you qualify</p>
+              <p>If you enroll today, coverage will begin Oct 1. Do you need coverage earlier?  Check <%= link_to "am I eligible for a Special Enrollment Period", "#", :onclick=>"$('#sep_indicator').val('true');$(this).closest('form').submit()" %> to see if you qualify</p>
             </div>
           </div>
 
