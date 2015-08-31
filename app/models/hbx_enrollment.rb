@@ -130,7 +130,7 @@ class HbxEnrollment
     end
     if consumer_role.present?
       hbx_enrollment_members.each do |hem|
-        hem.person.consumer_role.start_individual_market_eligibility!
+        hem.person.consumer_role.start_individual_market_eligibility!(effective_on)
       end
     end
   end

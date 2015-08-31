@@ -5,6 +5,7 @@ describe Events::VlpVerificationRequestsController do
     let(:person) { double(hbx_id: "123") }
     let(:outbound_event_name) { "acapi.info.events.lawful_presence.vlp_verification_request" }
     let(:rendered_template) { double }
+    let(:coverage_start_date) { double }
     let(:mock_end_time) { (mock_now + 24.hours).to_i }
     let(:mock_now) { Time.mktime(2015,5,21,12,29,39) }
 
@@ -18,9 +19,10 @@ describe Events::VlpVerificationRequestsController do
       allow(Time).to receive(:now).and_return(mock_now)
       expect(controller).to receive(:render_to_string).with(
         "events/lawful_presence/vlp_verification_request", {:formats => ["xml"], :locals => {
-         :individual => person
+         :individual => person,
+         :coverage_start_date => coverage_start_date
         }}).and_return(rendered_template)
-      controller.call(LawfulPresenceDetermination::VLP_VERIFICATION_REQUEST_EVENT_NAME, nil, nil, nil, {:person => person} )
+      controller.call(LawfulPresenceDetermination::VLP_VERIFICATION_REQUEST_EVENT_NAME, nil, nil, nil, {:person => person, :coverage_start_date => coverage_start_date } )
       ActiveSupport::Notifications.unsubscribe(event_subscriber)
       expect(@event_name).to eq outbound_event_name
       expect(@body).to eq ({:body => rendered_template, :individual_id => person.hbx_id, :retry_deadline => mock_end_time})
