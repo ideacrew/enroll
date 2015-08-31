@@ -13,7 +13,7 @@
             <table class="table table-wrapper table-condensed group-selection-tbl">
               <tbody>
                 <% @coverage_household.family_members.each_with_index do |family_member, index|
-                   is_coverage = @eligibility.satisfied(family_member)
+                   is_coverage = @eligibility.satisfied?
                     is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
                       %>
                   <tr class="<%='ineligible_row' if !is_coverage && !@employee_role.present? %>">

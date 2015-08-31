@@ -9,7 +9,7 @@ RSpec.describe "group_selection/new.html.erb" do
     let(:family_member2) { double(id: "family_member", primary_relationship: "parent", dob: Date.new(1990,10,10), full_name: "member") }
     let(:family_member3) { double(id: "family_member", primary_relationship: "spouse", dob: Date.new(1990,10,10), full_name: "member") }
     let(:coverage_household) { double(family_members: [family_member1, family_member2, family_member3]) }
-    
+
     before(:each) do
       assign(:person, person)
       assign(:employee_role, employee_role)
@@ -23,8 +23,8 @@ RSpec.describe "group_selection/new.html.erb" do
       allow(family_member1).to receive(:person).and_return(person)
       allow(family_member2).to receive(:person).and_return(person)
       allow(family_member3).to receive(:person).and_return(person)
-      @eligibility = InsuredEligibleToEnrollRule.new(employee_role,'shop')
-      allow(@eligibility).to receive(:satisfied).and_return([true, true, false])
+      @eligibility = InsuredEligibleForBenefitRule.new(employee_role,'shop')
+      allow(@eligibility).to receive(:satisfied?).and_return([true, true, false])
       controller.request.path_parameters[:person_id] = person.id
       controller.request.path_parameters[:employee_role_id] = employee_role.id
       render :template => "group_selection/new.html.erb"
@@ -72,8 +72,8 @@ RSpec.describe "group_selection/new.html.erb" do
   context "coverage selection with incarcerated" do
     let(:person) { FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) }
     let(:jail_person) { FactoryGirl.create(:person, is_incarcerated: true, us_citizen: true) }
-    let(:consumer_role) { FactoryGirl.create(:consumer_role) }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:consumer_role) { FactoryGirl.create(:consumer_role, person: jail_person) }
+    let(:benefit_package) { FactoryGirl.create(:benefit_package) }
     let(:family_member2) { double(id: "family_member", primary_relationship: "parent", dob: Date.new(1990,10,10), full_name: "member") }
     let(:family_member3) { double(id: "family_member", primary_relationship: "spouse", dob: Date.new(1990,10,10), full_name: "member") }
     let(:family_member4) { double(id: "family_member", primary_relationship: "spouse", dob: Date.new(1990,10,10), full_name: "member") }
@@ -83,7 +83,6 @@ RSpec.describe "group_selection/new.html.erb" do
       assign(:consumer_role, consumer_role)
       assign(:coverage_household, coverage_household_jail)
       assign(:market_kind, 'individual')
-      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
       allow(family_member4).to receive(:is_primary_applicant?).and_return(true)
@@ -94,10 +93,10 @@ RSpec.describe "group_selection/new.html.erb" do
       allow(family_member4).to receive(:person).and_return(jail_person)
 
       allow(family_member3).to receive(:person).and_return(person)
-      @eligibility = InsuredEligibleToEnrollRule.new(consumer_role,'individual') 
+      @eligibility = InsuredEligibleForBenefitRule.new(consumer_role,benefit_package)
 
       controller.request.path_parameters[:person_id] = person.id
-      controller.request.path_parameters[:employee_role_id] = employee_role.id
+      controller.request.path_parameters[:consumer_role_id] = consumer_role.id
       render :template => "group_selection/new.html.erb"
     end
 
@@ -113,7 +112,7 @@ RSpec.describe "group_selection/new.html.erb" do
     it "should have a checked checkbox option and a checked radio button" do
       expect(rendered).to have_selector("input[checked='checked']", count: 2)
     end
-    
+
   end
 
   context "family member" do
@@ -142,7 +141,7 @@ RSpec.describe "group_selection/new.html.erb" do
         full_name: "full_name_#{random_value}",
         is_primary_applicant?: true,
         primary_relationship: "self",
-        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) 
+        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true)
       )
     end
 
@@ -155,7 +154,7 @@ RSpec.describe "group_selection/new.html.erb" do
         full_name: "full_name_#{random_value}",
         is_primary_applicant?: false,
         primary_relationship: "child",
-        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) 
+        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true)
       )
     end
 
@@ -168,6 +167,7 @@ RSpec.describe "group_selection/new.html.erb" do
       assign :person, person
       assign :employee_role, employee_role
       assign :coverage_household, coverage_household
+      assign :eligibility, instance_double("InsuredEligibleForBenefitRule", :satisfied? => true)
       render file: "group_selection/new.html.erb"
     end
 

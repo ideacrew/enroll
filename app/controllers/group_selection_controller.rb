@@ -9,7 +9,7 @@ class GroupSelectionController < ApplicationController
     else
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
     end
-    @eligibility = InsuredEligibleToEnrollRule.new(@role, @market_kind)
+    @eligibility = InsuredEligibleForBenefitRule.new(@role, @market_kind)
   end
 
   def create

@@ -9,7 +9,11 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
   let(:end_on)                    { Date.current.end_of_year }
   let(:open_enrollment_start_on)  { Date.current.beginning_of_year - 2.months }
   let(:open_enrollment_end_on)    { Date.current.end_of_year + 2.months }
-  let(:benefit_packages)          { FactoryGirl.build(:benefit_package).to_a }
+  let(:benefit_packages) do
+    bp = FactoryGirl.build(:benefit_package)
+    bpeg = FactoryGirl.build(:benefit_eligibility_element_group, benefit_package: bp)
+    bp.to_a
+  end
 
   let(:valid_params){
       {
