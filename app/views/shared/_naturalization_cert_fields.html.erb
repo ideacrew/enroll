@@ -1,6 +1,5 @@
 <div id="naturalization_cert_container" style="display: none">
   <% document = find_document(c.object, "Naturalization Certificate") %>
-    <% debugger %>
   <%= c.fields_for 'vlp_documents', document do |v| %>
       <%= v.hidden_field :subject %>
       <%= v.hidden_field :id %>

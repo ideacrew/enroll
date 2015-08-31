@@ -1,5 +1,5 @@
 class Consumer::ConsumerRolesController < ApplicationController
-  include ::Consumer::ConsumerRolesHelper
+  include ApplicationHelper
 
   before_action :find_consumer_role_and_person, only: [:edit, :update]
 
@@ -52,6 +52,7 @@ class Consumer::ConsumerRolesController < ApplicationController
     @person.emails = []
 
     params_clean_vlp_documents
+    update_vlp_documents
     if @person.update_attributes(params.require(:person).permit(*person_parameters_list))
       redirect_to new_insured_interactive_identity_verification_path
     else
@@ -69,9 +70,6 @@ class Consumer::ConsumerRolesController < ApplicationController
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
       { :phones_attributes => [:kind, :full_phone_number] },
       { :emails_attributes => [:kind, :address] },
-      {:consumer_role_attributes =>
-           [:vlp_documents_attributes=>
-                [:subject, :citizenship_number, :naturalization_number, :alien_number]]},
       :first_name,
       :last_name,
       :middle_name,
@@ -114,17 +112,20 @@ class Consumer::ConsumerRolesController < ApplicationController
   end
 
   def params_clean_vlp_documents
+    return if params[:person][:consumer_role_attributes].empty? or params[:person][:consumer_role_attributes][:vlp_documents_attributes].empty?
     params[:person][:consumer_role_attributes][:vlp_documents_attributes].reject! do |index, doc|
       params[:naturalization_doc_type] != doc[:subject]
     end
   end
 
   def update_vlp_documents
-    debugger
+    return if params[:person][:consumer_role_attributes].empty? or params[:person][:consumer_role_attributes][:vlp_documents_attributes].empty?
+
     doc_params = params.require(:person).permit({:consumer_role_attributes =>
                                                      [:vlp_documents_attributes=>
                                                           [:subject, :citizenship_number, :naturalization_number, :alien_number]]})
 
+    debugger
     document = find_document(@consumer_role, doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject]);
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
     document.save

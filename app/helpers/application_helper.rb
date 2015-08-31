@@ -448,4 +448,12 @@ module ApplicationHelper
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
     }
   end
+
+  def find_document(consumer_role, subject)
+    subject_doc = consumer_role.vlp_documents.detect do |documents|
+      documents.subject.eql?(subject)
+    end
+
+    subject_doc || consumer_role.vlp_documents.build({subject:subject})
+  end
 end
