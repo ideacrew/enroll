@@ -165,6 +165,97 @@ class ConsumerRole
 
   # RIDP and Verify Lawful Presence workflow.  IVL Consumer primary applicant must be in identity_verified state
   # to proceed with application.  Each IVL Consumer enrolled for benefit coverage must (eventually) pass
+  def alien_number
+    vlp_documents.select{|doc| doc.alien_number.present? }.first.try(:alien_number)
+  end
+
+  def i94_number
+    vlp_documents.select{|doc| doc.i94_number.present? }.first.try(:i94_number)
+  end
+
+  def citizenship_number
+    vlp_documents.select{|doc| doc.citizenship_number.present? }.first.try(:citizenship_number)
+  end
+
+  def visa_number
+    vlp_documents.select{|doc| doc.visa_number.present? }.first.try(:visa_number)
+  end
+
+  def sevis_id
+    vlp_documents.select{|doc| doc.sevis_id.present? }.first.try(:sevis_id)
+  end
+
+  def naturalization_number
+    vlp_documents.select{|doc| doc.naturalization_number.present? }.first.try(:naturalization_number)
+  end
+
+  def receipt_number
+    vlp_documents.select{|doc| doc.receipt_number.present? }.first.try(:receipt_number)
+  end
+
+  def passport_number
+    vlp_documents.select{|doc| doc.passport_number.present? }.first.try(:passport_number)
+  end
+
+  def has_i327?
+    vlp_documents.any?{|doc| doc.vlp_document_kind == "I-327 (Reentry Permit)" }
+  end
+
+  def has_i571?
+    vlp_documents.any?{|doc| doc.vlp_document_kind == "I-551 (Permanent Resident Card)" }
+  end
+
+  def has_cert_of_citizenship?
+    vlp_documents.any?{|doc| doc.vlp_document_kind == "Certificate of Citizenship" }
+  end
+
+  def has_cert_of_naturalization?
+    vlp_documents.any?{|doc| doc.vlp_document_kind == "Naturalization Certificate" }
+  end
+
+  def has_temp_i551?
+    vlp_documents.any?{|doc| doc.vlp_document_kind == "Temporary I-551 Stamp (on passport or I-94)" }
+  end
+
+  def has_i94?
+    vlp_documents.any?{|doc| doc.vlp_document_kind == "I-94 (Arrival/Departure Record)" || doc.vlp_document_kind == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport"}
+  end
+
+  def has_i20?
+    vlp_documents.any?{|doc| doc.vlp_document_kind == "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)" }
+  end
+
+  def has_ds2019?
+    vlp_documents.any?{|doc| doc.vlp_document_kind == "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)" }
+  end
+
+  def i551
+    vlp_documents.select{|doc| doc.vlp_document_kind == "I-551 (Permanent Resident Card)" && doc.receipt_number.present? }.first
+  end
+
+  def i766
+    vlp_documents.select{|doc| doc.vlp_document_kind == "I-766 (Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_date.present? }.first
+  end
+
+  def mac_read_i551
+    vlp_documents.select{|doc| doc.vlp_document_kind == "Machine Readable Immigrant Visa (with Temporary I-551 Language)" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+  end
+
+  def foreign_passport_i94
+    vlp_documents.select{|doc| doc.vlp_document_kind == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+  end
+
+  def foreign_passport
+    vlp_documents.select{|doc| doc.vlp_document_kind == "Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+  end
+
+  def case1
+    vlp_documents.select{|doc| doc.vlp_document_kind == "Other (With Alien Number)" }.first
+  end
+
+  def case2
+    vlp_documents.select{|doc| doc.vlp_document_kind == "Other (With I-94 Number)" }.first
+  end
 
   ## TODO: Move RIDP to user model
   aasm do

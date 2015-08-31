@@ -3,7 +3,7 @@ class VlpDocument < Document
   NATURALIZATION_DOCUMENT_TYPES = ["Certificate of Citizenship", "Naturalization Certificate"]
 
   VLP_DOCUMENT_IDENTIFICATION_KINDS = [
-      "A Number",
+      "Alien Number",
       "I-94 Number",
       "Visa Number",
       "Passport Number",
@@ -61,6 +61,6 @@ class VlpDocument < Document
   validates :passport_number, length: { within: 6..12 }
   validates :sevis_id, length: { is: 11 } #first char is N
   validates :visa_number, length: { is: 8 }
-  # ReceiptNumber: 13 character string, first 3 alpha, remaining 10 string
+  validates :receipt_number, length: { is: 13} #first 3 alpha, remaining 10 string
 
 end

@@ -51,45 +51,37 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def request_help
-    requester = Person.find(params[:person])
+    role = nil
     if params[:type]
       cac = params[:type] == 'CAC'
       staff = Person.where(:'csr_role.cac' => cac)
       match = staff.where(:$and => [{first_name: params[:firstname].strip},{last_name: params[:lastname].strip}])
       if match.count > 0
-        status_text = 'A message has been sent to the Certified Applicant Counselor.' if cac
-        status_text = 'A message has been sent to the Customer Service representative.' if !cac
-        hbx_profile = Organization.where(:hbx_profile =>{:$exists => true}).first.hbx_profile
-        message_params = {
-          sender_id: hbx_profile.id,
-          parent_message_id: hbx_profile.id,
-          from: 'Plan Shopping Automatic Message',
-          to: "HBX ADMIN",
-          subject: "Plan Shopping Help Request for #{params[:type]}",
-          body: 
-            "Please contact #{requester.first_name} #{requester.last_name}.  " +
-            "Plan Shopping help request from Person Id #{requester.id}, email #{requester.try(:user).try(:email)}. " 
-        }
-        create_secure_message message_params, hbx_profile, 'inbox'
-      else
-        status_text = call_customer_service
-      end  
+        agent = match.first
+        role = cac ? 'Certified Applicant Counselor' : 'Customer Service Representative'
+      end
     else
       if params[:broker] && params[:broker] != ''
-        @broker = Person.find(params[:broker]).broker_role.email
-        sender = Person.where(hbx_staff_role: {:$exists=> true}).first
-        body ={body: "please contact #{requester.first_name} #{requester.last_name}"}
-        UserMailer.message_to_broker(sender, @broker, body)
-        status_text = 'Message send to Broker'
+        agent = Person.find(params[:broker])
+        role = 'Broker'
       else
-        @assister = Person.find(params[:assister])
-        sender = Person.where(hbx_staff_role: {:$exists=> true}).first
-        UserMailer.message_to_assister(requester, @assister)
-        status_text = 'Message sent to Assister'
+        agent = Person.find(params[:assister])
+        role = 'In-Person Assister'
       end
     end
-    render :text =>status_text, layout: false
-end  
+    if role
+      status_text = 'Message sent to ' + role
+      insured = Person.find(params[:person]) 
+      if agent.try(:user).try(:email)
+        agent_assistance_messages(insured,agent,role)
+      else
+        status_text = "Agent has no email.   Please select another"
+      end
+    else
+      status_text = call_customer_service
+    end
+    render :text => status_text, layout: false
+  end
 
   def family_index
     @q = params.permit(:q)[:q]
@@ -227,8 +219,25 @@ end
     redirect_to exchanges_hbx_profiles_root_path
   end
 
-
 private
+  def agent_assistance_messages(insured, agent, role)
+    hbx_profile = Organization.where(:hbx_profile =>{:$exists => true}).first.hbx_profile
+    message_params = {
+      sender_id: hbx_profile.id,
+      parent_message_id: hbx_profile.id,
+      from: 'Plan Shopping Automatic Message',
+      to: "HBX ADMIN",
+      subject: "Plan Shopping Help Request for #{params[:type]}",
+      body: 
+        "Please contact #{insured.first_name} #{insured.last_name}. <br/> " + 
+        "Plan Shopping help request from Person Id #{insured.id}, email #{insured.try(:user).try(:email)}.<br/>" +
+        "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}"
+      }
+    create_secure_message message_params, hbx_profile, :sent
+    create_secure_message message_params, agent, :inbox
+    result = UserMailer.new_client_notification(insured, agent, role)
+    puts result.to_s if Rails.env.development?
+   end  
 
   def find_hbx_profile
     @profile = current_user.person.try(:hbx_staff_role).try(:hbx_profile)

@@ -17,7 +17,7 @@ describe Events::ResidencyVerificationRequestsController do
       end
       allow(Time).to receive(:now).and_return(mock_now)
       expect(controller).to receive(:render_to_string).with(
-        "residency_verification_request", {:formats => ["xml"], :locals => {
+        "events/residency/verification_request", {:formats => ["xml"], :locals => {
          :individual => person
         }}).and_return(rendered_template)
       controller.call(ConsumerRole::RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME, nil, nil, nil, {:person => person} )
