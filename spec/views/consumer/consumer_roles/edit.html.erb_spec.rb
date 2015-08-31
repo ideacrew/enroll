@@ -10,7 +10,7 @@ RSpec.describe "consumer/consumer_roles/edit.html.erb" do
     allow(consumer_role).to receive(:citizen_status)
     allow(consumer_role ).to receive(:persisted?)
     allow(consumer_role ).to receive(:vlp_document_id)
-    allow_any_instance_of(Consumer::ConsumerRolesHelper).to receive(:find_document).with(anything, anything)
+    allow_any_instance_of(ApplicationHelper).to receive(:find_document).with(anything, anything)
 
     render template: "consumer/consumer_roles/edit.html.erb"
   end

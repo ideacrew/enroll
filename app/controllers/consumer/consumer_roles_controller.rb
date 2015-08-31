@@ -54,13 +54,16 @@ class Consumer::ConsumerRolesController < ApplicationController
     params_clean_vlp_documents
     update_vlp_documents
     if @person.update_attributes(params.require(:person).permit(*person_parameters_list))
-      redirect_to new_insured_interactive_identity_verification_path
+      redirect_to ridp_agreement_consumer_consumer_role_index_path
     else
       build_nested_models
       respond_to do |format|
         format.html { render "edit" }
       end
     end
+  end
+
+  def ridp_agreement
   end
 
   private
@@ -88,7 +91,7 @@ class Consumer::ConsumerRolesController < ApplicationController
       :naturalized_citizen,
       :eligible_immigration_status,
       :indian_tribe_member,
-      :tribal_id,
+      :tribal_id
     ]
   end
 

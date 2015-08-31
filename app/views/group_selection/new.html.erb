@@ -8,11 +8,12 @@
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:employee_role_id, @employee_role.try(:id)) %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
+          <%= hidden_field_tag(:sep_indicator, 'false') %>
 
           <div class="table-responsive table-border">
             <table class="table table-wrapper table-condensed group-selection-tbl">
               <tbody>
-                <% offered_relationship_benefits = @employee_role.present? ? @employee_role.benefit_group.relationship_benefits.select(&:offered).map(&:relationship) : nil 
+                <% offered_relationship_benefits = @employee_role.present? ? @employee_role.benefit_group.relationship_benefits.select(&:offered).map(&:relationship) : nil
                 %>
                 <% @coverage_household.family_members.each_with_index do |family_member, index| %>
                   <tr class="<%='ineligible_row' if family_member.person.ineligible_ivl%>">
@@ -70,7 +71,7 @@
 
           <div class='row top-pd'>
             <div class="col-sm-12">
-              <p>If you enroll today, coverage will begin Oct 1. Do you need coverage earlier?  Check <a href="<%= find_sep_insured_families_path %>">am I eligible for a Special Enrollment Period</a> to see if you qualify</p>
+              <p>If you enroll today, coverage will begin Oct 1. Do you need coverage earlier?  Check <%= link_to "am I eligible for a Special Enrollment Period", "#", :onclick=>"$('#sep_indicator').val('true');$(this).closest('form').submit();" %> to see if you qualify</p>
             </div>
           </div>
 
@@ -80,7 +81,7 @@
             <% if @hbx_enrollment.present? and @hbx_enrollment.try(:coverage_selected?) %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-lg btn-primary' %>
               &nbsp;
-              <%= submit_tag 'Terminate Plan', class: 'btn btn-lg btn-primary' %>
+              <%= link_to 'Select Plan to Terminate', group_selection_terminate_selection_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-lg btn-primary' %>
             <% end %>
             <% if @employee_role.try(:benefit_group).try(:plan_option_kind) != "single_plan" %>
               &nbsp;

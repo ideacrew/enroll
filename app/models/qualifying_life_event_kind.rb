@@ -108,8 +108,8 @@ class QualifyingLifeEventKind
   # If coverage ends on date other than last day of month and plan selected before the month in which coverage ends: 
   #   effective date is consumer chooses between 1st of the month when coverage ends (allowing overlap - but no APTC for overlapping month) 
   #   or the first of the month following the month when coverage ends
-  def employee_gaining_medicare(coverage_end_on, consumer_coverage_effective_on = nil)
-    coverage_end_last_day_of_month = Date.new(coverage_end_on.year, coverage_end_on.month, coverage_end_on.end_of_month)
+  def employee_gaining_medicare(coverage_end_on, selected_effective_on = nil, consumer_coverage_effective_on = nil)
+    coverage_end_last_day_of_month = Date.new(coverage_end_on.year, coverage_end_on.month, coverage_end_on.end_of_month.day)
     if coverage_end_on == coverage_end_last_day_of_month
       if TimeKeeper.date_of_record <= coverage_end_on
         coverage_effective_on = coverage_end_last_day_of_month + 1.day
@@ -118,8 +118,11 @@ class QualifyingLifeEventKind
       end
     else
       if TimeKeeper.date_of_record < (coverage_end_last_day_of_month - 1.month).end_of_month
-        #FIXME here need a special UI to allowd consumer to choose first_of_month or first_of_next_month
-        coverage_effective_on = coverage_end_last_day_of_month + 1.day
+        coverage_effective_on = if selected_effective_on.blank?
+                                  [TimeKeeper.date_of_record.beginning_of_month, TimeKeeper.date_of_record.end_of_month + 1.day]
+                                else
+                                  selected_effective_on
+                                end
       else
         coverage_effective_on = TimeKeeper.date_of_record.end_of_month + 1.day
       end
@@ -159,4 +162,9 @@ class QualifyingLifeEventKind
     end
   end
 
+  def date_hint
+    start_date = TimeKeeper.date_of_record - post_event_sep_in_days.try(:days)
+    end_date = TimeKeeper.date_of_record + pre_event_sep_in_days.try(:days)
+    "(must fall between #{start_date.strftime("%B %d")} and #{end_date.strftime("%B %d")})"
+  end
 end

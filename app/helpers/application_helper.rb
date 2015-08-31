@@ -328,6 +328,7 @@ module ApplicationHelper
       "Welcome to the District's Health Insurance Marketplace"
     end
   end
+
   def override_backlink
     link=''
     if current_user.try(:has_hbx_staff_role?)
