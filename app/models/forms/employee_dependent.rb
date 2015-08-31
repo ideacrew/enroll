@@ -4,7 +4,7 @@ module Forms
     include ActiveModel::Validations
 
     attr_accessor :id, :family_id, :is_consumer_role, :vlp_document_id
-    attr_accessor :gender, :relationship, :tribal_id
+    attr_accessor :gender, :relationship
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -87,7 +87,8 @@ module Forms
         :ethnicity => ethnicity,
         :language_code => language_code,
         :is_incarcerated => is_incarcerated,
-        :citizen_status => @citizen_status
+        :citizen_status => @citizen_status,
+        :tribal_id => tribal_id
       }
     end
 
@@ -123,7 +124,8 @@ module Forms
         :ethnicity => found_family_member.ethnicity,
         :language_code => found_family_member.language_code,
         :is_incarcerated => found_family_member.is_incarcerated,
-        :citizen_status => found_family_member.citizen_status
+        :citizen_status => found_family_member.citizen_status,
+        :tribal_id => found_family_member.tribal_id
       })
     end
 

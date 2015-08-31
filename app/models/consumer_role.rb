@@ -51,7 +51,6 @@ class ConsumerRole
   field :birth_location, type: String
   field :marital_status, type: String
   field :is_active, type: Boolean, default: true
-  field :tribal_id, type: String
 
     field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
 
