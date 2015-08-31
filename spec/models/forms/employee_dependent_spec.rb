@@ -13,6 +13,13 @@ describe Forms::EmployeeDependent do
     expect(subject).to have_errors_on(:relationship)
   end
 
+  it "should require tribal_id when citizen_status=indian_tribe_member" do
+    subject.citizen_status = "indian_tribe_member"
+    subject.valid?
+    expect(subject).to have_errors_on(:tribal_id)
+    expect(subject.errors[:tribal_id]).to eq ["is required when native american / alaskan native is selected"]
+  end
+
   it "should require a gender" do
     expect(subject).to have_errors_on(:gender)
   end

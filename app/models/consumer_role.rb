@@ -51,6 +51,7 @@ class ConsumerRole
   field :birth_location, type: String
   field :marital_status, type: String
   field :is_active, type: Boolean, default: true
+  field :tribal_id, type: String
 
     field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
 
@@ -64,6 +65,7 @@ class ConsumerRole
   delegate :race,               :race=,              to: :person, allow_nil: true
   delegate :ethnicity,          :ethnicity=,         to: :person, allow_nil: true
   delegate :is_disabled,        :is_disabled=,       to: :person, allow_nil: true
+  delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
   embeds_many :vlp_documents, as: :documentable
