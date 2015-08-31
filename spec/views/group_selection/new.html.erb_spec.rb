@@ -108,7 +108,7 @@ RSpec.describe "group_selection/new.html.erb" do
     it "should have a checked checkbox option and a checked radio button" do
       expect(rendered).to have_selector("input[checked='checked']", count: 2)
     end
-    
+
   end
 
   context "family member" do
@@ -137,7 +137,7 @@ RSpec.describe "group_selection/new.html.erb" do
         full_name: "full_name_#{random_value}",
         is_primary_applicant?: true,
         primary_relationship: "self",
-        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) 
+        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true)
       )
     end
 
@@ -150,7 +150,7 @@ RSpec.describe "group_selection/new.html.erb" do
         full_name: "full_name_#{random_value}",
         is_primary_applicant?: false,
         primary_relationship: "child",
-        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) 
+        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true)
       )
     end
 
@@ -210,14 +210,14 @@ RSpec.describe "group_selection/new.html.erb" do
     it "when hbx_enrollment not terminated" do
       render file: "group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 1)
-      expect(rendered).to have_selector("input[value='Terminate Plan']", count: 1)
+      expect(rendered).to have_selector("a", text: "Select Plan to Terminate",  count: 1)
     end
 
     it "when hbx_enrollment is terminated" do
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(false)
       render file: "group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 0)
-      expect(rendered).to have_selector("a", count: 0)
+      expect(rendered).to have_selector("a", count: 1)
     end
   end
 

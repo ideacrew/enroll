@@ -152,7 +152,7 @@ QualifyingLifeEventKind.create!(
 
 QualifyingLifeEventKind.create!(
   title: "My immigration status has changed",
-  tool_tip: ": Someone gains a status that makes them newly eligible to enroll in coverage through DC Health Link",
+  tool_tip: "Someone gains a status that makes them newly eligible to enroll in coverage through DC Health Link",
   action_kind: "add_benefit",
   market_kind: "individual",
   event_kind_label: "Date of change",

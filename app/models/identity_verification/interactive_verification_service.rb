@@ -49,7 +49,7 @@ module IdentityVerification
 
     def invoke_request(key, payload, timeout)
       begin
-        r = self.class.requestor.request(key, {:body => payload}, 5)
+        r = self.class.requestor.request(key, {:body => payload}, 7)
         return ["503", nil] if r.nil?
         result_hash = r.stringify_keys
         result_code = result_hash["return_status"]

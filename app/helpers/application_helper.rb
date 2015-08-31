@@ -328,6 +328,7 @@ module ApplicationHelper
       "Welcome to the District's Health Insurance Marketplace"
     end
   end
+
   def override_backlink
     link=''
     if current_user.try(:has_hbx_staff_role?)
@@ -447,5 +448,13 @@ module ApplicationHelper
     ].inject([]){ |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
     }
+  end
+
+  def find_document(consumer_role, subject)
+    subject_doc = consumer_role.vlp_documents.detect do |documents|
+      documents.subject.eql?(subject)
+    end
+
+    subject_doc || consumer_role.vlp_documents.build({subject:subject})
   end
 end

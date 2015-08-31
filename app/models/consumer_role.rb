@@ -64,12 +64,13 @@ class ConsumerRole
   delegate :race,               :race=,              to: :person, allow_nil: true
   delegate :ethnicity,          :ethnicity=,         to: :person, allow_nil: true
   delegate :is_disabled,        :is_disabled=,       to: :person, allow_nil: true
+  delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
   embeds_many :vlp_documents, as: :documentable
   embeds_many :workflow_state_transitions, as: :transitional
 
-  accepts_nested_attributes_for :person, :workflow_state_transitions
+  accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents
 
   validates_presence_of :dob, :gender, :is_applicant
 
@@ -198,63 +199,63 @@ class ConsumerRole
   end
 
   def has_i327?
-    vlp_documents.any?{|doc| doc.vlp_document_kind == "I-327 (Reentry Permit)" }
+    vlp_documents.any?{|doc| doc.subject == "I-327 (Reentry Permit)" }
   end
 
   def has_i571?
-    vlp_documents.any?{|doc| doc.vlp_document_kind == "I-551 (Permanent Resident Card)" }
+    vlp_documents.any?{|doc| doc.subject == "I-551 (Permanent Resident Card)" }
   end
 
   def has_cert_of_citizenship?
-    vlp_documents.any?{|doc| doc.vlp_document_kind == "Certificate of Citizenship" }
+    vlp_documents.any?{|doc| doc.subject == "Certificate of Citizenship" }
   end
 
   def has_cert_of_naturalization?
-    vlp_documents.any?{|doc| doc.vlp_document_kind == "Naturalization Certificate" }
+    vlp_documents.any?{|doc| doc.subject == "Naturalization Certificate" }
   end
 
   def has_temp_i551?
-    vlp_documents.any?{|doc| doc.vlp_document_kind == "Temporary I-551 Stamp (on passport or I-94)" }
+    vlp_documents.any?{|doc| doc.subject == "Temporary I-551 Stamp (on passport or I-94)" }
   end
 
   def has_i94?
-    vlp_documents.any?{|doc| doc.vlp_document_kind == "I-94 (Arrival/Departure Record)" || doc.vlp_document_kind == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport"}
+    vlp_documents.any?{|doc| doc.subject == "I-94 (Arrival/Departure Record)" || doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport"}
   end
 
   def has_i20?
-    vlp_documents.any?{|doc| doc.vlp_document_kind == "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)" }
+    vlp_documents.any?{|doc| doc.subject == "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)" }
   end
 
   def has_ds2019?
-    vlp_documents.any?{|doc| doc.vlp_document_kind == "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)" }
+    vlp_documents.any?{|doc| doc.subject == "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)" }
   end
 
   def i551
-    vlp_documents.select{|doc| doc.vlp_document_kind == "I-551 (Permanent Resident Card)" && doc.receipt_number.present? }.first
+    vlp_documents.select{|doc| doc.subject == "I-551 (Permanent Resident Card)" && doc.receipt_number.present? }.first
   end
 
   def i766
-    vlp_documents.select{|doc| doc.vlp_document_kind == "I-766 (Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select{|doc| doc.subject == "I-766 (Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_date.present? }.first
   end
 
   def mac_read_i551
-    vlp_documents.select{|doc| doc.vlp_document_kind == "Machine Readable Immigrant Visa (with Temporary I-551 Language)" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select{|doc| doc.subject == "Machine Readable Immigrant Visa (with Temporary I-551 Language)" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
   end
 
   def foreign_passport_i94
-    vlp_documents.select{|doc| doc.vlp_document_kind == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select{|doc| doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
   end
 
   def foreign_passport
-    vlp_documents.select{|doc| doc.vlp_document_kind == "Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+    vlp_documents.select{|doc| doc.subject == "Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
   end
 
   def case1
-    vlp_documents.select{|doc| doc.vlp_document_kind == "Other (With Alien Number)" }.first
+    vlp_documents.select{|doc| doc.subject == "Other (With Alien Number)" }.first
   end
 
   def case2
-    vlp_documents.select{|doc| doc.vlp_document_kind == "Other (With I-94 Number)" }.first
+    vlp_documents.select{|doc| doc.subject == "Other (With I-94 Number)" }.first
   end
 
   ## TODO: Move RIDP to user model
@@ -272,6 +273,7 @@ class ConsumerRole
     event :authorize_lawful_presence, :after => [:record_transition, :mark_lp_authorized] do
       transitions from: :verifications_pending, to: :verifications_pending, guard: :residency_pending?
       transitions from: :verifications_pending, to: :fully_verified, guard: :residency_verified?
+      transitions from: :verifications_pending, to: :verifications_outstanding
       transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :residency_denied?
       transitions from: :verifications_outstanding, to: :fully_verified, guard: :residency_verified?
     end
@@ -279,6 +281,7 @@ class ConsumerRole
     event :authorize_residency, :after => [:record_transition, :mark_residency_authorized] do
       transitions from: :verifications_pending, to: :verifications_pending, guard: :lawful_presence_pending?
       transitions from: :verifications_pending, to: :fully_verified, guard: :lawful_presence_verified?
+      transitions from: :verifications_pending, to: :verifications_outstanding
       transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :lawful_presence_outstanding?
       transitions from: :verifications_outstanding, to: :fully_verified, guard: :lawful_presence_authorized?
     end

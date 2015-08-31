@@ -18,6 +18,13 @@
           <div class="right-menu navbar-right">
             <% if signed_in? %>
               <ul class="navbar-nav top-menu">
+                <li>
+                  <% if controller_name == "employee_roles" && current_user.has_consumer_role? %>
+                    <%= link_to "Switch to Consumer Portal", "#" %> |
+                  <% elsif controller_name == "consumer_roles" && current_user.has_employee_role? %>
+                    <%= link_to "Switch to Employee Portal", "#" %> |
+                  <% end %>
+                </li>
                 <% if @person.present? && @person.persisted? %>
                   <li><%= link_to "My Account", family_account_path %></li>
                   <li class="hidden-xs">|</li>

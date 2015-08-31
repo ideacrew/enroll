@@ -40,7 +40,7 @@
     </div>
     <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
-        <%= f.radio_button :naturalized_citizen, false, required: true,  class: "required floatlabel" %>
+        <%= f.radio_button :naturalized_citizen, false, required: true, class: "required floatlabel" %>
         <%= f.label :naturalized_citizen, :value => false do %>
             <span>No</span>
         <% end %>
@@ -71,25 +71,26 @@
   </div>
 
   <div class="row row-form-wrapper no-buffer" id="vlp_document_id_container" style="display: none">
-
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg">
-      <label>Select your document type</label>
-    </div>
-
     <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= select_tag :naturalization_doc_type, options_for_select(ConsumerRole.naturalization_document_types) %>
+      <%= hidden_field_tag :form_for_consumer_role, f.object.is_a?(Person) %>
+      <%= select_tag :naturalization_doc_type, options_for_select(ConsumerRole.naturalization_document_types), {id: 'naturalization_doc_type', prompt: 'Select your document type'} %>
     </div>
 
-    <% if f.object.is_a?(Person) %>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= f.fields_for :consumer_role do |cr| %>
-          <%= cr.text_field :vlp_document_id, :placeholder => "Document Id" %>
-      <% end %>
-    </div>
+    <% if f.object.is_a? Person %>
+        <%= f.fields_for :consumer_role do |c| %>
+            <%= render :partial => "shared/naturalization_cert_fields", locals: {c: c} %>
+            <%= render :partial => "shared/citizenship_cert_fields", locals: {c: c} %>
+        <% end %>
     <% else %>
-        <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-           <%= f.text_field :vlp_document_id, :placeholder => "Document Id" %>
-        </div>
+        <% if f.object.persisted? %>
+        <% dependent_consumer_role = f.object.family_member.person.consumer_role %>
+        <% else %>
+        <% dependent_consumer_role = ConsumerRole.new %>
+        <% end %>
+        <%= f.fields_for dependent_consumer_role do |c| %>
+            <%= render :partial => "shared/naturalization_cert_fields", locals: {c: c} %>
+            <%= render :partial => "shared/citizenship_cert_fields", locals: {c: c} %>
+        <% end %>
     <% end %>
   </div>
 
@@ -116,9 +117,9 @@
     <label>Are you currently incarcerated?</label>
   </div>
   <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 form-group form-group-lg no-pd">
-    <%= f.check_box :is_incarcerated %> 
+    <%= f.check_box :is_incarcerated %>
     <%= f.label :is_incarcerated, :value => true do %>
-      <span>Yes</span>
+        <span>Yes</span>
     <% end %>
   </div>
 </div>

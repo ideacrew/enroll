@@ -1,4 +1,5 @@
 - step = (defined? step) ? step.to_i : 1
+= ridp = (defined? ridp) ? ridp: false
 
 - percent_complete = 0
 - percent_complete = step == 1 ? 15 : (step == 2) ? 35 : ((step == 3) ? 50 : ((step == 4) ? 75 : ((step == 5) ? 90 : (step == 6 ? 100 : 0))))
@@ -33,6 +34,8 @@
 - if step == 1
   %button.btn.btn-lg.btn-primary.btn-br.btn-block.interaction-click-control-continue{type: 'submit'}
     CONTINUE
+- elsif ridp == true && step == 2
+  = link_to "Continue", new_insured_interactive_identity_verification_path, class: 'button btn btn-lg btn-primary btn-br btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => true
 - elsif defined? url
   = link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
 - elsif step == 4
