@@ -84,7 +84,7 @@ module Forms
         :dob => dob,
         :ssn => ssn,
         :race => race,
-        :ethnicity => ethnicity,
+        :ethnicity => ethnicity.reject!(&:empty?), # reject empty values before saving
         :language_code => language_code,
         :is_incarcerated => is_incarcerated,
         :citizen_status => @citizen_status,
