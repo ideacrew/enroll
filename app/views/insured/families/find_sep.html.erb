@@ -3,17 +3,18 @@
   <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12">
   <h3>Special Enrollment Period</h3>
   <div class="seps-panel panel panel-default">
-  <div class="panel-heading">
+  <div class="panel-heading" style="margin-bottom: 10px;">
     <div class="row">
       <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
-        <h4><strong>Have any of the following happen to you recently?</strong></h4>
+        <h4><strong>Has any of the following happened to you recently?</strong></h4>
       </div>
     </div>
     <hr>
   </div>
+
   <div class="panel-body">
     <div id="qle-menu">
-     <div class="row top-pd">
+     <div class="row">
         <%= render 'qles_carousel' %>
       </div>
     </div>
@@ -28,6 +29,10 @@
   </script>
 </div>
 
+<div style="text-align: center; margin-bottom: 15px;">
+  <input type="checkbox" name="no_qualifying_event" value="true"> I’ve not had a recent Qualifying Life Event.
+</div>
+
 <%= render 'qle_detail' %>
 
 </div>
@@ -36,7 +41,11 @@
   <% if @change_plan.blank? && @market_kind == "individual" %>
   <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
   <% elsif @change_plan.blank? %>
+  <% if action_name == 'find_sep' %>
+  <%= render  partial: 'shared/sep_progress', locals: {step: '5'} %>
+  <% else %>
   <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
+  <% end %>
   <% elsif @change_plan == "change_by_qle" %>
   <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
   <% elsif @change_plan == "change_plan" %>

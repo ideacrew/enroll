@@ -14,7 +14,10 @@
 
     <div class="panel-body">
       <div class="row">
-        <%= form_tag '/consumer/employee_dependents', method: :get, class: 'input-no-pd', id: 'qle_form' do %>
+        <% url = '/consumer/employee_dependents' %>
+        <% url = insured_plan_shopping_path(:id => @hbx_enrollment_id, market_kind: @market_kind, coverage_kind: @coverage_kind) if action_name == 'find_sep' %>
+
+        <%= form_tag url, method: :get, class: 'input-no-pd', id: 'qle_form' do %>
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 
             <div class='qle-form'>
@@ -39,6 +42,7 @@
 
               <%= hidden_field_tag 'change_plan' %>
               <%= hidden_field_tag 'qle_id' %>
+              <%= hidden_field_tag 'prev_action_name', action_name %>
               <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || "None" %>
               <div class="effective_on_kinds">
               </div>

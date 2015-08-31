@@ -1,5 +1,7 @@
 class Insured::FamiliesController < FamiliesController
+
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
+  # layout 'application', :only => :find_sep
 
   def home
     @hbx_enrollments = @family.enrolled_hbx_enrollments || []
@@ -20,7 +22,11 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def find_sep
-    render layout: "application"
+    @hbx_enrollment_id = params[:hbx_enrollment_id]
+    @market_kind = params[:market_kind]
+    @coverage_kind = params[:coverage_kind]
+
+    render :layout => 'application' 
   end
 
   def personal
