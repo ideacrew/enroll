@@ -10,7 +10,8 @@ class GroupSelectionController < ApplicationController
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
     end
 
-    special_enrollment_period = true
+    special_enrollment_period = false
+
 
     if params[:change_plan].present? || !special_enrollment_period || params[:return_action] == "find_sep"
       render 'new'
