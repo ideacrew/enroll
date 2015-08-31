@@ -50,7 +50,7 @@ class VlpDocument < Document
   field :issuing_country, type: String
 
   validates :subject,
-        inclusion: { in: VLP_DOCUMENT_KINDS, message: "%{value} is not a valid vlp document kind" },
+        inclusion: { in: VLP_DOCUMENT_KINDS, message: "%{value} is not a valid subject" },
         allow_blank: false
 
   validates :alien_number, length: { is: 9 }, :allow_blank => true
