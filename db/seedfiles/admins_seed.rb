@@ -4,7 +4,7 @@ puts "::: Creating HBX Admin:::"
 
 address  = Address.new(kind: "work", address_1: "1225 I St, NW", city: "Washington", state: "DC", zip: "20002")
 phone    = Phone.new(kind: "main", area_code: "855", number: "532-5465")
-email    = Email.new(kind: "work", address: "admin@dc.gov")
+# email    = Email.new(kind: "work", address: "admin@dc.gov")
 office_location = OfficeLocation.new(is_primary: true, address: address, phone: phone)
 geographic_rating_area = GeographicRatingArea.new(
     rating_area_code: "R-DC001", 
@@ -24,6 +24,8 @@ geographic_rating_area = GeographicRatingArea.new(
 #   )
 
 # under_age_thirty_benefit_package = BenefitPackage.new()
+
+
 
 organization = Organization.new(
       dba: "DCHL",
@@ -59,6 +61,7 @@ hbx_profile = organization.build_hbx_profile(
 
 organization.save!
 
+
 admin_user    = User.create!(email: "admin@dc.gov", password: "password", password_confirmation: "password", roles: ["hbx_staff"])
 admin_person  = Person.new(first_name: "system", last_name: "admin", dob: "1976-07-04", user: admin_user)
 admin_person.save!
@@ -75,7 +78,7 @@ def create_staff member
      person.build_csr_role(organization: member[:organization], shift: member[:shift], cac: member[:cac])
    end
    person.save!
- end
+end
 
 assisters = [
   {email: 'ddavis@cohdc.org',first_name:  'Dakia', last_name: 'Davis', organization: 'Community of Hope', role: 'assister'},
