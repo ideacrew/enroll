@@ -1,60 +1,110 @@
 class InsuredEligibleForBenefitRule
-  include Consumer::EmployeeRolesHelper
-  attr_reader :role, :benefit_package
 
-  # Insured can be: employee_role, consumer_role, resident_role
+  # Insured role can be: EmployeeRole, ConsumerRole, ResidentRole
 
-  ACA_ELIGIBLE_CITIZEN_STATUS_KINDS = %W(
-      us_citizen
-      naturalized_citizen
-      indian_tribe_member
-      alien_lawfully_present
-      lawful_permanent_resident
-  )
+
+  # ACA_ELIGIBLE_CITIZEN_STATUS_KINDS = %W(
+  #     us_citizen
+  #     naturalized_citizen
+  #     indian_tribe_member
+  #     alien_lawfully_present
+  #     lawful_permanent_resident
+  # )
 
   def initialize(role, benefit_package)
     @role = role
     @benefit_package = benefit_package
-    if @role.class.name == "EmployeeRole"
-      @offered_relationship_benefits = @role.benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
-    end
   end
 
-  def satisfied?(family_member)
-    if @role.class.name == "ConsumerRole" && @benefit_package == "individual"
-      member_role = family_member.person.consumer_role
-      #hbx = HbxProfile.find_by_state_abbreviation("dc")
+  def setup
+    hbx = HbxProfile.find_by_state_abbreviation("dc")
+    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bp| bp.start_on.year == 2015 }
+    ivl_health_benefits_2015 = bc_period.benefit_packages.detect { |bp| bp.title == "individual_health_benefits_2015" }
 
-      #member_role.is_state_resident? && TODO 
-       !member_role.is_incarcerated? &&
-        ACA_ELIGIBLE_CITIZEN_STATUS_KINDS.include?(member_role.citizen_status) #&& 
-        #(hbx.benefit_sponsorship.benefit_coverage_periods.first.open_enrollment_contains?(TimeKeeper.date_of_record)) ||
-        #( # family is under SEP )
-        #)
-
-    elsif @role.class.name == "EmployeeRole" && @benefit_package == "shop"
-      # employee_role is under open enrollment || employee_role family is under SEP
-      coverage_relationship_check(@offered_relationship_benefits, family_member)
+    person = Person.where(last_name: "Murray").entries.first
+    if person.consumer_role.nil?
+      consumer_role = person.build_consumer_role(is_applicant: true)
+      consumer_role.save!
+      consumer_role
     else
-      # raise error for role/benefit_package mismatch
+      consumer_role = person.consumer_role
+    end
+
+    # rule = InsuredEligibleForBenefitRule.new(consumer_role, ivl_health_benefits_2015)
+    # rule.satisfied?
+  end
+
+  def satisfied?
+    if @role.class.name == "ConsumerRole"
+      @errors = []
+      @benefit_package.benefit_eligibility_element_group.class.fields.keys.reject{|k| k == "_id"}.reduce(true) do |eligible, element|
+        if self.public_send("is_#{element}_satisfied?")
+          true && eligible
+        else
+          @errors << ["eligibility failed on #{element}"]
+          false
+        end
+      end
     end
   end
 
-  def determination_result
-    # eligible
-    ## Benefit package's benefit coverage period 
-    # no_open_enrollment_period_active
-    ## Benefit package
-    # no_benefit_for_relationship
-    # no_benefit_for_age
-    # invalid_relationship_and_age_combination
-    ## Role
-    # not_a_resident
-    # incarcerated
-    # unverified_lawful_presence
-    # not_lawfully_present
-    ## Role's Family
-    # no_special_enrollment_period_active
+  def is_market_places_satisfied?
+    true
+  end
+
+  def is_enrollment_periods_satisfied?
+    true
+  end
+
+  def is_family_relationships_satisfied?
+    true
+  end
+
+  def is_benefit_categories_satisfied?
+    true
+  end
+
+  def is_citizenship_status_satisfied?
+    true
+  end
+
+  def is_ethnicity_satisfied?
+    true
+  end
+
+  def is_residency_status_satisfied?
+    return true if @benefit_package.residency_status.include?("any")
+    @benefit_package.residency_status.include?("state_resident") && @role.is_state_resident?
+  end
+
+  def is_incarceration_status_satisfied?
+    return true if @benefit_package.incarceration_status.include?("any")
+    @benefit_package.incarceration_status.include?("unincarcerated") && !@role.is_incarcerated?
+  end
+
+  def is_age_range_satisfied?
+    return true # if @benefit_package.age_range == 0..0
+
+    age = age_on_next_effective_date(@role.dob)
+    @benefit_package.age_range.cover?(age)
+  end
+
+  def determination_results
+    @errors
+  end
+
+  # def fails_market_places?
+  #   if passes
+  #     false
+  #   else
+  #     reason
+  #   end
+  # end
+
+  def age_on_next_effective_date(dob)
+    today = TimeKeeper.date_of_record
+    today.day <= 15 ? age_on = today.end_of_month + 1.day : age_on = (today + 1.month).end_of_month + 1.day
+    age_on.year - dob.year - ((age_on.month > dob.month || (age_on.month == dob.month && age_on.day >= dob.day)) ? 0 : 1)
   end
 
 end
