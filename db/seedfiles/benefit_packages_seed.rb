@@ -10,7 +10,7 @@ shop_dental_plans_2015 = Plan.shop_dental_by_active_year(2015).entries.collect(&
 ivl_and_cat_health_plans_2015 = Plan.individual_health_by_active_year(2015).entries.collect(&:_id)
 
 individual_health_benefit_package = BenefitPackage.new(
-  title: "individual_health_benefit_package".titlecase,
+  title: "individual_health_benefits_2015",
   elected_premium_credit_strategy: "unassisted",
   benefit_ids:          ivl_health_plans_2015,
   benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
@@ -27,7 +27,7 @@ individual_health_benefit_package = BenefitPackage.new(
 )
 
 individual_dental_benefit_package = BenefitPackage.new(
-  title: "individual_dental_benefit_package".titlecase,
+  title: "individual_dental_benefits_2015",
   elected_premium_credit_strategy: "unassisted",
   benefit_ids:          shop_dental_plans_2015,
   benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
@@ -44,7 +44,7 @@ individual_dental_benefit_package = BenefitPackage.new(
 )
 
 catastrophic_health_benefit_package = BenefitPackage.new(
-  title: "catastrophic_health_benefit_package".titlecase,
+  title: "catastrophic_health_benefits_2015",
   elected_premium_credit_strategy: "unassisted",
   benefit_ids:          ivl_and_cat_health_plans_2015,
   benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
@@ -61,7 +61,7 @@ catastrophic_health_benefit_package = BenefitPackage.new(
 )
 
 native_american_health_benefit_package = BenefitPackage.new(
-  title: "native_american_health_benefit_package".titlecase,
+  title: "native_american_health_benefits_2015",
   elected_premium_credit_strategy: "unassisted",
   benefit_ids:          ivl_health_plans_2015,
   benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
@@ -78,7 +78,7 @@ native_american_health_benefit_package = BenefitPackage.new(
 )
 
 native_american_dental_benefit_package = BenefitPackage.new(
-  title: "native_american_dental_benefit_package".titlecase,
+  title: "native_american_dental_benefits_2015",
   elected_premium_credit_strategy: "unassisted",
   benefit_ids:          shop_dental_plans_2015,
   benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
