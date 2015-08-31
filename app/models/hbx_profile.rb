@@ -65,7 +65,7 @@ class HbxProfile
       org.hbx_profile if org.present?
     end
 
-    def find_by_state_abbrevation(state)
+    def find_by_state_abbreviation(state)
       org = Organization.where("hbx_profile.us_state_abbreviation": state.to_s.upcase).first
       org.hbx_profile if org.present?
     end
