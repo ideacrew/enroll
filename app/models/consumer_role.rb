@@ -273,6 +273,7 @@ class ConsumerRole
     event :authorize_lawful_presence, :after => [:record_transition, :mark_lp_authorized] do
       transitions from: :verifications_pending, to: :verifications_pending, guard: :residency_pending?
       transitions from: :verifications_pending, to: :fully_verified, guard: :residency_verified?
+      transitions from: :verifications_pending, to: :verifications_outstanding
       transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :residency_denied?
       transitions from: :verifications_outstanding, to: :fully_verified, guard: :residency_verified?
     end
@@ -280,6 +281,7 @@ class ConsumerRole
     event :authorize_residency, :after => [:record_transition, :mark_residency_authorized] do
       transitions from: :verifications_pending, to: :verifications_pending, guard: :lawful_presence_pending?
       transitions from: :verifications_pending, to: :fully_verified, guard: :lawful_presence_verified?
+      transitions from: :verifications_pending, to: :verifications_outstanding
       transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :lawful_presence_outstanding?
       transitions from: :verifications_outstanding, to: :fully_verified, guard: :lawful_presence_authorized?
     end
