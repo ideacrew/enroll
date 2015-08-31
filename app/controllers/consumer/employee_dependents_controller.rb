@@ -115,6 +115,7 @@ private
   def update_vlp_documents(vlp_doc_params)
     return unless vlp_doc_params.present?
     doc_params = vlp_doc_params.permit(:vlp_documents_attributes=>[:subject, :citizenship_number, :naturalization_number, :alien_number])
+    return if doc_params[:vlp_documents_attributes].first.nil?
     dependent_person = @dependent.family_member.person
     document = find_document(dependent_person.consumer_role, doc_params[:vlp_documents_attributes].first.last[:subject])
     document.update_attributes(doc_params[:vlp_documents_attributes].first.last)
