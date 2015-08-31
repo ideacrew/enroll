@@ -71,7 +71,7 @@
 
           <div class='row top-pd'>
             <div class="col-sm-12">
-              <p>If you enroll today, coverage will begin Oct 1. Do you need coverage earlier?  Check <%= link_to "am I eligible for a Special Enrollment Period", "#", :onclick=>"$('#sep_indicator').val('true');$(this).closest('form').submit();" %> to see if you qualify</p>
+              <p>If you enroll today, coverage will begin Oct 1. <!-- Do you need coverage earlier? Check <%#= link_to "am I eligible for a Special Enrollment Period", "#", :onclick=>"$('#sep_indicator').val('true');$(this).closest('form').submit();" %> to see if you qualify --></p>
             </div>
           </div>
 
@@ -94,7 +94,9 @@
         </div>
 
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
-          <% if @change_plan.blank? && @market_kind == "individual" %>
+          <% if @change_plan.blank? && special_enrollment_period? && @market_kind == "individual" %>
+            <%= render  partial: 'shared/sep_progress', locals: {step: '4'} %>
+          <% elsif @change_plan.blank? && @market_kind == "individual" %>
             <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
           <% elsif @change_plan.blank? %>
             <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>

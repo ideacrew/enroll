@@ -457,4 +457,8 @@ module ApplicationHelper
 
     subject_doc || consumer_role.vlp_documents.build({subject:subject})
   end
+  
+  def special_enrollment_period?
+    false
+  end
 end
