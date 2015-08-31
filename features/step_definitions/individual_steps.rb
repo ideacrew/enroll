@@ -66,8 +66,8 @@ end
 Then("Individual should see identity verification page and clicks on submit") do
   @browser.radio(class: /interaction-choice-control-value-agreement-agree/).wait_until_present
   @browser.radio(class: /interaction-choice-control-value-agreement-agree/).click
-  @browser.button(class: /interaction-click-control-continue/).wait_until_present
-  @browser.button(class: /interaction-click-control-continue/).click
+  @browser.a(class: /interaction-click-control-continue/).wait_until_present
+  @browser.a(class: /interaction-click-control-continue/).click
   @browser.radio(class: /interaction-choice-control-value-interactive-verification-questions-attributes-0-response-id-a/).wait_until_present
   @browser.radio(class: /interaction-choice-control-value-interactive-verification-questions-attributes-0-response-id-a/).set
   @browser.radio(class: /interaction-choice-control-value-interactive-verification-questions-attributes-1-response-id-c/).set
