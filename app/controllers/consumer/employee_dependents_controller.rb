@@ -1,4 +1,6 @@
 class Consumer::EmployeeDependentsController < ApplicationController
+  include ApplicationHelper
+
   before_action :set_current_person, :set_family
   def index
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
@@ -30,9 +32,11 @@ class Consumer::EmployeeDependentsController < ApplicationController
 
   def create
 
+    doc_params = params_clean_vlp_documents
     @dependent = Forms::EmployeeDependent.new(params.require(:dependent).permit!)
 
     if @dependent.save
+      update_vlp_documents(doc_params)
       @created = true
       respond_to do |format|
         format.html { render 'show' }
@@ -75,10 +79,12 @@ class Consumer::EmployeeDependentsController < ApplicationController
   end
 
   def update
+    doc_params = params_clean_vlp_documents
     @family = @person.primary_family
     @dependent = Forms::EmployeeDependent.find(params.require(:id))
 
     if @dependent.update_attributes(params.require(:dependent))
+      update_vlp_documents(doc_params)
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }
@@ -93,5 +99,24 @@ class Consumer::EmployeeDependentsController < ApplicationController
 private
   def set_family
     @family = @person.try(:primary_family)
+  end
+
+  def params_clean_vlp_documents
+    return if params[:dependent][:consumer_role].nil? or params[:dependent][:consumer_role][:vlp_documents_attributes].nil?
+    params[:dependent][:consumer_role][:vlp_documents_attributes].reject! do |index, doc|
+      params[:naturalization_doc_type] != doc[:subject]
+    end
+    vlp_doc_params = params[:dependent][:consumer_role]
+    params[:dependent].delete :consumer_role
+    vlp_doc_params
+  end
+
+  def update_vlp_documents(vlp_doc_params)
+    return unless vlp_doc_params.present?
+    doc_params = vlp_doc_params.permit(:vlp_documents_attributes=>[:subject, :citizenship_number, :naturalization_number, :alien_number])
+    dependent_person = @dependent.family_member.person
+    document = find_document(dependent_person.consumer_role, doc_params[:vlp_documents_attributes].first.last[:subject])
+    document.update_attributes(doc_params[:vlp_documents_attributes].first.last)
+    document.save
   end
 end
