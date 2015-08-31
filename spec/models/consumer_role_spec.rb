@@ -119,10 +119,42 @@ describe ConsumerRole, "in the verifications_pending state" do
     end
   end
 
+  describe "with residency denied" do
+    before(:each) do
+      subject.is_state_resident = false
+    end
+    describe "when lawful_presence fails" do
+      let(:mock_lp_denial) { double({ :determined_at => Time.now, :vlp_authority => "ssa" }) }
+      before(:each) do
+        subject.is_state_resident = true
+        subject.deny_lawful_presence(mock_lp_denial)
+      end
+      it "should be in verifications_outstanding" do
+        expect(subject.verifications_outstanding?).to eq true
+      end
+    end
+  end
+
   describe "with lawful_presence authorized" do
     before :each do
       subject.lawful_presence_determination = LawfulPresenceDetermination.new(
         :aasm_state => :verification_successful
+      )
+    end
+    describe "when residency fails" do
+      before(:each) do
+        subject.deny_residency
+      end
+      it "should be in verifications_outstanding" do
+        expect(subject.verifications_outstanding?).to eq true
+      end
+    end
+  end
+
+  describe "with lawful_presence failed" do
+    before :each do
+      subject.lawful_presence_determination = LawfulPresenceDetermination.new(
+        :aasm_state => :verification_outstanding
       )
     end
     describe "when residency fails" do
