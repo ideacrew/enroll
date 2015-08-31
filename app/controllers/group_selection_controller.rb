@@ -9,6 +9,14 @@ class GroupSelectionController < ApplicationController
     else
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
     end
+
+    special_enrollment_period = true
+
+    if params[:change_plan].present? || !special_enrollment_period || params[:return_action] == "find_sep"
+      render 'new'
+    else
+      redirect_to find_sep_insured_families_path
+    end
   end
 
   def create

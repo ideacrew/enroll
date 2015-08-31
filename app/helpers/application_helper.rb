@@ -459,6 +459,6 @@ module ApplicationHelper
   end
   
   def special_enrollment_period?
-    false
+    true
   end
 end
