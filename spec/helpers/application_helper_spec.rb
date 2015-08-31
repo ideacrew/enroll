@@ -101,4 +101,25 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.calculate_participation_minimum).to eq 3
     end
   end
+
+  describe "#find_document" do
+    context "consumer role does not have any vlp_documents" do
+      it "it creates and returns an empty document of given subject" do
+        doc = find_document(ConsumerRole.new, "Certificate of Citizenship")
+        expect(doc).to be_a_kind_of(VlpDocument)
+        expect(doc.subject).to eq("Certificate of Citizenship")
+      end
+    end
+
+    context "consumer role has a vlp_document" do
+      it "it returns the document" do
+        consumer_role = ConsumerRole.new
+        document = consumer_role.vlp_documents.build({subject:"Certificate of Citizenship"})
+        found_document = find_document(consumer_role, "Certificate of Citizenship")
+        expect(found_document).to be_a_kind_of(VlpDocument)
+        expect(found_document).to eq(document)
+        expect(found_document.subject).to eq("Certificate of Citizenship")
+      end
+    end
+  end
 end
