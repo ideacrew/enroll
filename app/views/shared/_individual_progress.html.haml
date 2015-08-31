@@ -33,6 +33,9 @@
 - if step == 1
   %button.btn.btn-lg.btn-primary.btn-br.btn-block.interaction-click-control-continue{type: 'submit'}
     CONTINUE
+- elsif ridp == true && step == 2
+  %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{disabled: true}
+    = link_to "Continue", new_insured_interactive_identity_verification_path
 - elsif defined? url
   = link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
 - elsif step == 4
