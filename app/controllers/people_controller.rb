@@ -217,7 +217,11 @@ class PeopleController < ApplicationController
     # fail
     respond_to do |format|
       if @person.update_attributes(person_params)
-        format.html { redirect_to consumer_employee_path(@person), notice: 'Person was successfully updated.' }
+        if @person.has_active_consumer_role and request.referer.include?("insured/families/personal")
+          format.html { redirect_to personal_insured_families_path, notice: 'Person was successfully updated.' }
+        else
+          format.html { redirect_to consumer_employee_path(@person), notice: 'Person was successfully updated.' }
+        end
         format.json { head :no_content }
       else
         build_nested_models
