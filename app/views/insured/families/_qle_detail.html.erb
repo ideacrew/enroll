@@ -42,7 +42,7 @@
 
               <%= hidden_field_tag 'change_plan' %>
               <%= hidden_field_tag 'qle_id' %>
-              <%= hidden_field_tag 'prev_action_name', action_name %>
+              <%#= hidden_field_tag 'prev_action_name', action_name %>
               <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || "None" %>
 
               <% if action_name == 'find_sep' %>
