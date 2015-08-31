@@ -111,16 +111,6 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
 
-    if params[:qle_id].present?
-      qle = QualifyingLifeEventKind.find(params[:qle_id])
-      family = @person.primary_family
-      special_enrollment_period = family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
-      special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
-      special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
-      special_enrollment_period.qualifying_life_event_kind = qle
-      special_enrollment_period.save
-    end
-
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
 
     @carriers = @carrier_names_map.values
@@ -133,6 +123,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @plans = @plans.sort_by(&:total_employee_cost)
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(plan_ids: @plans.map(&:id))
+    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
   end
 
   private
