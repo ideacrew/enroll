@@ -117,6 +117,22 @@ describe ConsumerRole, "in the verifications_pending state" do
         expect(subject.verifications_outstanding?).to eq true
       end
     end
+
+    describe "instructed to start the eligibility process" do
+      let(:person) { Person.new }
+      let(:requested_start_date) { double }
+
+      before(:each) do
+        subject.person = person
+      end
+
+      it "should trigger lawful presence determination only " do
+        expect(subject.lawful_presence_determination).to receive(:start_determination_process).with(requested_start_date)
+        expect(subject).not_to receive(:notify).with(ConsumerRole::RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME, {:person => person})
+        subject.start_individual_market_eligibility!(requested_start_date)
+      end
+    end
+
   end
 
   describe "with residency denied" do
@@ -149,6 +165,21 @@ describe ConsumerRole, "in the verifications_pending state" do
         expect(subject.verifications_outstanding?).to eq true
       end
     end
+
+    describe "instructed to start the eligibility process" do
+      let(:person) { Person.new }
+      let(:requested_start_date) { double }
+
+      before(:each) do
+        subject.person = person
+      end
+
+      it "should trigger local residency determination only " do
+        expect(subject.lawful_presence_determination).not_to receive(:start_determination_process).with(requested_start_date)
+        expect(subject).to receive(:notify).with(ConsumerRole::RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME, {:person => person})
+        subject.start_individual_market_eligibility!(requested_start_date)
+      end
+    end
   end
 
   describe "with lawful_presence failed" do
@@ -168,6 +199,21 @@ describe ConsumerRole, "in the verifications_pending state" do
   end
 
   describe "with residency and lawful_presence pending" do
+    describe "instructed to start the eligibility process" do
+      let(:person) { Person.new }
+      let(:requested_start_date) { double }
+
+      before(:each) do
+        subject.person = person
+      end
+
+      it "should trigger both eligibility processes when individual eligibility is triggered" do
+        expect(subject.lawful_presence_determination).to receive(:start_determination_process).with(requested_start_date)
+        expect(subject).to receive(:notify).with(ConsumerRole::RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME, {:person => person})
+        subject.start_individual_market_eligibility!(requested_start_date) 
+      end
+    end
+
     describe "which fails residency" do
       before(:each) do
         subject.deny_residency
