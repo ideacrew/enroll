@@ -12,7 +12,7 @@
           <div class="table-responsive table-border">
             <table class="table table-wrapper table-condensed group-selection-tbl">
               <tbody>
-                <% offered_relationship_benefits = @employee_role.present? ? @employee_role.benefit_group.relationship_benefits.select(&:offered).map(&:relationship) : nil 
+                <% offered_relationship_benefits = @employee_role.present? ? @employee_role.benefit_group.relationship_benefits.select(&:offered).map(&:relationship) : nil
                 %>
                 <% @coverage_household.family_members.each_with_index do |family_member, index| %>
                   <tr class="<%='ineligible_row' if family_member.person.ineligible_ivl%>">
@@ -80,7 +80,7 @@
             <% if @hbx_enrollment.present? and @hbx_enrollment.try(:coverage_selected?) %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-lg btn-primary' %>
               &nbsp;
-              <%= submit_tag 'Terminate Plan', class: 'btn btn-lg btn-primary' %>
+              <%= link_to 'Select Plan to Terminate', group_selection_terminate_selection_path(person_id: @person.id, change_plan: @change_plan), class: 'btn btn-lg btn-primary' %>
             <% end %>
             <% if @employee_role.try(:benefit_group).try(:plan_option_kind) != "single_plan" %>
               &nbsp;

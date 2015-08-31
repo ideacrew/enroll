@@ -68,6 +68,29 @@ class GroupSelectionController < ApplicationController
     return redirect_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind)
   end
 
+  def terminate_selection
+    initialize_common_vars
+    @hbx_enrollments = @family.enrolled_hbx_enrollments.select{|pol| pol.may_terminate_coverage? } || []
+  end
+
+  def terminate_confirm
+    @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+  end
+
+  def terminate
+    term_date = Date.strptime(params.require(:term_date),"%m/%d/%Y")
+    hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+
+    if hbx_enrollment.may_terminate_coverage?
+      hbx_enrollment.update_current(aasm_state: "coverage_terminated", terminated_on: term_date)
+      hbx_enrollment.propogate_terminate(term_date)
+
+      redirect_to family_account_path
+    else
+      redirect_to :back
+    end
+  end
+
   private
 
   def initialize_common_vars

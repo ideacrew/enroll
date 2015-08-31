@@ -110,10 +110,10 @@ class HbxEnrollment
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
 
-  def propogate_terminate
-    self.terminated_on = TimeKeeper.date_of_record.end_of_month
+  def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
+    self.terminated_on = term_date
     if benefit_group_assignment
-      benefit_group_assignment.end_benefit(TimeKeeper.date_of_record.end_of_month)
+      benefit_group_assignment.end_benefit(term_date)
       benefit_group_assignment.save
     end
   end
