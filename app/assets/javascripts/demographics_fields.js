@@ -68,14 +68,18 @@ function applyListeners() {
         }
     });
 
-    $('#dependent_indian_tribe_member').change(function () {
-        if ($(this).is(':checked')) {
+    $('#dependent_indian_tribe_member').change(function(){
+        show_or_hide_tribal_id();
+    });
+    show_or_hide_tribal_id();
+    function show_or_hide_tribal_id(){
+        if($("#dependent_indian_tribe_member").is(':checked')) {
             $('#tribal_container').show();
         }
-        else {
+        else{
             $('#tribal_container').hide();
         }
-    });
+    }
 }
 
 
