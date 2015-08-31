@@ -294,9 +294,9 @@ class ConsumerRole
     end
   end
 
-  def start_individual_market_eligibility!
+  def start_individual_market_eligibility!(requested_start_date)
     if lawful_presence_pending?
-      lawful_presence_determination.start_determination_process
+      lawful_presence_determination.start_determination_process(requested_start_date)
     end
     if residency_pending?
       start_residency_verification_process
