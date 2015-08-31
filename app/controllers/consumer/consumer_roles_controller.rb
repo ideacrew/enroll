@@ -115,14 +115,14 @@ class Consumer::ConsumerRolesController < ApplicationController
   end
 
   def params_clean_vlp_documents
-    return if params[:person][:consumer_role_attributes].nil? or params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil?
+    return if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil?
     params[:person][:consumer_role_attributes][:vlp_documents_attributes].reject! do |index, doc|
       params[:naturalization_doc_type] != doc[:subject]
     end
   end
 
   def update_vlp_documents
-    return if params[:person][:consumer_role_attributes].nil? or params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil?
+    return if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].first.nil?
     doc_params = params.require(:person).permit({:consumer_role_attributes =>
                                                      [:vlp_documents_attributes=>
                                                           [:subject, :citizenship_number, :naturalization_number, :alien_number]]})
