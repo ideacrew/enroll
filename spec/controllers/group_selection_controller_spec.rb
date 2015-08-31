@@ -130,14 +130,14 @@ RSpec.describe GroupSelectionController, :type => :controller do
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to eq 'You must select the primary applicant to enroll in the healthcare plan'
-      expect(response).to redirect_to(group_selection_new_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop'))
+      expect(response).to redirect_to(group_selection_new_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', return_action: 'group_create'))
     end
 
     it "should render group selection page if without family_member_ids" do
       post :create, person_id: person.id, employee_role_id: employee_role.id
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to eq 'You must select at least one applicant to enroll in the healthcare plan'
-      expect(response).to redirect_to(group_selection_new_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop'))
+      expect(response).to redirect_to(group_selection_new_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', return_action: 'group_create'))
     end
   end
 end
