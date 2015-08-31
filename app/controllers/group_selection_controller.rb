@@ -88,7 +88,6 @@ class GroupSelectionController < ApplicationController
     if hbx_enrollment.may_terminate_coverage?
       hbx_enrollment.update_current(aasm_state: "coverage_terminated", terminated_on: term_date)
       hbx_enrollment.propogate_terminate(term_date)
-
       redirect_to family_account_path
     else
       redirect_to :back
