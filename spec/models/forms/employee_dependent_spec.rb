@@ -13,6 +13,13 @@ describe Forms::EmployeeDependent do
     expect(subject).to have_errors_on(:relationship)
   end
 
+  it "should require tribal_id when citizen_status=indian_tribe_member" do
+    subject.citizen_status = "indian_tribe_member"
+    subject.valid?
+    expect(subject).to have_errors_on(:tribal_id)
+    expect(subject.errors[:tribal_id]).to eq ["is required when native american / alaskan native is selected"]
+  end
+
   it "should require a gender" do
     expect(subject).to have_errors_on(:gender)
   end
@@ -56,9 +63,10 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
       :gender => "male",
       :dob => dob,
       :race => "race",
-      :ethnicity => "ethnicity",
+      :ethnicity => ["ethnicity"],
       :language_code => "english",
-      :is_incarcerated => "no"
+      :is_incarcerated => "no",
+      :tribal_id => "test"
     }
   }
 
@@ -141,9 +149,10 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
       :gender => "male",
       :dob => Date.strptime(dob, "%Y-%m-%d"),
       :race => "race",
-      :ethnicity => "ethnicity",
+      :ethnicity => ["ethnicity"],
       :language_code => "english",
-      :is_incarcerated => "no"
+      :is_incarcerated => "no",
+      tribal_id: "test"
     }
   }
   let(:person) { double(:errors => double(:has_key? => false)) }

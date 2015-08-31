@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "insured/families/_qles.html.erb" do
   before :each do
+    QualifyingLifeEventKind.delete_all
     10.times.each {FactoryGirl.create(:qualifying_life_event_kind)}
     assign(:qualifying_life_events, QualifyingLifeEventKind.all)
     render "insured/families/qles"

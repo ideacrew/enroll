@@ -16,11 +16,18 @@ module Forms
     validates_presence_of :last_name, :allow_blank => nil
     validates_presence_of :gender, :allow_blank => nil
     validates_presence_of :family_id, :allow_blank => nil
+    validate :tribal_id_presence
     validates_presence_of :dob
     validates_inclusion_of :relationship, :in => ::PersonRelationship::Relationships, :allow_blank => nil
     validate :relationship_validation
 
     attr_reader :dob
+
+    def tribal_id_presence
+      if !tribal_id.present? && @citizen_status.present? && @citizen_status == "indian_tribe_member"
+        self.errors.add(:tribal_id, "is required when native american / alaskan native is selected")
+      end
+    end
 
     def dob=(val)
       @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
@@ -80,7 +87,8 @@ module Forms
         :ethnicity => ethnicity,
         :language_code => language_code,
         :is_incarcerated => is_incarcerated,
-        :citizen_status => @citizen_status
+        :citizen_status => @citizen_status,
+        :tribal_id => tribal_id
       }
     end
 
@@ -116,7 +124,8 @@ module Forms
         :ethnicity => found_family_member.ethnicity,
         :language_code => found_family_member.language_code,
         :is_incarcerated => found_family_member.is_incarcerated,
-        :citizen_status => found_family_member.citizen_status
+        :citizen_status => found_family_member.citizen_status,
+        :tribal_id => found_family_member.tribal_id
       })
     end
 

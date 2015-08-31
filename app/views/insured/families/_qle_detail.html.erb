@@ -23,6 +23,7 @@
             <div class='qle-form'>
               <h3 class="qle-details-title">I got married</h3>
               <h5 class='qle-label'>Enter the date of the event.</h5>
+              <h5 class="qle-date-hint">(must fall between July 1st and August 30th)</h5>
               <div class="form-inline">
                 <div class="form-group">
                   <%= text_field_tag 'qle_date', '', :'data-date-max'=> "+30d", :'data-date-min'=> "-30d", placeholder: "mm/dd/yyyy",

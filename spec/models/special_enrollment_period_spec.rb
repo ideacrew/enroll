@@ -51,12 +51,22 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
             expect(sep.effective_on).to eq (TimeKeeper.date_of_record.end_of_month + 1.day)
           end
 
-          it "when current_date < qle on" do
-            sep.effective_on_kind = "first_of_next_month"
-            sep.qualifying_life_event_kind = qle
-            allow(qle).to receive(:is_moved_to_dc?).and_return true
-            sep.qle_on = TimeKeeper.date_of_record + 40.days
-            expect(sep.effective_on).to eq ((TimeKeeper.date_of_record+40.days).end_of_month + 1.day)
+          context "when current_date < qle on" do
+            it "qle on is not beginning_of_month" do
+              sep.effective_on_kind = "first_of_next_month"
+              sep.qualifying_life_event_kind = qle
+              allow(qle).to receive(:is_moved_to_dc?).and_return true
+              sep.qle_on = TimeKeeper.date_of_record.end_of_month + 2.days
+              expect(sep.effective_on).to eq ((TimeKeeper.date_of_record.end_of_month+2.days).end_of_month + 1.day)
+            end
+
+            it "qle on is beginning_of_month" do
+              sep.effective_on_kind = "first_of_next_month"
+              sep.qualifying_life_event_kind = qle
+              allow(qle).to receive(:is_moved_to_dc?).and_return true
+              sep.qle_on = TimeKeeper.date_of_record.end_of_month + 1.days
+              expect(sep.effective_on).to eq (TimeKeeper.date_of_record.end_of_month+1.days)
+            end
           end
         end
 

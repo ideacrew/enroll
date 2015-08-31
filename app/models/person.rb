@@ -33,6 +33,7 @@ class Person
   field :is_disabled, type: Boolean
   field :ethnicity, type: Array
   field :race, type: String
+  field :tribal_id, type: String
 
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
@@ -410,7 +411,7 @@ class Person
   # TODO: Move this out of here
   attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
-  attr_accessor :tribal_id, :is_consumer_role
+  attr_accessor :is_consumer_role
 
   before_save :assign_citizen_status_from_consumer_role
 
