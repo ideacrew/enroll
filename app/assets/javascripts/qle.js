@@ -2,11 +2,12 @@ $(function () {
   $(document).on('click', 'a.qle-menu-item', function() {
     $('#qle_flow_info #qle-menu').hide();
     $('.qle-details-title').html($(this).data('title'));
-    $('.qle-label').html($(this).data('label'))
+    $('.qle-label').html($(this).data('label'));
+    $('.qle-date-hint').html($(this).data('date-hint'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
-    var pre_event_sep_in_days = '-'+$(this).data('pre-event-sep-in-days')+'d';
-    var post_event_sep_in_days = '+'+$(this).data('post-event-sep-in-days')+'d';
+    var pre_event_sep_in_days = '+'+$(this).data('pre-event-sep-in-days')+'d';
+    var post_event_sep_in_days = '-'+$(this).data('post-event-sep-in-days')+'d';
 
     init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days);
     $('#qle-details').removeClass('hidden');
@@ -64,8 +65,8 @@ $(function () {
 
   function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days) {
     var target = $('.qle-date-picker');
-    var dateMax = post_event_sep_in_days;
-    var dateMin = pre_event_sep_in_days;
+    var dateMin = post_event_sep_in_days;
+    var dateMax = pre_event_sep_in_days;
     var cur_qle_title = $('.qle-details-title').html();
 
     $(target).val('');

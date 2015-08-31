@@ -5,7 +5,7 @@ RSpec.describe ConsumerProfilesController do
   let(:family) { double }
   let(:person) { double(:employee_roles => []) }
   let(:employee_role_id) { "2343" }
-  let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 0, post_event_sep_in_days: 30) }
+  let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
 
   describe "GET check_qle_date" do
 
