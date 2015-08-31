@@ -4,7 +4,7 @@ module Forms
     include ActiveModel::Validations
 
     attr_accessor :id, :family_id, :is_consumer_role, :vlp_document_id
-    attr_accessor :gender, :relationship
+    attr_accessor :gender, :relationship, :tribal_id
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -16,11 +16,18 @@ module Forms
     validates_presence_of :last_name, :allow_blank => nil
     validates_presence_of :gender, :allow_blank => nil
     validates_presence_of :family_id, :allow_blank => nil
+    validate :tribal_id_presence
     validates_presence_of :dob
     validates_inclusion_of :relationship, :in => ::PersonRelationship::Relationships, :allow_blank => nil
     validate :relationship_validation
 
     attr_reader :dob
+
+    def tribal_id_presence
+      if !tribal_id.present? && @citizen_status.present? && @citizen_status == "indian_tribe_member"
+        self.errors.add(:tribal_id, "is required when native american / alaskan native is selected")
+      end
+    end
 
     def dob=(val)
       @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
