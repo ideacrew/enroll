@@ -112,21 +112,18 @@ class Consumer::ConsumerRolesController < ApplicationController
   end
 
   def params_clean_vlp_documents
-    return if params[:person][:consumer_role_attributes].empty? or params[:person][:consumer_role_attributes][:vlp_documents_attributes].empty?
+    return if params[:person][:consumer_role_attributes].nil? or params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil?
     params[:person][:consumer_role_attributes][:vlp_documents_attributes].reject! do |index, doc|
       params[:naturalization_doc_type] != doc[:subject]
     end
   end
 
   def update_vlp_documents
-    return if params[:person][:consumer_role_attributes].empty? or params[:person][:consumer_role_attributes][:vlp_documents_attributes].empty?
-
+    return if params[:person][:consumer_role_attributes].nil? or params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil?
     doc_params = params.require(:person).permit({:consumer_role_attributes =>
                                                      [:vlp_documents_attributes=>
                                                           [:subject, :citizenship_number, :naturalization_number, :alien_number]]})
-
-    debugger
-    document = find_document(@consumer_role, doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject]);
+    document = find_document(@consumer_role, doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject])
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
     document.save
   end
