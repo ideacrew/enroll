@@ -63,9 +63,10 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
       :gender => "male",
       :dob => dob,
       :race => "race",
-      :ethnicity => "ethnicity",
+      :ethnicity => ["ethnicity"],
       :language_code => "english",
-      :is_incarcerated => "no"
+      :is_incarcerated => "no",
+      :tribal_id => "test"
     }
   }
 
@@ -148,9 +149,10 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
       :gender => "male",
       :dob => Date.strptime(dob, "%Y-%m-%d"),
       :race => "race",
-      :ethnicity => "ethnicity",
+      :ethnicity => ["ethnicity"],
       :language_code => "english",
-      :is_incarcerated => "no"
+      :is_incarcerated => "no",
+      tribal_id: "test"
     }
   }
   let(:person) { double(:errors => double(:has_key? => false)) }

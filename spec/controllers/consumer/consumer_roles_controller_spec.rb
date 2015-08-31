@@ -134,7 +134,7 @@ RSpec.describe Consumer::ConsumerRolesController, :type => :controller do
       allow(person).to receive(:update_attributes).and_return(true)
       put :update, person: person_params, id: "test"
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(new_insured_interactive_identity_verification_path)
+      expect(response).to redirect_to(ridp_agreement_consumer_consumer_role_index_path)
     end
 
     it "should not update the person" do
