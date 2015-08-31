@@ -79,6 +79,7 @@ Rails.application.routes.draw do
         get 'inbox'
         get 'documents_index'
         get 'document_upload'
+        get 'find_sep'
       end
 
       resources :people do
