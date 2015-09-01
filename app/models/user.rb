@@ -45,6 +45,8 @@ class User
   # Oracle Identity Manager ID
   field :oim_id, type: String, default: ""
 
+  field :last_portal_visited, type: String
+
   index({preferred_language: 1})
   index({approved: 1})
   index({roles: 1},  {sparse: true}) # MongoDB multikey index
@@ -145,6 +147,10 @@ class User
 
   def has_broker_agency_staff_role?
     has_role?(:broker_agency_staff)
+  end
+
+  def has_insured_role?
+    has_employee_role? || has_consumer_role?
   end
 
   def has_broker_role?
