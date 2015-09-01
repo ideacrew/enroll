@@ -450,8 +450,7 @@ module ApplicationHelper
     }
   end
 
-
-  def special_enrollment_period?
+  def is_sep_eligible?
     false
   end
   
