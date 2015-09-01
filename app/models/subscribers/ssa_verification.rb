@@ -43,7 +43,6 @@ module Subscribers
              :message => e.message,
              :backtrace => e.backtrace
           })})
-        raise e
       end
     end
 
