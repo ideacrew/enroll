@@ -1,0 +1,50 @@
+<div id="personal_info" class="focus_effect">
+  <%= hidden_field "people","id" %>
+
+  <div class="row row-form-wrapper no-buffer">
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :first_name, class: "required floatlabel form-control", required: true, placeholder: 'FIRST NAME *' %>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'MIDDLE NAME' %>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :last_name, class: "required floatlabel form-control", required: true, placeholder: 'LAST NAME *' %>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= f.text_field :name_sfx, class: "floatlabel form-control", placeholder: 'SUFFIX' %>
+    </div>
+  </div>
+
+  <div class="row row-form-wrapper no-buffer">
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+      <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "BIRTHDATE *",
+                                                 :'data-date-min' => "-110y", :'data-date-max' => "+0",
+                                                 required: true, readonly: f.object.is_a?(Forms::EmployeeRole) } %>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-7 form-group form-group-lg no-pd">
+      <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", readonly: f.object.is_a?(Forms::EmployeeRole) %>
+    </div>
+
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
+      <%= f.check_box :no_ssn %> 
+      <%= f.label :no_ssn, :value => true do %>
+        <span class='no_ssn'>&nbsp;NO SSN</span>
+      <% end %>
+      <span><i class='fa fa-question-circle'></i></span>
+    </div>
+
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd border_bottom_zero">
+      <div class="radio">
+        <%= f.radio_button :gender, "male", class: "required floatlabel", id: 'radio_male', required: true %>
+        <label for="radio_male"><span>MALE</span></label>
+      </div>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio">
+        <%= f.radio_button :gender, "female", class: "required floatlabel", id: 'radio_female', required: true %>
+        <label for="radio_female"><span>FEMALE</span></label>
+      </div>
+    </div>
+  </div>
+</div>

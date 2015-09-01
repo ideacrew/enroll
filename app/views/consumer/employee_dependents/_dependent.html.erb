@@ -63,7 +63,7 @@
         <div class="col-md-6 col-sm-6 no-pd">
           <div class="form-group form-group-lg">
             <label class="static_label label-floatlabel">RACE/ETHNICITY</label>
-            <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.ethnicity.reject!(&:empty?).join(", ")  if dependent.ethnicity.present? %></span>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= parse_ethnicity(dependent.try(:ethnicity)) %></span>
           </div>
         </div>
         <div class="col-md-3 col-sm-3 no-pd">

@@ -65,9 +65,9 @@
         <% if @change_plan.present? %>
           <%= render partial: 'shared/qle_progress', locals: {step: '1'} %>
         <% elsif @consumer_role.present? %>
-          <%= render  partial: 'shared/individual_progress', locals: {step: '3', url: group_selection_url} %>
+          <%= render  partial: 'shared/individual_progress', locals: {step: '3', url: (is_sep_eligible? ? find_sep_insured_families_path : group_selection_url)} %>
         <% else %>
-          <%= render  partial: 'shared/signup_progress', locals: {step: '4', url: group_selection_url} %>
+          <%= render  partial: 'shared/signup_progress', locals: {step: '4', url: (is_sep_eligible? ? find_sep_insured_families_path : group_selection_url)} %>
         <% end %>
       </div>
 

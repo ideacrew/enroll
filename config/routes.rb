@@ -80,6 +80,7 @@ Rails.application.routes.draw do
         get 'documents_index'
         get 'document_upload'
         get 'find_sep'
+        post 'record_sep'
       end
 
       resources :people do

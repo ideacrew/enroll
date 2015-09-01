@@ -2,14 +2,14 @@
 - no_purchase = (defined? no_purchase) ? no_purchase : false
 
 - percent_complete = 0
-- percent_complete = (step == 1) ? 25 : ((step == 2) ? 50 : ((step == 3) ? 75 : ((step == 4) ? 100: 0)))
+- percent_complete = (step == 1) ? 33 : ((step == 2) ? 66 : ((step == 3) ? 100 : 0))
 
 %h3= "#{percent_complete}% Complete"
 %ul.list-unstyled.progress-wrapper.hidden-xs
   %li{class: add_progress_class(1, step)}
     %span.circle-progress
     .vertical-line-progress
-    Household
+    Special Enrollment Period
   %li{class: add_progress_class(2, step)}
     %span.circle-progress
     .vertical-line-progress
@@ -24,11 +24,11 @@
     Complete
 
 - if step == 3 and !no_purchase
-  = link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, change_plan: @change_plan, coverage_kind: @coverage_kind, market_kind: @market_kind), :class => 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue', :method => :post
+  = link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue', :method => :post
   %ul.list-unstyled.list-right-section
     %li
       %a.back{href: '#'}
         = image_tag 'icons/list.png'
         PREVIOUS
 - elsif step == 4
-  = link_to 'GO TO MY ACCOUNT', family_account_path, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
+  = link_to 'Continue', family_account_path, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'

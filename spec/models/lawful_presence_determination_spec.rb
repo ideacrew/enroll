@@ -28,3 +28,25 @@ describe LawfulPresenceDetermination do
   end
 end
 
+describe LawfulPresenceDetermination do
+  let(:person) { Person.new }
+  let(:requested_start_date) { double }
+  describe "given a citizen status of us_citizen" do
+    subject { LawfulPresenceDetermination.new(citizen_status: "us_citizen", :consumer_role => ConsumerRole.new(:person => person)) }
+
+    it "should invoke the ssa workflow event when asked to begin the lawful presence process" do
+      expect(subject).to receive(:notify).with(LawfulPresenceDetermination::SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => person})
+      subject.start_determination_process(requested_start_date)   
+    end
+  end
+
+  describe "given a citizen status of naturalized_citizen" do
+    subject { LawfulPresenceDetermination.new(citizen_status: "naturalized_citizen", :consumer_role => ConsumerRole.new(:person => person)) }
+    it "should invoke the vlp workflow event when asked to begin the lawful presence process" do
+      expect(subject).to receive(:notify).with(LawfulPresenceDetermination::VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => person, :coverage_start_date => requested_start_date})
+      subject.start_determination_process(requested_start_date)
+    end
+  end
+
+end
+

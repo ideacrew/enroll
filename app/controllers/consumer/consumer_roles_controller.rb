@@ -1,10 +1,11 @@
 class Consumer::ConsumerRolesController < ApplicationController
   include ApplicationHelper
+  before_action :check_consumer_role, only: [:search]
 
   before_action :find_consumer_role_and_person, only: [:edit, :update]
 
   def search
-    @person = Forms::EmployeeCandidate.new
+    @person = Forms::ConsumerCandidate.new
     respond_to do |format|
       format.html
     end
@@ -12,11 +13,11 @@ class Consumer::ConsumerRolesController < ApplicationController
 
   def match
     @person_params = params.require(:person).merge({user_id: current_user.id})
-    @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
-    @person = @employee_candidate
+    @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
+    @person = @consumer_candidate
     respond_to do |format|
-      if @employee_candidate.valid?
-        found_person = @employee_candidate.match_person
+      if @consumer_candidate.valid?
+        found_person = @consumer_candidate.match_person
         if found_person.present?
           format.html { render 'match' }
         else
@@ -70,6 +71,7 @@ class Consumer::ConsumerRolesController < ApplicationController
 
   def person_parameters_list
     [
+<<<<<<< HEAD
         {:addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
         {:phones_attributes => [:kind, :full_phone_number]},
         {:emails_attributes => [:kind, :address]},
@@ -92,6 +94,31 @@ class Consumer::ConsumerRolesController < ApplicationController
         :eligible_immigration_status,
         :indian_tribe_member,
         :tribal_id
+=======
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
+      { :phones_attributes => [:kind, :full_phone_number] },
+      { :emails_attributes => [:kind, :address] },
+      :first_name,
+      :last_name,
+      :middle_name,
+      :name_pfx,
+      :name_sfx,
+      :dob,
+      :ssn,
+      :no_ssn,
+      :gender,
+      :language_code,
+      :is_incarcerated,
+      :is_disabled,
+      :race,
+      :is_consumer_role,
+      :ethnicity,
+      :us_citizen,
+      :naturalized_citizen,
+      :eligible_immigration_status,
+      :indian_tribe_member,
+      :tribal_id
+>>>>>>> c05b5be4e1d50517df8d3bd2a63f22d4a893e8e3
     ]
   end
 
@@ -136,5 +163,11 @@ class Consumer::ConsumerRolesController < ApplicationController
     document = find_document(@consumer_role, doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject])
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
     document.save
+  end
+
+  def check_consumer_role
+    if current_user.has_consumer_role?
+      redirect_to family_account_path
+    end
   end
 end
