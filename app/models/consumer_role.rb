@@ -74,7 +74,7 @@ class ConsumerRole
   accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents
 
   validates_presence_of :dob, :gender, :is_applicant
-  validate :ssn_or_no_ssn
+  #validate :ssn_or_no_ssn
 
   validates :vlp_authority,
     allow_blank: true,

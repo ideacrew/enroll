@@ -83,13 +83,13 @@ describe ConsumerRole, dbclean: :after_each do
       end
     end
 
-    context "with invalid arguments  no ssn" do
-      let(:consumer_role) { saved_person_no_ssn_invalid.build_consumer_role(valid_params) }
+    #context "with invalid arguments  no ssn" do
+    #  let(:consumer_role) { saved_person_no_ssn_invalid.build_consumer_role(valid_params) }
 
-      it "should not save" do
-        expect(consumer_role.save).to be_falsey
-      end
-    end
+    #  it "should not save" do
+    #    expect(consumer_role.save).to be_falsey
+    #  end
+    #end
 
     # context "with no is_incarcerated" do
     #   let(:params) {valid_params.except(:is_incarcerated)}
