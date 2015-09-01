@@ -40,7 +40,7 @@ class Insured::FamiliesController < FamiliesController
       special_enrollment_period.save
     end
 
-    redirect_to group_selection_new_path(return_action: 'find_sep', person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id))
+    redirect_to group_selection_new_path(person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id))
   end
 
   def personal
