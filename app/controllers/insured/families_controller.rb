@@ -74,8 +74,10 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_insured_role
-    return true if current_user.has_employee_role? || current_user.has_consumer_role?
-    flash[:error] = "You are not authorized to visit this portal."
-    redirect_to root_path and return
+    if session[:portal].include?("insured/families")
+      return true if current_user.has_employee_role? || current_user.has_consumer_role?
+      flash[:error] = "You are not authorized to visit this portal."
+      redirect_to root_path and return
+    end
   end
 end
