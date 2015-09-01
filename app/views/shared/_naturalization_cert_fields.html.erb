@@ -1,4 +1,3 @@
-<div id="naturalization_cert_container" style="display: none">
   <% document = find_document(c.object, "Naturalization Certificate") %>
   <%= c.fields_for 'vlp_documents', document do |v| %>
       <%= v.hidden_field :subject %>
@@ -10,4 +9,3 @@
         <%= v.text_field :alien_number, :placeholder => "Alien Number" %>
       </div>
   <% end %>
-</div>
