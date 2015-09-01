@@ -461,4 +461,10 @@ module ApplicationHelper
 
     subject_doc || consumer_role.vlp_documents.build({subject:subject})
   end
+
+  def parse_ethnicity(value)
+    return "" unless value.present?
+    value = value.select{|a| a.present? }  if value.present?
+    value.present? ? value.join(", ") : ""
+  end
 end
