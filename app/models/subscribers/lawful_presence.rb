@@ -13,12 +13,22 @@ module Subscribers
       stringed_key_payload = payload.stringify_keys
       xml = stringed_key_payload['body']
       person_hbx_id = stringed_key_payload['individual_id']
+      return_status = stringed_key_payload["return_status"].to_s
 
       person = find_person(person_hbx_id)
       return if person.nil? || person.consumer_role.nil?
 
       consumer_role = person.consumer_role
       consumer_role.lawful_presence_determination.vlp_responses << EventResponse.new({received_at: Time.now, body: xml})
+      if "503" == return_status.to_s
+        args = OpenStruct.new
+        args.determined_at = Time.now
+        args.vlp_authority = 'vlp'
+        consumer_role.deny_lawful_presence!(args)
+        consumer_role.save      
+        return                          
+      end 
+
       xml_hash = xml_to_hash(xml)
 
       update_consumer_role(consumer_role, xml_hash)
@@ -37,10 +47,10 @@ module Subscribers
         args.citizen_status = get_citizen_status(xml_hash[:lawful_presence_determination][:legal_status])
         consumer_role.authorize_lawful_presence!(args)
       elsif xml_hash[:lawful_presence_determination].present? && xml_hash[:lawful_presence_determination][:response_code].eql?("not_lawfully_present")
-      args.determined_at = Time.now
-      args.vlp_authority = 'vlp'
-      args.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
-      consumer_role.deny_lawful_presence!(args)
+        args.determined_at = Time.now
+        args.vlp_authority = 'vlp'
+        args.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
+        consumer_role.deny_lawful_presence!(args)
       end
 
       consumer_role.save
