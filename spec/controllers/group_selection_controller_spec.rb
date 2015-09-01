@@ -35,6 +35,49 @@ RSpec.describe GroupSelectionController, :type => :controller do
     end
   end
 
+  context "GET terminate_selection" do
+    it "return http success and render" do
+      sign_in
+      get :terminate_selection, person_id: person.id
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:terminate_selection)
+    end
+  end
+
+  context "GET terminate_confirm" do
+    it "return http success and render" do
+      sign_in
+      allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
+      get :terminate_confirm, person_id: person.id, hbx_enrollment_id: hbx_enrollment.id
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:terminate_confirm)
+    end
+  end
+
+  context "POST terminate" do
+
+    before do
+      sign_in
+      request.env["HTTP_REFERER"] = group_selection_terminate_confirm_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id)
+      allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
+    end
+
+    it "should redirect to family home if termination is possible" do
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
+      allow(hbx_enrollment).to receive(:update_current)
+      expect(hbx_enrollment).to receive(:propogate_terminate).with(Date.today)
+      post :terminate, term_date: Date.today, hbx_enrollment_id: hbx_enrollment.id
+      expect(response).to redirect_to(family_account_path)
+    end
+
+    it "should redirect back if hbx enrollment can't be terminated" do
+      post :terminate, term_date: Date.today, hbx_enrollment_id: hbx_enrollment.id
+      expect(hbx_enrollment.may_terminate_coverage?).to be_falsey
+      expect(response).to redirect_to(group_selection_terminate_confirm_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id))
+    end
+
+  end
+
   context "POST CREATE" do
     let(:family_member_ids) {{"0"=>"559366ca63686947784d8f01", "1"=>"559366ca63686947784e8f01", "2"=>"559366ca63686947784f8f01", "3"=>"559366ca6368694778508f01"}}
     let(:benefit_group) {FactoryGirl.create(:benefit_group)}
@@ -63,7 +106,7 @@ RSpec.describe GroupSelectionController, :type => :controller do
 
     it "with change_plan" do
       user = FactoryGirl.create(:user, id: 98, person: FactoryGirl.create(:person))
-      sign_in user 
+      sign_in user
       allow(hbx_enrollment).to receive(:save).and_return(true)
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, change_plan: 'change'
       expect(response).to have_http_status(:redirect)
@@ -72,7 +115,7 @@ RSpec.describe GroupSelectionController, :type => :controller do
 
     it "when keep_existing_plan" do
       user = FactoryGirl.create(:user, id: 97, person: FactoryGirl.create(:person))
-      sign_in user 
+      sign_in user
       allow(hbx_enrollment).to receive(:save).and_return(true)
       allow(hbx_enrollment).to receive(:plan=).and_return(true)
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change'
@@ -82,19 +125,19 @@ RSpec.describe GroupSelectionController, :type => :controller do
 
     it "should render group selection page if not valid" do
       user = FactoryGirl.create(:user, id: 96, person: FactoryGirl.create(:person))
-      sign_in user 
+      sign_in user
       allow(person).to receive(:employee_roles).and_return([employee_role])
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to eq 'You must select the primary applicant to enroll in the healthcare plan'
-      expect(response).to redirect_to(group_selection_new_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop'))
+      expect(response).to redirect_to(group_selection_new_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', return_action: 'group_create'))
     end
 
     it "should render group selection page if without family_member_ids" do
       post :create, person_id: person.id, employee_role_id: employee_role.id
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to eq 'You must select at least one applicant to enroll in the healthcare plan'
-      expect(response).to redirect_to(group_selection_new_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop'))
+      expect(response).to redirect_to(group_selection_new_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', return_action: 'group_create'))
     end
   end
 end

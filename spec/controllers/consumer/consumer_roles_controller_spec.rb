@@ -27,6 +27,7 @@ RSpec.describe Consumer::ConsumerRolesController, :type => :controller do
     before(:each) do
       sign_in user
       allow(Forms::EmployeeCandidate).to receive(:new).and_return(mock_employee_candidate)
+      allow(user).to receive(:has_consumer_role?).and_return(false)
     end
 
     it "should render search template" do

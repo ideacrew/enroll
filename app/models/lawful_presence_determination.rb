@@ -8,7 +8,7 @@ class LawfulPresenceDetermination
   include Acapi::Notifiers
 
   embedded_in :consumer_role
-  embeds_many :ssa_verifcation_responses, class_name:"EventResponse"
+  embeds_many :ssa_responses, class_name:"EventResponse"
   embeds_many :vlp_responses, class_name:"EventResponse"
 
   field :vlp_verified_at, type: DateTime
@@ -34,11 +34,11 @@ class LawfulPresenceDetermination
     end
   end
 
-  def start_determination_process
+  def start_determination_process(requested_start_date)
     if should_use_ssa?
       start_ssa_process
     else
-      start_vlp_process
+      start_vlp_process(requested_start_date)
     end
   end
 
@@ -50,8 +50,8 @@ class LawfulPresenceDetermination
     notify(SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.consumer_role.person})
   end
 
-  def start_vlp_process
-    notify(VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.consumer_role.person})
+  def start_vlp_process(requested_start_date)
+    notify(VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.consumer_role.person, :coverage_start_date => requested_start_date})
   end
 
   private

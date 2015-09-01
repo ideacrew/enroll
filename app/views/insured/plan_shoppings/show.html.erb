@@ -60,8 +60,8 @@
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
-        <% if !@change_plan.blank? && @market_kind == "individual" %>
-          <%= render  partial: 'shared/sep_progress', locals: {step: '6'} %>
+        <% if @change_plan.blank? && special_enrollment_period? && @market_kind == "individual" %>
+          <%= render  partial: 'shared/sep_progress', locals: {step: '5'} %>
         <% elsif @change_plan.blank? && @market_kind == "individual" %>
           <%= render  partial: 'shared/individual_progress', locals: {step: '4'} %>
         <% elsif @change_plan.blank? %>
