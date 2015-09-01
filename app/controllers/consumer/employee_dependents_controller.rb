@@ -104,9 +104,17 @@ private
 
   def params_clean_vlp_documents
     return if params[:dependent][:consumer_role].nil? or params[:dependent][:consumer_role][:vlp_documents_attributes].nil?
-    params[:dependent][:consumer_role][:vlp_documents_attributes].reject! do |index, doc|
-      params[:naturalization_doc_type] != doc[:subject]
+
+    if params[:dependent][:us_citizen].eql? 'true'
+      params[:dependent][:consumer_role][:vlp_documents_attributes].reject! do |index, doc|
+        params[:naturalization_doc_type] != doc[:subject]
+      end
+    elsif params[:dependent][:eligible_immigration_status].eql? 'true'
+      params[:dependent][:consumer_role][:vlp_documents_attributes].reject! do |index, doc|
+        params[:immigration_doc_type] != doc[:subject]
+      end
     end
+
     vlp_doc_params = params[:dependent][:consumer_role]
     params[:dependent].delete :consumer_role
     vlp_doc_params

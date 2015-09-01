@@ -1,0 +1,8 @@
+<% document = find_document(c.object, "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)") %>
+<%= c.fields_for 'vlp_documents', document do |v| %>
+    <%= v.hidden_field :subject %>
+    <%= v.hidden_field :id %>
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <%= v.text_field :sevis_id, :placeholder => "SEVIS Id" %>
+    </div>
+<% end %>

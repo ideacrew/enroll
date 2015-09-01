@@ -99,15 +99,15 @@ class Consumer::ConsumerRolesController < ApplicationController
 
   def build_nested_models
     ["home", "mobile"].each do |kind|
-      @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
+      @person.phones.build(kind: kind) if @person.phones.select { |phone| phone.kind == kind }.blank?
     end
 
     Address::KINDS.each do |kind|
-      @person.addresses.build(kind: kind) if @person.addresses.select{|address| address.kind.to_s.downcase == kind}.blank?
+      @person.addresses.build(kind: kind) if @person.addresses.select { |address| address.kind.to_s.downcase == kind }.blank?
     end
 
     Email::KINDS.each do |kind|
-      @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
+      @person.emails.build(kind: kind) if @person.emails.select { |email| email.kind == kind }.blank?
     end
   end
 
@@ -118,15 +118,22 @@ class Consumer::ConsumerRolesController < ApplicationController
 
   def params_clean_vlp_documents
     return if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil?
-    params[:person][:consumer_role_attributes][:vlp_documents_attributes].reject! do |index, doc|
-      params[:naturalization_doc_type] != doc[:subject]
+
+    if params[:person][:us_citizen].eql? 'true'
+      params[:person][:consumer_role_attributes][:vlp_documents_attributes].reject! do |index, doc|
+        params[:naturalization_doc_type] != doc[:subject]
+      end
+    elsif params[:person][:eligible_immigration_status].eql? 'true'
+      params[:person][:consumer_role_attributes][:vlp_documents_attributes].reject! do |index, doc|
+        params[:immigration_doc_type] != doc[:subject]
+      end
     end
   end
 
   def update_vlp_documents
     return if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].first.nil?
     doc_params = params.require(:person).permit({:consumer_role_attributes =>
-                                                     [:vlp_documents_attributes=>
+                                                     [:vlp_documents_attributes =>
                                                           [:subject, :citizenship_number, :naturalization_number, :alien_number]]})
     document = find_document(@consumer_role, doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject])
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
