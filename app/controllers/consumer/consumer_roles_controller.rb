@@ -71,30 +71,6 @@ class Consumer::ConsumerRolesController < ApplicationController
 
   def person_parameters_list
     [
-<<<<<<< HEAD
-        {:addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
-        {:phones_attributes => [:kind, :full_phone_number]},
-        {:emails_attributes => [:kind, :address]},
-        :first_name,
-        :last_name,
-        :middle_name,
-        :name_pfx,
-        :name_sfx,
-        :dob,
-        :ssn,
-        :gender,
-        :language_code,
-        :is_incarcerated,
-        :is_disabled,
-        :race,
-        :is_consumer_role,
-        :ethnicity,
-        :us_citizen,
-        :naturalized_citizen,
-        :eligible_immigration_status,
-        :indian_tribe_member,
-        :tribal_id
-=======
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
       { :phones_attributes => [:kind, :full_phone_number] },
       { :emails_attributes => [:kind, :address] },
@@ -118,7 +94,6 @@ class Consumer::ConsumerRolesController < ApplicationController
       :eligible_immigration_status,
       :indian_tribe_member,
       :tribal_id
->>>>>>> c05b5be4e1d50517df8d3bd2a63f22d4a893e8e3
     ]
   end
 
