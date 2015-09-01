@@ -96,7 +96,18 @@ class CoverageHousehold
   end
 
   def self.update_individual_eligibilities_for(person)
-    #TODO: Add code to search for households for this person
+    found_families = Family.find_all_by_person(person)
+    found_families.each do |ff|
+      ff.households.each do |hh|
+        hh.coverage_households.each do |ch|
+          ch.evaluate_individual_market_eligiblity
+        end
+      end
+    end
+  end
+
+  def evaluate_individual_market_eligiblity
+    #TODO: Provide code which will re-run the eligibility using the new rules object
   end
 
 private
