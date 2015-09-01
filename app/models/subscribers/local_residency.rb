@@ -13,12 +13,18 @@ module Subscribers
       stringed_key_payload = payload.stringify_keys
       xml = stringed_key_payload['body']
       person_hbx_id = stringed_key_payload['individual_id']
+      return_status = stringed_key_payload["return_status"].to_s
 
       person = find_person(person_hbx_id)
       return if person.nil? || person.consumer_role.nil?
-
       consumer_role = person.consumer_role
       consumer_role.local_residency_responses << EventResponse.new({received_at: Time.now, body: xml})
+
+      if "503" == return_status.to_s
+        consumer_role.deny_residency!
+        consumer_role.save
+        return
+      end
 
       xml_hash = xml_to_hash(xml)
 
