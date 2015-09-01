@@ -1,5 +1,6 @@
 class Consumer::ConsumerRolesController < ApplicationController
   include ApplicationHelper
+  before_action :check_consumer_role, only: [:search]
 
   before_action :find_consumer_role_and_person, only: [:edit, :update]
 
@@ -129,5 +130,11 @@ class Consumer::ConsumerRolesController < ApplicationController
     document = find_document(@consumer_role, doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject])
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
     document.save
+  end
+
+  def check_consumer_role
+    if current_user.has_consumer_role?
+      redirect_to family_account_path
+    end
   end
 end
