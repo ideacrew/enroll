@@ -95,6 +95,9 @@ class CoverageHousehold
     end
   end
 
+  def self.update_individual_eligibilities_for(person)
+    #TODO: Add code to search for households for this person
+  end
 
 private
   def presence_of_coverage_household_members
