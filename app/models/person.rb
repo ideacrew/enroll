@@ -308,11 +308,11 @@ class Person
     self.emails << ::Email.new(:kind => 'work', :address => email)
   end
 
-  def has_active_consumer_role
+  def has_active_consumer_role?
     consumer_role.present? and consumer_role.is_active?
   end
 
-  def has_active_employee_roles
+  def has_active_employee_role?
     employee_roles.present? and employee_roles.active.present?
   end
 

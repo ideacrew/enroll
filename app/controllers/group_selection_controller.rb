@@ -2,9 +2,9 @@ class GroupSelectionController < ApplicationController
   def new
     initialize_common_vars
 
-    if @person.try(:has_active_employee_roles) and !@person.try(:has_active_consumer_role)
+    if @person.try(:has_active_employee_role?) and !@person.try(:has_active_consumer_role?)
       @market_kind = 'shop'
-    elsif !@person.try(:has_active_employee_roles) and @person.try(:has_active_consumer_role)
+    elsif !@person.try(:has_active_employee_role?) and @person.try(:has_active_consumer_role?)
       @market_kind = 'individual'
     else
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
