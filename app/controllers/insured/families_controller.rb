@@ -26,6 +26,7 @@ class Insured::FamiliesController < FamiliesController
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @market_kind = params[:market_kind]
     @coverage_kind = params[:coverage_kind]
+    @change_plan = params[:change_plan]
 
     render :layout => 'application' 
   end
@@ -40,7 +41,10 @@ class Insured::FamiliesController < FamiliesController
       special_enrollment_period.save
     end
 
-    redirect_to group_selection_new_path(return_action: 'find_sep', person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id))
+    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id)}
+    action_params.merge!({change_plan: "change_plan"}) if @family.enrolled_hbx_enrollments.any?
+
+    redirect_to group_selection_new_path(action_params)
   end
 
   def personal
