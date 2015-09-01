@@ -1,5 +1,10 @@
 module Parsers::Xml::Cv
   class ResidencyVerificationResponse
+    def self.parse(xml)
+      self.new.tap do |me|
+        me.parse(xml)
+      end
+    end
 
     def parse(xml)
       @parsed_obj=HappyMapper.parse(xml)

@@ -35,7 +35,8 @@ class GroupSelectionController < ApplicationController
                        @coverage_household.household.new_hbx_enrollment_from(
                          consumer_role: @person.consumer_role,
                          coverage_household: @coverage_household,
-                         benefit_package: @benefit_package)
+                         benefit_package: @benefit_package,
+                         qle: @change_plan == 'change_by_qle')
                      end
 
     hbx_enrollment.plan = @hbx_enrollment.plan if keep_existing_plan and @hbx_enrollment.present?
@@ -58,7 +59,11 @@ class GroupSelectionController < ApplicationController
       else
         # FIXME: models should update relationships, not the controller
         hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
-        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind)
+        if params['sep_indicator'] == 'true'
+          redirect_to find_sep_insured_families_path(:hbx_enrollment_id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind)
+        else
+          redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind)
+        end
       end
     else
       raise "You must select the primary applicant to enroll in the healthcare plan"
@@ -66,6 +71,28 @@ class GroupSelectionController < ApplicationController
   rescue Exception => error
     flash[:error] = error.message
     return redirect_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind)
+  end
+
+  def terminate_selection
+    initialize_common_vars
+    @hbx_enrollments = @family.enrolled_hbx_enrollments.select{|pol| pol.may_terminate_coverage? } || []
+  end
+
+  def terminate_confirm
+    @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+  end
+
+  def terminate
+    term_date = Date.strptime(params.require(:term_date),"%m/%d/%Y")
+    hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+
+    if hbx_enrollment.may_terminate_coverage?
+      hbx_enrollment.update_current(aasm_state: "coverage_terminated", terminated_on: term_date)
+      hbx_enrollment.propogate_terminate(term_date)
+      redirect_to family_account_path
+    else
+      redirect_to :back
+    end
   end
 
   private

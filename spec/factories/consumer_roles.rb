@@ -8,5 +8,20 @@ FactoryGirl.define do
     citizen_status 'us_citizen'
     is_incarcerated 'yes'
     is_applicant 'yes'
+    vlp_documents {[FactoryGirl.build(:vlp_document)]}
+  end
+
+  factory(:consumer_role_person, {class: ::Person}) do
+    first_name { Forgery(:name).first_name }
+    last_name { Forgery(:name).first_name }
+    gender { Forgery(:personal).gender }
+    sequence(:ssn, 222222222)
+    dob Date.new(1980, 1, 1)
+  end
+
+
+  factory(:consumer_role_object, {class: ::ConsumerRole}) do
+    is_applicant true
+    person { FactoryGirl.create(:consumer_role_person) }
   end
 end

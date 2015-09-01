@@ -25,7 +25,7 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
         Then Employer should see a published success message
         Then Employer logs out
 
-    When Soren White logs on to the Insured Portal
+    When Soren White logs on to the Employee Portal
         #Then Soren White should be logged on as an unlinked employee
         When Employee goes to register as an employee
         Then Employee should see the employee search page

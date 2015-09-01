@@ -8,6 +8,9 @@ class LawfulPresenceDetermination
   include Acapi::Notifiers
 
   embedded_in :consumer_role
+  embeds_many :ssa_responses, class_name:"EventResponse"
+  embeds_many :vlp_responses, class_name:"EventResponse"
+
   field :vlp_verified_at, type: DateTime
   field :vlp_authority, type: String
   field :vlp_document_id, type: String
@@ -29,6 +32,18 @@ class LawfulPresenceDetermination
       transitions from: :verification_pending, to: :verification_outstanding, after: :record_denial_information
       transitions from: :verification_outstanding, to: :verification_outstanding, after: :record_denial_information
     end
+  end
+
+  def start_determination_process
+    if should_use_ssa?
+      start_ssa_process
+    else
+      start_vlp_process
+    end
+  end
+
+  def should_use_ssa?
+    ::ConsumerRole::US_CITIZEN_STATUS == self.citizen_status
   end
 
   def start_ssa_process

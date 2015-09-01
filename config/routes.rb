@@ -79,6 +79,7 @@ Rails.application.routes.draw do
         get 'inbox'
         get 'documents_index'
         get 'document_upload'
+        get 'find_sep'
       end
 
       resources :people do
@@ -187,6 +188,14 @@ Rails.application.routes.draw do
     end
   end
 
+  # used to select which people are going to be covered before plan selection
+  get 'group_selection/new', to: 'group_selection#new'
+  post 'group_selection/new', to: 'group_selection#new'
+  post 'group_selection/create', to: 'group_selection#create'
+  get 'group_selection/terminate_selection', to: 'group_selection#terminate_selection'
+  get 'group_selection/terminate_confirm', to: 'group_selection#terminate_confirm'
+  post 'group_selection/terminate', to: 'group_selection#terminate'
+
   ############################# TO DELETE BELOW ##############################
 
   # FIXME: Do this properly later
@@ -217,13 +226,12 @@ Rails.application.routes.draw do
     end
     root 'employee_roles#show'
 
-    resources :consumer_role, controller: 'consumer_roles'
+    resources :consumer_role, controller: 'consumer_roles' do
+      get :search, on: :collection
+      get :match, on: :collection
+      get :ridp_agreement, on: :collection
+    end
   end
-
-  # used to select which people are going to be covered before plan selection
-  get 'group_selection/new', to: 'group_selection#new'
-  post 'group_selection/new', to: 'group_selection#new'
-  post 'group_selection/create', to: 'group_selection#create'
 
   resources :people do #TODO Delete
     get 'select_employer'

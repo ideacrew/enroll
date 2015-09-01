@@ -8,8 +8,6 @@ class ConsumerRole
 
   embedded_in :person
 
-  INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
-
   VLP_AUTHORITY_KINDS = %w(ssa dhs hbx)
   NATURALIZED_CITIZEN_STATUS = "naturalized_citizen"
   INDIAN_TRIBE_MEMBER_STATUS = "indian_tribe_member"
@@ -41,12 +39,7 @@ class ConsumerRole
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
   field :requested_coverage_start_date, type: Date, default: Date.today
-  field :aasm_state, type: String, default: "identity_unverified"
-  field :identity_verified_date, type: Date
-  field :identity_final_decision_code, type: String
-  field :identity_final_decision_transaction_id, type: String
-  field :identity_response_code, type: String
-  field :identity_response_description_text, type: String
+  field :aasm_state, type: String, default: "verifications_pending"
 
   delegate :citizen_status,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
   delegate :citizen_status=,:vlp_verified_date=, :vlp_authority=, :vlp_document_id=, to: :lawful_presence_determination_instance
@@ -59,6 +52,8 @@ class ConsumerRole
   field :marital_status, type: String
   field :is_active, type: Boolean, default: true
 
+    field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
+
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
   delegate :dob,    :dob=,    to: :person, allow_nil: true
@@ -69,12 +64,13 @@ class ConsumerRole
   delegate :race,               :race=,              to: :person, allow_nil: true
   delegate :ethnicity,          :ethnicity=,         to: :person, allow_nil: true
   delegate :is_disabled,        :is_disabled=,       to: :person, allow_nil: true
+  delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
   embeds_many :vlp_documents, as: :documentable
   embeds_many :workflow_state_transitions, as: :transitional
 
-  accepts_nested_attributes_for :person, :workflow_state_transitions
+  accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents
 
   validates_presence_of :ssn, :dob, :gender, :is_applicant
 
@@ -97,6 +93,8 @@ class ConsumerRole
   alias_method :is_incarcerated?,   :is_incarcerated
 
   embeds_one :lawful_presence_determination
+
+  embeds_many :local_residency_responses, class_name:"EventResponse"
 
   after_initialize :setup_lawful_determination_instance
 
@@ -168,31 +166,103 @@ class ConsumerRole
 
   # RIDP and Verify Lawful Presence workflow.  IVL Consumer primary applicant must be in identity_verified state
   # to proceed with application.  Each IVL Consumer enrolled for benefit coverage must (eventually) pass
+  def alien_number
+    vlp_documents.select{|doc| doc.alien_number.present? }.first.try(:alien_number)
+  end
+
+  def i94_number
+    vlp_documents.select{|doc| doc.i94_number.present? }.first.try(:i94_number)
+  end
+
+  def citizenship_number
+    vlp_documents.select{|doc| doc.citizenship_number.present? }.first.try(:citizenship_number)
+  end
+
+  def visa_number
+    vlp_documents.select{|doc| doc.visa_number.present? }.first.try(:visa_number)
+  end
+
+  def sevis_id
+    vlp_documents.select{|doc| doc.sevis_id.present? }.first.try(:sevis_id)
+  end
+
+  def naturalization_number
+    vlp_documents.select{|doc| doc.naturalization_number.present? }.first.try(:naturalization_number)
+  end
+
+  def receipt_number
+    vlp_documents.select{|doc| doc.receipt_number.present? }.first.try(:receipt_number)
+  end
+
+  def passport_number
+    vlp_documents.select{|doc| doc.passport_number.present? }.first.try(:passport_number)
+  end
+
+  def has_i327?
+    vlp_documents.any?{|doc| doc.subject == "I-327 (Reentry Permit)" }
+  end
+
+  def has_i571?
+    vlp_documents.any?{|doc| doc.subject == "I-551 (Permanent Resident Card)" }
+  end
+
+  def has_cert_of_citizenship?
+    vlp_documents.any?{|doc| doc.subject == "Certificate of Citizenship" }
+  end
+
+  def has_cert_of_naturalization?
+    vlp_documents.any?{|doc| doc.subject == "Naturalization Certificate" }
+  end
+
+  def has_temp_i551?
+    vlp_documents.any?{|doc| doc.subject == "Temporary I-551 Stamp (on passport or I-94)" }
+  end
+
+  def has_i94?
+    vlp_documents.any?{|doc| doc.subject == "I-94 (Arrival/Departure Record)" || doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport"}
+  end
+
+  def has_i20?
+    vlp_documents.any?{|doc| doc.subject == "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)" }
+  end
+
+  def has_ds2019?
+    vlp_documents.any?{|doc| doc.subject == "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)" }
+  end
+
+  def i551
+    vlp_documents.select{|doc| doc.subject == "I-551 (Permanent Resident Card)" && doc.receipt_number.present? }.first
+  end
+
+  def i766
+    vlp_documents.select{|doc| doc.subject == "I-766 (Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_date.present? }.first
+  end
+
+  def mac_read_i551
+    vlp_documents.select{|doc| doc.subject == "Machine Readable Immigrant Visa (with Temporary I-551 Language)" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+  end
+
+  def foreign_passport_i94
+    vlp_documents.select{|doc| doc.subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+  end
+
+  def foreign_passport
+    vlp_documents.select{|doc| doc.subject == "Unexpired Foreign Passport" && doc.issuing_country.present? && doc.passport_number.present? && doc.expiration_date.present? }.first
+  end
+
+  def case1
+    vlp_documents.select{|doc| doc.subject == "Other (With Alien Number)" }.first
+  end
+
+  def case2
+    vlp_documents.select{|doc| doc.subject == "Other (With I-94 Number)" }.first
+  end
 
   ## TODO: Move RIDP to user model
   aasm do
-    state :identity_unverified, initial: true
-    state :identity_followup_pending            # Identity unconfirmed due to service failure or negative response
-    state :identity_verified                    # Identity confirmed via RIDP services or subsequent followup
-    state :identity_invalid
-
-    state :verifications_pending
+    state :verifications_pending, initial: true
     state :verifications_outstanding
     state :fully_verified
-
-    event :verify_identity, :after => :record_transition  do
-      transitions from: [:identity_unverified, :identity_followup_pending], to: :identity_verified, :guard => :identity_verification_succeeded?
-      transitions from: :identity_unverified, to: :identity_followup_pending, :guard => :identity_verification_pending?
-    end
-
-    event :import_identity, :guard => :identity_metadata_provided?, :after => :record_transition  do
-      transitions from: :identity_unverified, to: :identity_verified, :guard => :identity_verification_succeeded?
-      transitions from: :identity_unverified, to: :identity_followup_pending, :guard => :identity_verification_pending?
-    end
-
-    event :revoke_identity, :after => :record_transition  do
-      transitions from: [:identity_unverified, :identity_followup_pending, :identity_verified], to: :identity_invalid
-    end
 
     event :deny_lawful_presence, :after => [:record_transition, :mark_lp_denied] do
       transitions from: :verifications_pending, to: :verifications_pending, guard: :residency_pending?
@@ -203,6 +273,7 @@ class ConsumerRole
     event :authorize_lawful_presence, :after => [:record_transition, :mark_lp_authorized] do
       transitions from: :verifications_pending, to: :verifications_pending, guard: :residency_pending?
       transitions from: :verifications_pending, to: :fully_verified, guard: :residency_verified?
+      transitions from: :verifications_pending, to: :verifications_outstanding
       transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :residency_denied?
       transitions from: :verifications_outstanding, to: :fully_verified, guard: :residency_verified?
     end
@@ -210,6 +281,7 @@ class ConsumerRole
     event :authorize_residency, :after => [:record_transition, :mark_residency_authorized] do
       transitions from: :verifications_pending, to: :verifications_pending, guard: :lawful_presence_pending?
       transitions from: :verifications_pending, to: :fully_verified, guard: :lawful_presence_verified?
+      transitions from: :verifications_pending, to: :verifications_outstanding
       transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :lawful_presence_outstanding?
       transitions from: :verifications_outstanding, to: :fully_verified, guard: :lawful_presence_authorized?
     end
@@ -219,6 +291,15 @@ class ConsumerRole
       transitions from: :verifications_pending, to: :verifications_outstanding
       transitions from: :verifications_outstanding, to: :verifications_outstanding, guard: :lawful_presence_outstanding?
       transitions from: :verifications_outstanding, to: :fully_verified, guard: :lawful_presence_authorized?
+    end
+  end
+
+  def start_individual_market_eligibility!
+    if lawful_presence_pending?
+      lawful_presence_determination.start_determination_process
+    end
+    if residency_pending?
+      start_residency_verification_process
     end
   end
 
@@ -278,22 +359,6 @@ private
       from_state: aasm.from_state,
       to_state: aasm.to_state
     )
-  end
-
-  def identity_verification_succeeded?
-    identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
-  end
-
-  def identity_verification_denied?
-    identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
-  end
-
-  def identity_verification_pending?
-    identity_final_decision_code.to_s.downcase == "ref" && identity_response_code.present?
-  end
-
-  def identity_metadata_provided?
-    identity_final_decision_code.present? && identity_response_code.present?
   end
 
 end

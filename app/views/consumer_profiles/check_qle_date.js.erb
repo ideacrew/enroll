@@ -3,6 +3,9 @@ $('#qle-details .qle-form').addClass('hidden');
   $('#qle-details .success-info').removeClass('hidden');
   $('#qle-details .error-info').addClass('hidden');
   $('#qle-details .initial-info').addClass('hidden');
+  <% if @qle.present? %>
+    $(".effective_on_kinds").html("<%= escape_javascript(render 'effective_on_kind_fields') %>");
+  <% end %>
 <% else %>
   $('#qle-details .error-info').removeClass('hidden');
   $('#qle-details .success-info').addClass('hidden');

@@ -5,25 +5,37 @@ RSpec.describe Consumer::EmployeeDependentsController do
   let(:user) { instance_double("User", :primary_family => family, :person => person) }
   let(:person) { double(:employee_roles => [], :primary_family => family) }
   let(:employee_role_id) { "2343" }
+  let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
+  let(:fm) { FactoryGirl.build(:family, :with_primay_family_member) }
 
   describe "GET index" do
+    context 'normal' do
+      before(:each) do
+        sign_in(user)
+        get :index, :employee_role_id => employee_role_id
+      end
 
-    before(:each) do
-      sign_in(user)
-      get :index, :employee_role_id => employee_role_id
+      it "renders the 'index' template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("index")
+      end
+
+      it "assigns the person" do
+        expect(assigns(:person)).to eq person
+      end
+
+      it "assigns the family" do
+        expect(assigns(:family)).to eq family
+      end
     end
 
-    it "renders the 'index' template" do
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template("index")
-    end
-
-    it "assigns the person" do
-      expect(assigns(:person)).to eq person
-    end
-
-    it "assigns the family" do
-      expect(assigns(:family)).to eq family
+    it "with qle_id" do
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:primary_family).and_return(fm)
+      sign_in user
+      expect{
+        get :index, employee_role_id: employee_role_id, qle_id: qle.id, effective_on_kind: 'date_of_event', qle_date: '10/10/2015'
+      }.to change(fm.special_enrollment_periods, :count).by(1)
     end
   end
 

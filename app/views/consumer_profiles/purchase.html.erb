@@ -31,7 +31,7 @@
   </div>
 
   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
-    <% if @change_plan == "change" %>
+    <% if @change_plan == "change_by_qle" %>
       <%= render partial: 'shared/qle_progress', locals: {step: '3', no_purchase: true} %>
     <% elsif @change_plan == "change_plan" %>
       <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '2', no_purchase: true} %>

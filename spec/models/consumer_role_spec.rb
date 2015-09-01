@@ -54,87 +54,9 @@ describe ConsumerRole, dbclean: :after_each do
           expect(ConsumerRole.find(consumer_role.id).id).to eq consumer_role.id
         end
 
-        context "and the consumer's should not have a identity_verified identity" do
-
-          it "identity state should be unidentity_verified" do
-            expect(consumer_role.aasm_state).to eq "identity_unverified"
-          end
-
-          context "and a recognized authority verifies the consumer's identity" do
-            before do
-              consumer_role.identity_final_decision_code = "ACC"
-              consumer_role.identity_response_code = "xyz321abc"
-              consumer_role.verify_identity
-            end
-
-            it "identity state should transition to identity verified status" do
-              expect(consumer_role.aasm_state).to eq "identity_verified"
-            end
-          end
-
-          context "and a recognized authority is unable to verify the consumer's identity" do
-            before do
-              consumer_role.identity_final_decision_code = "REF"
-              consumer_role.identity_response_code = "xyz321abc"
-              consumer_role.verify_identity
-            end
-
-            it "identity state should transition to followup pending status" do
-              expect(consumer_role.aasm_state).to eq "identity_followup_pending"
-            end
-
-            context "and authority is subsequently able to verify consumer's identity" do
-              before do
-                consumer_role.identity_final_decision_code = "ACC"
-                consumer_role.identity_response_code = "xyz321abc"
-                consumer_role.verify_identity
-              end
-
-              it "identity state should transition to identity verified status" do
-                expect(consumer_role.aasm_state).to eq "identity_verified"
-              end
-            end
-          end
-
-          context "and the identity verification status is imported from a trusted source" do
-            context "and trusted source doesn't pass sufficient verification content" do
-              before do
-                consumer_role.identity_final_decision_code = ""
-                consumer_role.identity_response_code = ""
-              end
-
-              it "identity state should stay in identity_unverified status" do
-                expect(consumer_role.may_import_identity?).to be_falsey
-              end
-            end
-
-            context "and the consumer's identity is identity_verified" do
-              before do
-                consumer_role.identity_final_decision_code = "ACC"
-                consumer_role.identity_response_code = "xyz321abc"
-                consumer_role.import_identity
-              end
-
-              it "identity state should transition to identity verified status" do
-                expect(consumer_role.aasm_state).to eq "identity_verified"
-              end
-            end
-
-            context "and the consumer's identity isn't identity verified" do
-              before do
-                consumer_role.identity_final_decision_code = "REF"
-                consumer_role.identity_response_code = "xyz321abc"
-                consumer_role.import_identity
-              end
-
-              it "identity state should transition to followup pending status" do
-                expect(consumer_role.aasm_state).to eq "identity_followup_pending"
-              end
-            end
-
-          end
+        it "should have a state of verifications_pending" do
+          expect(consumer_role.aasm_state).to eq "verifications_pending"
         end
-
       end
     end
 
@@ -197,10 +119,42 @@ describe ConsumerRole, "in the verifications_pending state" do
     end
   end
 
+  describe "with residency denied" do
+    before(:each) do
+      subject.is_state_resident = false
+    end
+    describe "when lawful_presence fails" do
+      let(:mock_lp_denial) { double({ :determined_at => Time.now, :vlp_authority => "ssa" }) }
+      before(:each) do
+        subject.is_state_resident = true
+        subject.deny_lawful_presence(mock_lp_denial)
+      end
+      it "should be in verifications_outstanding" do
+        expect(subject.verifications_outstanding?).to eq true
+      end
+    end
+  end
+
   describe "with lawful_presence authorized" do
     before :each do
       subject.lawful_presence_determination = LawfulPresenceDetermination.new(
         :aasm_state => :verification_successful
+      )
+    end
+    describe "when residency fails" do
+      before(:each) do
+        subject.deny_residency
+      end
+      it "should be in verifications_outstanding" do
+        expect(subject.verifications_outstanding?).to eq true
+      end
+    end
+  end
+
+  describe "with lawful_presence failed" do
+    before :each do
+      subject.lawful_presence_determination = LawfulPresenceDetermination.new(
+        :aasm_state => :verification_outstanding
       )
     end
     describe "when residency fails" do
