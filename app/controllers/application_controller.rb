@@ -97,11 +97,7 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_in_path_for(resource)
-    if session[:portal].include?("insured/families/home") && (current_user.has_employee_role? || current_user.has_consumer_role?)
-      family_account_path
-    else
-      session[:portal] || request.referer || root_path
-    end
+    session[:portal] || request.referer || root_path
   end
 
   def authenticate_user_from_token!

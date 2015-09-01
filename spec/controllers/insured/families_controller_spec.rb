@@ -20,6 +20,8 @@ RSpec.describe Insured::FamiliesController do
   describe "GET home" do
     before :each do 
       allow(family).to receive(:enrolled_hbx_enrollments).and_return(hbx_enrollments)
+      allow(user).to receive(:has_employee_role?).and_return(true)
+      allow(user).to receive(:has_consumer_role?).and_return(true)
     end
 
     context "for SHOP market" do    

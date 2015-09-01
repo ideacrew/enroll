@@ -1,6 +1,7 @@
 class Insured::FamiliesController < FamiliesController
 
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
+  before_action :check_insured_role, only: [:home]
   # layout 'application', :only => :find_sep
 
   def home
@@ -70,5 +71,11 @@ class Insured::FamiliesController < FamiliesController
     elsif @person.consumer_role.present?
       @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
     end
+  end
+
+  def check_insured_role
+    return true if current_user.has_employee_role? || current_user.has_consumer_role?
+    flash[:error] = "You are not authorized to visit this portal."
+    redirect_to root_path and return
   end
 end
