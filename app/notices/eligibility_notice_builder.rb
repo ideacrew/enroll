@@ -17,6 +17,7 @@ class EligibilityNoticeBuilder < Notice
     @hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active || []
     @notice = PdfTemplates::EligibilityNotice.new
     @notice.primary_fullname = @consumer.full_name.titleize
+    @notice.primary_identifier = @consumer.hbx_id
     append_address(@consumer.addresses[0])
     append_enrollments(@hbx_enrollments)
   end

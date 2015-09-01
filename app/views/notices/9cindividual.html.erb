@@ -19,7 +19,7 @@
   </tr>
     <tr class="wid50">
       <td align="left"><%= format_date(Date.today) %></td>
-      <td  align="right">AccountID</td>
+      <td  align="right"><%= notice.primary_identifier %></td>
     </tr>
   </tbody>
 </table>
@@ -30,7 +30,7 @@
       <td><h3>Subject:  Eligibility for Health Insurance, Confirmation of Plan Selection</h3></td>
     </tr>
     <tr class="fssizeuser">
-      <td>Dear <%= notice.primary_fullname.strip %>,</td>
+      <td>Dear <%= notice.primary_fullname.strip %>:</td>
     </tr>
   </tbody>
 </table>
@@ -43,11 +43,10 @@
 </table>
 <table class="total_table" border="0">
   <tbody>
-     <% notice_eligible_enrolles(notice).each do |name| %>
-    <tr class="fssizeuser mar20">
-    
-      <td><%= name %></td>
-    </tr>
+    <% notice_eligible_enrolles(notice).each do |name| %>
+      <tr class="fssizeuser mar20">
+        <td><%= name %></td>
+      </tr>
     <% end %>
   </tbody>
 </table>
@@ -67,7 +66,7 @@
 <table class="total_table" border="0">
   <tbody>
     <% notice.enrollments[0].enrollees.each do |name| %>
-    <tr class="mar20" style="padding-left:5%;margin-top: 5px;">
+    <tr class="mar20" style="padding-left:5%;margin:5px 0;">
       <td><%= name %></td>
     </tr>
     <% end %>
@@ -80,15 +79,16 @@
   <tbody>
       <tr class="fssizeuser">
         <td class="col-red"><strong>Additionally, the following individual(s) selected the <%= notice.enrollments[1].plan_name %> health insurance plan.</strong></td>
-       
       </tr>
-    
-      <% notice.enrollments[1].enrollees.each do |name| %>
-     <tr class="fssizeuser">
-        <td><%= name %></td>
-      </tr>
-      <% end %>
-    
+  </tbody>
+</table>
+<table class="total_table" border="0">
+  <tbody>
+    <% notice.enrollments[1].enrollees.each do |name| %>
+    <tr class="mar20" style="padding-left:5%;margin:5px 0;">
+      <td><%= name %></td>
+    </tr>
+    <% end %>
   </tbody>
 </table>
 <% end %>
@@ -117,7 +117,7 @@
     <tr class="mar20">
       <td style="text-decoration:underline;"><%= enrollment.plan_name %></td>
     </tr>
-    <tr style="padding-left:5%" class="mar20">
+    <tr class="mar20">
       <td><ul>
           <li>Your Total Monthly Premium Cost:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= number_to_currency(enrollment.monthly_premium_cost) %></li>
         </ul></td>

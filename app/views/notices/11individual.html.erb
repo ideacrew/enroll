@@ -17,8 +17,8 @@
   <td></br></td>
   </tr>
     <tr class="wid50">
-      <td align="left">Date of Notice</td>
-      <td  align="right">AccountID</td>
+      <td align="left"><%= format_date(Date.today) %></td>
+      <td  align="right"><%= notice.primary_identifier %></td>
     </tr>
   </tbody>
 </table>
@@ -35,41 +35,30 @@
       <td><h3>Subject:  Denial of Eligibility for DC Health Link Enrollment</h3></td>
     </tr>
     <tr class="fssizeuser">
-      <td>Dear <%= notice.primary_fullname.strip %>,</td>
+      <td>Dear <%= notice.primary_fullname.strip %>:</td>
     </tr>
   </tbody>
 </table>
 <table class="total_table" border="0">
   <tbody>
     <tr class="widn">
-      <td>Thank you for theapplication you submitted and we processed on
-        <span style="width:150px; display:block;"></span>
-        . Unfortunately, the following individual(s)are not qualified to enroll in health insurance through DC Health Link based on the information you provided to us. </td>
+      <td>Thank you for theapplication you submitted and we processed on <%= format_date(Date.today) %>. Unfortunately, the following individual(s)are not qualified to enroll in health insurance through DC Health Link based on the information you provided to us. </td>
     </tr>
   </tbody>
 </table>
 <table class="total_table" border="0">
   <tbody>
-    <tr class="fssizeuser mar20">
-      <td>QHP Ineligible 1 First Name</td>
-      <td>QHP Ineligible 1 Last Name</td>
-    </tr>
+    <% notice_eligible_enrolles(notice).each do |name| %>
+      <tr class="fssizeuser mar20">
+        <td><%= name %></td>
+      </tr>
+    <% end %>
   </tbody>
 </table>
 <table class="total_table" border="0">
   <tbody>
-    <tr class="fssizeuser">
-      <td><span style="color:rgb(255,0,0);"><strong>[IF Person N field populated]</strong></span><span>QHP Ineligible N First Name</span><span>QHP Ineligible N Last Name</span></td>
-    </tr>
-  </tbody>
-</table>
-<table class="total_table" border="0">
-  <tbody>
-        <tr>
-      <td><h3 style="color:rgb(54,95,145);">Ineligibility for Assistance or Enrollment through DC Health Link</h3></td>
-    </tr>
     <tr>
-      <td><h5 style="color:rgb(255,0,0); text-transform:uppercase;">[PICK ALL THAT APPLY]</h5></td>
+      <td><h3 style="color:rgb(54,95,145);">Ineligibility for Assistance or Enrollment through DC Health Link</h3></td>
     </tr>
     <tr>
       <td><span style="color:rgb(255,0,0);">[IF Anyone Ineligible Due to Residency]</span>The following individual(s)are not qualified to enrollthrough DC Health Link because they are not residents of the District of Columbia. They are encouraged to submit another application for the state where they live. You can find these applications at <a href="www.HealthCare.gov">www.HealthCare.gov</a>. 45 C.F.R. §155.305(a)(3).</td>
