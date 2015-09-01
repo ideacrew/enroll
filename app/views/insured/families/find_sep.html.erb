@@ -34,22 +34,10 @@
     </div>
 
     <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12 right-section">
-      <% if @change_plan.blank? && @market_kind == "individual" %>
-        <% if is_sep_eligible? %>
-          <%= render  partial: 'shared/sep_progress', locals: {step: '3'} %>
-        <% else %>
-          <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
-        <% end %>
-      <% elsif @change_plan.blank? %>  
-      <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
-      <% elsif @change_plan == "change_by_qle" %>
-      <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
-      <% elsif @change_plan == "change_plan" %>
-        <% if is_sep_eligible? %>
-          <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '1'} %>
-        <% else %>
-          <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
-        <% end %>
+      <% if @change_plan.blank? %>
+        <%= render  partial: 'shared/sep_progress', locals: {step: '3'} %>
+      <% else %>
+        <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '1'} %>
       <% end %>
     </div>
   </div>
