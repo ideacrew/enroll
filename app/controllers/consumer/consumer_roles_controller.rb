@@ -134,7 +134,9 @@ class Consumer::ConsumerRolesController < ApplicationController
     return if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].first.nil?
     doc_params = params.require(:person).permit({:consumer_role_attributes =>
                                                      [:vlp_documents_attributes =>
-                                                          [:subject, :citizenship_number, :naturalization_number, :alien_number]]})
+                                                          [:subject, :citizenship_number, :naturalization_number,
+                                                           :alien_number, :passport_number, :sevis_id, :visa_number,
+                                                           :receipt_number, :expiration_date, :card_number, :i94_number]]})
     document = find_document(@consumer_role, doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject])
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
     document.save
