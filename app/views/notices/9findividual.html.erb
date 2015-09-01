@@ -46,7 +46,7 @@
     </tr>
     </tbody>
   </table>
-  <% if notice.active_members.try(:any) %>
+  <% if notice.try(:active_members).try(:any?) %>
     <table class="total_table" border="0">
         <tbody>
           <tr class="fssizeuser mar20">
@@ -60,7 +60,7 @@
       </table>
       <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.active_members} %>
     <% end %>
-    <% if notice.inconsistent_members.try(:any) %>
+    <% if notice.try(:inconsistent_members).try(:any?) %>
       <table class="total_table" border="0">
         <tbody>
           <tr class="fssizeuser mar20">
@@ -144,7 +144,7 @@
     </tbody>
   </table>
   
-  <% if notice.members_with_more_plans.try(:any?) %>
+  <% if notice.try(:members_with_more_plans).try(:any?) %>
   <table class="total_table" border="0">
     <tbody>
       <tr class="fssizeuser mar20">
@@ -293,7 +293,7 @@
    
 </div>
 <div class="page_break">
-  <% if notice.unverfied_ssn_members.try(:any) %>
+  <% if notice.try(:unverfied_ssn_members).try(:any?) %>
   <table  class="total_table" border="0">
     <tbody>
     <tr class="mar20">
@@ -306,7 +306,7 @@
     <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.unverfied_ssn_members} %>
     <% end %>
 
-    <% if notice.unverfied_citizenship_members.try(:any) %>
+    <% if notice.try(:unverfied_citizenship_members).try(:any?) %>
       <table>
       <tbody>
       <tr class="mar20">

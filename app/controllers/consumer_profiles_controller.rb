@@ -102,8 +102,8 @@ class ConsumerProfilesController < ApplicationController
     elsif params[:view].eql?("lawfully_ineligible")
       html_view = "notices/11individual.html.erb"
     end
-    notice = Notice.new(current_user.email, {:notice_data => {:user => current_user}, :template => html_view})
-    render :text => notice.html.html_content
+    notice = IndividualNoticeBuilder.new(current_user.person, {template: html_view})
+    render :text => notice.html
   end
 
   private

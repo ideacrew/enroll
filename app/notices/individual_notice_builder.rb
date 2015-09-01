@@ -13,9 +13,10 @@ class IndividualNoticeBuilder < EligibilityNoticeBuilder
 
   def build
     super
-    @family = @consumer.primary_family
-    @hbx_enrollments = family.try(:latest_household).try(:hbx_enrollments).active || []
-    @members = @hbx_enrollments.map(&:hbx_enrollment_members).map(&:person)
+    #@family = Family.find_by_primary_applicant(@consumer)
+    #@family = @consumer.primary_family
+    #@hbx_enrollments = family.try(:latest_household).try(:hbx_enrollments).active || []
+    @members = @hbx_enrollments.map(&:hbx_enrollment_members).flatten.uniq.map(&:person)
   end
   
   def unverfied_ssn_members
