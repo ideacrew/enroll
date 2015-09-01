@@ -167,4 +167,55 @@ RSpec.describe Insured::FamiliesController do
       expect(assigns(:consumer_wrapper)).to be_an_instance_of(Forms::ConsumerRole)
     end
   end
+
+  describe "GET find_sep" do
+    before :each do
+      get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
+    end
+
+    it "should be a success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should render my account page" do
+      expect(response).to render_template("find_sep")
+    end
+
+    it "should assign variables" do
+      expect(assigns(:hbx_enrollment_id)).to eq("2312121212")
+      expect(assigns(:change_plan)).to eq('change_plan')
+    end
+  end
+
+  describe "POST record_sep" do
+    before :each do   
+      @qle = FactoryGirl.create(:qualifying_life_event_kind)
+      @family = FactoryGirl.build(:family, :with_primay_family_member)
+      allow(person).to receive(:primary_family).and_return(@family)
+    end
+
+    context 'when its initial enrollment' do 
+      before :each do
+        post :record_sep, qle_id: @qle.id, qle_date: Date.today
+      end
+
+      it "should redirect" do
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(group_selection_new_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id)}))
+      end
+    end
+
+    context 'when its change of plan' do
+
+      before :each do
+        allow(@family).to receive(:enrolled_hbx_enrollments).and_return([ double ])
+        post :record_sep, qle_id: @qle.id, qle_date: Date.today
+      end
+      
+      it "should redirect with change_plan parameter" do 
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(group_selection_new_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan'}))
+      end
+    end
+  end
 end
