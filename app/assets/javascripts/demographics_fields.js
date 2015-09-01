@@ -6,6 +6,7 @@ function applyListeners() {
             $('#dependent_naturalized_citizen_true').attr('required');
             $('#dependent_naturalized_citizen_false').attr('required');
             $('#immigration_status_container').hide();
+            $('#immigration_fields_container').hide();
         } else {
             $('#dependent_naturalized_citizen_true').removeAttr('required');
             $('#dependent_naturalized_citizen_false').removeAttr('required');
@@ -123,6 +124,7 @@ function applyListeners() {
             $('#person_naturalized_citizen_true').attr('required');
             $('#person_naturalized_citizen_false').attr('required');
             $('#immigration_status_container').hide();
+            $('#immigration_fields_container').hide();
         } else {
             $('#person_naturalized_citizen_true').removeAttr('required');
             $('#person_naturalized_citizen_false').removeAttr('required');
