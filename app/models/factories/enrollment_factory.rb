@@ -40,7 +40,7 @@ module Factories
         user, person_params["name_pfx"], person_params["first_name"],
         person_params["middle_name"] , person_params["last_name"],
         person_params["name_fx"], person_params["ssn"].gsub("-",""),
-        person_params["dob"], person_params["gender"], "consumer"
+        person_params["dob"], person_params["gender"], "consumer", person_params["no_ssn"]
         )
       return nil, nil if person.blank? and person_new.blank?
       role = build_consumer_role(person, person_new)
@@ -163,7 +163,7 @@ module Factories
     end
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
-                               last_name, name_sfx, ssn, dob, gender, role_type)
+                               last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil)
       people = Person.match_by_id_info(ssn: ssn, dob: dob, last_name: last_name)
       person, is_new = nil, nil
       case people.count
@@ -200,6 +200,7 @@ module Factories
             last_name: last_name,
             name_sfx: name_sfx,
             ssn: ssn,
+            no_ssn: no_ssn,
             dob: dob,
             gender: gender,
           ), true

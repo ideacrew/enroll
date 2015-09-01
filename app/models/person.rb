@@ -40,7 +40,7 @@ class Person
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
-
+  field :no_ssn, type: String #ConsumerRole TODO TODOJF
   # Login account
   belongs_to :user
 
@@ -308,11 +308,11 @@ class Person
     self.emails << ::Email.new(:kind => 'work', :address => email)
   end
 
-  def has_active_consumer_role
+  def has_active_consumer_role?
     consumer_role.present? and consumer_role.is_active?
   end
 
-  def has_active_employee_roles
+  def has_active_employee_role?
     employee_roles.present? and employee_roles.active.present?
   end
 

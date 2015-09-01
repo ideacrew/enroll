@@ -29,7 +29,7 @@ function ineligible_alert(){
       alert("Since " + name + beginning + pronoun + ending + name + '.')
 }
 
-$(document).on('click', '.consumer_roles #btn-continue', function(){
+$(document).on('click', '.consumer_roles .edit_person .right-section .btn', function(){
   var valid_form = $('form')[0].checkValidity()
   if (!valid_form) {
     if (__is_safari__) alert(__invalid_form__)

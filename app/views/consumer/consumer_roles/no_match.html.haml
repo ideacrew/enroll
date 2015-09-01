@@ -4,7 +4,7 @@
       = form_for @person, { :as => :person, :url => match_consumer_consumer_role_index_path, :method => :get } do |f|
         .col-lg-7.col-md-7.col-sm-8.col-xs-12
           %h3 Personal Information
-          = render 'consumer/employee_roles/remote_search_form', f: f
+          = render 'consumer/consumer_roles/remote_search_form', f: f
           #person_search_results
             = render 'no_match'
           %br

@@ -56,6 +56,7 @@ class ConsumerRole
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
+  delegate :no_ssn,    :no_ssn=,    to: :person, allow_nil: true
   delegate :dob,    :dob=,    to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
@@ -72,7 +73,8 @@ class ConsumerRole
 
   accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents
 
-  validates_presence_of :ssn, :dob, :gender, :is_applicant
+  validates_presence_of :dob, :gender, :is_applicant
+  #validate :ssn_or_no_ssn
 
   validates :vlp_authority,
     allow_blank: true,
@@ -97,6 +99,10 @@ class ConsumerRole
   embeds_many :local_residency_responses, class_name:"EventResponse"
 
   after_initialize :setup_lawful_determination_instance
+
+  def ssn_or_no_ssn
+    errors.add(:base, 'Provide SSN or check No SSN') unless ssn.present? || no_ssn == '1'
+  end
 
   def start_residency_verification_process
     notify(RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.person})
@@ -294,9 +300,9 @@ class ConsumerRole
     end
   end
 
-  def start_individual_market_eligibility!
+  def start_individual_market_eligibility!(requested_start_date)
     if lawful_presence_pending?
-      lawful_presence_determination.start_determination_process
+      lawful_presence_determination.start_determination_process(requested_start_date)
     end
     if residency_pending?
       start_residency_verification_process

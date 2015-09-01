@@ -8,7 +8,6 @@
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:employee_role_id, @employee_role.try(:id)) %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
-          <%= hidden_field_tag(:sep_indicator, 'false') %>
 
           <div class="table-responsive table-border">
             <table class="table table-wrapper table-condensed group-selection-tbl">
@@ -67,7 +66,7 @@
 
           <div class='row top-pd'>
             <div class="col-sm-12">
-              <p>If you enroll today, coverage will begin Oct 1. Do you need coverage earlier?  Check <%= link_to "am I eligible for a Special Enrollment Period", "#", :onclick=>"$('#sep_indicator').val('true');$(this).closest('form').submit();" %> to see if you qualify</p>
+              <p>If you enroll today, coverage will begin Oct 1. <!-- Do you need coverage earlier? Check <%#= link_to "am I eligible for a Special Enrollment Period", "#", :onclick=>"$('#sep_indicator').val('true');$(this).closest('form').submit();" %> to see if you qualify --></p>
             </div>
           </div>
 
@@ -89,15 +88,23 @@
           <% end %>
         </div>
 
-        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">            
           <% if @change_plan.blank? && @market_kind == "individual" %>
+            <% if is_sep_eligible? %>
+            <%= render  partial: 'shared/sep_progress', locals: {step: '4'} %>
+            <% else %>
             <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
+            <% end %>
           <% elsif @change_plan.blank? %>
             <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
           <% elsif @change_plan == "change_by_qle" %>
             <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
           <% elsif @change_plan == "change_plan" %>
+            <% if is_sep_eligible? %>
+            <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
+            <% else %>
             <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
+            <% end %>
           <% end %>
         </div>
       </div>

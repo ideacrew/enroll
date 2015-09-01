@@ -2,9 +2,9 @@ class GroupSelectionController < ApplicationController
   def new
     initialize_common_vars
 
-    if @person.try(:has_active_employee_roles) and !@person.try(:has_active_consumer_role)
+    if @person.try(:has_active_employee_role?) and !@person.try(:has_active_consumer_role?)
       @market_kind = 'shop'
-    elsif !@person.try(:has_active_employee_roles) and @person.try(:has_active_consumer_role)
+    elsif !@person.try(:has_active_employee_role?) and @person.try(:has_active_consumer_role?)
       @market_kind = 'individual'
     else
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
@@ -59,11 +59,7 @@ class GroupSelectionController < ApplicationController
       else
         # FIXME: models should update relationships, not the controller
         hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
-        if params['sep_indicator'] == 'true'
-          redirect_to find_sep_insured_families_path(:hbx_enrollment_id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind)
-        else
-          redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind)
-        end
+        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind)
       end
     else
       raise "You must select the primary applicant to enroll in the healthcare plan"

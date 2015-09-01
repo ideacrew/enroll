@@ -1,10 +1,11 @@
 class Consumer::ConsumerRolesController < ApplicationController
   include ApplicationHelper
+  before_action :check_consumer_role, only: [:search]
 
   before_action :find_consumer_role_and_person, only: [:edit, :update]
 
   def search
-    @person = Forms::EmployeeCandidate.new
+    @person = Forms::ConsumerCandidate.new
     respond_to do |format|
       format.html
     end
@@ -12,11 +13,11 @@ class Consumer::ConsumerRolesController < ApplicationController
 
   def match
     @person_params = params.require(:person).merge({user_id: current_user.id})
-    @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
-    @person = @employee_candidate
+    @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
+    @person = @consumer_candidate
     respond_to do |format|
-      if @employee_candidate.valid?
-        found_person = @employee_candidate.match_person
+      if @consumer_candidate.valid?
+        found_person = @consumer_candidate.match_person
         if found_person.present?
           format.html { render 'match' }
         else
@@ -80,6 +81,7 @@ class Consumer::ConsumerRolesController < ApplicationController
       :name_sfx,
       :dob,
       :ssn,
+      :no_ssn,
       :gender,
       :language_code,
       :is_incarcerated,
@@ -129,5 +131,11 @@ class Consumer::ConsumerRolesController < ApplicationController
     document = find_document(@consumer_role, doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject])
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
     document.save
+  end
+
+  def check_consumer_role
+    if current_user.has_consumer_role?
+      redirect_to family_account_path
+    end
   end
 end

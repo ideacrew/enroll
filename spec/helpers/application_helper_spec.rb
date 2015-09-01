@@ -87,6 +87,15 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "#parse_ethnicity" do
+    it "should return string of values" do
+      expect(helper.parse_ethnicity(["test", "test1"])).to eq "test, test1"
+    end
+    it "should return empty value if ethnicity is not selected" do
+      expect(helper.parse_ethnicity([""])).to eq ""
+    end
+  end
+
   describe "#calculate_participation_minimum" do
     let(:plan_year_1){ double("PlanYear", eligible_to_enroll_count: 5) }
     before do
