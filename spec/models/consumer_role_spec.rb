@@ -3,6 +3,7 @@ require 'rails_helper'
 describe ConsumerRole, dbclean: :after_each do
   it { should delegate_method(:hbx_id).to :person }
   it { should delegate_method(:ssn).to :person }
+  it { should delegate_method(:no_ssn).to :person}
   it { should delegate_method(:dob).to :person }
   it { should delegate_method(:gender).to :person }
 
@@ -13,12 +14,12 @@ describe ConsumerRole, dbclean: :after_each do
   it { should delegate_method(:is_disabled).to :person }
 
   it { should validate_presence_of :gender }
-  it { should validate_presence_of :ssn }
   it { should validate_presence_of :dob }
 
   let(:address)       {FactoryGirl.build(:address)}
   let(:saved_person)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789")}
-
+  let(:saved_person_no_ssn)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "", no_ssn: '1')}
+  let(:saved_person_no_ssn_invalid)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "", no_ssn: '0')}
   let(:is_applicant)          { true }
   let(:citizen_error_message) { "test citizen_status is not a valid citizen status" }
 
@@ -57,6 +58,36 @@ describe ConsumerRole, dbclean: :after_each do
         it "should have a state of verifications_pending" do
           expect(consumer_role.aasm_state).to eq "verifications_pending"
         end
+      end
+    end
+
+    context "with all valid arguments including no ssn" do
+      let(:consumer_role) { saved_person_no_ssn.build_consumer_role(valid_params) }
+
+      it "should save" do
+        expect(consumer_role.save).to be_truthy
+      end
+
+      context "and it is saved" do
+        before do
+          consumer_role.save
+        end
+
+        it "should be findable" do
+          expect(ConsumerRole.find(consumer_role.id).id).to eq consumer_role.id
+        end
+
+        it "should have a state of verifications_pending" do
+          expect(consumer_role.aasm_state).to eq "verifications_pending"
+        end
+      end
+    end
+
+    context "with invalid arguments  no ssn" do
+      let(:consumer_role) { saved_person_no_ssn_invalid.build_consumer_role(valid_params) }
+
+      it "should not save" do
+        expect(consumer_role.save).to be_falsey
       end
     end
 

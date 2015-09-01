@@ -1,5 +1,5 @@
 require "rails_helper"
-
+include ActionView::Context
 RSpec.describe "consumer/consumer_roles/_form.html.erb" do
   let(:person) { Person.new }
   let(:consumer_role) { double("ConsumerRole", id: "test")}
