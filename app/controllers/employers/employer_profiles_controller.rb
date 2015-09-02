@@ -2,7 +2,6 @@ class Employers::EmployerProfilesController < ApplicationController
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox]
   before_action :check_admin_staff_role, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
-  before_action :set_current_person
 
   def index
     @q = params.permit(:q)[:q]
