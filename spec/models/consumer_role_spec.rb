@@ -133,6 +133,9 @@ end
 
 describe ConsumerRole, "in the verifications_pending state" do
   subject { ConsumerRole.new(:aasm_state => :verifications_pending) }
+    before(:each) do
+      allow(CoverageHousehold).to receive(:update_individual_eligibilities_for).with(subject)
+    end
 
   describe "with residency authorized" do
     before(:each) do
@@ -302,7 +305,12 @@ describe ConsumerRole, "in the verifications_pending state" do
 end
 
 describe ConsumerRole, "in the verifications_outstanding state" do
+
   subject { ConsumerRole.new(:aasm_state => :verifications_outstanding, :lawful_presence_determination => lawful_presence_determination, :is_state_resident => state_resident_value) }
+
+  before(:each) do
+    allow(CoverageHousehold).to receive(:update_individual_eligibilities_for).with(subject)
+  end
 
   describe "with a failed residency, and successful lawful presence" do
     let(:lawful_presence_determination) {

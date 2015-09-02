@@ -1,5 +1,6 @@
 module Subscribers
   class LocalResidency < ::Acapi::Subscription
+    include Acapi::Notifiers
     def self.subscription_details
       ["acapi.info.events.residency.verification_response"]
     end
@@ -10,19 +11,34 @@ module Subscribers
 
     private
     def process_response(payload)
-      stringed_key_payload = payload.stringify_keys
-      xml = stringed_key_payload['body']
-      person_hbx_id = stringed_key_payload['individual_id']
+      begin
+        stringed_key_payload = payload.stringify_keys
+        xml = stringed_key_payload['body']
+        person_hbx_id = stringed_key_payload['individual_id']
+        return_status = stringed_key_payload["return_status"].to_s
 
-      person = find_person(person_hbx_id)
-      return if person.nil? || person.consumer_role.nil?
+        person = find_person(person_hbx_id)
+        return if person.nil? || person.consumer_role.nil?
+        consumer_role = person.consumer_role
+        consumer_role.local_residency_responses << EventResponse.new({received_at: Time.now, body: xml})
 
-      consumer_role = person.consumer_role
-      consumer_role.local_residency_responses << EventResponse.new({received_at: Time.now, body: xml})
+        if "503" == return_status.to_s
+          consumer_role.deny_residency!
+          consumer_role.save
+          return
+        end
 
-      xml_hash = xml_to_hash(xml)
+        xml_hash = xml_to_hash(xml)
 
-      update_consumer_role(consumer_role, xml_hash)
+        update_consumer_role(consumer_role, xml_hash)
+      rescue => e
+        notify("acapi.error.application.enroll.remote_listener.local_residency_reponses", {
+          :body => JSON.dump({
+            :error => e.inspect,
+            :message => e.message,
+            :backtrace => e.backtrace
+          })})
+      end
     end
 
     def update_consumer_role(consumer_role, xml_hash)

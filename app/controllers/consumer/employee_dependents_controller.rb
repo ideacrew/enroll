@@ -104,9 +104,17 @@ private
 
   def params_clean_vlp_documents
     return if params[:dependent][:consumer_role].nil? or params[:dependent][:consumer_role][:vlp_documents_attributes].nil?
-    params[:dependent][:consumer_role][:vlp_documents_attributes].reject! do |index, doc|
-      params[:naturalization_doc_type] != doc[:subject]
+
+    if params[:dependent][:us_citizen].eql? 'true'
+      params[:dependent][:consumer_role][:vlp_documents_attributes].reject! do |index, doc|
+        params[:naturalization_doc_type] != doc[:subject]
+      end
+    elsif params[:dependent][:eligible_immigration_status].eql? 'true'
+      params[:dependent][:consumer_role][:vlp_documents_attributes].reject! do |index, doc|
+        params[:immigration_doc_type] != doc[:subject]
+      end
     end
+
     vlp_doc_params = params[:dependent][:consumer_role]
     params[:dependent].delete :consumer_role
     vlp_doc_params
@@ -114,7 +122,9 @@ private
 
   def update_vlp_documents(vlp_doc_params)
     return unless vlp_doc_params.present?
-    doc_params = vlp_doc_params.permit(:vlp_documents_attributes=>[:subject, :citizenship_number, :naturalization_number, :alien_number])
+    doc_params = vlp_doc_params.permit(:vlp_documents_attributes=> [:subject, :citizenship_number, :naturalization_number,
+                                                                    :alien_number, :passport_number, :sevis_id, :visa_number,
+                                                                    :receipt_number, :expiration_date, :card_number, :i94_number])
     return if doc_params[:vlp_documents_attributes].first.nil?
     dependent_person = @dependent.family_member.person
     document = find_document(dependent_person.consumer_role, doc_params[:vlp_documents_attributes].first.last[:subject])

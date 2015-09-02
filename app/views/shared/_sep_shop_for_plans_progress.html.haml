@@ -32,3 +32,5 @@
         PREVIOUS
 - elsif step == 4
   = link_to 'Continue', family_account_path, class: 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue'
+- elsif step == 1
+  = link_to 'CONTINUE', family_account_path, class: 'btn btn-lg btn-primary btn-br btn-block no-sep-continue', disabled: true, id: 'btn-continue'

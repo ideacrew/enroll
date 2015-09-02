@@ -24,8 +24,6 @@ class Insured::FamiliesController < FamiliesController
 
   def find_sep
     @hbx_enrollment_id = params[:hbx_enrollment_id]
-    @market_kind = params[:market_kind]
-    @coverage_kind = params[:coverage_kind]
     @change_plan = params[:change_plan]
 
     render :layout => 'application' 

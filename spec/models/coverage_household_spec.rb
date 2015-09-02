@@ -20,3 +20,16 @@ describe CoverageHousehold, type: :model do
     end
   end
 end
+
+describe CoverageHousehold, "when informed that eligiblity has changed for an individual" do
+  let(:mock_person) { double }
+  let(:matching_coverage_household) { instance_double("CoverageHousehold") }
+  let(:mock_household) { instance_double("Household", :coverage_households => [matching_coverage_household]) }
+  let(:mock_family) { instance_double("Family", :households => [mock_household]) }
+
+  it "should locate and notify each coverage household containing that individual" do
+    allow(Family).to receive(:find_all_by_person).with(mock_person).and_return([mock_family])
+    expect(matching_coverage_household).to receive(:evaluate_individual_market_eligiblity)
+    CoverageHousehold.update_individual_eligibilities_for(mock_person)
+  end
+end

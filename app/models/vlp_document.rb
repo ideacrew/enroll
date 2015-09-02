@@ -1,5 +1,4 @@
 class VlpDocument < Document
-  include Mongoid::Document
 
   NATURALIZATION_DOCUMENT_TYPES = ["Certificate of Citizenship", "Naturalization Certificate"]
 
