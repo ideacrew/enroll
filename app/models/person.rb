@@ -29,7 +29,7 @@ class Person
   field :date_of_death, type: Date
 
   field :is_incarcerated, type: Boolean
-  
+
   field :is_disabled, type: Boolean
   field :ethnicity, type: Array
   field :race, type: String
@@ -149,7 +149,7 @@ class Person
   scope :broker_role_certified,     -> { where("broker_role.aasm_state" => { "$in" => [:active, :broker_agency_pending]})}
   scope :broker_role_decertified,   -> { where("broker_role.aasm_state" => { "$eq" => :decertified })}
   scope :broker_role_denied,        -> { where("broker_role.aasm_state" => { "$eq" => :denied })}
- 
+
 
 #  ViewFunctions::Person.install_queries
 
@@ -374,7 +374,7 @@ class Person
     end
 
     def find_all_staff_roles_by_employer_profile(employer_profile)
-      where(:'employer_staff_role.employer_profile_id' => employer_profile.id)
+      where({"$and"=>[{"employer_staff_roles.employer_profile_id"=> employer_profile.id}, {"employer_staff_roles.is_owner"=>true}]})
     end
 
     def match_existing_person(personish)
@@ -397,10 +397,10 @@ class Person
     end
 
     def brokers_or_agency_staff_with_status(query, status)
-      query.and( 
-                Person.or( 
-                          { :"broker_agency_staff_roles.aasm_state" => status }, 
-                          { :"broker_role.aasm_state" => status } 
+      query.and(
+                Person.or(
+                          { :"broker_agency_staff_roles.aasm_state" => status },
+                          { :"broker_role.aasm_state" => status }
                          ).selector
                )
     end
@@ -487,8 +487,8 @@ class Person
   private
   def is_ssn_composition_correct?
     # Invalid compositions:
-    #   All zeros or 000, 666, 900-999 in the area numbers (first three digits); 
-    #   00 in the group number (fourth and fifth digit); or 
+    #   All zeros or 000, 666, 900-999 in the area numbers (first three digits);
+    #   00 in the group number (fourth and fifth digit); or
     #   0000 in the serial number (last four digits)
 
     if ssn.present?

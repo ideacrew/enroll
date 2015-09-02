@@ -408,9 +408,9 @@ RSpec.describe Employers::EmployerProfilesController do
       end
     end
 
-     context "given the company has an owner" do
+     context "given the company have managing staff" do
       it "should render edit template" do
-        allow(employer_profile).to receive(:owner).and_return(person)
+        allow(employer_profile).to receive(:staff_roles).and_return(person)
         allow(user).to receive(:save).and_return(true)
         sign_in(user)
         put :update, id: organization.id

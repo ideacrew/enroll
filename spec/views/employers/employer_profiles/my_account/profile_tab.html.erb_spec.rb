@@ -7,7 +7,7 @@ RSpec.describe "employers/employer_profiles/my_account/_profile_tab.html.erb" do
 
   context "employer profile tab" do
     before :each do
-      allow(employer_profile).to receive(:owner).and_return(person)
+      allow(employer_profile).to receive(:staff_roles).and_return([person])
       assign :employer_profile, employer_profile
       render partial: "employers/employer_profiles/my_account/profile_tab.html.erb"
     end
@@ -24,14 +24,14 @@ RSpec.describe "employers/employer_profiles/my_account/_profile_tab.html.erb" do
     end
 
     it "should display the contact" do
-      expect(rendered).to match /Owner/
+      expect(rendered).to match /Staff/
       expect(rendered).to match /#{person.full_name}/
     end
   end
 
   context "employer_profile should have home page" do
     before :each do
-      allow(employer_profile).to receive(:owner).and_return(person)
+      allow(employer_profile).to receive(:staff_roles).and_return([person])
       allow(employer_profile).to receive(:organization).and_return(organization)
       allow(organization).to receive(:home_page).and_return("http://google.com")
       assign :employer_profile, employer_profile
