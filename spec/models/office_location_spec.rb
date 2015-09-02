@@ -3,10 +3,9 @@ require 'rails_helper'
 RSpec.describe OfficeLocation, :type => :model do
 
   it { should validate_presence_of :address }
-  it { should validate_presence_of :phone }
 
   let(:organization) {FactoryGirl.create(:organization)}
-  let(:address) {FactoryGirl.build(:address)}
+  let(:address) {FactoryGirl.build(:address, kind: 'primary')}
   let(:phone) {FactoryGirl.build(:phone)}
   let(:email) {FactoryGirl.build(:email)}
   let(:is_primary) { true }
@@ -50,8 +49,14 @@ RSpec.describe OfficeLocation, :type => :model do
     context "with no phone" do
       let(:params) {valid_params.except(:phone)}
 
-      it "should fail validation" do
+      it "should fail validation when primary" do
         expect(OfficeLocation.create(**params).errors[:phone].any?).to be_truthy
+      end
+
+      it "should success when mailing" do
+        params[:address][:kind] = "mailing"
+        expect(OfficeLocation.create(**params).errors[:phone].any?).to be_falsey
+        expect(OfficeLocation.new(**params).save).to be_truthy
       end
     end
 

@@ -120,6 +120,7 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def update
+    sanitize_employer_profile_params
     @organization = Organization.find(params[:id])
     @employer_profile = @organization.employer_profile
     current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
@@ -227,6 +228,12 @@ class Employers::EmployerProfilesController < ApplicationController
           :email_attributes => [:kind, :address]
         ]
       )
+    end
+
+    def sanitize_employer_profile_params
+      params[:organization][:office_locations_attributes].each do |key, location|
+        location.delete('phone_attributes') if location['phone_attributes'].present? and location['phone_attributes']['number'].blank?
+      end
     end
 
     def build_organization

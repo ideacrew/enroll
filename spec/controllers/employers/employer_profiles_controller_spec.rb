@@ -385,6 +385,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(Organization).to receive(:find).and_return(organization)
       allow(organization).to receive(:employer_profile).and_return(employer_profile)
       allow(controller).to receive(:employer_profile_params).and_return({})
+      allow(controller).to receive(:sanitize_employer_profile_params).and_return(true)
     end
 
     it "should redirect" do
