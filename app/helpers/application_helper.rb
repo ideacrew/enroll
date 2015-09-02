@@ -316,14 +316,13 @@ module ApplicationHelper
     elsif current_user.try(:person).try(:assister_role)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm an In Person Assister".html_safe,
       home_exchanges_agents_path
+    elsif (controller_path.include?("insured") && current_user.try(:has_insured_role?)) ||
+      (["employee_roles", "consumer_roles"].include?(controller))
+      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Insured".html_safe
     elsif current_user.try(:has_broker_agency_staff_role?)
       "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe
     elsif current_user.try(:has_employer_staff_role?)
       "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe
-    elsif controller == 'employee_roles' || controller == "consumer_roles"
-      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Insured".html_safe
-    elsif controller == 'consumer_profiles'
-      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Insured".html_safe
     else
       "Welcome to the District's Health Insurance Marketplace"
     end
