@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   # before_filter :require_login, unless: :devise_controller?
 
   before_filter :require_login, unless: :authentication_not_required?
+  after_action :update_url
 
 
   # force_ssl
@@ -75,6 +76,17 @@ class ApplicationController < ActionController::Base
       request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first
     else
       nil
+    end
+  end
+
+  def update_url
+    if (controller_name == "employer_profiles" && action_name == "show") ||
+        (controller_name == "families" && action_name == "home") ||
+        (controller_name == "profiles" && action_name == "new")
+        if current_user.last_portal_visited != request.original_url
+          current_user.last_portal_visited = request.original_url
+          current_user.save
+        end
     end
   end
 
