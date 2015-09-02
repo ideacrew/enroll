@@ -4,7 +4,7 @@ RSpec.describe Insured::FamiliesController do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { double("User", last_portal_visited: "test.com") }
-  let(:person) { double("Person") }
+  let(:person) { double("Person", id: "test") }
   let(:family) { double("Family") }
   let(:household) { double("HouseHold") }
   let(:family_members){[double("FamilyMember")]}
@@ -14,6 +14,8 @@ RSpec.describe Insured::FamiliesController do
   before :each do
     allow(user).to receive(:person).and_return(person)
     allow(person).to receive(:primary_family).and_return(family)
+    allow(person).to receive(:consumer_role).and_return(consumer_role)
+    allow(person).to receive(:employee_roles).and_return(employee_roles)
     sign_in(user)
   end
 
