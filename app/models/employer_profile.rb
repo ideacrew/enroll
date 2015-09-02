@@ -68,12 +68,12 @@ class EmployerProfile
     EmployeeRole.ids_in(covered_ee_ids)
   end
 
-  def owners
+  def owners #business owners
     staff_roles.select{|p| p.try(:employee_roles).try(:any?){|ee| ee.census_employee.is_business_owner? }}
   end
 
-  def staff_roles
-    Person.find_all_staff_roles_by_employer_profile(self)
+  def staff_roles #managing profile staff
+    Person.find_all_staff_roles_by_employer_profile(self) || [Person.find_all_staff_roles_by_employer_profile(self).select{ |staff| staff.employer_staff_role.is_owner }]
   end
 
   def today=(new_date)

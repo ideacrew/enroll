@@ -32,15 +32,15 @@
 </div>
 
 <div class="row no-buffer">
-  <% if @employer_profile.owner.try(:present?) %>
+  <% if @employer_profile.staff_roles.try(:present?) %>
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-      <h4>Owner</h4>
+      <h4>Staff</h4>
       <div class="form-border">
-        <p><%= @employer_profile.owner.full_name %></p>
-        <% @employer_profile.owner.phones.each do |phone| %>
+        <p><%= @employer_profile.staff_roles.first.full_name %></p>
+        <% @employer_profile.staff_roles.first.phones.each do |phone| %>
           <p><%= phone.kind %> phone: <%= phone.to_s %></p>
         <% end %>
-        <% @employer_profile.owner.emails.each do |email| %>
+        <% @employer_profile.staff_roles.first.emails.each do |email| %>
           <p><%= email.kind %> email: <%= email.address %></p>
         <% end %>
       </div>
