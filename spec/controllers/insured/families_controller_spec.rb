@@ -3,30 +3,37 @@ require 'rails_helper'
 RSpec.describe Insured::FamiliesController do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
-  let(:person) { FactoryGirl.create(:person) }
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { double("User", last_portal_visited: "test.com") }
+  let(:person) { double("Person", id: "test") }
   let(:family) { double("Family") }
   let(:household) { double("HouseHold") }
   let(:family_members){[double("FamilyMember")]}
   let(:employee_roles) { [double("EmployeeRole")] }
   let(:consumer_role) { double("ConsumerRole") }
 
-  before :each do 
+  before :each do
     allow(user).to receive(:person).and_return(person)
     allow(person).to receive(:primary_family).and_return(family)
+    allow(person).to receive(:consumer_role).and_return(consumer_role)
+    allow(person).to receive(:employee_roles).and_return(employee_roles)
     sign_in(user)
   end
 
   describe "GET home" do
-    before :each do 
+    before :each do
       allow(family).to receive(:enrolled_hbx_enrollments).and_return(hbx_enrollments)
       allow(user).to receive(:has_employee_role?).and_return(true)
       allow(user).to receive(:has_consumer_role?).and_return(true)
+      allow(user).to receive(:last_portal_visited=).and_return("test.com")
+      allow(user).to receive(:save).and_return(true)
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:consumer_role).and_return(consumer_role)
       session[:portal] = "insured/families"
     end
 
-    context "for SHOP market" do    
+    context "for SHOP market" do
       before :each do
+        sign_in user
         allow(person).to receive(:employee_roles).and_return(employee_roles)
         get :home
       end
@@ -50,7 +57,7 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
-    context "for IVL market" do    
+    context "for IVL market" do
       before :each do
         allow(person).to receive(:employee_roles).and_return([])
         get :home
@@ -77,7 +84,8 @@ RSpec.describe Insured::FamiliesController do
   end
 
   describe "GET manage_family" do
-    before :each do 
+    before :each do
+      allow(person).to receive(:employee_roles).and_return(employee_roles)
       allow(family).to receive(:active_family_members).and_return(family_members)
       get :manage_family
     end
@@ -97,7 +105,7 @@ RSpec.describe Insured::FamiliesController do
   end
 
   describe "GET personal" do
-    before :each do 
+    before :each do
       allow(family).to receive(:active_family_members).and_return(family_members)
       get :personal
     end
@@ -116,7 +124,7 @@ RSpec.describe Insured::FamiliesController do
   end
 
   describe "GET inbox" do
-    before :each do 
+    before :each do
       get :inbox
     end
 
@@ -135,7 +143,7 @@ RSpec.describe Insured::FamiliesController do
 
 
   describe "GET document_index" do
-    before :each do 
+    before :each do
       get :documents_index
     end
 
@@ -150,7 +158,7 @@ RSpec.describe Insured::FamiliesController do
 
 
   describe "GET document_upload" do
-    before :each do 
+    before :each do
       allow(person).to receive(:consumer_role).and_return(consumer_role)
       get :document_upload
     end

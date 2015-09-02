@@ -1,13 +1,20 @@
 class GroupSelectionController < ApplicationController
-  def new
-    initialize_common_vars
 
+  def new
+    initialize_common_vars 
     if @person.try(:has_active_employee_role?) and !@person.try(:has_active_consumer_role?)
       @market_kind = 'shop'
     elsif !@person.try(:has_active_employee_role?) and @person.try(:has_active_consumer_role?)
       @market_kind = 'individual'
     else
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
+    end
+    if @market_kind == 'individual'
+      hbx = HbxProfile.find_by_state_abbreviation("dc")
+      bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
+      pkgs = bc_period.benefit_packages
+      benefit_package = pkgs.select{|plan|  plan[:title] == "individual_health_benefits_2015"}
+      @benefit = benefit_package.first
     end
   end
 
@@ -101,8 +108,10 @@ class GroupSelectionController < ApplicationController
     if params[:employee_role_id].present?
       emp_role_id = params.require(:employee_role_id)
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
+      @role = @employee_role
     else
       @consumer_role = @person.consumer_role
+      @role = @consumer_role
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'

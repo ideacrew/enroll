@@ -34,7 +34,7 @@ $(document).on('click', '.consumer_roles .edit_person .right-section .btn', func
   if (!valid_form) {
     if (__is_safari__) alert(__invalid_form__)
   }
-  else { 
+  else {
     if (ineligible_immigration() || ineligible_incarcerated())  ineligible_alert()
   }
   return true

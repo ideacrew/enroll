@@ -5,12 +5,14 @@ RSpec.describe BrokerAgencies::ProfilesController do
   let(:broker_agency_profile) { double("test") }
 
   describe "GET new" do
-    let(:user) { double("user")}
+    let(:user) { double("user", last_portal_visited: "test.com")}
     let(:person) { double("person")}
 
     it "should render the new template" do
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(false)
       allow(user).to receive(:has_broker_role?).and_return(false)
+      allow(user).to receive(:last_portal_visited=).and_return("true")
+      allow(user).to receive(:save).and_return(true)
       sign_in(user)
       get :new
       expect(response).to have_http_status(:success)

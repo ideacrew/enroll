@@ -264,28 +264,6 @@ describe Person do
           allow(person).to receive(:consumer_role).and_return(nil)
           expect(person.has_active_consumer_role?).to eq false
         end
-
-        it 'incarcerated consumer is ineligible' do
-          allow(person).to receive(:consumer_role).and_return(consumer_role)
-          allow(person).to receive(:is_incarcerated).and_return(true)
-          expect(person.ineligible_ivl).to eq true
-        end
-
-        it 'non citizen consumer is eligible' do
-          allow(person).to receive(:consumer_role).and_return(consumer_role)
-          allow(person).to receive(:is_incarcerated).and_return(false)
-          allow(person).to receive(:us_citizen).and_return(false)
-          allow(person).to receive(:eligible_immigration_status).and_return(true)
-          expect(person.ineligible_ivl).to eq false
-        end
-
-        it 'illegal consumer is ineligible' do
-          allow(person).to receive(:consumer_role).and_return(consumer_role)
-          allow(person).to receive(:is_incarcerated).and_return(false)
-          allow(person).to receive(:us_citizen).and_return(false)
-          allow(person).to receive(:eligible_immigration_status).and_return(false)
-          expect(person.ineligible_ivl).to eq true
-        end
       end
     end
   end

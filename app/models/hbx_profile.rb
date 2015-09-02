@@ -56,7 +56,18 @@ class HbxProfile
 
   class << self
     def find(id)
-      Organization.where("hbx_profile._id" => BSON::ObjectId.from_string(id)).first.hbx_profile
+      org = Organization.where("hbx_profile._id" => BSON::ObjectId.from_string(id)).first
+      org.hbx_profile if org.present?
+    end
+
+    def find_by_cms_id(id)
+      org = Organization.where("hbx_profile.cms_id": id).first
+      org.hbx_profile if org.present?
+    end
+
+    def find_by_state_abbreviation(state)
+      org = Organization.where("hbx_profile.us_state_abbreviation": state.to_s.upcase).first
+      org.hbx_profile if org.present?
     end
 
     def all

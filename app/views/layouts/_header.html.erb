@@ -18,17 +18,8 @@
           <div class="right-menu navbar-right">
             <% if signed_in? %>
               <ul class="navbar-nav top-menu">
-                <li>
-                  <% if controller_name == "employee_roles" && current_user.has_consumer_role? %>
-                    <%= link_to "Switch to Consumer Portal", "#" %> |
-                  <% elsif controller_name == "consumer_roles" && current_user.has_employee_role? %>
-                    <%= link_to "Switch to Employee Portal", "#" %> |
-                  <% end %>
-                </li>
-                <% if @person.present? && @person.persisted? %>
-                  <li><%= link_to "My Account", family_account_path %></li>
+                  <%= render partial: "shared/my_portal_links"%>
                   <li class="hidden-xs">|</li>
-                <% end %>
                   <li><a href="#">1-855-532-5465</a></li>
                   <li class="hidden-xs">|</li>
                   <li><a href="https://dchealthlink.com/help" target="_blank">Help</a></li>

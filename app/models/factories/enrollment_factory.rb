@@ -179,7 +179,8 @@ module Factories
         person, is_new = person, false
       when 0
         if user.try(:person).try(:present?)
-          if user.person.first_name == first_name and user.person.last_name = last_name
+          if user.person.first_name.downcase == first_name.downcase and
+            user.person.last_name.downcase == last_name.downcase # if user enters lowercase during matching.
             person = user.person
             person.update(name_sfx: name_sfx,
                           middle_name: middle_name,

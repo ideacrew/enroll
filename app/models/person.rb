@@ -484,16 +484,6 @@ class Person
     !!agent
   end
 
-  def ineligible_ivl
-    return false unless self.try(:consumer_role)
-    is_incarcerated || (!us_citizen && !eligible_immigration_status)
-  end
-
-  # HACK
-  # FIXME
-  # TODO: Never emulate this behaviour - this is something terrible Trey did to unblock our progress -
-  #       and needs to be revisited and refactored
-
   private
   def is_ssn_composition_correct?
     # Invalid compositions:
