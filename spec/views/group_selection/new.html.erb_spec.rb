@@ -14,7 +14,7 @@ RSpec.describe "group_selection/new.html.erb" do
       assign(:person, person)
       assign(:employee_role, employee_role)
       assign(:coverage_household, coverage_household)
-      assign(:market_kind, 'individual')
+      assign(:market_kind, 'shop')
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
       allow(family_member1).to receive(:is_primary_applicant?).and_return(true)
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
@@ -23,8 +23,8 @@ RSpec.describe "group_selection/new.html.erb" do
       allow(family_member1).to receive(:person).and_return(person)
       allow(family_member2).to receive(:person).and_return(person)
       allow(family_member3).to receive(:person).and_return(person)
-      @eligibility = InsuredEligibleForBenefitRule.new(employee_role,'shop')
-      allow(@eligibility).to receive(:satisfied?).and_return([true, true, false])
+      #@eligibility = InsuredEligibleForBenefitRule.new(employee_role,'shop')
+      #allow(@eligibility).to receive(:satisfied?).and_return([true, true, false])
       controller.request.path_parameters[:person_id] = person.id
       controller.request.path_parameters[:employee_role_id] = employee_role.id
       render :template => "group_selection/new.html.erb"
@@ -40,7 +40,7 @@ RSpec.describe "group_selection/new.html.erb" do
     end
 
     it "should have a checked checkbox option and a checked radio button" do
-      expect(rendered).to have_selector("input[checked='checked']", count: 3)
+      expect(rendered).to have_selector("input[checked='checked']", count: 2)
     end
 
     it "should have a disabled checkbox option" do
@@ -53,6 +53,61 @@ RSpec.describe "group_selection/new.html.erb" do
 
     it "should have a 'not eligible'" do
       expect(rendered).to have_selector('td', text: 'ineligible relationship')
+    end
+
+  end
+  context "coverage selection with incarcerated" do
+    let(:jail_person) { FactoryGirl.create(:person, is_incarcerated: true, us_citizen: true) }
+    let(:person2) { FactoryGirl.create(:person, us_citizen: true, is_incarcerated: false) }
+    let(:person3) { FactoryGirl.create(:person, us_citizen: true, is_incarcerated: false) }
+    let(:consumer_role) { FactoryGirl.create(:consumer_role, person: jail_person) }
+    let(:consumer_role2) { FactoryGirl.create(:consumer_role, person: person2) }
+    let(:consumer_role3) { FactoryGirl.create(:consumer_role, person: person3) }
+    let(:benefit_package) { FactoryGirl.create(:benefit_package,
+      title: "individual_health_benefits_2015",
+      elected_premium_credit_strategy: "unassisted",
+      benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
+        market_places:        ["individual"],
+        enrollment_periods:   ["open_enrollment", "special_enrollment"],
+        family_relationships: BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS,
+        benefit_categories:   ["health"],
+        incarceration_status: ["unincarcerated"],
+        age_range:            0..0,
+        citizenship_status:   ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
+        residency_status:     ["state_resident"],
+        ethnicity:            ["any"]
+    ))}
+
+    let(:family_member2) { instance_double("FamilyMember",id: "family_member", primary_relationship: "child", dob: Date.new(2010,11,18), full_name: "cgukd", is_primary_applicant: false, person: person2) }
+    let(:family_member3) { instance_double("FamilyMember",id: "family_member", primary_relationship: "spouse", dob: Date.new(1991,9,21), full_name: "spouse", is_primary_applicant: false, person: person3) }
+    let(:family_member4) { instance_double("FamilyMember",id: "family_member", primary_relationship: "self", dob: Date.new(1990,10,28), full_name: "inmsr", is_primary_applicant: true, person: jail_person) }
+    let(:coverage_household_jail) { instance_double("CoverageHousehold",family_members: [family_member4, family_member2, family_member3]) }
+    before(:each) do
+      assign(:person, jail_person)
+      assign(:consumer_role, consumer_role)
+      assign(:coverage_household, coverage_household_jail)
+      assign(:market_kind, 'individual')
+      assign(:benefit, benefit_package)
+      allow(jail_person).to receive(:consumer_role).and_return(consumer_role)
+      allow(person2).to receive(:consumer_role).and_return(consumer_role2)
+      allow(consumer_role2).to receive(:is_incarcerated?).and_return(false)
+      allow(person3).to receive(:consumer_role).and_return(consumer_role3)
+      allow(consumer_role3).to receive(:is_incarcerated?).and_return(false)
+      controller.request.path_parameters[:person_id] = jail_person.id
+      controller.request.path_parameters[:consumer_role_id] = consumer_role.id
+      render :template => "group_selection/new.html.erb"
+    end
+
+    it "should show the title of family members" do
+      expect(rendered).to match /Family Members/
+    end
+
+    it "should have three checkbox option" do
+      expect(rendered).to have_selector("input[type='checkbox']", count: 3)
+    end
+
+    it "should have one ineligible row" do
+      expect(rendered).to have_selector("tr[class='ineligible_row']", count: 1)
     end
 
     it "should have coverage_kinds area" do
@@ -68,50 +123,8 @@ RSpec.describe "group_selection/new.html.erb" do
       expect(rendered).to have_selector('input[value="dental"]')
       expect(rendered).to have_selector('label', text: 'Dental')
     end
-  end
-  context "coverage selection with incarcerated" do
-    let(:person) { FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) }
-    let(:jail_person) { FactoryGirl.create(:person, is_incarcerated: true, us_citizen: true) }
-    let(:consumer_role) { FactoryGirl.create(:consumer_role, person: jail_person) }
-    let(:benefit_package) { FactoryGirl.create(:benefit_package) }
-    let(:family_member2) { double(id: "family_member", primary_relationship: "parent", dob: Date.new(1990,10,10), full_name: "member") }
-    let(:family_member3) { double(id: "family_member", primary_relationship: "spouse", dob: Date.new(1990,10,10), full_name: "member") }
-    let(:family_member4) { double(id: "family_member", primary_relationship: "spouse", dob: Date.new(1990,10,10), full_name: "member") }
-    let(:coverage_household_jail) { double(family_members: [family_member4, family_member2, family_member3]) }
-    before(:each) do
-      assign(:person, person)
-      assign(:consumer_role, consumer_role)
-      assign(:coverage_household, coverage_household_jail)
-      assign(:market_kind, 'individual')
-      allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
-      allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
-      allow(family_member4).to receive(:is_primary_applicant?).and_return(true)
-      allow(person).to receive(:consumer_role).and_return(true)
-      allow(jail_person).to receive(:consumer_role).and_return(true)
-      allow(family_member2).to receive(:person).and_return(person)
-      allow(family_member3).to receive(:person).and_return(person)
-      allow(family_member4).to receive(:person).and_return(jail_person)
 
-      allow(family_member3).to receive(:person).and_return(person)
-      @eligibility = InsuredEligibleForBenefitRule.new(consumer_role,benefit_package)
 
-      controller.request.path_parameters[:person_id] = person.id
-      controller.request.path_parameters[:consumer_role_id] = consumer_role.id
-      render :template => "group_selection/new.html.erb"
-    end
-
-    it "should show the title of family members" do
-
-      expect(rendered).to match /Family Members/
-    end
-
-    it "should have three checkbox option" do
-      expect(rendered).to have_selector("input[type='checkbox']", count: 2)
-    end
-
-    it "should have a checked checkbox option and a checked radio button" do
-      expect(rendered).to have_selector("input[checked='checked']", count: 2)
-    end
 
   end
 

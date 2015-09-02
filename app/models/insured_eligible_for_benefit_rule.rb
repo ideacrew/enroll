@@ -37,7 +37,7 @@ class InsuredEligibleForBenefitRule
   def satisfied?
     if @role.class.name == "ConsumerRole"
       @errors = []
-      @benefit_package.benefit_eligibility_element_group.class.fields.keys.reject{|k| k == "_id"}.reduce(true) do |eligible, element|
+      status = @benefit_package.benefit_eligibility_element_group.class.fields.keys.reject{|k| k == "_id"}.reduce(true) do |eligible, element|
         if self.public_send("is_#{element}_satisfied?")
           true && eligible
         else
@@ -45,6 +45,7 @@ class InsuredEligibleForBenefitRule
           false
         end
       end
+      return status, @errors
     end
   end
 
@@ -74,7 +75,13 @@ class InsuredEligibleForBenefitRule
 
   def is_residency_status_satisfied?
     return true if @benefit_package.residency_status.include?("any")
-    @benefit_package.residency_status.include?("state_resident") && @role.is_state_resident?
+    if @benefit_package.residency_status.include?("state_resident")
+      addresses = @role.person.addresses
+      return true if !addresses || addresses.count == 0 #TEMPORARY CODE FOR DEPENDENTS FIXME TOD
+      address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
+      addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}
+    end
+    return false
   end
 
   def is_incarceration_status_satisfied?

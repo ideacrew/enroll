@@ -1,7 +1,7 @@
 class GroupSelectionController < ApplicationController
-  def new
-    initialize_common_vars
 
+  def new
+    initialize_common_vars 
     if @person.try(:has_active_employee_role?) and !@person.try(:has_active_consumer_role?)
       @market_kind = 'shop'
     elsif !@person.try(:has_active_employee_role?) and @person.try(:has_active_consumer_role?)
@@ -9,7 +9,13 @@ class GroupSelectionController < ApplicationController
     else
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
     end
-    @eligibility = InsuredEligibleForBenefitRule.new(@role, @market_kind)
+    if @market_kind == 'individual'
+      hbx = HbxProfile.find_by_state_abbreviation("dc")
+      bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
+      pkgs = bc_period.benefit_packages
+      benefit_package = pkgs.select{|plan|  plan[:title] == "individual_health_benefits_2015"}
+      @benefit = benefit_package.first
+    end
   end
 
   def create

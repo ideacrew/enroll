@@ -4,6 +4,5 @@ FactoryGirl.define do
     elected_premium_credit_strategy { "unassisted" }
     benefit_begin_after_event_offsets { [30, 60, 90] }
     benefit_effective_dates { ["first_of_month"] }
-    # benefit_eligibility_element_group
-  end
+    end 
 end
