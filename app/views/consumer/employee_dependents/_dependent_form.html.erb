@@ -46,9 +46,18 @@
         </div>
       </div>
 
-      <div class="col-md-3 col-sm-3 no-pd">
+      <div class="col-md-2 col-sm-2 no-pd">
         <div class="form-group form-group-lg">
           <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", placeholder: "SOCIAL SECURITY" %>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-2 no-pd">
+        <div class="form-group form-group-lg top-buffer">
+          <%= f.check_box :no_ssn %> 
+          <%= f.label :no_ssn, :value => true do %>
+            <span class='no_ssn'>&nbsp;NO SSN</span>
+          <% end %>
+          <span><i class='fa fa-question-circle'></i></span>
         </div>
       </div>
 
@@ -58,14 +67,14 @@
         </div>
       </div>
 
-      <div class="col-md-4 col-sm-4 no-pd">
+      <div class="col-md-3 col-sm-3 no-pd">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
           <div class="radio">
             <%= f.radio_button :gender, "male", checked: true, class: "required floatlabel", id: 'radio_male' %>
             <label for="radio_male"><span>MALE</span></label>
           </div>
         </div>
-        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
           <div class="radio">
             <%= f.radio_button :gender, "female", class: "required floatlabel", id: 'radio_female'  %>
             <label for="radio_female"><span>FEMALE</span></label>

@@ -83,6 +83,7 @@ module Forms
         :gender => gender,
         :dob => dob,
         :ssn => ssn,
+        :no_ssn => no_ssn,
         :race => race,
         :ethnicity => ethnicity,
         :language_code => language_code,

@@ -25,5 +25,14 @@ describe "consumer/employee_dependents/_dependent_form.html.erb" do
     it "should have consumer_fields area" do
       expect(rendered).to have_selector("div#consumer_fields")
     end
+
+    it "should have no_ssn input" do
+      expect(rendered).to have_selector('input#dependent_no_ssn')
+    end
+    
+    it "should have no_ssn label" do
+      expect(rendered).to have_selector('span.no_ssn')
+      expect(rendered).to match /NO SSN/
+    end
   end
 end
