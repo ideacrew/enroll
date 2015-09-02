@@ -31,7 +31,7 @@ FactoryGirl.define do
   end
 
   factory(:generative_carrier_profile, {class: CarrierProfile}) do
-    organization { 
+    organization {
       FactoryGirl.build_stubbed :generative_organization
     }
   end
@@ -39,12 +39,12 @@ FactoryGirl.define do
   factory(:generative_reference_plan, {class: Plan}) do
     active_year 2015
     hios_id "JDFLKJELKFJKLDJFIODFIE-01"
-    coverage_kind { 
+    coverage_kind {
       pick_list = Plan::COVERAGE_KINDS
       max = pick_list.length
       pick_list[Random.rand(max)]
     }
-    metal_level { 
+    metal_level {
       pick_list = Plan::METAL_LEVEL_KINDS
       max = pick_list.length
       pick_list[Random.rand(max)]
@@ -77,7 +77,7 @@ FactoryGirl.define do
     open_enrollment_end_on Date.today
     start_on Date.today
     end_on Date.today
-    benefit_groups { 
+    benefit_groups {
       example_count = Random.rand(4)
       (0..example_count).to_a.map do |e|
         FactoryGirl.build_stubbed :generative_benefit_group
@@ -115,13 +115,13 @@ FactoryGirl.define do
   }
 
   factory(:generative_employer_profile, {class: EmployerProfile}) do
-    entity_kind { 
+    entity_kind {
       pick_list = Organization::ENTITY_KINDS
       max = pick_list.length
       pick_list[Random.rand(max)]
     }
     organization { FactoryGirl.build_stubbed :generative_organization }
-    plan_years { 
+    plan_years {
       example_count = Random.rand(6)
       (0..example_count).to_a.map do |e|
         FactoryGirl.build_stubbed :generative_plan_year
@@ -136,7 +136,7 @@ FactoryGirl.define do
 
     after(:stub) do |obj|
       extend RSpec::Mocks::ExampleMethods
-      allow(obj).to receive(:owner).and_return([(FactoryGirl.build_stubbed :generative_owner)])
+      allow(obj).to receive(:staff_roles).and_return([(FactoryGirl.build_stubbed :generative_owner)])
     end
   end
 end
