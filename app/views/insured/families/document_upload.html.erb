@@ -1,38 +1,29 @@
 <% content_for :navigation do %>
-  <%= render 'navigation' %>
+    <%= render 'navigation' %>
 <% end %>
 
 <div class="container">
   <div class="row">
     <div class="col-md-10 col-xs-10 col-sm-10">
       <h3>Additional Documentation Required</h3>
-      <p>We need the following documentation to verify the information you enetered into your application. You may submit documentation now or within <strong>90 days</strong> after you submit your application. <%= link_to 'Learn why we need additional documentation', '#' %></p>
 
-      <%= form_for @consumer_wrapper, :url => insured_verification_documents_upload_path , method: :post do |f| %>
+      <p>We need the following documentation to verify the information you enetered into your application. You may
+        submit documentation now or within <strong>90 days</strong> after you submit your
+        application. <%= link_to 'Learn why we need additional documentation', '#' %></p>
 
-        <div class="row">
+      <%= form_for @person, :url => insured_verification_documents_upload_path, html: { multipart: true }, method: :post do |f| %>
+          <%= fields_for @person.consumer_role do |c| %>
+              <div class="row row-form-wrapper no-buffer" id="immigration_fields_container">
+                <%= render :partial => "consumer/consumer_roles/immigration_document_fields", locals: {c: c} %>
+              </div>
+          <% end %>
+          <br/>
           <div class="col-md-6 col-xs-6 col-sm-6">
-            <%= f.select(:vlp_document_kind) do %>
-              <% ::VlpDocument::VLP_DOCUMENT_KINDS.each do |c| -%>
-                <%= content_tag(:option, c, value: c) %>
-              <% end %>
-            <% end %>
+            <%= file_field_tag :file %>
           </div>
-
-          <div class="col-md-6 col-xs-6 col-sm-6">
-            <%= f.label "Document Number/Id" %>
-            <%= f.text_field :doc_number %>
+          <div class="col-md-4 colx-xs-4 col-sm-4">
+            <%= f.submit "Submit Documentation", class: "btn btn-primary" %>
           </div>
-        </div>
-
-        <div class="col-md-6 col-xs-6 col-sm-6">
-          <%= f.file_field :file %>
-        </div>
-
-        <div class="col-md-4 colx-xs-4 col-sm-4">
-          <br>
-          <%= f.submit "Submit Documentation", class: "btn btn-primary" %>
-        </div>
       <% end %>
     </div>
   </div>

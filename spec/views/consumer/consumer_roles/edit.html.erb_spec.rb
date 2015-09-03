@@ -37,7 +37,7 @@ RSpec.describe "consumer/consumer_roles/edit.html.erb" do
     expect(rendered).to match(/immigration_temporary_i_551_stamp_fields_container/)
     expect(rendered).to match(/immigration_i_766_fields_container/)
     expect(rendered).to match(/immigration_temporary_i_551_fields_container/)
-    expect(rendered).to match(/immigration_I_94_2_fields_container/)
+    expect(rendered).to match(/immigration_i_94_2_fields_container/)
     expect(rendered).to match(/immigration_other_doc_fields_container/)
     expect(rendered).to match(/immigration_i_766_fields_container/)
     expect(rendered).to match(/immigration_unexpired_foreign_passport_fields_container/)

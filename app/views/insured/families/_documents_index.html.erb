@@ -15,8 +15,8 @@
         <td>N/A</td>
       </tr>
     <% else %>
-      <% if @person.consumer_role.documents.present? %>
-        <% @person.consumer_role.documents.uniq.each do |doc| %>
+      <% if @person.consumer_role.vlp_documents.present? %>
+        <% @person.consumer_role.vlp_documents.uniq.each do |doc| %>
           <tr>
             <td><%= doc.title %></td>
             <td><%= doc.subject %></td>

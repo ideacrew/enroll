@@ -61,8 +61,4 @@ class VlpDocument < Document
   validates :visa_number, length: { is: 8 }, :allow_blank => true
   validates :receipt_number, length: { is: 13}, :allow_blank => true #first 3 alpha, remaining 10 string
 
-  def title
-    subject
-  end
-
 end
