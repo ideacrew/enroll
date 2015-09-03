@@ -80,19 +80,6 @@ class CoverageHousehold
     state :enrolled
     state :canceled
     state :terminated
-
-    event :submit_enrollment do
-      transitions from: :unverified, to: :enrollment_submitted
-    end
-
-
-    event :ivl_benefit_selected do
-      transitions from: :applicant, to: :ivl_enrollment_eligible, :guards => [:is_identity_proved?, :is_lawfully_present?, :is_state_resident?]
-      transitions from: :applicant, to: :ivl_enrollment_contingent, :guard => :has_ineligible_period_expired?
-    end
-
-    event :ivl_benefit_purchased do
-    end
   end
 
   def self.update_individual_eligibilities_for(person)
