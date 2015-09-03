@@ -110,6 +110,14 @@ class CoverageHousehold
     #TODO: Provide code which will re-run the eligibility using the new rules object
   end
 
+  def active_individual_enrollments
+    household.hbx_enrollments.select do |he|
+      (he.coverage_household_id == self.id.to_s) &&
+         (!he.benefit_sponsored?) &&
+         he.currently_active?
+    end
+  end
+
 private
   def presence_of_coverage_household_members
     if self.coverage_household_members.size == 0

@@ -106,6 +106,13 @@ class HbxEnrollment
     employer_profile.present?
   end
 
+  def currently_active?
+    return false if shopping?
+    return false unless (effective_on <= Timekeeper.date_of_record)
+    return true if terminated_on.blank?
+    terminated_on >= Timekeeper.date_of_record
+  end
+
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
