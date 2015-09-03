@@ -38,6 +38,8 @@ class Organization
 
   default_scope -> {order("legal_name ASC")}
 
+  scope :has_broker_agency_profile, ->{ exists(broker_agency_profile: true) }
+
   embeds_many :office_locations, cascade_callbacks: true, validate: true
 
   embeds_one :employer_profile, cascade_callbacks: true, validate: true

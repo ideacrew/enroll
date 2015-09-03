@@ -275,9 +275,9 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
       end
 
-      context "search by npn" do
+      context "search by fein" do
         before do
-          xhr :get, :search_broker_agency, broker_agency_search: @broker_agency_profile.corporate_npn, format: :js
+          xhr :get, :search_broker_agency, broker_agency_search: @broker_agency_profile.fein, format: :js
         end
 
         it "should be a success" do
@@ -301,9 +301,9 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
       end
 
-      context "search by npn" do
+      context "search by fein" do
         before do
-          xhr :get, :search_broker_agency, broker_agency_search: @broker_agency_profile.corporate_npn.last(5), format: :js
+          xhr :get, :search_broker_agency, broker_agency_search: @broker_agency_profile.fein.last(5), format: :js
         end
 
         it "should be a success" do

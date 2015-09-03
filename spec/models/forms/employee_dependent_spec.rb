@@ -60,6 +60,7 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
       :name_pfx => "ddd",
       :name_sfx => "eee",
       :ssn => "123456778",
+      :no_ssn => '',
       :gender => "male",
       :dob => dob,
       :race => "race",
@@ -192,13 +193,13 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
 
   describe "when updated" do
     it "should update the relationship of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil})).and_return(true)
+      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil})).and_return(true)
       expect(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
 
     it "should update the attributes of the person" do
-      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil}))
+      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end

@@ -113,3 +113,14 @@ $(document).on('click', '#census_employee_search_clear', function() {
   $('form#census_employee_search input#employee_name').val('');
   $("form#census_employee_search").submit();
 })
+
+$(document).on('change', '#address_info .office_kind_select select', function() {
+  if ($(this).val() == 'mailing') {
+    $(this).parents('fieldset').find('#phone_info input.area_code').attr('required', false);
+    $(this).parents('fieldset').find('#phone_info input.phone_number7').attr('required', false);
+  };
+  if ($(this).val() == 'primary' || $(this).val() == 'branch'){
+    $(this).parents('fieldset').find('#phone_info input.area_code').attr('required', true);
+    $(this).parents('fieldset').find('#phone_info input.phone_number7').attr('required', true);
+  };
+})
