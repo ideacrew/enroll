@@ -23,7 +23,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
     end
 
     it "should have link with change_plan" do
-      expect(rendered).to have_selector("form[action='/group_selection/new']") do |form|
+      expect(rendered).to have_selector("form[action='/insured/group_selections/new']") do |form|
         expect(form).to have_selector("input[name='change_plan']", :count => 1)
         expect(form).to have_selector('input', :type => 'submit', :value => 'Shop for Plans')
       end
@@ -39,7 +39,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
     end
 
     it "should have link without change_plan" do
-      expect(rendered).to have_selector("form[action='/group_selection/new']") do |form|
+      expect(rendered).to have_selector("form[action='/insured/group_selections/new']") do |form|
         expect(form).to have_selector("input[name='change_plan']", :count => 0)
         expect(form).to have_selector('input', :type => 'submit', :value => 'Shop for Plans')
       end

@@ -33,11 +33,11 @@
 
         <% #if elligible to shop? (links for shop)%>
         <%- if @hbx_enrollments && @hbx_enrollments.last %>
-          <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: 'change_plan') do %>
+          <%= link_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.id, change_plan: 'change_plan') do %>
             <%= render partial: "shop_for_plans_widget" %>
           <% end %>
         <% else %>
-          <%= link_to group_selection_new_path(person_id: @person.id, employee_role_id: @employee_role.id) do %>
+          <%= link_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.id) do %>
             <%= render partial: "shop_for_plans_widget" %>
           <% end %>
         <% end %>

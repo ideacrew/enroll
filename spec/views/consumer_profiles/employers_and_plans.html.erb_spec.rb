@@ -51,7 +51,7 @@ RSpec.describe "consumer_profiles/_employers_and_plans.html.erb" do
 
     it "should show the link of shop for plan" do
       expect(rendered).to match(/Update Plan/)
-      target = "a[href='/group_selection/new?change_plan=change&employee_role_id=#{employee_role.id}&person_id=#{person.id}']"
+      target = "a[href='/insured/group_selection/new?change_plan=change&employee_role_id=#{employee_role.id}&person_id=#{person.id}']"
       expect(rendered).to match /#{target}/
     end
 

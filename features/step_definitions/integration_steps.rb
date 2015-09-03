@@ -387,7 +387,7 @@ When(/^.+ clicks? continue on the dependents page$/) do
 end
 
 Then(/^.+ should see the group selection page$/) do
-  @browser.form(action: /group_selection\/create/).wait_until_present
+  @browser.form(action: /insured\/group_selection/).wait_until_present
   screenshot("group_selection")
 end
 

@@ -15,7 +15,7 @@ class Exchanges::AgentsController < ApplicationController
   def begin_enrollment
   	session[:person] = nil
   	session[:original_application_type] = params['original_application_type']
-	  redirect_to search_consumer_employee_index_path
+	  redirect_to search_insured_employee_index_path
   end
 
   def send_enrollment_confirmation
