@@ -7,7 +7,7 @@ module Forms
 
     attr_accessor :broker_agency_profile
     attr_accessor :market_kind, :languages_spoken
-    attr_accessor :working_hours, :accept_new_clients, :home_page, :corporate_npn
+    attr_accessor :working_hours, :accept_new_clients, :home_page
     attr_accessor :broker_applicant_type, :email
     include NpnField
 
@@ -90,7 +90,6 @@ module Forms
           :entity_kind => entity_kind,
           :home_page => home_page,
           :market_kind => market_kind,
-          :corporate_npn => corporate_npn,
           :languages_spoken => languages_spoken,
           :working_hours => working_hours,
           :accept_new_clients => accept_new_clients

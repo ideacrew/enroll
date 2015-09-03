@@ -8,12 +8,12 @@
           <tbody>
             <tr>
               <th>Legal Name:</th>
-              <td><%= agency.legal_name %></td>
+              <td><%= agency.try(:legal_name) %></td>
             </tr>
 
             <tr>
-              <th>NPN:</th>
-              <td><%= agency.try(:corporate_npn) %></td>
+              <th>FEIN:</th>
+              <td><%= agency.try(:fein) %></td>
             </tr>
 
             <tr>
