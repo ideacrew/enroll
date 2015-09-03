@@ -32,7 +32,6 @@ And(/^.+ enters broker agency information$/) do
   entity_kind.click
   entity_kind.li(text: /S Corporation/).click
 
-  @browser.text_field(class: /interaction-field-control-broker-corporate-npn/).set("890890892")
   @browser.text_field(class: /interaction-field-control-broker-home-page/).set("www.logistics.example.com")
 
   practice_area = @browser.div(class: /selectric-interaction-choice-control-broker-agency-practice-area/)

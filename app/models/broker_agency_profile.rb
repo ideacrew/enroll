@@ -42,9 +42,9 @@ class BrokerAgencyProfile
 
   validates_presence_of :market_kind, :entity_kind #, :primary_broker_role_id
 
-  validates :corporate_npn, 
+  validates :corporate_npn,
     numericality: {only_integer: true},
-    length: { minimum: 1, maximum: 10 },    
+    length: { minimum: 1, maximum: 10 },
     uniqueness: true,
     allow_blank: true
 
