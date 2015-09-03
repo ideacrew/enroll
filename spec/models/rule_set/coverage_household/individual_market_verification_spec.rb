@@ -43,7 +43,7 @@ describe RuleSet::CoverageHousehold::IndividualMarketVerification do
           end
 
           it "should recommend the unverified state" do
-            expect(subject.determine_next_state).to eq(:unverified)
+            expect(subject.determine_next_state).to eq(:move_to_pending!)
           end
         end
         describe "where one of the members is pending and the other has failed validation" do
@@ -54,7 +54,7 @@ describe RuleSet::CoverageHousehold::IndividualMarketVerification do
           end
 
           it "should recommend the unverified state" do
-            expect(subject.determine_next_state).to eq(:unverified)
+            expect(subject.determine_next_state).to eq(:move_to_pending!)
           end
         end
         describe "where one of the members is verified and the other has failed validation" do
@@ -67,7 +67,7 @@ describe RuleSet::CoverageHousehold::IndividualMarketVerification do
           end
 
           it "should recommend the enrolled_contingent state" do
-            expect(subject.determine_next_state).to eq(:enrolled_contingent)
+            expect(subject.determine_next_state).to eq(:move_to_contingent!)
           end
         end
       end
@@ -86,7 +86,7 @@ describe RuleSet::CoverageHousehold::IndividualMarketVerification do
         end
 
         it "should recommend the enrolled state" do
-          expect(subject.determine_next_state).to eq(:enrolled)
+          expect(subject.determine_next_state).to eq(:move_to_enrolled!)
         end
       end
     end

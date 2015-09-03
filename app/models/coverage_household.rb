@@ -29,6 +29,8 @@ class CoverageHousehold
   validates_presence_of :is_immediate_family
   validate :presence_of_coverage_household_members
 
+  embeds_many :workflow_state_transitions, as: :transitional
+
   # belongs_to writing agent (broker_role)
   def writing_agent=(new_writing_agent)
     raise ArgumentError.new("expected BrokerRole class") unless new_writing_agent.is_a? BrokerRole
@@ -80,6 +82,24 @@ class CoverageHousehold
     state :enrolled
     state :canceled
     state :terminated
+
+    event :move_to_contingent!, :after => :record_transition do
+      transitions from: :unverified, to: :enrolled_contingent, after: :notify_verification_outstanding
+      transitions from: :enrolled_contingent, to: :enrolled_contingent
+      transitions from: :enrolled, to: :enrolled_contingent, after: :notify_verification_outstanding
+    end
+
+    event :move_to_enrolled!, :after => :record_transition do
+      transitions from: :unverified, to: :enrolled, after: :notify_verification_success
+      transitions from: :enrolled_contingent, to: :enrolled, after: :notify_verification_success
+      transitions from: :enrolled, to: :enrolled
+    end
+
+    event :move_to_pending!, :after => :record_transition do
+      transitions from: :unverified, to: :unverified
+      transitions from: :enrolled_contingent, to: :unverified
+      transitions from: :enrolled, to: :unverified
+    end
   end
 
   def self.update_individual_eligibilities_for(person)
@@ -94,7 +114,10 @@ class CoverageHousehold
   end
 
   def evaluate_individual_market_eligiblity
-    #TODO: Provide code which will re-run the eligibility using the new rules object
+    eligibility_ruleset = ::RuleSet::CoverageHousehold::IndividualMarketVerification.new(self)
+    if eligibility_ruleset.applicable?
+      self.send(eligibility_ruleset.determine_next_state)
+    end
   end
 
   def active_individual_enrollments
@@ -105,6 +128,12 @@ class CoverageHousehold
     end
   end
 
+  def notify_verification_outstanding
+  end
+
+  def notify_verification_success
+  end
+
 private
   def presence_of_coverage_household_members
     if self.coverage_household_members.size == 0
@@ -112,5 +141,11 @@ private
     end
   end
 
+  def record_transition(*args)
+    workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state
+    )
+  end
 
 end

@@ -16,9 +16,9 @@ module RuleSet
       end
 
       def determine_next_state
-        return(:unverified) if roles_for_determination.any?(&:verifications_pending?)
-        return(:enrolled_contingent) if roles_for_determination.any?(&:verifications_outstanding?)
-        :enrolled
+        return(:move_to_pending!) if roles_for_determination.any?(&:verifications_pending?)
+        return(:move_to_contingent!) if roles_for_determination.any?(&:verifications_outstanding?)
+        :move_to_enrolled!
       end
     end
   end
