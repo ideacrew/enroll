@@ -77,7 +77,7 @@
 
           <div class='row top-pd'>
             <div class="col-sm-12">
-              <p>If you enroll today, coverage will begin Oct 1. <!-- Do you need coverage earlier? Check <%#= link_to "am I eligible for a Special Enrollment Period", "#", :onclick=>"$('#sep_indicator').val('true');$(this).closest('form').submit();" %> to see if you qualify --></p>
+              <p>If you enroll today, coverage will begin <%= @hbx_enrollment.effective_on.strftime("%d %b %Y") %>. </p>
             </div>
           </div>
 
