@@ -15,15 +15,13 @@
         <td>N/A</td>
       </tr>
     <% else %>
-      <% if @person.consumer_role.documents.present? %>
-        <% @person.consumer_role.documents.uniq.each do |doc| %>
+        <% @person.consumer_role.vlp_documents.select do |doc| doc.identifier.present? end.each do |doc| %>
           <tr>
             <td><%= doc.title %></td>
             <td><%= doc.subject %></td>
             <td><%= doc.created_at.try(:to_date) %></td>
           </tr>
         <% end %>
-      <% end %>
     <% end %>
   </tbody>
 </table>
