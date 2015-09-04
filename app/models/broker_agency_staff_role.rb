@@ -68,8 +68,9 @@ class BrokerAgencyStaffRole
     end
   end
   
-private
-  def last_state_transition_date
+  private
+
+  def latest_transition_time
     if self.workflow_state_transitions.any?
       self.workflow_state_transitions.first.transition_at
     end

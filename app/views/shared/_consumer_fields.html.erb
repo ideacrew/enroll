@@ -155,3 +155,10 @@
 <%= render "shared/race_and_ethnicity_options", f: f %>
 
 <%= f.hidden_field :is_consumer_role, value: 'true' %>
+
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    demographicsNew.init();
+  });
+</script>

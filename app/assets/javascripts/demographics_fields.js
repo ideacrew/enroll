@@ -147,31 +147,52 @@ function applyListeners() {
             $('#vlp_document_id_container').hide();
         }
     });
-
-    $('#person_indian_tribe_member').change(function () {
-        if ($(this).is(':checked')) {
-            $('#tribal_container').show();
-        }
-        else {
-            $('#tribal_container').hide();
-        }
-    });
-
-    $('#dependent_indian_tribe_member').change(function () {
-        show_or_hide_tribal_id();
-    });
-    show_or_hide_tribal_id();
-    function show_or_hide_tribal_id() {
-        if ($("#dependent_indian_tribe_member").is(':checked')) {
-            $('#tribal_container').show();
-        }
-        else {
-            $('#tribal_container').hide();
-        }
-    }
 }
 
 
 $(function () {
     applyListeners();
 });
+
+
+var demographicsNew = {
+  ui: {
+    personTribeMember: "#person_indian_tribe_member",
+    dependentTribeMember: "#dependent_indian_tribe_member",
+    tribalContainer: "#tribal_container"
+  },
+  queries:{
+  },
+  init: function(){
+    this.setUpDependentTribalId();
+    this.setUpPersonTribalId();
+  },
+  setUpPersonTribalId: function(){
+    $(demographicsNew.ui.personTribeMember).change(function () {
+        demographicsNew.show_or_hide_person_tribal_id();
+    });
+    demographicsNew.show_or_hide_person_tribal_id();
+  },
+  setUpDependentTribalId: function(){
+    $(demographicsNew.ui.dependentTribeMember).change(function () {
+        demographicsNew.show_or_hide_dependent_tribal_id();
+    });
+    demographicsNew.show_or_hide_dependent_tribal_id();
+  },
+  show_or_hide_dependent_tribal_id: function(){
+    if ($(demographicsNew.ui.dependentTribeMember).is(':checked')) {
+      $(demographicsNew.ui.tribalContainer).show();
+    }
+    if (!$(demographicsNew.ui.dependentTribeMember).is(':checked')) {
+      $(demographicsNew.ui.tribalContainer).hide();
+    }
+  },
+  show_or_hide_person_tribal_id: function(){
+    if ($(demographicsNew.ui.personTribeMember).is(':checked')) {
+      $(demographicsNew.ui.tribalContainer).show();
+    }
+    if (!$(demographicsNew.ui.personTribeMember).is(':checked')) {
+      $(demographicsNew.ui.tribalContainer).hide();
+    }
+  },
+}

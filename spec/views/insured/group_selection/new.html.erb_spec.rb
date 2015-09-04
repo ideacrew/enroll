@@ -9,12 +9,15 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:family_member2) { double(id: "family_member", primary_relationship: "parent", dob: Date.new(1990,10,10), full_name: "member") }
     let(:family_member3) { double(id: "family_member", primary_relationship: "spouse", dob: Date.new(1990,10,10), full_name: "member") }
     let(:coverage_household) { double(family_members: [family_member1, family_member2, family_member3]) }
+    let(:hbx_enrollment) {double(id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
 
     before(:each) do
       assign(:person, person)
       assign(:employee_role, employee_role)
       assign(:coverage_household, coverage_household)
       assign(:market_kind, 'shop')
+      assign(:hbx_enrollment, hbx_enrollment)
+
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
       allow(family_member1).to receive(:is_primary_applicant?).and_return(true)
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
@@ -82,12 +85,15 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:family_member3) { instance_double("FamilyMember",id: "family_member", primary_relationship: "spouse", dob: Date.new(1991,9,21), full_name: "spouse", is_primary_applicant: false, person: person3) }
     let(:family_member4) { instance_double("FamilyMember",id: "family_member", primary_relationship: "self", dob: Date.new(1990,10,28), full_name: "inmsr", is_primary_applicant: true, person: jail_person) }
     let(:coverage_household_jail) { instance_double("CoverageHousehold",family_members: [family_member4, family_member2, family_member3]) }
+    let(:hbx_enrollment) {double(id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
+
     before(:each) do
       assign(:person, jail_person)
       assign(:consumer_role, consumer_role)
       assign(:coverage_household, coverage_household_jail)
       assign(:market_kind, 'individual')
       assign(:benefit, benefit_package)
+      assign(:hbx_enrollment, hbx_enrollment)
       allow(jail_person).to receive(:consumer_role).and_return(consumer_role)
       allow(person2).to receive(:consumer_role).and_return(consumer_role2)
       allow(consumer_role2).to receive(:is_incarcerated?).and_return(false)
@@ -175,12 +181,14 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:person) { instance_double("Person", id: "Person.id") }
     let(:coverage_household) { instance_double("CoverageHousehold", family_members: family_members) }
     let(:employee_role) { instance_double("EmployeeRole", id: "EmployeeRole.id", benefit_group: new_benefit_group) }
+    let(:hbx_enrollment) {double(id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
 
     before :each do
       assign :person, person
       assign :employee_role, employee_role
       assign :coverage_household, coverage_household
       assign :eligibility, instance_double("InsuredEligibleForBenefitRule", :satisfied? => true)
+      assign :hbx_enrollment, hbx_enrollment
       render file: "insured/group_selection/new.html.erb"
     end
 
@@ -196,8 +204,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:coverage_household) { double(family_members: []) }
-    let(:hbx_enrollment) {double(coverage_selected?: true, id: "hbx_id")}
-
+    let(:hbx_enrollment) {double(coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
+ 
     before :each do
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
       assign :person, person
@@ -244,7 +252,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:coverage_household) { double(family_members: []) }
-    let(:hbx_enrollment) {double(coverage_selected?: true, id: "hbx_id")}
+    let(:hbx_enrollment) {double(coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
 
     before :each do
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
