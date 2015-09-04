@@ -38,8 +38,11 @@
       <div id="immigration_I_94_2_fields_container" style="display: none">
         <%= render :partial => "insured/consumer_roles/i_94_2_fields", locals: {c: c} %>
       </div>
-      <div id="immigration_other_doc_fields_container" style="display: none">
-        <%= render :partial => "insured/consumer_roles/other_doc_fields", locals: {c: c} %>
+      <div id="immigration_other_with_alien_number_fields_container" style="display: none">
+        <%= render :partial => "insured/consumer_roles/other_with_alien_number_fields", locals: {c: c} %>
+      </div>
+      <div id="immigration_other_with_i94_fields_container" style="display: none">
+        <%= render :partial => "insured/consumer_roles/other_with_i94_fields", locals: {c: c} %>
       </div>
       <div id="immigration_i_766_fields_container" style="display: none">
         <%= render :partial => "insured/consumer_roles/i_766_fields", locals: {c: c} %>

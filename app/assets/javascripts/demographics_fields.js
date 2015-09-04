@@ -89,8 +89,11 @@ function applyListeners() {
             case "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)":
                 showOnly("immigration_DS_2019_fields_container");
                 break;
-            case "Other":
-                showOnly("immigration_other_fields_container");
+            case "Other (With Alien Number)":
+                showOnly("immigration_other_with_alien_number_fields_container");
+                break;
+            case "Other (With I-94 Number)":
+                showOnly("immigration_other_with_i94_fields_container");
                 break;
         }
     });
@@ -98,10 +101,11 @@ function applyListeners() {
     function showOnly(selected) {
         var doc_types = ["immigration_citizenship_cert_container", "immigration_naturalization_cert_container",
             "immigration_i_327_fields_container", "immigration_i_551_fields_container", "immigration_i_571_fields_container",
-            "immigration_other_fields_container", "immigration_i_766_fields_container",
-            "immigration_i_566_fields_container", "immigration_temporary_i_551_stamp_fields_container", "immigration_i_94_fields_container",
+            "immigration_i_766_fields_container", "immigration_i_566_fields_container",
+            "immigration_temporary_i_551_stamp_fields_container", "immigration_i_94_fields_container",
             "immigration_i_94_in_unexpired_foreign_passport_fields_container", "immigration_unexpired_foreign_passport_fields_container",
-            "immigration_temporary_i_20_stamp_fields_container", "immigration_DS_2019_fields_container"]
+            "immigration_temporary_i_20_stamp_fields_container", "immigration_DS_2019_fields_container",
+            "immigration_other_with_alien_number_fields_container", "immigration_other_with_i94_fields_container"]
 
         for (index = 0; index < doc_types.length; index++) {
             $('#' + doc_types[index]).hide();
