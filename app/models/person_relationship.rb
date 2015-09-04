@@ -13,6 +13,19 @@ class PersonRelationship
                               foster\ child daughter-in-law sister-in-law mother-in-law sister ward
                               stepdaughter child sponsored\ dependent dependent\ of\ a\ minor\ dependent
                               guardian court\ appointed\ guardian collateral\ dependent life\ partner)
+
+  ConsumerRelationships = [
+    "spouse",
+    "child",
+    "domestic_partner",
+    "parent",
+    "sibling",
+    "ward",
+    "guardian",
+    "unrelated",
+    "other_tax_dependent"
+  ]
+
   Relationships = [
     "spouse",
     "life_partner",
@@ -69,6 +82,8 @@ class PersonRelationship
     "other_relationship" => "other_relationship",
     "cousin" => "cousin",
     "unrelated" => "unrelated",
+    "domestic_partner" => "domestic_partner",
+    "other_tax_dependent" => "other_relationship",
 
     #one directional
     "foster_child" => "guardian",
@@ -78,7 +93,7 @@ class PersonRelationship
 
   SymmetricalRelationships = %W[head\ of\ household spouse ex-spouse cousin ward trustee annuitant other\ relationship other\ relative self]
 
-  Kinds = SymmetricalRelationships | Relationships
+  Kinds = SymmetricalRelationships | Relationships | ConsumerRelationships
 
   field :relative_id, type: BSON::ObjectId
   field :kind, type: String
