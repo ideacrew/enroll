@@ -153,6 +153,16 @@ class Person
 
 #  ViewFunctions::Person.install_queries
 
+  validate :consumer_fields_validations
+
+  def consumer_fields_validations
+    if self.is_consumer_role.to_s == "true"
+      if !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
+        self.errors.add(:base, "Tribal id is required when native american / alaskan native is selected")
+      end
+    end
+  end
+
   after_save :update_family_search_collection
   after_validation :move_encrypted_ssn_errors
 

@@ -14,6 +14,7 @@ describe Forms::EmployeeDependent do
   end
 
   it "should require tribal_id when citizen_status=indian_tribe_member" do
+    subject.is_consumer_role = "true"
     subject.citizen_status = "indian_tribe_member"
     subject.valid?
     expect(subject).to have_errors_on(:tribal_id)
