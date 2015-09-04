@@ -20,9 +20,9 @@ class WorkflowStateTransition
 
   def to_html
     if from_state.blank?
-      "<div>#{transition_at.strftime("%m/%d/%Y")} - Application received.</div>".html_safe
+      "<div>#{transition_at.strftime("%m/%d/%Y %H:%M UTC")} - Application received.</div>".html_safe
     else
-      "<div>#{transition_at.strftime("%m/%d/%Y")} - State changed from <b>#{from_state.camelcase}</b> to <b>#{to_state.camelcase}</b>.</div>".html_safe
+      "<div>#{transition_at.strftime("%m/%d/%Y %H:%M UTC")} - State changed from <b>#{from_state.camelcase}</b> to <b>#{to_state.camelcase}</b>.</div>".html_safe
     end
   end
 
