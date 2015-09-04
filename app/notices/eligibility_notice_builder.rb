@@ -37,6 +37,7 @@ class EligibilityNoticeBuilder < Notice
       @notice.enrollments << PdfTemplates::Enrollment.new({
         plan_name: hbx_enrollment.plan.name,
         monthly_premium_cost: hbx_enrollment.total_premium,
+        phone: hbx_enrollment.phone_number,
         enrollees: hbx_enrollment.hbx_enrollment_members.inject([]) do |names, member| 
           names << member.person.full_name.titleize
         end

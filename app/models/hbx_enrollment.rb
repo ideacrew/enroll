@@ -196,6 +196,15 @@ class HbxEnrollment
     hbx_enrollment_members.count - 1
   end
 
+  def phone_number
+    if plan.present?
+      phone = plan.try(:carrier_profile).try(:organization).try(:primary_office_location).try(:phone)
+      "#{phone.try(:area_code)}#{phone.try(:number)}"
+    else
+      ""
+    end
+  end
+
   def rebuild_members_by_coverage_household(coverage_household:)
     applicant_ids = hbx_enrollment_members.map(&:applicant_id)
     coverage_household.coverage_household_members.each do |coverage_member|
