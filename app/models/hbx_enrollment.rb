@@ -253,7 +253,11 @@ class HbxEnrollment
       enrollment.household = coverage_household.household
       enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
-      enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+      enrollment.effective_on = if qle
+                                  calculate_start_date_by_qle(coverage_household.household)
+                                else
+                                  calculate_start_date_from(employee_role, coverage_household, benefit_group)
+                                end
       # benefit_group.plan_year.start_on
       enrollment.benefit_group = benefit_group
       census_employee = employee_role.census_employee

@@ -13,12 +13,13 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
     ordinal_position: 10,
+    event_kind_label: "Date of start new job",
     tool_tip: "Enroll due to becoming newly eligibile"
   )
 
 
 QualifyingLifeEventKind.create!(
-    title: "I've married", 
+    title: "I've married",
     action_kind: "add_benefit",
     reason: " ",
     edi_code: "32-MARRIAGE", 
@@ -28,11 +29,12 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
     ordinal_position: 15,
+    event_kind_label: "Date of marriage",
     tool_tip: "Enroll or add a family member because of marriage"
   )
 
 QualifyingLifeEventKind.create!(
-    title: "I've entered into a legal domestic partnership", 
+    title: "I've entered into a legal domestic partnership",
     action_kind: "add_benefit",
     reason: " ",
     edi_code: "33-ENTERING DOMESTIC PARTNERSHIP", 
@@ -42,11 +44,12 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
     ordinal_position: 20,
+    event_kind_label: "Date of domestic partnership",
     tool_tip: "Enroll or add a family member due to a new domestic partnership"
   )
 
 QualifyingLifeEventKind.create!(
-    title: "I've had a baby", 
+    title: "I've had a baby",
     action_kind: "add_benefit",
     reason: " ",
     edi_code: "02-BIRTH", 
@@ -56,11 +59,12 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
     ordinal_position: 25,
+    event_kind_label: "Date of birth",
     tool_tip: "Enroll or add a family member due to birth"
   )
 
 QualifyingLifeEventKind.create!(
-    title: "I've adopted a child", 
+    title: "I've adopted a child",
     action_kind: "add_benefit",
     reason: " ",
     edi_code: "05-ADOPTION", 
@@ -70,6 +74,7 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
     ordinal_position: 30,
+    event_kind_label: "Date of adoption",
     tool_tip: "Enroll or add a family member due to adoption"
   )
 
@@ -84,6 +89,7 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
     ordinal_position: 35,
+    event_kind_label: "Last day of coverage",
     tool_tip: "Enroll or add a family member due to loss of eligibility for other coverage"
   )
 
@@ -98,6 +104,7 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
     ordinal_position: 40,
+    event_kind_label: "Divorce or partnership end date",
     tool_tip: "Remove a family member due to divorce"
   )
 
@@ -112,6 +119,7 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
     ordinal_position: 45,
+    event_kind_label: "Date of death",
     tool_tip: "Remove a family member due to death"
   )
 
@@ -126,11 +134,12 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
     ordinal_position: 50,
+    event_kind_label: "Date of coverage",
     tool_tip: "Remove a child who is no longer eligible due to turning age 26"
   )
 
 QualifyingLifeEventKind.create!(
-    title: "drop_self_due_to_new_eligibility", 
+    title: "Drop self due to new eligibility",
     action_kind: "drop_member",
     reason: "terminate_benefit",
     edi_code: "07-TERMINATION OF BENEFITS", 
@@ -140,11 +149,12 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
     ordinal_position: 55,
+    event_kind_label: "Date of eligibility",
     tool_tip: "Drop coverage for myself or family member due to new eligibility for other coverage"
   )
 
 QualifyingLifeEventKind.create!(
-    title: "drop_family_member_due_to_new_elgibility", 
+    title: "Drop family member due to new elgibility",
     action_kind: "drop_member",
     reason: "drop_family_member_due_to_new_elgibility",
     edi_code: "07-TERMINATION OF BENEFITS", 
@@ -154,11 +164,12 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: true, 
     ordinal_position: 60,
+    event_kind_label: "Date of eligibility",
     tool_tip: "Drop coverage for a family member due to their new eligibility for other coverage"
   )
 
 QualifyingLifeEventKind.create!(
-    title: "I've moved", 
+    title: "I've moved",
     action_kind: "administrative",
     reason: "relocate",
     edi_code: "43-CHANGE OF LOCATION", 
@@ -168,11 +179,12 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: false, 
     ordinal_position: 65,
+    event_kind_label: "Date of move",
     tool_tip: "Drop coverage due to a permanent move outside of my current plan's service area"
   )
 
 QualifyingLifeEventKind.create!(
-    title: "exceptional_circumstances", 
+    title: "Exceptional circumstances",
     action_kind: "administrative",
     reason: "exceptional_circumstances",
     edi_code: "EX-EXCEPTIONAL CIRCUMSTANCES", 
@@ -182,11 +194,12 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: false, 
     ordinal_position: 70,
+    event_kind_label: "Date of exceptional circumstances",
     tool_tip: "Enroll due to an inadvertent or erroneous enrollment or another exceptional circumstance"
   )
 
 QualifyingLifeEventKind.create!(
-    title: "contract_violation", 
+    title: "Contract violation",
     action_kind: "administrative",
     reason: "contract_violation",
     edi_code: "33-CONTRACT VIOLATION", 
@@ -196,6 +209,7 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: false, 
     ordinal_position: 75,
+    event_kind_label: "Date of contract violation",
     tool_tip: "Enroll due to contract violation"
   )
 
