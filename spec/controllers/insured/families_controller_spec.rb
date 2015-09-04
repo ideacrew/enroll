@@ -196,13 +196,13 @@ RSpec.describe Insured::FamiliesController do
   end
 
   describe "POST record_sep" do
-    before :each do   
+    before :each do
       @qle = FactoryGirl.create(:qualifying_life_event_kind)
-      @family = FactoryGirl.build(:family, :with_primay_family_member)
+      @family = FactoryGirl.build(:family, :with_primary_family_member)
       allow(person).to receive(:primary_family).and_return(@family)
     end
 
-    context 'when its initial enrollment' do 
+    context 'when its initial enrollment' do
       before :each do
         post :record_sep, qle_id: @qle.id, qle_date: Date.today
       end
@@ -219,8 +219,8 @@ RSpec.describe Insured::FamiliesController do
         allow(@family).to receive(:enrolled_hbx_enrollments).and_return([ double ])
         post :record_sep, qle_id: @qle.id, qle_date: Date.today
       end
-      
-      it "should redirect with change_plan parameter" do 
+
+      it "should redirect with change_plan parameter" do
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan'}))
       end
