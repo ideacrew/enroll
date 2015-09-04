@@ -55,7 +55,7 @@ RSpec.describe "insured/show" do
     sign_in consumer_user
     render :template => 'layouts/_header.html.erb'
     expect(rendered).to_not match(/I'm a Broker/)
-    expect(rendered).to match(/Welcome|Family/)
+    expect(rendered).to match(/I'm an Insured/i)
   end
 
   it "should get the plans-count" do
@@ -78,5 +78,12 @@ RSpec.describe "insured/show" do
     render :template => "insured/plan_shoppings/show.html.erb"
     expect(rendered).to have_selector('div#waive_confirm')
     expect(response).to render_template(partial: "insured/plan_shoppings/waive_confirmation", locals: {enrollment: hbx_enrollment})
+  end
+
+  it "should have plans area" do
+    sign_in current_broker_user
+    allow(@hbx_enrollment).to receive(:employee_role).and_return(double)
+    render :template => "insured/plan_shoppings/show.html.erb"
+    expect(rendered).to have_selector('#plans', text: 'Loading...')
   end
 end

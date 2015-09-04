@@ -21,6 +21,10 @@ class SpecialEnrollmentPeriod
   # Timestamp when SEP was reported to HBX
   field :submitted_at, type: DateTime
 
+  field :effective_on_kind, type: String
+  # for employee gaining medicare qle
+  attr_accessor :selected_effective_on
+
   validates_presence_of :qle_on, :begin_on, :end_on, :effective_on
   validate :end_date_follows_begin_date
 
@@ -70,11 +74,24 @@ private
   def set_effective_on
     return unless self.begin_on.present? && self.qualifying_life_event_kind.present?
 
-    if self.qualifying_life_event_kind.effective_on_kind == "date_of_event"
-      self.effective_on = self.qle_on
-    else
-      self.effective_on = self.qle_on.end_of_month + 1
-    end
+    self.effective_on = case effective_on_kind
+                        when "date_of_event"
+                          qle_on
+                        when "first_of_month"
+                          calculate_effective_on_for_first_of_month
+                        when "first_of_next_month"
+                          if qualifying_life_event_kind.is_dependent_loss_of_esi?
+                            qualifying_life_event_kind.employee_gaining_medicare(qle_on, selected_effective_on)
+                          elsif qualifying_life_event_kind.is_moved_to_dc?
+                            calculate_effective_on_for_moved_qle
+                          else
+                            TimeKeeper.date_of_record.end_of_month + 1.day
+                          end
+                        when "fixed_first_of_next_month"
+                          qle_on.end_of_month + 1.day
+                        when "exact_date"
+                          qle_on
+                        end
   end
 
   def end_date_follows_begin_date
@@ -87,4 +104,19 @@ private
     self.submitted_at ||= Time.now
   end
 
+  def calculate_effective_on_for_moved_qle
+    if qle_on <= TimeKeeper.date_of_record
+      TimeKeeper.date_of_record.end_of_month + 1.day
+    else
+      if qle_on == qle_on.beginning_of_month
+        qle_on.beginning_of_month
+      else
+        qle_on.end_of_month + 1.day
+      end
+    end
+  end
+
+  def calculate_effective_on_for_first_of_month
+    [TimeKeeper.date_of_record, qle_on].max.end_of_month + 1.day
+  end
 end

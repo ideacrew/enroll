@@ -46,8 +46,6 @@ class EmployerProfile
     inclusion: { in: Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
     allow_blank: false
 
-  validate :no_more_than_one_owner
-
   after_initialize :build_nested_models
   after_save :save_associated_nested_models
 
@@ -70,12 +68,12 @@ class EmployerProfile
     EmployeeRole.ids_in(covered_ee_ids)
   end
 
-  def owner
-    staff_roles.select{ |staff| staff.employer_staff_role.is_owner }
+  def owners #business owners
+    staff_roles.select{|p| p.try(:employee_roles).try(:any?){|ee| ee.census_employee.is_business_owner? }}
   end
 
-  def staff_roles
-    Person.find_all_staff_roles_by_employer_profile(self)
+  def staff_roles #managing profile staff
+    Person.find_all_staff_roles_by_employer_profile(self) || [Person.find_all_staff_roles_by_employer_profile(self).select{ |staff| staff.employer_staff_role.is_owner }]
   end
 
   def today=(new_date)
@@ -415,13 +413,4 @@ private
   def plan_year_publishable?
     published_plan_year.is_application_valid?
   end
-
-  def no_more_than_one_owner
-    if owner.present? && owner.count > 1
-      errors.add(:owner, "must only have one owner")
-    end
-
-    true
-  end
-
 end

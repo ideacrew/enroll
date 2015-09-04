@@ -14,7 +14,7 @@ class Document
   # Entity responsible for making the resource - person, organization or service
   field :creator, type: String, default: "dchl"
 
-  # Controlled vocabulary w/classification codes
+  # Controlled vocabulary w/classification codes. Mapped to ConsumerRole::VLP_DOCUMENT_KINDS
   field :subject, type: String
 
   # May include but is not limited to: an abstract, a table of contents, a graphical representation, or a free-text account of the resource
@@ -33,7 +33,7 @@ class Document
   field :type, type: String, default: "text"
 
   # Conforms to IANA mime types - http://www.iana.org/assignments/media-types/media-types.xhtml
-  field :format, type: String
+  field :format, type: String, default: "application/octet-stream"
 
   # An unambiguous reference to the resource - Conforms to URI
   field :identifier, type: String
@@ -55,7 +55,7 @@ class Document
 
   field :tags, type: Array, default: []
 
-  validates_presence_of :title, :creator, :publisher, :type, :format, :identifier, :source, :language
+  validates_presence_of :title, :creator, :publisher, :type, :format, :source, :language
 
   validates :rights,
     allow_blank: true,

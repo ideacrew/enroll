@@ -159,7 +159,7 @@ describe Person do
       context "with nil ssn" do
         let(:params) {valid_params.deep_merge({ssn: ""})}
 
-        it "should fail validation" do
+        it "should not fail validation" do
           person = Person.new(**params)
           person.valid?
           expect(person.errors[:ssn].any?).to be_falsey
@@ -236,33 +236,33 @@ describe Person do
         end
       end
 
-      context "has_active_employee_roles" do
+      context "has_active_employee_role?" do
         let(:person) {FactoryGirl.build(:person)}
         let(:employee_roles) {double(active: true)}
 
         it "should return true" do
           allow(person).to receive(:employee_roles).and_return(employee_roles)
-          expect(person.has_active_employee_roles).to eq true
+          expect(person.has_active_employee_role?).to eq true
         end
 
         it "should return false" do
           allow(person).to receive(:employee_roles).and_return([])
-          expect(person.has_active_employee_roles).to eq false
+          expect(person.has_active_employee_role?).to eq false
         end
       end
 
-      context "has_active_consumer_role" do
+      context "has_active_consumer_role?" do
         let(:person) {FactoryGirl.build(:person)}
         let(:consumer_role) {double(is_active?: true)}
 
         it "should return true" do
           allow(person).to receive(:consumer_role).and_return(consumer_role)
-          expect(person.has_active_consumer_role).to eq true
+          expect(person.has_active_consumer_role?).to eq true
         end
 
         it "should return false" do
           allow(person).to receive(:consumer_role).and_return(nil)
-          expect(person.has_active_consumer_role).to eq false
+          expect(person.has_active_consumer_role?).to eq false
         end
       end
     end
@@ -273,14 +273,19 @@ describe Person do
       @p0 = Person.create!(first_name: "Jack",   last_name: "Bruce",   dob: "1943-05-14", ssn: "517994321")
       @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
       @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
+      @p4 = Person.create!(first_name: "Joe",   last_name: "Kramer", dob: "1993-03-30")
     end
 
     after(:all) do
       DatabaseCleaner.clean
     end
 
-    it 'matches by last_name and dob' do
-      expect(Person.match_by_id_info(last_name: @p0.last_name, dob: @p0.dob)).to eq [@p0]
+    it 'matches by last_name and dob if no previous ssn and no current ssn' do
+      expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob)).to eq [@p4]
+    end
+
+    it 'does not matches by last_name and dob if previous ssn' do
+      expect(Person.match_by_id_info(last_name: @p0.last_name, dob: @p0.dob)).to eq []
     end
 
     it 'matches by ssn' do
@@ -297,6 +302,10 @@ describe Person do
 
     it 'returns empty array for non-matches' do
       expect(Person.match_by_id_info(ssn: "577600345")).to eq []
+    end
+
+    it 'not match last_name and dob if ssn provided (match is already done if ssn ok)' do
+      expect(Person.match_by_id_info(last_name: @p0.last_name, dob: @p0.dob, ssn: '999884321').size).to eq 0
     end
   end
 

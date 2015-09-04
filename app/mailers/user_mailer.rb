@@ -24,16 +24,19 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def message_to_assister(person, assister)
-    mail({to: person.user.email_address, subject: "Plan Selection Help", from: person.user.email}) do |format|
-      format.html { render "message_to_assister", :locals => { :person => person, :assister => assister}}
-    end
-  end
- 
-  def message_to_enrolled_by_agent(person, assister)
-    mail({to: person.emails.first.address, subject: "Your Enrollment Progress", from: person.user.email}) do |format|
-      format.html { render "message_to_enrollee", :locals => { :person => person, :assister => assister}}
+  def new_client_notification(insured, agent, role)
+    first_name = insured.first_name
+    name = first_name + ' ' + insured.last_name
+    subject = "New Client Notification -[#{name}]"
+    agent_email = agent.user.email
+    mail({to: agent_email, subject: subject, from: 'no-reply@individual.dchealthlink.com'}) do |format|
+      format.html { render "new_client_notification", :locals => { first_name: first_name, :role => role, name: name}}
     end
   end
 
-end 
+  def generic_consumer_welcome(first_name, hbx_id, email)
+    message = mail({to: email, subject: 'DC HealthLink', from: 'no-reply@individual.dchealthlink.com'}) do |format|
+      format.html {render "generic_consumer", locals: {first_name: first_name, hbx_id: hbx_id}}
+    end
+  end
+end

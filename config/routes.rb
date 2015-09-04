@@ -57,6 +57,7 @@ Rails.application.routes.draw do
 
     resources :plan_shoppings, :only => [:show] do
       member do
+        get 'plans'
         get 'receipt'
         get 'print_waiver'
         post 'checkout'
@@ -66,7 +67,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resource :interactive_identity_verifications, only: [:create, :new]
+    resources :interactive_identity_verifications, only: [:create, :new, :update]
 
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
@@ -79,6 +80,8 @@ Rails.application.routes.draw do
         get 'inbox'
         get 'documents_index'
         get 'document_upload'
+        get 'find_sep'
+        post 'record_sep'
       end
 
       resources :people do
@@ -87,6 +90,33 @@ Rails.application.routes.draw do
         end
       end
     end
+
+    resources :consumer_role, controller: 'consumer_roles', only: [:create, :edit, :update] do
+      get :search, on: :collection
+      get :match, on: :collection
+      get :ridp_agreement, on: :collection
+    end
+
+    resources :employee, :controller=>"employee_roles", only: [:create, :edit, :update, :show] do
+      collection do
+        get 'new_message_to_broker'
+        post 'send_message_to_broker'
+        get :match
+        get 'welcome'
+        get 'search'
+      end
+    end
+    root 'employee_roles#show'
+
+    resources :employee_dependents
+    resources :group_selections, controller: "group_selection", only: [:new, :create] do
+      collection do
+        post :terminate
+        get :terminate_selection
+        get :terminate_confirm
+      end
+    end
+
   end
 
   namespace :employers do
@@ -198,32 +228,6 @@ Rails.application.routes.draw do
       end
     end
   end
-
-  namespace :consumer do
-    resources :employee_dependents do
-      collection do
-        get :group_selection
-      end
-    end
-
-    resources :employee, :controller=>"employee_roles" do
-      collection do
-        get 'new_message_to_broker'
-        post 'send_message_to_broker'
-        get :match
-        get 'welcome'
-        get 'search'
-      end
-    end
-    root 'employee_roles#show'
-
-    resources :consumer_role, controller: 'consumer_roles'
-  end
-
-  # used to select which people are going to be covered before plan selection
-  get 'group_selection/new', to: 'group_selection#new'
-  post 'group_selection/new', to: 'group_selection#new'
-  post 'group_selection/create', to: 'group_selection#create'
 
   resources :people do #TODO Delete
     get 'select_employer'

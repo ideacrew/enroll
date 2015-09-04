@@ -87,6 +87,15 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "#parse_ethnicity" do
+    it "should return string of values" do
+      expect(helper.parse_ethnicity(["test", "test1"])).to eq "test, test1"
+    end
+    it "should return empty value if ethnicity is not selected" do
+      expect(helper.parse_ethnicity([""])).to eq ""
+    end
+  end
+
   describe "#calculate_participation_minimum" do
     let(:plan_year_1){ double("PlanYear", eligible_to_enroll_count: 5) }
     before do
@@ -99,6 +108,27 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
     it "should calculate eligible_to_enroll_count when not zero" do
       expect(helper.calculate_participation_minimum).to eq 3
+    end
+  end
+
+  describe "#find_document" do
+    context "consumer role does not have any vlp_documents" do
+      it "it creates and returns an empty document of given subject" do
+        doc = find_document(ConsumerRole.new, "Certificate of Citizenship")
+        expect(doc).to be_a_kind_of(VlpDocument)
+        expect(doc.subject).to eq("Certificate of Citizenship")
+      end
+    end
+
+    context "consumer role has a vlp_document" do
+      it "it returns the document" do
+        consumer_role = ConsumerRole.new
+        document = consumer_role.vlp_documents.build({subject:"Certificate of Citizenship"})
+        found_document = find_document(consumer_role, "Certificate of Citizenship")
+        expect(found_document).to be_a_kind_of(VlpDocument)
+        expect(found_document).to eq(document)
+        expect(found_document.subject).to eq("Certificate of Citizenship")
+      end
     end
   end
 end

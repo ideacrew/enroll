@@ -29,6 +29,8 @@ class CoverageHousehold
   validates_presence_of :is_immediate_family
   validate :presence_of_coverage_household_members
 
+  embeds_many :workflow_state_transitions, as: :transitional
+
   # belongs_to writing agent (broker_role)
   def writing_agent=(new_writing_agent)
     raise ArgumentError.new("expected BrokerRole class") unless new_writing_agent.is_a? BrokerRole
@@ -94,20 +96,56 @@ class CoverageHousehold
     state :canceled
     state :terminated
 
-    event :submit_enrollment do
-      transitions from: :unverified, to: :enrollment_submitted
+    event :move_to_contingent!, :after => :record_transition do
+      transitions from: :unverified, to: :enrolled_contingent, after: :notify_verification_outstanding
+      transitions from: :enrolled_contingent, to: :enrolled_contingent
+      transitions from: :enrolled, to: :enrolled_contingent, after: :notify_verification_outstanding
     end
 
-
-    event :ivl_benefit_selected do
-      transitions from: :applicant, to: :ivl_enrollment_eligible, :guards => [:is_identity_proved?, :is_lawfully_present?, :is_state_resident?]
-      transitions from: :applicant, to: :ivl_enrollment_contingent, :guard => :has_ineligible_period_expired?
+    event :move_to_enrolled!, :after => :record_transition do
+      transitions from: :unverified, to: :enrolled, after: :notify_verification_success
+      transitions from: :enrolled_contingent, to: :enrolled, after: :notify_verification_success
+      transitions from: :enrolled, to: :enrolled
     end
 
-    event :ivl_benefit_purchased do
+    event :move_to_pending!, :after => :record_transition do
+      transitions from: :unverified, to: :unverified
+      transitions from: :enrolled_contingent, to: :unverified
+      transitions from: :enrolled, to: :unverified
     end
   end
 
+  def self.update_individual_eligibilities_for(person)
+    found_families = Family.find_all_by_person(person)
+    found_families.each do |ff|
+      ff.households.each do |hh|
+        hh.coverage_households.each do |ch|
+          ch.evaluate_individual_market_eligiblity
+        end
+      end
+    end
+  end
+
+  def evaluate_individual_market_eligiblity
+    eligibility_ruleset = ::RuleSet::CoverageHousehold::IndividualMarketVerification.new(self)
+    if eligibility_ruleset.applicable?
+      self.send(eligibility_ruleset.determine_next_state)
+    end
+  end
+
+  def active_individual_enrollments
+    household.hbx_enrollments.select do |he|
+      (he.coverage_household_id == self.id.to_s) &&
+         (!he.benefit_sponsored?) &&
+         he.currently_active?
+    end
+  end
+
+  def notify_verification_outstanding
+  end
+
+  def notify_verification_success
+  end
 
 private
   def presence_of_coverage_household_members
@@ -116,5 +154,11 @@ private
     end
   end
 
+  def record_transition(*args)
+    workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state
+    )
+  end
 
 end

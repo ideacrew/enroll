@@ -33,7 +33,7 @@ def people
       last_name: "White",
       dob: "08/13/1979",
       ssn: "670991234",
-      home_phone: "2025551234", 
+      home_phone: "2025551234",
       email: 'soren@dc.gov',
       password: '12345678',
       legal_name: "Acme Inc.",
@@ -118,7 +118,7 @@ def fill_user_registration_form(credentials)
   @browser.text_field(name: "user[password]").set(credentials[:password])
   @browser.text_field(name: "user[password_confirmation]").set(credentials[:password])
 end
-  
+
 def default_office_location
   {
   address1: "623a Spalding Ct",
@@ -231,9 +231,9 @@ end
 
 When(/^(?:.+) go(?:es)? to the employee account creation page$/) do
   @browser.goto("http://localhost:3000/")
-  @browser.a(text: "Insured Portal").wait_until_present
+  @browser.a(text: /employee portal/i).wait_until_present
   screenshot("start")
-  scroll_then_click(@browser.a(text: "Insured Portal"))
+  scroll_then_click(@browser.a(text: /employee portal/i))
   @browser.a(text: "Create account").wait_until_present
   screenshot("employee_portal")
   scroll_then_click(@browser.a(text: "Create account"))
@@ -250,7 +250,7 @@ When (/^(.*) logs? out$/) do |someone|
   sleep 2
   scroll_then_click(@browser.element(class: /interaction-click-control-logout/))
   @browser.element(class: /interaction-click-control-logout/).wait_while_present
-  @browser.element(class: /interaction-click-control-insured-portal/).wait_until_present
+  @browser.element(class: /interaction-click-control-employee-portal/).wait_until_present
 end
 
 When(/^.+ go(?:es)? to register as an employee$/) do
@@ -262,7 +262,7 @@ Then(/^.+ should see the employee search page$/) do
   @browser.text_field(class: /interaction-field-control-person-first-name/).wait_until_present
   screenshot("employer_search")
   expect(@browser.text_field(class: /interaction-field-control-person-first-name/).visible?).to be_truthy
-end 
+end
 
 When(/^(.*) creates an HBX account$/) do |named_person|
   person = people[named_person]
@@ -387,7 +387,7 @@ When(/^.+ clicks? continue on the dependents page$/) do
 end
 
 Then(/^.+ should see the group selection page$/) do
-  @browser.form(action: /group_selection\/create/).wait_until_present
+  @browser.form(action: /insured\/group_selection/).wait_until_present
   screenshot("group_selection")
 end
 
@@ -443,6 +443,7 @@ end
 
 Then(/^.+ should see the "my account" page$/) do
   wait_and_confirm_text(/My DC Health Link/)
+  screenshot("my_account")
 end
 
 Then(/^.+ should see the "Your Enrollment History" section/) do
@@ -465,7 +466,7 @@ When(/^.+ clicks? a qle event$/) do
   scroll_then_click(@browser.element(class: /interaction-click-control-keep-existing-plan/))
 end
 
-Then(/^.+ can purchase a plan$/) do 
+Then(/^.+ can purchase a plan$/) do
   @browser.element(text: /Confirm Your Plan Selection/i).wait_until_present
   expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
   scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
@@ -476,7 +477,7 @@ Then(/^.+ can purchase a plan$/) do
   expect(@browser.element(text: /YOUR PLAN/i).visible?).to be_truthy
 end
 
-When(/^Employer publishes a plan year$/) do  
+When(/^Employer publishes a plan year$/) do
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-edit-plan-year/))
   start_on = @browser.element(class: /selectric-interaction-choice-control-plan-year-start-on/)
@@ -486,22 +487,6 @@ When(/^Employer publishes a plan year$/) do
   @browser.element(class: /alert-notice/, text: /Plan Year successfully saved./).wait_until_present
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))
-end
-
-When(/^.+ visits? consumer profile homepage$/) do
-  @browser.goto("http://localhost:3000/consumer_profiles/home")
-end
-
-Then(/^.+ should see the "YOUR LIFE EVENTS" section/) do
-  @browser.element(text: /YOUR LIFE EVENTS/i).wait_until_present
-  screenshot("your_life_events")
-  expect(@browser.element(text: /YOUR LIFE EVENTS/i).visible?).to be_truthy
-end
-
-Then(/^.+ should see my plan/) do
-  @browser.element(text: /plan name/i).wait_until_present
-  screenshot("my_plan")
-  expect(@browser.element(text: /plan name/i).visible?).to be_truthy
 end
 
 When(/^.+ should see a published success message$/) do
@@ -518,7 +503,7 @@ end
 When(/^.+ clicks? on the (.+) tab$/) do |tab_name|
   @browser.a(text: /#{tab_name}/).wait_until_present
   scroll_then_click(@browser.a(text: /#{tab_name}/))
-end 
+end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
   @browser.element(class: /interaction-click-control-#{tab_name}/).wait_until_present
@@ -538,26 +523,33 @@ end
 When(/^I click on continue on qle confirmation page$/) do
   @browser.element(text: /Purchase confirmation/i).wait_until_present
   expect(@browser.element(text: /Purchase confirmation/i).visible?).to be_truthy
-  scroll_then_click(@browser.a(class: /interaction-click-control-continue/))
+  screenshot("qle_confirm")
+  click_when_present(@browser.a(text: /go to my account/i))
 end
 
 
-When(/^I select qle date$/) do
+When(/^I select a future qle date$/) do
   @browser.text_field(class: "interaction-field-control-qle-date").set((Date.today + 5).strftime("%m/%d/%Y"))
+  sleep(1)
+  screenshot("future_qle_date")
   scroll_then_click(@browser.a(class: /interaction-click-control-continue/))
 end
 
 Then(/^I should see not qualify message$/) do
   expect(@browser.element(text: /The date you submitted does not qualify for special enrollment/i).visible?).to be_truthy
+  screenshot("not_qualify")
 end
 
 When(/^I select a past qle date$/) do
   @browser.text_field(class: "interaction-field-control-qle-date").set((Date.today - 5).strftime("%m/%d/%Y"))
+  sleep(1)
+  screenshot("past_qle_date")
   scroll_then_click(@browser.a(class: /interaction-click-control-continue/))
 end
 
 Then(/^I should see confirmation and continue$/) do
   expect(@browser.element(text: /Based on the information you entered, you may be eligible/i).visible?).to be_truthy
+  screenshot("valid_qle")
   scroll_then_click(@browser.button(class: /interaction-click-control-continue/))
 end
 

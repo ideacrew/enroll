@@ -65,6 +65,7 @@ class QhpBuilder
 
   def associate_plan_with_qhp
     plan_year = @qhp.plan_effective_date.to_date.year
+    return if plan_year == 2016
     candidate_plans = Plan.where(active_year: plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
     plan = candidate_plans.sort_by do |plan| plan.hios_id.gsub('-','').to_i end.first
     plans_to_update = Plan.where(active_year: plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a

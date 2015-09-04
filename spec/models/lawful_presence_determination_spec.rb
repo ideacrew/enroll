@@ -1,0 +1,52 @@
+require 'rails_helper'
+
+describe LawfulPresenceDetermination do
+  let(:consumer_role) {
+    FactoryGirl.create(:consumer_role_object)
+  }
+  let(:person_id) { consumer_role.person.id }
+  let(:payload) { "lsjdfioennnklsjdfe" }
+
+  describe "being given an ssa response which fails" do
+    it "should have the ssa response document" do
+      consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: Time.now, body: payload})
+      consumer_role.person.save!
+      found_person = Person.find(person_id)
+      ssa_response = found_person.consumer_role.lawful_presence_determination.ssa_responses.first
+      expect(ssa_response.body).to eq payload
+    end
+  end
+
+  describe "being given an vlp response which fails" do
+    it "should have the vlp response document" do
+      consumer_role.lawful_presence_determination.vlp_responses << EventResponse.new({received_at: Time.now, body: payload})
+      consumer_role.person.save!
+      found_person = Person.find(person_id)
+      vlp_response = found_person.consumer_role.lawful_presence_determination.vlp_responses.first
+      expect(vlp_response.body).to eq payload
+    end
+  end
+end
+
+describe LawfulPresenceDetermination do
+  let(:person) { Person.new }
+  let(:requested_start_date) { double }
+  describe "given a citizen status of us_citizen" do
+    subject { LawfulPresenceDetermination.new(citizen_status: "us_citizen", :consumer_role => ConsumerRole.new(:person => person)) }
+
+    it "should invoke the ssa workflow event when asked to begin the lawful presence process" do
+      expect(subject).to receive(:notify).with(LawfulPresenceDetermination::SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => person})
+      subject.start_determination_process(requested_start_date)   
+    end
+  end
+
+  describe "given a citizen status of naturalized_citizen" do
+    subject { LawfulPresenceDetermination.new(citizen_status: "naturalized_citizen", :consumer_role => ConsumerRole.new(:person => person)) }
+    it "should invoke the vlp workflow event when asked to begin the lawful presence process" do
+      expect(subject).to receive(:notify).with(LawfulPresenceDetermination::VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => person, :coverage_start_date => requested_start_date})
+      subject.start_determination_process(requested_start_date)
+    end
+  end
+
+end
+

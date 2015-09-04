@@ -16,7 +16,7 @@ class InvitationsController < ApplicationController
   end
 
   def redirect_to_employee_match(census_employee)
-    redirect_to welcome_consumer_employee_index_path
+    redirect_to welcome_insured_employee_index_path
   end
 
   def redirect_to_employer_profile(employer_profile)

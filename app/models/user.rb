@@ -1,4 +1,5 @@
 class User
+  INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
   include Mongoid::Document
   include Mongoid::Timestamps
   include Acapi::Notifiers
@@ -22,6 +23,11 @@ class User
   ## Recoverable
   field :reset_password_token,   type: String
   field :reset_password_sent_at, type: Time
+  field :identity_verified_date, type: Date
+  field :identity_final_decision_code, type: String
+  field :identity_final_decision_transaction_id, type: String
+  field :identity_response_code, type: String
+  field :identity_response_description_text, type: String
 
   ## Rememberable
   field :remember_created_at, type: Time
@@ -38,6 +44,8 @@ class User
 
   # Oracle Identity Manager ID
   field :oim_id, type: String, default: ""
+
+  field :last_portal_visited, type: String
 
   index({preferred_language: 1})
   index({approved: 1})
@@ -82,12 +90,12 @@ class User
 
   before_save :ensure_authentication_token
 
-#  after_create :send_welcome_email
+  #  after_create :send_welcome_email
 
   delegate :primary_family, to: :person, allow_nil: true
 
   attr_accessor :invitation_id
-#  validate :ensure_valid_invitation, :on => :create
+  #  validate :ensure_valid_invitation, :on => :create
 
   def ensure_valid_invitation
     if self.invitation_id.blank?
@@ -139,6 +147,10 @@ class User
 
   def has_broker_agency_staff_role?
     has_role?(:broker_agency_staff)
+  end
+
+  def has_insured_role?
+    has_employee_role? || has_consumer_role?
   end
 
   def has_broker_role?
@@ -197,8 +209,12 @@ class User
   # def valid_password?(plaintext_password)
   #   Rypt::Sha512.compare(self.encrypted_password, plaintext_password)
   # end
+  def identity_verified?
+    return false if identity_final_decision_code.blank?
+    identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+  end
 
-private
+  private
   # Remove indexed, unique, empty attributes from document
   def strip_empty_fields
     unset("email") if email.blank?

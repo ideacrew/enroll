@@ -4,16 +4,6 @@ class BenefitPackage
 
   embedded_in :benefit_coverage_period
 
-  ELIGIBLE_RELATIONSHIP_CATEGORY_KINDS = %w(
-      self
-      spouse
-      domestic_partner
-      children_under_26
-      disabled_children_26_and_over
-      children_26_and_over
-      dependents
-    )
-
   BENEFIT_BEGIN_AFTER_EVENT_OFFSET_KINDS = [0, 30, 60, 90]
   BENEFIT_EFFECTIVE_DATE_KINDS      = %w(date_of_event first_of_month)
   BENEFIT_TERMINATION_DATE_KINDS    = %w(date_of_event end_of_month)
@@ -30,27 +20,43 @@ class BenefitPackage
   PREMIUM_CREDIT_STRATEGY_KINDS  = %w(unassisted employer_fixed_cost employee_fixed_cost allocated_lump_sum_credit 
                                       percentage_contribution indexed_percentage_contribution, federal_employee_health_benefit)
 
+
   field :title, type: String, default: ""
 
-  field :eligible_relationship_categories, type: Array, default: []
   field :benefit_begin_after_event_offsets, type: Array, default: []
-  field :benefit_effective_dates, type: Array, default: []
-  field :benefit_termination_dates, type: Array, default: []
+  field :benefit_effective_dates,           type: Array, default: []
+  field :benefit_termination_dates,         type: Array, default: []
 
-  field :elected_premium_credit_strategy, type: String
-  field :index_benefit_id, type: BSON::ObjectId
-  field :benefit_ids, type: Array, default: []
+  field :elected_premium_credit_strategy,   type: String
+  field :index_benefit_id,                  type: BSON::ObjectId
+  field :benefit_ids,                       type: Array, default: []
 
   delegate :start_on, :end_on, to: :benefit_coverage_period
 
-  # embeds_one :premium_credit_strategy
+  delegate :market_places, :enrollment_periods, :family_relationships, :benefit_categories, 
+           :incarceration_status, :age_range, :citizenship_status, :residency_status, :ethnicity, 
+           to: :benefit_eligibility_element_group
 
-  # validates :eligible_relationship_categories,
-  #   allow_blank: false,
-  #   inclusion: {
-  #     in: ELIGIBLE_RELATIONSHIP_CATEGORY_KINDS,
-  #     message: "%{value} is not a valid eligible relationship category kind"
-  #   }
+  delegate :market_places=, :enrollment_periods=, :family_relationships=, :benefit_categories=, 
+           :incarceration_status=, :age_range=, :citizenship_status=, :residency_status=, :ethnicity=, 
+           to: :benefit_eligibility_element_group
+
+
+  embeds_one :benefit_eligibility_element_group
+  accepts_nested_attributes_for :benefit_eligibility_element_group
+
+  after_initialize :initialize_dependent_models
+
+  def initialize_dependent_models
+    build_benefit_eligibility_element_group if benefit_eligibility_element_group.nil?
+  end
+
+  # def initialize(*args)
+  #   self.build_benefit_eligibility_element_group
+  #   super(*args)
+  # end
+
+  # embeds_one :premium_credit_strategy
 
   # validates :benefit_begin_after_event_offsets,
   #   allow_blank: false,
@@ -79,5 +85,6 @@ class BenefitPackage
       in: PREMIUM_CREDIT_STRATEGY_KINDS,
       message: "%{value} is not a valid premium credit strategy kind"
     }
+
 
 end

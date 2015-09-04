@@ -51,7 +51,7 @@ puts "*"*80
 # require File.join(File.dirname(__FILE__),'seedfiles', 'premiums')
 
 puts "*"*80
-puts "Loading constructed geographic areas, people, broker agencies, employers, and employees."
+puts "*"*80
 require File.join(File.dirname(__FILE__),'seedfiles', 'us_counties_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'admins_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'people_seed')
@@ -79,6 +79,10 @@ qhp_import_hash.run
 puts "*"*80
 
 require File.join(File.dirname(__FILE__),'seedfiles', 'shop_2015_sbc_files')
+
+puts "*"*80
+puts "Loading benefit packages."
+require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_seed')
 
 puts "*"*80
 puts "End of Seed Data"

@@ -48,6 +48,7 @@ Eye.application 'eye_enroll' do
     pid_file "pids/enroll_remote_event_listener.pid"
     start_command "bundle exec rails runner -e production script/remote_event_listener.rb"
     stdall "log/enroll_remote_event_listener.log"
+    trigger :flapping, times: 3, within: 1.minute, retry_in: 10.minutes
     daemonize true
 
     # stop signals:

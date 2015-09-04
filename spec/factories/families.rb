@@ -1,9 +1,12 @@
 FactoryGirl.define do
   factory :family do
-    # e_case_id   "abc123xyz"
-    # e_status_code_type  "applicant"
-    # application_type    "employer_sponsored"
-    # renewal_consent_through_year  2017
+    sequence(:e_case_id) {|n| "abc#{n}12xyz#{n}"}
+    renewal_consent_through_year  2017
+    submitted_at Time.now
+    updated_at "user"
 
+    trait :with_primay_family_member do
+      family_members {[FamilyMember.new(is_primary_applicant: true, is_consent_applicant:true)]}
+    end
   end
 end

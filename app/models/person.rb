@@ -29,17 +29,18 @@ class Person
   field :date_of_death, type: Date
 
   field :is_incarcerated, type: Boolean
-  
+
   field :is_disabled, type: Boolean
-  field :ethnicity, type: String
+  field :ethnicity, type: Array
   field :race, type: String
+  field :tribal_id, type: String
 
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
-
+  field :no_ssn, type: String #ConsumerRole TODO TODOJF
   # Login account
   belongs_to :user
 
@@ -148,7 +149,7 @@ class Person
   scope :broker_role_certified,     -> { where("broker_role.aasm_state" => { "$in" => [:active, :broker_agency_pending]})}
   scope :broker_role_decertified,   -> { where("broker_role.aasm_state" => { "$eq" => :decertified })}
   scope :broker_role_denied,        -> { where("broker_role.aasm_state" => { "$eq" => :denied })}
- 
+
 
 #  ViewFunctions::Person.install_queries
 
@@ -315,11 +316,11 @@ class Person
     emails.detect { |adr| adr.kind == "home" }
   end
 
-  def has_active_consumer_role
+  def has_active_consumer_role?
     consumer_role.present? and consumer_role.is_active?
   end
 
-  def has_active_employee_roles
+  def has_active_employee_role?
     employee_roles.present? and employee_roles.active.present?
   end
 
@@ -381,7 +382,7 @@ class Person
     end
 
     def find_all_staff_roles_by_employer_profile(employer_profile)
-      where(:'employer_staff_role.employer_profile_id' => employer_profile.id)
+      where({"$and"=>[{"employer_staff_roles.employer_profile_id"=> employer_profile.id}, {"employer_staff_roles.is_owner"=>true}]})
     end
 
     def match_existing_person(personish)
@@ -396,18 +397,22 @@ class Person
       last_name = options[:last_name]
 
       raise ArgumentError, "must provide an ssn, last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank?))
-
+      
       matches = Array.new
       matches.concat Person.active.where(encrypted_ssn: encrypt_ssn(ssn_query)).to_a unless ssn_query.blank?
-      matches.concat Person.where(last_name: last_name, dob: dob_query).active.to_a unless (dob_query.blank? || last_name.blank?)
+      #matches.concat Person.where(last_name: last_name, dob: dob_query).active.to_a unless (dob_query.blank? || last_name.blank?)
+
+      if ssn_query.blank? && !dob_query.blank? && !last_name.blank?
+        matches.concat Person.where(last_name: last_name, dob: dob_query, encrypted_ssn: {:$exists => false}).active.to_a
+      end
       matches.uniq
     end
 
     def brokers_or_agency_staff_with_status(query, status)
-      query.and( 
-                Person.or( 
-                          { :"broker_agency_staff_roles.aasm_state" => status }, 
-                          { :"broker_role.aasm_state" => status } 
+      query.and(
+                Person.or(
+                          { :"broker_agency_staff_roles.aasm_state" => status },
+                          { :"broker_role.aasm_state" => status }
                          ).selector
                )
     end
@@ -418,7 +423,7 @@ class Person
   # TODO: Move this out of here
   attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
-  attr_accessor :tribal_id, :is_consumer_role
+  attr_accessor :is_consumer_role
 
   before_save :assign_citizen_status_from_consumer_role
 
@@ -491,16 +496,11 @@ class Person
     !!agent
   end
 
-  # HACK
-  # FIXME
-  # TODO: Never emulate this behaviour - this is something terrible Trey did to unblock our progress -
-  #       and needs to be revisited and refactored
-
   private
   def is_ssn_composition_correct?
     # Invalid compositions:
-    #   All zeros or 000, 666, 900-999 in the area numbers (first three digits); 
-    #   00 in the group number (fourth and fifth digit); or 
+    #   All zeros or 000, 666, 900-999 in the area numbers (first three digits);
+    #   00 in the group number (fourth and fifth digit); or
     #   0000 in the serial number (last four digits)
 
     if ssn.present?

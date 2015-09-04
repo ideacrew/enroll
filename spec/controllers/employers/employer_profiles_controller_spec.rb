@@ -9,6 +9,7 @@ RSpec.describe Employers::EmployerProfilesController do
     it "should render the new template" do
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(user).to receive(:has_employer_staff_role?).and_return(false)
+      allow(user).to receive(:person).and_return(person)
       sign_in(user)
       get :new
       expect(response).to have_http_status(:success)
@@ -37,6 +38,10 @@ RSpec.describe Employers::EmployerProfilesController do
 
     before(:each) do
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(user).to receive(:last_portal_visited=).and_return("true")
+      allow(user).to receive(:last_portal_visited).and_return("true")
+      allow(user).to receive(:save).and_return(true)
+      allow(user).to receive(:person).and_return(person)
       allow(user).to receive(:has_employer_staff_role?)
       employer_profile.plan_years = [plan_year]
       sign_in(user)
@@ -103,9 +108,11 @@ RSpec.describe Employers::EmployerProfilesController do
 
   describe "GET welcome" do
     let(:user) { double("user")}
+    let(:person) { double("Person")}
 
     it "renders the 'welcome' template" do
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(user).to receive(:person).and_return(person)
       allow(user).to receive(:has_employer_staff_role?)
       sign_in(user)
       get :welcome
@@ -115,8 +122,11 @@ RSpec.describe Employers::EmployerProfilesController do
   end
 
   describe "GET search" do
+    let(:user) { double("user")}
+    let(:person) { double("Person")}
     before(:each) do
-      sign_in
+      allow(user).to receive(:person).and_return(person)
+      sign_in user
       get :search
     end
 
@@ -203,6 +213,8 @@ RSpec.describe Employers::EmployerProfilesController do
   end
 
   describe "POST create" do
+    let(:user){ double("User") }
+    let(:person){ double("Person") }
     let(:phone_attributes) { {
       :kind => "phone kind",
       :number => "phone number",
@@ -239,7 +251,8 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:organization) { double(:employer_profile => double) }
 
     before(:each) do
-      sign_in
+      sign_in user
+      allow(user).to receive(:person).and_return(person)
       allow(Forms::EmployerProfile).to receive(:new).and_return(organization)
       allow(organization).to receive(:save).and_return(save_result)
       post :create, :organization => organization_params
@@ -273,14 +286,17 @@ RSpec.describe Employers::EmployerProfilesController do
   end
 
   describe "POST create" do
+    let(:user) { double("User") }
+    let(:person) { double("Person") }
     let(:employer_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:found_employer) { double("test", :save => validation_result, :employer_profile => double) }
     let(:office_locations){[double(address: double("address"), phone: double("phone"), email: double("email"))]}
     let(:organization) {double(office_locations: office_locations)}
 
     before(:each) do
-      sign_in
+      sign_in user
       allow(Forms::EmployerProfile).to receive(:new).and_return(found_employer)
+      allow(user).to receive(:person).and_return(person)
 #      allow(EmployerProfile).to receive(:find_by_fein).and_return(found_employer)
 #      allow(found_employer).to receive(:organization).and_return(organization)
       post :create, :organization => employer_parameters
@@ -298,11 +314,14 @@ RSpec.describe Employers::EmployerProfilesController do
   describe "POST match" do
     let(:employer_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:found_employer) { [] }
+    let(:user) { double("User")}
+    let(:person) { double("Person") }
     let(:create_employer_params) { "" }
     let(:mock_employer_candidate) { instance_double("Forms::EmployerCandidate", :valid? => validation_result) }
 
     before(:each) do
-      sign_in
+      sign_in user
+      allow(user).to receive(:person).and_return(person)
       allow(Forms::EmployerCandidate).to receive(:new).with(employer_parameters).and_return(mock_employer_candidate)
       allow(mock_employer_candidate).to receive(:match_employer).and_return(found_employer)
       post :match, :employer_profile => employer_parameters, :create_employer => create_employer_params
@@ -333,6 +352,7 @@ RSpec.describe Employers::EmployerProfilesController do
       let(:found_employer) { FactoryGirl.create(:employer_profile) }
 
       it "renders the 'match' template" do
+        allow(user).to receive(:person).and_return(person)
         expect(response).to have_http_status(:success)
         expect(response).to render_template("match")
         expect(assigns[:employer_candidate]).to eq mock_employer_candidate
@@ -365,6 +385,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(Organization).to receive(:find).and_return(organization)
       allow(organization).to receive(:employer_profile).and_return(employer_profile)
       allow(controller).to receive(:employer_profile_params).and_return({})
+      allow(controller).to receive(:sanitize_employer_profile_params).and_return(true)
     end
 
     it "should redirect" do
@@ -387,9 +408,9 @@ RSpec.describe Employers::EmployerProfilesController do
       end
     end
 
-     context "given the company has an owner" do
+     context "given the company have managing staff" do
       it "should render edit template" do
-        allow(employer_profile).to receive(:owner).and_return(person)
+        allow(employer_profile).to receive(:staff_roles).and_return(person)
         allow(user).to receive(:save).and_return(true)
         sign_in(user)
         put :update, id: organization.id

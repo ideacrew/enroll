@@ -42,8 +42,8 @@
                   </div>
                 </div>
 
-		<div id="plans">
-			<%= render :partial => "insured/plan_shoppings/plan_details", :collection => @plans, :as => :plan %>
+                <div id="plans">
+                  <h3>Loading...</h3>
                 </div>
               </div>
             </div>
@@ -59,15 +59,23 @@
         </div>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">  
         <% if @change_plan.blank? && @market_kind == "individual" %>
-          <%= render  partial: 'shared/individual_progress', locals: {step: '4'} %>
+          <% if is_sep_eligible? %>
+            <%= render  partial: 'shared/sep_progress', locals: {step: '5'} %>
+          <% else %>
+            <%= render  partial: 'shared/individual_progress', locals: {step: '4'} %>
+          <% end %>
         <% elsif @change_plan.blank? %>
           <%= render  partial: 'shared/signup_progress', locals: {step: '5'} %>
-        <% elsif @change_plan == "change" %>
+        <% elsif @change_plan == "change_by_qle" %>
           <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
         <% elsif @change_plan == "change_plan" %>
-          <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
+          <% if is_sep_eligible? %>
+            <%= render partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
+          <% else %>
+            <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
+          <% end %>
         <% end %>
       </div>
     </div>
@@ -95,3 +103,11 @@
 
 <%= render :partial => "insured/plan_shoppings/help_with_plan", :locals => {:enrollment => @hbx_enrollment } %>
 
+<script type="text/javascript">
+  window.onload = function() {
+    $.ajax({
+      url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind) %>",
+      type: "GET"
+    });
+  };
+</script>

@@ -20,7 +20,7 @@ module Forms
 
     def create_employer_staff_role(current_user, employer_profile)
       person.user = current_user
-      person.employer_staff_roles << EmployerStaffRole.new(:employer_profile_id => employer_profile.id)
+      person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => employer_profile.id, is_owner: true)
       current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
       current_user.save!
       person.save!

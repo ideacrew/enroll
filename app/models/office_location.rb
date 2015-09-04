@@ -10,12 +10,17 @@ class OfficeLocation
   embeds_one :phone, cascade_callbacks: true, validate: true
   accepts_nested_attributes_for :phone, reject_if: :all_blank, allow_destroy: true
 
-  validates_presence_of :address, :phone
+  validates_presence_of :address
+  validates_presence_of :phone, if: :primary_or_branch?
 
   alias_method :is_primary?, :is_primary
 
   def parent
     self.organization
+  end
+
+  def primary_or_branch?
+    ['primary', 'branch'].include? address.kind if address.present?
   end
 
   # TODO -- only one office location can be primary

@@ -33,7 +33,7 @@ module Insured
               render "service_unavailable"
             else
               if service_response.successful?
-                process_successful_interactive_verification(@interactive_verification, service_response)
+                process_successful_interactive_verification(service_response)
               else
                 @verification_response = service_response
                 render "failed_validation" 
@@ -46,15 +46,37 @@ module Insured
       end
     end
 
-    def process_successful_interactive_verification(interactive_verification, service_response)
+    def update
+      @transaction_id = params.require(:id)
+
+      respond_to do |format|
+        format.html do
+            service = ::IdentityVerification::InteractiveVerificationService.new
+            service_response = service.check_override(render_verification_override(@transaction_id))
+            if service_response.blank?
+              render "service_unavailable"
+            else
+              if service_response.successful?
+                process_successful_interactive_verification(service_response)
+              else
+                @verification_response = service_response
+                render "failed_validation"
+              end
+            end
+        end
+      end
+    end
+
+    def process_successful_interactive_verification(service_response)
       consumer_role = @person.consumer_role
-      consumer_role.identity_final_decision_code = ConsumerRole::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
-      consumer_role.identity_response_code = ConsumerRole::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
-      consumer_role.identity_response_description_text = service_response.response_text
-      consumer_role.identity_final_decision_transaction_id = service_response.transaction_id
-      consumer_role.identity_verified_date = Date.today
-      consumer_role.verify_identity!
-      redirect_to consumer_employee_dependents_path(consumer_role_id: consumer_role.id)
+      consumer_user = @person.user
+      consumer_user.identity_final_decision_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+      consumer_user.identity_response_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+      consumer_user.identity_response_description_text = service_response.response_text
+      consumer_user.identity_final_decision_transaction_id = service_response.transaction_id
+      consumer_user.identity_verified_date = Date.today
+      consumer_user.save!
+      redirect_to insured_employee_dependents_path(consumer_role_id: consumer_role.id)
     end
 
     def render_session_start
@@ -63,6 +85,10 @@ module Insured
 
     def render_question_responses(session)
       render_to_string "events/identity_verification/interactive_questions_response", :formats => ["xml"], :locals => { :session => session }
+    end
+
+    def render_verification_override(transaction_id)
+      render_to_string "events/identity_verification/interactive_verification_override", :formats => ["xml"], :locals => { :transaction_id => transaction_id }
     end
   end
 end

@@ -34,8 +34,8 @@ describe Forms::EmployerCandidate, "asked to match an employer" do
     expect(subject.match_employer).to be_nil
   end
 
-  context "who does not have an owner associated" do
-    let(:fake_employer) { instance_double("EmployerProfile", :owner => false) }
+  context "who does not have a managing staff associated" do
+    let(:fake_employer) { instance_double("EmployerProfile", :staff_roles => []) }
 
     it "should return the employer profile" do
       allow(::EmployerProfile).to receive(:find_by_fein).and_return(fake_employer)
@@ -44,7 +44,7 @@ describe Forms::EmployerCandidate, "asked to match an employer" do
   end
 
   context "who does have an owner associated" do
-    let(:owned_employer) { instance_double("EmployerProfile", :owner => true) }
+    let(:owned_employer) { instance_double("EmployerProfile", :staff_roles => double) }
 
     it "should have an error on the employer profile" do
       allow(::EmployerProfile).to receive(:find_by_fein).and_return(owned_employer)

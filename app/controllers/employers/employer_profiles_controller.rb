@@ -72,14 +72,14 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show
-   if params[:q] || params[:page] || params[:commit] || params[:status]      
+   if params[:q] || params[:page] || params[:commit] || params[:status]
      paginate_employees
    else
       @current_plan_year = @employer_profile.published_plan_year
       @plan_years = @employer_profile.plan_years.order(id: :desc)
       @broker_agency_accounts = @employer_profile.broker_agency_accounts
       if @current_plan_year.present?
-        #FIXME commeted out for performance test 
+        #FIXME commeted out for performance test
         #enrollments = HbxEnrollment.covered(@current_plan_year.hbx_enrollments)
         @premium_amt_total = 0 #enrollments.map(&:total_premium).sum
         @employee_cost_total = 0 #enrollments.map(&:total_employee_cost).sum
@@ -104,11 +104,11 @@ class Employers::EmployerProfilesController < ApplicationController
   def new
     @organization = Forms::EmployerProfile.new
   end
-  
+
   def edit
     @organization = Organization.find(params[:id])
   end
-   
+
   def create
     params.permit!
     @organization = Forms::EmployerProfile.new(params[:organization])
@@ -120,12 +120,13 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def update
+    sanitize_employer_profile_params
     @organization = Organization.find(params[:id])
     @employer_profile = @organization.employer_profile
     current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
     current_user.person.employer_contact = @employer_profile
     if current_user.has_employer_staff_role? #&& @employer_profile.owner == current_user
-      if !@employer_profile.owner.present? && @organization.update_attributes(employer_profile_params) && current_user.save
+      if !@employer_profile.staff_roles.present? && @organization.update_attributes(employer_profile_params) && current_user.save
         current_user.person.employer_staff_roles << EmployerStaffRole.create(person: current_user.person, employer_profile_id: @employer_profile.id, is_owner: true)
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to employers_employer_profile_path(@employer_profile)
@@ -227,6 +228,12 @@ class Employers::EmployerProfilesController < ApplicationController
           :email_attributes => [:kind, :address]
         ]
       )
+    end
+
+    def sanitize_employer_profile_params
+      params[:organization][:office_locations_attributes].each do |key, location|
+        location.delete('phone_attributes') if location['phone_attributes'].present? and location['phone_attributes']['number'].blank?
+      end
     end
 
     def build_organization

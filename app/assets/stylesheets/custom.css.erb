@@ -3848,26 +3848,30 @@ ul.list-right-section li a img {
   margin-bottom: 0;
 }
 
-.hbx-enrollment-panel .panel-heading, .qles-panel .panel-heading{
+.hbx-enrollment-panel .panel-heading, .qles-panel .panel-heading, .seps-panel .panel-heading{
   background-image: none;
   padding-bottom: 0;
+  border-bottom: 0;
 }
 
+.hbx-enrollment-panel .panel-heading hr, .qles-panel .panel-heading hr, .seps-panel .panel-heading hr{
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.seps-panel ul{
+  margin-left: 25px;
+}
 #qle-details .hbx-enrollment-panel .panel-heading h4{
   color: #468847;
 }
 
-
-.qles-panel .panel-heading{
-  border-bottom: 0;
-}
-
-.qles-panel .panel-heading hr{
-  margin-bottom: 0;
-}
-
-.qles-panel .panel-body{
+.qles-panel .panel-body, .seps-panel .panel-body{
   padding-top: 5px;
+}
+
+.qles-panel .panel-heading hr, .seps-panel .panel-heading hr{
+  margin-top: 10px;
 }
 
 .hbx-enrollment-panel .btn{
@@ -4877,4 +4881,24 @@ position: absolute;
 
 .language_multi_select .multiselect .caret {
   color: #bbb;
+}
+
+.ethnicity_options label {
+    display: block;
+    padding-left: 20px;
+    text-indent: -18px;
+}
+.ethnicity_options label input {
+    margin-right: 5px;
+}
+.fa-question-circle {
+  color: #8af;
+}
+.no_ssn {
+  font-family: 'AvenirLTStd-Light';
+  color: #666;
+  font-size: 12px;
+}
+ul.list-qle {
+  padding: 5px 30px;
 }

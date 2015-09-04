@@ -37,5 +37,13 @@ module Enroll
     config.i18n.fallbacks = {'es' => 'en'}
     config.paths.add "app/api", glob: "**/*.rb"
     config.autoload_paths += Dir["#{Rails.root}/app/api/api/*/*"]
+    unless Rails.env.test?
+      config.acapi.add_subscription("Events::ResidencyVerificationRequestsController")
+      config.acapi.add_subscription("Events::SsaVerificationRequestsController")
+      config.acapi.add_subscription("Events::VlpVerificationRequestsController")
+      config.acapi.add_async_subscription("Subscribers::SsaVerification")
+      config.acapi.add_async_subscription("Subscribers::LawfulPresence")
+      config.acapi.add_async_subscription("Subscribers::LocalResidency")
+    end
   end
 end

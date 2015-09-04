@@ -55,6 +55,10 @@ module ApplicationHelper
     date_value.strftime("%m/%d/%Y") if date_value.respond_to?(:strftime)
   end
 
+  def format_datetime(date_value)
+    date_value.strftime("%m/%d/%Y %H:%M UTC") if date_value.respond_to?(:strftime)
+  end
+
   # Builds a Dropdown button
   def select_dropdown(input_id, list)
     return unless list.is_a? Array
@@ -316,18 +320,18 @@ module ApplicationHelper
     elsif current_user.try(:person).try(:assister_role)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm an In Person Assister".html_safe,
       home_exchanges_agents_path
+    elsif (controller_path.include?("insured") && current_user.try(:has_insured_role?)) ||
+      (["employee_roles", "consumer_roles"].include?(controller))
+      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Insured".html_safe
     elsif current_user.try(:has_broker_agency_staff_role?)
       "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe
     elsif current_user.try(:has_employer_staff_role?)
       "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe
-    elsif controller == 'employee_roles' || controller == "consumer_roles"
-      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Insured".html_safe
-    elsif controller == 'consumer_profiles'
-      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Insured".html_safe
     else
       "Welcome to the District's Health Insurance Marketplace"
     end
   end
+
   def override_backlink
     link=''
     if current_user.try(:has_hbx_staff_role?)
@@ -362,6 +366,8 @@ module ApplicationHelper
       end
     else
       case @status
+      when 'applicant'
+        'Submitted Date'
       when 'certified'
         'Certified Date'
       when 'decertified'
@@ -432,5 +438,44 @@ module ApplicationHelper
     notice.enrollments.inject([]) do |enrollees, enrollment|
       enrollees += enrollment.enrollees
     end.uniq
+  end
+
+  def ethnicity_collection
+    [
+      ["White", "Black or African American", "Asian Indian" ],
+      ["Chinese", "Filipino", "Japanese", "Korean"], 
+      ["Vietnamese", "Other Asian", "Native Hawaiian", "Samon" ],
+      ["Guamanion or Chamorro", "Other pacific islander", "Other"]
+    ].inject([]){ |sets, ethnicities|
+      sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
+    }
+  end
+
+  def latino_collection
+    [
+      ["Mexican", "Mexican American"],
+      ["Chicano/a", "Puerto Rican"],
+      ["Cuban", "Other"]
+    ].inject([]){ |sets, ethnicities|
+      sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
+    }
+  end
+
+  def is_sep_eligible?
+    false
+  end
+  
+  def find_document(consumer_role, subject)
+    subject_doc = consumer_role.vlp_documents.detect do |documents|
+      documents.subject.eql?(subject)
+    end
+
+    subject_doc || consumer_role.vlp_documents.build({subject:subject})
+  end
+
+  def parse_ethnicity(value)
+    return "" unless value.present?
+    value = value.select{|a| a.present? }  if value.present?
+    value.present? ? value.join(", ") : ""
   end
 end

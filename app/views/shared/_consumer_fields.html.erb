@@ -2,8 +2,8 @@
 
   <div class="row row-form-wrapper no-buffer">
 
-    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      Are you a US Citizen or US National? *
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg">
+      <label>Are you a US Citizen or US National? *</label>
     </div>
     <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
@@ -26,8 +26,8 @@
 
   <div class="row row-form-wrapper no-buffer" id="naturalized_citizen_container" style="display: none">
 
-    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      Are you a naturalized citizen? *
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg">
+      <label>Are you a naturalized citizen? *</label>
     </div>
 
     <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
@@ -40,7 +40,7 @@
     </div>
     <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
-        <%= f.radio_button :naturalized_citizen, false, required: true,  class: "required floatlabel" %>
+        <%= f.radio_button :naturalized_citizen, false, required: true, class: "required floatlabel" %>
         <%= f.label :naturalized_citizen, :value => false do %>
             <span>No</span>
         <% end %>
@@ -49,8 +49,8 @@
   </div>
 
   <div class="row row-form-wrapper no-buffer" id="immigration_status_container" style="display: none">
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      Do you have eligible immigration status?
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg">
+      <label>Do you have eligible immigration status? *</label>
     </div>
     <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
@@ -70,34 +70,62 @@
     </div>
   </div>
 
-  <div class="row row-form-wrapper no-buffer" id="vlp_document_id_container" style="display: none">
-
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      Select your document type
-    </div>
-
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= select_tag :naturalization_doc_type, options_for_select(ConsumerRole.naturalization_document_types) %>
-    </div>
-
-    <% if f.object.is_a?(Person) %>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= f.fields_for :consumer_role do |cr| %>
-          <%= cr.text_field :vlp_document_id, :placeholder => "Document Id" %>
+  <% if f.object.is_a? Person %>
+      <%= f.fields_for :consumer_role do |c| %>
+          <div class="row row-form-wrapper no-buffer" id="immigration_fields_container" style="display: none">
+            <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c} %>
+          </div>
       <% end %>
+  <% else %>
+      <% if f.object.persisted? %>
+          <% dependent_consumer_role = f.object.family_member.person.consumer_role %>
+      <% else %>
+          <% dependent_consumer_role = ConsumerRole.new %>
+      <% end %>
+      <%= f.fields_for dependent_consumer_role do |c| %>
+          <div class="row row-form-wrapper no-buffer" id="immigration_fields_container" style="display: none">
+            <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c} %>
+          </div>
+      <% end %>
+  <% end %>
+
+  <div class="row row-form-wrapper no-buffer" id="vlp_document_id_container" style="display: none">
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <%= hidden_field_tag :form_for_consumer_role, f.object.is_a?(Person) %>
+      <%= select_tag :naturalization_doc_type, options_for_select(ConsumerRole.naturalization_document_types), {id: 'naturalization_doc_type', prompt: 'Select document type'} %>
     </div>
+
+    <% if f.object.is_a? Person %>
+        <%= f.fields_for :consumer_role do |c| %>
+            <div id="naturalization_cert_container" style="display: none">
+              <%= render :partial => "shared/naturalization_cert_fields", locals: {c: c} %>
+            </div>
+            <div id="citizenship_cert_container" style="display: none">
+              <%= render :partial => "shared/citizenship_cert_fields", locals: {c: c} %>
+            </div>
+        <% end %>
     <% else %>
-        <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-           <%= f.text_field :vlp_document_id, :placeholder => "Document Id" %>
-        </div>
+        <% if f.object.persisted? %>
+            <% dependent_consumer_role = f.object.family_member.person.consumer_role %>
+        <% else %>
+            <% dependent_consumer_role = ConsumerRole.new %>
+        <% end %>
+        <%= f.fields_for dependent_consumer_role do |c| %>
+            <div id="naturalization_cert_container" style="display: none">
+              <%= render :partial => "shared/naturalization_cert_fields", locals: {c: c} %>
+            </div>
+            <div id="citizenship_cert_container" style="display: none">
+              <%= render :partial => "shared/citizenship_cert_fields", locals: {c: c} %>
+            </div>
+
+        <% end %>
     <% end %>
   </div>
 
 
   <div class="row row-form-wrapper no-buffer" id="vlp_document_id_container">
-
-    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 form-group form-group-lg no-pd">
-      Are you a member of an American Indian tribe or Alaskan Native?
+    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 form-group form-group-lg">
+      <label>Are you a member of an American Indian or Alaskan Native?</label>
     </div>
     <div style="text-align: center" class="col-lg-1 col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd">
 
@@ -113,14 +141,17 @@
 </div>
 
 <div class="row row-form-wrapper no-buffer" id="vlp_document_id_container">
-  <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 form-group form-group-lg no-pd">
-    Are you currently Incarcerated?
+  <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 form-group form-group-lg">
+    <label>Are you currently incarcerated?</label>
   </div>
   <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 form-group form-group-lg no-pd">
-    <%= f.check_box :is_incarcerated %> Yes
+    <%= f.check_box :is_incarcerated %>
+    <%= f.label :is_incarcerated, :value => true do %>
+        <span>Yes</span>
+    <% end %>
   </div>
 </div>
 
-<%= render partial: "shared/race_and_ethnicity_options"%>
+<%= render "shared/race_and_ethnicity_options", f: f %>
 
 <%= f.hidden_field :is_consumer_role, value: 'true' %>
