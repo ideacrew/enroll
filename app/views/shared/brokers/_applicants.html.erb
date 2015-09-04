@@ -1,6 +1,7 @@
  <div class="table-border table-responsive">
   <table class="table">
     <thead>
+      <tr>
       <th>Applicant Name</th>
       <% if controller_name == 'applicants' %>
         <th>Application Type</th>
@@ -13,47 +14,15 @@
           <%= date_col_name_for_broker_roaster %>
         </th>
       <% end %>
+    </tr>
     </thead>
-    <% if @broker_applicants.any? %>
-    <% @broker_applicants.each do |applicant| %>
-
-    <% broker_role = applicant.broker_role %>
-    <% edit_path = edit_exchanges_broker_applicant_path(applicant) %>
-
-    <% if @broker_agency_profile.present? %>
-      <% if applicant.broker_role.nil?  %>
-         <% broker_role = applicant.broker_agency_staff_roles[0] %>
-      <% end %>
-      <% edit_path = edit_broker_agencies_profile_applicant_path(@broker_agency_profile, applicant) %>
-    <% end %>
-    
-    <% if broker_role.broker_agency_profile %>
     <tbody>
-      <td>
-        <%= link_to applicant.full_name,
-        edit_path, class: "interaction-click-control-broker-show", method: :get, remote: true %>
-      </td>
-      <% if controller_name == 'applicants' %>
-      <td>
-        <% if broker_role.class.to_s == 'BrokerRole' %>
-        <%= broker_role.is_primary_broker? ? 'Primary Broker' : 'Broker' %>
-        <% else %>
-        Broker Agency Staff
-        <% end %>
-      </td>
+      <% if @broker_applicants.any? %>
+      <%= render partial: "shared/brokers/applicant_row", :collection => @broker_applicants, :as => :applicant %>
+      <% else %>
+      <tr><td>No Applicants found.</td></tr>
       <% end %>
-      <td><%= broker_role.npn if broker_role.respond_to?(:npn) %></td>
-      <td><%= broker_role.broker_agency_profile.legal_name %></td>
-      <td><%= broker_role.current_state %></td>
-      <% if date_col_name_for_broker_roaster.present? %>
-      <td><%= format_date broker_role.last_state_transition_date %></td>
-      <% end %>
-    </tbody>
-    <% end %> 
-    <% end %>
-    <% else %>
-    <tbody><td>No Applicants found.</td></tbody>
-    <% end %>
+    </tbody>  
   </table>
 </div>
 <div class="row">

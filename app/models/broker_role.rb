@@ -229,19 +229,16 @@ class BrokerRole
 
   def initial_transition
     return if workflow_state_transitions.size > 0
-    self.workflow_state_transitions = [WorkflowStateTransition.new(
+    self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: nil,
-      to_state: aasm.to_state || "applicant",
-      transition_at: Time.now.utc
-    )]
+      to_state: aasm.to_state || "applicant"
+      )
   end
 
   def record_transition
-    # byebug
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
-      to_state: aasm.to_state,
-      transition_at: Time.now.utc
+      to_state: aasm.to_state
     )
   end
 
@@ -268,13 +265,13 @@ class BrokerRole
   end
 
   def certified_date
-    if self.workflow_state_transitions.any?
-      transition = workflow_state_transitions.detect do |transition|
-        transition.from_state == 'applicant' && ( transition.to_state == 'active' || transition.to_state == 'broker_agency_pending')
-      end
+    return if self.workflow_state_transitions.empty?
+
+    transition = workflow_state_transitions.detect do |transition|
+      transition.from_state == 'applicant' && ( transition.to_state == 'active' || transition.to_state == 'broker_agency_pending')
     end
-    return unless transition
-    transition.transition_at
+
+    transition.transition_at if transition
   end
 
   def current_state
