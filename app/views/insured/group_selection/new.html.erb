@@ -74,13 +74,13 @@
               <% end %>
             </div>
           <% end %>
-
+          <% if @hbx_enrollment.present? %>
           <div class='row top-pd'>
             <div class="col-sm-12">
               <p>If you enroll today, coverage will begin <%= @hbx_enrollment.effective_on.strftime("%d %b %Y") %>. </p>
             </div>
           </div>
-
+          <% end %>
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', @change_plan %>
             <h4><strong>What do you like to do?</strong></h4>
