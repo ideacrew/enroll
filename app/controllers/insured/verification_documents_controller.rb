@@ -12,7 +12,9 @@ class Insured::VerificationDocumentsController < ApplicationController
         if update_vlp_documents(doc_params, file_name, doc_uri)
           flash[:notice] = "File Saved"
         else
-          flash[:error] = "Could not save file"
+          flash[:error] = "Could not save file. " + @doc_errors.join(". ")
+          redirect_to(:back)
+          return
         end
       else
         flash[:error] = "Could not save file"
@@ -53,7 +55,8 @@ class Insured::VerificationDocumentsController < ApplicationController
   def update_vlp_documents(doc_params, title, file_uri)
     return unless doc_params.present?
     document = find_document(@person.consumer_role, doc_params.first.last[:subject])
-    document.update_attributes(doc_params.first.last.merge({:identifier=>file_uri, :title=>title}))
+    success = document.update_attributes(doc_params.first.last.merge({:identifier=>file_uri, :title=>title}))
+    @doc_errors = document.errors.full_messages unless success
     @person.save
   end
 end

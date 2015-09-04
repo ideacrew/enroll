@@ -61,4 +61,36 @@ class VlpDocument < Document
   validates :visa_number, length: { is: 8 }, :allow_blank => true
   validates :receipt_number, length: { is: 13}, :allow_blank => true #first 3 alpha, remaining 10 string
 
+
+  validate :document_required_fields
+
+  # hash of doc type and necessary fields
+  def required_fields
+    {
+        "I-327 (Reentry Permit)":[:alien_number],
+        "I-551 (Permanent Resident Card)": [:alien_number, :card_number],
+        "I-571 (Refugee Travel Document)": [:alien_number],
+        "I-766 (Employment Authorization Card)": [:alien_number, :card_number],
+        "Certificate of Citizenship": [:alien_number, :citizenship_number],
+        "Naturalization Certificate": [:alien_number, :naturalization_number],
+        "Machine Readable Immigrant Visa (with Temporary I-551 Language)": [:alien_number, :passport_number],
+        "Temporary I-551 Stamp (on passport or I-94)": [:alien_number],
+        "I-94 (Arrival/Departure Record)": [:i94_number],
+        "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport": [:i94_number, :passport_number],
+        "Unexpired Foreign Passport": [:passport_number],
+        "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)": [:sevis_id],
+        "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)": [:sevis_id],
+        "Other (With Alien Number)": [:alien_number, :description],
+        "Other (With I-94 Number)": [:i94_number,:description]
+    }
+  end
+
+  private
+  def document_required_fields
+     required_fields[self.subject.to_sym].each do |field|
+       errors.add(:base, "#{field} value is required") unless self.send(field).present?
+     end
+  end
+
+
 end
