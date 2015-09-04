@@ -16,16 +16,18 @@ module Forms
     validates_presence_of :last_name, :allow_blank => nil
     validates_presence_of :gender, :allow_blank => nil
     validates_presence_of :family_id, :allow_blank => nil
-    validate :tribal_id_presence
     validates_presence_of :dob
     validates_inclusion_of :relationship, :in => ::PersonRelationship::Relationships, :allow_blank => nil
     validate :relationship_validation
+    validate :consumer_fields_validation
 
     attr_reader :dob
 
-    def tribal_id_presence
-      if !tribal_id.present? && @citizen_status.present? && @citizen_status == "indian_tribe_member"
-        self.errors.add(:tribal_id, "is required when native american / alaskan native is selected")
+    def consumer_fields_validation
+      if @is_consumer_role.to_s == "true" #only check this for consumer flow.
+        if !tribal_id.present? && @citizen_status.present? && @citizen_status == "indian_tribe_member"
+          self.errors.add(:tribal_id, "is required when native american / alaskan native is selected")
+        end
       end
     end
 

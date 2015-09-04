@@ -35,7 +35,6 @@ class Insured::EmployeeDependentsController < ApplicationController
 
     doc_params = params_clean_vlp_documents
     @dependent = Forms::EmployeeDependent.new(params.require(:dependent).permit!)
-
     if @dependent.save
       update_vlp_documents(doc_params)
       @created = true
