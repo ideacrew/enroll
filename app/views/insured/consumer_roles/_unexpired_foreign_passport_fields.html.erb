@@ -1,4 +1,4 @@
-<% document = find_document(c.object, "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport") %>
+<% document = find_document(c.object, "Unexpired Foreign Passport") %>
 <%= c.fields_for 'vlp_documents', document do |v| %>
     <%= v.hidden_field :subject %>
     <%= v.hidden_field :id %>

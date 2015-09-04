@@ -9,7 +9,7 @@ class Document
   embedded_in :documentable, polymorphic: true
 
   # Dublin Core metadata elements
-  field :title, type: String
+  field :title, type: String, default: "untitled"
 
   # Entity responsible for making the resource - person, organization or service
   field :creator, type: String, default: "dchl"
