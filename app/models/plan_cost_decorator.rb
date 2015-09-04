@@ -1,11 +1,12 @@
 class PlanCostDecorator < SimpleDelegator
   attr_reader :member_provider, :benefit_group, :reference_plan
 
-  def initialize(plan, member_provider, benefit_group, reference_plan)
+  def initialize(plan, member_provider, benefit_group, reference_plan, max_cont_cache = {})
     super(plan)
     @member_provider = member_provider
     @benefit_group = benefit_group
     @reference_plan = reference_plan
+    @max_contribution_cache = max_cont_cache
   end
 
   def members
@@ -113,14 +114,15 @@ class PlanCostDecorator < SimpleDelegator
   def premium_for(member)
     relationship_benefit = relationship_benefit_for(member)
     if relationship_benefit && relationship_benefit.offered?
-      __getobj__.premium_for(plan_year_start_on, age_of(member))
+      Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member))
     else
       0.0
     end
   end
 
   def max_employer_contribution(member)
-    (reference_premium_for(member) * employer_contribution_percent(member)) / 100.00
+    return @max_contribution_cache.fetch(member._id) if @max_contribution_cache.has_key?(member._id)
+    @max_contribution_cache[member._id] = (reference_premium_for(member) * employer_contribution_percent(member)) / 100.00
   end
 
   def employer_contribution_for(member)

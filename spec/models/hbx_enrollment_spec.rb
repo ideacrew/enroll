@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 describe HbxEnrollment do
+
   context "an employer defines a plan year with multiple benefit groups, adds employees to roster and assigns benefit groups" do
     let(:blue_collar_employee_count)              { 7 }
     let(:white_collar_employee_count)             { 5 }
@@ -199,14 +200,17 @@ describe HbxEnrollment do
         end
 
         it "should know the total premium" do
+          Caches::PlanDetails.load_record_cache!
           expect(blue_collar_enrollments.first.total_premium).to be
         end
 
         it "should know the total employee cost" do
+          Caches::PlanDetails.load_record_cache!
           expect(blue_collar_enrollments.first.total_employee_cost).to be
         end
 
         it "should know the total employer contribution" do
+          Caches::PlanDetails.load_record_cache!
           expect(blue_collar_enrollments.first.total_employer_contribution).to be
         end
 
@@ -296,14 +300,17 @@ describe HbxEnrollment, dbclean: :after_all do
       end
 
       it "should return a total premium" do
+        Caches::PlanDetails.load_record_cache!
         expect(enrollment.total_premium).to be
       end
 
       it "should return an employee cost" do
+        Caches::PlanDetails.load_record_cache!
         expect(enrollment.total_employee_cost).to be
       end
 
       it "should return an employer contribution" do
+        Caches::PlanDetails.load_record_cache!
         expect(enrollment.total_employer_contribution).to be
       end
     end
