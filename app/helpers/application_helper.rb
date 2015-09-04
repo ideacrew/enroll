@@ -55,6 +55,10 @@ module ApplicationHelper
     date_value.strftime("%m/%d/%Y") if date_value.respond_to?(:strftime)
   end
 
+  def format_datetime(date_value)
+    date_value.strftime("%m/%d/%Y %H:%M UTC") if date_value.respond_to?(:strftime)
+  end
+
   # Builds a Dropdown button
   def select_dropdown(input_id, list)
     return unless list.is_a? Array
@@ -362,6 +366,8 @@ module ApplicationHelper
       end
     else
       case @status
+      when 'applicant'
+        'Submitted Date'
       when 'certified'
         'Certified Date'
       when 'decertified'

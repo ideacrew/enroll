@@ -258,20 +258,10 @@ class BrokerRole
     aasm_state == 'active'
   end
 
-  def last_state_transition_date
+  def latest_transition_time
     if self.workflow_state_transitions.any?
       self.workflow_state_transitions.first.transition_at
     end
-  end
-
-  def certified_date
-    return if self.workflow_state_transitions.empty?
-
-    transition = workflow_state_transitions.detect do |transition|
-      transition.from_state == 'applicant' && ( transition.to_state == 'active' || transition.to_state == 'broker_agency_pending')
-    end
-
-    transition.transition_at if transition
   end
 
   def current_state

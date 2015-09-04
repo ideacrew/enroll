@@ -27,7 +27,7 @@
   <td><%= broker_role.broker_agency_profile.legal_name %></td>
   <td><%= broker_role.current_state %></td>
   <% if date_col_name_for_broker_roaster.present? %>
-    <td><%= format_date broker_role.last_state_transition_date %></td>
+    <td><%= format_datetime broker_role.latest_transition_time %></td>
   <% end %>
 </tr>
 <% end %>
