@@ -142,7 +142,7 @@ class BenefitGroup
 
   def decorated_elected_plans(member_provider)
     max_contribution_cache = Hash.new
-    elected_plans.collect(){|plan| decorated_plan(plan, member_provider)}
+    elected_plans.collect(){|plan| decorated_plan(plan, member_provider, max_contribution_cache)}
   end
 
   def decorated_plan(plan, member_provider, max_contribution_cache)
