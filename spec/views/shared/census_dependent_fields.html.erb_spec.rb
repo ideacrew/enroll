@@ -20,8 +20,4 @@ describe "shared/census_dependent_fields.html.erb" do
   it "should not have checked checkbox option" do
     expect(rendered).to have_selector("input[checked='checked']", count: 0)
   end
-
-  it "should have an dob-picker input" do
-    expect(rendered).to have_selector("input._date-picker", count: 1)
-  end
 end

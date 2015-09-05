@@ -1,18 +1,20 @@
 class Insured::VerificationDocumentsController < ApplicationController
+  include ApplicationHelper
+
   before_action :get_family
 
   def upload
-    @consumer_wrapper = Forms::ConsumerRole.new(person_consumer_role)
+    doc_params = params_clean_vlp_documents
+    if params.permit![:file]
+      doc_uri = Aws::S3Storage.save(file_path, 'dchbx-id-verification')
 
-    if params.require(:consumer_role).permit![:file]
-      doc_id = Aws::S3Storage.save(file_path, 'dchbx-id-verification')
-
-      if doc_id.present?
-        doc = build_document(doc_id, file_path)
-        if save_consumer_role(doc)
+      if doc_uri.present?
+        if update_vlp_documents(doc_params, file_name, doc_uri)
           flash[:notice] = "File Saved"
         else
-          flash[:error] = "Could not save file"
+          flash[:error] = "Could not save file. " + @doc_errors.join(". ")
+          redirect_to(:back)
+          return
         end
       else
         flash[:error] = "Could not save file"
@@ -35,20 +37,26 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   def file_path
-    params.require(:consumer_role).permit(:file)[:file].tempfile.path
+    params.permit(:file)[:file].tempfile.path
   end
 
-  def build_document(doc_id, file_path)
-    @person.consumer_role.documents.build({
-                                              identifier: doc_id,
-                                              subject: params[:consumer_role][:vlp_document_kind],
-                                              tags: [params[:consumer_role][:doc_number]] ,
-                                              title: params[:consumer_role][:file].original_filename,
-                                              format: params[:consumer_role][:file].content_type
-                                          })
+  def file_name
+    params.permit![:file].original_filename
   end
 
-  def save_consumer_role(doc)
-    doc.save && @person.consumer_role.save
+  def params_clean_vlp_documents
+    return if params[:consumer_role].nil? or params[:consumer_role][:vlp_documents_attributes].nil?
+
+    params[:consumer_role][:vlp_documents_attributes].reject! do |index, doc|
+      params[:immigration_doc_type] != doc[:subject]
+    end
+  end
+
+  def update_vlp_documents(doc_params, title, file_uri)
+    return unless doc_params.present?
+    document = find_document(@person.consumer_role, doc_params.first.last[:subject])
+    success = document.update_attributes(doc_params.first.last.merge({:identifier=>file_uri, :title=>title}))
+    @doc_errors = document.errors.full_messages unless success
+    @person.save
   end
 end

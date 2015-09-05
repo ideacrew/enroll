@@ -141,11 +141,12 @@ class BenefitGroup
   end
 
   def decorated_elected_plans(member_provider)
+    max_contribution_cache = Hash.new
     elected_plans.collect(){|plan| decorated_plan(plan, member_provider)}
   end
 
-  def decorated_plan(plan, member_provider)
-    PlanCostDecorator.new(plan, member_provider, self, reference_plan)
+  def decorated_plan(plan, member_provider, max_contribution_cache)
+    PlanCostDecorator.new(plan, member_provider, self, reference_plan, max_contribution_cache)
   end
 
   def benefit_group_assignments

@@ -29,6 +29,11 @@
   <% if date_col_name_for_broker_roaster.present? %>
     <td><%= format_datetime broker_role.latest_transition_time %></td>
   <% end %>
+  <% if @status != 'applicant' %>
+    <td>
+      <%= truncate(broker_role.reason) { link_to "Continue", "#", :data => { toggle: "popover", placement: "bottom", content: broker_role.reason, trigger: 'focus' }, "role" => "button", "id" => "broker_application_comments" } %>
+    </td>
+  <% end %>
 </tr>
 <% end %>
     

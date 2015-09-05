@@ -89,8 +89,11 @@ function applyListeners() {
             case "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)":
                 showOnly("immigration_DS_2019_fields_container");
                 break;
-            case "Other":
-                showOnly("immigration_other_fields_container");
+            case "Other (With Alien Number)":
+                showOnly("immigration_other_with_alien_number_fields_container");
+                break;
+            case "Other (With I-94 Number)":
+                showOnly("immigration_other_with_i94_fields_container");
                 break;
         }
     });
@@ -98,10 +101,11 @@ function applyListeners() {
     function showOnly(selected) {
         var doc_types = ["immigration_citizenship_cert_container", "immigration_naturalization_cert_container",
             "immigration_i_327_fields_container", "immigration_i_551_fields_container", "immigration_i_571_fields_container",
-            "immigration_other_fields_container", "immigration_i_766_fields_container",
-            "immigration_i_566_fields_container", "immigration_temporary_i_551_stamp_fields_container", "immigration_i_94_fields_container",
+            "immigration_i_766_fields_container", "immigration_i_566_fields_container",
+            "immigration_temporary_i_551_stamp_fields_container", "immigration_i_94_fields_container",
             "immigration_i_94_in_unexpired_foreign_passport_fields_container", "immigration_unexpired_foreign_passport_fields_container",
-            "immigration_temporary_i_20_stamp_fields_container", "immigration_DS_2019_fields_container"]
+            "immigration_temporary_i_20_stamp_fields_container", "immigration_DS_2019_fields_container",
+            "immigration_other_with_alien_number_fields_container", "immigration_other_with_i94_fields_container"]
 
         for (index = 0; index < doc_types.length; index++) {
             $('#' + doc_types[index]).hide();
@@ -143,31 +147,52 @@ function applyListeners() {
             $('#vlp_document_id_container').hide();
         }
     });
-
-    $('#person_indian_tribe_member').change(function () {
-        if ($(this).is(':checked')) {
-            $('#tribal_container').show();
-        }
-        else {
-            $('#tribal_container').hide();
-        }
-    });
-
-    $('#dependent_indian_tribe_member').change(function () {
-        show_or_hide_tribal_id();
-    });
-    show_or_hide_tribal_id();
-    function show_or_hide_tribal_id() {
-        if ($("#dependent_indian_tribe_member").is(':checked')) {
-            $('#tribal_container').show();
-        }
-        else {
-            $('#tribal_container').hide();
-        }
-    }
 }
 
 
 $(function () {
     applyListeners();
 });
+
+
+var demographicsNew = {
+  ui: {
+    personTribeMember: "#person_indian_tribe_member",
+    dependentTribeMember: "#dependent_indian_tribe_member",
+    tribalContainer: "#tribal_container"
+  },
+  queries:{
+  },
+  init: function(){
+    this.setUpDependentTribalId();
+    this.setUpPersonTribalId();
+  },
+  setUpPersonTribalId: function(){
+    $(demographicsNew.ui.personTribeMember).change(function () {
+        demographicsNew.show_or_hide_person_tribal_id();
+    });
+    demographicsNew.show_or_hide_person_tribal_id();
+  },
+  setUpDependentTribalId: function(){
+    $(demographicsNew.ui.dependentTribeMember).change(function () {
+        demographicsNew.show_or_hide_dependent_tribal_id();
+    });
+    demographicsNew.show_or_hide_dependent_tribal_id();
+  },
+  show_or_hide_dependent_tribal_id: function(){
+    if ($(demographicsNew.ui.dependentTribeMember).is(':checked')) {
+      $(demographicsNew.ui.tribalContainer).show();
+    }
+    if (!$(demographicsNew.ui.dependentTribeMember).is(':checked')) {
+      $(demographicsNew.ui.tribalContainer).hide();
+    }
+  },
+  show_or_hide_person_tribal_id: function(){
+    if ($(demographicsNew.ui.personTribeMember).is(':checked')) {
+      $(demographicsNew.ui.tribalContainer).show();
+    }
+    if (!$(demographicsNew.ui.personTribeMember).is(':checked')) {
+      $(demographicsNew.ui.tribalContainer).hide();
+    }
+  },
+}

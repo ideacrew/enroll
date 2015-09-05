@@ -14,6 +14,11 @@
           <%= date_col_name_for_broker_roaster %>
         </th>
       <% end %>
+      <% if @status != 'applicant' %>
+        <th>
+          Comments
+        </th>
+      <% end %>
     </tr>
     </thead>
     <tbody>
@@ -38,3 +43,8 @@
 </div>
 </div>
 
+<script>
+$(function() {
+  $('[data-toggle="popover"]').popover();
+});
+</script>

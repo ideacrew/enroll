@@ -457,13 +457,14 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "GET employee_costs" do
     let(:plan_year){ double }
-    let(:benefit_group) { FactoryGirl.build(:benefit_group) }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:census_employee) { FactoryGirl.build(:census_employee) }
     let(:census_employees) { double }
 
     before do
       @employer_profile = FactoryGirl.create(:employer_profile)
-      @reference_plan = FactoryGirl.create(:plan_with_premium_tables)
+      @reference_plan = benefit_group.reference_plan
+      Caches::PlanDetails.load_record_cache!
       @census_employees = [census_employee, census_employee]
     end
 

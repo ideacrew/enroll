@@ -1,7 +1,6 @@
 <div class="container">
   <div class="row">
     <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
-      <div class="alert_row"></div>
       <% if @census_employee.errors.any? %>
         <div class="alert alert-error">
           <h4>
@@ -56,7 +55,7 @@
             <%= render 'email_fields', f: email %>
           <% end %>
           <br/>
-          
+
           <%= render 'shared/add_dependents', {f: f} %>
           <div class="key-btn">
             <% button_label = @census_employee.persisted? ? 'Update Employee' : 'Create Employee' %>
