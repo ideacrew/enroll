@@ -14,7 +14,7 @@ class EligibilityNoticeBuilder < Notice
   def build
     #family = @consumer.primary_family
     @family = Family.find_by_primary_applicant(@consumer)
-    @hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active || []
+    @hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active rescue []
     @notice = PdfTemplates::EligibilityNotice.new
     @notice.primary_fullname = @consumer.full_name.titleize
     @notice.primary_identifier = @consumer.hbx_id
@@ -38,6 +38,7 @@ class EligibilityNoticeBuilder < Notice
         plan_name: hbx_enrollment.plan.name,
         monthly_premium_cost: hbx_enrollment.total_premium,
         phone: hbx_enrollment.phone_number,
+        effective_on: hbx_enrollment.effective_on,
         enrollees: hbx_enrollment.hbx_enrollment_members.inject([]) do |names, member| 
           names << member.person.full_name.titleize
         end

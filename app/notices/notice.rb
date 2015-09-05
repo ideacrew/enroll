@@ -54,6 +54,7 @@ class Notice
       file << self.pdf
     end
     append_dc_rights(notice_path)
+    notice_path
   end
 
   def save_html

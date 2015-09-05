@@ -13,20 +13,63 @@ class IndividualNoticeBuilder < EligibilityNoticeBuilder
 
   def build
     super
-    #@family = Family.find_by_primary_applicant(@consumer)
-    #@family = @consumer.primary_family
-    #@hbx_enrollments = family.try(:latest_household).try(:hbx_enrollments).active || []
-    @members = @hbx_enrollments.map(&:hbx_enrollment_members).flatten.uniq.map(&:person)
+    @members = @hbx_enrollments.map(&:hbx_enrollment_members).flatten.map(&:person).try(:uniq)
+    init_benefit
     append_individual
+  end
+
+  def init_benefit
+    hbx = HbxProfile.find_by_state_abbreviation("dc")
+    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
+    pkgs = bc_period.benefit_packages
+    benefit_package = pkgs.select{|plan|  plan[:title] == "individual_health_benefits_2015"}
+    @benefit = benefit_package.first
+  rescue
+    nil
   end
 
   def append_individual
     @notice.individual = PdfTemplates::Individual.new
-    %w(active_members inconsistent_members eligible_immigration_status_members members_with_more_plans indian_tribe_members unverfied_resident_members unverfied_citizenship_members unverfied_ssn_members).each do |method_name|
+    %w(ineligible_members ineligible_members_due_to_residency ineligible_members_due_to_incarceration ineligible_members_due_to_immigration active_members inconsistent_members eligible_immigration_status_members members_with_more_plans indian_tribe_members unverfied_resident_members unverfied_citizenship_members unverfied_ssn_members).each do |method_name|
       member_names = self.public_send(method_name).inject([]) do |names, member|
-        names << member.full_name.titleize
+        names << member.try(:full_name).try(:titleize)
       end
       @notice.individual.public_send("#{method_name}=", member_names)
+    end
+  end
+
+  def ineligible_members
+    @family.active_family_members.map(&:person) - @members rescue []
+  end
+
+  def ineligible_members_due_to_residency
+    ineligible_members.select do |person|
+      if person.try(:consumer_role).blank? || @benefit.blank?
+        false
+      else
+        InsuredEligibleForBenefitRule.new(person.consumer_role, @benefit).is_residency_status_satisfied?
+      end
+    end
+  end
+
+  def ineligible_members_due_to_incarceration
+    ineligible_members.select do |person|
+      if person.try(:consumer_role).blank? || @benefit.blank?
+        false
+      else
+        InsuredEligibleForBenefitRule.new(person.consumer_role, @benefit).is_incarceration_status_satisfied?
+      end
+    end
+  end
+
+  # Ineligible Due to Citizenship/Immigration
+  def ineligible_members_due_to_immigration
+    ineligible_members.select do |person|
+      if person.try(:consumer_role).blank? || @benefit.blank?
+        false
+      else
+        InsuredEligibleForBenefitRule.new(person.consumer_role, @benefit).is_citizenship_status_satisfied?
+      end
     end
   end
   
@@ -62,7 +105,7 @@ class IndividualNoticeBuilder < EligibilityNoticeBuilder
   end
   
   def active_members
-    @family.primary_family_member.to_a
+    @family.primary_family_member.to_a rescue []
   end
   
   def inconsistent_members

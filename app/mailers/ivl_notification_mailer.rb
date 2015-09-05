@@ -36,7 +36,7 @@ class IvlNotificationMailer < ApplicationMailer
   
   def send_inbox_notice
     if @user.parent && (to_inbox = @user.parent.inbox)
-      @link = link_to("click here", :controller => "consumer_profiles", :action => "notification", :id => user.id, :view => @view_type).html_safe
+      @link = link_to('click here', Rails.application.routes.url_helpers.notification_consumer_profiles_path(view: @view_type)).html_safe
       new_message = to_inbox.messages.build(:subject => "DCHealthLink Notification", :body => "Please #{@link} to view the file")
       new_message.folder = Message::FOLDER_TYPES[:inbox]
       to_inbox.post_message(new_message)

@@ -45,7 +45,7 @@
     <table class="total_table" border="0">
       <tbody>
         <tr class="fssizeuser mar20">
-          <td class="col-red">
+          <td>
             <span>
               The following person(s) qualify for health coverage through DC Health Link.
             </span>
@@ -91,9 +91,9 @@
       <tbody>
         <tr>
           <% if index == 0 %>
-            <td>On  <%= format_date(Date.today) %>, the following individual(s) selected the <%= enrollment.plan_name %> health insurance plan.</td>
+            <td>On  <%= format_date(enrollment.effective_on) %>, the following individual(s) selected the <%= enrollment.plan_name %> health insurance plan.</td>
           <% else %>
-            <td class="col-red"><strong>Additionally, the following individual(s) selected the <%= enrollment.plan_name %> health insurance plan.</strong></td>
+            <td><strong>Additionally, the following individual(s) selected the <%= enrollment.plan_name %> health insurance plan.</strong></td>
           <% end %>
         </tr>
         <% enrollment.enrollees.each do |name| %>
@@ -102,7 +102,7 @@
           </tr>
         <% end %>
         <tr class="fssizeuser mar20">
-          <td>You will start getting health insurance benefits through <span><%= enrollment.plan_name %></span> on  <span><%= format_date Date.today %></span>, as long as you make the first premium payment by the due date. You will receive an invoice directly from your plan within 3 – 10 business days and the due date for the first premium will be listed on the invoice. If you get any health care services before <span><%= format_date Date.today %></span>, you may have to pay the costs for those services on your own if you have not yet paid your premium.</td>
+          <td>You will start getting health insurance benefits through <span><%= enrollment.plan_name %></span> on  <span><%= format_date enrollment.effective_on %></span>, as long as you make the first premium payment by the due date. You will receive an invoice directly from your plan within 3 – 10 business days and the due date for the first premium will be listed on the invoice. If you get any health care services before <span><%= format_date enrollment.effective_on %></span>, you may have to pay the costs for those services on your own if you have not yet paid your premium.</td>
         </tr>
         <tr class="mar20">
           <td>For any questions about your health plan's covered services and providers, you need to contact:</td>
@@ -303,7 +303,7 @@
     <table class="total_table" border="0">
       <tbody>
         <tr>
-          <td>Needed Information to Verify Other Immigration Status</td>
+          <td><span class="underline">Needed Information to Verify Other Immigration Status</span></td>
         </tr>
         <tr>
           <td style="font-size:12px !important;" ><strong>The documents that you may be able to use to verify your immigration status include, but are not limited to: </strong></td>
@@ -434,7 +434,7 @@
         <td><h3 style="color:rgb(54,95,145);">How Soon We Need Your Documents</h3></td>
       </tr>
       <tr>
-        <td>We need the documents above <strong>by <span>Date=Date of Notice +95 days</span></strong> in order to make a final decision on your eligibility for your health plan. If you do not provide the documents by this deadline, we will assume that our records are correct. <span class="underline">Your health insurance coverage may be terminated.</span></td>
+        <td>We need the documents above <strong>by &lt;<span>Date=Date of Notice +95 days</span>&gt;</strong> in order to make a final decision on your eligibility for your health plan. If you do not provide the documents by this deadline, we will assume that our records are correct. <span class="underline">Your health insurance coverage may be terminated.</span></td>
       </tr>
     </tbody>
   </table>
@@ -445,7 +445,7 @@
     <tbody>
       <tr class="mar20">
         <td>
-          If you think you will not be able to submit the requested documentation <strong>by<span>Date=Date of Notice +95 days</span></strong> due to circumstances outside of your control, please call DC Health Link Customer Service toll-free at (855) 532-5465 (TTY/TDD 711).  If you truly have a special need, a Department of Human Services representative will work with you to complete the verification process.
+          If you think you will not be able to submit the requested documentation <strong>by &lt;<span>Date=Date of Notice +95 days</span>&gt;</strong> due to circumstances outside of your control, please call DC Health Link Customer Service toll-free at (855) 532-5465 (TTY/TDD 711).  If you truly have a special need, a Department of Human Services representative will work with you to complete the verification process.
         </td>
       </tr>
       <tr>
@@ -469,7 +469,7 @@
         <td><h3 style="color:rgb(54,95,145);">Changing Plans</h3></td>
       </tr>
       <tr>
-        <td>You will be able to change plans during the annual open enrollment period at the end of each year.  45 C.F.R. §155.410(e).You can get the date of the next open enrollment period by going to <a href="www.DCHealthLink.com" target="_blank">www.DCHealthLink.com</a> or calling DC Health Link Customer Service at (855) 532-5465. If you have a change in circumstances during <coverage year>, you may also qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include: </td>
+        <td>You will be able to change plans during the annual open enrollment period at the end of each year.  45 C.F.R. §155.410(e).You can get the date of the next open enrollment period by going to <a href="www.DCHealthLink.com" target="_blank">www.DCHealthLink.com</a> or calling DC Health Link Customer Service at (855) 532-5465. If you have a change in circumstances during <%= TimeKeeper.date_of_record.year %>, you may also qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include: </td>
       </tr>
       <tr>
         <td>
@@ -487,6 +487,9 @@
             <li>A material violation of your health or dental plan contract by your plan sponsor</li>
             <li>Becoming eligible for Medicaid, employer-sponsored insurance, or other insurance outside of DC Health Link.</li>
         </ul></td>
+      </tr>
+      <tr>
+        <td>45 C.F.R. §155.420</td>
       </tr>
     </tbody>
   </table>
@@ -520,7 +523,7 @@
         <td><h3 style="color:rgb(54,95,145);">If You Think We Made a Mistake</h3></td>
       </tr>
       <tr>
-        <td>If you disagree with this determination, you have the right to appeal to an independent administrative law judge. You may request an appeal by phone, in person, online, and by mail. You must request an appeal <strong>by <span>Date of Notice+95 calendar days</span></strong>. DC Health Link will work to resolve your appeal as quickly as possible, but appeals can take between 30 and 90 days to resolve. <strong>See the insert for more information on your appeal rights</strong>. 45 C.F.R. §155.520.</td>
+        <td>If you disagree with this determination, you have the right to appeal to an independent administrative law judge. You may request an appeal by phone, in person, online, and by mail. You must request an appeal <strong>by &lt;<span>Date of Notice+95 calendar days</span>&gt;</strong>. DC Health Link will work to resolve your appeal as quickly as possible, but appeals can take between 30 and 90 days to resolve. <strong>See the insert for more information on your appeal rights</strong>. 45 C.F.R. §155.520.</td>
       </tr>
     </tbody>
   </table>

@@ -58,9 +58,9 @@
       <% notice.enrollments.each_with_index do |enrollment, index| %>
         <tr>
           <% if index == 0 %>
-            <td>On <%= format_date(Date.today) %>, the following individual(s) selected the <%= enrollment.plan_name %> health insurance plan. </td><br>
+            <td>On <%= format_date(enrollment.effective_on) %>, the following individual(s) selected the <%= enrollment.plan_name %> health insurance plan. </td><br>
           <% else %>
-            <td class="col-red"><strong>Additionally, the following individual(s) selected the <%= enrollment.plan_name %> health insurance plan.</strong></td>
+            <td><strong>Additionally, the following individual(s) selected the <%= enrollment.plan_name %> health insurance plan.</strong></td>
           <% end %>
         </tr>
         <% enrollment.enrollees.each do |name| %>

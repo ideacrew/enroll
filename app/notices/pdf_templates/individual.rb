@@ -2,6 +2,10 @@ module PdfTemplates
   class Individual
     include Virtus.model
 
+    attribute :ineligible_members, Array[String]
+    attribute :ineligible_members_due_to_residency, Array[String]
+    attribute :ineligible_members_due_to_incarceration, Array[String]
+    attribute :ineligible_members_due_to_immigration, Array[String]
     attribute :active_members, Array[String]
     attribute :inconsistent_members, Array[String]
     attribute :eligible_immigration_status_members, Array[String]
