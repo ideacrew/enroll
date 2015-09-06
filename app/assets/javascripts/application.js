@@ -563,3 +563,9 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
     }
   }
 })
+$(document).on('keyup', ".new_person #person_ssn", function(){
+  $(".new_person input#person_no_ssn").prop('checked', false)
+})
+$(document).on('change', ".new_person #person_no_ssn", function(){
+  if (this.checked) { $(".new_person #person_ssn").val("");  $(".new_person #person_ssn").trigger('change')  }
+})
