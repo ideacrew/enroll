@@ -125,8 +125,8 @@ class Employers::EmployerProfilesController < ApplicationController
     @employer_profile = @organization.employer_profile
     current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
     current_user.person.employer_contact = @employer_profile
-    if current_user.has_employer_staff_role? #&& @employer_profile.owner == current_user
-      if !@employer_profile.staff_roles.present? && @organization.update_attributes(employer_profile_params) && current_user.save
+    if current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)
+      if @organization.update_attributes(employer_profile_params) && current_user.save
         current_user.person.employer_staff_roles << EmployerStaffRole.create(person: current_user.person, employer_profile_id: @employer_profile.id, is_owner: true)
         flash[:notice] = 'Employer successfully Updated.'
         redirect_to employers_employer_profile_path(@employer_profile)
@@ -139,6 +139,7 @@ class Employers::EmployerProfilesController < ApplicationController
       end
     else
       flash[:error] = 'You do not have permissions to update the details'
+      redirect_to employers_employer_profile_path(@employer_profile)
     end
   end
 
@@ -221,7 +222,7 @@ class Employers::EmployerProfilesController < ApplicationController
 
     def employer_profile_params
       params.require(:organization).permit(
-        :employer_profile_attributes => [ :entity_kind, :dba, :fein, :legal_name],
+        :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
         :office_locations_attributes => [
           :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
           :phone_attributes => [:kind, :area_code, :number, :extension],
@@ -232,7 +233,8 @@ class Employers::EmployerProfilesController < ApplicationController
 
     def sanitize_employer_profile_params
       params[:organization][:office_locations_attributes].each do |key, location|
-        location.delete('phone_attributes') if location['phone_attributes'].present? and location['phone_attributes']['number'].blank?
+        params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
+        location.delete('phone_attributes') if (location['phone_attributes'].present? and location['phone_attributes']['number'].blank?)
       end
     end
 
