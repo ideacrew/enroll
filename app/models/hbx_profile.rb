@@ -14,7 +14,7 @@ class HbxProfile
   delegate :entity_kind, :entity_kind=, to: :organization, allow_nil: true
 
   embeds_many :hbx_staff_roles
-  embeds_many :enrollment_periods
+  embeds_many :enrollment_periods # TODO: deprecated - should be removed by 2015-09-03 - Sean Carley
 
   embeds_one :benefit_sponsorship, cascade_callbacks: true
   embeds_one :inbox, as: :recipient, cascade_callbacks: true
@@ -116,7 +116,7 @@ class HbxProfile
   # TODO - turn into struct that includes count, plus effective date range
   ShopApplicationAppealPeriodMaximum = 30.days
 
-  # After submitting an ineligible plan year application, time period an Employer must wait 
+  # After submitting an ineligible plan year application, time period an Employer must wait
   #   before submitting a new application
   ShopApplicationIneligiblePeriodMaximum = 90.days
 
