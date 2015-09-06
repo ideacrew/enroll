@@ -495,6 +495,12 @@ When(/^.+ should see a published success message$/) do
   expect(@browser.element(text: /Plan Year successfully published/).visible?).to be_truthy
 end
 
+When(/^.+ should see a published success message without employee$/) do
+  # @browser.element(class: /mainmenu/).wait_until_present
+  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
+  expect(@browser.element(text: /You have 0 non-owner employees on your roster/).visible?).to be_truthy
+end
+
 When(/^.+ clicks? on the add employee button$/) do
   @browser.a(text: /Add Employee/).wait_until_present
   @browser.a(text: /Add Employee/).click
