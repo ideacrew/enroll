@@ -104,6 +104,10 @@ class PlanYear
     benefit_groups.flat_map(){ |benefit_group| benefit_group.census_employees.active }
   end
 
+  def assigned_census_employees_without_owner
+    benefit_groups.flat_map(){ |benefit_group| benefit_group.census_employees.active.non_business_owner }
+  end
+
   def open_to_publish?
     employer_profile.plan_years.reject{ |py| py==self }.any?(&:published?)
   end
