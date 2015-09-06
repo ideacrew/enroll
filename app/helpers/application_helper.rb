@@ -455,10 +455,28 @@ module ApplicationHelper
     }
   end
 
-  def is_sep_eligible?
-    false
+  def is_under_open_enrollment?
+    eligible_open_enrollments_present = false
+
+    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").try(:benefit_sponsorship)
+    (benefit_sponsorship.try(:benefit_coverage_periods) || []).each do |benefit_coverage_period|
+      if benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
+        eligible_open_enrollments_present = true
+        break
+      end
+    end
+
+    eligible_open_enrollments_present
   end
-  
+
+  def ivl_enrollment_effective_date
+    if !is_under_open_enrollment? || @change_plan == 'change_by_qle'
+      HbxEnrollment.calculate_start_date_by_qle(@family.latest_household)
+    else
+      HbxProfile.all.first.benefit_sponsorship.benefit_coverage_periods.first.earliest_effective_date # FIXME
+    end
+  end
+
   def find_document(consumer_role, subject)
     subject_doc = consumer_role.vlp_documents.detect do |documents|
       documents.subject.eql?(subject)

@@ -74,10 +74,10 @@
               <% end %>
             </div>
           <% end %>
-          <% if @hbx_enrollment.present? %>
+          <% if @consumer_role.present? %>
           <div class='row top-pd'>
             <div class="col-sm-12">
-              <p>If you enroll today, coverage will begin <%= @hbx_enrollment.effective_on.strftime("%d %b %Y") %>. </p>
+              <p>If you enroll today, coverage will begin <%= ivl_enrollment_effective_date.strftime("%d %b %Y") %>. </p>
             </div>
           </div>
           <% end %>
@@ -101,20 +101,20 @@
 
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">            
           <% if @change_plan.blank? && @market_kind == "individual" %>
-            <% if is_sep_eligible? %>
-            <%= render  partial: 'shared/sep_progress', locals: {step: '4'} %>
+            <% if is_under_open_enrollment? %>
+              <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
             <% else %>
-            <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
+              <%= render  partial: 'shared/sep_progress', locals: {step: '4'} %>
             <% end %>
           <% elsif @change_plan.blank? %>
             <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
           <% elsif @change_plan == "change_by_qle" %>
             <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
           <% elsif @change_plan == "change_plan" %>
-            <% if is_sep_eligible? %>
-            <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
+            <% if is_under_open_enrollment? %>
+              <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
             <% else %>
-            <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
+              <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
             <% end %>
           <% end %>
         </div>
