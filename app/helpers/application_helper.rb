@@ -470,9 +470,7 @@ module ApplicationHelper
   end
 
   def ivl_enrollment_effective_date
-    if !is_under_open_enrollment? || @change_plan == 'change_by_qle'
-      HbxEnrollment.calculate_start_date_by_qle(@family.latest_household)
-    else
+    if is_under_open_enrollment?
       HbxProfile.all.first.benefit_sponsorship.benefit_coverage_periods.first.earliest_effective_date # FIXME
     end
   end

@@ -74,8 +74,8 @@
               <% end %>
             </div>
           <% end %>
-          
-          <% if @consumer_role.present? %>
+
+          <% if @consumer_role.present? && is_under_open_enrollment? %>
           <div class='row top-pd'>
             <div class="col-sm-12">
               <p>If you enroll today, coverage will begin <%= format_date ivl_enrollment_effective_date %>. </p>
