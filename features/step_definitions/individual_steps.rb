@@ -25,6 +25,10 @@ When(/user goes to register as an individual$/) do
   @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-person-dob/).set("05/23/1969")
   @browser.text_field(class: /interaction-field-control-person-ssn/).set("677991234")
   @browser.text_field(class: /interaction-field-control-person-ssn/).click
+  expect(@browser.text_field(class: /interaction-field-control-person-ssn/).value).to_not eq("")
+  @browser.checkbox(class: /interaction-choice-control-value-person-no-ssn/).fire_event("onclick")
+  expect(@browser.text_field(class: /interaction-field-control-person-ssn/).value).to eq("")
+  @browser.text_field(class: /interaction-field-control-person-ssn/).set("677991234")
   @browser.radio(class: /interaction-choice-control-value-radio-male/).fire_event("onclick")
   screenshot("register")
   @browser.button(class: /interaction-click-control-continue/).click
