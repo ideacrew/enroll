@@ -456,22 +456,18 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    eligible_open_enrollments_present = false
-
     benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").try(:benefit_sponsorship)
-    (benefit_sponsorship.try(:benefit_coverage_periods) || []).each do |benefit_coverage_period|
-      if benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
-        eligible_open_enrollments_present = true
-        break
-      end
+    if benefit_sponsorship.nil?
+      false
+    else
+      benefit_sponsorship.is_under_open_enrollment?
     end
-
-    eligible_open_enrollments_present
   end
 
   def ivl_enrollment_effective_date
-    if is_under_open_enrollment?
-      HbxProfile.all.first.benefit_sponsorship.benefit_coverage_periods.first.earliest_effective_date # FIXME
+    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").try(:benefit_sponsorship)
+    if benefit_sponsorship
+      benefit_sponsorship.earliest_effective_date
     end
   end
 
