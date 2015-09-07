@@ -1,12 +1,11 @@
 <nav>
   <ul>
-      <li <%=menu_tab_class(active_tab, "home") %> data-tab="home">
-        <%= link_to 'MY DC Health Link', employers_employer_profile_path(:employer_profile_id=>@employer_profile.id, :tab=>'home'), :remote => true,
-      "aria-expanded" => "true" %>
-      </li>
-      <li data-tab="recent_activity">
+      <li <%=menu_tab_class(active_tab, "home-tab") %>>
+        <%= link_to 'MY DC Health Link', employers_employer_profile_path(:employer_profile_id=>@employer_profile.id, :tab=>'home-tab'), "aria-expanded" => "true" %>
       </li>
       <li data-tab="enrollment">
+        <%= link_to 'Manage Employees', employers_employer_profile_path(:employer_profile_id=>@employer_profile.id, :tab=>'home'), :remote => true,
+      "aria-expanded" => "true" %>
       </li>
       <li data-tab="documents">
         <%= link_to 'Documents', employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, :tab=>'documents'), :remote => true,
