@@ -5,7 +5,7 @@ FactoryGirl.define do
     submitted_at Time.now
     updated_at "user"
 
-    trait :with_primay_family_member do
+    trait :with_primary_family_member do
       family_members {[FamilyMember.new(is_primary_applicant: true, is_consent_applicant:true)]}
     end
   end

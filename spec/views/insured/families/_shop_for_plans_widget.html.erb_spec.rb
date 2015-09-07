@@ -4,6 +4,8 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
   let(:person) { double(id: '123') }
   let(:employee_role) { double(id: '123') }
   let(:hbx_enrollments) {double}
+  let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
+
 
   context "with hbx_enrollments" do
     before :each do
