@@ -26,7 +26,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.update_current(aasm_state: "coverage_selected")
       hbx_enrollment.propogate_selection
       UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now if hbx_enrollment.employee_role.present?
-      redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan])
+      redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
     else
       redirect_to :back
     end
@@ -45,6 +45,8 @@ class Insured::PlanShoppingsController < ApplicationController
       @market_kind = "individual"
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile
     end
@@ -66,6 +68,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile
@@ -110,6 +113,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def show
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
 
@@ -124,9 +128,11 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = @plans.sort_by(&:total_employee_cost)
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(plan_ids: @plans.map(&:id))
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
   end
 
   private
+
   def set_plans_by(hbx_enrollment_id:)
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
