@@ -3,6 +3,8 @@ class Employers::EmployerProfilesController < ApplicationController
   before_action :check_admin_staff_role, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
 
+  layout "two_column"
+
   def index
     @q = params.permit(:q)[:q]
     @orgs = Organization.search(@q).exists(employer_profile: true)
