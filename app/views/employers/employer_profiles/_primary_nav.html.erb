@@ -1,17 +1,16 @@
 <nav class="row">
   <ul>
-      <li <%=menu_tab_class(active_tab, "home-tab") %>>
-        <%= link_to 'MY DC Health Link', employers_employer_profile_path(:employer_profile_id=>@employer_profile.id, :tab=>'home-tab'), "aria-expanded" => "true" %>
+      <li <%= menu_tab_class(active_tab, "home") %>>
+        <%= link_to 'MY DC Health Link', employers_employer_profile_path(:employer_profile_id=>@employer_profile.id, :tab=>'home'), "aria-expanded" => "true" %>
       </li>
-      <li <%=menu_tab_class(active_tab, "employees-tab") %>>
-        <%= link_to 'Manage Employees', employers_employer_profile_path(:employer_profile_id=>@employer_profile.id, :tab=>'employees-tab'), "aria-expanded" => "true" %>
+      <li <%= menu_tab_class(active_tab, "employees") %>>
+        <%= link_to 'Manage Employees', employers_employer_profile_path(:employer_profile_id=>@employer_profile.id, :tab=>'employees'), "aria-expanded" => "true" %>
       </li>
-      <li data-tab="documents">
-        <%= link_to 'Documents', employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, :tab=>'documents'), :remote => true,
-      "aria-expanded" => "true" %>
+      <li <%= menu_tab_class(active_tab, "documents") %>>
+        <%= link_to 'Documents', employers_employer_profile_path(:employer_profile_id=>@employer_profile.id, :tab=>'documents'), "aria-expanded" => "true" %>
       </li>
-      <li data-tab="messages">
-        <%= link_to(inbox_employers_employer_profiles_path(id: @employer_profile.id, :tab => 'messages'), :remote => true) do  %>
+      <li <%= menu_tab_class(active_tab, "messages") %>>
+        <%= link_to(employers_employer_profile_path(id: @employer_profile.id, :tab => 'messages')) do  %>
           Messages <span class="badge message-unread"><%= @employer_profile.inbox.unread_messages.try(:count) || 0 %></span>
           <% end %>
       </li>

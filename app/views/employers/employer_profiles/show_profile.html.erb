@@ -1,12 +1,12 @@
-<%- if @tab == 'home' %>      
+<%- if @tab == 'home' %>
       <%= render 'employers/employer_profiles/my_account/home_tab' %>
-<%- elsif @tab == 'profile' %>   
+<%- elsif @tab == 'profile' %>
       <%= render 'employers/employer_profiles/my_account/profile_tab' %>
 <%- elsif @tab == 'employees' %>
         <%= render partial: "employers/employer_profiles/my_account/census_employees" %>
 <%- elsif @tab == 'broker_agency' %>
       <%= render partial: "employers/employer_profiles/my_account/broker_agency" %>
-<%- elsif @tab == 'benefits' %>       
+<%- elsif @tab == 'benefits' %>
       <%= render partial: "employers/employer_profiles/my_account/benefits" %>
 <%- elsif @tab == 'documents' %>
     <div class='container top-pd'>
@@ -17,5 +17,4 @@
     </div>
 <%- elsif @tab == 'families' %>
       <%= render partial:  "employers/employer_profiles/my_account/families" %>
-<%- end %>    
-     
+<%- end %>
