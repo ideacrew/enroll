@@ -42,32 +42,23 @@ class Insured::GroupSelectionController < ApplicationController
     broker_role = current_user.person.broker_role
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
 
-    consumer_preferences = { 
-      change_plan: @change_plan, 
-      market_kind: @market_kind, 
-      coverage_kind: @coverage_kind, 
-      enrollment_kind: @enrollment_kind 
-    }
-
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
-        redirect_to purchase_consumer_profiles_path(consumer_preferences)
+        redirect_to purchase_consumer_profiles_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind)
       elsif @change_plan.present?
-        redirect_to insured_plan_shopping_path({:id => hbx_enrollment.id}.merge(consumer_preferences))
+        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind)
       else
         # FIXME: models should update relationships, not the controller
-        if hbx_enrollment.benefit_group_assignment.present?
-          hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id)
-        end
-        redirect_to insured_plan_shopping_path({:id => hbx_enrollment.id}.merge(consumer_preferences))
+        hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
+        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
       end
     else
       raise "You must select the primary applicant to enroll in the healthcare plan"
     end
   rescue Exception => error
     flash[:error] = error.message
-    return redirect_to new_insured_group_selection_path({person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id)}.merge(consumer_preferences))
+    return redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, enrollment_kind: @enrollment_kind)
   end
 
   def terminate_selection
