@@ -74,13 +74,15 @@
               <% end %>
             </div>
           <% end %>
+          
           <% if @consumer_role.present? %>
           <div class='row top-pd'>
             <div class="col-sm-12">
-              <p>If you enroll today, coverage will begin <%= ivl_enrollment_effective_date.strftime("%d %b %Y") %>. </p>
+              <p>If you enroll today, coverage will begin <%= format_date ivl_enrollment_effective_date %>. </p>
             </div>
           </div>
           <% end %>
+
           <% if @change_plan.present? %>
             <%= hidden_field_tag 'change_plan', @change_plan %>
             <h4><strong>What do you like to do?</strong></h4>
