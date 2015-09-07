@@ -14,7 +14,8 @@ class ApplicationController < ActionController::Base
   ## Devise filters
   before_filter :authenticate_user_from_token!
   before_filter :authenticate_me!
-  
+  before_filter :make_action_mailer_use_request_host_and_protocol
+
   # for i18L
   before_action :set_locale
 
@@ -95,6 +96,11 @@ class ApplicationController < ActionController::Base
   end
 
   protected
+
+  def make_action_mailer_use_request_host_and_protocol
+    ActionMailer::Base.default_url_options[:protocol] = request.protocol
+    ActionMailer::Base.default_url_options[:host] = request.host_with_port
+  end
 
   # Broker Signup form should be accessibile for anonymous users
   def authentication_not_required?

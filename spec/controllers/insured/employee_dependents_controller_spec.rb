@@ -6,7 +6,7 @@ RSpec.describe Insured::EmployeeDependentsController do
   let(:person) { double(:employee_roles => [], :primary_family => family) }
   let(:employee_role_id) { "2343" }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
-  let(:fm) { FactoryGirl.build(:family, :with_primay_family_member) }
+  let(:fm) { FactoryGirl.build(:family, :with_primary_family_member) }
 
   describe "GET index" do
     context 'normal' do
