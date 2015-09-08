@@ -67,6 +67,42 @@ class Insured::FamiliesController < FamiliesController
     @consumer_wrapper = Forms::ConsumerRole.new(@person.consumer_role)
   end
 
+  def check_qle_date
+    qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    start_date = TimeKeeper.date_of_record - 30.days
+    end_date = TimeKeeper.date_of_record + 30.days
+    if params[:qle_id].present?
+      @qle = QualifyingLifeEventKind.find(params[:qle_id]) 
+      start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
+      end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
+      @effective_on_options = @qle.employee_gaining_medicare(qle_date) if @qle.is_dependent_loss_of_esi?
+    end
+
+    @qualified_date = (start_date <= qle_date && qle_date <= end_date) ? true : false
+  end
+
+  def purchase
+    @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
+
+    if @enrollment.present?
+      plan = @enrollment.try(:plan)
+      if @enrollment.employee_role.present?
+        @benefit_group = @enrollment.benefit_group
+        @reference_plan = @benefit_group.reference_plan
+        @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
+      else
+        @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
+      end
+      @enrollable = @family.is_eligible_to_enroll?
+
+      @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+      @terminate = params[:terminate].present? ? params[:terminate] : ''
+      render :layout => 'application'
+    else
+      redirect_to :back
+    end
+  end
+
   private
   def init_qualifying_life_events
     @qualifying_life_events = []

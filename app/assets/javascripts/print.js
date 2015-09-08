@@ -1,4 +1,4 @@
-$(document).on('click', 'button#btnPrint', function(){
+$(document).on('click', '#btnPrint', function(){
   printElement(document.getElementById("printArea"));
   window.print();
 });
