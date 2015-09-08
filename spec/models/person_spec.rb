@@ -584,4 +584,22 @@ describe Person do
     end
   end
 
+  describe "us_citizen status" do
+    let(:person) { FactoryGirl.create(:person) }
+
+    before do
+      person.us_citizen="false"
+    end
+
+    context "set to false" do
+      it "should set @us_citizen to false" do
+        expect(person.us_citizen).to be_falsey
+      end
+
+      it "should set @naturalized_citizen to false" do
+        expect(person.naturalized_citizen).to be_falsey
+      end
+    end
+  end
+
 end

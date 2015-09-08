@@ -13,6 +13,9 @@ class Person
   ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
   RELATIONSHIP_CHANGE_ATTRIBUTES = %w(person_relationships)
 
+  PERSON_CREATED_EVENT_NAME = "local.events.person.created"
+  PERSON_UPDATED_EVENT_NAME = "local.events.person.updated"
+
   field :hbx_id, type: String
   field :name_pfx, type: String
   field :first_name, type: String
@@ -155,6 +158,17 @@ class Person
 #  ViewFunctions::Person.install_queries
 
   validate :consumer_fields_validations
+
+  after_create :notify_created
+  after_update :notify_updated
+
+  def notify_created
+    notify(PERSON_CREATED_EVENT_NAME, {:individual => self } )
+  end
+
+  def notify_updated
+    notify(PERSON_UPDATED_EVENT_NAME, {:individual => self } )
+  end
 
   def consumer_fields_validations
     if self.is_consumer_role.to_s == "true"
@@ -438,6 +452,7 @@ class Person
 
   def us_citizen=(val)
     @us_citizen = (val.to_s == "true")
+    @naturalized_citizen = false if val.to_s == "false"
   end
 
   def naturalized_citizen=(val)
