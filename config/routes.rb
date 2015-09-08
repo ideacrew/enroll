@@ -182,7 +182,7 @@ Rails.application.routes.draw do
     resources :inboxes, only: [:new, :create, :show, :destroy] do
       get :msg_to_portal
     end
-    resources :profiles, only: [:new, :create, :show, :index] do
+    resources :profiles, only: [:new, :create, :show, :index, :edit, :update] do
       get :inbox
 
       collection do
