@@ -41,6 +41,7 @@ function applySelectric() {
   $("select[multiple!='multiple']").selectric();
 };
 
+<<<<<<< d1fc655f4caf5d4995f6b039a9606cd93a9c7e79
 function applyMultiLanguateSelect() {
   $('#broker_agency_language_select').multiselect({
     nonSelectedText: 'Select Language',
@@ -53,6 +54,8 @@ $(document).on('page:update', function(){
   applyFloatLabels();
   applySelectric();
 });
+=======
+>>>>>>> make tabbing and autocomplete work in add person
 
 $(document).ready(function () {
   $('[data-toggle="tooltip"]').tooltip();
@@ -440,6 +443,12 @@ $(document).on('page:update', function() {
     $('#employer_census_employee_family_census_employee_attributes_address_attributes_kind').val($(this).data('value'));
   });
 
+  $('select').selectric();
+  $('#person_addresses_attributes_0_state').on('change', function () {
+    $('select').selectric('refresh');
+  });
+  $('select').attr('tabindex', '-1');
+
   $('#plan-years-list li a').on('click', function(){
     var target = $(this).attr('href');
     $("span#current_plan_year").text($(this).text());
@@ -510,19 +519,51 @@ $(document).on('change', '#waive_confirm select#waiver_reason', function() {
   }
 })
 
+$(document).on('click', '#search_for_plan_shopping_help', function() {
+  $.ajax({
+    type: 'GET',
+    data: {firstname: $('#help_first_name').val(), lastname: $('#help_last_name').val(), type: $('#help_type').html(),
+           person: $('#help_requestor').html()},
+    url: '/exchanges/hbx_profiles/request_help?',
+  }).done(function(response) {
+    $('#help_status').html(response)
+  });
+})
+
+$(document).on('click', '.help_button', function(){
+$.ajax({
+    type: 'GET',
+    data: {assister: this.getAttribute('data-assister'), broker: this.getAttribute('data-broker'),
+           person: $('#help_requestor').html()},
+    url: '/exchanges/hbx_profiles/request_help?',
+  }).done(function(response) {
+    console.log(response)
+    console.log('here')
+    $('#help_index_status').html(response).removeClass('hide')
+  });
+})
+
+$(document).on('click', '.name_search_only', function() {
+  $('#help_list').addClass('hide')
+  $('#help_search').removeClass('hide')
+  $('#help_type').html(this.id)
+})
+$(document).on('click', '[data-target="#help_with_plan_shopping"]',function(){$('.help_reset').addClass("hide"); $('#help_list').removeClass("hide") })
+
+
 $(document).on('click', '#terms_check_thank_you', function() {
   first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
-  
-  if($(this).prop("checked") == true){    
+
+  if($(this).prop("checked") == true){
     if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
       $('#btn-continue').removeClass('disabled');
     } else {
       $('#btn-continue').addClass('disabled');
     }
-  }else if($(this).prop("checked") == false){ 
+  }else if($(this).prop("checked") == false){
     $('#btn-continue').addClass('disabled');
   }
 })
@@ -532,11 +573,11 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
-  
+
   if(last_name_thank_you == ""){
     $('#btn-continue').addClass('disabled');
   }else{
-    if($("#terms_check_thank_you").prop("checked") == true){    
+    if($("#terms_check_thank_you").prop("checked") == true){
       if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
         $('#btn-continue').removeClass('disabled');
       } else {
