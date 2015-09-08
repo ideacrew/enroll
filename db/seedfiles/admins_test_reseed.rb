@@ -9,11 +9,9 @@ geographic_rating_area = GeographicRatingArea.new(
     rating_area_code: "R-DC001", 
     us_counties: UsCounty.where(county_fips_code: "11001").to_a
   )
+
 hbx_profile =  HbxProfile.find_by_state_abbreviation('DC')
-hbx_profile.update_attributes(
-    cms_id: "DC0",
-    us_state_abbreviation: "DC",
-    benefit_sponsorship: BenefitSponsorship.new(
+benefit_sponsorship = BenefitSponsorship.new(
         geographic_rating_areas: [geographic_rating_area],
         service_markets: ["shop", "individual"],
         benefit_coverage_periods: [
@@ -33,9 +31,9 @@ hbx_profile.update_attributes(
               )
           ]
       )
-  )
-organization = hbx_profile.organization
-organization.save!
+
+hbx_profile.benefit_sponsorship = benefit_sponsorship
+hbx_profile.save!
 
 def create_staff member
    user = User.create!(email: member[:email], password: "password", password_confirmation: "password", roles: [member[:role]])
@@ -70,7 +68,6 @@ cac = [
   {first_name:"Sandra",last_name:"Bolognesis",email: "bolognesi@decorm.com", organization: "DECO", cac: true, role: 'csr'},
   {first_name:"German", last_name:"Chavez",email: "gchavez@decorm.com", organization: "DECO", cac: true, role: 'csr'},
 ]
-
 
 staff = assisters + csr + cac
 staff.each{|member| create_staff member}
