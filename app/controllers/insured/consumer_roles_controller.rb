@@ -3,7 +3,9 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :check_consumer_role, only: [:search]
 
   before_action :find_consumer_role_and_person, only: [:edit, :update]
+  def privacy
 
+  end
   def search
     @person = Forms::ConsumerCandidate.new
     respond_to do |format|
@@ -140,6 +142,8 @@ class Insured::ConsumerRolesController < ApplicationController
   def check_consumer_role
     if current_user.has_consumer_role?
       redirect_to family_account_path
+    else
+      render 'privacy'
     end
   end
 end
