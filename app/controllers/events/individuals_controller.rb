@@ -6,7 +6,7 @@ module Events
       Person::PERSON_CREATED_EVENT_NAME
     end
 
-    def self.created_subscription_details
+    def self.updated_subscription_details
       Person::PERSON_UPDATED_EVENT_NAME
     end
 
