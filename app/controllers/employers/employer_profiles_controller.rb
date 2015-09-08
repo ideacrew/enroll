@@ -193,7 +193,7 @@ class Employers::EmployerProfilesController < ApplicationController
 
     def check_employer_staff_role
       if current_user.has_employer_staff_role?
-        redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
+        redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id, :tab => "home")
       end
     end
 
