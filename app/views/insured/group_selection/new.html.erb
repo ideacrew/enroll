@@ -8,6 +8,8 @@
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:employee_role_id, @employee_role.try(:id)) %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
+          <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
+
 
           <div class="table-responsive table-border">
             <table class="table table-wrapper table-condensed group-selection-tbl">
@@ -75,12 +77,15 @@
             </div>
           <% end %>
 
-          <% if @consumer_role.present? && is_under_open_enrollment? %>
+          <% if @market_kind == 'individual' && is_under_open_enrollment? %>
+          <% if @change_plan.blank? && @enrollment_kind.blank?%>
           <div class='row top-pd'>
             <div class="col-sm-12">
               <p>If you enroll today, coverage will begin <%= format_date ivl_enrollment_effective_date %>. </p>
+              <p>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", "#", :id => 'find_sep_link' %></p>
             </div>
           </div>
+          <% end %>
           <% end %>
 
           <% if @change_plan.present? %>
@@ -102,8 +107,8 @@
         </div>
 
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">            
-          <% if @change_plan.blank? && @market_kind == "individual" %>
-            <% if is_under_open_enrollment? %>
+          <% if @change_plan.blank?  && @market_kind == "individual" %>
+            <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
               <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
             <% else %>
               <%= render  partial: 'shared/sep_progress', locals: {step: '4'} %>
@@ -124,3 +129,14 @@
     <% end %>
   </div>
 </div>
+<script>
+  $(function(){
+    if ( $("#find_sep_link").length ) {
+      $("#find_sep_link").click(function() {
+      $(this).closest('form').attr('action', '<%= find_sep_insured_families_path %>');
+      $(this).closest('form').attr('method', 'get');
+      $(this).closest('form').submit();
+    });
+  }
+})
+</script>
