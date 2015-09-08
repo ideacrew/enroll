@@ -137,7 +137,10 @@ module Forms
       organization.broker_agency_profile.update_attributes(extract_broker_agency_profile_params)
       broker_role = organization.broker_agency_profile.primary_broker_role
       person = broker_role.try(:person)
-      person.update_attributes(extract_person_params) if person.present?
+      if person.present?
+        person.update_attributes(extract_person_params)
+        person.emails.find_by(kind: 'work').update(address: attr[:email])
+      end
     rescue
       return false
     end
