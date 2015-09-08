@@ -25,7 +25,7 @@ class Insured::GroupSelectionController < ApplicationController
 
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
-    raise "You must select at least one applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
+    raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
     end
