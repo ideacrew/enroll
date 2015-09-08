@@ -68,7 +68,7 @@ cac = [
   {first_name:"Sandra",last_name:"Bolognesis",email: "bolognesi@decorm.com", organization: "DECO", cac: true, role: 'csr'},
   {first_name:"German", last_name:"Chavez",email: "gchavez@decorm.com", organization: "DECO", cac: true, role: 'csr'},
 ]
-
-
+Person.where(csr_role: {:$exists => true}).each{|p|p.user.delete; p.delete}
+Person.where(assister_role: {:$exists => true}).each{|p|p.user.delete; p.delete}
 staff = assisters + csr + cac
 staff.each{|member| create_staff member}
