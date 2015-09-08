@@ -46,7 +46,7 @@ load_tasks = %w(
 )
 puts "*"*80
 puts "Loading sanitized plans, people, families, employers, and census."
-system "ENROLL_SEEDING=true rake #{load_tasks.join(" ")}"
+system "bundle exec rake #{load_tasks.join(" ")} ENROLL_SEEDING=true"
 puts "*"*80
 
 # require File.join(File.dirname(__FILE__),'seedfiles', 'premiums')
