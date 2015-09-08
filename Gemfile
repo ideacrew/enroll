@@ -58,6 +58,9 @@ gem 'aasm', '~> 4.0.7'
 gem 'haml'
 # gem 'bh'
 
+# spreadsheet support
+gem 'roo', '~> 2.1.0'
+
 gem 'devise', '~> 3.4.1'
 # gem 'devise_ldap_authenticatable', '~> 0.8.1'
 gem 'cancancan', '~> 1.9.2'
