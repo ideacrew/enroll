@@ -4699,18 +4699,6 @@ a.interaction-click-control-default {
   margin-left: 220px;
 }
 
-@media print {
-  body {
-    background: #FFF;
-  }
-  div.plan_receipt{
-    display: none;
-  }
-  div.waiver_receipt{
-    display: none;
-  }
-}
-
 .form-wrapper {
     width: 100%;
     position: relative;
@@ -4901,4 +4889,51 @@ position: absolute;
 }
 ul.list-qle {
   padding: 5px 30px;
+}
+
+
+input:focus:required:invalid { 
+  background-color: rgba(247, 208, 215, 0.55); 
+  outline: none; 
+}
+
+input:focus:required:valid { 
+  background-color: #DCEAF1;
+  outline: none; 
+}
+
+input:required:valid { 
+  background-color: #fff;
+}
+
+@media screen {
+  #printSection {
+    display: none;
+  }
+}
+
+@media print {
+  body * {
+    visibility:hidden;
+  }
+  body {
+    background: #FFF;
+  }
+  body button, body a, body .content {
+    display: none;
+  }
+  #printSection, #printSection * {
+    visibility:visible;
+  }
+  #printSection {
+    position:absolute;
+    left:0;
+    top:0;
+  }
+  div.plan_receipt{
+    display: none;
+  }
+  div.waiver_receipt{
+    display: none;
+  }
 }

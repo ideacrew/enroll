@@ -43,4 +43,7 @@ describe "shared/_comparison.html.erb" do
     end
   end
   
+  it "should have print area" do
+    expect(rendered).to have_selector('div#printArea')
+  end
 end
