@@ -81,6 +81,9 @@ Rails.application.routes.draw do
         get 'document_upload'
         get 'find_sep'
         post 'record_sep'
+        get 'check_qle_date'
+        get 'purchase'
+        get 'family'
       end
 
       resources :people do
@@ -243,19 +246,6 @@ Rails.application.routes.draw do
       get 'get_member'
     end
 
-  end
-
-  resources :consumer_profiles, :only => [] do
-    collection do
-      get 'documents'
-      get 'home'
-      get 'plans'
-      get 'personal'
-      get 'family'
-      get 'check_qle_date'
-      get 'inbox'
-      get 'purchase'
-    end
   end
 
   match 'families/home', to: 'insured/families#home', via:[:get], as: "family_account"

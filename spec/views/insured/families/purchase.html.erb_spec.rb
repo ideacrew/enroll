@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "consumer_profiles/purchase.html.erb" do
+RSpec.describe "insured/families/purchase.html.erb" do
 
   let(:employee_role){FactoryGirl.create(:employee_role)}
   let(:plan){FactoryGirl.create(:plan)}
@@ -15,7 +15,7 @@ RSpec.describe "consumer_profiles/purchase.html.erb" do
       @benefit_group = @enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
-      render :template => "consumer_profiles/purchase.html.erb"
+      render :template => "insured/families/purchase.html.erb"
     end
 
     it 'should display the correct plan selection text' do
@@ -39,7 +39,7 @@ RSpec.describe "consumer_profiles/purchase.html.erb" do
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       assign :terminate, 'terminate'
-      render :template => "consumer_profiles/purchase.html.erb"
+      render :template => "insured/families/purchase.html.erb"
     end
 
     it "should display the terminate button" do

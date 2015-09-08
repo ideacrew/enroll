@@ -23,7 +23,7 @@ class Insured::GroupSelectionController < ApplicationController
     keep_existing_plan = params[:commit] == "Keep existing plan"
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
 
-    return redirect_to purchase_consumer_profiles_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
+    return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
     raise "You must select at least one applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
@@ -45,7 +45,7 @@ class Insured::GroupSelectionController < ApplicationController
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
-        redirect_to purchase_consumer_profiles_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind)
+        redirect_to purchase_insured_families_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind)
       elsif @change_plan.present?
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind)
       else

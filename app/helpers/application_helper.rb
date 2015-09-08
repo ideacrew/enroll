@@ -293,7 +293,7 @@ module ApplicationHelper
     when "BrokerAgencyProfile"
       broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
     when "Person"
-      inbox_consumer_profiles_path(profile_id: provider.id, folder: folder)
+      inbox_insured_families_path(profile_id: provider.id, folder: folder)
     end
   end
 

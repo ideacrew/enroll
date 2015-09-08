@@ -59,7 +59,7 @@ $(function () {
     $.ajax({
       type: "GET",
       data:{date_val: $("#qle_date").val(), qle_type: qle_type, qle_id: $("#qle_id").val()},
-      url: "/consumer_profiles/check_qle_date.js"
+      url: "/insured/families/check_qle_date.js"
     });
   }
 
