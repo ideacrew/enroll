@@ -43,7 +43,6 @@ Eye.application 'eye_enroll' do
     end
   end
 
-=begin
   process("enroll_remote_event_listener") do
     working_dir BUS_DIRECTORY
     pid_file "pids/enroll_remote_event_listener.pid"
@@ -66,5 +65,4 @@ Eye.application 'eye_enroll' do
     restart_grace 30.seconds
     stop_timeout 10.seconds
   end
-=end
 end
