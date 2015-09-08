@@ -1,5 +1,6 @@
 class EmployerProfile
   BINDER_PREMIUM_PAID_EVENT_NAME = "local.enroll.employer.binder_premium_paid"
+  EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "local.enroll.employer.updated"
 
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -324,6 +325,18 @@ class EmployerProfile
       transitions from: :eligible, to: :applicant, :after => :cancel_benefit
     end
 
+  end
+
+  after_update :broadcast_employer_update
+
+  def broadcast_employer_update
+    if previous_states.include?(:binder_paid) || (aasm_state.to_sym == :binder_paid)
+      notify(EMPLOYER_PROFILE_UPDATED_EVENT_NAME, {:employer => self})
+    end
+  end
+
+  def previous_states
+    self.workflow_state_transitions.map(&:from_state).uniq.map(&:to_sym)
   end
 
   def within_open_enrollment_for?(t_date, effective_date)
