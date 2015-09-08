@@ -45,7 +45,12 @@ function supportRequiredForSafari() {
         if(!input.value){
           var placeholder=input.placeholder? input.placeholder:input.getAttribute('placeholder');
           placeholder = typeof(placeholder) === 'string' ? placeholder.replace(" *", "") : "";
-          alert('Please fill in ' + placeholder);
+          if ( placeholder == "BIRTHDATE" && input.value.length == 10 ) {
+            alert('Please fill in ' + placeholder);
+          } else if ( placeholder == "BIRTHDATE" ) {
+            alert('Please fill in ' + placeholder + ' with format: dd/mm/yyyy');
+          } else {
+          }
           e.preventDefault&&e.preventDefault();
           break;
         };
@@ -374,6 +379,7 @@ $(document).ready(function () {
   $(".npn_field").mask("9999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
+  $("#jq_datepicker_ignore_person_dob").mask("99/99/9999");
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
 
@@ -523,7 +529,7 @@ $(document).on('change', '#waive_confirm select#waiver_reason', function() {
 
 $(document).on('click', '#search_for_plan_shopping_help', function() {
   $.ajax({
-    type: 'GET', 
+    type: 'GET',
     data: {firstname: $('#help_first_name').val(), lastname: $('#help_last_name').val(), type: $('#help_type').html(),
            person: $('#help_requestor').html()},
     url: '/exchanges/hbx_profiles/request_help?',
@@ -534,7 +540,7 @@ $(document).on('click', '#search_for_plan_shopping_help', function() {
 
 $(document).on('click', '.help_button', function(){
 $.ajax({
-    type: 'GET', 
+    type: 'GET',
     data: {assister: this.getAttribute('data-assister'), broker: this.getAttribute('data-broker'),
            person: $('#help_requestor').html()},
     url: '/exchanges/hbx_profiles/request_help?',
@@ -558,14 +564,14 @@ $(document).on('click', '#terms_check_thank_you', function() {
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
-  
-  if($(this).prop("checked") == true){    
+
+  if($(this).prop("checked") == true){
     if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
       $('#btn-continue').removeClass('disabled');
     } else {
       $('#btn-continue').addClass('disabled');
     }
-  }else if($(this).prop("checked") == false){ 
+  }else if($(this).prop("checked") == false){
     $('#btn-continue').addClass('disabled');
   }
 })
@@ -575,11 +581,11 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
-  
+
   if(last_name_thank_you == ""){
     $('#btn-continue').addClass('disabled');
   }else{
-    if($("#terms_check_thank_you").prop("checked") == true){    
+    if($("#terms_check_thank_you").prop("checked") == true){
       if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
         $('#btn-continue').removeClass('disabled');
       } else {
