@@ -223,6 +223,25 @@ class CensusEmployee < CensusMember
     "employee"
   end
 
+  def build_from_params(census_employee_params, benefit_group_id)
+    self.attributes = census_employee_params
+
+    if benefit_group_id.present?
+      benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
+      new_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(benefit_group, self)
+      self.benefit_group_assignments = new_benefit_group_assignment.to_a
+    end
+  end
+
+  def send_invite
+    if has_active_benefit_group_assignment?
+      plan_year = active_benefit_group_assignment.benefit_group.plan_year
+      if plan_year.employees_are_matchable?
+        Invitation.invite_employee!(self)
+      end
+    end
+  end
+
   class << self
     def find_all_by_employer_profile(employer_profile)
       unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
