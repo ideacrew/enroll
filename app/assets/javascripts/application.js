@@ -26,6 +26,7 @@
 //= require jq_datepicker
 //= require qle
 //= require print
+//= require browser_issues
 //= require_tree .
 
 function applyFloatLabels() {
@@ -33,30 +34,6 @@ function applyFloatLabels() {
     slideInput: false
   });
 }
-
-function supportRequiredForSafari() {
-  var testElement=document.createElement('input');
-  var requiredSupported='required' in testElement&&!/Version\/[\d\.]+\s*Safari/i.test(navigator.userAgent);
-  if(!requiredSupported){
-    $('form').submit(function(e){
-      var inputs=$(this).find("input[required='required'][type='text']");
-      for (var i=0; i<inputs.length; i++){
-        var input=inputs[i];
-        if(!input.value){
-          var placeholder=input.placeholder? input.placeholder:input.getAttribute('placeholder');
-          placeholder = typeof(placeholder) === 'string' ? placeholder.replace(" *", "") : "";
-          alert('Please fill in ' + placeholder);
-          e.preventDefault&&e.preventDefault();
-          break;
-        };
-      };
-    });
-  };
-};
-
-$(document).on('page:update', function(){
-  supportRequiredForSafari();
-});
 
 $(document).ready(function () {
 
