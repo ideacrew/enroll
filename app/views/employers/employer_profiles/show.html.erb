@@ -2,7 +2,6 @@
   <%= render :partial => 'primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
 
-  <div class="col-md-8">
     <%- if @tab == 'home' %>
           <%= render 'employers/employer_profiles/my_account/home_tab' %>
     <%- elsif @tab == 'profile' %>
@@ -29,4 +28,3 @@
   <div class="col-md-4">
 
   </div>
-</div>
