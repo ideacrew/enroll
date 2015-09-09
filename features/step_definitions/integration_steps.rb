@@ -171,7 +171,7 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   @browser.a(class: portal_class).wait_until_present
   @browser.a(class: portal_class).click
   @browser.element(class: /interaction-click-control-sign-in-existing-account/).wait_until_present
-    @browser.element(class: /interaction-click-control-sign-in-existing-account/).click
+  @browser.element(class: /interaction-click-control-sign-in-existing-account/).click
   @browser.text_field(class: /interaction-field-control-user-email/).set(person[:email])
   @browser.text_field(class: /interaction-field-control-user-password/).set(person[:password])
   @browser.element(class: /interaction-click-control-sign-in/).click
@@ -220,8 +220,6 @@ When(/^I visit the Employer portal$/) do
   @browser.a(text: /Employer Portal/).wait_until_present
   @browser.a(text: /Employer Portal/).click
   screenshot("employer_start")
-  @browser.a(text: /Create account/).wait_until_present
-  @browser.a(text: /Create account/).click
 end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
@@ -230,14 +228,18 @@ Then(/^(?:.+) should see a successful sign up message$/) do
   expect(@browser.element(text: /Welcome! Your account has been created./).visible?).to be_truthy
 end
 
+Then(/^(?:.+) should click on employer portal$/) do
+  @browser.goto("http://localhost:3000/")
+  @browser.a(text: /Employer Portal/).wait_until_present
+  @browser.a(text: /Employer Portal/).click
+end
+
 When(/^(?:.+) go(?:es)? to the employee account creation page$/) do
   @browser.goto("http://localhost:3000/")
   @browser.a(text: /employee portal/i).wait_until_present
   screenshot("start")
   scroll_then_click(@browser.a(text: /employee portal/i))
-  @browser.a(text: "Create account").wait_until_present
   screenshot("employee_portal")
-  scroll_then_click(@browser.a(text: "Create account"))
 end
 
 Then(/^(?:.+) should be logged on as an unlinked employee$/) do
