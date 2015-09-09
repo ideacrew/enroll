@@ -1,0 +1,10 @@
+!!! XML
+%policy{ :xmlns => "http://openhbx.org/api/terms/1.0", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance", "xsi:type" => "EmployerOrganizationType"}
+  %id
+    %id= hbx_enrollment.hbx_id
+  = render "events/shared/broker", :object => hbx_enrollment.broker_agency_profile
+  %enrollees
+    =render "events/shared/enrollee", :collection => hbx_enrollment.hbx_enrollment_members
+  %enrollment
+    =render "events/hbx_enrollment/plan"
+  %request_submitted_timestamp= simple_date_for(hbx_enrollment.created_at) if hbx_enrollment.created_at
