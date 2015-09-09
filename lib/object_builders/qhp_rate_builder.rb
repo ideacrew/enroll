@@ -56,11 +56,7 @@ class QhpRateBuilder
       end_on: @end_on,
       cost: @cost
       )
-    if pt.valid?
-      pt.save!
-    else
-      binding.pry
-    end
+    pt.save!
   end
 
 end
