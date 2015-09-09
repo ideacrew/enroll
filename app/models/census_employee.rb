@@ -233,13 +233,15 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def send_invite
+  def send_invite!
     if has_active_benefit_group_assignment?
       plan_year = active_benefit_group_assignment.benefit_group.plan_year
       if plan_year.employees_are_matchable?
         Invitation.invite_employee!(self)
+        return true
       end
     end
+    false
   end
 
   class << self

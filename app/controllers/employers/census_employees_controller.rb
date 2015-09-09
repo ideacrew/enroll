@@ -12,7 +12,7 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.employer_profile = @employer_profile
     if @census_employee.save
       if benefit_group_id.present?
-        @census_employee.send_invite
+        @census_employee.send_invite!
         flash[:notice] = "Census Employee is successfully created."
       else
         flash[:notice] = "Note: new employee cannot enroll on DC Healthlink until they are assigned a benefit group. "
