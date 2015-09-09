@@ -60,7 +60,7 @@ class ApplicationController < ActionController::Base
   def create_secure_message(message_params, inbox_provider, folder)
     message = Message.new(message_params)
     message.folder =  Message::FOLDER_TYPES[folder]
-    msg_box = inbox_provider.inbox 
+    msg_box = inbox_provider.inbox
     msg_box.post_message(message)
     msg_box.save
   end
@@ -69,7 +69,7 @@ class ApplicationController < ActionController::Base
     requested_locale = params[:locale] || user_preferred_language || extract_locale_from_accept_language_header || I18n.default_locale
     requested_locale = I18n.default_locale unless I18n.available_locales.include? requested_locale.try(:to_sym)
     I18n.locale = requested_locale
-  end 
+  end
 
   def extract_locale_from_accept_language_header
     if request.env['HTTP_ACCEPT_LANGUAGE']
@@ -104,7 +104,7 @@ class ApplicationController < ActionController::Base
   def require_login
     unless current_user
       session[:portal] = url_for(params)
-      redirect_to new_user_session_url
+      redirect_to new_user_registration_path
     end
   end
 
@@ -152,7 +152,7 @@ class ApplicationController < ActionController::Base
       @person = current_user.person
     end
   end
- 
+
   def actual_user
     if current_user.try(:person).try(:agent?)
       real_user = nil
