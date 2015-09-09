@@ -1,5 +1,3 @@
-require 'prawn'
-
 class Notice
 
   attr_accessor :from, :to, :subject, :template, :notice_data, :mkt_kind, :file_name
@@ -54,7 +52,6 @@ class Notice
       file << self.pdf
     end
     append_dc_rights(notice_path)
-    notice_path
   end
 
   def save_html
@@ -69,16 +66,15 @@ class Notice
   end
 
   def join_pdfs(pdfs)
-    Prawn::Document.generate("result.pdf", {:page_size => 'LETTER', :skip_page_creation => true}) do |pdf|
-      pdfs.each do |pdf_file|
-        if File.exists?(pdf_file)
-          pdf_temp_nb_pages = Prawn::Document.new(:template => pdf_file).page_count
-          (1..pdf_temp_nb_pages).each do |i|
-            pdf.start_new_page(:template => pdf_file, :template_page => i)
-          end
-        end
+    notice_path = Rails.root.join('pdfs', 'notice_combined.pdf')
+    join_pdf = CombinePDF.new
+    pdfs.each do |pdf_file|
+      if File.exists?(pdf_file)
+        join_pdf << CombinePDF.load(pdf_file)
       end
     end
+    join_pdf.save notice_path
+    notice_path
   end
 end
 
