@@ -8,11 +8,11 @@
           <%= render 'employers/employer_profiles/my_account/profile_tab' %>
     <%- elsif @tab == 'employees' %>
             <%= render partial: "employers/employer_profiles/my_account/census_employees" %>
-    <%- elsif @tab == 'broker_agency' %>
-          <%= render partial: "employers/employer_profiles/my_account/broker_agency" %>
     <%- elsif @tab == 'benefits' %>
           <%= render partial: "employers/employer_profiles/my_account/benefits" %>
-    <%- elsif @tab == 'messages' %>
+    <%- elsif @tab == 'brokers' %>
+          <%= render partial: "employers/employer_profiles/my_account/broker_agency" %>
+    <%- elsif @tab == 'inbox' %>
           <%= render partial: "employers/employer_profiles/my_account/messages" %>
     <%- elsif @tab == 'documents' %>
         <div class='container top-pd'>
