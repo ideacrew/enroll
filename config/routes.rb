@@ -97,6 +97,7 @@ Rails.application.routes.draw do
       get :search, on: :collection
       get :match, on: :collection
       get :ridp_agreement, on: :collection
+      ##get :privacy, on: :collection
     end
 
     resources :employee, :controller=>"employee_roles", only: [:create, :edit, :update, :show] do
