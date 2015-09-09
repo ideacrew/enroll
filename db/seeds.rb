@@ -72,11 +72,26 @@ qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
   puts file
   xml = Nokogiri::XML(File.open(file))
   plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
-  qhp_hash.add(plan.to_hash)
+  qhp_hash.add(plan.to_hash, file)
   qhp_hash
 end
 
 qhp_import_hash.run
+puts "*"*80
+
+puts "*"*80
+puts "Loading SERFF PLAN RATE data"
+
+files = Dir.glob(File.join(Rails.root, "db/seedfiles/rate_xmls", "**", "*.xml"))
+rate_import_hash = files.inject(QhpRateBuilder.new({})) do |rate_hash, file|
+  puts file
+  xml = Nokogiri::XML(File.open(file))
+  rates = Parser::PlanRateGroupParser.parse(xml.root.canonicalize, :single => true)
+  rate_hash.add(rates.to_hash)
+  rate_hash
+end
+
+rate_import_hash.run
 puts "*"*80
 
 require File.join(File.dirname(__FILE__),'seedfiles', 'shop_2015_sbc_files')
