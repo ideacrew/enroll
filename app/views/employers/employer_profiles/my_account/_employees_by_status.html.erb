@@ -1,4 +1,4 @@
-<div class="employees-tab">
+<div class="employees-table">
   <% if @search %>
   <% if @census_employees.present? %>
   <h4>Results found</h4>
@@ -6,8 +6,8 @@
   <h4>No results found</h4>
   <% end %>
   <% end %>
-  <div class="table-responsive" style="overflow-y: hidden;">
-    <table class="table table-wrapper" style="opacity: 1;">
+  <div class="table-responsive">
+    <table>
       <thead>
         <tr>
           <th>Employee Name</th>
@@ -20,7 +20,6 @@
           <th>Status</th>
           <th>Enrollment Status</th>
           <th>Linked?</th>
-          <th></th>
         </tr>
       </thead>
       <tbody>

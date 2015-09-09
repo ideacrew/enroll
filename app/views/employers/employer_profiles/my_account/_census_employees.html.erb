@@ -63,29 +63,30 @@
   </div>
   <div class="col-xs-12">
     <%= render "employers/employer_profiles/my_account/employees_by_status", status: 'active' %>
-  </div>
 
-</div>
+    <div id="employee_roster">
 
-<div id="employee_roster">
-  <div class="row">
+        <script>
+          //$(function() {
+          //  $( "#employee_name" ).autocomplete({
+          //    source: <%= raw @avaliable_employee_names.to_s %>
+          //  });
+          //});
+        </script>
 
-    <script>
-      //$(function() {
-      //  $( "#employee_name" ).autocomplete({
-      //    source: <%= raw @avaliable_employee_names.to_s %>
-      //  });
-      //});
-    </script>
 
-  </div>
+      <div id="employee_families">
+        <div id="employees_active">
+        </div>
+        <div id="employees_waived"></div>
+        <div id="employees_terminated"></div>
+        <div id="employees_all"></div>
+      </div>
 
-  <div id="employee_families">
-    <div id="employees_active">
     </div>
-    <div id="employees_waived"></div>
-    <div id="employees_terminated"></div>
-    <div id="employees_all"></div>
+
   </div>
+
+
 
 </div>
