@@ -3,8 +3,6 @@ When(/I visit the Insured portal$/) do
   @browser.a(text: /consumer\/family portal/i).wait_until_present
   @browser.a(text: /consumer\/family portal/i).click
   screenshot("individual_start")
-  @browser.a(text: /Create account/).wait_until_present
-  @browser.a(text: /Create account/).click
 end
 
 Then(/Individual creates HBX account$/) do
@@ -144,7 +142,7 @@ And(/I click on continue button on group selection page/) do
 
     qle_form = @browser.div(class: /qle-form/)
     click_when_present(qle_form.a(class: /interaction-click-control-continue/))
-    
+
     @browser.div(class: /success-info/).wait_until_present
     @browser.div(class: /success-info/).button(class: /interaction-click-control-continue/).click
   end
