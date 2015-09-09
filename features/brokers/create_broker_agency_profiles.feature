@@ -32,8 +32,7 @@ Feature: Create Primary Broker and Broker Agency
 
     Then Primary Broker should receive an invitation email
         When Primary Broker visits invitation url in email
-        Then Primary Broker should see the login page
-        When Primary Broker clicks on Create Account
+        Then Primary Broker should see the create account page
         When Primary Broker registers with valid information
         Then Primary Broker should see successful message with broker agency home page
         And Primary Broker logs out

@@ -12,8 +12,37 @@ class QhpBuilder
     end
   end
 
-  def add(qhp_hash)
-    @qhp_array = @qhp_array + qhp_hash[:packages_list][:packages]
+  def add(qhp_hash, file_path)
+    temp = qhp_hash[:packages_list][:packages]
+    qhp_hash[:packages_list][:packages].each do |package|
+      package[:plans_list].deep_merge!(carrier_name: search_carrier_name(file_path))
+    end
+    @qhp_array = @qhp_array + temp
+  end
+
+  def search_carrier_name(file_path)
+    file_path = file_path.downcase
+    carrier = if file_path.include?("aetna")
+      "Aetna"
+    elsif file_path.include?("dentegra")
+      "Dentegra"
+    elsif file_path.include?("delta")
+      "Delta Dental"
+    elsif file_path.include?("dominion")
+      "Dominion"
+    elsif file_path.include?("guardian")
+      "Guardian"
+    elsif file_path.include?("best life")
+      "BestLife"
+    elsif file_path.include?("metlife")
+      "MetLife"
+    elsif file_path.include?("united")
+      "United Health Care"
+    elsif file_path.include?("kaiser")
+      "Kaiser"
+    elsif file_path.include?("carefirst") || file_path.include?("cf")
+      "CareFirst"
+    end
   end
 
   def run
@@ -28,6 +57,7 @@ class QhpBuilder
       @xml_plan_counter += plans[:plans_list][:plans].size
       plans[:plans_list][:plans].each do |plan|
         @plan = plan
+        @carrier_name = plans[:plans_list][:carrier_name]
         build_qhp_params
       end
     end
@@ -64,11 +94,13 @@ class QhpBuilder
   end
 
   def associate_plan_with_qhp
-    plan_year = @qhp.plan_effective_date.to_date.year
-    return if plan_year == 2016
-    candidate_plans = Plan.where(active_year: plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
+    @plan_year = @qhp.plan_effective_date.to_date.year
+    if @plan_year > 2015
+      create_plan_from_serff_data
+    end
+    candidate_plans = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
     plan = candidate_plans.sort_by do |plan| plan.hios_id.gsub('-','').to_i end.first
-    plans_to_update = Plan.where(active_year: plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
+    plans_to_update = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
     plans_to_update.each do |up_plan|
       nationwide_str = (@qhp.national_network.blank? ? "" : @qhp.national_network)
       nationwide_value = nationwide_str.downcase.strip == "yes"
@@ -88,6 +120,36 @@ class QhpBuilder
       puts "Plan Not Saved! Hios: #{@qhp.standard_component_id}, Plan Name: #{@qhp.plan_marketing_name}"
       @qhp.plan = nil
     end
+  end
+
+  def create_plan_from_serff_data
+    plan = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
+    return if plan.present?
+    new_plan = Plan.new(
+      name: @qhp.plan_marketing_name,
+      hios_id: @qhp.standard_component_id,
+      active_year: @plan_year,
+      metal_level: parse_metal_level,
+      market: parse_market,
+      carrier_profile_id: get_carrier_id(@carrier_name),
+      coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental"
+      )
+    if new_plan.valid?
+      new_plan.save!
+    end
+  end
+
+  def parse_metal_level
+    return @qhp.metal_level unless ["high","low"].include?(@qhp.metal_level.downcase)
+    @qhp.metal_level = "dental"
+  end
+
+  def parse_market
+    @qhp.market_coverage.downcase.include?("shop") ? "shop" : "individual"
+  end
+
+  def get_carrier_id(name)
+    CarrierProfile.find_by_legal_name(name)
   end
 
   def build_qhp
