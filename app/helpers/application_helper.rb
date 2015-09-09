@@ -56,7 +56,7 @@ module ApplicationHelper
   end
 
   def format_datetime(date_value)    
-    date_value.to_time.strftime("%m/%d/%Y %I:%M %p %Z") if date_value.respond_to?(:strftime)
+    date_value.to_time.strftime("%m/%d/%Y %H:%M %Z") if date_value.respond_to?(:strftime)
   end
 
   # Builds a Dropdown button
