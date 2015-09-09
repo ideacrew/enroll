@@ -56,7 +56,7 @@ module ApplicationHelper
   end
 
   def format_datetime(date_value)
-    date_value.strftime("%m/%d/%Y %H:%M UTC") if date_value.respond_to?(:strftime)
+    date_value.to_time.strftime("%m/%d/%Y %H:%M %Z %:z") if date_value.respond_to?(:strftime)
   end
 
   # Builds a Dropdown button
@@ -456,12 +456,7 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").try(:benefit_sponsorship)
-    if benefit_sponsorship.nil?
-      false
-    else
-      benefit_sponsorship.is_under_open_enrollment?
-    end
+    HbxProfile.find_by_state_abbreviation("DC").under_open_enrollment?
   end
 
   def ivl_enrollment_effective_date
