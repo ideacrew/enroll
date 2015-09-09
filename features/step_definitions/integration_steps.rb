@@ -170,7 +170,8 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
   @browser.a(class: portal_class).wait_until_present
   @browser.a(class: portal_class).click
-  @browser.element(class: /interaction-click-control-sign-in/).wait_until_present
+  @browser.element(class: /interaction-click-control-sign-in-existing-account/).wait_until_present
+    @browser.element(class: /interaction-click-control-sign-in-existing-account/).click
   @browser.text_field(class: /interaction-field-control-user-email/).set(person[:email])
   @browser.text_field(class: /interaction-field-control-user-password/).set(person[:password])
   @browser.element(class: /interaction-click-control-sign-in/).click
@@ -250,7 +251,6 @@ When (/^(.*) logs? out$/) do |someone|
   sleep 2
   scroll_then_click(@browser.element(class: /interaction-click-control-logout/))
   @browser.element(class: /interaction-click-control-logout/).wait_while_present
-  @browser.element(class: /interaction-click-control-employee-portal/).wait_until_present
 end
 
 When(/^.+ go(?:es)? to register as an employee$/) do
@@ -265,6 +265,12 @@ Then(/^.+ should see the employee search page$/) do
 end
 
 When(/^(.*) creates an HBX account$/) do |named_person|
+  @browser.goto("http://localhost:3000/")
+  @browser.a(text: /employee portal/i).wait_until_present
+  screenshot("start")
+  scroll_then_click(@browser.a(text: /employee portal/i))
+  @browser.button(text: "Create account").wait_until_present
+
   person = people[named_person]
 
   @browser.text_field(name: "user[password_confirmation]").wait_until_present
