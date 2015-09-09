@@ -100,6 +100,10 @@ Then(/^.+ should see the login page$/) do
   @browser.element(class: /interaction-click-control-sign-in/).wait_until_present
 end
 
+Then(/^.+ should see the create account page$/) do
+  @browser.element(class: /interaction-click-control-create-account/).wait_until_present
+end
+
 When(/^.+ clicks? on Create Account$/) do
   @browser.a(text: /Create account/).wait_until_present
   @browser.a(text: /Create account/).click
