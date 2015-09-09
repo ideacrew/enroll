@@ -14,7 +14,7 @@ RSpec.describe ApplicationController do
     end
 
     it "redirect to the sign in page" do
-      expect(response).to redirect_to(new_user_session_url)
+      expect(response).to redirect_to(new_user_registration_path)
     end
 
     it "should set portal in session" do
