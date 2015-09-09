@@ -1,5 +1,5 @@
 module ApplicationHelper
-  
+
   def menu_tab_class(a_tab, current_tab)
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
@@ -437,7 +437,7 @@ module ApplicationHelper
   def ethnicity_collection
     [
       ["White", "Black or African American", "Asian Indian" ],
-      ["Chinese", "Filipino", "Japanese", "Korean"], 
+      ["Chinese", "Filipino", "Japanese", "Korean"],
       ["Vietnamese", "Other Asian", "Native Hawaiian", "Samon" ],
       ["Guamanion or Chamorro", "Other pacific islander", "American Indian or Alaskan Native", "Other"]
     ].inject([]){ |sets, ethnicities|

@@ -5,7 +5,7 @@
         <div class="col-md-12 col-sm-12 no-pd col-xs-12">
 
           <h3>Purchase confirmation</h3>
-          <p>Your purchase of <strong><%= @plan.name %></strong> was completed on <%= I18n.localize(@enrollment.updated_at, format: :short) %>. </p>
+          <p>Your purchase of <strong><%= @plan.name %></strong> was completed on <%= format_datetime(@enrollment.updated_at) %>. </p>
           <p>Please print this page for your records.</p>
           <p>A copy of this confirmation has also been emailed to you. </p>
 
