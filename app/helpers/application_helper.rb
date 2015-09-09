@@ -456,12 +456,7 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").try(:benefit_sponsorship)
-    if benefit_sponsorship.nil?
-      false
-    else
-      benefit_sponsorship.is_under_open_enrollment?
-    end
+    HbxProfile.find_by_state_abbreviation("DC").under_open_enrollment?
   end
 
   def ivl_enrollment_effective_date
