@@ -1,6 +1,7 @@
 class QhpRateBuilder
   LOG_PATH = "#{Rails.root}/log/rake_xml_import_plan_rates_#{Time.now.to_s.gsub(' ', '')}.log"
   LOGGER = Logger.new(LOG_PATH)
+  INVALID_PLAN_IDS = ["78079DC0320003","78079DC0320004","78079DC0340002","78079DC0330002"]
 
   def initialize(rates_hash)
     @rates_array = []
@@ -13,16 +14,10 @@ class QhpRateBuilder
 
   def run
     @rates_array.each do |rate|
-    # @rates_hash[:items].each do |rate|
       @rate = rate
+      assign_price_attributes
       find_plan_and_create_premium_tables
     end
-  end
-
-  def find_plan_and_create_premium_tables
-    assign_price_attributes
-    find_plan
-    create_premium_tables
   end
 
   def assign_price_attributes
@@ -44,13 +39,15 @@ class QhpRateBuilder
     end
   end
 
-  def find_plan
-    @plan = Plan.find_by(hios_id: /#{@hios_id}/, active_year: 2016)
+  def find_plan_and_create_premium_tables
+    unless INVALID_PLAN_IDS.include?(@hios_id)
+      plan = Plan.find_by(hios_id: /#{@hios_id}/, active_year: 2016)
+      create_premium_tables(plan)
+    end
   end
 
-  def create_premium_tables
-    # binding.pry
-    pt = @plan.premium_tables.build(
+  def create_premium_tables(plan)
+    pt = plan.premium_tables.build(
       age: @age,
       start_on: @start_on,
       end_on: @end_on,
