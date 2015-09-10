@@ -88,7 +88,9 @@ class Insured::ConsumerRolesController < ApplicationController
       :naturalized_citizen,
       :eligible_immigration_status,
       :indian_tribe_member,
-      :tribal_id
+      :tribal_id,
+      :no_dc_address,
+      :no_dc_address_reason
     ]
   end
 
