@@ -5,6 +5,7 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :find_consumer_role_and_person, only: [:edit, :update]
 
   def search
+    @help_me = true
     @person = Forms::ConsumerCandidate.new
     respond_to do |format|
       format.html
