@@ -127,3 +127,4 @@ group :production do
 end
 
 gem 'aws-sdk', '~> 2'
+gem 'ruby-saml', '~> 1.0.0'

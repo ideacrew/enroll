@@ -2,6 +2,12 @@ Rails.application.routes.draw do
 
   devise_for :users
 
+  resources :saml, only: :index do
+    collection do
+      post :login
+    end
+  end
+
   namespace :exchanges do
     resources :inboxes, only: [:show, :destroy]
 
