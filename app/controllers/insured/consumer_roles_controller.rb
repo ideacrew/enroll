@@ -173,7 +173,7 @@ class Insured::ConsumerRolesController < ApplicationController
     if current_user.has_consumer_role?
       redirect_to family_account_path
     else
-      current_user.last_portal_visted = search_insured_consumer_role_index_path
+      current_user.last_portal_visited = search_insured_consumer_role_index_path
       current_user.save!
     end
   end
