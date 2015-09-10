@@ -46,6 +46,7 @@ class User
   field :oim_id, type: String, default: ""
 
   field :last_portal_visited, type: String
+  field :idp_verified, type: Boolean, default: false
 
   index({preferred_language: 1})
   index({approved: 1})
