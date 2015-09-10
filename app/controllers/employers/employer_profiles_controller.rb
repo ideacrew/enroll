@@ -148,6 +148,10 @@ class Employers::EmployerProfilesController < ApplicationController
   def inbox
     @folder = params[:folder] || 'Inbox'
     @sent_box = false
+    respond_to do |format|
+      format.js { render 'inbox' }
+      format.html { render 'inbox' }
+    end
   end
 
   def consumer_override

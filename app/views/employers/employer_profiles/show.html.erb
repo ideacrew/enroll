@@ -13,7 +13,7 @@
     <%- elsif @tab == 'brokers' %>
           <%= render partial: "employers/employer_profiles/my_account/broker_agency" %>
     <%- elsif @tab == 'inbox' %>
-          <%= render :partial => 'shared/inboxes/messages_list' %>"" %>
+          <%= render :partial => 'shared/inboxes/messages_list', provider: @provider %>"" %>
     <%- elsif @tab == 'documents' %>
         <div class='container top-pd'>
           <div class="col-md-10 col-sm-12">
