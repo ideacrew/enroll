@@ -118,6 +118,10 @@ class User
     return nil unless person.present?
     person.id
   end
+  
+  def idp_verified?
+    idp_verified
+  end
 
   def send_welcome_email
     UserMailer.welcome(self).deliver_now
