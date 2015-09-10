@@ -31,12 +31,12 @@
       <div class="row">
         <h4 class="pull-left"><%= page_title %></h4>
         <% if @reload %>
-          <%= link_to employers_employer_profile_path(@employer_profile, :tab => "home"), class:'remove return_to_employee_roster' do %>
+          <%= link_to employers_employer_profile_path(@employer_profile, :tab => "employees"), class:'remove return_to_employee_roster' do %>
             <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
             Cancel
           <% end %>
         <% else %>
-        <%= link_to employers_employer_profile_path(@employer_profile, :tab => "home"), class:'remove return_to_employee_roster' do %>
+        <%= link_to employers_employer_profile_path(@employer_profile, :tab => "employees"), class:'remove return_to_employee_roster' do %>
             <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
             Cancel
   <% end %>

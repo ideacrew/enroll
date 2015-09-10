@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row top-pd">
       <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
-        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile), class: "btn btn-primary btn-br btn-block", data: {loading_text: "Loading..."} %>
+        <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile), class: "btn btn-primary btn-br btn-block", remote: true, data: {loading_text: "Loading..."} %>
       </div>
     </div>
 
@@ -16,7 +16,7 @@
                 <div class="pull-right bottom-mgn-xs">
                   <% if plan_year.draft? && @current_plan_year.nil? %>
                     <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-select" %>
-                    <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-select"%>
+                    <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), remote: true, class: "btn btn-select"%>
                   <% else %>
                     <%= plan_year.aasm_state.to_s.humanize %>
                   <% end %>

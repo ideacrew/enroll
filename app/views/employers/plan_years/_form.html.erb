@@ -42,7 +42,7 @@
               <button class="btn btn-primary pull-right" type="submit">
                 <%= "#{button_name}".html_safe %>
               </button> &nbsp;&nbsp;
-              <%= link_to "Cancel", employers_employer_profile_path(@employer_profile), class:'btn btn-transparent pull-right' %>
+              <%= link_to "Cancel", employers_employer_profile_path(@employer_profile, :tab => "benefits"), class:'btn btn-transparent pull-right' %>
             </div>
           </div>
       </div>

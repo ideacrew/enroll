@@ -4,6 +4,10 @@ class Employers::PlanYearsController < ApplicationController
 
   def new
     @plan_year = build_plan_year
+    respond_to do |format|
+      format.js { render 'new' }
+      format.html { render 'new' }
+    end
   end
 
   def create
@@ -50,7 +54,7 @@ class Employers::PlanYearsController < ApplicationController
   def calc_employer_contributions
     @location_id = params[:location_id]
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
-    
+
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups[0].reference_plan = @plan
@@ -61,6 +65,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def edit
+
     plan_year = @employer_profile.find_plan_year(params[:id])
     @just_a_warning = false
     if plan_year.publish_pending?
@@ -79,6 +84,10 @@ class Employers::PlanYearsController < ApplicationController
         benefit_group.carrier_for_elected_plan = benefit_group.elected_plans.try(:last).try(:carrier_profile_id)
       end
     end
+    respond_to do |format|
+      format.js { render 'edit' }
+      format.html { render 'edit' }
+    end
   end
 
   def update
@@ -96,7 +105,7 @@ class Employers::PlanYearsController < ApplicationController
     end
     if @plan_year.save
       flash[:notice] = "Plan Year successfully saved."
-      redirect_to employers_employer_profile_path(@employer_profile)
+      redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits")
     else
       render action: "edit"
     end
@@ -122,7 +131,7 @@ class Employers::PlanYearsController < ApplicationController
         format.js
       end
     else
-      if (@plan_year.published? || @plan_year.enrolling?) 
+      if (@plan_year.published? || @plan_year.enrolling?)
         if @plan_year.assigned_census_employees_without_owner.present?
           flash[:notice] = "Plan Year successfully published."
         else
@@ -146,7 +155,7 @@ class Employers::PlanYearsController < ApplicationController
   def employee_costs
     @location_id = params[:location_id]
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
-    
+
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups[0].reference_plan = @plan
@@ -166,8 +175,8 @@ class Employers::PlanYearsController < ApplicationController
         ref_plan_cost: @benefit_group.employee_cost_for_plan(employee)
       }
       if !@benefit_group.single_plan_type?
-        costs.merge!({ 
-          lowest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.lowest_cost_plan), 
+        costs.merge!({
+          lowest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.lowest_cost_plan),
           highest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.highest_cost_plan)
           })
       end
@@ -216,9 +225,9 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def relationship_benefits
-    { 
-      "benefit_groups_attributes" => 
-      { 
+    {
+      "benefit_groups_attributes" =>
+      {
         "0" => {
            "title"=>"2015 Employer Benefits",
            # "carrier_for_elected_plan"=>"53e67210eb899a4603000004",
