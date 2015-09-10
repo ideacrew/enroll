@@ -27,11 +27,11 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
 
   describe "GET match" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
-    let(:mock_consumer_candidate) { instance_double("Forms::ConsumerCandidate", :valid? => validation_result, ssn: "333224444", dob: "08/15/1975") }
+    let(:mock_consumer_candidate) { instance_double("Forms::ConsumerCandidate", :valid? => validation_result, ssn: "333224444", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname") }
     let(:user_id) { "SOMDFINKETHING_ID"}
     let(:found_person){ [] }
     let(:person){ instance_double("Person") }
-    let(:user) { double("User",id: user_id ) }
+    let(:user) { double("User",id: user_id, :idp_verified? => false) }
 
     before(:each) do
       sign_in(user)

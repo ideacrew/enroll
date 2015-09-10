@@ -18,11 +18,26 @@ class Insured::ConsumerRolesController < ApplicationController
     @person = @consumer_candidate
     respond_to do |format|
       if @consumer_candidate.valid?
-        found_person = @consumer_candidate.match_person
-        if found_person.present?
-          format.html { render 'match' }
+        idp_search_result = nil
+        if current_user.idp_verified? 
+          idp_search_result = :not_found
         else
-          format.html { render 'no_match' }
+          idp_search_result = IdpAccountManager.check_existing_account(@consumer_candidate)
+        end
+        case idp_search_result
+        when :service_unavailable
+          format.html { render 'idp_unavailable' }
+        when :too_many_matches
+          format.html { render 'idp_identity_conflict' }
+        when :existing_account
+          format.html { render 'redirect_to_recover_account' }
+        else
+          found_person = @consumer_candidate.match_person
+          if found_person.present?
+            format.html { render 'match' }
+          else
+            format.html { render 'no_match' }
+          end
         end
       else
         format.html { render 'search' }
@@ -31,11 +46,25 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def create
-    @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
-    @person = @consumer_role.person
-    session[:person_id] = @person.id
-    respond_to do |format|
-      format.html { redirect_to :action => "edit", :id => @consumer_role.id }
+    idp_account_created = nil
+    if current_user.idp_verified?
+      idp_account_created = :created
+    else
+      idp_account_created = IdpAccountManager.create_account(current_user.email, stashed_user_password)
+    end
+    case idp_account_created
+    when :created
+      @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
+      @person = @consumer_role.person
+      session[:person_id] = @person.id
+      session.delete("stashed_password")
+      respond_to do |format|
+        format.html { redirect_to :action => "edit", :id => @consumer_role.id }
+      end
+    else
+      respond_to do |format|
+        format.html { render 'idp_unavailable' }
+      end
     end
   end
 
@@ -131,10 +160,10 @@ class Insured::ConsumerRolesController < ApplicationController
   def update_vlp_documents
     return if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].first.nil?
     doc_params = params.require(:person).permit({:consumer_role_attributes =>
-                                                     [:vlp_documents_attributes =>
-                                                          [:subject, :citizenship_number, :naturalization_number,
-                                                           :alien_number, :passport_number, :sevis_id, :visa_number,
-                                                           :receipt_number, :expiration_date, :card_number, :i94_number]]})
+                                                 [:vlp_documents_attributes =>
+                                                  [:subject, :citizenship_number, :naturalization_number,
+                                                   :alien_number, :passport_number, :sevis_id, :visa_number,
+                                                   :receipt_number, :expiration_date, :card_number, :i94_number]]})
     document = find_document(@consumer_role, doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject])
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
     document.save
@@ -146,5 +175,9 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       current_user.last_portal_visted = search_insured_consumer_role_index_path
     end
+  end
+
+  def stashed_user_password
+    session["stashed_password"]
   end
 end
