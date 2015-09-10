@@ -2,7 +2,7 @@
   nav {
     ul {
       background-color: #007bc4;
-      padding: 0;
+      padding: 20px 0;
       list-style-type: none;
       img {
         width:100%
@@ -17,8 +17,9 @@
         }
         a {
           color: #cbe6ff;
-          text-align: center;
-          font-weight: Semibold;
+          text-align: left;
+          padding-left: 15px;
+          font-weight: 600;
           font-size: 18px;
           display: inline-block;
           width: 100%;
@@ -66,8 +67,12 @@
            li {
              color: #007bc4;
              margin-left: 17px;
+             margin-bottom: 5px;
+             &:last-of-type {
+               margin-bottom: 0;
+             }
              span {
-               color: #333;
+               color: #333333;
                display: inline-block;
              }
              a {
@@ -113,7 +118,9 @@
             font-size: 18px;
             padding: 0;
             margin-top: 0;
-
+            i {
+              color: #007bc4;
+            }
           }
           .progress {
             height: 8px;
