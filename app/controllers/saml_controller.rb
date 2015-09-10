@@ -27,6 +27,7 @@ class SamlController < ApplicationController
         redirect_to search_insured_consumer_role_index_path
       end
     else
+      logger.info "ERROR: SAMLResponse errors #{response.errors}"
       render file: 'public/403.html', status: 403
     end
   end
