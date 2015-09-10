@@ -1,4 +1,5 @@
 class SamlController < ApplicationController
+  skip_before_action :verify_authenticity_token
   # def init
   #   request = OneLogin::RubySaml::Authrequest.new
   #   redirect_to(request.create(saml_settings))
