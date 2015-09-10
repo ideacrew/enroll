@@ -41,11 +41,13 @@ module Enroll
       config.acapi.add_subscription("Events::ResidencyVerificationRequestsController")
       config.acapi.add_subscription("Events::SsaVerificationRequestsController")
       config.acapi.add_subscription("Events::VlpVerificationRequestsController")
+      config.acapi.add_async_subscription("Subscribers::DateChange")
       config.acapi.add_async_subscription("Subscribers::SsaVerification")
       config.acapi.add_async_subscription("Subscribers::LawfulPresence")
       config.acapi.add_async_subscription("Subscribers::LocalResidency")
       if ENV["ENROLL_SEEDING"].blank?
         config.acapi.add_subscription("Events::IndividualsController")
+        config.acapi.add_subscription("Events::EmployersController")
       end
     end
   end

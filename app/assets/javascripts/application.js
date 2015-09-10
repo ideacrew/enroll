@@ -26,6 +26,8 @@
 //= require jq_datepicker
 //= require qle
 //= require print
+//= require browser_issues
+//= require consumer_role
 //= require_tree .
 
 function applyFloatLabels() {
@@ -33,30 +35,6 @@ function applyFloatLabels() {
     slideInput: false
   });
 }
-
-function supportRequiredForSafari() {
-  var testElement=document.createElement('input');
-  var requiredSupported='required' in testElement&&!/Version\/[\d\.]+\s*Safari/i.test(navigator.userAgent);
-  if(!requiredSupported){
-    $('form').submit(function(e){
-      var inputs=$(this).find("input[required='required'][type='text']");
-      for (var i=0; i<inputs.length; i++){
-        var input=inputs[i];
-        if(!input.value){
-          var placeholder=input.placeholder? input.placeholder:input.getAttribute('placeholder');
-          placeholder = typeof(placeholder) === 'string' ? placeholder.replace(" *", "") : "";
-          alert('Please fill in ' + placeholder);
-          e.preventDefault&&e.preventDefault();
-          break;
-        };
-      };
-    });
-  };
-};
-
-$(document).on('page:update', function(){
-  supportRequiredForSafari();
-});
 
 $(document).ready(function () {
 
@@ -525,7 +503,10 @@ $(document).on('click', '#search_for_plan_shopping_help', function() {
   $.ajax({
     type: 'GET', 
     data: {firstname: $('#help_first_name').val(), lastname: $('#help_last_name').val(), type: $('#help_type').html(),
-           person: $('#help_requestor').html()},
+           person: $('#help_requestor').html(), email: $('#help_requestor_email').html(),
+           first_name: $('#person_first_name').val(), last_name: $('#person_last_name').val(),
+           ssn: $('#person_ssn').val(), dob: $('#jq_datepicker_ignore_person_dob').val()
+         },
     url: '/exchanges/hbx_profiles/request_help?',
   }).done(function(response) {
     $('#help_status').html(response)
@@ -536,7 +517,10 @@ $(document).on('click', '.help_button', function(){
 $.ajax({
     type: 'GET', 
     data: {assister: this.getAttribute('data-assister'), broker: this.getAttribute('data-broker'),
-           person: $('#help_requestor').html()},
+           person: $('#help_requestor').html(), email: $('#help_requestor_email').html(),
+           first_name: $('#person_first_name').val(), last_name: $('#person_last_name').val(),
+           ssn: $('#person_ssn').val(), dob: $('#jq_datepicker_ignore_person_dob').val()
+         },
     url: '/exchanges/hbx_profiles/request_help?',
   }).done(function(response) {
     console.log(response)

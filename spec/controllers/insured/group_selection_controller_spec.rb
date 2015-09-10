@@ -150,7 +150,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     it "should render group selection page if without family_member_ids" do
       post :create, person_id: person.id, employee_role_id: employee_role.id
       expect(response).to have_http_status(:redirect)
-      expect(flash[:error]).to eq 'You must select at least one applicant to enroll in the healthcare plan'
+      expect(flash[:error]).to eq 'You must select at least one Eligible applicant to enroll in the healthcare plan'
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
   end

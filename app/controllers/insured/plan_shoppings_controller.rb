@@ -50,6 +50,7 @@ class Insured::PlanShoppingsController < ApplicationController
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile
     end
+    send_receipt_emails
   end
 
   def thankyou
@@ -132,6 +133,21 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   private
+
+  def send_receipt_emails
+    UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, @person.emails.first.address).deliver_now
+    body = render_to_string 'user_mailer/secure_purchase_confirmation.html.erb', layout: false
+    from_provider = HbxProfile.find_by_state_abbreviation('DC')
+    message_params = {
+      sender_id: from_provider.try(:id),
+      parent_message_id: @person.id,
+      from: from_provider.try(:legal_name),
+      to: @person.full_name,
+      body: body,
+      subject: 'Your Secure Purchase Confirmation'
+    }
+    create_secure_message(message_params, @person, :inbox)
+  end
 
   def set_plans_by(hbx_enrollment_id:)
     Caches::MongoidCache.allocate(CarrierProfile)

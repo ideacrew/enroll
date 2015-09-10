@@ -3,8 +3,6 @@ When(/I visit the Insured portal$/) do
   @browser.a(text: /consumer\/family portal/i).wait_until_present
   @browser.a(text: /consumer\/family portal/i).click
   screenshot("individual_start")
-  @browser.a(text: /Create account/).wait_until_present
-  @browser.a(text: /Create account/).click
 end
 
 Then(/Individual creates HBX account$/) do
@@ -136,6 +134,19 @@ And(/I click on continue button on household info form/) do
 end
 
 And(/I click on continue button on group selection page/) do
+  if !HbxProfile.find_by_state_abbreviation('DC').under_open_enrollment?
+    click_when_present(@browser.a(text: /I've had a baby/))
+
+    @browser.text_field(id: /qle_date/).wait_until_present
+    @browser.text_field(id: /qle_date/).set(5.days.ago.strftime('%m/%d/%Y'))
+
+    qle_form = @browser.div(class: /qle-form/)
+    click_when_present(qle_form.a(class: /interaction-click-control-continue/))
+
+    @browser.div(class: /success-info/).wait_until_present
+    @browser.div(class: /success-info/).button(class: /interaction-click-control-continue/).click
+  end
+
   click_when_present(@browser.button(class: /interaction-click-control-continue/))
 end
 

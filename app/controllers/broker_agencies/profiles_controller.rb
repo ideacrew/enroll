@@ -61,7 +61,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def employers
     profile = BrokerAgencyProfile.find(params[:id])
-    @orgs = Organization.where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => profile._id})
+    @orgs = Organization.by_broker_agency_profile(profile._id)
     @page_alphabets = page_alphabets(@orgs, "legal_name")
     page_no = cur_page_no(@page_alphabets.first)
     @organizations = @orgs.where("legal_name" => /^#{page_no}/i)

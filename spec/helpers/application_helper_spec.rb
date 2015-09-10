@@ -133,22 +133,28 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe ".is_under_open_enrollment?" do
-    let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
-    let(:hbx_profile) { double }
-
-    before :each do 
-      allow(HbxProfile).to receive(:find_by_state_abbreviation).and_return(hbx_profile)
-      allow(hbx_profile).to receive(:benefit_sponsorship).and_return(benefit_coverage_period.benefit_sponsorship)
-    end
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
 
     context "when under open enrollment" do
+      let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
+
+      before :each do
+        hbx_profile.benefit_sponsorship = benefit_coverage_period.benefit_sponsorship
+        hbx_profile.save!
+      end
+
       it "should return true" do
         expect(helper.is_under_open_enrollment?).to be_truthy
       end
     end
 
     context "when not under open enrollment" do
-      let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 20.days, open_enrollment_end_on: TimeKeeper.date_of_record - 10.days) }
+      let!(:benefit_coverage_period1) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 20.days, open_enrollment_end_on: TimeKeeper.date_of_record - 10.days) }
+
+      before :each do
+        hbx_profile.benefit_sponsorship = benefit_coverage_period1.benefit_sponsorship
+        hbx_profile.save!
+      end
 
       it "should return false" do
         expect(helper.is_under_open_enrollment?).to be_falsey

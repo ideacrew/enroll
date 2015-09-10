@@ -16,6 +16,7 @@
               <tbody>
                 <% offered_relationship_benefits = @employee_role.present? ? @employee_role.benefit_group.relationship_benefits.select(&:offered).map(&:relationship) : nil
                 %>
+                <% show_residency_alert = false %>
                 <% @coverage_household.family_members.each_with_index do |family_member, index| %>
                     <% is_coverage = @employee_role.present? ? coverage_relationship_check(offered_relationship_benefits, family_member) : true
                       is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
@@ -25,6 +26,7 @@
                           role = family_member.person.consumer_role
                           rule = InsuredEligibleForBenefitRule.new(role, @benefit)
                           is_coverage, errors = rule.satisfied?
+                          show_residency_alert = !rule.is_residency_status_satisfied? if show_residency_alert == false
 
                       end
                         #TEMPORARY CODE DO NOT COPY  TODO
@@ -83,6 +85,13 @@
             <div class="col-sm-12">
               <p>If you enroll today, coverage will begin <%= format_date ivl_enrollment_effective_date %>. </p>
               <p>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", "#", :id => 'find_sep_link' %></p>
+            </div>
+          </div>
+          <% end %>
+          <% if show_residency_alert %>
+          <div class='row top-pd'>
+            <div class="col-sm-12">
+              <p>Since <%= @person.full_name %> is not a resident of the District of Columbia she/he is not eligible to purchase a plan through DC Health Link. Other members may still be eligible to enroll. Please call us at 1-855-532-5465 to learn about other health insurance options for <%= @person.full_name %>.</p>
             </div>
           </div>
           <% end %>

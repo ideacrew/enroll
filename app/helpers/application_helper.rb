@@ -55,8 +55,8 @@ module ApplicationHelper
     date_value.strftime("%m/%d/%Y") if date_value.respond_to?(:strftime)
   end
 
-  def format_datetime(date_value)
-    date_value.strftime("%m/%d/%Y %H:%M UTC") if date_value.respond_to?(:strftime)
+  def format_datetime(date_value)    
+    date_value.to_time.strftime("%m/%d/%Y %H:%M %Z %:z") if date_value.respond_to?(:strftime)
   end
 
   # Builds a Dropdown button
@@ -439,7 +439,7 @@ module ApplicationHelper
       ["White", "Black or African American", "Asian Indian" ],
       ["Chinese", "Filipino", "Japanese", "Korean"], 
       ["Vietnamese", "Other Asian", "Native Hawaiian", "Samon" ],
-      ["Guamanion or Chamorro", "Other pacific islander", "Other"]
+      ["Guamanion or Chamorro", "Other pacific islander", "American Indian or Alaskan Native", "Other"]
     ].inject([]){ |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
     }
@@ -456,12 +456,7 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").try(:benefit_sponsorship)
-    if benefit_sponsorship.nil?
-      false
-    else
-      benefit_sponsorship.is_under_open_enrollment?
-    end
+    HbxProfile.find_by_state_abbreviation("DC").under_open_enrollment?
   end
 
   def ivl_enrollment_effective_date

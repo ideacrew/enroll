@@ -23,11 +23,12 @@
 	          <%= f.label :password_confirmation %><br />
 	          <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", required: true %>
 	        </div>
-		<%= f.hidden_field :invitation_id %>
+      		<%= f.hidden_field :invitation_id %>
 
           <br>
 	        <div class="actions">
 	          <%= f.submit "Create account", class: "btn btn-primary btn-lg" %>
+            <%= link_to "Sign In Existing Account", new_user_session_path , class: "btn btn-default btn-lg" %>
 	        </div>
 		    <% end %>
       </div>

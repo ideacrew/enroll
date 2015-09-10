@@ -56,6 +56,7 @@ RSpec.describe Employers::CensusEmployeesController do
 
     it "should be redirect when valid" do
       allow(census_employee).to receive(:save).and_return(true)
+      allow(census_employee).to receive(:send_invite!).and_return(true)
       post :create, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(response).to be_redirect
     end
@@ -63,6 +64,7 @@ RSpec.describe Employers::CensusEmployeesController do
     context "get flash notice" do
       it "with benefit_group_id" do
         allow(census_employee).to receive(:save).and_return(true)
+        allow(census_employee).to receive(:send_invite!).and_return(true)
         allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
         post :create, :employer_profile_id => employer_profile_id, census_employee: {}
         expect(flash[:notice]).to eq "Census Employee is successfully created."
