@@ -100,7 +100,7 @@ class IdpAccountManager
 end
 
 # Fix slug setting on request reload
-unless Rails.env.production?
+#unless Rails.env.production?
   IdpAccountManager.slug!
-end
+#end
 
