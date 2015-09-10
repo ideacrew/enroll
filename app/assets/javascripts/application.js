@@ -91,6 +91,23 @@ $(document).ready(function () {
     divtoshow = $(this).data("value") + "-div";
     $("."+divtoshow).show();
   });
+  // Add something similar to jqueries deprecated .toggle()
+  $.fn.toggleClick=function(){
+	var functions=arguments, iteration=0
+	return this.click(function(){
+		functions[iteration].apply(this,arguments)
+		iteration= (iteration+1) %functions.length
+	})
+}
+
+  $('#address_info + span.form-action').toggleClick(function () {
+        $(this).text('Remove Mailing Address');
+        $('.mailing-div').show();
+    }, function () {
+        $(this).text('Add Mailing Address');
+        $('.mailing-div').hide();
+        });
+
 
   // $('.alert').delay(7000).fadeOut(2000); //Fade Alert Box
   // $('#plan_year input,select').click(function(){
@@ -390,9 +407,6 @@ $(document).ready(function () {
     $('#edit_broker_applicant').html('');
     $('#broker_applicants_roster').show();
   });
-});
-
-$(document).ready(function () {
   $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").click(function(){
     $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").addClass('focus_none');
     $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").removeClass('add_focus');
@@ -500,7 +514,7 @@ $(document).on('change', '#waive_confirm select#waiver_reason', function() {
 
 $(document).on('click', '#search_for_plan_shopping_help', function() {
   $.ajax({
-    type: 'GET', 
+    type: 'GET',
     data: {firstname: $('#help_first_name').val(), lastname: $('#help_last_name').val(), type: $('#help_type').html(),
            person: $('#help_requestor').html()},
     url: '/exchanges/hbx_profiles/request_help?',
@@ -511,7 +525,7 @@ $(document).on('click', '#search_for_plan_shopping_help', function() {
 
 $(document).on('click', '.help_button', function(){
 $.ajax({
-    type: 'GET', 
+    type: 'GET',
     data: {assister: this.getAttribute('data-assister'), broker: this.getAttribute('data-broker'),
            person: $('#help_requestor').html()},
     url: '/exchanges/hbx_profiles/request_help?',
@@ -535,14 +549,14 @@ $(document).on('click', '#terms_check_thank_you', function() {
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
-  
-  if($(this).prop("checked") == true){    
+
+  if($(this).prop("checked") == true){
     if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
       $('#btn-continue').removeClass('disabled');
     } else {
       $('#btn-continue').addClass('disabled');
     }
-  }else if($(this).prop("checked") == false){ 
+  }else if($(this).prop("checked") == false){
     $('#btn-continue').addClass('disabled');
   }
 })
@@ -552,11 +566,11 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
-  
+
   if(last_name_thank_you == ""){
     $('#btn-continue').addClass('disabled');
   }else{
-    if($("#terms_check_thank_you").prop("checked") == true){    
+    if($("#terms_check_thank_you").prop("checked") == true){
       if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
         $('#btn-continue').removeClass('disabled');
       } else {
