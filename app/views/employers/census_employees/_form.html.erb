@@ -1,5 +1,5 @@
 <div class="container">
-  <div class="row">
+
     <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
       <% if @census_employee.errors.any? %>
         <div class="alert alert-error">
@@ -31,15 +31,15 @@
       <div class="row">
         <h4 class="pull-left"><%= page_title %></h4>
         <% if @reload %>
-          <%= link_to employers_employer_profile_path(@employer_profile), class:'remove return_to_employee_roster' do %>
+          <%= link_to employers_employer_profile_path(@employer_profile, :tab => "home"), class:'remove return_to_employee_roster' do %>
             <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
             Cancel
           <% end %>
         <% else %>
-          <a class="remove return_to_employee_roster" href="#">
+        <%= link_to employers_employer_profile_path(@employer_profile, :tab => "home"), class:'remove return_to_employee_roster' do %>
             <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
             Cancel
-          </a>
+  <% end %>
         <% end %>
       </div>
       <div class="row">
@@ -65,5 +65,5 @@
           </div>
       </div>
     </div>
-  </div>
+
 </div>
