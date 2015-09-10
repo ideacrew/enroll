@@ -20,27 +20,27 @@ RSpec.describe SamlController do
       end
     end
 
-    context "with valid saml response" do
+    # context "with valid saml response" do
 
-      sample_xml = File.read("spec/saml/invalid_saml_response.xml")
+    #   sample_xml = File.read("spec/saml/invalid_saml_response.xml")
 
-      # describe "with an existing user" do
-      #   it "should redirect back to the welcome page with an error" do
-      #     allow(User).to receive(:where).and_return([user])
-      #     post :login, :SAMLResponse => sample_xml
-      #     expect(response).to redirect_to(user.last_portal_visited)
-      #   end
-      # end
+    #   describe "with an existing user" do
+    #     it "should redirect back to the welcome page with an error" do
+    #       allow(User).to receive(:where).and_return([user])
+    #       post :login, :SAMLResponse => sample_xml
+    #       expect(response).to redirect_to(user.last_portal_visited)
+    #     end
+    #   end
 
-      # describe "with a new user" do
-      #   it "should claim the invitation" do
-      #     allow(User).to receive(:where).and_return([])
-      #     post :login, :SAMLResponse => sample_xml
-      #     expect(response).to redirect_to(search_insured_consumer_role_index_path)
-      #   end
-      # end
+    #   describe "with a new user" do
+    #     it "should claim the invitation" do
+    #       allow(User).to receive(:where).and_return([])
+    #       post :login, :SAMLResponse => sample_xml
+    #       expect(response).to redirect_to(search_insured_consumer_role_index_path)
+    #     end
+    #   end
 
-    end
+    # end
 
 
 

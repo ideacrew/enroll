@@ -1,4 +1,5 @@
 class SamlController < ApplicationController
+  skip_before_action :verify_authenticity_token
   # def init
   #   request = OneLogin::RubySaml::Authrequest.new
   #   redirect_to(request.create(saml_settings))
@@ -14,11 +15,13 @@ class SamlController < ApplicationController
       user_with_email = User.where(email: email).first
 
       if user_with_email.present?
+        user_with_email.idp_verified = true
+        user_with_email.save!
         sign_in(:user, user_with_email)
         redirect_to user_with_email.last_portal_visited
       else
         new_password = Devise.friendly_token.first(20)
-        new_user = User.new(email: email, password: new_password)
+        new_user = User.new(email: email, password: new_password, idp_verified: true)
         new_user.save!
         sign_in(:user, new_user)
         redirect_to search_insured_consumer_role_index_path
