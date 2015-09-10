@@ -19,7 +19,7 @@ class Insured::ConsumerRolesController < ApplicationController
     respond_to do |format|
       if @consumer_candidate.valid?
         idp_search_result = nil
-        if current_user.idp_verified? 
+        if current_user.idp_verified?
           idp_search_result = :not_found
         else
           idp_search_result = IdpAccountManager.check_existing_account(@consumer_candidate)
@@ -174,6 +174,7 @@ class Insured::ConsumerRolesController < ApplicationController
       redirect_to family_account_path
     else
       current_user.last_portal_visted = search_insured_consumer_role_index_path
+      current_user.save!
     end
   end
 

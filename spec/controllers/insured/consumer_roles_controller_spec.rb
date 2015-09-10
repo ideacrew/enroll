@@ -15,6 +15,8 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       sign_in user
       allow(Forms::EmployeeCandidate).to receive(:new).and_return(mock_employee_candidate)
       allow(user).to receive(:has_consumer_role?).and_return(false)
+      allow(user).to receive(:last_portal_visted=)
+      allow(user).to receive(:save!).and_return(true)
     end
 
     it "should render search template" do
