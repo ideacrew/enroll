@@ -602,4 +602,25 @@ describe Person do
     end
   end
 
+  describe "residency_eligible?" do
+    let(:person) { FactoryGirl.create(:person) }
+
+    it "should false" do
+      person.no_dc_address = false
+      person.no_dc_address_reason = ""
+      expect(person.residency_eligible?).to be_falsey
+    end
+
+    it "should false" do
+      person.no_dc_address = true
+      person.no_dc_address_reason = ""
+      expect(person.residency_eligible?).to be_falsey
+    end
+
+    it "should true" do
+      person.no_dc_address = true
+      person.no_dc_address_reason = "I am Homeless"
+      expect(person.residency_eligible?).to be_truthy
+    end
+  end
 end

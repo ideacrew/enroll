@@ -27,6 +27,7 @@
 //= require qle
 //= require print
 //= require browser_issues
+//= require consumer_role
 //= require_tree .
 
 function applyFloatLabels() {

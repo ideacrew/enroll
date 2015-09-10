@@ -58,6 +58,9 @@ gem 'aasm', '~> 4.0.7'
 gem 'haml'
 # gem 'bh'
 
+# spreadsheet support
+gem 'roo', '~> 2.1.0'
+
 gem 'devise', '~> 3.4.1'
 # gem 'devise_ldap_authenticatable', '~> 0.8.1'
 gem 'cancancan', '~> 1.9.2'
@@ -76,8 +79,6 @@ gem 'bson', '2.3.0'
 
 gem 'language_list', '~> 1.1.0'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
-
-gem 'roo', '~> 2.1.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

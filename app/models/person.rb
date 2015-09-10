@@ -41,6 +41,9 @@ class Person
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
 
+  field :no_dc_address, type: Boolean, default: false
+  field :no_dc_address_reason, type: String, default: ""
+
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
@@ -339,6 +342,10 @@ class Person
 
   def has_active_employee_role?
     employee_roles.present? and employee_roles.active.present?
+  end
+
+  def residency_eligible?
+    no_dc_address and no_dc_address_reason.present?
   end
 
   class << self
