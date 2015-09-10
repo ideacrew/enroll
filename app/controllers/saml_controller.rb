@@ -27,6 +27,7 @@ class SamlController < ApplicationController
         redirect_to search_insured_consumer_role_index_path
       end
     else
+      logger.info "ERROR: SAMLResponse errors #{response.errors}"
       render file: 'public/403.html', status: 403
     end
   end
@@ -39,7 +40,7 @@ class SamlController < ApplicationController
     settings.assertion_consumer_service_url = "https://enroll-test.dchbx.org/saml/login"
     settings.issuer                         = "https://enroll-test.dchbx.org/saml"
     settings.idp_sso_target_url             = "https://DHSDCASOHSSVRQA201.dhs.dc.gov:4443/fed/idp/samlv20"
-    settings.idp_cert_fingerprint           = "96:ED:14:CD:A1:2D:9D:AD:EC:47:1C:85:79:72:37:FB:91:65:13:B5"
+    settings.idp_cert_fingerprint           = "7A:18:21:C6:89:2F:EA:C7:68:F1:3E:87:74:08:8C:38:54:5B:27:A9"
     settings.idp_cert_fingerprint_algorithm = "http://www.w3.org/2000/09/xmldsig#sha1"
     settings.name_identifier_format         = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
 
