@@ -149,10 +149,10 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     context "when not under open enrollment" do
-      let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 20.days, open_enrollment_end_on: TimeKeeper.date_of_record - 10.days) }
+      let!(:benefit_coverage_period1) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 20.days, open_enrollment_end_on: TimeKeeper.date_of_record - 10.days) }
 
       before :each do
-        hbx_profile.benefit_sponsorship = benefit_coverage_period.benefit_sponsorship
+        hbx_profile.benefit_sponsorship = benefit_coverage_period1.benefit_sponsorship
         hbx_profile.save!
       end
 

@@ -551,7 +551,7 @@ When(/^I select a future qle date$/) do
 end
 
 Then(/^I should see not qualify message$/) do
-  expect(@browser.element(text: /The date you submitted does not qualify for special enrollment/i).visible?).to be_truthy
+  expect(@browser.element(text: /Based on the information you entered, you may be eligible for a special enrollment period./i).visible?).to be_truthy
   screenshot("not_qualify")
 end
 
