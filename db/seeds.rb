@@ -83,7 +83,7 @@ puts "*"*80
 puts "Loading SERFF PLAN RATE data"
 
 files = Dir.glob(File.join(Rails.root, "db/seedfiles/rate_xmls", "**", "*.xml"))
-rate_import_hash = files.inject(QhpRateBuilder.new({})) do |rate_hash, file|
+rate_import_hash = files.inject(QhpRateBuilder.new()) do |rate_hash, file|
   puts file
   xml = Nokogiri::XML(File.open(file))
   rates = Parser::PlanRateGroupParser.parse(xml.root.canonicalize, :single => true)

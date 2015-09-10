@@ -3,9 +3,8 @@ class QhpRateBuilder
   LOGGER = Logger.new(LOG_PATH)
   INVALID_PLAN_IDS = ["78079DC0320003","78079DC0320004","78079DC0340002","78079DC0330002"]
 
-  def initialize(rates_hash)
+  def initialize
     @rates_array = []
-    @rates_hash = rates_hash
   end
 
   def add(rates_hash)
@@ -13,19 +12,21 @@ class QhpRateBuilder
   end
 
   def run
+    @results = Hash.new{|results,k| results[k] = []}
     @rates_array.each do |rate|
       @rate = rate
-      assign_price_attributes
-      find_plan_and_create_premium_tables
+      build_premium_tables
     end
+    find_plan_and_create_premium_tables
   end
 
-  def assign_price_attributes
-    @age = assign_age
-    @start_on = @rate[:effective_date]
-    @end_on = @rate[:expiration_date]
-    @cost = @rate[:primary_enrollee]
-    @hios_id = @rate[:plan_id]
+  def build_premium_tables
+    @results[@rate[:plan_id]] << {
+      age: assign_age,
+      start_on: @rate[:effective_date],
+      end_on: @rate[:expiration_date],
+      cost: @rate[:primary_enrollee]
+    }
   end
 
   def assign_age
@@ -40,20 +41,11 @@ class QhpRateBuilder
   end
 
   def find_plan_and_create_premium_tables
-    unless INVALID_PLAN_IDS.include?(@hios_id)
-      plan = Plan.find_by(hios_id: /#{@hios_id}/, active_year: 2016)
-      create_premium_tables(plan)
+    @results.each do |plan_id, premium_tables|
+      unless INVALID_PLAN_IDS.include?(plan_id)
+        @plan = Plan.find_by(hios_id: /#{plan_id}/, active_year: @rate[:effective_date].to_date.year)
+        @plan.premium_tables.create!(premium_tables)
+      end
     end
   end
-
-  def create_premium_tables(plan)
-    pt = plan.premium_tables.build(
-      age: @age,
-      start_on: @start_on,
-      end_on: @end_on,
-      cost: @cost
-      )
-    pt.save!
-  end
-
 end
