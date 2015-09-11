@@ -36,12 +36,24 @@ function applyFloatLabels() {
   });
 }
 
-$(document).ready(function () {
+function applySelectric() {
+  $("select[multiple!='multiple']").selectric();
+};
 
-  $(function(){
-    $('select').selectric();
+function applyMultiLanguateSelect() {
+  $('#broker_agency_language_select').multiselect({
+    nonSelectedText: 'Select Language',
+    maxHeight: 300
   });
+  $('#broker_agency_language_select').multiselect('select', 'en', true);
+};
 
+$(document).on('page:update', function(){
+  applyFloatLabels();
+  applySelectric();
+});
+
+$(document).ready(function () {
   $('[data-toggle="tooltip"]').tooltip();
   $("[data-toggle=popover]").popover();
 
@@ -83,8 +95,6 @@ $(document).ready(function () {
       });
     }
   });
-
-  applyFloatLabels();
 
   $(".address-li").on('click',function(){
     $(".address-span").html($(this).data("address-text"));
@@ -427,7 +437,6 @@ $(document).on('page:update', function() {
     $('#address_info > .first').attr('id', ($(this).text()));
     $('#employer_census_employee_family_census_employee_attributes_address_attributes_kind').val($(this).data('value'));
   });
-  $('select').selectric();
 
   $('#plan-years-list li a').on('click', function(){
     var target = $(this).attr('href');
