@@ -118,7 +118,7 @@ class User
     return nil unless person.present?
     person.id
   end
-  
+
   def idp_verified?
     idp_verified
   end
@@ -220,45 +220,25 @@ class User
   end
 
   def self.get_saml_settings
-     settings = OneLogin::RubySaml::Settings.new
+    settings = OneLogin::RubySaml::Settings.new
 
     # When disabled, saml validation errors will raise an exception.
     settings.soft = true
 
     # SP section
-    settings.assertion_consumer_service_url = "https://enroll-test.dchbx.org/saml/login"
-    settings.assertion_consumer_logout_service_url = "https://enroll-test.dchbx.org/saml/logout"
-    settings.issuer                         = "https://enroll-test.dchbx.org/saml"
+    settings.assertion_consumer_service_url = SamlInformation.assertion_consumer_service_url
+    settings.assertion_consumer_logout_service_url = SamlInformation.assertion_consumer_logout_service_url
+    settings.issuer                         = SamlInformation.issuer
 
     # IdP section
-    settings.idp_entity_id                  = "LocalIDP"
-    settings.idp_sso_target_url             = "https://DHSDCASOHSSVRQA201.dhs.dc.gov:4443/fed/idp/samlv20"
-    settings.idp_slo_target_url             = "https://DHSDCASOHSSVRQA201.dhs.dc.gov:4443/fed/idp/samlv20"
-    settings.idp_cert                       = "-----BEGIN CERTIFICATE-----
-MIIDhzCCAm+gAwIBAgIEY6x59jANBgkqhkiG9w0BAQsFADB0MQswCQYDVQQGEwJV
-UzELMAkGA1UECBMCREMxEzARBgNVBAcTCldBU0hJTkdUT0IxDTALBgNVBAoTBERD
-QVMxDDAKBgNVBAsTA0RIUzEmMCQGA1UEAxMdREhTRENBU09JRFNWUlVBVDAxLmRo
-cy5kYy5nb3YwHhcNMTQwMTEwMTg1NjQ3WhcNMjQwMTA4MTg1NjQ3WjB0MQswCQYD
-VQQGEwJVUzELMAkGA1UECBMCREMxEzARBgNVBAcTCldBU0hJTkdUT0IxDTALBgNV
-BAoTBERDQVMxDDAKBgNVBAsTA0RIUzEmMCQGA1UEAxMdREhTRENBU09JRFNWUlVB
-VDAxLmRocy5kYy5nb3YwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCQ
-iiDHH9JAnCqowuDTyiecnhtgLo7rMiQQQimuS0h7p1HfLOTvNgxu+2JeQu/jmXfg
-pPrlmHPCMTuiT/m+5VhwYB81IuF2ZmHdvcRW+saAEyfDO0BLgsNdM66QTCXvPJOI
-Kic8vMy+1bX5OS0cqrUTPA9q6uxLH/vp2onP52fJwFuDC4lh+xCa4JajwkwyvbEv
-0dPH3GBJXgUmtVuamx5apMXzoxMcPUeEZtyjfgYZk1NOjckCOLMw032FEOlPextD
-QAk46bA734ipsMcopTxAGla7EqIW5PYZh5Ju2pYIFKAjoXQNwD5kQ7bEhW2V3uuO
-qwxszUjymIbifzVRTqCfAgMBAAGjITAfMB0GA1UdDgQWBBRS2mDuOE+PWEqp/NRM
-9xw3ZyFMjTANBgkqhkiG9w0BAQsFAAOCAQEADsoCyfzE3E7r0k9f+dKBRKE3QHrn
-taJw9g2TMrpoMD+5i8qU6yrXqsYwzscy0y9Cx6xRTC0JDwrIYSlJqyZIbyMG9wdd
-9FC3iy4fXAgbDDRg2t8v9N/c/sKfbKaP9uVjQwfEEgGRD8u8qSIhcegtpVNyKhVH
-IRm3GhAsDTm2bHkYhFGEBwa1HJINl3FLutqhROjeyjJHogFM6FFYXWUqf69NkwMz
-tr5ZuSA1NBPFeZkMhqB1KKmXD3877sfrvH291wBTwTleINhhFV6/CN5CB0T/cY08
-tklYiyapP34LsnWdivUWCtkiXNPHGEGq0GqAkoEnegRTrC3isqMNiATyEw==
------END CERTIFICATE-----"
+    settings.idp_entity_id                  = SamlInformation.idp_entity_id
+    settings.idp_sso_target_url             = SamlInformation.idp_sso_target_url
+    settings.idp_slo_target_url             = SamlInformation.idp_slo_target_url
+    settings.idp_cert                       = SamlInformation.idp_cert
     # or settings.idp_cert_fingerprint           = "3B:05:BE:0A:EC:84:CC:D4:75:97:B3:A2:22:AC:56:21:44:EF:59:E6"
     #    settings.idp_cert_fingerprint_algorithm = XMLSecurity::Document::SHA1
 
-    settings.name_identifier_format         = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+    settings.name_identifier_format         = SamlInformation.name_identifier_format
 
     # Security section
     settings.security[:authn_requests_signed] = false

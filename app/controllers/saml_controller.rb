@@ -37,13 +37,12 @@ class SamlController < ApplicationController
   def saml_settings
     settings = OneLogin::RubySaml::Settings.new
 
-    settings.assertion_consumer_service_url = "https://enroll-test.dchbx.org/saml/login"
-    settings.issuer                         = "https://enroll-test.dchbx.org/saml"
-    settings.idp_sso_target_url             = "https://DHSDCASOHSSVRQA201.dhs.dc.gov:4443/fed/idp/samlv20"
-    settings.idp_cert_fingerprint           = "7A:18:21:C6:89:2F:EA:C7:68:F1:3E:87:74:08:8C:38:54:5B:27:A9"
-    settings.idp_cert_fingerprint_algorithm = "http://www.w3.org/2000/09/xmldsig#sha1"
-    settings.name_identifier_format         = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
-
+    settings.assertion_consumer_service_url = SamlInformation.assertion_consumer_service_url
+    settings.issuer                         = SamlInformation.issuer
+    settings.idp_sso_target_url             = SamlInformation.idp_sso_target_url
+    settings.idp_cert_fingerprint           = SamlInformation.idp_cert_fingerprint_algorithm
+    settings.idp_cert_fingerprint_algorithm = SamlInformation.idp_cert_fingerprint_algorithm
+    settings.name_identifier_format         = SamlInformation.name_identifier_format
     ## Optional for most SAML IdPs
     # settings.authn_context = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
 
