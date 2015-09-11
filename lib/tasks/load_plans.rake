@@ -19,8 +19,8 @@ namespace :seed do
 end
 
 namespace :xml do
-  task :hios_plan_crosswalk, [:file] => :environment do |task,args|
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/master_xml", "**", "*.xlsx"))
+  task :renewal_plans, [:file] => :environment do |task,args|
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "**", "*.xlsx"))
     result = Roo::Spreadsheet.open(files.first)
     sheets = ["IVL HIOS Plan Crosswalk", "SHOP HIOS Plan Crosswalk"]
     sheets.each do |sheet|
@@ -29,8 +29,9 @@ namespace :xml do
       (2..last_row).each do |row_number|
         carrier, old_hios_id, old_plan_name, new_hios_id, new_plan_name = sheet_data.row(row_number)
         old_plan = Plan.where(hios_id: /#{old_hios_id}/, active_year: 2015).first
-        new_plan = old_plan.dup
-        new_plan.update(name: new_plan_name, hios_id: new_hios_id, active_year: 2016)
+        new_plan = Plan.where(hios_id: /#{new_hios_id}/, active_year: 2016).first
+        old_plan.update(renewal_plan_id: new_plan._id)
+        puts "Old plan hios_id #{old_plan.hios_id} renewed with New plan hios_id: #{new_plan.hios_id}"
       end
     end
   end

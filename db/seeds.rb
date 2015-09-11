@@ -94,6 +94,8 @@ end
 rate_import_hash.run
 puts "*"*80
 
+system "bundle exec rake xml:renewal_plans"
+
 require File.join(File.dirname(__FILE__),'seedfiles', 'shop_2015_sbc_files')
 
 puts "*"*80

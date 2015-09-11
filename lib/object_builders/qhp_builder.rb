@@ -145,7 +145,7 @@ class QhpBuilder
   end
 
   def parse_market
-    @qhp.market_coverage.downcase.include?("shop") ? "shop" : "individual"
+    @qhp.market_coverage = @qhp.market_coverage.downcase.include?("shop") ? "shop" : "individual"
   end
 
   def get_carrier_id(name)
