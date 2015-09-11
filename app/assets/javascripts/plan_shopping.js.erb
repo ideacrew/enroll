@@ -179,13 +179,15 @@ $(function() {
 //for plan_year
 $(document).on("change", "select[name='reference_plan']", function() {
   $("#employer_cost_info_btn .btn").removeClass('disabled');
-  var start_date = $("#plan_year_start_on").val();
-  if (start_date == "") {
-    return
-  }
   var reference_plan_id = $(this).val();
   if (reference_plan_id != "" && reference_plan_id != undefined){
     $(this).parents('.reference-plan-select').find("input[type='hidden']").val(reference_plan_id);
+
+    //for calculate employer contributions
+    var start_date = $("#plan_year_start_on").val();
+    if (start_date == "") {
+      return
+    }
     $(this).parents('fieldset').find('.reference_plan_info h4').html("loading...")
     $.ajax({
       type: "GET",
