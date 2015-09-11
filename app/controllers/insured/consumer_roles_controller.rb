@@ -46,16 +46,16 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def create
+    @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
+    @person = @consumer_role.person
     idp_account_created = nil
     if current_user.idp_verified?
       idp_account_created = :created
     else
-      idp_account_created = IdpAccountManager.create_account(current_user.email, stashed_user_password)
+      idp_account_created = IdpAccountManager.create_account(current_user.email, stashed_user_password, @person, 15)
     end
     case idp_account_created
     when :created
-      @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
-      @person = @consumer_role.person
       session[:person_id] = @person.id
       session.delete("stashed_password")
       respond_to do |format|

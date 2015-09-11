@@ -1,5 +1,6 @@
 class SamlController < ApplicationController
   skip_before_action :verify_authenticity_token
+  include Acapi::Notifiers
   # def init
   #   request = OneLogin::RubySaml::Authrequest.new
   #   redirect_to(request.create(saml_settings))
@@ -27,7 +28,7 @@ class SamlController < ApplicationController
         redirect_to search_insured_consumer_role_index_path
       end
     else
-      logger.info "ERROR: SAMLResponse errors #{response.errors}"
+      log("ERROR: SAMLResponse assertion errors #{response.errors}", {:severity => "error"})
       render file: 'public/403.html', status: 403
     end
   end
@@ -40,7 +41,7 @@ class SamlController < ApplicationController
     settings.assertion_consumer_service_url = SamlInformation.assertion_consumer_service_url
     settings.issuer                         = SamlInformation.issuer
     settings.idp_sso_target_url             = SamlInformation.idp_sso_target_url
-    settings.idp_cert_fingerprint           = SamlInformation.idp_cert_fingerprint_algorithm
+    settings.idp_cert_fingerprint           = SamlInformation.idp_cert_fingerprint
     settings.idp_cert_fingerprint_algorithm = SamlInformation.idp_cert_fingerprint_algorithm
     settings.name_identifier_format         = SamlInformation.name_identifier_format
     ## Optional for most SAML IdPs
