@@ -1,6 +1,6 @@
 
-<div class="container top-pd">
-  <div class="row">
+<div class="col-xs-12 employer-edit-tab">
+<h1>Business Info</h1>
     <%= form_for @organization,{as: :organization, url: employers_employer_profile_path(@organization), method: :put} do |f| %>
 
       <%#= render "shared/error_messages", object: f.object %>
@@ -54,5 +54,5 @@
         </div>
       </div>
     <% end %>
-  </div>
+
 </div>
