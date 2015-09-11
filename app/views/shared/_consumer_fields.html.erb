@@ -24,7 +24,7 @@
 
   </div>
 
-  <div class="row row-form-wrapper no-buffer" id="naturalized_citizen_container" style="display: none">
+  <div class="row row-form-wrapper no-buffer" id="naturalized_citizen_container" style="display: <%= (f.object.us_citizen.present? and f.object.us_citizen) ? 'block' : 'none' %>">
 
     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg">
       <label>Are you a naturalized citizen? *</label>
@@ -48,7 +48,7 @@
     </div>
   </div>
 
-  <div class="row row-form-wrapper no-buffer" id="immigration_status_container" style="display: none">
+  <div class="row row-form-wrapper no-buffer" id="immigration_status_container" style="display: <%= (f.object.us_citizen.present? and !f.object.us_citizen) ? 'block' : 'none' %>">
     <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg">
       <label>Do you have eligible immigration status? *</label>
     </div>
