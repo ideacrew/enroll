@@ -2,12 +2,10 @@ class Employers::PlanYearsController < ApplicationController
   before_action :find_employer, except: [:recommend_dates]
   before_action :generate_carriers_and_plans, except: [:recommend_dates]
 
+  layout "two_column"
+
   def new
     @plan_year = build_plan_year
-    respond_to do |format|
-      format.js { render 'new' }
-      format.html { render 'new' }
-    end
   end
 
   def create

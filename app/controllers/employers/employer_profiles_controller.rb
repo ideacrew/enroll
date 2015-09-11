@@ -74,6 +74,7 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show
+    
    @tab = params['tab']
    if params[:q] || params[:page] || params[:commit] || params[:status]
      paginate_employees
