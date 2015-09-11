@@ -113,6 +113,7 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def edit
     @organization = Organization.find(params[:id])
+    @employer_profile = @organization.employer_profile
   end
 
   def create
