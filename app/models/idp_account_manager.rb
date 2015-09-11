@@ -8,7 +8,7 @@ class IdpAccountManager
     @provider = AmqpSource
   end
 
-  def check_existing_account(personish)
+  def check_existing_account(personish, timeout = 5)
     person_details = {
       :first_name => personish.first_name,
       :last_name => personish.last_name,
@@ -18,15 +18,19 @@ class IdpAccountManager
       person_details[:ssn] = personish.ssn 
     end
     provider.check_existing_account(
-      person_details
+      person_details,
+      timeout
     )
   end
 
-  def create_account(email, password)
+  def create_account(email, password, personish, timeout, account_role = "individual")
     provider.create_account({
       :email => email,
-      :password => password
-    })
+      :password => password,
+      :first_name => personish.first_name,
+      :last_name => personish.last_name,
+      :account_role => account_role
+    }, timeout)
   end
 
   def self.set_provider(prov)
@@ -37,17 +41,17 @@ class IdpAccountManager
     self.set_provider(SlugSource)
   end
 
-  def self.check_existing_account(personish)
-    self.instance.check_existing_account(personish)
+  def self.check_existing_account(personish, timeout = 5)
+    self.instance.check_existing_account(personish, timeout)
   end
 
-  def self.create_account(email, password)
-    self.instance.create_account(email, password)
+  def self.create_account(email, password, personish, timeout = 5, account_role = "individual")
+    self.instance.create_account(email, password, personish, timeout, account_role)
   end
 
   class AmqpSource
-    def self.check_existing_account(args)
-      invoke_service("account_management.check_existing_account", args) do |code|
+    def self.check_existing_account(args, timeout = 5)
+      invoke_service("account_management.check_existing_account", args, timeout) do |code|
         case code
         when "404"
           :not_found
@@ -61,8 +65,8 @@ class IdpAccountManager
       end
     end
 
-    def self.create_account(args)
-      invoke_service("account_management.create_account", args) do |code|
+    def self.create_account(args, timeout = 5)
+      invoke_service("account_management.create_account", args, timeout = 5) do |code|
         case code
         when "201"
           :created
@@ -72,9 +76,9 @@ class IdpAccountManager
       end
     end
 
-    def self.invoke_service(key, args, &blk)
+    def self.invoke_service(key, args, timeout = 5, &blk)
       begin
-        request_result = Acapi::Requestor.request(key, args)
+        request_result = Acapi::Requestor.request(key, args, timeout)
         result_code = request_result.stringify_keys["return_status"].to_s
         case result_code
         when "503"
@@ -89,11 +93,11 @@ class IdpAccountManager
   end
 
   class SlugSource
-    def self.create_account(args)
+    def self.create_account(args, timeout = 5)
       :created
     end
 
-    def self.check_existing_account(args)
+    def self.check_existing_account(args, timeout = 5)
       :not_found
     end
   end
