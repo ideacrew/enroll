@@ -214,9 +214,10 @@ end
 Then(/^Primary Broker creates and publishes a plan year$/) do
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-add-plan-year/))
-  start_on = @browser.element(class: /selectric-interaction-choice-control-plan-year-start-on/)
+  start_on = @browser.p(text: /SELECT START ON/i)
   click_when_present(start_on)
-  click_when_present(start_on.lis()[1])
+  start_on = @browser.li(text: /SELECT START ON/i)
+  click_when_present(start_on.parent().lis()[1])
   id="plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_premium_pct"
   @browser.text_field(id: id).set(50)
 
