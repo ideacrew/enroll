@@ -21,7 +21,7 @@ class SamlController < ApplicationController
         sign_in(:user, user_with_email)
         redirect_to user_with_email.last_portal_visited
       else
-        new_password = Devise.friendly_token.first(20)
+        new_password = User.generate_valid_password
         new_user = User.new(email: email, password: new_password, idp_verified: true)
         new_user.save!
         sign_in(:user, new_user)

@@ -4,7 +4,7 @@ When(/^.+ visits the HBX Broker Registration form$/) do
   @browser.element(class: /interaction-click-control-broker-registration/).click
 end
 
- When(/^Primary Broker clicks on New Broker Agency Tab$/) do 
+ When(/^Primary Broker clicks on New Broker Agency Tab$/) do
   @browser.radio(class: /interaction-choice-control-value-new-broker-agency/).wait_until_present
   @browser.radio(class: /interaction-choice-control-value-new-broker-agency/).fire_event("onclick")
 end
@@ -27,7 +27,7 @@ And(/^.+ enters broker agency information$/) do
   @browser.text_field(class: /interaction-field-control-organization-legal-name/).set("Logistics Inc")
   @browser.text_field(class: /interaction-field-control-organization-dba/).set("Logistics Inc")
   @browser.text_field(class: /interaction-field-control-organization-fein/).set("890890891")
-  
+
   entity_kind = @browser.div(class: /interaction-choice-control-organization-entity-kind/)
   entity_kind.click
   entity_kind.li(text: /S Corporation/).click
@@ -43,7 +43,7 @@ And(/^.+ enters broker agency information$/) do
   language_multi_select.click
   @browser.checkbox(:value => 'bn').set
   @browser.checkbox(:value => 'fr').set
-  
+
   @browser.checkbox(:name => "organization[working_hours]").set
   @browser.checkbox(:name => "organization[accept_new_clients]").set
 end
@@ -112,8 +112,8 @@ end
 When(/^.+ registers? with valid information$/) do
   @browser.text_field(name: "user[password_confirmation]").wait_until_present
   @browser.text_field(name: "user[email]").set("ricky.martin@example.com")
-  @browser.text_field(name: "user[password]").set("12345678")
-  @browser.text_field(name: "user[password_confirmation]").set("12345678")
+  @browser.text_field(name: "user[password]").set("aA1!aA1!aA1!")
+  @browser.text_field(name: "user[password_confirmation]").set("aA1!aA1!aA1!")
   @browser.input(value: /Create account/).click
 end
 
@@ -231,7 +231,7 @@ Then(/^Primary Broker creates and publishes a plan year$/) do
   select_carrier = benefit_form.element(text: 'SELECT CARRIER').parent.parent.parent
   scroll_then_click(select_carrier)
   click_when_present(select_carrier.lis()[1])
-  
+
   sleep 3
   benefit_form.element(text: 'SELECT REFERENCE PLAN').parent.parent.parent.wait_until_present
   select_reference = benefit_form.element(text: 'SELECT REFERENCE PLAN').parent.parent.parent
@@ -271,7 +271,7 @@ end
 # end
 
 Then(/^.+ shops for plans$/) do
-  @browser.a(class: 'interaction-click-control-shop-for-plans').click 
+  @browser.a(class: 'interaction-click-control-shop-for-plans').click
 end
 
 Then(/^.+ sees covered family members$/) do

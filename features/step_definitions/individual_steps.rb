@@ -8,8 +8,8 @@ end
 Then(/Individual creates HBX account$/) do
   @browser.button(class: /interaction-click-control-create-account/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set("taylor.york@example.com")
-  @browser.text_field(class: /interaction-field-control-user-password/).set("password")
-  @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("password")
+  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
+  @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!aA1!")
   screenshot("create_account")
   scroll_then_click(@browser.input(value: "Create account"))
 end

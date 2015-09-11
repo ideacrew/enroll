@@ -35,7 +35,7 @@ def people
       ssn: "670991234",
       home_phone: "2025551234",
       email: 'soren@dc.gov',
-      password: '12345678',
+      password: 'aA1!aA1!aA1!',
       legal_name: "Acme Inc.",
       dba: "Acme Inc.",
       fein: "764141112"
@@ -46,7 +46,7 @@ def people
       dob: "01/01/1980",
       ssn: "786120965",
       email: 'patrick.doe@dc.gov',
-      password: '12345678'
+      password: 'aA1!aA1!aA1!'
     },
     "Broker Assisted" => {
       first_name: 'Broker',
@@ -54,15 +54,15 @@ def people
       dob: "05/02/1976",
       ssn: "761234567",
       email: 'broker.assisted@dc.gov',
-      password: '12345678'
+      password: 'aA1!aA1!aA1!'
     },
     "Hbx Admin" => {
       email: 'admin@dc.gov',
-      password: 'password'
+      password: 'aA1!aA1!aA1!'
     },
     "Primary Broker" => {
       email: 'ricky.martin@example.com',
-      password: '12345678'
+      password: 'aA1!aA1!aA1!'
     },
     "John Doe" => {
       first_name: "John",
@@ -73,7 +73,7 @@ def people
       fein: '123456999',
       ssn: '111000999',
       email: 'john.doe@example.com',
-      password: '12345678'
+      password: 'aA1!aA1!aA1!'
 
     },
     "Tim Wood" => {
@@ -84,7 +84,7 @@ def people
       dba: "Legal LLC",
       fein: "890000223",
       email: 'tim.wood@example.com',
-      password: '12345678'
+      password: 'aA1!aA1!aA1!'
     },
   }
 end
@@ -174,6 +174,7 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   @browser.element(class: /interaction-click-control-sign-in-existing-account/).click
   @browser.text_field(class: /interaction-field-control-user-email/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set(person[:email])
+  @browser.text_field(class: /interaction-field-control-user-password/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-password/).set(person[:password])
   @browser.element(class: /interaction-click-control-sign-in/).click
 end

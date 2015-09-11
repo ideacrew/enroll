@@ -7,7 +7,7 @@ phone    = Phone.new(kind: "main", area_code: "855", number: "532-5465")
 # email    = Email.new(kind: "work", address: "admin@dc.gov")
 office_location = OfficeLocation.new(is_primary: true, address: address, phone: phone)
 geographic_rating_area = GeographicRatingArea.new(
-    rating_area_code: "R-DC001", 
+    rating_area_code: "R-DC001",
     us_counties: UsCounty.where(county_fips_code: "11001").to_a
   )
 
@@ -61,15 +61,14 @@ hbx_profile = organization.build_hbx_profile(
 
 organization.save!
 
-
-admin_user    = User.create!(email: "admin@dc.gov", password: "password", password_confirmation: "password", roles: ["hbx_staff"])
+admin_user    = User.create!(email: "admin@dc.gov", password: "aA1!aA1!aA1!", password_confirmation: "aA1!aA1!aA1!", roles: ["hbx_staff"])
 admin_person  = Person.new(first_name: "system", last_name: "admin", dob: "1976-07-04", user: admin_user)
 admin_person.save!
 admin_person.build_hbx_staff_role(hbx_profile_id: hbx_profile._id, job_title: "grand poobah", department: "accountability")
 admin_person.save!
 
 def create_staff member
-   user = User.create!(email: member[:email], password: "password", password_confirmation: "password", roles: [member[:role]])
+   user = User.create!(email: member[:email], password: "aA1!aA1!aA1!", password_confirmation: "aA1!aA1!aA1!", roles: [member[:role]])
    person = Person.new(first_name: member[:first_name], last_name: member[:last_name], user: user)
    person.save!
    if member[:role] == 'assister'
