@@ -25,6 +25,7 @@
           <%= render partial:  "employers/employer_profiles/my_account/families" %>
     <%- end %>
 
+    <%- if @tab == 'home' %>
     <aside class="col-xs-4">
               <section class="row">
                 <article class="col-xs-12">
@@ -71,3 +72,4 @@
                 </article>
               </section>
             </aside>
+            <% end %>
