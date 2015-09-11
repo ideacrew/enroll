@@ -52,7 +52,7 @@ class Insured::ConsumerRolesController < ApplicationController
     if current_user.idp_verified?
       idp_account_created = :created
     else
-      idp_account_created = IdpAccountManager.create_account(current_user.email, stashed_user_password, @person, 10)
+      idp_account_created = IdpAccountManager.create_account(current_user.email, stashed_user_password, @person, 15)
     end
     case idp_account_created
     when :created
