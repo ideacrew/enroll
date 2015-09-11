@@ -40,7 +40,7 @@ class SamlController < ApplicationController
     settings.assertion_consumer_service_url = SamlInformation.assertion_consumer_service_url
     settings.issuer                         = SamlInformation.issuer
     settings.idp_sso_target_url             = SamlInformation.idp_sso_target_url
-    settings.idp_cert_fingerprint           = SamlInformation.idp_cert_fingerprint_algorithm
+    settings.idp_cert_fingerprint           = SamlInformation.idp_cert_fingerprint
     settings.idp_cert_fingerprint_algorithm = SamlInformation.idp_cert_fingerprint_algorithm
     settings.name_identifier_format         = SamlInformation.name_identifier_format
     ## Optional for most SAML IdPs
