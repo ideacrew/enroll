@@ -3,7 +3,7 @@ class Employers::EmployerProfilesController < ApplicationController
   before_action :check_admin_staff_role, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
 
-  layout "two_column"
+  layout "two_column", except: [:new]
 
   def index
     @q = params.permit(:q)[:q]
@@ -74,7 +74,7 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show
-    
+
    @tab = params['tab']
    if params[:q] || params[:page] || params[:commit] || params[:status]
      paginate_employees
