@@ -112,6 +112,11 @@ class ApplicationController < ActionController::Base
     session[:portal] || request.referer || root_path
   end
 
+  def after_sign_out_path_for(resource_or_scope)
+    return SamlInformation.saml_logout_url if Rails.env == "production"
+    root_path
+  end
+
   def authenticate_user_from_token!
     user_token = params[:user_token].presence
     user = user_token && User.find_by_authentication_token(user_token.to_s)

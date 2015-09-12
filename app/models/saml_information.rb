@@ -19,7 +19,8 @@ class SamlInformation
     'name_identifier_format',
     'idp_cert_fingerprint',
     'idp_cert_fingerprint_algorithm',
-    'curam_landing_page_url'
+    'curam_landing_page_url',
+    'saml_logout_url'
   ]
 
   attr_reader :config
