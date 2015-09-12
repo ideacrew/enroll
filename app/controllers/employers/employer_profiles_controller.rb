@@ -1,5 +1,5 @@
 class Employers::EmployerProfilesController < ApplicationController
-  before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox]
+  before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox, :edit]
   before_action :check_admin_staff_role, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
 
@@ -113,7 +113,8 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def edit
     @organization = Organization.find(params[:id])
-    @employer_profile = @organization.employer_profile
+    
+
   end
 
   def create
