@@ -106,6 +106,8 @@ $(document).ready(function () {
     }, function () {
         $(this).text('Add Mailing Address');
         $('.mailing-div').hide();
+        $('.mailing-div input').val("");
+        $('.mailing-div .label-floatlabel').hide();
         });
 
 
