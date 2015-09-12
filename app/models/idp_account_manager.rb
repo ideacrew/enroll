@@ -66,7 +66,7 @@ class IdpAccountManager
     end
 
     def self.create_account(args, timeout = 5)
-      invoke_service("account_management.create_account", args, timeout = 5) do |code|
+      invoke_service("account_management.create_account", args, timeout) do |code|
         case code
         when "201"
           :created
@@ -104,7 +104,7 @@ class IdpAccountManager
 end
 
 # Fix slug setting on request reload
-#unless Rails.env.production?
+unless Rails.env.production?
   IdpAccountManager.slug!
-#end
+end
 
