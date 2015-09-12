@@ -23,13 +23,25 @@ class IdpAccountManager
     )
   end
 
-  def create_account(email, password, personish, timeout, account_role = "individual")
+  def create_account(email, password, personish, account_role, timeout = 15)
+    account_role_val = "individual"
+    system_flag = "1"
+    case account_role
+    when "assisted_individual"
+      account_role_val = "individual"
+      system_flag = "2"
+    when "broker"
+      account_role_val = "broker"
+    else
+      account_role_val = "individual"
+    end
     provider.create_account({
       :email => email,
       :password => password,
       :first_name => personish.first_name,
       :last_name => personish.last_name,
-      :account_role => account_role
+      :account_role => account_role_val,
+      :system_flag => system_flag
     }, timeout)
   end
 
@@ -45,8 +57,8 @@ class IdpAccountManager
     self.instance.check_existing_account(personish, timeout)
   end
 
-  def self.create_account(email, password, personish, timeout = 5, account_role = "individual")
-    self.instance.create_account(email, password, personish, timeout, account_role)
+  def self.create_account(email, password, personish, account_role, timeout = 15)
+    self.instance.create_account(email, password, personish, account_role, timeout)
   end
 
   class AmqpSource
@@ -66,7 +78,7 @@ class IdpAccountManager
     end
 
     def self.create_account(args, timeout = 5)
-      invoke_service("account_management.create_account", args, timeout = 5) do |code|
+      invoke_service("account_management.create_account", args, timeout) do |code|
         case code
         when "201"
           :created

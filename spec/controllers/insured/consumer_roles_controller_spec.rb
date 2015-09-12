@@ -25,6 +25,18 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       expect(response).to render_template(:search)
     end
 
+    it "should set the session flag for aqhp the param exists" do
+      get :search, aqhp: true
+      expect(session[:individual_assistance_path]).to be_truthy
+    end
+
+    it "should unset the session flag for aqhp if the param does not exist upon return" do
+      get :search, aqhp: true
+      expect(session[:individual_assistance_path]).to be_truthy
+      get :search, uqhp: true
+      expect(session[:individual_assistance_path]).to be_falsey
+    end
+
   end
 
   describe "GET match" do

@@ -9,6 +9,28 @@ class User
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
+
+  validate :password_complexity
+
+  def password_complexity
+    if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W]).+$/)
+      errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter"
+    end
+  end
+
+  def self.generate_valid_password
+    password = Devise.friendly_token.first(16)
+    password = password + "aA1!"
+  end
+
+  def switch_to_idp!
+    new_password = self.class.generate_valid_password
+    self.password = new_password
+    self.password_confirmation = new_password
+    self.idp_verified = true
+    self.save!
+  end
+
   # for i18L
   field :preferred_language, type: String, default: "en"
 

@@ -152,7 +152,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def set_plans_by(hbx_enrollment_id:)
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
-    if @market_kind == 'shop' and @coverage_kind == 'health'
+    if @market_kind == 'shop'
       @benefit_group = @hbx_enrollment.benefit_group
       @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
     elsif @market_kind == 'individual'

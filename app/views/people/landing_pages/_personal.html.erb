@@ -41,6 +41,10 @@
     </div>
   </div><br>
 
+  <% if @person.has_active_consumer_role? %>
+    <%= render 'shared/consumer_fields', f: f %><br>
+  <% end %>
+
   <%= render 'shared/home_address_fields', f: f %><br>
 
   <%=

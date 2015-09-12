@@ -2,11 +2,13 @@ require 'rails_helper'
 
 RSpec.describe User, :type => :model do
 
+  let(:gen_pass) { User.generate_valid_password }
+
   let(:valid_params) do
     {
       email: "test@test.com",
-      password: "test1234",
-      password_confirmation: "test1234",
+      password: gen_pass,
+      password_confirmation: gen_pass,
       approved: true,
       person: {first_name: "john", last_name: "doe", ssn: "123456789"}
     }
@@ -39,8 +41,16 @@ RSpec.describe User, :type => :model do
       end
     end
 
+    context 'when password' do
+      let(:params){valid_params.deep_merge!({password: "1234566746464DDss"})}
+      it 'does not contain valid complexity' do
+        expect(User.create(**params).errors[:password].any?).to be_truthy
+        expect(User.create(**params).errors[:password]).to eq ["must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter"]
+      end
+    end
+
     context 'when password & password confirmation' do
-      let(:params){valid_params.deep_merge!({password: "123"})}
+      let(:params){valid_params.deep_merge!({password: "1Aa@"})}
       it 'does not match' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
         expect(User.create(**params).errors[:password_confirmation].any?).to be_truthy

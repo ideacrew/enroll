@@ -5,7 +5,7 @@ class Plan
 
   COVERAGE_KINDS = %w[health dental]
   METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental]
-  REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum]
+  REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental]
   MARKET_KINDS = %w(shop individual)
   PLAN_TYPE_KINDS = %w[pos hmo epo ppo]
 
@@ -141,8 +141,8 @@ class Plan
   scope :health_coverage,       ->{ where(coverage_kind: "health") }
   scope :dental_coverage,       ->{ where(coverage_kind: "dental") }
 
-  scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
-  scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: metal_level)}
+  scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop",  metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
+  scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", metal_level: metal_level)}
 
   scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
 
