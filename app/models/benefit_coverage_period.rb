@@ -36,7 +36,7 @@ class BenefitCoveragePeriod
 
   def second_lowest_cost_silver_plan=(new_plan)
     raise ArgumentError.new("expected Plan") unless new_plan.is_a?(Plan)
-    raise ArgumentError.new("metal level must be silver") unless new_plan.metal_level == "silver"
+    raise ArgumentError.new("slcsp metal level must be silver") unless new_plan.metal_level == "silver"
     self.slcsp_id = new_plan._id
     self.slcsp = new_plan._id
     @second_lowest_cost_silver_plan = new_plan
