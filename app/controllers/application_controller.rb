@@ -167,7 +167,7 @@ class ApplicationController < ActionController::Base
     if user.idp_verified?
       idp_account_created = :created
     else
-      idp_account_created = IdpAccountManager.create_account(user.email, password, personish, timeout, account_role)
+      idp_account_created = IdpAccountManager.create_account(user.email, password, personish, account_role, timeout)
     end
     case idp_account_created
     when :created
