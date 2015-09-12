@@ -15,7 +15,9 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
     else
-      decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
+      get_aptc_info_from_session
+      hbx_enrollment.update_current(elected_aptc_pct: @elected_aptc_pct, elected_amount: @elected_aptc_pct*@max_aptc)
+      decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, hbx_enrollment.elected_amount)
     end
     # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
@@ -41,7 +43,7 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
     else
-      @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
+      @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.elected_amount)
       @market_kind = "individual"
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
@@ -62,7 +64,10 @@ class Insured::PlanShoppingsController < ApplicationController
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     else
-      @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment)
+      get_aptc_info_from_session
+      elected_amount = @max_aptc * @elected_aptc_pct
+
+      @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment, elected_amount)
     end
     @family = @person.primary_family
     #FIXME need to implement can_complete_shopping? for individual
@@ -122,6 +127,18 @@ class Insured::PlanShoppingsController < ApplicationController
     @waivable = @hbx_enrollment.can_complete_shopping?
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
+
+    #TODO get max_aptc from EligibilityDetermination
+    if @person.has_active_consumer_role?
+      @max_aptc = 300
+      session[:max_aptc] = @max_aptc
+      session[:selected_aptc_pct] = 0.8
+    end
+  end
+
+  def set_elected_pct
+    session[:elected_aptc_pct] = params[:elected_pct].to_f rescue 0.8
+    render json: 'ok'
   end
 
   def plans
@@ -175,5 +192,11 @@ class Insured::PlanShoppingsController < ApplicationController
   def set_kind_for_market_and_coverage
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
+  end
+
+  def get_aptc_info_from_session
+    @max_aptc = session[:max_aptc].to_f rescue 0
+    elected_aptc_pct = session[:elected_aptc_pct]
+    @elected_aptc_pct = elected_aptc_pct.present? ? elected_aptc_pct.to_f : 0.8
   end
 end
