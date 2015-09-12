@@ -24,9 +24,9 @@ class User
   end
 
   def switch_to_idp!
-    new_password = self.class.generate_valid_password
-    self.password = new_password
-    self.password_confirmation = new_password
+    # new_password = self.class.generate_valid_password
+    # self.password = new_password
+    # self.password_confirmation = new_password
     self.idp_verified = true
     self.save!
   end
