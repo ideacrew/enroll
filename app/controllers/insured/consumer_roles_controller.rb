@@ -54,9 +54,17 @@ class Insured::ConsumerRolesController < ApplicationController
   def create
     @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
     @person = @consumer_role.person
-    create_sso_account(current_user, stashed_user_password, @person, 15) do
+    is_assisted = session[:individual_assistance_path]
+    role_for_user = (is_assisted) ? "assisted_individual" : "individual"
+    create_sso_account(current_user, stashed_user_password, @person, 15, role_for_user) do
       respond_to do |format|
-        format.html { redirect_to :action => "edit", :id => @consumer_role.id }
+        format.html { 
+          if is_assisted
+            redirect_to SamlInformation.curam_landing_page_url
+          else
+            redirect_to :action => "edit", :id => @consumer_role.id
+          end
+        }
       end
     end
   end
