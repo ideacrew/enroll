@@ -6,7 +6,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember") }
   let(:consumer_role){ double("ConsumerRole", id: double("id")) }
-
+  let(:bookmark_url) {'localhost:3000'}
   describe "Get search" do
     let(:user) { double("User" ) }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", ssn: "333224444", dob: "08/15/1975") }
@@ -17,6 +17,9 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(user).to receive(:has_consumer_role?).and_return(false)
       allow(user).to receive(:last_portal_visited=)
       allow(user).to receive(:save!).and_return(true)
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:consumer_role).and_return(consumer_role)
+      allow(consumer_role).to receive(:save!).and_return(true)
     end
 
     it "should render search template" do
@@ -99,6 +102,9 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(consumer_role).to receive(:person).and_return(person)
       allow(controller).to receive(:build_nested_models).and_return(true)
       allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:consumer_role).and_return(consumer_role)
+      allow(consumer_role).to receive(:save!).and_return(true)
+      allow(consumer_role).to receive(:bookmark_url=).and_return(true)
     end
     it "should render new template" do
       sign_in user

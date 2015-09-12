@@ -5,6 +5,8 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :find_consumer_role_and_person, only: [:edit, :update]
 
   def search
+    @no_previous_button = true
+    @no_save_button = true
     @help_me = true
     @person = Forms::ConsumerCandidate.new
     respond_to do |format|
@@ -13,6 +15,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def match
+    @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id})
     @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
     @person = @consumer_candidate
@@ -69,10 +72,12 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def edit
+    set_consumer_bookmark_url
     build_nested_models
   end
 
   def update
+    save_and_exit =  params['exit_after_method'] == 'true'
     @person.addresses = []
     @person.phones = []
     @person.emails = []
@@ -80,16 +85,30 @@ class Insured::ConsumerRolesController < ApplicationController
     params_clean_vlp_documents
     update_vlp_documents
     if @person.update_attributes(params.require(:person).permit(*person_parameters_list))
-      redirect_to ridp_agreement_insured_consumer_role_index_path
+      if save_and_exit
+        respond_to do |format|
+          format.html {redirect_to destroy_user_session_path}
+        end
+      else
+        redirect_to ridp_agreement_insured_consumer_role_index_path
+      end
+
     else
-      build_nested_models
-      respond_to do |format|
-        format.html { render "edit" }
+      if save_and_exit
+        respond_to do |format|
+          format.html {redirect_to destroy_user_session_path}
+        end
+      else
+        build_nested_models
+        respond_to do |format|
+          format.html { render "edit" }
+        end
       end
     end
   end
 
   def ridp_agreement
+    set_consumer_bookmark_url
   end
 
   private
@@ -170,8 +189,9 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def check_consumer_role
-    if current_user.has_consumer_role?
-      redirect_to family_account_path
+    set_current_person
+    if @person.try(:consumer_role?)
+      redirect_to @person.consumer_role.bookmark_url || family_account_path
     else
       current_user.last_portal_visited = search_insured_consumer_role_index_path
       current_user.save!
