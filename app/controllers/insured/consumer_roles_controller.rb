@@ -156,26 +156,6 @@ class Insured::ConsumerRolesController < ApplicationController
     document.save
   end
 
-  def create_sso_account(user, password, personish, timeout, account_role = "individual")
-    idp_account_created = nil
-    if user.idp_verified?
-      idp_account_created = :created
-    else
-      idp_account_created = IdpAccountManager.create_account(user.email, password, personish, timeout, account_role)
-    end
-    case idp_account_created
-    when :created
-      session[:person_id] = @person.id
-      session.delete("stashed_password")
-      user.switch_to_idp!
-      yield
-    else
-      respond_to do |format|
-        format.html { render 'shared/idp_unavailable' }
-      end
-    end
-  end
-
   def check_consumer_role
     if current_user.has_consumer_role?
       redirect_to family_account_path
