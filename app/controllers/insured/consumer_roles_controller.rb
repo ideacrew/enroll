@@ -5,6 +5,12 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :find_consumer_role_and_person, only: [:edit, :update]
 
   def search
+    if params[:aqhp].present?
+      session[:individual_assistance_path] = true
+    elsif params[:uqhp].present?
+      session.delete(:individual_assistance_path)
+    end
+
     @help_me = true
     @person = Forms::ConsumerCandidate.new
     respond_to do |format|
