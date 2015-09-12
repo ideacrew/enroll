@@ -9,7 +9,7 @@ module Forms
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
     include ::Forms::SsnField
-    RELATIONSHIPS = ::PersonRelationship::Relationships + ::PersonRelationship::ConsumerRelationships
+    RELATIONSHIPS = ::PersonRelationship::Relationships + ::BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
     #include ::Forms::DateOfBirthField
     #include Validations::USDate.on(:date_of_birth)
 

@@ -22,16 +22,17 @@ describe PersonRelationship, dbclean: :after_each do
     end
 
     let(:consumer_relationship_kinds) { [
+      "self",
       "spouse",
-      "child",
       "domestic_partner",
+      "child",
       "parent",
       "sibling",
       "ward",
       "guardian",
       "unrelated",
       "other_tax_dependent"
-    ] }
+      ] }
 
     let(:kinds) {  [
       "spouse",
@@ -68,7 +69,7 @@ describe PersonRelationship, dbclean: :after_each do
       let(:params){ valid_params.deep_merge!({kind: "other_tax_dependent"}) }
 
       it "consumer relationships should be matched" do
-        expect(PersonRelationship::ConsumerRelationships).to eq consumer_relationship_kinds
+        expect(BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS).to eq consumer_relationship_kinds
       end
 
       it "should be valid if kind is present" do
