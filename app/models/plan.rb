@@ -18,6 +18,9 @@ class Plan
   field :metal_level, type: String
   field :hios_id, type: String
 
+  field :hios_base_id, type: String
+  field :csr_variant_id, type: String
+
   field :name, type: String
   field :abbrev, type: String
   field :provider, type: String
@@ -53,6 +56,21 @@ class Plan
   index({ renewal_plan_id: 1, name: 1 })
   index({ name: 1 })
 
+  # 2015, "94506DC0390006-01"
+  index(
+      { 
+        active_year: 1, 
+        hios_id: 1, 
+        "premium_tables.age": 1, 
+        "premium_tables.start_on": 1, 
+        "premium_tables.end_on": 1 
+      }, 
+      { name: "plan_premium_age" }
+    )
+
+  # 92479DC0020002, 2015, 32, 2015-04-01, 2015-06-30
+  index({ hios_id: 1, active_year: 1, "premium_tables.age": 1, "premium_tables.start_on": 1, "premium_tables.end_on": 1 }, {name: "plan_premium_age_deprecated"})
+
   # 2015, individual, health, gold
   index({ active_year: 1, market: 1, coverage_kind: 1, metal_level: 1, name: 1 })
 
@@ -61,9 +79,6 @@ class Plan
 
   # 2015, individual, health, uhc, gold
   index({ active_year: 1, market: 1, coverage_kind: 1, carrier_profile_id: 1, metal_level: 1, name: 1 })
-
-  # 92479DC0020002, 2015, 32, 2015-04-01, 2015-06-30
-  index({ hios_id: 1, active_year: 1, "premium_tables.age": 1, "premium_tables.start_on": 1, "premium_tables.end_on": 1 }, {name: "plan_premium_age"})
 
   index({ "premium_tables.age" => 1 })
   index({ "premium_tables.age" => 1, "premium_tables.start_on" => 1, "premium_tables.end_on" => 1 })
