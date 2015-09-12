@@ -98,9 +98,7 @@ class Employers::EmployerProfilesController < ApplicationController
       @plan_years = @employer_profile.plan_years.order(id: :desc)
     elsif @tab == 'employees'
       paginate_employees
-    elsif @tab == 'inbox'
-      @folder = params[:folder] || 'Inbox'
-      @sent_box = false
+
     elsif @tab == 'families'
      #families defined as employee_roles.each { |ee| ee.person.primary_family }
      paginate_families
@@ -113,7 +111,7 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def edit
     @organization = Organization.find(params[:id])
-    
+    @employer_profile = @organization.employer_profile
 
   end
 
