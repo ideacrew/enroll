@@ -26,7 +26,7 @@ class Insured::ConsumerRolesController < ApplicationController
         end
         case idp_search_result
         when :service_unavailable
-          format.html { render 'idp_unavailable' }
+          format.html { render 'shared/idp_unavailable' }
         when :too_many_matches
           format.html { render 'idp_identity_conflict' }
         when :existing_account
@@ -48,22 +48,9 @@ class Insured::ConsumerRolesController < ApplicationController
   def create
     @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
     @person = @consumer_role.person
-    idp_account_created = nil
-    if current_user.idp_verified?
-      idp_account_created = :created
-    else
-      idp_account_created = IdpAccountManager.create_account(current_user.email, stashed_user_password, @person, 15)
-    end
-    case idp_account_created
-    when :created
-      session[:person_id] = @person.id
-      session.delete("stashed_password")
+    create_sso_account(current_user, stashed_user_password, @person, 15) do
       respond_to do |format|
         format.html { redirect_to :action => "edit", :id => @consumer_role.id }
-      end
-    else
-      respond_to do |format|
-        format.html { render 'idp_unavailable' }
       end
     end
   end
@@ -167,6 +154,26 @@ class Insured::ConsumerRolesController < ApplicationController
     document = find_document(@consumer_role, doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject])
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
     document.save
+  end
+
+  def create_sso_account(user, password, personish, timeout, account_role = "individual")
+    idp_account_created = nil
+    if user.idp_verified?
+      idp_account_created = :created
+    else
+      idp_account_created = IdpAccountManager.create_account(user.email, password, personish, timeout, account_role)
+    end
+    case idp_account_created
+    when :created
+      session[:person_id] = @person.id
+      session.delete("stashed_password")
+      user.switch_to_idp!
+      yield
+    else
+      respond_to do |format|
+        format.html { render 'shared/idp_unavailable' }
+      end
+    end
   end
 
   def check_consumer_role
