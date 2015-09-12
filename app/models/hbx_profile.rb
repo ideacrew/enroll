@@ -26,7 +26,7 @@ class HbxProfile
   after_initialize :build_nested_models
 
   def under_open_enrollment?
-    (benefit_sponsorship && benefit_sponsorship.is_under_open_enrollment?) ?  true : false
+    (benefit_sponsorship.present? && benefit_sponsorship.is_under_open_enrollment?) ?  true : false
   end
 
   def active_employers
