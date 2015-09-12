@@ -26,6 +26,7 @@
       <tbody>
         <% if @census_employees.present? %>
         <% @census_employees.each do |census_employee| %>
+
         <tr class="terminated_<%= census_employee.employment_terminated? %> remove_<%= census_employee.id %>">
           <td>
             <%= link_to name_to_listing(census_employee), employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id), remote: true %>
@@ -52,7 +53,6 @@
             <%= link_to '<i class="fa fa-pencil"></i> Edit'.html_safe, (edit_employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id)), class: "btn btn-br btn-default", remote: true %>
             <%= link_to '<i class="fa fa-chain-broken"></i> Delink'.html_safe, (employers_employer_profile_census_employee_delink_path(@employer_profile.id, census_employee.id)), class: "btn btn-default", disabled: (!census_employee.employee_role_linked? or cannot? :delink, CensusEmployee) if current_user.has_hbx_staff_role? %>
             <%= link_to '<i class="fa fa-times"></i> Terminate'.html_safe, ('javascript:;'), class: "btn btn-danger btn-br show_confirm", id: "show_confirm_#{census_employee.id}" %>
-            <% end %>
             <% end %>
           </td>
         </tr>
@@ -82,6 +82,8 @@
         </tr>
         <% end %>
         <% end %>
+        <% end %>
+
       </tbody>
     </table>
   </div>

@@ -81,6 +81,7 @@ class Employers::EmployerProfilesController < ApplicationController
    else
       @current_plan_year = @employer_profile.published_plan_year
       @plan_years = @employer_profile.plan_years.order(id: :desc)
+
       @broker_agency_accounts = @employer_profile.broker_agency_accounts
       if @current_plan_year.present?
         #FIXME commeted out for performance test
@@ -89,6 +90,9 @@ class Employers::EmployerProfilesController < ApplicationController
         @employee_cost_total = 0 #enrollments.map(&:total_employee_cost).sum
         @employer_contribution_total = 0 #enrollments.map(&:total_employer_contribution).sum
       end
+    end
+    if @tab == 'employees'
+      paginate_employees
     end
   end
 
@@ -127,25 +131,21 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def update
     sanitize_employer_profile_params
+    params.permit!
     @organization = Organization.find(params[:id])
     @employer_profile = @organization.employer_profile
-    current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
-    current_user.person.employer_contact = @employer_profile
     if current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)
-      if @organization.update_attributes(employer_profile_params) && current_user.save
-        current_user.person.employer_staff_roles << EmployerStaffRole.create(person: current_user.person, employer_profile_id: @employer_profile.id, is_owner: true)
+      if @organization.update_attributes(employer_profile_params)
+
         flash[:notice] = 'Employer successfully Updated.'
-        redirect_to employers_employer_profile_path(@employer_profile)
+        redirect_to employers_employer_profile_path(@employer_profile, tab: 'profile')
       else
         @organization.reload
-        respond_to do |format|
-          format.js { render "edit" }
-          format.html { render "edit" }
-        end
+
       end
     else
       flash[:error] = 'You do not have permissions to update the details'
-      redirect_to employers_employer_profile_path(@employer_profile)
+      redirect_to employers_employer_profile_path(@employer_profile, tab: 'profile')
     end
   end
 

@@ -7,6 +7,7 @@
     <%- elsif @tab == 'profile' %>
           <%= render 'employers/employer_profiles/my_account/profile_tab' %>
     <%- elsif @tab == 'employees' %>
+       
           <%= render :partial => "employers/employer_profiles/my_account/census_employees" %>
 
     <%- elsif @tab == 'benefits' %>
@@ -16,12 +17,9 @@
     <%- elsif @tab == 'inbox' %>
           <%= render :partial => 'shared/inboxes/messages_list' %>
     <%- elsif @tab == 'documents' %>
-        <div class='container top-pd'>
-          <div class="col-md-10 col-sm-12">
-            <h4> Documents </h4>
-            <%#= render partial: "employers/employer_profiles/my_account/documents" %>
-          </div>
-        </div>
+
+            <%= render partial: "employers/employer_profiles/my_account/documents" %>
+
     <%- elsif @tab == 'families' %>
           <%= render partial:  "employers/employer_profiles/my_account/families" %>
     <%- end %>
