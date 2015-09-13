@@ -31,7 +31,8 @@ class BenefitSponsorship
   end
   
   def earliest_effective_date
-    HbxProfile.all.first.benefit_sponsorship.benefit_coverage_periods.first.earliest_effective_date # FIXME
+    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").benefit_sponsorship
+    benefit_sponsorship.benefit_coverage_periods.first.earliest_effective_date # FIXME
   end
 
 # effective_coverage_period

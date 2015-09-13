@@ -32,14 +32,5 @@ RSpec.describe BenefitSponsorship, :type => :model do
         expect(benefit_sponsorship.earliest_effective_date).to eq(benefit_coverage_period.earliest_effective_date)
       end
     end
-
-    context 'when not under open enrollment' do
-      let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 20.days, open_enrollment_end_on: TimeKeeper.date_of_record - 10.days) }
-
-      it 'should return nil' do 
-        benefit_sponsorship = benefit_coverage_period.benefit_sponsorship
-        expect(benefit_sponsorship.earliest_effective_date).to be_nil
-      end
-    end
   end
 end
