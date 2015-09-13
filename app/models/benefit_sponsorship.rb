@@ -34,6 +34,11 @@ class BenefitSponsorship
     end
   end
 
+  def self.find(id)
+    orgs = Organization.where("hbx_profile.benefit_sponsorship._id" => BSON::ObjectId.from_string(id))
+    orgs.size > 0 ? orgs.first.hbx_profile.benefit_sponsorship : nil
+  end
+
 # effective_coverage_period
 # HBX: Jan-Dec
 # Employers: year-over-year, e.g. Jun-May
@@ -61,13 +66,18 @@ class BenefitSponsorship
   class << self
     def advance_day(new_date)
 
-      # Employer activities that take place monthly - on first of month
-      if new_date.day == 1
+      # BenefitSponsor activities that take place monthly - on first of month
+      hbx_profile.advance_day
+      hbx_profile.advance_month   if new_date.day == 1
+      hbx_profile.advance_quarter if new_date.day == 1 && [1, 4, 7, 10].include?(new_date.month)
+      hbx_profile.advance_year    if new_date.day == 1 && new_date.month == 1
+
+
+
         orgs = Organization.exists(:"employer_profile.employer_profile_account._id" => true).not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
         orgs.each do |org|
           org.employer_profile.employer_profile_account.advance_billing_period!
         end
-      end
 
       # Find employers with events today and trigger their respective workflow states
       orgs = Organization.or(
@@ -94,4 +104,5 @@ class BenefitSponsorship
       end
     end
   end
+
 end
