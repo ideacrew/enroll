@@ -36,7 +36,7 @@ class TaxHousehold
 
 
     # Benchmark Plan: use SLCSP premium rates to determine ratios
-    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").benefit_sponsorship
+    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
     current_benefit_coverage_period = benefit_sponsorship.current_benefit_coverage_period
     slcsp = current_benefit_coverage_period.second_lowest_cost_silver_plan
 

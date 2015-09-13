@@ -311,8 +311,7 @@ class HbxEnrollment
       if qle
         enrollment.effective_on = calculate_start_date_by_qle(coverage_household.household)
       else
-        benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").benefit_sponsorship
-        enrollment.effective_on = benefit_sponsorship.earliest_effective_date
+        enrollment.effective_on = HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
       end
     else
       raise "either employee_role or consumer_role is required"

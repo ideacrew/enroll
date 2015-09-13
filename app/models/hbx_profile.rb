@@ -76,6 +76,10 @@ class HbxProfile
     def all
       Organization.exists(hbx_profile: true).all.reduce([]) { |set, org| set << org.hbx_profile }
     end
+
+    def current_hbx
+      find_by_state_abbreviation("DC")
+    end
   end
 
   ## Application-level caching

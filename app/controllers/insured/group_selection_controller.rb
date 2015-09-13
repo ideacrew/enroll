@@ -10,7 +10,7 @@ class Insured::GroupSelectionController < ApplicationController
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
     end
     if @market_kind == 'individual'
-      hbx = HbxProfile.find_by_state_abbreviation("dc")
+      hbx = HbxProfile.current_hbx
       bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
       pkgs = bc_period.benefit_packages
       benefit_package = pkgs.select{|plan|  plan[:title] == "individual_health_benefits_2015"}

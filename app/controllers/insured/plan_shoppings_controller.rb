@@ -137,7 +137,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def send_receipt_emails
     UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, @person.emails.first.address).deliver_now
     body = render_to_string 'user_mailer/secure_purchase_confirmation.html.erb', layout: false
-    from_provider = HbxProfile.find_by_state_abbreviation('DC')
+    from_provider = HbxProfile.current_hbx
     message_params = {
       sender_id: from_provider.try(:id),
       parent_message_id: @person.id,
