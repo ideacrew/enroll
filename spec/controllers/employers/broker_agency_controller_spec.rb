@@ -84,7 +84,7 @@ RSpec.describe Employers::BrokerAgencyController do
       end
 
       it "should assign employer broker accounts" do
-        expect(assigns(:broker_agency_accounts)[0].broker_agency_profile).to eq(@org2.broker_agency_profile)
+        expect(assigns(:broker_agency_account).broker_agency_profile).to eq(@org2.broker_agency_profile)
       end
     end
   end
