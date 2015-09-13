@@ -18,6 +18,9 @@ namespace :seed do
   end
 end
 
+#FIXME
+#TODO
+#REFACTOR, move code to models or relevent place.
 namespace :xml do
   task :renewal_plans, [:file] => :environment do |task,args|
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "**", "*.xlsx"))
