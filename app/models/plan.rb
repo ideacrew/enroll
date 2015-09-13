@@ -29,6 +29,7 @@ class Plan
   field :ehb, type: Float, default: 0.0
 
   field :renewal_plan_id, type: BSON::ObjectId
+  field :is_standard_plan, type: Boolean, default: false
 
   field :minimum_age, type: Integer, default: 0
   field :maximum_age, type: Integer, default: 120
