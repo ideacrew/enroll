@@ -92,7 +92,6 @@ RSpec.describe Employers::PremiumStatementsController do
     #   request.user_agent = 'application/vnd.ms-excel'
     #   sign_in(user)
     #   xhr :get, :show, id: "test", format: :csv
-    #   binding.pry
     #   expect(response.headers['Content-Type']).to have_content 'application/vnd.ms-excel'
     # end
   end

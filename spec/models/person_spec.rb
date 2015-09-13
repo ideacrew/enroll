@@ -75,6 +75,15 @@ describe Person do
         it "should known its relationship is self" do
           expect(person.find_relationship_with(person)).to eq "self"
         end
+
+        it "unread message count is accurate" do
+          expect(person.inbox).to be nil
+          person.save
+          expect(person.inbox.messages.count).to eq 1
+          expect(person.inbox.unread_messages.count).to eq 1
+        end
+
+
       end
 
       context "with no first_name" do

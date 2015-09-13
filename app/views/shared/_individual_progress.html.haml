@@ -54,16 +54,18 @@
     CONTINUE
 
 %ul.list-unstyled.list-right-section
-  %li
-    %a.back{href: '#'}
-      = image_tag 'icons/list.png'
-      PREVIOUS
-  %li
-    %a{href: '#'}
-      = image_tag 'icons/list.png'
-      SAVE &amp; EXIT
-    %br
-    %br
-  %li
-    %p
-      If you select Save & Logout, you can save your work and continue where you left off the next time you login.
+  - unless @no_previous_button
+    %li
+      %a.back{href: '#'}
+        = image_tag 'icons/list.png'
+        PREVIOUS
+  - unless @no_save_button
+    %li
+      %a{href: '#'}
+        = image_tag 'icons/list.png'
+        SAVE &amp; EXIT
+      %br
+      %br
+    %li
+      %p
+        If you select Save & Logout, you can save your work and continue where you left off the next time you login.
