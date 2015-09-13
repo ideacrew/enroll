@@ -23,16 +23,42 @@ namespace :xml do
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "**", "*.xlsx"))
     if files.present?
       result = Roo::Spreadsheet.open(files.first)
+      updated_hios_ids_list = []
+      rejected_hios_ids_list = []
+      old_plan_hios_ids = Plan.where(active_year: 2015).map(&:hios_id)
       sheets = ["IVL HIOS Plan Crosswalk", "SHOP HIOS Plan Crosswalk"]
       sheets.each do |sheet|
         sheet_data = result.sheet(sheet)
         last_row = sheet == "IVL HIOS Plan Crosswalk" ? sheet_data.last_row : 58
-        (2..last_row).each do |row_number|
+        (2..last_row).each do |row_number| # update renewal plan_ids
           carrier, old_hios_id, old_plan_name, new_hios_id, new_plan_name = sheet_data.row(row_number)
-          old_plan = Plan.where(hios_id: /#{old_hios_id}/, active_year: 2015).first
           new_plan = Plan.where(hios_id: /#{new_hios_id}/, active_year: 2016).first
-          old_plan.update(renewal_plan_id: new_plan._id)
-          puts "Old plan hios_id #{old_plan.hios_id} renewed with New plan hios_id: #{new_plan.hios_id}"
+          Plan.where(hios_id: /#{old_hios_id}/, active_year: 2015).each do |pln|
+            pln.update(renewal_plan_id: new_plan._id)
+            puts "Old plan hios_id #{pln.hios_id} renewed with New plan hios_id: #{new_plan.hios_id}"
+            updated_hios_ids_list << pln.hios_id
+          end
+        end
+        if sheet == "SHOP HIOS Plan Crosswalk"
+          (59..117).each do |row_number| # rejected hios ids
+            carrier, old_hios_id, old_plan_name, new_hios_id, new_plan_name = sheet_data.row(row_number)
+            rejected_hios_ids_list << old_hios_id
+          end
+        end
+      end
+      old_plan_hios_ids = old_plan_hios_ids.map { |str| str[0..13] }.uniq
+      updated_hios_ids_list = updated_hios_ids_list.map { |str| str[0..13] }.uniq
+      no_change_in_hios_ids = old_plan_hios_ids - (updated_hios_ids_list + rejected_hios_ids_list)
+      no_change_in_hios_ids = no_change_in_hios_ids.uniq
+      no_change_in_hios_ids.each do |hios_id|
+        new_plan = Plan.where(active_year: 2016, hios_id: /#{hios_id}/).first
+        if new_plan.present?
+          Plan.where(active_year: 2015, hios_id: /#{hios_id}/).each do |old_plan|
+          old_plan.update(renewal_plan_id: new_plan.id)
+            puts "Old plan hios_id #{old_plan.hios_id} carry overed with New plan hios_id: #{new_plan.hios_id}"
+          end
+        else
+          puts "plan not present: #{hios_id}"
         end
       end
     end
