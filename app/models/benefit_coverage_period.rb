@@ -61,6 +61,10 @@ class BenefitCoveragePeriod
     write_attribute(:end_on, new_date.end_of_day)
   end
 
+  def contains?(date)
+    (start_on <= date) && (date <= end_on)
+  end
+
   def open_enrollment_contains?(date)
     (open_enrollment_start_on <= date) && (date <= open_enrollment_end_on)
   end
