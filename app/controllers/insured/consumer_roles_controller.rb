@@ -7,6 +7,11 @@ class Insured::ConsumerRolesController < ApplicationController
   def search
     @no_previous_button = true
     @no_save_button = true
+    if params[:aqhp].present?
+      session[:individual_assistance_path] = true
+    elsif params[:uqhp].present?
+      session.delete(:individual_assistance_path)
+    end
     @help_me = true
     @person = Forms::ConsumerCandidate.new
     respond_to do |format|
@@ -29,7 +34,7 @@ class Insured::ConsumerRolesController < ApplicationController
         end
         case idp_search_result
         when :service_unavailable
-          format.html { render 'idp_unavailable' }
+          format.html { render 'shared/account_lookup_service_unavailable' }
         when :too_many_matches
           format.html { render 'idp_identity_conflict' }
         when :existing_account
@@ -51,22 +56,17 @@ class Insured::ConsumerRolesController < ApplicationController
   def create
     @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
     @person = @consumer_role.person
-    idp_account_created = nil
-    if current_user.idp_verified?
-      idp_account_created = :created
-    else
-      idp_account_created = IdpAccountManager.create_account(current_user.email, stashed_user_password, @person, 15)
-    end
-    case idp_account_created
-    when :created
-      session[:person_id] = @person.id
-      session.delete("stashed_password")
+    is_assisted = session["individual_assistance_path"]
+    role_for_user = (is_assisted) ? "assisted_individual" : "individual"
+    create_sso_account(current_user, @person, 15, role_for_user) do
       respond_to do |format|
-        format.html { redirect_to :action => "edit", :id => @consumer_role.id }
-      end
-    else
-      respond_to do |format|
-        format.html { render 'idp_unavailable' }
+        format.html { 
+          if is_assisted
+            redirect_to SamlInformation.curam_landing_page_url
+          else
+            redirect_to :action => "edit", :id => @consumer_role.id
+          end
+        }
       end
     end
   end
@@ -198,7 +198,4 @@ class Insured::ConsumerRolesController < ApplicationController
     end
   end
 
-  def stashed_user_password
-    session["stashed_password"]
-  end
 end

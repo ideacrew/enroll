@@ -20,6 +20,10 @@ class BenefitSponsorship
 
   validates_presence_of :service_markets
 
+  def current_benefit_coverage_period
+    benefit_coverage_periods.detect { |bcp| bcp.contains?(TimeKeeper.date_of_record) }
+  end
+
   def is_under_open_enrollment?
     benefit_coverage_periods.any? do |benefit_coverage_period|
       benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
@@ -27,10 +31,8 @@ class BenefitSponsorship
   end
   
   def earliest_effective_date
-    coverage_period = benefit_coverage_periods.detect do |benefit_coverage_period|
-      benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
-    end
-    coverage_period.earliest_effective_date if coverage_period
+    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").benefit_sponsorship
+    benefit_sponsorship.benefit_coverage_periods.first.earliest_effective_date # FIXME
   end
 
 # effective_coverage_period

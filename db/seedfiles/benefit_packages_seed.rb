@@ -95,8 +95,11 @@ native_american_dental_benefit_package = BenefitPackage.new(
 )
 
 hbx = HbxProfile.find_by_state_abbreviation("dc")
+slcsp_2015 = Plan.where(active_year: 2015).and(hios_id: "94506DC0390006-01").first
 
 bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
+
+bc_period.second_lowest_cost_silver_plan = slcsp_2015
 
 bc_period.benefit_packages = [
     individual_health_benefit_package,

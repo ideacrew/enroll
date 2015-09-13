@@ -59,7 +59,6 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'people_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'broker_agencies_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
-require File.join(File.dirname(__FILE__),'seedfiles', 'slcsp_seed')
 
 puts "*"*80
 
