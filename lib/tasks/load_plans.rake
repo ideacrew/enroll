@@ -2,7 +2,6 @@ require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_be
 require Rails.root.join('lib', 'object_builders', 'qhp_builder.rb')
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_rate_group_parser')
 require Rails.root.join('lib', 'object_builders', 'qhp_rate_builder.rb')
-require 'roo'
 
 namespace :seed do
   desc "Load the plan data"
@@ -35,7 +34,6 @@ namespace :xml do
     end
   end
 end
-
 
 #FIXME
 #TODO
