@@ -17,6 +17,8 @@ class Plan
   field :carrier_profile_id, type: BSON::ObjectId
   field :metal_level, type: String
   field :hios_id, type: String
+  field :hios_base_id, type: String
+  field :csr_variant_id, type: String
 
   field :hios_base_id, type: String
   field :csr_variant_id, type: String
