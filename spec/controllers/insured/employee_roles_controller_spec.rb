@@ -130,7 +130,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       } )
     }
     let(:employment_relationship_properties) { { :skllkjasdfjksd => "a3r123rvf" } }
-    let(:user) { double }
+    let(:user) { double(:idp_verified? => true) }
 
     context "can construct_employee_role" do
       before :each do
@@ -140,6 +140,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         allow(census_employee).to receive(:employee_role_linked?).and_return(true)
         allow(employee_role).to receive(:census_employee).and_return(census_employee)
         sign_in(user)
+        allow(user).to receive(:switch_to_idp!)
         post :create, :employment_relationship => employment_relationship_properties
       end
 
