@@ -51,11 +51,11 @@ Then(/Individual should see a form to enter personal information/) do
   @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).fire_event("onclick")
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-1/).set("4900 USAA BLVD")
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-2/).set("Suite 220")
-  @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-city/).set("Sacramento")
+  @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-city/).set("Washington")
   select_state = @browser.divs(text: /SELECT STATE/).last
   select_state.click
-  scroll_then_click(@browser.li(text: /CA/))
-  @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-zip/).set("78218")
+  scroll_then_click(@browser.li(text: /DC/))
+  @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-zip/).set("20002")
   @browser.text_field(class: /interaction-field-control-person-phones-attributes-0-full-phone-number/).set("1110009999")
   @browser.text_field(class: /interaction-field-control-person-emails-attributes-0-address/).set("taylor.york@example.com")
   screenshot("personal_form_bottom")
