@@ -112,6 +112,11 @@ class ApplicationController < ActionController::Base
     session[:portal] || request.referer || root_path
   end
 
+  def after_sign_out_path_for(resource_or_scope)
+    return SamlInformation.saml_logout_url if Rails.env == "production"
+    root_path
+  end
+
   def authenticate_user_from_token!
     user_token = params[:user_token].presence
     user = user_token && User.find_by_authentication_token(user_token.to_s)
@@ -161,4 +166,29 @@ class ApplicationController < ActionController::Base
     end
     real_user
   end
+
+  def create_sso_account(user, personish, timeout, account_role = "individual")
+    idp_account_created = nil
+    if user.idp_verified?
+      idp_account_created = :created
+    else
+      idp_account_created = IdpAccountManager.create_account(user.email, stashed_user_password, personish, account_role, timeout)
+    end
+    case idp_account_created
+    when :created
+      session[:person_id] = @person.id
+      session.delete("stashed_password")
+      user.switch_to_idp!
+      yield
+    else
+      respond_to do |format|
+        format.html { render 'shared/idp_unavailable' }
+      end
+    end
+  end
+
+  def stashed_user_password
+    session["stashed_password"]
+  end
+
 end

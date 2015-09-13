@@ -22,6 +22,19 @@ RSpec.describe ApplicationController do
     end
   end
 
+  context "when signed in with new user" do
+    let(:user) { FactoryGirl.create("user") }
+
+    it "should return the root url in dev environment" do
+      expect( controller.send(:after_sign_out_path_for, user) ).to eq root_path
+    end
+
+    it "should return the root url in dev environment" do
+      allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("production"))
+      expect( controller.send(:after_sign_out_path_for, user) ).to eq SamlInformation.saml_logout_url
+    end
+  end
+
   context "when signed in" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:person) { double("person")}

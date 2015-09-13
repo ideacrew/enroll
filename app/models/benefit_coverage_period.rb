@@ -17,6 +17,7 @@ class BenefitCoveragePeriod
 
   # Second Lowest Cost Silver Plan, by rating area (only one rating area in DC)
   field :slcsp, type: BSON::ObjectId
+  field :slcsp_id, type: BSON::ObjectId
 
   # embeds_many :open_enrollment_periods, class_name: "EnrollmentPeriod"
   embeds_many :benefit_packages
@@ -32,6 +33,20 @@ class BenefitCoveragePeriod
 
   before_save :set_title
 
+
+  def second_lowest_cost_silver_plan=(new_plan)
+    raise ArgumentError.new("expected Plan") unless new_plan.is_a?(Plan)
+    raise ArgumentError.new("slcsp metal level must be silver") unless new_plan.metal_level == "silver"
+    self.slcsp_id = new_plan._id
+    self.slcsp = new_plan._id
+    @second_lowest_cost_silver_plan = new_plan
+  end
+
+  def second_lowest_cost_silver_plan
+    return @second_lowest_cost_silver_plan if defined? @second_lowest_cost_silver_plan
+    @second_lowest_cost_silver_plan = Plan.find(slcsp_id) unless slcsp_id.blank?
+  end
+
   # The universe of products this sponsor may offer during this time period
   def benefit_products
   end
@@ -44,6 +59,10 @@ class BenefitCoveragePeriod
   def end_on=(new_date)
     new_date = Date.parse(new_date) if new_date.is_a? String
     write_attribute(:end_on, new_date.end_of_day)
+  end
+
+  def contains?(date)
+    (start_on <= date) && (date <= end_on)
   end
 
   def open_enrollment_contains?(date)
@@ -65,7 +84,6 @@ class BenefitCoveragePeriod
       organizations = Organization.where("hbx_profile.benefit_sponsorship.benefit_coverage_periods._id" => BSON::ObjectId.from_string(id))
       organizations.size > 0 ? organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods.first : nil
     end
-
   end
 
 private
