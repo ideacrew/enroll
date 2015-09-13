@@ -42,9 +42,11 @@ class Insured::EmployeeRolesController < ApplicationController
     if @employee_role.present? && @employee_role.try(:census_employee).try(:employee_role_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
       session[:person_id] = @person.id
-      build_nested_models
-      respond_to do |format|
-        format.html { redirect_to :action => "edit", :id => @employee_role.id }
+      create_sso_account(current_user, @employee_role.person, 15,"individual") do
+        build_nested_models
+        respond_to do |format|
+          format.html { redirect_to :action => "edit", :id => @employee_role.id }
+        end
       end
     else
       respond_to do |format|
@@ -145,9 +147,9 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   private
-    def check_employee_role
-      if current_user.has_employee_role?
-        redirect_to family_account_path
-      end
+  def check_employee_role
+    if current_user.has_employee_role?
+      redirect_to family_account_path
     end
+  end
 end
