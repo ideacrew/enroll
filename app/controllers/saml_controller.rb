@@ -26,9 +26,6 @@ class SamlController < ApplicationController
         new_user.save!
         sign_in(:user, new_user)
         redirect_to search_insured_consumer_role_index_path
-        # TODO redirect_to search_insured_employee_index_path   FOR EMPLOYEES
-        # TODO redirect_to  employer
-        # TODO redirect_to  broker
       end
     else
       log("ERROR: SAMLResponse assertion errors #{response.errors}", {:severity => "error"})
