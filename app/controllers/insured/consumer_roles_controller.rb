@@ -32,7 +32,7 @@ class Insured::ConsumerRolesController < ApplicationController
         end
         case idp_search_result
         when :service_unavailable
-          format.html { render 'shared/idp_unavailable' }
+          format.html { render 'shared/account_lookup_service_unavailable' }
         when :too_many_matches
           format.html { render 'idp_identity_conflict' }
         when :existing_account
