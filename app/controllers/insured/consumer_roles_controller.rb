@@ -54,9 +54,9 @@ class Insured::ConsumerRolesController < ApplicationController
   def create
     @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
     @person = @consumer_role.person
-    is_assisted = session[:individual_assistance_path]
+    is_assisted = session["individual_assistance_path"]
     role_for_user = (is_assisted) ? "assisted_individual" : "individual"
-    create_sso_account(current_user, stashed_user_password, @person, 15, role_for_user) do
+    create_sso_account(current_user, @person, 15, role_for_user) do
       respond_to do |format|
         format.html { 
           if is_assisted
@@ -179,7 +179,4 @@ class Insured::ConsumerRolesController < ApplicationController
     end
   end
 
-  def stashed_user_password
-    session["stashed_password"]
-  end
 end

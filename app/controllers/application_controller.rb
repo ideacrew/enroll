@@ -167,12 +167,12 @@ class ApplicationController < ActionController::Base
     real_user
   end
 
-  def create_sso_account(user, password, personish, timeout, account_role = "individual")
+  def create_sso_account(user, personish, timeout, account_role = "individual")
     idp_account_created = nil
     if user.idp_verified?
       idp_account_created = :created
     else
-      idp_account_created = IdpAccountManager.create_account(user.email, password, personish, account_role, timeout)
+      idp_account_created = IdpAccountManager.create_account(user.email, stashed_user_password, personish, account_role, timeout)
     end
     case idp_account_created
     when :created
@@ -185,6 +185,10 @@ class ApplicationController < ActionController::Base
         format.html { render 'shared/idp_unavailable' }
       end
     end
+  end
+
+  def stashed_user_password
+    session["stashed_password"]
   end
 
 end
