@@ -2,6 +2,7 @@
   <div class="col-xs-12" id='plan_year'>
       <div class="row">
         <div class="col-xs-12 planyear-add-tab">
+          <div id="choose-coverage">
           <h1>Coverage - Choose your Coverage Year</h1>
           <% if @plan_year.errors.any? %>
             <div class="alert-plan-year alert-error">
@@ -28,10 +29,11 @@
             </div>
           <% end %>
 
+
           <%= render "shared/plan_year_fields", f: f %>
-  
-          <div style="display: none">
-          <h3>Benefit Groups</h3>
+</div>
+          <div style="display: none;" class="benefits-setup-tab">
+          <h1>Coverage - Setup Benefits Packages for your Employees</h1>
           <div class='form-inputs'>
             <a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
             <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>

@@ -171,8 +171,11 @@
     .recommend {
       .panel {
         padding-bottom: 15px;
+        background-color: transparent;
         .panel-heading {
           text-transform: uppercase;
+          background-color: transparent;
+
           h3 {
             font-weight: bold;
             color: #333333;
@@ -192,6 +195,7 @@
           span {
             display: inline-block;
             text-align: center;
+
             h3.day {
               padding-top: 15px;
               display: block;
@@ -212,9 +216,243 @@
         }
       }
     }
+
+  }
+  .benefits-setup-tab {
+    .row-form-wrapper {
+      margin: 0;
+      padding: 15px 0 20px;
+
+    }
+    .form-group {
+      &.header {
+        padding: 20px 20px;
+        h3 {
+          margin: 0;
+          font-weight: 600;
+          width: 100%;
+          font-size: 20px;
+          .form-functions {
+            float: right;
+          }
+        }
+      }
+      label {
+        text-transform: uppercase;
+        margin-top: 5px;
+        font-size: 14px;
+      }
+      .selectric {
+        p.label {
+          font-size: 18px;
+          margin-top: 5px;
+        }
+      }
+
+    }
+    .offerings {
+
+
+      .row-form-wrapper.heading {
+        text-transform: uppercase;
+        font-size: 14px;
+        padding: 10px 0;
+
+        color: rgb(131, 135, 128);
+        border-bottom: none;
+        border-left: solid 1px #d5d5d5;
+        border-right: solid 1px #d5d5d5;
+
+        &+.benefits-fields {
+          background-color: #ffffff;
+          border-left: solid 1px #d5d5d5;
+          border-right: solid 1px #d5d5d5;
+          border-bottom: solid 1px #d5d5d5;
+        }
+        .col-xs-4 {
+          border-bottom: solid 1px #d5d5d5;
+          padding: 15px 0 25px;
+          text-align: center;
+
+        }
+        .row-form-wrapper {
+          border: none;
+          border-left: solid 1px #d5d5d5;
+          border-top: none;
+
+        }
+        &+.row-form-wrapper {
+            border-top: none;
+
+
+        }
+      }
+    .row-form-wrapper {
+      border: none;
+    }
+
+    }
+    ul.nav-tabs {
+        li {
+          margin-right: 15px;
+          background-color: #007bc4;
+          border-bottom: solid 3px #003260;
+          border-radius: 6px;
+          &:hover {
+            background-color: #003260;
+          }
+          &.active {
+            background-color: transparent;
+            border: none;
+            a {
+              color: #007bc4;
+              text-transform: uppercase;
+              font-size: 12px;
+              background-color: transparent;
+
+              &:hover {
+                background-color: transparent;
+                border-radius: 0;
+              }
+            }
+          }
+          a {
+            color: #ffffff;
+            text-transform: uppercase;
+            font-size: 12px;
+
+            &:hover {
+              background-color: inherit;
+              border-radius: inherit;
+            }
+            label {
+              font-weight: bold;
+            }
+        }
+      }
+      input[type=radio] {
+        display: none;
+      }
+      input[type=radio] + label {
+
+        &>i {
+          font-size: 28px;
+          color: #b7b7b7;
+
+
+
+          &:first-of-type {
+            display: inline-block;
+
+          }
+          &:last-of-type {
+            display: none;
+          }
+        }
+      }
+      input[type=radio]:checked + label {
+
+        &>i {
+          color: #69A30D;
+          &:first-of-type {
+            display: none;
+          }
+          &:last-of-type {
+            display: inline-block;
+          }
+        }
+      }
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+
+    }
+    input[type=radio] {
+      display: inline-block;
+    }
+    input[type=number] {
+       text-align: center;
+       font-weight: bold;
+       font-size: 16px;
+       width: 50px;
+       display: block;
+       margin: auto;
+     }
+   input[type=checkbox] {
+      display: none;
+      + label > i.fa {
+        color: #69A30D;
+      }
+    }
+    .checkbox {
+      display: block;
+      margin: auto;
+      padding-left: 15%;
+    }
+    .checkbox {
+      &>div {
+        display: inline-block;
+        margin: auto;
+      }
+    }
+    .checkbox label {
+      padding-left: 0;
+    }
+    .checkbox label label {
+      display: inline;
+      padding-left: 0;
+    }
+    .checkbox label label + span {
+      display: inline-block;
+      position: relative;
+      text-transform: capitalize;
+      font-size: 16px;
+      top: -5px;
+      left: 10px;
+    }
+    input[type=checkbox]:disabled + label i {
+      color: #b7b7b7;
+      cursor: not-allowed;
+    }
+    input[type=checkbox] + label i {
+      &:first-of-type {
+        display: none;
+
+      }
+      &:last-of-type {
+        display: inline-block;
+        width: 30px;
+      }
+    }
+    input[type=checkbox]:checked + label i {
+      &:first-of-type {
+        display: inline-block;
+        width: 30px;
+      }
+      &:last-of-type {
+        display: none;
+      }
+    }
+
   }
   .home-tab, .employees-tab, .employee-add-tab, .benefits-tab,
   .planyear-add-tab, .brokers-tab, .employer-tab, .employer-edit-tab {
+    .btn-primary {
+      text-transform: uppercase;
+      width: 25%;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 16px;
+      letter-spacing: 1px;
+      margin-bottom: 45px;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+
+    }
     h1 {
       margin-top: 0;
       color: #003260;
@@ -544,6 +782,7 @@
     }
     .fa {
       color: #007bc4;
+      cursor: pointer;
     }
   }
 
