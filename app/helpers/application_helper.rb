@@ -476,4 +476,10 @@ module ApplicationHelper
     value = value.select{|a| a.present? }  if value.present?
     value.present? ? value.join(", ") : ""
   end
+
+  def incarceration_cannot_purchase(family_member)
+    pronoun = family_member.try(:gender)=='male' ? ' he ':' she '
+    name=family_member.try(:first_name) || ''
+    result = "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on DC Health Link.<br/> Other family members may still be eligible to enroll. <br/>Please call us at 1-855-532-5465 to learn about other health insurance options for " + name
+  end
 end
