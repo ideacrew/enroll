@@ -62,6 +62,7 @@ class TimeKeeper
   end
 
   def push_date_of_record
+    BenefitSponsorship.advance_day(self.date_of_record)
     EmployerProfile.advance_day(self.date_of_record)
     Family.advance_day(self.date_of_record)
   end

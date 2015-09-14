@@ -105,6 +105,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(consumer_role3).to receive(:is_incarcerated?).and_return(false)
       controller.request.path_parameters[:person_id] = jail_person.id
       controller.request.path_parameters[:consumer_role_id] = consumer_role.id
+      allow(family_member4).to receive(:first_name).and_return('joey')
+      allow(family_member4).to receive(:gender).and_return('female')
       render :template => "insured/group_selection/new.html.erb"
     end
 
@@ -134,7 +136,13 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       expect(rendered).to have_selector('label', text: 'Dental')
     end
 
-
+    it "should have an incarceration warning with more text" do
+      expect(rendered).to match /Other family members may still be eligible to enroll/
+    end
+ 
+    it "should match the pronoun in the text" do
+      expect(rendered).to match /, she is not eligible/
+    end
 
   end
 

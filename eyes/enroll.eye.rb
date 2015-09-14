@@ -38,8 +38,8 @@ Eye.application 'eye_enroll' do
     #
     monitor_children do
       stop_command "kill -QUIT {PID}"
-      check :cpu, :every => 30, :below => 80, :times => [3,5]
-      check :memory, :every => 30, :below => 600.megabytes, :times => [4,7]
+      check :cpu, :every => 30, :below => 95, :times => [3,5]
+      check :memory, :every => 30, :below => 900.megabytes, :times => [4,7]
     end
   end
 
