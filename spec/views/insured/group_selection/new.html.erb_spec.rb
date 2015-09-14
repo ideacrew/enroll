@@ -87,6 +87,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:family_member4) { instance_double("FamilyMember",id: "family_member", primary_relationship: "self", dob: Date.new(1990,10,28), full_name: "inmsr", is_primary_applicant: true, person: jail_person) }
     let(:coverage_household_jail) { instance_double("CoverageHousehold",family_members: [family_member4, family_member2, family_member3]) }
     let(:hbx_enrollment) {double(id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
+    let(:benefit_sponsorship) {double(earliest_effective_date: TimeKeeper.date_of_record.beginning_of_year)}
+    let(:current_hbx) {double(benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: true)}
 
     before(:each) do
       assign(:person, jail_person)
@@ -95,6 +97,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign(:market_kind, 'individual')
       assign(:benefit, benefit_package)
       assign(:hbx_enrollment, hbx_enrollment)
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
       allow(jail_person).to receive(:consumer_role).and_return(consumer_role)
       allow(person2).to receive(:consumer_role).and_return(consumer_role2)
       allow(consumer_role2).to receive(:is_incarcerated?).and_return(false)

@@ -20,7 +20,7 @@
           <% if @enrollment.employee_role.present? %>
             <%= render "insured/plan_shoppings/coverage_information" %>
           <%else%>
-            <%= render "insured/plan_shoppings/individual_coverage_information" %>
+            <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate:false} %>
           <% end %>
         </div>
 
