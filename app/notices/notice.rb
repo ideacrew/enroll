@@ -60,6 +60,34 @@ class Notice
     end
   end
 
+  def attach_blank_page
+    page_count = Prawn::Document.new(:template => @notice_path).page_count
+    if (page_count % 2) == 1
+      join_pdfs [@notice_path, @blank_sheet_path]
+    end
+  end
+
+  def attach_dchl_rights
+    join_pdfs [@notice_path, @dchl_rights]
+  end
+
+  def attach_voter_registration
+    join_pdfs [@notice_path, @voter_registration]
+  end
+
+  def prepend_envelope
+    generate_envelope
+    join_pdfs [@envelope_path, @notice_path]
+  end
+
+  private
+
+  def generate_envelope
+    envelope = Notices::Envelope.new 
+    envelope.fill_envelope(@notice)
+    envelope.render_file(@envelope_path)
+  end
+
   def join_pdfs(pdfs)
     Prawn::Document.generate(@notice_path, {:page_size => 'LETTER', :skip_page_creation => true}) do |pdf|
       pdfs.each do |pdf_file|
@@ -72,31 +100,6 @@ class Notice
         end
       end
     end
-  end
-
-  def attach_blank_page
-    page_count = Prawn::Document.new(:template => @notice_path).page_count
-    if (page_count % 2) == 1
-      join_pdfs [@notice_path, @blank_sheet_path]
-    end
-  end
-
-  def append_dc_rights
-    join_pdfs [@notice_path, @dchl_rights]
-  end
-
-  def attach_voter_registration
-    join_pdfs [@notice_path, @voter_registration]
-  end
-
-  def generate_envelope
-    envelope = Notices::Envelope.new 
-    envelope.fill_envelope(@notice)
-    envelope.render_file(@envelope_path)
-  end
-
-  def prepend_envelope
-    join_pdfs [@envelope_path, @notice_path]
   end
 end
 

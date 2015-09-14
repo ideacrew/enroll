@@ -18,9 +18,15 @@ class IndividualNoticeBuilder < EligibilityNoticeBuilder
     append_individual
   end
 
+  def create_notice
+    generate_notice
+    attach_blank_page
+    attach_dchl_rights
+    prepend_envelope
+  end
+
   def init_benefit
-    hbx = HbxProfile.find_by_state_abbreviation("dc")
-    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
+    bc_period = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
     pkgs = bc_period.benefit_packages
     benefit_package = pkgs.select{|plan|  plan[:title] == "individual_health_benefits_2015"}
     @benefit = benefit_package.first
