@@ -2,10 +2,10 @@ require 'rails_helper'
 
 RSpec.describe BenefitSponsorship, :type => :model do
 
-  context "an Employer is instantiated as the benefit sponsor" do
+  context "when an Employer is instantiated as the benefit sponsor" do
   end
 
-  context "an HBX is instantiated as a benefit sponsor" do
+  context "when an HBX is instantiated as a benefit sponsor" do
     let(:hbx_profile)             { FactoryGirl.create(:hbx_profile) }
     let(:service_markets)         { %w(individual) }
 
@@ -33,8 +33,8 @@ RSpec.describe BenefitSponsorship, :type => :model do
     end
 
     context "with all required arguments" do
-      let(:params)              { valid_params }
-      let(:benefit_sponsorship) { BenefitSponsorship.new(**params) }
+      let(:params)                  { valid_params }
+      let(:benefit_sponsorship)     { BenefitSponsorship.new(**params) }
       let(:geographic_rating_area)  { FactoryGirl.build(:geographic_rating_area) }
 
       it "should be valid" do
@@ -52,10 +52,10 @@ RSpec.describe BenefitSponsorship, :type => :model do
           expect(BenefitSponsorship.find(benefit_sponsorship.id)).to eq benefit_sponsorship
         end
 
-        context "and a benefit coverage period is defined" do
+        context "and a benefit coverage period is defined with open enrollment start/end dates" do
           let(:benefit_coverage_period) { FactoryGirl.build(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
 
-          context "when under open enrollment" do
+          context "when system date is during open enrollment period" do
             before do
               benefit_sponsorship.benefit_coverage_periods = benefit_coverage_period.to_a
             end
@@ -65,7 +65,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
             end
           end
 
-          context "when open enrollment is closed" do
+          context "when system date is outside open enrollment period" do
             let(:benefit_coverage_period) { FactoryGirl.build(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record + 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 40.days) }
 
             before do
@@ -107,10 +107,34 @@ RSpec.describe BenefitSponsorship, :type => :model do
           it 'should return next year as the renewal benefit coverage period' do 
             expect(benefit_sponsorship.renewal_benefit_coverage_period).to eq(benefit_coverage_period_next_year)
           end
+
+          context "and today's date is before the deadline for first-of-next-month enrollment" do
+            let(:enroll_date)              { Date.current.end_of_month + 15.days }
+            let(:first_of_next_month_date) { enroll_date.end_of_month + 1.day }
+
+            before do
+              TimeKeeper.set_date_of_record_unprotected!(enroll_date)
+            end
+
+            it 'should return first-of-next-month as the earliest effective date' do 
+              expect(benefit_sponsorship.earliest_effective_date).to eq first_of_next_month_date
+            end
+          end
+
+          context "and today's date is after the deadline for first-of-next-month enrollment" do
+            let(:enroll_date)                   { Date.current.end_of_month + 16.days }
+            let(:first_of_following_month_date) { enroll_date.next_month.end_of_month + 1.day }
+
+            before do
+              TimeKeeper.set_date_of_record_unprotected!(enroll_date)
+            end
+
+            it 'should return first-of-following-month as the earliest effective date' do 
+              expect(benefit_sponsorship.earliest_effective_date).to eq first_of_following_month_date
+            end
+          end
+
         end
-
-
-
       end
     end
   end
