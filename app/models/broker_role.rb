@@ -189,7 +189,7 @@ class BrokerRole
       transitions from: :applicant, to: :broker_agency_pending
     end
 
-    event :broker_agency_accept, :after => :record_transition do 
+    event :broker_agency_accept, :after => [:record_transition, :send_invitation] do 
       transitions from: :broker_agency_pending, to: :active
     end
 
