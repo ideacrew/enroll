@@ -14,6 +14,6 @@ module WickedPdfHelper
       raise 'Invalid platform. Must be running linux or intel-based Mac OS.'
     end
 
-    WickedPdf.config = { exe_path: "#{Gem.bin_path('wkhtmltopdf-binary').match(/(.+)\/.+/).captures.first}/#{executable}" }
+    WickedPdf.config = { exe_path: "/usr/local/bin/wkhtmltopdf" }
   end
 end
