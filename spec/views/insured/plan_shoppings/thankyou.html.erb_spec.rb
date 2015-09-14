@@ -45,7 +45,7 @@ RSpec.describe "insured/thankyou.html.erb" do
       @enrollment = hbx_enrollment
       @benefit_group = @enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
-      @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
+      @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment)
       allow(@plan).to receive(:carrier_profile).and_return(carrier_profile)
     end
 

@@ -29,7 +29,7 @@ class BenefitSponsorship
   end
 
   def earliest_effective_date
-    current_benefit_coverage_period.earliest_effective_date
+    current_benefit_coverage_period.earliest_effective_date if current_benefit_coverage_period
   end
 
   def is_under_open_enrollment?

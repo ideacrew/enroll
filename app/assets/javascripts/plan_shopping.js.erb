@@ -131,6 +131,17 @@ function applyPlanSort(sort_by){
   $("#all-plans #plans").empty().append(plandivs);
 };
 
+function updatePlanCost(elected_pct) {
+  var elected_amount = parseFloat($('#max_aptc').val()) * parseFloat(elected_pct);
+  var plans = $('.plan-row');
+  for(var i=0; i<plans.length; i++){
+    var plan = plans[i];
+    var premium_resp_amt = parseFloat($(plan).data('plan-metal-premium')) - elected_amount;
+    premium_resp_amt = premium_resp_amt.toFixed(2);
+    $(plan).find('h2.plan-premium').html("$" + premium_resp_amt);
+  };
+};
+
 $(function() {
   $(document).on('click', "#select-plan-container a[role='tab'][data-toggle='tab']", function(){
 		hidePlanTabs();
@@ -158,6 +169,20 @@ $(function() {
 
   $(document).on('click', '.all-filters-row .apply-btn', function(){
 		applyPlanFilters();
+
+    if ($('.atpc').length > 0){
+      var elected_pct = $("input[name='elected_pct']").val()
+
+      updatePlanCost(elected_pct);
+      $.ajax({
+        type: "POST",
+        url: $('#set_elected_pct_url').val(),
+        dataType: 'script',
+        data: {
+          'elected_pct': elected_pct
+        }
+      });
+    };
   });
 
   $(document).on('click', '.all-filters-row .reset-btn', function(){
@@ -284,3 +309,4 @@ function calcEmployerContributions(url) {
 $(document).on("click", ".reference_plan_info h4 span", function() {
   $(this).parents(".reference_plan_info").find('.content').toggle();
 });
+

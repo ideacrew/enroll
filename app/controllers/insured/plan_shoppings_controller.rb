@@ -15,7 +15,12 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
     else
-      decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
+      get_aptc_info_from_session
+      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, @elected_aptc_pct, tax_household)
+
+      hbx_enrollment.update_hbx_enrollment_members_premium(decorated_plan)
+      hbx_enrollment.update_current(elected_aptc_pct: @elected_aptc_pct, elected_amount: @elected_aptc_pct*@max_aptc, applied_aptc_amount: decorated_plan.total_aptc_amount)
     end
     # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
@@ -41,7 +46,8 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
     else
-      @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
+      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.elected_aptc_pct, tax_household)
       @market_kind = "individual"
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
@@ -63,7 +69,9 @@ class Insured::PlanShoppingsController < ApplicationController
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     else
-      @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment)
+      get_aptc_info_from_session
+      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment, @elected_aptc_pct, tax_household)
     end
     @family = @person.primary_family
     #FIXME need to implement can_complete_shopping? for individual
@@ -124,6 +132,21 @@ class Insured::PlanShoppingsController < ApplicationController
     @waivable = @hbx_enrollment.can_complete_shopping?
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
+
+    #TODO get max_aptc from EligibilityDetermination
+    if @person.has_active_consumer_role?
+      #TODO generate tax_household for current user
+      generate_tax_households
+      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      @max_aptc = tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
+      session[:max_aptc] = @max_aptc
+      session[:selected_aptc_pct] = 0.8
+    end
+  end
+
+  def set_elected_pct
+    session[:elected_aptc_pct] = params[:elected_pct].to_f rescue 0.8
+    render json: 'ok'
   end
 
   def plans
@@ -178,5 +201,21 @@ class Insured::PlanShoppingsController < ApplicationController
   def set_kind_for_market_and_coverage
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
+  end
+
+  def get_aptc_info_from_session
+    @max_aptc = session[:max_aptc].to_f rescue 0
+    elected_aptc_pct = session[:elected_aptc_pct]
+    @elected_aptc_pct = elected_aptc_pct.present? ? elected_aptc_pct.to_f : 0.8
+  end
+
+  def generate_tax_households
+    household = current_user.person.primary_family.latest_household
+    if household.tax_households.blank?
+      tax_household = household.tax_households.create(allocated_aptc: 330, effective_starting_on: TimeKeeper.date_of_record - 1.month, effective_ending_on: TimeKeeper.date_of_record + 2.month, submitted_at: TimeKeeper.date_of_record)
+      household.family.family_members.each do |member|
+        tax_household.tax_household_members.create(applicant_id: member.id, is_ia_eligible: true, is_subscriber: true)
+      end
+    end
   end
 end

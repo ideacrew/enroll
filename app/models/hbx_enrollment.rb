@@ -29,6 +29,10 @@ class HbxEnrollment
 
   field :elected_premium_credit, type: Money, default: 0.0
   field :applied_premium_credit, type: Money, default: 0.0
+  # TODO need to understand these two fields
+  field :elected_aptc_pct, type: Float, default: 0.0
+  field :elected_amount, type: Money, default: 0.0
+  field :applied_aptc_amount, type: Money, default: 0.0
 
   field :effective_on, type: Date
   field :terminated_on, type: Date
@@ -252,6 +256,15 @@ class HbxEnrollment
 
   def update_current(updates)
     household.hbx_enrollments.where(id: id).update_all(updates)
+  end
+
+  def update_hbx_enrollment_members_premium(decorated_plan)
+    return if decorated_plan.blank? and hbx_enrollment_members.blank?
+
+    hbx_enrollment_members.each do |member|
+      #TODO update applied_aptc_amount error like hbx_enrollment
+      member.update_current(applied_aptc_amount: decorated_plan.aptc_amount(member))
+    end
   end
 
   # FIXME: not sure what this is or if it should be removed - Sean

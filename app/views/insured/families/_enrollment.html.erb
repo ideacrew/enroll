@@ -20,6 +20,13 @@
               <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong><%= hbx_enrollment.try(:subscriber).try(:person).try(:hbx_id) %></strong>
             </p>
           </div>
+          <% if hbx_enrollment.consumer_role.present? %>
+            <div>
+              <p>
+                <label>APTC amount:</label> <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount) %></strong>/month
+              </p>
+            </div>
+          <% end %>
             <% names = hbx_enrollment.covered_members_first_names %>
             <div class="family-members">
               <p>

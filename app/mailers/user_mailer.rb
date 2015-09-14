@@ -40,4 +40,10 @@ class UserMailer < ApplicationMailer
       format.html {render "generic_consumer", locals: {first_name: first_name, hbx_id: hbx_id}}
     end
   end
+
+  def broker_denied_notification(broker_role)
+    mail({to: broker_role.email_address, subject: "Broker application denied"}) do |format|
+      format.html { render "broker_denied", :locals => { :applicant_name => broker_role.person.full_name }}
+    end
+  end
 end
