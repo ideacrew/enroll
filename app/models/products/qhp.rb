@@ -32,7 +32,6 @@ class Products::Qhp
   field :is_specialist_referral_required, type: String
   field :health_care_specialist_referral_type, type: String, default: ""
   field :insurance_plan_benefit_exclusion_text, type: String
-  field :ehb_percent_premium, type: String
 
   field :indian_plan_variation, type: String  # amount per enrollee
 
@@ -87,12 +86,12 @@ class Products::Qhp
     cascade_callbacks: true,
     validate: true
 
-  embeds_many :qhp_cost_share_variances,
+  embeds_one :qhp_cost_share_variance,
     class_name: "Products::QhpCostShareVariance",
     cascade_callbacks: true,
     validate: true
 
-  accepts_nested_attributes_for :qhp_benefits, :qhp_cost_share_variances
+  accepts_nested_attributes_for :qhp_benefits, :qhp_cost_share_variance
 
   index({"issuer_id" => 1})
   index({"state_postal_code" => 1})
