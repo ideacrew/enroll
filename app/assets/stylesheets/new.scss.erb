@@ -219,6 +219,7 @@
 
   }
   .benefits-tab {
+
     .package-offering {
       border: solid 1px #b7b7b7;
 
@@ -265,6 +266,8 @@
           th {
             font-weight: normal;
             color: #b7b7b7;
+            font-size: 12px;
+            text-transform: uppercase;
           }
           td {
             color: #333333;
@@ -272,6 +275,34 @@
             &:last-of-type {
               padding-left: 0;
             }
+          }
+        }
+      }
+      .col-xs-4 {
+        text-transform: uppercase;
+        span {
+          color: #b7b7b7;
+          font-size: 12px;
+          text-transform: uppercase;
+          &+h2 {
+            margin: 0;
+            font-size: 36px;
+          }
+
+        }
+      }
+      .col-xs-8 {
+        table {
+          tr {
+            th {
+              padding-bottom: 20px;
+            }
+            td {
+              border-top: solid 1px #d5d5d5;
+              font-size: 12px;
+              padding-top: 10px;
+            }
+
           }
         }
       }
