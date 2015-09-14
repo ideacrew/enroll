@@ -408,7 +408,9 @@ private
       :eligible_immigration_status,
       :indian_tribe_member,
       {:ethnicity => []},
-      :tribal_id
+      :tribal_id,
+      :no_dc_address,
+      :no_dc_address_reason
     ]
   end
 

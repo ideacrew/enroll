@@ -13,6 +13,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:person_id) { "5234234" }
     let(:employee_role) { double(:id => employee_role_id, :employer_profile => employer_profile, :benefit_group => benefit_group, :census_employee => census_employee) }
     let(:person) { Person.new }
+    let(:user) {FactoryGirl.create(:user)}
     let(:role_form) {
       Forms::EmployeeRole.new(person, employee_role)
     }
@@ -24,6 +25,11 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(Forms::EmployeeRole).to receive(:new).with(person, employee_role).and_return(role_form)
       allow(benefit_group).to receive(:effective_on_for).with("whatever").and_return(effective_date)
       allow(role_form).to receive(:update_attributes).with(person_parameters).and_return(save_result)
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:employee_roles).and_return([employee_role])
+      allow(employee_role).to receive(:save!).and_return(true)
+      allow(employee_role).to receive(:bookmark_url=).and_return(true)
+      sign_in user
       put :update, :person => person_parameters, :id => person_id
     end
 
@@ -241,10 +247,13 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
   describe "GET search" do
     let(:user) { double("user") }
     let(:person) { double("person")}
-
+    
     before(:each) do
       allow(user).to receive(:has_employee_role?).and_return(false)
       allow(user).to receive(:has_consumer_role?).and_return(false)
+      allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:last_portal_visited=).and_return(true)
+      allow(user).to receive(:save!).and_return(true)
       sign_in(user)
       get :search
     end
@@ -259,11 +268,16 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
   describe "GET welcome" do
     let(:user) { double("user") }
     let(:person) { double("person")}
+    let(:employee_role) {FactoryGirl.create(:employee_role)}
 
     it "renders the 'welcome' template when user has no employee role" do
       allow(user).to receive(:has_employee_role?).and_return(false)
       allow(user).to receive(:has_consumer_role?).and_return(false)
+      allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:last_portal_visited=).and_return(true)
+      allow(user).to receive(:save!).and_return(true)
       sign_in(user)
+      allow(user).to receive(:person).and_return(person)
       get :welcome
       expect(response).to have_http_status(:success)
       expect(response).to render_template("welcome")
@@ -272,6 +286,11 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     it "renders the 'my account' template when user has employee role" do
       allow(user).to receive(:has_employee_role?).and_return(true)
       allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:last_portal_visited=).and_return(family_account_path)
+
+      allow(user).to receive(:save!).and_return(true)
+      allow(person).to receive(:employee_roles).and_return([employee_role])
+      allow(employee_role).to receive(:bookmark_url).and_return(family_account_path)
       sign_in(user)
       get :welcome
       expect(response).to have_http_status(:redirect)

@@ -40,6 +40,26 @@ class ApplicationController < ActionController::Base
     render file: 'public/403.html', status: 403
   end
 
+  def create_sso_account(user, personish, timeout, account_role = "individual")
+    idp_account_created = nil
+    if user.idp_verified?
+      idp_account_created = :created
+    else
+      idp_account_created = IdpAccountManager.create_account(user.email, stashed_user_password, personish, account_role, timeout)
+    end
+    case idp_account_created
+    when :created
+      session[:person_id] = personish.id
+      session.delete("stashed_password")
+      user.switch_to_idp!
+      yield
+    else
+      respond_to do |format|
+        format.html { render 'shared/idp_unavailable' }
+      end
+    end
+  end
+
   private
 
 
@@ -167,23 +187,24 @@ class ApplicationController < ActionController::Base
     real_user
   end
 
-  def create_sso_account(user, personish, timeout, account_role = "individual")
-    idp_account_created = nil
-    if user.idp_verified?
-      idp_account_created = :created
-    else
-      idp_account_created = IdpAccountManager.create_account(user.email, stashed_user_password, personish, account_role, timeout)
+  def set_employee_bookmark_url(url=nil)
+    set_current_person
+    role = @person.try(:employee_roles).try(:last)
+    bookmark_url = url || request.original_url
+    if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
+      role.bookmark_url = bookmark_url
+      role.try(:save!)
     end
-    case idp_account_created
-    when :created
-      session[:person_id] = @person.id
-      session.delete("stashed_password")
-      user.switch_to_idp!
-      yield
-    else
-      respond_to do |format|
-        format.html { render 'shared/idp_unavailable' }
-      end
+  end
+
+  def set_consumer_bookmark_url(url=nil)
+    set_current_person
+    role = @person.try(:consumer_role)
+    bookmark_url = url || request.original_url
+    #no bookmark after visiting family_account_path
+    if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
+      role.bookmark_url = bookmark_url
+      role.try(:save!)
     end
   end
 

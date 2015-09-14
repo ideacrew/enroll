@@ -24,17 +24,14 @@ class BenefitSponsorship
     benefit_coverage_periods.detect { |bcp| bcp.contains?(TimeKeeper.date_of_record) }
   end
 
+  def earliest_effective_date
+    current_benefit_coverage_period.earliest_effective_date
+  end
+
   def is_under_open_enrollment?
     benefit_coverage_periods.any? do |benefit_coverage_period|
       benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
     end
-  end
-  
-  def earliest_effective_date
-    coverage_period = benefit_coverage_periods.detect do |benefit_coverage_period|
-      benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
-    end
-    coverage_period.earliest_effective_date if coverage_period
   end
 
 # effective_coverage_period
