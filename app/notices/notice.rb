@@ -8,7 +8,10 @@ class Notice
     @email_notice = args[:email_notice] || true
     @pdf_notice = args[:pdf_notice] || true
     @mailer = args[:mailer] || ApplicationMailer
-    @file_name = "notice.pdf"
+    @blank_sheet_path = Rails.root.join('lib/pdf_pages', 'blank.pdf')
+    @envelope_path = Rails.root.join('pdfs', 'envelope.pdf')
+    @voter_registration = Rails.root.join('lib/pdf_pages', 'voter_application.pdf')
+    @dchl_rights = Rails.root.join('lib/pdf_templates', 'dchl_rights.pdf')
   end
 
   def html
@@ -24,34 +27,25 @@ class Notice
       self.html,
       margin:  {  
         top: 15,
-        bottom: 40,
+        bottom: 30,
         left: 22,
         right: 22 
-      },
-      page_size: 'Letter',
-      formats: :html, 
-      encoding: 'utf8',
-      footer: { 
-        content: ApplicationController.new.render_to_string( { template: "notices/ivl/footer.html.erb", layout: false })
-      }
-    )
-  end
-
-  def deliver
-    send_email_notice if @email_notice
-    send_pdf_notice if @paper_notice
+        },
+        disable_smart_shrinking: true,
+        dpi: 96,
+        page_size: 'Letter',
+        formats: :html,
+        encoding: 'utf8',
+        footer: { 
+          content: ApplicationController.new.render_to_string({ 
+            template: "notices/ivl/footer.html.erb", 
+            layout: false 
+            })
+        })
   end
 
   def send_email_notice
     @mailer.notice_email(self).deliver_now
-  end
-
-  def send_pdf_notice
-    notice_path = Rails.root.join('pdfs', @file_name)
-    File.open(notice_path, 'wb') do |file|
-      file << self.pdf
-    end
-    append_dc_rights(notice_path)
   end
 
   def save_html
@@ -60,21 +54,49 @@ class Notice
     end
   end
 
-  def append_dc_rights(source)
-    legal_rights = Rails.root.join('lib/pdf_templates', 'dchl_rights.pdf')
-    join_pdfs([source, legal_rights])
+  def generate_pdf_notice
+    File.open(@notice_path, 'wb') do |file|
+      file << self.pdf
+    end
   end
 
   def join_pdfs(pdfs)
-    notice_path = Rails.root.join('pdfs', 'notice_combined.pdf')
-    join_pdf = CombinePDF.new
-    pdfs.each do |pdf_file|
-      if File.exists?(pdf_file)
-        join_pdf << CombinePDF.load(pdf_file)
+    Prawn::Document.generate(@notice_path, {:page_size => 'LETTER', :skip_page_creation => true}) do |pdf|
+      pdfs.each do |pdf_file|
+        if File.exists?(pdf_file)
+          pdf_temp_nb_pages = Prawn::Document.new(:template => pdf_file).page_count
+
+          (1..pdf_temp_nb_pages).each do |i|
+            pdf.start_new_page(:template => pdf_file, :template_page => i)
+          end
+        end
       end
     end
-    join_pdf.save notice_path
-    notice_path
+  end
+
+  def attach_blank_page
+    page_count = Prawn::Document.new(:template => @notice_path).page_count
+    if (page_count % 2) == 1
+      join_pdfs [@notice_path, @blank_sheet_path]
+    end
+  end
+
+  def append_dc_rights
+    join_pdfs [@notice_path, @dchl_rights]
+  end
+
+  def attach_voter_registration
+    join_pdfs [@notice_path, @voter_registration]
+  end
+
+  def generate_envelope
+    envelope = Notices::Envelope.new 
+    envelope.fill_envelope(@notice)
+    envelope.render_file(@envelope_path)
+  end
+
+  def prepend_envelope
+    join_pdfs [@envelope_path, @notice_path]
   end
 end
 
