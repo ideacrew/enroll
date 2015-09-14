@@ -66,7 +66,7 @@ puts "*"*80
 puts "Loading SERFF data"
 
 Products::Qhp.delete_all
-files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "**", "*.xml"))
+files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "*.xml"))
 qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
   puts file
   xml = Nokogiri::XML(File.open(file))
@@ -81,7 +81,7 @@ puts "*"*80
 puts "*"*80
 puts "Loading SERFF PLAN RATE data"
 
-files = Dir.glob(File.join(Rails.root, "db/seedfiles/rate_xmls", "**", "*.xml"))
+files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "rates", "**", "*.xml"))
 rate_import_hash = files.inject(QhpRateBuilder.new()) do |rate_hash, file|
   puts file
   xml = Nokogiri::XML(File.open(file))
