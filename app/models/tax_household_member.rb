@@ -53,6 +53,23 @@ class TaxHouseholdMember
     unless is_subscriber.is_a? Boolean
       self.errors.add(:base, "is_subscriber should be a boolean")
     end
+  end
 
+  def age_on_effective_date
+    return @age_on_effective_date unless @age_on_effective_date.blank?
+    person = Rails.cache.fetch("hbx_enrollment_member/person_age/#{family_member.person_id}") { family_member.person }
+    dob = person.dob
+    coverage_start_on = Forms::TimeKeeper.new.date_of_record
+    return unless coverage_start_on.present?
+    age = coverage_start_on.year - dob.year
+
+    # Shave off one year if coverage starts before birthday
+    if coverage_start_on.month == dob.month
+      age -= 1 if coverage_start_on.day < dob.day
+    else
+      age -= 1 if coverage_start_on.month < dob.month
+    end
+
+    @age_on_effective_date = age
   end
 end

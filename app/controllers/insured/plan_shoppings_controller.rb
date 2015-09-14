@@ -16,8 +16,11 @@ class Insured::PlanShoppingsController < ApplicationController
       decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
     else
       get_aptc_info_from_session
-      hbx_enrollment.update_current(elected_aptc_pct: @elected_aptc_pct, elected_amount: @elected_aptc_pct*@max_aptc)
-      decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, hbx_enrollment.elected_amount)
+      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, @elected_aptc_pct, tax_household)
+
+      hbx_enrollment.update_hbx_enrollment_members_premium(decorated_plan)
+      hbx_enrollment.update_current(elected_aptc_pct: @elected_aptc_pct, elected_amount: @elected_aptc_pct*@max_aptc, applied_aptc_amount: decorated_plan.total_aptc_amount)
     end
     # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
@@ -43,7 +46,8 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
     else
-      @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.elected_amount)
+      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.elected_aptc_pct, tax_household)
       @market_kind = "individual"
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
@@ -66,9 +70,8 @@ class Insured::PlanShoppingsController < ApplicationController
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     else
       get_aptc_info_from_session
-      elected_amount = @max_aptc * @elected_aptc_pct
-
-      @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment, elected_amount)
+      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment, @elected_aptc_pct, tax_household)
     end
     @family = @person.primary_family
     #FIXME need to implement can_complete_shopping? for individual
@@ -132,7 +135,8 @@ class Insured::PlanShoppingsController < ApplicationController
 
     #TODO get max_aptc from EligibilityDetermination
     if @person.has_active_consumer_role?
-      @max_aptc = 300
+      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      @max_aptc = tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
       session[:max_aptc] = @max_aptc
       session[:selected_aptc_pct] = 0.8
     end

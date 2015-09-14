@@ -23,7 +23,7 @@
           <% if hbx_enrollment.consumer_role.present? %>
             <div>
               <p>
-                <label>Elected APTC amount:</label> <strong><%= number_to_currency(hbx_enrollment.elected_amount) %></strong>/month
+                <label>APTC amount:</label> <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount) %></strong>/month
               </p>
             </div>
           <% end %>

@@ -10,6 +10,7 @@ class HbxEnrollmentMember
   field :is_subscriber, type: Boolean, default: false
 
   field :premium_amount, type: Money
+  field :applied_aptc_amount, type: Money
 
   field :eligibility_date, type: Date
   field :coverage_start_on, type: Date
@@ -30,6 +31,10 @@ class HbxEnrollmentMember
     self.hbx_enrollment.household.family.family_members.detect do |fm|
       fm.id == applicant_id
     end
+  end
+
+  def update_current(updates)
+    hbx_enrollment.hbx_enrollment_members.where(id: id).update_all(updates)
   end
 
   def primary_relationship

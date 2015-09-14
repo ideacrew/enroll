@@ -1,11 +1,13 @@
 class UnassistedPlanCostDecorator < SimpleDelegator
   attr_reader :member_provider
-  attr_reader :elected_amount
+  attr_reader :elected_pct
+  attr_reader :tax_household
 
-  def initialize(plan, hbx_enrollment, elected_amount=0)
+  def initialize(plan, hbx_enrollment, elected_pct=0, tax_household=nil)
     super(plan)
     @member_provider = hbx_enrollment
-    @elected_amount = elected_amount.to_f
+    @elected_pct = elected_pct.to_f
+    @tax_household = tax_household
   end
 
   def members
@@ -13,7 +15,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def plan_year_start_on
-    TimeKeeper.date_of_record.beginning_of_year
+    Forms::TimeKeeper.new.date_of_record.beginning_of_year
   end
 
   def age_of(member)
@@ -28,19 +30,17 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     0.0
   end
 
-  # TODO most of ehb from plan are 0.0 or 1 need to confirm that 0 is the correct ehb number
-  # Benchmark Plan Cost * APTC share pct
-  # Premium Amount * ehb
   def aptc_amount(member)
-    if @elected_amount > 0
-      [@elected_amount * (premium_for(member) / total_premium), premium_for(member) * ehb].reject{|amount| amount.to_f == 0}.min
+    if @tax_household.present?
+      aptc_available_hash = @tax_household.aptc_available_amount_for_enrollment(@member_provider, __getobj__, @elected_pct)
+      aptc_available_hash[member.applicant_id.to_s].try(:to_f) || 0
     else
       0
     end
   end
 
   def employee_cost_for(member)
-    premium_for(member)
+    premium_for(member) - aptc_amount(member)
   end
 
   def total_premium
@@ -54,7 +54,9 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_aptc_amount
-    @elected_amount
+    members.reduce(0) do |sum, member|
+      sum + aptc_amount(member)
+    end
   end
 
   def total_employee_cost
