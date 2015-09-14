@@ -36,7 +36,7 @@ class Insured::ConsumerRolesController < ApplicationController
         when :service_unavailable
           format.html { render 'shared/account_lookup_service_unavailable' }
         when :too_many_matches
-          format.html { render 'idp_identity_conflict' }
+          format.html { redirect_to SamlInformation.account_conflict_url }
         when :existing_account
           format.html { render 'redirect_to_recover_account' }
         else
