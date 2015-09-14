@@ -70,42 +70,38 @@ class BenefitSponsorship
   class << self
     def advance_day(new_date)
 
-      # BenefitSponsor activities that take place monthly - on first of month
-      hbx_profile.advance_day
-      hbx_profile.advance_month   if new_date.day == 1
-      hbx_profile.advance_quarter if new_date.day == 1 && [1, 4, 7, 10].include?(new_date.month)
-      hbx_profile.advance_year    if new_date.day == 1 && new_date.month == 1
+      hbx_sponsors = Organization.exists("hbx_profile.benefit_sponsorship": true).reduce([]) { |memo, org| memo << org.hbx_profile }
 
-
-
-        orgs = Organization.exists(:"employer_profile.employer_profile_account._id" => true).not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
-        orgs.each do |org|
-          org.employer_profile.employer_profile_account.advance_billing_period!
-        end
-
-      # Find employers with events today and trigger their respective workflow states
-      orgs = Organization.or(
-        {:"employer_profile.plan_years.start_on" => new_date},
-        {:"employer_profile.plan_years.end_on" => new_date - 1.day},
-        {:"employer_profile.plan_years.open_enrollment_start_on" => new_date},
-        {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day},
-        {:"employer_profile.workflow_state_transitions".elem_match => {
-            "$and" => [
-              {:transition_at.gte => (new_date.beginning_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
-              {:transition_at.lte => (new_date.end_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
-              {:to_state => "ineligible"}
-            ]
-          }
-        }
-      )
-
-      orgs.each do |org|
-        org.employer_profile.today = new_date
-        org.employer_profile.advance_date! if org.employer_profile.may_advance_date?
-        plan_year = org.employer_profile.published_plan_year
-        plan_year.advance_date! if plan_year && plan_year.may_advance_date?
-        plan_year
+      hbx_sponsors.each do |hbx_sponsor|
+        hbx_sponsor.advance_day
+        hbx_sponsor.advance_month   if new_date.day == 1
+        hbx_sponsor.advance_quarter if new_date.day == 1 && [1, 4, 7, 10].include?(new_date.month)
+        hbx_sponsor.advance_year    if new_date.day == 1 && new_date.month == 1
       end
+
+      # # Find families with events today and trigger their respective workflow states
+      # orgs = Organization.or(
+      #   {:"employer_profile.plan_years.start_on" => new_date},
+      #   {:"employer_profile.plan_years.end_on" => new_date - 1.day},
+      #   {:"employer_profile.plan_years.open_enrollment_start_on" => new_date},
+      #   {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day},
+      #   {:"employer_profile.workflow_state_transitions".elem_match => {
+      #       "$and" => [
+      #         {:transition_at.gte => (new_date.beginning_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
+      #         {:transition_at.lte => (new_date.end_of_day - HbxProfile::ShopApplicationIneligiblePeriodMaximum)},
+      #         {:to_state => "ineligible"}
+      #       ]
+      #     }
+      #   }
+      # )
+
+      # orgs.each do |org|
+      #   org.employer_profile.today = new_date
+      #   org.employer_profile.advance_date! if org.employer_profile.may_advance_date?
+      #   plan_year = org.employer_profile.published_plan_year
+      #   plan_year.advance_date! if plan_year && plan_year.may_advance_date?
+      #   plan_year
+      # end
     end
   end
 
