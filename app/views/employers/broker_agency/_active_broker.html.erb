@@ -2,8 +2,8 @@
 <div class="container">
 <div class="row no-buffer top-pd" id="active_broker_tab">
   <div class="col-xs-8">
-  <% if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
-  <% active_broker = @broker_agency_accounts[0].writing_agent %>
+  <% if @employer_profile.broker_agency_profile.present? && @broker_agency_account.writing_agent.present? %>
+  <% active_broker = @broker_agency_account.writing_agent %>
   <h4>Active Broker</h4>
   <div class="form-border">
     <dl class="dl-horizontal no-buffer">
@@ -12,7 +12,7 @@
       <dt>Broker Name</dt>
       <dd><%= active_broker.person.full_name %></dd>
       <dt>Selected On</dt>
-      <dd><%= format_date @broker_agency_accounts[0].start_on %></dd>
+      <dd><%= format_date @broker_agency_account.start_on %></dd>
       <dt>Email</dt>
       <dd>
       <a href="mailto:<%= active_broker.person.emails.first.address %>">

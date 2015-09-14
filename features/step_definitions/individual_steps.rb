@@ -39,6 +39,7 @@ Then(/user should see button to continue as an individual/) do
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do
+
   @browser.a(text: /continue as an individual/i).wait_until_present
   @browser.a(text: /continue as an individual/i).click
 end
@@ -61,8 +62,24 @@ Then(/Individual should see a form to enter personal information/) do
   screenshot("personal_form_bottom")
 end
 
+When(/Individual clicks on Save and Exit/) do
+   click_when_present(@browser.link(class: /interaction-click-control-save---exit/))
+end
+
 When(/Individual clicks on continue button/) do
   click_when_present(@browser.button(class: /interaction-click-control-continue/))
+end
+
+When (/Individual resumes enrollment/) do
+  @browser.a(text: /consumer\/family portal/i).wait_until_present
+  @browser.a(text: /consumer\/family portal/i).click
+  wait_and_confirm_text(/Sign In Existing Account/)
+  click_when_present(@browser.link(class: /interaction-click-control-sign-in-existing-account/))
+  @browser.text_field(class: /interaction-field-control-user-email/).set("taylor.york@example.com")
+  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
+  @browser.element(class: /interaction-click-control-sign-in/).click
+  sleep(2)
+  expect(@browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-1/).value).to eq("4900 USAA BLVD")
 end
 
 Then("Individual should see identity verification page and clicks on submit") do

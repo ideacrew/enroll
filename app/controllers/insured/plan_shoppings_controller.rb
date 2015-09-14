@@ -54,6 +54,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def thankyou
+    set_consumer_bookmark_url(family_account_path)
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
 
@@ -112,6 +113,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def show
+    set_consumer_bookmark_url(family_account_path)
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -125,6 +127,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def plans
+    set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @plans = @plans.sort_by(&:total_employee_cost)
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(plan_ids: @plans.map(&:id))
@@ -137,7 +140,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def send_receipt_emails
     UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, @person.emails.first.address).deliver_now
     body = render_to_string 'user_mailer/secure_purchase_confirmation.html.erb', layout: false
-    from_provider = HbxProfile.find_by_state_abbreviation('DC')
+    from_provider = HbxProfile.current_hbx
     message_params = {
       sender_id: from_provider.try(:id),
       parent_message_id: @person.id,

@@ -266,7 +266,6 @@ Then(/^.+ goes to the Consumer page$/) do
 end
 
 # Then(/^.+ is on the consumer home page$/) do
-#   binding.pry
 #   @browser.a(class: 'interaction-click-control-shop-for-plans').wait_until_present
 # end
 

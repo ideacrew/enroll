@@ -17,7 +17,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def setup
-    hbx = HbxProfile.find_by_state_abbreviation("dc")
+    hbx = HbxProfile.current_hbx
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bp| bp.start_on.year == 2015 }
     ivl_health_benefits_2015 = bc_period.benefit_packages.detect { |bp| bp.title == "individual_health_benefits_2015" }
 

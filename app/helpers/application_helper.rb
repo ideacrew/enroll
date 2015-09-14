@@ -456,14 +456,11 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    HbxProfile.find_by_state_abbreviation("DC").under_open_enrollment?
+    HbxProfile.current_hbx.under_open_enrollment?
   end
 
   def ivl_enrollment_effective_date
-    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").try(:benefit_sponsorship)
-    if benefit_sponsorship
-      benefit_sponsorship.earliest_effective_date
-    end
+    HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
   end
 
   def find_document(consumer_role, subject)

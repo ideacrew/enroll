@@ -187,6 +187,27 @@ class ApplicationController < ActionController::Base
     real_user
   end
 
+  def set_employee_bookmark_url(url=nil)
+    set_current_person
+    role = @person.try(:employee_roles).try(:last)
+    bookmark_url = url || request.original_url
+    if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
+      role.bookmark_url = bookmark_url
+      role.try(:save!)
+    end
+  end
+
+  def set_consumer_bookmark_url(url=nil)
+    set_current_person
+    role = @person.try(:consumer_role)
+    bookmark_url = url || request.original_url
+    #no bookmark after visiting family_account_path
+    if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
+      role.bookmark_url = bookmark_url
+      role.try(:save!)
+    end
+  end
+
   def stashed_user_password
     session["stashed_password"]
   end
