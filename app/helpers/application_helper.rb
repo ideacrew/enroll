@@ -436,10 +436,10 @@ module ApplicationHelper
 
   def ethnicity_collection
     [
-      ["White", "Black or African American", "Asian Indian" ],
-      ["Chinese", "Filipino", "Japanese", "Korean"], 
-      ["Vietnamese", "Other Asian", "Native Hawaiian", "Samon" ],
-      ["Guamanion or Chamorro", "Other pacific islander", "American Indian or Alaskan Native", "Other"]
+      ["White", "Black or African American", "Asian Indian", "Chinese" ],
+      ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], 
+      ["Native Hawaiian", "Samoan", "Guamanian or Chamorro", ],
+      ["Other Pacific Islander", "American Indian or Alaskan Native", "Other"]
     ].inject([]){ |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
     }
