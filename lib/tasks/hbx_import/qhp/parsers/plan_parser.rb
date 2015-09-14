@@ -8,12 +8,12 @@ module Parser
     tag 'plans'
 
     has_one :plan_attributes, Parser::PlanAttributesParser, tag: 'planAttributes'
-    has_one :cost_share_variance_list_attributes, Parser::CostShareVarianceParser, tag: 'costShareVariance', deep: true
+    has_many :cost_share_variance_list_attributes, Parser::CostShareVarianceParser, tag: 'costShareVariance', deep: true
 
     def to_hash
       {
         plan_attributes: plan_attributes.to_hash,
-        cost_share_variance_list_attributes: cost_share_variance_list_attributes.to_hash
+        cost_share_variance_list_attributes: cost_share_variance_list_attributes.map(&:to_hash)
       }
     end
   end
