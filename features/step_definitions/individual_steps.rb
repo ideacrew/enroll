@@ -151,7 +151,7 @@ And(/I click on continue button on household info form/) do
 end
 
 And(/I click on continue button on group selection page/) do
-  if !HbxProfile.find_by_state_abbreviation('DC').under_open_enrollment?
+  if !HbxProfile.current_hbx.under_open_enrollment?
     click_when_present(@browser.a(text: /I've had a baby/))
 
     @browser.text_field(id: /qle_date/).wait_until_present
