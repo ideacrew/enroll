@@ -135,6 +135,8 @@ class Insured::PlanShoppingsController < ApplicationController
 
     #TODO get max_aptc from EligibilityDetermination
     if @person.has_active_consumer_role?
+      #TODO generate tax_household for current user
+      generate_tax_households
       tax_household = current_user.person.primary_family.latest_household.tax_households.last
       @max_aptc = tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
       session[:max_aptc] = @max_aptc
@@ -205,5 +207,15 @@ class Insured::PlanShoppingsController < ApplicationController
     @max_aptc = session[:max_aptc].to_f rescue 0
     elected_aptc_pct = session[:elected_aptc_pct]
     @elected_aptc_pct = elected_aptc_pct.present? ? elected_aptc_pct.to_f : 0.8
+  end
+
+  def generate_tax_households
+    household = current_user.person.primary_family.latest_household
+    if household.tax_households.blank?
+      tax_household = household.tax_households.create(allocated_aptc: 330, effective_starting_on: TimeKeeper.date_of_record - 1.month, effective_ending_on: TimeKeeper.date_of_record + 2.month, submitted_at: TimeKeeper.date_of_record)
+      household.family.family_members.each do |member|
+        tax_household.tax_household_members.create(applicant_id: member.id, is_ia_eligible: true, is_subscriber: true)
+      end
+    end
   end
 end
