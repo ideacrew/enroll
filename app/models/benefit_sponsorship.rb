@@ -20,6 +20,20 @@ class BenefitSponsorship
 
   validates_presence_of :service_markets
 
+  def current_benefit_coverage_period
+    benefit_coverage_periods.detect { |bcp| bcp.contains?(TimeKeeper.date_of_record) }
+  end
+
+  def earliest_effective_date
+    current_benefit_coverage_period.earliest_effective_date if current_benefit_coverage_period
+  end
+
+  def is_under_open_enrollment?
+    benefit_coverage_periods.any? do |benefit_coverage_period|
+      benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
+    end
+  end
+
 # effective_coverage_period
 # HBX: Jan-Dec
 # Employers: year-over-year, e.g. Jun-May

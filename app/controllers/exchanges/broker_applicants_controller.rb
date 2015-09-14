@@ -43,10 +43,8 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       flash[:notice] = "Broker applicant decertified."
     else
       broker_role.approve!
-      if broker_role.active?
-        broker_role.reload
-        Invitation.invite_broker!(broker_role)
-      else
+      broker_role.reload
+      if broker_role.agency_pending?
         send_secure_message_to_broker_agency(broker_role) if broker_role.broker_agency_profile
       end
       flash[:notice] = "Broker applicant approved successfully."

@@ -189,6 +189,7 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
   scroll_then_click(@browser.li(text: /VA/))
   #@browser.text_field(id: /census_employee_address_attributes_state/).set("VA")
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mariah")
+  @browser.checkbox(id: /census_employee_is_business_owner/i).clear
   input_field = @browser.divs(class: "selectric-wrapper").last
   input_field.click
   input_field.li(text: /Child/).click

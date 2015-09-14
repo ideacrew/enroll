@@ -244,7 +244,106 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
   end
 end
 
+describe Forms::BrokerAgencyProfile, ".find" do
+  let(:organization) {FactoryGirl.create(:organization)}
+  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
 
+  before :each do
+    @form = Forms::BrokerAgencyProfile.find(broker_agency_profile.id)
+  end
 
+  it "should have correct organization info" do
+    expect(@form.id).to eq organization.id
+    expect(@form.legal_name).to eq organization.legal_name
+    expect(@form.dba).to eq organization.dba
+    expect(@form.fein).to eq organization.fein
+    expect(@form.home_page).to eq organization.home_page
+    expect(@form.office_locations).to eq organization.office_locations
+  end
 
+  it "should have broker_agency_profile info" do
+    expect(@form.entity_kind).to eq broker_agency_profile.entity_kind
+    expect(@form.market_kind).to eq broker_agency_profile.market_kind
+    expect(@form.languages_spoken).to eq broker_agency_profile.languages_spoken
+    expect(@form.working_hours).to eq broker_agency_profile.working_hours
+    expect(@form.accept_new_clients).to eq broker_agency_profile.accept_new_clients
+  end
 
+  it "should have correct npn" do
+    expect(@form.npn).to eq broker_agency_profile.primary_broker_role.try(:npn)
+  end
+end
+
+describe Forms::BrokerAgencyProfile, '.update_attributes' do
+  let(:organization) {FactoryGirl.create(:organization)}
+  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
+  let(:broker_role) { broker_agency_profile.primary_broker_role }
+  let(:person) { broker_role.person }
+
+  let(:attributes) { {
+    id: organization.id,
+    first_name: 'joe',
+    last_name: 'smith',
+    dob: "2015-06-01",
+    email: 'useraccount@gmail.com',
+    legal_name: organization.legal_name,
+    fein: organization.fein, 
+    dba: organization.dba,
+    home_page: 'dchealth.com',
+    entity_kind: broker_agency_profile.entity_kind,
+    market_kind: "individual",
+    languages_spoken: ["English"],
+    working_hours: "0", 
+    accept_new_clients: "0",
+    office_locations_attributes: office_locations
+    } }
+
+ let(:office_locations) { { 
+   "0" => { 
+     address_attributes: address_attributes, 
+     phone_attributes: phone_attributes
+   }
+   }}
+
+ let(:address_attributes) {
+   { 
+     kind: "primary",
+     address_1: "99 N ST", 
+     city: "washignton", 
+     state: "dc",
+     zip: "20006"
+   }
+ }
+
+ let(:phone_attributes) {
+   { 
+     kind: "phone main", 
+     area_code: "202", 
+     number: "324-2232"
+   }
+ }
+  
+  before :each do
+    @form = Forms::BrokerAgencyProfile.find(broker_agency_profile.id)
+    @form.update_attributes(attributes)
+  end
+
+  it "should update organization info" do
+    organization.reload
+    expect(@form.home_page).to eq "dchealth.com"
+    expect(organization.home_page).to eq "dchealth.com"
+  end
+
+  it "should update broker_agency_profile info" do
+    broker_agency_profile.reload
+    expect(@form.market_kind).to eq "individual"
+    expect(broker_agency_profile.market_kind).to eq "individual"
+    expect(broker_agency_profile.languages_spoken).to eq ["English"]
+  end
+
+  it "should update person info" do
+    person.reload
+    expect(@form.first_name).to eq "joe"
+    expect(person.first_name).to eq "joe"
+  end
+end

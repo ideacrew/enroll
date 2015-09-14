@@ -19,6 +19,8 @@ class EnrollmentEligibilityReason
         SpecialEnrollmentPeriodReasonProvider.new(provider)
       when EmployerProfile
         EmployerProfileReasonProvider.new(provider)
+      when BenefitSponsorship
+        BenefitSponsorshipReasonProvider.new(provider)
       else
         raise ArgumentError.new("invalid provider class: #{provider.class}")
       end
@@ -28,6 +30,13 @@ class EnrollmentEligibilityReason
   class EmployerProfileReasonProvider < ReasonProvider
     attr_reader :employer_profile
     def initialize(employer_profile); @employer_profile = employer_profile; end
+    def type; "open_enrollment_period"; end
+    def reason; "open_enrollment"; end
+  end
+
+  class BenefitSponsorshipReasonProvider < ReasonProvider
+    attr_reader :benefit_sponsorship
+    def initialize(benefit_sponsorship); @benefit_sponsorship = benefit_sponsorship; end
     def type; "open_enrollment_period"; end
     def reason; "open_enrollment"; end
   end

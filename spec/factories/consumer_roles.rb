@@ -9,6 +9,7 @@ FactoryGirl.define do
     is_incarcerated 'yes'
     is_applicant 'yes'
     vlp_documents {[FactoryGirl.build(:vlp_document)]}
+    bookmark_url nil
   end
 
   factory(:consumer_role_person, {class: ::Person}) do

@@ -3,15 +3,13 @@ When(/I visit the Insured portal$/) do
   @browser.a(text: /consumer\/family portal/i).wait_until_present
   @browser.a(text: /consumer\/family portal/i).click
   screenshot("individual_start")
-  @browser.a(text: /Create account/).wait_until_present
-  @browser.a(text: /Create account/).click
 end
 
 Then(/Individual creates HBX account$/) do
   @browser.button(class: /interaction-click-control-create-account/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set("taylor.york@example.com")
-  @browser.text_field(class: /interaction-field-control-user-password/).set("password")
-  @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("password")
+  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
+  @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!aA1!")
   screenshot("create_account")
   scroll_then_click(@browser.input(value: "Create account"))
 end
@@ -25,6 +23,10 @@ When(/user goes to register as an individual$/) do
   @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-person-dob/).set("05/23/1969")
   @browser.text_field(class: /interaction-field-control-person-ssn/).set("677991234")
   @browser.text_field(class: /interaction-field-control-person-ssn/).click
+  expect(@browser.text_field(class: /interaction-field-control-person-ssn/).value).to_not eq("")
+  @browser.checkbox(class: /interaction-choice-control-value-person-no-ssn/).fire_event("onclick")
+  expect(@browser.text_field(class: /interaction-field-control-person-ssn/).value).to eq("")
+  @browser.text_field(class: /interaction-field-control-person-ssn/).set("677991234")
   @browser.radio(class: /interaction-choice-control-value-radio-male/).fire_event("onclick")
   screenshot("register")
   @browser.button(class: /interaction-click-control-continue/).click
@@ -37,6 +39,7 @@ Then(/user should see button to continue as an individual/) do
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do
+
   @browser.a(text: /continue as an individual/i).wait_until_present
   @browser.a(text: /continue as an individual/i).click
 end
@@ -49,18 +52,34 @@ Then(/Individual should see a form to enter personal information/) do
   @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).fire_event("onclick")
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-1/).set("4900 USAA BLVD")
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-2/).set("Suite 220")
-  @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-city/).set("Sacramento")
+  @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-city/).set("Washington")
   select_state = @browser.divs(text: /SELECT STATE/).last
   select_state.click
-  scroll_then_click(@browser.li(text: /CA/))
-  @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-zip/).set("78218")
+  scroll_then_click(@browser.li(text: /DC/))
+  @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-zip/).set("20002")
   @browser.text_field(class: /interaction-field-control-person-phones-attributes-0-full-phone-number/).set("1110009999")
   @browser.text_field(class: /interaction-field-control-person-emails-attributes-0-address/).set("taylor.york@example.com")
   screenshot("personal_form_bottom")
 end
 
+When(/Individual clicks on Save and Exit/) do
+   click_when_present(@browser.link(class: /interaction-click-control-save---exit/))
+end
+
 When(/Individual clicks on continue button/) do
   click_when_present(@browser.button(class: /interaction-click-control-continue/))
+end
+
+When (/Individual resumes enrollment/) do
+  @browser.a(text: /consumer\/family portal/i).wait_until_present
+  @browser.a(text: /consumer\/family portal/i).click
+  wait_and_confirm_text(/Sign In Existing Account/)
+  click_when_present(@browser.link(class: /interaction-click-control-sign-in-existing-account/))
+  @browser.text_field(class: /interaction-field-control-user-email/).set("taylor.york@example.com")
+  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
+  @browser.element(class: /interaction-click-control-sign-in/).click
+  sleep(2)
+  expect(@browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-1/).value).to eq("4900 USAA BLVD")
 end
 
 Then("Individual should see identity verification page and clicks on submit") do
@@ -132,6 +151,19 @@ And(/I click on continue button on household info form/) do
 end
 
 And(/I click on continue button on group selection page/) do
+  if !HbxProfile.current_hbx.under_open_enrollment?
+    click_when_present(@browser.a(text: /I've had a baby/))
+
+    @browser.text_field(id: /qle_date/).wait_until_present
+    @browser.text_field(id: /qle_date/).set(5.days.ago.strftime('%m/%d/%Y'))
+
+    qle_form = @browser.div(class: /qle-form/)
+    click_when_present(qle_form.a(class: /interaction-click-control-continue/))
+
+    @browser.div(class: /success-info/).wait_until_present
+    @browser.div(class: /success-info/).button(class: /interaction-click-control-continue/).click
+  end
+
   click_when_present(@browser.button(class: /interaction-click-control-continue/))
 end
 

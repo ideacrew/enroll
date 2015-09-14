@@ -1,8 +1,9 @@
 FactoryGirl.define do
   factory :user do
     sequence(:email) {|n| "example\##{n}@example.com"}
-    password '12345678'
-    password_confirmation '12345678'
+    gen_pass = User.generate_valid_password
+    password gen_pass
+    password_confirmation gen_pass
     approved true
     roles ['web_service']
   end

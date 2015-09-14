@@ -6,11 +6,14 @@ RSpec.describe Insured::EmployeeDependentsController do
   let(:person) { double(:employee_roles => [], :primary_family => family) }
   let(:employee_role_id) { "2343" }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
-  let(:fm) { FactoryGirl.build(:family, :with_primay_family_member) }
-
+  let(:fm) { FactoryGirl.build(:family, :with_primary_family_member) }
+  let(:employee_role){ double("EmployeeRole", id: double("id")) }
   describe "GET index" do
     context 'normal' do
       before(:each) do
+        allow(person).to receive(:employee_role).and_return(employee_role)
+        allow(user).to receive(:person).and_return(person)
+        allow(employee_role).to receive(:save!).and_return(true)
         sign_in(user)
         get :index, :employee_role_id => employee_role_id
       end
@@ -30,8 +33,9 @@ RSpec.describe Insured::EmployeeDependentsController do
     end
 
     it "with qle_id" do
-      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:employee_role).and_return(employee_role)
       allow(person).to receive(:primary_family).and_return(fm)
+      allow(employee_role).to receive(:save!).and_return(true)
       sign_in user
       expect{
         get :index, employee_role_id: employee_role_id, qle_id: qle.id, effective_on_kind: 'date_of_event', qle_date: '10/10/2015'

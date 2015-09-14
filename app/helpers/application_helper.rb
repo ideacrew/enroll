@@ -55,8 +55,8 @@ module ApplicationHelper
     date_value.strftime("%m/%d/%Y") if date_value.respond_to?(:strftime)
   end
 
-  def format_datetime(date_value)
-    date_value.strftime("%m/%d/%Y %H:%M UTC") if date_value.respond_to?(:strftime)
+  def format_datetime(date_value)    
+    date_value.to_time.strftime("%m/%d/%Y %H:%M %Z %:z") if date_value.respond_to?(:strftime)
   end
 
   # Builds a Dropdown button
@@ -293,7 +293,7 @@ module ApplicationHelper
     when "BrokerAgencyProfile"
       broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
     when "Person"
-      inbox_consumer_profiles_path(profile_id: provider.id, folder: folder)
+      inbox_insured_families_path(profile_id: provider.id, folder: folder)
     end
   end
 
@@ -445,7 +445,7 @@ module ApplicationHelper
       ["White", "Black or African American", "Asian Indian" ],
       ["Chinese", "Filipino", "Japanese", "Korean"], 
       ["Vietnamese", "Other Asian", "Native Hawaiian", "Samon" ],
-      ["Guamanion or Chamorro", "Other pacific islander", "Other"]
+      ["Guamanion or Chamorro", "Other pacific islander", "American Indian or Alaskan Native", "Other"]
     ].inject([]){ |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
     }
@@ -461,10 +461,14 @@ module ApplicationHelper
     }
   end
 
-  def is_sep_eligible?
-    false
+  def is_under_open_enrollment?
+    HbxProfile.current_hbx.under_open_enrollment?
   end
-  
+
+  def ivl_enrollment_effective_date
+    HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
+  end
+
   def find_document(consumer_role, subject)
     subject_doc = consumer_role.vlp_documents.detect do |documents|
       documents.subject.eql?(subject)

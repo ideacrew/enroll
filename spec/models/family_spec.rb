@@ -561,3 +561,359 @@ describe Family, "large family with multiple employees - The Brady Bunch", :dbcl
     end
   end
 end
+
+describe Family, "enrollment periods", :model, dbclean: :around_each do
+  let(:person) { FactoryGirl.create(:person) }
+  let(:family) { FactoryGirl.build(:family) }
+  let!(:family_member) do
+    fm = FactoryGirl.build(:family_member, person: person, family: family, is_primary_applicant: true, is_consent_applicant: true)
+    family.family_members = [fm]
+    fm
+  end
+
+  before do
+    family.save
+  end
+
+  context "no open enrollment periods" do
+    it "should not be in open enrollment" do
+      expect(family.is_under_open_enrollment?).to be_falsey
+    end
+
+    it "should have no current eligible open enrollments" do
+      expect(family.current_eligible_open_enrollments).to eq []
+    end
+
+    it "should not be in shop open enrollment" do
+      expect(family.is_under_shop_open_enrollment?).to be_falsey
+    end
+
+    it "should have no current shop eligible open enrollments" do
+      expect(family.current_shop_eligible_open_enrollments).to eq []
+    end
+
+    it "should not be in ivl open enrollment" do
+      expect(family.is_under_ivl_open_enrollment?).to be_falsey
+    end
+
+    it "should have no current ivl eligible open enrollments" do
+      expect(family.current_ivl_eligible_open_enrollments).to eq []
+    end
+  end
+
+  context "one shop open enrollment period" do
+    let!(:benefit_group) do
+      bg = FactoryGirl.create(:benefit_group)
+      py = bg.plan_year
+      py.open_enrollment_start_on = TimeKeeper.date_of_record - 5.days
+      py.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
+      py.aasm_state = "published"
+      py.save
+      bg
+    end
+    let(:plan_year) { benefit_group.plan_year }
+    let(:employer_profile) { plan_year.employer_profile }
+    let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
+    let!(:census_employee) do
+      ce = FactoryGirl.create(:census_employee,
+        first_name: person.first_name,
+        last_name: person.last_name,
+        dob: person.dob,
+        gender: person.gender,
+        hired_on: TimeKeeper.date_of_record - 5.years,
+        ssn: person.ssn,
+        address: person.addresses.first,
+        email: person.emails.first,
+        employer_profile: employer_profile
+      )
+      employee_role.census_employee = ce
+      employee_role.save
+      ce
+    end
+    let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
+
+    it "should be in open enrollment" do
+      expect(family.is_under_open_enrollment?).to be_truthy
+    end
+
+    it "should have one current eligible open enrollments" do
+      expect(family.current_eligible_open_enrollments.count).to eq 1
+    end
+
+    it "should be in shop open enrollment" do
+      expect(family.is_under_shop_open_enrollment?).to be_truthy
+    end
+
+    it "should have one current shop eligible open enrollments" do
+      expect(family.current_shop_eligible_open_enrollments.count).to eq 1
+    end
+
+    it "should not be in ivl open enrollment" do
+      expect(family.is_under_ivl_open_enrollment?).to be_falsey
+    end
+
+    it "should have no current ivl eligible open enrollments" do
+      expect(family.current_ivl_eligible_open_enrollments.count).to eq 0
+    end
+  end
+
+  context "multiple shop open enrollment periods" do
+    let!(:benefit_group) do
+      bg = FactoryGirl.create(:benefit_group)
+      py = bg.plan_year
+      py.open_enrollment_start_on = TimeKeeper.date_of_record - 5.days
+      py.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
+      py.aasm_state = "published"
+      py.save
+      bg
+    end
+    let(:plan_year) { benefit_group.plan_year }
+    let(:employer_profile) { plan_year.employer_profile }
+    let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
+    let!(:census_employee) do
+      ce = FactoryGirl.create(:census_employee,
+        first_name: person.first_name,
+        last_name: person.last_name,
+        dob: person.dob,
+        gender: person.gender,
+        hired_on: TimeKeeper.date_of_record - 5.years,
+        ssn: person.ssn,
+        address: person.addresses.first,
+        email: person.emails.first,
+        employer_profile: employer_profile
+      )
+      employee_role.census_employee = ce
+      employee_role.save
+      ce
+    end
+    let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
+
+    let!(:benefit_group2) do
+      bg = FactoryGirl.create(:benefit_group)
+      py = bg.plan_year
+      py.open_enrollment_start_on = TimeKeeper.date_of_record - 5.days
+      py.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
+      py.aasm_state = "published"
+      py.save
+      bg
+    end
+    let(:plan_year2) { benefit_group2.plan_year }
+    let(:employer_profile2) { plan_year2.employer_profile }
+    let!(:employee_role2) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile2) }
+    let!(:census_employee2) do
+      ce = FactoryGirl.create(:census_employee,
+        first_name: person.first_name,
+        last_name: person.last_name,
+        dob: person.dob,
+        gender: person.gender,
+        hired_on: TimeKeeper.date_of_record - 5.years,
+        ssn: person.ssn,
+        address: person.addresses.first,
+        email: person.emails.first,
+        employer_profile: employer_profile2
+      )
+      employee_role2.census_employee = ce
+      employee_role2.save
+      ce
+    end
+    let!(:benefit_group_assignment2) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group2, census_employee: census_employee2)}
+
+    it "should be in open enrollment" do
+      expect(family.is_under_open_enrollment?).to be_truthy
+    end
+
+    it "should have two current eligible open enrollments" do
+      expect(family.current_eligible_open_enrollments.count).to eq 2
+    end
+
+    it "should be in shop open enrollment" do
+      expect(family.is_under_shop_open_enrollment?).to be_truthy
+    end
+
+    it "should have two current shop eligible open enrollments" do
+      expect(family.current_shop_eligible_open_enrollments.count).to eq 2
+    end
+
+    it "should not be in ivl open enrollment" do
+      expect(family.is_under_ivl_open_enrollment?).to be_falsey
+    end
+
+    it "should have no current ivl eligible open enrollments" do
+      expect(family.current_ivl_eligible_open_enrollments.count).to eq 0
+    end
+  end
+
+  context "one ivl open enrollment period" do
+    let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
+
+    it "should be in open enrollment" do
+      expect(family.is_under_open_enrollment?).to be_truthy
+    end
+
+    it "should have one current eligible open enrollments" do
+      expect(family.current_eligible_open_enrollments.count).to eq 1
+    end
+
+    it "should not be in shop open enrollment" do
+      expect(family.is_under_shop_open_enrollment?).to be_falsey
+    end
+
+    it "should have no current shop eligible open enrollments" do
+      expect(family.current_shop_eligible_open_enrollments.count).to eq 0
+    end
+
+    it "should be in ivl open enrollment" do
+      expect(family.is_under_ivl_open_enrollment?).to be_truthy
+    end
+
+    it "should have one current ivl eligible open enrollments" do
+      expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+    end
+  end
+
+  context "one shop and one ivl open enrollment period" do
+    let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
+
+    let!(:benefit_group) do
+      bg = FactoryGirl.create(:benefit_group)
+      py = bg.plan_year
+      py.open_enrollment_start_on = TimeKeeper.date_of_record - 5.days
+      py.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
+      py.aasm_state = "published"
+      py.save
+      bg
+    end
+    let(:plan_year) { benefit_group.plan_year }
+    let(:employer_profile) { plan_year.employer_profile }
+    let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
+    let!(:census_employee) do
+      ce = FactoryGirl.create(:census_employee,
+        first_name: person.first_name,
+        last_name: person.last_name,
+        dob: person.dob,
+        gender: person.gender,
+        hired_on: TimeKeeper.date_of_record - 5.years,
+        ssn: person.ssn,
+        address: person.addresses.first,
+        email: person.emails.first,
+        employer_profile: employer_profile
+      )
+      employee_role.census_employee = ce
+      employee_role.save
+      ce
+    end
+    let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+
+    it "should be in open enrollment" do
+      expect(family.is_under_open_enrollment?).to be_truthy
+    end
+
+    it "should have two current eligible open enrollments" do
+      expect(family.current_eligible_open_enrollments.count).to eq 2
+    end
+
+    it "should be in shop open enrollment" do
+      expect(family.is_under_shop_open_enrollment?).to be_truthy
+    end
+
+    it "should have one current shop eligible open enrollments" do
+      expect(family.current_shop_eligible_open_enrollments.count).to eq 1
+    end
+
+    it "should be in ivl open enrollment" do
+      expect(family.is_under_ivl_open_enrollment?).to be_truthy
+    end
+
+    it "should have one current ivl eligible open enrollments" do
+      expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+    end
+  end
+
+  context "multiple shop and one ivl open enrollment periods" do
+    let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
+
+    let!(:benefit_group) do
+      bg = FactoryGirl.create(:benefit_group)
+      py = bg.plan_year
+      py.open_enrollment_start_on = TimeKeeper.date_of_record - 5.days
+      py.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
+      py.aasm_state = "published"
+      py.save
+      bg
+    end
+    let(:plan_year) { benefit_group.plan_year }
+    let(:employer_profile) { plan_year.employer_profile }
+    let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
+    let!(:census_employee) do
+      ce = FactoryGirl.create(:census_employee,
+        first_name: person.first_name,
+        last_name: person.last_name,
+        dob: person.dob,
+        gender: person.gender,
+        hired_on: TimeKeeper.date_of_record - 5.years,
+        ssn: person.ssn,
+        address: person.addresses.first,
+        email: person.emails.first,
+        employer_profile: employer_profile
+      )
+      employee_role.census_employee = ce
+      employee_role.save
+      ce
+    end
+    let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
+
+    let!(:benefit_group2) do
+      bg = FactoryGirl.create(:benefit_group)
+      py = bg.plan_year
+      py.open_enrollment_start_on = TimeKeeper.date_of_record - 5.days
+      py.open_enrollment_end_on = TimeKeeper.date_of_record + 5.days
+      py.aasm_state = "published"
+      py.save
+      bg
+    end
+    let(:plan_year2) { benefit_group2.plan_year }
+    let(:employer_profile2) { plan_year2.employer_profile }
+    let!(:employee_role2) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile2) }
+    let!(:census_employee2) do
+      ce = FactoryGirl.create(:census_employee,
+        first_name: person.first_name,
+        last_name: person.last_name,
+        dob: person.dob,
+        gender: person.gender,
+        hired_on: TimeKeeper.date_of_record - 5.years,
+        ssn: person.ssn,
+        address: person.addresses.first,
+        email: person.emails.first,
+        employer_profile: employer_profile2
+      )
+      employee_role2.census_employee = ce
+      employee_role2.save
+      ce
+    end
+    let!(:benefit_group_assignment2) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group2, census_employee: census_employee2)}
+
+    it "should be in open enrollment" do
+      expect(family.is_under_open_enrollment?).to be_truthy
+    end
+
+    it "should have three current eligible open enrollments" do
+      expect(family.current_eligible_open_enrollments.count).to eq 3
+    end
+
+    it "should be in shop open enrollment" do
+      expect(family.is_under_shop_open_enrollment?).to be_truthy
+    end
+
+    it "should have two current shop eligible open enrollments" do
+      expect(family.current_shop_eligible_open_enrollments.count).to eq 2
+    end
+
+    it "should be in ivl open enrollment" do
+      expect(family.is_under_ivl_open_enrollment?).to be_truthy
+    end
+
+    it "should have one current ivl eligible open enrollments" do
+      expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+    end
+  end
+end

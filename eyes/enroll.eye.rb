@@ -39,11 +39,10 @@ Eye.application 'eye_enroll' do
     monitor_children do
       stop_command "kill -QUIT {PID}"
       check :cpu, :every => 30, :below => 80, :times => [3,5]
-      check :memory, :every => 30, :below => 800.megabytes, :times => [4,7]
+      check :memory, :every => 30, :below => 600.megabytes, :times => [4,7]
     end
   end
 
-=begin
   process("enroll_remote_event_listener") do
     working_dir BUS_DIRECTORY
     pid_file "pids/enroll_remote_event_listener.pid"
@@ -66,5 +65,4 @@ Eye.application 'eye_enroll' do
     restart_grace 30.seconds
     stop_timeout 10.seconds
   end
-=end
 end

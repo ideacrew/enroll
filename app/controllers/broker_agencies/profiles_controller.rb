@@ -2,6 +2,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
+  before_action :find_broker_agency_profile, only: [:show, :edit, :update]
 
   def index
     @broker_agency_profiles = BrokerAgencyProfile.all
@@ -25,7 +26,23 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def show
-    @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
+  end
+
+  def edit
+    @organization = Forms::BrokerAgencyProfile.find(@broker_agency_profile.id)
+  end
+
+  def update
+    params.permit!
+    @organization = Forms::BrokerAgencyProfile.find(@broker_agency_profile.id)
+
+    if @organization.update_attributes(params[:organization])
+      flash[:notice] = "Successfully Update Broker Agency Profile"
+      redirect_to broker_agencies_profile_path(@broker_agency_profile)
+    else
+      flash[:error] = "Failed to Update Broker Agency Profile"
+      render "edit"
+    end
   end
  
   def staff_index
@@ -44,7 +61,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def employers
     profile = BrokerAgencyProfile.find(params[:id])
-    @orgs = Organization.where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => profile._id})
+    @orgs = Organization.by_broker_agency_profile(profile._id)
     @page_alphabets = page_alphabets(@orgs, "legal_name")
     page_no = cur_page_no(@page_alphabets.first)
     @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
@@ -66,6 +83,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def find_hbx_profile
     @profile = current_user.person.hbx_staff_role.hbx_profile
+  end
+
+  def find_broker_agency_profile
+    @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
   end
 
   def check_admin_staff_role

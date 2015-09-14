@@ -8,10 +8,11 @@
     </strong>
   </p>
   <% end %>
-  
+
   <p>
       <%= link_to "Employee Portal", search_insured_employee_index_path, class: "btn btn-default" %>
-      <%= link_to "Consumer/Family Portal", search_insured_consumer_role_index_path, class: "btn btn-default" %>
+      <%= link_to "Consumer/Family Portal", search_insured_consumer_role_index_path(uqhp: true), class: "btn btn-default" %>
+      <%= link_to "Assisted Consumer/Family Portal", search_insured_consumer_role_index_path(aqhp: true), class: "btn btn-default" %>
       <%= link_to "Returning User", family_account_path, class: "btn btn-default" %>
       <%= link_to "Employer Portal", new_employers_employer_profile_path, class: "btn btn-default" %>
       <%= link_to "Broker Agency Portal", broker_agencies_root_path, class: "btn btn-default" %>

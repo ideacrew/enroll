@@ -17,7 +17,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def setup
-    hbx = HbxProfile.find_by_state_abbreviation("dc")
+    hbx = HbxProfile.current_hbx
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bp| bp.start_on.year == 2015 }
     ivl_health_benefits_2015 = bc_period.benefit_packages.detect { |bp| bp.title == "individual_health_benefits_2015" }
 
@@ -77,6 +77,9 @@ class InsuredEligibleForBenefitRule
     return true if @benefit_package.residency_status.include?("any")
     if @benefit_package.residency_status.include?("state_resident")
       addresses = @role.person.addresses
+      person = @role.person
+      return false if person.no_dc_address == true and person.no_dc_address_reason.blank?
+      return true if person.no_dc_address == true and person.no_dc_address_reason.present?
       return true if !addresses || addresses.count == 0 #TEMPORARY CODE FOR DEPENDENTS FIXME TOD
       address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
       addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}

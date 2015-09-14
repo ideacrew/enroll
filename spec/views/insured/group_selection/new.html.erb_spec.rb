@@ -42,8 +42,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       expect(rendered).to have_selector("input[type='checkbox']", count: 3)
     end
 
-    it "should have a checked checkbox option and a checked radio button" do
-      expect(rendered).to have_selector("input[checked='checked']", count: 2)
+    it "should have two checked checkbox option and a checked radio button" do
+      expect(rendered).to have_selector("input[checked='checked']", count: 3)
     end
 
     it "should have a disabled checkbox option" do
@@ -66,7 +66,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:consumer_role) { FactoryGirl.create(:consumer_role, person: jail_person) }
     let(:consumer_role2) { FactoryGirl.create(:consumer_role, person: person2) }
     let(:consumer_role3) { FactoryGirl.create(:consumer_role, person: person3) }
-    let(:benefit_package) { FactoryGirl.create(:benefit_package,
+
+    let(:benefit_package) { FactoryGirl.build(:benefit_package,
       title: "individual_health_benefits_2015",
       elected_premium_credit_strategy: "unassisted",
       benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(

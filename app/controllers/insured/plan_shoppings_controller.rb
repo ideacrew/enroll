@@ -26,7 +26,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.update_current(aasm_state: "coverage_selected")
       hbx_enrollment.propogate_selection
       UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now if hbx_enrollment.employee_role.present?
-      redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan])
+      redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
     else
       redirect_to :back
     end
@@ -45,12 +45,16 @@ class Insured::PlanShoppingsController < ApplicationController
       @market_kind = "individual"
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile
     end
+    send_receipt_emails
   end
 
   def thankyou
+    set_consumer_bookmark_url(family_account_path)
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
 
@@ -66,6 +70,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile
@@ -108,8 +113,10 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def show
+    set_consumer_bookmark_url(family_account_path)
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
 
@@ -120,17 +127,35 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def plans
+    set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @plans = @plans.sort_by(&:total_employee_cost)
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(plan_ids: @plans.map(&:id))
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
   end
 
   private
+
+  def send_receipt_emails
+    UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, @person.emails.first.address).deliver_now
+    body = render_to_string 'user_mailer/secure_purchase_confirmation.html.erb', layout: false
+    from_provider = HbxProfile.current_hbx
+    message_params = {
+      sender_id: from_provider.try(:id),
+      parent_message_id: @person.id,
+      from: from_provider.try(:legal_name),
+      to: @person.full_name,
+      body: body,
+      subject: 'Your Secure Purchase Confirmation'
+    }
+    create_secure_message(message_params, @person, :inbox)
+  end
+
   def set_plans_by(hbx_enrollment_id:)
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
-    if @market_kind == 'shop' and @coverage_kind == 'health'
+    if @market_kind == 'shop'
       @benefit_group = @hbx_enrollment.benefit_group
       @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
     elsif @market_kind == 'individual'

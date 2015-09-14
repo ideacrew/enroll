@@ -23,8 +23,11 @@ end
 
 describe CoverageHousehold, "when informed that eligiblity has changed for an individual" do
   let(:mock_person) { double }
+  let(:mock_consumer_role) { double(person: mock_person) }
   let(:matching_coverage_household) { instance_double("CoverageHousehold") }
-  let(:mock_household) { instance_double("Household", :coverage_households => [matching_coverage_household]) }
+  let(:matching_hbx_enrollment) { instance_double("HbxEnrollment") }
+  let(:hbxs) { double(active: [matching_hbx_enrollment]) }
+  let(:mock_household) { instance_double("Household", :coverage_households => [matching_coverage_household], hbx_enrollments: hbxs) }
   let(:mock_family) { instance_double("Family", :households => [mock_household]) }
 
   before :each do
@@ -33,7 +36,8 @@ describe CoverageHousehold, "when informed that eligiblity has changed for an in
 
   it "should locate and notify each coverage household containing that individual" do
     expect(matching_coverage_household).to receive(:evaluate_individual_market_eligiblity)
-    CoverageHousehold.update_individual_eligibilities_for(mock_person)
+    expect(matching_hbx_enrollment).to receive(:evaluate_individual_market_eligiblity)
+    CoverageHousehold.update_individual_eligibilities_for(mock_consumer_role)
   end
 
   describe "and that individual exists on individual market policies" do
@@ -42,13 +46,14 @@ describe CoverageHousehold, "when informed that eligiblity has changed for an in
 
     before :each do
       allow(::RuleSet::CoverageHousehold::IndividualMarketVerification).to receive(:new).with(matching_coverage_household).and_return(mock_ruleset)
+      allow(matching_hbx_enrollment).to receive(:evaluate_individual_market_eligiblity).and_return(true)
     end
 
     describe "with a ruleset recommending contingent status" do
       let(:recommended_event) { :move_to_contingent! }
       it "should update it's state to match the state provided by the ruleset" do
         expect(matching_coverage_household).to receive(recommended_event)
-        CoverageHousehold.update_individual_eligibilities_for(mock_person)
+        CoverageHousehold.update_individual_eligibilities_for(mock_consumer_role)
       end
     end
 
@@ -56,7 +61,7 @@ describe CoverageHousehold, "when informed that eligiblity has changed for an in
       let(:recommended_event) { :move_to_pending! }
       it "should update it's state to match the state provided by the ruleset" do
         expect(matching_coverage_household).to receive(recommended_event)
-        CoverageHousehold.update_individual_eligibilities_for(mock_person)
+        CoverageHousehold.update_individual_eligibilities_for(mock_consumer_role)
       end
     end
 
@@ -64,7 +69,7 @@ describe CoverageHousehold, "when informed that eligiblity has changed for an in
       let(:recommended_event) { :move_to_enrolled! }
       it "should update it's state to match the state provided by the ruleset" do
         expect(matching_coverage_household).to receive(recommended_event)
-        CoverageHousehold.update_individual_eligibilities_for(mock_person)
+        CoverageHousehold.update_individual_eligibilities_for(mock_consumer_role)
       end
     end
   end

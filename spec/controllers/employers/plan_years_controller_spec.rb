@@ -385,11 +385,25 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     context "plan year published sucessfully" do
       before :each do
         allow(plan_year_proxy).to receive(:published?).and_return(true)
+        allow(plan_year_proxy).to receive(:assigned_census_employees_without_owner).and_return([double])
       end
 
       it "should redirect with success message" do
         xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
         expect(flash[:notice]).to eq "Plan Year successfully published."
+      end
+    end
+
+    context "plan year published sucessfully but with warning" do
+      before :each do
+        allow(plan_year_proxy).to receive(:published?).and_return(true)
+        allow(plan_year_proxy).to receive(:assigned_census_employees_without_owner).and_return([])
+      end
+
+      it "should redirect with success message" do
+        xhr :post, :publish, employer_profile_id: employer_profile_id, plan_year_id: plan_year_id
+        expect(flash[:notice]).not_to eq "Plan Year successfully published."
+        expect(flash[:error]).to eq "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?"
       end
     end
 

@@ -1,5 +1,7 @@
 puts "*"*80
 
+ENV["ENROLL_SEEDING"] = "true"
+
 puts "::: Generating People :::"
 wk_addr = Address.new(kind: "work", address_1: "1600 Pennsylvania Ave", city: "Washington", state: "DC", zip: "20001")
 hm_addr = Address.new(kind: "home", address_1: "609 H St, NE", city: "Washington", state: "DC", zip: "20002")

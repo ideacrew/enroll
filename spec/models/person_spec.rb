@@ -75,6 +75,15 @@ describe Person do
         it "should known its relationship is self" do
           expect(person.find_relationship_with(person)).to eq "self"
         end
+
+        it "unread message count is accurate" do
+          expect(person.inbox).to be nil
+          person.save
+          expect(person.inbox.messages.count).to eq 1
+          expect(person.inbox.unread_messages.count).to eq 1
+        end
+
+
       end
 
       context "with no first_name" do
@@ -584,4 +593,43 @@ describe Person do
     end
   end
 
+  describe "us_citizen status" do
+    let(:person) { FactoryGirl.create(:person) }
+
+    before do
+      person.us_citizen="false"
+    end
+
+    context "set to false" do
+      it "should set @us_citizen to false" do
+        expect(person.us_citizen).to be_falsey
+      end
+
+      it "should set @naturalized_citizen to false" do
+        expect(person.naturalized_citizen).to be_falsey
+      end
+    end
+  end
+
+  describe "residency_eligible?" do
+    let(:person) { FactoryGirl.create(:person) }
+
+    it "should false" do
+      person.no_dc_address = false
+      person.no_dc_address_reason = ""
+      expect(person.residency_eligible?).to be_falsey
+    end
+
+    it "should false" do
+      person.no_dc_address = true
+      person.no_dc_address_reason = ""
+      expect(person.residency_eligible?).to be_falsey
+    end
+
+    it "should true" do
+      person.no_dc_address = true
+      person.no_dc_address_reason = "I am Homeless"
+      expect(person.residency_eligible?).to be_truthy
+    end
+  end
 end

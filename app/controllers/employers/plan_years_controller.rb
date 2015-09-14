@@ -123,7 +123,11 @@ class Employers::PlanYearsController < ApplicationController
       end
     else
       if (@plan_year.published? || @plan_year.enrolling?) 
-        flash[:notice] = "Plan Year successfully published."
+        if @plan_year.assigned_census_employees_without_owner.present?
+          flash[:notice] = "Plan Year successfully published."
+        else
+          flash[:error] = "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?"
+        end
       else
         errors = @plan_year.application_errors.try(:values)
         flash[:error] = "Plan Year failed to publish. #{('<li>' + errors.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe

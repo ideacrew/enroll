@@ -43,10 +43,8 @@
     CONTINUE
   %br>/
   \ 
-  .btn.btn-waive.btn-transparent{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
-    I need help with
-    = succeed "Plan" do
-      %br/
+  .btn.btn-transparent{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
+    Help me select coverage
 - elsif step == 5
   = link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary btn-br btn-block disabled', id: 'btn-continue', :method => :post, :disabled => !@enrollable
 - elsif step == 6
@@ -56,16 +54,18 @@
     CONTINUE
 
 %ul.list-unstyled.list-right-section
-  %li
-    %a.back{href: '#'}
-      = image_tag 'icons/list.png'
-      PREVIOUS
-  %li
-    %a{href: '#'}
-      = image_tag 'icons/list.png'
-      SAVE &amp; EXIT
-    %br
-    %br
-  %li
-    %p
-      If you select Save & Logout, you can save your work and continue where you left off the next time you login.
+  - unless @no_previous_button
+    %li
+      %a.back{href: '#'}
+        = image_tag 'icons/list.png'
+        PREVIOUS
+  - unless @no_save_button
+    %li
+      %a{href: '#'}
+        = image_tag 'icons/list.png'
+        SAVE &amp; EXIT
+      %br
+      %br
+    %li
+      %p
+        If you select Save & Logout, you can save your work and continue where you left off the next time you login.
