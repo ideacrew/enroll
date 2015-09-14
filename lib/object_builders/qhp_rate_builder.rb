@@ -43,8 +43,10 @@ class QhpRateBuilder
   def find_plan_and_create_premium_tables
     @results.each do |plan_id, premium_tables|
       unless INVALID_PLAN_IDS.include?(plan_id)
-        @plan = Plan.find_by(hios_id: /#{plan_id}/, active_year: @rate[:effective_date].to_date.year)
-        @plan.premium_tables.create!(premium_tables)
+        @plan = Plan.where(hios_id: /#{plan_id}/, active_year: @rate[:effective_date].to_date.year)
+        @plan.each do |plan|
+          plan.premium_tables.create!(premium_tables)
+        end
       end
     end
   end
