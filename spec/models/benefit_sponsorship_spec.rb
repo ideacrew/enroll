@@ -2,13 +2,11 @@ require 'rails_helper'
 
 RSpec.describe BenefitSponsorship, :type => :model do
 
-  context "an Employer is the benefit sponsor" do
+  context "an Employer is instantiated as the benefit sponsor" do
   end
 
-  context "an HBX is the benefit sponsor" do
+  context "an HBX is instantiated as a benefit sponsor" do
     let(:hbx_profile)             { FactoryGirl.create(:hbx_profile) }
-    let(:benefit_coverage_period) { FactoryGirl.build(:benefit_coverage_period) }
-    let(:geographic_rating_area)  { FactoryGirl.build(:geographic_rating_area) }
     let(:service_markets)         { %w(individual) }
 
     let(:valid_params){
@@ -34,9 +32,10 @@ RSpec.describe BenefitSponsorship, :type => :model do
       end
     end
 
-    context "with all required attributes" do
+    context "with all required arguments" do
       let(:params)              { valid_params }
       let(:benefit_sponsorship) { BenefitSponsorship.new(**params) }
+      let(:geographic_rating_area)  { FactoryGirl.build(:geographic_rating_area) }
 
       it "should be valid" do
         expect(benefit_sponsorship.valid?).to be_truthy
@@ -52,64 +51,68 @@ RSpec.describe BenefitSponsorship, :type => :model do
         it "should be findable by ID" do
           expect(BenefitSponsorship.find(benefit_sponsorship.id)).to eq benefit_sponsorship
         end
+
+        context "and a benefit coverage period is defined" do
+          let(:benefit_coverage_period) { FactoryGirl.build(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
+
+          context "when under open enrollment" do
+            before do
+              benefit_sponsorship.benefit_coverage_periods = benefit_coverage_period.to_a
+            end
+
+            it 'is_under_open_enrollment should return true' do 
+              expect(benefit_sponsorship.is_under_open_enrollment?).to be_truthy
+            end
+          end
+
+          context "when open enrollment is closed" do
+            let(:benefit_coverage_period) { FactoryGirl.build(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record + 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 40.days) }
+
+            before do
+              benefit_sponsorship.benefit_coverage_periods = benefit_coverage_period.to_a
+            end
+
+            it 'is_under_open_enrollment should return false' do 
+              expect(benefit_sponsorship.is_under_open_enrollment?).to be_falsey
+            end
+          end
+        end
+
+        context "and benefit coverage periods are defined for the current and following years" do
+          let(:benefit_coverage_period_this_year) { 
+              FactoryGirl.build(:benefit_coverage_period, 
+                start_on: TimeKeeper.date_of_record.beginning_of_year, 
+                end_on:   TimeKeeper.date_of_record.end_of_year,
+                open_enrollment_start_on: (TimeKeeper.date_of_record.beginning_of_year - 1.month),
+                open_enrollment_end_on:   (TimeKeeper.date_of_record.beginning_of_year + 1.month),
+              ) 
+            }
+          let(:benefit_coverage_period_next_year) { 
+              FactoryGirl.build(:benefit_coverage_period, 
+                start_on: (TimeKeeper.date_of_record + 1.year).beginning_of_year, 
+                end_on: (TimeKeeper.date_of_record + 1.year).end_of_year,
+                open_enrollment_start_on: ((TimeKeeper.date_of_record + 1.year).beginning_of_year - 2.months),
+                open_enrollment_end_on:   ((TimeKeeper.date_of_record + 1.year).beginning_of_year + 1.month),              
+              )
+            }
+
+          before do
+            benefit_sponsorship.benefit_coverage_periods = [benefit_coverage_period_this_year, benefit_coverage_period_next_year]
+          end
+
+          it 'should return this year as the current benefit coverage period' do 
+            expect(benefit_sponsorship.current_benefit_coverage_period).to eq(benefit_coverage_period_this_year)
+          end
+
+          it 'should return next year as the renewal benefit coverage period' do 
+            expect(benefit_sponsorship.renewal_benefit_coverage_period).to eq(benefit_coverage_period_next_year)
+          end
+        end
+
+
+
       end
     end
-
-
   end
 
-
-
-  subject { BenefitSponsorship.new }
-  
-  context '.is_under_open_enrollment?' do
-    context 'when under open enrollment' do 
-      let(:benefit_coverage_period) { FactoryGirl.build(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
-
-      before do
-        allow(subject).to receive(:benefit_coverage_periods).and_return([benefit_coverage_period])
-      end
-
-      it 'should return true' do 
-        expect(subject.is_under_open_enrollment?).to be_truthy
-      end
-    end
-
-    context 'when not under open enrollment' do
-      let(:benefit_coverage_period) { FactoryGirl.build(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record + 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 40.days) }
-
-      before do
-        allow(subject).to receive(:benefit_coverage_periods).and_return([benefit_coverage_period])
-      end
-
-      it 'should return false' do 
-        expect(subject.is_under_open_enrollment?).to be_falsey
-      end
-    end
-  end
-
-  context '.current_benefit_coverage_period' do
-    let(:benefit_coverage_period1) { FactoryGirl.build(:benefit_coverage_period, start_on: (TimeKeeper.date_of_record + 1.year).beginning_of_year, end_on: (TimeKeeper.date_of_record + 1.year).end_of_year) }
-    let(:benefit_coverage_period2) { FactoryGirl.build(:benefit_coverage_period, start_on: TimeKeeper.date_of_record.beginning_of_year, end_on: TimeKeeper.date_of_record.end_of_year) }
-
-    before do
-      allow(subject).to receive(:benefit_coverage_periods).and_return([benefit_coverage_period1, benefit_coverage_period2])
-    end
-
-    context 'when current benefit coverage period exists' do 
-      it 'should return current benefit coverage period' do 
-        expect(subject.current_benefit_coverage_period).to eq(benefit_coverage_period2)
-      end
-    end
-
-    context 'when current benefit coverage period not exists' do
-      let(:benefit_coverage_period2) { FactoryGirl.build(:benefit_coverage_period, start_on: (TimeKeeper.date_of_record - 1.year).beginning_of_year, end_on: (TimeKeeper.date_of_record - 1.year).end_of_year) }
-
-      it 'should return current benefit coverage period' do 
-        expect(subject.current_benefit_coverage_period).to be_nil
-      end
-    end
-  end
-
-  pending "add some examples to (or delete) #{__FILE__}"
 end
