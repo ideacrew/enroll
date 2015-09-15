@@ -1,9 +1,21 @@
 <li id="<%= employee_dependent_form_id(dependent) %>" class="dependent_list">
 
-  <%= render 'shared/error_messages', :object => dependent %>
+  <!-- <%= render 'shared/error_messages', :object => dependent %> -->
 
   <div id="add_info_<%= dependent.id %>">
     <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
+      <% if dependent.errors.any? %>
+        <div class="alert alert-error">
+          <h4>
+            <%= "#{pluralize(@dependent.errors.size, "error")} prohibited this family member from being saved:" %>
+          </h4>
+          <ul>
+            <% dependent.errors.full_messages.each do |msg| %>
+              <li> <%= msg %> </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
       <%= token_tag form_authenticity_token %>
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
         <div class="dependent_notice_div_<%= dependent.id%>"></div>

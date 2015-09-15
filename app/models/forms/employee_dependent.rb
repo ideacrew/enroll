@@ -24,6 +24,12 @@ module Forms
 
     attr_reader :dob
 
+    HUMANIZED_ATTRIBUTES = { relationship: "Select Relationship Type " }
+
+    def self.human_attribute_name(attr, options={})
+      HUMANIZED_ATTRIBUTES[attr.to_sym] || super
+    end
+
     def consumer_fields_validation
       if @is_consumer_role.to_s == "true" #only check this for consumer flow.
         if !tribal_id.present? && @citizen_status.present? && @citizen_status == "indian_tribe_member"
