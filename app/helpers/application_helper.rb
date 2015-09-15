@@ -379,6 +379,13 @@ module ApplicationHelper
     end
   end
 
+  def relationship_options(dependent, referer)
+    relationships = referer.include?("consumer_role_id") ?
+      BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS :
+      PersonRelationship::Relationships
+    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
+  end
+
   def enrollment_progress_bar(plan_year, p_min, options = {:minimum => true})
     progress_bar_width = 0
     progress_bar_class = ''
