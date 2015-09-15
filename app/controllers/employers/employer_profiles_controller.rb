@@ -135,6 +135,8 @@ class Employers::EmployerProfilesController < ApplicationController
     @organization = Organization.find(params[:id])
     @employer_profile = @organization.employer_profile
     if current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)
+      @organization.assign_attributes(organization_profile_params)
+      @organization.save(validate: false)
       if @organization.update_attributes(employer_profile_params)
 
         flash[:notice] = 'Employer successfully Updated.'
@@ -228,6 +230,13 @@ class Employers::EmployerProfilesController < ApplicationController
       id_params = params.permit(:id, :employer_profile_id)
       id = id_params[:id] || id_params[:employer_profile_id]
       @employer_profile = EmployerProfile.find(id)
+    end
+
+    def organization_profile_params
+      params.require(:organization).permit(
+        :id,
+        :employer_profile_attributes => [:legal_name, :entity_kind, :dba]
+      )
     end
 
     def employer_profile_params
