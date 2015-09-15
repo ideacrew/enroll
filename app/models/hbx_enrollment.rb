@@ -242,6 +242,15 @@ class HbxEnrollment
     hbx_enrollment_members.count - 1
   end
 
+  def phone_number
+    if plan.present?
+      phone = plan.try(:carrier_profile).try(:organization).try(:primary_office_location).try(:phone)
+      "#{phone.try(:area_code)}#{phone.try(:number)}"
+    else
+      ""
+    end
+  end
+
   def rebuild_members_by_coverage_household(coverage_household:)
     applicant_ids = hbx_enrollment_members.map(&:applicant_id)
     coverage_household.coverage_household_members.each do |coverage_member|
@@ -308,7 +317,11 @@ class HbxEnrollment
       enrollment.household = coverage_household.household
       enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
-      enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+      enrollment.effective_on = if qle
+                                  calculate_start_date_by_qle(coverage_household.household)
+                                else
+                                  calculate_start_date_from(employee_role, coverage_household, benefit_group)
+                                end
       # benefit_group.plan_year.start_on
       enrollment.benefit_group = benefit_group
       census_employee = employee_role.census_employee

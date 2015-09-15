@@ -441,6 +441,12 @@ module ApplicationHelper
     end
   end
 
+  def notice_eligible_enrolles(notice)
+    notice.enrollments.inject([]) do |enrollees, enrollment|
+      enrollees += enrollment.enrollees
+    end.uniq
+  end
+
   def ethnicity_collection
     [
       ["White", "Black or African American", "Asian Indian", "Chinese" ],
