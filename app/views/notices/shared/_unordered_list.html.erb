@@ -1,0 +1,40 @@
+<table class="total_table" border="0">
+  <tbody>
+    <% if previous.present? %>
+      <tr>
+        <td>
+          <%= previous %>
+        </td>
+      </tr>   
+    <% end %>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+          <% listings.each do |listing| %>
+            <li style="margin-top: 10px;">
+            <% if listing.is_a?(Array) %>
+              <%= listing[0] %>
+              <ul style="list-style-type: circle;">
+                <%= listing[1].each do |item| %>
+                  <li style="margin-top: 5px;">
+                  <%= item %>
+                  </li>
+                <% end %>
+              </ul>
+            <% else %>
+              <%= listing %>          
+            <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </td>
+    </tr>
+    <% if after.present? %>
+    <tr>
+      <td>
+        <%= previous %>
+      </td>
+    </tr>   
+    <% end %>
+  </tbody>
+</table>
