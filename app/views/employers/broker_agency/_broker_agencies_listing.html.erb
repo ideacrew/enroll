@@ -18,7 +18,6 @@
       <tr>
         <td <%= "rowspan=#{broker_roles.size}" %>>
           <%= link_to broker_agency.legal_name, employers_employer_profile_broker_agency_path(@employer_profile, broker_agency), remote: true %>
-
         </td>
         <td <%= "rowspan=#{broker_roles.size}" %>>
           <%= broker_agency.working_hours ? "Yes" : "No" %>
@@ -26,11 +25,13 @@
         <td <%= "rowspan=#{broker_roles.size}" %>>
           <%= broker_agency.languages %>
         </td>
-        <%= render "employers/broker_agency/broker", broker: broker_roles.delete(broker_agency.primary_broker_role), broker_agency: broker_agency %>
+        <% primary_broker =  broker_roles.delete(broker_agency.primary_broker_role) %>
+        <% primary_broker =  broker_roles.delete_at(0) if primary_broker.blank? %>
+        <%= render "employers/broker_agency/broker", broker: primary_broker, broker_agency: broker_agency %>
         <% broker_roles.each do |broker_role| %>
         <tr><%= render "employers/broker_agency/broker", broker: broker_role, broker_agency: broker_agency %></tr>
         <% end %>
-      </tr>
+        </tr>
       <% end %>
     </tbody>
   </table>
