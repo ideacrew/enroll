@@ -70,6 +70,7 @@ Rails.application.routes.draw do
         post 'thankyou'
         post 'waive'
         post 'terminate'
+        post 'set_elected_pct'
       end
     end
 

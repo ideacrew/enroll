@@ -25,6 +25,20 @@ class HbxProfile
 
   after_initialize :build_nested_models
 
+
+  def advance_day
+  end
+
+  def advance_month
+  end
+
+  def advance_quarter
+  end
+
+  def advance_year
+  end
+
+
   def under_open_enrollment?
     (benefit_sponsorship.present? && benefit_sponsorship.is_under_open_enrollment?) ?  true : false
   end
@@ -87,6 +101,9 @@ class HbxProfile
   ## HBX general settings
   StateName = "District of Columbia"
   StateAbbreviation = "DC"
+  CallCenterName = "DC Health Link's Customer Care Center"
+  CallCenterPhoneNumber = "1-855-532-5465"
+
 
   ## Carriers
   # hbx_id, hbx_carrier_id, name, abbrev,

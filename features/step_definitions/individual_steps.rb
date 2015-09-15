@@ -33,15 +33,14 @@ When(/user goes to register as an individual$/) do
 end
 
 Then(/user should see button to continue as an individual/) do
-  @browser.a(text: /continue as an individual/i).wait_until_present
+  @browser.a(text: /continue/i).wait_until_present
   screenshot("no_match")
-  expect(@browser.a(text: /continue as an individual/i).visible?).to be_truthy
+  expect(@browser.a(text: /continue/i).visible?).to be_truthy
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do
-
-  @browser.a(text: /continue as an individual/i).wait_until_present
-  @browser.a(text: /continue as an individual/i).click
+  @browser.a(text: /continue/i).wait_until_present
+  @browser.a(text: /continue/i).click
 end
 
 Then(/Individual should see a form to enter personal information/) do
@@ -70,11 +69,12 @@ When(/Individual clicks on continue button/) do
   click_when_present(@browser.button(class: /interaction-click-control-continue/))
 end
 
-When (/Individual resumes enrollment/) do
+Then (/Individual resumes enrollment/) do
   @browser.a(text: /consumer\/family portal/i).wait_until_present
   @browser.a(text: /consumer\/family portal/i).click
   wait_and_confirm_text(/Sign In Existing Account/)
   click_when_present(@browser.link(class: /interaction-click-control-sign-in-existing-account/))
+  @browser.text_field(class: /interaction-field-control-user-email/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set("taylor.york@example.com")
   @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
   @browser.element(class: /interaction-click-control-sign-in/).click
@@ -111,11 +111,11 @@ And(/Individual clicks on add member button/) do
   @browser.text_field(id: /dependent_first_name/).set("Mary")
   @browser.text_field(id: /dependent_middle_name/).set("K")
   @browser.text_field(id: /dependent_last_name/).set("York")
-  @browser.text_field(name: 'jq_datepicker_ignore_dependent[dob]').set('01/15/2011')
+  @browser.text_field(name: 'jq_datepicker_ignore_dependent[dob]').set('01/15/1991')
   @browser.text_field(id: /dependent_ssn/).set("098098111")
   input_field = @browser.div(class: /selectric-wrapper/)
   input_field.click
-  input_field.li(text: /Child/).click
+  input_field.li(text: /Domestic Partner/i).click
   @browser.radio(id: /radio_female/).fire_event("onclick")
   @browser.radio(id: /dependent_us_citizen_true/).fire_event("onclick")
   @browser.radio(id: /dependent_naturalized_citizen_false/).wait_while_present

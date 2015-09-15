@@ -13,6 +13,7 @@ class PersonRelationship
                               foster\ child daughter-in-law sister-in-law mother-in-law sister ward
                               stepdaughter child sponsored\ dependent dependent\ of\ a\ minor\ dependent
                               guardian court\ appointed\ guardian collateral\ dependent life\ partner)
+
   Relationships = [
     "spouse",
     "life_partner",
@@ -78,7 +79,7 @@ class PersonRelationship
 
   SymmetricalRelationships = %W[head\ of\ household spouse ex-spouse cousin ward trustee annuitant other\ relationship other\ relative self]
 
-  Kinds = SymmetricalRelationships | Relationships
+  Kinds = SymmetricalRelationships | Relationships | BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
 
   field :relative_id, type: BSON::ObjectId
   field :kind, type: String

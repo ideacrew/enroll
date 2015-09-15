@@ -9,6 +9,7 @@ module Forms
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
     include ::Forms::SsnField
+    RELATIONSHIPS = ::PersonRelationship::Relationships + ::BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
     #include ::Forms::DateOfBirthField
     #include Validations::USDate.on(:date_of_birth)
 
@@ -17,14 +18,27 @@ module Forms
     validates_presence_of :gender, :allow_blank => nil
     validates_presence_of :family_id, :allow_blank => nil
     validates_presence_of :dob
-    validates_inclusion_of :relationship, :in => ::PersonRelationship::Relationships, :allow_blank => nil
+    validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil
     validate :relationship_validation
     validate :consumer_fields_validation
 
     attr_reader :dob
 
+    HUMANIZED_ATTRIBUTES = { relationship: "Select Relationship Type " }
+
+    def self.human_attribute_name(attr, options={})
+      HUMANIZED_ATTRIBUTES[attr.to_sym] || super
+    end
+
     def consumer_fields_validation
       if @is_consumer_role.to_s == "true" #only check this for consumer flow.
+        if @us_citizen.nil?
+          self.errors.add(:base, "Citizenship status is required")
+        elsif @us_citizen == false && @eligible_immigration_status.nil?
+          self.errors.add(:base, "Eligible immigration status is required")
+        elsif @us_citizen == true && @naturalized_citizen.nil?
+          self.errors.add(:base, "Naturalized citizen is required")
+        end
         if !tribal_id.present? && @citizen_status.present? && @citizen_status == "indian_tribe_member"
           self.errors.add(:tribal_id, "is required when native american / alaskan native is selected")
         end

@@ -1,7 +1,10 @@
 require "rails_helper"
 
 RSpec.describe "insured/_plan_filters.html.erb" do
+  let(:person) {double(has_active_consumer_role?: false)}
+
   before :each do
+    assign(:person, person)
     assign(:carriers, Array.new)
     assign(:max_total_employee_cost, 1000)
     assign(:max_deductible, 998)

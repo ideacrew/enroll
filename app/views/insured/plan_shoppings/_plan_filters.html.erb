@@ -144,6 +144,19 @@
             <%= hidden_field_tag :max_deductible, (@max_deductible || 5000) %>
         </div>
     </div>
+    <% if @person.has_active_consumer_role? %>
+      <div class="aptc">
+        <hr />
+        <h5>Maximum APTC: $<%= @max_aptc %></h5>
+        <p>Elected Percent:</p>
+        <%= hidden_field_tag :max_aptc, @max_aptc %>
+        <%= hidden_field_tag :set_elected_pct_url, set_elected_pct_insured_plan_shopping_path(id: @hbx_enrollment.id) %>
+        <form onsubmit="return false" oninput="pct.value = (elected_pct.value*100).toFixed(0)">
+          <input name='elected_pct' type="range" min='0' max='1' value='0.8' step='0.01'/>
+          <span><output name="pct">80</output>%</span>
+        </form>
+      </div>
+    <% end %>
     <div class="checkbox-filter-wrapper">
       <div class="form-inline search-apply-wrapper">
         <a href="javascript:void(0);" class="btn btn-primary apply-btn">Apply</a>

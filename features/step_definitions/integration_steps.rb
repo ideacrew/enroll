@@ -172,6 +172,7 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   @browser.a(class: portal_class).click
   @browser.element(class: /interaction-click-control-sign-in-existing-account/).wait_until_present
   @browser.element(class: /interaction-click-control-sign-in-existing-account/).click
+  sleep 2
   @browser.text_field(class: /interaction-field-control-user-email/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set(person[:email])
   @browser.text_field(class: /interaction-field-control-user-password/).wait_until_present

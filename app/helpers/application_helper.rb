@@ -379,6 +379,13 @@ module ApplicationHelper
     end
   end
 
+  def relationship_options(dependent, referer)
+    relationships = referer.include?("consumer_role_id") ?
+      BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS :
+      PersonRelationship::Relationships
+    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
+  end
+
   def enrollment_progress_bar(plan_year, p_min, options = {:minimum => true})
     progress_bar_width = 0
     progress_bar_class = ''
@@ -442,10 +449,10 @@ module ApplicationHelper
 
   def ethnicity_collection
     [
-      ["White", "Black or African American", "Asian Indian" ],
-      ["Chinese", "Filipino", "Japanese", "Korean"], 
-      ["Vietnamese", "Other Asian", "Native Hawaiian", "Samon" ],
-      ["Guamanion or Chamorro", "Other pacific islander", "American Indian or Alaskan Native", "Other"]
+      ["White", "Black or African American", "Asian Indian", "Chinese" ],
+      ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], 
+      ["Native Hawaiian", "Samoan", "Guamanian or Chamorro", ],
+      ["Other Pacific Islander", "American Indian or Alaskan Native", "Other"]
     ].inject([]){ |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
     }
@@ -481,5 +488,11 @@ module ApplicationHelper
     return "" unless value.present?
     value = value.select{|a| a.present? }  if value.present?
     value.present? ? value.join(", ") : ""
+  end
+
+  def incarceration_cannot_purchase(family_member)
+    pronoun = family_member.try(:gender)=='male' ? ' he ':' she '
+    name=family_member.try(:first_name) || ''
+    result = "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on DC Health Link.<br/> Other family members may still be eligible to enroll. <br/>Please call us at 1-855-532-5465 to learn about other health insurance options for " + name
   end
 end

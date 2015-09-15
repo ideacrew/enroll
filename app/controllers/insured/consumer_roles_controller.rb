@@ -9,7 +9,7 @@ class Insured::ConsumerRolesController < ApplicationController
     @no_save_button = true
     if params[:aqhp].present?
       session[:individual_assistance_path] = true
-    elsif params[:uqhp].present?
+    else
       session.delete(:individual_assistance_path)
     end
     @help_me = true
@@ -36,7 +36,7 @@ class Insured::ConsumerRolesController < ApplicationController
         when :service_unavailable
           format.html { render 'shared/account_lookup_service_unavailable' }
         when :too_many_matches
-          format.html { render 'idp_identity_conflict' }
+          format.html { redirect_to SamlInformation.account_conflict_url }
         when :existing_account
           format.html { render 'redirect_to_recover_account' }
         else
@@ -60,7 +60,7 @@ class Insured::ConsumerRolesController < ApplicationController
     role_for_user = (is_assisted) ? "assisted_individual" : "individual"
     create_sso_account(current_user, @person, 15, role_for_user) do
       respond_to do |format|
-        format.html { 
+        format.html {
           if is_assisted
             redirect_to SamlInformation.curam_landing_page_url
           else
