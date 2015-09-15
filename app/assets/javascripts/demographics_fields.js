@@ -159,13 +159,30 @@ var demographicsNew = {
   ui: {
     personTribeMember: "#person_indian_tribe_member",
     dependentTribeMember: "#dependent_indian_tribe_member",
-    tribalContainer: "#tribal_container"
+    tribalContainer: "#tribal_container",
+    dependentUsCitizenFalse: "#dependent_us_citizen_false",
+    personUsCitizenFalse: "#person_us_citizen_false",
+    eligibleImmigrationStatusContainer: "#immigration_status_container"
   },
   queries:{
   },
   init: function(){
     this.setUpDependentTribalId();
     this.setUpPersonTribalId();
+    this.setUpPersonEligibleImmigrationStatus();
+    this.setUpDependentEligibleImmigrationStatus();
+  },
+  setUpPersonEligibleImmigrationStatus: function(){
+    $(demographicsNew.ui.personUsCitizenFalse).change(function () {
+        demographicsNew.show_or_hide_person_eligible_immigration_status();
+    });
+    demographicsNew.show_or_hide_person_eligible_immigration_status();
+  },
+  setUpDependentEligibleImmigrationStatus: function(){
+    $(demographicsNew.ui.dependentUsCitizenFalse).change(function () {
+        demographicsNew.show_or_hide_dependent_eligible_immigration_status();
+    });
+    demographicsNew.show_or_hide_dependent_eligible_immigration_status();
   },
   setUpPersonTribalId: function(){
     $(demographicsNew.ui.personTribeMember).change(function () {
@@ -193,6 +210,23 @@ var demographicsNew = {
     }
     if (!$(demographicsNew.ui.personTribeMember).is(':checked')) {
       $(demographicsNew.ui.tribalContainer).hide();
+    }
+  },
+  show_or_hide_dependent_eligible_immigration_status: function(){
+    if ($(demographicsNew.ui.dependentUsCitizenFalse).is(':checked')) {
+      $(demographicsNew.ui.eligibleImmigrationStatusContainer).show();
+    }
+    if (!$(demographicsNew.ui.dependentUsCitizenFalse).is(':checked')) {
+      $(demographicsNew.ui.eligibleImmigrationStatusContainer).hide();
+    }
+  },
+  show_or_hide_person_eligible_immigration_status: function(){
+    if ($(demographicsNew.ui.personUsCitizenFalse).is(':checked')) {
+        console.log("herehereher");
+      $(demographicsNew.ui.eligibleImmigrationStatusContainer).show();
+    }
+    if (!$(demographicsNew.ui.personUsCitizenFalse).is(':checked')) {
+      $(demographicsNew.ui.eligibleImmigrationStatusContainer).hide();
     }
   },
 }

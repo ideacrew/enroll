@@ -25,6 +25,9 @@ class HbxProfile
 
   after_initialize :build_nested_models
 
+  def under_open_enrollment?
+    (benefit_sponsorship.present? && benefit_sponsorship.is_under_open_enrollment?) ?  true : false
+  end
 
   def active_employers
     EmployerProfile.active
@@ -72,6 +75,10 @@ class HbxProfile
 
     def all
       Organization.exists(hbx_profile: true).all.reduce([]) { |set, org| set << org.hbx_profile }
+    end
+
+    def current_hbx
+      find_by_state_abbreviation("DC")
     end
   end
 

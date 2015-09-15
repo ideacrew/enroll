@@ -4699,18 +4699,6 @@ a.interaction-click-control-default {
   margin-left: 220px;
 }
 
-@media print {
-  body {
-    background: #FFF;
-  }
-  div.plan_receipt{
-    display: none;
-  }
-  div.waiver_receipt{
-    display: none;
-  }
-}
-
 .form-wrapper {
     width: 100%;
     position: relative;
@@ -4901,4 +4889,91 @@ position: absolute;
 }
 ul.list-qle {
   padding: 5px 30px;
+}
+
+
+input:focus:required:invalid { 
+  background-color: rgba(247, 208, 215, 0.55); 
+  outline: none; 
+}
+
+input:focus:required:valid { 
+  background-color: #DCEAF1;
+  outline: none; 
+}
+
+input:required:valid { 
+  background-color: #fff;
+}
+
+@media screen {
+  #printSection {
+    display: none;
+  }
+}
+
+@media print {
+  body * {
+    visibility:hidden;
+  }
+  body {
+    background: #FFF;
+  }
+  body button, body a, body .content {
+    display: none;
+  }
+  #printSection, #printSection * {
+    visibility:visible;
+  }
+  #printSection {
+    position:absolute;
+    left:0;
+    top:0;
+  }
+  div.plan_receipt{
+    display: none;
+  }
+  div.waiver_receipt{
+    display: none;
+  }
+}
+
+.no-dc-address-reasons {
+  border: 1px solid #b7b7b7;
+  border-top: none;
+  padding:3px;
+}
+
+.no-dc-address-reasons .radio input {
+  margin: 15px 10px;
+}
+
+.no-dc-address-reasons .radio label span{
+  margin-left: 20px;
+  margin-top: 10px;
+  line-height: 14px;
+  display: block;
+}
+
+.csr-form {
+  text-align: center;
+}
+
+.language_multi_select .multiselect {
+  border: none;
+  font-size: 12px;
+  line-height: 30px;
+}
+
+.language_multi_select .multiselect .caret {
+  color: #bbb;
+}
+
+.aptc output {
+  padding: 0;
+  float: left;
+}
+
+.aptc input[type=range] {
+  padding: 10px 0;
 }

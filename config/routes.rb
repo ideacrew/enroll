@@ -1,6 +1,12 @@
 Rails.application.routes.draw do
 
-  devise_for :users
+  devise_for :users, :controllers => { :registrations => "users/registrations" }
+
+  resources :saml, only: :index do
+    collection do
+      post :login
+    end
+  end
 
   namespace :exchanges do
     resources :inboxes, only: [:show, :destroy]
@@ -64,6 +70,7 @@ Rails.application.routes.draw do
         post 'thankyou'
         post 'waive'
         post 'terminate'
+        post 'set_elected_pct'
       end
     end
 
@@ -81,6 +88,9 @@ Rails.application.routes.draw do
         get 'document_upload'
         get 'find_sep'
         post 'record_sep'
+        get 'check_qle_date'
+        get 'purchase'
+        get 'family'
       end
 
       resources :people do
@@ -182,7 +192,7 @@ Rails.application.routes.draw do
     resources :inboxes, only: [:new, :create, :show, :destroy] do
       get :msg_to_portal
     end
-    resources :profiles, only: [:new, :create, :show, :index] do
+    resources :profiles, only: [:new, :create, :show, :index, :edit, :update] do
       get :inbox
 
       collection do
@@ -243,19 +253,6 @@ Rails.application.routes.draw do
       get 'get_member'
     end
 
-  end
-
-  resources :consumer_profiles, :only => [] do
-    collection do
-      get 'documents'
-      get 'home'
-      get 'plans'
-      get 'personal'
-      get 'family'
-      get 'check_qle_date'
-      get 'inbox'
-      get 'purchase'
-    end
   end
 
   match 'families/home', to: 'insured/families#home', via:[:get], as: "family_account"

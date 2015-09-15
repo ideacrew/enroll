@@ -13,6 +13,9 @@ class Person
   ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
   RELATIONSHIP_CHANGE_ATTRIBUTES = %w(person_relationships)
 
+  PERSON_CREATED_EVENT_NAME = "local.events.person.created"
+  PERSON_UPDATED_EVENT_NAME = "local.events.person.updated"
+
   field :hbx_id, type: String
   field :name_pfx, type: String
   field :first_name, type: String
@@ -37,6 +40,9 @@ class Person
 
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
+
+  field :no_dc_address, type: Boolean, default: false
+  field :no_dc_address_reason, type: String, default: ""
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
@@ -155,6 +161,17 @@ class Person
 #  ViewFunctions::Person.install_queries
 
   validate :consumer_fields_validations
+
+  after_create :notify_created
+  after_update :notify_updated
+
+  def notify_created
+    notify(PERSON_CREATED_EVENT_NAME, {:individual => self } )
+  end
+
+  def notify_updated
+    notify(PERSON_UPDATED_EVENT_NAME, {:individual => self } )
+  end
 
   def consumer_fields_validations
     if self.is_consumer_role.to_s == "true"
@@ -325,6 +342,10 @@ class Person
 
   def has_active_employee_role?
     employee_roles.present? and employee_roles.active.present?
+  end
+
+  def residency_eligible?
+    no_dc_address and no_dc_address_reason.present?
   end
 
   class << self
@@ -527,7 +548,7 @@ class Person
     welcome_subject = "Welcome to DC HealthLink"
     welcome_body = "DC HealthLink is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     mailbox = Inbox.create(recipient: self)
-    mailbox.messages.create(subject: welcome_subject, body: welcome_body)
+    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: 'DC Health Link')
   end
 
   def update_full_name

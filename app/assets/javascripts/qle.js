@@ -11,13 +11,20 @@ $(function () {
 
     init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days);
     $('#qle-details').removeClass('hidden');
-    $('.qle-form').removeClass('hidden');
+    if ($(this).data('title') == "Change in APTC/CSR") {
+      $('.qle-form').addClass('hidden');
+      $('.csr-form').removeClass('hidden');
+    } else {
+      $('.qle-form').removeClass('hidden');
+      $('.csr-form').addClass('hidden');
+    }
     $('form#qle_form.success-info').addClass('hidden');
     $('form#qle_form.error-info').addClass('hidden');
   });
 
 	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
 		$('#qle-details').addClass('hidden');
+    $('.csr-form').addClass('hidden');
 		$('#qle-details .success-info, #qle-details .error-info').addClass('hidden');
     $('#qle-details .qle-form').removeClass('hidden');
     $("#qle_date").val("");
@@ -59,7 +66,7 @@ $(function () {
     $.ajax({
       type: "GET",
       data:{date_val: $("#qle_date").val(), qle_type: qle_type, qle_id: $("#qle_id").val()},
-      url: "/consumer_profiles/check_qle_date.js"
+      url: "/insured/families/check_qle_date.js"
     });
   }
 

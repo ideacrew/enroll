@@ -15,7 +15,12 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       decorated_plan = PlanCostDecorator.new(plan, hbx_enrollment, benefit_group, reference_plan)
     else
-      decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
+      get_aptc_info_from_session
+      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, @elected_aptc_pct, tax_household)
+
+      hbx_enrollment.update_hbx_enrollment_members_premium(decorated_plan)
+      hbx_enrollment.update_current(elected_aptc_pct: @elected_aptc_pct, elected_amount: @elected_aptc_pct*@max_aptc, applied_aptc_amount: decorated_plan.total_aptc_amount)
     end
     # notify("acapi.info.events.enrollment.submitted", hbx_enrollment.to_xml)
 
@@ -26,7 +31,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.update_current(aasm_state: "coverage_selected")
       hbx_enrollment.propogate_selection
       UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now if hbx_enrollment.employee_role.present?
-      redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan])
+      redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
     else
       redirect_to :back
     end
@@ -41,16 +46,21 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
     else
-      @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
+      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.elected_aptc_pct, tax_household)
       @market_kind = "individual"
     end
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile
     end
+    send_receipt_emails
   end
 
   def thankyou
+    set_consumer_bookmark_url(family_account_path)
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
 
@@ -59,13 +69,16 @@ class Insured::PlanShoppingsController < ApplicationController
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
     else
-      @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment)
+      get_aptc_info_from_session
+      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment, @elected_aptc_pct, tax_household)
     end
     @family = @person.primary_family
     #FIXME need to implement can_complete_shopping? for individual
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
     if @person.employee_roles.any?
       @employer_profile = @person.employee_roles.first.employer_profile
@@ -108,8 +121,10 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def show
+    set_consumer_bookmark_url(family_account_path)
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
 
@@ -117,20 +132,50 @@ class Insured::PlanShoppingsController < ApplicationController
     @waivable = @hbx_enrollment.can_complete_shopping?
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
+
+    if @person.has_active_consumer_role?
+      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      @max_aptc = tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
+      session[:max_aptc] = @max_aptc
+      session[:selected_aptc_pct] = 0.8
+    end
+  end
+
+  def set_elected_pct
+    session[:elected_aptc_pct] = params[:elected_pct].to_f rescue 0.8
+    render json: 'ok'
   end
 
   def plans
+    set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @plans = @plans.sort_by(&:total_employee_cost)
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(plan_ids: @plans.map(&:id))
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
   end
 
   private
+
+  def send_receipt_emails
+    UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, @person.emails.first.address).deliver_now
+    body = render_to_string 'user_mailer/secure_purchase_confirmation.html.erb', layout: false
+    from_provider = HbxProfile.current_hbx
+    message_params = {
+      sender_id: from_provider.try(:id),
+      parent_message_id: @person.id,
+      from: from_provider.try(:legal_name),
+      to: @person.full_name,
+      body: body,
+      subject: 'Your Secure Purchase Confirmation'
+    }
+    create_secure_message(message_params, @person, :inbox)
+  end
+
   def set_plans_by(hbx_enrollment_id:)
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
-    if @market_kind == 'shop' and @coverage_kind == 'health'
+    if @market_kind == 'shop'
       @benefit_group = @hbx_enrollment.benefit_group
       @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
     elsif @market_kind == 'individual'
@@ -153,5 +198,11 @@ class Insured::PlanShoppingsController < ApplicationController
   def set_kind_for_market_and_coverage
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
+  end
+
+  def get_aptc_info_from_session
+    @max_aptc = session[:max_aptc].to_f rescue 0
+    elected_aptc_pct = session[:elected_aptc_pct]
+    @elected_aptc_pct = elected_aptc_pct.present? ? elected_aptc_pct.to_f : 0.8
   end
 end

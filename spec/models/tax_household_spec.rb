@@ -1,6 +1,11 @@
 require 'rails_helper'
 
-describe TaxHousehold do
+RSpec.describe TaxHousehold, type: :model do
+  let(:family)  { FactoryGirl.create(:family) }
+  
+
+
+# describe TaxHousehold do
 =begin
   describe "validate associations" do
 #	  it { should have_and_belong_to_many  :people }

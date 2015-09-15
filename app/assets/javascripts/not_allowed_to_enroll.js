@@ -1,9 +1,3 @@
-__invalid_form__ = 'A form field is missing or invalid.'
-
-$(document).ready(function() {
-  __is_safari__ = navigator.userAgent.match(/Safari/i) && !navigator.userAgent.match(/Chrome/i)
-});
-
 function ineligible_incarcerated(){
   return $('input[name="person[is_incarcerated]"]:checked').val() == 1
 }
@@ -31,10 +25,7 @@ function ineligible_alert(){
 
 $(document).on('click', '.consumer_roles .edit_person .right-section .btn', function(){
   var valid_form = $('form')[0].checkValidity()
-  if (!valid_form) {
-    if (__is_safari__) alert(__invalid_form__)
-  }
-  else {
+  if (valid_form) {
     if (ineligible_immigration() || ineligible_incarcerated())  ineligible_alert()
   }
   return true

@@ -20,7 +20,7 @@
           <% if @enrollment.employee_role.present? %>
             <%= render "insured/plan_shoppings/coverage_information" %>
           <% else %>
-            <%= render "insured/plan_shoppings/individual_coverage_information" %>
+            <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate: true} %>
             <%= render "insured/plan_shoppings/individual_agreement" %>
           <% end %>
         </div>
@@ -30,7 +30,7 @@
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
         <% if @change_plan.blank? && @market_kind == "individual" %>
-          <% if is_under_open_enrollment? %>
+          <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
             <%= render  partial: 'shared/individual_progress', locals: {step: '5'} %>
           <% else %>
             <%= render  partial: 'shared/sep_progress', locals: {step: '6'} %>

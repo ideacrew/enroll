@@ -34,7 +34,7 @@ describe "shared/_reference_plans_list.html.erb" do
   end
 
   it "should not have a selection option for dental" do
-    expect(rendered).not_to have_selector("option[value='dental']")
+    expect(rendered).to have_selector("option[value='dental']")
   end
 
   it "should not have a selection option for catastrophic" do
