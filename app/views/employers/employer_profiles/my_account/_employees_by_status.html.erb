@@ -50,8 +50,8 @@
           <td><% boolean_to_human census_employee.employee_role_linked? %></td>
           -->
           <td class="table-functions">
-            <i class="fa fa-pencil fa-2x"></i>
-            <i class="fa fa-times-circle-o fa-2x"></i>
+            <%= link_to raw('<i class="fa fa-pencil fa-2x"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
+            <!--<i class="fa fa-times-circle-o fa-2x"></i>-->
             <% if census_employee.employment_terminated? %>
             <% link_to ('javascript:;'), class: "show_confirm btn btn-green-2", id: "show_confirm_#{census_employee.id}" do %>
             <span class="hidden-xs hidden-sm visible-md visible-lg">Rehire</span>
