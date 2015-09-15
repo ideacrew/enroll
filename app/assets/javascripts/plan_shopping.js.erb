@@ -136,7 +136,12 @@ function updatePlanCost(elected_pct) {
   var plans = $('.plan-row');
   for(var i=0; i<plans.length; i++){
     var plan = plans[i];
-    var premium_resp_amt = parseFloat($(plan).data('plan-metal-premium')) - elected_amount;
+    premium = parseFloat($(plan).data('plan-metal-premium'));
+    if (elected_amount >= premium) {
+      var premium_resp_amt = 0;
+    } else {
+      var premium_resp_amt = premium - elected_amount;
+    }
     premium_resp_amt = premium_resp_amt.toFixed(2);
     $(plan).find('h2.plan-premium').html("$" + premium_resp_amt);
   };
