@@ -1,4 +1,4 @@
-class IvlNotices::IndividualNoticeBuilder < EligibilityNoticeBuilder
+class IvlNotices::IndividualNoticeBuilder < IvlNotices::EligibilityNoticeBuilder
 
   attr_reader :notice
   

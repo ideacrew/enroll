@@ -21,7 +21,8 @@ class SamlInformation
     'idp_cert_fingerprint_algorithm',
     'curam_landing_page_url',
     'saml_logout_url',
-    'account_conflict_url'
+    'account_conflict_url',
+    'account_recovery_url'
   ]
 
   attr_reader :config

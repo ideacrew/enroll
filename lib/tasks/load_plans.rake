@@ -85,8 +85,12 @@ namespace :xml do
         hios_base_id = hios_id.split("-").first
         csr_variant_id = hios_id.split("-").last
         plan = Plan.where(active_year: 2016, hios_base_id: /#{hios_base_id}/, csr_variant_id: /#{csr_variant_id}/).first
-        plan.update(is_standard_plan: true)
-        puts "plan with hios id #{hios_base_id}-#{csr_variant_id} updated to standard plan."
+        if plan
+          plan.update(is_standard_plan: true)
+          puts "plan with hios id #{hios_base_id}-#{csr_variant_id} updated to standard plan."
+        else
+          puts "plan with hios id #{hios_base_id}-#{csr_variant_id} was not found and not updated to standard plan."
+        end
       end
     end
   end
