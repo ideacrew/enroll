@@ -43,12 +43,13 @@ class TaxHousehold
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
     aptc_members.each do |member|
+      #TODO use which date to calculate premiums by slcp
       premium = slcsp.premium_for(effective_starting_on, member.age_on_effective_date)
       benchmark_member_cost_hash[member.applicant_id.to_s] = premium
     end
 
     # Sum premium total for aptc_members
-    sum_premium_total = benchmark_member_cost_hash.values.sum
+    sum_premium_total = benchmark_member_cost_hash.values.sum.to_f
 
     # Compute the ratio
     ratio_hash = {}
