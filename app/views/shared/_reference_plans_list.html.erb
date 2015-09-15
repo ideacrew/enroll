@@ -3,41 +3,42 @@
 <% selected_kind_plan = f.object.plan_option_kind == 'single_plan' %>
 
 <!-- Select Elected Plan -->
-<ul class="nav nav-tabs">
-  <li role="presentation" class="active"><a href="#">
+<h4>Select Your Plan Offering</h4>
+<br>
+<ul class="nav nav-tabs row">
+  <li role="presentation" class="col-xs-4">
     <%= f.radio_button :plan_option_kind, "single_carrier" %>
-    <%= f.label :plan_option_kind_single_carrier do %>
+    <%= f.label :plan_option_kind_single_carrier, class: "elected_plan", onclick: "$(this).closest('li').addClass('active')" do %>
     <i class="fa fa-circle-o"></i>
     <i class="fa fa-dot-circle-o"></i>
+    By carrier
 
     <% end %>
-    All plans from a given carrier
-  </a></li>
-  <li role="presentation"><a href="#">
+  </li>
+  <li role="presentation" class="col-xs-4">
     <%= f.radio_button :plan_option_kind, "metal_level" %>
-    <%= f.label :plan_option_kind_metal_level do %>
+    <%= f.label :plan_option_kind_metal_level, class: "elected_plan", onclick: "$(this).closest('li').addClass('active')" do %>
     <i class="fa fa-circle-o"></i>
     <i class="fa fa-dot-circle-o"></i>
+    By metal level
 
     <% end %>
-    All plans with a given metal level
 
-  </a></li>
-  <li role="presentation"><a href="#">
-    <%= f.radio_button :plan_option_kind, "single_carrier" %>
-    <%= f.label :plan_option_kind_single_plan do %>
+  </li>
+  <li role="presentation" class="col-xs-4">
+    <%= f.radio_button :plan_option_kind, "single_plan" %>
+    <%= f.label :plan_option_kind_single_plan, class: "elected_plan", onclick: "$(this).closest('li').addClass('active')" do %>
     <i class="fa fa-circle-o"></i>
     <i class="fa fa-dot-circle-o"></i>
-    <% end %>
-    A single plan
+    Single plan
 
-  </a></li>
+    <% end %>
+
+  </li>
 </ul>
 
-<div class="col-md-4 col-sm-4 col-xs-12 no-pd">
-  <% f.select 'plan_option_kind', options_for_select([["All plans from a given carrier", "single_carrier"], ["All plans with a given metal level", "metal_level"], ["A single plan", "single_plan"]], selected: f.object.plan_option_kind), {class: 'elected_plan'} %>
-
-
+<div class="col-xs-12 plan-options">
+<span>Let you plan participants choose any plan they want that is offered by a single carrier. It will NOT cost you more to let them choose.</span>
 
 
 
