@@ -38,7 +38,7 @@ class Insured::ConsumerRolesController < ApplicationController
         when :too_many_matches
           format.html { redirect_to SamlInformation.account_conflict_url }
         when :existing_account
-          format.html { render 'redirect_to_recover_account' }
+          format.html { redirect_to SamlInformation.account_recovery_url }
         else
           found_person = @consumer_candidate.match_person
           if found_person.present?
