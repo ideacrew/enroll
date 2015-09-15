@@ -363,8 +363,15 @@
           border-left: solid 1px #d5d5d5;
           border-right: solid 1px #d5d5d5;
           border-bottom: solid 1px #d5d5d5;
+          .row-form-wrapper {
+            border-bottom: solid 1px #d5d5d5;
+            &:last-of-type {
+              border-bottom: none;
+            }
+          }
+
         }
-        .col-xs-4 {
+        .col-xs-6 {
           border-bottom: solid 1px #d5d5d5;
           padding: 15px 0 25px;
           text-align: center;
