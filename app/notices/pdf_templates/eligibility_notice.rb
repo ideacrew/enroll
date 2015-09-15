@@ -9,6 +9,10 @@ module PdfTemplates
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :enrollments, Array[PdfTemplates::Enrollment]
     attribute :individual, PdfTemplates::Individual
-    
+
+
+    def shop?
+      false
+    end
   end
 end
