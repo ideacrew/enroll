@@ -55,8 +55,8 @@ module ApplicationHelper
     date_value.strftime("%m/%d/%Y") if date_value.respond_to?(:strftime)
   end
 
-  def format_datetime(date_value)
-    date_value.strftime("%m/%d/%Y %H:%M UTC") if date_value.respond_to?(:strftime)
+  def format_datetime(date_value)    
+    date_value.to_time.strftime("%m/%d/%Y %H:%M %Z %:z") if date_value.respond_to?(:strftime)
   end
 
   # Builds a Dropdown button
@@ -293,7 +293,7 @@ module ApplicationHelper
     when "BrokerAgencyProfile"
       broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
     when "Person"
-      inbox_consumer_profiles_path(profile_id: provider.id, folder: folder)
+      inbox_insured_families_path(profile_id: provider.id, folder: folder)
     end
   end
 
@@ -379,6 +379,13 @@ module ApplicationHelper
     end
   end
 
+  def relationship_options(dependent, referer)
+    relationships = referer.include?("consumer_role_id") ?
+      BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS :
+      PersonRelationship::Relationships
+    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
+  end
+
   def enrollment_progress_bar(plan_year, p_min, options = {:minimum => true})
     progress_bar_width = 0
     progress_bar_class = ''
@@ -436,10 +443,10 @@ module ApplicationHelper
 
   def ethnicity_collection
     [
-      ["White", "Black or African American", "Asian Indian" ],
-      ["Chinese", "Filipino", "Japanese", "Korean"], 
-      ["Vietnamese", "Other Asian", "Native Hawaiian", "Samon" ],
-      ["Guamanion or Chamorro", "Other pacific islander", "Other"]
+      ["White", "Black or African American", "Asian Indian", "Chinese" ],
+      ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], 
+      ["Native Hawaiian", "Samoan", "Guamanian or Chamorro", ],
+      ["Other Pacific Islander", "American Indian or Alaskan Native", "Other"]
     ].inject([]){ |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
     }
@@ -456,23 +463,11 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    eligible_open_enrollments_present = false
-
-    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").try(:benefit_sponsorship)
-    (benefit_sponsorship.try(:benefit_coverage_periods) || []).each do |benefit_coverage_period|
-      if benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
-        eligible_open_enrollments_present = true
-        break
-      end
-    end
-
-    eligible_open_enrollments_present
+    HbxProfile.current_hbx.under_open_enrollment?
   end
 
   def ivl_enrollment_effective_date
-    if is_under_open_enrollment?
-      HbxProfile.all.first.benefit_sponsorship.benefit_coverage_periods.first.earliest_effective_date # FIXME
-    end
+    HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
   end
 
   def find_document(consumer_role, subject)
@@ -487,5 +482,11 @@ module ApplicationHelper
     return "" unless value.present?
     value = value.select{|a| a.present? }  if value.present?
     value.present? ? value.join(", ") : ""
+  end
+
+  def incarceration_cannot_purchase(family_member)
+    pronoun = family_member.try(:gender)=='male' ? ' he ':' she '
+    name=family_member.try(:first_name) || ''
+    result = "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on DC Health Link.<br/> Other family members may still be eligible to enroll. <br/>Please call us at 1-855-532-5465 to learn about other health insurance options for " + name
   end
 end

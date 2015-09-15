@@ -28,11 +28,8 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def new_client_notification(insured, agent, role)
-    first_name = insured.first_name
-    name = first_name + ' ' + insured.last_name
-    subject = "New Client Notification -[#{name}]"
-    agent_email = agent.user.email
+  def new_client_notification(agent_email, first_name, name, role, insured_email, is_person)
+    subject = "New Client Notification -[#{name}] email provided - [#{insured_email}]"
     mail({to: agent_email, subject: subject, from: 'no-reply@individual.dchealthlink.com'}) do |format|
       format.html { render "new_client_notification", :locals => { first_name: first_name, :role => role, name: name}}
     end
@@ -41,6 +38,12 @@ class UserMailer < ApplicationMailer
   def generic_consumer_welcome(first_name, hbx_id, email)
     message = mail({to: email, subject: 'DC HealthLink', from: 'no-reply@individual.dchealthlink.com'}) do |format|
       format.html {render "generic_consumer", locals: {first_name: first_name, hbx_id: hbx_id}}
+    end
+  end
+
+  def broker_denied_notification(broker_role)
+    mail({to: broker_role.email_address, subject: "Broker application denied"}) do |format|
+      format.html { render "broker_denied", :locals => { :applicant_name => broker_role.person.full_name }}
     end
   end
 end

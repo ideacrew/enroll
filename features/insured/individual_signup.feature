@@ -9,6 +9,8 @@ Feature: Insured Plan Shopping on Individual market
       Then user should see button to continue as an individual
       Then Individual should click on Individual market for plan shopping
       Then Individual should see a form to enter personal information
+      When Individual clicks on Save and Exit
+      Then Individual resumes enrollment
       When Individual clicks on continue button
       Then Individual should see identity verification page and clicks on submit
       Then Individual should see the dependents form

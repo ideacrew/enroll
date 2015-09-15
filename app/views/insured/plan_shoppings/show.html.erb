@@ -61,7 +61,7 @@
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">  
         <% if @change_plan.blank? && @market_kind == "individual" %>
-          <% if is_under_open_enrollment? %>
+          <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
             <%= render  partial: 'shared/individual_progress', locals: {step: '4'} %>
           <% else %>
             <%= render  partial: 'shared/sep_progress', locals: {step: '5'} %>
@@ -106,7 +106,7 @@
 <script type="text/javascript">
   window.onload = function() {
     $.ajax({
-      url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind) %>",
+      url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) %>",
       type: "GET"
     });
   };

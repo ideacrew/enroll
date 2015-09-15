@@ -71,6 +71,11 @@ class CarrierProfile
       organizations = Organization.where("carrier_profile._id" => BSON::ObjectId.from_string(id.to_s)).to_a
       organizations.size > 0 ? organizations.first.carrier_profile : nil
     end
+
+    def find_by_legal_name(name)
+      organizations = Organization.where("legal_name" => name).to_a
+      organizations.size > 0 ? organizations.first.carrier_profile._id : ""
+    end
   end
 
 end

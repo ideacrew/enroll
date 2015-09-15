@@ -5,6 +5,7 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+ENV["ENROLL_SEEDING"] = "true"
 
 reset_tasks = %w(
   tmp:clear
@@ -45,7 +46,7 @@ load_tasks = %w(
 )
 puts "*"*80
 puts "Loading sanitized plans, people, families, employers, and census."
-system "rake #{load_tasks.join(" ")}"
+system "bundle exec rake #{load_tasks.join(" ")} ENROLL_SEEDING=true"
 puts "*"*80
 
 # require File.join(File.dirname(__FILE__),'seedfiles', 'premiums')
@@ -58,7 +59,6 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'people_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'broker_agencies_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
-require File.join(File.dirname(__FILE__),'seedfiles', 'slcsp_seed')
 
 puts "*"*80
 
@@ -66,17 +66,34 @@ puts "*"*80
 puts "Loading SERFF data"
 
 Products::Qhp.delete_all
-files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "**", "*.xml"))
+files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "*.xml"))
 qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
   puts file
   xml = Nokogiri::XML(File.open(file))
   plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
-  qhp_hash.add(plan.to_hash)
+  qhp_hash.add(plan.to_hash, file)
   qhp_hash
 end
 
 qhp_import_hash.run
 puts "*"*80
+
+puts "*"*80
+puts "Loading SERFF PLAN RATE data"
+
+files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "rates", "**", "*.xml"))
+rate_import_hash = files.inject(QhpRateBuilder.new()) do |rate_hash, file|
+  puts file
+  xml = Nokogiri::XML(File.open(file))
+  rates = Parser::PlanRateGroupParser.parse(xml.root.canonicalize, :single => true)
+  rate_hash.add(rates.to_hash)
+  rate_hash
+end
+
+rate_import_hash.run
+puts "*"*80
+
+system "bundle exec rake xml:renewal_and_standard_plans"
 
 require File.join(File.dirname(__FILE__),'seedfiles', 'shop_2015_sbc_files')
 

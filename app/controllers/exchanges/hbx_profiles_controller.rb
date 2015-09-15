@@ -71,9 +71,8 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
     if role
       status_text = 'Message sent to ' + role
-      insured = Person.find(params[:person]) 
       if agent.try(:user).try(:email)
-        agent_assistance_messages(insured,agent,role)
+        agent_assistance_messages(params,agent,role)
       else
         status_text = "Agent has no email.   Please select another"
       end
@@ -220,7 +219,26 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
 private
-  def agent_assistance_messages(insured, agent, role)
+  def agent_assistance_messages(params, agent, role)
+    if params[:person].present?
+      insured = Person.find(params[:person])
+      first_name = insured.first_name
+      name = insured.full_name
+      insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
+      body = 
+        "Please contact #{insured.first_name} #{insured.last_name}. <br/> " + 
+        "Plan Shopping help request from Person Id #{insured.id}, email #{insured_email}.<br/>" +
+        "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}"   
+    else
+      first_name = params[:first_name]
+      last_name = params[:last_name]
+      name = first_name.to_s + ' ' + last_name.to_s 
+      insured_email = params[:email]
+      body = 
+        "Please contact #{first_name} #{last_name}. <br/>" +
+        "Plan shopping help has been requested by #{insured_email}"  +
+        "PII is SSN #{params[:ssn]} and DOB #{params[:dob]}"
+    end
     hbx_profile = Organization.where(:hbx_profile =>{:$exists => true}).first.hbx_profile
     message_params = {
       sender_id: hbx_profile.id,
@@ -228,14 +246,11 @@ private
       from: 'Plan Shopping Automatic Message',
       to: "HBX ADMIN",
       subject: "Plan Shopping Help Request for #{params[:type]}",
-      body: 
-        "Please contact #{insured.first_name} #{insured.last_name}. <br/> " + 
-        "Plan Shopping help request from Person Id #{insured.id}, email #{insured.try(:user).try(:email)}.<br/>" +
-        "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}"
+      body: body,
       }
     create_secure_message message_params, hbx_profile, :sent
     create_secure_message message_params, agent, :inbox
-    result = UserMailer.new_client_notification(insured, agent, role)
+    result = UserMailer.new_client_notification(agent.user.email, first_name, name, role, insured_email, params[:person].present?)
     puts result.to_s if Rails.env.development?
    end  
 

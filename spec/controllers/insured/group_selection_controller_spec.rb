@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Insured::GroupSelectionController, :type => :controller do
   let(:person) {FactoryGirl.create(:person)}
+  let(:user) { instance_double("User", :person => person) }
+  #let(:consumer_role) {FactoryGirl.create(:consumer_role, :person => person)}
   let(:employee_role) {FactoryGirl.create(:employee_role)}
   let(:household) {double(:immediate_family_coverage_household=> coverage_household, :hbx_enrollments => hbx_enrollments)}
   let(:coverage_household) {double}
@@ -27,23 +29,25 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(Person).to receive(:find).and_return(person)
     allow(person).to receive(:primary_family).and_return(family)
     allow(family).to receive(:active_household).and_return(household)
+    allow(person).to receive(:consumer_role).and_return(nil)
+    allow(person).to receive(:consumer_role?).and_return(false)
   end
 
   context "GET new" do
     it "return http success" do
-      sign_in
+      sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id
       expect(response).to have_http_status(:success)
     end
 
     it "return blank change_plan" do
-      sign_in
+      sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id
       expect(assigns(:change_plan)).to eq ""
     end
 
     it "return change_plan" do
-      sign_in
+      sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: "change"
       expect(assigns(:change_plan)).to eq "change"
     end
@@ -115,7 +119,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(hbx_enrollment).to receive(:save).and_return(true)
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(insured_plan_shopping_path(id: hbx_enrollment.id, market_kind: 'shop', coverage_kind: 'health'))
+      expect(response).to redirect_to(insured_plan_shopping_path(id: hbx_enrollment.id, market_kind: 'shop', coverage_kind: 'health', enrollment_kind: ''))
     end
 
     it "with change_plan" do
@@ -134,7 +138,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(hbx_enrollment).to receive(:plan=).and_return(true)
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change'
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(purchase_consumer_profiles_path(change_plan:'change', coverage_kind: 'health', market_kind:'shop'))
+      expect(response).to redirect_to(purchase_insured_families_path(change_plan:'change', coverage_kind: 'health', market_kind:'shop'))
     end
 
     it "should render group selection page if not valid" do
@@ -144,14 +148,14 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to eq 'You must select the primary applicant to enroll in the healthcare plan'
-      expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop'))
+      expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
 
     it "should render group selection page if without family_member_ids" do
       post :create, person_id: person.id, employee_role_id: employee_role.id
       expect(response).to have_http_status(:redirect)
-      expect(flash[:error]).to eq 'You must select at least one applicant to enroll in the healthcare plan'
-      expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop'))
+      expect(flash[:error]).to eq 'You must select at least one Eligible applicant to enroll in the healthcare plan'
+      expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
   end
 end

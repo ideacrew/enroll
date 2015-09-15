@@ -4,6 +4,7 @@ class CensusEmployee < CensusMember
   include Searchable
   # include Validations::EmployeeInfo
   include Autocomplete
+  require 'roo'
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -34,16 +35,16 @@ class CensusEmployee < CensusMember
   validate :no_duplicate_census_dependent_ssns
 
   index({aasm_state: 1})
-  index({employer_profile_id: 1, last_name: 1, first_name: 1 })
-  index({employer_profile_id: 1, hired_on: 1, last_name: 1, first_name: 1 })
+  index({last_name: 1})
+  index({dob: 1})
+
   index({encrypted_ssn: 1, dob: 1, aasm_state: 1})
   index({employee_role_id: 1}, {sparse: true})
-  index({last_name: 1})
-  index({hired_on: -1})
-  index({is_business_owner: 1})
-  index({dob: 1})
-  index({"encrypted_ssn" => 1})
-  index({"encrypted_ssn" => 1, "dob" => 1})
+  index({employer_profile_id: 1, encrypted_ssn: 1, aasm_state: 1})
+  index({employer_profile_id: 1, last_name: 1, first_name: 1, hired_on: -1 })
+  index({employer_profile_id: 1, hired_on: 1, last_name: 1, first_name: 1 })
+  index({employer_profile_id: 1, is_business_owner: 1})
+
   index({"benefit_group_assignments._id" => 1})
   index({"benefit_group_assignments.benefit_group_id" => 1})
   index({"benefit_group_assignments.aasm_state" => 1})
@@ -223,6 +224,27 @@ class CensusEmployee < CensusMember
     "employee"
   end
 
+  def build_from_params(census_employee_params, benefit_group_id)
+    self.attributes = census_employee_params
+
+    if benefit_group_id.present?
+      benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
+      new_benefit_group_assignment = BenefitGroupAssignment.new_from_group_and_census_employee(benefit_group, self)
+      self.benefit_group_assignments = new_benefit_group_assignment.to_a
+    end
+  end
+
+  def send_invite!
+    if has_active_benefit_group_assignment?
+      plan_year = active_benefit_group_assignment.benefit_group.plan_year
+      if plan_year.employees_are_matchable?
+        Invitation.invite_employee!(self)
+        return true
+      end
+    end
+    false
+  end
+
   class << self
     def find_all_by_employer_profile(employer_profile)
       unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
@@ -237,6 +259,8 @@ class CensusEmployee < CensusMember
     def find_all_by_benefit_group(benefit_group)
       unscoped.where("benefit_group_assignments.benefit_group_id" => benefit_group._id)
     end
+
+
   end
 
   aasm do

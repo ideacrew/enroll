@@ -8,12 +8,15 @@
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:employee_role_id, @employee_role.try(:id)) %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
+          <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
+
 
           <div class="table-responsive table-border">
             <table class="table table-wrapper table-condensed group-selection-tbl">
               <tbody>
                 <% offered_relationship_benefits = @employee_role.present? ? @employee_role.benefit_group.relationship_benefits.select(&:offered).map(&:relationship) : nil
                 %>
+                <% show_residency_alert = false %>
                 <% @coverage_household.family_members.each_with_index do |family_member, index| %>
                     <% is_coverage = @employee_role.present? ? coverage_relationship_check(offered_relationship_benefits, family_member) : true
                       is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
@@ -23,7 +26,8 @@
                           role = family_member.person.consumer_role
                           rule = InsuredEligibleForBenefitRule.new(role, @benefit)
                           is_coverage, errors = rule.satisfied?
-
+                          show_residency_alert = !rule.is_residency_status_satisfied? if show_residency_alert == false
+                          errors = [incarceration_cannot_purchase(family_member)] if index==0 && errors && errors.flatten.detect{|err| err.match(/incarceration/)}
                       end
                         #TEMPORARY CODE DO NOT COPY  TODO
                       %>
@@ -41,23 +45,19 @@
           </div>
 
           <br>
-          <% if @market_kind.present? and @market_kind == 'individual' %>
-            <div id="coverage_kinds" class='row no-buffer'>
-              <div class="col-md-3 col-lg-3 col-sm-6">
-                <strong>Coverage Kind: </strong>
-              </div>
-              <div class="col-md-3 col-lg-3 col-sm-6">
-                <%= radio_button_tag 'coverage_kind', 'health', true, id: 'coverage_kind_health' %>
-                <label for="coverage_kind_health">Health</label>
-              </div>
-              <div class="col-md-3 col-lg-3 col-sm-6">
-                <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental' %>
-                <label for="coverage_kind_dental">Dental</label>
-              </div>
+          <div id="coverage_kinds" class='row no-buffer'>
+            <div class="col-md-3 col-lg-3 col-sm-6">
+              <strong>Coverage Kind: </strong>
             </div>
-          <% else %>
-            <%= hidden_field_tag 'coverage_kind', 'health' %>
-          <% end %>
+            <div class="col-md-3 col-lg-3 col-sm-6">
+              <%= radio_button_tag 'coverage_kind', 'health', true, id: 'coverage_kind_health' %>
+              <label for="coverage_kind_health">Health</label>
+            </div>
+            <div class="col-md-3 col-lg-3 col-sm-6">
+              <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental' %>
+              <label for="coverage_kind_dental">Dental</label>
+            </div>
+          </div>
 
           <% if @market_kind.present? %>
             <%= hidden_field_tag 'market_kind', @market_kind %>
@@ -75,12 +75,22 @@
             </div>
           <% end %>
 
-          <% if @consumer_role.present? && is_under_open_enrollment? %>
+          <% if @market_kind == 'individual' && is_under_open_enrollment? %>
+          <% if @change_plan.blank? && @enrollment_kind.blank?%>
           <div class='row top-pd'>
             <div class="col-sm-12">
               <p>If you enroll today, coverage will begin <%= format_date ivl_enrollment_effective_date %>. </p>
+              <p>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", "#", :id => 'find_sep_link' %></p>
             </div>
           </div>
+          <% end %>
+          <% if show_residency_alert %>
+          <div class='row top-pd'>
+            <div class="col-sm-12">
+              <p>Since <%= @person.full_name %> is not a resident of the District of Columbia she/he is not eligible to purchase a plan through DC Health Link. Other members may still be eligible to enroll. Please call us at 1-855-532-5465 to learn about other health insurance options for <%= @person.full_name %>.</p>
+            </div>
+          </div>
+          <% end %>
           <% end %>
 
           <% if @change_plan.present? %>
@@ -102,8 +112,8 @@
         </div>
 
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">            
-          <% if @change_plan.blank? && @market_kind == "individual" %>
-            <% if is_under_open_enrollment? %>
+          <% if @change_plan.blank?  && @market_kind == "individual" %>
+            <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
               <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
             <% else %>
               <%= render  partial: 'shared/sep_progress', locals: {step: '4'} %>
@@ -124,3 +134,14 @@
     <% end %>
   </div>
 </div>
+<script>
+  $(function(){
+    if ( $("#find_sep_link").length ) {
+      $("#find_sep_link").click(function() {
+      $(this).closest('form').attr('action', '<%= find_sep_insured_families_path %>');
+      $(this).closest('form').attr('method', 'get');
+      $(this).closest('form').submit();
+    });
+  }
+})
+</script>

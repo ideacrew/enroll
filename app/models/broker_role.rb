@@ -184,12 +184,12 @@ class BrokerRole
     state :broker_agency_declined
     state :broker_agency_terminated
 
-    event :approve, :after => :record_transition do
+    event :approve, :after => [:record_transition, :send_invitation] do
       transitions from: :applicant, to: :active, :guard => :is_primary_broker?
       transitions from: :applicant, to: :broker_agency_pending
     end
 
-    event :broker_agency_accept, :after => :record_transition do 
+    event :broker_agency_accept, :after => [:record_transition, :send_invitation] do 
       transitions from: :broker_agency_pending, to: :active
     end
 
@@ -201,7 +201,7 @@ class BrokerRole
       transitions from: :active, to: :broker_agency_terminated
     end
 
-    event :deny, :after => :record_transition  do
+    event :deny, :after => [:record_transition, :notify_broker_denial]  do
       transitions from: :applicant, to: :denied
     end
 
@@ -219,6 +219,7 @@ class BrokerRole
       transitions from: [:active, :broker_agency_pending, :broker_agency_terminated], to: :applicant
     end  
   end
+
 
   private
 
@@ -240,6 +241,16 @@ class BrokerRole
       from_state: aasm.from_state,
       to_state: aasm.to_state
     )
+  end
+
+  def send_invitation
+    if active?
+      Invitation.invite_broker!(self)
+    end
+  end
+
+  def notify_broker_denial
+    UserMailer.broker_denied_notification(self).deliver_now
   end
 
   def applicant?

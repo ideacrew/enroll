@@ -59,6 +59,9 @@ gem 'haml'
 gem 'sass'
 # gem 'bh'
 
+# spreadsheet support
+gem 'roo', '~> 2.1.0'
+
 gem 'devise', '~> 3.4.1'
 # gem 'devise_ldap_authenticatable', '~> 0.8.1'
 gem 'cancancan', '~> 1.9.2'
@@ -126,3 +129,4 @@ group :production do
 end
 
 gem 'aws-sdk', '~> 2'
+gem 'ruby-saml', '~> 1.0.0'

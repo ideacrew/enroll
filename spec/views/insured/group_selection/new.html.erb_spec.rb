@@ -42,8 +42,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       expect(rendered).to have_selector("input[type='checkbox']", count: 3)
     end
 
-    it "should have a checked checkbox option and a checked radio button" do
-      expect(rendered).to have_selector("input[checked='checked']", count: 2)
+    it "should have two checked checkbox option and a checked radio button" do
+      expect(rendered).to have_selector("input[checked='checked']", count: 3)
     end
 
     it "should have a disabled checkbox option" do
@@ -66,7 +66,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:consumer_role) { FactoryGirl.create(:consumer_role, person: jail_person) }
     let(:consumer_role2) { FactoryGirl.create(:consumer_role, person: person2) }
     let(:consumer_role3) { FactoryGirl.create(:consumer_role, person: person3) }
-    let(:benefit_package) { FactoryGirl.create(:benefit_package,
+
+    let(:benefit_package) { FactoryGirl.build(:benefit_package,
       title: "individual_health_benefits_2015",
       elected_premium_credit_strategy: "unassisted",
       benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
@@ -86,6 +87,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:family_member4) { instance_double("FamilyMember",id: "family_member", primary_relationship: "self", dob: Date.new(1990,10,28), full_name: "inmsr", is_primary_applicant: true, person: jail_person) }
     let(:coverage_household_jail) { instance_double("CoverageHousehold",family_members: [family_member4, family_member2, family_member3]) }
     let(:hbx_enrollment) {double(id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
+    let(:benefit_sponsorship) {double(earliest_effective_date: TimeKeeper.date_of_record.beginning_of_year)}
+    let(:current_hbx) {double(benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: true)}
 
     before(:each) do
       assign(:person, jail_person)
@@ -94,6 +97,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign(:market_kind, 'individual')
       assign(:benefit, benefit_package)
       assign(:hbx_enrollment, hbx_enrollment)
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
       allow(jail_person).to receive(:consumer_role).and_return(consumer_role)
       allow(person2).to receive(:consumer_role).and_return(consumer_role2)
       allow(consumer_role2).to receive(:is_incarcerated?).and_return(false)
@@ -101,6 +105,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(consumer_role3).to receive(:is_incarcerated?).and_return(false)
       controller.request.path_parameters[:person_id] = jail_person.id
       controller.request.path_parameters[:consumer_role_id] = consumer_role.id
+      allow(family_member4).to receive(:first_name).and_return('joey')
+      allow(family_member4).to receive(:gender).and_return('female')
       render :template => "insured/group_selection/new.html.erb"
     end
 
@@ -130,7 +136,13 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       expect(rendered).to have_selector('label', text: 'Dental')
     end
 
-
+    it "should have an incarceration warning with more text" do
+      expect(rendered).to match /Other family members may still be eligible to enroll/
+    end
+ 
+    it "should match the pronoun in the text" do
+      expect(rendered).to match /, she is not eligible/
+    end
 
   end
 

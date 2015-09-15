@@ -29,4 +29,8 @@ RSpec.describe "employers/employer_profiles/my_account/_census_employees.html.er
   it "should not have waive filter option" do
     expect(rendered).not_to have_selector("input[value='waived']")
   end
+
+  it "should have the link of add employee" do
+    expect(rendered).to have_selector("a[data-remote='true']", text: 'Add Employee')
+  end
 end

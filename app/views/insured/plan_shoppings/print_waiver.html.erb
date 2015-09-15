@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" id='printArea'>
   <div class="employee-welocome">
     <div class="row">
       <div class="col-lg-9 col-md-9 col-sm-10 col-xs-12">
@@ -11,7 +11,7 @@
 
         </div>
 
-        <%= link_to 'Print', '#', onclick: 'window.print();return false;', class: "btn btn-default interaction-click-control-print-waiver-confirmation", style: "float:left;" %>
+        <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-waiver-confirmation", style: "float:left;" %>
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section waiver_receipt">

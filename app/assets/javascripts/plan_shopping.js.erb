@@ -131,8 +131,19 @@ function applyPlanSort(sort_by){
   $("#all-plans #plans").empty().append(plandivs);
 };
 
+function updatePlanCost(elected_pct) {
+  var elected_amount = parseFloat($('#max_aptc').val()) * parseFloat(elected_pct);
+  var plans = $('.plan-row');
+  for(var i=0; i<plans.length; i++){
+    var plan = plans[i];
+    var premium_resp_amt = parseFloat($(plan).data('plan-metal-premium')) - elected_amount;
+    premium_resp_amt = premium_resp_amt.toFixed(2);
+    $(plan).find('h2.plan-premium').html("$" + premium_resp_amt);
+  };
+};
+
 $(function() {
-	$("#select-plan-container a[role='tab'][data-toggle='tab']").click(function() {
+  $(document).on('click', "#select-plan-container a[role='tab'][data-toggle='tab']", function(){
 		hidePlanTabs();
 		$(this).parent().addClass("active");
 		var attr = $(this).attr("data-plan-category-filter");
@@ -145,25 +156,36 @@ $(function() {
 				$(qstring).show();
 			}
 		}
-	});
+  });
 
-	$(".select-plan-for-comparison").change(function() {
+  $(document).on('change', '.select-plan-for-comparison', function(){
 		maybeAddComparisonPlan(this);
-	});
+  });
 
-	$(".compare-selected-plans-link").click(function() {
-
+  $(document).on('click', '.compare-selected-plans-link', function(){
 		var base_url = $(this).attr("data-uri");
-
 		doPlanComparison(base_url);
-	});
+  });
 
-	$(".all-filters-row .apply-btn").on('click', function() {
-		// $(".all-filters-row").hide();
+  $(document).on('click', '.all-filters-row .apply-btn', function(){
 		applyPlanFilters();
-	});
 
-  $(".all-filters-row .reset-btn").on('click', function() {
+    if ($('.aptc').length > 0){
+      var elected_pct = $("input[name='elected_pct']").val()
+
+      updatePlanCost(elected_pct);
+      $.ajax({
+        type: "POST",
+        url: $('#set_elected_pct_url').val(),
+        dataType: 'script',
+        data: {
+          'elected_pct': elected_pct
+        }
+      });
+    };
+  });
+
+  $(document).on('click', '.all-filters-row .reset-btn', function(){
     $(".filter-sidebar input[type='checkbox']").attr("checked", false);
     $(".filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("0");
     $(".filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val($('#max_total_employee_cost').val());
@@ -182,13 +204,15 @@ $(function() {
 //for plan_year
 $(document).on("change", "select[name='reference_plan']", function() {
   $("#employer_cost_info_btn .btn").removeClass('disabled');
-  var start_date = $("#plan_year_start_on").val();
-  if (start_date == "") {
-    return
-  }
   var reference_plan_id = $(this).val();
   if (reference_plan_id != "" && reference_plan_id != undefined){
     $(this).parents('.reference-plan-select').find("input[type='hidden']").val(reference_plan_id);
+
+    //for calculate employer contributions
+    var start_date = $("#plan_year_start_on").val();
+    if (start_date == "") {
+      return
+    }
     $(this).parents('fieldset').find('.reference_plan_info h4').html("loading...")
     $.ajax({
       type: "GET",
@@ -285,3 +309,4 @@ function calcEmployerContributions(url) {
 $(document).on("click", ".reference_plan_info h4 span", function() {
   $(this).parents(".reference_plan_info").find('.content').toggle();
 });
+
