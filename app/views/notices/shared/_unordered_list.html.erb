@@ -1,6 +1,6 @@
 <table class="total_table" border="0">
   <tbody>
-    <% if previous.present? %>
+    <% if defined? previous %>
       <tr>
         <td>
           <%= previous %>
@@ -29,10 +29,10 @@
         </ul>
       </td>
     </tr>
-    <% if after.present? %>
+    <% if defined? after %>
     <tr>
       <td>
-        <%= previous %>
+        <%= after %>
       </td>
     </tr>   
     <% end %>
