@@ -1,0 +1,125 @@
+<div class="page_break">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td colspan="2" align="center"><a href=
+            "https://dchealthlink.com/"
+            target=
+            "_blank">
+            <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top;", width: "250"  %>
+        </a></td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td></br></td>
+      </tr>
+      <tr class="wid50">
+        <td align="left"><%= format_date(Date.today) %></td>
+        <td  align="right"><%= notice.primary_identifier %></td>
+      </tr>
+    </tbody>
+  </table>
+  <%= render partial: "notices/ivl/inner_address", :locals => {notice: notice} %>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td>
+          </br>
+          </br>
+        </td>
+      </tr>
+      <tr>
+        <td><h3>Subject:  Denial of Eligibility for DC Health Link Enrollment</h3></td>
+      </tr>
+      <tr class="fssizeuser">
+        <td>Dear <%= notice.primary_fullname.strip %>:</td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr class="widn">
+        <td>Thank you for the application you submitted and we processed on <%= format_date(Date.today) %>. Unfortunately, the following individual(s) are not qualified to enroll in health insurance through DC Health Link based on the information you provided to us. </td>
+      </tr>
+    </tbody>
+  </table>
+  <% if notice.try(:individual).try(:ineligible_members).present? %>
+    <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.individual.ineligible_members} %>
+  <% end %>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td><h3 style="color:rgb(54,95,145);">Ineligibility for Assistance or Enrollment through DC Health Link</h3></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <% if notice.try(:individual).try(:ineligible_members_due_to_residency).present? %>
+    <table class="total_table" border="0">
+      <tbody>
+        <tr>
+          <td>The following individual(s)are not qualified to enrollthrough DC Health Link because they are not residents of the District of Columbia. They are encouraged to submit another application for the state where they live. You can find these applications at <a href="www.HealthCare.gov">www.HealthCare.gov</a>. 45 C.F.R. §155.305(a)(3).</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style='padding-left:5%'>
+      <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.individual.ineligible_members_due_to_residency} %>
+    </div>
+  <% end %>
+
+  <% if notice.try(:individual).try(:ineligible_members_due_to_incarceration).present? %>
+    <table class="total_table" border="0">
+      <tbody>
+        <tr>
+          <td>The following individual(s) are not qualified to enroll through DC Health Link because they are in prison or jail serving a sentence. 45 C.F.R. §155.305(a)(2).</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style='padding-left:5%'>
+      <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.individual.ineligible_members_due_to_incarceration} %>
+    </div>
+  <% end %>
+</div>
+
+<div class="page_break">
+  <% if notice.try(:individual).try(:ineligible_members_due_to_immigration).present? %>
+    <table class="total_table" border="0">
+      <tbody>
+        <tr>
+          <td>The following individual(s) are not qualified to enroll through DC Health Link because our records did not indicate that they were a U.S. Citizen or had another qualifying immigration status. 45 C.F.R. §155.305(a)(1).</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style='padding-left:5%'>
+      <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.individual.ineligible_members_due_to_immigration} %>
+    </div>
+  <% end %>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td class="mar20"><strong>Because the above individual(s) are not eligible for enrollment in coverage through DC Health Link, they also cannot get tax credits or cost-sharing reductions through DC Health Link.</strong> 45 C.F.R. §155.305(f) & (g).</td>
+      </tr>
+      <tr><td></br></td></tr>
+      <tr class="mar20">
+        <td><h3 style="color:rgb(54,95,145);">Your Secure User Account</h3></td>
+      </tr>
+      <tr class="mar10">
+        <td>Important information is stored in your account on the DC Health Link website.  If you don't have an account already, you can create one by going to <a href="www.DCHealthLink.com">www.DCHealthLink.com.</a> You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free at (855) 532-5465.</td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="mar20" border="0">
+    <tbody>
+      <tr><td></br></td></tr>
+      <tr>
+        <td><h3 style="color:rgb(54,95,145);">If You Think We Made a Mistake</h3></td>
+      </tr>
+      <tr>
+        <td>If you disagree with any determination about the amount or type of health care coverage benefits you or any of the other person in your household was found eligible for, you have the right to appeal the determination(s). You may request an appeal by phone, in person, online, and by mail. You must request an appeal <strong>by &lt;Date of Notice+95 calendar days&gt;</strong>.  45 C.F.R. §155.520. <strong> See the insert for more information on your appeal rights.</strong></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

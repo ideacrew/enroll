@@ -74,6 +74,19 @@ class CoverageHousehold
        coverage_household_members.delete(family_member)
     end
   end
+  
+  def notify_the_user(member)
+    if member.person && (role = member.person.consumer_role)
+      if role.is_hbx_enrollment_eligible? && role.identity_verified_date
+        IvlNotificationMailer.lawful_presence_verified(role)
+      elsif role.is_hbx_enrollment_eligible? && role.identity_verification_pending?
+        IvlNotificationMailer.lawful_presence_unverified(role)
+      elsif !role.is_hbx_enrollment_eligible?
+        IvlNotificationMailer.lawfully_ineligible(role)
+      end
+    end
+  end
+  
 
   aasm do
     state :unverified, initial: true
