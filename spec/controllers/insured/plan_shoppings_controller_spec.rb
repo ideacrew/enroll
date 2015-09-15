@@ -282,5 +282,25 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         expect(assigns(:max_deductible)).to eq 0
       end
     end
+
+    context "when user has_active_consumer_role" do
+      let(:tax_household) {double}
+      let(:household) {double(tax_households: [tax_household])}
+      let(:family) {double(latest_household: household)}
+      let(:person) {double(primary_family: family, has_active_consumer_role?: true)}
+      let(:user) {double(person: person)}
+      before :each do
+        allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
+        get :show, id: "hbx_id"
+      end
+
+      it "should get max_aptc" do
+        expect(assigns(:max_aptc)).to eq 111
+      end
+
+      it "should get default selected_aptc_pct" do
+        expect(session[:selected_aptc_pct]).to eq 0.8
+      end
+    end
   end
 end
