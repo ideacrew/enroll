@@ -153,7 +153,7 @@ class Organization
         errors.add(:base, "can't have more than one mailing address")
       end
       if !errors.any?# this means that the validation succeeded and we can delete all the persisted ones
-        binding.pry
+#        binding.pry
         new_data = self.office_locations.select{|l| !l.persisted?}.dup
         #self.office_locations.delete_all
         #self.reload

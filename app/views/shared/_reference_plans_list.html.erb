@@ -41,9 +41,11 @@
 <div class="col-xs-12 plan-options">
 <span>Let you plan participants choose any plan they want that is offered by a single carrier. It will NOT cost you more to let them choose.</span>
 <div class="col-xs-12 row">
+  <%= @carrier_names.inspect %>
   <%= @carrier_names.each_key do |c| %>
-  <div class="col-xs-3" style="<%= 'display:block;' if (selected_kind_carrier or selected_kind_plan) %>">
-    <%= f.radio_button :carrier_for_elected_plan, 'this' %>
+  <div class="col-xs-3">
+    <%= c.inspect %>
+    <%= f.radio_button :carrier_for_elected_plan %>
     <%= f.label :carrier_for_elected_plan %>
 
   </div>

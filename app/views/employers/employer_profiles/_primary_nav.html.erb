@@ -32,7 +32,7 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <h4>My Account</h4>
-      <%= link_to 'Update Business Info', employers_employer_profile_path(@employer_profile.id, :tab=>'profile') %>
+      <%= link_to 'Update Business Info', edit_employers_employer_profile_path(@employer_profile.organization, :tab=>'profile') %>
     </div>
       <div class="panel-body">
         <div>My Employees: <span class="fte-count"><%= @fte_count.present? ? @fte_count:0 %></span></div>
