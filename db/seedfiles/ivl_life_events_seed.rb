@@ -1,5 +1,5 @@
 QualifyingLifeEventKind.create!(
-  title: "Dependent loss of ESI due to employee gaining Medicare",
+  title: "Dependent loss of Employer-Subsidized Insurance due to employee gaining Medicare",
   tool_tip: "A dependent is losing access to ESI coverage because the employee is enrolling in Medicare",
   action_kind: "add_benefit",
   event_kind_label: "Last day of coverage",
@@ -162,7 +162,7 @@ QualifyingLifeEventKind.create!(
   effective_on_kinds: ["first_of_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
-  is_self_attested: true,
+  is_self_attested: false,
     # start_of_sep: "Date change was verified (NOTE: this is not necessarily the date the customer reported the change)",
     # coverage_effective_date: "Regular effective date")
   )
