@@ -19,7 +19,7 @@ class BrokerAgencyProfile
   field :corporate_npn, type: String
   field :primary_broker_role_id, type: BSON::ObjectId
 
-  field :languages_spoken, type: Array, default: [] # TODO
+  field :languages_spoken, type: Array, default: ["en"] # TODO
   field :working_hours, type: Boolean, default: false
   field :accept_new_clients, type: Boolean
 
@@ -134,7 +134,7 @@ class BrokerAgencyProfile
 
   def languages
     if languages_spoken.any?
-      return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name}.join(",")
+      return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
     end
   end
 
