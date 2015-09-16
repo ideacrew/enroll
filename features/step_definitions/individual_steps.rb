@@ -199,3 +199,8 @@ And(/I should see the individual home page/) do
   click_when_present(@browser.a(class: /interaction-click-control-my-dc-health-link/))
   expect(@browser.element(text: /my dc health link/i).visible?).to be_truthy
 end
+
+And(/I click to see my Secure Purchase Confirmation/) do
+  @browser.link(text: /Messages/).click
+  wait_and_confirm_text /Your Secure Purchase Confirmation/
+end
