@@ -1,4 +1,5 @@
 class Insured::PlanShoppingsController < ApplicationController
+  include ApplicationHelper
   include Acapi::Notifiers
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
@@ -175,9 +176,15 @@ class Insured::PlanShoppingsController < ApplicationController
   def set_plans_by(hbx_enrollment_id:)
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
+    check_catastrophic_criteria
     if @market_kind == 'shop'
       @benefit_group = @hbx_enrollment.benefit_group
       @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment)
+    elsif @catastrophic_age_limit == true # only show catastrophic plans
+      elected_plans = Plan.catastrophic_level.where(active_year: TimeKeeper.date_of_record.year)
+      @plans = elected_plans.collect() do |plan|
+        UnassistedPlanCostDecorator.new(plan, @hbx_enrollment)
+      end
     elsif @market_kind == 'individual'
       elected_plans = Plan.individual_plans(coverage_kind: @coverage_kind, active_year: TimeKeeper.date_of_record.year)
       #FIXME need benefit_package for individual
@@ -198,6 +205,10 @@ class Insured::PlanShoppingsController < ApplicationController
   def set_kind_for_market_and_coverage
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
+  end
+
+  def check_catastrophic_criteria
+    @catastrophic_age_limit = @hbx_enrollment.household.family.family_members.map { |a| calculate_age_by_dob(a.dob) }.max < 30
   end
 
   def get_aptc_info_from_session

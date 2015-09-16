@@ -1,5 +1,5 @@
 module ApplicationHelper
-  
+
   def menu_tab_class(a_tab, current_tab)
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
@@ -55,7 +55,7 @@ module ApplicationHelper
     date_value.strftime("%m/%d/%Y") if date_value.respond_to?(:strftime)
   end
 
-  def format_datetime(date_value)    
+  def format_datetime(date_value)
     date_value.to_time.strftime("%m/%d/%Y %H:%M %Z %:z") if date_value.respond_to?(:strftime)
   end
 
@@ -447,10 +447,15 @@ module ApplicationHelper
     end.uniq
   end
 
+  def calculate_age_by_dob(dob)
+    now = Date.today
+    now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+  end
+
   def ethnicity_collection
     [
       ["White", "Black or African American", "Asian Indian", "Chinese" ],
-      ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], 
+      ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"],
       ["Native Hawaiian", "Samoan", "Guamanian or Chamorro", ],
       ["Other Pacific Islander", "American Indian or Alaskan Native", "Other"]
     ].inject([]){ |sets, ethnicities|

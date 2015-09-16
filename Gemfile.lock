@@ -55,12 +55,12 @@ GEM
     animate-rails (1.0.8)
       rails
     arel (6.0.3)
-    aws-sdk (2.1.20)
-      aws-sdk-resources (= 2.1.20)
-    aws-sdk-core (2.1.20)
+    aws-sdk (2.1.21)
+      aws-sdk-resources (= 2.1.21)
+    aws-sdk-core (2.1.21)
       jmespath (~> 1.0)
-    aws-sdk-resources (2.1.18)
-      aws-sdk-core (= 2.1.18)
+    aws-sdk-resources (2.1.21)
+      aws-sdk-core (= 2.1.21)
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
@@ -413,7 +413,8 @@ GEM
     thor (0.19.1)
     thread_safe (0.3.5)
     tilt (1.4.1)
-    timers (1.1.0)
+    timers (4.0.4)
+      hitimes
     ttfunk (1.0.3)
     turbolinks (2.5.3)
       coffee-rails
@@ -521,4 +522,9 @@ DEPENDENCIES
   unicorn (~> 4.8.3)
   virtus
   watir
+  web-console (~> 2.0)
+  wicked_pdf
   wkhtmltopdf-binary-edge (~> 0.12.2.1)
+
+BUNDLED WITH
+   1.10.6

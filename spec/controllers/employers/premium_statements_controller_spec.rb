@@ -13,7 +13,8 @@ RSpec.describe Employers::PremiumStatementsController do
   let(:plan){ double(
     "Plan",
     name: "my plan",
-    carrier_profile: carrier_profile
+    carrier_profile: carrier_profile,
+    coverage_kind: "my coverage kind"
     ) }
 
   let(:hbx_enrollments) { [
