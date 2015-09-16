@@ -49,5 +49,15 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       expect(rendered).to have_selector('input#set_elected_pct_url')
       expect(rendered).to have_selector("input[name='elected_pct']")
     end
+
+    it "should have Aptc used" do
+      expect(rendered).to match /APTC Used/
+      expect(rendered).to have_selector("input#aptc-used")
+    end
+
+    it "should have aptc available" do
+      expect(rendered).to match /APTC Available/
+      expect(rendered).to match /330/
+    end
   end
 end

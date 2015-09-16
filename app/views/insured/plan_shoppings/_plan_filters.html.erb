@@ -147,8 +147,16 @@
     <% if @person.has_active_consumer_role? %>
       <div class="aptc">
         <hr />
-        <p>APTC Available: <span><%=  number_to_currency(@max_aptc, precision: 2) %></span></p>
-        <p>APTC Used: <span id='aptc-used'><%=  number_to_currency(@max_aptc * 0.85, precision: 2) %></span></p>
+        <div class="row">
+          <div class="col-xs-6">
+            <p>APTC Available</p>
+            <p><span><%= number_to_currency(@max_aptc, precision: 2) %></span></p>
+          </div>
+          <div class="col-xs-6">
+            <p>APTC Used</p>
+            <p>$ <input type="text" id='aptc-used' value="<%= number_with_precision(@max_aptc * 0.85, precision: 2) %>" /></p>
+          </div>
+        </div>
         <%= hidden_field_tag :max_aptc, @max_aptc %>
         <%= hidden_field_tag :set_elected_pct_url, set_elected_pct_insured_plan_shopping_path(id: @hbx_enrollment.id) %>
         <form onsubmit="return false" oninput="pct.value = (elected_pct.value*100).toFixed(0)">
