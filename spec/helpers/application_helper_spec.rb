@@ -150,4 +150,17 @@ RSpec.describe ApplicationHelper, :type => :helper do
       end
     end
   end
+
+  describe "#generate_options_for_effective_on_kinds" do
+    it "it should return blank array" do
+      options = generate_options_for_effective_on_kinds([], TimeKeeper.date_of_record)
+      expect(options).to eq []
+    end
+
+    it "it should return options" do
+      options = generate_options_for_effective_on_kinds(['date_of_event', 'fixed_first_of_next_month'], TimeKeeper.date_of_record)
+      date = TimeKeeper.date_of_record
+      expect(options).to eq [["Date of event(#{date.to_s})", 'date_of_event'], ["Fixed first of next month(#{(date.end_of_month+1.day).to_s})", 'fixed_first_of_next_month']]
+    end
+  end
 end
