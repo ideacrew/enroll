@@ -4,7 +4,7 @@ BULK UPLOAD/TERMINATE FOR CENCUS EMPLOYEES
 <br/>
 <br/>
 <br/>
-<form action="/employers/employer_profiles/55e9a504536167fae6f18c01/bulk_employee_upload" method="post" enctype="multipart/form-data">
+<form action="/employers/employer_profiles/<%= @employer_profile.id %>/bulk_employee_upload" method="post" enctype="multipart/form-data">
   <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
   <input type="file" name="file"> Upload A Valid CSV (Better error handling coming later)<br/>
   <input type="submit">
