@@ -17,9 +17,9 @@ module Parsers::Xml::Cv
 
     def to_hash
       {
-       integrated_case_id: integrated_case_id.split('#').last,
+       integrated_case_id: integrated_case_id,
        family_members: family_members.map(&:to_hash),
-       primary_family_member_id: primary_family_member_id.split('#').last,
+       primary_family_member_id: primary_family_member_id,
        households: households.map(&:to_hash),
        submitted_at: submitted_at,
        is_active: is_active,

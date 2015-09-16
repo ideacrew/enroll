@@ -306,7 +306,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       end
 
       it "should get default selected_aptc_pct" do
-        expect(session[:selected_aptc_pct]).to eq 0.8
+        expect(session[:selected_aptc_pct]).to eq 0.85
       end
     end
   end

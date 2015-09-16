@@ -12,9 +12,9 @@ module Parsers::Xml::Cv
 
     def to_hash
       {
-        subject_individual_id: subject_individual_id.split('#').last,
-        relationship_uri: relationship_uri.split('#').last,
-        object_individual_id: object_individual_id.split('#').last
+        subject_individual_id: subject_individual_id,
+        relationship_uri: relationship_uri,
+        object_individual_id: object_individual_id
       }
     end
   end
