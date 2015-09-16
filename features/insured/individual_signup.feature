@@ -34,5 +34,6 @@ Feature: Insured Plan Shopping on Individual market
       And I click on purchase button on confirmation page
       When I click on continue on qle confirmation page
       And I should see the individual home page
+      And I click to see my Secure Purchase Confirmation
 
 

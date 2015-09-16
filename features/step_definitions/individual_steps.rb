@@ -160,6 +160,11 @@ And(/I click on continue button on group selection page/) do
     qle_form = @browser.div(class: /qle-form/)
     click_when_present(qle_form.a(class: /interaction-click-control-continue/))
 
+    effective_field = @browser.div(class: /selectric-wrapper/, text: /SELECT EFFECTIVE ON KIND/i)
+
+    click_when_present(effective_field)
+    effective_field.li(index: 1).click
+
     @browser.div(class: /success-info/).wait_until_present
     @browser.div(class: /success-info/).button(class: /interaction-click-control-continue/).click
   end
@@ -193,4 +198,9 @@ And(/I should see the individual home page/) do
   expect(@browser.element(text: /manage family/i).visible?).to be_truthy
   click_when_present(@browser.a(class: /interaction-click-control-my-dc-health-link/))
   expect(@browser.element(text: /my dc health link/i).visible?).to be_truthy
+end
+
+And(/I click to see my Secure Purchase Confirmation/) do
+  @browser.link(text: /Messages/).click
+  wait_and_confirm_text /Your Secure Purchase Confirmation/
 end
