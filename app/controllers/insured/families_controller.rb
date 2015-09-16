@@ -70,17 +70,17 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_qle_date
-    qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = TimeKeeper.date_of_record - 30.days
     end_date = TimeKeeper.date_of_record + 30.days
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id]) 
       start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
-      @effective_on_options = @qle.employee_gaining_medicare(qle_date) if @qle.is_dependent_loss_of_esi?
+      @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_esi?
     end
 
-    @qualified_date = (start_date <= qle_date && qle_date <= end_date) ? true : false
+    @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
   end
 
   def purchase

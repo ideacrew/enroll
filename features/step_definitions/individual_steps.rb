@@ -160,6 +160,11 @@ And(/I click on continue button on group selection page/) do
     qle_form = @browser.div(class: /qle-form/)
     click_when_present(qle_form.a(class: /interaction-click-control-continue/))
 
+    effective_field = @browser.div(class: /selectric-wrapper/, text: /SELECT EFFECTIVE ON KIND/i)
+
+    click_when_present(effective_field)
+    effective_field.li(index: 1).click
+
     @browser.div(class: /success-info/).wait_until_present
     @browser.div(class: /success-info/).button(class: /interaction-click-control-continue/).click
   end

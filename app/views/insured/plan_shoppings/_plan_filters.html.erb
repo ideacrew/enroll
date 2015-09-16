@@ -147,13 +147,13 @@
     <% if @person.has_active_consumer_role? %>
       <div class="aptc">
         <hr />
-        <h5>Maximum APTC: $<%= @max_aptc %></h5>
-        <p>Elected Percent:</p>
+        <p>APTC Available: <span><%=  number_to_currency(@max_aptc, precision: 2) %></span></p>
+        <p>APTC Used: <span id='aptc-used'><%=  number_to_currency(@max_aptc * 0.85, precision: 2) %></span></p>
         <%= hidden_field_tag :max_aptc, @max_aptc %>
         <%= hidden_field_tag :set_elected_pct_url, set_elected_pct_insured_plan_shopping_path(id: @hbx_enrollment.id) %>
         <form onsubmit="return false" oninput="pct.value = (elected_pct.value*100).toFixed(0)">
-          <input name='elected_pct' type="range" min='0' max='1' value='0.8' step='0.01'/>
-          <span><output name="pct">80</output>%</span>
+          <input name='elected_pct' type="range" min='0' max='1' value='0.85' step='0.05'/>
+          <span><output name="pct">85</output>%</span>
         </form>
       </div>
     <% end %>
