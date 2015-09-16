@@ -14,7 +14,7 @@ module Parsers::Xml::Cv
 
     def to_hash
       {
-        id: id.split('#').last,
+        id: id,
         household_state: household_state.split('#').last,
         maximum_aptc: maximum_aptc,
         csr_percent: csr_percent,

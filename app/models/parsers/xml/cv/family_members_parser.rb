@@ -19,7 +19,7 @@ module Parsers::Xml::Cv
 
     def to_hash
       {
-        id: id.split('#').last,
+        id: id,
         person: person.to_hash,
         person_relationships: person_relationships.map(&:to_hash),
         person_demographics: person_demographics.to_hash,

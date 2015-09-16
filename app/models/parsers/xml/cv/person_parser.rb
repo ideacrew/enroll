@@ -29,7 +29,7 @@ module Parsers::Xml::Cv
 
     def to_hash
       response = {
-          id: id.split('#').last,
+          id: id,
           first_name: name_first,
           last_name: name_last,
           :name_pfx => name_pfx,
