@@ -1,9 +1,21 @@
 <li id="<%= employee_dependent_form_id(dependent) %>" class="dependent_list">
 
-  <%= render 'shared/error_messages', :object => dependent %>
+  <!-- <%= render 'shared/error_messages', :object => dependent %> -->
 
   <div id="add_info_<%= dependent.id %>">
     <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
+      <% if dependent.errors.any? %>
+        <div class="alert alert-error">
+          <h4>
+            <%= "#{pluralize(@dependent.errors.size, "error")} prohibited this family member from being saved:" %>
+          </h4>
+          <ul>
+            <% dependent.errors.full_messages.each do |msg| %>
+              <li> <%= msg %> </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
       <%= token_tag form_authenticity_token %>
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
         <div class="dependent_notice_div_<%= dependent.id%>"></div>
@@ -63,7 +75,7 @@
 
       <div class="col-md-3 col-sm-3 no-pd">
         <div class="form-group form-group-lg">
-          <%= f.select :relationship, options_for_select(PersonRelationship::Relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: f.object.relationship), {include_blank: "RELATION", required: true} %>
+          <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "RELATION", required: true} %>
         </div>
       </div>
 
@@ -82,7 +94,7 @@
         </div>
       </div>
     </div>
-    <% if request.referer.include?("consumer_role_id") %>
+    <% if @person.has_active_consumer_role? %>
       <%= render 'shared/consumer_fields', f: f %>
     <% end %>
 

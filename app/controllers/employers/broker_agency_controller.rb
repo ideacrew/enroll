@@ -33,7 +33,7 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def active_broker
-    @broker_agency_accounts = @employer_profile.broker_agency_accounts
+    @broker_agency_account = @employer_profile.active_broker_agency_account
   end
 
   def create
@@ -42,7 +42,7 @@ class Employers::BrokerAgencyController < ApplicationController
 
     if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
       @employer_profile.broker_role_id = broker_role_id
-      @employer_profile.broker_agency_profile = broker_agency_profile
+      @employer_profile.hire_broker_agency(broker_agency_profile)
       @employer_profile.save!
     end
 
@@ -51,19 +51,15 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def terminate
-    termination_date = ""
     if params["termination_date"].present?
       termination_date = DateTime.strptime(params["termination_date"], '%m/%d/%Y').try(:to_date)
-    end
-
-    if termination_date.present?
-      @employer_profile.terminate_active_broker_agency(termination_date)
+      @employer_profile.fire_broker_agency(termination_date)
       @fa = @employer_profile.save!
     end
 
     respond_to do |format|
       format.js {
-        if termination_date.present? and @fa
+        if params["termination_date"].present? && @fa
           flash[:notice] = "Broker terminated successfully."
           render text: true
         else

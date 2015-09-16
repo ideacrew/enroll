@@ -41,6 +41,9 @@ class Person
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
 
+  field :no_dc_address, type: Boolean, default: false
+  field :no_dc_address_reason, type: String, default: ""
+
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
@@ -333,12 +336,24 @@ class Person
     self.emails << ::Email.new(:kind => 'work', :address => email)
   end
 
+  def home_email
+    emails.detect { |adr| adr.kind == "home" }
+  end
+
+  def work_email
+    emails.detect { |adr| adr.kind == "home" }
+  end
+
   def has_active_consumer_role?
     consumer_role.present? and consumer_role.is_active?
   end
 
   def has_active_employee_role?
     employee_roles.present? and employee_roles.active.present?
+  end
+
+  def residency_eligible?
+    no_dc_address and no_dc_address_reason.present?
   end
 
   class << self
@@ -541,7 +556,7 @@ class Person
     welcome_subject = "Welcome to DC HealthLink"
     welcome_body = "DC HealthLink is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     mailbox = Inbox.create(recipient: self)
-    mailbox.messages.create(subject: welcome_subject, body: welcome_body)
+    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: 'DC Health Link')
   end
 
   def update_full_name

@@ -91,6 +91,18 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
         sep.qle_on = event_date
         expect(sep.effective_on).to eq event_date
       end
+
+      context "for first_of_month" do
+        before :each do
+          sep.qualifying_life_event_kind = qle
+          sep.effective_on_kind = "first_of_month"
+        end
+
+        it "should the first of month" do
+          sep.qle_on = event_date
+          expect(sep.effective_on).to eq [event_date, TimeKeeper.date_of_record].max.end_of_month + 1.day
+        end
+      end
     end
 
     context "SEP is active as of this date" do

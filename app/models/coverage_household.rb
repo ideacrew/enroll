@@ -74,6 +74,19 @@ class CoverageHousehold
        coverage_household_members.delete(family_member)
     end
   end
+  
+  def notify_the_user(member)
+    if member.person && (role = member.person.consumer_role)
+      if role.is_hbx_enrollment_eligible? && role.identity_verified_date
+        IvlNotificationMailer.lawful_presence_verified(role)
+      elsif role.is_hbx_enrollment_eligible? && role.identity_verification_pending?
+        IvlNotificationMailer.lawful_presence_unverified(role)
+      elsif !role.is_hbx_enrollment_eligible?
+        IvlNotificationMailer.lawfully_ineligible(role)
+      end
+    end
+  end
+  
 
   aasm do
     state :unverified, initial: true
@@ -102,12 +115,15 @@ class CoverageHousehold
     end
   end
 
-  def self.update_individual_eligibilities_for(person)
-    found_families = Family.find_all_by_person(person)
+  def self.update_individual_eligibilities_for(consumer_role)
+    found_families = Family.find_all_by_person(consumer_role.try(:person))
     found_families.each do |ff|
       ff.households.each do |hh|
         hh.coverage_households.each do |ch|
           ch.evaluate_individual_market_eligiblity
+        end
+        hh.hbx_enrollments.active.each do |he|
+          he.evaluate_individual_market_eligiblity
         end
       end
     end

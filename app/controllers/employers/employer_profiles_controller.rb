@@ -114,7 +114,10 @@ class Employers::EmployerProfilesController < ApplicationController
     params.permit!
     @organization = Forms::EmployerProfile.new(params[:organization])
     if @organization.save(current_user)
-      redirect_to employers_employer_profile_path(@organization.employer_profile)
+      @person = current_user.person
+      create_sso_account(current_user, current_user.person, 15) do
+        redirect_to employers_employer_profile_path(@organization.employer_profile)
+      end
     else
       render action: "new"
     end

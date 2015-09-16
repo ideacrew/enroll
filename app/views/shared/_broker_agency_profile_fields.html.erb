@@ -24,26 +24,8 @@
 </div>
 
 <script type="text/javascript">
-    $(function() {
-      $('#broker_agency_language_select').on('selectric-init', function(element){
-        $('#broker_agency_language_select').selectric('destroy'); 
-        $('#broker_agency_language_select').multiselect({
-           nonSelectedText: 'Select Language',
-           maxHeight: 300
-        });
-        $('#broker_agency_language_select').multiselect('select', 'en', true);
-      });
-    });
+  $(function() {
+    applyMultiLanguateSelect();
+  });
 </script>
 
-<style type="text/css">
- .language_multi_select .multiselect {
-    border: none;
-    font-size: 12px;
-    line-height: 30px;
- }
-
- .language_multi_select .multiselect .caret {
-    color: #bbb;
- }
-</style>

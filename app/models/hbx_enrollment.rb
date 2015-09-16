@@ -29,6 +29,10 @@ class HbxEnrollment
 
   field :elected_premium_credit, type: Money, default: 0.0
   field :applied_premium_credit, type: Money, default: 0.0
+  # TODO need to understand these two fields
+  field :elected_aptc_pct, type: Float, default: 0.0
+  field :elected_amount, type: Money, default: 0.0
+  field :applied_aptc_amount, type: Money, default: 0.0
 
   field :effective_on, type: Date
   field :terminated_on, type: Date
@@ -86,6 +90,9 @@ class HbxEnrollment
 
     state :inactive   # :after_enter inform census_employee
 
+    state :unverified
+    state :enrolled_contingent
+
     event :waive_coverage do
       transitions from: [:shopping, :coverage_selected], to: :inactive, after: :propogate_waiver
     end
@@ -97,9 +104,48 @@ class HbxEnrollment
     event :terminate_coverage do
       transitions from: :coverage_selected, to: :coverage_terminated, after: :propogate_terminate
     end
+
+    event :move_to_enrolled! do
+      transitions from: :shopping, to: :coverage_enrolled
+      transitions from: :unverified, to: :coverage_enrolled
+      transitions from: :enrolled_contingent, to: :coverage_enrolled
+      transitions from: :coverage_enrolled, to: :coverage_enrolled
+    end
+
+    event :move_to_contingent! do
+      transitions from: :shopping, to: :enrolled_contingent
+      transitions from: :unverified, to: :enrolled_contingent
+      transitions from: :enrolled_contingent, to: :enrolled_contingent
+      transitions from: :coverage_enrolled, to: :enrolled_contingent
+    end
+
+    event :move_to_pending! do
+      transitions from: :shopping, to: :unverified
+      transitions from: :unverified, to: :unverified
+      transitions from: :enrolled_contingent, to: :unverified
+      transitions from: :coverage_enrolled, to: :unverified
+    end
   end
 
   before_save :generate_hbx_id
+
+  def self.update_individual_eligibilities_for(consumer_role)
+    found_families = Family.find_all_by_person(consumer_role.person)
+    found_families.each do |ff|
+      ff.households.each do |hh|
+        hh.hbx_enrollments.active.each do |he|
+          he.evaluate_individual_market_eligiblity
+        end
+      end
+    end
+  end
+
+  def evaluate_individual_market_eligiblity
+    eligibility_ruleset = ::RuleSet::HbxEnrollment::IndividualMarketVerification.new(self)
+    if eligibility_ruleset.applicable?
+      self.send(eligibility_ruleset.determine_next_state)
+    end
+  end
 
 
   def benefit_sponsored?
@@ -196,6 +242,15 @@ class HbxEnrollment
     hbx_enrollment_members.count - 1
   end
 
+  def phone_number
+    if plan.present?
+      phone = plan.try(:carrier_profile).try(:organization).try(:primary_office_location).try(:phone)
+      "#{phone.try(:area_code)}#{phone.try(:number)}"
+    else
+      ""
+    end
+  end
+
   def rebuild_members_by_coverage_household(coverage_household:)
     applicant_ids = hbx_enrollment_members.map(&:applicant_id)
     coverage_household.coverage_household_members.each do |coverage_member|
@@ -210,6 +265,15 @@ class HbxEnrollment
 
   def update_current(updates)
     household.hbx_enrollments.where(id: id).update_all(updates)
+  end
+
+  def update_hbx_enrollment_members_premium(decorated_plan)
+    return if decorated_plan.blank? and hbx_enrollment_members.blank?
+
+    hbx_enrollment_members.each do |member|
+      #TODO update applied_aptc_amount error like hbx_enrollment
+      member.update_current(applied_aptc_amount: decorated_plan.aptc_amount(member))
+    end
   end
 
   # FIXME: not sure what this is or if it should be removed - Sean
@@ -253,7 +317,11 @@ class HbxEnrollment
       enrollment.household = coverage_household.household
       enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
-      enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+      enrollment.effective_on = if qle
+                                  calculate_start_date_by_qle(coverage_household.household)
+                                else
+                                  calculate_start_date_from(employee_role, coverage_household, benefit_group)
+                                end
       # benefit_group.plan_year.start_on
       enrollment.benefit_group = benefit_group
       census_employee = employee_role.census_employee
@@ -269,8 +337,7 @@ class HbxEnrollment
       if qle
         enrollment.effective_on = calculate_start_date_by_qle(coverage_household.household)
       else
-        benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").benefit_sponsorship
-        enrollment.effective_on = benefit_sponsorship.earliest_effective_date
+        enrollment.effective_on = HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
       end
     else
       raise "either employee_role or consumer_role is required"

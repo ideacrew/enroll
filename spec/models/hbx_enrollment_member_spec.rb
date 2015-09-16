@@ -38,11 +38,11 @@ describe HbxEnrollmentMember, dbclean: :after_all do
         expect(@enrollment.hbx_enrollment_members.first.errors[:is_subscriber].any?).to be_falsey
       end
 
-      it "should raise if subscriber(primary applicant) is not selected during enrollment" do
-        enrollment_members.reject!{ |a| a._id == subscriber._id }
-        expect(@enrollment.valid?).to be_falsey
-        expect(@enrollment.hbx_enrollment_members.first.errors[:is_subscriber].any?).to be_truthy
-      end
+      # it "should raise if subscriber(primary applicant) is not selected during enrollment" do
+      #   enrollment_members.reject!{ |a| a._id == subscriber._id }
+      #   expect(@enrollment.valid?).to be_falsey
+      #   expect(@enrollment.hbx_enrollment_members.first.errors[:is_subscriber].any?).to be_truthy
+      # end
 
       context "should not raise error if employee_role is blank" do
         it "when subscriber is selected during enrollment" do
@@ -57,6 +57,18 @@ describe HbxEnrollmentMember, dbclean: :after_all do
           expect(@enrollment.valid?).to be_truthy
           expect(@enrollment.hbx_enrollment_members.first.errors[:is_subscriber].any?).to be_falsey
         end
+      end
+    end
+
+    context "update_current" do
+      before :all do
+        @member = enrollment.hbx_enrollment_members.last
+        @member.update_current(applied_aptc_amount: 11.1)
+      end
+
+      it "member should update applied_aptc_amount" do
+        @member.reload
+        expect(@member.applied_aptc_amount.to_f).to eq 11.1.to_f
       end
     end
   end

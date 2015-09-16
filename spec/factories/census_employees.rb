@@ -10,7 +10,8 @@ FactoryGirl.define do
     is_business_owner  false
     association :address, strategy: :build
     association :email, strategy: :build
-
+    association :employer_profile, strategy: :build
+    
     trait :owner do
       is_business_owner  true
     end

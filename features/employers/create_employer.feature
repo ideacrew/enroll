@@ -15,6 +15,7 @@ Feature: Create Employer
       When I visit the Employer portal
         Then John Doe creates an HBX account
         Then I should see a successful sign up message
+          Then I should click on employer portal
           Then John Doe creates a new employer profile
           When I go to the Profile tab
           Then I should see Edit Details link

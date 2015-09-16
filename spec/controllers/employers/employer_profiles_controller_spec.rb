@@ -213,8 +213,8 @@ RSpec.describe Employers::EmployerProfilesController do
   end
 
   describe "POST create" do
-    let(:user){ double("User") }
-    let(:person){ double("Person") }
+    let(:user){ double("User", :idp_verified? => true) }
+    let(:person){ double("Person", :id => "some person id") }
     let(:phone_attributes) { {
       :kind => "phone kind",
       :number => "phone number",
@@ -253,6 +253,7 @@ RSpec.describe Employers::EmployerProfilesController do
     before(:each) do
       sign_in user
       allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:switch_to_idp!)
       allow(Forms::EmployerProfile).to receive(:new).and_return(organization)
       allow(organization).to receive(:save).and_return(save_result)
       post :create, :organization => organization_params
@@ -286,8 +287,8 @@ RSpec.describe Employers::EmployerProfilesController do
   end
 
   describe "POST create" do
-    let(:user) { double("User") }
-    let(:person) { double("Person") }
+    let(:user) { double("User", :idp_verified? => true) }
+    let(:person) { double("Person", :id => "SOME PERSON ID") }
     let(:employer_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:found_employer) { double("test", :save => validation_result, :employer_profile => double) }
     let(:office_locations){[double(address: double("address"), phone: double("phone"), email: double("email"))]}
@@ -297,6 +298,7 @@ RSpec.describe Employers::EmployerProfilesController do
       sign_in user
       allow(Forms::EmployerProfile).to receive(:new).and_return(found_employer)
       allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:switch_to_idp!)
 #      allow(EmployerProfile).to receive(:find_by_fein).and_return(found_employer)
 #      allow(found_employer).to receive(:organization).and_return(organization)
       post :create, :organization => employer_parameters

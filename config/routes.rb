@@ -1,6 +1,12 @@
 Rails.application.routes.draw do
 
-  devise_for :users
+  devise_for :users, :controllers => { :registrations => "users/registrations" }
+
+  resources :saml, only: :index do
+    collection do
+      post :login
+    end
+  end
 
   namespace :exchanges do
     resources :inboxes, only: [:show, :destroy]
@@ -64,6 +70,7 @@ Rails.application.routes.draw do
         post 'thankyou'
         post 'waive'
         post 'terminate'
+        post 'set_elected_pct'
       end
     end
 
@@ -72,6 +79,7 @@ Rails.application.routes.draw do
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
       get 'new'
+
       collection do
         get 'home'
         get 'manage_family'
@@ -275,9 +283,6 @@ Rails.application.routes.draw do
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
-
-
-
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

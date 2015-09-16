@@ -11,6 +11,8 @@ describe "insured/employee_dependents/_dependent_form.html.erb" do
     before :each do
       sign_in user
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
+      allow(person).to receive(:has_active_consumer_role?).and_return true 
+      assign :person, person
       render "insured/employee_dependents/dependent_form", dependent: dependent, person: person
     end
 
@@ -24,6 +26,7 @@ describe "insured/employee_dependents/_dependent_form.html.erb" do
 
     it "should have consumer_fields area" do
       expect(rendered).to have_selector("div#consumer_fields")
+      expect(rendered).to match /Are you a US Citizen or US National/
     end
 
     it "should have no_ssn input" do

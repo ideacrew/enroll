@@ -15,7 +15,8 @@ class Inbox
   end
 
   def unread_messages
-    messages.where(message_read: false, folder: Message::FOLDER_TYPES[:inbox])
+    messages.where(message_read: false, folder: Message::FOLDER_TYPES[:inbox]) +
+    messages.where(message_read: false, folder: nil)
   end
 
   def post_message(new_message)

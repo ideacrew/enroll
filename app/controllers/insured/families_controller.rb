@@ -5,6 +5,7 @@ class Insured::FamiliesController < FamiliesController
   # layout 'application', :only => :find_sep
 
   def home
+    set_consumer_bookmark_url(family_account_path)
     @hbx_enrollments = @family.enrolled_hbx_enrollments || []
     @employee_role = @person.employee_roles.try(:first)
 
@@ -23,6 +24,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def find_sep
+    set_consumer_bookmark_url(family_account_path)
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
 
