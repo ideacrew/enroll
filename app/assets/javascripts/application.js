@@ -53,7 +53,24 @@ $(document).on('page:update', function(){
   applySelectric();
 });
 
+function getCarrierPlans(ep, ci) {
+
+  var params = 'carrier_id=' + ci;
+  $.ajax({
+    url: "/employers/employer_profiles/"+ep+"/plan_years/reference_plans/",
+    data: params
+  })
+};
 $(document).ready(function () {
+
+
+
+
+
+
+
+
+
   $('[data-toggle="tooltip"]').tooltip();
   $("[data-toggle=popover]").popover();
 
@@ -510,7 +527,7 @@ $(document).on('change', '#waive_confirm select#waiver_reason', function() {
 
 $(document).on('click', '#search_for_plan_shopping_help', function() {
   $.ajax({
-    type: 'GET', 
+    type: 'GET',
     data: {firstname: $('#help_first_name').val(), lastname: $('#help_last_name').val(), type: $('#help_type').html(),
            person: $('#help_requestor').html(), email: $('#help_requestor_email').html(),
            first_name: $('#person_first_name').val(), last_name: $('#person_last_name').val(),
@@ -524,7 +541,7 @@ $(document).on('click', '#search_for_plan_shopping_help', function() {
 
 $(document).on('click', '.help_button', function(){
 $.ajax({
-    type: 'GET', 
+    type: 'GET',
     data: {assister: this.getAttribute('data-assister'), broker: this.getAttribute('data-broker'),
            person: $('#help_requestor').html(), email: $('#help_requestor_email').html(),
            first_name: $('#person_first_name').val(), last_name: $('#person_last_name').val(),
@@ -551,14 +568,14 @@ $(document).on('click', '#terms_check_thank_you', function() {
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
-  
-  if($(this).prop("checked") == true){    
+
+  if($(this).prop("checked") == true){
     if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
       $('#btn-continue').removeClass('disabled');
     } else {
       $('#btn-continue').addClass('disabled');
     }
-  }else if($(this).prop("checked") == false){ 
+  }else if($(this).prop("checked") == false){
     $('#btn-continue').addClass('disabled');
   }
 })
@@ -568,11 +585,11 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
-  
+
   if(last_name_thank_you == ""){
     $('#btn-continue').addClass('disabled');
   }else{
-    if($("#terms_check_thank_you").prop("checked") == true){    
+    if($("#terms_check_thank_you").prop("checked") == true){
       if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
         $('#btn-continue').removeClass('disabled');
       } else {

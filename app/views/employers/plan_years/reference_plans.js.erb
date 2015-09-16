@@ -1,0 +1,20 @@
+
+<% if params[:plan_option_kind] == "single_carrier"%>
+  $('.reference-plans').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/single_carriers", locals: { :plans => @plans })).html_safe %>")
+  $('.reference-plans').show();
+
+
+<% elsif params[:plan_option_kind] == "metal_level"%>
+
+  $('.reference-plans').html("<%= raw("<i class='fa fa-refresh fa-spin fa-2x'></i>") %>");
+  $('.reference-plans').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/metal_level", locals: { :plans => @plans })).html_safe %>")
+  $('.reference-plans').show();
+
+
+
+<% elsif params[:plan_option_kind] == "single_plan"%>
+$('.reference-plans').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/single_plan", locals: { :plans => @plans })).html_safe %>")
+$('.reference-plans').show();
+
+
+<% end %>

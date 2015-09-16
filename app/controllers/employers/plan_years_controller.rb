@@ -6,6 +6,25 @@ class Employers::PlanYearsController < ApplicationController
 
   def new
     @plan_year = build_plan_year
+
+
+  end
+
+  def reference_plans
+    if params[:plan_option_kind] == "single_carrier"
+      @carrier_id = params[:carrier_id]
+      @plans = Plan.shop_health_by_active_year(2015).by_carrier_profile(@carrier_id)
+    elsif params[:plan_option_kind] == "metal_level"
+      @metal_level = params[:metal_level]
+      @plans = Plan.shop_health_by_active_year(2015).by_health_metal_levels(@metal_level)
+    elsif params[:plan_option_kind] == "single_plan"
+      @plans = Plan.shop_health_by_active_year(2015)
+    end
+
+    respond_to do |format|
+      format.js
+    end
+
   end
 
   def create
@@ -195,7 +214,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def generate_carriers_and_plans
-    binding.pry
     @carrier_names = Organization.valid_carrier_names
     @carriers_array = Organization.valid_carrier_names_for_options
   end

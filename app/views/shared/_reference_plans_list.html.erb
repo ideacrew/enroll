@@ -6,27 +6,34 @@
 <h4>Select Your Plan Offering</h4>
 <br>
 <ul class="nav nav-tabs row">
-  <li role="presentation" class="col-xs-4">
-    <%= f.radio_button :plan_option_kind, "single_carrier", selected: f.object.plan_option_kind %>
-    <%= f.label :plan_option_kind_single_carrier, class: "elected_plan", onclick: "$(this).closest('li').addClass('active')" do %>
-    <i class="fa fa-circle-o"></i>
-    <i class="fa fa-dot-circle-o"></i>
-    By carrier
 
-    <% end %>
-  </li>
+
+    <li role="presentation" class="col-xs-4">
+      <%= f.radio_button :plan_option_kind, "single_carrier", selected: f.object.plan_option_kind, onchange: "$('.metals-tab, .reference-plans, .plans-tab').hide();$('.carriers-tab').show();" %>
+      <%= f.label :plan_option_kind_single_carrier, class: "elected_plan", onclick: "$(this).closest('li').addClass('active')" do %>
+      <i class="fa fa-circle-o"></i>
+      <i class="fa fa-dot-circle-o"></i>
+      By carrier
+
+      <% end %>
+    </li>
+
 
   <li role="presentation" class="col-xs-4">
-    <%= f.radio_button :plan_option_kind, "metal_level", selected: f.object.plan_option_kind %>
+    <%= f.radio_button :plan_option_kind, "metal_level", selected: f.object.plan_option_kind, onchange: "$('.carriers-tab, .reference-plans, .plans-tab').hide();$('.metals-tab').show();" %>
     <%= f.label :plan_option_kind_metal_level, class: "elected_plan", onclick: "$(this).closest('li').addClass('active')" do %>
     <i class="fa fa-circle-o"></i>
     <i class="fa fa-dot-circle-o"></i>
     By metal level
 
-    <% end %>
 
   </li>
+    <% end %>
+
+
   <li role="presentation" class="col-xs-4">
+    <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, plan_option_kind: "single_plan"), remote: true, onclick: "$('.carriers-tab, .reference-plans, .metals-tab').hide();$('.plans-tab').show();" do %>
+
     <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
     <%= f.label :plan_option_kind_single_plan, class: "elected_plan", onclick: "$(this).closest('li').addClass('active')" do %>
     <i class="fa fa-circle-o"></i>
@@ -34,23 +41,91 @@
     Single plan
 
     <% end %>
+    <% end %>
 
   </li>
 </ul>
 
 <div class="col-xs-12 plan-options">
-<span>Let you plan participants choose any plan they want that is offered by a single carrier. It will NOT cost you more to let them choose.</span>
-<div class="col-xs-12 row">
-  <%= @carrier_names.inspect %>
-  <%= @carrier_names.each_key do |c| %>
-  <div class="col-xs-3">
-    <%= c.inspect %>
-    <%= f.radio_button :carrier_for_elected_plan %>
-    <%= f.label :carrier_for_elected_plan %>
+  <div class="col-xs-12 row carriers-tab" style="display: none;">
+    <span>Let you plan participants choose any plan they want that is offered by a single carrier. It will NOT cost you more to let them choose.</span>
 
+    <%= @carrier_names.each_pair do |ck, cv| %>
+    <div class="col-xs-3" class="carriers">
+      <div class="col-xs-12 row">
+        <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_carrier"), remote: true do %>
+
+          <div class="col-xs-3">
+            <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
+            <%= f.label "carrier_for_elected_plan_#{ck}" do %>
+          <i class="fa fa-circle-o"></i>
+          <i class="fa fa-dot-circle-o"></i>
+          <% end %>
+        </div>
+        <% end %>
+
+        <div class="col-xs-9">
+          <div class="panel">
+            <div class="panel-heading">
+              <h3><%= cv %></h3>
+            </div>
+          </div>
+          </div>
+
+
+
+      </div>
+    </div>
+
+        <% end %>
   </div>
-  <% end %>
+  <div class="col-xs-12 row metals-tab" style="display: none;">
+  <div class="col-xs-12">
+    <h3>Select Your Reference Plan</h3>
+  </div>
+    <%= Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
+    <div class="col-xs-3" class="metals">
+      <div class="col-xs-12 row">
+        <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, plan_option_kind: "metal_level", metal_level: kind), remote: true do %>
+
+          <div class="col-xs-3">
+            <%= f.radio_button :carrier_for_elected_plan, kind %>
+            <%= f.label "carrier_for_elected_plan_#{kind}" do %>
+          <i class="fa fa-circle-o"></i>
+          <i class="fa fa-dot-circle-o"></i>
+          <% end %>
+        </div>
+        <% end %>
+
+        <div class="col-xs-9">
+          <div class="panel">
+            <div class="panel-heading">
+              <h3><%= kind %></h3>
+            </div>
+          </div>
+          </div>
+
+
+
+      </div>
+    </div>
+
+        <% end %>
+
 </div>
+
+<div class="col-xs-12 row plans-tab" style="display: none;">
+<div class="col-xs-12">
+  <h3>Select Your Reference Plan</h3>
+</div>
+all plans
+
+</div>
+
+</div>
+
+<div class="reference-plans col-xs-12">
+
 
 </div>
 

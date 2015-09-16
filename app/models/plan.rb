@@ -49,7 +49,7 @@ class Plan
   field :out_of_service_area_coverage, type: Boolean # DC In-Network or not
 
   # In MongoDB, the order of fields in an index should be:
-  #   First: fields queried for exact values, in an order that most quickly reduces set 
+  #   First: fields queried for exact values, in an order that most quickly reduces set
   #   Second: fields used to sort
   #   Third: fields queried for a range of values
 
@@ -61,13 +61,13 @@ class Plan
 
   # 2015, "94506DC0390006-01"
   index(
-      { 
-        active_year: 1, 
-        hios_id: 1, 
-        "premium_tables.age": 1, 
-        "premium_tables.start_on": 1, 
-        "premium_tables.end_on": 1 
-      }, 
+      {
+        active_year: 1,
+        hios_id: 1,
+        "premium_tables.age": 1,
+        "premium_tables.start_on": 1,
+        "premium_tables.end_on": 1
+      },
       { name: "plan_premium_age" }
     )
 
@@ -149,40 +149,40 @@ class Plan
 
   scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
 
-  scope :shop_health_by_active_year, ->(active_year) {  
+  scope :shop_health_by_active_year, ->(active_year) {
       where(
-          active_year: active_year, 
-          market: "shop", 
+          active_year: active_year,
+          market: "shop",
           coverage_kind: "health"
         )
     }
 
-  scope :shop_dental_by_active_year, ->(active_year) {  
+  scope :shop_dental_by_active_year, ->(active_year) {
       where(
-          active_year: active_year, 
-          market: "shop", 
+          active_year: active_year,
+          market: "shop",
           coverage_kind: "dental"
         )
     }
 
-  scope :individual_health_by_active_year, ->(active_year) {  
+  scope :individual_health_by_active_year, ->(active_year) {
       where(
-          active_year: active_year, 
-          market: "individual", 
+          active_year: active_year,
+          market: "individual",
           coverage_kind: "health"
         )
-    } 
+    }
 
-  scope :individual_dental_by_active_year, ->(active_year) {  
+  scope :individual_dental_by_active_year, ->(active_year) {
       where(
-          active_year: active_year, 
-          market: "individual", 
+          active_year: active_year,
+          market: "individual",
           coverage_kind: "dental"
         )
-    } 
+    }
 
   scope :by_health_metal_levels,                ->(metal_levels)    { any_in(metal_level: metal_levels) }
-  scope :by_carrier_profile,                    ->(carrier_profile) { where(carrier_profile_id: carrier_profile._id) }
+  scope :by_carrier_profile,                    ->(carrier_profile_id) { where(carrier_profile_id: carrier_profile_id) }
 
   scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
   scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }
