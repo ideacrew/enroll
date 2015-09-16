@@ -138,7 +138,7 @@ class Insured::PlanShoppingsController < ApplicationController
       tax_household = current_user.person.primary_family.latest_household.tax_households.last
       @max_aptc = tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
       session[:max_aptc] = @max_aptc
-      session[:selected_aptc_pct] = 0.8
+      session[:selected_aptc_pct] = 0.85
     end
   end
 
@@ -214,6 +214,6 @@ class Insured::PlanShoppingsController < ApplicationController
   def get_aptc_info_from_session
     @max_aptc = session[:max_aptc].to_f rescue 0
     elected_aptc_pct = session[:elected_aptc_pct]
-    @elected_aptc_pct = elected_aptc_pct.present? ? elected_aptc_pct.to_f : 0.8
+    @elected_aptc_pct = elected_aptc_pct.present? ? elected_aptc_pct.to_f : 0.85
   end
 end
