@@ -6,9 +6,9 @@ class IvlPdfNotice < Notice
 
   def create
     generate_pdf_notice
-    attach_blank_page
-    attach_dchl_rights
-    prepend_envelope
+    # attach_blank_page
+    # attach_dchl_rights
+    # prepend_envelope
   end
 
   def prepend_envelope

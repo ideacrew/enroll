@@ -51,8 +51,9 @@ gem 'symmetric-encryption', '~> 3.6.0'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
-gem 'acapi', git: "git://github.com/dchbx/acapi.git", branch: 'development'
-# gem 'acapi', path: "../acapi"
+# gem 'acapi', git: "git://github.com/dchbx/acapi.git", branch: 'development'
+
+gem 'acapi', path: "../acapi", branch: 'development'
 
 gem 'aasm', '~> 4.0.7'
 gem 'haml'
@@ -80,7 +81,7 @@ gem 'bson', '2.3.0'
 gem 'language_list', '~> 1.1.0'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 
-gem 'prawn', '~> 0.11.1'
+gem 'prawn'
 gem 'virtus'
 gem 'wkhtmltopdf-binary-edge', '~> 0.12.2.1'
 gem 'wicked_pdf'
