@@ -162,11 +162,14 @@ RSpec.describe TaxHousehold, type: :model do
     let(:hbx_enrollment) { double(applied_aptc_amount: 30, hbx_enrollment_members: [hbx_member1, hbx_member2]) }
     let(:household) { double(hbx_enrollments: double(active: [hbx_enrollment])) }
     let!(:plan) {FactoryGirl.build(:plan_with_premium_tables)}
+    let(:decorated_plan) {double}
 
     before :each do
       @tax_household = TaxHousehold.new()
       allow(plan).to receive(:ehb).and_return 0.9
       allow(@tax_household).to receive(:aptc_available_amount_by_member).and_return aptc_available_amount_by_member
+      allow(UnassistedPlanCostDecorator).to receive(:new).and_return(decorated_plan)
+      allow(decorated_plan).to receive(:premium_for).and_return(100)
     end
 
     it "can return result when plan is individual" do
