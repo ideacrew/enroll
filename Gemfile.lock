@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/dchbx/acapi.git
-  revision: e83fedf15b0838b3406e0f508d792e7ea7899cdd
+  revision: 2b3f3904383c1d5d3e23971dab933c79def33a0a
   branch: development
   specs:
     acapi (0.0.1)
@@ -328,6 +328,7 @@ GEM
     raindrops (0.15.0)
     rake (10.4.2)
     rdoc (4.2.0)
+      json (~> 1.4)
     redis (3.2.1)
     redis-actionpack (4.0.1)
       actionpack (~> 4)
@@ -525,6 +526,3 @@ DEPENDENCIES
   web-console (~> 2.0)
   wicked_pdf
   wkhtmltopdf-binary-edge (~> 0.12.2.1)
-
-BUNDLED WITH
-   1.10.6
