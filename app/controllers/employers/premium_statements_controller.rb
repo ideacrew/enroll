@@ -30,7 +30,7 @@ private
                     ee.dob,
                     ee.hired_on,
                     ee.published_benefit_group.title,
-                    "Health",
+                    enrollment.plan.coverage_kind,
                     enrollment.plan.name,
                     enrollment.plan.carrier_profile.legal_name,
                     enrollment.humanized_dependent_summary,

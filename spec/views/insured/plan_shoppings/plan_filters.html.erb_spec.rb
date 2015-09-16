@@ -38,6 +38,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:carriers, Array.new)
       assign(:max_total_employee_cost, 1000)
       assign(:max_deductible, 998)
+      assign(:max_aptc, 330)
       assign(:hbx_enrollment, hbx_enrollment)
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
