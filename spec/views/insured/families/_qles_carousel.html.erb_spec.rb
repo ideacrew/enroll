@@ -1,20 +1,16 @@
 require 'rails_helper'
 
-RSpec.describe "insured/families/_qles.html.erb" do
+RSpec.describe "insured/families/_qles_carousel.html.erb" do
   before :each do
     QualifyingLifeEventKind.delete_all
     10.times.each {FactoryGirl.create(:qualifying_life_event_kind)}
     FactoryGirl.create(:qualifying_life_event_kind, tool_tip: "")
     assign(:qualifying_life_events, QualifyingLifeEventKind.all)
-    render "insured/families/qles"
+    render "insured/families/qles_carousel"
   end
 
-  it "should display the title" do
-    expect(rendered).to have_selector('h4', text: 'TOP LIFE CHANGES')
-  end
-
-  it "should have list-qle area" do
-    expect(rendered).to have_selector('ul.list-qle')
+  it "should have carousel-qles area" do
+    expect(rendered).to have_selector('div#carousel-qles')
   end
 
   it "should have qle options" do
@@ -23,8 +19,12 @@ RSpec.describe "insured/families/_qles.html.erb" do
     end
   end
 
-  it "should have qle-details" do
-    expect(rendered).to have_selector('div#qle-details.hidden')
+  it "should have carousel-indicators" do
+    expect(rendered).to have_selector('ol.carousel-indicators')
+  end
+
+  it "should have carousel-control" do
+    expect(rendered).to have_selector('a.carousel-control', count: 2)
   end
 
   it "should have placement bottom options" do
