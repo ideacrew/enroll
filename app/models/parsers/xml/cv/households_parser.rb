@@ -15,8 +15,8 @@ module Parsers::Xml::Cv
 
     def to_hash
       {
-        integrated_case_id: integrated_case_id.split('#').last,
-        irs_group_id: irs_group_id.split('#').last,
+        integrated_case_id: integrated_case_id,
+        irs_group_id: irs_group_id,
         start_date: start_date,
         coverage_households: coverage_households.map(&:to_hash),
         tax_households: tax_households.map(&:to_hash),

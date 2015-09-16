@@ -14,10 +14,10 @@ module Parsers::Xml::Cv
 
     def to_hash
       {
-        id: id.split('#').last,
+        id: id,
         start_date: start_date,
         coverage_household_members: coverage_household_members.map(&:to_hash),
-        primary_member_id: primary_member_id.split('#').last,
+        primary_member_id: primary_member_id,
         submitted_at: submitted_at,
         is_active: is_active,
         created_at: created_at
