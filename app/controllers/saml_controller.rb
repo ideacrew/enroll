@@ -16,6 +16,10 @@ class SamlController < ApplicationController
       user_with_email = User.where(email: email).first
 
       if user_with_email.present?
+        # if user.person.primary_family == "curam_landing"
+        #   log("ERROR: no verified family recieved", {:severity => "error"})
+        #   render file: 'public/403.html', status: 403
+        # end
         user_with_email.idp_verified = true
         user_with_email.save!
         sign_in(:user, user_with_email)
