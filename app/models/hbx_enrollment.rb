@@ -276,6 +276,28 @@ class HbxEnrollment
     end
   end
 
+  def decorated_elected_plans(coverage_kind)
+    benefit_packages = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.benefit_packages
+
+    ivl_bgs = []
+    benefit_packages.each do |bg|
+      satisfied = true
+      hbx_enrollment_members.map(&:person).map(&:consumer_role).each do |consumer_role|
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, coverage_kind)
+        satisfied = false and break unless rule.satisfied?[0]
+      end
+      ivl_bgs << bg if satisfied
+    end
+
+    ivl_bgs = ivl_bgs.uniq
+    elected_plan_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
+    elected_plans = Plan.where(:id => {"$in" => elected_plan_ids}).to_a
+
+    plans = elected_plans.collect do |plan|
+      UnassistedPlanCostDecorator.new(plan, self)
+    end
+  end
+
   # FIXME: not sure what this is or if it should be removed - Sean
   def inactive_related_hbxs
     hbxs = if employee_role.present?

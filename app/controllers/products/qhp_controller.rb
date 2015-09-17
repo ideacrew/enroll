@@ -11,8 +11,15 @@ class Products::QhpController < ApplicationController
         qhp[:total_employee_cost] = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan).total_employee_cost
       end
     else
-      @qhps = Products::Qhp.where(:standard_component_id.in => found_params).to_a.each do |qhp|
-        qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.plan, @hbx_enrollment).total_employee_cost
+      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      elected_aptc_pct = session[:elected_aptc_pct]
+      elected_aptc_pct = elected_aptc_pct.present? ? elected_aptc_pct.to_f : 0.85
+
+      @qhps = Products::Qhp.where(:standard_component_id.in => found_params).to_a.select do |qhp|
+        params["standard_component_ids"].include? qhp.plan.try(:hios_id).try(:to_s)
+      end
+      @qhps = @qhps.each do |qhp|
+        qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.plan, @hbx_enrollment, elected_aptc_pct, tax_household).total_employee_cost
       end
     end
     respond_to do |format|

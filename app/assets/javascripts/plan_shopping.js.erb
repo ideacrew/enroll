@@ -172,6 +172,19 @@ $(function() {
 		doPlanComparison(base_url);
   });
 
+  $(document).on('change', 'input[name="elected_pct"]', function(){
+    var elected_pct = $("input[name='elected_pct']").val();
+    var elected_amount = parseFloat($('#max_aptc').val()).toFixed(2) * parseFloat(elected_pct).toFixed(2);
+    $('#aptc-used').val(elected_amount.toFixed(2));
+  });
+
+  $(document).on('change', 'input#aptc-used', function(){
+    var aptc_used = $(this).val();
+    var max_aptc = $('input#max_aptc').val();
+    $("input[name='elected_pct']").val(aptc_used/max_aptc);
+    $("output[name='pct']").text((aptc_used/max_aptc*100).toFixed(0));
+  });
+
   $(document).on('click', '.all-filters-row .apply-btn', function(){
 		applyPlanFilters();
 

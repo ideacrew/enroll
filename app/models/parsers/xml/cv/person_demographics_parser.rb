@@ -18,10 +18,10 @@ module Parsers::Xml::Cv
     def to_hash
       response = {
           ssn: ssn,
-          sex: sex,
+          sex: sex.split('#').last,
           birth_date: birth_date,
           is_state_resident:is_state_resident,
-          citizen_status:citizen_status,
+          citizen_status:citizen_status.split('#').last,
           marital_status:marital_status,
           death_date: death_date,
           race: race,

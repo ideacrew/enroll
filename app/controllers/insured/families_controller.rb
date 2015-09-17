@@ -1,7 +1,6 @@
 class Insured::FamiliesController < FamiliesController
 
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
-  before_action :check_insured_role, only: [:home]
   # layout 'application', :only => :find_sep
 
   def home
@@ -70,17 +69,17 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_qle_date
-    qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = TimeKeeper.date_of_record - 30.days
     end_date = TimeKeeper.date_of_record + 30.days
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id]) 
       start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
-      @effective_on_options = @qle.employee_gaining_medicare(qle_date) if @qle.is_dependent_loss_of_esi?
+      @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_esi?
     end
 
-    @qualified_date = (start_date <= qle_date && qle_date <= end_date) ? true : false
+    @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
   end
 
   def purchase
@@ -115,11 +114,4 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
-  def check_insured_role
-    if session[:portal].include?("insured/families")
-      return true if current_user.has_employee_role? || current_user.has_consumer_role?
-      flash[:error] = "You are not authorized to visit this portal."
-      redirect_to root_path and return
-    end
-  end
 end

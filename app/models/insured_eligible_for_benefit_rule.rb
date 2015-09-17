@@ -11,9 +11,10 @@ class InsuredEligibleForBenefitRule
   #     lawful_permanent_resident
   # )
 
-  def initialize(role, benefit_package)
+  def initialize(role, benefit_package, coverage_kind='health')
     @role = role
     @benefit_package = benefit_package
+    @coverage_kind = coverage_kind
   end
 
   def setup
@@ -62,7 +63,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_benefit_categories_satisfied?
-    true
+    @benefit_package.benefit_categories.include? @coverage_kind
   end
 
   def is_citizenship_status_satisfied?
@@ -93,7 +94,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_age_range_satisfied?
-    return true # if @benefit_package.age_range == 0..0
+    return true if @benefit_package.age_range == (0..0)
 
     age = age_on_next_effective_date(@role.dob)
     @benefit_package.age_range.cover?(age)

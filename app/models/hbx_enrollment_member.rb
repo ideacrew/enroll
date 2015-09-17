@@ -10,7 +10,7 @@ class HbxEnrollmentMember
   field :is_subscriber, type: Boolean, default: false
 
   field :premium_amount, type: Money
-  field :applied_aptc_amount, type: Money
+  field :applied_aptc_amount, type: Money, default: 0.0
 
   field :eligibility_date, type: Date
   field :coverage_start_on, type: Date
