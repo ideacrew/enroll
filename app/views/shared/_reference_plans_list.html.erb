@@ -10,7 +10,7 @@
 
     <li role="presentation" class="col-xs-4">
       <%= f.radio_button :plan_option_kind, "single_carrier", selected: f.object.plan_option_kind, onchange: "$('.metals-tab, .reference-plans, .plans-tab').hide();$('.carriers-tab').show();" %>
-      <%= f.label :plan_option_kind_single_carrier, class: "elected_plan", onclick: "$(this).closest('li').addClass('active')" do %>
+      <%= f.label :plan_option_kind_single_carrier, class: "elected_plan", onclick: "$('.nav-tabs li').removeClass('active');$(this).closest('li').addClass('active')" do %>
       <i class="fa fa-circle-o"></i>
       <i class="fa fa-dot-circle-o"></i>
       By carrier
@@ -21,7 +21,7 @@
 
   <li role="presentation" class="col-xs-4">
     <%= f.radio_button :plan_option_kind, "metal_level", selected: f.object.plan_option_kind, onchange: "$('.carriers-tab, .reference-plans, .plans-tab').hide();$('.metals-tab').show();" %>
-    <%= f.label :plan_option_kind_metal_level, class: "elected_plan", onclick: "$(this).closest('li').addClass('active')" do %>
+    <%= f.label :plan_option_kind_metal_level, class: "elected_plan", onclick: "$('.nav-tabs li').removeClass('active');$(this).closest('li').addClass('active')" do %>
     <i class="fa fa-circle-o"></i>
     <i class="fa fa-dot-circle-o"></i>
     By metal level
@@ -32,10 +32,10 @@
 
 
   <li role="presentation" class="col-xs-4">
-    <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, plan_option_kind: "single_plan"), remote: true, onclick: "$('.carriers-tab, .reference-plans, .metals-tab').hide();$('.plans-tab').show();" do %>
+    <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, plan_option_kind: "single_plan"), remote: true, onclick: "$('.carriers-tab, .metals-tab').hide();$('.plans-tab, .reference-plans').show();" do %>
 
     <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
-    <%= f.label :plan_option_kind_single_plan, class: "elected_plan", onclick: "$(this).closest('li').addClass('active')" do %>
+    <%= f.label :plan_option_kind_single_plan, class: "elected_plan", onclick: "$('.nav-tabs li').removeClass('active');$(this).closest('li').addClass('active')" do %>
     <i class="fa fa-circle-o"></i>
     <i class="fa fa-dot-circle-o"></i>
     Single plan
@@ -50,10 +50,10 @@
   <div class="col-xs-12 row carriers-tab" style="display: none;">
     <span>Let you plan participants choose any plan they want that is offered by a single carrier. It will NOT cost you more to let them choose.</span>
 
-    <%= @carrier_names.each_pair do |ck, cv| %>
+    <% @carrier_names.each_pair do |ck, cv| %>
     <div class="col-xs-3" class="carriers">
       <div class="col-xs-12 row">
-        <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_carrier"), remote: true do %>
+        <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_carrier"), onclick: '$(".reference-plans").show();', remote: true do %>
 
           <div class="col-xs-3">
             <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
@@ -80,10 +80,9 @@
         <% end %>
   </div>
   <div class="col-xs-12 row metals-tab" style="display: none;">
-  <div class="col-xs-12">
-    <h3>Select Your Reference Plan</h3>
-  </div>
-    <%= Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
+    <span>Let you plan participants choose any plan they want that is offered by a single carrier. It will NOT cost you more to let them choose.</span>
+
+    <% Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
     <div class="col-xs-3" class="metals">
       <div class="col-xs-12 row">
         <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, plan_option_kind: "metal_level", metal_level: kind), remote: true do %>
@@ -115,95 +114,16 @@
 </div>
 
 <div class="col-xs-12 row plans-tab" style="display: none;">
-<div class="col-xs-12">
-  <h3>Select Your Reference Plan</h3>
-</div>
-all plans
+  <span>Let you plan participants choose any plan they want that is offered by a single carrier. It will NOT cost you more to let them choose.</span>
 
-</div>
-
-</div>
-
-<div class="reference-plans col-xs-12">
 
 
 </div>
 
-<div class="col-md-4 col-sm-4 col-xs-12 elected-plan-select no-pd">
-  <div class="hidden_field carrier_for_elected_plan" style="<%= 'display:block;' if (selected_kind_carrier or selected_kind_plan) %>">
-    <%= f.select 'carrier_for_elected_plan', options_for_select(@carriers_array, selected: f.object.carrier_for_elected_plan), {include_blank: "SELECT CARRIER"}, {class: 'carrier'} %>
-  </div>
-  <div class="hidden_field metal_level_for_elected_plan" style="<%= 'display:block;' if selected_kind_metal_level %>">
-    <%= f.select 'metal_level_for_elected_plan', options_for_select(Plan.reference_plan_metal_level_for_options, selected: f.object.metal_level_for_elected_plan), {include_blank: "SELECT METAL LEVEL"}, {class: 'metal-level'} %>
-  </div>
 </div>
 
-<!-- Select Reference Plan -->
-<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd reference-plan-select">
-  <%= f.hidden_field :reference_plan_id, value: f.object.reference_plan_id %>
-  <div class="carrier-select reference-plan-content" style="<%= 'display:block;' if (selected_kind_carrier or selected_kind_plan) %>">
-    <% @carrier_names.each_key do |carrier_id| %>
-    <% show_this_carrier = (f.object.carrier_for_elected_plan.to_s == carrier_id.to_s) && (selected_kind_carrier or selected_kind_plan) %>
-    <% carrier_plans = show_this_carrier ? @plan_year.carrier_plans_for(carrier_id) : [] %>
-    <div class="hidden_second_field carrier-<%= carrier_id %> carrier-content" style="<%= 'display:block;' if show_this_carrier %>">
-      <%= select_tag "reference_plan", options_for_select(carrier_plans, selected: f.object.reference_plan_id), class: "carrier-#{carrier_id}", include_blank: (show_this_carrier ? "SELECT REFERENCE PLAN" : "LOADING...") %>
-    </div>
-    <% end %>
-  </div>
-
-  <div class="metal-level-select reference-plan-content" style="<%= 'display:block;' if selected_kind_metal_level %>">
-    <% Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
-    <% show_this_metal_level = f.object.metal_level_for_elected_plan == kind && selected_kind_metal_level %>
-    <% metal_level_plans = show_this_metal_level ? @plan_year.metal_level_plans_for(kind) : [] %>
-    <div class="metal-level-<%= kind %> metal-level-content hidden_second_field" style="<%= 'display:block;' if show_this_metal_level %>">
-      <%= select_tag "reference_plan", options_for_select(metal_level_plans, selected: f.object.reference_plan_id), class: "metal-level-#{kind}", include_blank: (show_this_metal_level ? "SELECT REFERENCE PLAN" : "LOADING...") %>
-    </div>
-    <% end %>
-  </div>
-</div>
+<div class="reference-plans col-xs-12" style="display: none;">
+<i class='fa fa-refresh fa-spin fa-2x'></i>
 
 
-
-<!--
-<% selected_kind_carrier = f.object.plan_option_kind == 'single_carrier' %>
-<% selected_kind_metal_level = f.object.plan_option_kind == 'metal_level' %>
-<% selected_kind_plan = f.object.plan_option_kind == 'single_plan' %>
-
-
-<div class="col-md-4 col-sm-4 col-xs-12 no-pd">
-<% f.select 'plan_option_kind', options_for_select([["All plans from a given carrier", "single_carrier"], ["All plans with a given metal level", "metal_level"], ["A single plan", "single_plan"]], selected: f.object.plan_option_kind), {include_blank: "Select Plan Offerings"}, {class: 'elected_plan'} %>
 </div>
-
-<div class="col-md-4 col-sm-4 col-xs-12 elected-plan-select no-pd">
-<div class="hidden_field carrier_for_elected_plan" style="<%= 'display:block;' if (selected_kind_carrier or selected_kind_plan) %>">
-<% f.select 'carrier_for_elected_plan', options_for_select(@carriers_array, selected: f.object.carrier_for_elected_plan), {include_blank: "SELECT CARRIER"}, {class: 'carrier'} %>
-</div>
-<div class="hidden_field metal_level_for_elected_plan" style="<%= 'display:block;' if selected_kind_metal_level %>">
-<% f.select 'metal_level_for_elected_plan', options_for_select(Plan.reference_plan_metal_level_for_options, selected: f.object.metal_level_for_elected_plan), {include_blank: "SELECT METAL LEVEL"}, {class: 'metal-level'} %>
-</div>
-</div>
-
-
-<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd reference-plan-select">
-<% f.hidden_field :reference_plan_id, value: f.object.reference_plan_id %>
-<div class="carrier-select reference-plan-content" style="<%= 'display:block;' if (selected_kind_carrier or selected_kind_plan) %>">
-<% @carrier_names.each_key do |carrier_id| %>
-<% show_this_carrier = (f.object.carrier_for_elected_plan.to_s == carrier_id.to_s) && (selected_kind_carrier or selected_kind_plan) %>
-<% carrier_plans = show_this_carrier ? @plan_year.carrier_plans_for(carrier_id) : [] %>
-<div class="hidden_second_field carrier-<%= carrier_id %> carrier-content" style="<%= 'display:block;' if show_this_carrier %>">
-<% select_tag "reference_plan", options_for_select(carrier_plans, selected: f.object.reference_plan_id), class: "carrier-#{carrier_id}", include_blank: (show_this_carrier ? "SELECT REFERENCE PLAN" : "LOADING...") %>
-</div>
-<% end %>
-</div>
-
-<div class="metal-level-select reference-plan-content" style="<%= 'display:block;' if selected_kind_metal_level %>">
-<% Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
-<% show_this_metal_level = f.object.metal_level_for_elected_plan == kind && selected_kind_metal_level %>
-<% metal_level_plans = show_this_metal_level ? @plan_year.metal_level_plans_for(kind) : [] %>
-<div class="metal-level-<%= kind %> metal-level-content hidden_second_field" style="<%= 'display:block;' if show_this_metal_level %>">
-<% select_tag "reference_plan", options_for_select(metal_level_plans, selected: f.object.reference_plan_id), class: "metal-level-#{kind}", include_blank: (show_this_metal_level ? "SELECT REFERENCE PLAN" : "LOADING...") %>
-</div>
-<% end %>
-</div>
-</div>
--->

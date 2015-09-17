@@ -397,7 +397,9 @@
     ul.nav.nav-tabs, .plan-options .col-xs-3 a {
       border-bottom: none;
       li {
-
+        a {
+          padding: 0;
+        }
 
         &.active {
           label {
@@ -502,6 +504,8 @@
               font-size: 16px;
               padding-top: 2px;
               font-weight: bold;
+              text-transform: capitalize;
+
 
             }
 
@@ -517,8 +521,49 @@
         padding: 50px;
         background-color: #ffffff;
         border: solid 1px #d7d7d7;
+        .reference-plan {
+          height: 100px;
+          padding: 10px 0 0 0;
+          border-bottom: solid 1px #b7b7b7;
+          input[type=radio] {
+            display: none;
+          }
+          input[type=radio] + label {
+
+            &>i {
+              font-size: 28px;
+              color: #b7b7b7;
+
+
+
+              &:first-of-type {
+                display: inline-block;
+
+              }
+              &:last-of-type {
+                display: none;
+              }
+            }
+          }
+          input[type=radio]:checked + label {
+
+            &>i {
+              color: #69A30D;
+              &:first-of-type {
+                display: none;
+              }
+              &:last-of-type {
+                display: inline-block;
+              }
+            }
+          }
+
+        }
+
+
       }
     }
+
 
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {

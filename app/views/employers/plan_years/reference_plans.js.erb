@@ -6,7 +6,6 @@
 
 <% elsif params[:plan_option_kind] == "metal_level"%>
 
-  $('.reference-plans').html("<%= raw("<i class='fa fa-refresh fa-spin fa-2x'></i>") %>");
   $('.reference-plans').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/metal_level", locals: { :plans => @plans })).html_safe %>")
   $('.reference-plans').show();
 
@@ -18,3 +17,10 @@ $('.reference-plans').show();
 
 
 <% end %>
+$('.reference-plan .col-xs-3').on('click', function() {
+  if ($(this).find('input[type=radio]').is(':checked')) {
+  } else {
+      $(this).find('input[type=radio]').prop('checked', true )
+  }
+
+});

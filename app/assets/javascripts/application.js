@@ -64,8 +64,15 @@ function getCarrierPlans(ep, ci) {
 $(document).ready(function () {
 
 
+//toggle plan options checkbox through parent anchor
 
+$('.plan-options a, .nav-tabs a ').on('click', function() {
+  if ($(this).find('input[type=radio]').is(':checked')) {
+  } else {
+      $(this).find('input[type=radio]').prop('checked', true )
+  }
 
+});
 
 
 

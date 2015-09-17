@@ -1,9 +1,12 @@
-  <%= @plans.each do |p| %>
+  <% @plans.each do |p| %>
     <div class="col-xs-3">
-      <div clas="col-xs-12 reference-plan">
+      <div class="col-xs-12 reference-plan">
         <div class="col-xs-3">
   <%= radio_button "plan_year[benefit_groups_attributes][0]", :reference_plan_id, p.id %>
-  <%= label_tag :reference_plan_id, "" %>
+  <%= label_tag :reference_plan_id, "" do %>
+    <i class="fa fa-circle-o"></i>
+    <i class="fa fa-dot-circle-o"></i>
+  <% end %>
 </div>
 <div clas="col-xs-9">
   <%= p.name %>
