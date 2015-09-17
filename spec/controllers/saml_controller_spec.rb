@@ -14,7 +14,10 @@ RSpec.describe SamlController do
       invalid_xml = File.read("spec/saml/invalid_saml_response.xml")
 
       it "should render a 403" do
-        expect(subject).to receive(:log)
+        expect(subject).to receive(:log) do |arg1, arg2|
+          expect(arg1).to match(/ERROR: SAMLResponse assertion errors/)
+          expect(arg2).to be hash_including(:severity => 'errors')
+        end
         post :login, :SAMLResponse => invalid_xml
         expect(response).to render_template(:file => "#{Rails.root}/public/403.html")
         expect(response).to have_http_status(403)
