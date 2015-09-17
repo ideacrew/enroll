@@ -8,18 +8,20 @@
     <i class="fa fa-dot-circle-o"></i>
   <% end %>
 </div>
-<div clas="col-xs-9">
-  <%= p.name %>
-  <%= p.active_year %>
-  <%= p.market %>
-  <%= p.metal_level %>
-  <%= p.plan_type %>
-  <%= p.deductible %>
-  <%= p.family_deductible %>
 
+  <div class="col-xs-9">
+    <div class="panel row">
+      <div class="panel-heading">
+        <h3><%= p.name %></h3>
+      </div>
+      <div class="panel-body">
+        <span class="plan-label">Type: </span><span><%= p.plan_type %></span><br>
+        <span class="plan-label">Level: </span><span><%= p.metal_level %></span><br>
+        <span class="plan-label">Nationwide: </span><span><%= p.nationwide%></span><br>
+    </div>
+    </div>
 
   </div>
-
   </div>
 </div>
       <% end %>

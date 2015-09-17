@@ -9,7 +9,7 @@
 
 
     <li role="presentation" class="col-xs-4">
-      <%= f.radio_button :plan_option_kind, "single_carrier", selected: f.object.plan_option_kind, onchange: "$('.metals-tab, .reference-plans, .plans-tab').hide();$('.carriers-tab').show();" %>
+      <%= f.radio_button :plan_option_kind, "single_carrier", selected: f.object.plan_option_kind %>
       <%= f.label :plan_option_kind_single_carrier, class: "elected_plan", onclick: "$('.nav-tabs li').removeClass('active');$(this).closest('li').addClass('active')" do %>
       <i class="fa fa-circle-o"></i>
       <i class="fa fa-dot-circle-o"></i>
@@ -20,7 +20,7 @@
 
 
   <li role="presentation" class="col-xs-4">
-    <%= f.radio_button :plan_option_kind, "metal_level", selected: f.object.plan_option_kind, onchange: "$('.carriers-tab, .reference-plans, .plans-tab').hide();$('.metals-tab').show();" %>
+    <%= f.radio_button :plan_option_kind, "metal_level", selected: f.object.plan_option_kind %>
     <%= f.label :plan_option_kind_metal_level, class: "elected_plan", onclick: "$('.nav-tabs li').removeClass('active');$(this).closest('li').addClass('active')" do %>
     <i class="fa fa-circle-o"></i>
     <i class="fa fa-dot-circle-o"></i>
@@ -32,7 +32,7 @@
 
 
   <li role="presentation" class="col-xs-4">
-    <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, plan_option_kind: "single_plan"), remote: true, onclick: "$('.carriers-tab, .metals-tab').hide();$('.plans-tab, .reference-plans').show();" do %>
+    <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, plan_option_kind: "single_plan"), remote: true do %>
 
     <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
     <%= f.label :plan_option_kind_single_plan, class: "elected_plan", onclick: "$('.nav-tabs li').removeClass('active');$(this).closest('li').addClass('active')" do %>
@@ -46,14 +46,14 @@
   </li>
 </ul>
 
-<div class="col-xs-12 plan-options">
+<div class="col-xs-12 plan-options" style="display: none;">
   <div class="col-xs-12 row carriers-tab" style="display: none;">
     <span>Let you plan participants choose any plan they want that is offered by a single carrier. It will NOT cost you more to let them choose.</span>
 
     <% @carrier_names.each_pair do |ck, cv| %>
     <div class="col-xs-3" class="carriers">
       <div class="col-xs-12 row">
-        <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_carrier"), onclick: '$(".reference-plans").show();', remote: true do %>
+        <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_carrier"), remote: true do %>
 
           <div class="col-xs-3">
             <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
@@ -123,7 +123,8 @@
 </div>
 
 <div class="reference-plans col-xs-12" style="display: none;">
-<i class='fa fa-refresh fa-spin fa-2x'></i>
-
+<div class="col-xs-12 loading">
+  <i class='fa fa-refresh fa-spin fa-2x'></i>
+</div>
 
 </div>

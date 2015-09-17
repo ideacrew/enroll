@@ -64,15 +64,42 @@ function getCarrierPlans(ep, ci) {
 $(document).ready(function () {
 
 
+// nav tabs radio on change for plan selection
+$('.nav-tabs input[type=radio]').on('change', function() {
+  $('.plan-options > *').hide();
+  $('.plan-options > * input, .reference-plans input').prop('checked', 0);
+  $('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
+  $('.reference-plans').hide();
+  if ($(this).attr('value') == "single_carrier") {
+    $('.plan-options, .carriers-tab').show();
+  }
+  else if ($(this).attr('value') == "metal_level") {
+    $('.plan-options, .metals-tab').show();
+  }
+});
+$('.nav-tabs a').on('click', function() {
+  $('.plan-options').hide();
+  $('.plan-options > * input, .reference-plans input').prop('checked', 0);
+  $('.reference-plans').show();
+});
+
+$('.reference-plans input[type=radio]').on('change', function() {
+});
+
+
 //toggle plan options checkbox through parent anchor
 
-$('.plan-options a, .nav-tabs a ').on('click', function() {
+$('.plan-options a, .nav-tabs a').on('click', function() {
+  $('.plan-options input[type=radio]').attr('checked', 0);
   if ($(this).find('input[type=radio]').is(':checked')) {
   } else {
+    $('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
+      $(".reference-plans").show();
       $(this).find('input[type=radio]').prop('checked', true )
   }
 
 });
+
 
 
 
