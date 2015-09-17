@@ -147,6 +147,8 @@ Rails.application.routes.draw do
       get 'my_account'
       get 'show_profile'
       get 'consumer_override'
+      get 'bulk_employee_upload_form'
+      post 'bulk_employee_upload'
       collection do
         get 'welcome'
         get 'search'
