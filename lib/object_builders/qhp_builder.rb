@@ -1,6 +1,7 @@
 class QhpBuilder
   LOG_PATH = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
   LOGGER = Logger.new(LOG_PATH)
+  INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003"] # These plan ids are suppressed and we dont save these while importing.
 
   def initialize(qhp_hash)
     @qhp_hash = qhp_hash
@@ -94,7 +95,7 @@ class QhpBuilder
 
   def associate_plan_with_qhp
     @plan_year = @qhp.plan_effective_date.to_date.year
-    if @plan_year > 2015
+    if @plan_year > 2015 && !INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
       create_plan_from_serff_data
     end
     candidate_plans = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
@@ -130,7 +131,7 @@ class QhpBuilder
       next if plan.present?
       new_plan = Plan.new(
         name: @qhp.plan_marketing_name,
-        hios_id: @qhp.standard_component_id,
+        hios_id: cost_share_variance.hios_plan_and_variant_id,
         hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
         csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
         active_year: @plan_year,
