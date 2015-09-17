@@ -76,15 +76,16 @@ class Invitation
   end
 
   def claim_broker_role(user_obj, redirection_obj)
-    b_role = BrokerRole.find(source_id)
-    person = b_role.person
+    broker_role = BrokerRole.find(source_id)
+    person = broker_role.person
     redirection_obj.create_sso_account(user_obj, person, 15, "broker") do
       person.user = user_obj
       person.save!
-      broker_agency_profile = b_role.broker_agency_profile
+      broker_agency_profile = broker_role.broker_agency_profile
       person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)
       person.save!
-      user_obj.roles << "broker_agency_staff" unless user_obj.roles.include?("broker_agency_staff")
+      user_obj.roles << "broker" unless user_obj.roles.include?("broker")
+      user_obj.roles << "broker_agency_staff" if broker_role.is_primary_broker? && !user_obj.roles.include?("broker_agency_staff")
       user_obj.save!
       redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
     end
