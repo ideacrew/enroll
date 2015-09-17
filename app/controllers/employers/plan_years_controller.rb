@@ -41,7 +41,7 @@ class Employers::PlanYearsController < ApplicationController
     end
     if @plan_year.save
       flash[:notice] = "Plan Year successfully created."
-      redirect_to employers_employer_profile_path(@employer_profile)
+      redirect_to employers_employer_profile_path(@employer_profile, tab: "benefits")
     else
       render action: "new"
     end
