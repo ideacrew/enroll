@@ -47,6 +47,7 @@ class Employers::BrokerAgencyController < ApplicationController
     end
 
     flash[:notice] = "Successfully associated broker with your account."
+    send_broker_successfully_associated_email broker_role_id
     redirect_to employers_employer_profile_path(@employer_profile)
   end
 
@@ -74,6 +75,23 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   private
+  def send_broker_successfully_associated_email broker_role_id
+    id =BSON::ObjectId.from_string(broker_role_id)
+    @broker_person = Person.where(:'broker_role._id' => id).first
+    body = "You have been selected as a broker by #{@employer_profile.try(:legal_name)}"
+
+    from_provider = HbxProfile.current_hbx
+    message_params = {
+      sender_id: @employer_profile.try(:id),
+      parent_message_id: @broker_person.id,
+      from: @employer_profile.try(:legal_name),
+      to: @broker_person.try(:full_name),
+      body: body,
+      subject: 'You have been select as the Broker'
+    }
+
+    create_secure_message(message_params, @broker_person, :inbox)
+  end
 
   def find_employer
     @employer_profile = EmployerProfile.find(params["employer_profile_id"])

@@ -271,6 +271,7 @@ module ApplicationHelper
   end
 
   def retrieve_show_path(provider, message)
+    return broker_agencies_inbox_path(provider, message_id: message.id) if provider.try(:broker_role)
     case(provider.model_name.name)
     when "Person"
       insured_inbox_path(provider, message_id: message.id)
@@ -284,8 +285,9 @@ module ApplicationHelper
   end
 
   def retrieve_inbox_path(provider, folder: 'inbox')
+    broker_agency_mailbox =  broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
+    return broker_agency_mailbox if provider.try(:broker_role)
     case(provider.model_name.name)
-
     when "EmployerProfile"
       inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
     when "HbxProfile"

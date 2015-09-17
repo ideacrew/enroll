@@ -202,6 +202,7 @@ Rails.application.routes.draw do
         get :employers
         get :messages
         get :staff_index
+        get :agency_messages
       end
 
       resources :applicants
