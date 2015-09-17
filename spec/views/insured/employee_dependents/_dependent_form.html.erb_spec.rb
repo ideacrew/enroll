@@ -37,5 +37,10 @@ describe "insured/employee_dependents/_dependent_form.html.erb" do
       expect(rendered).to have_selector('span.no_ssn')
       expect(rendered).to match /NO SSN/
     end
+
+    it "should have show tribal_container" do
+      expect(rendered).to have_selector('div#tribal_container')
+      expect(rendered).to have_content('Are you a member of an American Indian or Alaskan Native tribe? *')
+    end
   end
 end
