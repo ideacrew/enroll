@@ -148,7 +148,12 @@ class Plan
   scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", metal_level: metal_level)}
 
   scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
-
+  scope :shop_by_active_year, -> (active_year) {
+    where(
+        active_year: active_year,
+        market: "shop"
+      )
+  }
   scope :shop_health_by_active_year, ->(active_year) {
       where(
           active_year: active_year,

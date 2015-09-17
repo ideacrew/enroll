@@ -11,20 +11,18 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def reference_plans
-    if params[:plan_option_kind] == "single_carrier"
+    @plans = if params[:plan_option_kind] == "single_carrier"
       @carrier_id = params[:carrier_id]
-      @plans = Plan.shop_health_by_active_year(2015).by_carrier_profile(@carrier_id)
+      Plan.valid_shop_health_plans("carrier", @carrier_id)
     elsif params[:plan_option_kind] == "metal_level"
       @metal_level = params[:metal_level]
-      @plans = Plan.shop_health_by_active_year(2015).by_health_metal_levels(@metal_level)
+      Plan.valid_shop_health_plans("metal_level", @carrier_id)
     elsif params[:plan_option_kind] == "single_plan"
-      @plans = Plan.shop_health_by_active_year(2015)
+      Plan.shop_by_active_year(TimeKeeper.date_of_record.year)
     end
-
     respond_to do |format|
       format.js
     end
-
   end
 
   def create
