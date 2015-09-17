@@ -41,14 +41,15 @@
             <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
               <%= render "shared/benefit_group_fields", f: bg %><br>
             <% end %>
-            <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-transparent pull-left xs_full_width' %>
+            <% link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-trans pull-left xs_full_width' %>
+
             <div class="row no-buffer">
             <% button_name = @plan_year.persisted? ? 'Save Plan Year' : 'Create Plan Year' %>
-
+            <br><br>
               <button class="btn btn-primary pull-right" type="submit">
                 <%= "#{button_name}".html_safe %>
               </button> &nbsp;&nbsp;
-              <%= link_to "Cancel", employers_employer_profile_path(@employer_profile, :tab => "benefits"), class:'btn btn-transparent pull-right' %>
+              <%= link_to "Cancel", employers_employer_profile_path(@employer_profile, :tab => "benefits"), class:'btn btn-trans pull-right' %>
             </div>
           </div>
         </div>

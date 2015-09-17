@@ -100,6 +100,8 @@ $('.plan-options a, .nav-tabs a').on('click', function() {
 
 });
 
+// asdas
+$('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').closest('.row-form-wrapper').attr('style', 'border-bottom: none;');
 
 
 

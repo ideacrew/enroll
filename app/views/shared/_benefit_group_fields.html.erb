@@ -11,7 +11,7 @@
           <h3><i class="fa fa-minus-circle"></i> Benefit Package: <% title_value = f.object.title.present? ? f.object.title : "#{Time.now.year} Employer Benefits" %><%= title_value %>
             <div class="form-functions">
               <i class="fa fa-pencil" onclick="$(this).closest('.row').next().attr('style', 'padding: 0;').show();"></i>
-              <i class="fa fa-times-circle-o" onclick="$(this).closest('.row').next().hide().find('input').val('');"></i>
+              <!--<i class="fa fa-times-circle-o" onclick="$(this).closest('.row').next().hide().find('input').val('');"></i>-->
             </div>
           </h3>
 
@@ -53,7 +53,7 @@
       <%= link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "employee_costs_link", class: "hidden" %>
     </div>
 
-    <% render "employers/plan_years/employee_costs_modal" %>
+    <%= render "employers/plan_years/employee_costs_modal" %>
 
     <div class="col-xs-12 offerings">
       <div class="row row-form-wrapper no-buffer heading">
