@@ -26,6 +26,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def show
+     @provider = current_user.person
+     @staff_role = current_user.has_broker_agency_staff_role?
   end
 
   def edit
@@ -60,8 +62,13 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
 
   def employers
-    profile = BrokerAgencyProfile.find(params[:id])
-    @orgs = Organization.by_broker_agency_profile(profile._id)
+    if current_user.has_broker_agency_staff_role?
+      profile = BrokerAgencyProfile.find(params[:id])
+      @orgs = Organization.by_broker_agency_profile(profile._id)
+    else
+      broker_role_id = current_user.person.broker_role._id
+      @orgs = Organization.where({'employer_profile.broker_agency_accounts.writing_agent_id' => broker_role_id})
+    end
     @page_alphabets = page_alphabets(@orgs, "legal_name")
     page_no = cur_page_no(@page_alphabets.first)
     @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
@@ -70,13 +77,24 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def messages
     @sent_box = true
-    @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
+    @provider = current_user.person
+  end
+
+  def agency_messages
+    @sent_box = true
+    @broker_agency_profile = current_user.person.broker_agency_staff_roles.first.broker_agency_profile
   end
 
   def inbox
     @sent_box = true
-    @broker_agency_provider = BrokerAgencyProfile.find(params["id"]||params['profile_id'])
+    id = params["id"]||params['profile_id']
+    @broker_agency_provider = BrokerAgencyProfile.find(id)
     @folder = (params[:folder] || 'Inbox').capitalize
+    if current_user.person._id.to_s == id
+      @provider = current_user.person
+    else
+      @provider = @broker_agency_provider
+    end
   end
 
   private

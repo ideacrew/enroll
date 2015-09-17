@@ -32,7 +32,7 @@
 
         <tbody>
           <%- if provider.try(:inbox).try(:messages) %>
-          <%= render partial: "shared/inboxes/individual_message", :collection => provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }, :as => :message, locals: {provider: provider} %>
+          <%= render partial: "shared/inboxes/individual_message", :collection => provider.inbox.messages.select{|m| @folder.capitalize == (m.folder.try(:capitalize) || 'Inbox') }, :as => :message, locals: {provider: provider} %>
           <% end %>
         </tbody>
       </table>

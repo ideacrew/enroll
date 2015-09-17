@@ -297,6 +297,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       let(:person) {double(primary_family: family, has_active_consumer_role?: true)}
       let(:user) {double(person: person)}
       before :each do
+        session[:individual_assistance_path] = "assistance"
         allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
         get :show, id: "hbx_id"
       end

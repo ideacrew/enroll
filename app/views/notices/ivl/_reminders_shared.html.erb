@@ -1,24 +1,28 @@
+<% @style_color_text = "style='color: #FF0000;'" %>
+<% @style_underline = "style='text-decoration: underline;'" %>
+<% @style_text_indent = "style='margin-left:30px;'" %>
+<% @style_color_indent = "style='color:#ff0000; margin-left:30px;'" %>
 
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["To make sure that we have correct and complete information about all the members of your household, we need you
     to provide some additional documents. <strong>Scanned or photocopied versions of these documents are acceptable.</strong> "],
-    heading: 'Provide Documents Needed <span style="color:#000000; font-size: 0.7em;"> CFR 435.952(c)(2)</span>', sub_heading: ''} %>
+    heading: 'Provide Documents Needed <span style="color:#000000; font-size: 0.7em;"> 42 CFR 435.952(c)(2), 45 CFR §155.315(f)(2).</span>', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Here is the information that we need:"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span style='color: #ff0000;'>[PICK one or multiple of the following, based on which persons have inconsistencies and which areas are
+  content: "<span #{@style_color_text}>[PICK one or multiple of the following, based on which persons have inconsistencies and which areas are
   inconsistent]</span>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span style='color: #ff0000;'>[IF SSN Unverified]</span> <strong><i>Documents Showing Social Security Number.</i></strong> The Social Security Administration could
+  content: "<span #{@style_color_text}>[IF SSN Unverified]</span> <strong><i>Documents Showing Social Security Number.</i></strong> The Social Security Administration could
   not confirm that the Social Security Number provided for the following applicant household members is correct:"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "[SSN Inconsistent First Name 1] [SSN Inconsistent Last Name 1]<br>
-  <span style='color: #ff0000;'>[IF Multiple SSN Inconsistencies]</span><SSN Inconsistent First Name N> <SSN Inconsistent Last Name N><br>
+  <span #{@style_color_text}>[IF Multiple SSN Inconsistencies]</span><SSN Inconsistent First Name N> <SSN Inconsistent Last Name N><br>
   [Repeat for as many member as is necessary]"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -34,16 +38,16 @@
   DC Health Link Customer Service at 1-855-532-5465.  "} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span style='color: #ff0000'>[IF Citizenship/Immigration Unverified]</span>
+  content: "<span #{@style_color_text}>[IF Citizenship/Immigration Unverified]</span>
   <strong><i>Documents of Citizenship or Immigration Status.</i></strong>
   We need proof of your U.S. citizenship or immigration status for the following applicant household members:<br>
   [Citizenship/Immigration Inconsistent First Name 1] [Citizenship/Immigration Inconsistent Last Name 1]
-  <span style='color: #ff0000;'>[IF Multiple Citizenship/Immigration Inconsistencies]</span>
+  <span #{@style_color_text}>[IF Multiple Citizenship/Immigration Inconsistencies]</span>
   [Citizenship/Immigration Inconsistent First Name N] [Citizenship/Immigration Inconsistent Last Name N]
   "} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span style='text-decoration:underline;'>How to Prove US Citizenship</span><br>
+  content: "<span #{@style_underline}>How to Prove US Citizenship</span><br>
   Two types of documentation are accepted to confirm citizenship status. We call the two types “primary” and “secondary”.
   If you provide primary documentation, no other documents are required. If you provide secondary documentation, other
   identification (ID) is required for verification. Secondary documentation must be accompanied with an identification
@@ -51,7 +55,7 @@
 
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "<span style='text-decoration:underline;'>Primary documentation:</span> (Only One (1) is needed)",
+    previous: "<span #{@style_underline}>Primary documentation:</span> (Only One (1) is needed)",
     listings: [["U.S. Passport", ["<i>Note:</i> Expired passports are acceptable."]], "Certificate of Naturalization",
     "Certificate of Citizenship", "Consular report of Birth Abroad of U.S. Citizen", "A valid Driver’s License from a state that requires proof of citizenship and verification of Social Security
     Number prior to issuance of the license", ["A tribal document issued by a federally-recognized Indian Tribe, which must:",
@@ -60,7 +64,7 @@
     } %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "<span style='text-decoration:underline;'>Secondary documentation:</span> (Must Present One (1) of the following, along with ID)",
+    previous: "<span #{@style_underline}>Secondary documentation:</span> (Must Present One (1) of the following, along with ID)",
     listings: ["A U.S. birth certificate showing birth in one of the 50 states, DC, Guam, American Samoa, Swain’s Island, Puerto Rico, the
     Virgin Islands, or the Commonwealth of the Northern Mariana Islands.  If born in the Puerto Rico, the Virgin Islands, or Commonwealth
     of the Northern Mariana Islands prior to the time these areas became part of the U.S., the individual will satisfy the citizenship
@@ -74,7 +78,7 @@
     } %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "<span style='text-decoration:underline;'>Needed Information to Verify Immigration Status</span>"} %>
+    content: "<span #{@style_underline}>Needed Information to Verify Immigration Status</span>"} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "<strong>The document that you may be able to use to verify your immigration status includes, but is not limited to:</strong>"} %>
@@ -159,11 +163,11 @@
     } %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "<span style='color: #ff0000;'>[IF Income Unverified]</span> <strong><i>Documents Showing Household Income.</i></strong>
+    content: "<span #{@style_color_text}>[IF Income Unverified]</span> <strong><i>Documents Showing Household Income.</i></strong>
     We need proof of income for [First Inconsistent First  Name][First Inconsistent Last Name],
     [Second First Name of First Inconsistent member’s household]
     [Second Last Name of First Inconsistent member’s household]
-    <span style='color: #ff0000;'>[continue until all members but one ofhousehold of first person with inconsistency are listed, then enter]“,
+    <span #{@style_color_text}>[continue until all members but one ofhousehold of first person with inconsistency are listed, then enter]“,
     and” [followed by]</span>
     [Last First Name of First Inconsistent member’s household][Last Name of First Inconsistent member’s household]."} %>
 
@@ -182,12 +186,12 @@
     } %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "<span style='color:#ff0000;'>[IF Residency Unverified]</span> <strong><i>Documents Showing D.C. Residency.</i></strong>
+    content: "<span #{@style_color_text}>[IF Residency Unverified]</span> <strong><i>Documents Showing D.C. Residency.</i></strong>
     A document that shows that the following household members live in the District of Columbia:"} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "[Residency Inconsistent First Name 1][Residency Inconsistent Last Name 1]
-    <span style='color:#ff0000;'>[IF Multiple Residency Inconsistencies]</span>[Residency Inconsistent First Name N][Residency Inconsistent Last Name N]
+    <span #{@style_color_text}>[IF Multiple Residency Inconsistencies]</span>[Residency Inconsistent First Name N][Residency Inconsistent Last Name N]
     [Repeat for as many member as is necessary]"} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
@@ -205,36 +209,36 @@
 
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "<span style='color: #ff0000;'>[IF MEC Conflict]</span><br> <strong><i>Access to Other Insurance Coverage.</i></strong>
+    content: "<span #{@style_color_text}>[IF MEC Conflict]</span><br> <strong><i>Access to Other Insurance Coverage.</i></strong>
     Our records indicate that the following individual(s) have access to [MEC Data Match]."} %>
 
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "<span style='margin-left:30px;'>[MEC Type 1 Inconsistent First Name 1] [MEC Type 1 Inconsistent Last Name 1]</span><br>
-   <span style='color:#ff0000; margin-left:30px;'>[IF Multiple MEC Inconsistency Type 1]</span> [MEC Type 1 Inconsistent First Name N] [MEC Type 1 Inconsistent Last Name N]<br>
-   <span style='margin-left:30px;'>[Repeat for as many member as is necessary]</span>"} %>
+    content: "<span #{@style_text_indent}>[MEC Type 1 Inconsistent First Name 1] [MEC Type 1 Inconsistent Last Name 1]</span><br>
+   <span #{@style_color_indent}>[IF Multiple MEC Inconsistency Type 1]</span> [MEC Type 1 Inconsistent First Name N] [MEC Type 1 Inconsistent Last Name N]<br>
+   <span #{@style_text_indent}>[Repeat for as many member as is necessary]</span>"} %>
 
  <%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "<span style='color: #ff0000;'>[IF Additional MEC Conflict (repeat as necessary)]</span> Our records indicate that the following individual(s)
+   content: "<span #{@style_color_text}>[IF Additional MEC Conflict (repeat as necessary)]</span> Our records indicate that the following individual(s)
    have access to [MEC Data Match]. "} %>
 
 
  <%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "<span style='margin-left:30px;'>[MEC Type 2 Inconsistent First Name 1] [MEC Type 2 Inconsistent Last Name 1]</span><br>
-  <span style='color:#ff0000; margin-left:30px;'>[IF Multiple MEC Inconsistency Type 2]</span> [MEC Type 2 Inconsistent First Name N] [MEC Type 1 Inconsistent Last Name N]<br>
-  <span style='margin-left:30px;'>[Repeat for as many member as is necessary]</span>"} %>
+   content: "<span #{@style_text_indent}>[MEC Type 2 Inconsistent First Name 1] [MEC Type 2 Inconsistent Last Name 1]</span><br>
+  <span #{@style_color_indent}>[IF Multiple MEC Inconsistency Type 2]</span> [MEC Type 2 Inconsistent First Name N] [MEC Type 1 Inconsistent Last Name N]<br>
+  <span #{@style_text_indent}>[Repeat for as many member as is necessary]</span>"} %>
 
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "This would make you ineligible for tax credits.  Please provide documentation that this coverage has been cancelled."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span style='color:#ff0000;'>[IF Indian Inconsistency]</span> American Indian Status. On your application or renewal form, you indicated that the following individual(s) were American Indian. "} %>
+  content: "<span #{@style_color_text}>[IF Indian Inconsistency]</span> American Indian Status. On your application or renewal form, you indicated that the following individual(s) were American Indian. "} %>
 
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "[Indian Inconsistent First Name 1] [Indian Inconsistent Last Name 1]<br>
-  <span style='color:#ff0000;'>[IF Multiple Indian Inconsistencies]</span>[Indian Inconsistent First Name N] [Indian Inconsistent Last Name N]<br>
+  <span #{@style_color_text}>[IF Multiple Indian Inconsistencies]</span>[Indian Inconsistent First Name N] [Indian Inconsistent Last Name N]<br>
   [Repeat for as many member as is necessary]"} %>
 
 
@@ -253,14 +257,14 @@
 
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span style='color: #ff0000;'>[IF Household Unverified (Duplicate Claiming)]</span> <strong><i>Documents Showing Household Composition.</i></strong> Our records indicate a conflict regarding whether [Conflicting HH First Name]
+  content: "<span #{@style_color_text}>[IF Household Unverified (Duplicate Claiming)]</span> <strong><i>Documents Showing Household Composition.</i></strong> Our records indicate a conflict regarding whether [Conflicting HH First Name]
   [Conflicting HH Last Name] is a member of [First Inconsistent First Name] [First Inconsistent Last Name]’s tax household. To resolve this conflict, you must submit documentation
   that First Inconsistent First Name] [First Inconsistent Last Name] can claim [Conflicting HH First Name] [Conflicting HH Last Name] as a dependent for federal tax purposes.
   IRS Form 8332 or Form 2120 that applies to the tax year at issue will be sufficient evidence."} %>
 
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<span style='color:#ff0000;'>[IF Household Unverified (Duplicate Living With)]</span> <strong><i>Documents Showing Household Composition.</i></strong> Our records indicate a conflict regarding whether
+  content: "<span #{@style_color_text}>[IF Household Unverified (Duplicate Living With)]</span> <strong><i>Documents Showing Household Composition.</i></strong> Our records indicate a conflict regarding whether
   [Conflicting HH First Name][Conflicting HH Last Name] is a member of [First Inconsistent First Name][First Inconsistent Last Name]’s household. To resolve this conflict,
   you must submit documents showing that [Conflicting HH First Name][Conflicting HH Last Name] lives with [First Inconsistent First Name][First Inconsistent Last Name]."} %>
 

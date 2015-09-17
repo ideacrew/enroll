@@ -1,92 +1,108 @@
 <div id="consumer_fields" class="focus_effect">
+  <div class="row row-form-wrapper no-buffer" style:"vertical-align: text-bottom">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <label class="required no-pd">Are you currently incarcerated? *</label>
+    </div>
+
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
+      <div class="radio">
+        <%= f.radio_button :is_incarcerated, true, class: "required floatlabel", id: 'radio_incarcerated_yes', required: true %>
+        <label for="radio_incarcerated_yes"><span>Yes</span></label>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio">
+        <%= f.radio_button :is_incarcerated, false, class: "required floatlabel", id: 'radio_incarcerated_no', required: true %>
+        <label for="radio_incarcerated_no"><span>No</span></label>
+      </div>
+    </div>
+  </div>
 
   <div class="row row-form-wrapper no-buffer">
-
-    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
       <label>Are you a US Citizen or US National? *</label>
     </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
-        <%= f.radio_button :us_citizen, true, class: "required floatlabel" %>
+        <%= f.radio_button :us_citizen, true, required: true, class: "required floatlabel" %>
         <%= f.label :us_citizen, :value => true do %>
-            <span>Yes</span>
-        <% end %>
-      </div>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <div class="radio skinned-form-controls skinned-form-controls-mac">
-        <%= f.radio_button :us_citizen, false, class: "required floatlabel" %>
-        <%= f.label :us_citizen, :value => false do %>
-            <span>No</span>
+          <span>Yes</span>
         <% end %>
       </div>
     </div>
 
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= f.radio_button :us_citizen, false, required: true, class: "required floatlabel" %>
+        <%= f.label :us_citizen, :value => false do %>
+          <span>No</span>
+        <% end %>
+      </div>
+    </div>
   </div>
 
   <div class="row row-form-wrapper no-buffer" id="naturalized_citizen_container" style="display: <%= (f.object.us_citizen.present? and f.object.us_citizen) ? 'block' : 'none' %>">
-
-    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
       <label>Are you a naturalized citizen? *</label>
     </div>
 
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
-        <%= f.radio_button :naturalized_citizen, true, class: "required floatlabel" %>
+        <%= f.radio_button :naturalized_citizen, true, required: true, class: "required floatlabel" %>
         <%= f.label :naturalized_citizen, :value => true do %>
-            <span>Yes</span>
+          <span>Yes</span>
         <% end %>
       </div>
     </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
-        <%= f.radio_button :naturalized_citizen, false, class: "required floatlabel" %>
+        <%= f.radio_button :naturalized_citizen, false, required: true, class: "required floatlabel" %>
         <%= f.label :naturalized_citizen, :value => false do %>
-            <span>No</span>
+          <span>No</span>
         <% end %>
       </div>
     </div>
   </div>
 
   <div class="row row-form-wrapper no-buffer" id="immigration_status_container" style="display: <%= (f.object.us_citizen.present? and !f.object.us_citizen) ? 'block' : 'none' %>">
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg">
+    <div class="col-lg-6 col-md-6 col-sm-4 col-xs-6 form-group form-group-lg">
       <label>Do you have eligible immigration status? *</label>
     </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+    <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
         <%= f.radio_button :eligible_immigration_status, true, class: "required floatlabel" %>
         <%= f.label :eligible_immigration_status, :value => true do %>
-            <span>Yes</span>
+          <span>Yes</span>
         <% end %>
       </div>
     </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+    <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
         <%= f.radio_button :eligible_immigration_status, false, class: "required floatlabel" %>
         <%= f.label :eligible_immigration_status, :value => false do %>
-            <span>No</span>
+          <span>No</span>
         <% end %>
       </div>
     </div>
   </div>
 
   <% if f.object.is_a? Person %>
-      <%= f.fields_for :consumer_role do |c| %>
-          <div class="row row-form-wrapper no-buffer" id="immigration_fields_container" style="display: <%= (f.object.eligible_immigration_status.present? and f.object.eligible_immigration_status) ? 'block' : 'none' %>">
-            <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c} %>
-          </div>
-      <% end %>
+    <%= f.fields_for :consumer_role do |c| %>
+       <div class="row row-form-wrapper no-buffer" id="immigration_fields_container" style="display: <%= (f.object.eligible_immigration_status.present? and f.object.eligible_immigration_status) ? 'block' : 'none' %>">
+        <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c} %>
+      </div>
+    <% end %>
   <% else %>
-      <% if f.object.persisted? %>
-          <% dependent_consumer_role = f.object.family_member.person.consumer_role %>
-      <% else %>
-          <% dependent_consumer_role = ConsumerRole.new %>
-      <% end %>
-      <%= f.fields_for dependent_consumer_role do |c| %>
-          <div class="row row-form-wrapper no-buffer" id="immigration_fields_container" style="display: none">
-            <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c} %>
-          </div>
-      <% end %>
+    <% if f.object.persisted? %>
+      <% dependent_consumer_role = f.object.family_member.person.consumer_role %>
+    <% else %>
+      <% dependent_consumer_role = ConsumerRole.new %>
+    <% end %>
+    <%= f.fields_for dependent_consumer_role do |c| %>
+      <div class="row row-form-wrapper no-buffer" id="immigration_fields_container" style="display: none">
+        <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c} %>
+      </div>
+    <% end %>
   <% end %>
 
   <div class="row row-form-wrapper no-buffer" id="vlp_document_id_container" style="display: <%= (f.object.naturalized_citizen.present? and f.object.naturalized_citizen) ? 'block' : 'none' %>">
@@ -96,66 +112,60 @@
     </div>
 
     <% if f.object.is_a? Person %>
-        <%= f.fields_for :consumer_role do |c| %>
-            <div id="naturalization_cert_container" style="display: none">
-              <%= render :partial => "shared/naturalization_cert_fields", locals: {c: c} %>
-            </div>
-            <div id="citizenship_cert_container" style="display: none">
-              <%= render :partial => "shared/citizenship_cert_fields", locals: {c: c} %>
-            </div>
-        <% end %>
+      <%= f.fields_for :consumer_role do |c| %>
+        <div id="naturalization_cert_container" style="display: none">
+          <%= render :partial => "shared/naturalization_cert_fields", locals: {c: c} %>
+        </div>
+        <div id="citizenship_cert_container" style="display: none">
+          <%= render :partial => "shared/citizenship_cert_fields", locals: {c: c} %>
+        </div>
+      <% end %>
     <% else %>
-        <% if f.object.persisted? %>
-            <% dependent_consumer_role = f.object.family_member.person.consumer_role %>
-        <% else %>
-            <% dependent_consumer_role = ConsumerRole.new %>
-        <% end %>
-        <%= f.fields_for dependent_consumer_role do |c| %>
-            <div id="naturalization_cert_container" style="display: none">
-              <%= render :partial => "shared/naturalization_cert_fields", locals: {c: c} %>
-            </div>
-            <div id="citizenship_cert_container" style="display: none">
-              <%= render :partial => "shared/citizenship_cert_fields", locals: {c: c} %>
-            </div>
-
-        <% end %>
+      <% if f.object.persisted? %>
+        <% dependent_consumer_role = f.object.family_member.person.consumer_role %>
+      <% else %>
+        <% dependent_consumer_role = ConsumerRole.new %>
+      <% end %>
+      <%= f.fields_for dependent_consumer_role do |c| %>
+        <div id="naturalization_cert_container" style="display: none">
+          <%= render :partial => "shared/naturalization_cert_fields", locals: {c: c} %>
+        </div>
+        <div id="citizenship_cert_container" style="display: none">
+          <%= render :partial => "shared/citizenship_cert_fields", locals: {c: c} %>
+        </div>
+      <% end %>
     <% end %>
   </div>
 
-
   <div class="row row-form-wrapper no-buffer" id="vlp_document_id_container">
-    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 form-group form-group-lg">
-      <label>Are you a member of an American Indian or Alaskan Native tribe?</label>
-    </div>
-    <div style="text-align: center" class="col-lg-1 col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd">
-
-      <%= f.check_box :indian_tribe_member %>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <label>Are you a member of an American Indian or Alaskan Native tribe? *</label>
     </div>
 
-    <div id="tribal_container" style="display: none">
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
+      <div class="radio">
+        <%= f.radio_button :indian_tribe_member, "true", class: "required floatlabel", id: 'indian_tribe_member_yes', required: true %>
+        <label for="indian_tribe_member_yes"><span>Yes</span></label>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio">
+        <%= f.radio_button :indian_tribe_member, "false", class: "required floatlabel", id: 'indian_tribe_member_no', required: true %>
+        <label for="indian_tribe_member_no"><span>No</span></label>
+      </div>
+    </div>
+
+    <div class="row no-buffer" id="tribal_container" style="display: <%= f.object.indian_tribe_member.present? and f.object.indian_tribe_member ? 'block' : 'none' %>">
+      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
         <%= f.text_field :tribal_id, class: "required floatlabel form-control", placeholder: 'TRIBAL ID' %>
       </div>
     </div>
   </div>
 </div>
 
-<div class="row row-form-wrapper no-buffer" id="vlp_document_id_container">
-  <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 form-group form-group-lg">
-    <label>Are you currently incarcerated?</label>
-  </div>
-  <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 form-group form-group-lg no-pd">
-    <%= f.check_box :is_incarcerated %>
-    <%= f.label :is_incarcerated, :value => true do %>
-        <span>Yes</span>
-    <% end %>
-  </div>
-</div>
-
 <%= render "shared/race_and_ethnicity_options", f: f %>
 
 <%= f.hidden_field :is_consumer_role, value: 'true' %>
-
 
 <script type="text/javascript">
   $(document).ready(function () {
