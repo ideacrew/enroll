@@ -58,19 +58,6 @@ class Household
     ch ||= coverage_households.build(is_immediate_family: false)
   end
 
-  def add_household_tax_member(family_member)
-    th = tax_households.first
-    # TODO Need the logic to calcute the allocated_aptc, effective_starting_on and so on
-    # not all the family member will be the tax household, need additional logic
-    th ||=  tax_households.build(allocated_aptc: 330, effective_starting_on: TimeKeeper.date_of_record - 1.month, effective_ending_on: TimeKeeper.date_of_record + 2.month, submitted_at: TimeKeeper.date_of_record)
-
-    th.tax_household_members.build(
-      family_member: family_member,
-      is_subscriber: family_member.is_primary_applicant?,
-      is_ia_eligible: true
-    )
-  end
-
   # def determination_split_coverage_household
   #   hh = coverage_household.find_or_initialize_by(is_determination_split_household: true)
   #   hh.submitted_at ||= DateTime.current
