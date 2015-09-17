@@ -11,7 +11,7 @@ class SamlController < ApplicationController
     response.settings = saml_settings
 
     if response.is_valid?
-      email = response.attributes['mail']
+      email = response.attributes['mail'].downcase
 
       user_with_email = User.where(email: email).first
 
