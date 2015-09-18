@@ -526,3 +526,6 @@ DEPENDENCIES
   web-console (~> 2.0)
   wicked_pdf
   wkhtmltopdf-binary-edge (~> 0.12.2.1)
+
+BUNDLED WITH
+   1.10.6
