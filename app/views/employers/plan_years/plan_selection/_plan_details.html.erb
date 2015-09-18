@@ -1,2 +1,71 @@
-  <h3><%= @plan.name %></h3>
-  <h3><%= @plan.metal_level %></h3>
+<h1>Your Reference Plan</h1>
+<div class="panel benefitgroup col-xs-12 referenceplan">
+  <section class="col-xs-6">
+    <header class="row">
+      <h5 style="color: #69A30D; font-size: 18px;"><%= @plan.name %></h5>
+    </header>
+  </section>
+  <section class="col-xs-6">
+  </section>
+  <h2></h2>
+  <table>
+    <tr>
+      <th>
+        <header>Type</header>
+      </th>
+      <th>
+        <header>Metallic Level</header>
+      </th>
+      <th>
+        <header>Nationwide</header>
+      </th>
+    </tr>
+    <tr>
+      <td>
+        <p><%= @plan.plan_type.upcase %></p>
+      </td>
+      <td>
+        <p>
+          <%= @plan.metal_level.humanize %>
+        </p>
+      </td>
+      <td style="padding-left: 0;">
+        <p>
+          <%= @plan.nationwide %>
+        </p>
+      </td>
+
+    </tr>
+  </table>
+  <div class="col-xs-12 row plan-details">
+    <hr>
+    <div class="col-xs-4 row">
+      <span>Your Estimated Monthly Cost</span>
+      <h2>1232132</h2>
+    </div>
+    <div class="col-xs-8">
+      <table>
+        <tr>
+          <th></th>
+          <th>Individual</th>
+          <th>Family</th>
+        </tr>
+        <tr>
+          <td>Estimated Total Monthly Cost for Employees</td>
+          <td>12312</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Estimated Annual Deductible</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Estimated Annual Out-of-Pocket Max</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
