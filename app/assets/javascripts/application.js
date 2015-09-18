@@ -24,6 +24,7 @@
 //= require override_confirm
 //= require floatlabels
 //= require jq_datepicker
+//= require date
 //= require qle
 //= require print
 //= require browser_issues
