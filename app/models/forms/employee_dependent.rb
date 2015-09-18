@@ -96,9 +96,12 @@ module Forms
         primary_person = family.primary_family_member.person
         person.update(no_dc_address: primary_person.no_dc_address, no_dc_address_reason: primary_person.no_dc_address_reason)
         address = primary_person.home_address
-        person.addresses << address if address.present?
+        if address.present?
+          person.home_address.try(:destroy)
+          person.addresses << address
+        end
       else
-        current_address = person.home_address
+        current_address = person.try(:home_address)
         if addresses["address_1"].blank? and addresses["city"].blank?
           current_address.destroy if current_address.present?
           return true
@@ -160,7 +163,7 @@ module Forms
       has_same_address_with_primary = compare_address_with_primary(found_family_member);
       address = if has_same_address_with_primary
                   Address.new(kind: 'home')
-                elsif found_family_member.person.home_address.present?
+                elsif found_family_member.person.try(:home_address).present?
                   found_family_member.person.home_address
                 else
                   Address.new(kind: 'home')
@@ -186,8 +189,8 @@ module Forms
         :citizen_status => found_family_member.citizen_status,
         :tribal_id => found_family_member.tribal_id,
         :same_with_primary => has_same_address_with_primary,
-        :no_dc_address => has_same_address_with_primary ? '' : found_family_member.person.no_dc_address,
-        :no_dc_address_reason => has_same_address_with_primary ? '' : found_family_member.person.no_dc_address_reason,
+        :no_dc_address => has_same_address_with_primary ? '' : found_family_member.person.try(:no_dc_address),
+        :no_dc_address_reason => has_same_address_with_primary ? '' : found_family_member.person.try(:no_dc_address_reason),
         :addresses => address
       })
     end

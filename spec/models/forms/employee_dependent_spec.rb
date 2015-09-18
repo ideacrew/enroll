@@ -68,7 +68,9 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
       :ethnicity => ["ethnicity"],
       :language_code => "english",
       :is_incarcerated => "no",
-      :tribal_id => "test"
+      :tribal_id => "test",
+      :no_dc_address=>nil,
+      :no_dc_address_reason=>nil
     }
   }
 
@@ -157,7 +159,7 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
       tribal_id: "test"
     }
   }
-  let(:person) { double(:errors => double(:has_key? => false)) }
+  let(:person) { double(:errors => double(:has_key? => false), home_address: nil) }
   let(:family_member) { instance_double(::FamilyMember,
                                         person_properties.merge({
                                         :family => family,
@@ -180,6 +182,7 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
 
   describe "that is findable using the family_member_id" do
     before(:each) do
+      allow(Forms::EmployeeDependent).to receive(:compare_address_with_primary).and_return false
       @found_form = Forms::EmployeeDependent.find(family_member_id)
     end
 
@@ -194,13 +197,13 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
 
   describe "when updated" do
     it "should update the relationship of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil})).and_return(true)
+      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
       expect(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
 
     it "should update the attributes of the person" do
-      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil}))
+      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
