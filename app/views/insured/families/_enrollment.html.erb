@@ -21,7 +21,7 @@
               <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong><%= hbx_enrollment.try(:subscriber).try(:person).try(:hbx_id) %></strong>
             </p>
           </div>
-          <% if hbx_enrollment.consumer_role.present? %>
+          <% if hbx_enrollment.consumer_role.present? and hbx_enrollment.try(:applied_aptc_amount) > 0 %>
             <div>
               <p>
                 <label>APTC amount:</label> <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong>/month

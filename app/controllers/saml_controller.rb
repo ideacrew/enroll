@@ -10,8 +10,10 @@ class SamlController < ApplicationController
     response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse])
     response.settings = saml_settings
 
+    sign_out current_user if current_user.present?
+
     if response.is_valid?
-      email = response.attributes['mail']
+      email = response.attributes['mail'].downcase
 
       user_with_email = User.where(email: email).first
 
@@ -31,6 +33,10 @@ class SamlController < ApplicationController
       log("ERROR: SAMLResponse assertion errors #{response.errors}", {:severity => "error"})
       render file: 'public/403.html', status: 403
     end
+  end
+
+  def logout
+    redirect_to SamlInformation.saml_logout_url
   end
 
   private

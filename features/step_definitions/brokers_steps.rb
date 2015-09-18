@@ -274,7 +274,7 @@ Then(/^.+ shops for plans$/) do
 end
 
 Then(/^.+ sees covered family members$/) do
-  wait_and_confirm_text(/Covered Family Members/)
+  wait_and_confirm_text(/Choose Benefits: Covered Family Members/)
   @browser.element(id: 'btn-continue').click
 end
 

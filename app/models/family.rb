@@ -241,7 +241,7 @@ class Family
       )
 
     active_household.add_household_coverage_member(family_member)
-    active_household.add_household_tax_member(family_member)
+    #active_household.add_household_tax_member(family_member)
     family_member
   end
 

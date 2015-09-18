@@ -34,7 +34,7 @@ RSpec.describe Exchanges::AgentsController do
     
     it 'begins enrollment' do
       sign_in current_user
-      get :begin_enrollment
+      get :begin_employee_enrollment
       expect(response).to have_http_status(:redirect)
     end
   end
