@@ -16,7 +16,7 @@ class Employers::PlanYearsController < ApplicationController
       Plan.valid_shop_health_plans("carrier", @carrier_id)
     elsif params[:plan_option_kind] == "metal_level"
       @metal_level = params[:metal_level]
-      Plan.valid_shop_health_plans("metal_level", @carrier_id)
+      Plan.valid_shop_health_plans("metal_level", @metal_level)
     elsif params[:plan_option_kind] == "single_plan"
       Plan.shop_by_active_year(TimeKeeper.date_of_record.year)
     end
