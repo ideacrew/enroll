@@ -41,23 +41,13 @@ class ApplicationController < ActionController::Base
   end
 
   def create_sso_account(user, personish, timeout, account_role = "individual")
-    idp_account_created = nil
-    if user.idp_verified?
-      idp_account_created = :created
-    else
-      idp_account_created = IdpAccountManager.create_account(user.email, stashed_user_password, personish, account_role, timeout)
-    end
-    case idp_account_created
-    when :created
+    if !user.idp_verified?
+      IdpAccountManager.create_account(user.email, stashed_user_password, personish, account_role, timeout)
       session[:person_id] = personish.id
       session.delete("stashed_password")
       user.switch_to_idp!
-      yield
-    else
-      respond_to do |format|
-        format.html { render 'shared/idp_unavailable' }
-      end
     end
+    yield
   end
 
   private
