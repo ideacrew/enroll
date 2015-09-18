@@ -4,14 +4,22 @@ RSpec.describe SamlController do
 
   describe "POST login" do
     let(:user) { FactoryGirl.create(:user, last_portal_visited: family_account_path)}
+    invalid_xml = File.read("spec/saml/invalid_saml_response.xml")
 
 
     before(:each) do
 
     end
 
+    context "with devise session active" do
+      it "should sign out current user" do
+        sign_in user
+        expect(subject).to receive(:sign_out).with(user)
+        post :login, :SAMLResponse => invalid_xml
+      end
+    end
+
     context "with invalid saml response" do
-      invalid_xml = File.read("spec/saml/invalid_saml_response.xml")
 
       it "should render a 403" do
         expect(subject).to receive(:log) do |arg1, arg2|

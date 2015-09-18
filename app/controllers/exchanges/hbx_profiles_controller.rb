@@ -225,19 +225,23 @@ private
       first_name = insured.first_name
       name = insured.full_name
       insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
+      root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + params[:person] +'&original_application_type:'
+      text = "<br>Resume Application via "
       body = 
         "Please contact #{insured.first_name} #{insured.last_name}. <br/> " + 
         "Plan Shopping help request from Person Id #{insured.id}, email #{insured_email}.<br/>" +
-        "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}"   
+        "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}.<br>" +
+        "<a href='" + root+"phone'>#{text}phone</a>  <br>" +
+        "<a href='" + root+"paper'>#{text}paper</a>  <br>"
     else
       first_name = params[:first_name]
       last_name = params[:last_name]
       name = first_name.to_s + ' ' + last_name.to_s 
       insured_email = params[:email]
-      body = 
-        "Please contact #{first_name} #{last_name}. <br/>" +
-        "Plan shopping help has been requested by #{insured_email}"  +
-        "PII is SSN #{params[:ssn]} and DOB #{params[:dob]}"
+      body =  "Please contact #{first_name} #{last_name}. <br/>" +
+        "Plan shopping help has been requested by #{insured_email}<br>"
+      body += "SSN #{params[:ssn]} <br>" if params[:ssn].present?
+      body += "DOB #{params[:dob]} <br>" if params[:dob].present?
     end
     hbx_profile = Organization.where(:hbx_profile =>{:$exists => true}).first.hbx_profile
     message_params = {

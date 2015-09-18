@@ -19,10 +19,9 @@ puts "*"*80
 db_tasks = %w(
   db:mongoid:purge
   db:mongoid:remove_indexes
-  db:mongoid:create_indexes
 )
 puts "*"*80
-puts "Purging Database"
+puts "Purging Database and Removing Indexes"
 system "rake #{db_tasks.join(" ")}"
 puts "*"*80
 
@@ -30,15 +29,101 @@ puts "*"*80
 puts "Start of seed data"
 puts "*"*80
 
+puts "*"*80
+puts "Loading carriers, plans, and products_qhp"
+puts "*"*80
+plan_tables = %w(
+  organizations
+  plans
+  products_qhps
+)
+restore_database = Mongoid.default_session.options[:database].to_s
+dump_location = File.join(File.dirname(__FILE__), 'seedfiles', 'plan_dumps', restore_database)
+plan_files = plan_tables.collect(){|table| File.join(dump_location, "#{table}.bson")}
+missing_plan_dumps = plan_files.any? {|file| !File.file?(file)}
+use_plan_dumps = ! missing_plan_dumps
+generate_plan_dumps = missing_plan_dumps
+
+if use_plan_dumps
+  puts "Using plan dump files in #{dump_location}"
+  plan_files.each do |file|
+    restore_command = "mongorestore --drop --noIndexRestore -d #{restore_database} #{file}"
+    system restore_command
+  end
+end
+
+puts "*"*80
+puts "Creating Indexes"
+system "rake db:mongoid:create_indexes"
+puts "*"*80
+
+if missing_plan_dumps
+  puts "Running full seed"
+
+  puts "*"*80
+  puts "Creating Indexes"
+  system "rake db:mongoid:create_indexes"
+  puts "*"*80
+
+  require File.join(File.dirname(__FILE__),'seedfiles', 'carriers_seed')
+  system "bundle exec rake seed:plans ENROLL_SEEDING=true"
+  puts "*"*80
+  puts "Loading SERFF data"
+
+  Products::Qhp.delete_all
+  files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "*.xml"))
+  qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
+    puts file
+    xml = Nokogiri::XML(File.open(file))
+    plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
+    qhp_hash.add(plan.to_hash, file)
+    qhp_hash
+  end
+
+  qhp_import_hash.run
+  puts "*"*80
+
+  puts "*"*80
+  puts "Loading SERFF PLAN RATE data"
+
+  files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "rates", "**", "*.xml"))
+  rate_import_hash = files.inject(QhpRateBuilder.new()) do |rate_hash, file|
+    puts file
+    xml = Nokogiri::XML(File.open(file))
+    rates = Parser::PlanRateGroupParser.parse(xml.root.canonicalize, :single => true)
+    rate_hash.add(rates.to_hash)
+    rate_hash
+  end
+
+  rate_import_hash.run
+  puts "*"*80
+
+  system "bundle exec rake xml:renewal_and_standard_plans"
+
+  require File.join(File.dirname(__FILE__),'seedfiles', 'shop_2015_sbc_files')
+
+  puts "*"*80
+end
+
+puts "*"*80
+puts "Creating plan dumps"
+if generate_plan_dumps
+  dump_command = ["mongodump", "-d", restore_database, "-o", dump_location, "-c"]
+  system *dump_command, "organizations", "-q", '{"carrier_profile._id": {$exists: true}}'
+  system *dump_command, "plans"
+  system *dump_command, "products_qhps"
+end
+puts "*"*80
+
 
 puts "*"*80
 puts "Loading carriers and QLE kinds."
-require File.join(File.dirname(__FILE__),'seedfiles', 'carriers_seed')
+# require File.join(File.dirname(__FILE__),'seedfiles', 'carriers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'ivl_life_events_seed')
 
+# seed:plans
 load_tasks = %w(
-  seed:plans
   seed:people
   seed:families
   hbx:employers:add[db/seedfiles/employers.csv,db/seedfiles/blacklist.csv]
@@ -62,40 +147,40 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
 
 puts "*"*80
 
-puts "*"*80
-puts "Loading SERFF data"
-
-Products::Qhp.delete_all
-files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "*.xml"))
-qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
-  puts file
-  xml = Nokogiri::XML(File.open(file))
-  plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
-  qhp_hash.add(plan.to_hash, file)
-  qhp_hash
-end
-
-qhp_import_hash.run
-puts "*"*80
-
-puts "*"*80
-puts "Loading SERFF PLAN RATE data"
-
-files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "rates", "**", "*.xml"))
-rate_import_hash = files.inject(QhpRateBuilder.new()) do |rate_hash, file|
-  puts file
-  xml = Nokogiri::XML(File.open(file))
-  rates = Parser::PlanRateGroupParser.parse(xml.root.canonicalize, :single => true)
-  rate_hash.add(rates.to_hash)
-  rate_hash
-end
-
-rate_import_hash.run
-puts "*"*80
-
-system "bundle exec rake xml:renewal_and_standard_plans"
-
-require File.join(File.dirname(__FILE__),'seedfiles', 'shop_2015_sbc_files')
+# puts "*"*80
+# puts "Loading SERFF data"
+#
+# Products::Qhp.delete_all
+# files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "*.xml"))
+# qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
+#   puts file
+#   xml = Nokogiri::XML(File.open(file))
+#   plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
+#   qhp_hash.add(plan.to_hash, file)
+#   qhp_hash
+# end
+#
+# qhp_import_hash.run
+# puts "*"*80
+#
+# puts "*"*80
+# puts "Loading SERFF PLAN RATE data"
+#
+# files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "rates", "**", "*.xml"))
+# rate_import_hash = files.inject(QhpRateBuilder.new()) do |rate_hash, file|
+#   puts file
+#   xml = Nokogiri::XML(File.open(file))
+#   rates = Parser::PlanRateGroupParser.parse(xml.root.canonicalize, :single => true)
+#   rate_hash.add(rates.to_hash)
+#   rate_hash
+# end
+#
+# rate_import_hash.run
+# puts "*"*80
+#
+# system "bundle exec rake xml:renewal_and_standard_plans"
+#
+# require File.join(File.dirname(__FILE__),'seedfiles', 'shop_2015_sbc_files')
 
 puts "*"*80
 puts "Loading benefit packages."
