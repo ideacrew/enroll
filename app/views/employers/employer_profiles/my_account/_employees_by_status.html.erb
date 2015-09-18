@@ -1,4 +1,3 @@
-
 <div class="employees-table">
   <% if @search %>
   <% if @census_employees.present? %>
@@ -11,18 +10,18 @@
     <table>
       <thead>
         <tr>
-          <th>Employee Name <i class="fa fa-caret-down"></i></th>
+          <th>Employee Name<!-- <i class="fa fa-caret-down"></i>--></th>
           <th>SSN</th>
           <th>DOB</th>
           <th>Hire Date</th>
           <% if ['terminated', 'all'].include?(status) %>
           <th>Termination Date</th>
           <% end %>
-          <!--
+
           <th>Status</th>
           <th>Enrollment Status</th>
           <th>Linked?</th>
-          -->
+
           <th>
           </th>
         </tr>
@@ -44,13 +43,13 @@
           <td><%= format_date census_employee.employment_terminated_on %>
           </td>
           <% end %>
-          <!--
+
           <td><% census_employee.aasm_state.humanize %></td>
           <td><% enrollment_state(census_employee) %></td>
-          <td><% boolean_to_human census_employee.employee_role_linked? %></td>
-          -->
+          <td><% boolean_to_human census_employee.employee_role_linked? %></td>        
           <td class="table-functions">
             <%= link_to raw('<i class="fa fa-pencil fa-2x"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
+            <%= link_to raw('<i class="fa fa-trash-o fa-2x"></i>'), employers_employer_profile_census_employee_terminate_path(@employer_profile, census_employee.id), remote: true %>
             <!--<i class="fa fa-times-circle-o fa-2x"></i>-->
             <% if census_employee.employment_terminated? %>
             <% link_to ('javascript:;'), class: "show_confirm btn btn-green-2", id: "show_confirm_#{census_employee.id}" do %>

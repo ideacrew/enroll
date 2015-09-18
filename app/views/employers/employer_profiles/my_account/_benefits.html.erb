@@ -18,7 +18,7 @@
     </section>
     <section class="col-xs-6">
       <header class="row">
-        <a href="#">View Details <span class="icon-drop-down icon-drop-down-dims" role="img" aria-label="tooltip"></span></a>
+        <a class="details" onclick="$(this).closest('.benefits-tab').find('.plan-details:first').toggle();">View Details <span class="icon-drop-down icon-drop-down-dims" role="img" aria-label="tooltip"></span></a>
       </header>
     </section>
     <table>
@@ -61,7 +61,7 @@
       </tr>
     </table>
   </div>
-  <div class="col-xs-12 package-offering">
+  <div class="col-xs-12 package-offering plan-details">
     <table>
       <tr>
         <th>Offered</th>
@@ -83,7 +83,7 @@
     </section>
     <section class="col-xs-6">
       <header class="row">
-        <a href="#">View Details <span class="icon-drop-down icon-drop-down-dims" role="img" aria-label="tooltip"></span></a>
+        <a class="details">View Details <span class="icon-drop-down icon-drop-down-dims" role="img" aria-label="tooltip"></span></a>
       </header>
     </section>
     <h2><%= bg.reference_plan.name %></h2>
@@ -122,7 +122,7 @@
         </td>
       </tr>
     </table>
-    <div class="col-xs-12 row">
+    <div class="col-xs-12 row plan-details">
       <hr>
       <div class="col-xs-4 row">
         <span>Employer Estimated Maximum Monthly Cost</span>
@@ -178,6 +178,10 @@
       </div></div></div><br><br>
       <% end %>
       <% end %>
+      <% else %>
+      <h4 style="max-width: 600px;">
+      You haven't created a benefits package yet. Click "Add Benefits Package" above to make your first one.
+    </h4>
       <% end %>
 
 

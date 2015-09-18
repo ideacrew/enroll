@@ -1,18 +1,22 @@
 
 <% if params[:plan_option_kind] == "single_carrier"%>
   $('.reference-plans').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/single_carriers", locals: { :plans => @plans })).html_safe %>")
+  $('.reference-plans').css({ "height": "450px", "y-overflow": "scroll" })
   $('.reference-plans').show();
 
 
 <% elsif params[:plan_option_kind] == "metal_level"%>
 
   $('.reference-plans').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/single_carriers", locals: { :plans => @plans })).html_safe %>")
+  $('.reference-plans').css({ "height": "450px", "y-overflow": "scroll" })
   $('.reference-plans').show();
+
 
 
 
 <% elsif params[:plan_option_kind] == "single_plan"%>
 $('.reference-plans').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/single_carriers", locals: { :plans => @plans })).html_safe %>")
+$('.reference-plans').css({ "height": "450px", "y-overflow": "scroll" })
 $('.reference-plans').show();
 
 

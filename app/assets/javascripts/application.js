@@ -64,16 +64,19 @@ function getCarrierPlans(ep, ci) {
 $(document).ready(function () {
 
 
-// nav tabs radio on change for plan selection
+// nav tabs radios on change for plan selection
 $('.nav-tabs input[type=radio]').on('change', function() {
   $('.plan-options > *').hide();
   $('.plan-options > * input, .reference-plans input').prop('checked', 0);
-  $('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
+  $('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
   $('.reference-plans').hide();
+  $('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
   if ($(this).attr('value') == "single_carrier") {
     $('.plan-options, .carriers-tab').show();
+
   }
   else if ($(this).attr('value') == "metal_level") {
+
     $('.plan-options, .metals-tab').show();
   }
 });
@@ -103,7 +106,9 @@ $('.plan-options a, .nav-tabs a').on('click', function() {
 // asdas
 $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').closest('.row-form-wrapper').attr('style', 'border-bottom: none;');
 
-
+$('.details').on('click', function() {
+  $(this).closest('.referenceplan').find('.plan-details').toggle();
+});
 
 
 

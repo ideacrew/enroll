@@ -223,7 +223,12 @@
 
   }
   .benefits-tab {
-
+    .plan-details {
+      display: none;
+    }
+    .details {
+      cursor: pointer;
+    }
     .package-offering {
       border: solid 1px #b7b7b7;
 
@@ -529,10 +534,13 @@
         background-color: #ffffff;
         border: solid 1px #d7d7d7;
         padding-bottom: 25px;
+        overflow-y: scroll;
 
 
         .loading {
-          padding: 40px;
+          position: relative;
+          padding-top: 25px;
+          top: 50%;
           text-align: center;
         }
         .reference-plan {
@@ -795,6 +803,9 @@
         margin-top: 0;
         padding-bottom: 20px;
         margin-bottom: 0;
+        .reference-plan-details {
+          display: none;
+        }
 
 
         .panel-heading {
