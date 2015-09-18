@@ -11,13 +11,14 @@ $(function () {
 
     init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days);
     $('#qle-details').removeClass('hidden');
-    if ($(this).data('title') == "Change in APTC/CSR") {
+    var is_self_attested = $(this).data('is-self-attested');
+    if (!is_self_attested) {
       $('.qle-form').addClass('hidden');
       $('.csr-form').removeClass('hidden');
     } else {
       $('.qle-form').removeClass('hidden');
       $('.csr-form').addClass('hidden');
-    }
+    };
     $('form#qle_form.success-info').addClass('hidden');
     $('form#qle_form.error-info').addClass('hidden');
   });

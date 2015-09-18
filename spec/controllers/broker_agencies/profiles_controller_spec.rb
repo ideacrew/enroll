@@ -26,6 +26,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
     
     before(:each) do
       allow(user).to receive(:has_broker_role?)
+      allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
       sign_in(user)
       get :show, id: broker_agency_profile.id
     end
@@ -161,6 +163,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
 
     it "should get organizations which broker_agency_account is active" do
+      allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
       sign_in user
       xhr :get, :employers, id: broker_agency_profile.id, format: :js
       expect(response).to have_http_status(:success)

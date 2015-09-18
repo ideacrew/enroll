@@ -23,7 +23,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def premium_for(member)
-    __getobj__.premium_for(plan_year_start_on, age_of(member))
+    __getobj__.premium_for(plan_year_start_on, age_of(member)) rescue 0
   end
 
   def employer_contribution_for(member)

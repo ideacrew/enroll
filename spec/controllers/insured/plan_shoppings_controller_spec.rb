@@ -297,6 +297,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       let(:person) {double(primary_family: family, has_active_consumer_role?: true)}
       let(:user) {double(person: person)}
       before :each do
+        session[:individual_assistance_path] = "assistance"
         allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
         get :show, id: "hbx_id"
       end
@@ -306,7 +307,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       end
 
       it "should get default selected_aptc_pct" do
-        expect(session[:selected_aptc_pct]).to eq 0.8
+        expect(session[:selected_aptc_pct]).to eq 0.85
       end
     end
   end

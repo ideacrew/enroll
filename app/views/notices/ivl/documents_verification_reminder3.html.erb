@@ -1,0 +1,30 @@
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+
+
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>Subject: Request for Additional Information—Third Reminder</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "You submitted an application for health insurance through DC Health Link on <date of application>.
+  The information you provided does not match our records or is not enough to process your application.
+  If you do not provide this information <strong>by [Date of Original Eligibility Notice +95 calendar days]</strong>, you and/or others
+  in your household could get less or no financial help paying for <span style='text-decoration:underline;'>your
+  DC Health Link coverage or your DC Health Linkcoverage may be cancelled.</span> <strong>This is your third reminder notice.</strong>"} %>
+
+<%= render partial: 'notices/ivl/reminders_shared' %>

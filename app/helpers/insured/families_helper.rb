@@ -15,4 +15,22 @@ module Insured::FamiliesHelper
       data << "<label>#{element}</label>"
     end.join("&nbsp<label class='separator'></label>").html_safe
   end
+
+  def qle_link_generater(qle, index)
+    options = {class: 'qle-menu-item'}
+    data = {
+      title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
+      post_event_sep_in_days: qle.post_event_sep_in_days, 
+      pre_event_sep_in_days: qle.pre_event_sep_in_days,
+      date_hint: qle.date_hint, is_self_attested: qle.is_self_attested 
+    } 
+
+    if qle.tool_tip.present?  
+      data.merge!(toggle: 'tooltip', placement: index > 1 ? 'top' : 'bottom')
+      options.merge!(data: data, title: qle.tool_tip)
+    else
+      options.merge!(data: data)
+    end
+    link_to qle.title, "javascript:void(0)", options
+  end
 end

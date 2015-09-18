@@ -99,7 +99,9 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'shop_2015_sbc_files')
 
 puts "*"*80
 puts "Loading benefit packages."
-require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_seed')
+require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2015_seed')
+require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2016_seed')
+puts "::: benefit packages seed complete :::"
 
 puts "*"*80
 puts "End of Seed Data"

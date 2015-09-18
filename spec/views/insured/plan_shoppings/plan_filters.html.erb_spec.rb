@@ -29,7 +29,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
   end
 
-  context "with consumer_role" do
+  context "with consumer_role and tax_household" do
     let(:person) {double(has_active_consumer_role?: true)}
     let(:hbx_enrollment) {double(id: '123')}
 
@@ -40,6 +40,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_deductible, 998)
       assign(:max_aptc, 330)
       assign(:hbx_enrollment, hbx_enrollment)
+      assign(:tax_household, true)
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
 
@@ -48,6 +49,38 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       expect(rendered).to have_selector('input#max_aptc')
       expect(rendered).to have_selector('input#set_elected_pct_url')
       expect(rendered).to have_selector("input[name='elected_pct']")
+    end
+
+    it "should have Aptc used" do
+      expect(rendered).to match /Used/
+      expect(rendered).to have_selector("input#aptc-used")
+    end
+
+    it "should have aptc available" do
+      expect(rendered).to match /APTC/
+      expect(rendered).to match /Available/
+      expect(rendered).to match /330/
+    end
+  end
+
+  context "with consumer_role but without tax_household" do
+    let(:person) {double(has_active_consumer_role?: true)}
+    let(:hbx_enrollment) {double(id: '123')}
+
+    before :each do
+      assign(:person, person)
+      assign(:carriers, Array.new)
+      assign(:max_total_employee_cost, 1000)
+      assign(:hbx_enrollment, hbx_enrollment)
+      assign(:tax_household, nil)
+      render :template => "insured/plan_shoppings/_plan_filters.html.erb"
+    end
+
+    it "should not have aptc area" do
+      expect(rendered).not_to have_selector('div.aptc')
+      expect(rendered).not_to have_selector('input#max_aptc')
+      expect(rendered).not_to have_selector('input#set_elected_pct_url')
+      expect(rendered).not_to have_selector("input[name='elected_pct']")
     end
   end
 end

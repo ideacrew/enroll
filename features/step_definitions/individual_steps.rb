@@ -49,6 +49,10 @@ Then(/Individual should see a form to enter personal information/) do
   @browser.radio(class: /interaction-choice-control-value-person-us-citizen-true/).fire_event("onclick")
   @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).wait_while_present
   @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).fire_event("onclick")
+  @browser.radio(class: /interaction-choice-control-value-radio-incarcerated-no/).wait_while_present
+  @browser.radio(class: /interaction-choice-control-value-radio-incarcerated-no/).fire_event("onclick")
+  @browser.radio(class: /interaction-choice-control-value-indian-tribe-member-no/).wait_while_present
+  @browser.radio(class: /interaction-choice-control-value-indian-tribe-member-no/).fire_event("onclick")
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-1/).set("4900 USAA BLVD")
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-2/).set("Suite 220")
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-city/).set("Washington")
@@ -120,6 +124,10 @@ And(/Individual clicks on add member button/) do
   @browser.radio(id: /dependent_us_citizen_true/).fire_event("onclick")
   @browser.radio(id: /dependent_naturalized_citizen_false/).wait_while_present
   @browser.radio(id: /dependent_naturalized_citizen_false/).fire_event("onclick")
+  @browser.radio(id: /radio_incarcerated_no/i).wait_while_present
+  @browser.radio(id: /radio_incarcerated_no/i).fire_event("onclick")
+  @browser.radio(id: /indian_tribe_member_no/i).wait_while_present
+  @browser.radio(id: /indian_tribe_member_no/i).fire_event("onclick")
   screenshot("add_member")
   scroll_then_click(@browser.button(text: /Confirm Member/))
   @browser.button(text: /Confirm Member/).wait_while_present
@@ -141,6 +149,10 @@ And(/Individual again clicks on add member button/) do
   @browser.radio(id: /dependent_us_citizen_false/).fire_event("onclick")
   @browser.radio(id: /dependent_eligible_immigration_status_true/).wait_while_present
   @browser.radio(id: /dependent_eligible_immigration_status_true/).fire_event("onclick")
+  @browser.radio(id: /radio_incarcerated_no/i).wait_while_present
+  @browser.radio(id: /radio_incarcerated_no/i).fire_event("onclick")
+  @browser.radio(id: /indian_tribe_member_no/i).wait_while_present
+  @browser.radio(id: /indian_tribe_member_no/i).fire_event("onclick")
   scroll_then_click(@browser.button(text: /Confirm Member/))
   @browser.button(text: /Confirm Member/).wait_while_present
 end
