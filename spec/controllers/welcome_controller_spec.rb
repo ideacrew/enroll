@@ -29,5 +29,11 @@ RSpec.describe WelcomeController, :type => :controller do
 
       include_examples "welcome"
     end
+
+    it "should return to a saml logout url in the production environment" do
+      allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("production"))
+      get :index
+      expect( response ).to redirect_to SamlInformation.saml_logout_url
+    end
   end
 end
