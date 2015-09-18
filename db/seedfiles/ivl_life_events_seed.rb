@@ -1,39 +1,4 @@
 QualifyingLifeEventKind.create!(
-  title: "Dependent loss of ESI due to employee gaining Medicare",
-  tool_tip: "A dependent is losing access to ESI coverage because the employee is enrolling in Medicare",
-  action_kind: "add_benefit",
-  event_kind_label: "Last day of coverage",
-  market_kind: "individual",
-  ordinal_position: 100,
-  reason: "employee_gaining_medicare",
-  edi_code: "33-LOST ACCESS TO MEC", 
-  effective_on_kinds: ["first_of_next_month"],
-  pre_event_sep_in_days: 60,
-  post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
-  is_self_attested: true,
-    # event_kind_label: "coverage end date",
-    # start_of_sep: "60 days before loss of MEC",
-    # coverage_effective_date: "If before loss of coverage: First day of the month after MEC will end. If after loss of MEC: First day of the month following plan selection (not following 15th of month rule)")
-  )
-
-QualifyingLifeEventKind.create!(
-  title: "I'm losing other health insurance",
-  tool_tip: "Someone in the household is losing other health insurance involuntarily",
-  action_kind: "add_benefit",
-  event_kind_label: "Coverage end date",
-  market_kind: "individual",
-  ordinal_position: 100,
-  reason: "lost_access_to_mec",
-  edi_code: "33-LOST ACCESS TO MEC", 
-  effective_on_kinds: ["first_of_month"],
-  pre_event_sep_in_days: 60,
-  post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
-  is_self_attested: true,
-    # start_of_sep: "60 days before loss of MEC",
-    # coverage_effective_date: "If before loss of coverage: First day of the month after MEC will end. If after loss of MEC: First day of the month following plan selection (not following 15th of month rule)")
-  )
-
-QualifyingLifeEventKind.create!(
   title: "I've had a baby",
   tool_tip: "Household adds a member due to marriage, birth, adoption, placement for adoption, or placement in foster care",
   action_kind: "add_member",
@@ -41,7 +6,7 @@ QualifyingLifeEventKind.create!(
   event_kind_label: "Date of birth",
   reason: " ",
   edi_code: "02-BIRTH", 
-  ordinal_position: 100,
+  ordinal_position: 10,
   effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
@@ -55,7 +20,7 @@ QualifyingLifeEventKind.create!(
   action_kind: "add_member",
   market_kind: "individual",
   event_kind_label: "Date of adoption",
-  ordinal_position: 100,
+  ordinal_position: 11,
   reason: " ",
   edi_code: "05-ADOPTION", 
   effective_on_kinds: ["date_of_event", "first_of_next_month"],
@@ -66,12 +31,29 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
+  title: "I'm losing other health insurance",
+  tool_tip: "Someone in the household is losing other health insurance involuntarily",
+  action_kind: "add_benefit",
+  event_kind_label: "Coverage end date",
+  market_kind: "individual",
+  ordinal_position: 12,
+  reason: "lost_access_to_mec",
+  edi_code: "33-LOST ACCESS TO MEC", 
+  effective_on_kinds: ["first_of_month"],
+  pre_event_sep_in_days: 60,
+  post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
+  is_self_attested: true,
+    # start_of_sep: "60 days before loss of MEC",
+    # coverage_effective_date: "If before loss of coverage: First day of the month after MEC will end. If after loss of MEC: First day of the month following plan selection (not following 15th of month rule)")
+  )
+
+QualifyingLifeEventKind.create!(
   title: "I've married",
   tool_tip: " ",
   action_kind: "add_member",
   market_kind: "individual",
   event_kind_label: "Date of marriage",
-  ordinal_position: 100,
+  ordinal_position: 13,
   reason: " ",
   edi_code: "32-MARRIAGE", 
   effective_on_kinds: ["first_of_next_month"],
@@ -79,6 +61,24 @@ QualifyingLifeEventKind.create!(
   post_event_sep_in_days: 60,
   is_self_attested: true,
     # coverage_effective_date: "Date of birth, adoption, placement for adoption, placement in foster care, or marriage.  For marriage: First day of the month following plan selection (not following 15th of month rule); this applies to all members of household")
+  )
+
+QualifyingLifeEventKind.create!(
+  title: "Losing employer insurance because employee is going on Medicare",
+  tool_tip: "A dependent is losing access to ESI coverage because the employee is enrolling in Medicare",
+  action_kind: "add_benefit",
+  event_kind_label: "Last day of coverage",
+  market_kind: "individual",
+  ordinal_position: 14,
+  reason: "employee_gaining_medicare",
+  edi_code: "33-LOST ACCESS TO MEC", 
+  effective_on_kinds: ["first_of_next_month"],
+  pre_event_sep_in_days: 60,
+  post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
+  is_self_attested: true,
+    # event_kind_label: "coverage end date",
+    # start_of_sep: "60 days before loss of MEC",
+    # coverage_effective_date: "If before loss of coverage: First day of the month after MEC will end. If after loss of MEC: First day of the month following plan selection (not following 15th of month rule)")
   )
 
 QualifyingLifeEventKind.create!(
