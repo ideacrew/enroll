@@ -35,5 +35,6 @@ RSpec.describe "insured/families/_qles_carousel.html.erb" do
   it "should not have tooltip when tool_tip is blank" do
     expect(rendered).to have_selector("a.qle-menu-item[data-toggle='tooltip']", count: 10)
     expect(rendered).to have_selector("a.qle-menu-item", count: 11)
+    expect(rendered).to have_selector("a[data-is-self-attested='true']")
   end
 end

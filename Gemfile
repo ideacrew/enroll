@@ -59,7 +59,6 @@ gem 'haml'
 # gem 'bh'
 
 # spreadsheet support
-gem "spreadsheet", "0.9.0"
 gem 'roo', '~> 2.1.0'
 
 gem 'devise', '~> 3.4.1'

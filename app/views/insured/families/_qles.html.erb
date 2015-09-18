@@ -11,7 +11,7 @@
           <ul class="list-unstyled list-inline list-qle">
             <% qles.each_with_index do |qle, index| %>
               <li>
-                <a class="qle-menu-item" href="javascript:void(0)" data-toggle="<%= 'tooltip' if qle.tool_tip.present? %>" title="<%= qle.tool_tip %>" data-title='<%= qle.title %>' data-placement="<%= index > 1 ? 'top' : 'bottom' %>" data-id='<%= qle.id %>' data-label='<%= qle.event_kind_label %>' data-post-event-sep-in-days='<%= qle.post_event_sep_in_days %>' data-pre-event-sep-in-days='<%= qle.pre_event_sep_in_days %>' data-date-hint='<%= qle.date_hint %>'><%= qle.title %></a>
+                <%= qle_link_generater(qle, index) %>
               </li>
             <% end %>
           </ul>

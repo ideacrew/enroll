@@ -372,7 +372,6 @@ GEM
       rspec-mocks (~> 3.1.0)
       rspec-support (~> 3.1.0)
     rspec-support (3.1.2)
-    ruby-ole (1.2.11.8)
     ruby-progressbar (1.6.0)
     ruby-rc4 (0.1.5)
     ruby-saml (1.0.0)
@@ -391,8 +390,6 @@ GEM
       activesupport (>= 3.0.0)
     sigar (0.7.3)
     slop (3.6.0)
-    spreadsheet (0.9.0)
-      ruby-ole (>= 1.0)
     spring (1.4.0)
     sprockets (2.12.4)
       hike (~> 1.2)
@@ -517,7 +514,6 @@ DEPENDENCIES
   ruby-saml (~> 1.0.0)
   sdoc (~> 0.4.0)
   shoulda-matchers
-  spreadsheet (= 0.9.0)
   spring
   sprockets (~> 2.12.3)
   symmetric-encryption (~> 3.6.0)
@@ -530,3 +526,6 @@ DEPENDENCIES
   web-console (~> 2.0)
   wicked_pdf
   wkhtmltopdf-binary-edge (~> 0.12.2.1)
+
+BUNDLED WITH
+   1.10.6

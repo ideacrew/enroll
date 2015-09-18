@@ -28,11 +28,6 @@ RSpec.describe ApplicationController do
     it "should return the root url in dev environment" do
       expect( controller.send(:after_sign_out_path_for, user) ).to eq root_path
     end
-
-    it "should return the root url in dev environment" do
-      allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("production"))
-      expect( controller.send(:after_sign_out_path_for, user) ).to eq SamlInformation.saml_logout_url
-    end
   end
 
   context "when signed in" do
