@@ -93,6 +93,7 @@ $('.reference-plans input[type=radio]').on('change', function() {
 //toggle plan options checkbox through parent anchor
 
 $('.plan-options a, .nav-tabs a').on('click', function() {
+  $('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
   $('.plan-options input[type=radio]').attr('checked', 0);
   if ($(this).find('input[type=radio]').is(':checked')) {
   } else {

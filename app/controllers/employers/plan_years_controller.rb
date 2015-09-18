@@ -24,7 +24,7 @@ class Employers::PlanYearsController < ApplicationController
       format.js
     end
   end
-  
+
   def plan_details
     @plan = Plan.find(params[:reference_plan_id])
     respond_to do |format|
