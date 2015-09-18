@@ -26,7 +26,7 @@ RSpec.describe ApplicationController do
     let(:user) { FactoryGirl.create("user") }
 
     it "should return the root url in dev environment" do
-      expect( controller.send(:after_sign_out_path_for, user) ).to eq root_path
+      expect( controller.send(:after_sign_out_path_for, user) ).to eq logout_saml_index_path
     end
   end
 

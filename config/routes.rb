@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resources :saml, only: :index do
     collection do
       post :login
+      get :logout
     end
   end
 

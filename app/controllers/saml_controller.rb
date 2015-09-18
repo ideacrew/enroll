@@ -35,6 +35,10 @@ class SamlController < ApplicationController
     end
   end
 
+  def logout
+    redirect_to SamlInformation.saml_logout_url
+  end
+
   private
 
   def saml_settings
