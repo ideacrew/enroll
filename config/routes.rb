@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 
   namespace :exchanges do
     resources :inboxes, only: [:show, :destroy]
-
+    resources :agents_inboxes, only: [:show, :destroy]
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
@@ -41,8 +41,14 @@ Rails.application.routes.draw do
     resources :agents do
       collection do
         get :home
-        get :begin_enrollment
+        get :begin_consumer_enrollment
+        get :begin_employee_enrollment
+        get :resume_enrollment
         get :send_enrollment_confirmation
+        get :show
+      end
+      member do
+        get :inbox
       end
     end
 

@@ -12,10 +12,22 @@ class Exchanges::AgentsController < ApplicationController
      render 'home'
   end
 
-  def begin_enrollment
+  def begin_employee_enrollment
   	session[:person] = nil
   	session[:original_application_type] = params['original_application_type']
 	  redirect_to search_insured_employee_index_path
+  end
+
+  def begin_consumer_enrollment
+    session[:person] = nil
+    session[:original_application_type] = params['original_application_type']
+    redirect_to search_insured_consumer_role_index_path
+  end
+
+  def resume_enrollment
+    session[:person_id] = params[:person_id]
+    session[:original_application_type] = params['original_application_type']
+    redirect_to family_account_path
   end
 
   def send_enrollment_confirmation
@@ -40,6 +52,16 @@ class Exchanges::AgentsController < ApplicationController
       end
     end
     render layout: false
+  end
+
+  def inbox
+    @inbox_provider = current_user.person
+    @profile=@inbox_provider
+    @folder = params[:folder] || 'inbox'
+    @sent_box = false  
+  end
+
+  def show
   end
 
 end
