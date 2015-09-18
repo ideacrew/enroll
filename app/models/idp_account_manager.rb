@@ -62,6 +62,7 @@ class IdpAccountManager
   end
 
   class AmqpSource
+    extend Acapi::Notifiers
     def self.check_existing_account(args, timeout = 5)
       invoke_service("account_management.check_existing_account", args, timeout) do |code|
         case code
@@ -78,14 +79,7 @@ class IdpAccountManager
     end
 
     def self.create_account(args, timeout = 5)
-      invoke_service("account_management.create_account", args, timeout) do |code|
-        case code
-        when "201"
-          :created
-        else
-          :service_unavailable
-        end
-      end
+      notify("acapi.info.events.account_management.creation_requested", args)
     end
 
     def self.invoke_service(key, args, timeout = 5, &blk)

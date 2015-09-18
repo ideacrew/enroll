@@ -277,7 +277,11 @@ class HbxEnrollment
   end
 
   def decorated_elected_plans(coverage_kind)
-    benefit_packages = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.benefit_packages
+    benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+    if HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
+      HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+    end
+    benefit_packages = benefit_coverage_period.benefit_packages
 
     ivl_bgs = []
     benefit_packages.each do |bg|
