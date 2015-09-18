@@ -336,6 +336,10 @@ class Person
     self.emails << ::Email.new(:kind => 'work', :address => email)
   end
 
+  def home_address
+    addresses.detect { |adr| adr.kind == "home" }
+  end
+
   def home_email
     emails.detect { |adr| adr.kind == "home" }
   end
