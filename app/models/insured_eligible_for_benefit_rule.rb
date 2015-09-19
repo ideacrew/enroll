@@ -76,14 +76,17 @@ class InsuredEligibleForBenefitRule
 
   def is_residency_status_satisfied?
     return true if @benefit_package.residency_status.include?("any")
+
     if @benefit_package.residency_status.include?("state_resident")
-      addresses = @role.person.addresses
       person = @role.person
-      return false if person.no_dc_address == true and person.no_dc_address_reason.blank?
-      return true if person.no_dc_address == true and person.no_dc_address_reason.present?
-      return true if !addresses || addresses.count == 0 #TEMPORARY CODE FOR DEPENDENTS FIXME TOD
-      address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
-      addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}
+      return true if person.is_dc_resident?
+
+      #TODO person can have more than one families
+      person.families.last.family_members.active.each do |family_member|
+        if age_on_next_effective_date(family_member.dob) >= 19 and family_member.is_dc_resident?
+          return true
+        end
+      end
     end
     return false
   end

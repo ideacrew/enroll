@@ -41,6 +41,158 @@ describe Forms::EmployeeDependent do
   it "should not be considered persisted" do
     expect(subject.persisted?).to be_falsey
   end
+
+  context "initialize" do
+    let(:dependent) {Forms::EmployeeDependent.new}
+    it "should initialize address" do
+      expect(dependent.addresses.class).to eq Address
+    end
+
+    it "should initialize same_with_primary" do
+      expect(dependent.same_with_primary).to eq true
+    end
+  end
+
+  context "compare_address_with_primary" do
+    let(:addr1) {Address.new(zip: '1234', state: 'DC')}
+    let(:addr2) {Address.new(zip: '4321', state: 'DC')}
+    let(:addr3) {Address.new(zip: '1234', state: 'DC', 'address_3': "abc")}
+    let(:person) {double}
+    let(:primary) {double}
+    let(:family) {double(primary_family_member: double(person: primary))}
+    let(:family_member) {double(person: person, family: family)}
+
+    it "without same no_dc_address" do
+      allow(person).to receive(:no_dc_address).and_return true
+      allow(primary).to receive(:no_dc_address).and_return false
+      expect(Forms::EmployeeDependent.compare_address_with_primary(family_member)).to eq false
+    end
+
+    it "with same no_dc_address but without smae no_dc_address_reason" do
+      allow(person).to receive(:no_dc_address).and_return true
+      allow(primary).to receive(:no_dc_address).and_return true
+      allow(person).to receive(:no_dc_address_reason).and_return "reason1"
+      allow(primary).to receive(:no_dc_address_reason).and_return "reason2"
+      expect(Forms::EmployeeDependent.compare_address_with_primary(family_member)).to eq false
+    end
+
+    context "with same no_dc_address and no_dc_address_reason" do
+      before :each do
+        allow(person).to receive(:no_dc_address).and_return true
+        allow(primary).to receive(:no_dc_address).and_return true
+        allow(person).to receive(:no_dc_address_reason).and_return "reason"
+        allow(primary).to receive(:no_dc_address_reason).and_return "reason"
+      end
+
+      it "has same address for compare_keys" do
+        allow(person).to receive(:home_address).and_return addr1
+        allow(primary).to receive(:home_address).and_return addr1
+        expect(Forms::EmployeeDependent.compare_address_with_primary(family_member)).to eq true
+      end
+
+      it "has not same address for compare_keys" do
+        allow(person).to receive(:home_address).and_return addr1
+        allow(primary).to receive(:home_address).and_return addr2
+        expect(Forms::EmployeeDependent.compare_address_with_primary(family_member)).to eq false
+      end
+
+      it "has not same address but the value of compare_keys is same" do
+        allow(person).to receive(:home_address).and_return addr1
+        allow(primary).to receive(:home_address).and_return addr3
+        expect(Forms::EmployeeDependent.compare_address_with_primary(family_member)).to eq true
+      end
+    end
+  end
+
+  context "assign_person_address" do
+    let(:addr1) {Address.new(zip: '1234', state: 'DC')}
+    let(:addr2) {Address.new(zip: '4321', state: 'DC')}
+    let(:addr3) {Address.new(zip: '1234', state: 'DC', 'address_3': "abc")}
+    let(:person) {FactoryGirl.create(:person)}
+    let(:primary) {FactoryGirl.create(:person)}
+    let(:family) {double(primary_family_member: double(person: primary))}
+    let(:family_member) {double(person: person, family: family)}
+    let(:employee_dependent) { Forms::EmployeeDependent.new } 
+
+    context "if same with primary" do 
+      before :each do
+        allow(employee_dependent).to receive(:same_with_primary).and_return 'true'
+        allow(employee_dependent).to receive(:family).and_return family 
+      end 
+
+      it "update person's attributes" do
+        allow(primary).to receive(:no_dc_address).and_return true
+        allow(primary).to receive(:no_dc_address_reason).and_return "no reason"
+        employee_dependent.assign_person_address(person)
+        expect(person.no_dc_address).to eq true
+        expect(person.no_dc_address_reason).to eq "no reason"
+      end
+
+      it "add new address if address present" do
+        allow(primary).to receive(:home_address).and_return addr3
+        employee_dependent.assign_person_address(person)
+        expect(person.addresses.include?(addr3)).to eq true 
+      end
+
+      it "not add new address if address blank" do
+        allow(primary).to receive(:home_address).and_return nil
+        employee_dependent.assign_person_address(person)
+        expect(person.addresses.include?(addr3)).to eq false 
+      end 
+    end
+
+    context "if not same with primary" do
+      before :each do 
+        allow(employee_dependent).to receive(:same_with_primary).and_return 'false'
+      end
+
+      context "if address_1 is blank and city is blank" do 
+        let(:addresses) { {"address_1" => "", "city" => ""} }
+
+        before :each do 
+          allow(person).to receive(:home_address).and_return addr3
+          allow(employee_dependent).to receive(:addresses).and_return(addresses)
+        end
+
+        it "destroy current address if current_address is absent" do 
+          expect(addr3).to receive(:destroy).and_return true
+          employee_dependent.assign_person_address(person) 
+        end
+
+        it "return true" do
+          allow(addr3).to receive(:destroy).and_return nil 
+          expect(employee_dependent.assign_person_address(person)).to eq true
+        end
+      end
+
+      context "if address_1 is blank or city is not blank" do 
+        let(:addresses) { {"address_1" => "", "city" => "not blank"} }
+
+        before :each do 
+          allow(person).to receive(:home_address).and_return addr3
+          allow(employee_dependent).to receive(:addresses).and_return(addresses)
+        end
+
+        it "call update when current address present " do
+          addresses.define_singleton_method(:permit!) {true}
+
+          expect(addr3).to receive(:update).and_return true
+          employee_dependent.assign_person_address(person) 
+        end
+
+        it "call new when current address blank" do 
+          addresses.define_singleton_method(:permit!) {true} 
+          allow(person).to receive(:home_address).and_return nil 
+
+          _addresses = double(new: {})
+          allow(person).to receive(:addresses).and_return _addresses
+
+          expect(_addresses).to receive(:new).and_return true
+          employee_dependent.assign_person_address(person) 
+        end
+      end 
+    end
+  end
 end
 
 describe Forms::EmployeeDependent, "which describes a new family member, and has been saved" do

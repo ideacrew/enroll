@@ -93,7 +93,6 @@ class Insured::ConsumerRolesController < ApplicationController
       else
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
-
     else
       if save_and_exit
         respond_to do |format|

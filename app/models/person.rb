@@ -360,6 +360,15 @@ class Person
     no_dc_address and no_dc_address_reason.present?
   end
 
+  def is_dc_resident?
+    return false if no_dc_address == true and no_dc_address_reason.blank?
+    return true if no_dc_address == true and no_dc_address_reason.present?
+
+    address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
+    addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}
+    return false
+  end
+
   class << self
     def default_search_order
       [[:last_name, 1],[:first_name, 1]]

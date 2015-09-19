@@ -68,18 +68,22 @@ module Forms
       end
       existing_person = Person.match_existing_person(self)
       if existing_person
-        assign_person_address(existing_person)
         family_member = family.relate_new_member(existing_person, self.relationship)
-        family_member.family.build_consumer_role(family_member) if self.is_consumer_role == "true"
+        if self.is_consumer_role == "true"
+          assign_person_address(existing_person)
+          family_member.family.build_consumer_role(family_member)
+        end
         family_member.save!
         self.id = family_member.id
         return true
       end
       person = Person.new(extract_person_params)
-      assign_person_address(person)
       return false unless try_create_person(person)
       family_member = family.relate_new_member(person, self.relationship)
-      family_member.family.build_consumer_role(family_member, extract_consumer_role_params) if self.is_consumer_role == "true"
+      if self.is_consumer_role == "true"
+        family_member.family.build_consumer_role(family_member, extract_consumer_role_params)
+        assign_person_address(person)
+      end
       family.save!
       self.id = family_member.id
       true
@@ -163,10 +167,8 @@ module Forms
       has_same_address_with_primary = compare_address_with_primary(found_family_member);
       address = if has_same_address_with_primary
                   Address.new(kind: 'home')
-                elsif found_family_member.person.try(:home_address).present?
-                  found_family_member.person.home_address
                 else
-                  Address.new(kind: 'home')
+                  found_family_member.try(:person).try(:home_address) || Address.new(kind: 'home')
                 end
 
       record = self.new({
@@ -189,8 +191,8 @@ module Forms
         :citizen_status => found_family_member.citizen_status,
         :tribal_id => found_family_member.tribal_id,
         :same_with_primary => has_same_address_with_primary,
-        :no_dc_address => has_same_address_with_primary ? '' : found_family_member.person.try(:no_dc_address),
-        :no_dc_address_reason => has_same_address_with_primary ? '' : found_family_member.person.try(:no_dc_address_reason),
+        :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),
+        :no_dc_address_reason => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address_reason),
         :addresses => address
       })
     end
@@ -236,8 +238,10 @@ module Forms
       assign_citizen_status
       return false unless valid?
       return false unless try_update_person(family_member.person)
-      return false unless assign_person_address(family_member.person)
-      family_member.family.build_consumer_role(family_member, attr["vlp_document_id"]) if attr["is_consumer_role"] == "true"
+      if attr["is_consumer_role"] == "true"
+        family_member.family.build_consumer_role(family_member, attr["vlp_document_id"])
+        return false unless assign_person_address(family_member.person)
+      end
       family_member.update_relationship(relationship)
       family_member.save!
       true
