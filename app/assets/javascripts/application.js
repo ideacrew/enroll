@@ -28,6 +28,7 @@
 //= require print
 //= require browser_issues
 //= require consumer_role
+//= require plan_year_selection
 //= require_tree .
 
 function applyFloatLabels() {
