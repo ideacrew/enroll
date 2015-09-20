@@ -1,4 +1,4 @@
-module Insured::EmployeeDependentsHelper
+module Insured::FamilyMembersHelper
   def employee_dependent_form_id(model)
     if model.persisted?
       "add_member_list_#{model.id}"
