@@ -1,13 +1,13 @@
 <div class="container">
   <div id="dependents_info_wrapper">
     <div class="row">
-      <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12 bottom-pd">
+      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-pd">
 
         <% if @change_plan.present? %>
            <h3 class="blue-text"><%= params[:change_plan] %>, on: <%= @change_plan_date %></h3>
         <% end %>
 
-        <h3>Family Members</h3>
+        <h3>Household Info: Family Members</h3>
         <p class='memo'>* = required field</p>
 
         <div class="row no-buffer">
@@ -62,17 +62,17 @@
         </div>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
         <% if @change_plan.present? %>
           <%= render partial: 'shared/qle_progress', locals: {step: '1'} %>
         <% elsif @consumer_role.present? %>
           <%= render  partial: 'shared/individual_progress', locals: {
-            step: '3', 
+            step: '3',
             url: (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_insured_families_path : group_selection_url)
           } %>
         <% else %>
           <%= render  partial: 'shared/signup_progress', locals: {
-            step: '4', 
+            step: '4',
             url: (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_insured_families_path : group_selection_url)
           } %>
         <% end %>

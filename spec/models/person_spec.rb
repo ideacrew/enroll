@@ -632,4 +632,76 @@ describe Person do
       expect(person.residency_eligible?).to be_truthy
     end
   end
+
+  describe "home_address" do
+    let(:person) { FactoryGirl.create(:person) }
+
+    it "return home address" do
+      address_1 = Address.new(kind: 'home')
+      address_2 = Address.new(kind: 'mailing')
+      allow(person).to receive(:addresses).and_return [address_1, address_2]
+
+      expect(person.home_address).to eq address_1
+    end
+  end
+
+  describe "is_dc_resident?" do
+    context "when no_dc_address is true" do
+      let(:person) { Person.new(no_dc_address: true) }
+
+      it "return false with no_dc_address_reason" do
+        allow(person).to receive(:no_dc_address_reason).and_return "reason"
+        expect(person.is_dc_resident?).to eq true
+      end
+
+      it "return true without no_dc_address_reason" do
+        allow(person).to receive(:no_dc_address_reason).and_return ""
+        expect(person.is_dc_resident?).to eq false
+      end
+    end
+
+    context "when no_dc_address is false" do
+      let(:person) { Person.new(no_dc_address: false) }
+
+      context "when state is not dc" do
+        let(:home_addr) {Address.new(kind: 'home', state: 'AC')}
+        let(:mailing_addr) {Address.new(kind: 'mailing', state: 'AC')}
+        let(:work_addr) { Address.new(kind: 'work', state: 'AC') }
+        it "home" do
+          allow(person).to receive(:addresses).and_return [home_addr]
+          expect(person.is_dc_resident?).to eq false
+        end
+
+        it "mailing" do
+          allow(person).to receive(:addresses).and_return [mailing_addr]
+          expect(person.is_dc_resident?).to eq false
+        end
+
+        it "work" do
+          allow(person).to receive(:addresses).and_return [work_addr]
+          expect(person.is_dc_resident?).to eq false
+        end
+      end
+
+      context "when state is dc" do
+        let(:home_addr) {Address.new(kind: 'home', state: 'DC')}
+        let(:mailing_addr) {Address.new(kind: 'mailing', state: 'DC')}
+        let(:work_addr) { Address.new(kind: 'work', state: 'DC') }
+        it "home" do
+          allow(person).to receive(:addresses).and_return [home_addr]
+          expect(person.is_dc_resident?).to eq true
+        end
+
+        it "mailing" do
+          allow(person).to receive(:addresses).and_return [mailing_addr]
+          expect(person.is_dc_resident?).to eq true
+        end
+
+        it "work" do
+          allow(person).to receive(:addresses).and_return [work_addr]
+          expect(person.is_dc_resident?).to eq false
+        end
+      end
+    end
+  end
 end

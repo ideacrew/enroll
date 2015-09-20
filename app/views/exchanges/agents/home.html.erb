@@ -1,14 +1,21 @@
 <div class='content'>
   <div class='container top-pd'>
+  <br/>
 	<h3> Welcome to DC HealthLink </h3>
 
 	<h4> <%=@cac ? 'Certified Application Counselor (CAC)' : 'Customer Service Representative (CSR)'%> </h4>
      <ul>
-     	<li> <%=link_to 'New Phone Application', begin_enrollment_exchanges_agents_path(
+     	<li> <%=link_to 'New Employee Phone Application', begin_employee_enrollment_exchanges_agents_path(
      	original_application_type: 'phone')  %> <br/></li>
 
-     	<li> <%=link_to 'New Paper Application', begin_enrollment_exchanges_agents_path(
-     	original_application_type: 'paper')  %> </li>
+     	<li> <%=link_to 'New Employee Paper Application', begin_employee_enrollment_exchanges_agents_path(
+     	original_application_type: 'paper')  %> <br/>&nbsp;</li>
+      
+      <li> <%=link_to 'New Consumer Phone Application', begin_consumer_enrollment_exchanges_agents_path(
+      original_application_type: 'phone')  %> <br/></li>
+
+      <li> <%=link_to 'New Consumer Paper Application', begin_consumer_enrollment_exchanges_agents_path(
+      original_application_type: 'paper')  %> </li>
      </ul>
      <br/>
     <% if @person %>
@@ -28,6 +35,17 @@
     <% end %>
     <div id='sent_email_status'></div>  
     <br/> 
-    <p> Federal Regulations apply</p>
-  </div>
+
+<div id='inbox'>
+    <div class="row col-md-10">
+
+<%=render 'message_list', provider: current_user.person %>
+
+     </div>
+   </div>
+</div>
+
+
+</div>
+
 </div>

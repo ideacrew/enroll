@@ -38,7 +38,7 @@ class Insured::ConsumerRolesController < ApplicationController
         when :too_many_matches
           format.html { redirect_to SamlInformation.account_conflict_url }
         when :existing_account
-          format.html { render 'redirect_to_recover_account' }
+          format.html { redirect_to SamlInformation.account_recovery_url }
         else
           found_person = @consumer_candidate.match_person
           if found_person.present?
@@ -62,6 +62,7 @@ class Insured::ConsumerRolesController < ApplicationController
       respond_to do |format|
         format.html {
           if is_assisted
+            @person.primary_family.update_attribute(:e_case_id, "curam_landing")
             redirect_to SamlInformation.curam_landing_page_url
           else
             redirect_to :action => "edit", :id => @consumer_role.id
@@ -92,7 +93,6 @@ class Insured::ConsumerRolesController < ApplicationController
       else
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
-
     else
       if save_and_exit
         respond_to do |format|

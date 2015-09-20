@@ -2,7 +2,7 @@
   <div class="row">
     <%= form_tag(:insured_group_selections) do %>
       <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
-        <h3>Covered Family Members</h3>
+        <h3>Choose Benefits: Covered Family Members</h3>
         <h4><strong>Who would you like to cover?</strong></h4>
 
           <%= hidden_field_tag(:person_id, @person.id) %>
@@ -45,6 +45,7 @@
           </div>
 
           <br>
+          
           <div id="coverage_kinds" class='row no-buffer'>
             <div class="col-md-3 col-lg-3 col-sm-6">
               <strong>Coverage Kind: </strong>

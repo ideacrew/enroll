@@ -24,6 +24,7 @@
 //= require override_confirm
 //= require floatlabels
 //= require jq_datepicker
+//= require date
 //= require qle
 //= require print
 //= require browser_issues
@@ -600,4 +601,11 @@ $(document).on('keyup', ".new_person #person_ssn", function(){
 })
 $(document).on('change', ".new_person #person_no_ssn", function(){
   if (this.checked) { $(".new_person #person_ssn").val("");  $(".new_person #person_ssn").trigger('change')  }
+})
+
+$(document).on('keyup', ".new_dependent #dependent_ssn", function(){
+  $(".new_dependent input#dependent_no_ssn").prop('checked', false)
+})
+$(document).on('change', ".new_dependent #dependent_no_ssn", function(){
+  if (this.checked) { $(".new_dependent #dependent_ssn").val("");  $(".new_dependent #dependent_ssn").trigger('change')  }
 })

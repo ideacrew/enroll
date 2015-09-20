@@ -41,23 +41,13 @@ class ApplicationController < ActionController::Base
   end
 
   def create_sso_account(user, personish, timeout, account_role = "individual")
-    idp_account_created = nil
-    if user.idp_verified?
-      idp_account_created = :created
-    else
-      idp_account_created = IdpAccountManager.create_account(user.email, stashed_user_password, personish, account_role, timeout)
-    end
-    case idp_account_created
-    when :created
+    if !user.idp_verified?
+      IdpAccountManager.create_account(user.email, stashed_user_password, personish, account_role, timeout)
       session[:person_id] = personish.id
       session.delete("stashed_password")
       user.switch_to_idp!
-      yield
-    else
-      respond_to do |format|
-        format.html { render 'shared/idp_unavailable' }
-      end
     end
+    yield
   end
 
   private
@@ -133,8 +123,7 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_out_path_for(resource_or_scope)
-    return SamlInformation.saml_logout_url if Rails.env == "production"
-    root_path
+    logout_saml_index_path
   end
 
   def authenticate_user_from_token!
@@ -172,7 +161,7 @@ class ApplicationController < ActionController::Base
 
   def set_current_person
     if current_user.try(:person).try(:agent?)
-      @person = Person.find(session[:person_id])
+      @person = session[:person_id].present? ? Person.find(session[:person_id]) : nil
     else
       @person = current_user.person
     end

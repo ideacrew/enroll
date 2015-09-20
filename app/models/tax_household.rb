@@ -43,12 +43,13 @@ class TaxHousehold
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
     aptc_members.each do |member|
+      #TODO use which date to calculate premiums by slcp
       premium = slcsp.premium_for(effective_starting_on, member.age_on_effective_date)
       benchmark_member_cost_hash[member.applicant_id.to_s] = premium
     end
 
     # Sum premium total for aptc_members
-    sum_premium_total = benchmark_member_cost_hash.values.sum
+    sum_premium_total = benchmark_member_cost_hash.values.sum.to_f
 
     # Compute the ratio
     ratio_hash = {}
@@ -92,13 +93,13 @@ class TaxHousehold
     decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
     hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
       #given_aptc = (aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0) * elected_pct
-      #ehb_premium = decorated_plan.premium_for(enrollment_member) * plan.ehb
+      ehb_premium = decorated_plan.premium_for(enrollment_member) * plan.ehb
       given_aptc_amount = aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0
       if plan.coverage_kind == "dental"
         aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = 0
       else
         #aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc, ehb_premium].min
-        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = given_aptc_amount * [elected_pct, plan.ehb].min
+        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc_amount * [elected_pct, plan.ehb].min, ehb_premium].min.round(2)
       end
     end
     aptc_available_amount_hash_for_enrollment

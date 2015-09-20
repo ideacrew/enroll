@@ -5,6 +5,7 @@ module Forms
 
     attr_accessor :id, :family_id, :is_consumer_role, :vlp_document_id
     attr_accessor :gender, :relationship
+    attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -12,6 +13,12 @@ module Forms
     RELATIONSHIPS = ::PersonRelationship::Relationships + ::BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
     #include ::Forms::DateOfBirthField
     #include Validations::USDate.on(:date_of_birth)
+    
+    def initialize(*attributes)
+      @addresses = Address.new(kind: 'home')
+      @same_with_primary = true
+      super
+    end
 
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
@@ -62,7 +69,10 @@ module Forms
       existing_person = Person.match_existing_person(self)
       if existing_person
         family_member = family.relate_new_member(existing_person, self.relationship)
-        family_member.family.build_consumer_role(family_member) if self.is_consumer_role == "true"
+        if self.is_consumer_role == "true"
+          assign_person_address(existing_person)
+          family_member.family.build_consumer_role(family_member)
+        end
         family_member.save!
         self.id = family_member.id
         return true
@@ -70,7 +80,10 @@ module Forms
       person = Person.new(extract_person_params)
       return false unless try_create_person(person)
       family_member = family.relate_new_member(person, self.relationship)
-      family_member.family.build_consumer_role(family_member, extract_consumer_role_params) if self.is_consumer_role == "true"
+      if self.is_consumer_role == "true"
+        family_member.family.build_consumer_role(family_member, extract_consumer_role_params)
+        assign_person_address(person)
+      end
       family.save!
       self.id = family_member.id
       true
@@ -80,6 +93,31 @@ module Forms
       person.save.tap do
         bubble_person_errors(person)
       end
+    end
+
+    def assign_person_address(person)
+      if same_with_primary == 'true'
+        primary_person = family.primary_family_member.person
+        person.update(no_dc_address: primary_person.no_dc_address, no_dc_address_reason: primary_person.no_dc_address_reason)
+        address = primary_person.home_address
+        if address.present?
+          person.home_address.try(:destroy)
+          person.addresses << address
+        end
+      else
+        current_address = person.try(:home_address)
+        if addresses["address_1"].blank? and addresses["city"].blank?
+          current_address.destroy if current_address.present?
+          return true
+        end
+        if current_address.present?
+          current_address.update(addresses.permit!)
+        else
+          person.addresses.new(addresses.permit!)
+        end
+      end
+    rescue => e
+      false
     end
 
     def extract_consumer_role_params
@@ -105,7 +143,9 @@ module Forms
         :language_code => language_code,
         :is_incarcerated => is_incarcerated,
         :citizen_status => @citizen_status,
-        :tribal_id => tribal_id
+        :tribal_id => tribal_id,
+        :no_dc_address => no_dc_address,
+        :no_dc_address_reason => no_dc_address_reason
       }
     end
 
@@ -124,6 +164,13 @@ module Forms
 
     def self.find(family_member_id)
       found_family_member = FamilyMember.find(family_member_id)
+      has_same_address_with_primary = compare_address_with_primary(found_family_member);
+      address = if has_same_address_with_primary
+                  Address.new(kind: 'home')
+                else
+                  found_family_member.try(:person).try(:home_address) || Address.new(kind: 'home')
+                end
+
       record = self.new({
         :relationship => found_family_member.primary_relationship,
         :id => family_member_id,
@@ -142,8 +189,24 @@ module Forms
         :language_code => found_family_member.language_code,
         :is_incarcerated => found_family_member.is_incarcerated,
         :citizen_status => found_family_member.citizen_status,
-        :tribal_id => found_family_member.tribal_id
+        :tribal_id => found_family_member.tribal_id,
+        :same_with_primary => has_same_address_with_primary,
+        :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),
+        :no_dc_address_reason => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address_reason),
+        :addresses => address
       })
+    end
+
+    def self.compare_address_with_primary(family_member)
+      current = family_member.person
+      primary = family_member.family.primary_family_member.person
+
+      compare_keys = ["address_1", "address_2", "city", "state", "zip"]
+      current.no_dc_address == primary.no_dc_address &&
+        current.no_dc_address_reason == primary.no_dc_address_reason &&
+        current.home_address.attributes.select{|k,v| compare_keys.include? k} == primary.home_address.attributes.select{|k,v| compare_keys.include? k}
+    rescue
+      false
     end
 
     def family_member
@@ -175,7 +238,10 @@ module Forms
       assign_citizen_status
       return false unless valid?
       return false unless try_update_person(family_member.person)
-      family_member.family.build_consumer_role(family_member, attr["vlp_document_id"]) if attr["is_consumer_role"] == "true"
+      if attr["is_consumer_role"] == "true"
+        family_member.family.build_consumer_role(family_member, attr["vlp_document_id"])
+        return false unless assign_person_address(family_member.person)
+      end
       family_member.update_relationship(relationship)
       family_member.save!
       true

@@ -1,7 +1,7 @@
 .container
   .row
     .col-lg-7.col-md-7.col-sm-8.col-xs-12
-      %br
+      %h3 Verify Identity
       = form_for(@interactive_verification, :as => :interactive_verification, :url => insured_interactive_identity_verifications_path, :method => :post) do |f|
         = f.hidden_field :session_id
         = f.hidden_field :transaction_id

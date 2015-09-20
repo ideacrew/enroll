@@ -336,6 +336,18 @@ class Person
     self.emails << ::Email.new(:kind => 'work', :address => email)
   end
 
+  def home_address
+    addresses.detect { |adr| adr.kind == "home" }
+  end
+
+  def home_email
+    emails.detect { |adr| adr.kind == "home" }
+  end
+
+  def work_email
+    emails.detect { |adr| adr.kind == "home" }
+  end
+
   def has_active_consumer_role?
     consumer_role.present? and consumer_role.is_active?
   end
@@ -346,6 +358,15 @@ class Person
 
   def residency_eligible?
     no_dc_address and no_dc_address_reason.present?
+  end
+
+  def is_dc_resident?
+    return false if no_dc_address == true and no_dc_address_reason.blank?
+    return true if no_dc_address == true and no_dc_address_reason.present?
+
+    address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
+    addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}
+    return false
   end
 
   class << self

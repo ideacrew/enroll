@@ -1,5 +1,5 @@
 module ApplicationHelper
-  
+
   def menu_tab_class(a_tab, current_tab)
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
@@ -55,7 +55,7 @@ module ApplicationHelper
     date_value.strftime("%m/%d/%Y") if date_value.respond_to?(:strftime)
   end
 
-  def format_datetime(date_value)    
+  def format_datetime(date_value)
     date_value.to_time.strftime("%m/%d/%Y %H:%M %Z %:z") if date_value.respond_to?(:strftime)
   end
 
@@ -271,6 +271,7 @@ module ApplicationHelper
   end
 
   def retrieve_show_path(provider, message)
+    return broker_agencies_inbox_path(provider, message_id: message.id) if provider.try(:broker_role)
     case(provider.model_name.name)
     when "Person"
       insured_inbox_path(provider, message_id: message.id)
@@ -284,8 +285,9 @@ module ApplicationHelper
   end
 
   def retrieve_inbox_path(provider, folder: 'inbox')
+    broker_agency_mailbox =  broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
+    return broker_agency_mailbox if provider.try(:broker_role)
     case(provider.model_name.name)
-
     when "EmployerProfile"
       inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
     when "HbxProfile"
@@ -441,10 +443,21 @@ module ApplicationHelper
     end
   end
 
+  def notice_eligible_enrolles(notice)
+    notice.enrollments.inject([]) do |enrollees, enrollment|
+      enrollees += enrollment.enrollees
+    end.uniq
+  end
+
+  def calculate_age_by_dob(dob)
+    now = Date.today
+    now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+  end
+
   def ethnicity_collection
     [
       ["White", "Black or African American", "Asian Indian", "Chinese" ],
-      ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], 
+      ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"],
       ["Native Hawaiian", "Samoan", "Guamanian or Chamorro", ],
       ["Other Pacific Islander", "American Indian or Alaskan Native", "Other"]
     ].inject([]){ |sets, ethnicities|
@@ -488,5 +501,21 @@ module ApplicationHelper
     pronoun = family_member.try(:gender)=='male' ? ' he ':' she '
     name=family_member.try(:first_name) || ''
     result = "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on DC Health Link.<br/> Other family members may still be eligible to enroll. <br/>Please call us at 1-855-532-5465 to learn about other health insurance options for " + name
+  end
+
+  def generate_options_for_effective_on_kinds(effective_on_kinds, qle_date)
+    return [] if effective_on_kinds.blank?
+
+    options = []
+    effective_on_kinds.each do |kind|
+      case kind
+      when 'date_of_event'
+        options << ["#{kind.humanize}(#{qle_date.to_s})", kind]
+      when 'fixed_first_of_next_month'
+        options << ["#{kind.humanize}(#{(qle_date.end_of_month + 1.day).to_s})", kind]
+      end
+    end
+
+    options
   end
 end

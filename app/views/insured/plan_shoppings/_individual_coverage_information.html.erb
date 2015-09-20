@@ -19,10 +19,10 @@
           <td><%= dob_in_words(member.person.age_on(Time.now.utc.to_date), member.person.dob) %></td>
           <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
           <% if calculate %>
-            <td class="text-right"><%= number_to_currency(@plan.aptc_amount(member)) %></td>
+            <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
             <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
           <% else %>
-            <td class="text-right"><%= number_to_currency(member.applied_aptc_amount.to_f) %></td>
+            <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
             <td class="text-right"><%= number_to_currency(@plan.premium_for(member) - member.applied_aptc_amount.to_f) %></td>
           <% end %>
         </tr>

@@ -1,45 +1,47 @@
 <div class="container">
   <div class="row">
-    <div class="col-lg-9 col-md-9 col-sm-10 col-xs-12">
-          <h3>Consent:</h3>
-          <p>To protect your privacy, you will need to complete Identity Verification successfully, before requesting higher account privileges. You are providing consent to Experian to access your personal information to conduct ID Verification on behalf of CMS. Below are a few items to keep in mind.</p>
-          <p>
-            • Ensure that you have entered your legal name, current home address, primary phone number, date of birth and email address correctly. We will only collect personal information to verify your identity with Experian, an external identity verification provider.
-          </p>
-          <p>
-            • Identity Verification involves Experian using information from your consumer report profile to help confirm your identity. As a result, you may see an entry called a “soft inquiry” on your Experian consumer report. Soft inquiries are only visible to you, will never be presented to third parties, and do not affect your credit score. The soft inquiry will be titled “CMS Proofing Services” and will be removed from your Experian consumer report after 25 months.
-          </p>
-          <p>
-            • You may need to have access to your personal and consumer report information, as the Experian application will pose questions to you, based on data in their files.
-          </p>
-          <p>
-            Please select one of the following options to proceed ahead:
-          </p>
-          <div class="disagree_placeholder_text" style="display: none">
-            Please contact DC Healthlink at 1-855-532-5465 for more info
-          </div>
-          <div>
-            <%= radio_button_tag :agreement, "agree" %> I agree <br>
-            <%= radio_button_tag :agreement, "disagree" %> I Disagree
-          </div>
+    <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+      <h3>Verify Identity: Consent</h3>
+      <p>To protect your privacy, you will need to complete Identity Verification successfully, before requesting higher account privileges. You are providing consent to Experian to access your personal information to conduct ID Verification on behalf of the Department of Health and Human Services (HHS) Centers for Medicare & Medicaid Services (CMS). Below are a few items to keep in mind. </p>
+      <ul>
+        <li>
+          Ensure that you have entered your legal name, current home address, primary phone number, date of birth and email address correctly. We will only collect personal information to verify your identity with Experian, an external identity verification provider.
+        </li>
+        <li>
+          Identity Verification involves Experian using information from your consumer report profile to help confirm your identity. As a result, you may see an entry called a “soft inquiry” on your Experian consumer report. Soft inquiries are only visible to you, will never be presented to third parties, and do not affect your credit score. The soft inquiry will be titled “CMS Proofing Services” and will be removed from your Experian consumer report after 25 months.
+        </li>
+        <li>
+          You may need to have access to your personal and consumer report information, as the Experian application will pose questions to you, based on data in their files.
+        </li>
+      </ul>
+      <p>
+        Please select one of the following options to proceed:
+      </p>
+      <div class="disagree_placeholder_text" style="display: none">
+        <%= "Please contact #{HbxProfile::CallCenterName}: #{HbxProfile::CallCenterPhoneNumber} for more information" %>
       </div>
-
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
-        <%= render  partial: 'shared/individual_progress', locals: {step: '2', ridp: true} %>
+      <div>
+        <%= radio_button_tag :agreement, "agree" %> I Agree <br>
+        <%= radio_button_tag :agreement, "disagree" %> I Disagree
       </div>
     </div>
-  </div>
 
-  <script type="text/javascript">
-    $(document).ready(function(){
-      $(".interaction-choice-control-value-agreement-agree").click(function(){
-        $(".interaction-click-control-continue").attr("disabled", false);
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
+      <%= render  partial: 'shared/individual_progress', locals: {step: '2', ridp: true} %>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $(".interaction-choice-control-value-agreement-agree").click(function(){
+      $(".interaction-click-control-continue").attr("disabled", false);
         // $(".disagree_placeholder_text").hide();
       });
-      $(".interaction-choice-control-value-agreement-disagree").click(function(){
-        $(".interaction-click-control-continue").attr("disabled", true);
+    $(".interaction-choice-control-value-agreement-disagree").click(function(){
+      $(".interaction-click-control-continue").attr("disabled", true);
         // $(".disagree_placeholder_text").show();
         alert("Please contact DC Healthlink at 1-855-532-5465 for more info");
       });
-    });
-  </script>
+  });
+</script>

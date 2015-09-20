@@ -36,10 +36,14 @@ namespace :xml do
         (2..last_row).each do |row_number| # update renewal plan_ids
           carrier, old_hios_id, old_plan_name, new_hios_id, new_plan_name = sheet_data.row(row_number)
           new_plan = Plan.where(hios_id: /#{new_hios_id}/, active_year: 2016).first
-          Plan.where(hios_id: /#{old_hios_id}/, active_year: 2015).each do |pln|
-            pln.update(renewal_plan_id: new_plan._id)
-            puts "Old plan hios_id #{pln.hios_id} renewed with New plan hios_id: #{new_plan.hios_id}"
-            updated_hios_ids_list << pln.hios_id
+          if new_plan
+            Plan.where(hios_id: /#{old_hios_id}/, active_year: 2015).each do |pln|
+              pln.update(renewal_plan_id: new_plan._id)
+              puts "Old plan hios_id #{pln.hios_id} renewed with New plan hios_id: #{new_plan.hios_id}"
+              updated_hios_ids_list << pln.hios_id
+            end
+          else
+            puts "No plan found for hios id: '#{new_hios_id}'"
           end
         end
         if sheet == "SHOP HIOS Plan Crosswalk"
@@ -81,8 +85,12 @@ namespace :xml do
         hios_base_id = hios_id.split("-").first
         csr_variant_id = hios_id.split("-").last
         plan = Plan.where(active_year: 2016, hios_base_id: /#{hios_base_id}/, csr_variant_id: /#{csr_variant_id}/).first
-        plan.update(is_standard_plan: true)
-        puts "plan with hios id #{hios_base_id}-#{csr_variant_id} updated to standard plan."
+        if plan
+          plan.update(is_standard_plan: true)
+          puts "plan with hios id #{hios_base_id}-#{csr_variant_id} updated to standard plan."
+        else
+          puts "plan with hios id #{hios_base_id}-#{csr_variant_id} was not found and not updated to standard plan."
+        end
       end
     end
   end

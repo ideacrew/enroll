@@ -1,5 +1,8 @@
 class Employers::EmployerProfilesController < ApplicationController
-  before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox, :edit]
+
+  before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
+                                       :bulk_employee_upload, :bulk_employee_upload_form]
+
   before_action :check_admin_staff_role, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
 
@@ -167,6 +170,20 @@ class Employers::EmployerProfilesController < ApplicationController
   def consumer_override
     session[:person_id] = params['person_id']
     redirect_to family_account_path
+  end
+
+  def bulk_employee_upload_form
+
+  end
+
+  def bulk_employee_upload
+    file = params.require(:file)
+    @census_employee_import = CensusEmployeeImport.new({file:file, employer_profile:@employer_profile})
+    if @census_employee_import.save
+      redirect_to "/employers/employer_profiles/#{@employer_profile.id}?employer_profile_id=#{@employer_profile.id}", :notice=>"#{@census_employee_import.length} records uploaded from CSV"
+    else
+      render "employers/employer_profiles/employee_csv_upload_errors"
+    end
   end
 
   private
