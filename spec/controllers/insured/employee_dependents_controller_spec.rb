@@ -48,7 +48,7 @@ RSpec.describe Insured::EmployeeDependentsController do
     let(:family_member) {double("FamilyMember", id: double("id"))}
 
     before(:each) do
-      allow(Forms::EmployeeDependent).to receive(:find).and_return(dependent)
+      allow(Forms::FamilyMember).to receive(:find).and_return(dependent)
       sign_in(user)
       get :show, :id => family_member.id
     end
@@ -65,7 +65,7 @@ RSpec.describe Insured::EmployeeDependentsController do
 
     before(:each) do
       sign_in(user)
-      allow(Forms::EmployeeDependent).to receive(:new).with({:family_id => family_id}).and_return(dependent)
+      allow(Forms::FamilyMember).to receive(:new).with({:family_id => family_id}).and_return(dependent)
       get :new, :family_id => family_id
     end
 
@@ -86,7 +86,7 @@ RSpec.describe Insured::EmployeeDependentsController do
 
     before :each do
       sign_in(user)
-      allow(Forms::EmployeeDependent).to receive(:new).with(dependent_properties).and_return(dependent)
+      allow(Forms::FamilyMember).to receive(:new).with(dependent_properties).and_return(dependent)
       allow(dependent).to receive(:save).and_return(save_result)
       post :create, :dependent => dependent_properties
     end
@@ -127,7 +127,7 @@ RSpec.describe Insured::EmployeeDependentsController do
 
     before :each do
       sign_in(user)
-      allow(Forms::EmployeeDependent).to receive(:find).with(dependent_id).and_return(dependent)
+      allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
     end
 
     it "should destroy the dependent" do
@@ -149,7 +149,7 @@ RSpec.describe Insured::EmployeeDependentsController do
 
     before :each do
       sign_in(user)
-      allow(Forms::EmployeeDependent).to receive(:find).with(dependent_id).and_return(dependent)
+      allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
       get :edit, :id => dependent_id
     end
 
@@ -171,7 +171,7 @@ RSpec.describe Insured::EmployeeDependentsController do
 
     before(:each) do
       sign_in(user)
-      allow(Forms::EmployeeDependent).to receive(:find).with(dependent_id).and_return(dependent)
+      allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
       allow(dependent).to receive(:update_attributes).with(dependent_properties).and_return(update_result)
       put :update, :id => dependent_id, :dependent => dependent_properties
     end

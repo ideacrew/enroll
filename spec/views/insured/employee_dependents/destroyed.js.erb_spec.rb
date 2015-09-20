@@ -12,7 +12,7 @@ describe "insured/employee_dependents/destroyed.js.erb" do
       assign(:person, person)
       allow(Family).to receive(:find_family_member).with(family_member.id).and_return(family_member)
       allow(family_member).to receive(:primary_relationship).and_return("self")
-      assign(:dependent, Forms::EmployeeDependent.find(family_member.id))
+      assign(:dependent, Forms::FamilyMember.find(family_member.id))
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
 
       render file: "insured/employee_dependents/destroyed.js.erb"

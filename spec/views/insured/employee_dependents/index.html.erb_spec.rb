@@ -5,7 +5,7 @@ describe "insured/employee_dependents/index.html.erb" do
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:family) { Family.new }
   let(:family_member) { family.family_members.new }
-  let(:dependent) { Forms::EmployeeDependent.new(family_id: family.id) }
+  let(:dependent) { Forms::FamilyMember.new(family_id: family.id) }
 
   before :each do
     sign_in user

@@ -13,7 +13,7 @@ describe "insured/employee_dependents/show.js.erb" do
       assign(:created, true)
       allow(Family).to receive(:find_family_member).with(family_member.id).and_return(family_member)
       allow(family_member).to receive(:primary_relationship).and_return("self")
-      assign(:dependent, Forms::EmployeeDependent.find(family_member.id))
+      assign(:dependent, Forms::FamilyMember.find(family_member.id))
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
 
       stub_template "insured/employee_dependents/dependent" => '' 
