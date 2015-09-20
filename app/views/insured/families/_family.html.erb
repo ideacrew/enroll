@@ -14,7 +14,7 @@
 
 <ul class="" id="dependent_ul">
   <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
-  <%= render "insured/employee_dependents/dependent", dependent: dependent, person: @person %>
+  <%= render "insured/family_members/dependent", dependent: dependent, person: @person %>
   <% end %>
 </ul>
 
