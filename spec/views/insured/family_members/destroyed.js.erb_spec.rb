@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "insured/employee_dependents/destroyed.js.erb" do
+describe "insured/family_members/destroyed.js.erb" do
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:family) { Family.new }
@@ -15,7 +15,7 @@ describe "insured/employee_dependents/destroyed.js.erb" do
       assign(:dependent, Forms::FamilyMember.find(family_member.id))
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
 
-      render file: "insured/employee_dependents/destroyed.js.erb"
+      render file: "insured/family_members/destroyed.js.erb"
     end
 
     it "should display qle_flow" do

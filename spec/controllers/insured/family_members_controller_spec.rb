@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Insured::EmployeeDependentsController do
+RSpec.describe Insured::FamilyMembersController do
   let(:family) { double }
   let(:user) { instance_double("User", :primary_family => family, :person => person) }
   let(:person) { double(:employee_roles => [], :primary_family => family) }

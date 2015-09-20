@@ -1,4 +1,4 @@
-class Insured::EmployeeDependentsController < ApplicationController
+class Insured::FamilyMembersController < ApplicationController
   include ApplicationHelper
 
   before_action :set_current_person, :set_family

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "insured/employee_dependents/index.html.erb" do
+describe "insured/family_members/index.html.erb" do
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:family) { Family.new }
@@ -11,7 +11,7 @@ describe "insured/employee_dependents/index.html.erb" do
     sign_in user
     assign :person, person
     assign :family, family
-    render template: "insured/employee_dependents/index.html.erb"
+    render template: "insured/family_members/index.html.erb"
   end
 
   it "should have title" do
