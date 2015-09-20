@@ -41,7 +41,7 @@
     <hr>
     <div class="col-xs-4 row">
       <span>Your Estimated Monthly Cost</span>
-      <h2>1232132</h2>
+      <h2 class="employer-monthly-cost"></h2>
     </div>
     <div class="col-xs-8">
       <table>
@@ -52,13 +52,13 @@
         </tr>
         <tr>
           <td>Estimated Total Monthly Cost for Employees</td>
-          <td>12312</td>
-          <td></td>
+          <td class="employee-monthly-cost-ivl"></td>
+          <td class="employee-monthly-cost-fam"></td>
         </tr>
         <tr>
           <td>Estimated Annual Deductible</td>
-          <td></td>
-          <td></td>
+          <td><%= @plan.deductible %></td>
+          <td><%= @plan.family_deductible %></td>
         </tr>
         <tr>
           <td>Estimated Annual Out-of-Pocket Max</td>
