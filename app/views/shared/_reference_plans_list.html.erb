@@ -9,8 +9,8 @@
 
 
     <li role="presentation" class="col-xs-4">
-      <%= f.radio_button :plan_option_kind, "single_carrier", selected: f.object.plan_option_kind %>
-      <%= f.label :plan_option_kind_single_carrier, class: "elected_plan", onclick: "$('.nav-tabs li').removeClass('active');$(this).closest('li').addClass('active')" do %>
+      <%= f.radio_button :plan_option_kind, "single_carrier" %>
+      <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
       <i class="fa fa-circle-o"></i>
       <i class="fa fa-dot-circle-o"></i>
       By carrier
@@ -20,8 +20,8 @@
 
 
   <li role="presentation" class="col-xs-4">
-    <%= f.radio_button :plan_option_kind, "metal_level", selected: f.object.plan_option_kind %>
-    <%= f.label :plan_option_kind_metal_level, class: "elected_plan", onclick: "$('.nav-tabs li').removeClass('active');$(this).closest('li').addClass('active')" do %>
+    <%= f.radio_button :plan_option_kind, "metal_level" %>
+    <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
     <i class="fa fa-circle-o"></i>
     <i class="fa fa-dot-circle-o"></i>
     By metal level
@@ -35,7 +35,7 @@
     <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, plan_option_kind: "single_plan"), remote: true do %>
 
     <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
-    <%= f.label :plan_option_kind_single_plan, class: "elected_plan", onclick: "$('.nav-tabs li').removeClass('active');$(this).closest('li').addClass('active')" do %>
+    <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
     <i class="fa fa-circle-o"></i>
     <i class="fa fa-dot-circle-o"></i>
     Single plan

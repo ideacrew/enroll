@@ -64,6 +64,59 @@ function getCarrierPlans(ep, ci) {
   })
 };
 $(document).ready(function () {
+  $('.nav-tabs li input[type=radio]').prop('checked', false);
+  $('.nav-tabs li label').on('click', function() {
+    $('.nav-tabs li').removeClass('active');
+    $(this).closest('li').addClass('active');
+    if ($(this).find('input[type=radio]').is(':checked')) {
+    } else {
+      $(this).find('input[type=radio]').prop('checked', true );
+      $('.plan-options > *').hide();
+      $('.plan-options > * input, .reference-plans input').prop('checked', 0);
+      $('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
+
+    }
+
+    });
+
+  $('.nav-tabs li input').on('change', function() {
+    if ($(this).attr('value') == "single_carrier") {
+      $('.plan-options, .carriers-tab').show();
+
+    }
+    else if ($(this).attr('value') == "metal_level") {
+
+      $('.plan-options, .metals-tab').show();
+    }
+  });
+  $('.nav-tabs a').on('click', function() {
+    $('.plan-options').hide();
+    $('.plan-options > * input, .reference-plans input').prop('checked', 0);
+    $('.reference-plans').show();
+  });
+
+
+
+  //toggle plan options checkbox through parent anchor
+
+  $('.plan-options a, .nav-tabs a').on('click', function() {
+    $('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
+    $('.plan-options input[type=radio]').attr('checked', 0);
+    if ($(this).find('input[type=radio]').is(':checked')) {
+    } else {
+      $('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
+      $(".reference-plans").show();
+      $(this).find('input[type=radio]').prop('checked', true )
+    }
+
+  });
+
+  // asdas
+  $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').closest('.row-form-wrapper').attr('style', 'border-bottom: none;');
+
+  $('.details').on('click', function() {
+    $(this).closest('.referenceplan').find('.plan-details').toggle();
+  });
 
 
 

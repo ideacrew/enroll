@@ -1,49 +1,8 @@
 
 $(document).on('ready', function() {
   // nav tabs radios on change for plan selection
-  $('.nav-tabs input[type=radio]').on('change', function() {
-    $('.plan-options > *').hide();
-    $('.plan-options > * input, .reference-plans input').prop('checked', 0);
-    $('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
-    $('.reference-plans').hide();
-    $('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
-    if ($(this).attr('value') == "single_carrier") {
-      $('.plan-options, .carriers-tab').show();
-
-    }
-    else if ($(this).attr('value') == "metal_level") {
-
-      $('.plan-options, .metals-tab').show();
-    }
-  });
-  $('.nav-tabs a').on('click', function() {
-    $('.plan-options').hide();
-    $('.plan-options > * input, .reference-plans input').prop('checked', 0);
-    $('.reference-plans').show();
-  });
 
 
-
-  //toggle plan options checkbox through parent anchor
-
-  $('.plan-options a, .nav-tabs a').on('click', function() {
-    $('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
-    $('.plan-options input[type=radio]').attr('checked', 0);
-    if ($(this).find('input[type=radio]').is(':checked')) {
-    } else {
-      $('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
-      $(".reference-plans").show();
-      $(this).find('input[type=radio]').prop('checked', true )
-    }
-
-  });
-
-  // asdas
-  $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').closest('.row-form-wrapper').attr('style', 'border-bottom: none;');
-
-  $('.details').on('click', function() {
-    $(this).closest('.referenceplan').find('.plan-details').toggle();
-  });
 
 
 // set reference_plan_id
@@ -54,7 +13,6 @@ $(document).on('click', '.reference-plan input + label', function() {
     if (start_date == "") {
       return
     }
-    $(this).parents('fieldset').find('.reference_plan_info h4').html("loading...")
     $.ajax({
       type: "GET",
       url: $('a#search_reference_plan_link').data('href'),
@@ -129,7 +87,6 @@ $(document).on('click', '.reference-plan input + label', function() {
         "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_offered').is(":checked")
       }
     }
-    alert(reference_plan_id + plan_option_kind + relation_benefits);
     $.ajax({
       type: "GET",
       url: url,
