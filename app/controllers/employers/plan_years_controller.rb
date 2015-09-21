@@ -11,6 +11,8 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def reference_plans
+
+    @benefit_group = params[:benefit_group]
     @plans = if params[:plan_option_kind] == "single_carrier"
       @carrier_id = params[:carrier_id]
       Plan.valid_shop_health_plans("carrier", @carrier_id)
