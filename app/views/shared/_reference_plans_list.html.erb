@@ -88,7 +88,7 @@
         <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, plan_option_kind: "metal_level", metal_level: kind, benefit_group:f.object.id ), remote: true do %>
 
           <div class="col-xs-3">
-            <%= f.radio_button :carrier_for_elected_plan, kind %>
+            <%= f.radio_button :metal_level_for_elected_plan, kind %>
             <%= f.label "carrier_for_elected_plan_#{kind}" do %>
           <i class="fa fa-circle-o"></i>
           <i class="fa fa-dot-circle-o"></i>
