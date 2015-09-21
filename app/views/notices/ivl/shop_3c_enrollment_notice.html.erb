@@ -1,0 +1,90 @@
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "<span style='color:#ff0000;'><h3>[SHOP3C]<br>
+  Renewal OE Open for EE, Auto-Renewal Not Available</h3></span>".html_safe} %>
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>[To]</h3></td>
+      <td>[Employee Email Address]</td>
+    </tr>
+    <tr>
+      <td><h3>[Subject]</h3></td>
+      <td>Enroll Now: Your Health Plan Open Enrollment Period has Begun</td>
+    </tr>
+    <tr>
+      <td><h3>[Content]</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "Good News!   [Employer Name] has chosen to renew the offer of health insurance coverage to its employees through DC Health Link and will contribute to the monthly premium to make the cost of coverage more affordable. ".html_safe} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>Your Current Plan is No Longer Available</strong><br>
+  The plan in which you are currently enrolled will no longer be available 
+  to you beginning [Coverage Start Date].  You must select another plan by[
+  OE End Date] in order to continue coverage effective [Coverage Start 
+  Date].".html_safe} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>IMPORTANT:  You MUST Select a New Plan to Continue Coverage into Upcoming Plan Year</strong><br>
+  If you do not make a new plan selection by <OE End Date>, your current 
+  coverage will be terminated on [Coverage Start Date – 1] and you will 
+  not have coverage for the upcoming plan year beginning on [Coverage 
+  Start Date].".html_safe} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>What is Open Enrollment?</strong><br>
+  Open enrollment is your annual opportunity to enroll in health plans 
+  offered by your employer or make changes to your current plan 
+  selection.  Outside of this annual open enrollment period, you will only 
+  be allowed to make changes to your enrollment if you experience certain 
+  life events such as marriage, birth, or adoption.".html_safe} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>To See Plan Options and Enroll:</strong><br>
+  Please log-in to your existing DC Health Link account at <HBEURL> to 
+  view your plan options and complete the enrollment process.".html_safe} %>  
+
+ <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<strong style='color:#ff0000;'>[If ER has a Broker/Assister]</strong> Contact your employer or your broker for further assistance.<br>  
+   <strong style='color:#ff0000;'>[If ER does NOT have a Broker/Assister]</strong> Contact your employer further assistance."
+.html_safe], heading: 'For Questions or Assistance:', sub_heading: ''} %> 
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact DC Health Link with any questions:".html_safe} %> 
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+  ["Online at www.DCHealthLink.com;".html_safe,
+   "By email at employer.hbx@dc.gov; or".html_safe,
+   "By calling 855-532-5465.".html_safe] } %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<p style='display:flex'>
+     <strong>CC:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     <table  class='total_table' border='0' align='right'>
+      <tbody>
+        <tr><td>[Employer Name]</td></tr>
+      </tbody>
+     </table>
+   </p>".html_safe} %> 
+
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong style='color:#ff0000;'>[If ER has a Broker/Assister, include contact info below]</strong><br>
+  <p style='display:flex'><strong>Broker:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <table  class='total_table' border='0' align='right'>
+    <tbody>
+      <tr><td>[Broker/Assister First Name] [Broker/Assister Last Name]</td></tr>
+      <tr><td>[Broker/Assister Organization]</td></tr>
+      <tr><td>[Broker/Assister Street Address 1]</td></tr>
+      <tr><td>[Broker/Assister Apt/Suite]</td></tr>
+      <tr><td>[Broker/Assister City], [Broker/Assister State] [Broker/Assister Zip]</td></tr>
+      <tr><td>[Broker/Assister Direct Phone #]</td></tr>
+      <tr><td>[Broker/Assister Email]</td></tr>
+      <tr><td>[Broker/Assister Web]</td></tr> 
+    </tbody>
+  </table></p>".html_safe} %> 
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "This notice is being provided in accordance with 45 C.F.R. 155.725(f)".html_safe} %>
+
