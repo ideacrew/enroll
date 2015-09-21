@@ -131,4 +131,34 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
     end
   end
 
+  context "elected_plans_by_enrollment_members" do
+    let(:benefit_coverage_period) { BenefitCoveragePeriod.new }
+    let(:c1) {FactoryGirl.create(:consumer_role)}
+    let(:c2) {FactoryGirl.create(:consumer_role)}
+    let(:member1) {double(person: double(consumer_role: c1))}
+    let(:member2) {double(person: double(consumer_role: c2))}
+    let(:plan1) { FactoryGirl.create(:plan) }
+    let(:plan2) { FactoryGirl.create(:plan) }
+    let(:plan3) { FactoryGirl.create(:plan) }
+    let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id])}
+    let(:benefit_package2) {double(benefit_ids: [plan3.id, plan2.id])}
+    let(:rule) {double}
+
+    before :each do
+      allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package1, benefit_package2]
+      allow(InsuredEligibleForBenefitRule).to receive(:new).and_return rule
+    end
+
+    it "when satisfied" do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      plans = [plan1, plan2, plan3]
+      expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')).to eq plans
+    end
+
+    it "when not satisfied" do
+      allow(rule).to receive(:satisfied?).and_return [false, 'ok']
+      plans = []
+      expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')).to eq plans
+    end
+  end
 end

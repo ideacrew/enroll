@@ -77,6 +77,22 @@ class BenefitCoveragePeriod
     end
   end
 
+  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind)
+    ivl_bgs = []
+    benefit_packages.each do |bg|
+      satisfied = true
+      hbx_enrollment_members.map(&:person).map(&:consumer_role).each do |consumer_role|
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, coverage_kind)
+        satisfied = false and break unless rule.satisfied?[0]
+      end
+      ivl_bgs << bg if satisfied
+    end
+
+    ivl_bgs = ivl_bgs.uniq
+    elected_plan_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
+    Plan.where(:id => {"$in" => elected_plan_ids}).to_a
+  end
+
   ## Class methods
   class << self
 
