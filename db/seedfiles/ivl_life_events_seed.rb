@@ -23,7 +23,7 @@ QualifyingLifeEventKind.create!(
   ordinal_position: 11,
   reason: " ",
   edi_code: "05-ADOPTION", 
-  effective_on_kinds: ["date_of_event", "first_of_next_month"],
+  effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: true,

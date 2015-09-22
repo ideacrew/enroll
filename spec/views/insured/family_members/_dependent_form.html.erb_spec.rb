@@ -1,11 +1,11 @@
 require 'rails_helper'
 
-describe "insured/employee_dependents/_dependent_form.html.erb" do
+describe "insured/family_members/_dependent_form.html.erb" do
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:family) { Family.new }
   let(:family_member) { family.family_members.new }
-  let(:dependent) { Forms::EmployeeDependent.new(family_id: family.id) }
+  let(:dependent) { Forms::FamilyMember.new(family_id: family.id) }
 
   context "with consumer_role_id" do
     before :each do
@@ -13,7 +13,7 @@ describe "insured/employee_dependents/_dependent_form.html.erb" do
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
       allow(person).to receive(:has_active_consumer_role?).and_return true 
       assign :person, person
-      render "insured/employee_dependents/dependent_form", dependent: dependent, person: person
+      render "insured/family_members/dependent_form", dependent: dependent, person: person
     end
 
     it "should have dependent_list area" do
@@ -54,7 +54,7 @@ describe "insured/employee_dependents/_dependent_form.html.erb" do
       @request.env['HTTP_REFERER'] = ''
       allow(person).to receive(:has_active_consumer_role?).and_return false
       assign :person, person
-      render "insured/employee_dependents/dependent_form", dependent: dependent, person: person
+      render "insured/family_members/dependent_form", dependent: dependent, person: person
     end
 
     it "should have dependent_list area" do

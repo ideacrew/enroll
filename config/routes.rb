@@ -125,7 +125,7 @@ Rails.application.routes.draw do
     end
     root 'employee_roles#show'
 
-    resources :employee_dependents
+    resources :family_members
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
