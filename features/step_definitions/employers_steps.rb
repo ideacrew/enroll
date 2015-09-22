@@ -271,8 +271,12 @@ And(/^.+ should see the census family is successfully rehired message$/) do
 end
 
 When(/^I go to the Profile tab$/) do
-  @browser.a(text: /Profile/).wait_until_present
-  @browser.a(text: /Profile/).click
+  @browser.a(class: /interaction-click-control-update-business-info/).wait_until_present
+  @browser.a(class: /interaction-click-control-update-business-info/).click
+  @browser.a(class: /interaction-click-control-cancel/).wait_until_present
+  @browser.a(class: /interaction-click-control-cancel/).click
+  @browser.a(text: /business info/i).wait_until_present
+  expect(@browser.a(text: /Business Info/i).visible?).to be_truthy
 end
 
 Then(/^I should see Edit Details link$/) do
@@ -287,25 +291,33 @@ end
 
 
 And(/^.+ should see a button to create new plan year$/) do
-  @browser.a(text: /Add Plan Year/).wait_until_present
+  @browser.a(class: /interaction-click-control-add-plan-year/).wait_until_present
   screenshot("employer_plan_year")
-  @browser.a(text: /Add Plan Year/).click
+  @browser.a(class: /interaction-click-control-add-plan-year/).click
 end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits with high FTE$/) do
 #Plan Year
   # @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").wait_until_present
-  @browser.text_field(id: /plan_year_fte_count/).wait_until_present
+  # @browser.text_field(id: /plan_year_fte_count/).wait_until_present
+  @browser.div(class: /selectric-interaction-choice-control-plan-year-start-on/).wait_until_present
+  start_on = @browser.div(class: /selectric-interaction-choice-control-plan-year-start-on/)
+  start_on.click
+  start_on.li(index: 1).click
   screenshot("employer_add_plan_year")
-  @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").set("91/96/2017")
-  @browser.h3(text: /Plan Year/).click
-  @browser.alert.wait_until_present
-  @browser.alert.ok
-  expect(@browser.text.include?("Open Enrollment Start Date: Invalid date format!")).to be_truthy
+  # @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").set("91/96/2017")
+  # @browser.h3(text: /Plan Year/).click
+  # @browser.alert.wait_until_present
+  # @browser.alert.ok
+  # expect(@browser.text.include?("Open Enrollment Start Date: Invalid date format!")).to be_truthy
   # happy path
-  start_on_field = @browser.div(class: /selectric-wrapper/, text: /SELECT START ON/i)
-  start_on_field.click
-  start_on_field.li(index: 1).click
+  # start_on_field = @browser.div(class: /selectric-wrapper/, text: /SELECT START ON/i)
+  # start_on_field.click
+  # start_on_field.li(index: 1).click
+  @browser.a(class: /interaction-click-control-continue/).wait_until_present
+  @browser.a(class: /interaction-click-control-continue/).click
+  @browser.a(text: /continue/i).click
+
   @browser.h3(text: /Recommend Dates/).wait_until_present
   expect(@browser.text.include?("Employer initial application earliest submit on")).to be_truthy
   @browser.text_field(name: "plan_year[fte_count]").click
