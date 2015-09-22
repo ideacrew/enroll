@@ -85,7 +85,7 @@ class Insured::EmployeeRolesController < ApplicationController
       else
         set_employee_bookmark_url
         respond_to do |format|
-          format.html { redirect_to insured_employee_dependents_path(employee_role_id: @employee_role.id) }
+          format.html { redirect_to insured_family_members_path(employee_role_id: @employee_role.id) }
         end
       end
     else

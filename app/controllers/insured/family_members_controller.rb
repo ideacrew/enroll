@@ -1,4 +1,4 @@
-class Insured::EmployeeDependentsController < ApplicationController
+class Insured::FamilyMembersController < ApplicationController
   include ApplicationHelper
 
   before_action :set_current_person, :set_family
@@ -25,7 +25,7 @@ class Insured::EmployeeDependentsController < ApplicationController
   end
 
   def new
-    @dependent = Forms::EmployeeDependent.new(:family_id => params.require(:family_id))
+    @dependent = Forms::FamilyMember.new(:family_id => params.require(:family_id))
     respond_to do |format|
       format.html
       format.js
@@ -35,7 +35,7 @@ class Insured::EmployeeDependentsController < ApplicationController
   def create
 
     doc_params = params_clean_vlp_documents
-    @dependent = Forms::EmployeeDependent.new(params.require(:dependent).permit!)
+    @dependent = Forms::FamilyMember.new(params.require(:dependent).permit!)
     if @dependent.save
       update_vlp_documents(doc_params)
       @created = true
@@ -52,7 +52,7 @@ class Insured::EmployeeDependentsController < ApplicationController
   end
 
   def destroy
-    @dependent = Forms::EmployeeDependent.find(params.require(:id))
+    @dependent = Forms::FamilyMember.find(params.require(:id))
     @dependent.destroy!
 
     respond_to do |format|
@@ -62,7 +62,7 @@ class Insured::EmployeeDependentsController < ApplicationController
   end
 
   def show
-    @dependent = Forms::EmployeeDependent.find(params.require(:id))
+    @dependent = Forms::FamilyMember.find(params.require(:id))
 
     respond_to do |format|
       format.html
@@ -71,7 +71,7 @@ class Insured::EmployeeDependentsController < ApplicationController
   end
 
   def edit
-    @dependent = Forms::EmployeeDependent.find(params.require(:id))
+    @dependent = Forms::FamilyMember.find(params.require(:id))
 
     respond_to do |format|
       format.html
@@ -82,7 +82,7 @@ class Insured::EmployeeDependentsController < ApplicationController
   def update
     doc_params = params_clean_vlp_documents
     @family = @person.primary_family
-    @dependent = Forms::EmployeeDependent.find(params.require(:id))
+    @dependent = Forms::FamilyMember.find(params.require(:id))
 
     if @dependent.update_attributes(params.require(:dependent))
       update_vlp_documents(doc_params)
@@ -98,6 +98,7 @@ class Insured::EmployeeDependentsController < ApplicationController
     end
   end
 private
+
   def set_family
     @family = @person.try(:primary_family)
   end

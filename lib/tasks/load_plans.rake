@@ -17,6 +17,15 @@ namespace :seed do
   end
 end
 
+namespace :delete do
+  desc "delete fake plans"
+  task :fake_plans => :environment do
+    Plan.where(:hios_id.in => [/123523/, /120523/, /191503/, /194303/]).each do |plan|
+      plan.destroy
+    end
+  end
+end
+
 #FIXME
 #TODO
 #REFACTOR, move code to models or relevent place.

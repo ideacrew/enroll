@@ -1,5 +1,5 @@
 module Forms
-  class EmployeeDependent
+  class FamilyMember
     include ActiveModel::Model
     include ActiveModel::Validations
 
@@ -163,7 +163,7 @@ module Forms
     end
 
     def self.find(family_member_id)
-      found_family_member = FamilyMember.find(family_member_id)
+      found_family_member = ::FamilyMember.find(family_member_id)
       has_same_address_with_primary = compare_address_with_primary(found_family_member);
       address = if has_same_address_with_primary
                   Address.new(kind: 'home')
@@ -210,7 +210,7 @@ module Forms
     end
 
     def family_member
-      @family_member = FamilyMember.find(id)
+      @family_member = ::FamilyMember.find(id)
     end
 
     def assign_attributes(atts)
