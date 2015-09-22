@@ -19,7 +19,12 @@
       </label>
     </div>
   </div>
+  <!--
+  <div class="col-xs-4 form-group form-group-lg <% cycle('fte', 'pte', 'msp') %>">
+    <% number_field_tag :count, nil, class: "contribution_handler" %>
 
+  </div>
+  -->
       <div class="col-xs-6 form-group form-group-lg">
         <%= f.number_field :premium_pct, class: "contribution_handler", value: f.object.premium_pct.try(:to_i) %><!--<i class="fa fa-question-circle fa-lg"></i>-->
 

@@ -2,6 +2,12 @@
 $(document).on('ready', function() {
   // nav tabs radios on change for plan selection
 
+    $(document).on('change', '.offerings .fte:first input, .offerings .pte:first input, .offerings .msp:first input', function() {
+      var change = $(this).val();
+      $('#plan_year_fte_count').val(change);
+    });
+    
+
     $('.nav-tabs li input[type=radio]').prop('checked', false);
     $(document).on('click', '.nav-tabs li label', function() {
       $(this).closest('.benefit-group-fields').find('.nav-tabs li').removeClass('active');
@@ -59,7 +65,7 @@ $(document).on('ready', function() {
 // set reference_plan_id
 $(document).on('click', '.reference-plan input + label', function() {
   var reference_plan_id = $(this).closest('.reference-plan').find('input').attr('value');
-  
+
   if (reference_plan_id != "" && reference_plan_id != undefined){
     var start_date = $("#plan_year_start_on").val();
     if (start_date == "") {
