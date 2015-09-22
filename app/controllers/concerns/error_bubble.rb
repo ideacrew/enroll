@@ -16,6 +16,7 @@ module ErrorBubble
             person.errors.add("#{vlp.subject}: #{k}", v)
           end
         end
+        person.errors.delete(:vlp_documents)
       end
       person.errors.delete(:consumer_role)
     end
