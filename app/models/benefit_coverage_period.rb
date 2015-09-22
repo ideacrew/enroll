@@ -90,7 +90,7 @@ class BenefitCoveragePeriod
 
     ivl_bgs = ivl_bgs.uniq
     elected_plan_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
-    Plan.where(:id => {"$in" => elected_plan_ids}).to_a
+    Plan.individual_plans(coverage_kind: coverage_kind, active_year: TimeKeeper.date_of_record.year).where(:id => {"$in" => elected_plan_ids}).to_a
   end
 
   ## Class methods
