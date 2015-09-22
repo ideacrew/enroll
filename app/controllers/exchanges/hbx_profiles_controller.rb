@@ -70,16 +70,16 @@ class Exchanges::HbxProfilesController < ApplicationController
       end
     end
     if role
-      status_text = 'Message sent to ' + role
+      status_text = 'Message sent to ' + role + ' ' + agent.full_name + ' <br>' 
       if agent.try(:user).try(:email)
         agent_assistance_messages(params,agent,role)
       else
         status_text = "Agent has no email.   Please select another"
       end
     else
-      status_text = call_customer_service
+      status_text = call_customer_service params[:firstname], params[:lastname]
     end
-    render :text => status_text, layout: false
+    render :text => status_text.html_safe, layout: false
   end
 
   def family_index
@@ -282,7 +282,7 @@ private
     end
   end
 
-  def call_customer_service
-    "No match found.  Please call Customer Service at: (855)532-5465 for assistance."
+  def call_customer_service(first_name, last_name)
+    "No match found for #{first_name} #{last_name}.  Please call Customer Service at: (855)532-5465 for assistance.<br/>"
   end
 end
