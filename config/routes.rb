@@ -45,7 +45,6 @@ Rails.application.routes.draw do
         get :begin_consumer_enrollment
         get :begin_employee_enrollment
         get :resume_enrollment
-        get :send_enrollment_confirmation
         get :show
       end
       member do

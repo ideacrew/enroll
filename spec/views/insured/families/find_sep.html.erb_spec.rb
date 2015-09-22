@@ -1,11 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/find_sep.html.erb" do
+  let(:current_user) {FactoryGirl.create(:user)}
+
 
   before do
     qle1 = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'individual')
     qle2 = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'individual', title: 'I had a baby')
-
+    sign_in current_user
     assign :qualifying_life_events, [qle1, qle2]
     render
   end
