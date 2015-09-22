@@ -3,8 +3,10 @@
   <div class="panel-body">
     <div class="row">
       <% if plan.is_standard_plan  %>
-        <i class="fa fa-certificate"> Standard Plan</i>
+        <div class="col-md-12"> <i class="fa fa-bookmark"> Standard Plan </i></div>
       <% end %>
+    </div>
+    <div class="row">
       <div class="col-md-2 col-sm-2"><%= display_carrier_logo(plan_carrier.legal_name, {width: 80}) %></div>
       <div class="col-md-7">
         <h3 class="no-buffer">
