@@ -7,8 +7,8 @@ class CensusEmployeeImport
 
   TEMPLATE_DATE = Date.new(2015, 9, 6)
   TEMPLATE_VERSION = "1.0"
-  TEMPLATE_DATE_CELL = "1,'J'"
-  TEMPLATE_VERSION_CELL = "1,'K'"
+  TEMPLATE_DATE_CELL = 7
+  TEMPLATE_VERSION_CELL = 13
 
   MEMBER_RELATIONSHIP_KINDS = %w(employee spouse domestic_partner child)
 
@@ -18,7 +18,7 @@ class CensusEmployeeImport
       last_name 
       first_name 
       middle_name 
-      name_suffix 
+      name_sfx
       email 
       ssn 
       dob 
@@ -195,17 +195,18 @@ class CensusEmployeeImport
   end
 
   def header_valid?(sheet_header_row)
-    #TODO fix the below statement
-    #parse_date(sheet_header_row(TEMPLATE_DATE_CELL)) == TEMPLATE_DATE &&
-    #sheet_header_row(TEMPLATE_VERSION_CELL) == TEMPLATE_VERSION
-    true
+    if sheet_header_row[TEMPLATE_DATE_CELL].is_a? Date
+      template_date = sheet_header_row[TEMPLATE_DATE_CELL]
+    else
+      template_date = Date.strptime(sheet_header_row[TEMPLATE_DATE_CELL], "%m/%d/%Y" )
+    end
+    template_date == TEMPLATE_DATE &&
+    sheet_header_row[TEMPLATE_VERSION_CELL] == TEMPLATE_VERSION
   end
 
   def column_header_valid?(column_header_row)
-    #TODO fix the below statement
-    #clean_header = column_header_row.reduce([]) { |memo, header_text| memo << sanitize_value(header_text) }
-    #clean_header == CENSUS_MEMBER_RECORD
-    true
+    clean_header = column_header_row.reduce([]) { |memo, header_text| memo << sanitize_value(header_text) }
+    clean_header == CENSUS_MEMBER_RECORD
   end
 
   def parse_relationship(cell)

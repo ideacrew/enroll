@@ -163,11 +163,18 @@ class Employers::EmployerProfilesController < ApplicationController
   def bulk_employee_upload
     file = params.require(:file)
     @census_employee_import = CensusEmployeeImport.new({file:file, employer_profile:@employer_profile})
+    begin
     if @census_employee_import.save
       redirect_to "/employers/employer_profiles/#{@employer_profile.id}?employer_profile_id=#{@employer_profile.id}", :notice=>"#{@census_employee_import.length} records uploaded from CSV"
     else
       render "employers/employer_profiles/employee_csv_upload_errors"
     end
+    rescue Exception => e
+      @census_employee_import.errors.add(:base, e.message)
+      render "employers/employer_profiles/employee_csv_upload_errors"
+    end
+
+
   end
 
   private
