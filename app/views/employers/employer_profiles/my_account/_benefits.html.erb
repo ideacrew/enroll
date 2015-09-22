@@ -161,22 +161,23 @@
       </div>
     </div>
   </div>
-  <div class="row top-pd">
-    <div class="col-xs-12">
-      <div class="plan-year-wrapper">
-        <div class="row no-buffer">
-          <div class="pull-right bottom-mgn-xs">
-            <% if plan_year.draft? && @current_plan_year.nil? %>
-            <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year, tab: 'benefits'), method: :post, class: "btn btn-select" %>
-            <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year, tab: 'benefits'), class: "btn btn-select"%>
-            <% else %>
-            <%= plan_year.aasm_state.to_s.humanize %>
-            <% end %>
-          </div>
-        </div>
-
-      </div></div></div><br><br>
+<br><br>
       <% end %>
+      <div class="row top-pd">
+        <div class="col-xs-12">
+          <div class="plan-year-wrapper">
+            <div class="row no-buffer">
+              <div class="pull-right bottom-mgn-xs">
+                <% if plan_year.draft? && @current_plan_year.nil? %>
+                <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year, tab: 'benefits'), method: :post, class: "btn btn-select" %>
+                <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year, tab: 'benefits'), class: "btn btn-select"%>
+                <% else %>
+                <%= plan_year.aasm_state.to_s.humanize %>
+                <% end %>
+              </div>
+            </div>
+
+          </div></div></div>
       <% end %>
       <% else %>
       <h4 style="max-width: 600px;">

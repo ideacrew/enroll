@@ -8,6 +8,9 @@ $('#benefit-group-<%= @benefit_group.to_s %> .reference-plan .col-xs-3').on('cli
   if ($(this).find('input[type=radio]').is(':checked')) {
   } else {
       $(this).find('input[type=radio]').prop('checked', true )
+      var id = $(this).find('input[type=radio]').attr('value');
+      alert(id);
+      $(this).closest('#benefit-group-<%= @benefit_group.to_s %>').find('.hidden-param').attr('value', id);
   }
 
 });

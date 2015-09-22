@@ -3,8 +3,8 @@
   <div class="col-xs-12 reference-plan">
     <div class="col-xs-3">
 
-      <%= radio_button "plan_year[benefit_groups_attributes][#{benefit_group}]", :reference_plan_id, p.id %>
-      <%= label_tag :reference_plan_id, "" do %>
+      <%= radio_button "", :reference_plan_id, p.id %>
+      <%= label_tag :reference_plan_id do %>
       <i class="fa fa-circle-o"></i>
       <i class="fa fa-dot-circle-o"></i>
       <% end %>

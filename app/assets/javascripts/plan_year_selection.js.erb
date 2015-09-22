@@ -59,6 +59,7 @@ $(document).on('ready', function() {
 // set reference_plan_id
 $(document).on('click', '.reference-plan input + label', function() {
   var reference_plan_id = $(this).closest('.reference-plan').find('input').attr('value');
+  
   if (reference_plan_id != "" && reference_plan_id != undefined){
     var start_date = $("#plan_year_start_on").val();
     if (start_date == "") {
