@@ -1,4 +1,3 @@
-
 <div class="row row-form-wrapper no-buffer">
 <fieldset style="<%= 'display: none;' if f.object.relationship == 'child_26_and_over' %>">
   <div class="col-xs-6 form-group form-group-lg">
@@ -19,15 +18,10 @@
       </label>
     </div>
   </div>
-  <!--
-  <div class="col-xs-4 form-group form-group-lg <% cycle('fte', 'pte', 'msp') %>">
-    <% number_field_tag :count, nil, class: "contribution_handler" %>
 
-  </div>
-  -->
       <div class="col-xs-6 form-group form-group-lg">
-        <%= f.number_field :premium_pct, class: "contribution_handler", value: f.object.premium_pct.try(:to_i) %><!--<i class="fa fa-question-circle fa-lg"></i>-->
-
-      </div>
+        <%= f.number_field :premium_pct, class: "contribution_handler slider", value: f.object.premium_pct.try(:to_i), :data => { :slider_min => '0', :slider_max => '100', :slider_value => '0' } %>
+&nbsp;&nbsp;&nbsp;<span class="slide-label">0</span>%</span><!--<i class="fa fa-question-circle fa-lg"></i>-->
+</div>
 </fieldset>
 </div>

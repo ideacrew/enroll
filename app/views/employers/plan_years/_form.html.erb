@@ -32,7 +32,7 @@
 
           <%= render "shared/plan_year_fields", f: f %>
 </div>
-          <div style="display: block;" class="benefits-setup-tab">
+          <div style="display: none;" class="benefits-setup-tab">
           <h1>Coverage - Setup Benefits Packages for your Employees</h1>
           <div class='form-inputs'>
             <a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
@@ -42,11 +42,11 @@
               <%= render "shared/benefit_group_fields", f: bg %><br>
             <% end %>
 
-            <div class="selected-plan"></div>
+            <div class="selected-plan" style="display: none;"></div>
 
 
             <br><br>
-            <div class="row no-buffer">
+            <div class="row no-buffer controls" style="display: none;">
             <% button_name = @plan_year.persisted? ? 'Save Plan Year' : 'Create Plan Year' %>
             <br><br>
               <button class="btn btn-primary pull-right" type="submit">

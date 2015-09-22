@@ -377,6 +377,12 @@
           border-left: solid 1px #d5d5d5;
           border-right: solid 1px #d5d5d5;
           border-bottom: solid 1px #d5d5d5;
+          .slider {
+            .slider-selection {
+               background: #9C9C9C;
+            }
+          }
+
           .row-form-wrapper {
             border-bottom: solid 1px #d5d5d5;
             &:last-of-type {
@@ -631,14 +637,7 @@
     input[type=radio] {
       display: inline-block;
     }
-    input[type=number] {
-       text-align: center;
-       font-weight: bold;
-       font-size: 16px;
-       width: 50px;
-       display: block;
-       margin: auto;
-     }
+
    input[type=checkbox] {
       display: none;
       + label > i.fa {
@@ -1048,7 +1047,15 @@
 
 }
 .selected-plan {
+  .col-xs-12 {
+    i {
+      display: block;
+      margin: auto;
+      text-align: center;
+    }
+  }
   table {
     table-layout: fixed;
   }
+
 }

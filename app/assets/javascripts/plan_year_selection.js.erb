@@ -2,11 +2,13 @@
 $(document).on('ready', function() {
   // nav tabs radios on change for plan selection
 
+
+
     $(document).on('change', '.offerings .fte:first input, .offerings .pte:first input, .offerings .msp:first input', function() {
       var change = $(this).val();
       $('#plan_year_fte_count').val(change);
     });
-    
+
 
     $('.nav-tabs li input[type=radio]').prop('checked', false);
     $(document).on('click', '.nav-tabs li label', function() {
@@ -71,6 +73,8 @@ $(document).on('click', '.reference-plan input + label', function() {
     if (start_date == "") {
       return
     }
+    $('.selected-plan').html("<div class=\'col-xs-12\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
+    $('.selected-plan').show();
     $.ajax({
       type: "GET",
       url: $('a#search_reference_plan_link').data('href'),

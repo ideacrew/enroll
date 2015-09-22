@@ -30,7 +30,9 @@
 //= require browser_issues
 //= require consumer_role
 //= require plan_year_selection
+//= require bootstrap-slider
 //= require_tree .
+
 
 function applyFloatLabels() {
   $('input.floatlabel').floatlabel({
@@ -64,8 +66,21 @@ function getCarrierPlans(ep, ci) {
   })
 };
 
+
+
 $(document).ready(function () {
-  
+  $('.benefits-fields .slider').bootstrapSlider({
+      formatter: function(value) {
+        return 'Contribution Percentage: ' + value + '%';
+      }
+    });
+    $(".benefits-fields .slider").on("slide", function(slideEvt) {
+      $(this).closest('.form-group').find('.slide-label').text(slideEvt.value);
+  });
+
+
+
+
   $('.details').on('click', function() {
     $(this).closest('.referenceplan').find('.plan-details').toggle();
   });
