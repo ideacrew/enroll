@@ -14,7 +14,7 @@
 
     <div class="panel-body">
       <div class="row">
-        <% url, http_method = '/insured/employee_dependents', :get %>
+        <% url, http_method = '/insured/family_members', :get %>
         <% if action_name == 'find_sep'%>
           <% url, http_method = record_sep_insured_families_path, :post %>
         <% end %>

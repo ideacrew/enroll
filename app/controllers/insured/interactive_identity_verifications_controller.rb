@@ -76,7 +76,7 @@ module Insured
       consumer_user.identity_final_decision_transaction_id = service_response.transaction_id
       consumer_user.identity_verified_date = Date.today
       consumer_user.save!
-      redirect_to insured_employee_dependents_path(consumer_role_id: consumer_role.id)
+      redirect_to insured_family_members_path(consumer_role_id: consumer_role.id)
     end
 
     def render_session_start
