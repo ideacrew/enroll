@@ -86,6 +86,20 @@ Then (/Individual resumes enrollment/) do
   expect(@browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-1/).value).to eq("4900 USAA BLVD")
 end
 
+Then (/Individual fixes a VLP error message/) do
+  @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-true/).wait_while_present
+  @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-true/).fire_event("onclick")
+  @browser.p(text: /Select document type/i).wait_until_present
+  @browser.p(text: /Select document type/i).click
+  @browser.li(text: /Certificate of Citizenship/i).wait_until_present
+  @browser.li(text: /Certificate of Citizenship/i).click
+  click_when_present(@browser.button(class: /interaction-click-control-continue/))
+  wait_and_confirm_text(/2 errors/)
+  wait_and_confirm_text(/Certificate of citizenship: base alien_number value is required/)
+  @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).wait_while_present
+  @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).fire_event("onclick")
+end
+
 Then("Individual should see identity verification page and clicks on submit") do
   @browser.radio(class: /interaction-choice-control-value-agreement-agree/).wait_until_present
   @browser.radio(class: /interaction-choice-control-value-agreement-agree/).click
