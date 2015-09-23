@@ -151,7 +151,7 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2016
 puts "::: benefit packages seed complete :::"
 
 puts "*"*80
-puts "Mapping Plans to SBC pdfs in S3."
+puts "::: Mapping Plans to SBC pdfs in S3 :::"
 system "bundle exec rake sbc:map"
 puts "::: Mapping Plans to SBC pdfs seed complete :::"
 
