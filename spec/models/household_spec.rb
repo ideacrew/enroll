@@ -19,6 +19,7 @@ describe Household, "given a coverage household with a dependent" do
   context "new_hbx_enrollment_from" do 
     let(:consumer_role) {FactoryGirl.create(:consumer_role)}
     let(:benefit_package) {FactoryGirl.create(:benefit_package)}
+    let(:hbx) {double(benefit_sponsorship: double(earliest_effective_date: TimeKeeper.date_of_record))}
 
     it "call the calculate_start_date_by_qle method" do 
       expect(HbxEnrollment).to receive(:calculate_start_date_by_qle)
@@ -30,6 +31,7 @@ describe Household, "given a coverage household with a dependent" do
     end
 
     it "call the calculate_start_date_from" do
+      allow(HbxProfile).to receive(:current_hbx).and_return(hbx)
       expect(HbxEnrollment).not_to receive(:calculate_start_date_by_qle)
       subject.new_hbx_enrollment_from(
         consumer_role: consumer_role,
