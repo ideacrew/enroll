@@ -32,9 +32,11 @@ class SbcProcessor
       end
       uri = Aws::S3Storage.save(pdf_path(data.sbc_file_name), S3_BUCKET)
       plan.sbc_document = Document.new({title: data.sbc_file_name, subject: "SBC", format: 'application/pdf', identifier: uri})
+      plan.sbc_document.save!
       plan.save!
       counter += 1
-      puts "Plan #{plan.name} updated, SBC #{data.sbc_file_name}, Document uri #{plan.document.identifier}"
+      plan = Plan.where(active_year: '2016').and(name: plan_name.gsub(/\A\p{Space}*|\p{Space}*\z/, '')).first
+      puts "Plan #{plan.name} updated, SBC #{data.sbc_file_name}, Document uri #{plan.sbc_document.identifier}"
     end
     puts "Total #{counter} plans updated."
   end
