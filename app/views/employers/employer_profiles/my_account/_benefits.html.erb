@@ -8,7 +8,9 @@
   <% if @plan_years.present? %>
 
   <% @plan_years.each do |plan_year| %>
-
+  <div col-xs-12>
+    <h2>Plan Year <%= plan_year.aasm_state.capitalize %></h3>
+  </div>
   <% plan_year.benefit_groups.each do |bg| %>
   <div class="panel benefitgroup col-xs-12">
     <section class="col-xs-6">
