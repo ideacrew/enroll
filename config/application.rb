@@ -46,10 +46,6 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::LawfulPresence")
       config.acapi.add_async_subscription("Subscribers::LocalResidency")
       config.acapi.add_async_subscription("Subscribers::FamilyApplicationCompleted")
-      if ENV["ENROLL_SEEDING"].blank?
-        config.acapi.add_subscription("Events::IndividualsController")
-        config.acapi.add_subscription("Events::EmployersController")
-      end
     end
   end
 end
