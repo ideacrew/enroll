@@ -54,13 +54,15 @@
 
 -if step != 7
   %ul.list-unstyled.list-right-section
-    %li
-      %a.back{href: '#'}
-        = image_tag 'icons/list.png'
-        PREVIOUS
-    %li
-      %a{href: '#'}
-        = image_tag 'icons/list.png'
-        SAVE &amp; EXIT
-      %br
-      %br
+    - unless @no_previous_button
+      %li
+        %a.back{href: '#'}
+          = image_tag 'icons/list.png'
+          PREVIOUS
+    - unless @no_save_button
+      %li
+        %a{href: '#'}
+          = image_tag 'icons/list.png'
+          SAVE &amp; EXIT
+        %br
+        %br

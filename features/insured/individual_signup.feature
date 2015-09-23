@@ -9,6 +9,9 @@ Feature: Insured Plan Shopping on Individual market
       Then user should see button to continue as an individual
       Then Individual should click on Individual market for plan shopping
       Then Individual should see a form to enter personal information
+      When Individual clicks on Save and Exit
+      Then Individual resumes enrollment
+      Then Individual fixes a VLP error message
       When Individual clicks on continue button
       Then Individual should see identity verification page and clicks on submit
       Then Individual should see the dependents form
@@ -32,5 +35,6 @@ Feature: Insured Plan Shopping on Individual market
       And I click on purchase button on confirmation page
       When I click on continue on qle confirmation page
       And I should see the individual home page
+      And I click to see my Secure Purchase Confirmation
 
 

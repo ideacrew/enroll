@@ -35,7 +35,7 @@ def people
       ssn: "670991234",
       home_phone: "2025551234",
       email: 'soren@dc.gov',
-      password: '12345678',
+      password: 'aA1!aA1!aA1!',
       legal_name: "Acme Inc.",
       dba: "Acme Inc.",
       fein: "764141112"
@@ -46,7 +46,7 @@ def people
       dob: "01/01/1980",
       ssn: "786120965",
       email: 'patrick.doe@dc.gov',
-      password: '12345678'
+      password: 'aA1!aA1!aA1!'
     },
     "Broker Assisted" => {
       first_name: 'Broker',
@@ -54,15 +54,15 @@ def people
       dob: "05/02/1976",
       ssn: "761234567",
       email: 'broker.assisted@dc.gov',
-      password: '12345678'
+      password: 'aA1!aA1!aA1!'
     },
     "Hbx Admin" => {
       email: 'admin@dc.gov',
-      password: 'password'
+      password: 'aA1!aA1!aA1!'
     },
     "Primary Broker" => {
       email: 'ricky.martin@example.com',
-      password: '12345678'
+      password: 'aA1!aA1!aA1!'
     },
     "John Doe" => {
       first_name: "John",
@@ -73,7 +73,7 @@ def people
       fein: '123456999',
       ssn: '111000999',
       email: 'john.doe@example.com',
-      password: '12345678'
+      password: 'aA1!aA1!aA1!'
 
     },
     "Tim Wood" => {
@@ -84,7 +84,7 @@ def people
       dba: "Legal LLC",
       fein: "890000223",
       email: 'tim.wood@example.com',
-      password: '12345678'
+      password: 'aA1!aA1!aA1!'
     },
   }
 end
@@ -172,8 +172,10 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   @browser.a(class: portal_class).click
   @browser.element(class: /interaction-click-control-sign-in-existing-account/).wait_until_present
   @browser.element(class: /interaction-click-control-sign-in-existing-account/).click
+  sleep 2
   @browser.text_field(class: /interaction-field-control-user-email/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set(person[:email])
+  @browser.text_field(class: /interaction-field-control-user-password/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-password/).set(person[:password])
   @browser.element(class: /interaction-click-control-sign-in/).click
 end
@@ -467,11 +469,11 @@ When(/^.+ clicks? a qle event$/) do
   @browser.element(text: /You may be eligible for a special enrollment period./i).wait_until_present
   expect(@browser.element(text: /You may be eligible for a special enrollment period./i).visible?).to be_truthy
   scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
-  @browser.element(text: /Family Members/i).wait_until_present
-  expect(@browser.element(text: /Family Members/i).visible?).to be_truthy
+  @browser.element(text: /Household Info: Family Members/i).wait_until_present
+  expect(@browser.element(text: /Household Info: Family Members/i).visible?).to be_truthy
   scroll_then_click(@browser.a(id: /btn_household_continue/))
-  @browser.element(text: /Covered Family Members/i).wait_until_present
-  expect(@browser.element(text: /Covered Family Members/i).visible?).to be_truthy
+  @browser.element(text: /Choose Benefits: Covered Family Members/i).wait_until_present
+  expect(@browser.element(text: /Choose Benefits: Covered Family Members/i).visible?).to be_truthy
   scroll_then_click(@browser.element(class: /interaction-click-control-keep-existing-plan/))
 end
 
@@ -489,9 +491,10 @@ end
 When(/^Employer publishes a plan year$/) do
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-edit-plan-year/))
-  start_on = @browser.element(class: /selectric-interaction-choice-control-plan-year-start-on/)
+  start_on = @browser.p(text: /SELECT START ON/i)
   click_when_present(start_on)
-  click_when_present(start_on.lis()[1])
+  start_on = @browser.li(text: /SELECT START ON/i)
+  click_when_present(start_on.parent().lis()[1])
   click_when_present(@browser.element(class: /interaction-click-control-save-plan-year/))
   @browser.element(class: /alert-notice/, text: /Plan Year successfully saved./).wait_until_present
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
@@ -530,8 +533,8 @@ When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
 end
 
 When(/^I click on "(.*?)" button on household info page$/) do |select_action|
-  @browser.element(text: /Covered Family Members/i).wait_until_present
-  expect(@browser.element(text: /Covered Family Members/i).visible?).to be_truthy
+  @browser.element(text: /Choose Benefits: Covered Family Members/i).wait_until_present
+  expect(@browser.element(text: /Choose Benefits: Covered Family Members/i).visible?).to be_truthy
   scroll_then_click(@browser.button(class: /interaction-click-control-shop-for-new-plan/))
 end
 
@@ -569,12 +572,12 @@ Then(/^I should see confirmation and continue$/) do
 end
 
 Then(/^I should see the dependents and group selection page$/) do
-  #@browser.element(text: /Family Members/i).wait_until_present
-  expect(@browser.element(text: /Family Members/i).visible?).to be_truthy
+  #@browser.element(text: /Household Info: Family Members/i).wait_until_present
+  expect(@browser.element(text: /Household Info: Family Members/i).visible?).to be_truthy
   @browser.element(class: /interaction-click-control-continue/).wait_until_present
   @browser.execute_script("$('.interaction-click-control-continue')[1].click();")
-  @browser.element(text: /Covered Family Members/i).wait_until_present
-  expect(@browser.element(text: /Covered Family Members/i).visible?).to be_truthy
+  @browser.element(text: /Choose Benefits: Covered Family Members/i).wait_until_present
+  expect(@browser.element(text: /Choose Benefits: Covered Family Members/i).visible?).to be_truthy
   scroll_then_click(@browser.button(class: /interaction-click-control-shop-for-new-plan/))
   @browser.element(text: /Choose a healthcare plan/i).wait_until_present
   expect(@browser.element(text: /Choose a healthcare plan/i).visible?).to be_truthy

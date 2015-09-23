@@ -61,11 +61,13 @@ class Invitation
   def claim_employer_staff_role(user_obj, redirection_obj)
     employer_staff_role = EmployerStaffRole.find(source_id)
     person = employer_staff_role.person
-    user_obj.roles << "employer_staff" unless user_obj.roles.include?("employer_staff")
-    user_obj.save!
-    person.user = current_user
-    person.save!
-    redirect_to_employer_profile(employer_staff_role.employer_profile)
+    redirection_obj.create_sso_account(user_obj, person, 15, "individual") do
+      user_obj.roles << "employer_staff" unless user_obj.roles.include?("employer_staff")
+      user_obj.save!
+      person.user = current_user
+      person.save!
+      redirect_to_employer_profile(employer_staff_role.employer_profile)
+    end
   end
 
   def claim_employee_role(user_obj, redirection_obj)
@@ -74,27 +76,31 @@ class Invitation
   end
 
   def claim_broker_role(user_obj, redirection_obj)
-    b_role = BrokerRole.find(source_id)
-    person = b_role.person
-    person.user = user_obj
-    person.save!
-    broker_agency_profile = b_role.broker_agency_profile
-    person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)
-    person.save!
-    user_obj.roles << "broker_agency_staff" unless user_obj.roles.include?("broker_agency_staff")
-    user_obj.save!
-    redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
+    broker_role = BrokerRole.find(source_id)
+    person = broker_role.person
+    redirection_obj.create_sso_account(user_obj, person, 15, "broker") do
+      person.user = user_obj
+      person.save!
+      broker_agency_profile = broker_role.broker_agency_profile
+      person.save!
+      user_obj.roles << "broker" unless user_obj.roles.include?("broker")
+      user_obj.roles << "broker_agency_staff" if broker_role.is_primary_broker? && !user_obj.roles.include?("broker_agency_staff")
+      user_obj.save!
+      redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
+    end
   end
 
   def claim_broker_agency_staff_role(user_obj, redirection_obj)
     staff_role = BrokerAgencyStaffRole.find(source_id)
     person = staff_role.person
-    person.user = user_obj
-    person.save!
-    broker_agency_profile = staff_role.broker_agency_profile
-    user_obj.roles << "broker_agency_staff" unless user_obj.roles.include?("broker_agency_staff")
-    user_obj.save!
-    redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
+    redirection_obj.create_sso_account(user_obj, person, 15, "broker") do
+      person.user = user_obj
+      person.save!
+      broker_agency_profile = staff_role.broker_agency_profile
+      user_obj.roles << "broker_agency_staff" unless user_obj.roles.include?("broker_agency_staff")
+      user_obj.save!
+      redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
+    end
   end
 
   def allowed_invite_types

@@ -1,6 +1,7 @@
 class QhpBuilder
   LOG_PATH = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
   LOGGER = Logger.new(LOG_PATH)
+  INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003"] # These plan ids are suppressed and we dont save these while importing.
 
   def initialize(qhp_hash)
     @qhp_hash = qhp_hash
@@ -52,6 +53,7 @@ class QhpBuilder
   end
 
   def iterate_plans
+    # @qhp_hash[:packages_list][:packages].each do |plans|
     @qhp_array.each do |plans|
       @plans = plans
       @xml_plan_counter += plans[:plans_list][:plans].size
@@ -66,9 +68,7 @@ class QhpBuilder
   def build_qhp_params
     build_qhp
     build_benefits
-    build_cost_share_variance
-    build_moops
-    build_service_visits
+    build_cost_share_variances_list
     validate_and_persist_qhp
   end
 
@@ -95,7 +95,7 @@ class QhpBuilder
 
   def associate_plan_with_qhp
     @plan_year = @qhp.plan_effective_date.to_date.year
-    if @plan_year > 2015
+    if @plan_year > 2015 && !INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
       create_plan_from_serff_data
     end
     candidate_plans = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
@@ -107,8 +107,8 @@ class QhpBuilder
       up_plan.update_attributes(
           name: @qhp.plan_marketing_name,
           plan_type: @qhp.plan_type.downcase,
-          deductible: @qhp.qhp_cost_share_variance.qhp_deductable.in_network_tier_1_individual,
-          family_deductible: @qhp.qhp_cost_share_variance.qhp_deductable.in_network_tier_1_family,
+          deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_individual,
+          family_deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_family,
           nationwide: nationwide_value,
           out_of_service_area_coverage: @qhp.out_of_service_area_coverage
       )
@@ -123,19 +123,28 @@ class QhpBuilder
   end
 
   def create_plan_from_serff_data
-    plan = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
-    return if plan.present?
-    new_plan = Plan.new(
-      name: @qhp.plan_marketing_name,
-      hios_id: @qhp.standard_component_id,
-      active_year: @plan_year,
-      metal_level: parse_metal_level,
-      market: parse_market,
-      carrier_profile_id: get_carrier_id(@carrier_name),
-      coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental"
-      )
-    if new_plan.valid?
-      new_plan.save!
+    @qhp.qhp_cost_share_variances.each do |cost_share_variance|
+      plan = Plan.where(active_year: @plan_year,
+        hios_id: /#{@qhp.standard_component_id.strip}/,
+        hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/,
+        csr_variant_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').last}/).to_a
+      next if plan.present?
+      new_plan = Plan.new(
+        name: @qhp.plan_marketing_name,
+        hios_id: cost_share_variance.hios_plan_and_variant_id,
+        hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
+        csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
+        active_year: @plan_year,
+        metal_level: parse_metal_level,
+        market: parse_market,
+        ehb: @qhp.ehb_percent_premium,
+        # carrier_profile_id: "53e67210eb899a4603000004",
+        carrier_profile_id: get_carrier_id(@carrier_name),
+        coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental"
+        )
+      if new_plan.valid?
+        new_plan.save!
+      end
     end
   end
 
@@ -145,7 +154,7 @@ class QhpBuilder
   end
 
   def parse_market
-    @qhp.market_coverage.downcase.include?("shop") ? "shop" : "individual"
+    @qhp.market_coverage = @qhp.market_coverage.downcase.include?("shop") ? "shop" : "individual"
   end
 
   def get_carrier_id(name)
@@ -160,42 +169,62 @@ class QhpBuilder
     benefits_params.each { |benefit| @qhp.qhp_benefits.build(benefit) }
   end
 
-  def build_cost_share_variance
-    @qhp.build_qhp_cost_share_variance.attributes = cost_share_variance_params
-    @qhp.qhp_cost_share_variance.build_qhp_deductable.attributes = deductible_params
+  def build_cost_share_variances_list
+    cost_share_variance_list_params.each do |csvp|
+      @csvp = csvp
+      build_cost_share_variance
+    end
   end
 
-  def build_moops
-    maximum_out_of_pockets_params.each { |moop| @qhp.qhp_cost_share_variance.qhp_maximum_out_of_pockets.build(moop) }
+  def build_cost_share_variance
+    build_sbc_params
+    build_moops
+    build_service_visits
+    build_deductible
+  end
+
+  def build_deductible
+    @csv.build_qhp_deductable(deductible_params)
   end
 
   def build_service_visits
-    service_visits_params.each { |visits| @qhp.qhp_cost_share_variance.qhp_service_visits.build(visits) }
+    service_visits_params.each do |svp|
+      @csv.qhp_service_visits.build(svp)
+    end
   end
 
-  def cost_share_variance_params
+  def build_moops
+    maximum_out_of_pockets_params.each do |moop|
+      @csv.qhp_maximum_out_of_pockets.build(moop)
+    end
+  end
 
-    if sbc_params
-      cost_share_variance_list_params[:cost_share_variance_attributes].merge(sbc_params)
+  def build_sbc_params
+    @csv = if sbc_params
+      @qhp.qhp_cost_share_variances.build(cost_share_variance_attributes.merge(sbc_params))
     else
-      cost_share_variance_list_params[:cost_share_variance_attributes]
+      @qhp.qhp_cost_share_variances.build(cost_share_variance_attributes)
     end
   end
 
   def service_visits_params
-    cost_share_variance_list_params[:service_visits_attributes]
+    @csvp[:service_visits_attributes]
   end
 
   def deductible_params
-    cost_share_variance_list_params[:deductible_attributes]
+    @csvp[:deductible_attributes]
   end
 
   def maximum_out_of_pockets_params
-    cost_share_variance_list_params[:maximum_out_of_pockets_attributes]
+    @csvp[:maximum_out_of_pockets_attributes]
   end
 
   def sbc_params
-    cost_share_variance_list_params[:sbc_attributes]
+    @csvp[:sbc_attributes]
+  end
+
+  def cost_share_variance_attributes
+    @csvp[:cost_share_variance_attributes]
   end
 
   def cost_share_variance_list_params

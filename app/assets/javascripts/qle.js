@@ -11,13 +11,21 @@ $(function () {
 
     init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days);
     $('#qle-details').removeClass('hidden');
-    $('.qle-form').removeClass('hidden');
+    var is_self_attested = $(this).data('is-self-attested');
+    if (!is_self_attested) {
+      $('.qle-form').addClass('hidden');
+      $('.csr-form').removeClass('hidden');
+    } else {
+      $('.qle-form').removeClass('hidden');
+      $('.csr-form').addClass('hidden');
+    };
     $('form#qle_form.success-info').addClass('hidden');
     $('form#qle_form.error-info').addClass('hidden');
   });
 
 	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
 		$('#qle-details').addClass('hidden');
+    $('.csr-form').addClass('hidden');
 		$('#qle-details .success-info, #qle-details .error-info').addClass('hidden');
     $('#qle-details .qle-form').removeClass('hidden');
     $("#qle_date").val("");
@@ -83,4 +91,26 @@ $(function () {
 		$('#qle_flow_info .initial-info').hide();
 		$('#qle_flow_info .qle-info').removeClass('hidden');
 	})
+});
+
+$(document).on('page:update', function(){
+  if ($('select#effective_on_kind').length > 0){
+    $('form#qle_form').submit(function(e){
+      if ($('select#effective_on_kind').val() == "" || $('select#effective_on_kind').val() == undefined) {
+        $('#qle_effective_on_kind_alert').show();
+        e.preventDefault&&e.preventDefault();
+      } else {
+        $('#qle_effective_on_kind_alert').hide();
+      };
+    });
+  };
+});
+
+$(document).on("change", "input[type=checkbox]#no_qle_checkbox", function(){
+  if(this.checked) {
+    $('#outside-open-enrollment').modal('show');
+    $('#outside-open-enrollment').on('hidden.bs.modal', function (e) {
+      $("#no_qle_checkbox").attr("checked",false)
+    });
+  }
 });

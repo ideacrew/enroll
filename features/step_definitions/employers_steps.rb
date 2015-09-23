@@ -299,6 +299,8 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   screenshot("employer_add_plan_year")
   @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").set("91/96/2017")
   @browser.h3(text: /Plan Year/).click
+  @browser.alert.wait_until_present
+  @browser.alert.ok
   expect(@browser.text.include?("Open Enrollment Start Date: Invalid date format!")).to be_truthy
   # happy path
   start_on_field = @browser.div(class: /selectric-wrapper/, text: /SELECT START ON/i)

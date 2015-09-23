@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Insured::GroupSelectionController, :type => :controller do
   let(:person) {FactoryGirl.create(:person)}
+  let(:user) { instance_double("User", :person => person) }
+  #let(:consumer_role) {FactoryGirl.create(:consumer_role, :person => person)}
   let(:employee_role) {FactoryGirl.create(:employee_role)}
   let(:household) {double(:immediate_family_coverage_household=> coverage_household, :hbx_enrollments => hbx_enrollments)}
   let(:coverage_household) {double}
@@ -27,23 +29,25 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(Person).to receive(:find).and_return(person)
     allow(person).to receive(:primary_family).and_return(family)
     allow(family).to receive(:active_household).and_return(household)
+    allow(person).to receive(:consumer_role).and_return(nil)
+    allow(person).to receive(:consumer_role?).and_return(false)
   end
 
   context "GET new" do
     it "return http success" do
-      sign_in
+      sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id
       expect(response).to have_http_status(:success)
     end
 
     it "return blank change_plan" do
-      sign_in
+      sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id
       expect(assigns(:change_plan)).to eq ""
     end
 
     it "return change_plan" do
-      sign_in
+      sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: "change"
       expect(assigns(:change_plan)).to eq "change"
     end

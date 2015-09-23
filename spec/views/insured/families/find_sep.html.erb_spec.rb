@@ -1,12 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/find_sep.html.erb" do
+  let(:current_user) {FactoryGirl.create(:user)}
+
 
   before do
     qle1 = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'individual')
     qle2 = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'individual', title: 'I had a baby')
-
+    sign_in current_user
     assign :qualifying_life_events, [qle1, qle2]
+    assign :next_ivl_open_enrollment_date, TimeKeeper.date_of_record
     render
   end
 
@@ -34,5 +37,12 @@ RSpec.describe "insured/families/find_sep.html.erb" do
     expect(rendered).to have_selector('h5.qle-label')
     expect(rendered).to have_selector('h5.qle-date-hint')
     expect(rendered).to have_selector("input[name='qle_date']", count: 1)
+  end
+
+  it "should have outside open enrollment modal" do
+    expect(rendered).to have_selector('div.modal#outside-open-enrollment')
+    expect(rendered).to match /Since you’ve not had a recent Qualifying Life Event, you must wait until the next open enrollment period to purchase coverage, which begins/
+    expect(rendered).to match /In the meantime, you are may browse benefits and plans, but will not be able enroll/
+    expect(rendered).to have_selector("a[href='/families/home']", text: 'Back To My Account')
   end
 end

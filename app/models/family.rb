@@ -134,7 +134,7 @@ class Family
   def current_ivl_eligible_open_enrollments
     eligible_open_enrollments = []
 
-    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").try(:benefit_sponsorship)
+    benefit_sponsorship = HbxProfile.current_hbx.try(:benefit_sponsorship)
     (benefit_sponsorship.try(:benefit_coverage_periods) || []).each do |benefit_coverage_period|
       if benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
         eligible_open_enrollments << EnrollmentEligibilityReason.new(benefit_sponsorship)
@@ -220,9 +220,6 @@ class Family
 
   def add_family_member(person, **opts)
 #    raise ArgumentError.new("expected Person") unless person.is_a? Person
-
-
-
 
     is_primary_applicant     = opts[:is_primary_applicant]  || false
     is_coverage_applicant    = opts[:is_coverage_applicant] || true

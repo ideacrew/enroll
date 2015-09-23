@@ -9,6 +9,28 @@ class User
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
+
+  validate :password_complexity
+
+  def password_complexity
+    if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W]).+$/)
+      errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter"
+    end
+  end
+
+  def self.generate_valid_password
+    password = Devise.friendly_token.first(16)
+    password = password + "aA1!"
+  end
+
+  def switch_to_idp!
+    # new_password = self.class.generate_valid_password
+    # self.password = new_password
+    # self.password_confirmation = new_password
+    self.idp_verified = true
+    self.save!
+  end
+
   # for i18L
   field :preferred_language, type: String, default: "en"
 
@@ -46,6 +68,7 @@ class User
   field :oim_id, type: String, default: ""
 
   field :last_portal_visited, type: String
+  field :idp_verified, type: Boolean, default: false
 
   index({preferred_language: 1})
   index({approved: 1})
@@ -116,6 +139,10 @@ class User
   def person_id
     return nil unless person.present?
     person.id
+  end
+
+  def idp_verified?
+    idp_verified
   end
 
   def send_welcome_email
@@ -212,6 +239,38 @@ class User
   def identity_verified?
     return false if identity_final_decision_code.blank?
     identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+  end
+
+  def self.get_saml_settings
+    settings = OneLogin::RubySaml::Settings.new
+
+    # When disabled, saml validation errors will raise an exception.
+    settings.soft = true
+
+    # SP section
+    settings.assertion_consumer_service_url = SamlInformation.assertion_consumer_service_url
+    settings.assertion_consumer_logout_service_url = SamlInformation.assertion_consumer_logout_service_url
+    settings.issuer                         = SamlInformation.issuer
+
+    # IdP section
+    settings.idp_entity_id                  = SamlInformation.idp_entity_id
+    settings.idp_sso_target_url             = SamlInformation.idp_sso_target_url
+    settings.idp_slo_target_url             = SamlInformation.idp_slo_target_url
+    settings.idp_cert                       = SamlInformation.idp_cert
+    # or settings.idp_cert_fingerprint           = "3B:05:BE:0A:EC:84:CC:D4:75:97:B3:A2:22:AC:56:21:44:EF:59:E6"
+    #    settings.idp_cert_fingerprint_algorithm = XMLSecurity::Document::SHA1
+
+    settings.name_identifier_format         = SamlInformation.name_identifier_format
+
+    # Security section
+    settings.security[:authn_requests_signed] = false
+    settings.security[:logout_requests_signed] = false
+    settings.security[:logout_responses_signed] = false
+    settings.security[:metadata_signed] = false
+    settings.security[:digest_method] = XMLSecurity::Document::SHA1
+    settings.security[:signature_method] = XMLSecurity::Document::RSA_SHA1
+
+    settings
   end
 
   private

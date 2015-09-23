@@ -32,12 +32,24 @@ class ApplicationController < ActionController::Base
 
   def authenticate_me!
     # Skip auth if you are trying to log in
-    return true if ["welcome", "broker_roles", "office_locations", "invitations"].include?(controller_name.downcase)
+    return true if ["welcome","saml", "broker_roles", "office_locations", "invitations"].include?(controller_name.downcase)
     authenticate_user!
   end
 
   def access_denied
     render file: 'public/403.html', status: 403
+  end
+
+  def create_sso_account(user, personish, timeout, account_role = "individual")
+    if !user.idp_verified?
+      IdpAccountManager.create_account(user.email, stashed_user_password, personish, account_role, timeout)
+      session[:person_id] = personish.id
+      session.delete("stashed_password")
+      user.switch_to_idp!
+    end
+    #TODO TREY KEVIN JIM CSR HAS NO SSO_ACCOUNT
+    session[:person_id] = personish.id if current_user.try(:person).try(:agent?)
+    yield
   end
 
   private
@@ -98,7 +110,7 @@ class ApplicationController < ActionController::Base
 
   # Broker Signup form should be accessibile for anonymous users
   def authentication_not_required?
-    devise_controller? || (controller_name == "broker_roles") || (controller_name == "office_locations") || (controller_name == "invitations")
+    devise_controller? || (controller_name == "broker_roles") || (controller_name == "office_locations") || (controller_name == "invitations") || (controller_name == "saml")
   end
 
   def require_login
@@ -110,6 +122,10 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource)
     session[:portal] || request.referer || root_path
+  end
+
+  def after_sign_out_path_for(resource_or_scope)
+    logout_saml_index_path
   end
 
   def authenticate_user_from_token!
@@ -147,7 +163,7 @@ class ApplicationController < ActionController::Base
 
   def set_current_person
     if current_user.try(:person).try(:agent?)
-      @person = Person.find(session[:person_id])
+      @person = session[:person_id].present? ? Person.find(session[:person_id]) : nil
     else
       @person = current_user.person
     end
@@ -161,4 +177,30 @@ class ApplicationController < ActionController::Base
     end
     real_user
   end
+
+  def set_employee_bookmark_url(url=nil)
+    set_current_person
+    role = @person.try(:employee_roles).try(:last)
+    bookmark_url = url || request.original_url
+    if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
+      role.bookmark_url = bookmark_url
+      role.try(:save!)
+    end
+  end
+
+  def set_consumer_bookmark_url(url=nil)
+    set_current_person
+    role = @person.try(:consumer_role)
+    bookmark_url = url || request.original_url
+    #no bookmark after visiting family_account_path
+    if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
+      role.bookmark_url = bookmark_url
+      role.try(:save!)
+    end
+  end
+
+  def stashed_user_password
+    session["stashed_password"]
+  end
+
 end
