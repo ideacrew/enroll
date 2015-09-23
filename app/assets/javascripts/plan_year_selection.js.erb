@@ -70,12 +70,12 @@ $(document).on('ready', function() {
         $(this).closest('.benefit-group-fields').find(".reference-plans").show();
         $(this).find('input[type=radio]').prop('checked', true );
         if ($(this).parents('.carriers-tab').length > 0 ) {
-          $('.metals-tab input[type=radio]').prop('checked', 0 );
+          $(this).closest('.benefit-group-fields').find('.metals-tab input[type=radio]').prop('checked', 0 );
         }
         else if ($(this).parents('.metals-tab').length > 0 ) {
-          $('.carriers-tab input[type=radio]').prop('checked', 0 );
+          $(this).closest('.benefit-group-fields').find('.carriers-tab input[type=radio]').prop('checked', 0 );
         } else {
-          $('.metals-tab input[type=radio], .carriers-tab input[type=radio]').prop('checked', 0 );
+          $(this).closest('.benefit-group-fields').find('.metals-tab input[type=radio], .carriers-tab input[type=radio]').prop('checked', 0 );
         }
 
       }
