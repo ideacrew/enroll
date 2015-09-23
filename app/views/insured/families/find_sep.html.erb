@@ -51,7 +51,7 @@
         <h4 class="modal-title">Outside Open Enrollment</h4>
       </div>
       <div class="modal-body">
-        <p>The next open enrollment period begins on <%= @next_ivl_open_enrollment_date.try(:strftime, "%B %e, %Y") %>. You must qualify for one of the special enrollment periods listed above to enroll before <%= @next_ivl_open_enrollment_date.try(:strftime, "%B %e") %>.</p>
+        <p>Since you’ve not had a recent Qualifying Life Event, you must wait until the next open enrollment period to purchase coverage, which begins <%= @next_ivl_open_enrollment_date.try(:strftime, "%B %e, %Y") %>. In the meantime, you are may browse benefits and plans, but will not be able enroll.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
