@@ -161,7 +161,7 @@ class Household
   end
 
   def latest_coverage_household
-    return coverage_households.first if coverage_households.size = 1
+    return coverage_households.first if coverage_households.size == 1
     coverage_households.sort_by(&:submitted_at).last.submitted_at
   end
 

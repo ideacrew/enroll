@@ -16,6 +16,29 @@ describe Household, "given a coverage household with a dependent" do
     expect(subject.enrolled_hbx_enrollments).to eq []
   end
 
+  context "new_hbx_enrollment_from" do 
+    let(:consumer_role) {FactoryGirl.create(:consumer_role)}
+    let(:benefit_package) {FactoryGirl.create(:benefit_package)}
+
+    it "call the calculate_start_date_by_qle method" do 
+      expect(HbxEnrollment).to receive(:calculate_start_date_by_qle)
+      subject.new_hbx_enrollment_from(
+        consumer_role: consumer_role,
+        benefit_package: benefit_package, 
+        qle: true
+      )
+    end
+
+    it "call the calculate_start_date_from" do
+      expect(HbxEnrollment).not_to receive(:calculate_start_date_by_qle)
+      subject.new_hbx_enrollment_from(
+        consumer_role: consumer_role,
+        benefit_package: benefit_package, 
+        qle: false
+      )
+    end
+  end
+
   # context "with an enrolled hbx enrollment" do
   #   let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
   #   let(:hbx_enrollments) { [mock_hbx_enrollment] }
