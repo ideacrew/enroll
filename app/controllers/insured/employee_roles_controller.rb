@@ -5,6 +5,8 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   def search
+    @no_previous_button = true
+    @no_save_button = true
     @person = Forms::EmployeeCandidate.new
     respond_to do |format|
       format.html
@@ -12,6 +14,7 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   def match
+    @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id})
     @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
     @person = @employee_candidate
@@ -42,9 +45,11 @@ class Insured::EmployeeRolesController < ApplicationController
     if @employee_role.present? && @employee_role.try(:census_employee).try(:employee_role_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
       session[:person_id] = @person.id
-      build_nested_models
-      respond_to do |format|
-        format.html { redirect_to :action => "edit", :id => @employee_role.id }
+      create_sso_account(current_user, @employee_role.person, 15,"individual") do
+        build_nested_models
+        respond_to do |format|
+          format.html { redirect_to :action => "edit", :id => @employee_role.id }
+        end
       end
     else
       respond_to do |format|
@@ -54,16 +59,19 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   def edit
+    set_employee_bookmark_url(family_account_path)
     @employee_role = EmployeeRole.find(params.require(:id))
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     if @person.present?
       @person.addresses << @employee_role.new_census_employee.address if @employee_role.new_census_employee.address.present?
+      @person.emails.first.address = @employee_role.new_census_employee.email.address if @employee_role.new_census_employee.email.present?
       @family = @person.primary_family
       build_nested_models
     end
   end
 
   def update
+    set_employee_bookmark_url(family_account_path)
     save_and_exit =  params['exit_after_method'] == 'true'
     person = Person.find(params.require(:id))
     object_params = params.require(:person).permit(*person_parameters_list)
@@ -75,8 +83,9 @@ class Insured::EmployeeRolesController < ApplicationController
           format.html {redirect_to destroy_user_session_path}
         end
       else
+        set_employee_bookmark_url
         respond_to do |format|
-          format.html { redirect_to insured_employee_dependents_path(employee_role_id: @employee_role.id) }
+          format.html { redirect_to insured_family_members_path(employee_role_id: @employee_role.id) }
         end
       end
     else
@@ -145,9 +154,14 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   private
-    def check_employee_role
-      if current_user.has_employee_role?
-        redirect_to family_account_path
-      end
+
+  def check_employee_role
+    set_current_person
+    if @person.try(:employee_roles).try(:last)
+      redirect_to @person.employee_roles.last.bookmark_url || family_account_path
+    else
+      current_user.last_portal_visited = search_insured_consumer_role_index_path
+      current_user.save!
     end
+  end
 end

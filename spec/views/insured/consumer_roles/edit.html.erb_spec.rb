@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "insured/consumer_roles/edit.html.erb" do
   let(:person) { FactoryGirl.create(:person) }
   let(:consumer_role) { double("ConsumerRole", id: "test")}
-
+  let(:current_user) {FactoryGirl.create(:user)}
   before :each do
     assign(:person, person)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
@@ -11,7 +11,7 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     allow(consumer_role ).to receive(:persisted?)
     allow(consumer_role ).to receive(:vlp_document_id)
     allow_any_instance_of(ApplicationHelper).to receive(:find_document).with(anything, anything)
-
+    sign_in current_user
     render template: "insured/consumer_roles/edit.html.erb"
   end
 

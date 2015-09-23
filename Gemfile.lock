@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/dchbx/acapi.git
-  revision: e83fedf15b0838b3406e0f508d792e7ea7899cdd
+  revision: c8ccbd14031fa5edb75b844dad19a516502df185
   branch: development
   specs:
     acapi (0.0.1)
@@ -10,6 +10,7 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    Ascii85 (1.0.2)
     aasm (4.0.8)
     action_mailer_cache_delivery (0.3.7)
       actionmailer (>= 3.0)
@@ -49,16 +50,21 @@ GEM
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     addressable (2.3.8)
+    afm (0.2.2)
     amq-protocol (1.9.2)
     animate-rails (1.0.8)
       rails
     arel (6.0.3)
-    aws-sdk (2.1.18)
-      aws-sdk-resources (= 2.1.18)
-    aws-sdk-core (2.1.18)
+    aws-sdk (2.1.23)
+      aws-sdk-resources (= 2.1.23)
+    aws-sdk-core (2.1.23)
       jmespath (~> 1.0)
-    aws-sdk-resources (2.1.18)
-      aws-sdk-core (= 2.1.18)
+    aws-sdk-resources (2.1.23)
+      aws-sdk-core (= 2.1.23)
+    axiom-types (0.1.1)
+      descendants_tracker (~> 0.0.4)
+      ice_nine (~> 0.11.0)
+      thread_safe (~> 0.3, >= 0.3.1)
     bcrypt (3.1.10)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
@@ -98,11 +104,11 @@ GEM
       carrierwave (>= 0.8.0, < 0.11.0)
       mongoid (>= 3.0, < 5.0)
       mongoid-grid_fs (>= 1.3, < 3.0)
-    celluloid (0.15.2)
-      timers (~> 1.1.0)
-    celluloid-io (0.15.0)
-      celluloid (>= 0.15.0)
-      nio4r (>= 0.5.0)
+    celluloid (0.16.0)
+      timers (~> 4.0.0)
+    celluloid-io (0.16.2)
+      celluloid (>= 0.16.0)
+      nio4r (>= 1.1.0)
     childprocess (0.5.6)
       ffi (~> 1.0, >= 1.0.11)
     coderay (1.1.0)
@@ -147,12 +153,13 @@ GEM
     email_spec (1.6.0)
       launchy (~> 2.1)
       mail (~> 2.2)
+    equalizer (0.0.11)
     erubis (2.7.0)
     execjs (2.6.0)
-    eye (0.6.4)
-      celluloid (~> 0.15.0)
-      celluloid-io (~> 0.15.0)
-      sigar (~> 0.7.2)
+    eye (0.7)
+      celluloid (~> 0.16.0)
+      celluloid-io (~> 0.16.0)
+      sigar (~> 0.7.3)
       state_machine
       thor
     factory_girl (4.5.0)
@@ -170,13 +177,15 @@ GEM
       activesupport (>= 4.1.0)
     haml (4.0.7)
       tilt
+    hashery (2.1.1)
     hike (1.2.3)
+    hitimes (1.2.3)
     i18n (0.7.0)
+    ice_nine (0.11.1)
     jbuilder (2.3.1)
       activesupport (>= 3.0.0, < 5)
       multi_json (~> 1.2)
-    jmespath (1.0.2)
-      multi_json (~> 1.0)
+    jmespath (1.1.3)
     jquery-rails (4.0.5)
       rails-dom-testing (~> 1.0)
       railties (>= 4.2.0)
@@ -190,7 +199,7 @@ GEM
     kaminari (0.16.3)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
-    kgio (2.9.3)
+    kgio (2.10.0)
     language_list (1.1.0)
     launchy (2.4.3)
       addressable (~> 2.3)
@@ -204,11 +213,13 @@ GEM
     libv8 (3.16.14.11)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
+    macaddr (1.7.1)
+      systemu (~> 2.6.2)
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
     maskedinput-rails (1.4.0.0)
     method_source (0.8.2)
-    mime-types (2.6.1)
+    mime-types (2.6.2)
     mini_portile (0.6.2)
     minitest (5.8.0)
     monetize (1.1.0)
@@ -229,9 +240,9 @@ GEM
       tzinfo (>= 0.3.37)
     mongoid-enum (0.2.0)
       mongoid (~> 4.0)
-    mongoid-grid_fs (2.1.0)
+    mongoid-grid_fs (2.2.1)
       mime-types (>= 1.0, < 3.0)
-      mongoid (>= 3.0, < 5.0)
+      mongoid (>= 3.0, < 6.0)
     mongoid-rspec (2.2.0)
       mongoid (~> 4.0.0)
       rake
@@ -250,7 +261,7 @@ GEM
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (2.9.2)
-    newrelic_rpm (3.13.0.299)
+    newrelic_rpm (3.13.1.300)
     nio4r (1.1.1)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
@@ -259,6 +270,15 @@ GEM
     optionable (0.2.0)
     origin (2.1.1)
     orm_adapter (0.5.0)
+    pdf-reader (1.3.3)
+      Ascii85 (~> 1.0.0)
+      afm (~> 0.2.0)
+      hashery (~> 2.0)
+      ruby-rc4
+      ttfunk
+    prawn (0.11.1)
+      pdf-reader (>= 0.9.0)
+      ttfunk (~> 1.0.0)
     pry (0.10.1)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -296,7 +316,7 @@ GEM
       rails-deprecated_sanitizer (>= 1.0.1)
     rails-html-sanitizer (1.0.2)
       loofah (~> 2.0)
-    rails-i18n (4.0.4)
+    rails-i18n (4.0.5)
       i18n (~> 0.6)
       railties (~> 4.0)
     railties (4.2.3)
@@ -309,7 +329,7 @@ GEM
     rdoc (4.2.0)
       json (~> 1.4)
     redis (3.2.1)
-    redis-actionpack (4.0.0)
+    redis-actionpack (4.0.1)
       actionpack (~> 4)
       redis-rack (~> 1.5.0)
       redis-store (~> 1.1.0)
@@ -328,6 +348,9 @@ GEM
     ref (2.0.0)
     responders (2.1.0)
       railties (>= 4.2.0, < 5)
+    roo (2.1.1)
+      nokogiri (~> 1)
+      rubyzip (~> 1.1, < 2.0.0)
     rspec (3.1.0)
       rspec-core (~> 3.1.0)
       rspec-expectations (~> 3.1.0)
@@ -349,6 +372,10 @@ GEM
       rspec-support (~> 3.1.0)
     rspec-support (3.1.2)
     ruby-progressbar (1.6.0)
+    ruby-rc4 (0.1.5)
+    ruby-saml (1.0.0)
+      nokogiri (>= 1.5.10)
+      uuid (~> 2.3)
     rubyzip (1.1.7)
     sdoc (0.4.1)
       json (~> 1.7, >= 1.7.7)
@@ -362,13 +389,13 @@ GEM
       activesupport (>= 3.0.0)
     sigar (0.7.3)
     slop (3.6.0)
-    spring (1.3.6)
+    spring (1.4.0)
     sprockets (2.12.4)
       hike (~> 1.2)
       multi_json (~> 1.0)
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
-    sprockets-rails (2.3.2)
+    sprockets-rails (2.3.3)
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
@@ -379,13 +406,16 @@ GEM
     state_machine (1.2.0)
     symmetric-encryption (3.6.0)
       coercible (>= 1.0.0)
+    systemu (2.6.5)
     therubyracer (0.12.2)
       libv8 (~> 3.16.14.0)
       ref
     thor (0.19.1)
     thread_safe (0.3.5)
     tilt (1.4.1)
-    timers (1.1.0)
+    timers (4.0.4)
+      hitimes
+    ttfunk (1.0.3)
     turbolinks (2.5.3)
       coffee-rails
     tzinfo (1.2.2)
@@ -397,6 +427,13 @@ GEM
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
+    uuid (2.3.8)
+      macaddr (~> 1.0)
+    virtus (1.0.5)
+      axiom-types (~> 0.1)
+      coercible (~> 1.0)
+      descendants_tracker (~> 0.0, >= 0.0.3)
+      equalizer (~> 0.0, >= 0.0.9)
     warden (1.2.3)
       rack (>= 1.0)
     watir (5.0.0)
@@ -410,6 +447,9 @@ GEM
       railties (>= 4.0)
       sprockets-rails (>= 2.0, < 4.0)
     websocket (1.2.2)
+    wicked_pdf (0.11.0)
+      rails
+    wkhtmltopdf-binary-edge (0.12.2.1)
     xpath (2.0.0)
       nokogiri (~> 1.3)
 
@@ -458,6 +498,7 @@ DEPENDENCIES
   newrelic_rpm
   nokogiri-happymapper
   origin (~> 2.1.1)
+  prawn (~> 0.11.1)
   pry
   pry-byebug
   pry-rails
@@ -466,8 +507,10 @@ DEPENDENCIES
   rails (= 4.2.3)
   rails-i18n (~> 4.0.0)
   redis-rails
+  roo (~> 2.1.0)
   rspec-rails (~> 3.1.0)
   ruby-progressbar (= 1.6.0)
+  ruby-saml (~> 1.0.0)
   sdoc (~> 0.4.0)
   shoulda-matchers
   spring
@@ -477,5 +520,11 @@ DEPENDENCIES
   turbolinks
   uglifier (>= 1.3.0)
   unicorn (~> 4.8.3)
+  virtus
   watir
   web-console (~> 2.0)
+  wicked_pdf
+  wkhtmltopdf-binary-edge (~> 0.12.2.1)
+
+BUNDLED WITH
+   1.10.6

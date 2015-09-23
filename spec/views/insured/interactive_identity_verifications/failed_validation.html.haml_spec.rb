@@ -1,8 +1,11 @@
 require "rails_helper"
 
 describe "insured/interactive_identity_verifications/failed_validation" do
-  let(:mock_response) { instance_double("IdentityVerification::InteractiveVerificationResponse", :transaction_id => "the_transaction_id") }
-
+  let(:mock_response) { instance_double("IdentityVerification::InteractiveVerificationResponse", :transaction_id => "the_transaction_id") } 
+  let(:current_user) {FactoryGirl.create(:user)}
+  before :each do
+    sign_in current_user
+  end
   it "should show a message about the user failing validation and providing contact info" do
     assign :verification_response, mock_response
     render :template => "insured/interactive_identity_verifications/failed_validation.html.haml"

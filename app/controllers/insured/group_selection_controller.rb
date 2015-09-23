@@ -1,6 +1,7 @@
 class Insured::GroupSelectionController < ApplicationController
 
   def new
+    set_consumer_bookmark_url
     initialize_common_vars 
     if @person.try(:has_active_employee_role?) and !@person.try(:has_active_consumer_role?)
       @market_kind = 'shop'
@@ -10,7 +11,7 @@ class Insured::GroupSelectionController < ApplicationController
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
     end
     if @market_kind == 'individual'
-      hbx = HbxProfile.find_by_state_abbreviation("dc")
+      hbx = HbxProfile.current_hbx
       bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
       pkgs = bc_period.benefit_packages
       benefit_package = pkgs.select{|plan|  plan[:title] == "individual_health_benefits_2015"}
@@ -25,7 +26,7 @@ class Insured::GroupSelectionController < ApplicationController
 
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
-    raise "You must select at least one applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
+    raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
     end
@@ -97,7 +98,7 @@ class Insured::GroupSelectionController < ApplicationController
         consumer_role: @person.consumer_role,
         coverage_household: @coverage_household,
         benefit_package: @benefit_package,
-        qle: @change_plan == 'change_by_qle')
+        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
     end
   end
 

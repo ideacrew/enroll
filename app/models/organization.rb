@@ -38,8 +38,14 @@ class Organization
 
   default_scope -> {order("legal_name ASC")}
 
-  scope :has_broker_agency_profile, ->{ exists(broker_agency_profile: true) }
+  scope :employer_by_hbx_id, ->(employer_id) {
+    where(hbx_id: employer_id, "employer_profile" => { "$exists" => true })
+  }
 
+  scope :has_broker_agency_profile, ->{ exists(broker_agency_profile: true) }
+  scope :by_broker_agency_profile, ->(broker_agency_profile_id) { where({'employer_profile.broker_agency_accounts.broker_agency_profile_id' => broker_agency_profile_id}).where({'employer_profile.broker_agency_accounts.is_active' => true}) }
+  scope :by_broker_role, -> (broker_role_id) { where({'employer_profile.broker_role_id' => broker_role_id})} 
+  
   embeds_many :office_locations, cascade_callbacks: true, validate: true
 
   embeds_one :employer_profile, cascade_callbacks: true, validate: true

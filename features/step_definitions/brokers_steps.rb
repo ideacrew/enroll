@@ -4,7 +4,7 @@ When(/^.+ visits the HBX Broker Registration form$/) do
   @browser.element(class: /interaction-click-control-broker-registration/).click
 end
 
- When(/^Primary Broker clicks on New Broker Agency Tab$/) do 
+ When(/^Primary Broker clicks on New Broker Agency Tab$/) do
   @browser.radio(class: /interaction-choice-control-value-new-broker-agency/).wait_until_present
   @browser.radio(class: /interaction-choice-control-value-new-broker-agency/).fire_event("onclick")
 end
@@ -27,7 +27,7 @@ And(/^.+ enters broker agency information$/) do
   @browser.text_field(class: /interaction-field-control-organization-legal-name/).set("Logistics Inc")
   @browser.text_field(class: /interaction-field-control-organization-dba/).set("Logistics Inc")
   @browser.text_field(class: /interaction-field-control-organization-fein/).set("890890891")
-  
+
   entity_kind = @browser.div(class: /interaction-choice-control-organization-entity-kind/)
   entity_kind.click
   entity_kind.li(text: /S Corporation/).click
@@ -43,7 +43,7 @@ And(/^.+ enters broker agency information$/) do
   language_multi_select.click
   @browser.checkbox(:value => 'bn').set
   @browser.checkbox(:value => 'fr').set
-  
+
   @browser.checkbox(:name => "organization[working_hours]").set
   @browser.checkbox(:name => "organization[accept_new_clients]").set
 end
@@ -100,6 +100,10 @@ Then(/^.+ should see the login page$/) do
   @browser.element(class: /interaction-click-control-sign-in/).wait_until_present
 end
 
+Then(/^.+ should see the create account page$/) do
+  @browser.element(class: /interaction-click-control-create-account/).wait_until_present
+end
+
 When(/^.+ clicks? on Create Account$/) do
   @browser.a(text: /Create account/).wait_until_present
   @browser.a(text: /Create account/).click
@@ -108,8 +112,8 @@ end
 When(/^.+ registers? with valid information$/) do
   @browser.text_field(name: "user[password_confirmation]").wait_until_present
   @browser.text_field(name: "user[email]").set("ricky.martin@example.com")
-  @browser.text_field(name: "user[password]").set("12345678")
-  @browser.text_field(name: "user[password_confirmation]").set("12345678")
+  @browser.text_field(name: "user[password]").set("aA1!aA1!aA1!")
+  @browser.text_field(name: "user[password_confirmation]").set("aA1!aA1!aA1!")
   @browser.input(value: /Create account/).click
 end
 
@@ -210,9 +214,10 @@ end
 Then(/^Primary Broker creates and publishes a plan year$/) do
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-add-plan-year/))
-  start_on = @browser.element(class: /selectric-interaction-choice-control-plan-year-start-on/)
+  start_on = @browser.p(text: /SELECT START ON/i)
   click_when_present(start_on)
-  click_when_present(start_on.lis()[1])
+  start_on = @browser.li(text: /SELECT START ON/i)
+  click_when_present(start_on.parent().lis()[1])
   id="plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_premium_pct"
   @browser.text_field(id: id).set(50)
 
@@ -226,7 +231,7 @@ Then(/^Primary Broker creates and publishes a plan year$/) do
   select_carrier = benefit_form.element(text: 'SELECT CARRIER').parent.parent.parent
   scroll_then_click(select_carrier)
   click_when_present(select_carrier.lis()[1])
-  
+
   sleep 3
   benefit_form.element(text: 'SELECT REFERENCE PLAN').parent.parent.parent.wait_until_present
   select_reference = benefit_form.element(text: 'SELECT REFERENCE PLAN').parent.parent.parent
@@ -261,16 +266,15 @@ Then(/^.+ goes to the Consumer page$/) do
 end
 
 # Then(/^.+ is on the consumer home page$/) do
-#   binding.pry
 #   @browser.a(class: 'interaction-click-control-shop-for-plans').wait_until_present
 # end
 
 Then(/^.+ shops for plans$/) do
-  @browser.a(class: 'interaction-click-control-shop-for-plans').click 
+  @browser.a(class: 'interaction-click-control-shop-for-plans').click
 end
 
 Then(/^.+ sees covered family members$/) do
-  wait_and_confirm_text(/Covered Family Members/)
+  wait_and_confirm_text(/Choose Benefits: Covered Family Members/)
   @browser.element(id: 'btn-continue').click
 end
 

@@ -3,6 +3,7 @@ class InvitationsController < ApplicationController
   
   def claim
     @invitation = Invitation.find(params[:id])
+
     if @invitation.may_claim?
       @invitation.claim_invitation!(current_user, self)
     else
@@ -26,7 +27,7 @@ class InvitationsController < ApplicationController
   def require_login_and_allow_new_account
     if current_user.nil?
       session[:portal] = url_for(params)
-      redirect_to new_user_session_url(:invitation_id => params[:id])
+      redirect_to new_user_registration_url(:invitation_id => params[:id])
     end
   end
 end

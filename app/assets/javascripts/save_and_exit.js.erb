@@ -1,9 +1,14 @@
 $(document).ready(function () {
    $(document).on('click', '.interaction-click-control-save---exit', function(){
-   	    if ($('#btn_user_contact_info').length) {
+
+   	    if ($('.employee_roles #new_person_wrapper').length) {
    	       $('#exit_after_method').val('true')
-   	       $('#btn_user_contact_info').click()
-        } else {
+   	       $('#btn-continue').click()
+        } else if ($('.consumer_roles .edit_person').length) {
+          $('#exit_after_method').val('true')
+   	      $('.interaction-click-control-continue').click()
+        }
+        else {
    	    	$('.interaction-click-control-logout').click()
    	    }
    })
