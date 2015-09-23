@@ -513,11 +513,8 @@ DEPENDENCIES
   roo (~> 2.1.0)
   rspec-rails (~> 3.1.0)
   ruby-progressbar (= 1.6.0)
-<<<<<<< HEAD
-  sass
-=======
   ruby-saml (~> 1.0.0)
->>>>>>> development
+  sass
   sdoc (~> 0.4.0)
   shoulda-matchers
   spring
@@ -530,11 +527,8 @@ DEPENDENCIES
   virtus
   watir
   web-console (~> 2.0)
-<<<<<<< HEAD
-=======
   wicked_pdf
   wkhtmltopdf-binary-edge (~> 0.12.2.1)
->>>>>>> development
 
 BUNDLED WITH
    1.10.6
