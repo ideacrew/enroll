@@ -2,8 +2,10 @@ class BrokerRole
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
+  include Acapi::Notifiers
 
   PROVIDER_KINDS = %W[broker assister]
+  BROKER_UPDATED_EVENT_NAME = "acapi.info.events.broker.updated"
 
   embedded_in :person
 
@@ -184,12 +186,12 @@ class BrokerRole
     state :broker_agency_declined
     state :broker_agency_terminated
 
-    event :approve, :after => [:record_transition, :send_invitation] do
+    event :approve, :after => [:record_transition, :send_invitation, :notify_updated] do
       transitions from: :applicant, to: :active, :guard => :is_primary_broker?
       transitions from: :applicant, to: :broker_agency_pending
     end
 
-    event :broker_agency_accept, :after => [:record_transition, :send_invitation] do 
+    event :broker_agency_accept, :after => [:record_transition, :send_invitation, :notify_updated] do 
       transitions from: :broker_agency_pending, to: :active
     end
 
@@ -218,6 +220,10 @@ class BrokerRole
     event :transfer, :after => :record_transition  do
       transitions from: [:active, :broker_agency_pending, :broker_agency_terminated], to: :applicant
     end  
+  end
+
+  def notify_updated
+    notify(BROKER_UPDATED_EVENT_NAME, { :broker_id => self.npn } )
   end
 
 

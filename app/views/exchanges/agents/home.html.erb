@@ -1,41 +1,35 @@
 <div class='content'>
   <div class='container top-pd'>
-  <br/>
-	<h3> Welcome to DC HealthLink </h3>
-
 	<h4> <%=@cac ? 'Certified Application Counselor (CAC)' : 'Customer Service Representative (CSR)'%> </h4>
-     <ul>
-     	<li> <%=link_to 'New Employee Phone Application', begin_employee_enrollment_exchanges_agents_path(
-     	original_application_type: 'phone')  %> <br/></li>
 
-     	<li> <%=link_to 'New Employee Paper Application', begin_employee_enrollment_exchanges_agents_path(
-     	original_application_type: 'paper')  %> <br/>&nbsp;</li>
-      
+     <ul class='col-xs-12 col-md-5 col-lg-5'> 
       <li> <%=link_to 'New Consumer Phone Application', begin_consumer_enrollment_exchanges_agents_path(
       original_application_type: 'phone')  %> <br/></li>
 
       <li> <%=link_to 'New Consumer Paper Application', begin_consumer_enrollment_exchanges_agents_path(
       original_application_type: 'paper')  %> </li>
      </ul>
+
+     <ul class='col-xs-12 col-md-5 col-lg-5'>
+     	<li> <%=link_to 'New Employee Phone Application', begin_employee_enrollment_exchanges_agents_path(
+     	original_application_type: 'phone')  %> <br/></li>
+
+     	<li> <%=link_to 'New Employee Paper Application', begin_employee_enrollment_exchanges_agents_path(
+     	original_application_type: 'paper')  %> <br/>&nbsp;</li>
+     </ul>
+
      <br/>
+    <div class='col-md-12 col-lg-12'> 
     <% if @person %>
          <div>
          	<br/>
-            You have entered data for <%=@person.first_name%> <%=@person.last_name %>. <br/><br/>
-            <% if @person.emails.first %>     
-                 <%= link_to "Send Confirmation Email to #{@person.emails.first.address}",
-                  send_enrollment_confirmation_exchanges_agents_path(person_id: @person.id), data: {remote: true},
-                   class: 'btn btn-transparent' %>
-                  <br/><br/>     
-            <% else %>
-                They did not provide an email for followup.
-            <% end %>     
+            <h4>Your secure mailbox contains a link to the account for <%=@person.first_name%> <%=@person.last_name %>. </h4>
             <br/>
          </div>
     <% end %>
     <div id='sent_email_status'></div>  
     <br/> 
-
+    <div>
 <div id='inbox'>
     <div class="row col-md-10">
 

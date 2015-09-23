@@ -187,7 +187,7 @@ describe Forms::FamilyMember do
           _addresses = double(new: {})
           allow(person).to receive(:addresses).and_return _addresses
 
-          expect(_addresses).to receive(:new).and_return true
+          expect(_addresses).to receive(:create).and_return true
           employee_dependent.assign_person_address(person) 
         end
       end 
