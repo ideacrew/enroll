@@ -25,6 +25,16 @@ describe Forms::BrokerCandidate do
     @broker_agency_profile = FactoryGirl.create(:broker_agency).broker_agency_profile
   end
 
+  context 'when email address invalid' do 
+
+    it 'should have error on email' do 
+      broker = Forms::BrokerCandidate.new(attributes.merge({email: ""}))
+      broker.valid?
+      expect(broker).to have_errors_on(:email)
+      expect(broker.errors[:email]).to eq(["can't be blank", "is not valid"])
+    end
+  end
+
   context 'when data missing' do 
 
     let(:attributes) { { broker_applicant_type: 'staff' } }

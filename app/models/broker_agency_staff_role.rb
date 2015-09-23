@@ -23,7 +23,7 @@ class BrokerAgencyStaffRole
     state :broker_agency_declined
     state :broker_agency_terminated
 
-    event :broker_agency_accept, :after => :record_transition do 
+    event :broker_agency_accept, :after => [:record_transition, :send_invitation] do 
       transitions from: :broker_agency_pending, to: :active
     end
 
@@ -34,6 +34,10 @@ class BrokerAgencyStaffRole
     event :broker_agency_terminate, :after => :record_transition do 
       transitions from: :active, to: :broker_agency_terminated
     end
+  end
+
+  def send_invitation
+    Invitation.invite_broker_agency_staff!(self)
   end
 
   def current_state

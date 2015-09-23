@@ -157,42 +157,65 @@ $(function () {
 
 var demographicsNew = {
   ui: {
-    personTribeMember: "#person_indian_tribe_member",
-    dependentTribeMember: "#dependent_indian_tribe_member",
-    tribalContainer: "#tribal_container"
+    indianTribeMemberTrue: "#indian_tribe_member_yes",
+    indianTribeMemberFalse: "#indian_tribe_member_no",
+    tribalContainer: "#tribal_container",
+    dependentUsCitizenFalse: "#dependent_us_citizen_false",
+    personUsCitizenFalse: "#person_us_citizen_false",
+    eligibleImmigrationStatusContainer: "#immigration_status_container"
   },
   queries:{
   },
   init: function(){
-    this.setUpDependentTribalId();
-    this.setUpPersonTribalId();
+    this.setUpTribalId();
+    this.setUpPersonEligibleImmigrationStatus();
+    this.setUpDependentEligibleImmigrationStatus();
   },
-  setUpPersonTribalId: function(){
-    $(demographicsNew.ui.personTribeMember).change(function () {
-        demographicsNew.show_or_hide_person_tribal_id();
+  setUpPersonEligibleImmigrationStatus: function(){
+    $(demographicsNew.ui.personUsCitizenFalse).change(function () {
+        demographicsNew.show_or_hide_person_eligible_immigration_status();
     });
-    demographicsNew.show_or_hide_person_tribal_id();
+    demographicsNew.show_or_hide_person_eligible_immigration_status();
   },
-  setUpDependentTribalId: function(){
-    $(demographicsNew.ui.dependentTribeMember).change(function () {
-        demographicsNew.show_or_hide_dependent_tribal_id();
+  setUpDependentEligibleImmigrationStatus: function(){
+    $(demographicsNew.ui.dependentUsCitizenFalse).change(function () {
+        demographicsNew.show_or_hide_dependent_eligible_immigration_status();
     });
-    demographicsNew.show_or_hide_dependent_tribal_id();
+    demographicsNew.show_or_hide_dependent_eligible_immigration_status();
   },
-  show_or_hide_dependent_tribal_id: function(){
-    if ($(demographicsNew.ui.dependentTribeMember).is(':checked')) {
-      $(demographicsNew.ui.tribalContainer).show();
+  setUpTribalId: function(){
+    $(demographicsNew.ui.indianTribeMemberTrue).change(function () {
+      demographicsNew.show_or_hide_tribal_id();
+    });
+    $(demographicsNew.ui.indianTribeMemberFalse).change(function () {
+      demographicsNew.show_or_hide_tribal_id();
+    });
+    demographicsNew.show_or_hide_tribal_id();
+  },
+  show_or_hide_tribal_id: function() {
+    $(demographicsNew.ui.indianTribeMemberFalse).is(':checked') ?
+      $(demographicsNew.ui.tribalContainer).hide() :
+      $(demographicsNew.ui.tribalContainer).show()
+
+    $(demographicsNew.ui.indianTribeMemberTrue).is(':checked') ?
+      $(demographicsNew.ui.tribalContainer).show() :
+      $(demographicsNew.ui.tribalContainer).hide()
+  },
+  show_or_hide_dependent_eligible_immigration_status: function(){
+    if ($(demographicsNew.ui.dependentUsCitizenFalse).is(':checked')) {
+      $(demographicsNew.ui.eligibleImmigrationStatusContainer).show();
     }
-    if (!$(demographicsNew.ui.dependentTribeMember).is(':checked')) {
-      $(demographicsNew.ui.tribalContainer).hide();
+    if (!$(demographicsNew.ui.dependentUsCitizenFalse).is(':checked')) {
+      $(demographicsNew.ui.eligibleImmigrationStatusContainer).hide();
     }
   },
-  show_or_hide_person_tribal_id: function(){
-    if ($(demographicsNew.ui.personTribeMember).is(':checked')) {
-      $(demographicsNew.ui.tribalContainer).show();
+  show_or_hide_person_eligible_immigration_status: function(){
+    if ($(demographicsNew.ui.personUsCitizenFalse).is(':checked')) {
+        console.log("herehereher");
+      $(demographicsNew.ui.eligibleImmigrationStatusContainer).show();
     }
-    if (!$(demographicsNew.ui.personTribeMember).is(':checked')) {
-      $(demographicsNew.ui.tribalContainer).hide();
+    if (!$(demographicsNew.ui.personUsCitizenFalse).is(':checked')) {
+      $(demographicsNew.ui.eligibleImmigrationStatusContainer).hide();
     }
   },
 }

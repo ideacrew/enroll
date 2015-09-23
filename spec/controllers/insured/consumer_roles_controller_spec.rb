@@ -6,7 +6,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember") }
   let(:consumer_role){ double("ConsumerRole", id: double("id")) }
-
+  let(:bookmark_url) {'localhost:3000'}
   describe "Get search" do
     let(:user) { double("User" ) }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", ssn: "333224444", dob: "08/15/1975") }
@@ -15,6 +15,11 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       sign_in user
       allow(Forms::EmployeeCandidate).to receive(:new).and_return(mock_employee_candidate)
       allow(user).to receive(:has_consumer_role?).and_return(false)
+      allow(user).to receive(:last_portal_visited=)
+      allow(user).to receive(:save!).and_return(true)
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:consumer_role).and_return(consumer_role)
+      allow(consumer_role).to receive(:save!).and_return(true)
     end
 
     it "should render search template" do
@@ -23,15 +28,27 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       expect(response).to render_template(:search)
     end
 
+    it "should set the session flag for aqhp the param exists" do
+      get :search, aqhp: true
+      expect(session[:individual_assistance_path]).to be_truthy
+    end
+
+    it "should unset the session flag for aqhp if the param does not exist upon return" do
+      get :search, aqhp: true
+      expect(session[:individual_assistance_path]).to be_truthy
+      get :search, uqhp: true
+      expect(session[:individual_assistance_path]).to be_falsey
+    end
+
   end
 
   describe "GET match" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
-    let(:mock_consumer_candidate) { instance_double("Forms::ConsumerCandidate", :valid? => validation_result, ssn: "333224444", dob: "08/15/1975") }
+    let(:mock_consumer_candidate) { instance_double("Forms::ConsumerCandidate", :valid? => validation_result, ssn: "333224444", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname") }
     let(:user_id) { "SOMDFINKETHING_ID"}
     let(:found_person){ [] }
     let(:person){ instance_double("Person") }
-    let(:user) { double("User",id: user_id ) }
+    let(:user) { double("User",id: user_id, :idp_verified? => false) }
 
     before(:each) do
       sign_in(user)
@@ -97,6 +114,9 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(consumer_role).to receive(:person).and_return(person)
       allow(controller).to receive(:build_nested_models).and_return(true)
       allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:consumer_role).and_return(consumer_role)
+      allow(consumer_role).to receive(:save!).and_return(true)
+      allow(consumer_role).to receive(:bookmark_url=).and_return(true)
     end
     it "should render new template" do
       sign_in user

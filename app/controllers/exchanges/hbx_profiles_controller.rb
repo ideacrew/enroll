@@ -70,17 +70,16 @@ class Exchanges::HbxProfilesController < ApplicationController
       end
     end
     if role
-      status_text = 'Message sent to ' + role
-      insured = Person.find(params[:person]) 
+      status_text = 'Message sent to ' + role + ' ' + agent.full_name + ' <br>' 
       if agent.try(:user).try(:email)
-        agent_assistance_messages(insured,agent,role)
+        agent_assistance_messages(params,agent,role)
       else
         status_text = "Agent has no email.   Please select another"
       end
     else
-      status_text = call_customer_service
+      status_text = call_customer_service params[:firstname], params[:lastname]
     end
-    render :text => status_text, layout: false
+    render :text => status_text.html_safe, layout: false
   end
 
   def family_index
@@ -220,22 +219,43 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
 private
-  def agent_assistance_messages(insured, agent, role)
-    hbx_profile = Organization.where(:hbx_profile =>{:$exists => true}).first.hbx_profile
+  def agent_assistance_messages(params, agent, role)
+    if params[:person].present?
+      insured = Person.find(params[:person])
+      first_name = insured.first_name
+      last_name = insured.last_name
+      name = insured.full_name
+      insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
+      root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + params[:person] +'&original_application_type:'
+      text = "<br>Resume Application via "
+      body = 
+        "Please contact #{insured.first_name} #{insured.last_name}. <br/> " + 
+        "Plan Shopping help request from Person Id #{insured.id}, email #{insured_email}.<br/>" +
+        "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}.<br>" +
+        "<a href='" + root+"phone'>#{text}phone</a>  <br>" +
+        "<a href='" + root+"paper'>#{text}paper</a>  <br>"
+    else
+      first_name = params[:first_name]
+      last_name = params[:last_name]
+      name = first_name.to_s + ' ' + last_name.to_s 
+      insured_email = params[:email]
+      body =  "Please contact #{first_name} #{last_name}. <br/>" +
+        "Plan shopping help has been requested by #{insured_email}<br>"
+      body += "SSN #{params[:ssn]} <br>" if params[:ssn].present?
+      body += "DOB #{params[:dob]} <br>" if params[:dob].present?
+    end
+    hbx_profile = HbxProfile.find_by_state_abbreviation('DC')
     message_params = {
       sender_id: hbx_profile.id,
       parent_message_id: hbx_profile.id,
-      from: 'Plan Shopping Automatic Message',
-      to: "HBX ADMIN",
-      subject: "Plan Shopping Help Request for #{params[:type]}",
-      body: 
-        "Please contact #{insured.first_name} #{insured.last_name}. <br/> " + 
-        "Plan Shopping help request from Person Id #{insured.id}, email #{insured.try(:user).try(:email)}.<br/>" +
-        "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}"
+      from: 'Plan Shopping Web Portal',
+      to: "Agent Mailbox",
+      subject: "Please contact #{first_name} #{last_name}. ",
+      body: body,
       }
     create_secure_message message_params, hbx_profile, :sent
     create_secure_message message_params, agent, :inbox
-    result = UserMailer.new_client_notification(insured, agent, role)
+    result = UserMailer.new_client_notification(agent.user.email, first_name, name, role, insured_email, params[:person].present?)
     puts result.to_s if Rails.env.development?
    end  
 
@@ -263,7 +283,7 @@ private
     end
   end
 
-  def call_customer_service
-    "No match found.  Please call Customer Service at: (855)532-5465 for assistance."
+  def call_customer_service(first_name, last_name)
+    "No match found for #{first_name} #{last_name}.  Please call Customer Service at: (855)532-5465 for assistance.<br/>"
   end
 end

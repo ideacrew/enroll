@@ -13,7 +13,8 @@ RSpec.describe Employers::PremiumStatementsController do
   let(:plan){ double(
     "Plan",
     name: "my plan",
-    carrier_profile: carrier_profile
+    carrier_profile: carrier_profile,
+    coverage_kind: "my coverage kind"
     ) }
 
   let(:hbx_enrollments) { [
@@ -92,7 +93,6 @@ RSpec.describe Employers::PremiumStatementsController do
     #   request.user_agent = 'application/vnd.ms-excel'
     #   sign_in(user)
     #   xhr :get, :show, id: "test", format: :csv
-    #   binding.pry
     #   expect(response.headers['Content-Type']).to have_content 'application/vnd.ms-excel'
     # end
   end

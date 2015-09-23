@@ -33,7 +33,7 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def active_broker
-    @broker_agency_accounts = @employer_profile.broker_agency_accounts
+    @broker_agency_account = @employer_profile.active_broker_agency_account
   end
 
   def create
@@ -42,28 +42,25 @@ class Employers::BrokerAgencyController < ApplicationController
 
     if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
       @employer_profile.broker_role_id = broker_role_id
-      @employer_profile.broker_agency_profile = broker_agency_profile
+      @employer_profile.hire_broker_agency(broker_agency_profile)
       @employer_profile.save!
     end
 
     flash[:notice] = "Successfully associated broker with your account."
+    send_broker_successfully_associated_email broker_role_id
     redirect_to employers_employer_profile_path(@employer_profile)
   end
 
   def terminate
-    termination_date = ""
     if params["termination_date"].present?
       termination_date = DateTime.strptime(params["termination_date"], '%m/%d/%Y').try(:to_date)
-    end
-
-    if termination_date.present?
-      @employer_profile.terminate_active_broker_agency(termination_date)
+      @employer_profile.fire_broker_agency(termination_date)
       @fa = @employer_profile.save!
     end
 
     respond_to do |format|
       format.js {
-        if termination_date.present? and @fa
+        if params["termination_date"].present? && @fa
           flash[:notice] = "Broker terminated successfully."
           render text: true
         else
@@ -78,6 +75,23 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   private
+  def send_broker_successfully_associated_email broker_role_id
+    id =BSON::ObjectId.from_string(broker_role_id)
+    @broker_person = Person.where(:'broker_role._id' => id).first
+    body = "You have been selected as a broker by #{@employer_profile.try(:legal_name)}"
+
+    from_provider = HbxProfile.current_hbx
+    message_params = {
+      sender_id: @employer_profile.try(:id),
+      parent_message_id: @broker_person.id,
+      from: @employer_profile.try(:legal_name),
+      to: @broker_person.try(:full_name),
+      body: body,
+      subject: 'You have been select as the Broker'
+    }
+
+    create_secure_message(message_params, @broker_person, :inbox)
+  end
 
   def find_employer
     @employer_profile = EmployerProfile.find(params["employer_profile_id"])
