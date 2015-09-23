@@ -34,10 +34,11 @@
           <a class="close" data-dismiss="alert"><i class="fa fa-times"></i></a>
         </p>
       </div>
+      <% if @current_plan_year.present? %>
       <div class="panel panel-default myplanyear col-xs-12">
 
                   <div class="panel-heading">
-                    <h5>My Plan Year</h5>
+                    <h5><%= @current_plan_year %></h5>
                   </div>
                   <table>
                     <tr>
@@ -116,51 +117,9 @@
                     </tr>
                   </table>
                 </div>
-                <div class="panel benefitgroup col-xs-12">
-                  <section class="col-xs-6">
-                    <header class="row">
-                      <h5>Benefit Group 1</h5>
-                      <h3>All Employees</h3>
-                    </header>
-                  </section>
-                  <section class="col-xs-6">
-                    <header class="row">
-                      <a href="#">View Details <span class="icon-drop-down icon-drop-down-dims" role="img" aria-label="tooltip"></span></a>
-                    </header>
-                  </section>
-                  <table>
-                    <tr>
-                      <td>
-                        <header>Eligibility</header>
-                      </td>
-                      <td>
-                        <p>First day of the month following date of hire</p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <header>Plans</header>
-                      </td>
-                      <td>
-                        <p>
-                          All plans from CareFirst
-                        </p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <header>Reference Plans</header>
-                      </td>
-                      <td>
-                        <p>
-                          CareFirst BlueChoice HMO Referral HAS/HRA $4,000
-                        </p>
-                      </td>
-                    </tr>
-                  </table>
-                </article>
-
-
-    </div>
+                <% else %>
+                <h2>Plan Years</h2>
+                <h4>You have not yet published a plan year. Once you do, it will display here.</h4>
+                <% end %>
   </div>
 </div>
