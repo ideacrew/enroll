@@ -289,6 +289,8 @@ Rails.application.routes.draw do
   end
   resources :office_locations, only: [:new]
 
+  get "document/download/:bucket/:key" => "documents#download", as: :document_download
+
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
 

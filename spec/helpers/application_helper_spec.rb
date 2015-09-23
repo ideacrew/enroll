@@ -10,8 +10,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#enrollment_progress_bar" do
-    let(:employer_profile){FactoryGirl.create(:employer_profile)}
-    let(:plan_year){FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile) }
 
     it "display progress bar" do
       expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper">')
@@ -66,7 +66,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "relationship_options" do
-    let(:dependent){ double("FamilyMember") }
+    let(:dependent) { double("FamilyMember") }
 
     context "consumer_portal" do
       it "should return correct options for consumer portal" do
@@ -86,8 +86,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
   describe "#is_readonly" do
     # let(:user){FactoryGirl.create(:user)}
-    let(:user){ double("User")}
-    let(:census_employee){ double("CensusEmployee") }
+    let(:user) { double("User") }
+    let(:census_employee) { double("CensusEmployee") }
     before do
       expect(helper).to receive(:current_user).and_return(user)
     end
@@ -116,7 +116,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#calculate_participation_minimum" do
-    let(:plan_year_1){ double("PlanYear", eligible_to_enroll_count: 5) }
+    let(:plan_year_1) { double("PlanYear", eligible_to_enroll_count: 5) }
     before do
       @current_plan_year = plan_year_1
     end
@@ -142,7 +142,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     context "consumer role has a vlp_document" do
       it "it returns the document" do
         consumer_role = ConsumerRole.new
-        document = consumer_role.vlp_documents.build({subject:"Certificate of Citizenship"})
+        document = consumer_role.vlp_documents.build({subject: "Certificate of Citizenship"})
         found_document = find_document(consumer_role, "Certificate of Citizenship")
         expect(found_document).to be_a_kind_of(VlpDocument)
         expect(found_document).to eq(document)
@@ -163,4 +163,14 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(options).to eq [["Date of event(#{date.to_s})", 'date_of_event'], ["Fixed first of next month(#{(date.end_of_month+1.day).to_s})", 'fixed_first_of_next_month']]
     end
   end
+
+  describe "get_key_and_bucket" do
+    it "should return array with key and bucket" do
+      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-sbc#f21369fc-ae6c-4fa5-a299-370a555dc401"
+      key, bucket = get_key_and_bucket(uri)
+      expect(key).to eq("f21369fc-ae6c-4fa5-a299-370a555dc401")
+      expect(bucket).to eq("dchbx-sbc")
+    end
+  end
 end
+

@@ -518,4 +518,11 @@ module ApplicationHelper
 
     options
   end
+
+  def get_key_and_bucket(uri)
+    splits = uri.split('#')
+    key = splits.last
+    bucket =splits.first.split(':').last
+    [key, bucket]
+  end
 end
