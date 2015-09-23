@@ -13,7 +13,6 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       session.delete(:individual_assistance_path)
     end
-    @help_me = true
     @person = Forms::ConsumerCandidate.new
     respond_to do |format|
       format.html

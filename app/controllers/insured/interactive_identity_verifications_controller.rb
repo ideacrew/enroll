@@ -70,12 +70,15 @@ module Insured
     def process_successful_interactive_verification(service_response)
       consumer_role = @person.consumer_role
       consumer_user = @person.user
-      consumer_user.identity_final_decision_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
-      consumer_user.identity_response_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
-      consumer_user.identity_response_description_text = service_response.response_text
-      consumer_user.identity_final_decision_transaction_id = service_response.transaction_id
-      consumer_user.identity_verified_date = Date.today
-      consumer_user.save!
+      #TODO TREY KEVIN JIM There is no user when CSR creates enroooment 
+      if consumer_user
+        consumer_user.identity_final_decision_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+        consumer_user.identity_response_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+        consumer_user.identity_response_description_text = service_response.response_text
+        consumer_user.identity_final_decision_transaction_id = service_response.transaction_id
+        consumer_user.identity_verified_date = Date.today
+        consumer_user.save!
+      end
       redirect_to insured_family_members_path(consumer_role_id: consumer_role.id)
     end
 

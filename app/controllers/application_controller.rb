@@ -47,6 +47,8 @@ class ApplicationController < ActionController::Base
       session.delete("stashed_password")
       user.switch_to_idp!
     end
+    #TODO TREY KEVIN JIM CSR HAS NO SSO_ACCOUNT
+    session[:person_id] = personish.id if current_user.try(:person).try(:agent?)
     yield
   end
 
