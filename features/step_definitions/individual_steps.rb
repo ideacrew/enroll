@@ -78,6 +78,7 @@ Then (/Individual resumes enrollment/) do
   @browser.a(text: /consumer\/family portal/i).click
   wait_and_confirm_text(/Sign In Existing Account/)
   click_when_present(@browser.link(class: /interaction-click-control-sign-in-existing-account/))
+  sleep 2
   @browser.text_field(class: /interaction-field-control-user-email/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set("taylor.york@example.com")
   @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
