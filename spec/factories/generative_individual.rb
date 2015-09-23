@@ -62,7 +62,7 @@ FactoryGirl.define do
 
   factory(:generative_person_relationship, {class: PersonRelationship}) do
     kind {
-      pick_list = PersonRelationship::Kinds - ["head of household", "self", "unrelated"]
+      pick_list = PersonRelationship::Kinds - ["head of household", "self", "unrelated", "domestic_partner", "other_tax_dependent"]
       max = pick_list.length
       pick_list[Random.rand(max)]
     }

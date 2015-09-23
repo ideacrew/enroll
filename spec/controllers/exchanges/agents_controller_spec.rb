@@ -34,30 +34,8 @@ RSpec.describe Exchanges::AgentsController do
     
     it 'begins enrollment' do
       sign_in current_user
-      get :begin_enrollment
+      get :begin_employee_enrollment
       expect(response).to have_http_status(:redirect)
     end
   end
-
-  describe "Send enrollment confirmation" do
-    let(:person) {FactoryGirl.create(:person, hbx_id: 77 + rand(100000))}
-    let(:current_user){FactoryGirl.create(:user)}
-    let(:signed_in?){ true }
-    render_views
-    before(:each) do
-      allow(Person).to receive(:find).and_return(person)
-      sign_in current_user
-    end
-
-    it 'invokes UserMailer' do
-      expect(UserMailer).to receive(:generic_consumer_welcome).with(person.first_name, person.hbx_id, person.emails.first.address)
-      get :send_enrollment_confirmation
-    end
-
-    it 'returns a ajax success response'  do
-      get :send_enrollment_confirmation
-      expect(response.body).to match(/Email has been sent/)
-    end
-  end
-
 end

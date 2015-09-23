@@ -1,3 +1,4 @@
+<% calculate = (defined? calculate) ? calculate : true %>
 <div class="table-border table-responsive">
   <table class="table table-striped">
     <thead>
@@ -5,6 +6,8 @@
         <th>Name</th>
         <th>Relationship</th>
         <th>Age</th>
+        <th class="text-right">Premium</th>
+        <th class="text-right">APTC amount</th>
         <th class="text-right" width="50">You Pay</th>
       </tr>
     </thead>
@@ -14,15 +17,29 @@
           <td><%= member.person.full_name %></td>
           <td><%= member.primary_relationship %></td>
           <td><%= dob_in_words(member.person.age_on(Time.now.utc.to_date), member.person.dob) %></td>
-          <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+          <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
+          <% if calculate %>
+            <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
+            <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+          <% else %>
+            <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
+            <td class="text-right"><%= number_to_currency(@plan.premium_for(member) - member.applied_aptc_amount.to_f) %></td>
+          <% end %>
         </tr>
       <% end %>
       <tr class="gray-row">
         <td colspan="3" class="text-right capital"><strong>Totals</strong></td>
-        <td class="text-right"><strong><%= number_to_currency(@plan.total_employee_cost) %></strong></td>
+        <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
+        <% if calculate %>
+          <td class="text-right"><strong><%= number_to_currency(@plan.total_aptc_amount) %></strong></td>
+          <td class="text-right"><strong><%= number_to_currency(@plan.total_employee_cost) %></strong></td>
+        <% else %>
+          <td class="text-right"><strong><%= number_to_currency(@enrollment.applied_aptc_amount.to_f) %></strong></td>
+          <td class="text-right"><strong><%= number_to_currency(@plan.total_premium - @enrollment.applied_aptc_amount.to_f) %></strong></td>
+        <% end %>
       </tr>
       <tr>
-        <td colspan="3" class="text-right">Your coverage start date :</td>
+        <td colspan="5" class="text-right">Your coverage start date :</td>
         <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
       </tr>
     </tbody>

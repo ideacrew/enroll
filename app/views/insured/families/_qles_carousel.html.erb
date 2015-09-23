@@ -6,10 +6,8 @@
       <% @qualifying_life_events.each_slice(5) do |qles| %>
         <div class="item <%= 'active' if count == 0 %>">
           <ul class="list-qle">
-            <% qles.each do |qle| %>
-              <p>
-                <a class="qle-menu-item" href="javascript:void(0)" data-toggle="tooltip" title="<%= qle.tool_tip %>" data-title='<%= qle.title %>' data-id='<%= qle.id %>' data-label='<%= qle.event_kind_label %>' data-post-event-sep-in-days='<%= qle.post_event_sep_in_days %>' data-pre-event-sep-in-days='<%= qle.pre_event_sep_in_days %>' data-date-hint='<%= qle.date_hint %>'><%= qle.title %></a>
-              </p>
+            <% qles.each_with_index do |qle, index| %>
+              <p><%= qle_link_generater(qle, index) %></p>
             <% end %>
           </ul>
         </div>

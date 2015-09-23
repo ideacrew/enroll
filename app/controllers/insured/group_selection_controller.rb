@@ -1,6 +1,7 @@
 class Insured::GroupSelectionController < ApplicationController
 
   def new
+    set_consumer_bookmark_url
     initialize_common_vars 
     if @person.try(:has_active_employee_role?) and !@person.try(:has_active_consumer_role?)
       @market_kind = 'shop'
@@ -10,7 +11,7 @@ class Insured::GroupSelectionController < ApplicationController
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
     end
     if @market_kind == 'individual'
-      hbx = HbxProfile.find_by_state_abbreviation("dc")
+      hbx = HbxProfile.current_hbx
       bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2015 }.first
       pkgs = bc_period.benefit_packages
       benefit_package = pkgs.select{|plan|  plan[:title] == "individual_health_benefits_2015"}
@@ -97,7 +98,7 @@ class Insured::GroupSelectionController < ApplicationController
         consumer_role: @person.consumer_role,
         coverage_household: @coverage_household,
         benefit_package: @benefit_package,
-        qle: @change_plan == 'change_by_qle')
+        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
     end
   end
 

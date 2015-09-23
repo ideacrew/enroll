@@ -373,6 +373,45 @@ describe HbxEnrollment, dbclean: :after_all do
         expect(hbxs.count).to eq 1
       end
     end
+
+    context "decorated_elected_plans" do
+      let(:benefit_package) { BenefitPackage.new }
+      let(:consumer_role) { FactoryGirl.create(:consumer_role) }
+      let(:enrollment) {
+        household.create_hbx_enrollment_from(
+          consumer_role: consumer_role,
+          coverage_household: coverage_household,
+          benefit_package: benefit_package
+        )
+      }
+      let(:hbx_profile) {double} 
+      let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
+      let(:renewal_bcp) { double }
+      let(:bcp) { double }
+      let(:plan) { FactoryGirl.create(:plan) }
+      let(:plan2) { FactoryGirl.create(:plan) }
+
+      before :each do
+        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+      end
+
+      it "should return decoratored plans when not in the open enrollment" do
+        allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
+        allow(bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan]
+        expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
+        expect(enrollment.decorated_elected_plans('health').count).to eq 1
+        expect(enrollment.decorated_elected_plans('health').first.id).to eq plan.id
+      end
+
+      it "should return decoratored plans when not in the open enrollment" do
+        allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return true
+        allow(renewal_bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan2]
+        expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
+        expect(enrollment.decorated_elected_plans('health').count).to eq 1
+        expect(enrollment.decorated_elected_plans('health').first.id).to eq plan2.id
+      end
+    end
   end
 end
 

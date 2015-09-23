@@ -39,7 +39,7 @@ module Factories
       person, person_new = initialize_person(
         user, person_params["name_pfx"], person_params["first_name"],
         person_params["middle_name"] , person_params["last_name"],
-        person_params["name_fx"], person_params["ssn"].gsub("-",""),
+        person_params["name_sfx"], person_params["ssn"].gsub("-",""),
         person_params["dob"], person_params["gender"], "consumer", person_params["no_ssn"]
         )
       return nil, nil if person.blank? and person_new.blank?

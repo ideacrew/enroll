@@ -1,6 +1,6 @@
 class EmployerProfile
-  BINDER_PREMIUM_PAID_EVENT_NAME = "local.enroll.employer.binder_premium_paid"
-  EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "local.enroll.employer.updated"
+  BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
+  EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
 
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -91,20 +91,19 @@ class EmployerProfile
     start_on = start_on.to_date.beginning_of_day
     if active_broker_agency_account.present?
       terminate_on = (start_on - 1.day).end_of_day
-      terminate_active_broker_agency(terminate_on)
+      fire_broker_agency(terminate_on)
     end
     broker_agency_accounts.build(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on)
     @broker_agency_profile = new_broker_agency
   end
 
-  alias_method :broker_agency_profile=, :hire_broker_agency
-
-  def terminate_active_broker_agency(terminate_on = today)
-    if active_broker_agency_account.present?
-      active_broker_agency_account.end_on = terminate_on
-      active_broker_agency_account.is_active = false
-    end
+  def fire_broker_agency(terminate_on = today)
+    return unless active_broker_agency_account
+    active_broker_agency_account.end_on = terminate_on
+    active_broker_agency_account.is_active = false
   end
+
+  alias_method :broker_agency_profile=, :hire_broker_agency
 
   def broker_agency_profile
     return @broker_agency_profile if defined? @broker_agency_profile
@@ -331,7 +330,7 @@ class EmployerProfile
 
   def broadcast_employer_update
     if previous_states.include?(:binder_paid) || (aasm_state.to_sym == :binder_paid)
-      notify(EMPLOYER_PROFILE_UPDATED_EVENT_NAME, {:employer => self})
+      notify(EMPLOYER_PROFILE_UPDATED_EVENT_NAME, {:employer_id => self.hbx_id})
     end
   end
 
@@ -367,7 +366,7 @@ class EmployerProfile
   end
 
   def notify_binder_paid
-    notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer => self})
+    notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer_id => self.hbx_id})
   end
 
 private

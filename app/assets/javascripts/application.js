@@ -24,9 +24,11 @@
 //= require override_confirm
 //= require floatlabels
 //= require jq_datepicker
+//= require date
 //= require qle
 //= require print
 //= require browser_issues
+//= require consumer_role
 //= require_tree .
 
 function applyFloatLabels() {
@@ -35,12 +37,26 @@ function applyFloatLabels() {
   });
 }
 
-$(document).ready(function () {
 
-  $(function(){
-    $('select').selectric();
+function applySelectric() {
+  $("select[multiple!='multiple']").selectric();
+};
+
+function applyMultiLanguateSelect() {
+  $('#broker_agency_language_select').multiselect({
+    nonSelectedText: 'Select Language',
+    maxHeight: 300
   });
+  $('#broker_agency_language_select').multiselect('select', 'en', true);
+};
 
+$(document).on('page:update', function(){
+  applyFloatLabels();
+  applySelectric();
+});
+
+
+$(document).ready(function () {
   $('[data-toggle="tooltip"]').tooltip();
   $("[data-toggle=popover]").popover();
 
@@ -82,8 +98,6 @@ $(document).ready(function () {
       });
     }
   });
-
-  applyFloatLabels();
 
   $(".address-li").on('click',function(){
     $(".address-span").html($(this).data("address-text"));
@@ -426,7 +440,6 @@ $(document).on('page:update', function() {
     $('#address_info > .first').attr('id', ($(this).text()));
     $('#employer_census_employee_family_census_employee_attributes_address_attributes_kind').val($(this).data('value'));
   });
-  $('select').selectric();
 
   $('#plan-years-list li a').on('click', function(){
     var target = $(this).attr('href');
@@ -498,51 +511,19 @@ $(document).on('change', '#waive_confirm select#waiver_reason', function() {
   }
 })
 
-$(document).on('click', '#search_for_plan_shopping_help', function() {
-  $.ajax({
-    type: 'GET', 
-    data: {firstname: $('#help_first_name').val(), lastname: $('#help_last_name').val(), type: $('#help_type').html(),
-           person: $('#help_requestor').html()},
-    url: '/exchanges/hbx_profiles/request_help?',
-  }).done(function(response) {
-    $('#help_status').html(response)
-  });
-})
-
-$(document).on('click', '.help_button', function(){
-$.ajax({
-    type: 'GET', 
-    data: {assister: this.getAttribute('data-assister'), broker: this.getAttribute('data-broker'),
-           person: $('#help_requestor').html()},
-    url: '/exchanges/hbx_profiles/request_help?',
-  }).done(function(response) {
-    console.log(response)
-    console.log('here')
-    $('#help_index_status').html(response).removeClass('hide')
-  });
-})
-
-$(document).on('click', '.name_search_only', function() {
-  $('#help_list').addClass('hide')
-  $('#help_search').removeClass('hide')
-  $('#help_type').html(this.id)
-})
-$(document).on('click', '[data-target="#help_with_plan_shopping"]',function(){$('.help_reset').addClass("hide"); $('#help_list').removeClass("hide") })
-
-
 $(document).on('click', '#terms_check_thank_you', function() {
   first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
-  
-  if($(this).prop("checked") == true){    
+
+  if($(this).prop("checked") == true){
     if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
       $('#btn-continue').removeClass('disabled');
     } else {
       $('#btn-continue').addClass('disabled');
     }
-  }else if($(this).prop("checked") == false){ 
+  }else if($(this).prop("checked") == false){
     $('#btn-continue').addClass('disabled');
   }
 })
@@ -552,11 +533,11 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
-  
+
   if(last_name_thank_you == ""){
     $('#btn-continue').addClass('disabled');
   }else{
-    if($("#terms_check_thank_you").prop("checked") == true){    
+    if($("#terms_check_thank_you").prop("checked") == true){
       if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
         $('#btn-continue').removeClass('disabled');
       } else {
@@ -570,4 +551,11 @@ $(document).on('keyup', ".new_person #person_ssn", function(){
 })
 $(document).on('change', ".new_person #person_no_ssn", function(){
   if (this.checked) { $(".new_person #person_ssn").val("");  $(".new_person #person_ssn").trigger('change')  }
+})
+
+$(document).on('keyup', ".new_dependent #dependent_ssn", function(){
+  $(".new_dependent input#dependent_no_ssn").prop('checked', false)
+})
+$(document).on('change', ".new_dependent #dependent_no_ssn", function(){
+  if (this.checked) { $(".new_dependent #dependent_ssn").val("");  $(".new_dependent #dependent_ssn").trigger('change')  }
 })

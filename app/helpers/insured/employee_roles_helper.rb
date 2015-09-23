@@ -17,8 +17,4 @@ module Insured::EmployeeRolesHelper
     offered_relationship_benefits.include? relationship
   end
 
-  def calculate_age_by_dob(dob)
-    now = Date.today
-    now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
-  end
 end

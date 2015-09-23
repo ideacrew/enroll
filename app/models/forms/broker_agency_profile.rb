@@ -48,12 +48,12 @@ module Forms
 
       person.save!
       add_broker_role
-
       organization = create_new_organization
       self.broker_agency_profile = organization.broker_agency_profile
       self.broker_agency_profile.primary_broker_role = person.broker_role
       self.broker_agency_profile.save!
       person.broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id })
+      person.update_attributes({ broker_agency_staff_roles: [::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)]})
       true
     end
 

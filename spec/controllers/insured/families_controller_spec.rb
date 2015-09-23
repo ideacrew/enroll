@@ -17,6 +17,7 @@ RSpec.describe Insured::FamiliesController do
     allow(person).to receive(:primary_family).and_return(family)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
     allow(person).to receive(:employee_roles).and_return(employee_roles)
+    allow(consumer_role).to receive(:bookmark_url=).and_return(true)
     sign_in(user)
   end
 
@@ -29,6 +30,7 @@ RSpec.describe Insured::FamiliesController do
       allow(user).to receive(:save).and_return(true)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
+      allow(consumer_role).to receive(:save!).and_return(true)
       session[:portal] = "insured/families"
     end
 

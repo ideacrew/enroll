@@ -64,6 +64,72 @@ class Household
   #   hh
   # end
 
+  def build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
+    verified_tax_household = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last }.first
+    verified_primary_tax_household_member = verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first
+    primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
+
+    if tax_households.present?
+      latest_tax_household = tax_households.where(effective_ending_on: nil).last
+      latest_tax_household.update_attributes(effective_ending_on: verified_tax_household.start_date - 1.day )
+    end
+
+    th = tax_households.build(
+      allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
+      effective_starting_on: verified_tax_household.start_date,
+      submitted_at: verified_tax_household.submitted_at
+    )
+
+    th.tax_household_members.build(
+      family_member: primary_family_member,
+      is_subscriber: true,
+      is_ia_eligible: verified_primary_tax_household_member.is_insurance_assistance_eligible
+    )
+
+    # verified_primary_family_member.financial_statements.each do |fs|
+    #   th.tax_household_members.first.financial_statements.build(
+    #     tax_filing_status: fs.tax_filing_status.split('#').last,
+    #     is_tax_filing_together: fs.is_tax_filing_together
+    #   )
+
+    #   th.tax_household_members.first.financial_statements.last.incomes.each do |i|
+    #     th.tax_household_members.first.financial_statements.last.incomes.build(
+    #       amount:
+    #       end_date:
+    #       frequency:
+    #       start_date:
+    #       submitted_date:
+    #       type:
+    #     )
+    #   end
+    # end
+
+    if verified_tax_household.eligibility_determinations.present?
+      benchmark_plan_id = Organization.where(:hbx_profile.exists => true).first.hbx_profile.benefit_sponsorship.current_benefit_coverage_period.slcsp
+
+      th.update_attributes(is_eligibility_determined: true)
+
+      latest_eligibility_determination = verified_tax_household.eligibility_determinations.max_by(&:determination_date)
+      th.eligibility_determinations.build(
+        e_pdc_id: latest_eligibility_determination.id,
+        benchmark_plan_id: benchmark_plan_id,
+        max_aptc: latest_eligibility_determination.maximum_aptc,
+        csr_percent_as_integer: latest_eligibility_determination.csr_percent,
+        determined_on: latest_eligibility_determination.determination_date
+      )
+
+    end
+  end
+
+  def add_tax_household_family_member(family_member, verified_tax_household_member)
+    th = latest_active_tax_household
+    th.tax_household_members.build(
+      family_member: family_member,
+      is_subscriber: false,
+      is_ia_eligible: verified_tax_household_member.is_insurance_assistance_eligible
+      )
+  end
+
   def effective_ending_on_gt_effective_starting_on
 
     return if effective_ending_on.nil?
@@ -95,8 +161,13 @@ class Household
   end
 
   def latest_coverage_household
-    return coverage_households.first if coverage_households.size = 1
+    return coverage_households.first if coverage_households.size == 1
     coverage_households.sort_by(&:submitted_at).last.submitted_at
+  end
+
+  def latest_active_tax_household
+    return tax_households.first if tax_households.length == 1
+    tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
   end
 
   def applicant_ids
