@@ -84,7 +84,6 @@ gem 'prawn', '~> 0.11.1'
 gem 'virtus'
 gem 'wkhtmltopdf-binary-edge', '~> 0.12.2.1'
 gem 'wicked_pdf'
-gem 'forkr'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

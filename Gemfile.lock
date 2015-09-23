@@ -171,7 +171,6 @@ GEM
     font-awesome-rails (4.4.0.0)
       railties (>= 3.2, < 5.0)
     forgery (0.6.0)
-    forkr (0.1.7)
     gherkin (2.12.2)
       multi_json (~> 1.3)
     globalid (0.3.6)
@@ -478,7 +477,6 @@ DEPENDENCIES
   factory_girl_rails (~> 4.0)
   font-awesome-rails
   forgery
-  forkr
   haml
   jbuilder (~> 2.0)
   jquery-rails
