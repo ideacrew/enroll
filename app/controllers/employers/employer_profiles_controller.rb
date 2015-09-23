@@ -128,7 +128,7 @@ class Employers::EmployerProfilesController < ApplicationController
     if @organization.save(current_user)
       @person = current_user.person
       create_sso_account(current_user, current_user.person, 15) do
-        redirect_to employers_employer_profile_path(@organization.employer_profile)
+        redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
       end
     else
       render action: "new"
