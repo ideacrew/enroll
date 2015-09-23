@@ -163,7 +163,7 @@ RSpec.describe Plan, dbclean: :after_each do
       start_on: "2015-01-01",
       end_on: "2015-05-31",
       cost: 500,
-      age: 32 
+      age: 32
       } }
 
     let(:premium_table_entry2) { {
@@ -296,6 +296,7 @@ RSpec.describe Plan, dbclean: :after_each do
     let(:carrier_profile_0_count) { platinum_count + gold_count + bronze_count }
     let(:carrier_profile_1_count) { shop_silver_count + individual_silver_count + catastrophic_count }
     let(:current_year) {TimeKeeper.date_of_record.year}
+    let(:next_year) {current_year + 1}
 
     context "with plans loaded" do
       before do
@@ -328,6 +329,26 @@ RSpec.describe Plan, dbclean: :after_each do
       context "valid_shop_by_metal_level" do
         it "should return all silver plans this year" do
           expect(Plan.valid_shop_by_metal_level('silver').count).to eq shop_silver_count
+        end
+      end
+
+      context "valid_shop_by_carrier_and_year" do
+        it "should return all carrier_profile_1 plans this year" do
+          expect(Plan.valid_shop_by_carrier_and_year(carrier_profile_1.id, current_year).count).to eq shop_silver_count
+        end
+
+        it "should return no carrier_profile_1 plans next year" do
+          expect(Plan.valid_shop_by_carrier_and_year(carrier_profile_1.id, next_year).count).to eq 0
+        end
+      end
+
+      context "valid_shop_by_metal_level_and_year" do
+        it "should return all silver plans this year" do
+          expect(Plan.valid_shop_by_metal_level_and_year('silver', current_year).count).to eq shop_silver_count
+        end
+
+        it "should return no silver plans next year" do
+          expect(Plan.valid_shop_by_metal_level_and_year('silver', next_year).count).to eq 0
         end
       end
 
@@ -378,7 +399,7 @@ RSpec.describe Plan, dbclean: :after_each do
 
     context "valid_shop_health_plans" do
       let(:carrier_profile) {FactoryGirl.create(:carrier_profile)}
-      before :each do 
+      before :each do
         Rails.cache.clear
       end
 
