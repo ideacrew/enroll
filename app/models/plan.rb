@@ -37,6 +37,7 @@ class Plan
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
   field :sbc_file, type: String
+  embeds_one :sbc_document, :class_name => "Document", as: :documentable
 
   embeds_many :premium_tables
   accepts_nested_attributes_for :premium_tables

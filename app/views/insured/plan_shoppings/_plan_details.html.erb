@@ -2,12 +2,17 @@
 <div class="plan-row panel panel-default" data-plan-category="<%= plan.plan_type ? plan.plan_type.downcase : "" %>" data-plan-metal-level="<%= plan.metal_level.downcase %>" data-plan-metal-network="<%= plan.nationwide ? "nationwide" : "dc area network" %>" data-plan-metal-premium="<%= plan.total_employee_cost %>" data-plan-metal-deductible="<%= plan.deductible %>" data-plan-name="<%= plan.name %>" data-plan-carrier="<%= plan_carrier.try(:legal_name) %>" data-plan-hsa-eligibility="<%= @plan_hsa_status[plan.id.to_s] %>">
   <div class="panel-body">
     <div class="row">
+      <% if plan.is_standard_plan  %>
+        <div class="col-md-12"> <i class="fa fa-bookmark"> Standard Plan </i></div>
+      <% end %>
+    </div>
+    <div class="row">
       <div class="col-md-2 col-sm-2"><%= display_carrier_logo(plan_carrier.legal_name, {width: 80}) %></div>
       <div class="col-md-7">
         <h3 class="no-buffer">
           <%= link_to plan.name, summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id}), {:remote => true} %>
           <br/>
-	  <small><%= plan_carrier.legal_name %></small>
+	        <small><%= plan_carrier.legal_name %></small>
         </h3>
       </div>
       <div class="col-md-3">
@@ -58,3 +63,9 @@
     </div>
   </div>
 </div>
+
+<style type="text/css">
+  .fa-bookmark {
+    color: green;
+  }
+</style>

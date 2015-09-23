@@ -26,6 +26,7 @@ class Insured::FamiliesController < FamiliesController
     set_consumer_bookmark_url(family_account_path)
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
+    @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     render :layout => 'application' 
   end
