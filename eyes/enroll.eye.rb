@@ -35,6 +35,8 @@ Eye.application 'eye_enroll' do
   notify :tevans, :info
   notify :dthomas, :info
 
+  define_forked_worker("employer_resource_listener", BUS_DIRECTORY, "bundle exec rails r -e production script/employer_resource_listener.rb", true)
+
   process("unicorn") do
     working_dir BUS_DIRECTORY
     pid_file "pids/unicorn.pid"
