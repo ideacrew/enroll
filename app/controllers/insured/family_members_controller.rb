@@ -1,5 +1,6 @@
 class Insured::FamilyMembersController < ApplicationController
   include ApplicationHelper
+  include ErrorBubble
 
   before_action :set_current_person, :set_family
   def index
@@ -33,7 +34,6 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def create
-
     doc_params = params_clean_vlp_documents
     @dependent = Forms::FamilyMember.new(params.require(:dependent).permit!)
     if @dependent.save
@@ -44,6 +44,8 @@ class Insured::FamilyMembersController < ApplicationController
         format.js { render 'show' }
       end
     else
+      update_vlp_documents(doc_params)
+      @dependent.addresses = Address.new(@dependent.addresses) if @dependent.addresses.is_a? ActionController::Parameters
       respond_to do |format|
         format.html { render 'new' }
         format.js { render 'new' }
@@ -80,23 +82,25 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def update
-    doc_params = params_clean_vlp_documents
     @family = @person.primary_family
+    doc_params = params_clean_vlp_documents
     @dependent = Forms::FamilyMember.find(params.require(:id))
 
-    if @dependent.update_attributes(params.require(:dependent))
-      update_vlp_documents(doc_params)
+    if @dependent.update_attributes(params.require(:dependent)) and update_vlp_documents(doc_params)
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }
       end
     else
+      @dependent.same_with_primary = Forms::FamilyMember.compare_address_with_primary(@dependent.family_member)
+      @dependent.addresses = Address.new(@dependent.addresses) if @dependent.addresses.is_a? ActionController::Parameters
       respond_to do |format|
         format.html { render 'edit' }
         format.js { render 'edit' }
       end
     end
   end
+
 private
 
   def set_family
@@ -104,6 +108,11 @@ private
   end
 
   def params_clean_vlp_documents
+    if (params[:dependent][:us_citizen] == 'true' and params[:dependent][:naturalized_citizen] == 'false') or (params[:dependent][:us_citizen] == 'false' and params[:dependent][:eligible_immigration_status] == 'false')
+      params[:dependent].delete :consumer_role
+      return
+    end
+
     return if params[:dependent][:consumer_role].nil? or params[:dependent][:consumer_role][:vlp_documents_attributes].nil?
 
     if params[:dependent][:us_citizen].eql? 'true'
@@ -122,14 +131,17 @@ private
   end
 
   def update_vlp_documents(vlp_doc_params)
-    return unless vlp_doc_params.present?
+    return true unless vlp_doc_params.present?
     doc_params = vlp_doc_params.permit(:vlp_documents_attributes=> [:subject, :citizenship_number, :naturalization_number,
                                                                     :alien_number, :passport_number, :sevis_id, :visa_number,
                                                                     :receipt_number, :expiration_date, :card_number, :i94_number])
-    return if doc_params[:vlp_documents_attributes].first.nil?
+    return true if doc_params[:vlp_documents_attributes].first.nil?
+    @vlp_doc_subject = doc_params[:vlp_documents_attributes].first.last[:subject]
+    return true if @dependent.family_member.blank?
     dependent_person = @dependent.family_member.person
-    document = find_document(dependent_person.consumer_role, doc_params[:vlp_documents_attributes].first.last[:subject])
+    document = find_document(dependent_person.consumer_role, @vlp_doc_subject)
     document.update_attributes(doc_params[:vlp_documents_attributes].first.last)
-    document.save
+    add_document_errors_to_dependent(@dependent, document)
+    return document.errors.blank?
   end
 end

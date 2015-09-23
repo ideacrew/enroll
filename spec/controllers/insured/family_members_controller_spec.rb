@@ -80,14 +80,16 @@ RSpec.describe Insured::FamilyMembersController do
   end
 
   describe "POST create" do
+    let(:address) { double }
+    let(:dependent) { double(addresses: address, family_member: true, same_with_primary: true) }
     let(:dependent_properties) { { :family_id => "saldjfalkdjf"} }
-    let(:dependent) { double }
     let(:save_result) { false }
 
     before :each do
       sign_in(user)
       allow(Forms::FamilyMember).to receive(:new).with(dependent_properties).and_return(dependent)
       allow(dependent).to receive(:save).and_return(save_result)
+      allow(dependent).to receive(:address=)
       post :create, :dependent => dependent_properties
     end
 
@@ -164,7 +166,8 @@ RSpec.describe Insured::FamilyMembersController do
   end
 
   describe "PUT update" do
-    let(:dependent) { double }
+    let(:address) { double }
+    let(:dependent) { double(addresses: address, family_member: true, same_with_primary: true) }
     let(:dependent_id) { "234dlfjadsklfj" }
     let(:dependent_properties) { { "first_name" => "lkjdfkajdf" } }
     let(:update_result) { false }
@@ -173,23 +176,30 @@ RSpec.describe Insured::FamilyMembersController do
       sign_in(user)
       allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
       allow(dependent).to receive(:update_attributes).with(dependent_properties).and_return(update_result)
-      put :update, :id => dependent_id, :dependent => dependent_properties
+      allow(address).to receive(:is_a?).and_return(true)
+      allow(dependent).to receive(:same_with_primary=)
+      allow(dependent).to receive(:addresses=) 
     end
 
     describe "with an invalid dependent" do
       it "should render the edit template" do
+        expect(Address).to receive(:new)
+        expect(Forms::FamilyMember).to receive(:compare_address_with_primary)
+        put :update, :id => dependent_id, :dependent => dependent_properties
+
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
-      end
+      end 
     end
 
     describe "with a valid dependent" do
       let(:update_result) { true }
       it "should render the show template" do
+        allow(controller).to receive(:update_vlp_documents).and_return(true)
+        put :update, :id => dependent_id, :dependent => dependent_properties
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")
-      end
-    end
-
+      end 
+    end 
   end
 end
