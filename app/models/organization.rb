@@ -39,7 +39,7 @@ class Organization
   default_scope -> {order("legal_name ASC")}
 
   scope :employer_by_hbx_id, ->(employer_id) {
-    where(hbx_id: employer_id, "$exists" => { "employer_profile" => true })
+    where(hbx_id: employer_id, "employer_profile" => { "$exists" => true })
   }
 
   scope :has_broker_agency_profile, ->{ exists(broker_agency_profile: true) }
