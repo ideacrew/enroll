@@ -31,7 +31,7 @@ class TaxHousehold
     # For example, given family of 4, with 2 adults & 2 children, all who are eligible
     # Based on SLCSP, we will compute ratio for each member based on premium cost
     # So, if total family premium cost is $1,000, adult premium cost is $350/each and
-    # child premium cost is $150/each, APTC ratio will be 35% to each adult and 
+    # child premium cost is $150/each, APTC ratio will be 35% to each adult and
     # 15% to each child
 
 
