@@ -3,22 +3,38 @@ $(document).on('ready', function() {
   // nav tabs radios on change for plan selection
 
 
+    $('.plan-options > * input, .reference-plans > * input').prop('checked', false);
 
     $(document).on('change', '.offerings .fte:first input, .offerings .pte:first input, .offerings .msp:first input', function() {
       var change = $(this).val();
       $('#plan_year_fte_count').val(change);
+    });
+    // MAKE SLIDER AND ADJACENT INPUT FIELD MIRROR EACHOTHER
+    $(document).on('change', 'input.premium-storage-input', function() {
+      if ( $(this).hasClass('slider') ) {
+        var data = $(this).val();
+        $(this).closest('.form-group').find('input').val(data);
+      } else if ( $(this).hasClass('hidden-param') )  {
+        var hidden = parseInt($(this).val());
+        var mySlider = $(this).closest('.form-group').find('input.slider');
+        mySlider.bootstrapSlider('setValue', hidden);
+        $(this).closest('.form-group').find('input.slider').attr('value', hidden).attr('data-slider-value', hidden);
+
+      }
     });
 
 
     $('.nav-tabs li input[type=radio]').prop('checked', false);
     $(document).on('click', '.nav-tabs li label', function() {
       $(this).closest('.benefit-group-fields').find('.nav-tabs li').removeClass('active');
+      $(this).closest('.benefit-group-fields').find('.plan-options > * input, .reference-plans > * input').prop('checked', false);
+      $(this).closest('.benefit-group-fields').find('.reference-plans').hide();
       $(this).closest('li').addClass('active');
       if ($(this).find('input[type=radio]').is(':checked')) {
       } else {
         $(this).find('input[type=radio]').prop('checked', true );
         $(this).closest('.benefit-group-fields').find('.plan-options > *').hide();
-        $(this).closest('.benefit-group-fields').find('.plan-options > * input, .reference-plans input').prop('checked', 0);
+        $(this).closest('.benefit-group-fields').find('.plan-options > * input, .reference-plans > * input').prop('checked', 0);
         $(this).closest('.benefit-group-fields').find('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
 
       }
@@ -37,7 +53,7 @@ $(document).on('ready', function() {
     });
     $(document).on('click', '.nav-tabs a', function() {
       $(this).closest('.benefit-group-fields').find('.plan-options').hide();
-      $(this).closest('.benefit-group-fields').find('.plan-options > * input, .reference-plans input').prop('checked', 0);
+      $(this).closest('.benefit-group-fields').find('.plan-options > * input, .reference-plans > * input').prop('checked', 0);
       $(this).closest('.benefit-group-fields').find('.reference-plans').show();
     });
 
@@ -52,7 +68,16 @@ $(document).on('ready', function() {
       } else {
         $(this).closest('.benefit-group-fields').find('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
         $(this).closest('.benefit-group-fields').find(".reference-plans").show();
-        $(this).find('input[type=radio]').prop('checked', true )
+        $(this).find('input[type=radio]').prop('checked', true );
+        if ($(this).parents('.carriers-tab').length > 0 ) {
+          $('.metals-tab input[type=radio]').prop('checked', 0 );
+        }
+        else if ($(this).parents('.metals-tab').length > 0 ) {
+          $('.carriers-tab input[type=radio]').prop('checked', 0 );
+        } else {
+          $('.metals-tab input[type=radio], .carriers-tab input[type=radio]').prop('checked', 0 );
+        }
+
       }
 
     });
