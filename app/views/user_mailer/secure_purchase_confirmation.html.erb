@@ -22,23 +22,26 @@ You and the following dependents have successfully enrolled in
    <% end %>
    </table>   
 <br>
-<p>
-	Your monthly total family premium
-    <% if @market_kind != 'individual' %>
-    , which will will be deducted by your employer from your pay,
-   <% end %>
-    is 
-    <b><%= ActionView::Base.new.number_to_currency @plan.total_premium%>.</b>
-</p>
+
 <% if @market_kind != 'individual' %>
 <p>
-    Additionally your employer pays <b> <%= ActionView::Base.new.number_to_currency @plan.total_employer_contribution %>.</b>
+  Your monthly premium contribution is <b><%= ActionView::Base.new.number_to_currency @plan.total_premium%>.</b><br>
+  Your employer contributes <b><%= ActionView::Base.new.number_to_currency @plan.total_employer_contribution %></b> towards your monthly premium.<br>
+  Your coverage start date is <b><%= @enrollment.effective_on.strftime("%m/%d/%Y") %>.</b>
 </p>
-<% end %>
+<p>
+  Thank you for enrolling into employer-sponsored coverage through DC Health Link.
+</p>
+<% else %>
+<p>
+  Your monthly total family premium is <b><%= ActionView::Base.new.number_to_currency @plan.total_premium%>.</b>
+</p>
 <p> Your coverage start date is:
-	<b><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></b>
+  <b><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></b>
 </p>
 <p>Thank you for your order. </p>
+<% end %>
+
 DC Health Link <br>
 PHONE: 855-532-5465 (855-532-LINK)<br>
 TTY/TDD 711-1-532-5465<br>

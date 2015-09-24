@@ -155,20 +155,14 @@
                             width="100%">
                             <tbody>
                               <tr valign="top">
-                                <td style=
-                                  "line-height: 130%; color: rgb(51, 51, 51);"
+                                <td style="line-height: 130%; color: rgb(51, 51, 51);"
                                   valign="top">
-                                  <span style=
-                                    "font-family: arial, helvetica, sans-serif; line-height: 130%;">
-                                    <span style=
-                                      "font-size: 16px; line-height: 130%;">
-                                      <span style=
-                                        "color: rgb(51, 51, 51); line-height: 130%;">
-                                        <span style=
-                                          "color: rgb(51, 51, 51); line-height: 130%;">
+                                  <span>
+                                    <span style="line-height: 130%;">
+                                      <span style="line-height: 130%;">
+                                        <span style="line-height: 130%;">
                                           Congratulations
-					  <%= enrollment.subscriber.family_member.person.full_name %>
-                                          ,<br />
+					  <%=enrollment.subscriber.family_member.person.full_name%>,<br />
                                           <br />
                                           You and the
                                           following
@@ -176,8 +170,7 @@
                                           successfully
                                           enrolled
                                           in</span>
-                                        <span style=
-                                          "color: rgb(51, 51, 51); line-height: 130%;">
+                                        <span style="line-height: 130%;">
 					  <%= plan.name %><br />
                                           <br />
                                   </span></span></span></span>
@@ -193,51 +186,28 @@
 					
 					    <tr>
 
-                                        <td style="text-decoration: none; padding: 2px 6px; line-height: 130%; color: rgb(51, 51, 51); border-color: #aaa;">
-                                          <span style="font-family: arial, helvetica, sans-serif; line-height: 130%;">
-                                            <span style="font-size: 16px; line-height: 130%;">
-                                              <span style="color: rgb(51, 51, 51); line-height: 130%;">
+                                        <td style="text-decoration: none; padding: 2px 6px; line-height: 130%; border-color: #aaa;">
+                                          <span style="line-height: 130%;">
+                                            <span style="line-height: 130%;">
+                                              <span style="line-height: 130%;">
 						      <%= member.person.full_name %></span></span></span></td>
 
-                                        <td style="text-align: right; text-decoration: none; padding: 2px 6px; line-height: 130%; color: rgb(51, 51, 51); border-color: #aaa;">
-                                          <span style="font-family: arial, helvetica, sans-serif; line-height: 130%;">
-                                            <span style="font-size: 16px; line-height: 130%;">
-						    <span style="color: rgb(51, 51, 51); line-height: 130%;"><%= number_to_currency(plan.premium_for(member)) %></span></span></span></td>
+                                        <td style="text-align: right; text-decoration: none; padding: 2px 6px; line-height: 130%; border-color: #aaa;">
+                                          <span style="line-height: 130%;">
+                                            <span style="line-height: 130%;">
+						    <span style="line-height: 130%;"><%= number_to_currency(plan.premium_for(member)) %></span></span></span></td>
                                       </tr>
                                       <% end %>
                                     </tbody>
-                                        </table><span style="font-family: arial, helvetica, sans-serif; line-height: 130%;"><span style="font-size: 16px; line-height: 130%;"><span style="color: rgb(51, 51, 51); line-height: 130%;"><br />
-
-                                        Your monthly
-                                        total family
-                                        premium, which
-                                        will be
-                                        deducted by
-                                        your employer
-                                        from your pay,
-                                        is:
-                                        <span style="font-size: 18px; line-height: 130%;">
-						<strong><%=number_to_currency(plan.total_employee_cost) %></strong></span><br />
-
-                                        <br />
-                                        Additionally
-                                        your employer
-                                        pays
-                                        <strong><span style="font-size: 18px; line-height: 130%;">
-							<%= number_to_currency(plan.total_employer_contribution) %></span></strong><br />
-                                        <br />
-                                        Your coverage
-                                        start date is:
-                                        <strong><span style="font-size: 18px; line-height: 130%;">
-							<%= enrollment.effective_on.strftime("%m/%d/%Y") %></span></strong><br />
-                                    </span></span><br />
-
-                                    <span style=
-                                      "font-size: 16px; line-height: 130%;">
-                                      Thank you for
-                                      your
-                                      order.<br /></span><br />
-
+                                        </table>
+                                        <p>
+                                          Your monthly premium contribution is <b><%= number_to_currency plan.total_premium %>.</b><br>
+                                          Your employer contributes <b><%= number_to_currency plan.total_employer_contribution %></b> towards your monthly premium.<br>
+                                          Your coverage start date is <b><%= enrollment.effective_on.strftime("%m/%d/%Y") %>.</b>
+                                        </p>
+                                        <p>
+                                          Thank you for enrolling into employer-sponsored coverage through DC Health Link.
+                                        </p>
                                     <span style=
                                       "font-size: 16px; line-height: 130%;">
                                       DC Health
@@ -255,9 +225,6 @@
                                       E-Mail:
                                       info@dchealthlink.com</span><br />
                                   </span><br />
-                                  <span style=
-                                    "font-size: 14px; font-family: Arial, Helvetica, sans-serif; color: rgb(51, 51, 51); line-height: 130%;">
-                                  </span>
                                 </td>
                               </tr>
                             </tbody>
