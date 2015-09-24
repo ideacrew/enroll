@@ -1,7 +1,7 @@
 class Insured::FamiliesController < FamiliesController
 
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
-  # layout 'application', :only => :find_sep
+  before_action :check_for_address_info, only: [:find_sep]
 
   def home
     set_consumer_bookmark_url(family_account_path)
@@ -28,7 +28,7 @@ class Insured::FamiliesController < FamiliesController
     @change_plan = params[:change_plan]
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
-    render :layout => 'application' 
+    render :layout => 'application'
   end
 
   def record_sep
@@ -60,7 +60,7 @@ class Insured::FamiliesController < FamiliesController
     @folder = params[:folder] || 'Inbox'
     @sent_box = false
   end
-  
+
   def documents_index
 
   end
@@ -74,7 +74,7 @@ class Insured::FamiliesController < FamiliesController
     start_date = TimeKeeper.date_of_record - 30.days
     end_date = TimeKeeper.date_of_record + 30.days
     if params[:qle_id].present?
-      @qle = QualifyingLifeEventKind.find(params[:qle_id]) 
+      @qle = QualifyingLifeEventKind.find(params[:qle_id])
       start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_esi?
@@ -115,4 +115,9 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  def check_for_address_info
+    if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
+      redirect_to edit_insured_consumer_role_path(@person.consumer_role)
+    end
+  end
 end

@@ -4,7 +4,7 @@ RSpec.describe Insured::FamiliesController do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { double("User", last_portal_visited: "test.com") }
-  let(:person) { double("Person", id: "test") }
+  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "") }
   let(:family) { double("Family") }
   let(:household) { double("HouseHold") }
   let(:family_members){[double("FamilyMember")]}
@@ -184,17 +184,25 @@ RSpec.describe Insured::FamiliesController do
       get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
     end
 
-    it "should be a success" do
-      expect(response).to have_http_status(:success)
+    it "should be a redirect to edit insured person" do
+      expect(response).to have_http_status(:redirect)
     end
 
-    it "should render my account page" do
-      expect(response).to render_template("find_sep")
-    end
+    context "with a person with an address" do
+      let(:person) { double("Person", id: "test", addresses: true, no_dc_address: false, no_dc_address_reason: "") }
 
-    it "should assign variables" do
-      expect(assigns(:hbx_enrollment_id)).to eq("2312121212")
-      expect(assigns(:change_plan)).to eq('change_plan')
+      it "should be a success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should render my account page" do
+        expect(response).to render_template("find_sep")
+      end
+
+      it "should assign variables" do
+        expect(assigns(:hbx_enrollment_id)).to eq("2312121212")
+        expect(assigns(:change_plan)).to eq('change_plan')
+      end
     end
   end
 
