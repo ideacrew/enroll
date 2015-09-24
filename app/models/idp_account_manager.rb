@@ -48,8 +48,8 @@ class IdpAccountManager
     }, timeout)
   end
 
-  def update_navigation_flag(email, flag)
-    provider.update_flag(email, flag)
+  def update_navigation_flag(lu, email, flag)
+    provider.update_flag(lu, email, flag)
   end
 
   def self.set_provider(prov)
@@ -60,8 +60,8 @@ class IdpAccountManager
     self.set_provider(SlugSource)
   end
 
-  def self.update_navigation_flag(email, flag)
-    self.instance.update_navigation_flag(email, flag)
+  def self.update_navigation_flag(lu, email, flag)
+    self.instance.update_navigation_flag(lu, email, flag)
   end
 
   def self.check_existing_account(personish, timeout = 5)
@@ -89,8 +89,8 @@ class IdpAccountManager
       end
     end
 
-    def self.update_navigation_flag(email, flag)
-      notify("acapi.info.events.account_management.update_navigation_flag",{ :email => email, :flag => flag }) 
+    def self.update_navigation_flag(legacy_username, email, flag)
+      notify("acapi.info.events.account_management.update_navigation_flag",{ :email => email, :flag => flag, :legacy_username => legacy_username}) 
     end
 
     def self.create_account(args, timeout = 5)
@@ -114,7 +114,7 @@ class IdpAccountManager
   end
 
   class SlugSource
-    def self.update_navigation_flag(email, flag)
+    def self.update_navigation_flag(legacy_username, email, flag)
     end
 
     def self.create_account(args, timeout = 5)
