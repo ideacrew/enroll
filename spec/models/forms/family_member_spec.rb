@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Forms::EmployeeDependent do
+describe Forms::FamilyMember do
   let(:family_id) { double }
   let(:family) { instance_double("Family") }
   before(:each) do
@@ -43,7 +43,7 @@ describe Forms::EmployeeDependent do
   end
 
   context "initialize" do
-    let(:dependent) {Forms::EmployeeDependent.new}
+    let(:dependent) {Forms::FamilyMember.new}
     it "should initialize address" do
       expect(dependent.addresses.class).to eq Address
     end
@@ -65,7 +65,7 @@ describe Forms::EmployeeDependent do
     it "without same no_dc_address" do
       allow(person).to receive(:no_dc_address).and_return true
       allow(primary).to receive(:no_dc_address).and_return false
-      expect(Forms::EmployeeDependent.compare_address_with_primary(family_member)).to eq false
+      expect(Forms::FamilyMember.compare_address_with_primary(family_member)).to eq false
     end
 
     it "with same no_dc_address but without smae no_dc_address_reason" do
@@ -73,7 +73,7 @@ describe Forms::EmployeeDependent do
       allow(primary).to receive(:no_dc_address).and_return true
       allow(person).to receive(:no_dc_address_reason).and_return "reason1"
       allow(primary).to receive(:no_dc_address_reason).and_return "reason2"
-      expect(Forms::EmployeeDependent.compare_address_with_primary(family_member)).to eq false
+      expect(Forms::FamilyMember.compare_address_with_primary(family_member)).to eq false
     end
 
     context "with same no_dc_address and no_dc_address_reason" do
@@ -87,19 +87,19 @@ describe Forms::EmployeeDependent do
       it "has same address for compare_keys" do
         allow(person).to receive(:home_address).and_return addr1
         allow(primary).to receive(:home_address).and_return addr1
-        expect(Forms::EmployeeDependent.compare_address_with_primary(family_member)).to eq true
+        expect(Forms::FamilyMember.compare_address_with_primary(family_member)).to eq true
       end
 
       it "has not same address for compare_keys" do
         allow(person).to receive(:home_address).and_return addr1
         allow(primary).to receive(:home_address).and_return addr2
-        expect(Forms::EmployeeDependent.compare_address_with_primary(family_member)).to eq false
+        expect(Forms::FamilyMember.compare_address_with_primary(family_member)).to eq false
       end
 
       it "has not same address but the value of compare_keys is same" do
         allow(person).to receive(:home_address).and_return addr1
         allow(primary).to receive(:home_address).and_return addr3
-        expect(Forms::EmployeeDependent.compare_address_with_primary(family_member)).to eq true
+        expect(Forms::FamilyMember.compare_address_with_primary(family_member)).to eq true
       end
     end
   end
@@ -112,7 +112,7 @@ describe Forms::EmployeeDependent do
     let(:primary) {FactoryGirl.create(:person)}
     let(:family) {double(primary_family_member: double(person: primary))}
     let(:family_member) {double(person: person, family: family)}
-    let(:employee_dependent) { Forms::EmployeeDependent.new } 
+    let(:employee_dependent) { Forms::FamilyMember.new } 
 
     context "if same with primary" do 
       before :each do
@@ -187,7 +187,7 @@ describe Forms::EmployeeDependent do
           _addresses = double(new: {})
           allow(person).to receive(:addresses).and_return _addresses
 
-          expect(_addresses).to receive(:new).and_return true
+          expect(_addresses).to receive(:create).and_return true
           employee_dependent.assign_person_address(person) 
         end
       end 
@@ -195,7 +195,7 @@ describe Forms::EmployeeDependent do
   end
 end
 
-describe Forms::EmployeeDependent, "which describes a new family member, and has been saved" do
+describe Forms::FamilyMember, "which describes a new family member, and has been saved" do
   let(:family_id) { double }
   let(:family) { instance_double("Family") }
   let(:ssn) { nil }
@@ -226,7 +226,7 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
     }
   }
 
-  subject { Forms::EmployeeDependent.new(person_properties.merge({:family_id => family_id, :relationship => relationship })) }
+  subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family_id, :relationship => relationship })) }
 
   before(:each) do
     allow(subject).to receive(:valid?).and_return(true)
@@ -288,7 +288,7 @@ describe Forms::EmployeeDependent, "which describes a new family member, and has
   end
 end
 
-describe Forms::EmployeeDependent, "which describes an existing family member" do
+describe Forms::FamilyMember, "which describes an existing family member" do
   let(:family_member_id) { double }
   let(:family_id) { double }
   let(:family) { instance_double("Family", :id => family_id) }
@@ -319,7 +319,7 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
 
   let(:update_attributes) { person_properties.merge(:family_id => family_id, :relationship => relationship, :dob => dob) }
 
-  subject { Forms::EmployeeDependent.new({ :id => family_member_id }) }
+  subject { Forms::FamilyMember.new({ :id => family_member_id }) }
 
   before(:each) do
     allow(FamilyMember).to receive(:find).with(family_member_id).and_return(family_member)
@@ -334,8 +334,8 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
 
   describe "that is findable using the family_member_id" do
     before(:each) do
-      allow(Forms::EmployeeDependent).to receive(:compare_address_with_primary).and_return false
-      @found_form = Forms::EmployeeDependent.find(family_member_id)
+      allow(Forms::FamilyMember).to receive(:compare_address_with_primary).and_return false
+      @found_form = Forms::FamilyMember.find(family_member_id)
     end
 
     it "should have the correct family_id" do
@@ -362,7 +362,7 @@ describe Forms::EmployeeDependent, "which describes an existing family member" d
   end
 end
 
-describe Forms::EmployeeDependent, "relationship validation" do
+describe Forms::FamilyMember, "relationship validation" do
   let(:family) { FactoryGirl.build(:family) }
   let(:family_member) { FactoryGirl.build(:family_member, family: family) }
   let(:family_members) { family.family_members}
@@ -390,7 +390,7 @@ describe Forms::EmployeeDependent, "relationship validation" do
 
   context "spouse" do
     let(:relationship) { "spouse" }
-    subject { Forms::EmployeeDependent.new(person_properties.merge({:family_id => family.id, :relationship => relationship })) }
+    subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family.id, :relationship => relationship })) }
 
     it "should fail with multiple spouse" do
       allow(family_member).to receive(:relationship).and_return("spouse")
@@ -407,7 +407,7 @@ describe Forms::EmployeeDependent, "relationship validation" do
 
   context "life_partner" do
     let(:relationship) { "life_partner" }
-    subject { Forms::EmployeeDependent.new(person_properties.merge({:family_id => family.id, :relationship => relationship })) }
+    subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family.id, :relationship => relationship })) }
 
     it "should fail with multiple life_partner" do
       allow(family_member).to receive(:relationship).and_return("life_partner")
@@ -424,7 +424,7 @@ describe Forms::EmployeeDependent, "relationship validation" do
       allow(family_member).to receive(:reactivate!).and_return(true)
       allow(FamilyMember).to receive(:find).and_return(family_member)
 
-      dependent = Forms::EmployeeDependent.find(family_member.id)
+      dependent = Forms::FamilyMember.find(family_member.id)
       dependent.update_attributes(person_properties.merge({:family_id => family.id, :relationship => relationship, :id => family_member.id }))
 
       expect(dependent.valid?).to be true

@@ -98,7 +98,7 @@ class Insured::GroupSelectionController < ApplicationController
         consumer_role: @person.consumer_role,
         coverage_household: @coverage_household,
         benefit_package: @benefit_package,
-        qle: @change_plan == 'change_by_qle')
+        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
     end
   end
 

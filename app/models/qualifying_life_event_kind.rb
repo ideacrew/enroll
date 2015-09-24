@@ -119,7 +119,7 @@ class QualifyingLifeEventKind
     else
       if TimeKeeper.date_of_record < (coverage_end_last_day_of_month - 1.month).end_of_month
         coverage_effective_on = if selected_effective_on.blank?
-                                  [TimeKeeper.date_of_record.beginning_of_month, TimeKeeper.date_of_record.end_of_month + 1.day]
+                                  [coverage_end_on.beginning_of_month, coverage_end_last_day_of_month + 1.day]
                                 else
                                   selected_effective_on
                                 end
@@ -145,7 +145,7 @@ class QualifyingLifeEventKind
   end
 
   def is_dependent_loss_of_esi?
-    title == "Dependent loss of ESI due to employee gaining Medicare"
+    title == "Losing Employer-Subsidized Insurance because employee is going on Medicare"
   end
 
   def is_moved_to_dc?

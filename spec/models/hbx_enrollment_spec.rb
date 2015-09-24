@@ -8,7 +8,7 @@ describe HbxEnrollment do
     let(:fte_count)                               { blue_collar_employee_count + white_collar_employee_count }
     let(:employer_profile)                        { FactoryGirl.create(:employer_profile) }
 
-    let(:plan_year_start_on)                      { Date.current.next_month.end_of_month + 1.day }
+    let(:plan_year_start_on)                      { TimeKeeper.date_of_record.next_month.end_of_month + 1.day }
     let(:plan_year_end_on)                        { (plan_year_start_on + 1.year) - 1.day }
 
     let(:blue_collar_benefit_group)               { plan_year.benefit_groups[0] }
@@ -28,8 +28,8 @@ describe HbxEnrollment do
     let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
                                                       start_on: plan_year_start_on,
                                                       end_on: plan_year_end_on,
-                                                      open_enrollment_start_on: Date.current,
-                                                      open_enrollment_end_on: Date.current + 5.days,
+                                                      open_enrollment_start_on: TimeKeeper.date_of_record,
+                                                      open_enrollment_end_on: TimeKeeper.date_of_record + 5.days,
                                                       employer_profile: employer_profile
                                                     )
                                                     blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
@@ -54,7 +54,7 @@ describe HbxEnrollment do
                                                      ees
                                                     }
 
-    it "should have a valid plan year in published state" do
+    it "should have a valid plan year in enrolling state" do
       expect(plan_year.aasm_state).to eq "enrolling"
     end
 
@@ -371,6 +371,45 @@ describe HbxEnrollment, dbclean: :after_all do
           hbx.employee_role.employer_profile_id == @enrollment3.employee_role.employer_profile_id and hbx.is_active?
         end
         expect(hbxs.count).to eq 1
+      end
+    end
+
+    context "decorated_elected_plans" do
+      let(:benefit_package) { BenefitPackage.new }
+      let(:consumer_role) { FactoryGirl.create(:consumer_role) }
+      let(:enrollment) {
+        household.create_hbx_enrollment_from(
+          consumer_role: consumer_role,
+          coverage_household: coverage_household,
+          benefit_package: benefit_package
+        )
+      }
+      let(:hbx_profile) {double} 
+      let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
+      let(:renewal_bcp) { double }
+      let(:bcp) { double }
+      let(:plan) { FactoryGirl.create(:plan) }
+      let(:plan2) { FactoryGirl.create(:plan) }
+
+      before :each do
+        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+      end
+
+      it "should return decoratored plans when not in the open enrollment" do
+        allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
+        allow(bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan]
+        expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
+        expect(enrollment.decorated_elected_plans('health').count).to eq 1
+        expect(enrollment.decorated_elected_plans('health').first.id).to eq plan.id
+      end
+
+      it "should return decoratored plans when not in the open enrollment" do
+        allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return true
+        allow(renewal_bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan2]
+        expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
+        expect(enrollment.decorated_elected_plans('health').count).to eq 1
+        expect(enrollment.decorated_elected_plans('health').first.id).to eq plan2.id
       end
     end
   end

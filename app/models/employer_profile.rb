@@ -1,6 +1,6 @@
 class EmployerProfile
-  BINDER_PREMIUM_PAID_EVENT_NAME = "local.enroll.employer.binder_premium_paid"
-  EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "local.enroll.employer.updated"
+  BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
+  EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
 
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -330,7 +330,7 @@ class EmployerProfile
 
   def broadcast_employer_update
     if previous_states.include?(:binder_paid) || (aasm_state.to_sym == :binder_paid)
-      notify(EMPLOYER_PROFILE_UPDATED_EVENT_NAME, {:employer => self})
+      notify(EMPLOYER_PROFILE_UPDATED_EVENT_NAME, {:employer_id => self.hbx_id})
     end
   end
 
@@ -366,7 +366,7 @@ class EmployerProfile
   end
 
   def notify_binder_paid
-    notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer => self})
+    notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer_id => self.hbx_id})
   end
 
 private

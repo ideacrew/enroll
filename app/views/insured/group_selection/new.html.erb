@@ -37,7 +37,7 @@
                     </td>
                     <td><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></td>
                     <td><%= "ineligible relationship"  if !is_coverage && @market_kind == 'shop'  %></td>
-                    <td><%= errors.join(', ') if errors.present? && @market_kind == 'individual'  %></td>
+                    <td><%= raw(errors.join(', ')) if errors.present? && @market_kind == 'individual'  %></td>
                   </tr>
                 <% end %>
               </tbody>
@@ -124,10 +124,10 @@
           <% elsif @change_plan == "change_by_qle" %>
             <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
           <% elsif @change_plan == "change_plan" %>
-            <% if is_under_open_enrollment? %>
-              <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
-            <% else %>
+            <% if @market_kind == "individual" && !is_under_open_enrollment? %>
               <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
+            <% else %>
+              <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
             <% end %>
           <% end %>
         </div>

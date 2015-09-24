@@ -1,72 +1,90 @@
 require 'rails_helper'
 
 describe ::Forms::PlanYearForm, "when newly created" do
-  subject { ::Forms::PlanYearForm.new(PlanYear.new) }
+  let(:plan_year_form) { ::Forms::PlanYearForm.new(PlanYear.new(start_on: TimeKeeper.date_of_record)) }
+
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 11, 1))
+  end
+
+  after do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
 
   context "validation" do
+    let(:invalid_plan_year_form) {::Forms::PlanYearForm.new(PlanYear.new())}
     before :each do
-      subject.valid?
+      invalid_plan_year_form.valid?
     end
 
     [:start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on].each do |attr|
       it "should have errors on #{attr}" do
-        expect(subject).to have_errors_on(attr.to_sym)
+        expect(invalid_plan_year_form).to have_errors_on(attr.to_sym)
       end
     end
   end
 
   context "plans" do
     let(:carrier_profile) {FactoryGirl.build(:carrier_profile)}
+    let(:next_year_plan_year_form) { ::Forms::PlanYearForm.new(PlanYear.new(start_on: TimeKeeper.date_of_record + 1.year)) }
 
     before :each do
       Plan.delete_all
       Rails.cache.clear
-      plan = FactoryGirl.create(:plan, active_year: Time.now.year, market: "shop", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "silver")
+      plan = FactoryGirl.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "silver")
       @plan = ["#{::Organization.valid_carrier_names[plan.carrier_profile_id.to_s]} - #{plan.name}", plan.id]
-      excluded_metal_level_plan = FactoryGirl.create(:plan, active_year: Time.now.year, market: "shop", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "catastrophic")
+      excluded_metal_level_plan = FactoryGirl.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "catastrophic")
       @excluded_metal_level_plan = ["#{::Organization.valid_carrier_names[excluded_metal_level_plan.carrier_profile_id.to_s]} - #{excluded_metal_level_plan.name}", excluded_metal_level_plan.id.to_s]
-      excluded_market_plan = FactoryGirl.create(:plan, active_year: Time.now.year, market: "individual", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "silver")
+      excluded_market_plan = FactoryGirl.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "individual", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "silver")
       @excluded_market_plan = ["#{::Organization.valid_carrier_names[:excluded_market_plan]} - #{excluded_market_plan.name}", excluded_market_plan.id.to_s]
-      excluded_coverage_kind_plan = FactoryGirl.create(:plan, active_year: Time.now.year, market: "shop", coverage_kind: "dental", carrier_profile: carrier_profile, metal_level: "silver")
+      excluded_coverage_kind_plan = FactoryGirl.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "dental", carrier_profile: carrier_profile, metal_level: "silver")
       @excluded_coverage_kind_plan = ["#{::Organization.valid_carrier_names[:excluded_coverage_kind_plan]} - #{excluded_coverage_kind_plan.name}", excluded_coverage_kind_plan.id.to_s]
-      FactoryGirl.create(:plan, active_year: (Time.now.year - 1), carrier_profile: carrier_profile)
+      FactoryGirl.create(:plan, active_year: (TimeKeeper.date_of_record.year - 1), carrier_profile: carrier_profile)
       FactoryGirl.create(:plan, market: "individual", carrier_profile: carrier_profile)
       FactoryGirl.create(:plan, coverage_kind: "dental", carrier_profile: carrier_profile)
     end
 
     describe "asked to provide plans for a carrier" do
       it "should include the expected plan" do
-        expect(subject.carrier_plans_for(carrier_profile.id)).to include(@plan)
+        expect(plan_year_form.carrier_plans_for(carrier_profile.id)).to include(@plan)
+      end
+
+      it "should not include the expected plan in next year" do
+        expect(next_year_plan_year_form.carrier_plans_for(carrier_profile.id)).not_to include(@plan)
       end
 
       it "should not include dental" do
-        expect(subject.carrier_plans_for(carrier_profile.id)).to include(@excluded_coverage_kind_plan)
+        expect(plan_year_form.carrier_plans_for(carrier_profile.id)).to include(@excluded_coverage_kind_plan)
       end
 
       it "should not include individual" do
-        expect(subject.carrier_plans_for(carrier_profile.id)).not_to include(@excluded_market_plan)
+        expect(plan_year_form.carrier_plans_for(carrier_profile.id)).not_to include(@excluded_market_plan)
       end
 
       it "should not include catastrophic" do
-        expect(subject.carrier_plans_for(carrier_profile.id)).not_to include(@excluded_metal_level_plan)
+        expect(plan_year_form.carrier_plans_for(carrier_profile.id)).not_to include(@excluded_metal_level_plan)
       end
     end
 
     describe "asked to provide plans for a metal level" do
-
       it "should include the expected plan" do
-        expect(subject.metal_level_plans_for("silver")).to include(@plan)
+        expect(plan_year_form.metal_level_plans_for("silver")).to include(@plan)
       end
+
+      it "should not include the expected plan in next year" do
+        expect(next_year_plan_year_form.metal_level_plans_for("silver")).not_to include(@plan)
+      end
+
       it "should not include dental" do
-        expect(subject.metal_level_plans_for("silver")).to include(@excluded_coverage_kind_plan)
+        expect(plan_year_form.metal_level_plans_for("silver")).to include(@excluded_coverage_kind_plan)
       end
 
       it "should not include individual" do
-        expect(subject.metal_level_plans_for("silver")).not_to include(@excluded_market_plan)
+        expect(plan_year_form.metal_level_plans_for("silver")).not_to include(@excluded_market_plan)
       end
 
       it "should not include catastrophic" do
-        expect(subject.metal_level_plans_for("silver")).not_to include(@excluded_metal_level_plan)
+        expect(plan_year_form.metal_level_plans_for("silver")).not_to include(@excluded_metal_level_plan)
       end
     end
   end

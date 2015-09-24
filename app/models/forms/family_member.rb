@@ -1,5 +1,5 @@
 module Forms
-  class EmployeeDependent
+  class FamilyMember
     include ActiveModel::Model
     include ActiveModel::Validations
 
@@ -103,6 +103,7 @@ module Forms
         if address.present?
           person.home_address.try(:destroy)
           person.addresses << address
+          person.save
         end
       else
         current_address = person.try(:home_address)
@@ -113,7 +114,7 @@ module Forms
         if current_address.present?
           current_address.update(addresses.permit!)
         else
-          person.addresses.new(addresses.permit!)
+          person.addresses.create(addresses.permit!)
         end
       end
     rescue => e
@@ -163,7 +164,7 @@ module Forms
     end
 
     def self.find(family_member_id)
-      found_family_member = FamilyMember.find(family_member_id)
+      found_family_member = ::FamilyMember.find(family_member_id)
       has_same_address_with_primary = compare_address_with_primary(found_family_member);
       address = if has_same_address_with_primary
                   Address.new(kind: 'home')
@@ -190,7 +191,7 @@ module Forms
         :is_incarcerated => found_family_member.is_incarcerated,
         :citizen_status => found_family_member.citizen_status,
         :tribal_id => found_family_member.tribal_id,
-        :same_with_primary => has_same_address_with_primary,
+        :same_with_primary => has_same_address_with_primary.to_s,
         :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),
         :no_dc_address_reason => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address_reason),
         :addresses => address
@@ -210,7 +211,7 @@ module Forms
     end
 
     def family_member
-      @family_member = FamilyMember.find(id)
+      @family_member = ::FamilyMember.find(id)
     end
 
     def assign_attributes(atts)

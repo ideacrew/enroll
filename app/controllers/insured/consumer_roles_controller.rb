@@ -1,5 +1,6 @@
 class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
+  include ErrorBubble
   before_action :check_consumer_role, only: [:search]
 
   before_action :find_consumer_role_and_person, only: [:edit, :update]
@@ -12,7 +13,6 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       session.delete(:individual_assistance_path)
     end
-    @help_me = true
     @person = Forms::ConsumerCandidate.new
     respond_to do |format|
       format.html
@@ -94,6 +94,7 @@ class Insured::ConsumerRolesController < ApplicationController
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
     else
+      bubble_consumer_role_errors_by_person(@person)
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
@@ -112,7 +113,6 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
-
   def person_parameters_list
     [
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
@@ -132,7 +132,7 @@ class Insured::ConsumerRolesController < ApplicationController
       :is_disabled,
       :race,
       :is_consumer_role,
-      :ethnicity,
+      {:ethnicity => []},
       :us_citizen,
       :naturalized_citizen,
       :eligible_immigration_status,
@@ -177,13 +177,18 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def update_vlp_documents
+    if (params[:person][:us_citizen] == 'true' and params[:person][:naturalized_citizen] == 'false') or (params[:person][:us_citizen] == 'false' and params[:person][:eligible_immigration_status] == 'false')
+      return
+    end
+
     return if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].first.nil?
     doc_params = params.require(:person).permit({:consumer_role_attributes =>
                                                  [:vlp_documents_attributes =>
                                                   [:subject, :citizenship_number, :naturalization_number,
                                                    :alien_number, :passport_number, :sevis_id, :visa_number,
                                                    :receipt_number, :expiration_date, :card_number, :i94_number]]})
-    document = find_document(@consumer_role, doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject])
+    @vlp_doc_subject = doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject]
+    document = find_document(@consumer_role, @vlp_doc_subject)
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
     document.save
   end

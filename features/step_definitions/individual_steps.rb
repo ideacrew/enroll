@@ -14,7 +14,7 @@ Then(/Individual creates HBX account$/) do
   scroll_then_click(@browser.input(value: "Create account"))
 end
 
-When(/user goes to register as an individual$/) do
+When(/^user goes to register as an individual$/) do
   @browser.button(class: /interaction-click-control-continue/).wait_until_present
   @browser.text_field(class: /interaction-field-control-person-first-name/).set("Taylor")
   @browser.text_field(class: /interaction-field-control-person-middle-name/).set("K")
@@ -29,10 +29,9 @@ When(/user goes to register as an individual$/) do
   @browser.text_field(class: /interaction-field-control-person-ssn/).set("677991234")
   @browser.radio(class: /interaction-choice-control-value-radio-male/).fire_event("onclick")
   screenshot("register")
-  @browser.button(class: /interaction-click-control-continue/).click
 end
 
-Then(/user should see button to continue as an individual/) do
+Then(/^user should see button to continue as an individual/) do
   @browser.a(text: /continue/i).wait_until_present
   screenshot("no_match")
   expect(@browser.a(text: /continue/i).visible?).to be_truthy
@@ -69,7 +68,7 @@ When(/Individual clicks on Save and Exit/) do
    click_when_present(@browser.link(class: /interaction-click-control-save---exit/))
 end
 
-When(/Individual clicks on continue button/) do
+When(/^\w+ clicks? on continue button$/) do
   click_when_present(@browser.button(class: /interaction-click-control-continue/))
 end
 
@@ -78,6 +77,7 @@ Then (/Individual resumes enrollment/) do
   @browser.a(text: /consumer\/family portal/i).click
   wait_and_confirm_text(/Sign In Existing Account/)
   click_when_present(@browser.link(class: /interaction-click-control-sign-in-existing-account/))
+  sleep 2
   @browser.text_field(class: /interaction-field-control-user-email/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set("taylor.york@example.com")
   @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
@@ -86,7 +86,21 @@ Then (/Individual resumes enrollment/) do
   expect(@browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-1/).value).to eq("4900 USAA BLVD")
 end
 
-Then("Individual should see identity verification page and clicks on submit") do
+Then (/Individual fixes a VLP error message/) do
+  @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-true/).wait_while_present
+  @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-true/).fire_event("onclick")
+  @browser.p(text: /Select document type/i).wait_until_present
+  @browser.p(text: /Select document type/i).click
+  @browser.li(text: /Certificate of Citizenship/i).wait_until_present
+  @browser.li(text: /Certificate of Citizenship/i).click
+  click_when_present(@browser.button(class: /interaction-click-control-continue/))
+  wait_and_confirm_text(/2 errors/)
+  wait_and_confirm_text(/Certificate of citizenship: base alien_number value is required/)
+  @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).wait_while_present
+  @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).fire_event("onclick")
+end
+
+Then(/^\w+ should see identity verification page and clicks on submit/) do
   @browser.radio(class: /interaction-choice-control-value-agreement-agree/).wait_until_present
   @browser.radio(class: /interaction-choice-control-value-agreement-agree/).click
   @browser.a(class: /interaction-click-control-continue/).wait_until_present
@@ -102,11 +116,11 @@ Then("Individual should see identity verification page and clicks on submit") do
   @browser.a(class: /interaction-click-control-override-identity-verification/).click
 end
 
-Then(/Individual should see the dependents form/) do
+Then(/\w+ should see the dependents form/) do
   @browser.a(text: /Add Member/).wait_until_present
   screenshot("dependents")
   expect(@browser.a(text: /Add Member/).visible?).to be_truthy
-end
+end 
 
 And(/Individual clicks on add member button/) do
   @browser.a(text: /Add Member/).wait_until_present
@@ -215,4 +229,91 @@ end
 And(/I click to see my Secure Purchase Confirmation/) do
   @browser.link(text: /Messages/).click
   wait_and_confirm_text /Your Secure Purchase Confirmation/
+end
+
+Then(/Second user creates an individual account$/) do
+  @browser.button(class: /interaction-click-control-create-account/).wait_until_present
+  @browser.text_field(class: /interaction-field-control-user-email/).set("second.york@example.com")
+  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
+  @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!aA1!")
+  screenshot("create_account")
+  scroll_then_click(@browser.input(value: "Create account"))
+end
+
+Then(/^Second user goes to register as an individual/) do
+  step "user goes to register as an individual"
+  @browser.text_field(class: /interaction-field-control-person-first-name/).set("Second")
+  @browser.text_field(class: /interaction-field-control-person-ssn/).set("222991234")
+end
+
+Then(/^Second user should see a form to enter personal information$/) do
+  step "Individual should see a form to enter personal information"
+  @browser.text_field(class: /interaction-field-control-person-emails-attributes-0-address/).set("second.york@example.com")
+end
+
+Then(/Second user asks for help$/) do
+  @browser.divs(text: /Help me sign up/).last.click
+  wait_and_confirm_text /Options/
+  click_when_present(@browser.a(class: /interaction-click-control-help-from-a-customer-service-representative/))
+  @browser.text_field(class: /interaction-field-control-help-first-name/).set("Sherry")
+  @browser.text_field(class: /interaction-field-control-help-last-name/).set("Buckner")
+  @browser.div(id: 'search_for_plan_shopping_help').click
+  @browser.button(class: 'close').click
+end
+
+And(/^.+ clicks? the continue button$/i) do
+  click_when_present(@browser.a(text: /continue/i))
+end
+
+Then(/^.+ sees the Verify Identity Consent page/)  do
+  wait_and_confirm_text(/Verify Identity: Consent/)
+end
+
+When(/^CSR accesses the HBX portal$/) do
+  @browser.goto("http://localhost:3000/")
+  @browser.a(text: /hbx portal/i).wait_until_present
+  @browser.a(text: /hbx portal/i).click
+  wait_and_confirm_text(/Sign In Existing Account/)
+  click_when_present(@browser.link(class: /interaction-click-control-sign-in-existing-account/))
+  sleep 2
+  @browser.text_field(class: /interaction-field-control-user-email/).wait_until_present
+  @browser.text_field(class: /interaction-field-control-user-email/).set("sherry.buckner@dc.gov")
+  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
+  @browser.element(class: /interaction-click-control-sign-in/).click
+  sleep(2)
+
+end
+
+Then(/CSR should see the Agent Portal/) do
+  wait_and_confirm_text /Agent Messages/
+  wait_and_confirm_text /New Consumer Paper Application/
+end
+
+Then(/CSR opens the Please Contact Message/) do
+  tr=@browser.tr(text: /Please contact/)
+  tr.a(text: /show/).click
+end
+
+Then(/CSR clicks on Resume Application via phone/) do
+  sleep 2
+  @browser.a(text: /Resume Application via phone/).fire_event('onclick')
+end
+
+When(/I click on the header link to return to CSR page/) do
+  wait_and_confirm_text /Enrollment assistance for: Second/
+  @browser.a(text: /I'm a Customer Service/i).click
+end
+
+Then(/CSR clicks on New Consumer Paper Application/) do
+  click_when_present(@browser.a(text: /New Consumer Paper Application/i))
+end
+
+Then(/CSR starts a new enrollment/) do
+  wait_and_confirm_text /Personal Information/
+  wait_and_confirm_text /15% Complete/
+end
+
+Then(/^click continue again$/) do
+  wait_and_confirm_text /continue/i
+  scroll_then_click(@browser.a(text: /continue/i))
 end

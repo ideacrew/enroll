@@ -20,7 +20,7 @@
       <div class="row row-form-wrapper no-buffer">
         <div class="col-md-4 col-sm-4 no-pd">
           <div class="form-group form-group-lg">
-            <%= f.text_field :first_name, value: dependent.first_name,class: "home required floatlabel form-control", required: true, placeholder: "FIRST NAME" %>
+            <%= f.text_field :first_name, value: dependent.first_name,class: "home required floatlabel form-control", required: true, placeholder: "FIRST NAME *" %>
           </div>
         </div>
 
@@ -32,13 +32,13 @@
 
         <div class="col-md-4 col-sm-4 no-pd">
           <div class="form-group form-group-lg">
-            <%= f.text_field :last_name, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "LAST NAME" %>
+            <%= f.text_field :last_name, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "LAST NAME *" %>
             <div class="text-right">
               <% if !dependent.persisted? %>
               <a href="#" class="close close-1 remove-new-employee-dependent" data-target="#new_employee_dependent_form"><%= image_tag "member-close.png" %></a>
               <% else %>
               <%=
-              link_to insured_employee_dependent_path(dependent), class: 'close close-2', :method => :delete, :remote => true, data: {confirm: "Remove dependent?", ok: 'yes', cancel: 'no'} do
+              link_to insured_family_member_path(dependent), class: 'close close-2', :method => :delete, :remote => true, data: {confirm: "Remove dependent?", ok: 'yes', cancel: 'no'} do
                 '<i class="fa fa-times"></i>'.html_safe
               end
               %>
@@ -51,7 +51,7 @@
       <div class="row row-form-wrapper no-buffer">
         <div class="col-md-2 col-sm-2 no-pd">
           <div class="form-group form-group-lg">
-            <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH",
+            <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH *",
              :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true,  id: "family_member_dob_#{dependent.id}"}, dependent.dob %>
            </div>
          </div>
@@ -73,7 +73,7 @@
 
         <div class="col-md-3 col-sm-3 no-pd">
           <div class="form-group form-group-lg">
-            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "RELATION", required: true} %>
+            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "RELATION *"} %>
           </div>
         </div>
 
@@ -101,7 +101,7 @@
               <label for="dependent_same_with_primary">Live with primary subscriber</label>
             </div>
           </div>
-          <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary ? 'none' : 'block' %>">
+          <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
             <%= render 'shared/consumer_home_address_fields', f: f %>
           </div>
         </div>
@@ -119,7 +119,7 @@
         Cancel
       </a>
       <% else %>
-      <%= link_to '<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Cancel'.html_safe, insured_employee_dependent_path(dependent), :remote => true %>
+      <%= link_to '<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Cancel'.html_safe, insured_family_member_path(dependent), :remote => true %>
       <% end %>
       <%= f.button(class: "btn btn-select pull-right") do %>
       Confirm Member
