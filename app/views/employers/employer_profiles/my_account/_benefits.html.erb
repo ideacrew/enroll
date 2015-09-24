@@ -17,9 +17,11 @@
     <h3 class="title-inline"><%= plan_year.start_on.to_date.year%> - Plan Year (<%= plan_year.aasm_state.to_s.humanize %>)</h3>
     <div class="pull-right bottom-mgn-xs">
       <% if plan_year.draft? && @current_plan_year.nil? %>
-        <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
-        <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans"%>
-      <% else %>
+      <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
+      <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans right"%>
+      <% elsif plan_year.draft? %>
+      <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans right"%>
+
       <% end %>
     </div>
   </div>
@@ -176,18 +178,15 @@
       </div>
     </div>
   </div>
-<br><br>
-<%= render "employers/plan_years/publish_modal", plan_year: plan_year %>
+  <% end %>
+  <div class="col-xs-12"><br><br></div>
 
-      <% end %>
-      <div class="row top-pd">
+  <%= render "employers/plan_years/publish_modal", plan_year: plan_year %>
 
-      <% end %>
-      <% else %>
-      <h4 style="max-width: 600px;">
-      You haven't created a benefits package yet. Click "Add Benefits Package" above to make your first one.
-    </h4>
-      <% end %>
+  <% end %>
 
-
-    </div>
+  <% else %>
+  <h4 style="max-width: 600px;">
+    You haven't created a benefits package yet. Click "Add Benefits Package" above to make your first one.
+  </h4>
+  <% end %>
