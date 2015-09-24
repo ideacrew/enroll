@@ -105,3 +105,12 @@ $(document).on('page:update', function(){
     });
   };
 });
+
+$(document).on("change", "input[type=checkbox]#no_qle_checkbox", function(){
+  if(this.checked) {
+    $('#outside-open-enrollment').modal('show');
+    $('#outside-open-enrollment').on('hidden.bs.modal', function (e) {
+      $("#no_qle_checkbox").attr("checked",false)
+    });
+  }
+});

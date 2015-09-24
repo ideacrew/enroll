@@ -13,8 +13,8 @@ class Person
   ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
   RELATIONSHIP_CHANGE_ATTRIBUTES = %w(person_relationships)
 
-  PERSON_CREATED_EVENT_NAME = "local.events.person.created"
-  PERSON_UPDATED_EVENT_NAME = "local.events.person.updated"
+  PERSON_CREATED_EVENT_NAME = "acapi.info.events.individual.created"
+  PERSON_UPDATED_EVENT_NAME = "acapi.info.events.individual.updated"
 
   field :hbx_id, type: String
   field :name_pfx, type: String
@@ -166,11 +166,11 @@ class Person
   after_update :notify_updated
 
   def notify_created
-    notify(PERSON_CREATED_EVENT_NAME, {:individual => self } )
+    notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
   def notify_updated
-    notify(PERSON_UPDATED_EVENT_NAME, {:individual => self } )
+    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
   def consumer_fields_validations

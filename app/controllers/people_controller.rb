@@ -1,5 +1,6 @@
 class PeopleController < ApplicationController
   include ApplicationHelper
+  include ErrorBubble
 
   def new
     @person = Person.new
@@ -224,8 +225,11 @@ class PeopleController < ApplicationController
         format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
         format.json { head :no_content }
       else
+        bubble_consumer_role_errors_by_person(@person)
         build_nested_models
-        format.html { redirect_to redirect_path, alert: 'Person update failed.' }
+        person_error_megs = @person.errors.full_messages.join('<br/>') if @person.errors.present?
+
+        format.html { redirect_to redirect_path, alert: "Person update failed.<br />" + person_error_megs }
         # format.html { redirect_to edit_insured_employee_path(@person) }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end
@@ -312,7 +316,6 @@ private
   end
 
   def build_nested_models
-
     ["home","mobile","work","fax"].each do |kind|
        @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
     end
@@ -435,7 +438,8 @@ private
                                                   [:subject, :citizenship_number, :naturalization_number,
                                                    :alien_number, :passport_number, :sevis_id, :visa_number,
                                                    :receipt_number, :expiration_date, :card_number, :i94_number]]})
-    document = find_document(@person.consumer_role, doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject])
+    @vlp_doc_subject = doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject]
+    document = find_document(@consumer_role, @vlp_doc_subject)
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
     document.save
   end

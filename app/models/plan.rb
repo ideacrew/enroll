@@ -37,6 +37,7 @@ class Plan
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
   field :sbc_file, type: String
+  embeds_one :sbc_document, :class_name => "Document", as: :documentable
 
   embeds_many :premium_tables
   accepts_nested_attributes_for :premium_tables
@@ -144,16 +145,19 @@ class Plan
   scope :health_coverage,       ->{ where(coverage_kind: "health") }
   scope :dental_coverage,       ->{ where(coverage_kind: "dental") }
 
-  scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop",  metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
-  scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", metal_level: metal_level)}
+  # DEPRECATED - 2015-09-23 - By Sean Carley
+  # scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop",  metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
+  # scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", metal_level: metal_level)}
+  scope :valid_shop_by_carrier, ->(carrier_profile_id) {valid_shop_by_carrier_and_year(carrier_profile_id, TimeKeeper.date_of_record.year)}
+  scope :valid_shop_by_metal_level, ->(metal_level) {valid_shop_by_metal_level_and_year(metal_level, TimeKeeper.date_of_record.year)}
+  # END DEPRECATED
+
+  scope :valid_shop_by_carrier_and_year, ->(carrier_profile_id, year) {where(carrier_profile_id: carrier_profile_id, active_year: year, market: "shop",  metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
+  scope :valid_shop_by_metal_level_and_year, ->(metal_level, year) {where(active_year: year, market: "shop", metal_level: metal_level)}
 
   scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
-  scope :shop_by_active_year, -> (active_year) {
-    where(
-        active_year: active_year,
-        market: "shop"
-      )
-  }
+
+
   scope :shop_health_by_active_year, ->(active_year) {
       where(
           active_year: active_year,
@@ -280,9 +284,9 @@ class Plan
       result
     end
 
-    def valid_shop_health_plans(type="carrier", key=nil)
-      Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{TimeKeeper.date_of_record.year}", expires_in: 5.hour) do
-        Plan.public_send("valid_shop_by_#{type}", key.to_s).to_a
+    def valid_shop_health_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)
+      Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}", expires_in: 5.hour) do
+        Plan.public_send("valid_shop_by_#{type}_and_year", key.to_s, year_of_plans).to_a
       end
     end
 

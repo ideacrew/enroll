@@ -221,9 +221,6 @@ class Family
   def add_family_member(person, **opts)
 #    raise ArgumentError.new("expected Person") unless person.is_a? Person
 
-
-
-
     is_primary_applicant     = opts[:is_primary_applicant]  || false
     is_coverage_applicant    = opts[:is_coverage_applicant] || true
     is_consent_applicant     = opts[:is_consent_applicant]  || false
@@ -241,7 +238,6 @@ class Family
       )
 
     active_household.add_household_coverage_member(family_member)
-    #active_household.add_household_tax_member(family_member)
     family_member
   end
 

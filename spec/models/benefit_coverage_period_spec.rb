@@ -131,4 +131,36 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
     end
   end
 
+  context "elected_plans_by_enrollment_members" do
+    let(:benefit_coverage_period) { BenefitCoveragePeriod.new }
+    let(:c1) {FactoryGirl.create(:consumer_role)}
+    let(:c2) {FactoryGirl.create(:consumer_role)}
+    let(:member1) {double(person: double(consumer_role: c1))}
+    let(:member2) {double(person: double(consumer_role: c2))}
+    let(:plan1) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
+    let(:plan2) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', active_year: TimeKeeper.date_of_record.year - 1, hios_id: "11111111122303-01") }
+    let(:plan3) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01") }
+    let(:plan4) { FactoryGirl.create(:plan, market: 'individual', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
+    let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id])}
+    let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id])}
+    let(:rule) {double}
+
+    before :each do
+      Plan.delete_all
+      allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package1, benefit_package2]
+      allow(InsuredEligibleForBenefitRule).to receive(:new).and_return rule
+    end
+
+    it "when satisfied" do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      plans = [plan1, plan3]
+      expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')).to eq plans
+    end
+
+    it "when not satisfied" do
+      allow(rule).to receive(:satisfied?).and_return [false, 'ok']
+      plans = []
+      expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')).to eq plans
+    end
+  end
 end

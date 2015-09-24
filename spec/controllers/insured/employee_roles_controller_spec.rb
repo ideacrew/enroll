@@ -38,7 +38,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
 
       it "should redirect to dependent_details" do
         expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(insured_employee_dependents_path(:employee_role_id => employee_role_id))
+        expect(response).to redirect_to(insured_family_members_path(:employee_role_id => employee_role_id))
       end
     end
 

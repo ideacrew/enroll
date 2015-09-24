@@ -2,27 +2,27 @@
 
 <div id= 'message_form'></div>
 <div class="container" id="plan_shoppings_show_form">
-	<div id="select_plan_wrapper">
-		<div class="row">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-				<div class="ct-1">
-					<h3>Choose a healthcare plan.</h3>
+  <div id="select_plan_wrapper">
+    <div class="row">
+      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+        <div class="ct-1">
+          <h3>Choose a healthcare plan.</h3>
           <div class="row no-buffer">
-              <p class="pull-left">
-                    Individual: <strong><%= @person.full_name %></strong> &nbsp;&nbsp;
-                    Dependents: <strong><%= @hbx_enrollment.humanized_dependent_summary %></strong> &nbsp;&nbsp;
-                    <% if @market_kind == 'shop' and @coverage_kind == 'health' %>
-                      Employer: <strong><%= @benefit_group.try(:plan_year).try(:employer_profile).try(:legal_name) %></strong> &nbsp;&nbsp;
-                    <% end %>
-                    Plans: <strong id='plans-count'><%= @plans.count %></strong>
-              </p>
+            <p class="pull-left">
+              Individual: <strong><%= @person.full_name %></strong> &nbsp;&nbsp;
+              Dependents: <strong><%= @hbx_enrollment.humanized_dependent_summary %></strong> &nbsp;&nbsp;
+              <% if @market_kind == 'shop' and @coverage_kind == 'health' %>
+              Employer: <strong><%= @benefit_group.try(:plan_year).try(:employer_profile).try(:legal_name) %></strong> &nbsp;&nbsp;
+              <% end %>
+              Plans: <strong id='plans-count'><%= @plans.count %></strong>
+            </p>
 
-              <p class="pull-right">
-                <a href="javascript:void(0);" style="display: none;" class="btn btn-select compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
-                  COMPARE PLANS
-                </a>
-              </p>
-  	          <br/><br/><br/>
+            <p class="pull-right">
+              <a href="javascript:void(0);" style="display: none;" class="btn btn-select compare-selected-plans-link", data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
+                COMPARE PLANS
+              </a>
+            </p>
+            <br/><br/><br/>
           </div>
 
           <div class="row">
@@ -83,20 +83,20 @@
 </div>
 
 <div class="modal fade" id="plans-compare-alert">
-	<div class="modal-dialog modal-lg">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">Plan Compare Alert</h4>
-			</div>
-			<div class="modal-body">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Plan Compare Alert</h4>
+      </div>
+      <div class="modal-body">
         <p style='color:red;'>Can not select more than 3 plans to compare.</p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-			</div>
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
 <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if @hbx_enrollment.employee_role.present? %>

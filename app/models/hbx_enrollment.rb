@@ -6,7 +6,7 @@ class HbxEnrollment
   include HasFamilyMembers
   include AASM
   include MongoidSupport::AssociationProxies
-
+  include Acapi::Notifiers
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip individual]
   Authority = [:open_enrollment]
   WAIVER_REASONS = [
@@ -19,6 +19,9 @@ class HbxEnrollment
     "I have coverage through Medicaid",
     "I do not have other coverage"
   ]
+
+  ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
+  ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
 
   ENROLLED_STATUSES = ["coverage_selected", "enrollment_transmitted_to_carrier", "coverage_enrolled"]
 
@@ -185,6 +188,23 @@ class HbxEnrollment
       hbx_enrollment_members.each do |hem|
         hem.person.consumer_role.start_individual_market_eligibility!(effective_on)
       end
+      notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
+    else
+      if is_shop_sep?
+        notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
+      end
+    end
+  end
+
+  def is_shop_sep?
+    false
+  end
+
+  def transmit_shop_enrollment!
+    if !consumer_role.present?
+      if !is_shop_sep?
+        notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
+      end
     end
   end
 
@@ -277,29 +297,15 @@ class HbxEnrollment
   end
 
   def decorated_elected_plans(coverage_kind)
-    benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-    if HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
-      HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
-    end
-    benefit_packages = benefit_coverage_period.benefit_packages
+    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    benefit_coverage_period = if benefit_sponsorship.renewal_benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
+                                benefit_sponsorship.renewal_benefit_coverage_period
+                              else
+                                benefit_sponsorship.current_benefit_coverage_period
+                              end
+    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind)
 
-    ivl_bgs = []
-    benefit_packages.each do |bg|
-      satisfied = true
-      hbx_enrollment_members.map(&:person).map(&:consumer_role).each do |consumer_role|
-        rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, coverage_kind)
-        satisfied = false and break unless rule.satisfied?[0]
-      end
-      ivl_bgs << bg if satisfied
-    end
-
-    ivl_bgs = ivl_bgs.uniq
-    elected_plan_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
-    elected_plans = Plan.where(:id => {"$in" => elected_plan_ids}).to_a
-
-    plans = elected_plans.collect do |plan|
-      UnassistedPlanCostDecorator.new(plan, self)
-    end
+    elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
   # FIXME: not sure what this is or if it should be removed - Sean
