@@ -7,7 +7,7 @@ describe Subscribers::FamilyApplicationCompleted do
 
   describe "given an xml" do
     let(:message) { { "body" => xml } }
-    let(:hbx_profile_organization) { double("Organization", hbx_profile: double("HbxProfile", benefit_sponsorship:  double(current_benefit_coverage_period: double(slcsp: Plan.new.id))))}
+    let(:hbx_profile_organization) { double("HbxProfile", benefit_sponsorship:  double(current_benefit_coverage_period: double(slcsp: Plan.new.id)))}
 
     context "with valid single member in payload" do
       let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_sample.xml")) }
@@ -49,6 +49,7 @@ describe Subscribers::FamilyApplicationCompleted do
 
         before do
           family.save!
+          allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile_organization)
           allow(person).to receive(:consumer_role).and_return(consumer_role)
           allow(Person).to receive(:where).and_return([person])
           allow(Organization).to receive(:where).and_return([hbx_profile_organization])
@@ -107,7 +108,7 @@ describe Subscribers::FamilyApplicationCompleted do
         before do
           person.save!
           expect(subject).not_to receive(:log)
-          allow(Organization).to receive(:where).and_return([hbx_profile_organization])
+          allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile_organization)
           subject.call(nil, nil, nil, nil, message)
         end
 

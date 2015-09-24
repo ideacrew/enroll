@@ -105,7 +105,7 @@ class Household
     # end
 
     if verified_tax_household.eligibility_determinations.present?
-      benchmark_plan_id = Organization.where(:hbx_profile.exists => true).first.hbx_profile.benefit_sponsorship.current_benefit_coverage_period.slcsp
+      benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
 
       th.update_attributes(is_eligibility_determined: true)
 
