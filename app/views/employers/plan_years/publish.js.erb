@@ -1,6 +1,5 @@
 <% @plan_year.application_eligibility_warnings.each_value do |warning| %>
   $(".application-warnings").append("<li><%= warning %></li>");
 <% end %>
-
+alert(123);
 $("#publishPlanYear").modal('show');
-

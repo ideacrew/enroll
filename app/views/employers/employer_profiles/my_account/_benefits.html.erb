@@ -1,16 +1,29 @@
 <div class="col-xs-12 benefits-tab">
-  <h1>Coverage - Benefits You Offer</h1>
-  <div class="row top-pd">
-    <div class="col-xs-12">
+  <div class="row">
+    <div class="col-xs-8">
+      <h1>Coverage - Benefits You Offer</h1>
+    </div>
+    <div class="col-xs-4">
       <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-br btn-block", data: {loading_text: "Loading..."} %>
     </div>
+
+
   </div>
+  <br>
   <% if @plan_years.present? %>
 
   <% @plan_years.each do |plan_year| %>
-  <div col-xs-12>
-    <h2>Plan Year <%= plan_year.aasm_state.capitalize %></h3>
+  <div class="row no-buffer">
+    <h3 class="title-inline"><%= plan_year.start_on.to_date.year%> - Plan Year (<%= plan_year.aasm_state.to_s.humanize %>)</h3>
+    <div class="pull-right bottom-mgn-xs">
+      <% if plan_year.draft? && @current_plan_year.nil? %>
+        <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
+        <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans"%>
+      <% else %>
+      <% end %>
+    </div>
   </div>
+
   <% plan_year.benefit_groups.each do |bg| %>
   <div class="panel benefitgroup col-xs-12">
     <section class="col-xs-6">
@@ -164,22 +177,11 @@
     </div>
   </div>
 <br><br>
+<%= render "employers/plan_years/publish_modal", plan_year: plan_year %>
+
       <% end %>
       <div class="row top-pd">
-        <div class="col-xs-12">
-          <div class="plan-year-wrapper">
-            <div class="row no-buffer">
-              <div class="pull-right bottom-mgn-xs">
-                <% if plan_year.draft? && @current_plan_year.nil? %>
-                <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year, tab: 'benefits'), method: :post, class: "btn btn-select" %>
-                <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year, tab: 'benefits'), class: "btn btn-select"%>
-                <% else %>
-                <%= plan_year.aasm_state.to_s.humanize %>
-                <% end %>
-              </div>
-            </div>
 
-          </div></div></div>
       <% end %>
       <% else %>
       <h4 style="max-width: 600px;">

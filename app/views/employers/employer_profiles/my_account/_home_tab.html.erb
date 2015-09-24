@@ -15,6 +15,7 @@
   </div>
   <div class="col-md-8">
     <div class="row">
+      <% if @current_plan_year.present? %>
       <div class="panel panel-default alert" id="panelOne">
         <div class="panel-heading">
           <h3>Employee Enrollments and Waivers <i class="fa fa-question-circle"></i>
@@ -34,7 +35,7 @@
           <a class="close" data-dismiss="alert"><i class="fa fa-times"></i></a>
         </p>
       </div>
-      <% if @current_plan_year.present? %>
+
       <div class="panel panel-default myplanyear col-xs-12">
 
                   <div class="panel-heading">
