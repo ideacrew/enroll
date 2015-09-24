@@ -4,12 +4,8 @@ RSpec.describe SamlController do
 
   describe "POST login" do
     let(:user) { FactoryGirl.create(:user, last_portal_visited: family_account_path)}
+
     invalid_xml = File.read("spec/saml/invalid_saml_response.xml")
-
-
-    before(:each) do
-
-    end
 
     context "with devise session active" do
       it "should sign out current user" do
@@ -32,30 +28,36 @@ RSpec.describe SamlController do
       end
     end
 
-    # context "with valid saml response" do
+    context "with valid saml response" do
+      sample_xml = File.read("spec/saml/invalid_saml_response.xml")
+      let(:name_id) { user.email}
+      let(:valid_saml_response) { double(is_valid?: true, :"settings=" => true, attributes: attributes_double, name_id: name_id)}
+      let(:attributes_double) { { 'mail' => user.email} }
 
-    #   sample_xml = File.read("spec/saml/invalid_saml_response.xml")
+      before do
+        allow(OneLogin::RubySaml::Response).to receive(:new).and_return( valid_saml_response )
+      end
 
-    #   describe "with an existing user" do
-    #     it "should redirect back to their last portal" do
-    #       allow(User).to receive(:where).and_return([user])
-    #       post :login, :SAMLResponse => sample_xml
-    #       expect(response).to redirect_to(user.last_portal_visited)
-    #       puts user.last_portal_visited
-    #     end
-    #   end
+      describe "with an existing user" do
+        it "should redirect back to their last portal" do
+          post :login, :SAMLResponse => sample_xml
+          expect(response).to redirect_to(user.last_portal_visited)
+          expect(User.where(email: user.email).first.oim_id).to eq name_id
+          expect(User.where(email: user.email).first.idp_verified).to be_truthy
+        end
+      end
 
-    #   describe "with a new user" do
-    #     it "should claim the invitation" do
-    #       allow(User).to receive(:where).and_return([])
-    #       post :login, :SAMLResponse => sample_xml
-    #       expect(response).to redirect_to(search_insured_consumer_role_index_path)
-    #     end
-    #   end
+      describe "with a new user" do
+        let(:name_id) { attributes_double['mail'] }
+        let(:attributes_double) { { 'mail' => "new@user.com"} }
 
-    # end
-
-
-
+        it "should claim the invitation" do
+          post :login, :SAMLResponse => sample_xml
+          expect(response).to redirect_to(search_insured_consumer_role_index_path)
+          expect(User.where(email: attributes_double['mail']).first.oim_id).to eq name_id
+          expect(User.where(email: attributes_double['mail']).first.idp_verified).to be_truthy
+        end
+      end
+    end
   end
 end

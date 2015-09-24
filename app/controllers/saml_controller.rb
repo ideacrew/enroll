@@ -19,12 +19,13 @@ class SamlController < ApplicationController
 
       if user_with_email.present?
         user_with_email.idp_verified = true
+        user_with_email.oim_id = response.name_id
         user_with_email.save!
         sign_in(:user, user_with_email)
         redirect_to user_with_email.last_portal_visited
       else
         new_password = User.generate_valid_password
-        new_user = User.new(email: email, password: new_password, idp_verified: true)
+        new_user = User.new(email: email, password: new_password, idp_verified: true, oim_id: email)
         new_user.save!
         sign_in(:user, new_user)
         redirect_to search_insured_consumer_role_index_path
