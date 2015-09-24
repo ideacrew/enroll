@@ -65,7 +65,7 @@
         </tr>
         <% if census_employee.employment_terminated? %>
 
-        <tr class="unbrd  rehire_<%= census_employee.id %>">
+        <tr class="unbrd  rehire_<%= census_employee.id %>" style="display: none;">
           <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="8" id="enter-date">
             <div class="confirm-terminate">
               <input class="text-center date-picker" data-date-min="<%= (census_employee.employment_terminated_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="e.g. 5/1/2015" type="text"><br/>
