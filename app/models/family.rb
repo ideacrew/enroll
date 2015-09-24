@@ -341,6 +341,7 @@ class Family
     end
 
     def find_family_member(family_member_id)
+      return [] if family_member_id.nil?
       family = Family.where("family_members._id" => BSON::ObjectId.from_string(family_member_id)).first
       family.family_members.detect { |member| member._id.to_s == family_member_id.to_s }
     end
