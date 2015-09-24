@@ -49,7 +49,7 @@ class IdpAccountManager
   end
 
   def update_navigation_flag(lu, email, flag)
-    provider.update_flag(lu, email, flag)
+    provider.update_navigation_flag(lu, email, flag)
   end
 
   def self.set_provider(prov)
