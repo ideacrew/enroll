@@ -18,7 +18,7 @@ class IdpAccountManager
       :dob => personish.dob.strftime("%Y%m%d")
     }
     if !personish.ssn.blank?
-      person_details[:ssn] = personish.ssn 
+      person_details[:ssn] = personish.ssn
     end
     provider.check_existing_account(
       person_details,
@@ -91,7 +91,7 @@ class IdpAccountManager
 
     def self.update_navigation_flag(legacy_username, email, flag)
       lu = (legacy_username.blank? ? email : legacy_username)
-      notify("acapi.info.events.account_management.update_navigation_flag",{ :email => email, :flag => flag, :legacy_username => lu}) 
+      notify("acapi.info.events.account_management.update_navigation_flag",{ :email => email, :flag => flag, :legacy_username => lu})
     end
 
     def self.create_account(args, timeout = 5)
@@ -132,4 +132,3 @@ end
 unless Rails.env.production?
   IdpAccountManager.slug!
 end
-

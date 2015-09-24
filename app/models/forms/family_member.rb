@@ -191,7 +191,7 @@ module Forms
         :is_incarcerated => found_family_member.is_incarcerated,
         :citizen_status => found_family_member.citizen_status,
         :tribal_id => found_family_member.tribal_id,
-        :same_with_primary => has_same_address_with_primary,
+        :same_with_primary => has_same_address_with_primary.to_s,
         :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),
         :no_dc_address_reason => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address_reason),
         :addresses => address
