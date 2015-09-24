@@ -90,7 +90,8 @@ class IdpAccountManager
     end
 
     def self.update_navigation_flag(legacy_username, email, flag)
-      notify("acapi.info.events.account_management.update_navigation_flag",{ :email => email, :flag => flag, :legacy_username => legacy_username}) 
+      lu = (legacy_username.blank? ? email : legacy_username)
+      notify("acapi.info.events.account_management.update_navigation_flag",{ :email => email, :flag => flag, :legacy_username => lu}) 
     end
 
     def self.create_account(args, timeout = 5)
