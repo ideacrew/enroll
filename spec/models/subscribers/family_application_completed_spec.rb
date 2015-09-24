@@ -45,9 +45,11 @@ describe Subscribers::FamilyApplicationCompleted do
       context "with a valid single person family" do
         let(:person) { FactoryGirl.create(:person) }
         let(:family) { Family.new.build_from_person(person) }
+        let(:consumer_role) { double("ConsumerRole", id: 12345, import: true, :"vlp_authority=" => true, :"residency_determined_at=" => true, :"citizen_status=" => true, :"is_state_resident=" => true, save!: true)}
 
         before do
           family.save!
+          allow(person).to receive(:consumer_role).and_return(consumer_role)
           allow(Person).to receive(:where).and_return([person])
           allow(Organization).to receive(:where).and_return([hbx_profile_organization])
         end
