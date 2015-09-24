@@ -43,9 +43,18 @@
           </td>
           <% end %>
 
+<<<<<<< Updated upstream
           <td><%= census_employee.aasm_state.humanize %></td>
           <td><%= enrollment_state(census_employee) %></td>
           <td><%= boolean_to_human census_employee.employee_role_linked? %></td>
+=======
+          <td><% census_employee.aasm_state.humanize %></td>
+          <td><% enrollment_state(census_employee) %></td>
+          <td><% boolean_to_human census_employee.employee_role_linked? %></td>
+
+
+
+>>>>>>> Stashed changes
           <td class="table-functions">
             <%= link_to raw('<i class="fa fa-pencil fa-2x"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
             <%= link_to raw('<i class="fa fa-trash-o fa-2x"></i>'), employers_employer_profile_census_employee_terminate_path(@employer_profile, census_employee.id), remote: true, onclick: '$(this).closest("tr").next().toggle();' %>
