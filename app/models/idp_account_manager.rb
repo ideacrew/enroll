@@ -4,6 +4,9 @@ class IdpAccountManager
   attr_accessor :provider
   include Singleton
 
+  CURAM_NAVIGATION_FLAG = "2"
+  ENROLL_NAVIGATION_FLAG = "1"
+
   def initialize
     @provider = AmqpSource
   end
@@ -45,12 +48,20 @@ class IdpAccountManager
     }, timeout)
   end
 
+  def update_navigation_flag(email, flag)
+    provider.update_flag(email, flag)
+  end
+
   def self.set_provider(prov)
     self.instance.provider = prov
   end
 
   def self.slug!
     self.set_provider(SlugSource)
+  end
+
+  def self.update_navigation_flag(email, flag)
+    self.instance.update_navigation_flag(email, flag)
   end
 
   def self.check_existing_account(personish, timeout = 5)
@@ -78,6 +89,10 @@ class IdpAccountManager
       end
     end
 
+    def self.update_navigation_flag(email, flag)
+      notify("acapi.info.events.account_management.update_navigation_flag",{ :email => email, :flag => flag }) 
+    end
+
     def self.create_account(args, timeout = 5)
       notify("acapi.info.events.account_management.creation_requested", args)
     end
@@ -99,6 +114,9 @@ class IdpAccountManager
   end
 
   class SlugSource
+    def self.update_navigation_flag(email, flag)
+    end
+
     def self.create_account(args, timeout = 5)
       :created
     end
