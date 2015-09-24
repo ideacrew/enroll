@@ -162,7 +162,7 @@
                                       <span style="line-height: 130%;">
                                         <span style="line-height: 130%;">
                                           Congratulations
-					  <%=enrollment.subscriber.family_member.person.full_name%>,<br />
+					  <%= enrollment.subscriber.family_member.person.full_name.strip %>,<br />
                                           <br />
                                           You and the
                                           following
@@ -201,7 +201,7 @@
                                     </tbody>
                                         </table>
                                         <p>
-                                          Your monthly premium contribution is <b><%= number_to_currency plan.total_premium %>.</b><br>
+                                          Your monthly premium contribution is <b><%= number_to_currency plan.total_employee_cost %>.</b><br>
                                           Your employer contributes <b><%= number_to_currency plan.total_employer_contribution %></b> towards your monthly premium.<br>
                                           Your coverage start date is <b><%= enrollment.effective_on.strftime("%m/%d/%Y") %>.</b>
                                         </p>
