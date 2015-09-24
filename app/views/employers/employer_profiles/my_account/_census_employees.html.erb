@@ -6,8 +6,9 @@
   </div>
   <div class="col-xs-6">
     <div class="col-xs-12">
+
       <div class="row">
-      <%= form_tag employers_employer_profile_path(@employer_profile), method: :get, class: 'input-no-pd', id: 'census_employee_search' do %>
+      <%= form_tag employers_employer_profile_path(@employer_profile), method: :get, remote: true, class: 'input-no-pd', id: 'census_employee_search' do %>
       <%= hidden_field_tag(:status, 'active') %>
       <%= hidden_field_tag(:search, true) %>
       <div class="input-group">
