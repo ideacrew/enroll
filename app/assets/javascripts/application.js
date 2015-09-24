@@ -78,14 +78,14 @@ $(document).ready(function () {
       $(this).closest('.form-group').find('.slide-label').text(slideEvt.value);
   });
 
-
-
-
   $('.details').on('click', function() {
     $(this).closest('.referenceplan').find('.plan-details').toggle();
   });
 
-
+// toggle filter options in employees list
+  $(document).on('click', '.filter-options label', function()  {
+    $('.filter-options').hide();
+  });
 
 
 
@@ -424,7 +424,7 @@ $(document).ready(function () {
 
   $(document).on('click', '.return_to_employee_roster', function() {
     $('#add_employee_action').html('');
-    $('#employee_roster').show();
+    $('.employees-section').show();
   });
 
   $(document).on('click', '.return_to_employer_broker_agenices', function() {

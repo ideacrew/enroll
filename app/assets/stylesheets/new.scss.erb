@@ -83,6 +83,12 @@
     #census_employee_search {
       margin-top: 12px;
     }
+    #employees-filter {
+      position: relative;
+      i {
+        color: #007bc4;
+      }
+    }
     .filter {
       font-size: 14px;
       color: #007bc4;
@@ -90,6 +96,70 @@
       text-transform: uppercase;
       padding-top: 10px;
       cursor: pointer;
+
+    }
+    .filter-options {
+      display: none;
+      background-color: #fff;
+      border: solid 1px #b7b7b7;
+      padding: 5px 15px 30px 20px;
+      position: absolute;
+      right: 0;
+      top: 0;
+      color: #23527c;
+
+
+      h4 {
+        text-align: right;
+        text-transform: uppercase;
+        font-size: 14px;
+        color: #333;
+      }
+      input {
+      }
+      label {
+        display: block;
+        text-align: right;
+        color: #007bc4;
+        font-size: 18px;
+        padding: 0;
+        width: 100%;
+        &.btn {
+          display: block;
+          width: 100%;
+          background-color: transparent;
+          background-image: none;
+          border: none;
+          border-color: none;
+        }
+        &.btn-default {
+          display: block;
+          width: 100%;
+          background-color: transparent;
+          background-image: none;
+          border: none;
+          border-color: none;
+          &:hover, &:active, &:focus, &:active {
+            background-color: transparent;
+            border-color: none;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+          }
+        }
+        &.active {
+          background-color: transparent;
+          background-image: none;
+          border: none;
+          -webkit-box-shadow: none;
+          box-shadow: none;
+
+        }
+        &:hover {
+          color: underline;
+        }
+      }
+
+
     }
     .employees-table {
         margin-top: 20px;
@@ -152,6 +222,13 @@
 
       }
 
+    }
+  }
+  #add_employee_action {
+    .col-xs-12 {
+      .col-md-6 {
+        height: 180px;
+      }
     }
   }
   .planyear-add-tab {
