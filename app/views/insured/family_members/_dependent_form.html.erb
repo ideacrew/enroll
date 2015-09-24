@@ -101,7 +101,7 @@
               <label for="dependent_same_with_primary">Live with primary subscriber</label>
             </div>
           </div>
-          <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary ? 'none' : 'block' %>">
+          <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
             <%= render 'shared/consumer_home_address_fields', f: f %>
           </div>
         </div>

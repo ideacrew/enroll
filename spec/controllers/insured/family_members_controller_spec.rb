@@ -184,9 +184,7 @@ RSpec.describe Insured::FamilyMembersController do
     describe "with an invalid dependent" do
       it "should render the edit template" do
         expect(Address).to receive(:new)
-        expect(Forms::FamilyMember).to receive(:compare_address_with_primary)
         put :update, :id => dependent_id, :dependent => dependent_properties
-
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
       end 
@@ -199,6 +197,13 @@ RSpec.describe Insured::FamilyMembersController do
         put :update, :id => dependent_id, :dependent => dependent_properties
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")
+      end 
+
+      it "should render the edit template when update_vlp_documents failure" do
+        allow(controller).to receive(:update_vlp_documents).and_return(false)
+        put :update, :id => dependent_id, :dependent => dependent_properties
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("edit")
       end 
     end 
   end
