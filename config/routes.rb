@@ -45,7 +45,6 @@ Rails.application.routes.draw do
         get :begin_consumer_enrollment
         get :begin_employee_enrollment
         get :resume_enrollment
-        get :send_enrollment_confirmation
         get :show
       end
       member do
@@ -288,6 +287,8 @@ Rails.application.routes.draw do
     end
   end
   resources :office_locations, only: [:new]
+
+  get "document/download/:bucket/:key" => "documents#download", as: :document_download
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]

@@ -103,6 +103,7 @@ module Forms
         if address.present?
           person.home_address.try(:destroy)
           person.addresses << address
+          person.save
         end
       else
         current_address = person.try(:home_address)
@@ -113,7 +114,7 @@ module Forms
         if current_address.present?
           current_address.update(addresses.permit!)
         else
-          person.addresses.new(addresses.permit!)
+          person.addresses.create(addresses.permit!)
         end
       end
     rescue => e

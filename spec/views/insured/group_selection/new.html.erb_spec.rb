@@ -10,6 +10,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:family_member3) { double(id: "family_member", primary_relationship: "spouse", dob: Date.new(1990,10,10), full_name: "member") }
     let(:coverage_household) { double(family_members: [family_member1, family_member2, family_member3]) }
     let(:hbx_enrollment) {double(id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
+    let(:current_user) {FactoryGirl.create(:user)}
 
     before(:each) do
       assign(:person, person)
@@ -17,7 +18,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign(:coverage_household, coverage_household)
       assign(:market_kind, 'shop')
       assign(:hbx_enrollment, hbx_enrollment)
-
+      sign_in current_user
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
       allow(family_member1).to receive(:is_primary_applicant?).and_return(true)
       allow(family_member2).to receive(:is_primary_applicant?).and_return(false)
@@ -89,7 +90,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:hbx_enrollment) {double(id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
     let(:benefit_sponsorship) {double(earliest_effective_date: TimeKeeper.date_of_record.beginning_of_year)}
     let(:current_hbx) {double(benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: true)}
-
+    let(:current_user) {FactoryGirl.create(:user)}
     before(:each) do
       assign(:person, jail_person)
       assign(:consumer_role, consumer_role)
@@ -107,6 +108,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       controller.request.path_parameters[:consumer_role_id] = consumer_role.id
       allow(family_member4).to receive(:first_name).and_return('joey')
       allow(family_member4).to receive(:gender).and_return('female')
+      sign_in current_user
       render :template => "insured/group_selection/new.html.erb"
     end
 

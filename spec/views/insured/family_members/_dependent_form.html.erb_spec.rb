@@ -46,6 +46,13 @@ describe "insured/family_members/_dependent_form.html.erb" do
     it "should have dependent-address area" do
       expect(rendered).to have_selector("div#dependent-address")
     end
+
+    it "should have required indicator for fields" do
+      ["FIRST NAME", "LAST NAME", "DATE OF BIRTH"].each do |field|
+        expect(rendered).to have_selector("input[placeholder='#{field} *']")
+      end
+      expect(rendered).to have_selector("option", text: 'RELATION *')
+    end
   end
 
   context "without consumer_role" do
@@ -69,6 +76,13 @@ describe "insured/family_members/_dependent_form.html.erb" do
     it "should not have dependent-address area" do
       expect(rendered).not_to have_selector("div#dependent-address")
       expect(rendered).not_to have_selector("div#dependent-home-address-area")
+    end
+
+    it "should have required indicator for fields" do
+      ["FIRST NAME", "LAST NAME", "DATE OF BIRTH"].each do |field|
+        expect(rendered).to have_selector("input[placeholder='#{field} *']")
+      end
+      expect(rendered).to have_selector("option", text: 'RELATION *')
     end
   end
 end

@@ -8,7 +8,7 @@ describe HbxEnrollment do
     let(:fte_count)                               { blue_collar_employee_count + white_collar_employee_count }
     let(:employer_profile)                        { FactoryGirl.create(:employer_profile) }
 
-    let(:plan_year_start_on)                      { Date.current.next_month.end_of_month + 1.day }
+    let(:plan_year_start_on)                      { TimeKeeper.date_of_record.next_month.end_of_month + 1.day }
     let(:plan_year_end_on)                        { (plan_year_start_on + 1.year) - 1.day }
 
     let(:blue_collar_benefit_group)               { plan_year.benefit_groups[0] }
@@ -28,8 +28,8 @@ describe HbxEnrollment do
     let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
                                                       start_on: plan_year_start_on,
                                                       end_on: plan_year_end_on,
-                                                      open_enrollment_start_on: Date.current,
-                                                      open_enrollment_end_on: Date.current + 5.days,
+                                                      open_enrollment_start_on: TimeKeeper.date_of_record,
+                                                      open_enrollment_end_on: TimeKeeper.date_of_record + 5.days,
                                                       employer_profile: employer_profile
                                                     )
                                                     blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
@@ -54,7 +54,7 @@ describe HbxEnrollment do
                                                      ees
                                                     }
 
-    it "should have a valid plan year in published state" do
+    it "should have a valid plan year in enrolling state" do
       expect(plan_year.aasm_state).to eq "enrolling"
     end
 

@@ -6,7 +6,7 @@ class HbxEnrollment
   include HasFamilyMembers
   include AASM
   include MongoidSupport::AssociationProxies
-
+  include Acapi::Notifiers
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip individual]
   Authority = [:open_enrollment]
   WAIVER_REASONS = [
@@ -19,6 +19,9 @@ class HbxEnrollment
     "I have coverage through Medicaid",
     "I do not have other coverage"
   ]
+
+  ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
+  ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
 
   ENROLLED_STATUSES = ["coverage_selected", "enrollment_transmitted_to_carrier", "coverage_enrolled"]
 
@@ -184,6 +187,23 @@ class HbxEnrollment
     if consumer_role.present?
       hbx_enrollment_members.each do |hem|
         hem.person.consumer_role.start_individual_market_eligibility!(effective_on)
+      end
+      notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
+    else
+      if is_shop_sep?
+        notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
+      end
+    end
+  end
+
+  def is_shop_sep?
+    false
+  end
+
+  def transmit_shop_enrollment!
+    if !consumer_role.present?
+      if !is_shop_sep?
+        notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
       end
     end
   end
