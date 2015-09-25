@@ -67,7 +67,6 @@ module Subscribers
       )
       if new_address.valid?
         person.addresses << new_address
-        binding.pry unless person.valid?
         person.save!
       else
         log("ERROR: Failed to load home address from xml: #{xml}", {:severity => "error"})
