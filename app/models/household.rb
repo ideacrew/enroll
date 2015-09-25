@@ -84,7 +84,7 @@ class Household
       th.tax_household_members.build(
         family_member: primary_family_member,
         is_subscriber: true,
-        is_ia_eligible: verified_primary_tax_household_member.is_insurance_assistance_eligible
+        is_ia_eligible: verified_primary_tax_household_member.is_insurance_assistance_eligible ? verified_primary_tax_household_member.is_insurance_assistance_eligible : false
       )
 
       # verified_primary_family_member.financial_statements.each do |fs|
