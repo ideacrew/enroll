@@ -490,6 +490,13 @@ module ApplicationHelper
     options
   end
 
+  def purchase_or_confirm #TODO #TODOJF Maybe both roles?
+    if @person.try(:consumer_role)
+      'Confirm'
+    else
+      'Purchase'
+    end
+  end
   def get_key_and_bucket(uri)
     splits = uri.split('#')
     key = splits.last

@@ -64,12 +64,14 @@
                 <div class='bg-content'>
                   <% plan_year.benefit_groups.each_with_index do |bg, index| %>
                     <table class="table table-wrapper table-condensed bg" id="bg<%= bg.id %>" style="display: <%= index == 0 ? 'block' : 'none' %>">
+                    <% if @employer_profile.census_employees.active.count < 100 %>
                     <tr>
                       <th>Est. Monthly Employer Contribution :</th>
                       <td> <%= number_to_currency(bg.monthly_employer_contribution_amount) %> </td>
                       <th colspan="3">Est. Monthly Employee Cost (Min/Max) :</th>
                       <td> <%= number_to_currency(bg.monthly_min_employee_cost) %> / <%= number_to_currency(bg.monthly_max_employee_cost) %></td>
                     </tr>
+                    <% end %>
                     <tr>
                       <th>Benefit Group :</th>
                       <td><%= bg.title %></td>

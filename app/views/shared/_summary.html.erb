@@ -75,13 +75,12 @@
       <thead>
         <tr>
           <th width="35%">Services You May Need</th>
-          <th colspan="2">Your cost if you use a </th>
+          <th colspan="2">Your cost </th>
           <th>Limitations & Exceptions</th>
         </tr>
         <tr>
           <th>&nbsp;</th>
           <th>Participating Provider</th>
-          <th>Non-Participating Provider</th>
           <th>&nbsp;</th>
         </tr>
       </thead>
@@ -94,7 +93,6 @@
             <tr>
               <td><%= benefit.benefit_type_code %></td>
               <td><%= deductible.copay_in_network_tier_1 %></td>
-              <td><%= deductible.copay_out_of_network %></td>
               <td><%= benefit.explanation.present? ? benefit.explanation : "None" %></td>
             </tr>
           <% end %>

@@ -208,7 +208,7 @@ And(/I click on purchase button on confirmation page/) do
   @browser.text_field(class: /interaction-field-control-first-name-thank-you/).set("Taylor")
   @browser.text_field(class: /interaction-field-control-last-name-thank-you/).set("York")
   screenshot("purchase")
-  click_when_present(@browser.a(text: /purchase/i))
+  click_when_present(@browser.a(text: /confirm/i))
 end
 
 And(/I click on continue button to go to the individual home page/) do
