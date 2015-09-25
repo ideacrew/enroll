@@ -398,6 +398,7 @@ describe HbxEnrollment, dbclean: :after_all do
 
       it "should return decoratored plans when not in the open enrollment" do
         allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
+        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
         allow(bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan]
         expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
         expect(enrollment.decorated_elected_plans('health').count).to eq 1
@@ -405,6 +406,7 @@ describe HbxEnrollment, dbclean: :after_all do
       end
 
       it "should return decoratored plans when not in the open enrollment" do
+        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(renewal_bcp)
         allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return true
         allow(renewal_bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan2]
         expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator

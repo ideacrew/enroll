@@ -300,7 +300,7 @@ class HbxEnrollment
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 
     if family.is_under_special_enrollment_period?
-      benefit_coverage_period = benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
+      benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
     else
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end

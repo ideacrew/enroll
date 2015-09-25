@@ -191,12 +191,12 @@ class Family
 
   # List of SEPs active for this Application Group today, or passed date
   def active_seps(day = Date.today)
-    special_enrollment_periods.find_all { |sep| (sep.start_date..sep.end_date).include?(day) }
+    special_enrollment_periods.find_all { |sep| (sep.begin_on..sep.end_on).include?(day) }
   end
 
   # single SEP with latest end date from list of active SEPs
   def current_sep
-    active_seps.max { |sep| sep.end_date }
+    active_seps.max { |sep| sep.end_on }
   end
 
   def active_broker_roles
