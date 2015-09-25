@@ -10,7 +10,7 @@
   </div>
   <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
-      <div class="row row-form-wrapper no-buffer">
+      <div class="row row-form-wrapper no-buffer" style="display: none;">
         <div class="col-xs-12 form-group header">
           <h3><i class="fa fa-minus-circle"></i> Benefit Package: <% title_value = f.object.title.present? ? f.object.title : "#{Time.now.year} Employer Benefits" %><%= title_value %>
             <div class="form-functions">
@@ -20,12 +20,18 @@
 
         </div>
       </div>
-      <div class="row row-form-wrapper no-buffer" style="display: none;">
-        <div class="col-xs-12 form-group form-group-lg no-pd">
+
+
+      <div class="row row-form-wrapper no-buffer">
+        <div class="col-xs-12 form-group form-group-lg">
+          <!-- Offset :  -->
+          <label class="title">BENEFIT PACKAGE TITLE</label>
           <% title_value = f.object.title.present? ? f.object.title : "#{Time.now.year} Employer Benefits" %>
-          <%= f.text_field :title, class: "floatlabel form-control", value: title_value, required: true, placeholder: 'TITLE' %>
+          <%= f.text_field :title, class: "form-control", style: "font-weight: normal !important;", required: true %>
         </div>
       </div>
+
+
       <div class="row row-form-wrapper no-buffer">
         <div class="col-xs-12 form-group benefit-group-offset" data-toggle="popover" data-placement="top" title="" data-content="For dates of hire on the 1st day of the month, coverage would start on the date of hire" data-trigger="hover">
           <!-- Offset :  -->
@@ -65,7 +71,7 @@
           <div class="col-xs-6">Employer Contribution</div>
         </div>
       </div>
-    <div class="col-xs-12 benefits-fields">
+      <div class="col-xs-12 benefits-fields">
         <% f.object.relationship_benefits = generate_relationship_benefits(f.object) %>
         <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
         <%= render "shared/relationship_benefit_fields", f: rb %>
@@ -86,8 +92,12 @@
 
   </div>
 
-    <!-- Select Plan:  -->
-    <%= render "shared/reference_plans_list", f: f %>
+  <!-- Select Plan:  -->
+  <%= render "shared/reference_plans_list", f: f %>
+  <div class="col-xs-12 row">
+    <br><br>
+    <div class="selected-plan" style="display: none;"></div>
+  </div>
 
 
 

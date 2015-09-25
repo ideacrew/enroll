@@ -2,7 +2,6 @@
 $(document).on('ready', function() {
   // nav tabs radios on change for plan selection
 
-
     $('.plan-options > * input, .reference-plans > * input').prop('checked', false);
 
     $(document).on('change', '.offerings .fte:first input, .offerings .pte:first input, .offerings .msp:first input', function() {
@@ -62,11 +61,12 @@ $(document).on('ready', function() {
     //toggle plan options checkbox through parent anchor
 
     $(document).on('click', '.plan-options a, .nav-tabs a', function() {
+      $(this).closest('.benefit-group-fields').find('.selected-plan, .referenceplan').hide();
       $(this).closest('.benefit-group-fields').find('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
       $(this).closest('.benefit-group-fields').find('.plan-options input[type=radio]').attr('checked', 0);
       if ($(this).find('input[type=radio]').is(':checked')) {
       } else {
-        $(this).closest('.benefit-group-fields').find('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
+        $(this).closest('.benefit-group-fields').find('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h5>Loading plans...</h5></div>");
         $(this).closest('.benefit-group-fields').find(".reference-plans").show();
         $(this).find('input[type=radio]').prop('checked', true );
         if ($(this).parents('.carriers-tab').length > 0 ) {
@@ -82,8 +82,7 @@ $(document).on('ready', function() {
 
     });
 
-    // asdas
-    $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').closest('.row-form-wrapper').attr('style', 'border-bottom: none;');
+
 
 
 
@@ -91,6 +90,7 @@ $(document).on('ready', function() {
 
 // set reference_plan_id
 $(document).on('click', '.reference-plan input + label', function() {
+  
   var reference_plan_id = $(this).closest('.reference-plan').find('input').attr('value');
 
   if (reference_plan_id != "" && reference_plan_id != undefined){
@@ -98,7 +98,7 @@ $(document).on('click', '.reference-plan input + label', function() {
     if (start_date == "") {
       return
     }
-    $('.selected-plan').html("<div class=\'col-xs-12\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
+    $(this).closest('.benefit-group-fields').find('.selected-plan').html("<div class=\'col-xs-12\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
     $('.selected-plan').show();
     $.ajax({
       type: "GET",

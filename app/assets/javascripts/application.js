@@ -75,12 +75,16 @@ $(document).ready(function () {
       }
     });
     $(".benefits-fields .slider").on("slide", function(slideEvt) {
-      $(this).closest('.form-group').find('.slide-label').text(slideEvt.value);
+      $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
+      $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
   });
+
+  $('input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: 0px;');
 
   $('.details').on('click', function() {
     $(this).closest('.referenceplan').find('.plan-details').toggle();
   });
+
 
 // toggle filter options in employees list
   $(document).on('click', '.filter-options label', function()  {

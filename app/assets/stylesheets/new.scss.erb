@@ -399,7 +399,18 @@
     .row-form-wrapper {
       margin: 0;
       padding: 15px 0 20px;
+      &.active {
+        box-shadow: none;
+      }
+      .form-group-lg .form-control .form-control {
+        input {
+          font-weight: normal !important;
+        }
+      }
 
+    }
+    .row-form-wrapper.active::before {
+      border-right: none;
     }
     .form-inputs {
       fieldset {
@@ -426,6 +437,24 @@
         text-transform: uppercase;
         margin-top: 5px;
         font-size: 14px;
+        color: rgba(131, 135, 128, 1);
+        margin-bottom: 0;
+
+      }
+
+      input {
+        font-size: 18px !important;
+        padding: 0 !important;
+        color: #444;
+        font-family: 'Open Sans', sans-serif !important;
+        line-height: 28px;
+        &.hidden-param {
+          padding: 10px !important;
+        }
+
+        &:focus {
+          background-color: transparent;
+        }
       }
       .selectric {
         p.label {
@@ -470,6 +499,11 @@
 
           .row-form-wrapper {
             border-bottom: solid 1px #d5d5d5;
+            .form-group {
+              .col-xs-9 {
+                padding-right: 0;
+              }
+            }
             &:last-of-type {
               border-bottom: none;
             }
