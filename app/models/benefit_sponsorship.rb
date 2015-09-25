@@ -29,7 +29,7 @@ class BenefitSponsorship
   end
 
   def earliest_effective_date
-    current_benefit_coverage_period.earliest_effective_date if current_benefit_coverage_period
+    current_benefit_period.earliest_effective_date if current_benefit_period
   end
 
   def benefit_coverage_period_by_effective_date(effective_date)
@@ -52,11 +52,7 @@ class BenefitSponsorship
   end
 
   def current_benefit_period
-    if renewal_benefit_coverage_period.blank?
-      raise "renewal benefit coverage period missing!!"
-    end
-
-    if renewal_benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
+    if renewal_benefit_coverage_period && renewal_benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
       renewal_benefit_coverage_period
     else
       current_benefit_coverage_period
