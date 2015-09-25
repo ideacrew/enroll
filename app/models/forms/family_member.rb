@@ -16,7 +16,7 @@ module Forms
     
     def initialize(*attributes)
       @addresses = Address.new(kind: 'home')
-      @same_with_primary = true
+      @same_with_primary = "true"
       super
     end
 

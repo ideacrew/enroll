@@ -46,10 +46,12 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
   describe "instance methods" do
     let(:esi_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "Losing Employer-Subsidized Insurance because employee is going on Medicare")}
     let(:moved_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "I'm moving to the District of Columbia")}
+    let(:qle) {FactoryGirl.create(:qualifying_life_event_kind, title: "My employer did not pay my premiums on time")}
 
-    it "is_dependent_loss_of_esi?" do
-      expect(esi_qlek.is_dependent_loss_of_esi?).to eq true
-      expect(moved_qlek.is_dependent_loss_of_esi?).to eq false
+    it "is_dependent_loss_of_coverage?" do
+      expect(esi_qlek.is_dependent_loss_of_coverage?).to eq true
+      expect(qle.is_dependent_loss_of_coverage?).to eq true
+      expect(moved_qlek.is_dependent_loss_of_coverage?).to eq false
     end
 
     it "is_moved_to_dc?" do
