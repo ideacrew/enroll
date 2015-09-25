@@ -29,7 +29,7 @@
           </div>
           <div class="information">
             <strong>7</strong> out of <strong>14</strong> have enrolled or waived coverage<br/>
-            <strong>3</strong> or more needed by August 31, 2015 to meet minimum requirement
+            <strong>3</strong> or more needed by <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %> to meet minimum requirement
           </div>
         </div>
         <p class="panel-body alert-warning" role="alert">
@@ -37,11 +37,11 @@
           <a class="close" data-dismiss="alert"><i class="fa fa-times"></i></a>
         </p>
       </div>
-
       <div class="panel panel-default myplanyear col-xs-12">
 
                   <div class="panel-heading">
-                    <h5><%= @current_plan_year %></h5>
+                    <h5>Plan Year</h5>
+                    <%= @current_plan_year.inspect %>
                   </div>
                   <table>
                     <tr>
@@ -50,7 +50,7 @@
                       </td>
                       <td>
                         <p>
-                          October 1, 2015 - September 30, 2016
+                          <%= @current_plan_year.start_on.to_date.to_formatted_s :long_ordinal %> - <%= @current_plan_year.end_on.to_date.to_formatted_s :long_ordinal %>
                         </p>
                       </td>
                       <td>
@@ -65,23 +65,24 @@
                       </td>
                       <td>
                         <p>
-                          August 15, 2015 - August 31, 2015
+                          <%= @current_plan_year.open_enrollment_start_on.to_date.to_formatted_s :long_ordinal %> - <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %>
                         </p>
                       </td>
                       <td>
                         <h3>
-                          Status
+                          <%= @current_plan_year.aasm_state.capitalize %>
                         </h3>
                       </td>
                     </tr>
                   </table>
                 </div>
+                <%= @current_plan_year.benefit_groups.each do |bg| %>
 
                 <div class="panel benefitgroup col-xs-12">
                   <section class="col-xs-6">
                     <header class="row">
-                      <h5>Benefit Group 1</h5>
-                      <h3>All Employees</h3>
+                      <h5>Benefit Group</h5>
+                      <h3><%= bg.title.capitalize %></h3>
                     </header>
                   </section>
                   <section class="col-xs-6">
@@ -120,6 +121,7 @@
                     </tr>
                   </table>
                 </div>
+                <% end %>
                 <% else %>
                 <h4>You have not yet published a plan year. Once you do, it will display here. To make your first plan year now, <%= link_to "Click Here", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits') %>.</h4>
                 <% end %>
