@@ -71,10 +71,12 @@ class BenefitCoveragePeriod
 
   def earliest_effective_date
     if TimeKeeper.date_of_record.day < 16
-      TimeKeeper.date_of_record.end_of_month + 1.day
+      effective_date = TimeKeeper.date_of_record.end_of_month + 1.day
     else
-      TimeKeeper.date_of_record.next_month.end_of_month + 1.day
+      effective_date = TimeKeeper.date_of_record.next_month.end_of_month + 1.day
     end
+
+    [effective_date, start_on].max
   end
 
   def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind)
@@ -90,7 +92,7 @@ class BenefitCoveragePeriod
 
     ivl_bgs = ivl_bgs.uniq
     elected_plan_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
-    Plan.individual_plans(coverage_kind: coverage_kind, active_year: TimeKeeper.date_of_record.year).where(:id => {"$in" => elected_plan_ids}).to_a
+    Plan.individual_plans(coverage_kind: coverage_kind, active_year: earliest_effective_date.year).where(:id => {"$in" => elected_plan_ids}).to_a
   end
 
   ## Class methods

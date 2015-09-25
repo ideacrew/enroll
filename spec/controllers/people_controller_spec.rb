@@ -30,7 +30,7 @@ RSpec.describe PeopleController do
     it "when employee" do
       allow(person).to receive(:has_active_consumer_role?).and_return(false)
       post :update, id: person.id, person: person_attributes
-      expect(response).to redirect_to(insured_employee_path(person))
+      expect(response).to redirect_to(family_account_path)
       expect(flash[:notice]).to eq 'Person was successfully updated.'
     end
   end
