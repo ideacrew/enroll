@@ -219,3 +219,12 @@ var demographicsNew = {
     }
   },
 }
+
+$(document).on('page:update', function(){
+  $('form.edit_person, form.new_dependent, form.edit_dependent').submit(function(e){
+    if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')){
+      alert("Please select the option for 'Are you a member of an American Indian or Alaskan Native tribe?'");
+      e.preventDefault && e.preventDefault();
+    };
+  });
+});

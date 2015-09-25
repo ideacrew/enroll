@@ -315,6 +315,27 @@ class ConsumerRole
     end
   end
 
+  def update_by_person(*args)
+    person.addresses = []
+    person.phones = []
+    person.emails = []
+    person.update_attributes(*args)
+  end
+
+  def build_nested_models_for_person
+    ["home", "mobile"].each do |kind|
+      person.phones.build(kind: kind) if person.phones.select { |phone| phone.kind == kind }.blank?
+    end
+
+    Address::KINDS.each do |kind|
+      person.addresses.build(kind: kind) if person.addresses.select { |address| address.kind.to_s.downcase == kind }.blank?
+    end
+
+    Email::KINDS.each do |kind|
+      person.emails.build(kind: kind) if person.emails.select { |email| email.kind == kind }.blank?
+    end
+  end
+
 private
   def notify_of_eligibility_change
     CoverageHousehold.update_individual_eligibilities_for(self)
