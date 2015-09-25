@@ -90,6 +90,9 @@ $(document).ready(function () {
   $(document).on('click', '.filter-options label', function()  {
     $('.filter-options').hide();
   });
+  $(document).on('mouseleave', '.filter-options', function()  {
+    $('.filter-options').hide();
+  });
 
 
 
