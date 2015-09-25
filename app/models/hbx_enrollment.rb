@@ -298,13 +298,14 @@ class HbxEnrollment
 
   def decorated_elected_plans(coverage_kind)
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-    benefit_coverage_period = if benefit_sponsorship.renewal_benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
-                                benefit_sponsorship.renewal_benefit_coverage_period
-                              else
-                                benefit_sponsorship.current_benefit_coverage_period
-                              end
-    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind)
 
+    if family.is_under_special_enrollment_period?
+      benefit_coverage_period = benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
+    else
+      benefit_coverage_period = benefit_sponsorship.current_benefit_period
+    end
+
+    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
