@@ -1,4 +1,4 @@
-@watir @screenshots
+@watir @screenshots @no-database-cleaner 
 Feature: Insured Plan Shopping on Individual market
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
