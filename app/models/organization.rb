@@ -149,6 +149,7 @@ class Organization
   def office_location_kinds
     location_kinds = self.office_locations.select{|l| !l.persisted?}.flat_map(&:address).compact.flat_map(&:kind)
     # should validate only office location which are not persisted AND kinds ie. primary, mailing, branch
+    return if no_primary = location_kinds.detect{|kind| kind == 'work' || kind == 'home'}
     unless location_kinds.empty?
       if location_kinds.count('primary').zero?
         errors.add(:base, "must select one primary address")
@@ -158,14 +159,8 @@ class Organization
         errors.add(:base, "can't have more than one mailing address")
       end
       if !errors.any?# this means that the validation succeeded and we can delete all the persisted ones
-#        binding.pry
-        new_data = self.office_locations.select{|l| !l.persisted?}.dup
-        #self.office_locations.delete_all
-        #self.reload
-        #self.office_locations << new_data
+        self.office_locations.delete_if{|l| l.persisted?}
       end
-    else
-      errors.add(:base, "must select one primary address")
     end
   end
 

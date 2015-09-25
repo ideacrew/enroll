@@ -100,6 +100,7 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show_profile
+    @tab ||= params[:tab]
     if @tab == 'benefits'
       @current_plan_year = @employer_profile.published_plan_year
       @plan_years = @employer_profile.plan_years.order(id: :desc)
