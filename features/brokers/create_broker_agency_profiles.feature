@@ -1,7 +1,7 @@
-@watir @screenshots
+@watir @screenshots @no-database-cleaner
 Feature: Create Primary Broker and Broker Agency
   In order for Brokers to help individuals and SHOP employees
-  The Primary Broker must create and manage an account on the HBX for their organization.  
+  The Primary Broker must create and manage an account on the HBX for their organization.
   Such organizations are referred to as a Broker Agency
   The Primary Broker should be able to create a Broker Agency account application
   The HBX Admin should be able to approve the application and send an email invite
@@ -41,6 +41,7 @@ Feature: Create Primary Broker and Broker Agency
         When I visit the Employer portal
         Then Tim Wood creates an HBX account
         Then Tim Wood should see a successful sign up message
+        Then I should click on employer portal
         And Tim Wood creates a new employer profile
         When Employer clicks on the Broker Agency tab
         Then Employer should see no active broker

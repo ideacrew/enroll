@@ -4,6 +4,7 @@ class CensusEmployee < CensusMember
   include Searchable
   # include Validations::EmployeeInfo
   include Autocomplete
+  require 'roo'
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -34,16 +35,16 @@ class CensusEmployee < CensusMember
   validate :no_duplicate_census_dependent_ssns
 
   index({aasm_state: 1})
-  index({employer_profile_id: 1, last_name: 1, first_name: 1 })
-  index({employer_profile_id: 1, hired_on: 1, last_name: 1, first_name: 1 })
+  index({last_name: 1})
+  index({dob: 1})
+
   index({encrypted_ssn: 1, dob: 1, aasm_state: 1})
   index({employee_role_id: 1}, {sparse: true})
-  index({last_name: 1})
-  index({hired_on: -1})
-  index({is_business_owner: 1})
-  index({dob: 1})
-  index({"encrypted_ssn" => 1})
-  index({"encrypted_ssn" => 1, "dob" => 1})
+  index({employer_profile_id: 1, encrypted_ssn: 1, aasm_state: 1})
+  index({employer_profile_id: 1, last_name: 1, first_name: 1, hired_on: -1 })
+  index({employer_profile_id: 1, hired_on: 1, last_name: 1, first_name: 1 })
+  index({employer_profile_id: 1, is_business_owner: 1})
+
   index({"benefit_group_assignments._id" => 1})
   index({"benefit_group_assignments.benefit_group_id" => 1})
   index({"benefit_group_assignments.aasm_state" => 1})
@@ -258,6 +259,8 @@ class CensusEmployee < CensusMember
     def find_all_by_benefit_group(benefit_group)
       unscoped.where("benefit_group_assignments.benefit_group_id" => benefit_group._id)
     end
+
+
   end
 
   aasm do

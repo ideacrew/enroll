@@ -19,7 +19,7 @@ QualifyingLifeEventKind.create!(
 
 
 QualifyingLifeEventKind.create!(
-    title: "I've married", 
+    title: "I've married",
     action_kind: "add_benefit",
     reason: " ",
     edi_code: "32-MARRIAGE", 
@@ -34,7 +34,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "I've entered into a legal domestic partnership", 
+    title: "I've entered into a legal domestic partnership",
     action_kind: "add_benefit",
     reason: " ",
     edi_code: "33-ENTERING DOMESTIC PARTNERSHIP", 
@@ -49,7 +49,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "I've had a baby", 
+    title: "I've had a baby",
     action_kind: "add_benefit",
     reason: " ",
     edi_code: "02-BIRTH", 
@@ -64,7 +64,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "I've adopted a child", 
+    title: "I've adopted a child",
     action_kind: "add_benefit",
     reason: " ",
     edi_code: "05-ADOPTION", 
@@ -169,7 +169,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "I've moved", 
+    title: "I've moved",
     action_kind: "administrative",
     reason: "relocate",
     edi_code: "43-CHANGE OF LOCATION", 
@@ -194,6 +194,7 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: false, 
     ordinal_position: 70,
+    event_kind_label: "Date of exceptional circumstances",
     tool_tip: "Enroll due to an inadvertent or erroneous enrollment or another exceptional circumstance"
   )
 
@@ -208,6 +209,7 @@ QualifyingLifeEventKind.create!(
     post_event_sep_in_days: 30, 
     is_self_attested: false, 
     ordinal_position: 75,
+    event_kind_label: "Date of contract violation",
     tool_tip: "Enroll due to contract violation"
   )
 

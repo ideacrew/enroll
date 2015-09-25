@@ -41,7 +41,12 @@
     </div>
   </div><br>
 
-  <%= render 'shared/home_address_fields', f: f %><br>
+  <% if @person.has_active_consumer_role? %>
+    <%= render 'shared/consumer_fields', f: f %><br>
+    <%= render 'shared/consumer_home_address_fields', f: f %><br>
+  <% else %>
+    <%= render 'shared/home_address_fields', f: f %><br>
+  <% end %>
 
   <%=
     unless f.object.phones.nil?

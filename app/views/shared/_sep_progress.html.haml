@@ -47,14 +47,9 @@
 - elsif step == 5
   %button.btn.btn-lg.btn-primary.btn-br.btn-block#btn-continue{disabled: true}
     CONTINUE
-  %br>/
-  \ 
-  .btn.btn-waive.btn-transparent{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
-    I need help with
-    = succeed "Plan" do
-      %br/
+
 - elsif step == 6
-  = link_to 'Purchase', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind), :class => 'btn btn-lg btn-primary btn-br btn-block disabled', id: 'btn-continue', :method => :post, :disabled => !@enrollable
+  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind), :class => 'btn btn-lg btn-primary btn-br btn-block disabled', id: 'btn-continue', :method => :post, :disabled => !@enrollable
 - elsif step == 7
   = link_to 'GO TO MY ACCOUNT', family_account_path, class: 'btn btn-lg btn-primary', id: 'btn-continue'
 - else
@@ -74,4 +69,7 @@
     %br
   %li
     %p
-      If you select Save & Logout, you can save your work and continue where you left off the next time you login.
+      If you select Save & Exit, you can save your work and continue where you left off the next time you login.
+.btn.btn-transparent{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
+  Help me sign up
+= render partial: 'insured/plan_shoppings/help_with_plan' 

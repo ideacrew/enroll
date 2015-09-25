@@ -6,7 +6,7 @@ class HbxEnrollment
   include HasFamilyMembers
   include AASM
   include MongoidSupport::AssociationProxies
-
+  include Acapi::Notifiers
   Kinds = %W[unassisted_qhp insurance_assisted_qhp employer_sponsored streamlined_medicaid emergency_medicaid hcr_chip individual]
   Authority = [:open_enrollment]
   WAIVER_REASONS = [
@@ -20,6 +20,9 @@ class HbxEnrollment
     "I do not have other coverage"
   ]
 
+  ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
+  ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
+
   ENROLLED_STATUSES = ["coverage_selected", "enrollment_transmitted_to_carrier", "coverage_enrolled"]
 
   embedded_in :household
@@ -29,6 +32,10 @@ class HbxEnrollment
 
   field :elected_premium_credit, type: Money, default: 0.0
   field :applied_premium_credit, type: Money, default: 0.0
+  # TODO need to understand these two fields
+  field :elected_aptc_pct, type: Float, default: 0.0
+  field :elected_amount, type: Money, default: 0.0
+  field :applied_aptc_amount, type: Money, default: 0.0
 
   field :effective_on, type: Date
   field :terminated_on, type: Date
@@ -150,9 +157,9 @@ class HbxEnrollment
 
   def currently_active?
     return false if shopping?
-    return false unless (effective_on <= Timekeeper.date_of_record)
+    return false unless (effective_on <= TimeKeeper.date_of_record)
     return true if terminated_on.blank?
-    terminated_on >= Timekeeper.date_of_record
+    terminated_on >= TimeKeeper.date_of_record
   end
 
   def generate_hbx_id
@@ -180,6 +187,23 @@ class HbxEnrollment
     if consumer_role.present?
       hbx_enrollment_members.each do |hem|
         hem.person.consumer_role.start_individual_market_eligibility!(effective_on)
+      end
+      notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
+    else
+      if is_shop_sep?
+        notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
+      end
+    end
+  end
+
+  def is_shop_sep?
+    false
+  end
+
+  def transmit_shop_enrollment!
+    if !consumer_role.present?
+      if !is_shop_sep?
+        notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
       end
     end
   end
@@ -238,6 +262,15 @@ class HbxEnrollment
     hbx_enrollment_members.count - 1
   end
 
+  def phone_number
+    if plan.present?
+      phone = plan.try(:carrier_profile).try(:organization).try(:primary_office_location).try(:phone)
+      "#{phone.try(:area_code)}#{phone.try(:number)}"
+    else
+      ""
+    end
+  end
+
   def rebuild_members_by_coverage_household(coverage_household:)
     applicant_ids = hbx_enrollment_members.map(&:applicant_id)
     coverage_household.coverage_household_members.each do |coverage_member|
@@ -252,6 +285,28 @@ class HbxEnrollment
 
   def update_current(updates)
     household.hbx_enrollments.where(id: id).update_all(updates)
+  end
+
+  def update_hbx_enrollment_members_premium(decorated_plan)
+    return if decorated_plan.blank? and hbx_enrollment_members.blank?
+
+    hbx_enrollment_members.each do |member|
+      #TODO update applied_aptc_amount error like hbx_enrollment
+      member.update_current(applied_aptc_amount: decorated_plan.aptc_amount(member))
+    end
+  end
+
+  def decorated_elected_plans(coverage_kind)
+    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+
+    if family.is_under_special_enrollment_period?
+      benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
+    else
+      benefit_coverage_period = benefit_sponsorship.current_benefit_period
+    end
+
+    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind)
+    elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
   # FIXME: not sure what this is or if it should be removed - Sean
@@ -279,12 +334,7 @@ class HbxEnrollment
   end
 
   def self.calculate_start_date_by_qle(household)
-    special_enrollment_period = household.family.special_enrollment_periods.last
-    if special_enrollment_period.present?
-      special_enrollment_period.effective_on
-    else
-      TimeKeeper.date_of_record
-    end
+    household.family.current_sep.effective_on
   end
 
   def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false)
@@ -295,7 +345,11 @@ class HbxEnrollment
       enrollment.household = coverage_household.household
       enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
-      enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+      enrollment.effective_on = if qle
+                                  calculate_start_date_by_qle(coverage_household.household)
+                                else
+                                  calculate_start_date_from(employee_role, coverage_household, benefit_group)
+                                end
       # benefit_group.plan_year.start_on
       enrollment.benefit_group = benefit_group
       census_employee = employee_role.census_employee
@@ -308,12 +362,20 @@ class HbxEnrollment
       enrollment.kind = "individual"
       enrollment.consumer_role = consumer_role
       enrollment.benefit_package_id = benefit_package.try(:id)
-      if qle
-        enrollment.effective_on = calculate_start_date_by_qle(coverage_household.household)
+      # if qle
+      #   enrollment.effective_on = calculate_start_date_by_qle(coverage_household.household)
+      # else
+
+      
+      benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+      family = consumer_role.person.primary_family
+      if family.is_under_special_enrollment_period?
+        enrollment.effective_on = family.current_sep.effective_on
       else
-        benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").benefit_sponsorship
-        enrollment.effective_on = benefit_sponsorship.earliest_effective_date
+        enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
       end
+
+      # end
     else
       raise "either employee_role or consumer_role is required"
     end

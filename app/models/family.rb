@@ -134,7 +134,7 @@ class Family
   def current_ivl_eligible_open_enrollments
     eligible_open_enrollments = []
 
-    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").try(:benefit_sponsorship)
+    benefit_sponsorship = HbxProfile.current_hbx.try(:benefit_sponsorship)
     (benefit_sponsorship.try(:benefit_coverage_periods) || []).each do |benefit_coverage_period|
       if benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
         eligible_open_enrollments << EnrollmentEligibilityReason.new(benefit_sponsorship)
@@ -191,12 +191,12 @@ class Family
 
   # List of SEPs active for this Application Group today, or passed date
   def active_seps(day = Date.today)
-    special_enrollment_periods.find_all { |sep| (sep.start_date..sep.end_date).include?(day) }
+    special_enrollment_periods.find_all { |sep| (sep.begin_on..sep.end_on).include?(day) }
   end
 
   # single SEP with latest end date from list of active SEPs
   def current_sep
-    active_seps.max { |sep| sep.end_date }
+    active_seps.max { |sep| sep.end_on }
   end
 
   def active_broker_roles
@@ -220,9 +220,6 @@ class Family
 
   def add_family_member(person, **opts)
 #    raise ArgumentError.new("expected Person") unless person.is_a? Person
-
-
-
 
     is_primary_applicant     = opts[:is_primary_applicant]  || false
     is_coverage_applicant    = opts[:is_coverage_applicant] || true
@@ -344,6 +341,7 @@ class Family
     end
 
     def find_family_member(family_member_id)
+      return [] if family_member_id.nil?
       family = Family.where("family_members._id" => BSON::ObjectId.from_string(family_member_id)).first
       family.family_members.detect { |member| member._id.to_s == family_member_id.to_s }
     end

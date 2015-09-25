@@ -8,7 +8,7 @@ class ConsumerRole
 
   embedded_in :person
 
-  VLP_AUTHORITY_KINDS = %w(ssa dhs hbx)
+  VLP_AUTHORITY_KINDS = %w(ssa dhs hbx curam)
   NATURALIZED_CITIZEN_STATUS = "naturalized_citizen"
   INDIAN_TRIBE_MEMBER_STATUS = "indian_tribe_member"
   US_CITIZEN_STATUS = "us_citizen"
@@ -52,7 +52,8 @@ class ConsumerRole
   field :marital_status, type: String
   field :is_active, type: Boolean, default: true
 
-    field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
+  field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
+  field :bookmark_url, type: String, default: nil
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -270,6 +271,11 @@ class ConsumerRole
     state :verifications_outstanding
     state :fully_verified
 
+    event :import, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :verifications_pending, to: :fully_verified
+      transitions from: :verifications_outstanding, to: :fully_verified
+    end
+
     event :deny_lawful_presence, :after => [:record_transition, :mark_lp_denied, :notify_of_eligibility_change] do
       transitions from: :verifications_pending, to: :verifications_pending, guard: :residency_pending?
       transitions from: :verifications_pending, to: :verifications_outstanding
@@ -306,6 +312,27 @@ class ConsumerRole
     end
     if residency_pending?
       start_residency_verification_process
+    end
+  end
+
+  def update_by_person(*args)
+    person.addresses = []
+    person.phones = []
+    person.emails = []
+    person.update_attributes(*args)
+  end
+
+  def build_nested_models_for_person
+    ["home", "mobile"].each do |kind|
+      person.phones.build(kind: kind) if person.phones.select { |phone| phone.kind == kind }.blank?
+    end
+
+    Address::KINDS.each do |kind|
+      person.addresses.build(kind: kind) if person.addresses.select { |address| address.kind.to_s.downcase == kind }.blank?
+    end
+
+    Email::KINDS.each do |kind|
+      person.emails.build(kind: kind) if person.emails.select { |email| email.kind == kind }.blank?
     end
   end
 

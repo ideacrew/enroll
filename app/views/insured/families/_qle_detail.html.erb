@@ -14,7 +14,7 @@
 
     <div class="panel-body">
       <div class="row">
-        <% url, http_method = '/insured/employee_dependents', :get %>
+        <% url, http_method = '/insured/family_members', :get %>
         <% if action_name == 'find_sep'%>
           <% url, http_method = record_sep_insured_families_path, :post %>
         <% end %>
@@ -32,8 +32,15 @@
                     class: "required date-picker qle-date-picker form-control", required: true %>
                 </div>
                 <div class="form-group">
-                <%= link_to 'CONTINUE', 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit' %>
+                  <%= link_to 'CONTINUE', 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit' %>
+                </div>
               </div>
+            </div>
+
+            <div class="csr-form hidden">
+              <h3 class="qle-details-title">Change in APTC/CSR</h3>
+              <div class="alert alert-danger" role="alert">
+                Based on the information you entered, you may be eligible for a special enrollment period. Please call us at 1-855-532-5465 to give us more information so we can see if you qualify.
               </div>
             </div>
 
@@ -55,7 +62,7 @@
             </div>
 
             <div class="error-info hidden">
-              <p class="error-text">The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact DC Health Link's Customer Care Center: 1-855-532-5465.</p>
+              <p class="error-text">The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact DC Health Link's Customer Care Center: 1-855-532-5465.<</p>
               <div class="center">
                 <%= submit_tag 'Continue', disabled: true, class: 'btn' %>
               </div>

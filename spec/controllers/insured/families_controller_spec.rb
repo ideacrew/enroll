@@ -4,7 +4,7 @@ RSpec.describe Insured::FamiliesController do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { double("User", last_portal_visited: "test.com") }
-  let(:person) { double("Person", id: "test") }
+  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "") }
   let(:family) { double("Family") }
   let(:household) { double("HouseHold") }
   let(:family_members){[double("FamilyMember")]}
@@ -17,6 +17,7 @@ RSpec.describe Insured::FamiliesController do
     allow(person).to receive(:primary_family).and_return(family)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
     allow(person).to receive(:employee_roles).and_return(employee_roles)
+    allow(consumer_role).to receive(:bookmark_url=).and_return(true)
     sign_in(user)
   end
 
@@ -29,6 +30,7 @@ RSpec.describe Insured::FamiliesController do
       allow(user).to receive(:save).and_return(true)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
+      allow(consumer_role).to receive(:save!).and_return(true)
       session[:portal] = "insured/families"
     end
 
@@ -182,17 +184,25 @@ RSpec.describe Insured::FamiliesController do
       get :find_sep, hbx_enrollment_id: "2312121212", change_plan: "change_plan"
     end
 
-    it "should be a success" do
-      expect(response).to have_http_status(:success)
+    it "should be a redirect to edit insured person" do
+      expect(response).to have_http_status(:redirect)
     end
 
-    it "should render my account page" do
-      expect(response).to render_template("find_sep")
-    end
+    context "with a person with an address" do
+      let(:person) { double("Person", id: "test", addresses: true, no_dc_address: false, no_dc_address_reason: "") }
 
-    it "should assign variables" do
-      expect(assigns(:hbx_enrollment_id)).to eq("2312121212")
-      expect(assigns(:change_plan)).to eq('change_plan')
+      it "should be a success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should render my account page" do
+        expect(response).to render_template("find_sep")
+      end
+
+      it "should assign variables" do
+        expect(assigns(:hbx_enrollment_id)).to eq("2312121212")
+        expect(assigns(:change_plan)).to eq('change_plan')
+      end
     end
   end
 
@@ -301,7 +311,7 @@ RSpec.describe Insured::FamiliesController do
           date = (TimeKeeper.date_of_record - 8.days).strftime("%m/%d/%Y")
           effective_on_options = [TimeKeeper.date_of_record, TimeKeeper.date_of_record - 10.days]
           allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
-          allow(qle).to receive(:is_dependent_loss_of_esi?).and_return(true)
+          allow(qle).to receive(:is_dependent_loss_of_coverage?).and_return(true)
           allow(qle).to receive(:employee_gaining_medicare).and_return(effective_on_options)
           xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
           expect(response).to have_http_status(:success)

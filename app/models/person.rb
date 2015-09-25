@@ -13,8 +13,8 @@ class Person
   ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
   RELATIONSHIP_CHANGE_ATTRIBUTES = %w(person_relationships)
 
-  PERSON_CREATED_EVENT_NAME = "local.events.person.created"
-  PERSON_UPDATED_EVENT_NAME = "local.events.person.updated"
+  PERSON_CREATED_EVENT_NAME = "acapi.info.events.individual.created"
+  PERSON_UPDATED_EVENT_NAME = "acapi.info.events.individual.updated"
 
   field :hbx_id, type: String
   field :name_pfx, type: String
@@ -40,6 +40,9 @@ class Person
 
   field :is_tobacco_user, type: String, default: "unknown"
   field :language_code, type: String
+
+  field :no_dc_address, type: Boolean, default: false
+  field :no_dc_address_reason, type: String, default: ""
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
@@ -145,6 +148,7 @@ class Person
   # PersonRelationship child model indexes
   index({"person_relationship.relative_id" =>  1})
 
+  scope :by_hbx_id, ->(person_hbx_id) { where(hbx_id: person_hbx_id) }
   scope :active,   ->{ where(is_active: true) }
   scope :inactive, ->{ where(is_active: false) }
 
@@ -163,11 +167,11 @@ class Person
   after_update :notify_updated
 
   def notify_created
-    notify(PERSON_CREATED_EVENT_NAME, {:individual => self } )
+    notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
   def notify_updated
-    notify(PERSON_UPDATED_EVENT_NAME, {:individual => self } )
+    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
   def consumer_fields_validations
@@ -333,12 +337,37 @@ class Person
     self.emails << ::Email.new(:kind => 'work', :address => email)
   end
 
+  def home_address
+    addresses.detect { |adr| adr.kind == "home" }
+  end
+
+  def home_email
+    emails.detect { |adr| adr.kind == "home" }
+  end
+
+  def work_email
+    emails.detect { |adr| adr.kind == "home" }
+  end
+
   def has_active_consumer_role?
     consumer_role.present? and consumer_role.is_active?
   end
 
   def has_active_employee_role?
     employee_roles.present? and employee_roles.active.present?
+  end
+
+  def residency_eligible?
+    no_dc_address and no_dc_address_reason.present?
+  end
+
+  def is_dc_resident?
+    return false if no_dc_address == true and no_dc_address_reason.blank?
+    return true if no_dc_address == true and no_dc_address_reason.present?
+
+    address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
+    addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}
+    return false
   end
 
   class << self
@@ -541,7 +570,7 @@ class Person
     welcome_subject = "Welcome to DC HealthLink"
     welcome_body = "DC HealthLink is the District of Columbia's on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     mailbox = Inbox.create(recipient: self)
-    mailbox.messages.create(subject: welcome_subject, body: welcome_body)
+    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: 'DC Health Link')
   end
 
   def update_full_name

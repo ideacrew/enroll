@@ -131,6 +131,22 @@ function applyPlanSort(sort_by){
   $("#all-plans #plans").empty().append(plandivs);
 };
 
+function updatePlanCost(elected_pct) {
+  var elected_amount = parseFloat($('#max_aptc').val()) * parseFloat(elected_pct);
+  var plans = $('.plan-row');
+  for(var i=0; i<plans.length; i++){
+    var plan = plans[i];
+    premium = parseFloat($(plan).data('plan-metal-premium'));
+    if (elected_amount >= premium) {
+      var premium_resp_amt = 0;
+    } else {
+      var premium_resp_amt = premium - elected_amount;
+    }
+    premium_resp_amt = premium_resp_amt.toFixed(2);
+    $(plan).find('h2.plan-premium').html("$" + premium_resp_amt);
+  };
+};
+
 $(function() {
   $(document).on('click', "#select-plan-container a[role='tab'][data-toggle='tab']", function(){
 		hidePlanTabs();
@@ -156,8 +172,35 @@ $(function() {
 		doPlanComparison(base_url);
   });
 
+  $(document).on('change', 'input[name="elected_pct"]', function(){
+    var elected_pct = $("input[name='elected_pct']").val();
+    var elected_amount = parseFloat($('#max_aptc').val()).toFixed(2) * parseFloat(elected_pct).toFixed(2);
+    $('#aptc-used').val(elected_amount.toFixed(2));
+  });
+
+  $(document).on('change', 'input#aptc-used', function(){
+    var aptc_used = $(this).val();
+    var max_aptc = $('input#max_aptc').val();
+    $("input[name='elected_pct']").val(aptc_used/max_aptc);
+    $("output[name='pct']").text((aptc_used/max_aptc*100).toFixed(0));
+  });
+
   $(document).on('click', '.all-filters-row .apply-btn', function(){
 		applyPlanFilters();
+
+    if ($('.aptc').length > 0){
+      var elected_pct = $("input[name='elected_pct']").val()
+
+      updatePlanCost(elected_pct);
+      $.ajax({
+        type: "POST",
+        url: $('#set_elected_pct_url').val(),
+        dataType: 'script',
+        data: {
+          'elected_pct': elected_pct
+        }
+      });
+    };
   });
 
   $(document).on('click', '.all-filters-row .reset-btn', function(){
@@ -179,13 +222,15 @@ $(function() {
 //for plan_year
 $(document).on("change", "select[name='reference_plan']", function() {
   $("#employer_cost_info_btn .btn").removeClass('disabled');
-  var start_date = $("#plan_year_start_on").val();
-  if (start_date == "") {
-    return
-  }
   var reference_plan_id = $(this).val();
   if (reference_plan_id != "" && reference_plan_id != undefined){
     $(this).parents('.reference-plan-select').find("input[type='hidden']").val(reference_plan_id);
+
+    //for calculate employer contributions
+    var start_date = $("#plan_year_start_on").val();
+    if (start_date == "") {
+      return
+    }
     $(this).parents('fieldset').find('.reference_plan_info h4').html("loading...")
     $.ajax({
       type: "GET",
@@ -282,3 +327,4 @@ function calcEmployerContributions(url) {
 $(document).on("click", ".reference_plan_info h4 span", function() {
   $(this).parents(".reference_plan_info").find('.content').toggle();
 });
+

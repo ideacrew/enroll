@@ -1,4 +1,6 @@
 class PeopleController < ApplicationController
+  include ApplicationHelper
+  include ErrorBubble
 
   def new
     @person = Person.new
@@ -208,24 +210,26 @@ class PeopleController < ApplicationController
 
     make_new_person_params @person
 
-    # Delete old sub documents
-    @person.addresses.each {|address| address.delete}
-    @person.phones.each {|phone| phone.delete}
-    @person.emails.each {|email| email.delete}
-
     @person.updated_by = current_user.email unless current_user.nil?
-    # fail
+
+    if @person.has_active_consumer_role? and request.referer.include?("insured/families/personal")
+      params_clean_vlp_documents
+      update_vlp_documents 
+      redirect_path = personal_insured_families_path
+    else
+      redirect_path = family_account_path
+    end
+
     respond_to do |format|
       if @person.update_attributes(person_params)
-        if @person.has_active_consumer_role? and request.referer.include?("insured/families/personal")
-          format.html { redirect_to personal_insured_families_path, notice: 'Person was successfully updated.' }
-        else
-          format.html { redirect_to insured_employee_path(@person), notice: 'Person was successfully updated.' }
-        end
+        format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
         format.json { head :no_content }
       else
+        bubble_consumer_role_errors_by_person(@person)
         build_nested_models
-        format.html { render action: "show" }
+        person_error_megs = @person.errors.full_messages.join('<br/>') if @person.errors.present?
+
+        format.html { redirect_to redirect_path, alert: "Person update failed.<br />" + person_error_megs }
         # format.html { redirect_to edit_insured_employee_path(@person) }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end
@@ -312,7 +316,6 @@ private
   end
 
   def build_nested_models
-
     ["home","mobile","work","fax"].each do |kind|
        @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
     end
@@ -327,21 +330,27 @@ private
   end
 
   def sanitize_person_params
-    person_params["addresses_attributes"].each do |key, address|
-      if address["city"].blank? && address["zip"].blank? && address["address_1"].blank?
-        person_params["addresses_attributes"].delete("#{key}")
+    if person_params["addresses_attributes"].present?
+      person_params["addresses_attributes"].each do |key, address|
+        if address["city"].blank? && address["zip"].blank? && address["address_1"].blank?
+          person_params["addresses_attributes"].delete("#{key}")
+        end
       end
     end
 
-    person_params["phones_attributes"].each do |key, phone|
-      if phone["full_phone_number"].blank?
-        person_params["phones_attributes"].delete("#{key}")
+    if person_params["phones_attributes"].present?
+      person_params["phones_attributes"].each do |key, phone|
+        if phone["full_phone_number"].blank?
+          person_params["phones_attributes"].delete("#{key}")
+        end
       end
     end
 
-    person_params["emails_attributes"].each do |key, email|
-      if email["address"].blank?
-        person_params["emails_attributes"].delete("#{key}")
+    if person_params["emails_attributes"].present?
+      person_params["emails_attributes"].each do |key, email|
+        if email["address"].blank?
+          person_params["emails_attributes"].delete("#{key}")
+        end
       end
     end
   end
@@ -353,27 +362,86 @@ private
     person.phones.each {|phone| phone.delete}
     person.emails.each {|email| email.delete}
 
-    person_params["addresses_attributes"].each do |key, address|
-      if address.has_key?('id')
-        address.delete('id')
+    if person_params["addresses_attributes"].present?
+      person_params["addresses_attributes"].each do |key, address|
+        if address.has_key?('id')
+          address.delete('id')
+        end
       end
     end
 
-    person_params["phones_attributes"].each do |key, phone|
-      if phone.has_key?('id')
-        phone.delete('id')
+    if person_params["phones_attributes"].present?
+      person_params["phones_attributes"].each do |key, phone|
+        if phone.has_key?('id')
+          phone.delete('id')
+        end
       end
     end
 
-    person_params["emails_attributes"].each do |key, email|
-      if email.has_key?('id')
-        email.delete('id')
+    if person_params["emails_attributes"].present?
+      person_params["emails_attributes"].each do |key, email|
+        if email.has_key?('id')
+          email.delete('id')
+        end
       end
     end
   end
 
   def person_params
-    params.require(:person).permit!
+    params.require(:person).permit(*person_parameters_list)
+  end
+
+  def person_parameters_list
+    [
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
+      { :phones_attributes => [:kind, :full_phone_number] },
+      { :emails_attributes => [:kind, :address] },
+      :first_name,
+      :middle_name,
+      :last_name,
+      :name_sfx,
+      :gender,
+      :us_citizen,
+      :is_incarcerated,
+      :language_code,
+      :is_disabled,
+      :race,
+      :is_consumer_role,
+      :naturalized_citizen,
+      :eligible_immigration_status,
+      :indian_tribe_member,
+      {:ethnicity => []},
+      :tribal_id,
+      :no_dc_address,
+      :no_dc_address_reason
+    ]
+  end
+
+  def params_clean_vlp_documents
+    return if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil?
+
+    if params[:person][:us_citizen].eql? 'true'
+      params[:person][:consumer_role_attributes][:vlp_documents_attributes].reject! do |index, doc|
+        params[:naturalization_doc_type] != doc[:subject]
+      end
+    elsif params[:person][:eligible_immigration_status].eql? 'true'
+      params[:person][:consumer_role_attributes][:vlp_documents_attributes].reject! do |index, doc|
+        params[:immigration_doc_type] != doc[:subject]
+      end
+    end
+  end
+
+  def update_vlp_documents
+    return if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].first.nil?
+    doc_params = params.require(:person).permit({:consumer_role_attributes =>
+                                                 [:vlp_documents_attributes =>
+                                                  [:subject, :citizenship_number, :naturalization_number,
+                                                   :alien_number, :passport_number, :sevis_id, :visa_number,
+                                                   :receipt_number, :expiration_date, :card_number, :i94_number]]})
+    @vlp_doc_subject = doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject]
+    document = find_document(@consumer_role, @vlp_doc_subject)
+    document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
+    document.save
   end
 
   def dependent_params

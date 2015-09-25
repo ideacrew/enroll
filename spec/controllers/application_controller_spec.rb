@@ -14,11 +14,19 @@ RSpec.describe ApplicationController do
     end
 
     it "redirect to the sign in page" do
-      expect(response).to redirect_to(new_user_session_url)
+      expect(response).to redirect_to(new_user_registration_path)
     end
 
     it "should set portal in session" do
       expect(session[:portal]).to eq "http://test.host/employers/employer_profiles"
+    end
+  end
+
+  context "when signed in with new user" do
+    let(:user) { FactoryGirl.create("user") }
+
+    it "should return the root url in dev environment" do
+      expect( controller.send(:after_sign_out_path_for, user) ).to eq logout_saml_index_path
     end
   end
 

@@ -17,6 +17,7 @@ class BenefitCoveragePeriod
 
   # Second Lowest Cost Silver Plan, by rating area (only one rating area in DC)
   field :slcsp, type: BSON::ObjectId
+  field :slcsp_id, type: BSON::ObjectId
 
   # embeds_many :open_enrollment_periods, class_name: "EnrollmentPeriod"
   embeds_many :benefit_packages
@@ -32,6 +33,20 @@ class BenefitCoveragePeriod
 
   before_save :set_title
 
+
+  def second_lowest_cost_silver_plan=(new_plan)
+    raise ArgumentError.new("expected Plan") unless new_plan.is_a?(Plan)
+    raise ArgumentError.new("slcsp metal level must be silver") unless new_plan.metal_level == "silver"
+    self.slcsp_id = new_plan._id
+    self.slcsp = new_plan._id
+    @second_lowest_cost_silver_plan = new_plan
+  end
+
+  def second_lowest_cost_silver_plan
+    return @second_lowest_cost_silver_plan if defined? @second_lowest_cost_silver_plan
+    @second_lowest_cost_silver_plan = Plan.find(slcsp_id) unless slcsp_id.blank?
+  end
+
   # The universe of products this sponsor may offer during this time period
   def benefit_products
   end
@@ -46,16 +61,38 @@ class BenefitCoveragePeriod
     write_attribute(:end_on, new_date.end_of_day)
   end
 
+  def contains?(date)
+    (start_on <= date) && (date <= end_on)
+  end
+
   def open_enrollment_contains?(date)
     (open_enrollment_start_on <= date) && (date <= open_enrollment_end_on)
   end
 
   def earliest_effective_date
     if TimeKeeper.date_of_record.day < 16
-      TimeKeeper.date_of_record.end_of_month + 1.day
+      effective_date = TimeKeeper.date_of_record.end_of_month + 1.day
     else
-      TimeKeeper.date_of_record.next_month.end_of_month + 1.day
+      effective_date = TimeKeeper.date_of_record.next_month.end_of_month + 1.day
     end
+
+    [effective_date, start_on].max
+  end
+
+  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind)
+    ivl_bgs = []
+    benefit_packages.each do |bg|
+      satisfied = true
+      hbx_enrollment_members.map(&:person).map(&:consumer_role).each do |consumer_role|
+        rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, coverage_kind)
+        satisfied = false and break unless rule.satisfied?[0]
+      end
+      ivl_bgs << bg if satisfied
+    end
+
+    ivl_bgs = ivl_bgs.uniq
+    elected_plan_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
+    Plan.individual_plans(coverage_kind: coverage_kind, active_year: earliest_effective_date.year).where(:id => {"$in" => elected_plan_ids}).to_a
   end
 
   ## Class methods
@@ -65,7 +102,6 @@ class BenefitCoveragePeriod
       organizations = Organization.where("hbx_profile.benefit_sponsorship.benefit_coverage_periods._id" => BSON::ObjectId.from_string(id))
       organizations.size > 0 ? organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods.first : nil
     end
-
   end
 
 private

@@ -10,8 +10,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#enrollment_progress_bar" do
-    let(:employer_profile){FactoryGirl.create(:employer_profile)}
-    let(:plan_year){FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile) }
 
     it "display progress bar" do
       expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper">')
@@ -65,10 +65,29 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "relationship_options" do
+    let(:dependent) { double("FamilyMember") }
+
+    context "consumer_portal" do
+      it "should return correct options for consumer portal" do
+        expect(helper.relationship_options(dependent, "consumer_role_id")).to match(/Domestic Partner/mi)
+        expect(helper.relationship_options(dependent, "consumer_role_id")).to match(/other tax dependent/mi)
+      end
+    end
+
+    context "employee portal" do
+      it "should not match options that are in consumer portal" do
+        expect(helper.relationship_options(dependent, "")).not_to match(/Domestic Partner/mi)
+        expect(helper.relationship_options(dependent, "")).not_to match(/other tax dependent/mi)
+      end
+    end
+
+  end
+
   describe "#is_readonly" do
     # let(:user){FactoryGirl.create(:user)}
-    let(:user){ double("User")}
-    let(:census_employee){ double("CensusEmployee") }
+    let(:user) { double("User") }
+    let(:census_employee) { double("CensusEmployee") }
     before do
       expect(helper).to receive(:current_user).and_return(user)
     end
@@ -97,7 +116,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#calculate_participation_minimum" do
-    let(:plan_year_1){ double("PlanYear", eligible_to_enroll_count: 5) }
+    let(:plan_year_1) { double("PlanYear", eligible_to_enroll_count: 5) }
     before do
       @current_plan_year = plan_year_1
     end
@@ -123,7 +142,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     context "consumer role has a vlp_document" do
       it "it returns the document" do
         consumer_role = ConsumerRole.new
-        document = consumer_role.vlp_documents.build({subject:"Certificate of Citizenship"})
+        document = consumer_role.vlp_documents.build({subject: "Certificate of Citizenship"})
         found_document = find_document(consumer_role, "Certificate of Citizenship")
         expect(found_document).to be_a_kind_of(VlpDocument)
         expect(found_document).to eq(document)
@@ -132,58 +151,26 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
-  describe ".is_under_open_enrollment?" do
-    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
-
-    context "when under open enrollment" do
-      let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
-
-      before :each do
-        hbx_profile.benefit_sponsorship = benefit_coverage_period.benefit_sponsorship
-        hbx_profile.save!
-      end
-
-      it "should return true" do
-        expect(helper.is_under_open_enrollment?).to be_truthy
-      end
+  describe "#generate_options_for_effective_on_kinds" do
+    it "it should return blank array" do
+      options = generate_options_for_effective_on_kinds([], TimeKeeper.date_of_record)
+      expect(options).to eq []
     end
 
-    context "when not under open enrollment" do
-      let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 20.days, open_enrollment_end_on: TimeKeeper.date_of_record - 10.days) }
-
-      before :each do
-        hbx_profile.benefit_sponsorship = benefit_coverage_period.benefit_sponsorship
-        hbx_profile.save!
-      end
-
-      it "should return false" do
-        expect(helper.is_under_open_enrollment?).to be_falsey
-      end
+    it "it should return options" do
+      options = generate_options_for_effective_on_kinds(['date_of_event', 'fixed_first_of_next_month'], TimeKeeper.date_of_record)
+      date = TimeKeeper.date_of_record
+      expect(options).to eq [["Date of event(#{date.to_s})", 'date_of_event'], ["Fixed first of next month(#{(date.end_of_month+1.day).to_s})", 'fixed_first_of_next_month']]
     end
   end
 
-
-  describe ".ivl_enrollment_effective_date" do
-    let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
-    let(:hbx_profile) { double }
-
-    before :each do 
-      allow(HbxProfile).to receive(:find_by_state_abbreviation).and_return(hbx_profile)
-      allow(hbx_profile).to receive(:benefit_sponsorship).and_return(benefit_coverage_period.benefit_sponsorship)
-    end
-
-    context "when under open enrollment" do
-      it "should return true" do
-        expect(helper.ivl_enrollment_effective_date).to eq(benefit_coverage_period.earliest_effective_date)
-      end
-    end
-
-    context "when not under open enrollment" do
-      let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 20.days, open_enrollment_end_on: TimeKeeper.date_of_record - 10.days) }
-
-      it "should return false" do
-        expect(helper.ivl_enrollment_effective_date).to be_nil
-      end
+  describe "get_key_and_bucket" do
+    it "should return array with key and bucket" do
+      uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-sbc#f21369fc-ae6c-4fa5-a299-370a555dc401"
+      key, bucket = get_key_and_bucket(uri)
+      expect(key).to eq("f21369fc-ae6c-4fa5-a299-370a555dc401")
+      expect(bucket).to eq("dchbx-sbc")
     end
   end
 end
+

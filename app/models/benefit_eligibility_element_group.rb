@@ -8,14 +8,14 @@ class BenefitEligibilityElementGroup
   INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS = %w(
       self
       spouse
-      domestic partner
+      domestic_partner
       child
       parent
       sibling
       ward
       guardian
       unrelated
-      other_tax_dependent    
+      other_tax_dependent
     )
 
   SHOP_MARKET_RELATIONSHIP_CATEGORY_KINDS = %w(

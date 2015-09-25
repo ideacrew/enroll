@@ -533,35 +533,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context ".send_invite!" do
-    let(:census_employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: "Amy", last_name: "Frank")}
-
-    context 'when benefit group plan year published' do
-      before :each do
-        CensusEmployee.delete_all
-        census_employee.benefit_group_assignments = FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group).to_a
-        census_employee.save
-        plan_year.publish!
-      end
-
-      it "should send invitation email" do
-        expect(census_employee.send_invite!).to be_truthy
-      end
-    end
-
-    context 'when benefit group plan_year not published' do 
-      before :each do
-        CensusEmployee.delete_all
-        census_employee.benefit_group_assignments = FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group).to_a
-        census_employee.save
-      end
-
-      it "should not send invitation email" do
-        expect(census_employee.send_invite!).to be_falsey
-      end
-    end
+  context "and " do
   end
-
 
   # context '.edit' do
   #   let(:employee) {FactoryGirl.create(:census_employee, employer_profile: employer_profile)}

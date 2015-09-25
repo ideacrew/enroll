@@ -505,16 +505,17 @@ describe EmployerProfile, "roster size" do
 end
 
 describe EmployerProfile, "when a binder premium is credited" do
-  let(:employer) { EmployerProfile.new(:aasm_state => :eligible) }
+  let(:hbx_id) { "some hbx id string value" }
+  let(:employer) { EmployerProfile.new(:aasm_state => :eligible, :organization => Organization.new(:hbx_id => hbx_id)) }
 
   it "should send the notification broadcast" do
-    @employer = nil
+    @employer_id = nil
     event_subscriber = ActiveSupport::Notifications.subscribe(EmployerProfile::BINDER_PREMIUM_PAID_EVENT_NAME) do |e_name, s_at, e_at, m_id, payload|
-      @employer = payload.stringify_keys["employer"]
+      @employer_id = payload.stringify_keys["employer_id"]
     end
     employer.binder_credited
     ActiveSupport::Notifications.unsubscribe(event_subscriber)
-    expect(@employer).to eq employer
+    expect(@employer_id).to eq hbx_id
   end
 end
 
