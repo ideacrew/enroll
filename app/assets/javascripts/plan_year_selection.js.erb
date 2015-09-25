@@ -85,8 +85,9 @@ $(document).on('ready', function() {
     });
 
     // call slider js after benefit group is added
-    $(document).on('click', '.benefit-group-fields', function() {
+
       if ( $('.benefit-group-fields').length > 1 ) {
+        alert(123);
         $(this).closest('.benefit-group-fields').find('.benefits-fields .slider').bootstrapSlider({
             formatter: function(value) {
               return 'Contribution Percentage: ' + value + '%';
@@ -98,7 +99,7 @@ $(document).on('ready', function() {
         });
 
       }
-    });
+
 
 
 

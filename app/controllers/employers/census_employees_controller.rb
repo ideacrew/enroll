@@ -4,6 +4,11 @@ class Employers::CensusEmployeesController < ApplicationController
   layout "two_column"
   def new
     @census_employee = build_census_employee
+    if params[:modal] = 'upload'
+      respond_to do |format|
+        format.js { render "employers/employer_profiles/upload_employees" }
+      end
+    end
   end
 
   def create

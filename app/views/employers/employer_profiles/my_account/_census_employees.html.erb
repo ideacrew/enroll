@@ -37,7 +37,7 @@
         <% else %>
 <!-- javascript click when clicked on new employee -->
         <%= link_to 'Add New Employee', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-trans" %>
-        <%= link_to 'Upload Employee Roster', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-trans" %>
+        <%= link_to 'Upload Employee Roster', new_employers_employer_profile_census_employee_path(@employer_profile, modal: 'upload'), remote: 'true', class: "btn btn-trans" %>
 
         <% end %>
       </div>

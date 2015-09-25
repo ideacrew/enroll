@@ -69,6 +69,8 @@ function getCarrierPlans(ep, ci) {
 
 
 $(document).ready(function () {
+
+  // init slider
   $('.benefits-fields .slider').bootstrapSlider({
       formatter: function(value) {
         return 'Contribution Percentage: ' + value + '%';
@@ -79,10 +81,32 @@ $(document).ready(function () {
       $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
   });
 
+  //hide border bottom
   $('input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: 0px;');
 
+
+  // show more details links
   $('.details').on('click', function() {
     $(this).closest('.referenceplan').find('.plan-details').toggle();
+  });
+
+  // modal input type file clicks
+  $(document).on('click', '#modal-wrapper div .select', function(){
+    $(this).closest('div').find('input[type=file]').trigger('click').on('change', function() {
+      var filename = $(this).closest('div').find('input[type=file]').val()
+      $(this).closest('div').find('.select').hide();
+      $(this).closest('div').find('.upload-preview').html(filename + "<i class='fa fa-times fa-lg pull-right'></i>").show();
+      $(this).closest('div').find('input[type=submit]').show();
+    });
+  });
+  $(document).on('click', '.upload-preview .fa', function(){
+    $(this).closest('#modal-wrapper').find('input[type=file]').val("");
+    $(this).closest('#modal-wrapper').find('.upload-preview').hide();
+    $(this).closest('#modal-wrapper').find('input[type=submit]').hide();
+    $(this).closest('#modal-wrapper').find('.select').show();
+  });
+  $(document).on('click', '#modal-wrapper .modal-close', function(){
+    $(this).closest('#modal-wrapper').remove();
   });
 
 
