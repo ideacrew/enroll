@@ -334,12 +334,7 @@ class HbxEnrollment
   end
 
   def self.calculate_start_date_by_qle(household)
-    special_enrollment_period = household.family.special_enrollment_periods.last
-    if special_enrollment_period.present?
-      special_enrollment_period.effective_on
-    else
-      TimeKeeper.date_of_record
-    end
+    household.family.current_sep.effective_on
   end
 
   def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false)
@@ -367,11 +362,20 @@ class HbxEnrollment
       enrollment.kind = "individual"
       enrollment.consumer_role = consumer_role
       enrollment.benefit_package_id = benefit_package.try(:id)
-      if qle
-        enrollment.effective_on = calculate_start_date_by_qle(coverage_household.household)
+      # if qle
+      #   enrollment.effective_on = calculate_start_date_by_qle(coverage_household.household)
+      # else
+
+      
+      benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+      family = consumer_role.person.primary_family
+      if family.is_under_special_enrollment_period?
+        enrollment.effective_on = family.current_sep.effective_on
       else
-        enrollment.effective_on = HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
+        enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
       end
+
+      # end
     else
       raise "either employee_role or consumer_role is required"
     end
