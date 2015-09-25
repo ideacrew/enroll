@@ -231,7 +231,8 @@
       }
     }
   }
-  .planyear-add-tab {
+  .planyear-add-tab, .employee-add-tab, .employer-edit-tab {
+    padding-bottom: 45px;
     h3 {
       &:first-of-type {
         display: inline-block;
@@ -305,6 +306,7 @@
     }
     .details {
       cursor: pointer;
+      margin-right:20px;
     }
     .package-offering {
       border: solid 1px #b7b7b7;
@@ -624,6 +626,9 @@
         margin: auto;
         max-width: 660px;
       }
+      h4 {
+        text-align: center;
+      }
       .col-xs-3 {
 
       }
@@ -816,7 +821,7 @@
   }
   .home-tab, .employees-tab, .employee-add-tab, .benefits-tab,
   .planyear-add-tab, .brokers-tab, .employer-tab, .employer-edit-tab,
-   .documents-tab, #add_employee_action {
+   .documents-tab, #add_employee_action, .benefits-setup-tab {
     .btn-primary {
       text-transform: uppercase;
       padding: 10px 20px;
@@ -827,7 +832,9 @@
       border-left: none;
       border-right: none;
       margin-top: 5px;
-
+      &.mtz {
+        margin-top: 0;
+      }
     }
     h1 {
       margin-top: 0;
@@ -1150,7 +1157,8 @@
         border-radius: 4px;
         padding: 10px 20px;
 
-        &:first-of-type {
+
+        &:first-of-type, &:last-of-type {
           margin-right: 15px;
         }
 
@@ -1165,6 +1173,7 @@
     }
 
   }
+
 
 }
 .selected-plan {

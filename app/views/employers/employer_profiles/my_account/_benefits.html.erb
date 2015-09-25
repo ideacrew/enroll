@@ -9,21 +9,14 @@
 
 
   </div>
-  <br>
+  <br/>
+  <br/>
+  <br/>
   <% if @plan_years.present? %>
 
   <% @plan_years.each do |plan_year| %>
   <div class="row no-buffer">
     <h3 class="title-inline"><%= plan_year.start_on.to_date.year%> - Plan Year (<%= plan_year.aasm_state.to_s.humanize %>)</h3>
-    <div class="pull-right bottom-mgn-xs">
-      <% if plan_year.draft? && @current_plan_year.nil? %>
-      <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
-      <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans right"%>
-      <% elsif plan_year.draft? %>
-      <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans right"%>
-
-      <% end %>
-    </div>
   </div>
 
   <% plan_year.benefit_groups.each do |bg| %>
@@ -177,6 +170,16 @@
         </table>
       </div>
     </div>
+  </div>
+  <div class="pull-left bottom-mgn-xs">
+    <% if plan_year.draft? && @current_plan_year.nil? %>
+    <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
+    <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans right"%>
+    <% elsif plan_year.draft? %>
+    <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans right"%>
+
+    <% end %>
+  </br></br></br>
   </div>
   <% end %>
   <div class="col-xs-12"><br><br></div>

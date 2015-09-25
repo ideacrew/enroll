@@ -2,6 +2,6 @@
   <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |dependent| %>
   <%= render 'shared/census_dependent_fields', {f: dependent} %>
   <% end %>
-  
-  <%= link_to_add_fields 'Add Family Member', f, :census_dependents, 'btn btn-transparent pull-left' %>
+
+  <%= link_to_add_fields 'Add Family Member', f, :census_dependents, 'btn btn-trans pull-left' %>
 </div>

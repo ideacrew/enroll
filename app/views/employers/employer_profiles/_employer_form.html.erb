@@ -35,22 +35,23 @@
           <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp|  %>
             <%= render "shared/employer_profile_fields", f: emp %><br>
           <% end %>
-        </div>
-        <h4> Office Locations </h4>
+        </div><br>
+        <h2> Office Locations </h2>
         <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location| %>
           <%= render partial: 'shared/office_location_fields', locals: {f: office_location} %>
         <% end %>
         <br/>
         <div class="form-inputs">
-          <%= link_to_add_fields '<i class="fa fa-user-plus"></i> Add Office Location'.html_safe, f, :office_locations, 'btn btn-success pull-right' %>
+          <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-trans pull-left' %>
+          <%= link_to "Cancel", employers_employer_profile_path(@organization.employer_profile, tab: 'profile'), class:'btn btn-trans pull-left' %>
+
         </div>
 
         <div class="top-row no-border">
           <% button_name = @organization.persisted? ? 'Save' : 'Create' %>
-          <button type="submit" class="btn btn-primary pull-left sm_full_width">
+          <button type="submit" class="btn btn-primary pull-right btn-br mtz sm_full_width">
             <%= "#{button_name}".html_safe %>
           </button> &nbsp;&nbsp;
-          <%= link_to "Cancel", employers_employer_profile_path(@organization.employer_profile, tab: 'profile'), class:'btn btn-transparent pull-left' %>
         </div>
       </div>
     <% end %>

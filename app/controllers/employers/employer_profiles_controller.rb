@@ -146,15 +146,15 @@ class Employers::EmployerProfilesController < ApplicationController
       if @organization.update_attributes(employer_profile_params)
 
         flash[:notice] = 'Employer successfully Updated.'
-        redirect_to employers_employer_profile_path(@employer_profile, tab: 'profile')
+        redirect_to edit_employers_employer_profile_path(@employer_profile)
       else
         @organization.reload
         flash[:notice] = 'Employer information not saved.'
-        redirect_to employers_employer_profile_path(@employer_profile, tab: 'profile')
+        redirect_to edit_employers_employer_profile_path(@employer_profile)
       end
     else
       flash[:error] = 'You do not have permissions to update the details'
-      redirect_to employers_employer_profile_path(@employer_profile, tab: 'profile')
+      redirect_to edit_employers_employer_profile_path(@employer_profile)
     end
   end
 
