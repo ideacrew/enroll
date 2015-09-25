@@ -80,7 +80,7 @@ private
                         when "first_of_month"
                           calculate_effective_on_for_first_of_month
                         when "first_of_next_month"
-                          if qualifying_life_event_kind.is_dependent_loss_of_esi?
+                          if qualifying_life_event_kind.is_dependent_loss_of_coverage?
                             qualifying_life_event_kind.employee_gaining_medicare(qle_on, selected_effective_on)
                           elsif qualifying_life_event_kind.is_moved_to_dc?
                             calculate_effective_on_for_moved_qle
