@@ -17,6 +17,7 @@
   <% @plan_years.each do |plan_year| %>
   <div class="row no-buffer">
     <h3 class="title-inline"><%= plan_year.start_on.to_date.year%> - Plan Year (<%= plan_year.aasm_state.to_s.humanize %>)</h3>
+
   </div>
 
   <% plan_year.benefit_groups.each do |bg| %>
