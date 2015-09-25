@@ -84,7 +84,21 @@ $(document).on('ready', function() {
 
     });
 
+    // call slider js after benefit group is added
+    $(document).on('click', '.benefit-group-fields', function() {
+      if ( $('.benefit-group-fields').length > 1 ) {
+        $(this).closest('.benefit-group-fields').find('.benefits-fields .slider').bootstrapSlider({
+            formatter: function(value) {
+              return 'Contribution Percentage: ' + value + '%';
+            }
+          });
+          $(this).closest('.benefit-group-fields').find(".benefits-fields .slider").on("slide", function(slideEvt) {
+            $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
+            $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
+        });
 
+      }
+    });
 
 
 
@@ -139,6 +153,7 @@ $(document).on('click', '.reference-plan input + label', function() {
     console.log(reference_plan_id);
     var plan_option_kind = $(".nav-tabs input[type=radio]:checked").val();
     console.log(plan_option_kind);
+    var location_id = $('.reference-plan input[type=radio]:checked').parents('fieldset').attr('id')
 
     if (reference_plan_id == "" || reference_plan_id == undefined) {
       return
@@ -184,7 +199,9 @@ $(document).on('click', '.reference-plan input + label', function() {
         "start_on": $("#plan_year_start_on").val(),
         "reference_plan_id": reference_plan_id,
         "plan_option_kind": plan_option_kind,
-        "relation_benefits": relation_benefits
+        "relation_benefits": relation_benefits,
+        "location_id": location_id
+
       }
     }).done(function() {
     });;

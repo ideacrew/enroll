@@ -110,8 +110,15 @@ class Employers::EmployerProfilesController < ApplicationController
     elsif @tab == 'families'
      #families defined as employee_roles.each { |ee| ee.person.primary_family }
      paginate_families
+   elsif @tab == "inbox"
+     @folder = params[:folder] || 'Inbox'
+     @sent_box = false
+     respond_to do |format|
+       format.js { render 'employers/employer_profiles/inbox' }
+     end
+   end
     end
-  end
+
 
   def new
     @organization = Forms::EmployerProfile.new
