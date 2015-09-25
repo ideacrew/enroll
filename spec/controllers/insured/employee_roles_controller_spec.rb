@@ -250,13 +250,12 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
 
   describe "GET search" do
     let(:user) { FactoryGirl.build(:user) }
-    let(:person) { double("person")}
+    let(:person) { FactoryGirl.build(:person) }
 
     before(:each) do
       allow(user).to receive(:has_employee_role?).and_return(false)
       allow(user).to receive(:has_consumer_role?).and_return(false)
       allow(user).to receive(:person).and_return(person)
-      allow(user).to receive(:save!).and_return(true)
       sign_in(user)
       get :search
     end
