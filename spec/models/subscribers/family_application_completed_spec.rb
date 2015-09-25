@@ -45,7 +45,7 @@ describe Subscribers::FamilyApplicationCompleted do
       context "with a valid single person family" do
         let(:person) { FactoryGirl.create(:person) }
         let(:family) { Family.new.build_from_person(person) }
-        let(:consumer_role) { double("ConsumerRole", id: 12345, import: true, :"vlp_authority=" => true, :"residency_determined_at=" => true, :"citizen_status=" => true, :"is_state_resident=" => true, save!: true)}
+        let(:consumer_role) { FactoryGirl.create(:consumer_role, person: person) }
 
         before do
           family.save!
@@ -123,6 +123,9 @@ describe Subscribers::FamilyApplicationCompleted do
           expect(consumer_role.residency_determined_at).to eq primary.created_at
           expect(consumer_role.citizen_status).to eq primary.verifications.citizen_status.split('#').last
           expect(consumer_role.is_state_resident).to eq primary.verifications.is_lawfully_present
+          expect(consumer_role.is_incarcerated).to eq primary.person_demographics.is_incarcerated
+          person.reload
+          expect(person.addresses).to be_truthy
         end
       end
 

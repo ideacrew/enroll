@@ -29,13 +29,16 @@ module Subscribers
           active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.integrated_case_id}.first
           active_verified_tax_household = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last}.first
           new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
-
+          verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
+          import_home_address(primary_person, verified_new_address)
           active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
           update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
           new_dependents.each do |p|
             new_family_member = family.relate_new_member(p[0], p[1])
-            new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
-            active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
+            if active_verified_tax_household.present?
+              new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
+              active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
+            end
             family.save!
           end
         rescue
@@ -54,7 +57,22 @@ module Subscribers
       consumer_role.residency_determined_at = verified_primary_family_member.created_at
       consumer_role.citizen_status = verified_verifications.citizen_status.split('#').last
       consumer_role.is_state_resident = verified_verifications.is_lawfully_present
+      consumer_role.is_incarcerated = verified_primary_family_member.person_demographics.is_incarcerated
       consumer_role.save!
+    end
+
+    def import_home_address(person, verified_new_address)
+      verified_address_hash = verified_new_address.to_hash
+      verified_address_hash.delete(:country)
+      new_address = Address.new(
+        verified_address_hash
+      )
+      if new_address.valid?
+        person.addresses << new_address
+        person.save!
+      else
+        log("ERROR: Failed to load home address from xml: #{xml}", {:severity => "error"})
+      end
     end
 
     def find_or_create_new_members(verified_dependents, verified_primary_family_member)
@@ -74,10 +92,12 @@ module Subscribers
               name_pfx: verified_family_member.person.name_pfx,
               name_sfx: verified_family_member.person.name_sfx,
               dob: verified_family_member.person_demographics.birth_date,
-              ssn: verified_family_member.person_demographics.ssn,
+              ssn: verified_family_member.person_demographics.ssn == "999999999" ? "" : verified_family_member.person_demographics.ssn ,
               gender: verified_family_member.person_demographics.sex.split('#').last
             )
             new_member.save!
+            verified_new_address = verified_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
+            import_home_address(new_member, verified_new_address)
             new_people << [new_member, relationship, [verified_family_member.id]]
           end
         end
@@ -97,6 +117,7 @@ module Subscribers
 
     def search_person(verified_family_member)
       ssn = verified_family_member.person_demographics.ssn
+      ssn = "" if ssn == "999999999"
       dob = verified_family_member.person_demographics.birth_date
       last_name = verified_family_member.person.name_last
 
