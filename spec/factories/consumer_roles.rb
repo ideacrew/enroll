@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :consumer_role do
     association :person
-    sequence(:ssn) { |n| "75634863" + "#{n}" }
+    sequence(:ssn) { |n| "75634863"[0..-(n/10 + 1)]+ "#{n}" }
     dob "01/01/1980"
     gender 'male'
     is_state_resident 'yes'
