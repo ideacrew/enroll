@@ -4,7 +4,9 @@
       <h1>Coverage - Benefits You Offer</h1>
     </div>
     <div class="col-xs-4">
+      <% if @plan_years.present? %>
       <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-br btn-block", data: {loading_text: "Loading..."} %>
+      <% end %>
     </div>
 
 
@@ -191,6 +193,9 @@
 
   <% else %>
   <h4 style="max-width: 600px;">
-    You haven't created a benefits package yet. Click "Add Benefits Package" above to make your first one.
+    You haven't created a benefits package yet. Click "Add Benefits Package" below to make your first one.
   </h4>
+  <br/>
+  <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."} %>
+
   <% end %>

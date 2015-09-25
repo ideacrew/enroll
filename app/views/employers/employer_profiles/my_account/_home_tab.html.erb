@@ -1,5 +1,6 @@
 <div class="col-xs-12 home-tab">
   <h1>My Health Benefits Program</h1>
+  <% if @current_plan_year.present? %>
   <div class="panel panel-default alert" id="panelOne">
     <h3 class="panel-heading">Important Messages
       <a class="close" data-dismiss="alert"><i class="fa fa-times"></i></a>
@@ -13,6 +14,7 @@
       </li>
     </ul>
   </div>
+  <% end %>
   <div class="col-md-8">
     <div class="row">
       <% if @current_plan_year.present? %>
@@ -119,7 +121,6 @@
                   </table>
                 </div>
                 <% else %>
-                <h2>Plan Years</h2>
                 <h4>You have not yet published a plan year. Once you do, it will display here. To make your first plan year now, <%= link_to "Click Here", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits') %>.</h4>
                 <% end %>
   </div>

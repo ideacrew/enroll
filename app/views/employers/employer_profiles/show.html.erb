@@ -1,74 +1,91 @@
 <% content_for :navigation do %>
-  <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
+<%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
 
-    <%- if @tab == 'home' %>
-          <%= render :partial => 'employers/employer_profiles/my_account/home_tab' %>
-    <%- elsif @tab == 'profile' %>
-          <%= render 'employers/employer_profiles/my_account/profile_tab' %>
-    <%- elsif @tab == 'employees' %>
-       
-          <%= render :partial => "employers/employer_profiles/my_account/census_employees" %>
+<%- if @tab == 'home' %>
+<%= render :partial => 'employers/employer_profiles/my_account/home_tab' %>
+<%- elsif @tab == 'profile' %>
+<%= render 'employers/employer_profiles/my_account/profile_tab' %>
+<%- elsif @tab == 'employees' %>
 
-    <%- elsif @tab == 'benefits' %>
-          <%= render partial: "employers/employer_profiles/my_account/benefits" %>
-    <%- elsif @tab == 'brokers' %>
-          <%= render partial: "employers/employer_profiles/my_account/broker_agency" %>
-    <%- elsif @tab == 'inbox' %>
-          <%= render :partial => 'shared/inboxes/messages_list' %>
-    <%- elsif @tab == 'documents' %>
+<%= render :partial => "employers/employer_profiles/my_account/census_employees" %>
 
-            <%= render partial: "employers/employer_profiles/my_account/documents" %>
+<%- elsif @tab == 'benefits' %>
+<%= render partial: "employers/employer_profiles/my_account/benefits" %>
+<%- elsif @tab == 'brokers' %>
+<%= render partial: "employers/employer_profiles/my_account/broker_agency" %>
+<%- elsif @tab == 'inbox' %>
+<%= render :partial => 'shared/inboxes/messages_list' %>
+<%- elsif @tab == 'documents' %>
 
-    <%- elsif @tab == 'families' %>
-          <%= render partial:  "employers/employer_profiles/my_account/families" %>
-    <%- end %>
+<%= render partial: "employers/employer_profiles/my_account/documents" %>
 
-    <%- if @tab == 'home' %>
-    <aside class="col-xs-4">
-              <section class="row">
-                <article class="col-xs-12">
-                  <div class="row">
-                    <div class="col-xs-4">
-                      <figure>
-                        <span class="icon-calendar-large icon-calendar-large-dims" role="img" aria-label="tooltip"><figcaption><h2>10</h2><span>Days</span></figcaption></span>
-                      </figure>
-                    </div>
-                    <div class="col-xs-8">
-                      <h3>Until Open Enrollment Ends</h3>
-                      <span>On August 31, 2015</span>
-                    </div>
-                </div>
-                </article>
-                <article class="col-xs-12">
-                  <div class="row">
-                    <div class="col-xs-4">
-                      <figure>
-                        <span class="icon-calendar-large icon-calendar-large-dims" role="img" aria-label="tooltip"><figcaption><h2>10</h2><span>Days</span></figcaption></span>
-                      </figure>
-                    </div>
-                    <div class="col-xs-8">
-                      <h3>Until your first payment is due to DC Health Link</h3>
-                      <span>On September 2, 2015</span>
-                    </div>
-                      <div class="col-xs-4">
-                      </div>
-                      <div class="col-xs-8">
-                        <a href="#" class="btn">Learn More</a>
-                      </div>
-                </div>
-                </article>
-              </section>
-              <section class="row">
-                <article>
-                  <figure>
-                    <%= image_tag('images/didyouknow_288.png') %>
-                  </figure>
-                  <figcaption>
-                    <h5>Did you know?</h5>
-                    You can always get help from a broker <strong>at no cost</strong> to you.
-                  </figcaption>
-                </article>
-              </section>
-            </aside>
-            <% end %>
+<%- elsif @tab == 'families' %>
+<%= render partial:  "employers/employer_profiles/my_account/families" %>
+<%- end %>
+
+<%- if @tab == 'home' %>
+<% if @current_plan_year.present? %>
+<aside class="col-xs-4">
+  <section class="row">
+    <article class="col-xs-12">
+      <div class="row">
+        <div class="col-xs-4">
+          <figure>
+            <span class="icon-calendar-large icon-calendar-large-dims" role="img" aria-label="tooltip"><figcaption><h2>10</h2><span>Days</span></figcaption></span>
+          </figure>
+        </div>
+        <div class="col-xs-8">
+          <h3>Until Open Enrollment Ends</h3>
+          <span>On August 31, 2015</span>
+        </div>
+      </div>
+    </article>
+    <article class="col-xs-12">
+      <div class="row">
+        <div class="col-xs-4">
+          <figure>
+            <span class="icon-calendar-large icon-calendar-large-dims" role="img" aria-label="tooltip"><figcaption><h2>10</h2><span>Days</span></figcaption></span>
+          </figure>
+        </div>
+        <div class="col-xs-8">
+          <h3>Until your first payment is due to DC Health Link</h3>
+          <span>On September 2, 2015</span>
+        </div>
+        <div class="col-xs-4">
+        </div>
+        <div class="col-xs-8">
+          <a href="#" class="btn">Learn More</a>
+        </div>
+      </div>
+    </article>
+  </section>
+  <section class="row">
+    <article>
+      <figure>
+        <%= image_tag('images/didyouknow_288.png') %>
+      </figure>
+      <figcaption>
+        <h5>Did you know?</h5>
+        You can always get help from a broker <strong>at no cost</strong> to you.
+      </figcaption>
+    </article>
+  </section>
+</aside>
+<% else %>
+<aside class="col-xs-4">
+  <section class="row">
+    <article>
+      <figure>
+        <%= image_tag('images/didyouknow_288.png') %>
+      </figure>
+      <figcaption>
+        <h5>Did you know?</h5>
+        You can always get help from a broker <strong>at no cost</strong> to you.
+      </figcaption>
+    </article>
+  </section>
+</aside>
+
+<% end %>
+<% end %>
