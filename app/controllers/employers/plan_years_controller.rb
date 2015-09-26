@@ -178,7 +178,7 @@ class Employers::PlanYearsController < ApplicationController
     plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     plan_year.force_publish!
     flash[:error] = "As submitted, this application is ineligible for coverage under the DC HealthLink exchange. If information that you provided leading to this determination is inaccurate, you have 30 days from this notice to request a review by DCHL officials."
-    redirect_to employers_employer_profile_path(@employer_profile)
+    redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
   end
 
   def employee_costs

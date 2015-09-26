@@ -85,10 +85,28 @@ $(document).ready(function () {
   $('input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: 0px;');
 
 
-  // show more details links
-  $('.details').on('click', function() {
-    $(this).closest('.referenceplan').find('.plan-details').toggle();
-  });
+
+
+  // mimic jquery toggle function
+  $.fn.toggleClick=function(){
+  var functions=arguments, iteration=0
+  return this.click(function(){
+    functions[iteration].apply(this,arguments)
+    iteration= (iteration+1) %functions.length
+  })
+}
+
+// details toggler
+  $('.details').toggleClick(function () {
+        $(this).closest('.referenceplan').find('.plan-details').show();
+        $(this).html('Hide Details <i class="fa fa-chevron-up fa-lg"></i>');
+    }, function () {
+      $(this).closest('.referenceplan').find('.plan-details').hide();
+      $(this).html('Hide Details <i class="fa fa-chevron-down fa-lg"></i>');
+
+
+        });
+
 
   // modal input type file clicks
   $(document).on('click', '#modal-wrapper div .select', function(){
