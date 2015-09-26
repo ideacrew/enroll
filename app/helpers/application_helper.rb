@@ -353,7 +353,7 @@ module ApplicationHelper
   end
 
   def relationship_options(dependent, referer)
-    relationships = referer.include?("consumer_role_id") || @person.has_active_consumer_role? ?
+    relationships = referer.include?("consumer_role_id") || @person.try(:has_active_consumer_role?) ?
       BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS - ["self"] :
       PersonRelationship::Relationships
     options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
