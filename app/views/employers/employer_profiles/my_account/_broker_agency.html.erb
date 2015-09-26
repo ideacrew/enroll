@@ -1,10 +1,16 @@
-
-
-
-  <div class="col-xs-12 brokers-tab">
-
-
-          <%= render "employers/broker_agency/active_broker" %>
-
+<div class="col-xs-12 brokers-tab">
+  <% if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
+  <% else %>
+  <div id="brokers-empty">
+    <h1>Brokers</h1>
+    <h4 class="starter">You have no active broker, but you can always get help from a broker at no cost to you. Click "Browse Brokers" below to review brokers available to you.</h4>
+    <br/>
+    <%= link_to 'Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-primary btn-br", onclick: '$("#brokers-empty").hide();' %>
+  </div>
+  <div class="col-xs-12 row" id="browse_brokers">
+    <%= render "employers/broker_agency/active_broker" %>
 
   </div>
+  <% end %>
+
+</div>
