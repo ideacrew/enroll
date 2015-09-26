@@ -15,6 +15,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def plan_year_start_on
+    #FIXME should get time from benefit_package
     Forms::TimeKeeper.new.date_of_record.beginning_of_year
   end
 
