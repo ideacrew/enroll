@@ -9,7 +9,7 @@ $('#benefit-group-<%= @benefit_group.to_s %> .reference-plan .col-xs-3').on('cli
   } else {
       $(this).find('input[type=radio]').prop('checked', true )
       var id = $(this).find('input[type=radio]').attr('value');
-      $(this).closest('#benefit-group-<%= @benefit_group.to_s %>').find('.hidden-param').attr('value', id);
+      $(this).closest('#benefit-group-<%= @benefit_group.to_s %>').find('.ref-plan.hidden-param').attr('value', id);
   }
 
 });

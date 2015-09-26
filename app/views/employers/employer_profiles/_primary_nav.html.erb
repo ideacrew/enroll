@@ -34,7 +34,7 @@
       <h4>My Account</h4>
       <%= link_to 'Update Business Info', edit_employers_employer_profile_path(@employer_profile.organization, :tab=>'profile') %>
       <br/>
-      <%= link_to 'View Billing Reports', edit_employers_employer_profile_path(@employer_profile.organization, :tab=>'profile') %>
+      <%= link_to 'View Billing Reports', employers_premium_statement_path(@employer_profile, :tab=>'profile') %>
 
     </div>
     <div class="panel-body">

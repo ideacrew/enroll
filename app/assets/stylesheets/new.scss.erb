@@ -161,7 +161,7 @@
 
 
     }
-    .employees-table {
+    .employees-table, .premium-reports-table {
         margin-top: 20px;
       table {
 
@@ -830,7 +830,8 @@
   }
   .home-tab, .employees-tab, .employee-add-tab, .benefits-tab,
   .planyear-add-tab, .brokers-tab, .employer-tab, .employer-edit-tab,
-   .documents-tab, #add_employee_action, .benefits-setup-tab, .messages-tab {
+   .documents-tab, #add_employee_action, .benefits-setup-tab, .messages-tab,
+   .premium-reports-tab {
     .btn-primary {
       text-transform: uppercase;
       padding: 10px 20px;
@@ -1184,6 +1185,17 @@
       }
     }
 
+  }
+  .premium-reports-tab {
+    form {
+      display: inline;
+    }
+    input[type=submit] {
+      -webkit-appearance:none;
+      background-color: transparent;
+      margin-right: 15px;
+
+    }
   }
 
 

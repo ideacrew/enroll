@@ -44,7 +44,7 @@
 
 
             <div class="row no-buffer controls" style="display: none;">
-              <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-trans pull-left xs_full_width' %>
+              <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-trans pull-left xs_full_width abg' %>
               <% button_name = @plan_year.persisted? ? 'Save Plan Year' : 'Create Plan Year' %>
                 <button class="btn btn-primary pull-right btn-br mtz" type="submit">
                   <%= "#{button_name}".html_safe %>

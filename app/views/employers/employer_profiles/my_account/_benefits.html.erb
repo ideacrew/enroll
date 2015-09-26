@@ -13,8 +13,6 @@
   </div>
   <% if @plan_years.present? %>
   <br/>
-  <br/>
-  <br/>
 
   <% @plan_years.each do |plan_year| %>
   <div class="row no-buffer">
@@ -174,6 +172,7 @@
       </div>
     </div>
   </div>
+  <% end %>
   <div class="pull-left bottom-mgn-xs">
     <% if plan_year.draft? && @current_plan_year.nil? %>
     <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
@@ -184,7 +183,6 @@
     <% end %>
   </br></br></br>
   </div>
-  <% end %>
   <div class="col-xs-12"><br><br></div>
 
   <%= render "employers/plan_years/publish_modal", plan_year: plan_year %>
