@@ -13,7 +13,7 @@ module Forms
     RELATIONSHIPS = ::PersonRelationship::Relationships + ::BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
     #include ::Forms::DateOfBirthField
     #include Validations::USDate.on(:date_of_birth)
-    
+
     def initialize(*attributes)
       @addresses = Address.new(kind: 'home')
       @same_with_primary = "true"
@@ -25,7 +25,7 @@ module Forms
     validates_presence_of :gender, :allow_blank => nil
     validates_presence_of :family_id, :allow_blank => nil
     validates_presence_of :dob
-    validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil
+    validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil, message: ""
     validate :relationship_validation
     validate :consumer_fields_validation
 
