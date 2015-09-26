@@ -304,7 +304,7 @@ module ApplicationHelper
     # !params[:invitation_id].blank?
     true
   end
-  
+
   def override_backlink
     link=''
     if current_user.try(:has_hbx_staff_role?)

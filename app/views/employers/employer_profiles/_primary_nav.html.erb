@@ -33,9 +33,12 @@
     <div class="panel-heading">
       <h4>My Account</h4>
       <%= link_to 'Update Business Info', edit_employers_employer_profile_path(@employer_profile.organization, :tab=>'profile') %>
+      <br/>
+      <%= link_to 'View Billing Reports', edit_employers_employer_profile_path(@employer_profile.organization, :tab=>'profile') %>
+
     </div>
-      <div class="panel-body">
-        <div>My Employees: <span class="fte-count"><%= @fte_count.present? ? @fte_count:0 %></span></div>
-      </div>
+    <div class="panel-body">
+      <div>My Employees: <span class="fte-count"><%= @fte_count.present? ? @fte_count:0 %></span></div>
     </div>
+  </div>
 </nav>
