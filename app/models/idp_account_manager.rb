@@ -75,6 +75,8 @@ class IdpAccountManager
   class AmqpSource
     extend Acapi::Notifiers
     def self.check_existing_account(args, timeout = 5)
+      :not_found
+=begin
       invoke_service("account_management.check_existing_account", args, timeout) do |code|
         case code
         when "404"
@@ -86,6 +88,7 @@ class IdpAccountManager
         else
           :service_unavailable
         end
+=end
       end
     end
 
