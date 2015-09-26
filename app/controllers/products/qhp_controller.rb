@@ -7,7 +7,7 @@ class Products::QhpController < ApplicationController
     if @market_kind == 'employer_sponsored' and @coverage_kind == 'health'
       @benefit_group = @hbx_enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
-      @qhps = Products::Qhp.where(:standard_component_id.in => found_params).to_a.each do |qhp|
+      @qhps = Products::Qhp.where(:standard_component_id.in => found_params, active_year: params[:active_year].to_i).to_a.each do |qhp|
         qhp[:total_employee_cost] = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan).total_employee_cost
       end
     else
@@ -15,7 +15,7 @@ class Products::QhpController < ApplicationController
       elected_aptc_pct = session[:elected_aptc_pct]
       elected_aptc_pct = elected_aptc_pct.present? ? elected_aptc_pct.to_f : 0.85
 
-      @qhps = Products::Qhp.where(:standard_component_id.in => found_params).to_a.select do |qhp|
+      @qhps = Products::Qhp.where(:standard_component_id.in => found_params, active_year: params[:active_year].to_i).to_a.select do |qhp|
         params["standard_component_ids"].include? qhp.plan.try(:hios_id).try(:to_s)
       end
       @qhps = @qhps.each do |qhp|
@@ -49,7 +49,7 @@ class Products::QhpController < ApplicationController
     @new_params = params.permit(:standard_component_id, :hbx_enrollment_id)
     hbx_enrollment_id = @new_params[:hbx_enrollment_id]
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
-    params[:market_kind] ||= @hbx_enrollment.kind
+    params[:market_kind] = params[:market_kind] == "shop" ? @hbx_enrollment.kind : params[:market_kind]
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'employer_sponsored'
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
   end
