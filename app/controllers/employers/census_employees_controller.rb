@@ -75,7 +75,7 @@ class Employers::CensusEmployeesController < ApplicationController
         flash[:notice] = "Note: new employee cannot enroll on DC Healthlink until they are assigned a benefit group. "
         flash[:notice] += "Census Employee is successfully updated."
       end
-      redirect_to employers_employer_profile_path(@employer_profile)
+      redirect_to employers_employer_profile_path(@employer_profile, tab: 'employees')
     else
       @reload = true
       render action: "edit"
