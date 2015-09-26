@@ -88,8 +88,8 @@ class IdpAccountManager
         else
           :service_unavailable
         end
-=end
       end
+=end
     end
 
     def self.update_navigation_flag(legacy_username, email, flag)
