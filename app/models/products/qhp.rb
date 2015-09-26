@@ -60,8 +60,9 @@ class Products::Qhp
   field :begin_primary_care_cost_sharing_after_set_number_visits, type: String
 
   ## Plan Dates
-  field :plan_effective_date, type: String
-  field :plan_expiration_date, type: String
+  field :plan_effective_date, type: Date
+  field :plan_expiration_date, type: Date
+  field :active_year, type: Integer
 
   ## Geographic Coverage
   field :out_of_country_coverage, type: String
@@ -81,6 +82,8 @@ class Products::Qhp
                         :network_id, :service_area_id, :is_new_plan, :plan_type, :metal_level,
                         :qhp_or_non_qhp, :emp_contribution_amount_for_hsa_or_hra, :child_only_offering,
                         :plan_effective_date, :out_of_country_coverage, :out_of_service_area_coverage, :national_network
+
+  scope :by_hios_id_and_active_year, -> (sc_id, year) { where(standard_component_id: sc_id, active_year: year ) }
 
   embeds_many :qhp_benefits,
     class_name: "Products::QhpBenefit",

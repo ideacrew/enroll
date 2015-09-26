@@ -30,7 +30,7 @@ class Products::QhpController < ApplicationController
 
   def summary
     sc_id = @new_params[:standard_component_id][0..13]
-    @qhp = Products::Qhp.where(standard_component_id: sc_id).to_a.first
+    @qhp = Products::Qhp.by_hios_id_and_active_year(sc_id, params[:active_year]).first
     if @market_kind == 'employer_sponsored' and @coverage_kind == 'health'
       @benefit_group = @hbx_enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
