@@ -40,6 +40,14 @@ class BrokerRole
   scope :active,    ->{ any_in(aasm_state: ["applicant", "active", "broker_agency_pending"]) }
   scope :inactive,  ->{ any_in(aasm_state: ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"]) }
 
+  def self.by_npn(broker_npn)
+    person_records = Person.by_broker_role_npn(broker_npn)
+    return [] unless person_records.any?
+    person_records.select do |pr|
+      pr.broker_role.present? && 
+        (pr.broker_role.npn == broker_npn)
+    end.map(&:broker_role)
+  end
 
   def email_address
     return nil unless email.present?
