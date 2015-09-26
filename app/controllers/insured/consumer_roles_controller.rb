@@ -74,6 +74,7 @@ class Insured::ConsumerRolesController < ApplicationController
   def edit
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
+    init_vlp_doc_subject
   end
 
   def update
@@ -186,4 +187,9 @@ class Insured::ConsumerRolesController < ApplicationController
     end
   end
 
+  def init_vlp_doc_subject
+    if @consumer_role.person.try(:naturalized_citizen) or @consumer_role.person.try(:eligible_immigration_status)
+      @vlp_doc_subject = @consumer_role.try(:vlp_documents).try(:last).try(:subject)
+    end
+  end
 end
