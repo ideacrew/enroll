@@ -111,7 +111,7 @@ class Plan
    }
 
   validates_inclusion_of :active_year,
-    in: 2014..(Date.today.year + 3),
+    in: 2014..(TimeKeeper.date_of_record.year + 3),
     message: "%{value} is an invalid active year"
 
   ## Scopes

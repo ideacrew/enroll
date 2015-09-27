@@ -353,7 +353,7 @@ module ApplicationHelper
   end
 
   def relationship_options(dependent, referer)
-    relationships = referer.include?("consumer_role_id") ?
+    relationships = referer.include?("consumer_role_id") || @person.try(:has_active_consumer_role?) ?
       BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS - ["self"] :
       PersonRelationship::Relationships
     options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
@@ -421,7 +421,7 @@ module ApplicationHelper
   end
 
   def calculate_age_by_dob(dob)
-    now = Date.today
+    now = TimeKeeper.date_of_record
     now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
 
