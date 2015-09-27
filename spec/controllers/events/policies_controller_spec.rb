@@ -15,8 +15,8 @@ describe Events::PoliciesController do
     before :each do
       allow(HbxEnrollment).to receive(:by_hbx_id).with(policy_id).and_return(found_policys)
       allow(controller).to receive(:render_to_string).with(
-        "created", {:formats => ["xml"], :locals => {
-         :policy => policy
+        "events/hbx_enrollments/policy", {:formats => ["xml"], :locals => {
+         :hbx_enrollment => policy
         }}).and_return(rendered_template)
     end
 
