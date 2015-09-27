@@ -309,7 +309,18 @@
     }
 
   }
+  .benefits-tab {
+    .fa {
+      color: #007bc4;
+      margin: 0 10px 0 5px;
+      &.published, &.enrolling {
+        color: #69A30D;
+      }
+    }
+
+  }
   .benefits-tab, .home-tab {
+
     .plan-details {
       display: none;
     }
@@ -406,7 +417,14 @@
     }
   }
   .benefits-setup-tab {
-
+    .remove_fields {
+      display: none;
+    }
+    .benefit-group-offset label.title {
+      position: relative;
+      margin-left: 0;
+      margin-top: 0;
+    }
     .row-form-wrapper {
       margin: 0;
       padding: 15px 0 20px;
@@ -454,8 +472,8 @@
       }
 
       input {
-        font-size: 18px !important;
-        padding: 0 !important;
+        font-size: 22px !important;
+        padding: 10px 0 0 !important;
         color: #444;
         font-family: 'Open Sans', sans-serif !important;
         line-height: 28px;

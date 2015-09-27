@@ -16,7 +16,15 @@
 
   <% @plan_years.each do |plan_year| %>
   <div class="row no-buffer">
-    <h3 class="title-inline"><%= plan_year.start_on.to_date.year%> - Plan Year (<%= plan_year.aasm_state.to_s.humanize %>)</h3>
+    <h3 class="title-inline">
+      <% if plan_year.aasm_state == 'draft' %>
+      <i class="fa fa-file"></i>
+      <% elsif plan_year.aasm_state == 'enrolling' %>
+      <i class="fa fa-star enrolling"></i>
+      <% elsif plan_year.aasm_state == 'published' %>
+      <i class="fa fa-star published"></i>
+      <% end %>
+      <%= plan_year.start_on.to_date.year%> - Plan Year (<%= plan_year.aasm_state.to_s.humanize %>)</h3>
 
   </div>
 

@@ -23,11 +23,16 @@ $(document).on 'click', 'form .add_fields', (event) ->
     return
   $('.benefit-group-fields:last .selected-plan').remove()
   $('.benefit-group-fields:last input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: 0px;')
-  $('.benefit-group-fields:last input:first').focus();
+  $('.benefit-group-fields:last input:first').focus()
+  $('.remove_fields:last').css('display', 'inline-block')
 
 
 $(document).on 'click', 'form .remove_fields', (event) ->
   $(this).closest('fieldset').remove()
+  event.preventDefault()
+
+$(document).on 'click', '.benefits-setup-tab .remove_fields', (event) ->
+  $('.benefit-group-fields:last').remove()
   event.preventDefault()
 
 @update_delete_buttons = ->
