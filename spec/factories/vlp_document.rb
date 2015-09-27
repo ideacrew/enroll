@@ -5,6 +5,6 @@ FactoryGirl.define do
     expiration_date Date.today
     issuing_country "USA"
     passport_number "123456"
-    subject VlpDocument::VLP_DOCUMENT_KINDS[Random.rand(VlpDocument::VLP_DOCUMENT_KINDS.length)]
+    subject VlpDocument::VLP_DOCUMENT_KINDS[0] #I-327 (Reentry Permit) and validates on :alien_number
   end
 end
