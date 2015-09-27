@@ -30,17 +30,7 @@
       <% page_title = @census_employee.persisted? ? 'Update Employee' : 'Add New Employee' %>
 
         <h4 class="pull-left"><%= page_title %></h4>
-        <% if @reload %>
-          <%= link_to employers_employer_profile_path(@employer_profile, :tab => "employees"), class:'remove return_to_employee_roster' do %>
-            <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
-            Cancel
-          <% end %>
-        <% else %>
-        <%= link_to employers_employer_profile_path(@employer_profile, :tab => "employees"), class:'remove return_to_employee_roster' do %>
-            <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
-            Cancel
-  <% end %>
-        <% end %>
+
 
           <%= render 'member_fields', f: f %>
           <%= render 'shared/census_employee_fields', {f: f} %>
@@ -56,6 +46,9 @@
           <br/>
 
           <%= render 'shared/add_dependents', {f: f} %>
+
+
+
           <div class="key-btn">
             <% button_label = @census_employee.persisted? ? 'Update Employee' : 'Create Employee' %>
             <button class="btn btn-primary btn-br pull-right" type="submit">

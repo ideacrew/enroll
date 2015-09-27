@@ -170,7 +170,7 @@ class Employers::PlanYearsController < ApplicationController
         errors = @plan_year.application_errors.try(:values)
         flash[:error] = "Plan Year failed to publish. #{('<li>' + errors.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
       end
-      render :js => "window.location = #{employers_employer_profile_path(@employer_profile).to_json}"
+      render :js => "window.location = #{employers_employer_profile_path(@employer_profile).to_json}?tab=benefits"
     end
   end
 

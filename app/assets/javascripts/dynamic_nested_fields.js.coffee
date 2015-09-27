@@ -23,7 +23,7 @@ $(document).on 'click', 'form .add_fields', (event) ->
     return
   $('.benefit-group-fields:last .selected-plan').remove()
   $('.benefit-group-fields:last input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: 0px;')
-
+  $('.benefit-group-fields:last input:first').focus();
 
 
 $(document).on 'click', 'form .remove_fields', (event) ->
