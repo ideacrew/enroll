@@ -39,7 +39,6 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def create
-    binding.pry
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|
       benefit_group.elected_plans = case benefit_group.plan_option_kind
