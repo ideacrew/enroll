@@ -377,6 +377,8 @@ describe HbxEnrollment, dbclean: :after_all do
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
       let(:consumer_role) { FactoryGirl.create(:consumer_role) }
+      let(:person) { double(primary_family: family)}
+      let(:family) { double }
       let(:enrollment) {
         household.create_hbx_enrollment_from(
           consumer_role: consumer_role,
@@ -386,18 +388,21 @@ describe HbxEnrollment, dbclean: :after_all do
       }
       let(:hbx_profile) {double} 
       let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
-      let(:renewal_bcp) { double }
-      let(:bcp) { double }
+      let(:renewal_bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
+      let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
       let(:plan) { FactoryGirl.create(:plan) }
       let(:plan2) { FactoryGirl.create(:plan) }
 
       before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
         allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+        allow(consumer_role).to receive(:person).and_return(person)
+        allow(family).to receive(:is_under_special_enrollment_period?).and_return false
       end
 
       it "should return decoratored plans when not in the open enrollment" do
         allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
+        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
         allow(bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan]
         expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
         expect(enrollment.decorated_elected_plans('health').count).to eq 1
@@ -405,6 +410,7 @@ describe HbxEnrollment, dbclean: :after_all do
       end
 
       it "should return decoratored plans when not in the open enrollment" do
+        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(renewal_bcp)
         allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return true
         allow(renewal_bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan2]
         expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator

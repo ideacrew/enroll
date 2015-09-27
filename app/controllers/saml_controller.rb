@@ -46,6 +46,18 @@ class SamlController < ApplicationController
     end
   end
 
+  # This action is invoked only when going to curam from the account page.
+  # Going to curam during the initial flow is triggered differently.
+  # What we do here is set the navigation flag and send to the right location.
+  def navigate_to_assistance
+    ::IdpAccountManager.update_navigation_flag(
+      current_user.oim_id,
+      current_user.email,
+      ::IdpAccountManager::CURAM_NAVIGATION_FLAG
+    )
+    redirect_to SamlInformation.curam_landing_page_url
+  end
+
   def logout
     redirect_to SamlInformation.saml_logout_url
   end

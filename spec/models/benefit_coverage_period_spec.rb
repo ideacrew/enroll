@@ -149,6 +149,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
       Plan.delete_all
       allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package1, benefit_package2]
       allow(InsuredEligibleForBenefitRule).to receive(:new).and_return rule
+      allow(benefit_coverage_period).to receive(:earliest_effective_date).and_return(TimeKeeper.date_of_record)
     end
 
     it "when satisfied" do

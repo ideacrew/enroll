@@ -33,10 +33,10 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       end
 
       context "and qle is first_of_next_month" do
-        it "when is_dependent_loss_of_esi" do
+        it "when is_dependent_loss_of_coverage" do
           sep.effective_on_kind = "first_of_next_month"
           sep.qualifying_life_event_kind = qle
-          allow(qle).to receive(:is_dependent_loss_of_esi?).and_return true
+          allow(qle).to receive(:is_dependent_loss_of_coverage?).and_return true
           allow(qle).to receive(:employee_gaining_medicare).and_return (TimeKeeper.date_of_record - 1.day)
           sep.qle_on = TimeKeeper.date_of_record + 40.days
           expect(sep.effective_on).to eq (TimeKeeper.date_of_record - 1.day)

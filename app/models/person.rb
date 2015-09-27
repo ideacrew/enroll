@@ -148,6 +148,8 @@ class Person
   # PersonRelationship child model indexes
   index({"person_relationship.relative_id" =>  1})
 
+  scope :by_hbx_id, ->(person_hbx_id) { where(hbx_id: person_hbx_id) }
+  scope :by_broker_role_npn, ->(br_npn) { where("broker_role.npn" => br_npn) }
   scope :active,   ->{ where(is_active: true) }
   scope :inactive, ->{ where(is_active: false) }
 

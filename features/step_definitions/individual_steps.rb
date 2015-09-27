@@ -95,7 +95,7 @@ Then (/Individual fixes a VLP error message/) do
   @browser.li(text: /Certificate of Citizenship/i).click
   click_when_present(@browser.button(class: /interaction-click-control-continue/))
   wait_and_confirm_text(/2 errors/)
-  wait_and_confirm_text(/Certificate of citizenship: base alien_number value is required/)
+  wait_and_confirm_text(/alien_number value is required/)
   @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).wait_while_present
   @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).fire_event("onclick")
 end
@@ -208,7 +208,7 @@ And(/I click on purchase button on confirmation page/) do
   @browser.text_field(class: /interaction-field-control-first-name-thank-you/).set("Taylor")
   @browser.text_field(class: /interaction-field-control-last-name-thank-you/).set("York")
   screenshot("purchase")
-  click_when_present(@browser.a(text: /purchase/i))
+  click_when_present(@browser.a(text: /confirm/i))
 end
 
 And(/I click on continue button to go to the individual home page/) do
