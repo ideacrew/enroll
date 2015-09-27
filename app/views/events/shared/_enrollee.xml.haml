@@ -1,0 +1,19 @@
+%enrollee
+  %member
+    %id= hbx_enrollment_member.person.hbx_id
+    =render :partial=> "events/individuals/person", :object => hbx_enrollment_member.person, as: :person
+    =render :partial=> "events/individuals/person_relationship", :collection=>hbx_enrollment_member.person.person_relationships, as: :person_relationship
+    %person_demographics
+      %ssn= hbx_enrollment_member.person.ssn
+      %sex= "urn:openhbx:terms:v1:gender##{hbx_enrollment_member.person.gender}"
+      %birth_date= simple_date_for(hbx_enrollment_member.person.dob)
+      - if !hbx_enrollment_member.person.is_incarcerated.present?
+        %is_incarcerated= "false"
+      - else
+        %is_incarcerated= hbx_enrollment_member.person.is_incarcerated.to_s
+      %race= hbx_enrollment_member.person.race
+    %is_subscriber= hbx_enrollment_member.is_subscriber
+    %benefit
+      %premium_amount= hbx_enrollment_member.premium_amount
+      %begin_date= simple_date_for(hbx_enrollment_member.coverage_start_on)
+      %end_date= simple_date_for(hbx_enrollment_member.coverage_end_on) if hbx_enrollment_member.coverage_end_on

@@ -1,0 +1,24 @@
+%plan
+  %id
+    %id= hbx_enrollment.plan.hbx_id
+  %name= hbx_enrollment.plan.name
+  %active_year= hbx_enrollment.plan.active_year
+  %is_dental_only= hbx_enrollment.plan.is_dental_only?
+  = render :partial=> "events/shared/carrier", :object=> hbx_enrollment.plan.carrier_profile, as: :carrier
+  %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{hbx_enrollment.plan.metal_level}"
+  %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{hbx_enrollment.plan.coverage_kind} "
+  %ehb_percent= hbx_enrollment.plan.ehb*100
+  - if hbx_enrollment.plan.market.eql?("shop")
+    %shop_market
+      %employer_link
+        %id
+          %id= hbx_enrollment.employer_profile.hbx_id
+        %name= hbx_enrollment.employer_profile.legal_name
+        %dba= hbx_enrollment.employer_profile.dba
+      %total_employer_responsible_amount= hbx_enrollment.total_employer_contribution
+  - else
+    %individual_market
+      %elected_aptc_percent= hbx_enrollment.elected_aptc_pct
+      %applied_aptc_amount= hbx_enrollment.applied_aptc_amount
+  %premium_total_amount= hbx_enrollment.total_premium
+  %total_responsible_amount= hbx_enrollment.total_premium - hbx_enrollment.total_employer_contribution
