@@ -98,11 +98,11 @@ $(document).ready(function () {
 
 // details toggler
   $('.details').toggleClick(function () {
-        $(this).closest('.referenceplan').find('.plan-details').show();
+        $(this).closest('.referenceplan').find('.plan-details').slideDown();
         $(this).html('Hide Details <i class="fa fa-chevron-up fa-lg"></i>');
     }, function () {
-      $(this).closest('.referenceplan').find('.plan-details').hide();
-      $(this).html('Show Details <i class="fa fa-chevron-down fa-lg"></i>');
+      $(this).closest('.referenceplan').find('.plan-details').slideUp();
+      $(this).html('View Details <i class="fa fa-chevron-down fa-lg"></i>');
 
 
         });

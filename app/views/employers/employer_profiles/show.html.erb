@@ -41,7 +41,7 @@
         </div>
       </div>
     </article>
-    <article class="col-xs-12">
+    <article class="col-xs-12" style="display: none;">
       <div class="row">
         <div class="col-xs-4">
           <figure>
@@ -60,7 +60,7 @@
       </div>
     </article>
   </section>
-  <section class="row">
+  <section class="row" onclick="window.location.href = '<%= employers_employer_profile_path(@employer_profile, tab: 'brokers') %>'">
     <article>
       <figure>
         <%= image_tag('images/didyouknow_288.png') %>
