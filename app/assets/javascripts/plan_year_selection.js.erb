@@ -52,6 +52,10 @@ $(document).on('ready', function() {
 
         $(this).closest('.benefit-group-fields').find('.plan-options, .metals-tab').show();
       }
+      else if ($(this).attr('value') == "single_plan") {
+
+        $(this).closest('.benefit-group-fields').find('.plan-options, .single-plan-tab').show();
+      }
     });
     $(document).on('click', '.nav-tabs a', function() {
       $(this).closest('.benefit-group-fields').find('.plan-options').hide();
