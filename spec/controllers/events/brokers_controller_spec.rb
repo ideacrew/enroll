@@ -13,10 +13,10 @@ describe Events::BrokersController do
     let(:props) { double(:headers => {:broker_id => broker_id}, :reply_to => reply_to_key) }
 
     before :each do
-      allow(BrokerRole).to receive(:by_npn).with(broker_id).and_return(found_brokers)
+      allow(Person).to receive(:by_broker_role_npn).with(broker_id).and_return(found_brokers)
       allow(controller).to receive(:render_to_string).with(
-        "created", {:formats => ["xml"], :locals => {
-         :broker => broker
+        "events/individuals/created", {:formats => ["xml"], :locals => {
+         :individual => broker
         }}).and_return(rendered_template)
     end
 
