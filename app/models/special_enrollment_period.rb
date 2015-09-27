@@ -58,7 +58,7 @@ class SpecialEnrollmentPeriod
 
   def is_active?
     return false if self.begin_on.blank? || self.end_on.blank?
-    (self.begin_on..self.end_on).include?(Date.today)
+    (self.begin_on..self.end_on).include?(TimeKeeper.date_of_record)
   end
 
   def duration_in_days

@@ -14,8 +14,8 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     member_provider.hbx_enrollment_members
   end
 
-  def plan_year_start_on
-    Forms::TimeKeeper.new.date_of_record.beginning_of_year
+  def schedule_date
+    @member_provider.effective_on
   end
 
   def age_of(member)
@@ -23,7 +23,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def premium_for(member)
-    __getobj__.premium_for(plan_year_start_on, age_of(member)) rescue 0
+    __getobj__.premium_for(schedule_date, age_of(member)) rescue 0
   end
 
   def employer_contribution_for(member)

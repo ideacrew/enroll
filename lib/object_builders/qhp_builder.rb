@@ -50,6 +50,13 @@ class QhpBuilder
     @xml_plan_counter, @success_plan_counter = 0,0
     iterate_plans
     show_qhp_stats
+    mark_2015_dental_plans_as_individual
+  end
+
+  def mark_2015_dental_plans_as_individual
+    Plan.where(active_year: 2015, coverage_kind: "dental").each do |plan|
+      plan.update_attribute(:market, "individual") if plan.coverage_kind == "dental"
+    end
   end
 
   def iterate_plans
@@ -94,7 +101,10 @@ class QhpBuilder
   end
 
   def associate_plan_with_qhp
-    @plan_year = @qhp.plan_effective_date.to_date.year
+    effective_date = @qhp.plan_effective_date.to_date
+    @qhp.plan_effective_date = effective_date.beginning_of_year
+    @qhp.plan_expiration_date = effective_date.end_of_year
+    @plan_year = effective_date.year
     if @plan_year > 2015 && !INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
       create_plan_from_serff_data
     end
@@ -244,7 +254,12 @@ class QhpBuilder
   end
 
   def plan_attribute_params
+    assign_active_year_to_qhp
     @plan[:plan_attributes]
+  end
+
+  def assign_active_year_to_qhp
+    @plan[:plan_attributes][:active_year] = @plan[:plan_attributes][:plan_effective_date][-4..-1].to_i
   end
 
 end
