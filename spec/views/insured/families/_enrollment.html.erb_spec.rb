@@ -12,12 +12,12 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     it "should display the title" do
-      expect(rendered).to match /2015 Health Coverage/
+      expect(rendered).to match /#{plan.active_year} Health Coverage/
       expect(rendered).to match /DCHL/
     end
 
     it "should display the link of view detail" do
-      expect(rendered).to have_selector("a[href='/products/plans/summary?hbx_enrollment_id=#{hbx_enrollment.id}&standard_component_id=#{plan.hios_id}']", text: "VIEW DETAILS")
+      expect(rendered).to have_selector("a[href='/products/plans/summary?active_year=#{plan.active_year}&hbx_enrollment_id=#{hbx_enrollment.id}&standard_component_id=#{plan.hios_id}']", text: "VIEW DETAILS")
     end
 
     it "should display the effective date" do
@@ -37,7 +37,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     it "should display the title" do
-      expect(rendered).to match /2015 Health Coverage/
+      expect(rendered).to match /#{plan.active_year} Health Coverage/
       expect(rendered).to match /DCHL/
     end
 
