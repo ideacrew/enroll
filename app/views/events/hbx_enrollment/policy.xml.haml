@@ -1,10 +1,13 @@
 !!! XML
-%policy{ :xmlns => "http://openhbx.org/api/terms/1.0", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance", "xsi:type" => "EmployerOrganizationType"}
+%policy{ :xmlns => "http://openhbx.org/api/terms/1.0", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance"}
   %id
     %id= hbx_enrollment.hbx_id
-  = render "events/shared/broker", :object => hbx_enrollment.broker_agency_profile
+  - if hbx_enrollment.broker_agency_profile
+    = render :partial => "events/shared/broker", :object => hbx_enrollment.broker_agency_profile, as: :broker_agency_profile
   %enrollees
-    =render "events/shared/enrollee", :collection => hbx_enrollment.hbx_enrollment_members
+    =render :partial => "events/shared/enrollee", :collection => hbx_enrollment.hbx_enrollment_members, as: :hbx_enrollment_member
   %enrollment
-    =render "events/hbx_enrollment/plan"
+    =render :partial => "events/hbx_enrollment/plan", :locals=> {:hbx_enrollment => hbx_enrollment}
   %request_submitted_timestamp= simple_date_for(hbx_enrollment.created_at) if hbx_enrollment.created_at
+  %market= hbx_enrollment.plan.market
+  %is_active= hbx_enrollment.is_active
