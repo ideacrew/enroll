@@ -132,6 +132,14 @@ class HbxEnrollment
 
   before_save :generate_hbx_id
 
+  def self.by_hbx_id(policy_hbx_id)
+    families = Family.with_enrollment_hbx_id(policy_hbx_id)
+    households = families.flat_map(&:households)
+    households.flat_map(&:hbx_enrollments).select do |hbxe|
+      hbxe.hbx_id == policy_hbx_id
+    end
+  end
+
   def self.update_individual_eligibilities_for(consumer_role)
     found_families = Family.find_all_by_person(consumer_role.person)
     found_families.each do |ff|
