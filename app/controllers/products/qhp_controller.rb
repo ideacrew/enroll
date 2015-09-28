@@ -1,9 +1,15 @@
 class Products::QhpController < ApplicationController
+  include ContentType
+
   before_action :set_kind_for_market_and_coverage, only: [:comparison, :summary]
 
   def comparison
     params.permit("standard_component_ids", :hbx_enrollment_id)
     found_params = params["standard_component_ids"].map { |str| str[0..13] }
+
+    @standard_component_ids = params[:standard_component_ids]
+    @hbx_enrollment_id = params[:hbx_enrollment_id]
+
     if @market_kind == 'employer_sponsored' and @coverage_kind == 'health'
       @benefit_group = @hbx_enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
@@ -25,8 +31,12 @@ class Products::QhpController < ApplicationController
     respond_to do |format|
       format.html
       format.js
+      format.csv do
+        send_data(Products::Qhp.csv_for(@qhps), type: csv_content_type, filename: "comparsion_plans.csv")
+      end
     end
   end
+
 
   def summary
     sc_id = @new_params[:standard_component_id][0..13]
@@ -53,4 +63,5 @@ class Products::QhpController < ApplicationController
     @market_kind = params[:market_kind].present? ? params[:market_kind] : 'employer_sponsored'
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
   end
+
 end

@@ -11,7 +11,7 @@ class PeopleController < ApplicationController
   def check_qle_marriage_date
     date_married = Date.parse(params[:date_val])
     start_date = Date.parse('01/10/2013')
-    end_date = Date.today
+    end_date = TimeKeeper.date_of_record
 
     if start_date <= date_married && date_married <= end_date
       # Qualifed

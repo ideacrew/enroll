@@ -9,4 +9,12 @@ class CuramUser
 
   validates :ssn, uniqueness: true, allow_blank: true
 
+  def self.match_ssn ssn
+    CuramUser.where(ssn: ssn).exists?
+  end
+
+  def self.match_ssn_dob(ssn, dob)
+    CuramUser.where(ssn: ssn, dob: dob).exists?
+  end
+
 end

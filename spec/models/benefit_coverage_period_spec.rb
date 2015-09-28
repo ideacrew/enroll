@@ -132,7 +132,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
   end
 
   context "elected_plans_by_enrollment_members" do
-    let(:benefit_coverage_period) { BenefitCoveragePeriod.new }
+    let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: (TimeKeeper.date_of_record - 2.months).to_date) }
     let(:c1) {FactoryGirl.create(:consumer_role)}
     let(:c2) {FactoryGirl.create(:consumer_role)}
     let(:member1) {double(person: double(consumer_role: c1))}
@@ -149,7 +149,6 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
       Plan.delete_all
       allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package1, benefit_package2]
       allow(InsuredEligibleForBenefitRule).to receive(:new).and_return rule
-      allow(benefit_coverage_period).to receive(:earliest_effective_date).and_return(TimeKeeper.date_of_record)
     end
 
     it "when satisfied" do

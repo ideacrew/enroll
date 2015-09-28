@@ -55,6 +55,7 @@ class Family
   index({"households.tax_households.hbx_assigned_id" => 1})
   index({"households.tax_households.tax_household_member.financial_statement.submitted_date" => 1})
   index({"irs_groups.hbx_assigned_id" => 1})
+  index({"households.hbx_enrollments.hbx_id" => 1})
 
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
@@ -67,6 +68,9 @@ class Family
   after_save :update_family_search_collection
   after_destroy :remove_family_search_record
 
+  scope :with_enrollment_hbx_id, ->(enrollment_hbx_id) {
+    where("households.hbx_enrollments.hbx_id" => enrollment_hbx_id)
+  }
   scope :all_with_single_family_member,     -> { exists({:'family_members.1' => false}) }
   scope :all_with_multiple_family_members,  -> { exists({:'family_members.1' => true}) }
 
@@ -190,7 +194,7 @@ class Family
   end
 
   # List of SEPs active for this Application Group today, or passed date
-  def active_seps(day = Date.today)
+  def active_seps(day = TimeKeeper.date_of_record)
     special_enrollment_periods.find_all { |sep| (sep.begin_on..sep.end_on).include?(day) }
   end
 

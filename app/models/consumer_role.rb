@@ -38,7 +38,7 @@ class ConsumerRole
 
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
-  field :requested_coverage_start_date, type: Date, default: Date.today
+  field :requested_coverage_start_date, type: Date, default: TimeKeeper.date_of_record
   field :aasm_state, type: String, default: "verifications_pending"
 
   delegate :citizen_status,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
@@ -85,12 +85,12 @@ class ConsumerRole
     allow_blank: true,
     inclusion: { in: CITIZEN_STATUS_KINDS, message: "%{value} is not a valid citizen status" }
 
-  scope :all_under_age_twenty_six, ->{ gt(:'dob' => (Date.today - 26.years))}
-  scope :all_over_age_twenty_six,  ->{lte(:'dob' => (Date.today - 26.years))}
+  scope :all_under_age_twenty_six, ->{ gt(:'dob' => (TimeKeeper.date_of_record - 26.years))}
+  scope :all_over_age_twenty_six,  ->{lte(:'dob' => (TimeKeeper.date_of_record - 26.years))}
 
   # TODO: Add scope that accepts age range
-  scope :all_over_or_equal_age, ->(age) {lte(:'dob' => (Date.today - age.years))}
-  scope :all_under_or_equal_age, ->(age) {gte(:'dob' => (Date.today - age.years))}
+  scope :all_over_or_equal_age, ->(age) {lte(:'dob' => (TimeKeeper.date_of_record - age.years))}
+  scope :all_under_or_equal_age, ->(age) {gte(:'dob' => (TimeKeeper.date_of_record - age.years))}
 
   alias_method :is_state_resident?, :is_state_resident
   alias_method :is_incarcerated?,   :is_incarcerated
@@ -342,12 +342,12 @@ private
   end
 
   def mark_residency_denied(*args)
-    self.residency_determined_at = Time.now
+    self.residency_determined_at = TimeKeeper.datetime_of_record
     self.is_state_resident = false
   end
 
   def mark_residency_authorized(*args)
-    self.residency_determined_at = Time.now
+    self.residency_determined_at = TimeKeeper.datetime_of_record
     self.is_state_resident = true
   end
 
