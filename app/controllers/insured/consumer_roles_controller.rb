@@ -38,9 +38,6 @@ class Insured::ConsumerRolesController < ApplicationController
           format.html { redirect_to SamlInformation.account_conflict_url }
         when :existing_account
           format.html { redirect_to SamlInformation.account_recovery_url }
-        when :in_curam_list
-          flash[:error] = "User with this SSN already exists."
-          format.html { redirect_to search_insured_consumer_role_index_path }
         else
           found_person = @consumer_candidate.match_person
           if found_person.present?
@@ -64,7 +61,7 @@ class Insured::ConsumerRolesController < ApplicationController
       respond_to do |format|
         format.html {
           if is_assisted
-            @person.primary_family.update_attribute(:e_case_id, "curam_landing")
+            @person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{@person.id}")
             redirect_to SamlInformation.curam_landing_page_url
           else
             redirect_to :action => "edit", :id => @consumer_role.id

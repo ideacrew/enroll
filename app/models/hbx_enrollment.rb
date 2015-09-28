@@ -160,7 +160,7 @@ class HbxEnrollment
 
 
   def benefit_sponsored?
-    employer_profile.present?
+    employee_role.present?
   end
 
   def currently_active?

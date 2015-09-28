@@ -32,7 +32,7 @@ module Subscribers
 
         update_consumer_role(consumer_role, xml_hash)
       rescue => e
-        notify("acapi.error.application.enroll.remote_listener.local_residency_reponses", {
+        notify("acapi.error.application.enroll.remote_listener.local_residency_responses", {
           :body => JSON.dump({
             :error => e.inspect,
             :message => e.message,
