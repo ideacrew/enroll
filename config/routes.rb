@@ -163,7 +163,7 @@ Rails.application.routes.draw do
         get 'inbox'
       end
       resources :plan_years do
-        get 'reference_plans' => 'plan_years#reference_plans'
+        get 'reference_plans'
         get 'plan_details' => 'plan_years#plan_details', on: :collection
         get 'recommend_dates', on: :collection
         get 'reference_plan_options', on: :collection

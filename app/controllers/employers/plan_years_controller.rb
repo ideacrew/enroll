@@ -13,17 +13,17 @@ class Employers::PlanYearsController < ApplicationController
   def reference_plans
 
     @benefit_group = params[:benefit_group]
-    @bg = BenefitGroup.find(@benefit_group)
-    
+    @plan_year = PlanYear.find(params[:plan_year_id])
+
     @plans = if params[:plan_option_kind] == "single_carrier"
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
-      #Plan.valid_shop_health_plans("carrier", @carrier_id)
-      Plan.by_active_year(@plan_year.start_on.year).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
+      Plan.valid_shop_health_plans("carrier", @carrier_id)
+      #Plan.by_active_year(@plan_year.start_on.year).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
     elsif params[:plan_option_kind] == "metal_level"
       @metal_level = params[:metal_level]
-      #Plan.valid_shop_health_plans("metal_level", @metal_level)
-      Plan.by_active_year(@plan_year.start_on.year).shop_market.health_coverage.by_metal_level(@metal_level)
+      Plan.valid_shop_health_plans("metal_level", @metal_level)
+      #Plan.by_active_year(@plan_year.start_on.year).shop_market.health_coverage.by_metal_level(@metal_level)
     elsif params[:plan_option_kind] == "single_plan"
       @single_plan = params[:single_plan]
       Plan.shop_health_by_active_year(@plan_year.start_on.year) # .order(@carrier_id)
@@ -49,6 +49,7 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year.benefit_groups.each do |benefit_group|
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
     end
+
     if @plan_year.save
       flash[:notice] = "Plan Year successfully created."
       redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'benefits')

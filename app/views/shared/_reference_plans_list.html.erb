@@ -1,7 +1,6 @@
 <% selected_kind_carrier = f.object.plan_option_kind == 'single_carrier' %>
 <% selected_kind_metal_level = f.object.plan_option_kind == 'metal_level' %>
 <% selected_kind_plan = f.object.plan_option_kind == 'single_plan' %>
-
 <h1>Select Your Plan Offering</h1>
 <h4 style="max-width: 660px;">Let you plan participants choose any plan they want that is offered by a single carrier, single metal level, or offer just a single plan.
 </h4>
@@ -40,7 +39,7 @@
     <% @carrier_names.each_pair do |ck, cv| %>
     <div class="col-xs-3" class="carriers">
       <div class="col-xs-12 row">
-        <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_carrier", benefit_group:f.object.id ), remote: true do %>
+        <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_carrier", benefit_group:f.object.id ), remote: true do %>
         <div class="col-xs-3">
           <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
           <%= f.label "carrier_for_elected_plan_#{ck}" do %>
@@ -67,7 +66,7 @@
     <% Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
     <div class="col-xs-3" class="metals">
       <div class="col-xs-12 row">
-        <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, plan_option_kind: "metal_level", metal_level: kind, benefit_group:f.object.id ), remote: true do %>
+        <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, plan_option_kind: "metal_level", metal_level: kind, benefit_group:f.object.id ), remote: true do %>
 
         <div class="col-xs-3">
           <%= f.radio_button :metal_level_for_elected_plan, kind %>
@@ -101,7 +100,8 @@
     <% @carrier_names.each_pair do |ck, cv| %>
     <div class="col-xs-3" class="carriers">
       <div class="col-xs-12 row">
-        <%= link_to reference_plans_employers_employer_profile_plan_years_path(@employer_profile, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_plan", benefit_group:f.object.id ), remote: true do %>
+        <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_plan", benefit_group:f.object.id ), remote: true do %>
+
         <div class="col-xs-3">
           <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
           <%= f.label "carrier_for_elected_plan_#{ck}" do %>
