@@ -38,9 +38,6 @@ class Insured::ConsumerRolesController < ApplicationController
           format.html { redirect_to SamlInformation.account_conflict_url }
         when :existing_account
           format.html { redirect_to SamlInformation.account_recovery_url }
-        when :in_curam_list
-          flash[:notice] = "This SSN is already taken."
-          format.html { redirect_to search_insured_consumer_role_index_path }
         else
           found_person = @consumer_candidate.match_person
           if found_person.present?

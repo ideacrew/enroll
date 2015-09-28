@@ -20,15 +20,10 @@ class IdpAccountManager
     if !personish.ssn.blank?
       person_details[:ssn] = personish.ssn
     end
-
-    if CuramUser.match_ssn(person_details[:ssn])
-      :in_curam_list
-    else
-      provider.check_existing_account(
-        person_details,
-        timeout
-      )
-    end
+    provider.check_existing_account(
+      person_details,
+      timeout
+    )
   end
 
   def create_account(email, password, personish, account_role, timeout = 15)
