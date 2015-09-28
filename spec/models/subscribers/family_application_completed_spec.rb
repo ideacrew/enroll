@@ -48,7 +48,7 @@ describe Subscribers::FamilyApplicationCompleted do
         let(:consumer_role) { FactoryGirl.create(:consumer_role, person: person) }
 
         before do
-          family.save!
+          family.update_attribute(:e_case_id, "curam_landing_for#{person.id}")
           allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile_organization)
           allow(person).to receive(:consumer_role).and_return(consumer_role)
           allow(Person).to receive(:where).and_return([person])
@@ -56,8 +56,7 @@ describe Subscribers::FamilyApplicationCompleted do
         end
 
         after do
-          family.e_case_id = nil
-          family.save!
+          Family.delete_all
         end
 
         it "shouldn't log any errors" do
@@ -65,14 +64,15 @@ describe Subscribers::FamilyApplicationCompleted do
           subject.call(nil, nil, nil, nil, message)
         end
 
-        context "it runs with the same e_case_id/integrated_case_id" do
+        context "it runs with a different e_case_id/integrated_case_id" do
 
-          it "should log a save error on the unqiue field of e_case_id on family " do
+          it "should log an error saying integrated_case_id does not match family " do
             subject.call(nil, nil, nil, nil, message)
             expect(subject).to receive(:log) do |arg1, arg2|
-              expect(arg1).to match(/Integrated case id already exists in another family/)
+              expect(arg1).to match(/Integrated case id does not match existing family/)
               expect(arg2).to eq({:severity => 'error'})
             end
+            family.update_attribute(:e_case_id, "some_other_id")
             subject.call(nil, nil, nil, nil, message)
           end
         end
@@ -107,6 +107,7 @@ describe Subscribers::FamilyApplicationCompleted do
 
         before do
           person.save!
+          person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{person.id}")
           expect(subject).not_to receive(:log)
           allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile_organization)
           subject.call(nil, nil, nil, nil, message)

@@ -20,31 +20,34 @@ module Subscribers
       primary_person = search_person(verified_primary_family_member)
       family = find_existing_family(verified_primary_family_member, primary_person, xml)
 
-      if family.present? && family.e_case_id == verified_family.integrated_case_id
-        log("ERROR: Integrated case id already exists in another family for xml: #{xml}", {:severity => "error"})
-      elsif family.present?
-        begin
-          active_household = family.active_household
-          family.e_case_id = verified_family.integrated_case_id
-          active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.integrated_case_id}.first
-          active_verified_tax_household = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last}.first
-          new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
-          verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
-          import_home_address(primary_person, verified_new_address)
-          active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
-          update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
-          new_dependents.each do |p|
-            new_family_member = family.relate_new_member(p[0], p[1])
-            if active_verified_tax_household.present?
-              new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
-              active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
-            end
-            family.save!
-          end
-        rescue
-          log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
-        end
+      if family.present?
+        active_household = family.active_household
+        active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.integrated_case_id}.first
+        active_verified_tax_household = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last}.first
+        new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
+        verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
+        import_home_address(primary_person, verified_new_address)
         family.save!
+        if (family.e_case_id.include? "curam_landing") || family.e_case_id == verified_family.integrated_case_id
+          begin
+            family.e_case_id = verified_family.integrated_case_id if family.e_case_id.include? "curam_landing"
+            active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
+            update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
+            new_dependents.each do |p|
+              new_family_member = family.relate_new_member(p[0], p[1])
+              if active_verified_tax_household.present?
+                new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
+                active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
+              end
+              family.save!
+            end
+          rescue
+            log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
+          end
+          family.save!
+        else
+          log("ERROR: Integrated case id does not match existing family for xml: #{xml}", {:severity => "error"})
+        end
       else
         log("ERROR: Failed to find primary family for users person in xml: #{xml}", {:severity => "error"})
       end
@@ -68,6 +71,9 @@ module Subscribers
         verified_address_hash
       )
       if new_address.valid?
+        if person.home_address.present?
+          person.home_address.delete
+        end
         person.addresses << new_address
         person.save!
       else
