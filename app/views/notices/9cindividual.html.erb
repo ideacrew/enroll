@@ -18,7 +18,7 @@
         <td></br></td>
       </tr>
       <tr class="wid50">
-        <td align="left"><%= format_date(Date.today) %></td>
+        <td align="left"><%= format_date(TimeKeeper.date_of_record) %></td>
         <td  align="right"><%= notice.primary_identifier %></td>
       </tr>
     </tbody>
@@ -37,7 +37,7 @@
   <table class="total_table" border="0">
     <tbody>
       <tr class="widn">
-        <td><strong>Congratulations!</strong> Based on the health insurance application you submitted and we processed on <%= format_date(Date.today) %>, the following person(s) qualify for health coverage through DC Health Link.</td>
+        <td><strong>Congratulations!</strong> Based on the health insurance application you submitted and we processed on <%= format_date(TimeKeeper.date_of_record) %>, the following person(s) qualify for health coverage through DC Health Link.</td>
       </tr>
     </tbody>
   </table>
@@ -176,7 +176,7 @@
         <td><h3 style="color:rgb(54,95,145);">Changing Plans</h3></td>
       </tr>
       <tr class="mar15">
-        <td>You will be able to change plans during the annual open enrollment period at the end of each year.  45 C.F.R. §155.410(e). You can get the date of the next open enrollment period by going to <a href="www.DCHealthLink.com">www.DCHealthLink.com</a> or calling DC Health Link Customer Service at (855) 532-5465. If you have a change in circumstances during <%= Date.today.year %>, you may also qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include: </td>
+        <td>You will be able to change plans during the annual open enrollment period at the end of each year.  45 C.F.R. §155.410(e). You can get the date of the next open enrollment period by going to <a href="www.DCHealthLink.com">www.DCHealthLink.com</a> or calling DC Health Link Customer Service at (855) 532-5465. If you have a change in circumstances during <%= TimeKeeper.date_of_record.year %>, you may also qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include: </td>
       </tr>
       <tr><td></br></td>
       </tr>

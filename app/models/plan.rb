@@ -111,7 +111,7 @@ class Plan
    }
 
   validates_inclusion_of :active_year,
-    in: 2014..(Date.today.year + 3),
+    in: 2014..(TimeKeeper.date_of_record.year + 3),
     message: "%{value} is an invalid active year"
 
   ## Scopes
@@ -179,7 +179,8 @@ class Plan
       where(
           active_year: active_year,
           market: "individual",
-          coverage_kind: "health"
+          coverage_kind: "health",
+          hios_id: /-01$/
         )
     }
 
@@ -197,6 +198,8 @@ class Plan
   scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
   scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }
   scope :health_metal_nin_catastropic,          ->{ not_in(metal_level: "catastrophic") }
+
+  scope :by_plan_ids, ->(plan_ids) { where(:id => {"$in" => plan_ids}) }
 
   # Carriers: use class method (which may be chained)
   def self.find_by_carrier_profile(carrier_profile)
@@ -296,7 +299,7 @@ class Plan
     end
 
     def individual_plans(coverage_kind:, active_year:)
-      Plan.public_send("individual_#{coverage_kind}_by_active_year", active_year).with_premium_tables.where(hios_id: /-01$/)
+      Plan.public_send("individual_#{coverage_kind}_by_active_year", active_year).with_premium_tables
     end
   end
 end

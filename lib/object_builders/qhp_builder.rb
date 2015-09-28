@@ -2,6 +2,7 @@ class QhpBuilder
   LOG_PATH = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
   LOGGER = Logger.new(LOG_PATH)
   INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003"] # These plan ids are suppressed and we dont save these while importing.
+  BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005"]
 
   def initialize(qhp_hash)
     @qhp_hash = qhp_hash
@@ -50,6 +51,19 @@ class QhpBuilder
     @xml_plan_counter, @success_plan_counter = 0,0
     iterate_plans
     show_qhp_stats
+    mark_2015_dental_plans_as_individual
+  end
+
+  def mark_2015_dental_plans_as_individual
+    # find ivl dental plans that are marked as shop.
+    #delete bestone plans as they do not have corresponding serff templates.
+    Plan.shop_dental_by_active_year(2015).each do |plan|
+      if BEST_LIFE_HIOS_IDS.include?(plan.hios_id)
+        plan.destroy
+      else
+        plan.update_attribute(:market, "individual") if plan.coverage_kind == "dental"
+      end
+    end
   end
 
   def iterate_plans
@@ -94,7 +108,10 @@ class QhpBuilder
   end
 
   def associate_plan_with_qhp
-    @plan_year = @qhp.plan_effective_date.to_date.year
+    effective_date = @qhp.plan_effective_date.to_date
+    @qhp.plan_effective_date = effective_date.beginning_of_year
+    @qhp.plan_expiration_date = effective_date.end_of_year
+    @plan_year = effective_date.year
     if @plan_year > 2015 && !INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
       create_plan_from_serff_data
     end
@@ -244,7 +261,12 @@ class QhpBuilder
   end
 
   def plan_attribute_params
+    assign_active_year_to_qhp
     @plan[:plan_attributes]
+  end
+
+  def assign_active_year_to_qhp
+    @plan[:plan_attributes][:active_year] = @plan[:plan_attributes][:plan_effective_date][-4..-1].to_i
   end
 
 end

@@ -144,8 +144,8 @@ class QualifyingLifeEventKind
     # raise_error if move_date > TimeKeeper.date_of_record.end_of_month + 1.day
   end
 
-  def is_dependent_loss_of_esi?
-    title == "Losing Employer-Subsidized Insurance because employee is going on Medicare"
+  def is_dependent_loss_of_coverage?
+    ["Losing Employer-Subsidized Insurance because employee is going on Medicare", "My employer did not pay my premiums on time"].include? title
   end
 
   def is_moved_to_dc?

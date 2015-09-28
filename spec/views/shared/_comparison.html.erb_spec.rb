@@ -46,4 +46,12 @@ describe "shared/_comparison.html.erb" do
   it "should have print area" do
     expect(rendered).to have_selector('div#printArea')
   end
+
+  it "should have download link" do
+    expect(rendered).to have_selector('a', text: 'Download')
+  end
+
+  it "should have print link" do
+    expect(rendered).to have_selector('button', text: 'Print')
+  end
 end

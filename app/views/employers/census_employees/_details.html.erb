@@ -93,26 +93,26 @@
               </tr>
             </thead>
 
-            <tbody>
-              <% @hbx_enrollment.hbx_enrollment_members.each do |member| %>
-              <tr>
-                <td><%= member.person.full_name %></td>
-                <td><%= member.primary_relationship %></td>
-                <td><%= dob_in_words(member.person.age_on(Time.now.utc.to_date), member.person.dob) %></td>
-                <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
-                <td class="text-right"><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
-                <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
-              </tr>
-              <% end %>
-              <tr class="gray-row">
-                <td colspan="3" class="text-right capital"><strong>Totals</strong></td>
-                <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
-                <td class="text-right"><strong><%= number_to_currency(@plan.total_employer_contribution) %></strong></td>
-                <td class="text-right"><strong><%= number_to_currency(@plan.total_employee_cost) %></strong></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+              <tbody>
+                <% @hbx_enrollment.hbx_enrollment_members.each do |member| %>
+                  <tr>
+                    <td><%= member.person.full_name %></td>
+                    <td><%= member.primary_relationship %></td>
+                    <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
+                    <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
+                    <td class="text-right"><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
+                    <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+                  </tr>
+                <% end %>
+                <tr class="gray-row">
+                  <td colspan="3" class="text-right capital"><strong>Totals</strong></td>
+                  <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
+                  <td class="text-right"><strong><%= number_to_currency(@plan.total_employer_contribution) %></strong></td>
+                  <td class="text-right"><strong><%= number_to_currency(@plan.total_employee_cost) %></strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         <% end %>
         <% end %>
       </div>

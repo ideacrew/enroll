@@ -47,14 +47,7 @@ class Employers::PlanYearsController < ApplicationController
   def create
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|
-      benefit_group.elected_plans = case benefit_group.plan_option_kind
-                                    when "single_plan"
-                                      Plan.where(id: benefit_group.reference_plan_id).first
-                                    when "single_carrier"
-                                      Plan.valid_shop_health_plans("carrier", benefit_group.carrier_for_elected_plan)
-                                    when "metal_level"
-                                      Plan.valid_shop_health_plans("metal_level", benefit_group.metal_level_for_elected_plan)
-                                    end
+      benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
     end
     if @plan_year.save
       flash[:notice] = "Plan Year successfully created."
@@ -70,11 +63,13 @@ class Employers::PlanYearsController < ApplicationController
     @key = params[:key]
     @target = params[:target]
 
+    plan_year = Date.parse(params["start_date"]).year unless params["start_date"].blank?
+
     @plans = case @kind
             when "carrier"
-              Plan.valid_shop_health_plans("carrier", @key)
+              Plan.valid_shop_health_plans("carrier", @key, plan_year)
             when "metal-level"
-              Plan.valid_shop_health_plans("metal_level", @key)
+              Plan.valid_shop_health_plans("metal_level", @key, plan_year)
             else
               []
             end
@@ -129,14 +124,7 @@ class Employers::PlanYearsController < ApplicationController
     plan_year = @employer_profile.plan_years.where(id: params[:id]).last
     @plan_year = ::Forms::PlanYearForm.rebuild(plan_year, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|
-      benefit_group.elected_plans = case benefit_group.plan_option_kind
-                                    when "single_plan"
-                                      Plan.where(id: benefit_group.reference_plan_id).first
-                                    when "single_carrier"
-                                      Plan.valid_shop_health_plans("carrier", benefit_group.carrier_for_elected_plan)
-                                    when "metal_level"
-                                      Plan.valid_shop_health_plans("metal_level", benefit_group.metal_level_for_elected_plan)
-                                    end
+      benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
     end
     if @plan_year.save
       flash[:notice] = "Plan Year successfully saved."

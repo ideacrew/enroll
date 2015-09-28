@@ -160,7 +160,7 @@ class Insured::EmployeeRolesController < ApplicationController
     if @person.try(:employee_roles).try(:last)
       redirect_to @person.employee_roles.last.bookmark_url || family_account_path
     else
-      current_user.last_portal_visited = search_insured_consumer_role_index_path
+      current_user.last_portal_visited = search_insured_employee_index_path
       current_user.save!
     end
   end

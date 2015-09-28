@@ -29,8 +29,16 @@ class BenefitSponsorship
   end
 
   def earliest_effective_date
-    current_benefit_coverage_period.earliest_effective_date if current_benefit_coverage_period
+    current_benefit_period.earliest_effective_date if current_benefit_period
   end
+
+  def benefit_coverage_period_by_effective_date(effective_date)
+    benefit_coverage_periods.detect { |bcp| bcp.contains?(effective_date) }
+  end
+
+  # def is_under_special_enrollment_period?
+  #   benefit_coverage_periods.detect { |bcp| bcp.contains?(TimeKeeper.date_of_record) }
+  # end
 
   def is_under_open_enrollment?
     benefit_coverage_periods.any? do |benefit_coverage_period|
@@ -41,6 +49,14 @@ class BenefitSponsorship
   def self.find(id)
     orgs = Organization.where("hbx_profile.benefit_sponsorship._id" => BSON::ObjectId.from_string(id))
     orgs.size > 0 ? orgs.first.hbx_profile.benefit_sponsorship : nil
+  end
+
+  def current_benefit_period
+    if renewal_benefit_coverage_period && renewal_benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
+      renewal_benefit_coverage_period
+    else
+      current_benefit_coverage_period
+    end
   end
 
 # effective_coverage_period

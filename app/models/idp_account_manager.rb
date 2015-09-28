@@ -20,10 +20,15 @@ class IdpAccountManager
     if !personish.ssn.blank?
       person_details[:ssn] = personish.ssn
     end
-    provider.check_existing_account(
-      person_details,
-      timeout
-    )
+
+    if CuramUser.match_ssn(person_details[:ssn])
+      :in_curam_list
+    else
+      provider.check_existing_account(
+        person_details,
+        timeout
+      )
+    end
   end
 
   def create_account(email, password, personish, account_role, timeout = 15)
@@ -75,6 +80,8 @@ class IdpAccountManager
   class AmqpSource
     extend Acapi::Notifiers
     def self.check_existing_account(args, timeout = 5)
+      :not_found
+=begin
       invoke_service("account_management.check_existing_account", args, timeout) do |code|
         case code
         when "404"
@@ -87,6 +94,7 @@ class IdpAccountManager
           :service_unavailable
         end
       end
+=end
     end
 
     def self.update_navigation_flag(legacy_username, email, flag)

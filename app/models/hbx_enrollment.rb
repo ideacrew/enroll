@@ -132,6 +132,14 @@ class HbxEnrollment
 
   before_save :generate_hbx_id
 
+  def self.by_hbx_id(policy_hbx_id)
+    families = Family.with_enrollment_hbx_id(policy_hbx_id)
+    households = families.flat_map(&:households)
+    households.flat_map(&:hbx_enrollments).select do |hbxe|
+      hbxe.hbx_id == policy_hbx_id
+    end
+  end
+
   def self.update_individual_eligibilities_for(consumer_role)
     found_families = Family.find_all_by_person(consumer_role.person)
     found_families.each do |ff|
@@ -298,13 +306,14 @@ class HbxEnrollment
 
   def decorated_elected_plans(coverage_kind)
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-    benefit_coverage_period = if benefit_sponsorship.renewal_benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
-                                benefit_sponsorship.renewal_benefit_coverage_period
-                              else
-                                benefit_sponsorship.current_benefit_coverage_period
-                              end
-    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind)
 
+    if family.is_under_special_enrollment_period?
+      benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
+    else
+      benefit_coverage_period = benefit_sponsorship.current_benefit_period
+    end
+
+    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
@@ -333,12 +342,7 @@ class HbxEnrollment
   end
 
   def self.calculate_start_date_by_qle(household)
-    special_enrollment_period = household.family.special_enrollment_periods.last
-    if special_enrollment_period.present?
-      special_enrollment_period.effective_on
-    else
-      TimeKeeper.date_of_record
-    end
+    household.family.current_sep.effective_on
   end
 
   def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false)
@@ -366,11 +370,20 @@ class HbxEnrollment
       enrollment.kind = "individual"
       enrollment.consumer_role = consumer_role
       enrollment.benefit_package_id = benefit_package.try(:id)
-      if qle
-        enrollment.effective_on = calculate_start_date_by_qle(coverage_household.household)
+      # if qle
+      #   enrollment.effective_on = calculate_start_date_by_qle(coverage_household.household)
+      # else
+
+      
+      benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+      family = consumer_role.person.primary_family
+      if family.is_under_special_enrollment_period?
+        enrollment.effective_on = family.current_sep.effective_on
       else
-        enrollment.effective_on = HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
+        enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
       end
+
+      # end
     else
       raise "either employee_role or consumer_role is required"
     end

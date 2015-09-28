@@ -22,7 +22,7 @@
         <div class="col-xs-12 form-group form-group-lg">
           <!-- Offset :  -->
           <label class="title">BENEFIT PACKAGE TITLE</label>
-          <% title_value = f.object.title.present? ? f.object.title : "#{Time.now.year} Employer Benefits" %>
+          <% title_value = f.object.title.present? ? f.object.title : "#{TimeKeeper.date_of_record.year} Employer Benefits" %>
           <%= f.text_field :title, class: "form-control", style: "font-weight: normal !important;", required: true %>
         </div>
       </div>

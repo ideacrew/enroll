@@ -11,7 +11,7 @@ class PeopleController < ApplicationController
   def check_qle_marriage_date
     date_married = Date.parse(params[:date_val])
     start_date = Date.parse('01/10/2013')
-    end_date = Date.today
+    end_date = TimeKeeper.date_of_record
 
     if start_date <= date_married && date_married <= end_date
       # Qualifed
@@ -217,7 +217,7 @@ class PeopleController < ApplicationController
       update_vlp_documents 
       redirect_path = personal_insured_families_path
     else
-      redirect_path = insured_employee_path(id:@person.id)
+      redirect_path = family_account_path
     end
 
     respond_to do |format|

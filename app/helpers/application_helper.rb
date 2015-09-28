@@ -316,6 +316,7 @@ module ApplicationHelper
   end
 
   def display_carrier_logo(carrier_name, options = {:width => 50})
+    carrier_name = "Dominion Dental" if carrier_name.downcase == "dominion"
     if carrier_name.present?
       image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
     end
@@ -353,7 +354,7 @@ module ApplicationHelper
   end
 
   def relationship_options(dependent, referer)
-    relationships = referer.include?("consumer_role_id") ?
+    relationships = referer.include?("consumer_role_id") || @person.try(:has_active_consumer_role?) ?
       BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS - ["self"] :
       PersonRelationship::Relationships
     options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
@@ -421,7 +422,7 @@ module ApplicationHelper
   end
 
   def calculate_age_by_dob(dob)
-    now = Date.today
+    now = TimeKeeper.date_of_record
     now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
 
@@ -490,6 +491,13 @@ module ApplicationHelper
     options
   end
 
+  def purchase_or_confirm #TODO #TODOJF Maybe both roles?
+    if @person.try(:consumer_role)
+      'Confirm'
+    else
+      'Purchase'
+    end
+  end
   def get_key_and_bucket(uri)
     splits = uri.split('#')
     key = splits.last

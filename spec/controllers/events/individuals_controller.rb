@@ -3,47 +3,52 @@ require "rails_helper"
 describe Events::IndividualsController do
   describe "#created with an individual created event" do
     let(:individual) { double }
-    let(:outbound_event_name) { "acapi.info.events.individual.created" }
+    let(:individual_id) { "the hbx id for this individual" }
     let(:rendered_template) { double }
+    let(:di) { double }
+    let(:channel) { double(:default_exchange => exchange, :close => nil) }
+    let(:reply_to_key) { "some queue name" }
+    let(:exchange) { double }
+    let(:connection) { double(:create_channel => channel) }
+    let(:props) { double(:headers => {:individual_id => individual_id}, :reply_to => reply_to_key) }
 
-    it "should send out a message to the bus with the rendered individual object" do
-      @event_name = ""
-      @body = nil
-      event_subscriber = ActiveSupport::Notifications.subscribe(outbound_event_name) do |e_name, s_at, e_at, m_id, payload|
-        @event_name = e_name
-        @body = payload.stringify_keys["body"]
-      end
-      expect(controller).to receive(:render_to_string).with(
+    before :each do
+      allow(Person).to receive(:by_hbx_id).with(individual_id).and_return(found_individuals)
+      allow(controller).to receive(:render_to_string).with(
         "created", {:formats => ["xml"], :locals => {
          :individual => individual
         }}).and_return(rendered_template)
-      controller.created(nil, nil, nil, {:individual => individual})
-      ActiveSupport::Notifications.unsubscribe(event_subscriber)
-      expect(@event_name).to eq outbound_event_name
-      expect(@body).to eq rendered_template
     end
-  end
 
-  describe "#updated with an individual updated event" do
-    let(:individual) { double }
-    let(:outbound_event_name) { "acapi.info.events.individual.updated" }
-    let(:rendered_template) { double }
+    describe "for an existing individual" do
+      let(:found_individuals) { [individual] }
 
-    it "should send out a message to the bus with the rendered individual object" do
-      @event_name = ""
-      @body = nil
-      event_subscriber = ActiveSupport::Notifications.subscribe(outbound_event_name) do |e_name, s_at, e_at, m_id, payload|
-        @event_name = e_name
-        @body = payload.stringify_keys["body"]
+      it "should send out a message to the bus with the rendered individual object" do
+        expect(exchange).to receive(:publish).with(rendered_template, {
+          :routing_key => reply_to_key,
+          :headers => {
+            :individual_id => individual_id,
+            :return_status => "200"
+          }       
+        })
+        controller.resource(connection, di, props, "")
       end
-      expect(controller).to receive(:render_to_string).with(
-        "created", {:formats => ["xml"], :locals => {
-         :individual => individual
-        }}).and_return(rendered_template)
-      controller.updated(nil, nil, nil, {:individual => individual})
-      ActiveSupport::Notifications.unsubscribe(event_subscriber)
-      expect(@event_name).to eq outbound_event_name
-      expect(@body).to eq rendered_template
+    end
+
+    describe "for an individual which doesn't exist" do
+      let(:found_individuals) { [] }
+
+      it "should send out a message to the bus with no individual object" do
+        expect(exchange).to receive(:publish).with("", {
+          :routing_key => reply_to_key,
+          :headers => {
+            :individual_id => individual_id,
+            :return_status => "404"
+          }       
+        })
+        controller.resource(connection, di, props, "")
+      end
     end
   end
+
 end
