@@ -2,6 +2,7 @@ class QhpBuilder
   LOG_PATH = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
   LOGGER = Logger.new(LOG_PATH)
   INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003"] # These plan ids are suppressed and we dont save these while importing.
+  BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005"]
 
   def initialize(qhp_hash)
     @qhp_hash = qhp_hash
@@ -54,8 +55,14 @@ class QhpBuilder
   end
 
   def mark_2015_dental_plans_as_individual
-    Plan.where(active_year: 2015, coverage_kind: "dental").each do |plan|
-      plan.update_attribute(:market, "individual") if plan.coverage_kind == "dental"
+    # find ivl dental plans that are marked as shop.
+    #delete bestone plans as they do not have corresponding serff templates.
+    Plan.shop_dental_by_active_year(2015).each do |plan|
+      if BEST_LIFE_HIOS_IDS.include?(plan.hios_id)
+        plan.destroy
+      else
+        plan.update_attribute(:market, "individual") if plan.coverage_kind == "dental"
+      end
     end
   end
 
