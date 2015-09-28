@@ -135,7 +135,7 @@
                  <ns0:allocated_aptcs>
                     <ns0:allocated_aptc>
                        <ns0:calendar_year>2015</ns0:calendar_year>
-                       <ns0:total_amount>20.0</ns0:total_amount>
+                       <ns0:total_amount>0.0</ns0:total_amount>
                     </ns0:allocated_aptc>
                  </ns0:allocated_aptcs>
                  <ns0:tax_household_members>

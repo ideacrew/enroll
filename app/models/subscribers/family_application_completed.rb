@@ -41,6 +41,12 @@ module Subscribers
               end
               family.save!
             end
+
+            if active_household.tax_households.present?
+              unless active_household.tax_households.last.eligibility_determinations.present?
+                log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
+              end
+            end
           rescue
             log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
           end
