@@ -1,5 +1,14 @@
 
 $(document).on('ready', function() {
+  // move start date to url for plan options
+  $("#plan_year_start_on").on('change', function() {
+    start_on = $(this).val().substr(0,4); 
+    $('.plan-options a').each(function() {
+      var url = $(this).attr('href');
+      $(this).attr('href', url+"&start_on="+start_on);
+    });
+
+  });
   // nav tabs radios on change for plan selection
     $('#choose-coverage > * select').val("");
     $('.plan-options > * input, .reference-plans > * input').prop('checked', false);
@@ -77,6 +86,7 @@ $(document).on('ready', function() {
         $(this).closest('.benefit-group-fields').find('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h5>Loading plans...</h5></div>");
         $(this).closest('.benefit-group-fields').find(".reference-plans").show();
         $(this).find('input[type=radio]').prop('checked', true );
+
         if ($(this).parents('.carriers-tab').length > 0 ) {
           $(this).closest('.benefit-group-fields').find('.metals-tab input[type=radio]').prop('checked', 0 );
         }
@@ -89,8 +99,6 @@ $(document).on('ready', function() {
       }
 
     });
-
-
 
 
 // set reference_plan_id
