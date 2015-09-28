@@ -1,7 +1,5 @@
 require 'csv'
 
-# Usage: add .csv file curam_user.csv to db/seedfiles/ then $ rake import_curam:curam_users
-
 namespace :import_curam do
 
   desc "Import users from Curam"
