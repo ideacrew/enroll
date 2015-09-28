@@ -137,6 +137,7 @@ class Plan
   scope :dc_in_network, ->{ where(out_of_service_area_coverage: "false") }
 
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
+  scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }

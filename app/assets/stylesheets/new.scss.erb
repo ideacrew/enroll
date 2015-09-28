@@ -309,15 +309,21 @@
     }
 
   }
-  .benefits-tab {
+  .benefits-tab, .home-tab {
     .fa {
       color: #007bc4;
       margin: 0 10px 0 5px;
       &.published, &.enrolling {
-        color: #69A30D;
+        color: #FFD700;
       }
     }
-
+    .bg-title {
+      margin-bottom: 10px;
+      display: inline-block;
+      color: #69A30D;
+      font-size: 18px;
+      line-height: 120%;
+    }
   }
   .benefits-tab, .home-tab {
 
@@ -339,6 +345,8 @@
       width: 96%;
       padding: 0 2%;
       margin: auto;
+      table-layout: fixed;
+      display: table;
       tr:first-of-type {
         border-top: none;
         th {
@@ -368,7 +376,11 @@
     }
     }
     .panel.benefitgroup.benefitgroup.referenceplan {
+      padding-bottom: 30px;
       margin-bottom: 15px;
+      &>h2 {
+        font-size: 16px;
+      }
       table {
         tr {
           th {
@@ -989,7 +1001,7 @@
             header {
               h5 {
                 padding-bottom: 0;
-                margin-bottom: 0;
+                margin-bottom: 20px;
                 border: none;
               }
               h3 {
@@ -1059,10 +1071,13 @@
 
         h5 {
           text-transform: uppercase;
-          color: #909090;
+          color: #69A30D;
           font-weight: bold;
-          margin: 0;
-          font-size: 14px;
+          font-size: 18px;
+          span {
+            font-weight: normal;
+            color: #333;
+          }
         }
         .row {
           div:first-of-type {

@@ -189,7 +189,7 @@ class Employers::EmployerProfilesController < ApplicationController
     @census_employee_import = CensusEmployeeImport.new({file:file, employer_profile:@employer_profile})
     begin
     if @census_employee_import.save
-      redirect_to "/employers/employer_profiles/#{@employer_profile.id}?tab=employees?employer_profile_id=#{@employer_profile.id}", :notice=>"#{@census_employee_import.length} records uploaded from CSV"
+      redirect_to "/employers/employer_profiles/#{@employer_profile.id}?tab=employees?employer_profile_id=#{@employer_profile.id}?tab=employees", :notice=>"#{@census_employee_import.length} records uploaded from CSV"
     else
       render "employers/employer_profiles/employee_csv_upload_errors"
     end

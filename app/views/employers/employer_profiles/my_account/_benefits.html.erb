@@ -32,23 +32,15 @@
   <div class="panel benefitgroup col-xs-12">
     <section class="col-xs-6">
       <header class="row">
-        <h5 style="color: #69A30D; font-size: 18px;">Benefit Package</h5>
+        <h5 class="bg-title">Benefit Package: <span ><%= bg.title %></span></h5>
       </header>
     </section>
     <section class="col-xs-6">
       <header class="row">
-        <a class="details" onclick="$(this).closest('.benefitgroup').next().toggle();">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
+        <a class="details" onclick="$(this).closest('.benefitgroup').next().slideToggle();">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
       </header>
     </section>
     <table>
-      <tr>
-        <td>
-          <header>Benefit Package Name</header>
-        </td>
-        <td>
-          <p><%= bg.title %></p>
-        </td>
-      </tr>
       <tr>
         <td>
           <header>Eligibility</header>
@@ -56,15 +48,6 @@
         <td>
           <p>
             <%= "#{bg.effective_on_kind.humanize} after #{bg.effective_on_offset} days from date of hire" %>
-          </p>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <header>By Carrier</header>
-        </td>
-        <td>
-          <p>
           </p>
         </td>
       </tr>
@@ -97,7 +80,7 @@
   <div class="panel benefitgroup col-xs-12 referenceplan">
     <section class="col-xs-6">
       <header class="row">
-        <h5 style="color: #69A30D; font-size: 18px;">Your Reference Plan</h5>
+        <h5 class="bg-title">Reference Plan: <span><%= bg.reference_plan.name %></span></h5>
       </header>
     </section>
     <section class="col-xs-6">
@@ -105,7 +88,6 @@
         <a class="details">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
       </header>
     </section>
-    <h2><%= bg.reference_plan.name %></h2>
     <table>
       <tr>
         <th>
@@ -113,9 +95,6 @@
         </th>
         <th>
           <header>Metallic Level</header>
-        </th>
-        <th>
-          <header>Network</header>
         </th>
         <th>
           <header>ID</header>
@@ -128,11 +107,6 @@
         <td>
           <p>
             <%= bg.reference_plan.metal_level.titleize %>
-          </p>
-        </td>
-        <td>
-          <p>
-            <%= bg.plan_option_kind.titleize %>
           </p>
         </td>
         <td>

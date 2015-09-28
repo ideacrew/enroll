@@ -13,15 +13,21 @@ class Employers::PlanYearsController < ApplicationController
   def reference_plans
 
     @benefit_group = params[:benefit_group]
+    @bg = BenefitGroup.find(@benefit_group)
+    
     @plans = if params[:plan_option_kind] == "single_carrier"
       @carrier_id = params[:carrier_id]
-      Plan.valid_shop_health_plans("carrier", @carrier_id)
+      @carrier_profile = CarrierProfile.find(params[:carrier_id])
+      #Plan.valid_shop_health_plans("carrier", @carrier_id)
+      Plan.by_active_year(@plan_year.start_on.year).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
     elsif params[:plan_option_kind] == "metal_level"
       @metal_level = params[:metal_level]
-      Plan.valid_shop_health_plans("metal_level", @metal_level)
+      #Plan.valid_shop_health_plans("metal_level", @metal_level)
+      Plan.by_active_year(@plan_year.start_on.year).shop_market.health_coverage.by_metal_level(@metal_level)
     elsif params[:plan_option_kind] == "single_plan"
       @single_plan = params[:single_plan]
-      Plan.shop_market.by_active_year(TimeKeeper.date_of_record.year)
+      Plan.shop_health_by_active_year(@plan_year.start_on.year) # .order(@carrier_id)
+      # Plan.shop_health_by_active_year(TimeKeeper.date_of_record.start_on.year) # .order(@carrier_id)
     end
     respond_to do |format|
       format.js
