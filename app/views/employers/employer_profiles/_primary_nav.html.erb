@@ -38,7 +38,7 @@
 
     </div>
     <div class="panel-body">
-      <div>My Employees: <span class="fte-count"><%= @fte_count.present? ? @fte_count:0 %></span></div>
+      <div>My Employees: <span class="fte-count"><%= @employer_profile.census_employees.count %></span></div>
     </div>
   </div>
 </nav>
