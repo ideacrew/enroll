@@ -159,7 +159,12 @@
 
     <div class="row no-buffer" id="tribal_container" style="display: <%= f.object.indian_tribe_member.present? and f.object.indian_tribe_member ? 'block' : 'none' %>">
       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :tribal_id, class: "required floatlabel form-control", placeholder: 'TRIBAL ID' %>
+        <%= f.text_field :tribal_id, class: "floatlabel form-control required", id: "tribal_id", placeholder: 'TRIBAL ID' %>
+      </div>
+      <div id="tribal_id_alert" class="alert alert-warning alert-dismissible panel-footer" role="alert" style="display:none">
+        <button type="button" class="close" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button> Tribal ID number is required
       </div>
     </div>
   </div>
@@ -172,5 +177,13 @@
 <script type="text/javascript">
   $(document).ready(function () {
     demographicsNew.init();
+    $('form.edit_person').submit(function(e){
+      var tribal_val = $('#tribal_id').val();
+      if($(demographicsNew.ui.indianTribeMemberTrue).is(':checked') &&
+       (tribal_val == "undefined" || tribal_val == '')){
+        $('#tribal_id_alert').show();
+      }
+    });
   });
+  $('.close').click(function(){$('#tribal_id_alert').hide()});
 </script>
