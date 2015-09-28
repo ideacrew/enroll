@@ -237,6 +237,18 @@ class PlanYear
     end
   end
 
+  def minimum_enrolled_count
+    (HbxProfile::ShopEnrollmentParticipationRatioMinimum * eligible_to_enroll_count).ceil
+  end
+
+  def additional_required_participants_count
+    if total_enrolled_count < minimum_enrolled_count
+      minimum_enrolled_count - total_enrolled_count
+    else
+      0.0
+    end
+  end
+
   def is_enrollment_valid?
     enrollment_errors.blank? ? true : false
   end
