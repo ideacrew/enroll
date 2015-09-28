@@ -53,11 +53,17 @@
       </tr>
       <tr>
         <td>
-          <header>Carrier</header>
+          <header>Plans By</header>
         </td>
         <td>
           <p>
-            CareFirst BlueChoice HMO Referral HAS/HRA $4,000
+            <% if bg.plan_option_kind == "single_carrier" %>
+            All plans from a single carrier
+            <% elsif bg.plan_option_kind == "metal_level" %>
+            All Plans from a given metal level
+            <% elsif bg.plan_option_kind == "single_plan" %>
+            A single plan
+            <% end %>
           </p>
         </td>
       </tr>
@@ -97,12 +103,15 @@
           <header>Metallic Level</header>
         </th>
         <th>
+          <header>Carrier</header>
+        </th>
+        <th>
           <header>ID</header>
         </th>
       </tr>
       <tr>
         <td>
-          <p>PPO</p>
+          <p><%= bg.reference_plan.plan_type.upcase %></p>
         </td>
         <td>
           <p>
@@ -110,7 +119,13 @@
           </p>
         </td>
         <td>
-          <p>00089787
+          <p>
+
+          </p>
+        </td>
+        <td>
+          <p>
+            <%= bg.reference_plan.id %>
           </p>
         </td>
       </tr>
@@ -131,21 +146,6 @@
           <tr>
             <td>Total Estimated Monthly Cost for Plan Participants</td>
             <td><%= number_to_currency(bg.monthly_min_employee_cost) %> / <%= number_to_currency(bg.monthly_max_employee_cost) %></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td><strong>Other Annual Costs for Plan Participants</strong></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>Estimated Deductable</td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>Out-of-Pocket Max</td>
-            <td></td>
             <td></td>
           </tr>
 

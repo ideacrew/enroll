@@ -83,6 +83,7 @@ class Employers::EmployerProfilesController < ApplicationController
      paginate_employees
    else
       @current_plan_year = @employer_profile.published_plan_year
+      @additional_required_participants_count = @current_plan_year.additional_required_participants_count
       @plan_years = @employer_profile.plan_years.order(id: :desc)
 
       @broker_agency_accounts = @employer_profile.broker_agency_accounts
@@ -117,6 +118,7 @@ class Employers::EmployerProfilesController < ApplicationController
        format.js { render 'employers/employer_profiles/inbox' }
      end
    end
+
     end
 
 

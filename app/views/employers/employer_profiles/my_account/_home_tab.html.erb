@@ -36,7 +36,7 @@
 
           <div class="information">
             <strong><%=  @current_plan_year.total_enrolled_count %></strong> out of <strong><%= @current_plan_year.eligible_to_enroll_count %></strong> have enrolled or waived coverage<br/>
-            <strong>3</strong> or more needed by <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %> to meet minimum requirement
+            <strong><%= @additional_required_participants_count %></strong> or more needed by <%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %> to meet minimum requirement
           </div>
         </div>
         <!--
@@ -84,7 +84,7 @@
                     </tr>
                   </table>
                 </div>
-                <%= @current_plan_year.benefit_groups.each do |bg| %>
+                <% @current_plan_year.benefit_groups.each do |bg| %>
 
                 <div class="panel benefitgroup col-xs-12">
                   <section class="col-xs-6">
@@ -160,21 +160,28 @@
                       <th>
                         <header>Metallic Level</header>
                       </th>
-
+                      <th>
+                        <header>Carrier</header>
+                      </th>
                       <th>
                         <header>ID</header>
                       </th>
                     </tr>
                     <tr>
                       <td>
-                        <p>PPO</p>
+                        <p>
+                          <%= bg.reference_plan.plan_type.upcase %>
+                        </p>
                       </td>
                       <td>
                         <p>
                           <%= bg.reference_plan.metal_level.titleize %>
                         </p>
                       </td>
-
+                      <td>
+                        <p>
+                        </p>
+                      </td>
                       <td>
                         <p><%= bg.reference_plan.id %>
                         </p>
