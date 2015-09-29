@@ -120,6 +120,8 @@ class Household
         )
 
       end
+
+      th.save!
     end
   end
 

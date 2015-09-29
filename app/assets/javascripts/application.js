@@ -365,7 +365,8 @@ $(document).ready(function () {
   $(".mask-ssn").mask("999-99-9999");
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
-
+  $("#tribal_id").mask("999999999");
+  
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
       $("[for='person_ssn']").css('display', 'none');
