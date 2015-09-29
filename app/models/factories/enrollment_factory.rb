@@ -169,6 +169,7 @@ module Factories
       case people.count
       when 1
         person = people.first
+        user.save if user
         person.user = user if user
         if person.ssn.nil?
           #matched on last_name and dob
