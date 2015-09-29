@@ -211,7 +211,7 @@ Then(/^.+ should see the Employer Profile page as Broker$/) do
   expect(@browser.element(text: /I'm a Broker/).visible?).to be_truthy
 end
 
-Then(/^Primary Broker creates and publishes a plan year$/) do
+Then(/^.* creates and publishes a plan year$/) do
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-add-plan-year/))
   start_on = @browser.p(text: /SELECT START ON/i)

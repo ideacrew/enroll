@@ -59,19 +59,18 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   def edit
-    set_employee_bookmark_url(family_account_path)
+    set_employee_bookmark_url
     @employee_role = EmployeeRole.find(params.require(:id))
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     if @person.present?
       @person.addresses << @employee_role.new_census_employee.address if @employee_role.new_census_employee.address.present?
-      @person.emails.first.address = @employee_role.new_census_employee.email.address if @employee_role.new_census_employee.email.present?
+      @person.emails.first.address = @employee_role.new_census_employee.email.address if @employee_role.new_census_employee.email.present? && @person.emails.first
       @family = @person.primary_family
       build_nested_models
     end
   end
 
   def update
-    set_employee_bookmark_url(family_account_path)
     save_and_exit =  params['exit_after_method'] == 'true'
     person = Person.find(params.require(:id))
     object_params = params.require(:person).permit(*person_parameters_list)
