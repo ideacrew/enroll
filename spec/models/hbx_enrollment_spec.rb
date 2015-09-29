@@ -388,8 +388,8 @@ describe HbxEnrollment, dbclean: :after_all do
       }
       let(:hbx_profile) {double} 
       let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
-      let(:renewal_bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
-      let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
+      let(:renewal_bcp) { double(earliest_effective_date_max: TimeKeeper.date_of_record - 2.months) }
+      let(:bcp) { double(earliest_effective_date_max: TimeKeeper.date_of_record - 2.months) }
       let(:plan) { FactoryGirl.create(:plan) }
       let(:plan2) { FactoryGirl.create(:plan) }
 
