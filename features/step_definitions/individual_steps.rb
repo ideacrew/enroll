@@ -251,7 +251,7 @@ Then(/Second user creates an individual account$/) do
   scroll_then_click(@browser.input(value: "Create account"))
 end
 
-Then(/^Second user goes to register as an individual/) do
+Then(/^Second user goes to register as individual/) do
   step "user should see your information page"
   step "user goes to register as an individual"
   @browser.text_field(class: /interaction-field-control-person-first-name/).set("Second")
