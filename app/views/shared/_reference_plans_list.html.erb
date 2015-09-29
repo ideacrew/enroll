@@ -2,7 +2,7 @@
 <% selected_kind_metal_level = f.object.plan_option_kind == 'metal_level' %>
 <% selected_kind_plan = f.object.plan_option_kind == 'single_plan' %>
 <h1>Select Your Plan Offering</h1>
-<h4 style="max-width: 660px;">Let you plan participants choose any plan they want that is offered by a single carrier, single metal level, or offer just a single plan.
+<h4 style="max-width: 660px;">Let your plan participants choose any plan they want offered by a single carrier, from a given metal level, or offer just a single plan.
 </h4>
 <br>
 <ul class="nav nav-tabs row">
@@ -34,7 +34,7 @@
 <div class="col-xs-12 plan-options" style="display: none;">
   <div class="col-xs-12 carriers-tab" style="display: none;">
     <br><br>
-    <h4>Let you plan participants choose any plan they want that is offered by a single carrier.<br/>It will not cost more to left them choose.</h4>
+    <h4>Let your plan participants choose any plan they want offered by a single carrier.<br/>It will not cost you more to let them choose.</h4>
     <br/><br/>
     <% @carrier_names.each_pair do |ck, cv| %>
     <div class="col-xs-3" class="carriers">
@@ -61,7 +61,7 @@
   </div>
   <div class="col-xs-12 metals-tab" style="display: none;">
     <br><br>
-    <h4>Let you plan participants choose any plan they want that is offered by a given metal level.<br/>It will not cost more to left them choose.</h4>
+    <h4>Let your plan participants choose any plan from a given metal level.<br/>It will not cost you more to let them choose.</h4>
     <br/><br/>
     <% Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
     <div class="col-xs-3" class="metals">
@@ -95,7 +95,7 @@
   </div>
   <div class="col-xs-12 single-plan-tab" style="display: none;">
     <br><br>
-    <h4>Let you plan participants choose any plan they want that is offered by a single carrier.<br/>It will not cost more to left them choose.</h4>
+    <h4>Choose a single plan for your plan participants.</h4>
     <br/><br/>
     <% @carrier_names.each_pair do |ck, cv| %>
     <div class="col-xs-3" class="carriers">

@@ -65,7 +65,25 @@ function getCarrierPlans(ep, ci) {
     data: params
   })
 };
-
+// modal input type file clicks
+$(document).on('click', '#modal-wrapper div .select', function(){
+  $(this).closest('div').find('input[type=file]').trigger('click');
+  $(this).closest('div').find('input[type=file]').on('change', function() {
+    var filename = $(this).closest('div').find('input[type=file]').val()
+    $(this).closest('div').find('.select').hide();
+    $(this).closest('div').find('.upload-preview').html(filename + "<i class='fa fa-times fa-lg pull-right'></i>").show();
+    $(this).closest('div').find('input[type=submit]').show();
+  });
+});
+$(document).on('click', '.upload-preview .fa', function(){
+  $(this).closest('#modal-wrapper').find('input[type=file]').val("");
+  $(this).closest('#modal-wrapper').find('.upload-preview').hide();
+  $(this).closest('#modal-wrapper').find('input[type=submit]').hide();
+  $(this).closest('#modal-wrapper').find('.select').show();
+});
+$(document).on('click', '#modal-wrapper .modal-close', function(){
+  $(this).closest('#modal-wrapper').remove();
+});
 
 
 $(document).ready(function () {
@@ -83,6 +101,16 @@ $(document).ready(function () {
 
   //hide border bottom
   $('input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: 0px;');
+
+  // move start date to url for plan options
+  $("#plan_year_start_on").on('change', function() {
+    start_on = $(this).val().substr(0,4);
+    $('.plan-options a').each(function() {
+      var url = $(this).attr('href');
+      $(this).attr('href', url+"&start_on="+start_on);
+    });
+
+  });
 
 
 
@@ -108,24 +136,6 @@ $(document).ready(function () {
         });
 
 
-  // modal input type file clicks
-  $(document).on('click', '#modal-wrapper div .select', function(){
-    $(this).closest('div').find('input[type=file]').trigger('click').on('change', function() {
-      var filename = $(this).closest('div').find('input[type=file]').val()
-      $(this).closest('div').find('.select').hide();
-      $(this).closest('div').find('.upload-preview').html(filename + "<i class='fa fa-times fa-lg pull-right'></i>").show();
-      $(this).closest('div').find('input[type=submit]').show();
-    });
-  });
-  $(document).on('click', '.upload-preview .fa', function(){
-    $(this).closest('#modal-wrapper').find('input[type=file]').val("");
-    $(this).closest('#modal-wrapper').find('.upload-preview').hide();
-    $(this).closest('#modal-wrapper').find('input[type=submit]').hide();
-    $(this).closest('#modal-wrapper').find('.select').show();
-  });
-  $(document).on('click', '#modal-wrapper .modal-close', function(){
-    $(this).closest('#modal-wrapper').remove();
-  });
 
 
 // toggle filter options in employees list
@@ -449,7 +459,7 @@ $(document).ready(function () {
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
   $("#tribal_id").mask("999999999");
-  
+
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
       $("[for='person_ssn']").css('display', 'none');

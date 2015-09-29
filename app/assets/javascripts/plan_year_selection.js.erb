@@ -1,14 +1,6 @@
 
 $(document).on('ready', function() {
-  // move start date to url for plan options
-  $("#plan_year_start_on").on('change', function() {
-    start_on = $(this).val().substr(0,4); 
-    $('.plan-options a').each(function() {
-      var url = $(this).attr('href');
-      $(this).attr('href', url+"&start_on="+start_on);
-    });
 
-  });
   // nav tabs radios on change for plan selection
     $('#choose-coverage > * select').val("");
     $('.plan-options > * input, .reference-plans > * input').prop('checked', false);
