@@ -20,7 +20,7 @@ class CuramUser
   def self.match_fname_lname_dob(fname, lname, dob)
     f_name_regex = Regexp.compile(Regexp.escape(fname.to_s), true)
     l_name_regex = Regexp.compile(Regexp.escape(lname.to_s), true)
-    self.where(first_name: f_name_regex, last_name: last_name_regex, dob: dob)
+    self.where(first_name: f_name_regex, last_name: l_name_regex, dob: dob)
   end
 
   def self.search_for(fname, lname, ssn, dob)
