@@ -252,6 +252,7 @@ Then(/Second user creates an individual account$/) do
 end
 
 Then(/^Second user goes to register as an individual/) do
+  step "user should see your information page"
   step "user goes to register as an individual"
   @browser.text_field(class: /interaction-field-control-person-first-name/).set("Second")
   @browser.text_field(class: /interaction-field-control-person-ssn/).set(@u.ssn :ssn2)
