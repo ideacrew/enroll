@@ -43,7 +43,7 @@ Feature: Insured Plan Shopping on Individual market
 
       When I visit the Insured portal
       Then Second user creates an individual account
-      Then Second user goes to register as an individual
+      Then Second user goes to register as individual
       Then user clicks on continue button
       Then click continue again
       Then Second user should see a form to enter personal information
