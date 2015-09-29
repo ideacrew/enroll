@@ -7,7 +7,7 @@ RSpec.describe Products::QhpController, :type => :controller do
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
   let(:tax_household) {double}
-  let(:household) {double(tax_households: [tax_household])}
+  let(:household) {double(latest_active_tax_household: tax_household)}
   let(:family) {double(latest_household: household)}
   context "GET comparison" do
     before do

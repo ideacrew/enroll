@@ -23,7 +23,7 @@ module Subscribers
       if family.present?
         active_household = family.active_household
         active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.integrated_case_id}.first
-        active_verified_tax_household = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last}.first
+        active_verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last}
         new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
         verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
         import_home_address(primary_person, verified_new_address)
@@ -35,15 +35,15 @@ module Subscribers
             update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
             new_dependents.each do |p|
               new_family_member = family.relate_new_member(p[0], p[1])
-              if active_verified_tax_household.present?
-                new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
+              if active_verified_tax_households.present?
+                new_tax_household_member = active_verified_tax_households.select{|vth| vth.id == p[2][0].split('#').last}.first.tax_household_members.select{|thm| thm.id == p[2][0]}.first
                 active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
               end
               family.save!
             end
 
-            if active_household.tax_households.present?
-              unless active_household.tax_households.last.eligibility_determinations.present?
+            if active_household.latest_active_tax_household.present?
+              unless active_household.latest_active_tax_household.eligibility_determinations.present?
                 log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
               end
             end

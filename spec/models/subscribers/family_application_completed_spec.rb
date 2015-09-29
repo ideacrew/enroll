@@ -115,6 +115,7 @@ describe Subscribers::FamilyApplicationCompleted do
 
         it "builds a default taxhousehold with primary person as primary applicant and updates consumer role to fully vlp verified" do
           expect(tax_household).to be_truthy
+          expect(tax_household).to eq person.primary_family.active_household.latest_active_tax_household
           expect(tax_household.primary_applicant.family_member.person).to eq person
           expect(tax_household.allocated_aptc).to eq 0
           expect(tax_household.is_eligibility_determined).to be_truthy
