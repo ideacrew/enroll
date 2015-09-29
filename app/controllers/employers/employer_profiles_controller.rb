@@ -84,7 +84,7 @@ class Employers::EmployerProfilesController < ApplicationController
    else
       @current_plan_year = @employer_profile.published_plan_year
       if @current_plan_year.present?
-      @additional_required_participants_count = @current_plan_year.additional_required_participants_count
+        @additional_required_participants_count = @current_plan_year.additional_required_participants_count
       end
       @plan_years = @employer_profile.plan_years.order(id: :desc)
 

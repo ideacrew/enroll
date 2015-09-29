@@ -91,9 +91,10 @@
     </section>
     <section class="col-xs-6">
       <header class="row">
-        <a class="details">View Details <i class="fa fa-chevron-down fa-lg"></i></a>
+        <a class="details">View Details <i class="fa fa-chevron-down fa-lg"></i></span></a>
       </header>
     </section>
+    <table>
       <tr>
         <th>
           <header>Type</header>
@@ -110,7 +111,9 @@
       </tr>
       <tr>
         <td>
-          <p><%= bg.reference_plan.plan_type.upcase %></p>
+          <p>
+            <%= bg.reference_plan.plan_type.upcase %>
+          </p>
         </td>
         <td>
           <p>
@@ -119,12 +122,11 @@
         </td>
         <td>
           <p>
-
+            <%= bg.reference_plan.carrier_profile.legal_name %>
           </p>
         </td>
         <td>
-          <p>
-            <%= bg.reference_plan.id %>
+          <p><%= bg.reference_plan.id %>
           </p>
         </td>
       </tr>
@@ -139,13 +141,13 @@
         <table>
           <tr>
             <th></th>
-            <th>Individual</th>
-            <th>Family</th>
+            <th>Minimum</th>
+            <th>Maximum</th>
           </tr>
           <tr>
             <td>Total Estimated Monthly Cost for Plan Participants</td>
-            <td><%= number_to_currency(bg.monthly_min_employee_cost) %> / <%= number_to_currency(bg.monthly_max_employee_cost) %></td>
-            <td></td>
+            <td><%= number_to_currency(bg.monthly_min_employee_cost) %></td>
+            <td><%= number_to_currency(bg.monthly_max_employee_cost) %></td>
           </tr>
 
 
@@ -171,8 +173,8 @@
   <% end %>
 
   <% else %>
-  <h4 style="max-width: 600px;">
-    You haven't created a benefits package yet. Click "Add Benefits Package" below to make your first one.
+  <h4 class="starter">
+    You haven't created a benefits package yet. Click "Add Plan Year" below to make your first one.
   </h4>
   <br/>
   <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."} %>

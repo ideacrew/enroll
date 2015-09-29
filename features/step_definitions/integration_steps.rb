@@ -12,6 +12,12 @@ module WatirScreenshots
   end
 end
 
+When(/I use unique values/) do
+  require 'test/unique_value_stash.rb'
+  include UniqueValueStash
+  @u = UniqueValueStash::UniqueValues.new
+end
+
 Before "@watir" do
   extend WatirScreenshots
   @browser = Watir::Browser.new :chrome, switches: ["--test-type"]
@@ -66,13 +72,13 @@ def people
     },
     "John Doe" => {
       first_name: "John",
-      last_name: "Doe",
-      dob: "10/11/1985",
+      last_name: "Doe#{rand(1000)}",
+      dob: @u.adult_dob,
       legal_name: "Turner Agency, Inc",
       dba: "Turner Agency, Inc",
-      fein: '123456999',
-      ssn: '111000999',
-      email: 'john.doe@example.com',
+      fein: @u.fein,
+      ssn: @u.ssn,
+      email: @u.email,
       password: 'aA1!aA1!aA1!'
 
     },
@@ -514,8 +520,8 @@ When(/^.+ should see a published success message without employee$/) do
 end
 
 When(/^.+ clicks? on the add employee button$/) do
-  @browser.a(text: /Add Employee/).wait_until_present
-  @browser.a(text: /Add Employee/).click
+  @browser.a(class: /interaction-click-control-add-new-employee/).wait_until_present
+  @browser.a(class: /interaction-click-control-add-new-employee/).click
 end
 
 When(/^.+ clicks? on the (.+) tab$/) do |tab_name|

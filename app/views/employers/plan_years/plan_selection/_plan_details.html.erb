@@ -14,6 +14,9 @@
         <header>Type</header>
       </th>
       <th>
+        <header>Carrier</header>
+      </th>
+      <th>
         <header>Metallic Level</header>
       </th>
       <th>
@@ -25,12 +28,15 @@
         <p><%= @plan.plan_type.upcase %></p>
       </td>
       <td>
+        <p><%= @plan.carrier_profile.legal_name %></p>
+      </td>
+      <td>
         <p>
           <%= @plan.metal_level.humanize %>
         </p>
       </td>
       <td style="padding-left: 0;">
-        <p>
+        <p style="text-transform: capitalize;">
           <%= @plan.nationwide %>
         </p>
       </td>
@@ -47,11 +53,13 @@
       <table>
         <tr>
           <th></th>
-          <th>Individual</th>
+          <th>Min</th>
+          <th>Max</th>
         </tr>
         <tr>
-          <td style="padding-left: 0;">Estimated Total Monthly Cost for Employees</td>
-          <td class="employee-monthly-cost-ivl"></td>
+          <td>Estimated Total Monthly Cost for Employees</td>
+          <td class="employee-monthly-cost-min"></td>
+          <td class="employee-monthly-cost-max" style="padding-left: 0;"></td>
         </tr>
       </table>
     </div>

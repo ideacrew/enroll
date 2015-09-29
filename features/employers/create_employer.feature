@@ -12,20 +12,18 @@ Feature: Create Employer
 
     Scenario: An Employer Representative has not signed up on the HBX
       Given Employer has not signed up as an HBX user
+      When I use unique values
       When I visit the Employer portal
         Then John Doe creates an HBX account
         Then I should see a successful sign up message
           Then I should click on employer portal
           Then John Doe creates a new employer profile
           When I go to the Profile tab
-          Then I should see Edit Details link
         When Employer goes to the benefits tab I should see plan year information
           And Employer should see a button to create new plan year
           And Employer should be able to enter plan year, benefits, relationship benefits with high FTE
           And Employer should see a success message after clicking on create plan year button
         When Employer clicks on the Employees tab
-        Then Employer should see the employee family roster
-          And It should default to active tab
         When Employer clicks on the add employee button
         Then Employer should see a form to enter information about employee, address and dependents details
           And Employer should see employer census family created success message
