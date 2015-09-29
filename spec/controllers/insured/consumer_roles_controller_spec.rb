@@ -149,7 +149,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   end
 
   context "PUT update" do
-    let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz"}}
+    let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
     let(:person){ FactoryGirl.build(:person) }
 
     before(:each) do
@@ -181,6 +181,13 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       put :update, person: person_params, id: "test"
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
+    end
+
+    it "should raise error" do
+      put :update, person: person_params, id: "test"
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:edit)
+      expect(person.errors.full_messages).to include "Document type cannot be blank"
     end
   end
 end
