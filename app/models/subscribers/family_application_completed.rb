@@ -36,8 +36,11 @@ module Subscribers
             new_dependents.each do |p|
               new_family_member = family.relate_new_member(p[0], p[1])
               if active_verified_tax_households.present?
-                new_tax_household_member = active_verified_tax_households.select{|vth| vth.id == p[2][0].split('#').last}.first.tax_household_members.select{|thm| thm.id == p[2][0]}.first
-                active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
+                active_verified_tax_household = active_verified_tax_households.select{|vth| vth.id == p[2][0].split('#').last}.first
+                if active_verified_tax_household.present?
+                  new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
+                  active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
+                end
               end
               family.save!
             end

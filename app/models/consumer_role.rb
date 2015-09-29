@@ -274,6 +274,7 @@ class ConsumerRole
     event :import, :after => [:record_transition, :notify_of_eligibility_change] do
       transitions from: :verifications_pending, to: :fully_verified
       transitions from: :verifications_outstanding, to: :fully_verified
+      transitions from: :fully_verified, to: :fully_verified
     end
 
     event :deny_lawful_presence, :after => [:record_transition, :mark_lp_denied, :notify_of_eligibility_change] do
