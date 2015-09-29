@@ -83,7 +83,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
               FactoryGirl.build(:benefit_coverage_period, 
                 start_on: TimeKeeper.date_of_record.beginning_of_year, 
                 end_on:   TimeKeeper.date_of_record.end_of_year,
-                open_enrollment_start_on: (TimeKeeper.date_of_record.beginning_of_year - 1.month),
+                open_enrollment_start_on: (TimeKeeper.date_of_record.beginning_of_year - 2.months),
                 open_enrollment_end_on:   (TimeKeeper.date_of_record.beginning_of_year + 1.month),
               ) 
             }
@@ -116,6 +116,10 @@ RSpec.describe BenefitSponsorship, :type => :model do
               TimeKeeper.set_date_of_record_unprotected!(enroll_date)
             end
 
+            after do
+             TimeKeeper.set_date_of_record_unprotected!(Date.today)
+           end
+
             it 'should return first-of-next-month as the earliest effective date' do 
               expect(benefit_sponsorship.earliest_effective_date).to eq first_of_next_month_date
             end
@@ -128,6 +132,10 @@ RSpec.describe BenefitSponsorship, :type => :model do
             before do
               TimeKeeper.set_date_of_record_unprotected!(enroll_date)
             end
+
+            after do
+              TimeKeeper.set_date_of_record_unprotected!(Date.today)
+             end
 
             it 'should return first-of-following-month as the earliest effective date' do 
               expect(benefit_sponsorship.earliest_effective_date).to eq first_of_following_month_date

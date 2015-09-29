@@ -20,7 +20,7 @@ module Subscribers
         person = find_person(person_hbx_id)
         return if person.nil? || person.consumer_role.nil?
         consumer_role = person.consumer_role
-        consumer_role.local_residency_responses << EventResponse.new({received_at: Time.now, body: xml})
+        consumer_role.local_residency_responses << EventResponse.new({received_at: TimeKeeper.datetime_of_record, body: xml})
 
         if "503" == return_status.to_s
           consumer_role.deny_residency!
@@ -32,7 +32,7 @@ module Subscribers
 
         update_consumer_role(consumer_role, xml_hash)
       rescue => e
-        notify("acapi.error.application.enroll.remote_listener.local_residency_reponses", {
+        notify("acapi.error.application.enroll.remote_listener.local_residency_responses", {
           :body => JSON.dump({
             :error => e.inspect,
             :message => e.message,

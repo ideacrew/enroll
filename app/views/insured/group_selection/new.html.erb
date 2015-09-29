@@ -124,10 +124,10 @@
           <% elsif @change_plan == "change_by_qle" %>
             <%= render partial: 'shared/qle_progress', locals: {step: '2'} %>
           <% elsif @change_plan == "change_plan" %>
-            <% if is_under_open_enrollment? %>
-              <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
-            <% else %>
+            <% if @market_kind == "individual" && !is_under_open_enrollment? %>
               <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
+            <% else %>
+              <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1'} %>
             <% end %>
           <% end %>
         </div>

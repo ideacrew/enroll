@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     collection do
       post :login
       get :logout
+      get :navigate_to_assistance
     end
   end
 

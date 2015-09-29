@@ -49,7 +49,7 @@ describe Forms::FamilyMember do
     end
 
     it "should initialize same_with_primary" do
-      expect(dependent.same_with_primary).to eq true
+      expect(dependent.same_with_primary).to eq "true"
     end
   end
 
