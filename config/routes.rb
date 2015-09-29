@@ -109,6 +109,7 @@ Rails.application.routes.draw do
 
     resources :consumer_role, controller: 'consumer_roles', only: [:create, :edit, :update] do
       get :search, on: :collection
+      get :privacy, on: :collection
       get :match, on: :collection
       get :ridp_agreement, on: :collection
       ##get :privacy, on: :collection

@@ -56,6 +56,7 @@ gem 'acapi', git: "git://github.com/dchbx/acapi.git", branch: 'development'
 
 gem 'aasm', '~> 4.0.7'
 gem 'haml'
+gem 'sass'
 # gem 'bh'
 
 # spreadsheet support

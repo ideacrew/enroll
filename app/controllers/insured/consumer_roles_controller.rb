@@ -2,11 +2,13 @@ class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
   include ErrorBubble
   before_action :check_consumer_role, only: [:search]
-
   before_action :find_consumer_role_and_person, only: [:edit, :update]
-  def privacy
 
+  def privacy
+    set_current_person
+    redirect_to @person.consumer_role.bookmark_url || family_account_path  if @person.try(:consumer_role?)
   end
+
   def search
     @no_previous_button = true
     @no_save_button = true
@@ -202,7 +204,7 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       current_user.last_portal_visited = search_insured_consumer_role_index_path
       current_user.save!
-      render 'privacy'
+      # render 'privacy'
     end
   end
 

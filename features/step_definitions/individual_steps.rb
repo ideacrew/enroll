@@ -14,6 +14,11 @@ Then(/Individual creates HBX account$/) do
   scroll_then_click(@browser.input(value: "Create account"))
 end
 
+And(/user should see your information page$/) do
+  click_when_present(@browser.a(class: /interaction-click-control-continue/))
+#   screenshot("ivl_your_information")
+end
+
 When(/user goes to register as an individual$/) do
   @browser.button(class: /interaction-click-control-continue/).wait_until_present
   @browser.text_field(class: /interaction-field-control-person-first-name/).set("Taylor")
