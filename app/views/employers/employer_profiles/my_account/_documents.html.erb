@@ -1,0 +1,31 @@
+<div class="col-xs-12 documents-tab">
+  <h1>Documents</h1>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Document Title</th>
+        <th>Document Type</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <%# unless @employer_profile.has_consumer_role? %>
+        <tr>
+          <td>N/A</td>
+          <td>N/A</td>
+          <td>N/A</td>
+        </tr>
+      <%# else %>
+          <%# @person.consumer_role.vlp_documents.select do |doc| doc.identifier.present? end.each do |doc| %>
+            <tr>
+              <td><%#= doc.title %></td>
+              <td><%#= doc.subject %></td>
+              <td><%#= doc.created_at.try(:to_date) %></td>
+            </tr>
+          <%# end %>
+      <%# end %>
+    </tbody>
+  </table>
+
+</div>

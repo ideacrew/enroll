@@ -1,9 +1,3 @@
-When(/I use unique values/) do
-  require 'test/unique_value_stash.rb'
-  include UniqueValueStash
-  @u = UniqueValueStash::UniqueValues.new
-end
-
 When(/I visit the Insured portal$/) do
   @browser.goto("http://localhost:3000/")
   @browser.a(text: /consumer\/family portal/i).wait_until_present

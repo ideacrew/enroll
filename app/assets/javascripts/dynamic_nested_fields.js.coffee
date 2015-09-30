@@ -14,8 +14,32 @@ $(document).on 'click', 'form .add_fields', (event) ->
   update_delete_buttons()
   applyJQDatePickers()
 
+  $('.benefit-group-fields:last').find('.benefits-fields .slider').bootstrapSlider
+    formatter: (value) ->
+      return 'Contribution Percentage: ' + value + '%'
+  $('.benefit-group-fields:last').find('.benefits-fields .slider').on 'slide', (slideEvt) ->
+    $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr 'value', slideEvt.value
+    $(this).closest('.form-group').find('.slide-label').text slideEvt.value + '%'
+    return
+  $('.benefit-group-fields:last .selected-plan').remove()
+  $('.benefit-group-fields:last input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: 0px;')
+  $('.benefit-group-fields:last input:first').focus()
+  $('.remove_fields:last').css('display', 'inline-block')
+
+  start_on = $('#plan_year_start_on').val().substr(0, 4)
+
+  $('.plan-options a').each ->
+    url = $(this).attr('href')
+    $(this).attr 'href', url + '&start_on=' + start_on
+  return
+
+
 $(document).on 'click', 'form .remove_fields', (event) ->
   $(this).closest('fieldset').remove()
+  event.preventDefault()
+
+$(document).on 'click', '.benefits-setup-tab .remove_fields', (event) ->
+  $('.benefit-group-fields:last').remove()
   event.preventDefault()
 
 @update_delete_buttons = ->

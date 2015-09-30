@@ -48,6 +48,10 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
     let(:moved_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "I'm moving to the District of Columbia")}
     let(:qle) {FactoryGirl.create(:qualifying_life_event_kind, title: "My employer did not pay my premiums on time")}
 
+    before do
+      TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 9, 15))
+    end
+
     it "is_dependent_loss_of_coverage?" do
       expect(esi_qlek.is_dependent_loss_of_coverage?).to eq true
       expect(qle.is_dependent_loss_of_coverage?).to eq true

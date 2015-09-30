@@ -14,10 +14,6 @@ RSpec.describe "employers/plan_years/new.html.erb" do
     render :template => "employers/plan_years/new.html.erb"
   end
 
-  it "should show the title of Benefit Groups" do
-    expect(rendered).to match /Benefit Groups/
-  end
-
   it "displays four relationship benefits" do
     %w(employee spouse domestic_partner child_under_26).each do |kind|
       expect(rendered).to match /#{kind}/

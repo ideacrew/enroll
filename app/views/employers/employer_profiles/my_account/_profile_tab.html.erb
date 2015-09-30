@@ -1,4 +1,5 @@
-<div class="container">
+<div class="col-xs-12 employer-tab">
+  <h1>Business Info</h1>
 <div class="row no-buffer">
   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
   <h4><%= @employer_profile.legal_name %> Offices <%= (link_to "Edit Details", edit_employers_employer_profile_path(@employer_profile.organization), class: 'btn pull-right') if current_user.try(:has_employer_staff_role?) %></h4>

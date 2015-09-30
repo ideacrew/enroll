@@ -29,7 +29,10 @@
 //= require print
 //= require browser_issues
 //= require consumer_role
+//= require plan_year_selection
+//= require bootstrap-slider
 //= require_tree .
+
 
 function applyFloatLabels() {
   $('input.floatlabel').floatlabel({
@@ -54,7 +57,97 @@ $(document).on('page:update', function(){
   applySelectric();
 });
 
+function getCarrierPlans(ep, ci) {
+
+  var params = 'carrier_id=' + ci;
+  $.ajax({
+    url: "/employers/employer_profiles/"+ep+"/plan_years/reference_plans/",
+    data: params
+  })
+};
+// modal input type file clicks
+$(document).on('click', '#modal-wrapper div .select', function(){
+  $(this).closest('div').find('input[type=file]').trigger('click');
+  $(this).closest('div').find('input[type=file]').on('change', function() {
+    var filename = $(this).closest('div').find('input[type=file]').val()
+    $(this).closest('div').find('.select').hide();
+    $(this).closest('div').find('.upload-preview').html(filename + "<i class='fa fa-times fa-lg pull-right'></i>").show();
+    $(this).closest('div').find('input[type=submit]').show();
+  });
+});
+$(document).on('click', '.upload-preview .fa', function(){
+  $(this).closest('#modal-wrapper').find('input[type=file]').val("");
+  $(this).closest('#modal-wrapper').find('.upload-preview').hide();
+  $(this).closest('#modal-wrapper').find('input[type=submit]').hide();
+  $(this).closest('#modal-wrapper').find('.select').show();
+});
+$(document).on('click', '#modal-wrapper .modal-close', function(){
+  $(this).closest('#modal-wrapper').remove();
+});
+
+
 $(document).ready(function () {
+
+  // init slider
+  $('.benefits-fields .slider').bootstrapSlider({
+      formatter: function(value) {
+        return 'Contribution Percentage: ' + value + '%';
+      }
+    });
+    $(".benefits-fields .slider").on("slide", function(slideEvt) {
+      $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
+      $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
+  });
+
+  //hide border bottom
+  $('input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: 0px;');
+
+  // move start date to url for plan options
+  $("#plan_year_start_on").on('change', function() {
+    start_on = $(this).val().substr(0,4);
+    $('.plan-options a').each(function() {
+      var url = $(this).attr('href');
+      $(this).attr('href', url+"&start_on="+start_on);
+    });
+
+  });
+
+
+
+
+  // mimic jquery toggle function
+  $.fn.toggleClick=function(){
+  var functions=arguments, iteration=0
+  return this.click(function(){
+    functions[iteration].apply(this,arguments)
+    iteration= (iteration+1) %functions.length
+  })
+}
+
+// details toggler
+  $('.details').toggleClick(function () {
+        $(this).closest('.referenceplan').find('.plan-details').slideDown();
+        $(this).html('Hide Details <i class="fa fa-chevron-up fa-lg"></i>');
+    }, function () {
+      $(this).closest('.referenceplan').find('.plan-details').slideUp();
+      $(this).html('View Details <i class="fa fa-chevron-down fa-lg"></i>');
+
+
+        });
+
+
+
+
+// toggle filter options in employees list
+  $(document).on('click', '.filter-options label', function()  {
+    $('.filter-options').hide();
+  });
+  $(document).on('mouseleave', '.filter-options', function()  {
+    $('.filter-options').hide();
+  });
+
+
+
   $('[data-toggle="tooltip"]').tooltip();
   $("[data-toggle=popover]").popover();
 
@@ -366,7 +459,7 @@ $(document).ready(function () {
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
   $("#tribal_id").mask("999999999");
-  
+
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
       $("[for='person_ssn']").css('display', 'none');
@@ -391,7 +484,7 @@ $(document).ready(function () {
 
   $(document).on('click', '.return_to_employee_roster', function() {
     $('#add_employee_action').html('');
-    $('#employee_roster').show();
+    $('.employees-section').show();
   });
 
   $(document).on('click', '.return_to_employer_broker_agenices', function() {
@@ -439,6 +532,12 @@ $(document).on('page:update', function() {
     $('#address_info > .first').attr('id', ($(this).text()));
     $('#employer_census_employee_family_census_employee_attributes_address_attributes_kind').val($(this).data('value'));
   });
+
+  $('select').selectric();
+  $('#person_addresses_attributes_0_state').on('change', function () {
+    $('select').selectric('refresh');
+  });
+  $('select').attr('tabindex', '-1');
 
   $('#plan-years-list li a').on('click', function(){
     var target = $(this).attr('href');
@@ -510,19 +609,51 @@ $(document).on('change', '#waive_confirm select#waiver_reason', function() {
   }
 })
 
+$(document).on('click', '#search_for_plan_shopping_help', function() {
+  $.ajax({
+    type: 'GET',
+    data: {firstname: $('#help_first_name').val(), lastname: $('#help_last_name').val(), type: $('#help_type').html(),
+           person: $('#help_requestor').html()},
+    url: '/exchanges/hbx_profiles/request_help?',
+  }).done(function(response) {
+    $('#help_status').html(response)
+  });
+})
+
+$(document).on('click', '.help_button', function(){
+$.ajax({
+    type: 'GET',
+    data: {assister: this.getAttribute('data-assister'), broker: this.getAttribute('data-broker'),
+           person: $('#help_requestor').html()},
+    url: '/exchanges/hbx_profiles/request_help?',
+  }).done(function(response) {
+    console.log(response)
+    console.log('here')
+    $('#help_index_status').html(response).removeClass('hide')
+  });
+})
+
+$(document).on('click', '.name_search_only', function() {
+  $('#help_list').addClass('hide')
+  $('#help_search').removeClass('hide')
+  $('#help_type').html(this.id)
+})
+$(document).on('click', '[data-target="#help_with_plan_shopping"]',function(){$('.help_reset').addClass("hide"); $('#help_list').removeClass("hide") })
+
+
 $(document).on('click', '#terms_check_thank_you', function() {
   first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
-  
-  if($(this).prop("checked") == true){    
+
+  if($(this).prop("checked") == true){
     if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
       $('#btn-continue').removeClass('disabled');
     } else {
       $('#btn-continue').addClass('disabled');
     }
-  }else if($(this).prop("checked") == false){ 
+  }else if($(this).prop("checked") == false){
     $('#btn-continue').addClass('disabled');
   }
 })
@@ -532,11 +663,11 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
-  
+
   if(last_name_thank_you == ""){
     $('#btn-continue').addClass('disabled');
   }else{
-    if($("#terms_check_thank_you").prop("checked") == true){    
+    if($("#terms_check_thank_you").prop("checked") == true){
       if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
         $('#btn-continue').removeClass('disabled');
       } else {

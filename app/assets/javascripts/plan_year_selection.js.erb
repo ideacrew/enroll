@@ -1,0 +1,202 @@
+
+$(document).on('ready', function() {
+
+  // nav tabs radios on change for plan selection
+    $('#choose-coverage > * select').val("");
+    $('.plan-options > * input, .reference-plans > * input').prop('checked', false);
+
+    $(document).on('change', '.offerings .fte:first input, .offerings .pte:first input, .offerings .msp:first input', function() {
+      var change = $(this).val();
+      $('#plan_year_fte_count').val(change);
+    });
+    // MAKE SLIDER AND ADJACENT INPUT FIELD MIRROR EACHOTHER
+    $(document).on('change', 'input.premium-storage-input', function() {
+      if ( $(this).hasClass('slider') ) {
+        var data = $(this).val();
+        $(this).closest('.form-group').find('input').val(data);
+      } else if ( $(this).hasClass('hidden-param') )  {
+        var hidden = parseInt($(this).val());
+        var mySlider = $(this).closest('.form-group').find('input.slider');
+        mySlider.bootstrapSlider('setValue', hidden);
+        $(this).closest('.form-group').find('input.slider').attr('value', hidden).attr('data-slider-value', hidden);
+        $(this).closest('.form-group').find('.slide-label').text(hidden + "%");
+
+      }
+    });
+
+
+    $('.nav-tabs li input[type=radio]').prop('checked', false);
+    $(document).on('click', '.nav-tabs li label', function() {
+      $(this).closest('.benefit-group-fields').find('.select-reference').remove();
+      $(this).closest('.benefit-group-fields').find('.selected-plan, .referenceplan').hide();
+      $(this).closest('.benefit-group-fields').find('.nav-tabs li').removeClass('active');
+      $(this).closest('.benefit-group-fields').find('.plan-options > * input, .reference-plans > * input').prop('checked', false);
+      $(this).closest('.benefit-group-fields').find('.reference-plans').hide();
+      $(this).closest('li').addClass('active');
+      if ($(this).find('input[type=radio]').is(':checked')) {
+      } else {
+        $(this).find('input[type=radio]').prop('checked', true );
+        $(this).closest('.benefit-group-fields').find('.plan-options > *').hide();
+        $(this).closest('.benefit-group-fields').find('.plan-options > * input, .reference-plans > * input').prop('checked', 0);
+        $(this).closest('.benefit-group-fields').find('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i></div>");
+
+      }
+
+      });
+
+    $(document).on('change', '.nav-tabs li input', function() {
+      if ($(this).attr('value') == "single_carrier") {
+        $(this).closest('.benefit-group-fields').find('.plan-options, .carriers-tab').show();
+
+      }
+      else if ($(this).attr('value') == "metal_level") {
+
+        $(this).closest('.benefit-group-fields').find('.plan-options, .metals-tab').show();
+      }
+      else if ($(this).attr('value') == "single_plan") {
+
+        $(this).closest('.benefit-group-fields').find('.plan-options, .single-plan-tab').show();
+      }
+    });
+    $(document).on('click', '.nav-tabs a', function() {
+      $(this).closest('.benefit-group-fields').find('.plan-options').hide();
+      $(this).closest('.benefit-group-fields').find('.plan-options > * input, .reference-plans > * input').prop('checked', 0);
+      $(this).closest('.benefit-group-fields').find('.reference-plans').show();
+    });
+
+
+
+    //toggle plan options checkbox through parent anchor
+
+    $(document).on('click', '.plan-options a, .nav-tabs a', function() {
+      $(this).closest('.benefit-group-fields').find('.select-reference').remove();
+      $(this).closest('.benefit-group-fields').find('.selected-plan, .referenceplan').hide();
+      $(this).closest('.benefit-group-fields').find('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
+      $(this).closest('.benefit-group-fields').find('.plan-options input[type=radio]').attr('checked', 0);
+      if ($(this).find('input[type=radio]').is(':checked')) {
+      } else {
+        $(this).closest('.benefit-group-fields').find('.reference-plans').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h5>Loading plans...</h5></div>");
+        $(this).closest('.benefit-group-fields').find(".reference-plans").show();
+        $(this).find('input[type=radio]').prop('checked', true );
+
+        if ($(this).parents('.carriers-tab').length > 0 ) {
+          $(this).closest('.benefit-group-fields').find('.metals-tab input[type=radio]').prop('checked', 0 );
+        }
+        else if ($(this).parents('.metals-tab').length > 0 ) {
+          $(this).closest('.benefit-group-fields').find('.carriers-tab input[type=radio]').prop('checked', 0 );
+        } else {
+          $(this).closest('.benefit-group-fields').find('.metals-tab input[type=radio], .carriers-tab input[type=radio]').prop('checked', 0 );
+        }
+
+      }
+
+    });
+
+
+// set reference_plan_id
+$(document).on('click', '.reference-plan input + label', function() {
+
+  var reference_plan_id = $(this).closest('.reference-plan').find('input').attr('value');
+
+  if (reference_plan_id != "" && reference_plan_id != undefined){
+    var start_date = $("#plan_year_start_on").val();
+    if (start_date == "") {
+      return
+    }
+    $(this).closest('.benefit-group-fields').find('.selected-plan').html("<div class=\'col-xs-12\'><i class=\'fa fa-refresh fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
+    $('.selected-plan').show();
+    $.ajax({
+      type: "GET",
+      url: $('a#search_reference_plan_link').data('href'),
+      dataType: 'script',
+      data: {
+        "start_on": $("#plan_year_start_on").val(),
+        "reference_plan_id": reference_plan_id,
+        "location_id": $(this).parents('fieldset').attr('id')
+      }
+    }).done(function() {
+      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'));
+    });
+  };
+});
+
+  $(function() {
+
+    $('.contribution_handler').each(function() {
+      $(this).change(function(){
+        calcEmployerContributions($('a#calc_employer_contributions_link').data('href'));
+      });
+    });
+
+    $("#employer_cost_info_btn .btn").click(function(){
+      var reference_plan_id = $("#plan_year_benefit_groups_attributes_0_reference_plan_id").val();
+      if (reference_plan_id == "" || reference_plan_id == undefined) {
+        return
+      }
+      calcEmployerContributions($('a#employee_costs_link').attr('href'));
+    })
+  });
+
+  function calcEmployerContributions(url) {
+    var reference_plan_id = $('.reference-plan input[type=radio]:checked').val();
+    console.log(reference_plan_id);
+    var plan_option_kind = $(".nav-tabs input[type=radio]:checked").val();
+    console.log(plan_option_kind);
+    var location_id = $('.reference-plan input[type=radio]:checked').parents('fieldset').attr('id')
+
+    if (reference_plan_id == "" || reference_plan_id == undefined) {
+      return
+    }
+
+    var start_date = $("#plan_year_start_on").val();
+    if (start_date == "") {
+      return
+    }
+
+    var relation_benefits = {
+      "0": {
+        "relationship": "employee",
+        "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_premium_pct').val(),
+        "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').is(":checked")
+      },
+      "1": {
+        "relationship": "spouse",
+        "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_premium_pct').val(),
+        "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').is(":checked")
+      },
+      "2": {
+        "relationship": "domestic_partner",
+        "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_premium_pct').val(),
+        "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_offered').is(":checked")
+      },
+      "3": {
+        "relationship": "child_under_26",
+        "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_premium_pct').val(),
+        "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').is(":checked")
+      },
+      "4": {
+        "relationship": "child_26_and_over",
+        "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_premium_pct').val(),
+        "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_offered').is(":checked")
+      }
+    }
+    $.ajax({
+      type: "GET",
+      url: url,
+      dataType: 'script',
+      data: {
+        "start_on": $("#plan_year_start_on").val(),
+        "reference_plan_id": reference_plan_id,
+        "plan_option_kind": plan_option_kind,
+        "relation_benefits": relation_benefits,
+        "location_id": location_id
+
+      }
+    }).done(function() {
+    });;
+  }
+
+  $(document).on("click", ".reference_plan_info h4 span", function() {
+    $(this).parents(".reference_plan_info").find('.content').toggle();
+  });
+});

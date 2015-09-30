@@ -126,18 +126,17 @@ Then(/^.+ should see successful message with broker agency home page$/) do
 end
 
 Then(/^.+ should see no active broker$/) do
-  @browser.element(text: /No Active Broker/).wait_until_present
-  expect(@browser.element(text: /No Active Broker/).visible?).to be_truthy
+  @browser.element(class: /interaction-click-control-browse-brokers/).wait_until_present
+  expect(@browser.element(text: /You have no active broker, but you can always get help from a broker at no cost to you. Click "Browse Brokers" below to review brokers available to you./).visible?).to be_truthy
 end
 
 When(/^.+ clicks? on Browse Brokers button$/) do
-  @browser.a(text: /Browse Brokers/).wait_until_present
-  @browser.a(text: /Browse Brokers/).click
+  click_when_present(@browser.element(class: /interaction-click-control-browse-brokers/))
 end
 
 Then(/^.+ should see broker agencies index view$/) do
-  @browser.h4(text: /Broker Agencies/).wait_until_present
-  expect(@browser.h4(text: /Broker Agencies/).visible?).to be_truthy
+  @browser.h1(text: /Broker Agencies/).wait_until_present
+  expect(@browser.h1(text: /Broker Agencies/).visible?).to be_truthy
 end
 
 When(/^.+ searches broker agency by name$/) do
@@ -179,6 +178,7 @@ Then(/^.+ should see broker selected successful message$/) do
 end
 
 And (/^.+ should see broker active for the employer$/) do
+  @browser.element(text: /Logistics Inc/i).wait_until_present
   expect(@browser.element(text: /Logistics Inc/).visible?).to be_truthy
   expect(@browser.element(text: /Ricky Martin/).visible?).to be_truthy
 end
@@ -207,7 +207,7 @@ Then(/^.+ should see Employer and click on legal name$/) do
 end
 
 Then(/^.+ should see the Employer Profile page as Broker$/) do
-  wait_and_confirm_text(/Premium Billing Report/)
+  @browser.element(text: /I'm a Broker/).wait_until_present
   expect(@browser.element(text: /I'm a Broker/).visible?).to be_truthy
 end
 
@@ -218,31 +218,35 @@ Then(/^Primary Broker creates and publishes a plan year$/) do
   click_when_present(start_on)
   start_on = @browser.li(text: /SELECT START ON/i)
   click_when_present(start_on.parent().lis()[1])
-  id="plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_premium_pct"
-  @browser.text_field(id: id).set(50)
+  #id="plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_premium_pct"
+  #@browser.text_field(id: id).set(50)
+  @browser.text_field(name: "plan_year[fte_count]").fire_event('onclick')
+  @browser.text_field(name: "plan_year[fte_count]").set("3")
+  @browser.a(class: /interaction-click-control-continue/).wait_until_present
+  @browser.a(class: /interaction-click-control-continue/).fire_event('onclick')
+    @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
+  select_field = @browser.div(class: /selectric-wrapper/, text: /Date Of Hire/)
+  select_field.click
+  select_field.li(text: /Date of hire/).click
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(50)
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]").set(50)
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]").set(50)
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]").set(50)
+  select_plan_option = @browser.ul(class: /nav-tabs/)
+  select_plan_option.li(text: /By carrier/i).click
+  carriers_tab = @browser.div(class: /carriers-tab/)
+  sleep(3)
+  carriers_tab.as[1].fire_event("onclick")
+  plans_tab = @browser.div(class: /reference-plans/)
+  sleep(3)
+  plans_tab.labels.last.fire_event('onclick')
+  sleep(3)
 
-  select_plan_class ="selectric-interaction-choice-control-plan-year-benefit-groups-attributes-0-plan-option-kind"
-  select_plan = @browser.element(class: select_plan_class)
-  click_when_present(select_plan)
-  click_when_present(select_plan.lis()[3])
-
-  f=@browser.element(class: 'form-inputs')
-  benefit_form = @browser.element(class: 'form-inputs')
-  select_carrier = benefit_form.element(text: 'SELECT CARRIER').parent.parent.parent
-  scroll_then_click(select_carrier)
-  click_when_present(select_carrier.lis()[1])
-
-  sleep 3
-  benefit_form.element(text: 'SELECT REFERENCE PLAN').parent.parent.parent.wait_until_present
-  select_reference = benefit_form.element(text: 'SELECT REFERENCE PLAN').parent.parent.parent
-  scroll_then_click(select_reference)
-  benefit_form.element(text: 'SELECT REFERENCE PLAN').parent.parent.parent.lis()[1].wait_until_present
-  click_when_present(select_reference.lis()[1])
-  benefit_form.click
   scroll_then_click(@browser.button(class: /interaction-click-control-create-plan-year/))
   @browser.element(class: /alert-notice/, text: /Plan Year successfully created./).wait_until_present
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))
+  @browser.refresh
 end
 
 Then(/^.+ sees employer census family created$/) do
