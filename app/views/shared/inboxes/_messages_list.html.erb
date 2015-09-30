@@ -6,15 +6,15 @@
   <div class="no_margin">
     <div id="inbox_form" class="col-lg-2 col-md-3 col-sm-4 col-xs-12 no-pd">
       <ul class="list-group">
-        <%= link_to(employers_employer_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox'), remote: true) do%>
+        <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox'), remote: true) do%>
         <li class="list-group-item">Inbox <span class="badge message-badge pull-right"><%= @employer_profile.inbox.unread_messages.size %></span></li>
         <% end %>
         <%- if @sent_box == true %>
-          <%= link_to(employers_employer_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox', folder: 'Sent'), remote: true) do%>
+          <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox', folder: 'Sent'), remote: true) do%>
             <li class="list-group-item">Sent</li>
           <% end %>
         <% end %>
-        <%= link_to(employers_employer_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox', folder: 'Deleted'), remote: true) do%>
+        <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox', folder: 'Deleted'), remote: true) do%>
           <li class="list-group-item">Deleted</li>
         <% end %>
       </ul>
