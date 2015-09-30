@@ -12,9 +12,15 @@
     <li <%= menu_tab_class(active_tab, "brokers") %>>
       <%= link_to 'Brokers', employers_employer_profile_path(@employer_profile.id, :tab=>'brokers'), "aria-expanded" => "true" %>
     </li>
+    <% if current_user.try(:has_broker_agency_staff_role?)%>
+      <li <%= menu_tab_class(active_tab, "families") %>>
+        <%= link_to 'Families', employers_employer_profile_show_profile_path(@employer_profile.id, :tab=>'families'), "aria-expanded" => "true" %>
+      </li>
+    <% end %>
     <li <%= menu_tab_class(active_tab, "documents") %>>
       <%= link_to 'Documents', employers_employer_profile_path(@employer_profile.id, :tab=>'documents'), "aria-expanded" => "true" %>
     </li>
+
     <% unless current_user.try(:has_broker_agency_staff_role?)%>
     <li <%= menu_tab_class(active_tab, "inbox") %>>
       <%= link_to(employers_employer_profile_path(@employer_profile.id, :tab=>'inbox'), class: 'hidden-xs', "aria-expanded" => "true" ) do  %>
