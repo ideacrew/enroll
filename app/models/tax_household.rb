@@ -22,6 +22,19 @@ class TaxHousehold
 
   embeds_many :eligibility_determinations
 
+  def latest_eligibility_determination 
+    eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+  end
+
+  def current_max_aptc
+    eligibility_determination = latest_eligibility_determination
+    if eligibility_determination.present? and eligibility_determination.determined_on.year == TimeKeeper.date_of_record.year
+      eligibility_determination.max_aptc
+    else
+      0
+    end
+  end
+
   def aptc_members
     tax_household_members.find_all(&:is_ia_eligible?)
   end
@@ -72,12 +85,14 @@ class TaxHousehold
     # subtract from available amount
     aptc_available_amount_hash = {}
     aptc_ratio_by_member.each do |member_id, ratio|
-      aptc_available_amount_hash[member_id] = allocated_aptc.to_f * ratio
+      aptc_available_amount_hash[member_id] = current_max_aptc.to_f * ratio
     end
 
-    household.hbx_enrollments.active.select {|hbx| hbx.applied_aptc_amount > 0}.map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
-      if aptc_available_amount_hash.has_key?(enrollment_member.applicant_id.to_s)
-        aptc_available_amount_hash[enrollment_member.applicant_id.to_s] -= (enrollment_member.applied_aptc_amount || 0).try(:to_f)
+    household.current_year_hbx_enrollments.select {|hbx| hbx.applied_aptc_amount > 0}.map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
+      applicant_id = enrollment_member.applicant_id.to_s
+      if aptc_available_amount_hash.has_key?(applicant_id)
+        aptc_available_amount_hash[applicant_id] -= (enrollment_member.applied_aptc_amount || 0).try(:to_f)
+        aptc_available_amount_hash[applicant_id] = 0 if aptc_available_amount_hash[applicant_id] < 0
       end
     end
 

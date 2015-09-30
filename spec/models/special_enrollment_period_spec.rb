@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
-  let(:event_date) { Date.today }
-  let(:expired_event_date) { Date.today - 1.year }
-  let(:first_of_following_month) { Date.today.end_of_month + 1 }
+  let(:event_date) { TimeKeeper.date_of_record }
+  let(:expired_event_date) { TimeKeeper.date_of_record - 1.year }
+  let(:first_of_following_month) { TimeKeeper.date_of_record.end_of_month + 1 }
   let(:qle_effective_date) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
   let(:qle_first_of_month) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month) }
 

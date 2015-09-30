@@ -4,7 +4,25 @@
 <div class="container">
   <%= f.hidden_field :broker_applicant_type, value: @filter %>
   <div class="row">
-    <%= render "person_info_fields", f: f %><br>
+    <%= render "person_info_fields", f: f %>
+
+    <% if @filter != 'staff' %>
+      <div class="row">
+        <div class="col-md-9 col-sm-9 col-xs-12">
+          <div class="row no-buffer row-form-wrapper">
+            <%= render "shared/broker_agency_profile_fields", f: f%>
+          </div>
+        </div>
+      </div>
+      <br />
+      <div class="row">
+        <div class="col-md-9 col-sm-9 col-xs-12">
+          <%= render "shared/home_address_fields", f: f %>
+        </div>
+      </div>
+    <% end %>
+    <br>
+
     <div class="row">
       <div class="col-md-9 col-sm-9 col-xs-12 broker-agency-search">
         <div class="row search-dropdown-wrapper">

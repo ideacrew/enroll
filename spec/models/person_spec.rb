@@ -215,7 +215,7 @@ describe Person do
 
       context "with invalid date values" do
         context "and date of birth is in future" do
-          let(:params) {valid_params.deep_merge({dob: Date.today + 1})}
+          let(:params) {valid_params.deep_merge({dob: TimeKeeper.date_of_record + 1})}
 
           it "should fail validation" do
             person = Person.new(**params)
@@ -225,7 +225,7 @@ describe Person do
         end
 
         context "and date of death is in future" do
-          let(:params) {valid_params.deep_merge({date_of_death: Date.today + 1})}
+          let(:params) {valid_params.deep_merge({date_of_death: TimeKeeper.date_of_record + 1})}
 
           it "should fail validation" do
             person = Person.new(**params)

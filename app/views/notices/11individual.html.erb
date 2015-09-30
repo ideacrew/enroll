@@ -17,7 +17,7 @@
         <td></br></td>
       </tr>
       <tr class="wid50">
-        <td align="left"><%= format_date(Date.today) %></td>
+        <td align="left"><%= format_date(TimeKeeper.date_of_record) %></td>
         <td  align="right"><%= notice.primary_identifier %></td>
       </tr>
     </tbody>
@@ -42,7 +42,7 @@
   <table class="total_table" border="0">
     <tbody>
       <tr class="widn">
-        <td>Thank you for the application you submitted and we processed on <%= format_date(Date.today) %>. Unfortunately, the following individual(s) are not qualified to enroll in health insurance through DC Health Link based on the information you provided to us. </td>
+        <td>Thank you for the application you submitted and we processed on <%= format_date(TimeKeeper.date_of_record) %>. Unfortunately, the following individual(s) are not qualified to enroll in health insurance through DC Health Link based on the information you provided to us. </td>
       </tr>
     </tbody>
   </table>

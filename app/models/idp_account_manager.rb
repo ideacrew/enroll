@@ -12,16 +12,11 @@ class IdpAccountManager
   end
 
   def check_existing_account(personish, timeout = 5)
-    person_details = {
-      :first_name => personish.first_name,
-      :last_name => personish.last_name,
-      :dob => personish.dob.strftime("%Y%m%d")
-    }
-    if !personish.ssn.blank?
-      person_details[:ssn] = personish.ssn
-    end
     provider.check_existing_account(
-      person_details,
+      personish.first_name,
+      personish.last_name,
+      personish.ssn,
+      personish.dob,
       timeout
     )
   end
@@ -74,18 +69,20 @@ class IdpAccountManager
 
   class AmqpSource
     extend Acapi::Notifiers
-    def self.check_existing_account(args, timeout = 5)
-      invoke_service("account_management.check_existing_account", args, timeout) do |code|
-        case code
-        when "404"
-          :not_found
-        when "409"
-          :too_many_matches
-        when "302"
-          :existing_account
-        else
-          :service_unavailable
-        end
+    def self.check_existing_account(fname,lname,ssn,dob, timeout = 5)
+      found_users = CuramUser.search_for(
+        fname,
+        lname,
+        ssn,
+        dob
+      )
+      case found_users.count
+      when 1
+        :existing_account
+      when 0
+        :not_found
+      else
+        :too_many_matches
       end
     end
 
@@ -122,7 +119,7 @@ class IdpAccountManager
       :created
     end
 
-    def self.check_existing_account(args, timeout = 5)
+    def self.check_existing_account(fname, lname, ssn, dob, timeout = 5)
       :not_found
     end
   end

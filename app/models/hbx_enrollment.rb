@@ -59,6 +59,7 @@ class HbxEnrollment
   field :updated_by, type: String
   field :is_active, type: Boolean, default: true
   field :waiver_reason, type: String
+  field :published_to_bus_at, type: DateTime
 
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
@@ -69,6 +70,7 @@ class HbxEnrollment
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
   scope :my_enrolled_plans, -> { where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
+  scope :current_year, -> { where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -106,6 +108,9 @@ class HbxEnrollment
 
     event :terminate_coverage do
       transitions from: :coverage_selected, to: :coverage_terminated, after: :propogate_terminate
+      transitions from: :enrolled_contingent, to: :coverage_terminated, after: :propogate_terminate
+      transitions from: :unverified, to: :coverage_terminated, after: :propogate_terminate
+      transitions from: :coverage_enrolled, to: :coverage_terminated, after: :propogate_terminate
     end
 
     event :move_to_enrolled! do
@@ -132,6 +137,14 @@ class HbxEnrollment
 
   before_save :generate_hbx_id
 
+  def self.by_hbx_id(policy_hbx_id)
+    families = Family.with_enrollment_hbx_id(policy_hbx_id)
+    households = families.flat_map(&:households)
+    households.flat_map(&:hbx_enrollments).select do |hbxe|
+      hbxe.hbx_id == policy_hbx_id
+    end
+  end
+
   def self.update_individual_eligibilities_for(consumer_role)
     found_families = Family.find_all_by_person(consumer_role.person)
     found_families.each do |ff|
@@ -152,7 +165,7 @@ class HbxEnrollment
 
 
   def benefit_sponsored?
-    employer_profile.present?
+    employee_role.present?
   end
 
   def currently_active?
@@ -172,6 +185,10 @@ class HbxEnrollment
       benefit_group_assignment.end_benefit(term_date)
       benefit_group_assignment.save
     end
+
+    if should_transmit_update?
+      notify(ENROLLMENT_UPDATED_EVENT_NAME, {policy_id: self.hbx_id})
+    end
   end
 
   def propogate_waiver
@@ -189,21 +206,29 @@ class HbxEnrollment
         hem.person.consumer_role.start_individual_market_eligibility!(effective_on)
       end
       notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
+      self.published_to_bus_at = Time.now
     else
       if is_shop_sep?
         notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
+        self.published_to_bus_at = Time.now
       end
     end
   end
 
+  def should_transmit_update?
+    !self.published_to_bus_at.blank?
+  end
+
   def is_shop_sep?
-    false
+    return false if consumer_role.present?
+    true
   end
 
   def transmit_shop_enrollment!
     if !consumer_role.present?
       if !is_shop_sep?
         notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
+        self.published_to_bus_at = Time.now
       end
     end
   end
@@ -372,7 +397,7 @@ class HbxEnrollment
       if family.is_under_special_enrollment_period?
         enrollment.effective_on = family.current_sep.effective_on
       else
-        enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
+        enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date_max
       end
 
       # end
