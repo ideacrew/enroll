@@ -41,7 +41,6 @@ function applySelectric() {
   $("select[multiple!='multiple']").selectric();
 };
 
-<<<<<<< d1fc655f4caf5d4995f6b039a9606cd93a9c7e79
 function applyMultiLanguateSelect() {
   $('#broker_agency_language_select').multiselect({
     nonSelectedText: 'Select Language',
@@ -54,8 +53,6 @@ $(document).on('page:update', function(){
   applyFloatLabels();
   applySelectric();
 });
-=======
->>>>>>> make tabbing and autocomplete work in add person
 
 $(document).ready(function () {
   $('[data-toggle="tooltip"]').tooltip();
