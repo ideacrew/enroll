@@ -18,59 +18,31 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>Congratulations!</strong>  Based on the health insurance application you submitted and we processed on <application date>, the following person(s) qualify for health coverage through DC Health Link."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>Congratulations!</strong>  Based on the health insurance application you submitted and we processed on #{notice.enrollments[0].selected_on.strftime('%m/%d/%Y')}, the following person(s) qualify for health coverage through DC Health Link."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "[UnAssisted 1 First Name] [ UnAssisted 1 Last Name]<br>
-<strong><font color='red'>[IF Person N field populated]</font></strong> [UnAssisted N First Name] [] UnAssisted N Last Name]
-"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: notice.enrollments[0].enrollees.join("<br>")} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["On [date of plan selection], the following individual(s) selected the <plan 1 name> health insurance plan."], heading: 'Your Health Plan Selection', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["On #{notice.enrollments[0].selected_on.strftime('%m/%d/%Y')}, the following individual(s) selected the #{notice.enrollments[0].plan_name} health insurance plan."], heading: 'Your Health Plan Selection', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "
-  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-  [Plan 1 Enrollee First Name][Plan 1 Enrollee Last Name]<br>
-  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-  <strong><font color='red'>[IF More than One Enrollee in Plan 1]</font></strong> [Plan 1 Enrollee 2 First Name][Plan 1 Enrollee  
-    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
-    2 Last Name]
-"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: notice.enrollments[0].enrollees.join("<br>")} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "[IF More than One Plan Selected]  Additionally, the following individual(s) selected the <plan N name> health insurance plan.
-"} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "
-  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-  [Plan 1 Enrollee First Name][Plan N Enrollee Last Name]<br>
-  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-  <strong><font color='red'>[IF More than One Enrollee in Plan N]</font></strong> [Plan N Enrollee 2 First Name][Plan N   
-    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
-    Enrollee 2 Last Name]
-"} %>
+<% notice.other_enrollments.each do |enrollment| %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Additionally, the following individual(s) selected the #{enrollment.plan_name} health insurance plan."} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: enrollment.enrollees.join("<br>")} %>
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "You will get your new insurance ID card and other information about your benefit card shortly from your health plan(s) (if you have not received it already). For any questions about your health plan’s covered services and providers, you need to contact:"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "
-  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-  [plan 1 name] at [plan 1 main phone number]<br>
-  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-  <strong><font color='red'>[IF More than One Plan Selected]</font></strong> [plan N name] at [plan N main phone number]
-"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: notice.enrollments.inject([]){|plans, enrollment| plans << "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;#{enrollment.plan_name} at [plan 1 main phone number]"}.join("<br>")} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<strong><font color = 'red'>[Plan 1]</font></strong>"], heading: 'What You Must Pay Each Month', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<div style='text-decoration: underline;'>#{notice.enrollments[0].plan_name}</div>"], heading: 'What You Must Pay Each Month', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<u>[Plan 1 Name]</u>"} %>
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings: ["Your Total Monthly Premium Cost:&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;#{number_to_currency(notice.enrollments[0].premium)}"] } %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
-  ["Your Total Monthly Premium Cost:
-    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-    $ [Plan 1 Consumer Monthly Premium]"] } %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[IF More than One Plan Selected; Plan N]</font></strong> <u>[Plan 1 Name]</u>"} %>
-
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
-  ["Your Total Monthly Premium Cost:
-    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-    $ [Plan N Consumer Monthly Premium]"] } %>
+<% notice.other_enrollments.each do |enrollment| %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "<div style='text-decoration: underline;'>#{enrollment.plan_name}</div>" } %>
+  <%= render partial: 'notices/shared/unordered_list', :locals => { listings: ["Your Total Monthly Premium Cost:&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;#{number_to_currency(enrollment.premium)}"] } %>
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>If you do not make your monthly premium payments on time, you could lose your health insurance.</strong> 45 C.F.R. 155.430(b)(2)(ii). You will receive a separate invoice with instructions on how to make that payment. <strong>You must pay your premiums directly to the health plan or dental plan <u>by the date indicated on that invoice</u></strong>.  DC Health Link is not responsible for collecting your premiums.  Additionally, any auto-payments you may have previously established with your health insurance company prior to enrolling through DC Health Link will not carry-over; you must make new payment arrangements."} %>
 
@@ -100,7 +72,7 @@
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "To report changes, you can log in to your account on www.DCHealthLink.com or call DC Health Link Customer Service toll free at 1-855-532-5465."} %>
 
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You will be able to change plans during the annual open enrollment period at the end of each year.  45 C.F.R. §155.410(e). You can get the date of the next open enrollment period by going to www.DCHealthLink.com or calling DC Health Link Customer Service at 1-855-532-5465. If you have a change in circumstances during <coverage year>, you may also qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include:"], heading: 'Changing Plans', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You will be able to change plans during the annual open enrollment period at the end of each year.  45 C.F.R. §155.410(e). You can get the date of the next open enrollment period by going to www.DCHealthLink.com or calling DC Health Link Customer Service at 1-855-532-5465. If you have a change in circumstances during #{notice.enrollments[0].effective_on.year}, you may also qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include:"], heading: 'Changing Plans', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
   ["Getting married",
@@ -123,4 +95,4 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<b>Annual Renewal</b>: DC Health Link will notify you during the fall of each year if additional information is needed from you to renew your health insurance.  You can respond with new information if you believe any of the information we used is wrong. You can also pick a new plan during this time period if you want.  45 C.F.R. §155.335."], heading: 'Other Information', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["If you disagree with this determination, you have the right to appeal to an independent administrative law judge. You may request an appeal by phone, in person, online, and by mail. You must request an appeal by <b>«Date of Notice+95 calendar days»</b>.   DC Health Link will work to resolve your appeal as quickly as possible, but appeals can take between 30 and 90 days to resolve.  <b>See the insert for more information on your appeal rights.</b>  45 C.F.R. §155.520"], heading: 'If You Think We Made a Mistake', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["If you disagree with this determination, you have the right to appeal to an independent administrative law judge. You may request an appeal by phone, in person, online, and by mail. You must request an appeal by <b>#{(TimeKeeper.date_of_record + 95.days).strftime('%m/%d/%Y')}</b>.   DC Health Link will work to resolve your appeal as quickly as possible, but appeals can take between 30 and 90 days to resolve.  <b>See the insert for more information on your appeal rights.</b>  45 C.F.R. §155.520"], heading: 'If You Think We Made a Mistake', sub_heading: ''} %>

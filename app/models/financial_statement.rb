@@ -91,8 +91,8 @@ class FinancialStatement
           daily_income = income_deduction.amount_in_cents / (working_days_in_year)
       end
 
-      income_deduction.start_date = Date.today.beginning_of_year if income_deduction.start_date.to_s.eql? "01-01-0001" or income_deduction.start_date.blank?
-      income_deduction.end_date   = Date.today.end_of_year if income_deduction.end_date.to_s.eql? "01-01-0001" or income_deduction.end_date.blank?
+      income_deduction.start_date = TimeKeeper.date_of_record.beginning_of_year if income_deduction.start_date.to_s.eql? "01-01-0001" or income_deduction.start_date.blank?
+      income_deduction.end_date   = TimeKeeper.date_of_record.end_of_year if income_deduction.end_date.to_s.eql? "01-01-0001" or income_deduction.end_date.blank?
       years = (income_deduction.start_date.year..income_deduction.end_date.year)
 
       years.to_a.each do |year|
@@ -125,9 +125,9 @@ class FinancialStatement
   end
 
   def is_receiving_benefits_this_year?(alternate_benefit)
-    alternate_benefit.start_date = Date.today.beginning_of_year if alternate_benefit.start_date.blank?
-    alternate_benefit.end_date =   Date.today.end_of_year if alternate_benefit.end_date.blank?
-    (alternate_benefit.start_date.year..alternate_benefit.end_date.year).include? Date.today.year
+    alternate_benefit.start_date = TimeKeeper.date_of_record.beginning_of_year if alternate_benefit.start_date.blank?
+    alternate_benefit.end_date =   TimeKeeper.date_of_record.end_of_year if alternate_benefit.end_date.blank?
+    (alternate_benefit.start_date.year..alternate_benefit.end_date.year).include? TimeKeeper.date_of_record.year
   end
 
   def total_incomes_by_year

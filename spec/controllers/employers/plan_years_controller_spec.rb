@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   let(:employer_profile_id) { EmployerProfile.new.id}
   let(:plan_year_proxy) { double(id: "id") }
-  let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy) }
+  let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test") }
 
   describe "GET new" do
 
@@ -35,7 +35,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "GET calc_employer_contributions" do
     let(:employer_profile){ double("EmployerProfile") }
-    let(:reference_plan){ FactoryGirl.create(:plan) }
+    let(:reference_plan){ double("ReferencePlan", id: "id") }
     let(:plan_years){ [double("PlanYear")] }
     let(:benefit_groups){ [
       double(
@@ -48,6 +48,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:plan){ double("Plan") }
     it "should calculate employer contributions" do
       allow(EmployerProfile).to receive(:find).with("id").and_return(employer_profile)
+      allow(Plan).to receive(:find).and_return(reference_plan)
       allow(Forms::PlanYearForm).to receive(:build).and_return(plan_years.first)
       allow(plan_years.first).to receive(:benefit_groups).and_return(benefit_groups)
       allow(benefit_groups.first).to receive(:reference_plan=).and_return(plan)
@@ -168,6 +169,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       allow(plan_years).to receive(:where).and_return([plan_year])
       allow(benefit_group).to receive(:elected_plans=).and_return("test")
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
+      allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return([])
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)
@@ -267,6 +269,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(benefit_group).to receive(:elected_plans=).and_return("test")
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
+      allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return([])
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)

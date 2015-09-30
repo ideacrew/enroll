@@ -1,0 +1,51 @@
+<div id='plan_year'>
+    <div class="">
+      <div class="col-xs-12">
+        <% if @plan_year.errors.any? %>
+          <div class="alert-plan-year alert-error">
+            <% if @just_a_warning == false %>
+            <h4><%= pluralize(@plan_year.errors.count, "error") %> prohibited this plan year from being saved:</h4>
+            <% end %>
+            <ul>
+              <% @plan_year.errors.delete(:benefit_groups) %>
+              <% @plan_year.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+
+              <% @plan_year.benefit_groups.each do |bg| %>
+                <% bg.errors.full_messages.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+                <% bg.relationship_benefits.each do |rb| %>
+                  <% rb.errors.full_messages.each do |rb_msg| %>
+                    <li><%= rb_msg %></li>
+                  <% end %>
+                <% end %>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <%= render "shared/edit_plan_year_fields", f: f %>
+        <h3>Benefit Groups</h3>
+        <div class='form-inputs'>
+          <a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
+          <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
+          <a href="#" data-href="<%= reference_plan_options_employers_employer_profile_plan_years_path %>" id='reference_plan_options_link' style='display:none;'></a>
+          <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
+            <%= render "shared/edit_benefit_group_fields", f: bg %><br>
+          <% end %>
+          <% link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-transparent pull-left xs_full_width' %>
+          <div class="row no-buffer">
+          <% button_name = @plan_year.persisted? ? 'Save Plan Year' : 'Create Plan Year' %>
+
+            <button class="btn btn-primary pull-right" type="submit">
+              <%= "#{button_name}".html_safe %>
+            </button> &nbsp;&nbsp;
+            <%= link_to "Cancel", employers_employer_profile_path(@employer_profile), class:'btn btn-transparent pull-right' %>
+          </div>
+        </div>
+        <br><br>
+    </div>
+  </div>
+</div><br>

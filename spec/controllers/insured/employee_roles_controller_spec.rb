@@ -249,15 +249,13 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
   end
 
   describe "GET search" do
-    let(:user) { double("user") }
-    let(:person) { double("person")}
-    
+    let(:user) { FactoryGirl.build(:user) }
+    let(:person) { FactoryGirl.build(:person) }
+
     before(:each) do
       allow(user).to receive(:has_employee_role?).and_return(false)
       allow(user).to receive(:has_consumer_role?).and_return(false)
       allow(user).to receive(:person).and_return(person)
-      allow(user).to receive(:last_portal_visited=).and_return(true)
-      allow(user).to receive(:save!).and_return(true)
       sign_in(user)
       get :search
     end
@@ -266,6 +264,10 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       expect(response).to have_http_status(:success)
       expect(response).to render_template("search")
       expect(assigns[:person]).to be_a(Forms::EmployeeCandidate)
+    end
+
+    it "saves last portal as employee search index" do
+      expect(user.last_portal_visited).to eq search_insured_employee_index_path
     end
   end
 

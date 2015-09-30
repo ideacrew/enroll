@@ -4,6 +4,7 @@ $('#inbox').removeClass('active').removeClass('in')
 semantic_class();
 $('#show_profile').removeClass('hide')
 
+
 $('div[name=employee_family_tabs] > ').children().each( function() {
     $(this).change(function(){
       filter = $(this).val();

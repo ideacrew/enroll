@@ -352,6 +352,19 @@ RSpec.describe Plan, dbclean: :after_each do
         end
       end
 
+      context "individual health by active year" do
+        it "should return individual count" do 
+          expect(Plan.individual_health_by_active_year(current_year).size).to eq individual_silver_count + bronze_count + catastrophic_count
+        end
+
+        it "should not return plan which hios_id not ends with -01" do
+          plan = Plan.where(market: "individual").first
+          plan.update(hios_id: "1212312312322-02")
+
+          expect(Plan.individual_health_by_active_year(current_year).size).to eq individual_silver_count + bronze_count + catastrophic_count - 1
+        end 
+      end
+
       context "with referenced plan_type scope of either ppo, hmo, pos, epo" do
         it "should return all loaded plans" do
           expect(Plan.ppo_plan.size).to eq shop_silver_count + platinum_count

@@ -18,21 +18,19 @@ describe Household, "given a coverage household with a dependent" do
 
   context "new_hbx_enrollment_from" do 
     let(:consumer_role) {FactoryGirl.create(:consumer_role)}
+    let(:person) { double(primary_family: family)}
+    let(:family) { double }
     let(:benefit_package) {FactoryGirl.create(:benefit_package)}
-    let(:hbx) {double(benefit_sponsorship: double(earliest_effective_date: TimeKeeper.date_of_record))}
+    let(:hbx) {double(benefit_sponsorship: double(earliest_effective_date: TimeKeeper.date_of_record, current_benefit_period: bcp))}
+    let(:bcp) {double(earliest_effective_date_max: TimeKeeper.date_of_record)}
 
-    it "call the calculate_start_date_by_qle method" do 
-      expect(HbxEnrollment).to receive(:calculate_start_date_by_qle)
-      subject.new_hbx_enrollment_from(
-        consumer_role: consumer_role,
-        benefit_package: benefit_package, 
-        qle: true
-      )
+    before do 
+      allow(HbxProfile).to receive(:current_hbx).and_return(hbx)
+      allow(consumer_role).to receive(:person).and_return(person)
+      allow(family).to receive(:is_under_special_enrollment_period?).and_return false
     end
 
-    it "call the calculate_start_date_from" do
-      allow(HbxProfile).to receive(:current_hbx).and_return(hbx)
-      expect(HbxEnrollment).not_to receive(:calculate_start_date_by_qle)
+    it "should build hbx enrollment" do 
       subject.new_hbx_enrollment_from(
         consumer_role: consumer_role,
         benefit_package: benefit_package, 

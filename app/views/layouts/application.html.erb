@@ -24,8 +24,8 @@
 
     <%= render 'layouts/header' %>
 
-    <%= render_flash %>
-    <div class="content <%= controller_name %>">
+
+    <div class="content <%= controller_name %>"><%= render_flash %>
         <%= yield %>
     </div>
 

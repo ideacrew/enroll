@@ -1,7 +1,1 @@
-<h5>
-  <strong class="pull-left">Employee Enrollment Status</strong>
-  <strong class="pull-right"><%= @current_plan_year.aasm_state.humanize %></strong>
-  <div class="clearfix"></div>
-
-  <%= enrollment_progress_bar(@current_plan_year, calculate_participation_minimum) %>
-</h5>
+<%= enrollment_progress_bar(@current_plan_year, calculate_participation_minimum) %>

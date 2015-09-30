@@ -2,6 +2,7 @@ class QhpBuilder
   LOG_PATH = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
   LOGGER = Logger.new(LOG_PATH)
   INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003"] # These plan ids are suppressed and we dont save these while importing.
+  BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005"]
 
   def initialize(qhp_hash)
     @qhp_hash = qhp_hash
@@ -50,6 +51,26 @@ class QhpBuilder
     @xml_plan_counter, @success_plan_counter = 0,0
     iterate_plans
     show_qhp_stats
+    mark_2015_dental_plans_as_individual
+    mark_2015_catastrophic_plans_as_individual
+  end
+
+  def mark_2015_catastrophic_plans_as_individual
+    Plan.catastrophic_level.by_active_year(2015).each do |plan|
+      plan.update_attribute(:market, "individual")
+    end
+  end
+
+  def mark_2015_dental_plans_as_individual
+    # find ivl dental plans that are marked as shop.
+    #delete bestone plans as they do not have corresponding serff templates.
+    Plan.shop_dental_by_active_year(2015).each do |plan|
+      if BEST_LIFE_HIOS_IDS.include?(plan.hios_id)
+        plan.destroy
+      else
+        plan.update_attribute(:market, "individual") if plan.coverage_kind == "dental"
+      end
+    end
   end
 
   def iterate_plans
@@ -94,7 +115,10 @@ class QhpBuilder
   end
 
   def associate_plan_with_qhp
-    @plan_year = @qhp.plan_effective_date.to_date.year
+    effective_date = @qhp.plan_effective_date.to_date
+    @qhp.plan_effective_date = effective_date.beginning_of_year
+    @qhp.plan_expiration_date = effective_date.end_of_year
+    @plan_year = effective_date.year
     if @plan_year > 2015 && !INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
       create_plan_from_serff_data
     end
@@ -102,15 +126,14 @@ class QhpBuilder
     plan = candidate_plans.sort_by do |plan| plan.hios_id.gsub('-','').to_i end.first
     plans_to_update = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
     plans_to_update.each do |up_plan|
-      nationwide_str = (@qhp.national_network.blank? ? "" : @qhp.national_network)
-      nationwide_value = nationwide_str.downcase.strip == "yes"
+      nation_wide, dc_in_network = parse_nation_wide_and_dc_in_network
       up_plan.update_attributes(
           name: @qhp.plan_marketing_name,
           plan_type: @qhp.plan_type.downcase,
           deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_individual,
           family_deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_family,
-          nationwide: nationwide_value,
-          out_of_service_area_coverage: @qhp.out_of_service_area_coverage
+          nationwide: nation_wide,
+          dc_in_network: dc_in_network
       )
       up_plan.save!
     end
@@ -119,6 +142,14 @@ class QhpBuilder
     else
       puts "Plan Not Saved! Hios: #{@qhp.standard_component_id}, Plan Name: #{@qhp.plan_marketing_name}"
       @qhp.plan = nil
+    end
+  end
+
+  def parse_nation_wide_and_dc_in_network
+    if @qhp.national_network.downcase.strip == "yes"
+      ["true", "false"]
+    else
+      ["false", "true"]
     end
   end
 
@@ -244,7 +275,12 @@ class QhpBuilder
   end
 
   def plan_attribute_params
+    assign_active_year_to_qhp
     @plan[:plan_attributes]
+  end
+
+  def assign_active_year_to_qhp
+    @plan[:plan_attributes][:active_year] = @plan[:plan_attributes][:plan_effective_date][-4..-1].to_i
   end
 
 end

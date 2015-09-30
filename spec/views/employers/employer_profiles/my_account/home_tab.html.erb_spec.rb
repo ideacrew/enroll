@@ -79,6 +79,8 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         employee_participation_percent: 40,
         non_business_owner_enrollment_count: 10,
         hbx_enrollments: [hbx_enrollment],
+        additional_required_participants_count: 5,
+        benefit_groups: [],
         aasm_state: 'draft'
         )
     end
@@ -127,36 +129,11 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
       assign :participation_minimum, 0
       assign :broker_agency_accounts, [ broker_agency_account ]
       controller.request.path_parameters[:id] = "11111111"
-      render partial: "employers/employer_profiles/my_account/home_tab.html.erb"
+      render partial: "employers/employer_profiles/my_account/home_tab"
     end
 
-    it "should display dashboard info of employer" do
-      expect(rendered).to match(/#{employer_profile.legal_name}/)
+    it "should display title" do
+      expect(rendered).to have_selector("h1", text: "My Health Benefits Program")
     end
-
-    it "should display office locations" do
-      employer_profile.organization.office_locations.each do |off_loc|
-        expect(rendered).to match(/#{off_loc.address}/m)
-        expect(rendered).to match(/#{off_loc.phone}/m)
-      end
-    end
-
-    it "should display broker agency name and related information" do
-      expect(rendered).to match(/#{employer_profile.broker_agency_profile.legal_name}/)
-      expect(rendered).to match(/#{employer_profile.broker_agency_profile.primary_broker_role.person.full_name}/)
-    end
-
-    it "should display plan year and related information" do
-      expect(rendered).to match(/<dd>#{current_plan_year.start_on.year}<\/dd>/m)
-      expect(rendered).to match(/<dd>.*#{format_date current_plan_year.open_enrollment_start_on}.*-.*#{format_date current_plan_year.open_enrollment_end_on}.*<\/dd>/m)
-      expect(rendered).to match(/<dd>#{format_date current_plan_year.start_on}<\/dd>/m)
-      expect(rendered).to match(/<dd>#{current_plan_year.eligible_to_enroll_count}<\/dd>/m)
-      expect(rendered).to match(/<dd>.*#{current_plan_year.total_enrolled_count}.*<\/dd>/m)
-      expect(rendered).to match(/<dd>#{boolean_to_human(current_plan_year.non_business_owner_enrollment_count > 0)}<\/dd>/m)
-    end
-
-    it "should display a progress bar" do
-      expect(rendered).to have_selector('.progress-bar')
-    end   
   end
 end

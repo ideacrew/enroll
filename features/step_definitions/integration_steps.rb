@@ -12,6 +12,12 @@ module WatirScreenshots
   end
 end
 
+When(/I use unique values/) do
+  require 'test/unique_value_stash.rb'
+  include UniqueValueStash
+  @u = UniqueValueStash::UniqueValues.new
+end
+
 Before "@watir" do
   extend WatirScreenshots
   @browser = Watir::Browser.new :chrome, switches: ["--test-type"]
@@ -66,13 +72,13 @@ def people
     },
     "John Doe" => {
       first_name: "John",
-      last_name: "Doe",
-      dob: "10/11/1985",
+      last_name: "Doe#{rand(1000)}",
+      dob: @u.adult_dob,
       legal_name: "Turner Agency, Inc",
       dba: "Turner Agency, Inc",
-      fein: '123456999',
-      ssn: '111000999',
-      email: 'john.doe@example.com',
+      fein: @u.fein,
+      ssn: @u.ssn,
+      email: @u.email,
       password: 'aA1!aA1!aA1!'
 
     },
@@ -503,19 +509,19 @@ end
 
 When(/^.+ should see a published success message$/) do
   # @browser.element(class: /mainmenu/).wait_until_present
-  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
+  @browser.refresh
+  @browser.element(text: /plan year successfully published/i).wait_until_present
   expect(@browser.element(text: /Plan Year successfully published/).visible?).to be_truthy
 end
 
 When(/^.+ should see a published success message without employee$/) do
-  # @browser.element(class: /mainmenu/).wait_until_present
-  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
+  @browser.element(text: /You have 0 non-owner employees on your roster/).wait_until_present
   expect(@browser.element(text: /You have 0 non-owner employees on your roster/).visible?).to be_truthy
 end
 
 When(/^.+ clicks? on the add employee button$/) do
-  @browser.a(text: /Add Employee/).wait_until_present
-  @browser.a(text: /Add Employee/).click
+  @browser.a(class: /interaction-click-control-add-new-employee/).wait_until_present
+  @browser.a(class: /interaction-click-control-add-new-employee/).click
 end
 
 When(/^.+ clicks? on the (.+) tab$/) do |tab_name|
@@ -554,6 +560,7 @@ When(/^I select a future qle date$/) do
 end
 
 Then(/^I should see not qualify message$/) do
+  wait_and_confirm_text /The date you submitted does not qualify for special enrollment/i
   expect(@browser.element(text: /The date you submitted does not qualify for special enrollment/i).visible?).to be_truthy
   screenshot("not_qualify")
 end

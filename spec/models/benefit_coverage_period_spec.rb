@@ -132,7 +132,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
   end
 
   context "elected_plans_by_enrollment_members" do
-    let(:benefit_coverage_period) { BenefitCoveragePeriod.new }
+    let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: (TimeKeeper.date_of_record - 2.months).to_date) }
     let(:c1) {FactoryGirl.create(:consumer_role)}
     let(:c2) {FactoryGirl.create(:consumer_role)}
     let(:member1) {double(person: double(consumer_role: c1))}
