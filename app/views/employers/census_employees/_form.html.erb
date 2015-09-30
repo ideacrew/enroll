@@ -27,7 +27,7 @@
           </ul>
         </div>
       <% end %>
-      <% page_title = @census_employee.persisted? ? 'Update Employee' : 'Add New Employee' %>
+      <% page_title = @census_employee.persisted? ? "Update "+@census_employee.full_name.titleize : 'Add New Employee' %>
 
         <h4 class="pull-left"><%= page_title %></h4>
 

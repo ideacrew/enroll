@@ -161,77 +161,74 @@
 
 
     }
-    .employees-table, .premium-reports-table {
-        margin-top: 20px;
-      table {
-
-        width: 100%;
-        table-layout: fixed;
+  }
+  .employees-table, .premium-reports-table {
+      margin-top: 20px;
+      .table-responsive {
         border: solid 1px #d5d5d5;
+      }
+    table {
+      border: solid 1px #d5d5d5;
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
 
-        tr {
-        th {
-          padding: 12px 0;
-          font-weight: normal;
+      tr {
+      th {
+        padding: 12px 0;
+        font-weight: normal;
+        text-align: left;
+        text-transform: uppercase;
+        width: 10%;
+        border-bottom: solid 2px #b2b2b2;
+        padding-left: 20px;
+        &:hover {
+          border-bottom: solid 2px #007bc4;
+
+        }
+
+        }
+        td {
+          background-color: #ffffff;
+          padding: 10px 20px;
           text-align: left;
-          text-transform: uppercase;
-          width: 10%;
-          border-bottom: solid 2px #b2b2b2;
-          padding-left: 20px;
+          border-bottom: solid 2px #fff;
+          font-size: 13px;
+          height: 50px;
+
+          &:first-of-type {
+            font-size: 15px;
+          }
+          &:last-of-type {
+            text-align: right;
+          }
+          &.table-functions .fa {
+            display: none;
+            cursor: pointer;
+            &:first-of-type {
+              padding-right: 10px;
+            }
+          }
           &:hover {
             border-bottom: solid 2px #007bc4;
 
           }
 
-          }
-          td {
-            background-color: #ffffff;
-            padding: 10px 20px;
-            text-align: left;
-            border-bottom: solid 1px #b2b2b2;
-            font-size: 13px;
-            height: 50px;
-
-            &:first-of-type {
-              font-size: 15px;
-            }
-            &:last-of-type {
-              text-align: right;
-            }
-            &.table-functions .fa {
-              display: none;
-              cursor: pointer;
-              &:first-of-type {
-                padding-right: 10px;
-              }
-            }
-            &:hover {
-              border-bottom: solid 2px #007bc4;
-
-            }
-
-          }
-          &:hover .table-functions .fa {
-            color: #007bc4;
-            display: inline-block;
-          }
         }
-
-
-
-
+        &:hover .table-functions .fa {
+          color: #007bc4;
+          display: inline-block;
+        }
       }
-
     }
   }
   #add_employee_action {
     .col-xs-12 {
       .col-md-6 {
-        height: 180px;
       }
     }
   }
-  .planyear-add-tab, .employee-add-tab, .employer-edit-tab, .employees-tab {
+  .planyear-add-tab, .employee-add-tab, .employer-edit-tab, .employees-tab, .home-tab {
     padding-bottom: 45px;
     h3 {
       &:first-of-type {
@@ -247,18 +244,14 @@
       cursor: pointer;
     }
     .row-form-wrapper {
-      border-top: solid 1px #b7b7b7;
-      margin-bottom: 10px;
-    }
-    #address_info {
-      .row-form-wrapper {
-        border-top: none;
-        margin-bottom: 0;
-        &:first-of-type {
-          border-top: solid 1px #b7b7b7;
-        }
+      &:first-of-type {
+        border-top: 1px solid #b5b5b5;
+      }
+      &:last-of-type {
+        border-bottom: 1px solid #b5b5b5;
       }
     }
+
     .recommend {
       .panel {
         padding-bottom: 15px;
@@ -309,6 +302,13 @@
     }
 
   }
+  .planyear-add-tab {
+    .row-form-wrapper {
+
+        border-top: 1px solid #b5b5b5;
+
+    }
+  }
   .benefits-tab, .home-tab {
     .fa {
       color: #007bc4;
@@ -322,6 +322,15 @@
       display: inline-block;
       color: #69A30D;
       font-size: 18px;
+    }
+  }
+  #choose-coverage {
+    .selectric {
+      p.label {
+        font-size: 18px !important;
+
+        text-transform: capitalize;
+      }
     }
   }
   .benefits-tab, .home-tab {
@@ -426,6 +435,7 @@
       }
     }
   }
+
   .benefits-setup-tab {
     .remove_fields {
       display: none;
@@ -438,6 +448,7 @@
     .row-form-wrapper {
       margin: 0;
       padding: 15px 0 20px;
+
       &.active {
         box-shadow: none;
       }
@@ -497,7 +508,7 @@
       }
       .selectric {
         p.label {
-          font-size: 18px;
+          font-size: 18px !important;
           margin-top: 5px;
           text-transform: capitalize;
         }

@@ -43,24 +43,22 @@
           </td>
           <% end %>
 
-          <td><%= census_employee.aasm_state.humanize %></td>
+          <td style="text-transform: capitalize;"><%= census_employee.aasm_state.humanize %></td>
           <td><%= enrollment_state(census_employee) %></td>
           <td><%= boolean_to_human census_employee.employee_role_linked? %></td>
 
           <td class="table-functions">
-            <%= link_to raw('<i class="fa fa-pencil fa-2x"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
-            <%= link_to raw('<i class="fa fa-trash-o fa-2x"></i>'), employers_employer_profile_census_employee_terminate_path(@employer_profile, census_employee.id), remote: true, onclick: '$(this).closest("tr").next().toggle();' %>
             <!--<i class="fa fa-times-circle-o fa-2x"></i>-->
             <% if census_employee.employment_terminated? %>
-            <% link_to ('javascript:;'), class: "show_confirm btn btn-green-2", id: "show_confirm_#{census_employee.id}" do %>
-            <span class="hidden-xs hidden-sm visible-md visible-lg">Rehire</span>
+            <%= link_to ('javascript:;'), class: "show_confirm btn btn-green-2", id: "show_confirm_#{census_employee.id}" do %>
+            <span class="hidden-xs hidden-sm visible-md visible-lg" onclick="$(this).closest('tr').next().show();">Rehire</span>
             <span aria-hidden="true" class="glyphicon glyphicon-pencil hidden-md hidden-lg visible-sm visible-xs"></span>
             <% end %>
-            <% elsif !census_employee.rehired? %>
-            <% link_to '<i class="fa fa-pencil"></i> Edit'.html_safe, (edit_employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id)), class: "btn btn-br btn-default", remote: true %>
-            <% link_to '<i class="fa fa-chain-broken"></i> Delink'.html_safe, (employers_employer_profile_census_employee_delink_path(@employer_profile.id, census_employee.id)), class: "btn btn-default", disabled: (!census_employee.employee_role_linked? or cannot? :delink, CensusEmployee) if current_user.has_hbx_staff_role? %>
-            <% link_to '<i class="fa fa-times"></i> Terminate'.html_safe, ('javascript:;'), class: "btn btn-danger btn-br show_confirm", id: "show_confirm_#{census_employee.id}" %>
+            <% else %>
+            <%= link_to raw('<i class="fa fa-pencil fa-2x"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
+            <%= link_to raw('<i class="fa fa-trash-o fa-2x"></i>'), employers_employer_profile_census_employee_terminate_path(@employer_profile, census_employee.id), remote: true, onclick: '$(this).closest("tr").next().toggle();' %>
             <% end %>
+
           </td>
         </tr>
         <% if census_employee.employment_terminated? %>
