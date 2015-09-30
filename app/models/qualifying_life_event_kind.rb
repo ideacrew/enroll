@@ -117,7 +117,7 @@ class QualifyingLifeEventKind
         coverage_effective_on = TimeKeeper.date_of_record.end_of_month + 1.day
       end
     else
-      if TimeKeeper.date_of_record < (coverage_end_last_day_of_month - 1.month).end_of_month
+      if TimeKeeper.date_of_record <= (coverage_end_last_day_of_month - 1.month).end_of_month
         coverage_effective_on = if selected_effective_on.blank?
                                   [coverage_end_on.beginning_of_month, coverage_end_last_day_of_month + 1.day]
                                 else

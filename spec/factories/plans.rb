@@ -7,6 +7,7 @@ FactoryGirl.define do
     active_year         2015
     coverage_kind       "health"
     metal_level         "silver"
+    plan_type           "HMO"
     market              "shop"
     ehb                 0.9943
     carrier_profile         { FactoryGirl.create(:carrier_profile)  } #{ BSON::ObjectId.from_time(DateTime.now) }

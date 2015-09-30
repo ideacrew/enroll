@@ -14,18 +14,6 @@ RSpec.describe "employers/employer_profiles/my_account/_census_employees.html.er
     expect(rendered).to match(/Employee Roster/)
   end
 
-  it "should have active filter option" do
-    expect(rendered).to have_selector("input[value='active']")
-  end
-
-  it "should have terminated filter option" do
-    expect(rendered).to have_selector("input[value='terminated']")
-  end
-
-  it "should have all filter option" do
-    expect(rendered).to have_selector("input[value='all']")
-  end
-
   it "should not have waive filter option" do
     expect(rendered).not_to have_selector("input[value='waived']")
   end
