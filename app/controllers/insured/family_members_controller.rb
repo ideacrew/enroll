@@ -5,7 +5,6 @@ class Insured::FamilyMembersController < ApplicationController
   before_action :set_current_person, :set_family
   def index
     set_consumer_bookmark_url
-    set_employee_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
     if @type == "employee"
       emp_role_id = params.require(:employee_role_id)

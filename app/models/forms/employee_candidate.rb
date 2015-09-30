@@ -30,7 +30,7 @@ module Forms
 
     # TODO fix and use as the only way to match census employees for the employee flow or blow this away
     def match_census_employees
-      CensusEmployee.matchable(ssn, dob).to_a + CensusEmployee.unclaimed_matchable(ssn, dob).to_a
+      CensusEmployee.matchable(ssn, dob).to_a
     end
 
     def match_person

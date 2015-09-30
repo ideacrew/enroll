@@ -52,6 +52,7 @@ class CensusEmployee < CensusMember
 
   scope :active,      ->{ any_in(aasm_state: ["eligible", "employee_role_linked"]) }
   scope :terminated,  ->{ any_in(aasm_state: ["employment_terminated", "rehired"]) }
+
   #TODO - need to add fix for multiple plan years
   scope :enrolled,    ->{ any_in("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
   scope :covered,     ->{ where( "benefit_group_assignments.aasm_state" => "coverage_selected" ) }
@@ -75,12 +76,6 @@ class CensusEmployee < CensusMember
       ee.published_benefit_group_assignment ? ee.published_benefit_group_assignment.id : []
     end
     matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
-  }
-
-  scope :unclaimed_matchable, ->(ssn, dob) {
-   linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: "employee_role_linked")
-   unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
-   unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
 
   def initialize(*args)

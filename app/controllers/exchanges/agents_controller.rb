@@ -1,9 +1,8 @@
 class Exchanges::AgentsController < ApplicationController
-  before_action :check_agent_role
+
   def home
      
-     @title = current_user.agent_title
-     @assister = current_user.has_assister_role?
+     @cac = current_user.person.csr_role.try(:cac)
      person_id = session[:person_id]
      if person_id && person_id != ''
        @person = Person.find(person_id)
@@ -61,12 +60,6 @@ class Exchanges::AgentsController < ApplicationController
   end
 
   def show
-  end
-
-  def check_agent_role
-    unless current_user.has_agent_role?
-      redirect_to root_path, :flash => { :error => "You must be an Agent:  CSR, CAC, or IPA" }
-    end
   end
 
 end
