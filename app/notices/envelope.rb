@@ -20,9 +20,9 @@ class Envelope < PdfReport
     x_pos = mm2pt(6.15)
     y_pos = 57
 
-    bounding_box([x_pos, y_pos], :width => 300) do
-      text "MPI_IVLR1"
-    end
+    # bounding_box([x_pos, y_pos], :width => 300) do
+    #   text "MPI_IVLR1"
+    # end
   end
 
   def fill_recipient_contact(notice)

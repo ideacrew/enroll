@@ -314,12 +314,9 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   @browser.text_field(name: "plan_year[fte_count]").set("235")
   @browser.text_field(name: "plan_year[pte_count]").set("15")
   @browser.text_field(name: "plan_year[msp_count]").set("3")
-  #@browser.divs(class: /recommend/).wait_until_present
   @browser.a(class: /interaction-click-control-continue/).wait_until_present
   @browser.a(class: /interaction-click-control-continue/).fire_event('onclick')
 
-  #@browser.h3(text: /Recommend Dates/).wait_until_present
-  #expect(@browser.text.include?("Employer initial application earliest submit on")).to be_truthy
 
   # Benefit Group
 
@@ -341,50 +338,15 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   plans_tab.labels.last.fire_event('onclick')
   sleep(3)
   @browser.button(class: /interaction-click-control-create-plan-year/).click
-
-
-
-
-
-
-  # @browser.label(class: /elected-plan/)
-  # elected_field = @browser.div(class: /selectric-wrapper/, text: /Select Plan Offerings/)
-  # elected_field.click
-  # elected_field.li(text: /All plans from a given carrier/).click
-  # sleep(1)
-  # input_field = @browser.div(class: /selectric-wrapper/, text: /SELECT CARRIER/)
-  # input_field.click
-  # sleep(1)
-  # input_field.li(text: /CareFirst/).click
-  # sleep(3)
-  # @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last.wait_until_present
-  # ref_plan = @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last
-  # ref_plan.click
-  # @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last.li(index: 5).wait_until_present
-  # ref_plan.li(index: 5).click # select plan from list.
-  # sleep(3)
-  # # Relationship Benefit
-  # @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(51)
-  # # @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
-  # @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]").set(15)
-  # @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').first.set(true)
-  # @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').first.set(false)
-  # # @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_offered').first.set(false)
-  # screenshot("employer_add_plan_year_info")
-  # @browser.button(value: /Create Plan Year/).click
 end
 
 And(/^.+ should see a success message after clicking on create plan year button$/) do
-  Watir::Wait.until(30) {  @browser.text.include?("Plan Year successfully created.") }
+  @browser.element(text: /Plan Year successfully created/).wait_until_present
   screenshot("employer_plan_year_success_message")
-  # TimeKeeper.set_date_of_record_unprotected!("2014-11-01")
-  # Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.plan_years.first.update(start_on: '2015-01-01', end_on: '2015-12-31', open_enrollment_start_on: '2014-11-01', open_enrollment_end_on: '2014-11-30')
 end
 
 When(/^.+ enters filter in plan selection page$/) do
-  Watir::Wait.until(30) { @browser.element(text: /Filter Results/).present? }
-  # @browser.a(text: /All Filters/).wait_until_present
-  # @browser.a(text: /All Filters/).click
+  @browser.element(text: /Filter Results/).wait_until_present
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(true)
   @browser.element(class: /apply-btn/, text: /Apply/).wait_until_present
   @browser.element(class: /apply-btn/, text: /Apply/).click
