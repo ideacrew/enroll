@@ -5,7 +5,7 @@
         <div class="col-md-12 col-sm-12 no-pd col-xs-12">
 
           <h3>Purchase confirmation</h3>
-          <p>Your purchase of <strong><%= @plan.name %></strong> was completed on <%= @enrollment.updated_at %>. </p>
+          <p>Your purchase of <strong><%= @plan.name %></strong> was completed on <%= format_datetime(@enrollment.updated_at) %>. </p>
           <p>Please print this page for your records.</p>
           <p>A copy of this confirmation has also been emailed to you. </p>
 
@@ -35,7 +35,9 @@
               <h4 class="modal-title"><b>How to Pay</b></h4>
             </div>
             <div class="modal-body">
-              <% if @plan.coverage_kind == 'dental' %>
+
+              <% if @plan.coverage_kind == 'health' %>
+
               <h4><strong><%= @plan.name %></strong></h4>
               <br/>
               <ol>

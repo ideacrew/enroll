@@ -40,6 +40,7 @@ function applyFloatLabels() {
   });
 }
 
+
 function applySelectric() {
   $("select[multiple!='multiple']").selectric();
 };
@@ -57,6 +58,10 @@ $(document).on('page:update', function(){
   applySelectric();
 });
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> brokerconfirmationtime
 function getCarrierPlans(ep, ci) {
 
   var params = 'carrier_id=' + ci;
