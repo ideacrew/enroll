@@ -191,9 +191,27 @@ class User
   def has_csr_role?
     has_role?(:csr)
   end
+
   def has_assister_role?
-    has_role(:assister)
+    has_role?(:assister)
   end
+
+  def has_agent_role?
+    has_role?(:csr) || has_role?(:assister)
+  end
+
+  def agent_title
+    if has_agent_role?
+      if has_role?(:assister)
+        "In Person Assister (IPA)"
+      elsif person.csr_role.cac == true
+         "Certified Applicant Counselor (CAC)"
+      else
+        "Customer Service Representative (CSR)"
+      end
+    end
+  end
+
   def ensure_authentication_token
     if authentication_token.blank?
       self.authentication_token = generate_authentication_token

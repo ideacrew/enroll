@@ -59,12 +59,21 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   def edit
-    set_employee_bookmark_url(family_account_path)
+    set_employee_bookmark_url
     @employee_role = EmployeeRole.find(params.require(:id))
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     if @person.present?
       @person.addresses << @employee_role.new_census_employee.address if @employee_role.new_census_employee.address.present?
-      @person.emails.first.address = @employee_role.new_census_employee.email.address if @employee_role.new_census_employee.email.present?
+
+
+      if @employee_role.new_census_employee.email.present?
+        new_employee_email = @employee_role.new_census_employee.email.address
+        if @person.emails.first
+          @person.emails.first.address = new_employee_email
+        else
+          @person..emails =[Email.new(kind: 'home', address: new_employee_email)]
+        end
+      end   
       @family = @person.primary_family
       build_nested_models
     end
