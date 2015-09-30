@@ -10,7 +10,7 @@
       <dt>Broker Name</dt>
       <dd><%= active_broker.person.full_name %></dd>
       <dt>Selected On</dt>
-      <dd><%= format_date @broker_agency_account.start_on %></dd>
+      <dd><%= format_date @broker_agency_account.try(:start_on) %></dd>
       <dt>Email</dt>
       <dd>
       <a href="mailto:<%= active_broker.person.emails.first.address %>">

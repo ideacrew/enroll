@@ -515,8 +515,7 @@ When(/^.+ should see a published success message$/) do
 end
 
 When(/^.+ should see a published success message without employee$/) do
-  # @browser.element(class: /mainmenu/).wait_until_present
-  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
+  @browser.element(text: /You have 0 non-owner employees on your roster/).wait_until_present
   expect(@browser.element(text: /You have 0 non-owner employees on your roster/).visible?).to be_truthy
 end
 
