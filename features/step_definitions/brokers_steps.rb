@@ -207,8 +207,8 @@ Then(/^.+ should see Employer and click on legal name$/) do
 end
 
 Then(/^.+ should see the Employer Profile page as Broker$/) do
-  # wait_and_confirm_text(/Premium Billing Report/)
-  # expect(@browser.element(text: /I'm a Broker/).visible?).to be_truthy
+  @browser.element(text: /I'm a Broker/).wait_until_present
+  expect(@browser.element(text: /I'm a Broker/).visible?).to be_truthy
 end
 
 Then(/^Primary Broker creates and publishes a plan year$/) do
