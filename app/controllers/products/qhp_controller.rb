@@ -17,7 +17,7 @@ class Products::QhpController < ApplicationController
         qhp[:total_employee_cost] = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan).total_employee_cost
       end
     else
-      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      tax_household = current_user.person.primary_family.latest_household.latest_active_tax_household
       elected_aptc_pct = session[:elected_aptc_pct]
       elected_aptc_pct = elected_aptc_pct.present? ? elected_aptc_pct.to_f : 0.85
 

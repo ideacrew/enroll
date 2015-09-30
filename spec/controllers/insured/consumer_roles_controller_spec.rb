@@ -7,6 +7,28 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   let(:family_member){ double("FamilyMember") }
   let(:consumer_role){ double("ConsumerRole", id: double("id")) }
   let(:bookmark_url) {'localhost:3000'}
+
+  context "GET privacy" do
+    before(:each) do
+      sign_in user
+      allow(user).to receive(:person).and_return(person)
+    end
+    it "should redirect" do
+      allow(person).to receive(:consumer_role?).and_return(true)
+      allow(person).to receive(:consumer_role).and_return(consumer_role)
+      allow(consumer_role).to receive(:bookmark_url).and_return("test")
+      get :privacy
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(person.consumer_role.bookmark_url)
+    end
+    it "should render privacy" do
+      allow(person).to receive(:consumer_role?).and_return(false)
+      get :privacy
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:privacy)
+    end
+  end
+
   describe "Get search" do
     let(:user) { double("User" ) }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", ssn: "333224444", dob: "08/15/1975") }
@@ -127,7 +149,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   end
 
   context "PUT update" do
-    let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz"}}
+    let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
     let(:person){ FactoryGirl.build(:person) }
 
     before(:each) do
@@ -159,6 +181,13 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       put :update, person: person_params, id: "test"
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
+    end
+
+    it "should raise error" do
+      put :update, person: person_params, id: "test"
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:edit)
+      expect(person.errors.full_messages).to include "Document type cannot be blank"
     end
   end
 end

@@ -20,7 +20,11 @@ Then(/Individual creates HBX account$/) do
   scroll_then_click(@browser.input(value: "Create account"))
 end
 
-When(/^user goes to register as an individual$/) do
+And(/user should see your information page$/) do
+  click_when_present(@browser.a(class: /interaction-click-control-continue/))
+end
+
+When(/user goes to register as an individual$/) do
   @browser.button(class: /interaction-click-control-continue/).wait_until_present
   @browser.text_field(class: /interaction-field-control-person-first-name/).set("Taylor")
   @browser.text_field(class: /interaction-field-control-person-middle-name/).set("K")
@@ -247,7 +251,8 @@ Then(/Second user creates an individual account$/) do
   scroll_then_click(@browser.input(value: "Create account"))
 end
 
-Then(/^Second user goes to register as an individual/) do
+Then(/^Second user goes to register as individual/) do
+  step "user should see your information page"
   step "user goes to register as an individual"
   @browser.text_field(class: /interaction-field-control-person-first-name/).set("Second")
   @browser.text_field(class: /interaction-field-control-person-ssn/).set(@u.ssn :ssn2)

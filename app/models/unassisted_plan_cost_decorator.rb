@@ -40,7 +40,9 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def employee_cost_for(member)
-    premium_for(member) - aptc_amount(member)
+    cost = premium_for(member) - aptc_amount(member)
+    cost = 0 if cost < 0
+    cost
   end
 
   def total_premium
@@ -60,6 +62,8 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def total_employee_cost
-    total_premium - total_aptc_amount
+    members.reduce(0) do |sum, member|
+      sum + employee_cost_for(member)
+    end
   end
 end

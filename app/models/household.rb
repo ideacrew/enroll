@@ -65,7 +65,7 @@ class Household
   # end
 
   def build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
-    verified_tax_household = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id.split('#').last }.first
+    verified_tax_household = active_verified_household.tax_households.select{|th| th.id == th.primary_applicant_id && th.primary_applicant_id == verified_primary_family_member.id.split('#').last }.first
     if verified_tax_household.present?
       verified_primary_tax_household_member = verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first
       primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
@@ -254,5 +254,9 @@ class Household
 
   def enrolled_hbx_enrollments
     hbx_enrollments.my_enrolled_plans
+  end
+
+  def current_year_hbx_enrollments
+    hbx_enrollments.active.current_year
   end
 end

@@ -6,6 +6,7 @@ Feature: Insured Plan Shopping on Individual market
       When I visit the Insured portal
       Then Individual creates HBX account
       Then I should see a successful sign up message
+      And user should see your information page
       When user goes to register as an individual
       When user clicks on continue button
       Then user should see button to continue as an individual
@@ -42,7 +43,7 @@ Feature: Insured Plan Shopping on Individual market
 
       When I visit the Insured portal
       Then Second user creates an individual account
-      Then Second user goes to register as an individual
+      Then Second user goes to register as individual
       Then user clicks on continue button
       Then click continue again
       Then Second user should see a form to enter personal information

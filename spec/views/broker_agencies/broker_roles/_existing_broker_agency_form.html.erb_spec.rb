@@ -10,10 +10,24 @@ RSpec.describe "broker_agencies/broker_roles/_existing_broker_agency_form.html.e
     expect(rendered).to have_selector("input[placeholder='Name/FEIN']")
   end
 
+  it "should have asterik for mandatory feilds" do
+    render template: "broker_agencies/broker_roles/_existing_broker_agency_form.html.erb"
+    ["FIRST NAME", "LAST NAME", "DATE OF BIRTH", "EMAIL"].each do |item|
+      expect(rendered).to have_selector("input[placeholder='#{item} *']")
+    end
+  end
+
   context "not staff" do
     before :each do
       assign :filter, "not_staff"
       render template: "broker_agencies/broker_roles/_existing_broker_agency_form.html.erb"
+    end
+
+    it "should have asterik for mandatory feilds" do
+      render template: "broker_agencies/broker_roles/_existing_broker_agency_form.html.erb"
+      ["FIRST NAME", "LAST NAME", "DATE OF BIRTH", "EMAIL", "NPN"].each do |item|
+        expect(rendered).to have_selector("input[placeholder='#{item} *']")
+      end
     end
 
     it "should have broker_agency_profile_fields area" do

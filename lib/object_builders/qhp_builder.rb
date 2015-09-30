@@ -52,6 +52,13 @@ class QhpBuilder
     iterate_plans
     show_qhp_stats
     mark_2015_dental_plans_as_individual
+    mark_2015_catastrophic_plans_as_individual
+  end
+
+  def mark_2015_catastrophic_plans_as_individual
+    Plan.catastrophic_level.by_active_year(2015).each do |plan|
+      plan.update_attribute(:market, "individual")
+    end
   end
 
   def mark_2015_dental_plans_as_individual
@@ -119,15 +126,14 @@ class QhpBuilder
     plan = candidate_plans.sort_by do |plan| plan.hios_id.gsub('-','').to_i end.first
     plans_to_update = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
     plans_to_update.each do |up_plan|
-      nationwide_str = (@qhp.national_network.blank? ? "" : @qhp.national_network)
-      nationwide_value = nationwide_str.downcase.strip == "yes"
+      nation_wide, dc_in_network = parse_nation_wide_and_dc_in_network
       up_plan.update_attributes(
           name: @qhp.plan_marketing_name,
           plan_type: @qhp.plan_type.downcase,
           deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_individual,
           family_deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_family,
-          nationwide: nationwide_value,
-          out_of_service_area_coverage: @qhp.out_of_service_area_coverage
+          nationwide: nation_wide,
+          dc_in_network: dc_in_network
       )
       up_plan.save!
     end
@@ -136,6 +142,14 @@ class QhpBuilder
     else
       puts "Plan Not Saved! Hios: #{@qhp.standard_component_id}, Plan Name: #{@qhp.plan_marketing_name}"
       @qhp.plan = nil
+    end
+  end
+
+  def parse_nation_wide_and_dc_in_network
+    if @qhp.national_network.downcase.strip == "yes"
+      ["true", "false"]
+    else
+      ["false", "true"]
     end
   end
 

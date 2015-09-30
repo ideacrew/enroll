@@ -47,7 +47,7 @@ class Plan
   field :deductible, type: String # Deductible
   field :family_deductible, type: String
   field :nationwide, type: Boolean # Nationwide
-  field :out_of_service_area_coverage, type: Boolean # DC In-Network or not
+  field :dc_in_network, type: Boolean # DC In-Network or not
 
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
@@ -134,7 +134,7 @@ class Plan
   scope :nationwide, ->{ where(nationwide: "true") }
 
   # DC In-Network ?
-  scope :dc_in_network, ->{ where(out_of_service_area_coverage: "false") }
+  scope :dc_in_network, ->{ where(dc_in_network: "true") }
 
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
   scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
