@@ -1,6 +1,6 @@
 class IvlPdfNotice < Notice
 
-  def initialize(consumer, options ={})
+  def initialize(options ={})
     super
   end
 

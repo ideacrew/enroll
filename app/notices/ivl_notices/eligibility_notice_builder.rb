@@ -1,14 +1,15 @@
 class IvlNotices::EligibilityNoticeBuilder < IvlNotices::NoticeBuilder
 
-  def initialize(consumer, hbx_enrollment_id)
-    super(consumer, PdfTemplates::EligibilityNotice, {
-      subject: "Eligibility for Health Insurance, Confirmation of Plan Selection",
-      template: "notices/9cindividual.html.erb"
+  def initialize(hbx_enrollment_id)
+    super(PdfTemplates::EligibilityNotice, {
+      template: "notices/ivl/9c_eligibility_confirmation_notification.html.erb"
     })
     @hbx_enrollment_id = hbx_enrollment_id
   end
 
   def build
+    @hbx_enrollment = HbxEnrollment.find(@hbx_enrollment_id)
+    @consumer = @hbx_enrollment.subscriber.person
     super
     @family = @consumer.primary_family
     hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active rescue []  
@@ -16,9 +17,8 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotices::NoticeBuilder
   end
 
   def append_enrollments(hbx_enrollments)
-    hbx_enrollment = hbx_enrollments.detect{|enrollment| enrollment.id == @hbx_enrollment_id}
-    @notice.enrollments = build_enrollment(hbx_enrollment).to_a
-    hbx_enrollments.reject{|hbx_enrollment| hbx_enrollment.id == @hbx_enrollment_id}.each do |hbx_enrollment|
+    @notice.enrollments << build_enrollment(@hbx_enrollment)
+    hbx_enrollments.reject{|hbx_enrollment| hbx_enrollment.id.to_s == @hbx_enrollment_id}.each do |hbx_enrollment|
       @notice.enrollments << build_enrollment(hbx_enrollment)
     end
   end
