@@ -1,48 +1,25 @@
-class IvlNotices::EligibilityNoticeBuilder < Notice
+class IvlNotices::EligibilityNoticeBuilder < IvlNotices::NoticeBuilder
 
-  attr_reader :notice
-
-  def initialize(consumer, args = {})
-    super
-    @consumer = consumer
-    @to = (@consumer.home_email || @consumer.work_email).address
-    @subject = "Eligibility for Health Insurance, Confirmation of Plan Selection"
-    @template = "notices/9cindividual.html.erb"
-    build
+  def initialize(consumer, hbx_enrollment_id)
+    super(consumer, PdfTemplates::EligibilityNotice, {
+      subject: "Eligibility for Health Insurance, Confirmation of Plan Selection",
+      template: "notices/9cindividual.html.erb"
+    })
+    @hbx_enrollment_id = hbx_enrollment_id
   end
 
   def build
-    #family = @consumer.primary_family
-    @family = Family.find_by_primary_applicant(@consumer)
-    @hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active rescue []
-    @notice = PdfTemplates::EligibilityNotice.new
-    @notice.primary_fullname = @consumer.full_name.titleize
-    @notice.primary_identifier = @consumer.hbx_id
-    append_address(@consumer.addresses[0])
-    append_enrollments(@hbx_enrollments)
-  end
-
-  def append_address(primary_address)
-    @notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: primary_address.address_1.titleize,
-      street_2: primary_address.address_2.titleize,
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
-      })
+    super
+    @family = @consumer.primary_family
+    hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active rescue []  
+    append_enrollments(hbx_enrollments)
   end
 
   def append_enrollments(hbx_enrollments)
-    hbx_enrollments.each do |hbx_enrollment|
-      @notice.enrollments << PdfTemplates::Enrollment.new({
-        plan_name: hbx_enrollment.plan.name,
-        monthly_premium_cost: hbx_enrollment.total_premium,
-        phone: hbx_enrollment.phone_number,
-        effective_on: hbx_enrollment.effective_on,
-        enrollees: hbx_enrollment.hbx_enrollment_members.inject([]) do |names, member| 
-          names << member.person.full_name.titleize
-        end
-        }) 
-    end 
+    hbx_enrollment = hbx_enrollments.detect{|enrollment| enrollment.id == @hbx_enrollment_id}
+    @notice.enrollments = build_enrollment(hbx_enrollment).to_a
+    hbx_enrollments.reject{|hbx_enrollment| hbx_enrollment.id == @hbx_enrollment_id}.each do |hbx_enrollment|
+      @notice.enrollments << build_enrollment(hbx_enrollment)
+    end
   end
 end
