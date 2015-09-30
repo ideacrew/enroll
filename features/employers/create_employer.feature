@@ -27,9 +27,6 @@ Feature: Create Employer
         When Employer clicks on the add employee button
         Then Employer should see a form to enter information about employee, address and dependents details
           And Employer should see employer census family created success message
-        And Employer clicks on Edit family button for a census family
-        Then Employer should see a form to update the contents of the census employee
-          And Employer should see employer census family updated success message
         When Employer goes to the benefits tab
         Then Employer should see the plan year
         When Employer clicks on publish plan year
@@ -38,6 +35,9 @@ Feature: Create Employer
         Then Employer should be on the Plan Year Edit page with warnings
         When Employer updates the FTE field with valid input and save plan year
         Then Employer should see a plan year successfully saved message
+        And Employer clicks on Edit family button for a census family
+        Then Employer should see a form to update the contents of the census employee
+          And Employer should see employer census family updated success message
         When Employer goes to the benefits tab I should see plan year information
         Then Employer clicks on publish plan year
         Then Employer should see a published success message

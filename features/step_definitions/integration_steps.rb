@@ -509,7 +509,8 @@ end
 
 When(/^.+ should see a published success message$/) do
   # @browser.element(class: /mainmenu/).wait_until_present
-  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
+  @browser.refresh
+  @browser.element(text: /plan year successfully published/i).wait_until_present
   expect(@browser.element(text: /Plan Year successfully published/).visible?).to be_truthy
 end
 

@@ -148,6 +148,9 @@ And(/^.+ should see employer census family created success message$/) do
 end
 
 When(/^.+ clicks? on Edit family button for a census family$/) do
+  @browser.a(text: /employees/i).wait_until_present
+  @browser.a(text: /employees/i).click
+  @browser.a(class: /interaction-click-control-add-new-employee/).wait_until_present
   @browser.i(class: /fa-pencil/).fire_event("onclick")
 end
 
@@ -157,8 +160,8 @@ When(/^.+ edits? ssn and dob on employee detail page after linked$/) do
   @browser.button(value: /Update Employee/).wait_until_present
   @browser.text_field(id: /jq_datepicker_ignore_census_employee_dob/).set("01/01/1981")
   @browser.text_field(id: /census_employee_ssn/).set("786120969")
+  @browser.button(value: /Update Employee/).wait_until_present
   @browser.button(value: /Update Employee/).click
-  binding.pry
 end
 
 
@@ -175,15 +178,17 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
   #Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.delink_employee_role!
 
   @browser.button(text: /Update Employee/i).wait_until_present
+  @browser.text_field(id: /census_employee_first_name/).set("Patrick")
   @browser.text_field(id: /jq_datepicker_ignore_census_employee_dob/).set("01/01/1980")
   @browser.text_field(id: /census_employee_ssn/).set("786120965")
-  @browser.text_field(id: /census_employee_first_name/).set("Patrick")
+  input_field = @browser.divs(class: /selectric-wrapper/).first
+  input_field.click
+  input_field.li(text: /Silver PPO Group/).click
   select_state = @browser.divs(text: /GA/).last
   select_state.click
   scroll_then_click(@browser.li(text: /VA/))
   #@browser.text_field(id: /census_employee_address_attributes_state/).set("VA")
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mariah")
-  binding.pry
   @browser.checkbox(id: /census_employee_is_business_owner/i).fire_event("onclick")
   input_field = @browser.divs(class: "selectric-wrapper").last
   input_field.click
@@ -193,8 +198,7 @@ Then(/^.+ should see a form to update the contents of the census employee$/) do
 end
 
 And(/^.+ should see employer census family updated success message$/) do
-  pry.binding
-  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
+  @browser.element(class: /interaction-click-control-add-new-employee/).wait_until_present
   Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully updated.") }
 end
 
@@ -331,7 +335,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   select_plan_option.li(text: /By carrier/i).click
   carriers_tab = @browser.div(class: /carriers-tab/)
   sleep(3)
-  carriers_tab.as.first.fire_event('onclick')
+  carriers_tab.as[1].fire_event("onclick")
   plans_tab = @browser.div(class: /reference-plans/)
   sleep(3)
   plans_tab.labels.last.fire_event('onclick')
@@ -482,7 +486,7 @@ Then(/^.+ updates? the FTE field with valid input and save plan year$/) do
 end
 
 Then(/^.+ should see a plan year successfully saved message$/) do
-  @browser.element(class: /mainmenu/).wait_until_present
+  @browser.element( text: /coverage - benefits you offer/i).wait_until_present
   # TODO:  Add visible? to the next line.  This test is not valid.
   expect(@browser.element(text: /Plan Year successfully saved/)).to be_truthy
 end
