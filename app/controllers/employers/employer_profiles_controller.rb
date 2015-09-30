@@ -1,8 +1,12 @@
 class Employers::EmployerProfilesController < ApplicationController
+
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form]
+
   before_action :check_admin_staff_role, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
+
+  layout "two_column", except: [:new]
 
   def index
     @q = params.permit(:q)[:q]
@@ -73,11 +77,17 @@ class Employers::EmployerProfilesController < ApplicationController
   end
 
   def show
+
+   @tab = params['tab']
    if params[:q] || params[:page] || params[:commit] || params[:status]
      paginate_employees
    else
       @current_plan_year = @employer_profile.published_plan_year
+      if @current_plan_year.present?
+        @additional_required_participants_count = @current_plan_year.additional_required_participants_count
+      end
       @plan_years = @employer_profile.plan_years.order(id: :desc)
+
       @broker_agency_accounts = @employer_profile.broker_agency_accounts
       if @current_plan_year.present?
         #FIXME commeted out for performance test
@@ -87,20 +97,32 @@ class Employers::EmployerProfilesController < ApplicationController
         @employer_contribution_total = 0 #enrollments.map(&:total_employer_contribution).sum
       end
     end
+    if @tab == 'employees'
+      paginate_employees
+    end
   end
 
   def show_profile
-    @tab = params['tab']
+    @tab ||= params[:tab]
     if @tab == 'benefits'
       @current_plan_year = @employer_profile.published_plan_year
       @plan_years = @employer_profile.plan_years.order(id: :desc)
     elsif @tab == 'employees'
       paginate_employees
+
     elsif @tab == 'families'
      #families defined as employee_roles.each { |ee| ee.person.primary_family }
      paginate_families
+   elsif @tab == "inbox"
+     @folder = params[:folder] || 'Inbox'
+     @sent_box = false
+     respond_to do |format|
+       format.js { render 'employers/employer_profiles/inbox' }
+     end
+   end
+
     end
-  end
+
 
   def new
     @organization = Forms::EmployerProfile.new
@@ -108,6 +130,8 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def edit
     @organization = Organization.find(params[:id])
+    @employer_profile = @organization.employer_profile
+
   end
 
   def create
@@ -116,7 +140,7 @@ class Employers::EmployerProfilesController < ApplicationController
     if @organization.save(current_user)
       @person = current_user.person
       create_sso_account(current_user, current_user.person, 15) do
-        redirect_to employers_employer_profile_path(@organization.employer_profile)
+        redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
       end
     else
       render action: "new"
@@ -125,30 +149,34 @@ class Employers::EmployerProfilesController < ApplicationController
 
   def update
     sanitize_employer_profile_params
+    params.permit!
     @organization = Organization.find(params[:id])
     @employer_profile = @organization.employer_profile
-    current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
-    current_user.person.employer_contact = @employer_profile
-    if current_user.has_employer_staff_role? #&& @employer_profile.owner == current_user
-      if !@employer_profile.staff_roles.present? && @organization.update_attributes(employer_profile_params) && current_user.save
-        current_user.person.employer_staff_roles << EmployerStaffRole.create(person: current_user.person, employer_profile_id: @employer_profile.id, is_owner: true)
+    if current_user.has_employer_staff_role? && @employer_profile.staff_roles.include?(current_user.person)
+      @organization.assign_attributes(organization_profile_params)
+      @organization.save(validate: false)
+      if @organization.update_attributes(employer_profile_params)
+
         flash[:notice] = 'Employer successfully Updated.'
-        redirect_to employers_employer_profile_path(@employer_profile)
+        redirect_to edit_employers_employer_profile_path(@employer_profile)
       else
         @organization.reload
-        respond_to do |format|
-          format.js { render "edit" }
-          format.html { render "edit" }
-        end
+        flash[:notice] = 'Employer information not saved.'
+        redirect_to edit_employers_employer_profile_path(@employer_profile)
       end
     else
       flash[:error] = 'You do not have permissions to update the details'
+      redirect_to edit_employers_employer_profile_path(@employer_profile)
     end
   end
 
   def inbox
     @folder = params[:folder] || 'Inbox'
     @sent_box = false
+    respond_to do |format|
+      format.js { render 'inbox' }
+      format.html { render 'inbox' }
+    end
   end
 
   def consumer_override
@@ -165,7 +193,7 @@ class Employers::EmployerProfilesController < ApplicationController
     @census_employee_import = CensusEmployeeImport.new({file:file, employer_profile:@employer_profile})
     begin
     if @census_employee_import.save
-      redirect_to "/employers/employer_profiles/#{@employer_profile.id}?employer_profile_id=#{@employer_profile.id}", :notice=>"#{@census_employee_import.length} records uploaded from CSV"
+      redirect_to "/employers/employer_profiles/#{@employer_profile.id}?employer_profile_id=#{@employer_profile.id}&tab=employees", :notice=>"#{@census_employee_import.length} records uploaded from CSV"
     else
       render "employers/employer_profiles/employee_csv_upload_errors"
     end
@@ -214,7 +242,7 @@ class Employers::EmployerProfilesController < ApplicationController
 
     def check_employer_staff_role
       if current_user.has_employer_staff_role?
-        redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
+        redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id, :tab => "home")
       end
     end
 
@@ -244,9 +272,16 @@ class Employers::EmployerProfilesController < ApplicationController
       @employer_profile = EmployerProfile.find(id)
     end
 
+    def organization_profile_params
+      params.require(:organization).permit(
+        :id,
+        :employer_profile_attributes => [:legal_name, :entity_kind, :dba]
+      )
+    end
+
     def employer_profile_params
       params.require(:organization).permit(
-        :employer_profile_attributes => [ :entity_kind, :dba, :fein, :legal_name],
+        :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
         :office_locations_attributes => [
           :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
           :phone_attributes => [:kind, :area_code, :number, :extension],
@@ -257,7 +292,8 @@ class Employers::EmployerProfilesController < ApplicationController
 
     def sanitize_employer_profile_params
       params[:organization][:office_locations_attributes].each do |key, location|
-        location.delete('phone_attributes') if location['phone_attributes'].present? and location['phone_attributes']['number'].blank?
+        params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
+        location.delete('phone_attributes') if (location['phone_attributes'].present? and location['phone_attributes']['number'].blank?)
       end
     end
 

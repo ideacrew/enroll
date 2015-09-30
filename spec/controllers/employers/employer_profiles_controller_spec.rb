@@ -376,9 +376,10 @@ RSpec.describe Employers::EmployerProfilesController do
 
   describe "PUT update" do
     let(:user) { double("user")}
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:organization) { FactoryGirl.create(:organization) }
-    let(:person) { FactoryGirl.create(:person) }
+    let(:employer_profile) { double("EmployerProfile") }
+    let(:organization) { double("Organization", id: "test") }
+    let(:person) { double("Person") }
+    let(:staff_roles){ [double("StaffRole")] }
 
     before do
       allow(user).to receive(:has_employer_staff_role?).and_return(true)
@@ -388,6 +389,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(organization).to receive(:employer_profile).and_return(employer_profile)
       allow(controller).to receive(:employer_profile_params).and_return({})
       allow(controller).to receive(:sanitize_employer_profile_params).and_return(true)
+      allow(employer_profile).to receive(:staff_roles).and_return(staff_roles)
     end
 
     it "should redirect" do
@@ -395,8 +397,6 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(person).to receive(:employer_staff_roles).and_return([EmployerStaffRole.new])
       sign_in(user)
       expect(Organization).to receive(:find)
-      expect(EmployerStaffRole).to receive(:create)
-      expect(user).to receive(:roles)
       put :update, id: organization.id
       expect(response).to be_redirect
     end
@@ -406,17 +406,16 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(user).to receive(:save).and_return(false)
         sign_in(user)
         put :update, id: organization.id
-        expect(response).to render_template("edit")
+        expect(response).to be_redirect
       end
     end
 
      context "given the company have managing staff" do
       it "should render edit template" do
-        allow(employer_profile).to receive(:staff_roles).and_return(person)
         allow(user).to receive(:save).and_return(true)
         sign_in(user)
         put :update, id: organization.id
-        expect(response).to render_template("edit")
+        expect(response).to be_redirect
       end
 
     end

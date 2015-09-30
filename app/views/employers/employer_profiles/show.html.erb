@@ -1,13 +1,119 @@
-<%= render 'primary_nav', "active_tab" => "home-tab"%>
+<% content_for :navigation do %>
+<%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
+<% end %>
 
-  <div class="">
-      <div aria-labelledby="inbox-tab" id="show_profile" class="tab-pane-hbx" role="tabpanel">
-        <%= render 'employers/employer_profiles/my_account/home_tab' %>
+<%- if @tab == 'home' %>
+<%= render :partial => 'employers/employer_profiles/my_account/home_tab' %>
+<%- elsif @tab == 'profile' %>
+<%= render 'employers/employer_profiles/my_account/profile_tab' %>
+<%- elsif @tab == 'employees' %>
+
+<%= render :partial => "employers/employer_profiles/my_account/census_employees" %>
+
+<%- elsif @tab == 'benefits' %>
+<%= render partial: "employers/employer_profiles/my_account/benefits" %>
+<%- elsif @tab == 'brokers' %>
+<%= render partial: "employers/employer_profiles/my_account/broker_agency" %>
+<%- elsif @tab == 'inbox' %>
+<%= render :partial => 'shared/inboxes/messages_list' %>
+<%- elsif @tab == 'documents' %>
+
+<%= render partial: "employers/employer_profiles/my_account/documents" %>
+
+<%- elsif @tab == 'families' %>
+<%= render partial:  "employers/employer_profiles/my_account/families" %>
+<%- end %>
+
+<%- if @tab == 'home' %>
+<% if @current_plan_year.present? %>
+<aside class="col-xs-4">
+  <section class="row">
+    <article class="col-xs-12">
+      <div class="row">
+        <div class="col-xs-4">
+          <figure>
+            <span class="icon-calendar-large icon-calendar-large-dims" role="img" aria-label="tooltip"><figcaption><h2><%= (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i %></h2><span>Days</span></figcaption></span>
+          </figure>
+        </div>
+        <div class="col-xs-8">
+          <h3>Until Open Enrollment Ends</h3>
+          <span><%= @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %></span>
+        </div>
       </div>
-  </div>
-      <div class="tab-content" id="myTabContent">
-      <div aria-labelledby="inbox-tab" id="inbox" class="tab-pane container top-pd" role="tabpanel">
-        <h1>Server message lookup failed</h1>
+    </article>
+
+    <article class="col-xs-12" style="display: none;">
+      <div class="row">
+        <div class="col-xs-4">
+          <figure>
+            <span class="icon-calendar-large icon-calendar-large-dims" role="img" aria-label="tooltip"><figcaption><h2>10</h2><span>Days</span></figcaption></span>
+          </figure>
+        </div>
+        <div class="col-xs-8">
+          <h3>Until your first payment is due to DC Health Link</h3>
+          <span>On September 2, 2015</span>
+        </div>
+        <div class="col-xs-4">
+        </div>
+        <div class="col-xs-8">
+          <a href="#" class="btn">Learn More</a>
+        </div>
       </div>
-  </div>
-</div
+    </article>
+  </section>
+
+
+  <section class="row" style="background-color: #fff;">
+    <article class="col-xs-12">
+      <h4>Premium Billing Report
+        <% if @employer_profile.published_plan_year.present? %>
+          <%= @current_plan_year.start_on %> - <%= @current_plan_year.start_on.end_of_month %></h4>
+        <% end %>
+        <table>
+          <tr>
+            <td style="padding-right: 10px;">Total Premium:</td>
+            <td><%= number_to_currency(@premium_amt_total || 0)%></td>
+          </tr>
+          <tr>
+            <td style="padding-right: 10px;">Employee Contributions:</td>
+            <td><%= number_to_currency(@employee_cost_total || 0) %></td>
+          </tr>
+          <tr>
+            <td style="padding-right: 10px;">Employer Contributions:</td>
+            <td><%= number_to_currency(@employer_contribution_total || 0) %></td>
+          </tr>
+        </table>
+        <br/>
+    </article>
+  </section>
+  <br/>
+
+  <section class="row" onclick="window.location.href = '<%= employers_employer_profile_path(@employer_profile, tab: 'brokers') %>'">
+    <article>
+      <figure>
+        <%= image_tag('images/didyouknow_288.png') %>
+      </figure>
+      <figcaption>
+        <h5>Did you know?</h5>
+        You can always get help from a broker <strong>at no cost</strong> to you.
+      </figcaption>
+    </article>
+  </section>
+</aside>
+<% else %>
+<aside class="col-xs-4">
+  <section class="row">
+    <article>
+      <figure>
+        <%= image_tag('images/didyouknow_288.png') %>
+      </figure>
+      <figcaption>
+        <h5>Did you know?</h5>
+        You can always get help from a broker <strong>at no cost</strong> to you.
+      </figcaption>
+    </article>
+  </section>
+</aside>
+
+<% end %>
+<% end %>
