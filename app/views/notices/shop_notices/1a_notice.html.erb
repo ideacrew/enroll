@@ -1,14 +1,6 @@
-<% @style_color_text = "style='color: #FF0000;'" %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<span #{@style_color_text}>[SHOP1A]</span><br>
-<span #{@style_color_text}>Initial Employer SHOP Application Approval</span> "} %>
-
 <%= render partial: 'notices/shared/logo' %>
 <%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
-
-
 
 <table class="total_table" border="0">
   <tbody>
@@ -47,7 +39,7 @@ having a minimum level of employee enrollment."} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "",
-  listings: ["<strong>Log in to your Account</strong><br>([HBEURL]) ",
+  listings: ["<strong>Log in to your Account</strong><br>(#{notice.hbe.url}) ",
              "<strong>Select Plans</strong><br>
              You must choose one of the three plan selection options listed below:"] } %>
 
@@ -97,14 +89,14 @@ having a minimum level of employee enrollment."} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
  previous: "Please contact your broker for further assistance.  You can also contact DC Health Link with any questions:",
- listings: ["Online at [HBEURL];",
-            "By email at [HBEEMAIL]; or",
-            "By calling [HBEPHONE]."] } %>
+ listings: ["Online at #{notice.hbe.url};",
+            "By email at #{notice.hbe.email}; or",
+            "By calling #{notice.hbe.phone}."] } %>
 
-<%= render partial: 'notices/shared/broker_contact_info' %>
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
+<% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker”
-link in your employer account or calling [Call Center Phone #].<br><br>
-
-This notice is being provided in accordance with 45 C.F.R. 155.715(d) & (e)"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "This notice is being provided in accordance with 45 C.F.R. 155.715(d) & (e)"} %>

@@ -15,7 +15,8 @@ class ShopNotices::EmployerNotice < Notice
     # send_email_notice if @email_notice
     # send_pdf_notice if @paper_notice
     # send_email_notice
-    mock_notice_object
+    #mock_notice_object
+    build
     generate_pdf_notice
   end
 
@@ -36,9 +37,57 @@ class ShopNotices::EmployerNotice < Notice
 
   def build
     @notice = PdfTemplates::EmployerNotice.new
-    @notice.primary_fullname = @employer.full_name.titleize
-    @notice.primary_identifier = @consumer.hbx_id
-    append_address(@consumer.addresses[0])
+
+    @notice.primary_fullname = @employer.person.full_name.titleize
+    employer_profile = EmployerProfile.find(@employer.employer_profile_id)
+    @notice.primary_identifier = employer_profile.organization.hbx_id
+    @notice.open_enrollment_end_on = employer_profile.try(:active_plan_year).try(:open_enrollment_end_on)
+
+    if @employer.person.addresses.present?
+      append_address(@employer.person.addresses[0])
+    else
+      append_address(employer_profile.organization.try(:primary_office_location).try(:address))
+    end
+
+    append_hbe
+    append_broker(employer_profile.broker_agency_profile)
+  end
+
+  def append_hbe
+    @notice.hbe = PdfTemplates::Hbe.new({
+      url: "www.dhs.dc.gov",
+      phone: "(855) 532-5465",
+      fax: "(855) 532-5465",
+      email: "info@dchealthlink.com",
+      address: PdfTemplates::NoticeAddress.new({
+        street_1: "100 K ST NE",
+        street_2: "Suite 100",
+        city: "Washington DC",
+        state: "DC",
+        zip: "20005"
+      })
+    })
+  end
+
+  def append_broker(broker)
+    return if broker.blank?
+
+    location = broker.organization.primary_office_location
+    broker_role = broker.primary_broker_role
+    @notice.broker = PdfTemplates::Broker.new({
+      primary_fullname: broker_role.try(:person).try(:full_name),
+      organization: broker.legal_name,
+      phone: location.phone.try(:to_s),
+      email: broker_role.email_address,
+      web_address: broker.home_page,
+      address: PdfTemplates::NoticeAddress.new({
+        street_1: location.try(:address).try(:address_1),
+        street_2: location.try(:address).try(:address_2),
+        city: location.try(:address).try(:city),
+        state: location.try(:address).try(:state),
+        zip: location.try(:address).try(:zip)
+      })
+    })
   end
 
   def append_address(primary_address)
@@ -50,7 +99,4 @@ class ShopNotices::EmployerNotice < Notice
       zip: primary_address.zip
       })
   end
-end
-
-
-
+end 
