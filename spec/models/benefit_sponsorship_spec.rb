@@ -108,40 +108,79 @@ RSpec.describe BenefitSponsorship, :type => :model do
             expect(benefit_sponsorship.renewal_benefit_coverage_period).to eq(benefit_coverage_period_next_year)
           end
 
-          context "and today's date is before the deadline for first-of-next-month enrollment" do
-            let(:enroll_date)              { Date.new(2015,9,15).end_of_month + 15.days }
-            let(:first_of_next_month_date) { enroll_date.end_of_month + 1.day }
+          context "before next year open enrollment" do
+            context "and today's date is before the deadline for first-of-next-month enrollment" do
+              let(:enroll_date)              { Date.new(2015,9,15).end_of_month + 15.days }
+              let(:first_of_next_month_date) { enroll_date.end_of_month + 1.day }
 
-            before do
-              TimeKeeper.set_date_of_record_unprotected!(enroll_date)
+              before do
+                TimeKeeper.set_date_of_record_unprotected!(enroll_date)
+              end
+
+              after do
+                TimeKeeper.set_date_of_record_unprotected!(Date.today)
+              end
+
+              it 'should return first-of-next-month as the earliest effective date' do 
+                expect(benefit_sponsorship.earliest_effective_date).to eq first_of_next_month_date
+              end
             end
 
-            after do
-             TimeKeeper.set_date_of_record_unprotected!(Date.today)
-           end
+            context "and today's date is after the deadline for first-of-next-month enrollment" do
+              let(:enroll_date)                   { Date.new(2015,9,15).end_of_month + 16.days }
+              let(:first_of_following_month_date) { enroll_date.next_month.end_of_month + 1.day }
 
-            it 'should return first-of-next-month as the earliest effective date' do 
-              expect(benefit_sponsorship.earliest_effective_date).to eq first_of_next_month_date
+              before do
+                TimeKeeper.set_date_of_record_unprotected!(enroll_date)
+              end
+
+              after do
+                TimeKeeper.set_date_of_record_unprotected!(Date.today)
+              end
+
+              it 'should return first-of-following-month as the earliest effective date' do 
+                expect(benefit_sponsorship.earliest_effective_date).to eq first_of_following_month_date
+              end
             end
           end
 
-          context "and today's date is after the deadline for first-of-next-month enrollment" do
-            let(:enroll_date)                   { Date.new(2015,9,15).end_of_month + 16.days }
-            let(:first_of_following_month_date) { enroll_date.next_month.end_of_month + 1.day }
+          context "during open enrollment renewal" do
+            context "and today's date is before the deadline for first-of-next-month enrollment" do
+              let(:enroll_date)              { Date.new(2015,11,15) }
+              let(:first_of_next_month_date) { enroll_date.end_of_month + 1.day }
+              let(:start_on) { benefit_coverage_period_next_year.start_on }
 
-            before do
-              TimeKeeper.set_date_of_record_unprotected!(enroll_date)
+              before do
+                TimeKeeper.set_date_of_record_unprotected!(enroll_date)
+              end
+
+              after do
+                TimeKeeper.set_date_of_record_unprotected!(Date.today)
+              end
+
+              it 'should return first-of-next-month as the earliest effective date' do 
+                expect(benefit_sponsorship.earliest_effective_date).to eq start_on
+              end
             end
 
-            after do
-              TimeKeeper.set_date_of_record_unprotected!(Date.today)
-             end
+            context "and today's date is after the deadline for first-of-next-month enrollment" do
+              let(:enroll_date)                   { Date.new(2015,11,16) }
+              let(:first_of_following_month_date) { enroll_date.next_month.end_of_month + 1.day }
+              let(:start_on) { benefit_coverage_period_next_year.start_on }
 
-            it 'should return first-of-following-month as the earliest effective date' do 
-              expect(benefit_sponsorship.earliest_effective_date).to eq first_of_following_month_date
+              before do
+                TimeKeeper.set_date_of_record_unprotected!(enroll_date)
+              end
+
+              after do
+                TimeKeeper.set_date_of_record_unprotected!(Date.today)
+              end
+
+              it 'should return first-of-following-month as the earliest effective date' do 
+                expect(benefit_sponsorship.earliest_effective_date).to eq start_on
+              end
             end
           end
-
         end
       end
     end
