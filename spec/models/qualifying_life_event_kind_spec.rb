@@ -44,17 +44,67 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
   end
 
   describe "instance methods" do
-    let(:esi_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "Dependent loss of ESI due to employee gaining Medicare")}
+    let(:esi_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "Losing Employer-Subsidized Insurance because employee is going on Medicare")}
     let(:moved_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "I'm moving to the District of Columbia")}
+    let(:qle) {FactoryGirl.create(:qualifying_life_event_kind, title: "My employer did not pay my premiums on time")}
 
-    it "is_dependent_loss_of_esi?" do
-      expect(esi_qlek.is_dependent_loss_of_esi?).to eq true
-      expect(moved_qlek.is_dependent_loss_of_esi?).to eq false
+    before do
+      TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 9, 15))
+    end
+
+    it "is_dependent_loss_of_coverage?" do
+      expect(esi_qlek.is_dependent_loss_of_coverage?).to eq true
+      expect(qle.is_dependent_loss_of_coverage?).to eq true
+      expect(moved_qlek.is_dependent_loss_of_coverage?).to eq false
     end
 
     it "is_moved_to_dc?" do
       expect(esi_qlek.is_moved_to_dc?).to eq false
       expect(moved_qlek.is_moved_to_dc?).to eq true
+    end
+
+    context "employee_gaining_medicare" do
+      let(:qle) {QualifyingLifeEventKind.new}
+
+      context "when coverage_end_on is the last day of month" do
+        it "plan selection <= coverage_end_on" do
+          date = (TimeKeeper.date_of_record + 1.month).end_of_month
+          expect(qle.employee_gaining_medicare(date)).to eq date + 1.day
+        end
+
+        it "plan selection > coverage_end_on" do
+          date = (TimeKeeper.date_of_record - 1.month).end_of_month
+          expect(qle.employee_gaining_medicare(date)).to eq TimeKeeper.date_of_record.end_of_month + 1.day
+        end
+      end
+
+      context "when coverage_end_on is not the last day of month" do
+        it "plan selected before the month in which coverage ends" do
+          date = (TimeKeeper.date_of_record + 1.month).end_of_month.days_ago(3)
+          results = [date.beginning_of_month, date.end_of_month + 1.day]
+          expect(qle.employee_gaining_medicare(date)).to eq results
+        end
+
+        it "plan selected before the month in which coverage ends and has selected_effective_on" do
+          date = (TimeKeeper.date_of_record + 1.month).end_of_month.days_ago(3)
+          selected_on = TimeKeeper.date_of_record + 5.days
+          results = [date.beginning_of_month, date.end_of_month + 1.day]
+          expect(qle.employee_gaining_medicare(date, selected_on)).not_to eq results
+          expect(qle.employee_gaining_medicare(date, selected_on)).to eq selected_on
+        end
+
+        it "plan selected during the month in which coverage ends" do
+          date = (TimeKeeper.date_of_record).end_of_month.days_ago(3)
+          results = (TimeKeeper.date_of_record + 1.month).beginning_of_month
+          expect(qle.employee_gaining_medicare(date)).to eq results
+        end
+
+        it "plan selected after the month in which coverage ends" do
+          date = (TimeKeeper.date_of_record - 1.month).end_of_month.days_ago(3)
+          results = TimeKeeper.date_of_record.end_of_month + 1.day
+          expect(qle.employee_gaining_medicare(date)).to eq results
+        end
+      end
     end
   end
 end

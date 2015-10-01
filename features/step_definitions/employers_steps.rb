@@ -81,33 +81,27 @@ Then(/^.+ should see the employer information$/) do
 end
 
 Then(/^.+ should see the employee family roster$/) do
-  @browser.a(text: /Add Employee/).wait_until_present
+  @browser.a(class: /interaction-click-control-add-new-employee/).wait_until_present
   screenshot("employer_census_family")
-  expect(@browser.a(text: /Add Employee/).visible?).to be_truthy
+  expect(@browser.a(class: /interaction-click-control-add-new-employee/).visible?).to be_truthy
+  @browser.a(class: /interaction-click-control-add-new-employee/).click
 end
 
-And(/^It should default to active tab$/) do
-  @browser.radio(id: "terminated_no").wait_until_present
-  expect(@browser.radio(id: "terminated_no").set?).to be_truthy
-  expect(@browser.radio(id: "terminated_yes").set?).to be_falsey
-  #expect(@browser.radio(id: "family_waived").set?).to be_falsey
-  expect(@browser.radio(id: "family_all").set?).to be_falsey
-end
 
 Then(/^.+ should see a form to enter information about employee, address and dependents details$/) do
-  @browser.element(class: /interaction-click-control-create-employee/).wait_until_present
-  screenshot("create_census_employee")
+
   # Census Employee
   @browser.text_field(class: /interaction-field-control-census-employee-first-name/).wait_until_present
   @browser.text_field(class: /interaction-field-control-census-employee-first-name/).set("John")
   @browser.text_field(class: /interaction-field-control-census-employee-middle-name/).set("K")
   @browser.text_field(class: /interaction-field-control-census-employee-last-name/).set("Doe")
   @browser.text_field(class: /interaction-field-control-census-employee-name-sfx/).set("Jr")
-  @browser.text_field(class: /interaction-field-control-census-employee-dob/).set("01/01/1980")
+  # @browser.text_field(class: /interaction-field-control-census-employee-dob/).set("01/01/1980")
+  @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-census-employee-dob/).set("01/01/1980")
   @browser.text_field(class: /interaction-field-control-census-employee-ssn/).set("786120965")
   #@browser.radio(class: /interaction-choice-control-value-radio-male/).set
   @browser.radio(id: /radio_male/).fire_event("onclick")
-  @browser.text_field(class: /interaction-field-control-census-employee-hired-on/).set("10/10/2014")
+  @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-census-employee-hired-on/).set("10/10/2014")
   @browser.checkbox(class: /interaction-choice-control-value-census-employee-is-business-owner/).set
   input_field = @browser.divs(class: /selectric-wrapper/).first
   input_field.click
@@ -143,28 +137,30 @@ Then(/^.+ should see a form to enter information about employee, address and dep
 end
 
 And(/^.+ should see employer census family created success message$/) do
-  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
-  Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully created.") }
+  sleep(1)
+  expect(@browser.div(text: /successfully/).visible?).to be_truthy
   screenshot("employer_census_new_family_success_message")
   @browser.refresh
   @browser.a(text: /Employees/).wait_until_present
   @browser.a(text: /Employees/).click
   @browser.a(text: /John K Doe Jr/).wait_until_present
   expect(@browser.a(text: /John K Doe Jr/).visible?).to be_truthy
-  expect(@browser.a(text: /Edit/).visible?).to be_truthy
-  expect(@browser.a(text: /Terminate/).visible?).to be_truthy
 end
 
 When(/^.+ clicks? on Edit family button for a census family$/) do
-  @browser.a(text: /Edit/).wait_until_present
-  @browser.a(text: /Edit/).click
+  @browser.a(text: /employees/i).wait_until_present
+  @browser.a(text: /employees/i).click
+  @browser.a(class: /interaction-click-control-add-new-employee/).wait_until_present
+  @browser.i(class: /fa-pencil/).fire_event("onclick")
 end
 
 When(/^.+ edits? ssn and dob on employee detail page after linked$/) do
   Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.link_employee_role!
+
   @browser.button(value: /Update Employee/).wait_until_present
   @browser.text_field(id: /jq_datepicker_ignore_census_employee_dob/).set("01/01/1981")
   @browser.text_field(id: /census_employee_ssn/).set("786120969")
+  @browser.button(value: /Update Employee/).wait_until_present
   @browser.button(value: /Update Employee/).click
 end
 
@@ -180,25 +176,29 @@ end
 
 Then(/^.+ should see a form to update the contents of the census employee$/) do
   #Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.census_employees.first.delink_employee_role!
-  @browser.button(value: /Update Employee/).wait_until_present
+
+  @browser.button(text: /Update Employee/i).wait_until_present
+  @browser.text_field(id: /census_employee_first_name/).set("Patrick")
   @browser.text_field(id: /jq_datepicker_ignore_census_employee_dob/).set("01/01/1980")
   @browser.text_field(id: /census_employee_ssn/).set("786120965")
-  @browser.text_field(id: /census_employee_first_name/).set("Patrick")
+  input_field = @browser.divs(class: /selectric-wrapper/).first
+  input_field.click
+  input_field.li(text: /Silver PPO Group/).click
   select_state = @browser.divs(text: /GA/).last
   select_state.click
   scroll_then_click(@browser.li(text: /VA/))
   #@browser.text_field(id: /census_employee_address_attributes_state/).set("VA")
   @browser.text_field(id: /census_employee_census_dependents_attributes_\d+_first_name/).set("Mariah")
-  @browser.checkbox(id: /census_employee_is_business_owner/i).clear
+  @browser.checkbox(id: /census_employee_is_business_owner/i).fire_event("onclick")
   input_field = @browser.divs(class: "selectric-wrapper").last
   input_field.click
   input_field.li(text: /Child/).click
   screenshot("update_census_employee_with_data")
-  @browser.button(value: /Update Employee/).click
+  @browser.button(text: /Update Employee/i).fire_event('onclick')
 end
 
 And(/^.+ should see employer census family updated success message$/) do
-  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
+  @browser.element(class: /interaction-click-control-add-new-employee/).wait_until_present
   Watir::Wait.until(30) {  @browser.text.include?("Census Employee is successfully updated.") }
 end
 
@@ -271,14 +271,14 @@ And(/^.+ should see the census family is successfully rehired message$/) do
 end
 
 When(/^I go to the Profile tab$/) do
-  @browser.a(text: /Profile/).wait_until_present
-  @browser.a(text: /Profile/).click
+  @browser.a(class: /interaction-click-control-update-business-info/).wait_until_present
+  @browser.a(class: /interaction-click-control-update-business-info/).click
+  @browser.a(class: /interaction-click-control-cancel/).wait_until_present
+  @browser.a(class: /interaction-click-control-cancel/).click
+  @browser.a(text: /business info/i).wait_until_present
+  expect(@browser.a(text: /Business Info/i).visible?).to be_truthy
 end
 
-Then(/^I should see Edit Details link$/) do
-  @browser.a(text: /Edit Details/).wait_until_present
-  @browser.element(text: /Edit Details/).visible?
-end
 
 When(/^.+ go[es]+ to the benefits tab I should see plan year information$/) do
   @browser.a(text: /Benefits/).wait_until_present
@@ -287,71 +287,66 @@ end
 
 
 And(/^.+ should see a button to create new plan year$/) do
-  @browser.a(text: /Add Plan Year/).wait_until_present
+  @browser.a(class: /interaction-click-control-add-plan-year/).wait_until_present
   screenshot("employer_plan_year")
-  @browser.a(text: /Add Plan Year/).click
+  @browser.a(class: /interaction-click-control-add-plan-year/).click
 end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits with high FTE$/) do
 #Plan Year
   # @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").wait_until_present
-  @browser.text_field(id: /plan_year_fte_count/).wait_until_present
+  # @browser.text_field(id: /plan_year_fte_count/).wait_until_present
+  @browser.div(class: /selectric-interaction-choice-control-plan-year-start-on/).wait_until_present
+  start_on = @browser.div(class: /selectric-interaction-choice-control-plan-year-start-on/)
+  start_on.fire_event('onclick')
+  start_on.li(index: 1).fire_event('onclick')
   screenshot("employer_add_plan_year")
-  @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").set("91/96/2017")
-  @browser.h3(text: /Plan Year/).click
-  @browser.alert.wait_until_present
-  @browser.alert.ok
-  expect(@browser.text.include?("Open Enrollment Start Date: Invalid date format!")).to be_truthy
+  # @browser.text_field(id: "jq_datepicker_ignore_plan_year_open_enrollment_start_on").set("91/96/2017")
+  # @browser.h3(text: /Plan Year/).click
+  # @browser.alert.wait_until_present
+  # @browser.alert.ok
+  # expect(@browser.text.include?("Open Enrollment Start Date: Invalid date format!")).to be_truthy
   # happy path
-  start_on_field = @browser.div(class: /selectric-wrapper/, text: /SELECT START ON/i)
-  start_on_field.click
-  start_on_field.li(index: 1).click
-  @browser.h3(text: /Recommend Dates/).wait_until_present
-  expect(@browser.text.include?("Employer initial application earliest submit on")).to be_truthy
-  @browser.text_field(name: "plan_year[fte_count]").click
+  # start_on_field = @browser.div(class: /selectric-wrapper/, text: /SELECT START ON/i)
+  # start_on_field.click
+  # start_on_field.li(index: 1).click
+  @browser.text_field(name: "plan_year[fte_count]").fire_event('onclick')
   @browser.text_field(name: "plan_year[fte_count]").set("235")
   @browser.text_field(name: "plan_year[pte_count]").set("15")
   @browser.text_field(name: "plan_year[msp_count]").set("3")
+  @browser.a(class: /interaction-click-control-continue/).wait_until_present
+  @browser.a(class: /interaction-click-control-continue/).fire_event('onclick')
+
+
   # Benefit Group
+
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
-  elected_field = @browser.div(class: /selectric-wrapper/, text: /Select Plan Offerings/)
-  elected_field.click
-  elected_field.li(text: /All plans from a given carrier/).click
-  sleep(1)
-  input_field = @browser.div(class: /selectric-wrapper/, text: /SELECT CARRIER/)
-  input_field.click
-  sleep(1)
-  input_field.li(text: /CareFirst/).click
+  select_field = @browser.div(class: /selectric-wrapper/, text: /Date Of Hire/)
+  select_field.click
+  select_field.li(text: /Date of hire/).click
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(50)
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]").set(50)
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]").set(50)
+  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]").set(50)
+  select_plan_option = @browser.ul(class: /nav-tabs/)
+  select_plan_option.li(text: /By carrier/i).click
+  carriers_tab = @browser.div(class: /carriers-tab/)
   sleep(3)
-  @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last.wait_until_present
-  ref_plan = @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last
-  ref_plan.click
-  @browser.divs(class: /selectric-wrapper/, text: /SELECT REFERENCE PLAN/).last.li(index: 5).wait_until_present
-  ref_plan.li(index: 5).click # select plan from list.
+  carriers_tab.as[1].fire_event("onclick")
+  plans_tab = @browser.div(class: /reference-plans/)
   sleep(3)
-  # Relationship Benefit
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(51)
-  # @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').first.set(true)
-  @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]").set(15)
-  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').first.set(true)
-  @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').first.set(false)
-  # @browser.checkboxes(id: 'plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_offered').first.set(false)
-  screenshot("employer_add_plan_year_info")
-  @browser.button(value: /Create Plan Year/).click
+  plans_tab.labels.last.fire_event('onclick')
+  sleep(3)
+  @browser.button(class: /interaction-click-control-create-plan-year/).click
 end
 
 And(/^.+ should see a success message after clicking on create plan year button$/) do
-  @browser.element(class: /interaction-click-control-get-reports/).wait_until_present
-  Watir::Wait.until(30) {  @browser.text.include?("Plan Year successfully created.") }
+  @browser.element(text: /Plan Year successfully created/).wait_until_present
   screenshot("employer_plan_year_success_message")
-  # TimeKeeper.set_date_of_record_unprotected!("2014-11-01")
-  # Organization.where(legal_name: 'Turner Agency, Inc').first.employer_profile.plan_years.first.update(start_on: '2015-01-01', end_on: '2015-12-31', open_enrollment_start_on: '2014-11-01', open_enrollment_end_on: '2014-11-30')
 end
 
 When(/^.+ enters filter in plan selection page$/) do
-  Watir::Wait.until(30) { @browser.element(text: /Filter Results/).present? }
-  # @browser.a(text: /All Filters/).wait_until_present
-  # @browser.a(text: /All Filters/).click
+  @browser.element(text: /Filter Results/).wait_until_present
   @browser.checkboxes(class: /plan-type-selection-filter/).first.set(true)
   @browser.element(class: /apply-btn/, text: /Apply/).wait_until_present
   @browser.element(class: /apply-btn/, text: /Apply/).click
@@ -453,7 +448,7 @@ Then(/^.+ updates? the FTE field with valid input and save plan year$/) do
 end
 
 Then(/^.+ should see a plan year successfully saved message$/) do
-  @browser.element(class: /mainmenu/).wait_until_present
+  @browser.element( text: /coverage - benefits you offer/i).wait_until_present
   # TODO:  Add visible? to the next line.  This test is not valid.
   expect(@browser.element(text: /Plan Year successfully saved/)).to be_truthy
 end

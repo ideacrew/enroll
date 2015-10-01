@@ -143,12 +143,13 @@ RSpec.describe TaxHousehold, type: :model do
     let(:hbx_member1) { double(applicant_id: 'member1', applied_aptc_amount: 20) }
     let(:hbx_member2) { double(applicant_id: 'member2', applied_aptc_amount: 10) }
     let(:hbx_enrollment) { double(applied_aptc_amount: 30, hbx_enrollment_members: [hbx_member1, hbx_member2]) }
-    let(:household) { double(hbx_enrollments: double(active: [hbx_enrollment])) }
+    let(:household) { double(current_year_hbx_enrollments: [hbx_enrollment]) }
 
     it "can return result" do
-      tax_household = TaxHousehold.new(allocated_aptc: 100)
+      tax_household = TaxHousehold.new()
       allow(tax_household).to receive(:household).and_return household
       allow(tax_household).to receive(:aptc_ratio_by_member).and_return aptc_ratio_by_member
+      allow(tax_household).to receive(:current_max_aptc).and_return 100
       expect(tax_household.aptc_available_amount_by_member.class).to eq Hash
       result = {'member1'=>40, 'member2'=>30}
       expect(tax_household.aptc_available_amount_by_member).to eq result
@@ -160,7 +161,7 @@ RSpec.describe TaxHousehold, type: :model do
     let(:hbx_member1) { double(applicant_id: 'member1') }
     let(:hbx_member2) { double(applicant_id: 'member2') }
     let(:hbx_enrollment) { double(applied_aptc_amount: 30, hbx_enrollment_members: [hbx_member1, hbx_member2]) }
-    let(:household) { double(hbx_enrollments: double(active: [hbx_enrollment])) }
+    let(:household) { double(current_year_hbx_enrollments: [hbx_enrollment]) }
     let!(:plan) {FactoryGirl.build(:plan_with_premium_tables)}
     let(:decorated_plan) {double}
 
@@ -184,6 +185,22 @@ RSpec.describe TaxHousehold, type: :model do
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 0.5).class).to eq Hash
       result = {'member1'=>0, 'member2'=>0}
       expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 0.5)).to eq result
+    end
+  end
+
+  context "current_max_aptc" do 
+    before :each do
+      @tax_household = TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record) 
+    end
+
+    it "return max aptc when in the same year" do 
+      allow(@tax_household).to receive(:latest_eligibility_determination).and_return(double(determined_on: TimeKeeper.date_of_record, max_aptc: 100))
+      expect(@tax_household.current_max_aptc).to eq 100
+    end
+
+    it "return 0 when not in the same year" do
+      allow(@tax_household).to receive(:latest_eligibility_determination).and_return(double(determined_on: TimeKeeper.date_of_record + 1.year, max_aptc: 100))
+      expect(@tax_household.current_max_aptc).to eq 0
     end
   end
 end

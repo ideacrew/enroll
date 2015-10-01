@@ -2,8 +2,12 @@ class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
   include ErrorBubble
   before_action :check_consumer_role, only: [:search]
+  before_action :find_consumer_role, only: [:edit, :update]
 
-  before_action :find_consumer_role_and_person, only: [:edit, :update]
+  def privacy
+    set_current_person
+    redirect_to @person.consumer_role.bookmark_url || family_account_path  if @person.try(:consumer_role?)
+  end
 
   def search
     @no_previous_button = true
@@ -62,7 +66,7 @@ class Insured::ConsumerRolesController < ApplicationController
       respond_to do |format|
         format.html {
           if is_assisted
-            @person.primary_family.update_attribute(:e_case_id, "curam_landing")
+            @person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{@person.id}")
             redirect_to SamlInformation.curam_landing_page_url
           else
             redirect_to :action => "edit", :id => @consumer_role.id
@@ -74,18 +78,15 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def edit
     set_consumer_bookmark_url
-    build_nested_models
+    @consumer_role.build_nested_models_for_person
+    init_vlp_doc_subject
   end
 
   def update
     save_and_exit =  params['exit_after_method'] == 'true'
-    @person.addresses = []
-    @person.phones = []
-    @person.emails = []
 
     params_clean_vlp_documents
-    update_vlp_documents
-    if @person.update_attributes(params.require(:person).permit(*person_parameters_list))
+    if update_vlp_documents and @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
@@ -94,13 +95,12 @@ class Insured::ConsumerRolesController < ApplicationController
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
     else
-      bubble_consumer_role_errors_by_person(@person)
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
         end
       else
-        build_nested_models
+        @consumer_role.build_nested_models_for_person
         respond_to do |format|
           format.html { render "edit" }
         end
@@ -143,23 +143,8 @@ class Insured::ConsumerRolesController < ApplicationController
     ]
   end
 
-  def build_nested_models
-    ["home", "mobile"].each do |kind|
-      @person.phones.build(kind: kind) if @person.phones.select { |phone| phone.kind == kind }.blank?
-    end
-
-    Address::KINDS.each do |kind|
-      @person.addresses.build(kind: kind) if @person.addresses.select { |address| address.kind.to_s.downcase == kind }.blank?
-    end
-
-    Email::KINDS.each do |kind|
-      @person.emails.build(kind: kind) if @person.emails.select { |email| email.kind == kind }.blank?
-    end
-  end
-
-  def find_consumer_role_and_person
+  def find_consumer_role
     @consumer_role = ConsumerRole.find(params.require(:id))
-    @person = @consumer_role.person
   end
 
   def params_clean_vlp_documents
@@ -178,10 +163,13 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def update_vlp_documents
     if (params[:person][:us_citizen] == 'true' and params[:person][:naturalized_citizen] == 'false') or (params[:person][:us_citizen] == 'false' and params[:person][:eligible_immigration_status] == 'false')
-      return
+      return true
     end
 
-    return if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].first.nil?
+    if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].first.nil?
+      add_document_errors_to_consumer_role(@consumer_role, ["document type", "cannot be blank"])
+      return false
+    end
     doc_params = params.require(:person).permit({:consumer_role_attributes =>
                                                  [:vlp_documents_attributes =>
                                                   [:subject, :citizenship_number, :naturalization_number,
@@ -190,7 +178,8 @@ class Insured::ConsumerRolesController < ApplicationController
     @vlp_doc_subject = doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject]
     document = find_document(@consumer_role, @vlp_doc_subject)
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
-    document.save
+    add_document_errors_to_consumer_role(@consumer_role, document)
+    return document.errors.blank?
   end
 
   def check_consumer_role
@@ -200,7 +189,13 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       current_user.last_portal_visited = search_insured_consumer_role_index_path
       current_user.save!
+      # render 'privacy'
     end
   end
 
+  def init_vlp_doc_subject
+    if @consumer_role.person.try(:naturalized_citizen) or @consumer_role.person.try(:eligible_immigration_status)
+      @vlp_doc_subject = @consumer_role.try(:vlp_documents).try(:last).try(:subject)
+    end
+  end
 end

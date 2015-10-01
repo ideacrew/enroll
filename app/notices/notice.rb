@@ -1,8 +1,8 @@
 class Notice
 
-  attr_accessor :from, :to, :subject, :template, :notice_data, :mkt_kind, :file_name
+  attr_accessor :from, :to, :subject, :template, :notice_data, :mkt_kind, :file_name, :notice
 
-  def initialize(recipient, args = {})
+  def initialize(args = {})
     @notice_path = Rails.root.join('pdfs', 'notice.pdf')
     @layout = 'pdf_notice'
   end

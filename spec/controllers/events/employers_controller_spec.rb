@@ -39,7 +39,7 @@ describe Events::EmployersController do
     describe "for an employer which doesn't exist" do
       let(:found_orgs) { [] }
 
-      it "should send out a message to the bus with the rendered employer object" do
+      it "should send out a message to the bus with no employer object" do
         expect(exchange).to receive(:publish).with("", {
           :routing_key => reply_to_key,
           :headers => {

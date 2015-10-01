@@ -115,6 +115,12 @@ class EmployerProfile
     @active_broker_agency_account = broker_agency_accounts.detect { |account| account.is_active? }
   end
 
+  def active_broker
+    if active_broker_agency_account
+      Person.where("broker_role._id" => BSON::ObjectId.from_string(active_broker_agency_account.writing_agent_id)).first
+    end
+  end
+
   def employee_roles
     return @employee_roles if defined? @employee_roles
     @employee_roles = EmployeeRole.find_by_employer_profile(self)

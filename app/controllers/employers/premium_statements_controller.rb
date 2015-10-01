@@ -1,5 +1,6 @@
 require 'csv'
 class Employers::PremiumStatementsController < ApplicationController
+  layout "two_column", only: [:show]
 
   def show
     @employer_profile = EmployerProfile.find(params.require(:id))
@@ -7,7 +8,7 @@ class Employers::PremiumStatementsController < ApplicationController
     @hbx_enrollments = @current_plan_year.hbx_enrollments rescue []
     @hbx_enrollments = HbxEnrollment.covered(@hbx_enrollments)
 
-    respond_to do |format| 
+    respond_to do |format|
       format.html
       format.js
       format.csv do
@@ -45,7 +46,7 @@ private
 
   def csv_content_type
     case request.user_agent
-      when /windows/i 
+      when /windows/i
         'application/vnd.ms-excel'
       else
         'text/csv'

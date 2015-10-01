@@ -70,6 +70,8 @@ GEM
       debug_inspector (>= 0.0.1)
     bootstrap-multiselect-rails (0.9.9)
       rails (>= 4.0.0)
+    bootstrap-slider-rails (5.1.1)
+      railties (>= 3.2, < 5.0)
     bson (2.3.0)
     builder (3.2.2)
     bunny (1.7.1)
@@ -171,7 +173,6 @@ GEM
     font-awesome-rails (4.4.0.0)
       railties (>= 3.2, < 5.0)
     forgery (0.6.0)
-    forkr (0.1.7)
     gherkin (2.12.2)
       multi_json (~> 1.3)
     globalid (0.3.6)
@@ -328,7 +329,6 @@ GEM
     raindrops (0.15.0)
     rake (10.4.2)
     rdoc (4.2.0)
-      json (~> 1.4)
     redis (3.2.1)
     redis-actionpack (4.0.1)
       actionpack (~> 4)
@@ -465,6 +465,7 @@ DEPENDENCIES
   animate-rails (~> 1.0.7)
   aws-sdk (~> 2)
   bootstrap-multiselect-rails (~> 0.9.9)
+  bootstrap-slider-rails
   bson (= 2.3.0)
   cancancan (~> 1.9.2)
   capistrano (= 3.3.5)
@@ -479,7 +480,6 @@ DEPENDENCIES
   factory_girl_rails (~> 4.0)
   font-awesome-rails
   forgery
-  forkr
   haml
   jbuilder (~> 2.0)
   jquery-rails

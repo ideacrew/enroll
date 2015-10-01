@@ -1,35 +1,39 @@
 module Events
   class IndividualsController < ::ApplicationController
-    include Acapi::Notifiers
+    include Acapi::Amqp::Responder
 
-    def self.created_subscription_details
-      Person::PERSON_CREATED_EVENT_NAME
-    end
-
-    def self.updated_subscription_details
-      Person::PERSON_UPDATED_EVENT_NAME
-    end
-
-    def created(e_start, e_end, msg_id, payload)
-      individual = payload.stringify_keys["individual"]
-      event_payload = render_to_string "created", :formats => ["xml"], :locals => { :individual => individual }
-
-      notify("acapi.info.events.individual.created", {:body => event_payload})
-    end
-
-    def updated(e_start, e_end, msg_id, payload)
-      individual = payload.stringify_keys["individual"]
-      event_payload = render_to_string "created", :formats => ["xml"], :locals => { :individual => individual }
-
-      notify("acapi.info.events.individual.updated", {:body => event_payload})
-    end
-
-    def self.subscribe
-      ActiveSupport::Notifications.subscribe(self.created_subscription_details) do |e_name, e_start, e_end, msg_id, payload|
-        self.new.created(e_start,e_end,msg_id,payload)
-      end
-      ActiveSupport::Notifications.subscribe(self.updated_subscription_details) do |e_name, e_start, e_end, msg_id, payload|
-        self.new.updated(e_start,e_end,msg_id,payload)
+    def resource(connection, delivery_info, properties, body)
+      reply_to = properties.reply_to
+      headers = properties.headers || {}
+      individual_id = headers.stringify_keys["individual_id"]
+      individual = Person.by_hbx_id(individual_id).first
+      if !individual.nil?
+        response_payload = render_to_string "created", :formats => ["xml"], :locals => { :individual => individual }
+        with_response_exchange(connection) do |ex|
+          ex.publish(
+            response_payload,
+            {
+              :routing_key => reply_to,
+              :headers => {
+                :return_status => "200",
+                :individual_id => individual_id
+              }
+            }
+          )
+        end
+      else
+        with_response_exchange(connection) do |ex|
+          ex.publish(
+            "",
+            {
+              :routing_key => reply_to,
+              :headers => {
+                :return_status => "404",
+                :individual_id => individual_id
+              }
+            }
+          )
+        end
       end
     end
   end

@@ -1,9 +1,15 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
   before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :assignment_benefit_group ]
-
+  layout "two_column"
   def new
     @census_employee = build_census_employee
+    if params[:modal].present?
+      respond_to do |format|
+        format.js { render "employers/employer_profiles/upload_employees" }
+      end
+
+    end
   end
 
   def create
@@ -15,10 +21,10 @@ class Employers::CensusEmployeesController < ApplicationController
         @census_employee.send_invite!
         flash[:notice] = "Census Employee is successfully created."
       else
-        flash[:notice] = "Note: new employee cannot enroll on DC Healthlink until they are assigned a benefit group. "
-        flash[:notice] += "Census Employee is successfully created."
+        flash[:notice] = "Census Employee is successfully created. "
+        flash[:notice] += "Note: an employee must be assigned to a benefit group before they can enroll for benefits"
       end
-      redirect_to employers_employer_profile_path(@employer_profile)
+      redirect_to employers_employer_profile_path(@employer_profile, tab: 'employees')
     else
       begin
         missing_kind = census_employee_params['email_attributes']['kind']==''
@@ -69,7 +75,7 @@ class Employers::CensusEmployeesController < ApplicationController
         flash[:notice] = "Note: new employee cannot enroll on DC Healthlink until they are assigned a benefit group. "
         flash[:notice] += "Census Employee is successfully updated."
       end
-      redirect_to employers_employer_profile_path(@employer_profile)
+      redirect_to employers_employer_profile_path(@employer_profile, tab: 'employees')
     else
       @reload = true
       render action: "edit"

@@ -1,0 +1,54 @@
+<div class="row">
+        <div class="table-responsive">
+          <table class="table table-message-wrapper none_margin_bottom none_margin_top">
+            <tbody>
+
+              <tr>
+                <th>Applicant Name:</th>
+                <td><%= @broker_applicant.full_name %></td>
+              </tr>
+              <% if broker_or_staff_role.respond_to?(:npn) %>
+              <tr>
+                <th>NPN:</th>
+                <td><%= broker_or_staff_role.npn %></td>
+              </tr>
+              <% end %>
+              <tr>
+                <th>Email:</th>
+                <td><%= broker_or_staff_role.email_address %></td>
+              </tr>
+              <tr>
+                <th>Broker:</th>
+                <td><%= broker_or_staff_role.broker_agency_profile.legal_name %></td>
+              </tr>
+              <tr>
+                <th>Office Locations:</th>
+                <td>
+                    <% broker_or_staff_role.broker_agency_profile.organization.office_locations.each do |office_location| %>
+                      <%= office_location.address.to_html %>
+                    <% end %>
+                  
+                </td>
+              </tr> 
+              <tr>
+                <th>History</th> 
+                <td>
+                    <% broker_or_staff_role.workflow_state_transitions.each do |transition| %>
+                      <%= transition.to_html %>
+                    <% end %>
+                </td>
+              </tr> 
+              <tr>
+                <th>Application Status:</th>
+                <td><%= broker_or_staff_role.current_state %></td>
+              </tr> 
+              <% disabled = (broker_or_staff_role.active? || broker_or_staff_role.agency_pending?) ? true : false %>
+              <%= f.fields_for :broker_role do |broker_role_fields| %>
+              <tr>
+                <th style="vertical-align: top;">Reason<span class="text-danger"></span>:</th>
+                <td><%= broker_role_fields.text_area :reason, class: "floatlabel form-control", placeholder: 'Write here...', rows: 6, disabled: disabled %></td>
+              </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>

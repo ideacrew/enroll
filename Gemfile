@@ -80,12 +80,12 @@ gem 'bson', '2.3.0'
 
 gem 'language_list', '~> 1.1.0'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
+gem 'bootstrap-slider-rails'
 
 gem 'prawn', '~> 0.11.1'
 gem 'virtus'
 gem 'wkhtmltopdf-binary-edge', '~> 0.12.2.1'
 gem 'wicked_pdf'
-gem 'forkr'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

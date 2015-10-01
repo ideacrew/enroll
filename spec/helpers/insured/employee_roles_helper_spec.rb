@@ -4,33 +4,33 @@ RSpec.describe Insured::EmployeeRolesHelper, :type => :helper do
   describe "#calculate_age_by_dob" do
     context "return age by dob" do
       it "with now month less than dob month" do
-        now = Date.today
-        dob = Date.today - 10.years - 1.month
+        now = TimeKeeper.date_of_record
+        dob = TimeKeeper.date_of_record - 10.years - 1.month
         expect(helper.calculate_age_by_dob(dob)).to eq 10
       end
 
       it "with now month more than dob month" do
-        now = Date.today
-        dob = Date.today - 10.years + 1.month
+        now = TimeKeeper.date_of_record
+        dob = TimeKeeper.date_of_record - 10.years + 1.month
         expect(helper.calculate_age_by_dob(dob)).to eq 9
       end
 
       context "with now month equal dob month" do
         it "and now day less than dob day" do
-          now = Date.today
-          dob = Date.today - 10.years - 1.day
+          now = TimeKeeper.date_of_record
+          dob = TimeKeeper.date_of_record - 10.years - 1.day
           expect(helper.calculate_age_by_dob(dob)).to eq 10
         end
 
         it "and now day more than dob day" do
-          now = Date.today
-          dob = Date.today - 10.years + 1.day
+          now = TimeKeeper.date_of_record
+          dob = TimeKeeper.date_of_record - 10.years + 1.day
           expect(helper.calculate_age_by_dob(dob)).to eq 9
         end
 
         it "and now day equal dob day" do
-          now = Date.today
-          dob = Date.today - 10.years
+          now = TimeKeeper.date_of_record
+          dob = TimeKeeper.date_of_record - 10.years
           expect(helper.calculate_age_by_dob(dob)).to eq 10
         end
       end
@@ -41,7 +41,7 @@ RSpec.describe Insured::EmployeeRolesHelper, :type => :helper do
     let(:orb) {["employee", "spouse", "child_under_26"]}
     let(:spouse) { double(primary_relationship: "ex-spouse") }
     let(:domestic_partner) { double(primary_relationship: "life_partner") }
-    let(:child) {double(primary_relationship: "ward", dob: Date.today)}
+    let(:child) {double(primary_relationship: "ward", dob: TimeKeeper.date_of_record)}
 
     it "offered_relationship_benefits include the relationship of family_member" do
       expect(helper.coverage_relationship_check(orb, spouse)).to be_truthy

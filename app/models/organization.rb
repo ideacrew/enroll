@@ -61,9 +61,9 @@ class Organization
     length: { is: 9, message: "%{value} is not a valid FEIN" },
     numericality: true,
     uniqueness: true
-    
+
   validate :office_location_kinds
-    
+
 
 
   index({ hbx_id: 1 }, { unique: true })
@@ -148,7 +148,7 @@ class Organization
 
   def office_location_kinds
     location_kinds = self.office_locations.select{|l| !l.persisted?}.flat_map(&:address).compact.flat_map(&:kind)
-    # should validate only office location which are not persisted AND kinds ie. primary, mailing, branch 
+    # should validate only office location which are not persisted AND kinds ie. primary, mailing, branch
     return if no_primary = location_kinds.detect{|kind| kind == 'work' || kind == 'home'}
     unless location_kinds.empty?
       if location_kinds.count('primary').zero?
@@ -168,8 +168,8 @@ class Organization
   class << self
 
     def active_broker_agencies
-      Organization.exists(broker_agency_profile: true).where({ 
-        "broker_agency_profile._id" => { "$in" => BrokerRole.agency_ids_for_active_brokers } 
+      Organization.exists(broker_agency_profile: true).where({
+        "broker_agency_profile._id" => { "$in" => BrokerRole.agency_ids_for_active_brokers }
         })
     end
 
@@ -203,18 +203,18 @@ class Organization
 
     def broker_agencies_with_matching_agency_or_broker(search_params)
       if search_params[:q].present?
-        orgs2 = self.active_broker_agencies.where({ 
-          "broker_agency_profile._id" => { 
+        orgs2 = self.active_broker_agencies.where({
+          "broker_agency_profile._id" => {
             "$in" => BrokerRole.agencies_with_matching_broker(search_params[:q])
           }
         })
 
         brokers = BrokerRole.brokers_matching_search_criteria(search_params[:q])
         if brokers.any?
-          search_params.delete(:q)          
+          search_params.delete(:q)
           if search_params.empty?
             return filter_brokers_by_agencies(orgs2, brokers)
-          else 
+          else
             agencies_matching_advanced_criteria = orgs2.where({ "$and" => build_query_params(search_params) })
             return filter_brokers_by_agencies(agencies_matching_advanced_criteria, brokers)
           end

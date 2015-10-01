@@ -140,11 +140,14 @@ class Exchanges::HbxProfilesController < ApplicationController
   # GET /exchanges/hbx_profiles/1
   # GET /exchanges/hbx_profiles/1.json
   def show
-    if current_user.has_csr_role?
+    if current_user.has_csr_role? || current_user.try(:has_assister_role?)
       redirect_to home_exchanges_agents_path
       return
-    else
-      check_hbx_staff_role
+    else 
+      unless current_user.has_hbx_staff_role?
+        redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
+        return
+      end
     end
     @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
   end
