@@ -26,7 +26,7 @@ class ApplicationController < ActionController::Base
   #   method = "#{resource}_params"
   #   params[resource] &&= send(method) if respond_to?(method, true)
   # end
-
+  
   #cancancan access denied
   rescue_from CanCan::AccessDenied, with: :access_denied
 
@@ -179,19 +179,18 @@ class ApplicationController < ActionController::Base
   end
 
   def market_kind_is_employee?
-    /employee/.match(current_user.last_portal_visited) || (session[:last_market_visited] == 'shop' && !(/consumer/.match(current_user.last_portal_visited)))
+    /employee/.match(current_user.last_portal_visited) || (session[:last_market_visited] == 'shop' && !(/consumer/.match(current_user.try(:last_portal_visited))))
   end
 
   def market_kind_is_consumer?
-    /consumer/.match(current_user.last_portal_visited) || (session[:last_market_visited] == 'individual' && !(/employee/.match(current_user.last_portal_visited)))
+    /consumer/.match(current_user.last_portal_visited) || (session[:last_market_visited] == 'individual' && !(/employee/.match(current_user.try(:last_portal_visited))))
   end
 
   def save_bookmark (role, bookmark_url)
-   if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
+    if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
       role.bookmark_url = bookmark_url
       role.try(:save!)
     end
-
   end
   def set_bookmark_url(url=nil)
     set_current_person

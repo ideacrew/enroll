@@ -6,8 +6,8 @@ class Insured::FamiliesController < FamiliesController
   def home
     set_bookmark_url
     @hbx_enrollments = @family.enrolled_hbx_enrollments || []
-    @employee_role = @person.employee_roles.try(:first)
 
+    @employee_role = @person.employee_roles.try(:first) unless market_kind_is_consumer?
     respond_to do |format|
       format.html
     end

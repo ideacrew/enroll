@@ -47,7 +47,19 @@ Feature: Insured Enrolls as Employee then as Consumer and then does IVL purchase
     And Megan clicks on the purchase button on the confirmation page
     And I click on continue button to go to the individual home page
     And I should see the individual home page
-    And I click to see my Secure Purchase Confirmation
+
+    When I click the "I've married" in qle carousel
+      And I select a future qle date
+      Then I should see not qualify message
+      When I click the "I've married" in qle carousel
+      And I select a past qle date
+      Then I should see confirmation and continue
+      When I click on continue button on household info form
+      And I click on "shop for new plan" button on household info page
+      And I select a plan on plan shopping page
+      And Megan clicks on the purchase button on the confirmation page
+      When I click on continue on qle confirmation page
+      And I should see the individual home page      
     Then Megan logs out
 
     When Megan visits the Employee portal
