@@ -15,4 +15,12 @@
   <div style='margin: 0 auto;max-width:250px;'>
     <%= select_tag 'effective_on_date', options_for_select(@effective_on_options.map(&:to_s)), include_blank: 'SELECT EFFECTIVE ON DATE' %>
   </div>
+
+  <script>
+    $("#qle_message").addClass("hidden");
+    var mecNotice = "<br /><div class='alert alert-danger'><p class='error-text'>"
+    mecNotice += "Because your other health insurance is ending in the middle of the month, you can opt to have your coverage start on <%= @qle_date.beginning_of_month %> instead of <%= (@qle_date + 1.month).beginning_of_month %>. Please call us at 1-855-532-5465 by <%= (@qle_date.beginning_of_month - 1.day) %> to use this option"
+    mecNotice += "</p></div>"
+    $("#mec_notice").html(mecNotice)
+  </script> 
 <% end %>

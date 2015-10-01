@@ -70,6 +70,11 @@ class EmployeeRole
     census_employee.published_benefit_group
   end
 
+  def is_under_open_enrollment?
+    return false if benefit_group.blank?
+    benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+  end
+
   def new_census_employee=(new_census_employee)
     raise ArgumentError.new("expected CensusEmployee class") unless new_census_employee.is_a? CensusEmployee
     self.census_employee_id = new_census_employee._id
