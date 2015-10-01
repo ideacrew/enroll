@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     collection do
       post :login
       get :logout
+      get :navigate_to_assistance
     end
   end
 
@@ -109,8 +110,10 @@ Rails.application.routes.draw do
 
     resources :consumer_role, controller: 'consumer_roles', only: [:create, :edit, :update] do
       get :search, on: :collection
+      get :privacy, on: :collection
       get :match, on: :collection
       get :ridp_agreement, on: :collection
+      ##get :privacy, on: :collection
     end
 
     resources :employee, :controller=>"employee_roles", only: [:create, :edit, :update, :show] do
@@ -162,6 +165,8 @@ Rails.application.routes.draw do
         get 'inbox'
       end
       resources :plan_years do
+        get 'reference_plans'
+        get 'plan_details' => 'plan_years#plan_details', on: :collection
         get 'recommend_dates', on: :collection
         get 'reference_plan_options', on: :collection
         post 'publish'

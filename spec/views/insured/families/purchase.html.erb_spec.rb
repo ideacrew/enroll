@@ -6,7 +6,7 @@ RSpec.describe "insured/families/purchase.html.erb" do
   let(:plan){FactoryGirl.create(:plan)}
   let(:benefit_group){ FactoryGirl.build(:benefit_group) }
   let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
-
+  let(:person) { FactoryGirl.create(:person)}
   context "purchase" do
     before :each do
       @person = employee_role.person
@@ -15,6 +15,8 @@ RSpec.describe "insured/families/purchase.html.erb" do
       @benefit_group = @enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
+      allow(person).to receive(:consumer_role).and_return(false)
+      @person = person
       render :template => "insured/families/purchase.html.erb"
     end
 
@@ -45,6 +47,7 @@ RSpec.describe "insured/families/purchase.html.erb" do
     it "should display the terminate button" do
       expect(rendered).to have_selector('a', text: 'Terminate Plan')
       expect(rendered).not_to have_selector('a', text: 'Purchase')
+      expect(rendered).not_to have_selector('a', text: 'Confirm')
     end
 
     it "should display the terminate message" do

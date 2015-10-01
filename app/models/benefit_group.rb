@@ -254,6 +254,17 @@ class BenefitGroup
     plan_option_kind == "single_plan"
   end
 
+  def elected_plans_by_option_kind
+    case self.plan_option_kind
+    when "single_plan"
+      Plan.where(id: self.reference_plan_id).first
+    when "single_carrier"
+      Plan.valid_shop_health_plans("carrier", self.carrier_for_elected_plan, self.start_on.year)
+    when "metal_level"
+      Plan.valid_shop_health_plans("metal_level", self.metal_level_for_elected_plan, self.start_on.year)
+    end
+  end
+
 private
   def dollars_to_cents(amount_in_dollars)
     Rational(amount_in_dollars) * Rational(100) if amount_in_dollars

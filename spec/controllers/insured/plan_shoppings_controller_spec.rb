@@ -162,7 +162,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
   end
 
-
   context "POST terminate" do
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
@@ -217,7 +216,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:plan1) {double(id: '10', deductible: '$10', total_employee_cost: 1000, carrier_profile_id: '12345')}
     let(:plan2) {double(id: '11', deductible: '$20', total_employee_cost: 2000, carrier_profile_id: '12346')}
     let(:plan3) {double(id: '12', deductible: '$30', total_employee_cost: 3000, carrier_profile_id: '12347')}
-    
+
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
@@ -292,7 +291,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     context "when user has_active_consumer_role" do
       let(:tax_household) {double}
-      let(:household) {double(tax_households: [tax_household])}
+      let(:household) {double(latest_active_tax_household: tax_household)}
       let(:family) {double(latest_household: household)}
       let(:person) {double(primary_family: family, has_active_consumer_role?: true)}
       let(:user) {double(person: person)}

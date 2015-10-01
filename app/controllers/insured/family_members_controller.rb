@@ -5,6 +5,7 @@ class Insured::FamilyMembersController < ApplicationController
   before_action :set_current_person, :set_family
   def index
     set_consumer_bookmark_url
+    set_employee_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
     if @type == "employee"
       emp_role_id = params.require(:employee_role_id)
@@ -45,7 +46,7 @@ class Insured::FamilyMembersController < ApplicationController
       end
     else
       update_vlp_documents(doc_params)
-      @dependent.addresses = Address.new(@dependent.addresses) if @dependent.addresses.is_a? ActionController::Parameters
+      init_address_for_dependent
       respond_to do |format|
         format.html { render 'new' }
         format.js { render 'new' }
@@ -74,6 +75,9 @@ class Insured::FamilyMembersController < ApplicationController
 
   def edit
     @dependent = Forms::FamilyMember.find(params.require(:id))
+    if @dependent.try(:naturalized_citizen) or @dependent.try(:eligible_immigration_status)
+      @vlp_doc_subject = @dependent.family_member.person.consumer_role.try(:vlp_documents).try(:last).try(:subject)
+    end
 
     respond_to do |format|
       format.html
@@ -92,8 +96,7 @@ class Insured::FamilyMembersController < ApplicationController
         format.js { render 'show' }
       end
     else
-      @dependent.same_with_primary = Forms::FamilyMember.compare_address_with_primary(@dependent.family_member)
-      @dependent.addresses = Address.new(@dependent.addresses) if @dependent.addresses.is_a? ActionController::Parameters
+      init_address_for_dependent
       respond_to do |format|
         format.html { render 'edit' }
         format.js { render 'edit' }
@@ -143,5 +146,13 @@ private
     document.update_attributes(doc_params[:vlp_documents_attributes].first.last)
     add_document_errors_to_dependent(@dependent, document)
     return document.errors.blank?
+  end
+
+  def init_address_for_dependent
+    if @dependent.same_with_primary == "true"
+      @dependent.addresses = Address.new(kind: 'home')
+    elsif @dependent.addresses.is_a? ActionController::Parameters
+      @dependent.addresses = Address.new(@dependent.addresses.try(:permit!))
+    end
   end
 end

@@ -22,7 +22,7 @@ describe HbxIdGenerator do
     }
 
     before(:each) do
-      allow(Acapi::Requestor).to receive(:request).with("sequence.next", {:sequence_name => sequence_name}).and_return(amqp_response)
+      allow(Acapi::Requestor).to receive(:request).with("sequence.next", {:sequence_name => sequence_name}, 2).and_return(amqp_response)
     end
 
     describe "for member ids" do

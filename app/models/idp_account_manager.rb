@@ -4,21 +4,19 @@ class IdpAccountManager
   attr_accessor :provider
   include Singleton
 
+  CURAM_NAVIGATION_FLAG = "2"
+  ENROLL_NAVIGATION_FLAG = "1"
+
   def initialize
     @provider = AmqpSource
   end
 
   def check_existing_account(personish, timeout = 5)
-    person_details = {
-      :first_name => personish.first_name,
-      :last_name => personish.last_name,
-      :dob => personish.dob.strftime("%Y%m%d")
-    }
-    if !personish.ssn.blank?
-      person_details[:ssn] = personish.ssn 
-    end
     provider.check_existing_account(
-      person_details,
+      personish.first_name,
+      personish.last_name,
+      personish.ssn,
+      personish.dob,
       timeout
     )
   end
@@ -45,12 +43,20 @@ class IdpAccountManager
     }, timeout)
   end
 
+  def update_navigation_flag(lu, email, flag)
+    provider.update_navigation_flag(lu, email, flag)
+  end
+
   def self.set_provider(prov)
     self.instance.provider = prov
   end
 
   def self.slug!
     self.set_provider(SlugSource)
+  end
+
+  def self.update_navigation_flag(lu, email, flag)
+    self.instance.update_navigation_flag(lu, email, flag)
   end
 
   def self.check_existing_account(personish, timeout = 5)
@@ -63,19 +69,26 @@ class IdpAccountManager
 
   class AmqpSource
     extend Acapi::Notifiers
-    def self.check_existing_account(args, timeout = 5)
-      invoke_service("account_management.check_existing_account", args, timeout) do |code|
-        case code
-        when "404"
-          :not_found
-        when "409"
-          :too_many_matches
-        when "302"
-          :existing_account
-        else
-          :service_unavailable
-        end
+    def self.check_existing_account(fname,lname,ssn,dob, timeout = 5)
+      found_users = CuramUser.search_for(
+        fname,
+        lname,
+        ssn,
+        dob
+      )
+      case found_users.count
+      when 1
+        :existing_account
+      when 0
+        :not_found
+      else
+        :too_many_matches
       end
+    end
+
+    def self.update_navigation_flag(legacy_username, email, flag)
+      lu = (legacy_username.blank? ? email : legacy_username)
+      notify("acapi.info.events.account_management.update_navigation_flag",{ :email => email, :flag => flag, :legacy_username => lu})
     end
 
     def self.create_account(args, timeout = 5)
@@ -99,11 +112,14 @@ class IdpAccountManager
   end
 
   class SlugSource
+    def self.update_navigation_flag(legacy_username, email, flag)
+    end
+
     def self.create_account(args, timeout = 5)
       :created
     end
 
-    def self.check_existing_account(args, timeout = 5)
+    def self.check_existing_account(fname, lname, ssn, dob, timeout = 5)
       :not_found
     end
   end
@@ -113,4 +129,3 @@ end
 unless Rails.env.production?
   IdpAccountManager.slug!
 end
-

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "shared/_reference_plans_list.html.erb" do
+describe "shared/_edit_reference_plans_list.html.erb" do
   let(:mock_benefit_group) { double(:plan_option_kind => nil, :persisted? => false, :carrier_for_elected_plan => nil, :metal_level_for_elected_plan => nil, :reference_plan_id => nil )}
   let(:mock_plan_year) { double(:metal_level_plans_for => []) }
   let(:carrier_profile1) {double(:id => "carrier_1", :legal_name => "org_name_1")}
@@ -14,7 +14,7 @@ describe "shared/_reference_plans_list.html.erb" do
     assign :carriers_array, [[carrier_profile1.legal_name, carrier_profile1.id], [carrier_profile2.legal_name, carrier_profile2.id]]
     assign :carrier_names, {}
     assign :plan_year, mock_plan_year
-    render "shared/reference_plans_list", :f => mock_form
+    render "shared/edit_reference_plans_list", :f => mock_form
   end
 
   it "should have a selection option for platinum" do

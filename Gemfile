@@ -56,6 +56,7 @@ gem 'acapi', git: "git://github.com/dchbx/acapi.git", branch: 'development'
 
 gem 'aasm', '~> 4.0.7'
 gem 'haml'
+gem 'sass'
 # gem 'bh'
 
 # spreadsheet support
@@ -79,6 +80,7 @@ gem 'bson', '2.3.0'
 
 gem 'language_list', '~> 1.1.0'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
+gem 'bootstrap-slider-rails'
 
 gem 'prawn', '~> 0.11.1'
 gem 'virtus'

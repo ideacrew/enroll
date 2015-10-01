@@ -1,0 +1,68 @@
+<fieldset id='benefit-group-<%= f.object.id.to_s %>' class='benefit-group-fields'>
+  <div style="height:50px;position:relative;">
+    <%= link_to '#', :class => "remove_fields close-2" do %>
+      <%= image_tag("delete.png") %>
+    <% end %>
+  </div>
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="row row-form-wrapper no-buffer">
+        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+          <% title_value = f.object.title.present? ? f.object.title : "#{Time.now.year} Employer Benefits" %>
+          <%= f.text_field :title, class: "floatlabel form-control", value: title_value, required: true, placeholder: 'TITLE' %>
+        </div>
+        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd benefit-group-offset" data-toggle="popover" data-placement="top" title="" data-content="For dates of hire on the 1st day of the month, coverage would start on the date of hire" data-trigger="hover">
+          <!-- Offset :  -->
+          <label class="title">1st day of the month following:</label>
+          <%= f.select(:effective_on_offset, options_for_select([["date of hire", 0], ["30 days after date of hire", 30], ["60 days after date of hire", 60]], selected: f.object.effective_on_offset), {:include_blank => true}, { :class => ''}) %>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer reference-plan-selection-controls">
+        <!-- Select Plan:  -->
+        <%= render "shared/edit_reference_plans_list", f: f %>
+      </div>
+    </div>
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="employer_cost_info" style='clear: both;'>
+        <div class='loader' style="display:none">
+          <button class="btn btn-md btn-warning">
+            <span class="glyphicon glyphicon-refresh spinning"></span> Loading...
+          </button>
+        </div>
+        <h4></h4>
+        <div class="content"></div>
+      </div>
+    </div>
+<!--
+    <div id="employer_cost_info_btn" class="col-md-12 col-sm-12 col-xs-12">
+      <div class="btn btn-select disabled pull-right">
+        Employee Costs
+      </div>
+      <% link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "employee_costs_link", class: "hidden" %>
+    </div>
+-->
+    <% render "employers/plan_years/employee_costs_modal" %>
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <h3> Relationship Benefits</h3>
+      <div class='form-inputs'>
+        <% f.object.relationship_benefits = generate_relationship_benefits(f.object) %>
+        <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
+        <%= render "shared/edit_relationship_benefit_fields", f: rb %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="col-md-12 col-sm-12 col-xs-12 top-pd">
+      <div class="reference_plan_info" style='clear: both;'>
+        <h4></h4>
+        <div class="content"></div>
+      </div>
+    </div>
+
+  </div>
+
+</fieldset>
+<div class="clear"></div>

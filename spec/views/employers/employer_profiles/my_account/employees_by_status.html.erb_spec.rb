@@ -5,6 +5,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   let(:census_employee1) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:census_employee2) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:census_employee3) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+  let(:census_employees) { [census_employee1, census_employee2, census_employee3] }
   let(:user) { FactoryGirl.create(:user) }
 
   before :each do
@@ -19,7 +20,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   end
 
   it "should displays enrollment state" do
-    assign(:census_employees, [census_employee1, census_employee2, census_employee3])
+    assign(:census_employees, census_employees)
     render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
     expect(rendered).to match(/Enrollment Status/)
     expect(rendered).to match(/Coverage selected/)
@@ -28,9 +29,11 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
 
   it "should displays search result title" do
     assign(:search, true)
-    assign(:census_employees, [census_employee1, census_employee2, census_employee3])
+    assign(:census_employees, census_employees)
     render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
-    expect(rendered).to match /Results found/
+    census_employees.each do |ce|
+      expect(rendered).to match /.*#{ce.first_name}.*#{ce.last_name}.*/
+    end
   end
 
   it "should displays no results found" do

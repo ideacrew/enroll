@@ -16,7 +16,7 @@
   <table class="total_table" border="0">
     <tbody>
       <tr class="wid50">
-        <td align="left"><%= format_date(Date.today) %></td>
+        <td align="left"><%= format_date(TimeKeeper.date_of_record) %></td>
         <td  align="right"><%= notice.primary_identifier %></td>
       </tr>
     </tbody>
@@ -35,7 +35,7 @@
   <table class="total_table" border="0">
     <tbody>
       <tr class="widn">
-        <td><strong>Congratulations!</strong> Based on the health insurance application you submitted on  <%= format_date(Date.today) %>:</td>
+        <td><strong>Congratulations!</strong> Based on the health insurance application you submitted on  <%= format_date(TimeKeeper.date_of_record) %>:</td>
       </tr>
       <tr><td></br></td></tr>
     </tbody>

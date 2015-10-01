@@ -7,6 +7,12 @@ class BrokerRole
   PROVIDER_KINDS = %W[broker assister]
   BROKER_UPDATED_EVENT_NAME = "acapi.info.events.broker.updated"
 
+  MARKET_KINDS_OPTIONS = {
+    "Individual & Family Marketplace ONLY" => "individual",
+    "Small Business Marketplace ONLY" => "shop",
+    "Both – Individual & Family AND Small Business Marketplaces" => "both"
+  }
+
   embedded_in :person
 
   field :aasm_state, type: String
@@ -16,6 +22,11 @@ class BrokerRole
   field :broker_agency_profile_id, type: BSON::ObjectId
   field :provider_kind, type: String
   field :reason, type: String
+
+  field :market_kind, type: String
+  field :languages_spoken, type: Array, default: ["en"]
+  field :working_hours, type: Boolean, default: false
+  field :accept_new_clients, type: Boolean
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -40,6 +51,14 @@ class BrokerRole
   scope :active,    ->{ any_in(aasm_state: ["applicant", "active", "broker_agency_pending"]) }
   scope :inactive,  ->{ any_in(aasm_state: ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"]) }
 
+  def self.by_npn(broker_npn)
+    person_records = Person.by_broker_role_npn(broker_npn)
+    return [] unless person_records.any?
+    person_records.select do |pr|
+      pr.broker_role.present? && 
+        (pr.broker_role.npn == broker_npn)
+    end.map(&:broker_role)
+  end
 
   def email_address
     return nil unless email.present?

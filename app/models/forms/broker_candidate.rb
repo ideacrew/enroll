@@ -6,8 +6,9 @@ module Forms
     include PeopleNames
     include NpnField
 
-
     attr_accessor :broker_agency_id, :broker_applicant_type
+    attr_accessor :market_kind, :languages_spoken, :working_hours, :accept_new_clients
+    attr_accessor :addresses
 
     validate :validate_broker_agency
     validate :validate_duplicate_npn, :if => Proc.new {|p| p.broker_applicant_type != 'staff'}
@@ -20,6 +21,11 @@ module Forms
 
     validates :email, :email => true, :allow_blank => false
 
+    def initialize(*attributes)
+      @addresses ||= []
+      ensure_addresses
+      super
+    end
 
     def save
       return false unless valid?
@@ -38,13 +44,22 @@ module Forms
         person.broker_role = ::BrokerRole.new( { 
             :provider_kind => 'broker', 
             :npn => self.npn, 
-            :broker_agency_profile => broker_agency_profile 
+            :broker_agency_profile => broker_agency_profile,
+            :market_kind => market_kind,
+            :languages_spoken => languages_spoken,
+            :working_hours => working_hours,
+            :accept_new_clients => accept_new_clients
             })
       else
         person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)
       end
 
       true
+    end
+
+    def match_or_create_person
+      super
+      person.addresses << @addresses.select(&:valid?)
     end
 
     def validate_broker_agency
@@ -63,6 +78,26 @@ module Forms
 
     def broker_role?
       self.broker_applicant_type == 'staff' ? false : true
+    end
+
+    def ensure_addresses
+      if @addresses.empty?
+        @addresses = [Address.new(kind: 'home')]
+      end
+    end
+
+    def addresses_attributes
+      @addresses.map do |address|
+        address.attributes
+      end
+    end
+
+    def addresses_attributes=(attrs)
+      @addresses = []
+      attrs.each_pair do |k, att_set|
+        @addresses << Address.new(att_set)
+      end
+      @addresses
     end
   end
 end
