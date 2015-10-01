@@ -109,7 +109,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
           end
 
           context "and today's date is before the deadline for first-of-next-month enrollment" do
-            let(:enroll_date)              { Date.current.end_of_month + 15.days }
+            let(:enroll_date)              { Date.new(2015,9,15).end_of_month + 15.days }
             let(:first_of_next_month_date) { enroll_date.end_of_month + 1.day }
 
             before do
@@ -126,7 +126,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
           end
 
           context "and today's date is after the deadline for first-of-next-month enrollment" do
-            let(:enroll_date)                   { Date.current.end_of_month + 16.days }
+            let(:enroll_date)                   { Date.new(2015,9,15).end_of_month + 16.days }
             let(:first_of_following_month_date) { enroll_date.next_month.end_of_month + 1.day }
 
             before do

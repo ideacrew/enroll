@@ -167,7 +167,7 @@ class Insured::ConsumerRolesController < ApplicationController
     end
 
     if params[:person][:consumer_role_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].nil? || params[:person][:consumer_role_attributes][:vlp_documents_attributes].first.nil?
-      add_document_errors_to_consumer_role(@consumer_role, ["document type", "can not blank"])
+      add_document_errors_to_consumer_role(@consumer_role, ["document type", "cannot be blank"])
       return false
     end
     doc_params = params.require(:person).permit({:consumer_role_attributes =>

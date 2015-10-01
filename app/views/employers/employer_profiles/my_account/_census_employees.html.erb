@@ -1,74 +1,120 @@
-<div class="container" id="employees-list">
-  <div class="row">
-    <div class="">
-      <div class="col-md-12 col-sm-12 col-xs-12 col-gn-top">
+<div id="add_employee_action"></div>
+<div class="col-xs-12 employees-tab">
 
-        <div id="add_employee_action"></div>
+<div class="employees-section">
+    <div class="row">
+  <div class="col-xs-6">
+    <h1>Employee Roster</h1>
+  </div>
+  <% if @census_employees.present? %>
+  <div class="col-xs-6">
+    <div class="col-xs-12">
 
-        <div id="employee_roster">
-          <div class="row">
-            <div class="col-md-3">
-                <h3 class="title-inline">Employee Roster</h3>
-            </div>
-
-            <div class="col-md-4">
-              <div class="form-inline button-group-wrapper">
-                  <div class="btn-group" role="group" aria-label="">
-                  <div class="btn-group" data-toggle="buttons" name="employee_family_tabs">
-                    <label class="btn btn-default active">
-                      <input type="radio" name="options" id="terminated_no" autocomplete="off" value="active" checked> Active
-                    </label>
-                    <label class="btn btn-default">
-                      <input type="radio" name="options" id="terminated_yes" autocomplete="off" value="terminated"> Terminated
-                    </label>
-                    <label class="btn btn-default">
-                      <input type="radio" name="options" id="family_all" autocomplete="off" value="all"> All
-                    </label>
-                  </div>
-                </div>
-                <span name="employee_families_url" style="display:none"><%= employers_employer_profile_path(@employer_profile) %></span>
-              </div>
-            </div>
-
-            <div class="col-md-3">
-              <%= form_tag employers_employer_profile_path(@employer_profile), method: :get, remote: true, class: 'input-no-pd', id: 'census_employee_search' do %>
-                <%= hidden_field_tag(:status, 'active') %>
-                <%= hidden_field_tag(:search, true) %>
-                <div class="input-group">
-                  <%= text_field_tag(:employee_name, params[:employee_name], placeholder: 'Employee Name', class: 'form-control') %>
-                  <div class="input-group-btn">
-                    <div class="btn btn-default" id='census_employee_search_clear'>
-                      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                    </div>
-                    <%= submit_tag "Search", class: 'btn btn-default' %>
-                  </div>
-                </div>
-              <% end %>
-            </div>
-            <script>
-              //$(function() {
-              //  $( "#employee_name" ).autocomplete({
-              //    source: <%= raw @avaliable_employee_names.to_s %>
-              //  });
-              //});
-            </script>
-
-            <div class="col-md-2 text-right">
-              <%= link_to 'Add Employee', new_employers_employer_profile_census_employee_path(@employer_profile), class: "btn btn-primary btn-br", remote: true %>
-            </div>
+      <div class="row">
+      <%= form_tag employers_employer_profile_path(@employer_profile), method: :get, remote: true, class: 'input-no-pd', id: 'census_employee_search' do %>
+      <%= hidden_field_tag(:status, 'active') %>
+      <%= hidden_field_tag(:search, true) %>
+      <div class="input-group">
+        <%= text_field_tag(:employee_name, params[:employee_name], placeholder: 'Employee Name', class: 'form-control') %>
+        <div class="input-group-btn">
+          <div class="btn btn-default" id='census_employee_search_clear'>
+            <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
           </div>
-
-          <div id="employee_families">
-            <div id="employees_active">
-              <%= render "employers/employer_profiles/my_account/employees_by_status", status: 'active' %>
-            </div>
-            <div id="employees_waived"></div>
-            <div id="employees_terminated"></div>
-            <div id="employees_all"></div>
-          </div>
-
+          <%= submit_tag "Search", class: 'btn btn-default' %>
         </div>
       </div>
+      <% end %>
+    </div>
     </div>
   </div>
+  <% end %>
+</div>
+
+  <div class="col-xs-12">
+    <div class="row">
+      <% if @census_employees.present? %>
+    <div class="col-xs-8">
+      <div class="row">
+
+<!--  non javascript click when clicked on new employee -->
+
+<!-- javascript click when clicked on new employee -->
+<%= link_to 'Add New Employee', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-trans" %>
+<%= link_to 'Upload Employee Roster', new_employers_employer_profile_census_employee_path(@employer_profile, modal: 'upload'), remote: 'true', class: "btn btn-trans" %>
+
+
+      </div>
+    </div>
+
+    <div class="col-xs-4" id="employees-filter">
+
+    <div class="filter" onclick="$(this).closest('.col-xs-4').find('.filter-options').toggle();">
+    Filter By <i class="fa fa-chevron-down"></i>
+    </div>
+    <div class="filter-options">
+      <h4>Filter By <i class="fa fa-chevron-up"></i></h4>
+      <div class="form-inline button-group-wrapper">
+        <div aria-label="" class="btn-group" role="group">
+          <div class="btn-group" data-toggle="buttons" name="employee_family_tabs">
+            <label class="btn btn-default active">
+              <input autocomplete="off" checked id="terminated_no" name="options" type="radio" value="active">
+              Active
+            </label>
+            <label class="btn btn-default">
+              <input autocomplete="off" id="terminated_yes" name="options" type="radio" value="terminated">
+              Terminated
+            </label>
+            <label class="btn btn-default">
+              <input autocomplete="off" id="family_all" name="options" type="radio" value="all">
+              All
+            </label>
+          </div>
+        </div>
+        <span name="employee_families_url" style="display:none"><%= employers_employer_profile_path(@employer_profile) %></span>
+      </div>
+
+
+
+    </div>
+
+  </div>
+  <% end %>
+    </div>
+    <% if @census_employees.present? %>
+<div class="row">
+
+    <%= render "employers/employer_profiles/my_account/employees_by_status", status: 'active' %>
+</div>
+    <div id="employee_roster">
+
+        <script>
+          //$(function() {
+          //  $( "#employee_name" ).autocomplete({
+          //    source: <%= raw @avaliable_employee_names.to_s %>
+          //  });
+          //});
+        </script>
+
+
+      <div id="employee_families">
+        <div id="employees_active">
+        </div>
+        <div id="employees_waived"></div>
+        <div id="employees_terminated"></div>
+        <div id="employees_all"></div>
+      </div>
+
+    </div>
+    <% else %>
+    <div class="row">
+    <h4 class="starter">You haven't added any employees to your roster. Click "Add New Employee" below to add your first one.</h4>
+    <br/>
+    <%= link_to 'Add New Employee', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-primary btn-br"  %>
+
+  </div>
+<% end %>
+
+
+
+</div></div><div>
 </div>

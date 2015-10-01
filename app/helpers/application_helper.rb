@@ -304,7 +304,7 @@ module ApplicationHelper
     # !params[:invitation_id].blank?
     true
   end
-  
+
   def override_backlink
     link=''
     if current_user.try(:has_hbx_staff_role?)
@@ -432,6 +432,7 @@ module ApplicationHelper
       ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"],
       ["Native Hawaiian", "Samoan", "Guamanian or Chamorro", ],
       ["Other Pacific Islander", "American Indian or Alaskan Native", "Other"]
+
     ].inject([]){ |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
     }

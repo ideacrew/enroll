@@ -124,7 +124,7 @@ Then(/\w+ should see the dependents form/) do
   @browser.a(text: /Add Member/).wait_until_present
   screenshot("dependents")
   expect(@browser.a(text: /Add Member/).visible?).to be_truthy
-end 
+end
 
 And(/Individual clicks on add member button/) do
   @browser.a(text: /Add Member/).wait_until_present
@@ -182,6 +182,7 @@ end
 
 And(/I click on continue button on group selection page/) do
   if !HbxProfile.current_hbx.under_open_enrollment?
+
     click_when_present(@browser.a(text: /I've had a baby/))
 
     @browser.text_field(id: /qle_date/).wait_until_present
@@ -189,7 +190,10 @@ And(/I click on continue button on group selection page/) do
 
     qle_form = @browser.div(class: /qle-form/)
     click_when_present(qle_form.a(class: /interaction-click-control-continue/))
+
     wait_and_confirm_text /SELECT EFFECTIVE ON KIND/i
+
+
     effective_field = @browser.div(class: /selectric-wrapper/, text: /SELECT EFFECTIVE ON KIND/i)
 
     click_when_present(effective_field)

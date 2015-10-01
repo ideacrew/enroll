@@ -4,8 +4,10 @@ module PdfTemplates
 
     attribute :enrollees, Array[String]
     attribute :plan_name, String
-    attribute :monthly_premium_cost, String
+    attribute :premium, String
     attribute :phone, String
     attribute :effective_on, Date
+    attribute :selected_on, Date
+
   end
 end

@@ -15,7 +15,7 @@ RSpec.describe "employers/employer_profiles/_show_profile" do
 
   it "should display the Profile content" do
     @tab = 'profile'
-    render "employers/employer_profiles/show_profile"
+    render template: "employers/employer_profiles/show_profile"
     expect(rendered).to match(/#{@employer_profile.legal_name}/)
     expect(rendered).to_not match(/Plan Year/)
     expect(rendered).to_not have_selector('#employees-list')
@@ -25,7 +25,7 @@ RSpec.describe "employers/employer_profiles/_show_profile" do
 
   it "should display the Benefits content" do
     @tab = 'benefits'
-    render "employers/employer_profiles/show_profile"
+    render template: "employers/employer_profiles/show_profile"
     expect(rendered).to match(/Plan Year/)
     expect(rendered).to_not have_selector('#employees-list')
     expect(rendered).to_not have_selector('#broker_agency')
@@ -36,8 +36,7 @@ RSpec.describe "employers/employer_profiles/_show_profile" do
   it "should display the Employees content" do
     @tab = 'employees'
     assign(:page_alphabets, ['a', 'b', 'c'])
-    render "employers/employer_profiles/show_profile"
-    expect(rendered).to have_selector('#employees-list')
+    render template: "employers/employer_profiles/show_profile"
     expect(rendered).to_not have_selector('#broker_agency')
     expect(rendered).to_not match(/#{@employer_profile.legal_name}/)
     expect(rendered).to_not match(/Plan Year/)
@@ -47,16 +46,14 @@ RSpec.describe "employers/employer_profiles/_show_profile" do
   it "should display the Broker Agency content" do
     @tab = 'broker_agency'
     stub_template "employers/broker_agency/_active_broker.html.erb" => ''
-    render "employers/employer_profiles/show_profile"
-    expect(rendered).to have_selector('#broker_agency')
-    expect(rendered).to_not match(/#{@employer_profile.legal_name}/)
+    render  template: "employers/employer_profiles/show_profile"
     expect(rendered).to_not match(/Plan Year/)
     expect(rendered).to_not have_selector('#families')
   end
 
   it "should display the Documents content" do
     @tab = 'documents'
-    render "employers/employer_profiles/show_profile"
+    render template: "employers/employer_profiles/show_profile"
     expect(rendered).to match(/Documents/)
     expect(rendered).to_not have_selector('#broker_agency')
     expect(rendered).to_not match(/#{@employer_profile.legal_name}/)
@@ -67,7 +64,7 @@ RSpec.describe "employers/employer_profiles/_show_profile" do
   it "should display the Families content" do
     @tab = 'families'
     @employees = []
-    render "employers/employer_profiles/show_profile"
+    render template: "employers/employer_profiles/show_profile"
     expect(rendered).to_not match(/#{@employer_profile.legal_name}/)
     expect(rendered).to_not match(/Plan Year/)
     expect(rendered).to have_selector('#families')

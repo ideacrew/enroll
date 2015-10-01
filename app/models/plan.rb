@@ -137,6 +137,7 @@ class Plan
   scope :dc_in_network, ->{ where(dc_in_network: "true") }
 
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
+  scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }
@@ -156,6 +157,7 @@ class Plan
   scope :valid_shop_by_metal_level_and_year, ->(metal_level, year) {where(active_year: year, market: "shop", metal_level: metal_level)}
 
   scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
+
 
   scope :shop_health_by_active_year, ->(active_year) {
       where(
@@ -191,7 +193,7 @@ class Plan
     }
 
   scope :by_health_metal_levels,                ->(metal_levels)    { any_in(metal_level: metal_levels) }
-  scope :by_carrier_profile,                    ->(carrier_profile) { where(carrier_profile_id: carrier_profile._id) }
+  scope :by_carrier_profile,                    ->(carrier_profile_id) { where(carrier_profile_id: carrier_profile_id) }
 
   scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
   scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }

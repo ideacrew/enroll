@@ -18,7 +18,7 @@ function supportRequiredForSafari() {
 
       for (var i=0; i<inputs.length; i++){
         var input=inputs[i];
-        var placeholder = ""
+        var placeholder = "fields with asterik";
 
         if(!input.value){
           switch(input.type)
@@ -30,14 +30,14 @@ function supportRequiredForSafari() {
               placeholder = "password";
               break;
             default:
-              if(placeholder != "") {
-                placeholder=input.placeholder? input.placeholder:input.getAttribute('placeholder');
+              if(input.placeholder != "fields with asterik") {
+                placeholder=input.placeholder ? input.placeholder : input.getAttribute('placeholder');
+                placeholder = typeof(placeholder) === 'string' ? placeholder.replace(" *", "") : "";
               }
           }
 
-          placeholder = typeof(placeholder) === 'string' ? placeholder.replace(" *", "") : "";
           alert('Please fill in ' + placeholder);
-          e.preventDefault&&e.preventDefault();
+          e.preventDefault && e.preventDefault();
           break;
         };
       };

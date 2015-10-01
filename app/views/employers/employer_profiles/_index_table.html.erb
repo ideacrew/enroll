@@ -6,11 +6,14 @@
     <th>EE Ct</th>
     <th>Enroll Status</th>
     <th>Effective Date</th>
+    <%if controller_name == 'profiles' %>
+    <th>Assigned Broker</th>
+    <% else %>
     <th>Broker Agency</th>
+    <% end %>
     <th>&nbsp;</th>
   </tr>
 </thead>
-
 <tbody>
   <% @employer_profiles.each do |er| %>
     <tr>
@@ -20,10 +23,19 @@
       <td><%= er.roster_size %></td>
       <td><%= er.aasm_state.humanize %></td>
       <td><%= er.published_plan_year.try(:effective_date) %></td>
+      <% if controller_name == 'profiles' %>
+        <% broker_agency_profile = er.active_broker_agency_account.broker_agency_profile %>
+        <% edit_path = edit_broker_agencies_profile_applicant_path(broker_agency_profile, er.active_broker) %>
+        <td>
+          <%= link_to er.active_broker.full_name, edit_path, class: "interaction-click-control-broker-show", method: :get %>
+        </td>
+      <% else %>
       <%- if er.active_broker_agency_account.present? %>
-        <td><%= link_to er.active_broker_agency_account.broker_agency_profile.legal_name, broker_agencies_profile_path(er.active_broker_agency_account.broker_agency_profile) %></td>
+        <% broker_agency_profile = er.active_broker_agency_account.broker_agency_profile %>
+        <td><%= link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile) %></td>
       <%- else %>
         <td>None selected</td>
+      <% end %>
       <% end %>
       <%- if @profile %>
       <td><%= link_to 'Send Secure Message'.html_safe, new_employers_inbox_path(id: er.id, profile_id: @profile._id, to: er.legal_name), class: "btn btn-default", remote: true %></td>

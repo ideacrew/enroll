@@ -9,20 +9,21 @@ class Products::QhpController < ApplicationController
 
     @standard_component_ids = params[:standard_component_ids]
     @hbx_enrollment_id = params[:hbx_enrollment_id]
+    @active_year = params[:active_year]
 
     if @market_kind == 'employer_sponsored' and @coverage_kind == 'health'
       @benefit_group = @hbx_enrollment.benefit_group
       @reference_plan = @benefit_group.reference_plan
-      @qhps = Products::Qhp.where(:standard_component_id.in => found_params, active_year: params[:active_year].to_i).to_a.each do |qhp|
+      @qhps = Products::Qhp.where(:standard_component_id.in => found_params, active_year: @active_year.to_i).to_a.each do |qhp|
         qhp[:total_employee_cost] = PlanCostDecorator.new(qhp.plan, @hbx_enrollment, @benefit_group, @reference_plan).total_employee_cost
       end
     else
-      tax_household = current_user.person.primary_family.latest_household.tax_households.last
+      tax_household = current_user.person.primary_family.latest_household.latest_active_tax_household
       elected_aptc_pct = session[:elected_aptc_pct]
       elected_aptc_pct = elected_aptc_pct.present? ? elected_aptc_pct.to_f : 0.85
 
-      @qhps = Products::Qhp.where(:standard_component_id.in => found_params, active_year: params[:active_year].to_i).to_a.select do |qhp|
-        params["standard_component_ids"].include? qhp.plan.try(:hios_id).try(:to_s)
+      @qhps = Products::Qhp.where(:standard_component_id.in => found_params, active_year: @active_year.to_i).to_a.select do |qhp|
+        @standard_component_ids.include? qhp.plan.try(:hios_id).try(:to_s)
       end
       @qhps = @qhps.each do |qhp|
         qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.plan, @hbx_enrollment, elected_aptc_pct, tax_household).total_employee_cost
