@@ -1,4 +1,10 @@
-<%= form_tag (is_under_open_enrollment? ? new_insured_group_selection_path : find_sep_insured_families_path), method: :get do %>
+<% action_path = new_insured_group_selection_path %>
+
+<% if !@employee_role.present? && !is_under_open_enrollment? %>
+  <% action_path = find_sep_insured_families_path %>
+<% end %>
+
+<%= form_tag action_path, method: :get do %>
 
   <% if @hbx_enrollments.present? %>
     <%= hidden_field_tag 'change_plan', 'change_plan' %>

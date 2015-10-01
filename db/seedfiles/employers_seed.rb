@@ -62,41 +62,6 @@ jetson_0 = CensusEmployee.new(
     ]
   ).save!
 
-spacely_plan_year = spacely_employer_profile.plan_years.build(
-    start_on: 0.days.ago.beginning_of_year.to_date,
-    end_on: 0.days.ago.end_of_year.to_date,
-    open_enrollment_start_on: (0.days.ago.beginning_of_year.to_date - 2.months).beginning_of_month,
-    open_enrollment_end_on: (0.days.ago.beginning_of_year.to_date - 2.months).end_of_month,
-    fte_count: 3,
-    pte_count: 2
-  )
-
-spacely_plan = Plan.create(
-    active_year: 2015,
-    hios_id: "123523",
-    name: "BlueChoice 123 Silver 100",
-    coverage_kind: "health",
-    metal_level: "silver",
-    market: "individual",
-    carrier_profile_id: CarrierProfile.last.id
-  )
-
-spacely_benefit_group = spacely_plan_year.benefit_groups.build(
-    effective_on_kind:  "date_of_hire",
-    terminate_on_kind:  "end_of_month",
-    plan_option_kind: "single_plan", 
-    effective_on_offset:  30,
-    employer_max_amt_in_cents:  1000_00,
-    elected_plan_ids: [spacely_plan._id],
-    reference_plan: spacely_plan
-  )
-
-spacely_benefit_group.relationship_benefits.build(
-    relationship: "employee",
-    premium_pct: 60,
-    employer_max_amt: 1000.00,
-    offered: true
-  )
 spacely.save!
 
 
@@ -118,41 +83,6 @@ jetson_1 = CensusEmployee.new(
         employer_profile: cogswell_employer_profile, is_business_owner: false,
       ).save!
 
-cogswell_plan_year = cogswell_employer_profile.plan_years.build(
-    start_on: 0.days.ago.beginning_of_year.to_date,
-    end_on: 0.days.ago.end_of_year.to_date,
-    open_enrollment_start_on: (0.days.ago.beginning_of_year.to_date - 2.months).beginning_of_month,
-    open_enrollment_end_on: (0.days.ago.beginning_of_year.to_date - 2.months).end_of_month,
-    fte_count: 30,
-    pte_count: 21
-  )
-
-cogswell_plan = Plan.create(
-    active_year: 2015,
-    hios_id: "120523",
-    name: "United 123 Silver 900",
-    coverage_kind: "health",
-    metal_level: "bronze",
-    market: "individual",
-    carrier_profile_id: CarrierProfile.first.id
-  )
-
-cogswell_benefit_group = cogswell_plan_year.benefit_groups.build(
-    effective_on_kind:  "date_of_hire",
-    terminate_on_kind:  "end_of_month",
-    plan_option_kind: "single_plan",
-    effective_on_offset:  30,
-    employer_max_amt_in_cents:  1000_00,
-    elected_plan_ids: [cogswell_plan._id],
-    reference_plan: cogswell_plan
-  )
-
-cogswell_benefit_group.relationship_benefits.build(
-    relationship: "employee",
-    premium_pct: 80,
-    employer_max_amt: 500.00,
-    offered: true
-  )
 cogswell.save!
 
 puts "::: Creating addresses for office location :::"
@@ -191,41 +121,7 @@ org_1_jetson = CensusEmployee.new(
     ]
   ).save!
 
-org_1_plan_year = org_1_employer_profile.plan_years.build(
-    start_on: 0.days.ago.beginning_of_year.to_date,
-    end_on: 0.days.ago.end_of_year.to_date,
-    open_enrollment_start_on: (0.days.ago.beginning_of_year.to_date - 2.months).beginning_of_month,
-    open_enrollment_end_on: (0.days.ago.beginning_of_year.to_date - 2.months).end_of_month,
-    fte_count: 12,
-    pte_count: 1
-  )
 
-org_1_plan = Plan.create(
-    active_year: 2015,
-    hios_id: "191503",
-    name: "UHC 123 Silver 900",
-    coverage_kind: "health",
-    metal_level: "silver",
-    market: "individual",
-    carrier_profile_id: CarrierProfile.last.id
-  )
-
-org_1_benefit_group = org_1_plan_year.benefit_groups.build(
-    effective_on_kind:  "date_of_hire",
-    terminate_on_kind:  "end_of_month",
-    plan_option_kind: "single_plan", 
-    effective_on_offset:  30,
-    employer_max_amt_in_cents:  500_00,
-    elected_plan_ids: [org_1_plan._id],
-    reference_plan: org_1_plan
-  )
-
-org_1_benefit_group.relationship_benefits.build(
-    relationship: "employee",
-    premium_pct: 85,
-    employer_max_amt: 300.00,
-    offered: true
-  )
 org_1.save!
 
 org_2_add = Address.new(kind: "work", address_1: "823 Cosmic Way, NW", city: "Washington", state: "DC", zip: "20001")
@@ -262,41 +158,6 @@ org_2_jetson = CensusEmployee.new(
     ]
   ).save!
 
-org_2_plan_year = org_2_employer_profile.plan_years.build(
-    start_on: 0.days.ago.beginning_of_year.to_date,
-    end_on: 0.days.ago.end_of_year.to_date,
-    open_enrollment_start_on: (0.days.ago.beginning_of_year.to_date - 2.months).beginning_of_month,
-    open_enrollment_end_on: (0.days.ago.beginning_of_year.to_date - 2.months).end_of_month,
-    fte_count: 12,
-    pte_count: 1
-  )
-
-org_2_plan = Plan.create(
-    active_year: 2015,
-    hios_id: "194303",
-    name: "Aetna 8913 Silver 900",
-    coverage_kind: "health",
-    metal_level: "gold",
-    market: "individual",
-    carrier_profile_id: CarrierProfile.first.id
-  )
-
-org_2_benefit_group = org_2_plan_year.benefit_groups.build(
-    effective_on_kind:  "date_of_hire",
-    terminate_on_kind:  "end_of_month",
-    plan_option_kind: "single_plan", 
-    effective_on_offset:  30,
-    employer_max_amt_in_cents:  500_00,
-    elected_plan_ids: [org_2_plan._id],
-    reference_plan: org_2_plan
-  )
-
-org_2_benefit_group.relationship_benefits.build(
-    relationship: "employee",
-    premium_pct: 65,
-    employer_max_amt: 100.00,
-    offered: true
-  )
 org_2.save!
 
 puts "::: Employers seed complete :::"

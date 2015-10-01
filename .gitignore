@@ -26,11 +26,16 @@ db/data
 db/seedfiles/**/*.xml
 db/seedfiles/**/*.xls
 db/seedfiles/**/*.xlsx
+db/seedfiles/**/*.bson
+db/seedfiles/**/*.json
 # db/seedfiles/*.csv
 db/seedfiles/*.yml
 
 # Ignore Mongoid connection file
 # config/mongoid.yml
+
+# Ignore Saml Yaml
+config/saml.yml
 
 # Ignore the gem folder
 /gems
@@ -46,3 +51,4 @@ __MACOSX
 tags
 
 spec/vocabularies
+plan_xmls.zip

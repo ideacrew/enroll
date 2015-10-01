@@ -16,25 +16,19 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS BROKER" do
   it "should display the standard tabs for Employer [broker and employer control]" do
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
-    render "employers/employer_profiles/primary_nav"
-    expect(rendered).to have_selector('a', :text=>'Home')
-    expect(rendered).to have_selector('small', :text=>'Profile')
-    expect(rendered).to match(/tab=profile/)
-    expect(rendered).to have_selector('small', :text=>'Benefits')
-    expect(rendered).to match(/tab=benefits/)
-    expect(rendered).to have_selector('small', :text=>'Employees')
+    render "employers/employer_profiles/primary_nav", active_tab: "home"
+    expect(rendered).to have_selector('a', text: /my dc health link/i)
+    expect(rendered).to match(/li.*class.*active.*my dc health link/mi)
     expect(rendered).to match(/tab=employees/)
-    expect(rendered).to have_selector('small', :text=>'Documents')
+    expect(rendered).to match(/tab=benefits/)
     expect(rendered).to match(/tab=documents/)
+    expect(rendered).to match(/tab=brokers/)
   end
   it "should show different tabs when Broker not employer" do
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
-    render "employers/employer_profiles/primary_nav"
-    expect(rendered).to_not have_selector('small', :text=>'Inbox')
-    expect(rendered).to have_selector('small', :text=>'Families')
-    expect(rendered).to match(/tab=families/)
-    expect(rendered).to_not match(/broker_agency\/active_broker/)
+    render "employers/employer_profiles/primary_nav", active_tab: "brokers"
+    expect(rendered).to match(/li.*class.*active.*brokers/mi)
   end
 end
 RSpec.describe "employers/employer_profiles/_primary_nav AS EMPLOYER" do
@@ -47,24 +41,13 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS EMPLOYER" do
   end
   it "should display the standard tabs for Employer[broker and employer control]" do
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
-    render "employers/employer_profiles/primary_nav"
-    expect(rendered).to have_selector('a', :text=>'Home')
-    expect(rendered).to have_selector('small', :text=>'Profile')
-    expect(rendered).to match(/tab=profile/)
-    expect(rendered).to have_selector('small', :text=>'Benefits')
-    expect(rendered).to match(/tab=benefits/)
-    expect(rendered).to have_selector('small', :text=>'Employees')
-    expect(rendered).to match(/tab=employees/)
-    expect(rendered).to have_selector('small', :text=>'Documents')
-    expect(rendered).to match(/tab=documents/)
+    render "employers/employer_profiles/primary_nav", active_tab: "brokers"
+    expect(rendered).to match(/tab=inbox/)
   end 
 
   it "should display different tabs for Employer" do
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
-    render "employers/employer_profiles/primary_nav"
-    expect(rendered).to have_selector('small', :text=>'Inbox')
-    expect(rendered).to_not have_selector('small', :text=>'Families')
-    expect(rendered).to_not match(/tab=familiess/)
-    expect(rendered).to match(/broker_agency\/active_broker/)
+    render "employers/employer_profiles/primary_nav", active_tab: "benefits"
+    expect(rendered).to match(/li.*class.*active.*benefits/mi)
   end
 end

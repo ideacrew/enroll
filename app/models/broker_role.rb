@@ -2,8 +2,16 @@ class BrokerRole
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
+  include Acapi::Notifiers
 
   PROVIDER_KINDS = %W[broker assister]
+  BROKER_UPDATED_EVENT_NAME = "acapi.info.events.broker.updated"
+
+  MARKET_KINDS_OPTIONS = {
+    "Individual & Family Marketplace ONLY" => "individual",
+    "Small Business Marketplace ONLY" => "shop",
+    "Both – Individual & Family AND Small Business Marketplaces" => "both"
+  }
 
   embedded_in :person
 
@@ -14,6 +22,11 @@ class BrokerRole
   field :broker_agency_profile_id, type: BSON::ObjectId
   field :provider_kind, type: String
   field :reason, type: String
+
+  field :market_kind, type: String
+  field :languages_spoken, type: Array, default: ["en"]
+  field :working_hours, type: Boolean, default: false
+  field :accept_new_clients, type: Boolean
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -38,6 +51,14 @@ class BrokerRole
   scope :active,    ->{ any_in(aasm_state: ["applicant", "active", "broker_agency_pending"]) }
   scope :inactive,  ->{ any_in(aasm_state: ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"]) }
 
+  def self.by_npn(broker_npn)
+    person_records = Person.by_broker_role_npn(broker_npn)
+    return [] unless person_records.any?
+    person_records.select do |pr|
+      pr.broker_role.present? && 
+        (pr.broker_role.npn == broker_npn)
+    end.map(&:broker_role)
+  end
 
   def email_address
     return nil unless email.present?
@@ -184,12 +205,12 @@ class BrokerRole
     state :broker_agency_declined
     state :broker_agency_terminated
 
-    event :approve, :after => :record_transition do
+    event :approve, :after => [:record_transition, :send_invitation, :notify_updated] do
       transitions from: :applicant, to: :active, :guard => :is_primary_broker?
       transitions from: :applicant, to: :broker_agency_pending
     end
 
-    event :broker_agency_accept, :after => :record_transition do 
+    event :broker_agency_accept, :after => [:record_transition, :send_invitation, :notify_updated] do 
       transitions from: :broker_agency_pending, to: :active
     end
 
@@ -201,7 +222,7 @@ class BrokerRole
       transitions from: :active, to: :broker_agency_terminated
     end
 
-    event :deny, :after => :record_transition  do
+    event :deny, :after => [:record_transition, :notify_broker_denial]  do
       transitions from: :applicant, to: :denied
     end
 
@@ -219,6 +240,11 @@ class BrokerRole
       transitions from: [:active, :broker_agency_pending, :broker_agency_terminated], to: :applicant
     end  
   end
+
+  def notify_updated
+    notify(BROKER_UPDATED_EVENT_NAME, { :broker_id => self.npn } )
+  end
+
 
   private
 
@@ -240,6 +266,16 @@ class BrokerRole
       from_state: aasm.from_state,
       to_state: aasm.to_state
     )
+  end
+
+  def send_invitation
+    if active?
+      Invitation.invite_broker!(self)
+    end
+  end
+
+  def notify_broker_denial
+    UserMailer.broker_denied_notification(self).deliver_now
   end
 
   def applicant?

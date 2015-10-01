@@ -1,0 +1,44 @@
+<% content_for :navigation do %>
+  <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
+<% end %>
+<div class="col-xs-12 premium-reports-tab">
+  <div class="row no-buffer">
+    <h1>Premium Billing Report
+    <% if @current_plan_year.present? %>
+      <%= @current_plan_year.start_on %> - <%= @current_plan_year.start_on.end_of_month %></h1>
+    <% end %>
+  </div>
+  <div class="premium-reports-table">
+  <div class="row no-buffer table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>SSN</th>
+          <th>DOB</th>
+          <th>Hired</th>
+          <th>Benefit Group</th>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Issuer</th>
+          <th>Covered Ct</th>
+          <th>Employer Contribution</th>
+          <th>Employee Premium</th>
+          <th>Total Premium</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @hbx_enrollments.present? %>
+          <% @hbx_enrollments.each do |hbx_enrollment| %>
+            <%= render "employee_line_item", census_employee: hbx_enrollment.try(:subscriber).try(:person).try(:employee_roles).try(:first).try(:census_employee), enrollment: hbx_enrollment %>
+          <% end %>
+        <% else %>
+          <tr> <td colspan="12" style="text-align: left;">No employees enrolled.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div><br>
+  <%= button_to 'Output to CSV', employers_premium_statement_path(@employer_profile, format: :csv), method: :get, class: 'btn btn-trans' %>
+  <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'home'), class: 'btn btn-trans' %>
+</div>

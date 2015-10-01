@@ -7,6 +7,7 @@ module Parser
     element :standard_component_id, String, tag: 'standardComponentID'
     element :plan_marketing_name, String, tag: 'planMarketingName'
     element :hios_product_id, String, tag: 'hiosProductID'
+    element :ehb_percent_premium, String, tag: 'ehbPercentPremium'
     element :hpid, String, tag: 'hpid'
     element :network_id, String, tag: 'networkID'
     element :service_area_id, String, tag: 'serviceAreaID'
@@ -84,6 +85,7 @@ module Parser
         out_of_service_area_coverage: out_of_service_area_coverage.gsub(/\n/,'').strip,
         out_of_service_area_coverage_description: out_of_service_area_coverage_description.gsub(/\n/,'').strip,
         national_network: national_network.gsub(/\n/,'').strip,
+        ehb_percent_premium: (ehb_percent_premium.present? ? ehb_percent_premium.gsub(/\n/,'').strip : ""),
         summary_benefit_and_coverage_url: (summary_benefit_and_coverage_url.gsub(/\n/,'').strip rescue ""),
         enrollment_payment_url: enrollment_payment_url.gsub(/\n/,'').strip,
         plan_brochure: (plan_brochure.gsub(/\n/,'').strip rescue "")

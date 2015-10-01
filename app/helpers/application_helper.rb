@@ -1,5 +1,5 @@
 module ApplicationHelper
-  
+
   def menu_tab_class(a_tab, current_tab)
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
@@ -56,7 +56,7 @@ module ApplicationHelper
   end
 
   def format_datetime(date_value)
-    date_value.strftime("%m/%d/%Y %H:%M UTC") if date_value.respond_to?(:strftime)
+    date_value.to_time.strftime("%m/%d/%Y %H:%M %Z %:z") if date_value.respond_to?(:strftime)
   end
 
   # Builds a Dropdown button
@@ -271,6 +271,7 @@ module ApplicationHelper
   end
 
   def retrieve_show_path(provider, message)
+    return broker_agencies_inbox_path(provider, message_id: message.id) if provider.try(:broker_role)
     case(provider.model_name.name)
     when "Person"
       insured_inbox_path(provider, message_id: message.id)
@@ -284,8 +285,9 @@ module ApplicationHelper
   end
 
   def retrieve_inbox_path(provider, folder: 'inbox')
+    broker_agency_mailbox =  broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
+    return broker_agency_mailbox if provider.try(:broker_role)
     case(provider.model_name.name)
-
     when "EmployerProfile"
       inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
     when "HbxProfile"
@@ -303,35 +305,6 @@ module ApplicationHelper
     true
   end
 
-  def portal_display_name(controller)
-    if current_user.nil?
-      "Welcome to the District's Health Insurance Marketplace"
-    elsif current_user.try(:has_hbx_staff_role?)
-      "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm HBX Staff".html_safe
-    elsif current_user.try(:has_broker_agency_staff_role?) && current_user.person.broker_role
-      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe,
-      broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id)
-    elsif current_user.try(:person).try(:csr_role) && current_user.person.csr_role.cac
-      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Certified Applicant Counselor".html_safe,
-      home_exchanges_agents_path
-    elsif current_user.try(:person).try(:csr_role) && !current_user.person.csr_role.cac
-      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Customer Service Representative".html_safe,
-      home_exchanges_agents_path
-    elsif current_user.try(:person).try(:assister_role)
-      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm an In Person Assister".html_safe,
-      home_exchanges_agents_path
-    elsif (controller_path.include?("insured") && current_user.try(:has_insured_role?)) ||
-      (["employee_roles", "consumer_roles"].include?(controller))
-      "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an Insured".html_safe
-    elsif current_user.try(:has_broker_agency_staff_role?)
-      "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe
-    elsif current_user.try(:has_employer_staff_role?)
-      "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe
-    else
-      "Welcome to the District's Health Insurance Marketplace"
-    end
-  end
-
   def override_backlink
     link=''
     if current_user.try(:has_hbx_staff_role?)
@@ -343,6 +316,7 @@ module ApplicationHelper
   end
 
   def display_carrier_logo(carrier_name, options = {:width => 50})
+    carrier_name = "Dominion Dental" if carrier_name.downcase == "dominion"
     if carrier_name.present?
       image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
     end
@@ -377,6 +351,13 @@ module ApplicationHelper
       else
       end
     end
+  end
+
+  def relationship_options(dependent, referer)
+    relationships = referer.include?("consumer_role_id") || @person.try(:has_active_consumer_role?) ?
+      BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS - ["self"] :
+      PersonRelationship::Relationships
+    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
   end
 
   def enrollment_progress_bar(plan_year, p_min, options = {:minimum => true})
@@ -434,12 +415,24 @@ module ApplicationHelper
     end
   end
 
+  def notice_eligible_enrolles(notice)
+    notice.enrollments.inject([]) do |enrollees, enrollment|
+      enrollees += enrollment.enrollees
+    end.uniq
+  end
+
+  def calculate_age_by_dob(dob)
+    now = TimeKeeper.date_of_record
+    now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+  end
+
   def ethnicity_collection
     [
-      ["White", "Black or African American", "Asian Indian" ],
-      ["Chinese", "Filipino", "Japanese", "Korean"], 
-      ["Vietnamese", "Other Asian", "Native Hawaiian", "Samon" ],
-      ["Guamanion or Chamorro", "Other pacific islander", "Other"]
+      ["White", "Black or African American", "Asian Indian", "Chinese" ],
+      ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"],
+      ["Native Hawaiian", "Samoan", "Guamanian or Chamorro", ],
+      ["Other Pacific Islander", "American Indian or Alaskan Native", "Other"]
+
     ].inject([]){ |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
     }
@@ -456,19 +449,11 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").try(:benefit_sponsorship)
-    if benefit_sponsorship.nil?
-      false
-    else
-      benefit_sponsorship.is_under_open_enrollment?
-    end
+    HbxProfile.current_hbx.under_open_enrollment?
   end
 
   def ivl_enrollment_effective_date
-    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").try(:benefit_sponsorship)
-    if benefit_sponsorship
-      benefit_sponsorship.earliest_effective_date
-    end
+    HbxProfile.current_hbx.benefit_sponsorship.earliest_effective_date
   end
 
   def find_document(consumer_role, subject)
@@ -483,5 +468,41 @@ module ApplicationHelper
     return "" unless value.present?
     value = value.select{|a| a.present? }  if value.present?
     value.present? ? value.join(", ") : ""
+  end
+
+  def incarceration_cannot_purchase(family_member)
+    pronoun = family_member.try(:gender)=='male' ? ' he ':' she '
+    name=family_member.try(:first_name) || ''
+    result = "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on DC Health Link.<br/> Other family members may still be eligible to enroll. <br/>Please call us at 1-855-532-5465 to learn about other health insurance options for " + name
+  end
+
+  def generate_options_for_effective_on_kinds(effective_on_kinds, qle_date)
+    return [] if effective_on_kinds.blank?
+
+    options = []
+    effective_on_kinds.each do |kind|
+      case kind
+      when 'date_of_event'
+        options << ["#{kind.humanize}(#{qle_date.to_s})", kind]
+      when 'fixed_first_of_next_month'
+        options << ["#{kind.humanize}(#{(qle_date.end_of_month + 1.day).to_s})", kind]
+      end
+    end
+
+    options
+  end
+
+  def purchase_or_confirm #TODO #TODOJF Maybe both roles?
+    if @person.try(:consumer_role)
+      'Confirm'
+    else
+      'Purchase'
+    end
+  end
+  def get_key_and_bucket(uri)
+    splits = uri.split('#')
+    key = splits.last
+    bucket =splits.first.split(':').last
+    [key, bucket]
   end
 end

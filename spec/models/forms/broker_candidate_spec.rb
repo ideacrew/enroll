@@ -12,7 +12,11 @@ describe Forms::BrokerCandidate do
     dob: "1993-06-03",
     email: "useraccount@gmail.com", 
     npn: "234567895",
-    broker_agency_id: @broker_agency_profile.id
+    broker_agency_id: @broker_agency_profile.id,
+    market_kind: 'shop',
+    languages_spoken: ['en'],
+    working_hours: true,
+    accept_new_clients: false
     }.merge(other_attributes) }
 
   let(:other_attributes) { { } }
@@ -23,6 +27,22 @@ describe Forms::BrokerCandidate do
 
   before (:all) do
     @broker_agency_profile = FactoryGirl.create(:broker_agency).broker_agency_profile
+  end
+
+  it "should have addresses when initialize" do
+    broker = Forms::BrokerCandidate.new()
+    expect(broker.addresses.class).to eq Array
+    expect(broker.addresses.first.kind).to eq 'home'
+  end
+
+  context 'when email address invalid' do 
+
+    it 'should have error on email' do 
+      broker = Forms::BrokerCandidate.new(attributes.merge({email: ""}))
+      broker.valid?
+      expect(broker).to have_errors_on(:email)
+      expect(broker.errors[:email]).to eq(["can't be blank", "is not valid"])
+    end
   end
 
   context 'when data missing' do 
@@ -152,6 +172,10 @@ describe Forms::BrokerCandidate do
           expect(person.broker_agency_staff_roles).to be_empty
           expect(person.broker_role.npn).to eq(attributes[:npn])
           expect(person.broker_role.broker_agency_profile_id).to eq(attributes[:broker_agency_id])
+          expect(person.broker_role.market_kind).to eq attributes[:market_kind]
+          expect(person.broker_role.languages_spoken).to eq attributes[:languages_spoken]
+          expect(person.broker_role.working_hours).to eq attributes[:working_hours]
+          expect(person.broker_role.accept_new_clients).to eq attributes[:accept_new_clients]
         end
       end
 
@@ -174,6 +198,10 @@ describe Forms::BrokerCandidate do
           expect(person.broker_agency_staff_roles).to be_empty
           expect(person.broker_role.npn).to eq(attributes[:npn])
           expect(person.broker_role.broker_agency_profile_id).to eq(attributes[:broker_agency_id])
+          expect(person.broker_role.market_kind).to eq attributes[:market_kind]
+          expect(person.broker_role.languages_spoken).to eq attributes[:languages_spoken]
+          expect(person.broker_role.working_hours).to eq attributes[:working_hours]
+          expect(person.broker_role.accept_new_clients).to eq attributes[:accept_new_clients]
         end
       end
     end
@@ -215,6 +243,36 @@ describe Forms::BrokerCandidate do
           expect(person.broker_role).to be_falsey
           expect(person.broker_agency_staff_roles.count).to eq(1)
           expect(person.broker_agency_staff_roles[0].broker_agency_profile_id).to eq(attributes[:broker_agency_id])
+        end
+      end
+
+      context 'address' do
+        let(:other_attributes) { {
+          :addresses_attributes => {"0" => {
+            kind: 'home',
+            address_1: 'street',
+            city: 'NewYork',
+            state: 'DC',
+            zip: '12345'
+          }}
+        }}
+
+        before (:each) do 
+          Person.delete_all
+          FactoryGirl.create(:person, first_name: subject.first_name, last_name: subject.last_name, dob: subject.dob)
+        end
+
+        it 'should update existing person with addresses' do
+          expect(Person.where(first_name: subject.first_name, last_name: subject.last_name, dob: subject.dob)).not_to be_empty
+          subject.save
+
+          person = Person.where(first_name: subject.first_name, last_name: subject.last_name, dob: subject.dob).first
+
+          expect(person).to be_truthy
+          expect(person.addresses.last.address_1).to eq 'street'
+          expect(person.addresses.last.city).to eq 'NewYork'
+          expect(person.addresses.last.state).to eq 'DC'
+          expect(person.addresses.last.zip).to eq '12345'
         end
       end
     end

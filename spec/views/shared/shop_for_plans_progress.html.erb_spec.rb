@@ -3,6 +3,7 @@ require 'rails_helper'
 describe "shared/_shop_for_plans_progress.html.erb" do
   let(:plan) { FactoryGirl.build(:plan) }
   let(:enrollment) { double(id: 'hbx_id') }
+  let(:person) { FactoryGirl.create(:person)}
 
   context "step 1" do
     before :each do
@@ -24,6 +25,8 @@ describe "shared/_shop_for_plans_progress.html.erb" do
       assign :change_plan, "change"
       assign :plan, plan
       assign :enrollment, enrollment
+      allow(person).to receive(:consumer_role).and_return(false)
+      @person = person
       render 'shared/shop_for_plans_progress', step: '2'
     end
 

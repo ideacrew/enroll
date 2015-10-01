@@ -1,0 +1,16 @@
+$('#benefit-group-<%= @benefit_group.to_s %> .reference-plans').before("<div class='col-xs-12 select-reference'><br><br><h1 class='row'>Select Your Reference Plan</h1><h4 style='position: relative;' class='row'><span class='starter' style='display: inline-block;'>Now choose a reference plan. Reference plans displayed here based on your selection of carrier, metal level, or single plan above.</span><span style='position: absolute; right: 0; bottom: 0;'>Displaying: <strong><%= @plans.count %> Plans</strong> </span></h4><br/></div>")
+$('#benefit-group-<%= @benefit_group.to_s %> .reference-plans').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/single_carriers", locals: { :plans => @plans, :benefit_group => @benefit_group  })).html_safe %>")
+
+$('#benefit-group-<%= @benefit_group.to_s %> .reference-plans').css({ "height": "450px", "y-overflow": "scroll" })
+$('#benefit-group-<%= @benefit_group.to_s %> .reference-plans').show();
+
+$('#benefit-group-<%= @benefit_group.to_s %> .reference-plan .col-xs-3').on('click', function() {
+  if ($(this).find('input[type=radio]').is(':checked')) {
+  } else {
+      $(this).find('input[type=radio]').prop('checked', true )
+      var id = $(this).find('input[type=radio]').attr('value');
+      $(this).closest('#benefit-group-<%= @benefit_group.to_s %>').find('.ref-plan.hidden-param').attr('value', id);
+  }
+
+});
+$('.controls').show();

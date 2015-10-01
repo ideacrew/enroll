@@ -1,5 +1,6 @@
 class EmployerProfile
-  BINDER_PREMIUM_PAID_EVENT_NAME = "local.enroll.employer.binder_premium_paid"
+  BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
+  EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
 
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -90,20 +91,19 @@ class EmployerProfile
     start_on = start_on.to_date.beginning_of_day
     if active_broker_agency_account.present?
       terminate_on = (start_on - 1.day).end_of_day
-      terminate_active_broker_agency(terminate_on)
+      fire_broker_agency(terminate_on)
     end
     broker_agency_accounts.build(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on)
     @broker_agency_profile = new_broker_agency
   end
 
-  alias_method :broker_agency_profile=, :hire_broker_agency
-
-  def terminate_active_broker_agency(terminate_on = today)
-    if active_broker_agency_account.present?
-      active_broker_agency_account.end_on = terminate_on
-      active_broker_agency_account.is_active = false
-    end
+  def fire_broker_agency(terminate_on = today)
+    return unless active_broker_agency_account
+    active_broker_agency_account.end_on = terminate_on
+    active_broker_agency_account.is_active = false
   end
+
+  alias_method :broker_agency_profile=, :hire_broker_agency
 
   def broker_agency_profile
     return @broker_agency_profile if defined? @broker_agency_profile
@@ -113,6 +113,12 @@ class EmployerProfile
   def active_broker_agency_account
     return @active_broker_agency_account if defined? @active_broker_agency_account
     @active_broker_agency_account = broker_agency_accounts.detect { |account| account.is_active? }
+  end
+
+  def active_broker
+    if active_broker_agency_account
+      Person.where("broker_role._id" => BSON::ObjectId.from_string(active_broker_agency_account.writing_agent_id)).first
+    end
   end
 
   def employee_roles
@@ -147,7 +153,7 @@ class EmployerProfile
   end
 
   def find_plan_year_by_date(target_date)
-    plan_years.to_a.detect { |py| (py.start_date.beginning_of_day..py.end_date.end_of_day).cover?(target_date) }
+    plan_years.to_a.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date) }
   end
 
   def find_plan_year(id)
@@ -326,6 +332,18 @@ class EmployerProfile
 
   end
 
+  after_update :broadcast_employer_update
+
+  def broadcast_employer_update
+    if previous_states.include?(:binder_paid) || (aasm_state.to_sym == :binder_paid)
+      notify(EMPLOYER_PROFILE_UPDATED_EVENT_NAME, {:employer_id => self.hbx_id})
+    end
+  end
+
+  def previous_states
+    self.workflow_state_transitions.map(&:from_state).uniq.map(&:to_sym)
+  end
+
   def within_open_enrollment_for?(t_date, effective_date)
     plan_years.any? do |py|
       py.open_enrollment_contains?(t_date) &&
@@ -354,7 +372,7 @@ class EmployerProfile
   end
 
   def notify_binder_paid
-    notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer => self})
+    notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer_id => self.hbx_id})
   end
 
 private

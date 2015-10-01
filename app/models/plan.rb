@@ -5,7 +5,7 @@ class Plan
 
   COVERAGE_KINDS = %w[health dental]
   METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental]
-  REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum]
+  REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental]
   MARKET_KINDS = %w(shop individual)
   PLAN_TYPE_KINDS = %w[pos hmo epo ppo]
 
@@ -17,6 +17,11 @@ class Plan
   field :carrier_profile_id, type: BSON::ObjectId
   field :metal_level, type: String
   field :hios_id, type: String
+  field :hios_base_id, type: String
+  field :csr_variant_id, type: String
+
+  field :hios_base_id, type: String
+  field :csr_variant_id, type: String
 
   field :name, type: String
   field :abbrev, type: String
@@ -24,6 +29,7 @@ class Plan
   field :ehb, type: Float, default: 0.0
 
   field :renewal_plan_id, type: BSON::ObjectId
+  field :is_standard_plan, type: Boolean, default: false
 
   field :minimum_age, type: Integer, default: 0
   field :maximum_age, type: Integer, default: 120
@@ -31,6 +37,7 @@ class Plan
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
   field :sbc_file, type: String
+  embeds_one :sbc_document, :class_name => "Document", as: :documentable
 
   embeds_many :premium_tables
   accepts_nested_attributes_for :premium_tables
@@ -40,10 +47,10 @@ class Plan
   field :deductible, type: String # Deductible
   field :family_deductible, type: String
   field :nationwide, type: Boolean # Nationwide
-  field :out_of_service_area_coverage, type: Boolean # DC In-Network or not
+  field :dc_in_network, type: Boolean # DC In-Network or not
 
   # In MongoDB, the order of fields in an index should be:
-  #   First: fields queried for exact values, in an order that most quickly reduces set 
+  #   First: fields queried for exact values, in an order that most quickly reduces set
   #   Second: fields used to sort
   #   Third: fields queried for a range of values
 
@@ -53,6 +60,21 @@ class Plan
   index({ renewal_plan_id: 1, name: 1 })
   index({ name: 1 })
 
+  # 2015, "94506DC0390006-01"
+  index(
+      {
+        active_year: 1,
+        hios_id: 1,
+        "premium_tables.age": 1,
+        "premium_tables.start_on": 1,
+        "premium_tables.end_on": 1
+      },
+      { name: "plan_premium_age" }
+    )
+
+  # 92479DC0020002, 2015, 32, 2015-04-01, 2015-06-30
+  index({ hios_id: 1, active_year: 1, "premium_tables.age": 1, "premium_tables.start_on": 1, "premium_tables.end_on": 1 }, {name: "plan_premium_age_deprecated"})
+
   # 2015, individual, health, gold
   index({ active_year: 1, market: 1, coverage_kind: 1, metal_level: 1, name: 1 })
 
@@ -61,9 +83,6 @@ class Plan
 
   # 2015, individual, health, uhc, gold
   index({ active_year: 1, market: 1, coverage_kind: 1, carrier_profile_id: 1, metal_level: 1, name: 1 })
-
-  # 92479DC0020002, 2015, 32, 2015-04-01, 2015-06-30
-  index({ hios_id: 1, active_year: 1, "premium_tables.age": 1, "premium_tables.start_on": 1, "premium_tables.end_on": 1 }, {name: "plan_premium_age"})
 
   index({ "premium_tables.age" => 1 })
   index({ "premium_tables.age" => 1, "premium_tables.start_on" => 1, "premium_tables.end_on" => 1 })
@@ -92,7 +111,7 @@ class Plan
    }
 
   validates_inclusion_of :active_year,
-    in: 2014..(Date.today.year + 3),
+    in: 2014..(TimeKeeper.date_of_record.year + 3),
     message: "%{value} is an invalid active year"
 
   ## Scopes
@@ -115,9 +134,10 @@ class Plan
   scope :nationwide, ->{ where(nationwide: "true") }
 
   # DC In-Network ?
-  scope :dc_in_network, ->{ where(out_of_service_area_coverage: "false") }
+  scope :dc_in_network, ->{ where(dc_in_network: "true") }
 
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
+  scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }
@@ -126,49 +146,60 @@ class Plan
   scope :health_coverage,       ->{ where(coverage_kind: "health") }
   scope :dental_coverage,       ->{ where(coverage_kind: "dental") }
 
-  scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
-  scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", metal_level: metal_level)}
+  # DEPRECATED - 2015-09-23 - By Sean Carley
+  # scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop",  metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
+  # scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", metal_level: metal_level)}
+  scope :valid_shop_by_carrier, ->(carrier_profile_id) {valid_shop_by_carrier_and_year(carrier_profile_id, TimeKeeper.date_of_record.year)}
+  scope :valid_shop_by_metal_level, ->(metal_level) {valid_shop_by_metal_level_and_year(metal_level, TimeKeeper.date_of_record.year)}
+  # END DEPRECATED
+
+  scope :valid_shop_by_carrier_and_year, ->(carrier_profile_id, year) {where(carrier_profile_id: carrier_profile_id, active_year: year, market: "shop",  metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
+  scope :valid_shop_by_metal_level_and_year, ->(metal_level, year) {where(active_year: year, market: "shop", metal_level: metal_level)}
 
   scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
 
-  scope :shop_health_by_active_year, ->(active_year) {  
+
+  scope :shop_health_by_active_year, ->(active_year) {
       where(
-          active_year: active_year, 
-          market: "shop", 
+          active_year: active_year,
+          market: "shop",
           coverage_kind: "health"
         )
     }
 
-  scope :shop_dental_by_active_year, ->(active_year) {  
+  scope :shop_dental_by_active_year, ->(active_year) {
       where(
-          active_year: active_year, 
-          market: "shop", 
+          active_year: active_year,
+          market: "shop",
           coverage_kind: "dental"
         )
     }
 
-  scope :individual_health_by_active_year, ->(active_year) {  
+  scope :individual_health_by_active_year, ->(active_year) {
       where(
-          active_year: active_year, 
-          market: "individual", 
-          coverage_kind: "health"
+          active_year: active_year,
+          market: "individual",
+          coverage_kind: "health",
+          hios_id: /-01$/
         )
-    } 
+    }
 
-  scope :individual_dental_by_active_year, ->(active_year) {  
+  scope :individual_dental_by_active_year, ->(active_year) {
       where(
-          active_year: active_year, 
-          market: "individual", 
+          active_year: active_year,
+          market: "individual",
           coverage_kind: "dental"
         )
-    } 
+    }
 
   scope :by_health_metal_levels,                ->(metal_levels)    { any_in(metal_level: metal_levels) }
-  scope :by_carrier_profile,                    ->(carrier_profile) { where(carrier_profile_id: carrier_profile._id) }
+  scope :by_carrier_profile,                    ->(carrier_profile_id) { where(carrier_profile_id: carrier_profile_id) }
 
   scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
   scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }
   scope :health_metal_nin_catastropic,          ->{ not_in(metal_level: "catastrophic") }
+
+  scope :by_plan_ids, ->(plan_ids) { where(:id => {"$in" => plan_ids}) }
 
   # Carriers: use class method (which may be chained)
   def self.find_by_carrier_profile(carrier_profile)
@@ -257,9 +288,9 @@ class Plan
       result
     end
 
-    def valid_shop_health_plans(type="carrier", key=nil)
-      Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{TimeKeeper.date_of_record.year}", expires_in: 5.hour) do
-        Plan.public_send("valid_shop_by_#{type}", key.to_s).to_a
+    def valid_shop_health_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)
+      Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}", expires_in: 5.hour) do
+        Plan.public_send("valid_shop_by_#{type}_and_year", key.to_s, year_of_plans).to_a
       end
     end
 
@@ -268,7 +299,7 @@ class Plan
     end
 
     def individual_plans(coverage_kind:, active_year:)
-      Plan.public_send("individual_#{coverage_kind}_by_active_year", active_year).with_premium_tables.where(hios_id: /-01$/)
+      Plan.public_send("individual_#{coverage_kind}_by_active_year", active_year).with_premium_tables
     end
   end
 end

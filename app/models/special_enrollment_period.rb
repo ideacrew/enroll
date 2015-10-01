@@ -58,7 +58,7 @@ class SpecialEnrollmentPeriod
 
   def is_active?
     return false if self.begin_on.blank? || self.end_on.blank?
-    (self.begin_on..self.end_on).include?(Date.today)
+    (self.begin_on..self.end_on).include?(TimeKeeper.date_of_record)
   end
 
   def duration_in_days
@@ -78,9 +78,9 @@ private
                         when "date_of_event"
                           qle_on
                         when "first_of_month"
-                          [TimeKeeper.date_of_record, qle_on].max.end_of_month + 1.day
+                          calculate_effective_on_for_first_of_month
                         when "first_of_next_month"
-                          if qualifying_life_event_kind.is_dependent_loss_of_esi?
+                          if qualifying_life_event_kind.is_dependent_loss_of_coverage?
                             qualifying_life_event_kind.employee_gaining_medicare(qle_on, selected_effective_on)
                           elsif qualifying_life_event_kind.is_moved_to_dc?
                             calculate_effective_on_for_moved_qle
@@ -101,7 +101,7 @@ private
   end
 
   def set_submitted_at
-    self.submitted_at ||= Time.now
+    self.submitted_at ||= TimeKeeper.datetime_of_record
   end
 
   def calculate_effective_on_for_moved_qle
@@ -114,5 +114,9 @@ private
         qle_on.end_of_month + 1.day
       end
     end
+  end
+
+  def calculate_effective_on_for_first_of_month
+    [TimeKeeper.date_of_record, qle_on].max.end_of_month + 1.day
   end
 end

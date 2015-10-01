@@ -68,6 +68,32 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
           expect(BenefitCoveragePeriod.find(benefit_coverage_period.id)).to eq benefit_coverage_period
         end
 
+        context "and a second lowest cost silver plan is specified" do
+          let(:silver_plan) { FactoryGirl.create(:plan, metal_level: "silver") }
+          let(:bronze_plan) { FactoryGirl.create(:plan, metal_level: "bronze") }
+          let(:benefit_package) { FactoryGirl.create(:benefit_package) }
+
+          context "and a silver plan is provided" do
+            it "should set/get the assigned silver plan" do
+              expect(benefit_coverage_period.second_lowest_cost_silver_plan = silver_plan).to eq silver_plan
+              expect(benefit_coverage_period.second_lowest_cost_silver_plan).to eq silver_plan
+            end
+          end
+
+          context "and a non-silver plan is provided" do
+            it "should raise an error" do
+              expect{benefit_coverage_period.second_lowest_cost_silver_plan = bronze_plan}.to raise_error(ArgumentError)
+            end
+          end
+
+          context "and a non plan object is passed" do
+            it "should raise an error" do
+              expect{benefit_coverage_period.second_lowest_cost_silver_plan = benefit_package}.to raise_error(ArgumentError)
+            end
+          end
+
+        end
+
         context "and open enrollment dates are queried" do
           it "should determine dates that are within open enrollment" do
             expect(benefit_coverage_period.open_enrollment_contains?(open_enrollment_start_on)).to be_truthy
@@ -105,4 +131,36 @@ RSpec.describe BenefitCoveragePeriod, type: :model do
     end
   end
 
+  context "elected_plans_by_enrollment_members" do
+    let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: (TimeKeeper.date_of_record - 2.months).to_date) }
+    let(:c1) {FactoryGirl.create(:consumer_role)}
+    let(:c2) {FactoryGirl.create(:consumer_role)}
+    let(:member1) {double(person: double(consumer_role: c1))}
+    let(:member2) {double(person: double(consumer_role: c2))}
+    let(:plan1) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
+    let(:plan2) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', active_year: TimeKeeper.date_of_record.year - 1, hios_id: "11111111122303-01") }
+    let(:plan3) { FactoryGirl.create(:plan_with_premium_tables, market: 'individual', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01") }
+    let(:plan4) { FactoryGirl.create(:plan, market: 'individual', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
+    let(:benefit_package1) {double(benefit_ids: [plan1.id, plan2.id])}
+    let(:benefit_package2) {double(benefit_ids: [plan3.id, plan4.id])}
+    let(:rule) {double}
+
+    before :each do
+      Plan.delete_all
+      allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package1, benefit_package2]
+      allow(InsuredEligibleForBenefitRule).to receive(:new).and_return rule
+    end
+
+    it "when satisfied" do
+      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+      plans = [plan1, plan3]
+      expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')).to eq plans
+    end
+
+    it "when not satisfied" do
+      allow(rule).to receive(:satisfied?).and_return [false, 'ok']
+      plans = []
+      expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')).to eq plans
+    end
+  end
 end

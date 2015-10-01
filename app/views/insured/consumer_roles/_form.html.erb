@@ -12,7 +12,7 @@
         <%= render 'shared/consumer_fields', f: f %>
         <br>
 
-        <%= render 'shared/home_address_fields', f: f %><br>
+        <%= render 'shared/consumer_home_address_fields', f: f %><br>
         <%= render 'shared/phone_fields', f: f %><br>
 
         <div id="email_info" class="row row-form-wrapper no-buffer">
@@ -26,7 +26,12 @@
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
         <%= render  partial: 'shared/individual_progress', locals: {step: '1'} %>
+
+      <div class="btn btn-transparent" data-target="#help_with_plan_shopping" data-toggle="modal">
+        Help me sign up
+      </div>  
       </div>
     </div>
   </div>
+  <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
 </div>

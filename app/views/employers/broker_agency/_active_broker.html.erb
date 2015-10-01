@@ -1,7 +1,5 @@
-
-<div class="container">
-<div class="row no-buffer top-pd" id="active_broker_tab">
-  <div class="col-xs-8">
+<div class="no-buffer" id="active_broker_tab">
+  <div class="col-xs-12 row">
   <% if @employer_profile.broker_agency_profile.present? && @broker_agency_accounts[0].writing_agent.present? %>
   <% active_broker = @broker_agency_accounts[0].writing_agent %>
   <h4>Active Broker</h4>
@@ -12,7 +10,7 @@
       <dt>Broker Name</dt>
       <dd><%= active_broker.person.full_name %></dd>
       <dt>Selected On</dt>
-      <dd><%= format_date @broker_agency_accounts[0].start_on %></dd>
+      <dd><%= format_date @broker_agency_account.try(:start_on) %></dd>
       <dt>Email</dt>
       <dd>
       <a href="mailto:<%= active_broker.person.emails.first.address %>">
@@ -41,25 +39,19 @@
           <%= image_tag "enter_date_termination.png", width: "300", height: "" %>
         </td>
       </tr>
-    </tbody>  
+    </tbody>
     </table>
   </div>
     <% else %>
-  <span>No Active Broker</span>
     <% end %>
 </div>
 </div>
 
-<div class="container top-pd" id="browse_brokers">
-    <%= link_to 'Browse Brokers'.html_safe, "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", remote: true, class: "btn btn-danger" %>
-</div>
 
 <div class="row no-buffer">
-  <div class="col-xs-12"> 
+  <div class="col-xs-12 row">
   <div id="show_broker_agency"></div>
   <div id="broker_agencies_panel">
   </div>
 </div>
-</div>
-
 </div>

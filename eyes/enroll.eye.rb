@@ -12,9 +12,33 @@ Eye.config do
   contact :dthomas, :mail, 'dan.thomas@dc.gov'
 end
 
+def define_forked_worker(worker_name, directory, worker_command, watch_kids = false)
+  process(worker_name) do
+    start_command worker_command
+    stop_on_delete true
+    stop_signals [:TERM, 10.seconds, :KILL]
+    start_timeout 5.seconds
+    pid_file File.join(PID_DIRECTORY, "#{worker_name}.pid")
+    daemonize true
+    working_dir directory
+    stdall File.join(LOG_DIRECTORY, "#{worker_name}.log")
+    if watch_kids
+      monitor_children do
+        stop_command "/bin/kill -9 {PID}"
+        check :memory, :every => 30, :below => 200.megabytes, :times => [3,5]
+      end
+    end
+  end
+end
+
 Eye.application 'eye_enroll' do
   notify :tevans, :info
   notify :dthomas, :info
+
+  define_forked_worker("broker_resource_listener", BUS_DIRECTORY, "bundle exec rails r -e production script/broker_resource_listener.rb", false)
+  define_forked_worker("employer_resource_listener", BUS_DIRECTORY, "bundle exec rails r -e production script/employer_resource_listener.rb", false)
+  define_forked_worker("individual_resource_listener", BUS_DIRECTORY, "bundle exec rails r -e production script/individual_resource_listener.rb", false)
+  define_forked_worker("policy_resource_listener", BUS_DIRECTORY, "bundle exec rails r -e production script/policy_resource_listener.rb", false)
 
   process("unicorn") do
     working_dir BUS_DIRECTORY
@@ -38,12 +62,11 @@ Eye.application 'eye_enroll' do
     #
     monitor_children do
       stop_command "kill -QUIT {PID}"
-      check :cpu, :every => 30, :below => 80, :times => [3,5]
-      check :memory, :every => 30, :below => 800.megabytes, :times => [4,7]
+      check :cpu, :every => 30, :below => 95, :times => [3,5]
+      check :memory, :every => 30, :below => 900.megabytes, :times => [4,7]
     end
   end
 
-=begin
   process("enroll_remote_event_listener") do
     working_dir BUS_DIRECTORY
     pid_file "pids/enroll_remote_event_listener.pid"
@@ -66,5 +89,4 @@ Eye.application 'eye_enroll' do
     restart_grace 30.seconds
     stop_timeout 10.seconds
   end
-=end
 end

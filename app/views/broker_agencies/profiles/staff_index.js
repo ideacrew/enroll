@@ -1,4 +1,5 @@
 $('#inbox .col-md-10').html(("<%= escape_javascript render "staff"%>"))
 $('#inbox').removeClass("hide")
 $('#help_list').addClass('hide')
-$('#help_type').html('broker')
+$('#help_type').html('Broker')
+$('#back_to_help').removeClass('hide')

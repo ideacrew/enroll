@@ -46,7 +46,7 @@ html {
     font-family: 'Open Sans', sans-serif;
 }
 body {
-    background-color: #f2f2f2;
+    background-color: #F8F8F8;
     min-height: 100%;
     position: relative;
     padding-top: 73px;
@@ -578,7 +578,7 @@ a:hover{
   margin-top: 0;
 }
 .panel-heading{
-  background-color: #ffffff !important;
+  background-color: #ffffff;
   position: relative;
 }
 .panel-body.edi{
@@ -1664,7 +1664,7 @@ a.all-filter:hover{
 }
 .select-plan-details .tab-content .plan-row label{
   font-family: "AvenirLTStd-Light";
-  font-weight: lighter !important;
+  font-weight: lighter;
 }
 .select-plan-details .plan-row input[type="checkbox"] {
   height: 21px;
@@ -1698,6 +1698,12 @@ a.all-filter:hover{
   font-size: 16px;
   font-weight: bold;
   margin-right: 5px;
+}
+input[type="checkbox"] + h4.agree {
+  display: inline-block;
+  top: 2px;
+  left: 10px;
+  position: relative;
 }
 
 .gold-icon, .platinum-icon, .silver-icon, .bronze-icon {padding-left: 20px;}
@@ -2266,7 +2272,7 @@ a.all-filter:hover{
   font-family: "AvenirLTStd-Light";
 }
 #plans h3 {
-  font-size: 25px;
+  font-size: 18px;
   font-weight: bold;
   color: #616161;
 }
@@ -3292,7 +3298,7 @@ input.form-control {
     padding-top: 22px !important;
 }
 label {
-    font-weight: lighter !important;
+    font-weight: lighter;
     font-family: 'AvenirLTStd-Light';
 }
 .dropdown-toggle label {
@@ -3840,7 +3846,7 @@ ul.list-right-section li a img {
 }
 
 
-.hbx-enrollment-panel .family-members p{ 
+.hbx-enrollment-panel .family-members p{
     color: #007BC4;
 }
 
@@ -3878,8 +3884,8 @@ ul.list-right-section li a img {
   margin-right: 10px;
 }
 
-.hbx-enrollment-panel .separator:before{ 
-  content:'\2022 \2003'; 
+.hbx-enrollment-panel .separator:before{
+  content:'\2022 \2003';
 }
 
 .hbx-enrollment-panel .panel-body{
@@ -3967,7 +3973,7 @@ ul.list-right-section li a img {
 .row-form-wrapper {border: 1px solid #b7b7b7;border-top: none;padding: 3px; background-color: #fff; transition: all 0.2s ease-in-out 0s;}
 .row-form-wrapper-top, .row-form-wrapper:first-of-type, #email_info, #phone_info, #dependent_ul li {border-top: 1px solid #b7b7b7;}
 .remove-top-bdr {border-top: none !important;}
-.alert, .alert li {border: none !important;}
+.alert, .alert li {border: none;}
 .row-form-wrapper .form-group {
   margin-bottom: 0;
 }
@@ -4009,8 +4015,10 @@ ul.list-right-section li a img {
   margin-bottom: 5px;
 }
 
-.selectric .label {font-weight: normal;font-size: 12px !important;text-align: left;}
+
+.selectric .label {font-weight: normal;font-size: 12px; text-align: left;}
 .selectric {background: #fff !important;}
+
 /* Select Plan Page */
 .ct-1 p {
     font-size: 14px;
@@ -4684,7 +4692,7 @@ span.text_style {color: #616161 !important;}
 
 .benefit-group-offset .selectric p.label {
   padding: 14px 0 8px 0;
-  font-size: 14px !important;
+  font-size: 14px;
 }
 
 a.interaction-click-control-default {
@@ -4810,6 +4818,10 @@ table.table.table-no-sytle td {
   margin:0;
 }
 
+#carousel-qles a.qle-menu-item {
+  display: block;
+}
+
 /*#qle-details .panel-heading strong {
   color: #468847`;
   text-transform:uppercase;
@@ -4842,7 +4854,7 @@ table.table.table-no-sytle td {
 }
 
 .fa-icon-lable{
-margin-left: 2em; 
+margin-left: 2em;
 position: absolute;
 }
 
@@ -4892,17 +4904,17 @@ ul.list-qle {
 }
 
 
-input:focus:required:invalid { 
-  background-color: rgba(247, 208, 215, 0.55); 
-  outline: none; 
+input:focus:required:invalid {
+  background-color: rgba(247, 208, 215, 0.55);
+  outline: none;
 }
 
-input:focus:required:valid { 
+input:focus:required:valid {
   background-color: #DCEAF1;
-  outline: none; 
+  outline: none;
 }
 
-input:required:valid { 
+input:required:valid {
   background-color: #fff;
 }
 
@@ -4936,4 +4948,62 @@ input:required:valid {
   div.waiver_receipt{
     display: none;
   }
+}
+
+.no-dc-address-reasons {
+  border: 1px solid #b7b7b7;
+  border-top: none;
+  padding:3px;
+}
+
+.no-dc-address-reasons .radio input {
+  margin: 15px 10px;
+}
+
+.no-dc-address-reasons .radio label span{
+  margin-left: 20px;
+  margin-top: 10px;
+  line-height: 14px;
+  display: block;
+}
+
+.csr-form {
+  text-align: center;
+}
+
+.language_multi_select .multiselect {
+  border: none;
+  font-size: 12px;
+  line-height: 30px;
+}
+
+.language_multi_select .multiselect .caret {
+  color: #bbb;
+}
+
+.aptc output {
+  padding: 0;
+  float: left;
+}
+
+.aptc input[type=range] {
+  padding: 10px 0;
+}
+
+.aptc .row .col-xs-6 {
+  padding: 0 5px;
+}
+
+.aptc .row .col-xs-6 input {
+  width: 80%;
+  height: 32px;
+  padding: 0 6px !important;
+  font-size: 14px !important;
+  border: 1px solid #b7b7b7;
+  color: #555555;
+}
+
+.aptc p.title {
+  margin: 0;
+  text-align: center;
 }

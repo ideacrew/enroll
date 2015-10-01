@@ -24,9 +24,15 @@
 //= require override_confirm
 //= require floatlabels
 //= require jq_datepicker
+//= require date
 //= require qle
 //= require print
+//= require browser_issues
+//= require consumer_role
+//= require plan_year_selection
+//= require bootstrap-slider
 //= require_tree .
+
 
 function applyFloatLabels() {
   $('input.floatlabel').floatlabel({
@@ -34,40 +40,115 @@ function applyFloatLabels() {
   });
 }
 
-function supportRequiredForSafari() {
-  var testElement=document.createElement('input');
-  var requiredSupported='required' in testElement&&!/Version\/[\d\.]+\s*Safari/i.test(navigator.userAgent);
-  if(!requiredSupported){
-    $('form').submit(function(e){
-      var inputs=$(this).find("input[required='required'][type='text']");
-      for (var i=0; i<inputs.length; i++){
-        var input=inputs[i];
-        if(!input.value){
-          var placeholder=input.placeholder? input.placeholder:input.getAttribute('placeholder');
-          placeholder = typeof(placeholder) === 'string' ? placeholder.replace(" *", "") : "";
-          if ( placeholder == "BIRTHDATE" && input.value.length == 10 ) {
-            alert('Please fill in ' + placeholder);
-          } else if ( placeholder == "BIRTHDATE" ) {
-            alert('Please fill in ' + placeholder + ' with format: dd/mm/yyyy');
-          } else {
-          }
-          e.preventDefault&&e.preventDefault();
-          break;
-        };
-      };
-    });
-  };
+function applySelectric() {
+  $("select[multiple!='multiple']").selectric();
+};
+
+function applyMultiLanguateSelect() {
+  $('#broker_agency_language_select').multiselect({
+    nonSelectedText: 'Select Language',
+    maxHeight: 300
+  });
+  $('#broker_agency_language_select').multiselect('select', 'en', true);
+
 };
 
 $(document).on('page:update', function(){
-  supportRequiredForSafari();
+  applyFloatLabels();
+  applySelectric();
 });
+
+
+function getCarrierPlans(ep, ci) {
+
+  var params = 'carrier_id=' + ci;
+  $.ajax({
+    url: "/employers/employer_profiles/"+ep+"/plan_years/reference_plans/",
+    data: params
+  })
+};
+// modal input type file clicks
+$(document).on('click', '#modal-wrapper div .select', function(){
+  $(this).closest('div').find('input[type=file]').trigger('click');
+  $(this).closest('div').find('input[type=file]').on('change', function() {
+    var filename = $(this).closest('div').find('input[type=file]').val()
+    $(this).closest('div').find('.select').hide();
+    $(this).closest('div').find('.upload-preview').html(filename + "<i class='fa fa-times fa-lg pull-right'></i>").show();
+    $(this).closest('div').find('input[type=submit]').show();
+  });
+});
+$(document).on('click', '.upload-preview .fa', function(){
+  $(this).closest('#modal-wrapper').find('input[type=file]').val("");
+  $(this).closest('#modal-wrapper').find('.upload-preview').hide();
+  $(this).closest('#modal-wrapper').find('input[type=submit]').hide();
+  $(this).closest('#modal-wrapper').find('.select').show();
+});
+$(document).on('click', '#modal-wrapper .modal-close', function(){
+  $(this).closest('#modal-wrapper').remove();
+});
+
 
 $(document).ready(function () {
 
-  $(function(){
-    $('select').selectric();
+  // init slider
+  $('.benefits-fields .slider').bootstrapSlider({
+      formatter: function(value) {
+        return 'Contribution Percentage: ' + value + '%';
+      }
+    });
+    $(".benefits-fields .slider").on("slide", function(slideEvt) {
+      $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
+      $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
   });
+
+  //hide border bottom
+  $('input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: 0px;');
+
+  // move start date to url for plan options
+  $("#plan_year_start_on").on('change', function() {
+    start_on = $(this).val().substr(0,4);
+    $('.plan-options a').each(function() {
+      var url = $(this).attr('href');
+      $(this).attr('href', url+"&start_on="+start_on);
+    });
+
+  });
+
+
+
+
+  // mimic jquery toggle function
+  $.fn.toggleClick=function(){
+  var functions=arguments, iteration=0
+  return this.click(function(){
+    functions[iteration].apply(this,arguments)
+    iteration= (iteration+1) %functions.length
+  })
+}
+
+// details toggler
+  $('.details').toggleClick(function () {
+        $(this).closest('.referenceplan').find('.plan-details').slideDown();
+        $(this).html('Hide Details <i class="fa fa-chevron-up fa-lg"></i>');
+    }, function () {
+      $(this).closest('.referenceplan').find('.plan-details').slideUp();
+      $(this).html('View Details <i class="fa fa-chevron-down fa-lg"></i>');
+
+
+        });
+
+
+
+
+// toggle filter options in employees list
+  $(document).on('click', '.filter-options label', function()  {
+    $('.filter-options').hide();
+  });
+  $(document).on('mouseleave', '.filter-options', function()  {
+    $('.filter-options').hide();
+  });
+
+
 
   $('[data-toggle="tooltip"]').tooltip();
   $("[data-toggle=popover]").popover();
@@ -110,8 +191,6 @@ $(document).ready(function () {
       });
     }
   });
-
-  applyFloatLabels();
 
   $(".address-li").on('click',function(){
     $(".address-span").html($(this).data("address-text"));
@@ -382,6 +461,7 @@ $(document).ready(function () {
   $("#jq_datepicker_ignore_person_dob").mask("99/99/9999");
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
+  $("#tribal_id").mask("999999999");
 
   $("#person_ssn").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
@@ -407,7 +487,7 @@ $(document).ready(function () {
 
   $(document).on('click', '.return_to_employee_roster', function() {
     $('#add_employee_action').html('');
-    $('#employee_roster').show();
+    $('.employees-section').show();
   });
 
   $(document).on('click', '.return_to_employer_broker_agenices', function() {
@@ -455,7 +535,12 @@ $(document).on('page:update', function() {
     $('#address_info > .first').attr('id', ($(this).text()));
     $('#employer_census_employee_family_census_employee_attributes_address_attributes_kind').val($(this).data('value'));
   });
+
   $('select').selectric();
+  $('#person_addresses_attributes_0_state').on('change', function () {
+    $('select').selectric('refresh');
+  });
+  $('select').attr('tabindex', '-1');
 
   $('#plan-years-list li a').on('click', function(){
     var target = $(this).attr('href');
@@ -599,4 +684,11 @@ $(document).on('keyup', ".new_person #person_ssn", function(){
 })
 $(document).on('change', ".new_person #person_no_ssn", function(){
   if (this.checked) { $(".new_person #person_ssn").val("");  $(".new_person #person_ssn").trigger('change')  }
+})
+
+$(document).on('keyup', ".new_dependent #dependent_ssn", function(){
+  $(".new_dependent input#dependent_no_ssn").prop('checked', false)
+})
+$(document).on('change', ".new_dependent #dependent_no_ssn", function(){
+  if (this.checked) { $(".new_dependent #dependent_ssn").val("");  $(".new_dependent #dependent_ssn").trigger('change')  }
 })

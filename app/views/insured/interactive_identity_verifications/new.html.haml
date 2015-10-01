@@ -1,7 +1,7 @@
 .container
   .row
     .col-lg-7.col-md-7.col-sm-8.col-xs-12
-      %br
+      %h3 Verify Identity
       = form_for(@interactive_verification, :as => :interactive_verification, :url => insured_interactive_identity_verifications_path, :method => :post) do |f|
         = f.hidden_field :session_id
         = f.hidden_field :transaction_id
@@ -22,3 +22,7 @@
         = f.submit "Submit", class: 'btn btn-lg btn-primary'
     .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
       = render  partial: 'shared/individual_progress', locals: {step: '2'}
+      .btn.btn-transparent{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal"}
+        Help me sign up
+
+      = render partial: 'insured/plan_shoppings/help_with_plan' 

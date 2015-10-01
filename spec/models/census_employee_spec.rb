@@ -111,6 +111,17 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         end
       end
 
+      context "with duplicate blank ssn's on dependents" do
+        let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
+        let(:child2) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: "") }
+
+        it "should not have errors" do
+          initial_census_employee.census_dependents = [child1,child2]
+          expect(initial_census_employee.valid?).to be_truthy
+          expect(initial_census_employee.save).to be_truthy
+        end
+      end
+
       context "with ssn matching subscribers" do
         let(:child1) { FactoryGirl.build(:census_dependent, employee_relationship: "child_under_26", ssn: initial_census_employee.ssn) }
 
@@ -531,6 +542,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(CensusEmployee.employee_name("Bur")).to include census_employee2
       expect(CensusEmployee.employee_name("Bur")).to include census_employee3
     end
+  end
+
+
+  context "and " do
   end
 
   # context '.edit' do

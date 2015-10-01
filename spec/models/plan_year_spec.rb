@@ -765,6 +765,18 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                     expect(workflow_plan_year_with_benefit_group.total_enrolled_count).to eq 3
                   end
 
+                  it "should have the right enrollment ratio" do
+                    expect(workflow_plan_year_with_benefit_group.enrollment_ratio).to eq 0.50
+                  end
+
+                  it "should have the right minimum enrolled count" do
+                    expect(workflow_plan_year_with_benefit_group.minimum_enrolled_count).to eq 4.0
+                  end
+
+                  it "should have the right additional required participants count" do
+                    expect(workflow_plan_year_with_benefit_group.additional_required_participants_count).to eq 1.0
+                  end
+
                   context "and the plan effective date is Jan 1" do
                     before do
                       workflow_plan_year_with_benefit_group.start_on = Date.new(2016, 1, 1)

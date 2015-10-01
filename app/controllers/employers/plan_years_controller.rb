@@ -2,26 +2,59 @@ class Employers::PlanYearsController < ApplicationController
   before_action :find_employer, except: [:recommend_dates]
   before_action :generate_carriers_and_plans, except: [:recommend_dates]
 
+  layout "two_column"
+
   def new
     @plan_year = build_plan_year
+
+
+  end
+
+  def reference_plans
+
+    @benefit_group = params[:benefit_group]
+    @plan_year = PlanYear.find(params[:plan_year_id])
+
+
+    @plans = if params[:plan_option_kind] == "single_carrier"
+      @carrier_id = params[:carrier_id]
+      @carrier_profile = CarrierProfile.find(params[:carrier_id])
+      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
+    elsif params[:plan_option_kind] == "metal_level"
+      @metal_level = params[:metal_level]
+      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_metal_level(@metal_level)
+    elsif params[:plan_option_kind] == "single_plan"
+      @single_plan = params[:single_plan]
+      @carrier_id = params[:carrier_id]
+      @carrier_profile = CarrierProfile.find(params[:carrier_id])
+      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile)
+    end
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def plan_details
+    @plan = Plan.find(params[:reference_plan_id])
+
+
+
+    respond_to do |format|
+      format.js
+    end
   end
 
   def create
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|
-      benefit_group.elected_plans = case benefit_group.plan_option_kind
-                                    when "single_plan"
-                                      Plan.where(id: benefit_group.reference_plan_id).first
-                                    when "single_carrier"
-                                      Plan.valid_shop_health_plans("carrier", benefit_group.carrier_for_elected_plan)
-                                    when "metal_level"
-                                      Plan.valid_shop_health_plans("metal_level", benefit_group.metal_level_for_elected_plan)
-                                    end
+      benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
     end
+
     if @plan_year.save
       flash[:notice] = "Plan Year successfully created."
-      redirect_to employers_employer_profile_path(@employer_profile)
+      redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'benefits')
     else
+
       render action: "new"
     end
   end
@@ -31,11 +64,13 @@ class Employers::PlanYearsController < ApplicationController
     @key = params[:key]
     @target = params[:target]
 
+    plan_year = Date.parse(params["start_date"]).year unless params["start_date"].blank?
+
     @plans = case @kind
             when "carrier"
-              Plan.valid_shop_health_plans("carrier", @key)
+              Plan.valid_shop_health_plans("carrier", @key, plan_year)
             when "metal-level"
-              Plan.valid_shop_health_plans("metal_level", @key)
+              Plan.valid_shop_health_plans("metal_level", @key, plan_year)
             else
               []
             end
@@ -50,7 +85,7 @@ class Employers::PlanYearsController < ApplicationController
   def calc_employer_contributions
     @location_id = params[:location_id]
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
-    
+
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups[0].reference_plan = @plan
@@ -61,6 +96,7 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def edit
+
     plan_year = @employer_profile.find_plan_year(params[:id])
     @just_a_warning = false
     if plan_year.publish_pending?
@@ -79,24 +115,21 @@ class Employers::PlanYearsController < ApplicationController
         benefit_group.carrier_for_elected_plan = benefit_group.elected_plans.try(:last).try(:carrier_profile_id)
       end
     end
+    respond_to do |format|
+      format.js { render 'edit' }
+      format.html { render 'edit' }
+    end
   end
 
   def update
     plan_year = @employer_profile.plan_years.where(id: params[:id]).last
     @plan_year = ::Forms::PlanYearForm.rebuild(plan_year, plan_year_params)
     @plan_year.benefit_groups.each do |benefit_group|
-      benefit_group.elected_plans = case benefit_group.plan_option_kind
-                                    when "single_plan"
-                                      Plan.where(id: benefit_group.reference_plan_id).first
-                                    when "single_carrier"
-                                      Plan.valid_shop_health_plans("carrier", benefit_group.carrier_for_elected_plan)
-                                    when "metal_level"
-                                      Plan.valid_shop_health_plans("metal_level", benefit_group.metal_level_for_elected_plan)
-                                    end
+      benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
     end
     if @plan_year.save
       flash[:notice] = "Plan Year successfully saved."
-      redirect_to employers_employer_profile_path(@employer_profile)
+      redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits")
     else
       render action: "edit"
     end
@@ -116,13 +149,12 @@ class Employers::PlanYearsController < ApplicationController
   def publish
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     @plan_year.publish!
-
     if @plan_year.publish_pending?
       respond_to do |format|
         format.js
       end
     else
-      if (@plan_year.published? || @plan_year.enrolling?) 
+      if (@plan_year.published? || @plan_year.enrolling?)
         if @plan_year.assigned_census_employees_without_owner.present?
           flash[:notice] = "Plan Year successfully published."
         else
@@ -132,7 +164,7 @@ class Employers::PlanYearsController < ApplicationController
         errors = @plan_year.application_errors.try(:values)
         flash[:error] = "Plan Year failed to publish. #{('<li>' + errors.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
       end
-      render :js => "window.location = #{employers_employer_profile_path(@employer_profile).to_json}"
+      render :js => "window.location = #{employers_employer_profile_path(@employer_profile).to_json}&tab=benefits"
     end
   end
 
@@ -140,13 +172,13 @@ class Employers::PlanYearsController < ApplicationController
     plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     plan_year.force_publish!
     flash[:error] = "As submitted, this application is ineligible for coverage under the DC HealthLink exchange. If information that you provided leading to this determination is inaccurate, you have 30 days from this notice to request a review by DCHL officials."
-    redirect_to employers_employer_profile_path(@employer_profile)
+    redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
   end
 
   def employee_costs
     @location_id = params[:location_id]
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
-    
+
     @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
     @plan_year.benefit_groups[0].reference_plan = @plan
@@ -166,8 +198,8 @@ class Employers::PlanYearsController < ApplicationController
         ref_plan_cost: @benefit_group.employee_cost_for_plan(employee)
       }
       if !@benefit_group.single_plan_type?
-        costs.merge!({ 
-          lowest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.lowest_cost_plan), 
+        costs.merge!({
+          lowest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.lowest_cost_plan),
           highest_plan_cost: @benefit_group.employee_cost_for_plan(employee, @benefit_group.highest_cost_plan)
           })
       end
@@ -216,9 +248,9 @@ class Employers::PlanYearsController < ApplicationController
   end
 
   def relationship_benefits
-    { 
-      "benefit_groups_attributes" => 
-      { 
+    {
+      "benefit_groups_attributes" =>
+      {
         "0" => {
            "title"=>"2015 Employer Benefits",
            # "carrier_for_elected_plan"=>"53e67210eb899a4603000004",

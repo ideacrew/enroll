@@ -1,6 +1,9 @@
-  <div class="container top-pd" id='plan_year'>
+
+  <div class="col-xs-12" id='plan_year'>
       <div class="row">
-        <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
+        <div class="col-xs-12 planyear-add-tab">
+          <div id="choose-coverage">
+          <h1>Coverage - Choose your Coverage Year</h1>
           <% if @plan_year.errors.any? %>
             <div class="alert-plan-year alert-error">
               <% if @just_a_warning == false %>
@@ -26,25 +29,32 @@
             </div>
           <% end %>
 
+
           <%= render "shared/plan_year_fields", f: f %>
-          <h3>Benefit Groups</h3>
+</div>
+          <div style="display: none;" class="benefits-setup-tab">
+          <h1>Coverage - Setup Benefits Packages for your Employees</h1>
           <div class='form-inputs'>
             <a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
             <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
             <a href="#" data-href="<%= reference_plan_options_employers_employer_profile_plan_years_path %>" id='reference_plan_options_link' style='display:none;'></a>
             <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
-              <%= render "shared/benefit_group_fields", f: bg %><br>
+              <%= render "shared/benefit_group_fields", f: bg, p: @plan_year %><br>
             <% end %>
-            <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-transparent pull-left xs_full_width' %>
-            <div class="row no-buffer">
-            <% button_name = @plan_year.persisted? ? 'Save Plan Year' : 'Create Plan Year' %>
 
-              <button class="btn btn-primary pull-right" type="submit">
-                <%= "#{button_name}".html_safe %>
-              </button> &nbsp;&nbsp;
-              <%= link_to "Cancel", employers_employer_profile_path(@employer_profile), class:'btn btn-transparent pull-right' %>
+
+            <div class="row no-buffer controls" style="display: none;">
+              <%= link_to_add_fields "Add Benefit Group", f, :benefit_groups, 'btn btn-trans pull-left xs_full_width abg' %>
+              <a href="#" class="btn btn-trans remove_fields">Remove Benefit Group</a>
+
+              <% button_name = @plan_year.persisted? ? 'Save Plan Year' : 'Create Plan Year' %>
+                <button class="btn btn-primary pull-right btn-br mtz" type="submit">
+                  <%= "#{button_name}".html_safe %>
+                </button> &nbsp;&nbsp;
+              <%= link_to "Cancel", employers_employer_profile_path(@employer_profile, :tab => "benefits"), class:'btn btn-trans pull-right' %>
             </div>
           </div>
+        </div>
       </div>
     </div>
   </div><br>

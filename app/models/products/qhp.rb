@@ -1,6 +1,7 @@
 class Products::Qhp
   include Mongoid::Document
   include Mongoid::Timestamps
+  include CsvOperater
 
   field :template_version, type: String
   field :issuer_id, type: String
@@ -32,6 +33,7 @@ class Products::Qhp
   field :is_specialist_referral_required, type: String
   field :health_care_specialist_referral_type, type: String, default: ""
   field :insurance_plan_benefit_exclusion_text, type: String
+  field :ehb_percent_premium, type: String
 
   field :indian_plan_variation, type: String  # amount per enrollee
 
@@ -59,8 +61,9 @@ class Products::Qhp
   field :begin_primary_care_cost_sharing_after_set_number_visits, type: String
 
   ## Plan Dates
-  field :plan_effective_date, type: String
-  field :plan_expiration_date, type: String
+  field :plan_effective_date, type: Date
+  field :plan_expiration_date, type: Date
+  field :active_year, type: Integer
 
   ## Geographic Coverage
   field :out_of_country_coverage, type: String
@@ -81,17 +84,19 @@ class Products::Qhp
                         :qhp_or_non_qhp, :emp_contribution_amount_for_hsa_or_hra, :child_only_offering,
                         :plan_effective_date, :out_of_country_coverage, :out_of_service_area_coverage, :national_network
 
+  scope :by_hios_id_and_active_year, -> (sc_id, year) { where(standard_component_id: sc_id, active_year: year ) }
+
   embeds_many :qhp_benefits,
     class_name: "Products::QhpBenefit",
     cascade_callbacks: true,
     validate: true
 
-  embeds_one :qhp_cost_share_variance,
+  embeds_many :qhp_cost_share_variances,
     class_name: "Products::QhpCostShareVariance",
     cascade_callbacks: true,
     validate: true
 
-  accepts_nested_attributes_for :qhp_benefits, :qhp_cost_share_variance
+  accepts_nested_attributes_for :qhp_benefits, :qhp_cost_share_variances
 
   index({"issuer_id" => 1})
   index({"state_postal_code" => 1})
@@ -132,4 +137,40 @@ class Products::Qhp
 
     plan_hsa_status
   end
+
+  def self.csv_for(qhps)
+    (output = "").tap do 
+      CSV.generate(output) do |csv|
+        csv_ary = []
+        csv_ary << ["Carrier", "Plan Name", "Your Cost", "Provider NetWork", "Plan Benefits"] + Products::Qhp::VISIT_TYPES
+        qhps.each do |qhp|
+          arry1 = [
+            qhp.plan.carrier_profile.organization.legal_name,
+            qhp.plan_marketing_name, 
+            "$#{qhp[:total_employee_cost].round(2)}", 
+            qhp.plan.nationwide ? "Nationwide" : "DC Area Network",
+            "In Network"
+          ]
+          arry2 = [
+            "","","","","Out of Network"
+          ]
+          Products::Qhp::VISIT_TYPES.each do |visit_type|
+            matching_benefit = qhp.qhp_benefits.detect { |qb| qb.benefit_type_code == visit_type } 
+            if matching_benefit 
+              deductible = matching_benefit.find_deductible 
+              arry1 << deductible.copay_in_network_tier_1 
+              arry2 << deductible.copay_out_of_network
+            end 
+          end
+          csv_ary << arry1
+          csv_ary << arry2
+        end
+
+        inversion = convert_csv(csv_ary)
+        inversion.each do |row|
+          csv << row
+        end
+      end
+    end
+  end 
 end

@@ -26,6 +26,7 @@ class BrokerAgencies::ApplicantsController < ApplicationController
   def edit
     respond_to do |format|
       format.js
+      format.html
     end
   end
 
@@ -45,14 +46,6 @@ class BrokerAgencies::ApplicantsController < ApplicationController
       flash[:notice] = "Applicant terminated."
     else
       role.broker_agency_accept!
-      role.reload
-      if role.active?
-        if role.kind_of?(BrokerRole)
-          Invitation.invite_broker!(role) 
-        else
-          Invitation.invite_broker_agency_staff!(role)
-        end
-      end
       flash[:notice] = "Applicant accepted successfully."
     end
 

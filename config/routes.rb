@@ -1,10 +1,18 @@
 Rails.application.routes.draw do
 
-  devise_for :users
+  devise_for :users, :controllers => { :registrations => "users/registrations" }
+
+  resources :saml, only: :index do
+    collection do
+      post :login
+      get :logout
+      get :navigate_to_assistance
+    end
+  end
 
   namespace :exchanges do
     resources :inboxes, only: [:show, :destroy]
-
+    resources :agents_inboxes, only: [:show, :destroy]
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
@@ -35,8 +43,13 @@ Rails.application.routes.draw do
     resources :agents do
       collection do
         get :home
-        get :begin_enrollment
-        get :send_enrollment_confirmation
+        get :begin_consumer_enrollment
+        get :begin_employee_enrollment
+        get :resume_enrollment
+        get :show
+      end
+      member do
+        get :inbox
       end
     end
 
@@ -64,6 +77,7 @@ Rails.application.routes.draw do
         post 'thankyou'
         post 'waive'
         post 'terminate'
+        post 'set_elected_pct'
       end
     end
 
@@ -72,6 +86,7 @@ Rails.application.routes.draw do
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
       get 'new'
+
       collection do
         get 'home'
         get 'manage_family'
@@ -95,8 +110,10 @@ Rails.application.routes.draw do
 
     resources :consumer_role, controller: 'consumer_roles', only: [:create, :edit, :update] do
       get :search, on: :collection
+      get :privacy, on: :collection
       get :match, on: :collection
       get :ridp_agreement, on: :collection
+      ##get :privacy, on: :collection
     end
 
     resources :employee, :controller=>"employee_roles", only: [:create, :edit, :update, :show] do
@@ -110,7 +127,7 @@ Rails.application.routes.draw do
     end
     root 'employee_roles#show'
 
-    resources :employee_dependents
+    resources :family_members
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
@@ -139,6 +156,8 @@ Rails.application.routes.draw do
       get 'my_account'
       get 'show_profile'
       get 'consumer_override'
+      get 'bulk_employee_upload_form'
+      post 'bulk_employee_upload'
       collection do
         get 'welcome'
         get 'search'
@@ -146,6 +165,8 @@ Rails.application.routes.draw do
         get 'inbox'
       end
       resources :plan_years do
+        get 'reference_plans'
+        get 'plan_details' => 'plan_years#plan_details', on: :collection
         get 'recommend_dates', on: :collection
         get 'reference_plan_options', on: :collection
         post 'publish'
@@ -192,6 +213,7 @@ Rails.application.routes.draw do
         get :employers
         get :messages
         get :staff_index
+        get :agency_messages
       end
 
       resources :applicants
@@ -271,11 +293,10 @@ Rails.application.routes.draw do
   end
   resources :office_locations, only: [:new]
 
+  get "document/download/:bucket/:key" => "documents#download", as: :document_download
+
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]
-
-
-
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

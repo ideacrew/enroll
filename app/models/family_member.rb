@@ -19,6 +19,8 @@ class FamilyMember
   field :person_id, type: BSON::ObjectId
   field :broker_role_id, type: BSON::ObjectId
 
+  scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
+
   embeds_many :hbx_enrollment_exemptions
   accepts_nested_attributes_for :hbx_enrollment_exemptions
 
@@ -46,6 +48,7 @@ class FamilyMember
   delegate :tribal_id, to: :person, allow_nil: true
   delegate :is_disabled, to: :person, allow_nil: true
   delegate :citizen_status, to: :person, allow_nil: true
+  delegate :is_dc_resident?, to: :person, allow_nil: true
 
   validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
 

@@ -2,7 +2,11 @@ require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   let(:plan) { double(id: "plan_id") }
-  let(:hbx_enrollment) { double(id: "hbx_id") }
+  let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id") }
+  let(:household){ double("Household") }
+  let(:family){ double("Family") }
+  let(:family_member){ double("FamilyMember", dob: 28.years.ago) }
+  let(:family_members){ [family_member, family_member] }
   let(:benefit_group) {double}
   let(:reference_plan) {double}
   let(:usermailer) {double}
@@ -158,7 +162,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
   end
 
-
   context "POST terminate" do
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
@@ -213,11 +216,14 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:plan1) {double(id: '10', deductible: '$10', total_employee_cost: 1000, carrier_profile_id: '12345')}
     let(:plan2) {double(id: '11', deductible: '$20', total_employee_cost: 2000, carrier_profile_id: '12346')}
     let(:plan3) {double(id: '12', deductible: '$30', total_employee_cost: 3000, carrier_profile_id: '12347')}
-    
+
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
+      allow(hbx_enrollment).to receive(:household).and_return(household)
+      allow(household).to receive(:family).and_return(family)
+      allow(family).to receive(:family_members).and_return(family_members)
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
       allow(benefit_group).to receive(:decorated_elected_plans).with(hbx_enrollment).and_return([plan1, plan2, plan3])
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
@@ -280,6 +286,27 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
       it "should get max_deductible and return 0" do
         expect(assigns(:max_deductible)).to eq 0
+      end
+    end
+
+    context "when user has_active_consumer_role" do
+      let(:tax_household) {double}
+      let(:household) {double(latest_active_tax_household: tax_household)}
+      let(:family) {double(latest_household: household)}
+      let(:person) {double(primary_family: family, has_active_consumer_role?: true)}
+      let(:user) {double(person: person)}
+      before :each do
+        session[:individual_assistance_path] = "assistance"
+        allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
+        get :show, id: "hbx_id"
+      end
+
+      it "should get max_aptc" do
+        expect(assigns(:max_aptc)).to eq 111
+      end
+
+      it "should get default selected_aptc_pct" do
+        expect(session[:selected_aptc_pct]).to eq 0.85
       end
     end
   end

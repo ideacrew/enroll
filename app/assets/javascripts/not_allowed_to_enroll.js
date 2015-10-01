@@ -1,5 +1,5 @@
 function ineligible_incarcerated(){
-  return $('input[name="person[is_incarcerated]"]:checked').val() == 1
+  return $('input[name="person[is_incarcerated]"]:checked').val() == 'true'
 }
 
 function is_citizen(){

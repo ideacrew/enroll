@@ -20,7 +20,7 @@
           <% if @enrollment.employee_role.present? %>
             <%= render "insured/plan_shoppings/coverage_information" %>
           <% else %>
-            <%= render "insured/plan_shoppings/individual_coverage_information" %>
+            <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate: true} %>
             <%= render "insured/plan_shoppings/individual_agreement" %>
           <% end %>
         </div>
@@ -40,10 +40,10 @@
         <% elsif @change_plan == "change_by_qle" %>
           <%= render partial: 'shared/qle_progress', locals: {step: '3'} %>
         <% elsif @change_plan == "change_plan" %>
-          <% if is_under_open_enrollment? %>
-            <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '2'} %>
+          <% if @market_kind == "individual" && !is_under_open_enrollment? %>
+            <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '3'} %>
           <% else %>
-            <%= render partial: 'shared/sep_shop_for_plans_progress', locals: {step: '3'} %>
+            <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '2'} %>
           <% end %>
         <% end %>
       </div>

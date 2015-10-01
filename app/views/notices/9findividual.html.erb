@@ -1,0 +1,532 @@
+<div class="page_break">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr><td></br></br></td></tr>
+      <tr>
+        <td colspan="2" align="center">
+          <a href="https://dchealthlink.com/"
+            target=
+            "_blank">
+            <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top;", width: "250"  %>
+        </a></td>
+      </tr>
+      <tr><td></br></td></tr>
+    </tbody>
+  </table>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr class="wid50">
+        <td align="left"><%= format_date(TimeKeeper.date_of_record) %></td>
+        <td  align="right"><%= notice.primary_identifier %></td>
+      </tr>
+    </tbody>
+  </table>
+  <%= render partial: "notices/ivl/inner_address", :locals => {notice: notice} %>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td><h4>Subject:  Conditional Eligibility for Health Insurance, Confirmation of Plan Selection</h4></td>
+      </tr>
+      <tr class="fssizeuser">
+        <td>Dear <%= notice.primary_fullname.strip %>:</td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr class="widn">
+        <td><strong>Congratulations!</strong> Based on the health insurance application you submitted on  <%= format_date(TimeKeeper.date_of_record) %>:</td>
+      </tr>
+      <tr><td></br></td></tr>
+    </tbody>
+  </table>
+
+  <% if notice.try(:individual).try(:active_members).try(:any?) %>
+    <table class="total_table" border="0">
+      <tbody>
+        <tr class="fssizeuser mar20">
+          <td>
+            <span>
+              The following person(s) qualify for health coverage through DC Health Link.
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.individual.active_members} %>
+  <% end %>
+
+  <% if notice.try(:individual).try(:inconsistent_members).try(:any?) %>
+    <table class="total_table" border="0">
+      <tbody>
+        <tr class="fssizeuser mar20">
+          <td class="col-red">The following person(s) <strong>conditionally</strong> qualify for health coverage through DC Health Link.</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.individual.inconsistent_members} %>
+    <table class="total_table mar20" border="0">
+      <tbody>
+        <tr>
+          <td>Your eligibility has been approved <strong>conditionally</strong> until the discrepancies between the information you provided and our records have been resolved. To resolve these discrepancies, <span class="underline">we need documentation from you</span>. (See sections below).  If you do not provide this information, <span class="underline">your health insurance may be cancelled</span>.</td>
+        </tr>
+      </tbody>
+    </table>
+  <% end %>
+</div>
+
+<div class="page_break">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td></br></td>
+      </tr>
+      <tr>
+        <td><h3 style="color:rgb(54,95,145);">Your Private Health Plan Selection</h3></td>
+      </tr>
+    </tbody>
+  </table>
+  <% notice.enrollments.each_with_index do |enrollment, index| %>
+    <table class="total_table" border="0">
+      <tbody>
+        <tr>
+          <% if index == 0 %>
+            <td>On  <%= format_date(enrollment.effective_on) %>, the following individual(s) selected the <%= enrollment.plan_name %> health insurance plan.</td>
+          <% else %>
+            <td><strong>Additionally, the following individual(s) selected the <%= enrollment.plan_name %> health insurance plan.</strong></td>
+          <% end %>
+        </tr>
+        <% enrollment.enrollees.each do |name| %>
+          <tr class="mar20" style="padding-left:5%;margin-top: 5px;">
+            <td><%= name %></td>
+          </tr>
+        <% end %>
+        <tr class="fssizeuser mar20">
+          <td>You will start getting health insurance benefits through <span><%= enrollment.plan_name %></span> on  <span><%= format_date enrollment.effective_on %></span>, as long as you make the first premium payment by the due date. You will receive an invoice directly from your plan within 3 – 10 business days and the due date for the first premium will be listed on the invoice. If you get any health care services before <span><%= format_date enrollment.effective_on %></span>, you may have to pay the costs for those services on your own if you have not yet paid your premium.</td>
+        </tr>
+        <tr class="mar20">
+          <td>For any questions about your health plan's covered services and providers, you need to contact:</td>
+        </tr>
+        <tr class="mar20" style="padding-left:5%;margin-top: 5px;">
+          <td><span><%= enrollment.plan_name %></span>&nbsp;&nbsp;at&nbsp;&nbsp;<span><%= number_to_phone(enrollment.phone, area_code: true) %></span></td>
+        </tr>
+        <tr>
+          <td></br></td>
+        </tr>
+      </tbody>
+    </table>
+  <% end %>
+
+  <table class="total_table" border="0">
+    <tbody>
+      <tr class="mar20">
+        <td><h3 style="color:rgb(54,95,145);">What You Must Pay Each Month</h3></td>
+      </tr>
+      <% notice.enrollments.each do |enrollment| %>
+        <tr class="mar20">
+          <td style="text-decoration:underline;"><%= enrollment.plan_name %></td>
+        </tr>
+        <tr class="mar20">
+          <td><ul>
+              <li>Your Total Monthly Premium Cost:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= number_to_currency(enrollment.monthly_premium_cost) %></li>
+          </ul></td>
+        </tr>
+      <% end %>
+      <tr class="mar20">
+        <td>
+          <strong>If you do not make your monthly premium payments on time, you could lose your health insurance</strong>. 45 C.F.R. 155.430(b)(2)(ii). You will receive a separate invoice with instructions on how to make that payment. <strong>You must pay your premiums directly to the health plan or dental plan <span class="underline">by the date indicated on that invoice</span>.</strong>  DC Health Link is not responsible for collecting your premiums.  Additionally, any auto-payments you may have previously established with the carrier prior to enrolling through DC Health Link will not carry-over; you must make new payment arrangements.
+        </td>
+      </tr>
+      <tr class="mar20">
+        <td>The fastest way to pay the premium is by calling the health plan or dental plan directly at the numbers listed below.  Call these numbers to ensure your premium is paid even if you have not received an invoice.</td>
+      </tr>
+      <tr><td></br></td></tr>
+    </tbody>
+  </table>
+
+  <table class="tableNew" border="1">
+    <tbody>
+      <tr style="padding:0 10px;">
+        <td>CareFirst </td>
+        <td>(855) 444-3119</td>
+      </tr>
+      <tr style="padding:0 10px;">
+        <td>Kaiser </td>
+        <td>(866) 475-3925</td>
+      </tr>
+      <tr style="padding:0 10px;">
+        <td>Aetna </td>
+        <td>(855) 586-6959</td>
+      </tr>
+      <tr style="padding:0 10px;">
+        <td>Delta Dental </td>
+        <td>(800) 471-0236</td>
+      </tr>
+      <tr style="padding:0 10px;">
+        <td>Dentegra Dental</td>
+        <td>(800) 471-0284</td>
+      </tr>
+      <tr style="padding:0 10px;">
+        <td>Dominion Dental </td>
+        <td>(888) 518-5338</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr class="mar20">
+      <td><h3 style="color:rgb(54,95,145);">What You Must Pay When You Receive Health Services</h3></td>
+    </tr>
+    <tr class="fssize mar20">
+      <td>You did not apply for cost-sharing reductions. 45 C.F.R. §155.305(g). Therefore, your deductible, out-of-pocket maximum, and co-payments are not reduced. A more detailed explanation of costs and benefits can be found in your plan's Summary of Benefits and Coverage, available on <a href="www.DCHealthLink.com" target="_blank">www.DCHealthLink.com</a>.</td>
+    </tr>
+  </tbody>
+</table>
+<table class="total_table" border="0">
+  <tbody>
+    <tr class="mar20">
+      <td><h3 style="color:rgb(54,95,145);">Documents Needed</h3></td>
+    </tr>
+    <tr class="mar20">
+      <td><strong>To determine your continued eligibility for your health plan(s), you must provide documentation to confirm or update the information that you told us on your application.</strong></td>
+    </tr>
+    <tr class="mar20">
+      <td class="underline">We accept scanned or photocopied versions of all these documents.</td>
+    </tr>
+    <tr class="mar20">
+      <td>Here is the information that we need:</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page_break">
+  <% if notice.try(:individual).try(:unverfied_ssn_members).try(:any?) %>
+    <table  class="total_table" border="0">
+      <tbody>
+        <tr class="mar20">
+          <td>
+            <strong><i> Documents Showing Social Security Number.</i></strong>. The Social Security Administration could not confirm that the Social Security Number provided for the following applicant household members is correct:
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.individual.unverfied_ssn_members} %>
+    <table  class="total_table" border="0">
+      <tbody>
+        <tr class="mar20">
+          <td>Under federal law, 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number of every person who is applying for DC Health Link. We will only use your Social Security Number to verify the information you told us on your application. We will check your information in the District and Federal databases, and the databases of other District, Federal agencies, and a consumer reporting agency.</td>
+        </tr>
+        <tr class="mar20">
+          <td>You can use a Social Security card to verify the Social Security Number(s) you provided to us.  If you do not have a Social Security Number or cannot remember you social security number, we can help you obtain one. You may not need to provide a Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact DC Health Link Customer Service at (855) 532-5465.</td>
+        </tr>
+      </tbody>
+    </table>
+  <% end %>
+
+  <% if notice.try(:individual).try(:unverfied_citizenship_members).try(:any?) %>
+    <table>
+      <tbody>
+        <tr class="mar20">
+          <td>
+            <strong><i>Documents of Citizenship or Immigration Status.</i></strong>. We need proof of the U.S. citizenship or immigration status for the following applicant household members is correct:
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.individual.unverfied_citizenship_members} %>
+    <table>
+      <tbody>
+        <tr class="mar20">
+          <td>Two types of documentation are accepted to confirm citizenship/immigration status.  We call the two types "primary" and "secondary". If you provide primary documentation, no other documents are required. If you provide secondary documentation, other identification (ID) is required for verification. Secondary documentation must be accompanied with an identification card containing a recent photo and other identifying information.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="total_table" border="0">
+      <tbody>
+        <tr><td></br></td></tr>
+        <tr>
+          <td><span class="underline">Primary documentation</span>: (Only One (1) is needed)</td>
+        </tr>
+        <tr class="wid100">
+          <td colspan="2"><ul>
+              <li>U.S. Passport
+                <ul>
+                  <li>Note: Expired passports are acceptable.</li></ul></li>
+              <li>Certificate of Naturalization</li>
+              <li>Certificate of Citizenship</li>
+              <li>Consular report of Birth Abroad of U.S. Citizen</li>
+              <li>A valid Driver’s License from a state that requires proof of citizenship and verification of Social Security Number prior to issuance of the license</li>
+              <li>A tribal document issued by a federally-recognized Indian Tribe, which must:
+                <ul>
+                  <li>Identify the Tribe issuing the document</li>
+                  <li>Identify the individual by name</li>
+                  <li>Confirm the individual’s enrollment in or affiliation with the Tribe</li>
+                  <li>Examples: Tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document</li>
+                </ul>
+              </li>
+          </ul></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="total_table" border="0">
+      <tbody>
+        <tr><td></br></td></tr>
+        <tr>
+          <td><span class="underline">Secondary documentation</span>: (Must Present One (1) of the following, along with ID)</td>
+        </tr>
+        <tr class="wid100">
+          <td colspan="2"><ul>
+              <li>A U.S. birth certificate showing birth in one of the 50 states, DC, Guam, American Samoa, Swain’s Island, Puerto Rico, the Virgin Islands, or the Commonwealth of the Northern Mariana Islands.  If born in the Puerto Rico, the Virgin Islands, or CNMI prior to the time these areas became part of the U.S., the individual will satisfy the citizenship requirement if he or she is a collectively naturalized citizen.</li>
+              <li>A Northern Marianas ID Card, issued to a collectively naturalized citizen, who was born in the Commonwealth of the Northern Mariana Islands  before November 4, 1986</li>
+              <li>A certification of Report of Birth, issued to U.S. citizens born outside the U.S.</li>
+              <li>A Report of Birth Abroad of a U.S. Citizen</li>
+              <li>A Certification of Birth</li>
+              <li>A U.S. Citizen I.D. Card</li>
+              <li>A final adoption decree showing the child’s name and U.S. place of birth, or if an adoption is not final, a statement from a state-approved adoption agency that shows the child’s name and U.S. place of birth</li>
+              <li>Evidence of U.S. Civil Service employment before June 1, 1976</li>
+              <li>U.S. Military Record showing a U.S. place of birth</li>
+              <li>A data match with the SAVE Program or any other process established by the Department of Homeland Security to verify that an individual is a citizen</li>
+              <li>Documentation that a child meets the requirements of §101 of the Child Citizenship Act </li>
+              <li>Medical records that indicate a U.S. place of birth</li>
+              <li>Life, health, or other insurance record that indicates a U.S. place of birth</li>
+              <li>Official religious record recorded in the U.S. showing that the birth occurred in the U.S.</li>
+              <li>School records showing a U.S. place of birth</li>
+              <li>Federal or State census record showing U.S. citizenship or a U.S. place of birth</li>
+          </ul></td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="total_table" border="0">
+      <tbody>
+        <tr>
+          <td><span class="underline">Needed Information to Verify Other Immigration Status</span></td>
+        </tr>
+        <tr>
+          <td style="font-size:12px !important;" ><strong>The documents that you may be able to use to verify your immigration status include, but are not limited to: </strong></td>
+        </tr>
+        <tr class="wid100">
+          <td style="font-size:12px !important;" colspan="2"><ul>
+              <li>Lawful permanent resident card (DHS Form I-551)</li>
+              <li>Arrival/Departure Record (DHS Form I-94)</li>
+              <li>Temporary I-551 Stamp in a foreign passport or on an I-94 card</li>
+              <li>Refugee Travel Document (DHS Form I-571)</li>
+              <li>Employment Authorization Card (DHS Form I-766)</li>
+              <li>Immigrant Visa (Temporary Resident Card)</li>
+              <li>Asylum grant order</li>
+              <li>Order from Immigration Judge showing that you were scheduled for deportation, but deportation has been withheld, suspended, or cancelled</li>
+              <li>Documents showing that you have applied for an immigrant visa as a victim of domestic violence, and that your application has been approved or is pending</li>
+              <li>Letter from the Office of Refugee Resettlement (for Victims of Trafficking)</li>
+              <li>Documents showing Honorable Discharge from the military (DD Form 214)</li>
+              <li>Documents showing current active duty military service (DD Form 2 (Active)</li>
+          </ul></td>
+        </tr>
+      </tbody>
+    </table>
+  <% end %>
+</div>
+
+<% if notice.try(:individual).try(:unverfied_resident_members).try(:present?) %>
+  <table>
+    <tbody>
+      <tr>
+        <td style="font-size:12px !important;" ><strong><i>Documents Showing D.C. Residency</i></strong>. A document that shows that the following household members live in the District of Columbia:</td>
+      </tr>
+    </tbody>
+  </table>
+  <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.individual.unverfied_resident_members} %>
+  <table>
+    <tbody>
+      <tr class="mar20">
+        <td>This can include: </td>
+      </tr>
+      <tr class="mar20">
+        <td style="font-size:12px !important;">
+          <ul>
+            <li>Current Driver License</li>
+            <li>Current Lease (signed within the last year)</li>
+            <li>Current Rent Receipt/Mortgage Statement</li>
+            <li>Current Utility Bill</li>
+            <li>Current Letter from Landlord</li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+<% end %>
+
+<% if notice.try(:individual).try(:indian_tribe_members).try(:present?) %>
+<div class="page_break">
+  <table>
+    <tbody>
+      <tr>
+        <td style="font-size:12px !important;" ><strong><i>American Indian Status</i></strong>. On your application, you indicated the following individual(s) were American Indian.</td>
+      </tr>
+    </tbody>
+  </table>
+  <%= render partial: "notices/ivl/enrolles_information", :locals => {enrollees: notice.individual.indian_tribe_members} %>
+  <table>
+    <tbody>
+      <tr>
+        <td colspan="3" style="font-size:12px !important;" >Please provide one of the following documents to confirm this status.</td>
+      </tr>
+      <tr>
+        <td>
+          <ul>
+            <li>Any formal documentation from a tribe, Indian Health Services, or the Bureau of Indian Affairs that verifies American Indian status. Examples of such verifications include, but are not limited to the following:
+              <ul>
+                <li>A document issued by a federally-recognized American Indian/Alaska Native tribe, such as an enrollment or membership card, a tribal census document, or a document issued by a tribe indicating the person's affiliation with the Tribe.</li>
+                <li>A document issued by the Indian Health Services indicating that the person is eligible for Indian Health Services as an American Indian and</li>
+                <li>A document obtained from the Bureau of Indian Affairs recognizing the person as an American Indian.</li>
+              </ul>
+            </li>
+            <li>For Indians born outside of the United States, we will accept the following documents:
+              <ul>
+                <li>A Form I-94 with a notation of "S1-3"</li>
+                <li>I-551 Permanent Resident Card stamped "S1-3"</li>
+                <li>Temporary I-551 stamp coded "S1-3" in a Canadian passport</li>
+                <li>o A Tribal Record or document certifying at least 50% American Indian blood, as required by Section 289 of the Immigration and Nationality Act (INA); and satisfactory evidence of birth in Canada, such as the following: Birth certificate or Baptismal; Certificate issued on a reservation; Letter from Canadian Department of Indian Affairs; or School Records.</li>
+              </ul>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<% end %>
+
+<div class="page_break">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td><h3 style="color:rgb(54,95,145);">How to Send the Documents Requested</h3></td>
+      </tr>
+      <tr>
+        <td>You can send the necessary documents either online, through U.S. Postal mail, or in-person.</td>
+      </tr>
+      <tr>
+        <td><ul>
+            <li><strong>Online: </strong> Log into your account on <a href="https://dchealthlink.com">DCHealthLink.com</a>. You can upload a scanned copy of the document.</li>
+            <li style="list-style:none;">
+              <table>
+                <tr>
+                  <td style="vertical-align:top;"><ul style="margin:0; padding:0;"><li style="list-style:disc;"><strong>U.S. Postal Mail&nbsp; - &nbsp;&nbsp;&nbsp;&nbsp;</strong></li></ul></td>
+                  <td>
+                    DC Health Link<br>
+                    Department of Human Services<br>
+                    P.O. Box 91560<br>
+                    Washington, DC 20090
+                  </td>
+                </tr>
+              </table>
+              <p style="font-style:italic;" class="mar20">Be sure to write your account number (<span><%= notice.primary_identifier %></span>) on your submission.</p>
+            </li>
+            <li>
+              <strong>In-Person</strong> – Take the document(s) to any Economic Security Administration Office (call the DC Health Link Customer Service at (855) 532 5465 for locations).
+            </li>
+        </ul></td>
+      </tr>
+      <tr>
+        <td><h3 style="color:rgb(54,95,145);">How Soon We Need Your Documents</h3></td>
+      </tr>
+      <tr>
+        <td>We need the documents above <strong>by &lt;<span>Date=Date of Notice +95 days</span>&gt;</strong> in order to make a final decision on your eligibility for your health plan. If you do not provide the documents by this deadline, we will assume that our records are correct. <span class="underline">Your health insurance coverage may be terminated.</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="page_break">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr class="mar20">
+        <td>
+          If you think you will not be able to submit the requested documentation <strong>by &lt;<span>Date=Date of Notice +95 days</span>&gt;</strong> due to circumstances outside of your control, please call DC Health Link Customer Service toll-free at (855) 532-5465 (TTY/TDD 711).  If you truly have a special need, a Department of Human Services representative will work with you to complete the verification process.
+        </td>
+      </tr>
+      <tr>
+        <td><h3 style="color:rgb(54,95,145);">Reporting Changes</h3></td>
+      </tr>
+      <tr>
+        <td>You must report any changes that might affect you or your household member's health coverage such as if:</td>
+      </tr>
+      <tr>
+        <td><ul>
+            <li>You move</li>
+            <li>Your immigration status changes</li>
+            <li>You or a family member becomes incarcerated</li>
+            <li>45 C.F.R. § 155.330(b)</li>
+        </ul></td>
+      </tr>
+      <tr>
+        <td>To report changes, you can log in to your account on <a href="www.DCHealthLink.com" target="_blank">www.DCHealthLink.com</a> or call DC Health Link Customer Service toll free at (855) 532-5465.</td>
+      </tr>
+      <tr class="mar20">
+        <td><h3 style="color:rgb(54,95,145);">Changing Plans</h3></td>
+      </tr>
+      <tr>
+        <td>You will be able to change plans during the annual open enrollment period at the end of each year.  45 C.F.R. §155.410(e).You can get the date of the next open enrollment period by going to <a href="www.DCHealthLink.com" target="_blank">www.DCHealthLink.com</a> or calling DC Health Link Customer Service at (855) 532-5465. If you have a change in circumstances during <%= TimeKeeper.date_of_record.year %>, you may also qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include: </td>
+      </tr>
+      <tr>
+        <td>
+          <ul>
+            <li>Getting married</li>
+            <li>Changes in your household size
+              <ul>
+                <li>New birth or adoption</li>
+                <li>Death</li>
+                <li>New tax dependents</li>
+              </ul>
+            </li>
+            <li>A change in income for you or others in your household</li>
+            <li>A change in the immigration status of your household members</li>
+            <li>A material violation of your health or dental plan contract by your plan sponsor</li>
+            <li>Becoming eligible for Medicaid, employer-sponsored insurance, or other insurance outside of DC Health Link.</li>
+        </ul></td>
+      </tr>
+      <tr>
+        <td>45 C.F.R. §155.420</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+<div class="page_break">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td><h3 style="color:rgb(54,95,145);">Ending Your Health Insurance Coverage</h3></td>
+      </tr>
+      <tr>
+        <td>You have the right to terminate your health insurance coverage. You can terminate your coverage by logging into your account on <a href="www.DCHealthLink.com" target="_blank">www.DCHealthLink.com</a> or by calling DC Health Link Customer Service toll-free at (855) 532-5465. You need to tell us at least fourteen (14) days before you want your coverage to end.</td>
+      </tr>
+      <tr>
+        <td>Your health insurance may also be terminated without your request if you don't pay your premiums or if our data indicates that the information you put on your application has changed and you are no longer eligible for coverage. If your health insurance is going to be terminated without your request because it has been determined that you are no longer eligible for coverage, you will receive a notice in advance telling you the basis for the decision and you will be provided with information about how to contest the decision.</td>
+      </tr>
+      <tr>
+        <td><h3 style="color:rgb(54,95,145);">Your Secure User Account</h3></td>
+      </tr>
+      <tr>
+        <td>Important information is stored in your account on the DC Health Link website.  If you don't have an account already, you can create one by going to <a href="www.DCHealthLink.com" target="_blank">www.DCHealthLink.com</a>. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free at (855) 532-5465.</td>
+      </tr>
+      <tr>
+        <td><h3 style="color:rgb(54,95,145);">Other Information</h3></td>
+      </tr>
+      <tr>
+        <td><strong>Annual Renewal</strong>: DC Health Link will notify you during the fall of each year if additional information is needed from you to renew your health insurance.  You can respond with new information if you believe any of the information we used is wrong. You can also pick a new plan during this time period if you want. 45 C.F.R. §155.335.</td>
+      </tr>
+      <tr>
+        <td><h3 style="color:rgb(54,95,145);">If You Think We Made a Mistake</h3></td>
+      </tr>
+      <tr>
+        <td>If you disagree with this determination, you have the right to appeal to an independent administrative law judge. You may request an appeal by phone, in person, online, and by mail. You must request an appeal <strong>by &lt;<span>Date of Notice+95 calendar days</span>&gt;</strong>. DC Health Link will work to resolve your appeal as quickly as possible, but appeals can take between 30 and 90 days to resolve. <strong>See the insert for more information on your appeal rights</strong>. 45 C.F.R. §155.520.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<%= render partial: "notices/ivl/blank_sheet" %>

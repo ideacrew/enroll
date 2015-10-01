@@ -55,6 +55,7 @@ class Family
   index({"households.tax_households.hbx_assigned_id" => 1})
   index({"households.tax_households.tax_household_member.financial_statement.submitted_date" => 1})
   index({"irs_groups.hbx_assigned_id" => 1})
+  index({"households.hbx_enrollments.hbx_id" => 1})
 
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
@@ -67,6 +68,9 @@ class Family
   after_save :update_family_search_collection
   after_destroy :remove_family_search_record
 
+  scope :with_enrollment_hbx_id, ->(enrollment_hbx_id) {
+    where("households.hbx_enrollments.hbx_id" => enrollment_hbx_id)
+  }
   scope :all_with_single_family_member,     -> { exists({:'family_members.1' => false}) }
   scope :all_with_multiple_family_members,  -> { exists({:'family_members.1' => true}) }
 
@@ -134,7 +138,7 @@ class Family
   def current_ivl_eligible_open_enrollments
     eligible_open_enrollments = []
 
-    benefit_sponsorship = HbxProfile.find_by_state_abbreviation("DC").try(:benefit_sponsorship)
+    benefit_sponsorship = HbxProfile.current_hbx.try(:benefit_sponsorship)
     (benefit_sponsorship.try(:benefit_coverage_periods) || []).each do |benefit_coverage_period|
       if benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
         eligible_open_enrollments << EnrollmentEligibilityReason.new(benefit_sponsorship)
@@ -190,13 +194,13 @@ class Family
   end
 
   # List of SEPs active for this Application Group today, or passed date
-  def active_seps(day = Date.today)
-    special_enrollment_periods.find_all { |sep| (sep.start_date..sep.end_date).include?(day) }
+  def active_seps(day = TimeKeeper.date_of_record)
+    special_enrollment_periods.find_all { |sep| (sep.begin_on..sep.end_on).include?(day) }
   end
 
   # single SEP with latest end date from list of active SEPs
   def current_sep
-    active_seps.max { |sep| sep.end_date }
+    active_seps.max { |sep| sep.end_on }
   end
 
   def active_broker_roles
@@ -220,9 +224,6 @@ class Family
 
   def add_family_member(person, **opts)
 #    raise ArgumentError.new("expected Person") unless person.is_a? Person
-
-
-
 
     is_primary_applicant     = opts[:is_primary_applicant]  || false
     is_coverage_applicant    = opts[:is_coverage_applicant] || true
@@ -344,6 +345,7 @@ class Family
     end
 
     def find_family_member(family_member_id)
+      return [] if family_member_id.nil?
       family = Family.where("family_members._id" => BSON::ObjectId.from_string(family_member_id)).first
       family.family_members.detect { |member| member._id.to_s == family_member_id.to_s }
     end

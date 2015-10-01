@@ -5,45 +5,93 @@
         <div class="col-md-12 col-sm-12 no-pd col-xs-12">
 
           <h3>Purchase confirmation</h3>
-          <p>Your purchase of <strong><%= @plan.name %></strong> was completed on <%= @enrollment.updated_at %>. </p>
+          <p>Your purchase of <strong><%= @plan.name %></strong> was completed on <%= format_datetime(@enrollment.updated_at) %>. </p>
           <p>Please print this page for your records.</p>
           <p>A copy of this confirmation has also been emailed to you. </p>
 
           <p>
             <% if @employer_profile.present? %>
-              <strong><%= @employer_profile.legal_name %></strong><br>
+            <strong><%= @employer_profile.legal_name %></strong><br>
             <% end %>
             <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
             Metal level : <%= @plan.metal_level %>
           </p>
-          
+
           <% if @enrollment.employee_role.present? %>
-            <%= render "insured/plan_shoppings/coverage_information" %>
+          <%= render "insured/plan_shoppings/coverage_information" %>
           <%else%>
-            <%= render "insured/plan_shoppings/individual_coverage_information" %>
+          <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate:false} %>
           <% end %>
         </div>
+        <span class="btn btn-trans" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
+        <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-trans interaction-click-control-print-purchase-confirmation" %>
+      </div>
 
-        <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation", style: "float:right;" %>
+      <div id="how_to_pay" class="modal fade" role="dialog" style="display: none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title"><b>How to Pay</b></h4>
+            </div>
+            <div class="modal-body">
+
+              <% if @plan.coverage_kind == 'health' %>
+
+              <h4><strong><%= @plan.name %></strong></h4>
+              <br/>
+              <ol>
+                <li>
+                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %>.</strong>  Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>.  <%= @plan.carrier_profile.legal_name %> will bill you directly.  If you do not receive a bill within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below.  Your medical coverage will be active once you have paid the premium for your first month of coverage.  You must make this payment directly to <%= @plan.carrier_profile.legal_name %>. DC Health Link does not collect premiums.
+                  <br/>
+                  Call <%= @plan.carrier_profile.legal_name %> at <%= @plan.carrier_profile %>
+                </li>
+                <br>
+
+
+                <li>
+                  <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> has your payment, they can provide the information you will need to start using your benefits (such as a member number). They will also mail your cards.                    <br/>
+                </li>
+              </ol>
+              <% else %>
+              <h4><strong><%= @plan.name %></strong></h4>
+              <br/>
+              <ol>
+                <li>
+                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %></strong>. Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>. <%= @plan.carrier_profile.legal_name %> will bill you directly.  If you do not receive a bill within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your dental coverage will be active once you have paid the premium for your first month of coverage.  You must make this payment directly to <%= @plan.carrier_profile.legal_name %>.   DC Health Link does not collect premiums.
+                  <br/>
+                  Call <%= @plan.carrier_profile.legal_name %> at XXXXXXXXXX.
+                </li>
+                <br/>
+                <li>
+                  <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> has your payment, they can provide the information you will need to start using your benefits (such as a member number). They will also mail your cards.<br/>
+                </li>
+              </ol>
+              <% end %>
+            </div>
+            <br/>
+            <br/>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section plan_receipt">
         <% if @change_plan.blank? && @market_kind == "individual" %>
-          <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
-            <%= render  partial: 'shared/individual_progress', locals: {step: '6'} %>
-          <% else %>
-            <%= render  partial: 'shared/sep_progress', locals: {step: '7'} %>
-          <% end %>
+        <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
+        <%= render  partial: 'shared/individual_progress', locals: {step: '6'} %>
+        <% else %>
+        <%= render  partial: 'shared/sep_progress', locals: {step: '7'} %>
+        <% end %>
         <% elsif @change_plan.blank? %>
-          <%= render  partial: 'shared/signup_progress', locals: {step: '7'} %>
+        <%= render  partial: 'shared/signup_progress', locals: {step: '7'} %>
         <% elsif @change_plan == "change_by_qle" %>
-          <%= render partial: 'shared/qle_progress', locals: {step: '4'} %>
+        <%= render partial: 'shared/qle_progress', locals: {step: '4'} %>
         <% elsif @change_plan == "change_plan" %>
-          <% if is_under_open_enrollment? %>
-            <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '3'} %>
-          <% else %>
-            <%= render partial: 'shared/sep_shop_for_plans_progress', locals: {step: '4'} %>
-          <% end %>
+        <% if @market_kind == "individual" && !is_under_open_enrollment? %>
+        <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '4'} %>
+        <% else %>
+        <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '3'} %>
+        <% end %>
         <% end %>
       </div>
     </div>

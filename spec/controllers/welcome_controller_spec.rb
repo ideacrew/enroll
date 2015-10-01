@@ -29,5 +29,10 @@ RSpec.describe WelcomeController, :type => :controller do
 
       include_examples "welcome"
     end
+
+    it "should return to a http status success" do
+      get :index
+      expect( response ).to have_http_status(:success)
+    end
   end
 end
