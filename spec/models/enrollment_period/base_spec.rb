@@ -37,6 +37,26 @@ RSpec.describe EnrollmentPeriod::Base, :type => :model do
       it "should be valid" do
         expect(base_enrollment_period.valid?).to be_truthy
       end
+
+      context "and correctly determines if a passed date falls between start_on and end_on" do
+        let(:new_base_enrollment_period) { EnrollmentPeriod::Base.new }
+        let(:invalid_date) { end_on + 1.day }
+        let(:valid_date)   { start_on + 1.day }
+
+        it "should return false if no date values are set" do
+          expect(new_base_enrollment_period.contains?(valid_date)).to be_falsey
+        end
+
+        it "should return false for date outside range" do
+          expect(base_enrollment_period.contains?(invalid_date)).to be_falsey
+        end
+
+        it "should return true for date within range" do
+          expect(base_enrollment_period.contains?(valid_date)).to be_truthy
+        end
+
+      end
+
     end
   end
 

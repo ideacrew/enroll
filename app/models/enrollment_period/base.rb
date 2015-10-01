@@ -23,8 +23,9 @@ class EnrollmentPeriod::Base
     write_attribute(:end_on, new_date.end_of_day)
   end
 
-  def contains?(date)
-    (start_on <= date) && (date <= end_on)
+  def contains?(compare_date)
+    return false unless start_on.present? && end_on.present?
+    (start_on <= compare_date) && (compare_date <= end_on)
   end
 
 
