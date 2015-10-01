@@ -1,4 +1,2 @@
-$("#inbox-messages").html("<%= escape_javascript(render("shared/inboxes/messages_list")) %>");
+$("#inbox-messages").replaceWith("<%= escape_javascript(render("shared/inboxes/messages_list")) %>");
 semantic_class();
-
-

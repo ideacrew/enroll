@@ -134,9 +134,9 @@ describe Subscribers::FamilyApplicationCompleted do
 
       context "with the xml person built by EnrollmentFactory family logging no errors" do
         let(:message) { { "body" => xml } }
-        let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_with_mulitple_tax_filers_sample.xml")) }
+        let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_with_multiple_tax_filers_sample.xml")) }
         let(:user) { FactoryGirl.create(:user) }
-        let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_with_mulitple_tax_filers_sample.xml"))).first }
+        let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_with_multiple_tax_filers_sample.xml"))).first }
         let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
         let(:person) { consumer_role.person }
         let(:ua_params) do
