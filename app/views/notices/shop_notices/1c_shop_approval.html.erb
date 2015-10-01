@@ -1,7 +1,3 @@
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[SHOP1C]<br>
-Approval of Employer SHOP Application after<br> Request for Clarifying Documentation
-</font></strong>"} %>
-
 <%= render partial: 'notices/shared/logo' %>
 <%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
@@ -38,7 +34,7 @@ Approval of Employer SHOP Application after<br> Request for Clarifying Documenta
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
   ["<strong>Log in to your Account</strong>
-    <br>([HBEURL])",
+    <br>(#{notice.hbe.url})",
    "<strong>Select Plans</strong>
     <br>You must choose one of the three plan selection options listed below:"] } %>
 
@@ -68,61 +64,14 @@ Approval of Employer SHOP Application after<br> Request for Clarifying Documenta
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Please contact your broker for further assistance.  You can also contact DC Health Link with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
-  ["Online at [HBEURL];",
-   "By email at [HBEEMAIL]; or",
-   "By calling [HBEPHONE]."] } %>
+                                                                  ["Online at #{notice.hbe.url};",
+                                                                   "By email at #{notice.hbe.email}; or",
+                                                                   "By calling #{notice.hbe.phone}."] } %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[If ER has a Broker/Assister, include contact info below]</font></strong>"} %>
-
-<table style="width: 100%">
-	<tr>
-		<td style="width: 15%"><strong>Broker:&nbsp;&nbsp;&nbsp;&nbsp;</strong></td>
-		<td style="width: 85%">[Broker/Assister First Name] [Broker/Assister Last Name]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister Organization]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister Street Address 1]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister Apt/Suite]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister City], [ Broker/Assister State] [ Broker/Assister Zip]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister Direct Phone #]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister Email]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister Web]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%"></td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%"></td>
-	</tr>
-	<tr>
-		<td style="width: 10%"></td>
-		<td style="width: 90%">_________________________________________________________________________</td>
-	</tr>
-</table>
-
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[If ER does NOT have a Broker/Assister, include:]</font></strong> If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling [Call Center Phone #]."} %>
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "This notice is being provided in accordance with 45 C.F.R. 155.715(d) & (e)"} %>
-
-
