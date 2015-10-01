@@ -40,6 +40,7 @@ function applyFloatLabels() {
   });
 }
 
+
 function applySelectric() {
   $("select[multiple!='multiple']").selectric();
 };
@@ -56,6 +57,7 @@ $(document).on('page:update', function(){
   applyFloatLabels();
   applySelectric();
 });
+
 
 function getCarrierPlans(ep, ci) {
 
