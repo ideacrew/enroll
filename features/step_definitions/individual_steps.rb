@@ -217,7 +217,6 @@ And(/I click on purchase button on confirmation page/) do
   @browser.text_field(class: /interaction-field-control-first-name-thank-you/).set("Taylor")
   @browser.text_field(class: /interaction-field-control-last-name-thank-you/).set(@u.find :last_name1)
   screenshot("purchase")
-  binding.pry
   click_when_present(@browser.a(text: /confirm/i))
 end
 

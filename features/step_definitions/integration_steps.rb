@@ -15,7 +15,7 @@ end
 When(/I use unique values/) do
   require 'test/unique_value_stash.rb'
   include UniqueValueStash
-  @u = UniqueValueStash::UniqueValues.new
+  @u = UniqueValueStash::UniqueValues.new unless defined?(@u)
 end
 
 Before "@watir" do
@@ -249,9 +249,7 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
 end
 
 Given(/^(.+) has not signed up as an HBX user$/) do |actor|
-  require 'test/unique_value_stash.rb'
-  include UniqueValueStash
-  @u = UniqueValueStash::UniqueValues.new
+  step "I use unique values"
 end
 
 When(/^I visit the Employer portal$/) do

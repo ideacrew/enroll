@@ -179,10 +179,11 @@ class ApplicationController < ActionController::Base
   end
 
   def market_kind_is_employee?
-    /employee/.match(current_user.last_portal_visited)
+    /employee/.match(current_user.last_portal_visited) || (session[:last_market_visited] == 'shop' && !(/consumer/.match(current_user.last_portal_visited)))
   end
+
   def market_kind_is_consumer?
-    /consumer/.match(current_user.last_portal_visited)
+    /consumer/.match(current_user.last_portal_visited) || (session[:last_market_visited] == 'individual' && !(/employee/.match(current_user.last_portal_visited)))
   end
 
   def save_bookmark (role, bookmark_url)
@@ -208,6 +209,7 @@ class ApplicationController < ActionController::Base
     role = @person.try(:employee_roles).try(:last)
     bookmark_url = url || request.original_url
     save_bookmark role, bookmark_url
+    session[:last_market_visited] = 'shop'
   end
 
   def set_consumer_bookmark_url(url=nil)
@@ -215,6 +217,7 @@ class ApplicationController < ActionController::Base
     role = @person.try(:consumer_role)
     bookmark_url = url || request.original_url
     save_bookmark role, bookmark_url
+    session[:last_market_visited] = 'individual'
   end
 
   def stashed_user_password
