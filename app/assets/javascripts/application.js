@@ -40,7 +40,6 @@ function applyFloatLabels() {
   });
 }
 
-
 function applySelectric() {
   $("select[multiple!='multiple']").selectric();
 };
@@ -51,6 +50,7 @@ function applyMultiLanguateSelect() {
     maxHeight: 300
   });
   $('#broker_agency_language_select').multiselect('select', 'en', true);
+
 };
 
 $(document).on('page:update', function(){
@@ -458,6 +458,7 @@ $(document).ready(function () {
   $(".npn_field").mask("9999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
+  $("#jq_datepicker_ignore_person_dob").mask("99/99/9999");
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
   $("#tribal_id").mask("999999999");

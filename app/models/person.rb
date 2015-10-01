@@ -179,7 +179,7 @@ class Person
     if self.is_consumer_role.to_s == "true"
       if !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
         self.errors.add(:base, "Tribal id is required when native american / alaskan native is selected")
-      elsif tribal_id.present? && !!@us_citizen && !!@indian_tribe_member && tribal_id.match("[0-9]{9}")
+      elsif tribal_id.present? && !!@us_citizen && !!@indian_tribe_member && !tribal_id.match("[0-9]{9}")
         self.errors.add(:base, "Tribal id must be 9 digits")
       end
     end

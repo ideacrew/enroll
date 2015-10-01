@@ -259,6 +259,20 @@ describe Person do
           expect(person.has_active_employee_role?).to eq false
         end
       end
+      
+      context "with invalid Tribal Id" do
+        let(:params) {valid_params.deep_merge({tribal_id: "12124"})}
+
+        it "should fail validation" do
+          person = Person.new(**params)
+          person.us_citizen = "true"
+          person.indian_tribe_member = "1"
+          allow(person).to receive(:is_consumer_role).and_return(:true)
+          expect(person.valid?).to eq false
+          expect(person.errors[:base]).to eq ["Tribal id must be 9 digits"]
+        end
+      end
+      
 
       context "has_active_consumer_role?" do
         let(:person) {FactoryGirl.build(:person)}

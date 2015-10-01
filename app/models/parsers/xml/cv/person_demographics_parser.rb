@@ -14,8 +14,8 @@ module Parsers::Xml::Cv
     element :race, String, tag: "race"
     element :marital_status, String, tag: "marital_status"
     element :citizen_status, String, tag: "citizen_status"
-    element :is_state_resident, String, tag: "is_state_resident"
-    element :is_incarcerated, String, tag: "is_incarcerated"
+    element :is_state_resident, Boolean, tag: "is_state_resident"
+    element :is_incarcerated, Boolean, tag: "is_incarcerated"
 
     def to_hash
       sex_value = sex.blank? ? nil : sex.split('#').last

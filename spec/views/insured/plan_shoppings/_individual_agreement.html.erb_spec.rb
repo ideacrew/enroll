@@ -14,7 +14,7 @@ RSpec.describe "insured/plan_shoppings/_individual_agreement.html.erb" do
   end
 
   it "should display the title" do
-    expect(rendered).to have_selector('th', text: "Terms and Agreement")
+    expect(rendered).to have_selector('h3', text: "Terms and Conditions")
   end
 
   it "should have required fields" do
