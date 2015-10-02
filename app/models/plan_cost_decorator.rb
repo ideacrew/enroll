@@ -109,6 +109,8 @@ class PlanCostDecorator < SimpleDelegator
 
   def reference_premium_for(member)
     reference_plan.premium_for(plan_year_start_on, age_of(member))
+  rescue
+    0
   end
 
   def premium_for(member)

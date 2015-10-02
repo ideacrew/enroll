@@ -1,6 +1,6 @@
 <% action_path = new_insured_group_selection_path %>
 
-<% if !@employee_role.present? && !is_under_open_enrollment? %>
+<% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
   <% action_path = find_sep_insured_families_path %>
 <% end %>
 

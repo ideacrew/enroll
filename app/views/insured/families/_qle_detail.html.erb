@@ -37,35 +37,39 @@
               </div>
             </div>
 
-            <div class="csr-form hidden">
-              <h3 class="qle-details-title">Change in APTC/CSR</h3>
-              <div class="alert alert-danger" role="alert">
-                Based on the information you entered, you may be eligible for a special enrollment period. Please call us at 1-855-532-5465 to give us more information so we can see if you qualify.
+            <div id="qle_message">
+              <div class="csr-form hidden">
+                <h3 class="qle-details-title">Change in APTC/CSR</h3>
+                <div class="alert alert-danger" role="alert">
+                  Based on the information you entered, you may be eligible for a special enrollment period. Please call us at 1-855-532-5465 to give us more information so we can see if you qualify.
+                </div>
+              </div>
+
+              <div class="success-info hidden">
+                <p class="success-text">
+                  <strong id="qle-input-info">Based on the information you entered, you may be eligible to enroll now but there is limited time.</strong><br><br>
+                </p>
+
+                <%= hidden_field_tag 'change_plan' %>
+                <%= hidden_field_tag 'qle_id' %>
+                <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
+
+                <div class="effective_on_kinds">
+                </div>
+
+                <div class="center">
+                  <%= submit_tag 'Continue', class: 'btn btn-primary' %>
+                </div>
+              </div>
+
+              <div class="error-info hidden">
+                <p class="error-text">The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact DC Health Link's Customer Care Center: 1-855-532-5465.<</p>
+                <div class="center">
+                  <%= submit_tag 'Continue', disabled: true, class: 'btn' %>
+                </div>
               </div>
             </div>
-
-            <div class="success-info hidden">
-              <p class="success-text">
-                <strong id="qle-input-info">Based on the information you entered, you may be eligible to enroll now but there is limited time.</strong><br><br>
-              </p>
-
-              <%= hidden_field_tag 'change_plan' %>
-              <%= hidden_field_tag 'qle_id' %>
-              <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || "None" %>
-
-              <div class="effective_on_kinds">
-              </div>
-
-              <div class="center">
-                <%= submit_tag 'Continue', class: 'btn btn-primary' %>
-              </div>
-            </div>
-
-            <div class="error-info hidden">
-              <p class="error-text">The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact DC Health Link's Customer Care Center: 1-855-532-5465.<</p>
-              <div class="center">
-                <%= submit_tag 'Continue', disabled: true, class: 'btn' %>
-              </div>
+            <div id="mec_notice">
             </div>
           </div>
         <% end %>

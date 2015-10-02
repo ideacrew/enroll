@@ -40,7 +40,6 @@ function applyFloatLabels() {
   });
 }
 
-
 function applySelectric() {
   $("select[multiple!='multiple']").selectric();
 };
@@ -51,6 +50,7 @@ function applyMultiLanguateSelect() {
     maxHeight: 300
   });
   $('#broker_agency_language_select').multiselect('select', 'en', true);
+
 };
 
 $(document).on('page:update', function(){
@@ -102,8 +102,8 @@ $(document).ready(function () {
   });
 
   //hide border bottom
-  $('input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: 0px;');
-
+  $('input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: none;');
+  $(".package-offering tr:contains('Child under 26')").closest('tr').attr('style','border-bottom: none;');
   // move start date to url for plan options
   $("#plan_year_start_on").on('change', function() {
     start_on = $(this).val().substr(0,4);
@@ -458,6 +458,7 @@ $(document).ready(function () {
   $(".npn_field").mask("9999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
+  $("#jq_datepicker_ignore_person_dob").mask("99/99/9999");
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
   $("#tribal_id").mask("999999999");
