@@ -59,6 +59,12 @@ class EnrollmentPeriod::SpecialEnrollment < EnrollmentPeriod::Base
     end_on - start_on
   end
 
+  def self.find(search_id)
+    family = Family.by_special_enrollment_period_id(search_id).first
+    family.special_enrollment_periods.detect() { |sep| sep._id == search_id } unless family.blank?
+  end
+
+
 private
   def set_date_period
     self.start_on = self.qle_on - self.qualifying_life_event_kind.pre_event_sep_in_days

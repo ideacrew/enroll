@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
 
-  let(:family)        { FactoryGirl.build(:family, :with_primary_family_member) }
+  let(:family)        { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:shop_qle)      { QualifyingLifeEventKind.create(
                               title: "I've entered into a legal domestic partnership",
                               action_kind: "add_benefit",
@@ -80,13 +80,24 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
 
     context "with all valid arguments" do
       let(:params) { valid_params }
-      let(:base_enrollment_period) { EnrollmentPeriod::SpecialEnrollment.new(**params) }
+      let(:special_enrollment_period) { EnrollmentPeriod::SpecialEnrollment.new(**params) }
 
-      it "should be valid" do
-        expect(base_enrollment_period.valid?).to be_truthy
+      it "should save" do
+        expect(special_enrollment_period.save).to be_truthy
+      end
+
+      context "and it is saved" do
+        let!(:saved_sep) do
+          sep = special_enrollment_period
+          sep.save
+          sep
+        end
+
+        it "and should be findable" do
+          expect(EnrollmentPeriod::SpecialEnrollment.find(saved_sep._id).id).to eq saved_sep.id
+        end
       end
     end
-
   end
 
 
