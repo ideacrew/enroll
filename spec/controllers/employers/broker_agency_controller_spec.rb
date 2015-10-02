@@ -103,5 +103,18 @@ RSpec.describe Employers::BrokerAgencyController do
         expect(@employer_profile.broker_agency_accounts).to eq([])
       end
     end
+
+    context 'when direct terminate' do 
+      before(:each) do
+        sign_in(@user)
+      end
+
+      it "should terminate broker and redirect to my_account with broker tab actived" do
+        get :terminate, employer_profile_id: @employer_profile.id, broker_agency_id: @org2.broker_agency_profile.id, direct_terminate: true, termination_date: TimeKeeper.date_of_record
+
+        expect(flash[:notice]).to eq("Broker terminated successfully.")
+        expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab: "brokers"))
+      end 
+    end
   end
 end

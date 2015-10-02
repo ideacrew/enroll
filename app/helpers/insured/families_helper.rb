@@ -33,4 +33,20 @@ module Insured::FamiliesHelper
     end
     link_to qle.title, "javascript:void(0)", options
   end
+
+  def generate_options_for_effective_on_kinds(effective_on_kinds, qle_date)
+    return [] if effective_on_kinds.blank?
+
+    options = []
+    effective_on_kinds.each do |kind|
+      case kind
+      when 'date_of_event'
+        options << [qle_date.to_s, kind]
+      when 'fixed_first_of_next_month'
+        options << [(qle_date.end_of_month + 1.day).to_s, kind]
+      end
+    end
+
+    options
+  end
 end

@@ -198,6 +198,25 @@ $(document).ready(function () {
     divtoshow = $(this).data("value") + "-div";
     $("."+divtoshow).show();
   });
+  // Add something similar to jqueries deprecated .toggle()
+  $.fn.toggleClick=function(){
+	var functions=arguments, iteration=0
+	return this.click(function(){
+		functions[iteration].apply(this,arguments)
+		iteration= (iteration+1) %functions.length
+	})
+}
+
+  $('#address_info + span.form-action').toggleClick(function () {
+        $(this).text('Remove Mailing Address');
+        $('.row-form-wrapper.mailing-div').show();
+    }, function () {
+        $(this).text('Add Mailing Address');
+        $('.mailing-div').hide();
+        $('.mailing-div input').val("");
+        $('.mailing-div .label-floatlabel').hide();
+        });
+
 
   // $('.alert').delay(7000).fadeOut(2000); //Fade Alert Box
   // $('#plan_year input,select').click(function(){
@@ -499,9 +518,6 @@ $(document).ready(function () {
     $('#edit_broker_applicant').html('');
     $('#broker_applicants_roster').show();
   });
-});
-
-$(document).ready(function () {
   $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").click(function(){
     $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").addClass('focus_none');
     $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").removeClass('add_focus');
