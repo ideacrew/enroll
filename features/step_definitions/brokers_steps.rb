@@ -187,13 +187,14 @@ When(/^.+ terminates broker$/) do
   @browser.a(text: /Terminate/).wait_until_present
   @browser.a(text: /Terminate/).click
 
-  @browser.text_field(class: "date-picker").wait_until_present
-  @browser.text_field(class: "date-picker").set("07/23/2015")
+  #according to 2096 remove terminate in future
+  #@browser.text_field(class: "date-picker").wait_until_present
+  #@browser.text_field(class: "date-picker").set("07/23/2015")
 
-  2.times { @browser.a(text: /Terminate/).click } # To collapse calender
+  #2.times { @browser.a(text: /Terminate/).click } # To collapse calender
 
-  @browser.a(text: /Submit/).wait_until_present
-  @browser.a(text: /Submit/).click
+  #@browser.a(text: /Submit/).wait_until_present
+  #@browser.a(text: /Submit/).click
 end
 
 Then(/^.+ should see broker terminated message$/) do
