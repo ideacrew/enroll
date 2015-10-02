@@ -468,15 +468,15 @@ When(/^.+ selects? a plan on the plan shopping page$/) do
 end
 
 Then(/^.+ should see the coverage summary page$/) do
-  @browser.element(class: /interaction-click-control-purchase/).wait_until_present
+  @browser.element(class: /interaction-click-control-confirm/).wait_until_present
   screenshot("summary_page")
   expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
 end
 
-When(/^.+ clicks? on purchase button on the coverage summary page$/) do
+When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
   # @browser.execute_script('$(".interaction-click-control-purchase").trigger("click")')
-  @browser.element(class: /interaction-click-control-purchase/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
+  @browser.element(class: /interaction-click-control-confirm/).wait_until_present
+  scroll_then_click(@browser.element(class: /interaction-click-control-confirm/))
 end
 
 Then(/^.+ should see the receipt page$/) do

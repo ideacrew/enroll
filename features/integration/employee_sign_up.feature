@@ -46,7 +46,7 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
         When Employee clicks continue on the group selection page
         Then Employee should see the list of plans
         When Employee selects a plan on the plan shopping page
-        When Employee clicks on purchase button on the coverage summary page
+        When Employee clicks on Confirm button on the coverage summary page
         Then Employee should see the receipt page
         Then Employee should see the "my account" page
         # Then Employee should see the "Your Enrollment History" section
