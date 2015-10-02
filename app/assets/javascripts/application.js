@@ -209,7 +209,7 @@ $(document).ready(function () {
 
   $('#address_info + span.form-action').toggleClick(function () {
         $(this).text('Remove Mailing Address');
-        $('.mailing-div').show();
+        $('.row-form-wrapper.mailing-div').show();
     }, function () {
         $(this).text('Add Mailing Address');
         $('.mailing-div').hide();
