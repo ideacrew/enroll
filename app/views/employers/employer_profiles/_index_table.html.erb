@@ -22,7 +22,8 @@
       <td><%= number_to_obscured_fein(er.fein) %></td>
       <td><%= er.roster_size %></td>
       <td><%= er.aasm_state.humanize %></td>
-      <td><%= er.published_plan_year.try(:effective_date) %></td>
+      <td><%= er.published_plan_year.try(:effective_date) %>
+      <%= link_to ' (Review)', employers_premium_statement_path(er) %></td>
       <% if controller_name == 'profiles' %>
         <% broker_agency_profile = er.active_broker_agency_account.broker_agency_profile %>
         <% edit_path = edit_broker_agencies_profile_applicant_path(broker_agency_profile, er.active_broker) %>
