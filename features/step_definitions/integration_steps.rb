@@ -15,7 +15,7 @@ end
 When(/I use unique values/) do
   require 'test/unique_value_stash.rb'
   include UniqueValueStash
-  @u = UniqueValueStash::UniqueValues.new
+  @u = UniqueValueStash::UniqueValues.new unless defined?(@u)
 end
 
 Before "@watir" do
@@ -32,8 +32,9 @@ After "@watir" do
   @take_screens = false if @take_screens
 end
 
-def people
-  {
+def people 
+  return @a if defined?(@a)
+  @a = {
     "Soren White" => {
       first_name: "Soren",
       last_name: "White",
@@ -60,6 +61,22 @@ def people
       dob: "05/02/1976",
       ssn: "761234567",
       email: 'broker.assisted@dc.gov',
+      password: 'aA1!aA1!aA1!'
+    },
+    "Fred" => {
+      first_name: 'Fred',
+      last_name: 'Thirteen',
+      dob: defined?(@u) ? @u.adult_dob : "08/13/1979",
+      ssn: defined?(@u) ? @u.ssn : "761234567",
+      email: defined?(@u) ? @u.email : 'fred@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
+    "Megan" => {
+      first_name: 'Megan',
+      last_name: 'Smith',
+      dob: defined?(@u) ? @u.adult_dob : "08/13/1979",
+      ssn: defined?(@u) ? @u.ssn : "761234567",
+      email: defined?(@u) ? @u.email : 'megan@example.com',
       password: 'aA1!aA1!aA1!'
     },
     "Hbx Admin" => {
@@ -90,6 +107,16 @@ def people
       dba: "Legal LLC",
       fein: "890000223",
       email: 'tim.wood@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
+    "Tronics" => {
+      first_name: "Tronics",
+      last_name: "Rocks#{rand(1000)}",
+      dob: defined?(@u) ?  @u.adult_dob : "08/13/1979",
+      legal_name: "Tronics",
+      dba: "Tronics",
+      fein: defined?(@u) ? @u.fein : '123123123',
+      email: defined?(@u) ? @u.email : 'tronics@example.com',
       password: 'aA1!aA1!aA1!'
     },
   }
@@ -222,6 +249,7 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
 end
 
 Given(/^(.+) has not signed up as an HBX user$/) do |actor|
+  step "I use unique values"
 end
 
 When(/^I visit the Employer portal$/) do
@@ -440,15 +468,15 @@ When(/^.+ selects? a plan on the plan shopping page$/) do
 end
 
 Then(/^.+ should see the coverage summary page$/) do
-  @browser.element(class: /interaction-click-control-purchase/).wait_until_present
+  @browser.element(class: /interaction-click-control-confirm/).wait_until_present
   screenshot("summary_page")
   expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
 end
 
-When(/^.+ clicks? on purchase button on the coverage summary page$/) do
+When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
   # @browser.execute_script('$(".interaction-click-control-purchase").trigger("click")')
-  @browser.element(class: /interaction-click-control-purchase/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
+  @browser.element(class: /interaction-click-control-confirm/).wait_until_present
+  scroll_then_click(@browser.element(class: /interaction-click-control-confirm/))
 end
 
 Then(/^.+ should see the receipt page$/) do

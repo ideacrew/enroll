@@ -12,7 +12,6 @@ Feature: Create Employer
 
     Scenario: An Employer Representative has not signed up on the HBX
       Given Employer has not signed up as an HBX user
-      When I use unique values
       When I visit the Employer portal
         Then John Doe creates an HBX account
         Then I should see a successful sign up message
@@ -67,6 +66,6 @@ Feature: Create Employer
         Then Employee should see the hsa_compatible filter results
         When Employee selects a plan on the plan shopping page
         Then Employee should see the coverage summary page
-        When Employee clicks on purchase button on the coverage summary page
+        When Employee clicks on Confirm button on the coverage summary page
         Then Employee should see the receipt page
         Then Employee should see the "my account" page

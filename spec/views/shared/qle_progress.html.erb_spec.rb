@@ -44,7 +44,7 @@ describe "shared/_qle_progress.html.erb" do
     end
 
     it "should have purchase button" do
-      expect(rendered).to have_selector('a', text: 'Purchase')
+      expect(rendered).to have_selector('a', text: 'Confirm')
     end
 
     it "should have previous option" do

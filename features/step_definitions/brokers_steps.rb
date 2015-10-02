@@ -157,17 +157,16 @@ end
 
 Then(/^.+ clicks? select broker button$/) do
   @browser.a(text: /Select Broker/).wait_until_present
-  @browser.a(text: /Select Broker/).click
+  logistics = @browser.as(text: /Select Broker/).last
+  logistics.click
 end
 
 Then(/^.+ should see confirm modal dialog box$/) do
-  @browser.element(class: /modal-dialog/).wait_until_present
-  expect(@browser.div(class: /modal-body/).p(text: /Click Confirm to hire the selected broker\. Warning\: if you have an existing broker\,/).visible?).to be_truthy
-  expect(@browser.div(class: /modal-body/).p(text: /they will be terminated effective immediately\./).visible?).to be_truthy
+  wait_and_confirm_text /Broker Selection Confirmation/
 end
 
 Then(/^.+ confirms? broker selection$/) do
-  modal = @browser.div(class: 'modal-dialog')
+  modal = @browser.divs(class: 'modal-dialog').last
   modal.input(value: /Confirm/).wait_until_present
   modal.input(value: /Confirm/).click
 end
@@ -212,7 +211,7 @@ Then(/^.+ should see the Employer Profile page as Broker$/) do
   expect(@browser.element(text: /I'm a Broker/).visible?).to be_truthy
 end
 
-Then(/^Primary Broker creates and publishes a plan year$/) do
+Then(/^.* creates and publishes a plan year$/) do
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-add-plan-year/))
   start_on = @browser.p(text: /SELECT START ON/i)

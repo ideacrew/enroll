@@ -2,7 +2,6 @@
 Feature: Insured Plan Shopping on Individual market
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
-      When I use unique values
       When I visit the Insured portal
       Then Individual creates HBX account
       Then I should see a successful sign up message
@@ -61,5 +60,6 @@ Feature: Insured Plan Shopping on Individual market
       Then CSR should see the Agent Portal
       Then CSR clicks on New Consumer Paper Application
       Then CSR starts a new enrollment
+
 
 

@@ -4,16 +4,17 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_for_address_info, only: [:find_sep]
 
   def home
-    set_consumer_bookmark_url(family_account_path)
+    set_bookmark_url
     @hbx_enrollments = @family.enrolled_hbx_enrollments || []
-    @employee_role = @person.employee_roles.try(:first)
 
+    @employee_role = @person.employee_roles.try(:first) unless market_kind_is_consumer?
     respond_to do |format|
       format.html
     end
   end
 
   def manage_family
+    set_bookmark_url
     @family_members = @family.active_family_members
     # @employee_role = @person.employee_roles.first
 
@@ -23,7 +24,6 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def find_sep
-    set_consumer_bookmark_url(family_account_path)
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
@@ -109,9 +109,9 @@ class Insured::FamiliesController < FamiliesController
   private
   def init_qualifying_life_events
     @qualifying_life_events = []
-    if @person.employee_roles.present?
+    if market_kind_is_employee?
       @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
-    elsif @person.consumer_role.present?
+    elsif market_kind_is_consumer?
       @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
     end
   end

@@ -15,7 +15,10 @@ org0.create_broker_agency_profile(primary_broker_role: bk0, market_kind: "both",
 office1 = OfficeLocation.new(address: {kind: "work", address_1: "102 Main St", city: "Washington", state: "DC", zip: "20001"}, phone: {kind: "work", area_code: "202", number: "555-1213"})
 org1 = Organization.new(legal_name: "Chase & Assoc", fein: "034267001", office_locations: [office1], dba: "Chase")
 org1.create_broker_agency_profile(primary_broker_role: bk1, broker_agency_contacts: [p1, p3], market_kind: "both", entity_kind: "c_corporation")
-
+p0.broker_role.broker_agency_profile_id  = org1.broker_agency_profile.id
+p0.broker_role.save
+p3.broker_role.broker_agency_profile_id  = org1.broker_agency_profile.id
+p3.broker_role.save
 
 broker_files = Dir.glob("#{Rails.root}/public/xml/brokerxmls/*")
 broker_files.each do |file|

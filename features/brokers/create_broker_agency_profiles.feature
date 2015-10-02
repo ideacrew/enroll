@@ -13,7 +13,7 @@ Feature: Create Primary Broker and Broker Agency
 
   Scenario: Primary Broker has not signed up on the HBX
     When Primary Broker visits the HBX Broker Registration form
-        When I use unique values
+        Given Primary Broker has not signed up as an HBX user
         And Primary Broker clicks on New Broker Agency Tab
         Then Primary Broker should see the New Broker Agency form
         When Primary Broker enters personal information
@@ -39,7 +39,6 @@ Feature: Create Primary Broker and Broker Agency
         And Primary Broker logs out
 
     Given Employer has not signed up as an HBX user
-        When I use unique values
         When I visit the Employer portal
         Then Tim Wood creates an HBX account
         Then Tim Wood should see a successful sign up message

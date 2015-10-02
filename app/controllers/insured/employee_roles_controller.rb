@@ -64,8 +64,6 @@ class Insured::EmployeeRolesController < ApplicationController
     @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
     if @person.present?
       @person.addresses << @employee_role.new_census_employee.address if @employee_role.new_census_employee.address.present?
-
-
       if @employee_role.new_census_employee.email.present?
         new_employee_email = @employee_role.new_census_employee.email.address
         if @person.emails.first
@@ -80,7 +78,6 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   def update
-    set_employee_bookmark_url(family_account_path)
     save_and_exit =  params['exit_after_method'] == 'true'
     person = Person.find(params.require(:id))
     object_params = params.require(:person).permit(*person_parameters_list)

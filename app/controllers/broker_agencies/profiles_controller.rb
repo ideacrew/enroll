@@ -120,7 +120,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     if current_user.has_broker_agency_staff_role?
       redirect_to broker_agencies_profile_path(:id => current_user.person.broker_agency_staff_roles.first.broker_agency_profile_id)
     elsif current_user.has_broker_role?
-      redirect_to broker_agencies_profile_path(:id => current_user.person.broker_role.broker_agency_profile_id)
+      redirect_to broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id.to_s)
     else
       flash[:notice] = "You don't have a Broker Agency Profile associated with your Account!! Please register your Broker Agency first."
     end
