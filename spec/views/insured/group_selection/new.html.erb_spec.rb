@@ -257,7 +257,11 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(false)
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 0)
-      expect(rendered).to have_selector("a", count: 0)
+    end
+
+    it "should have back to my account link" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to have_selector("a[href='/families/home']", text: 'Back to my account')
     end
   end
 
