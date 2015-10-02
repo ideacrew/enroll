@@ -120,7 +120,8 @@ $(document).on('click', '.reference-plan input + label', function() {
 
     $('.contribution_handler').each(function() {
       $(this).change(function(){
-        calcEmployerContributions($('a#calc_employer_contributions_link').data('href'));
+        var location_id = $(this).parents('fieldset').attr('id')
+        calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);
       });
     });
 
@@ -139,6 +140,7 @@ $(document).on('click', '.reference-plan input + label', function() {
     var plan_option_kind = $("#"+location+" .nav-tabs input[type=radio]:checked").val();
     console.log(plan_option_kind);
     var location_id = location;
+
 
     if (reference_plan_id == "" || reference_plan_id == undefined) {
       return
