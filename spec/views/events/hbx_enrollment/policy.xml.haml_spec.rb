@@ -11,5 +11,7 @@ RSpec.describe "events/hbx_emrollment/policy.haml.erb" do
     expect(rendered).to include("</policy>")
     expect(rendered).to include("<enrollees>")
     expect(rendered).to include("<plan>")
+    expect(rendered).to include("<premium_total_amount>")
+    expect(rendered).to include("<total_responsible_amount>")
   end
 end
