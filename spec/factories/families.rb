@@ -6,7 +6,8 @@ FactoryGirl.define do
     updated_at "user"
 
     trait :with_primary_family_member do
-      family_members {[FamilyMember.new(is_primary_applicant: true, is_consent_applicant:true)]}
+      person { Person.new(last_name: "Belushi", first_name: "John", dob: Date.new(1949, 1, 12)) }
+      family_members {[FamilyMember.new(person: person, is_primary_applicant: true, is_consent_applicant:true)]}
     end
   end
 end
