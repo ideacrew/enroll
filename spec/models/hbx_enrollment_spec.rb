@@ -212,8 +212,9 @@ describe HbxEnrollment do
 
         it "should find all employees who have waived or selected plans" do
           enrollments = HbxEnrollment.find_by_benefit_groups(all_benefit_group_assignments.collect(&:benefit_group))
-          expect(enrollments.size).to eq (blue_collar_employee_count + white_collar_employee_count)
-          expect(enrollments).to match_array(blue_collar_enrollment_waivers + white_collar_enrollment_waivers + blue_collar_enrollments + white_collar_enrollments)
+          active_enrolled_enrollments = (blue_collar_enrollment_waivers + white_collar_enrollment_waivers + blue_collar_enrollments + white_collar_enrollments).reject{|e| !HbxEnrollment::ENROLLED_STATUSES.include?(e.aasm_state)}
+          expect(enrollments.size).to eq (active_enrolled_enrollments.size)
+          expect(enrollments).to match_array(active_enrolled_enrollments)
         end
 
         it "should know the total premium" do
@@ -229,21 +230,6 @@ describe HbxEnrollment do
         it "should know the total employer contribution" do
           Caches::PlanDetails.load_record_cache!
           expect(blue_collar_enrollments.first.total_employer_contribution).to be
-        end
-
-        context "covered" do
-          let!(:enrollments) {white_collar_enrollments + white_collar_enrollment_waivers + blue_collar_enrollments + blue_collar_enrollment_waivers}
-
-          it "should return only covered enrollments count" do
-            expect(HbxEnrollment.covered(enrollments).size).to eq 9
-          end
-
-          it "should return only active enrollments" do
-            white_collar_enrollments.each do |hbx|
-              allow(hbx).to receive(:is_active).and_return(false)
-            end
-            expect(HbxEnrollment.covered(enrollments).size).to eq (9-white_collar_enrollments.size)
-          end
         end
       end
 
