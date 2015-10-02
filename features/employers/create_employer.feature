@@ -66,6 +66,6 @@ Feature: Create Employer
         Then Employee should see the hsa_compatible filter results
         When Employee selects a plan on the plan shopping page
         Then Employee should see the coverage summary page
-        When Employee clicks on purchase button on the coverage summary page
+        When Employee clicks on Confirm button on the coverage summary page
         Then Employee should see the receipt page
         Then Employee should see the "my account" page
