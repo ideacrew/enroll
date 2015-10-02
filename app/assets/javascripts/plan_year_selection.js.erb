@@ -58,17 +58,13 @@ $(document).on('ready', function() {
         $(this).closest('.benefit-group-fields').find('.plan-options, .single-plan-tab').show();
       }
     });
-    $(document).on('click', '.nav-tabs a', function() {
-      $(this).closest('.benefit-group-fields').find('.plan-options').hide();
-      $(this).closest('.benefit-group-fields').find('.plan-options > * input, .reference-plans > * input').prop('checked', 0);
-      $(this).closest('.benefit-group-fields').find('.reference-plans').show();
-    });
+
 
 
 
     //toggle plan options checkbox through parent anchor
 
-    $(document).on('click', '.plan-options a, .nav-tabs a', function() {
+    $(document).on('click', '.plan-options a', function() {
       $(this).closest('.benefit-group-fields').find('.select-reference').remove();
       $(this).closest('.benefit-group-fields').find('.selected-plan, .referenceplan').hide();
       $(this).closest('.benefit-group-fields').find('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
@@ -97,7 +93,7 @@ $(document).on('ready', function() {
 $(document).on('click', '.reference-plan input + label', function() {
 
   var reference_plan_id = $(this).closest('.reference-plan').find('input').attr('value');
-
+  var location_id = $(this).parents('fieldset').attr('id')
   if (reference_plan_id != "" && reference_plan_id != undefined){
     var start_date = $("#plan_year_start_on").val();
     if (start_date == "") {
@@ -112,10 +108,10 @@ $(document).on('click', '.reference-plan input + label', function() {
       data: {
         "start_on": $("#plan_year_start_on").val(),
         "reference_plan_id": reference_plan_id,
-        "location_id": $(this).parents('fieldset').attr('id')
+        "location_id": location_id
       }
     }).done(function() {
-      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'));
+      calcEmployerContributions($('a#calc_employer_contributions_link').data('href'), location_id);
     });
   };
 });
@@ -137,12 +133,12 @@ $(document).on('click', '.reference-plan input + label', function() {
     })
   });
 
-  function calcEmployerContributions(url) {
-    var reference_plan_id = $('.reference-plan input[type=radio]:checked').val();
+  function calcEmployerContributions(url, location) {
+    var reference_plan_id = $('#'+location+' .reference-plan input[type=radio]:checked').val();
     console.log(reference_plan_id);
-    var plan_option_kind = $(".nav-tabs input[type=radio]:checked").val();
+    var plan_option_kind = $("#"+location+" .nav-tabs input[type=radio]:checked").val();
     console.log(plan_option_kind);
-    var location_id = $('.reference-plan input[type=radio]:checked').parents('fieldset').attr('id')
+    var location_id = location;
 
     if (reference_plan_id == "" || reference_plan_id == undefined) {
       return
