@@ -466,7 +466,7 @@ class HbxEnrollment
     enrollment_list = []
     families.each do |family|
       family.households.each do |household|
-        household.hbx_enrollments.each do |enrollment|
+        household.hbx_enrollments.active.each do |enrollment|
           enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_id)
         end
       end
@@ -489,7 +489,7 @@ class HbxEnrollment
     enrollment_list = []
     families.each do |family|
       family.households.each do |household|
-        household.hbx_enrollments.each do |enrollment|
+        household.hbx_enrollments.active.each do |enrollment|
           enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_assignment_id)
         end
       end
