@@ -51,6 +51,7 @@ class Employers::BrokerAgencyController < ApplicationController
     redirect_to employers_employer_profile_path(@employer_profile)
   end
 
+
   def terminate
     if params["termination_date"].present?
       termination_date = DateTime.strptime(params["termination_date"], '%m/%d/%Y').try(:to_date)
@@ -69,7 +70,11 @@ class Employers::BrokerAgencyController < ApplicationController
       }
       format.all {
         flash[:notice] = "Broker terminated successfully."
-        redirect_to employers_employer_profile_path(@employer_profile)
+        if params[:direct_terminate]
+          redirect_to employers_employer_profile_path(@employer_profile, tab: "brokers")
+        else
+          redirect_to employers_employer_profile_path(@employer_profile)
+        end
       }
     end
   end
