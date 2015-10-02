@@ -34,6 +34,7 @@ function check_dateformat(date) {
 };
 
 $(document).on('blur', 'input.jq-datepicker, input.date-picker',  function(){
+  var date = $(this).val();
   if(date != "" && !check_dateformat(date)){
     alert("invalid date format");
     $(this).val("");
