@@ -44,4 +44,15 @@ Feature: Insured Enrolls as Employee then as Consumer
     When Fred signs in
     Then Fred sees the Household Info: Family Members page
     Then Fred is an Employee
+    When Fred clicks continue on the dependents page
+    Then Fred should see the group selection page
+    When Fred clicks continue on the group selection page
+    Then Fred should see the plan shopping welcome page
+    Then Fred should see the list of plans
+    When Fred selects a plan on the plan shopping page
+    Then Fred should see the coverage summary page
+    When Fred clicks on Confirm button on the coverage summary page
+    Then Fred should see the receipt page
+    Then Fred should see the "my account" page
+
     Then Fred logs out
