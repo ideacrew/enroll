@@ -71,6 +71,7 @@ class HbxEnrollment
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
   scope :my_enrolled_plans, -> { where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
   scope :current_year, -> { where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
+  scope :enrolled, ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -454,52 +455,38 @@ class HbxEnrollment
   def self.find_by_benefit_groups(benefit_groups = [])
     id_list = benefit_groups.collect(&:_id).uniq
 
-    # families = nil
-    # if id_list.size == 1
-    #   families = Family.where(:"households.hbx_enrollments.benefit_group_id" => id_list.first)
-    # else
-    #   families = Family.any_in(:"households.hbx_enrollments.benefit_group_id" => id_list )
-    # end
-
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-
-    enrollment_list = []
-    families.each do |family|
-      family.households.each do |household|
-        household.hbx_enrollments.active.each do |enrollment|
-          enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_id)
-        end
-      end
+    families.inject([]) do |enrollments, family|
+      enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).active.enrolled.to_a
     end
-    enrollment_list
   end
 
-  def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
-    id_list = benefit_group_assignments.collect(&:_id)
+  # def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
+  #   id_list = benefit_group_assignments.collect(&:_id)
 
-    # families = nil
-    # if id_list.size == 1
-    #   families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list.first)
-    # else
-    #   families = Family.any_in(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list )
-    # end
+  #   # families = nil
+  #   # if id_list.size == 1
+  #   #   families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list.first)
+  #   # else
+  #   #   families = Family.any_in(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list )
+  #   # end
 
-    families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id".in => id_list)
+  #   families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id".in => id_list)
 
-    enrollment_list = []
-    families.each do |family|
-      family.households.each do |household|
-        household.hbx_enrollments.active.each do |enrollment|
-          enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_assignment_id)
-        end
-      end
-    end
-    enrollment_list
-  end
+  #   enrollment_list = []
+  #   families.each do |family|
+  #     family.households.each do |household|
+  #       household.hbx_enrollments.active.each do |enrollment|
+  #         enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_assignment_id)
+  #       end
+  #     end
+  #   end
+  #   enrollment_list
+  # end
 
-  def self.covered(enrollments)
-    enrollments.select{|e| ENROLLED_STATUSES.include?(e.aasm_state) && e.is_active? }
-  end
+  # def self.covered(enrollments)
+  #   enrollments.select{|e| ENROLLED_STATUSES.include?(e.aasm_state) && e.is_active? }
+  # end
 
   private
 
