@@ -66,7 +66,7 @@ class Household
 
   def build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
     verified_tax_household = active_verified_household.tax_households.select{|th| th.id == th.primary_applicant_id && th.primary_applicant_id == verified_primary_family_member.id.split('#').last }.first
-    if verified_tax_household.present?
+    if verified_tax_household.present? && verified_tax_household.eligibility_determinations.present?
       verified_primary_tax_household_member = verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first
       primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
 
@@ -78,6 +78,7 @@ class Household
       th = tax_households.build(
         allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
         effective_starting_on: verified_tax_household.start_date,
+        is_eligibility_determined: true,
         submitted_at: verified_tax_household.submitted_at
       )
 
@@ -105,21 +106,16 @@ class Household
       #   end
       # end
 
-      if verified_tax_household.eligibility_determinations.present?
-        benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
+      benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
 
-        th.update_attributes(is_eligibility_determined: true)
-
-        latest_eligibility_determination = verified_tax_household.eligibility_determinations.max_by(&:determination_date)
-        th.eligibility_determinations.build(
-          e_pdc_id: latest_eligibility_determination.id,
-          benchmark_plan_id: benchmark_plan_id,
-          max_aptc: latest_eligibility_determination.maximum_aptc,
-          csr_percent_as_integer: latest_eligibility_determination.csr_percent,
-          determined_on: latest_eligibility_determination.determination_date
-        )
-
-      end
+      latest_eligibility_determination = verified_tax_household.eligibility_determinations.max_by(&:determination_date)
+      th.eligibility_determinations.build(
+        e_pdc_id: latest_eligibility_determination.id,
+        benchmark_plan_id: benchmark_plan_id,
+        max_aptc: latest_eligibility_determination.maximum_aptc,
+        csr_percent_as_integer: latest_eligibility_determination.csr_percent,
+        determined_on: latest_eligibility_determination.determination_date
+      )
 
       th.save!
     end

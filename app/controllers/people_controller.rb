@@ -439,6 +439,7 @@ private
                                                    :alien_number, :passport_number, :sevis_id, :visa_number,
                                                    :receipt_number, :expiration_date, :card_number, :i94_number]]})
     @vlp_doc_subject = doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject]
+    @consumer_role =  Person.where(:id => params[:id]).first.consumer_role
     if @consumer_role && @vlp_doc_subject
       document = find_document(@consumer_role, @vlp_doc_subject)
       document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
