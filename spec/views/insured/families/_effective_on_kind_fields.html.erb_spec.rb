@@ -84,11 +84,11 @@ RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
       render "insured/families/effective_on_kind_fields"
     end
 
-    it "should have qle message" do 
+    it "should have qle message" do
       qle_date = TimeKeeper.date_of_record + 1.month
       expect(rendered).to match /Because your other health insurance is ending/
       expect(rendered).to match /#{qle_date.beginning_of_month}/
-      expect(rendered).to match /#{qle_date + 1.month}/
+      expect(rendered).to match /#{(qle_date + 1.month).beginning_of_month}/
       expect(rendered).to match /#{qle_date.beginning_of_month - 1.day}/
     end
 
