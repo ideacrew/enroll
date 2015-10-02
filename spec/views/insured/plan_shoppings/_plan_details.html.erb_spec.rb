@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
   let(:carrier_profile) { instance_double("CarrierProfile", id: "carrier profile id", legal_name: "legal_name") }
   let(:plan) do
-    double(plan_type: nil, metal_level: "bronze", is_standard_plan: true,
-      nationwide: nil, total_employee_cost: 100, deductible: 500,
+    double(plan_type: "ppo", metal_level: "bronze", is_standard_plan: true,
+      nationwide: "true", total_employee_cost: 100, deductible: 500,
       name: "My Plan", id: "my id", carrier_profile: nil,
       hios_id: "hios id", carrier_profile_id: carrier_profile.id,
       active_year: TimeKeeper.date_of_record.year, total_premium: 300,
@@ -18,13 +18,15 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
   let(:hbx_enrollment) do
     instance_double(
       "HbxEnrollment", id: "hbx enrollment id",
-      hbx_enrollment_members: hbx_enrollment_members
+      hbx_enrollment_members: hbx_enrollment_members,
+      plan: plan
     )
   end
   before :each do
     allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
     assign(:plan_hsa_status, plan_hsa_status)
     assign(:hbx_enrollment, hbx_enrollment)
+    assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
     assign(:carrier_names_map, {})
     render "insured/plan_shoppings/plan_details", plan: plan
   end
