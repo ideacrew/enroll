@@ -34,4 +34,22 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
   it "should display the main menu" do
     expect(rendered).not_to have_selector('a', text: /Waive/)
   end
+
+  it "should display plan details" do
+    expect(rendered).to match(/#{plan.name}/)
+    expect(rendered).to match(/#{plan.carrier_profile}/)
+    expect(rendered).to match(/#{plan.active_year}/)
+    expect(rendered).to match(/#{plan.deductible}/)
+    expect(rendered).to match(/#{plan.is_standard_plan}/)
+    expect(rendered).to match(/#{plan.nationwide}/)
+    expect(rendered).to match(/#{plan.total_employee_cost}/)
+    expect(rendered).to match(/#{plan.plan_type}/)
+    expect(rendered).to match(/#{plan.metal_level}/)
+    expect(rendered).to match(/#{plan.hios_id}/)
+  end
+
+  it "should match css selector for standard plan" do
+    expect(rendered).to have_css("i.fa-bookmark", text: /standard plan/i)
+    expect(rendered).to have_css("i.fa-check-square-o", text: /your current #{plan.active_year} plan/i)
+  end
 end
