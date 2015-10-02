@@ -22,7 +22,7 @@ describe Household, "given a coverage household with a dependent" do
     let(:family) { double }
     let(:benefit_package) {FactoryGirl.create(:benefit_package)}
     let(:hbx) {double(benefit_sponsorship: double(earliest_effective_date: TimeKeeper.date_of_record, current_benefit_period: bcp))}
-    let(:bcp) {double(earliest_effective_date_max: TimeKeeper.date_of_record)}
+    let(:bcp) {double(earliest_effective_date: TimeKeeper.date_of_record)}
 
     before do 
       allow(HbxProfile).to receive(:current_hbx).and_return(hbx)

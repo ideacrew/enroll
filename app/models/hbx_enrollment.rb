@@ -397,7 +397,7 @@ class HbxEnrollment
       if family.is_under_special_enrollment_period?
         enrollment.effective_on = family.current_sep.effective_on
       else
-        enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date_max
+        enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
       end
 
       # end
