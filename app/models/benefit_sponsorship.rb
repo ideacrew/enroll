@@ -29,7 +29,7 @@ class BenefitSponsorship
   end
 
   def earliest_effective_date
-    current_benefit_period.earliest_effective_date_max if current_benefit_period
+    current_benefit_period.earliest_effective_date if current_benefit_period
   end
 
   def benefit_coverage_period_by_effective_date(effective_date)

@@ -47,4 +47,28 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       end
     end
   end
+
+  context "action path" do 
+    before :each do
+      assign :person, person
+      assign :employee_role, employee_role
+      assign :hbx_enrollments, []
+    end
+
+    it "should action to new insured group selection path" do 
+      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(view).to receive(:is_under_open_enrollment?).and_return(true)
+      render "insured/families/shop_for_plans_widget" 
+      expect(rendered).to have_selector("form[action='/insured/group_selections/new']")
+    end
+
+    it "should action to find sep insured families path" do
+      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      allow(view).to receive(:is_under_open_enrollment?).and_return(false)
+      render "insured/families/shop_for_plans_widget" 
+
+      expect(rendered).to have_selector("form[action='/insured/families/find_sep']")
+
+    end
+  end
 end

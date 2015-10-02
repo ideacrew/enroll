@@ -6,6 +6,7 @@ RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
   before :each do
     assign(:qualifying_life_events, QualifyingLifeEventKind.all)
     assign :qle, qlk
+    assign :qle_date, TimeKeeper.date_of_record
     assign :effective_on_options, effective_on_options
   end
 
@@ -70,5 +71,26 @@ RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
     it "should have qle_effective_on_kind_alert area" do
       expect(rendered).to match /Please Select effective on kind/
     end
+  end
+
+  context "when I Losing Employer-Subsidized Insurance because employee is going on Medicare" do
+
+    before :each do
+      assign :qle_date, TimeKeeper.date_of_record + 1.month
+      assign :effective_on_options, [1, 2]
+      
+      allow(qlk).to receive(:title).and_return("when I Losing Employer-Subsidized Insurance because employee is going on Medicare")
+
+      render "insured/families/effective_on_kind_fields"
+    end
+
+    it "should have qle message" do 
+      qle_date = TimeKeeper.date_of_record + 1.month
+      expect(rendered).to match /Because your other health insurance is ending/
+      expect(rendered).to match /#{qle_date.beginning_of_month}/
+      expect(rendered).to match /#{qle_date + 1.month}/
+      expect(rendered).to match /#{qle_date.beginning_of_month - 1.day}/
+    end
+
   end
 end

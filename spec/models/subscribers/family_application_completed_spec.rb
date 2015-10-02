@@ -182,8 +182,8 @@ describe Subscribers::FamilyApplicationCompleted do
           expect(consumer_role.residency_determined_at).to eq primary.created_at
           expect(consumer_role.citizen_status).to eq primary.verifications.citizen_status.split('#').last
           expect(consumer_role.is_state_resident).to eq primary.verifications.is_lawfully_present
-          expect(consumer_role.is_incarcerated).to eq primary.person_demographics.is_incarcerated
           person.reload
+          expect(consumer_role.is_incarcerated).to eq primary.person_demographics.is_incarcerated
           expect(person.addresses).to be_truthy
         end
       end

@@ -1,5 +1,11 @@
 $(function () {
+  var hideMecMessage = function() {
+    $("#qle_message").removeClass("hidden");
+    $("#mec_notice").html(""); 
+  }
+
   $(document).on('click', 'a.qle-menu-item', function() {
+    hideMecMessage();
     $('#qle_flow_info #qle-menu').hide();
     $('.qle-details-title').html($(this).data('title'));
     $('.qle-label').html($(this).data('label'));
@@ -24,6 +30,7 @@ $(function () {
   });
 
 	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
+    hideMecMessage();
 		$('#qle-details').addClass('hidden');
     $('.csr-form').addClass('hidden');
 		$('#qle-details .success-info, #qle-details .error-info').addClass('hidden');

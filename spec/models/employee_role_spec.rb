@@ -410,4 +410,37 @@ describe EmployeeRole, dbclean: :after_each do
       expect(EmployeeRole.find_by_employer_profile(match_employer_profile).first).to be_an_instance_of EmployeeRole
     end
   end
+
+  context "is under open enrollment" do
+    let(:employee_role) { EmployeeRole.new }
+
+    it "return false without benefit_group" do
+      allow(employee_role).to receive(:benefit_group).and_return nil
+
+      expect(employee_role.is_under_open_enrollment?).to eq false
+    end
+
+    context "with benefit_group" do
+      let(:plan_year) {FactoryGirl.create(:plan_year)}
+      let(:benefit_group) { double(plan_year: plan_year) }
+
+      before :each do
+        allow(employee_role).to receive(:benefit_group).and_return benefit_group
+      end
+
+      it "return false" do
+        allow(plan_year).to receive(:open_enrollment_start_on).and_return (TimeKeeper.date_of_record - 10.days)
+        allow(plan_year).to receive(:open_enrollment_end_on).and_return (TimeKeeper.date_of_record - 5.days)
+        
+        expect(employee_role.is_under_open_enrollment?).to eq false
+      end
+
+      it "return true" do
+        allow(plan_year).to receive(:open_enrollment_start_on).and_return (TimeKeeper.date_of_record - 10.days)
+        allow(plan_year).to receive(:open_enrollment_end_on).and_return (TimeKeeper.date_of_record + 5.days)
+        
+        expect(employee_role.is_under_open_enrollment?).to eq true
+      end
+    end
+  end
 end

@@ -67,19 +67,16 @@
           <%= render partial: 'shared/qle_progress', locals: {step: '1'} %>
         <% elsif @consumer_role.present? %>
           <%= render  partial: 'shared/individual_progress', locals: {
-
             step: '3',
             url: (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_insured_families_path : group_selection_url)
           } %>
         <% else %>
           <%= render  partial: 'shared/signup_progress', locals: {
-
             step: '4',
-            url: (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_insured_families_path : group_selection_url)
+            url: (@employee_role.present? && !@employee_role.is_under_open_enrollment? ? find_sep_insured_families_path : group_selection_url)
           } %>
         <% end %>
       </div>
-
     </div>
   </div>
 </div>
