@@ -1483,6 +1483,27 @@ a.close-1, a.close-2{
 #address_info .new-address-flow input[type="text"]:-moz-placeholder{
   font-size: 16px;
 }
+#address_info {
+  .mailing-div {
+    display: none;
+  }
+  &+span {
+    &.form-action {
+      margin: 8px 0 20px;
+      display: inline-block;
+      color: #007bc4;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 4px;
+      border: solid 1px #b2b2b2;
+      background-color: transparent;
+      &:hover {
+        border: solid 1px #007bc4;
+        background-color: #ffffff;
+      }
+    }
+  }
+}
 
 /*  Home Page css start  */
 .welcome .home, .welcome .signin{

@@ -45,8 +45,8 @@ RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
 
     it "should have effective_on_kind options with date" do
       expect(rendered).to have_selector('select#effective_on_date')
-      expect(rendered).to have_selector("option", text: "Date of event(#{TimeKeeper.date_of_record.to_s})")
-      expect(rendered).to have_selector("option", text: "Fixed first of next month(#{(TimeKeeper.date_of_record.end_of_month + 1.day).to_s})")
+      expect(rendered).to have_selector("option", text: "#{TimeKeeper.date_of_record.to_s}")
+      expect(rendered).to have_selector("option", text: "#{(TimeKeeper.date_of_record.end_of_month + 1.day).to_s}")
     end
 
     it "should have qle_effective_on_kind_alert area" do
@@ -64,8 +64,8 @@ RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
 
     it "should have effective_on_kind options with date" do
       expect(rendered).to have_selector('select#effective_on_date')
-      expect(rendered).to have_selector("option", text: "Date of event(#{TimeKeeper.date_of_record.to_s})")
-      expect(rendered).to have_selector("option", text: "Fixed first of next month(#{(TimeKeeper.date_of_record.end_of_month + 1.day).to_s})")
+      expect(rendered).to have_selector("option", text: "#{TimeKeeper.date_of_record.to_s}")
+      expect(rendered).to have_selector("option", text: "#{(TimeKeeper.date_of_record.end_of_month + 1.day).to_s}")
     end
 
     it "should have qle_effective_on_kind_alert area" do

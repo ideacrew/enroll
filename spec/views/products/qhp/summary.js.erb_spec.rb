@@ -11,4 +11,8 @@ RSpec.describe "products/qhp/summary.js.erb" do
     expect(rendered).to match /all-plans/
     expect(rendered).to match /plan-summary/
   end
+
+  it "should call scroll" do
+    expect(rendered).to match /scroll/
+  end
 end
