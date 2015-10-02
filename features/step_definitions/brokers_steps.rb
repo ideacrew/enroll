@@ -227,7 +227,7 @@ Then(/^Primary Broker creates and publishes a plan year$/) do
     @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
   select_field = @browser.div(class: /selectric-wrapper/, text: /Date Of Hire/)
   select_field.click
-  select_field.li(text: /Date of hire/).click
+  select_field.li(text: /Date of hire/i).click
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(50)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]").set(50)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]").set(50)
@@ -246,7 +246,7 @@ Then(/^Primary Broker creates and publishes a plan year$/) do
   @browser.element(class: /alert-notice/, text: /Plan Year successfully created./).wait_until_present
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))
-  @browser.refresh
+  # @browser.refresh
 end
 
 Then(/^.+ sees employer census family created$/) do
