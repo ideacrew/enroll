@@ -8,7 +8,7 @@
     </div>
     <div class="row">
       <% if @enrolled_hbx_enrollment_plan_ids.include?(plan.id)  %>
-        <div class="col-md-12 current"> <i class="fa fa-check-square-o"> YOUR CURRENT <%= plan.try(:active_year)%> PLAN   </i></div>
+        <h5 class="col-md-12 current bg-title"> <i class="fa fa-star fa-lg enrolling"></i>YOUR CURRENT <%= plan.try(:active_year)%> PLAN   </h5>
       <% end %>
     </div>
     <div class="row">
@@ -52,7 +52,7 @@
         </table>
       </div>
     </div>
-    <div class="row top-pd">
+    <div class="row">
       <div class="col-md-4 col-sm-4 col-xs-4">
         <div class="checkbox no-buffer">
           <label>

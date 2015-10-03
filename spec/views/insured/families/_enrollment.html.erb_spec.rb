@@ -17,7 +17,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     it "should display the link of view detail" do
-      expect(rendered).to have_selector("a[href='/products/plans/summary?active_year=#{plan.active_year}&hbx_enrollment_id=#{hbx_enrollment.id}&standard_component_id=#{plan.hios_id}']", text: "VIEW DETAILS")
+      expect(rendered).to have_selector("a[href='/products/plans/summary?active_year=#{plan.active_year}&hbx_enrollment_id=#{hbx_enrollment.id}&standard_component_id=#{plan.hios_id}']", text: "View Details")
     end
 
     it "should display the effective date" do
