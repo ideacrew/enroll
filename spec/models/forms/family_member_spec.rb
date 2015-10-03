@@ -56,7 +56,7 @@ describe Forms::FamilyMember do
   context "compare_address_with_primary" do
     let(:addr1) {Address.new(zip: '1234', state: 'DC')}
     let(:addr2) {Address.new(zip: '4321', state: 'DC')}
-    let(:addr3) {Address.new(zip: '1234', state: 'DC', 'address_3': "abc")}
+    let(:addr3) {Address.new(zip: '1234', state: 'DC', 'address_3'=> "abc")}
     let(:person) {double}
     let(:primary) {double}
     let(:family) {double(primary_family_member: double(person: primary))}
@@ -107,7 +107,7 @@ describe Forms::FamilyMember do
   context "assign_person_address" do
     let(:addr1) {Address.new(zip: '1234', state: 'DC')}
     let(:addr2) {Address.new(zip: '4321', state: 'DC')}
-    let(:addr3) {Address.new(zip: '1234', state: 'DC', 'address_3': "abc")}
+    let(:addr3) {Address.new(zip: '1234', state: 'DC', 'address_3' => "abc")}
     let(:person) {FactoryGirl.create(:person)}
     let(:primary) {FactoryGirl.create(:person)}
     let(:family) {double(primary_family_member: double(person: primary))}
