@@ -202,7 +202,7 @@ RSpec.describe Employers::CensusEmployeesController do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
-      allow(controller).to receive(:authorize!).and_return(true)
+      allow(controller).to receive(:authorize).and_return(true)
     end
 
     it "should be redirect and successful when valid" do
