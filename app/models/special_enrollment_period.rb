@@ -4,16 +4,16 @@ class SpecialEnrollmentPeriod
 
   embedded_in :family
 
-  # Date Qualifying Life Event occured
-  field :qle_on, type: Date
+  # for employee gaining medicare qle
+  attr_accessor :selected_effective_on
 
   field :qualifying_life_event_kind_id, type: BSON::ObjectId
 
-  # Date Special Enrollment Period starts
-  field :begin_on, type: Date
+  # Date Qualifying Life Event occurred
+  field :qle_on, type: Date   
 
-  # Date Special Enrollment Period ends
-  field :end_on, type: Date
+  # Date coverage starts
+  field :effective_on_kind, type: String
 
   # Date coverage takes effect
   field :effective_on, type: Date
@@ -21,21 +21,42 @@ class SpecialEnrollmentPeriod
   # Timestamp when SEP was reported to HBX
   field :submitted_at, type: DateTime
 
-  field :effective_on_kind, type: String
-  # for employee gaining medicare qle
-  attr_accessor :selected_effective_on
+  field :title, type: String
 
-  validates_presence_of :qle_on, :begin_on, :end_on, :effective_on
-  validate :end_date_follows_begin_date
+  # Date Enrollment Period starts
+  field :start_on, type: Date  
+
+  # Date Enrollment Period ends
+  field :end_on, type: Date
+
+  validates_presence_of :start_on, :end_on, :message => "is invalid"
+  validates_presence_of :qualifying_life_event_kind_id, :qle_on
+  validate :end_date_follows_start_date
 
   before_create :set_submitted_at
+
+  def start_on=(new_date)
+    new_date = Date.parse(new_date) if new_date.is_a? String
+    write_attribute(:start_on, new_date.beginning_of_day)
+  end
+
+  def end_on=(new_date)
+    new_date = Date.parse(new_date) if new_date.is_a? String
+    write_attribute(:end_on, new_date.end_of_day)
+  end
+
+  def contains?(compare_date)
+    return false unless start_on.present? && end_on.present?
+    (start_on <= compare_date) && (compare_date <= end_on)
+  end
 
   def qualifying_life_event_kind=(new_qualifying_life_event_kind)
     raise ArgumentError.new("expected QualifyingLifeEventKind") unless new_qualifying_life_event_kind.is_a?(QualifyingLifeEventKind)
     self.qualifying_life_event_kind_id = new_qualifying_life_event_kind._id
-    set_sep_dates
-    new_qualifying_life_event_kind
+    self.title = new_qualifying_life_event_kind.title
     @qualifying_life_event_kind = new_qualifying_life_event_kind
+    set_sep_dates
+    @qualifying_life_event_kind
   end
 
   def qualifying_life_event_kind
@@ -45,63 +66,90 @@ class SpecialEnrollmentPeriod
 
   def qle_on=(new_qle_date)
     write_attribute(:qle_on, new_qle_date)
+    set_date_period
     set_sep_dates
-    self.qle_on
+    qle_on
   end
 
+  def effective_on_kind=(new_effective_on_kind)
+    write_attribute(:effective_on_kind, new_effective_on_kind)
+    set_sep_dates
+    effective_on_kind
+  end
+
+  def is_active?
+    return false if start_on.blank? || end_on.blank?
+    (start_on..end_on).include?(TimeKeeper.date_of_record)
+  end
+
+  def duration_in_days
+    return nil if start_on.blank? || end_on.blank?
+    end_on - start_on
+  end
+
+  def self.find(search_id)
+    family = Family.by_special_enrollment_period_id(search_id).first
+    family.special_enrollment_periods.detect() { |sep| sep._id == search_id } unless family.blank?
+  end
+
+private
   def set_sep_dates
-    return unless self.qle_on.present? && self.qualifying_life_event_kind_id.present?
-    set_begin_and_end_on
+    return unless @qualifying_life_event_kind.present? && qle_on.present? && effective_on_kind.present?
     set_effective_on
     set_submitted_at
   end
 
-  def is_active?
-    return false if self.begin_on.blank? || self.end_on.blank?
-    (self.begin_on..self.end_on).include?(TimeKeeper.date_of_record)
-  end
+  def set_date_period
+    return unless @qualifying_life_event_kind.present?
+    self.start_on = qle_on - @qualifying_life_event_kind.pre_event_sep_in_days.days
+    self.end_on   = start_on + @qualifying_life_event_kind.post_event_sep_in_days.days
 
-  def duration_in_days
-    self.end_on - self.begin_on
-  end
-
-private
-  def set_begin_and_end_on
-    self.begin_on = self.qle_on - self.qualifying_life_event_kind.pre_event_sep_in_days
-    self.end_on = self.begin_on + qualifying_life_event_kind.post_event_sep_in_days
+    # Use end_on date as boundary guard for lapsed SEPs
+    @reference_date = [TimeKeeper.date_of_record, end_on].min
+    start_on..end_on
   end
 
   def set_effective_on
-    return unless self.begin_on.present? && self.qualifying_life_event_kind.present?
+    return unless self.start_on.present? && self.qualifying_life_event_kind.present?
 
     self.effective_on = case effective_on_kind
-                        when "date_of_event"
-                          qle_on
-                        when "first_of_month"
-                          calculate_effective_on_for_first_of_month
-                        when "first_of_next_month"
-                          if qualifying_life_event_kind.is_dependent_loss_of_coverage?
-                            qualifying_life_event_kind.employee_gaining_medicare(qle_on, selected_effective_on)
-                          elsif qualifying_life_event_kind.is_moved_to_dc?
-                            calculate_effective_on_for_moved_qle
-                          else
-                            TimeKeeper.date_of_record.end_of_month + 1.day
-                          end
-                        when "fixed_first_of_next_month"
-                          qle_on.end_of_month + 1.day
-                        when "exact_date"
-                          qle_on
-                        end
-  end
-
-  def end_date_follows_begin_date
-    return unless self.end_on.present?
-    # Passes validation if end_on == start_date
-    errors.add(:end_on, "end_on cannot preceed begin_on date") if self.end_on < self.begin_on
+      when "date_of_event"
+        qle_on
+      when "exact_date"
+        qle_on
+      when "first_of_month"
+        first_of_month_effective_date
+      when "first_of_next_month"
+        first_of_next_month_effective_date
+      when "fixed_first_of_next_month"
+        fixed_first_of_next_month_effective_date
+    end
   end
 
   def set_submitted_at
     self.submitted_at ||= TimeKeeper.datetime_of_record
+  end
+
+  def first_of_month_effective_date
+    if @reference_date.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth
+      @reference_date.end_of_month + 1.day
+    else
+      @reference_date.next_month.end_of_month + 1.day
+    end
+  end
+
+  def first_of_next_month_effective_date
+    if qualifying_life_event_kind.is_dependent_loss_of_coverage?
+      qualifying_life_event_kind.employee_gaining_medicare(qle_on, selected_effective_on)
+    elsif qualifying_life_event_kind.is_moved_to_dc?
+      calculate_effective_on_for_moved_qle
+    else
+      @reference_date.end_of_month + 1.day
+    end    
+  end
+
+  def fixed_first_of_next_month_effective_date
+    qle_on.end_of_month + 1.day
   end
 
   def calculate_effective_on_for_moved_qle
@@ -116,7 +164,10 @@ private
     end
   end
 
-  def calculate_effective_on_for_first_of_month
-    [TimeKeeper.date_of_record, qle_on].max.end_of_month + 1.day
+  def end_date_follows_start_date
+    return false unless start_on.present? && end_on.present?
+    # Passes validation if end_on == start_date
+    errors.add(:end_on, "end_on cannot preceed start_on date") if self.end_on < self.start_on
   end
+
 end
