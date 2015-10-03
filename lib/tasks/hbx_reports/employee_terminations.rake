@@ -5,19 +5,21 @@ namespace :reports do
 
     desc "Employee terminations by employer profile and date range"
     task :employee_terminations => :environment do
-      start_date = Date.new(2015,10,1)
-      end_date = TimeKeeper.date_of_record.end_of_day
+      today = TimeKeeper.date_of_record
+      yesterday = today - 1.day
 
       # find census_employees who terminated by their employer
-      census_employees = CensusEmployee.unscoped.where(:aasm_state.in => ['employee_termination_pending', 'employment_terminated']).where(:employment_terminated_on.gte => (date_start = start_date))
+      census_employees = CensusEmployee.unscoped.where(:aasm_state.in => ['employee_termination_pending', 'employment_terminated']).
+                          where(:employment_terminated_on.gte => yesterday).
+                          where(:employment_terminated_on.lt => today)
 
       # find census_employees who terminate their hbx_enrollment by themselves
       families = Family.where(:"households.hbx_enrollments" =>{ :$elemMatch => {:"aasm_state".in => ["coverage_terminated", "coverage_termination_pending"],
-                                                                                :"termination_submitted_on" => (start_date..end_date)}})
+                                                                                :"termination_submitted_on" => (yesterday..today)}})
       ces = families.inject([]) do |employees, family|
         terminated_enrollments = family.latest_household.hbx_enrollments.
                 any_in(aasm_state: ['coverage_terminated', 'coverage_termination_pending']).
-                where(:"termination_submitted_on" => { "$gte" => start_date, "$lte" => end_date})
+                where(:"termination_submitted_on" => { "$gte" => yesterday, "$lt" => today})
         employees += terminated_enrollments.map(&:benefit_group_assignment).compact.map(&:census_employee).uniq
       end
 
@@ -88,7 +90,7 @@ namespace :reports do
         end
       end
 
-      puts "For period #{date_start} - #{TimeKeeper.date_of_record}, #{processed_count} employee terminations output to file: #{file_name}"
+      puts "For period #{yesterday} - #{today}, #{processed_count} employee terminations output to file: #{file_name}"
     end
   end
 end
