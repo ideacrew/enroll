@@ -106,7 +106,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
       expect(ivl_qle_sep.effective_on).to be_nil
     end
 
-    context "and retro QLE has lapsed" do
+    context "and this is retro QLE that has lapsed" do
       let(:lapsed_qle_on_date)  { (TimeKeeper.date_of_record.beginning_of_month + 16.days) - 1.year }
       let(:qle_start_on_date)   { lapsed_qle_on_date }
       let(:qle_end_on_date)     { lapsed_qle_on_date + ivl_qle_sep.qualifying_life_event_kind.post_event_sep_in_days }
@@ -165,7 +165,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
       end
     end
 
-    context "and QLE date is reported on timely basis" do
+    context "and this QLE date is reported on timely basis" do
       let(:today)               { TimeKeeper.date_of_record }
       # Ensure date is past 15th of the month
       let(:qle_on_date)         { today.day < 16 ? today.beginning_of_month - 1.day : today }
@@ -211,10 +211,6 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
         end
       end
     end
-
-    context "and QLE date is in the future" do
-    end
-
   end
 
   context "Family experiences IVL Qualifying Life Event" do

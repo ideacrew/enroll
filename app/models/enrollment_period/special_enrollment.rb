@@ -65,7 +65,6 @@ class EnrollmentPeriod::SpecialEnrollment < EnrollmentPeriod::Base
     family.special_enrollment_periods.detect() { |sep| sep._id == search_id } unless family.blank?
   end
 
-
 private
   def set_sep_dates
     return unless @qualifying_life_event_kind.present? && qle_on.present? && effective_on_kind.present?
@@ -77,7 +76,10 @@ private
     return unless @qualifying_life_event_kind.present?
     self.start_on = qle_on - @qualifying_life_event_kind.pre_event_sep_in_days.days
     self.end_on   = start_on + @qualifying_life_event_kind.post_event_sep_in_days.days
-    @current_date = [TimeKeeper.date_of_record, end_on].min
+
+    # Use end_on date as boundary guard for lapsed SEPs
+    @reference_date = [TimeKeeper.date_of_record, end_on].min
+    start_on..end_on
   end
 
   def set_effective_on
@@ -102,10 +104,10 @@ private
   end
 
   def first_of_month_effective_date
-    if @current_date.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth
-      @current_date.end_of_month + 1.day
+    if @reference_date.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth
+      @reference_date.end_of_month + 1.day
     else
-      @current_date.next_month.end_of_month + 1.day
+      @reference_date.next_month.end_of_month + 1.day
     end
   end
 
@@ -115,7 +117,7 @@ private
     elsif qualifying_life_event_kind.is_moved_to_dc?
       calculate_effective_on_for_moved_qle
     else
-      @current_date.end_of_month + 1.day
+      @reference_date.end_of_month + 1.day
     end    
   end
 
