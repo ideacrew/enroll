@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  include Pundit
   # before_filter :require_login, unless: :devise_controller?
 
   before_filter :require_login, unless: :authentication_not_required?
@@ -27,8 +28,8 @@ class ApplicationController < ActionController::Base
   #   params[resource] &&= send(method) if respond_to?(method, true)
   # end
   
-  #cancancan access denied
-  rescue_from CanCan::AccessDenied, with: :access_denied
+  #pundit access denied
+  rescue_from Pundit::NotAuthorizedError, with: :access_denied
 
   def authenticate_me!
     # Skip auth if you are trying to log in
