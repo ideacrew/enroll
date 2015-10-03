@@ -108,11 +108,11 @@
                 </li>
                 <div class="carrier-numbers">
                   <% if @plan.carrier_profile.legal_name == "CareFirst" %>
-                  <div>
+                  <div><br/>
                     Call: <strong><a href="tel:+18554443119">1-855-444-3119</a></strong><br/>
                   </div>
-                  <% elsif @plan.carrier_profile.legal_name == "Delta" %>
-                  <div>
+                  <% elsif @plan.carrier_profile.legal_name == "Delta Dental" %>
+                  <div><br/>
                     Call: <strong><a href="tel:+18004710236">1-800-471-0236</a></strong><br/>
                     For Customer Service: <strong><a href="tel:+18004710275">1-800-471-0275</a></strong>
 
@@ -120,11 +120,11 @@
                   </div>
 
                   <% elsif @plan.carrier_profile.legal_name == "Dentegra" %>
-                  <div>
+                  <div><br/>
                     Call: <strong><a href="tel:+18004710284">1-800-471-0284</a></strong><br/>
                   </div>
                   <% elsif @plan.carrier_profile.legal_name == "Dominion" %>
-                  <div>
+                  <div><br/>
                     Call: <strong><a href="tel:+18552243016">1-855-224-3016</a></strong><br/>
                   </div>
                   <% end %>
@@ -136,11 +136,6 @@
 
                 <li>
                   <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> has your payment, they can provide the information you will need to start using your benefits (such as a member number). They will also mail your cards.                    <br/>
-                </li>
-              </ol>
-                <br/>
-                <li>
-                  <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> has your payment, they can provide the information you will need to start using your benefits (such as a member number). They will also mail your cards.<br/>
                 </li>
               </ol>
               <% end %>
