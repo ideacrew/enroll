@@ -8,7 +8,7 @@
     </div>
     <div class="row">
       <% if @enrolled_hbx_enrollment_plan_ids.include?(plan.id)  %>
-        <div class="col-md-12"> <i class="fa fa-check-square-o"> YOUR CURRENT <%= plan.try(:active_year)%> PLAN   </i></div>
+        <div class="col-md-12 current"> <i class="fa fa-check-square-o"> YOUR CURRENT <%= plan.try(:active_year)%> PLAN   </i></div>
       <% end %>
     </div>
     <div class="row">
