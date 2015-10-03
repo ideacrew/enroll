@@ -59,7 +59,7 @@ class Employers::CensusEmployeesController < ApplicationController
 
     destroyed_dependent_ids = census_employee_params[:census_dependents_attributes].delete_if{|k,v| v.has_key?("_destroy") }.values.map{|x| x[:id]} if census_employee_params[:census_dependents_attributes]
 
-    authorize! :update, @census_employee
+    authorize @census_employee, :update?
 
     if @census_employee.save
       if destroyed_dependent_ids.present?
@@ -157,7 +157,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def delink
-    authorize! :delink, @census_employee
+    authorize @census_employee, :delink?
 
     employee_role = @census_employee.employee_role
     if employee_role.present?
