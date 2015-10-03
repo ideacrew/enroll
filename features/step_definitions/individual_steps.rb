@@ -188,11 +188,9 @@ And(/I click on continue button on group selection page/) do
     @browser.text_field(id: /qle_date/).wait_until_present
     @browser.text_field(id: /qle_date/).set(5.days.ago.strftime('%m/%d/%Y'))
 
-    qle_form = @browser.div(class: /qle-form/)
-    click_when_present(qle_form.a(class: /interaction-click-control-continue/))
+    click_when_present @browser.a(class: 'interaction-click-control-continue')
 
     wait_and_confirm_text /SELECT EFFECTIVE ON KIND/i
-
 
     effective_field = @browser.div(class: /selectric-wrapper/, text: /SELECT EFFECTIVE ON KIND/i)
 
