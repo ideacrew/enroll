@@ -42,7 +42,6 @@
         <th>Plan Benefits</th>
         <% qhps.each do |qhp|%>
           <th colspan="2">In Network</th>
-          <!--<th>Out of Network</th>-->
         <% end %>
       </tr>
       <% Products::Qhp::VISIT_TYPES.each do |visit_type| %>
@@ -52,7 +51,7 @@
             <% matching_benefit = qhp.qhp_benefits.detect { |qb| qb.benefit_type_code == visit_type } %>
             <% if matching_benefit %>
               <% deductible = matching_benefit.find_deductible %>
-              <td colspan="2"><%= deductible.copay_in_network_tier_1 %></td>
+              <td  colspan="2"><%= deductible.copay_in_network_tier_1 %></td>
               <!--<td><%= deductible.copay_out_of_network %></td>-->
             <% end %>
           <% end %>
