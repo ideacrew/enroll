@@ -89,7 +89,7 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 
 $(document).ready(function () {
-
+  // check that dob entered is not a future date
   $(document).on('blur', '#jq_datepicker_ignore_person_dob', function() {
     var entered_dob = $(this).val();
     var entered_year = entered_dob.substring(entered_dob.length -4);
@@ -99,7 +99,6 @@ $(document).ready(function () {
     var todays_year = todays_date.getFullYear();
     var todays_month = todays_date.getMonth() + 1;
     var todays_day = todays_date.getDate();
-    console.log(todays_day);
     if (entered_year > todays_year) {
       alert("Please enter a birthdate that does not take place in the future.");
       $(this).val("");
@@ -110,14 +109,12 @@ $(document).ready(function () {
           alert("Please enter a birthdate that does not take place in the future.");
           $(this).val("");
         } else {
-
         }
       }
       else if (entered_month > todays_month) {
         alert("Please enter a birthdate that does not take place in the future.");
         $(this).val("");
       }
-
     }
   });
 
