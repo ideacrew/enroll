@@ -50,6 +50,6 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb" do
 
   it "should match css selector for standard plan" do
     expect(rendered).to have_css("i.fa-bookmark", text: /standard plan/i)
-    expect(rendered).to have_css("i.fa-check-square-o", text: /your current #{plan.active_year} plan/i)
+    expect(rendered).to have_css("h5.bg-title", text: /your current #{plan.active_year} plan/i)
   end
 end
