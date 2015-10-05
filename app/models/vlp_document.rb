@@ -71,6 +71,7 @@ class VlpDocument < Document
   field :card_number, type: String
   field :country_of_citizenship, type: String
 
+
   # date of expiration of the document. e.g. passport / documentexpiration date
   field :expiration_date, type: Date
 
@@ -86,7 +87,7 @@ class VlpDocument < Document
   validates :i94_number, length: { is: 11 }, :allow_blank => true
   validates :naturalization_number, length: { within: 7..12 }, :allow_blank => true
   validates :passport_number, length: { within: 6..12 }, :allow_blank => true
-  validates :sevis_id, length: { is: 11 } , :allow_blank => true #first char is N
+  validates :sevis_id, length: { is: 10 } , :allow_blank => true #first char is N
   validates :visa_number, length: { is: 8 }, :allow_blank => true
   validates :receipt_number, length: { is: 13}, :allow_blank => true #first 3 alpha, remaining 10 string
 
@@ -109,8 +110,8 @@ class VlpDocument < Document
         "Unexpired Foreign Passport": [:passport_number],
         "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)": [:sevis_id],
         "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)": [:sevis_id],
-        "Other (With Alien Number)": [:alien_number, :description],
-        "Other (With I-94 Number)": [:i94_number,:description]
+        "Other (With Alien Number)": [:alien_number],
+        "Other (With I-94 Number)": [:i94_number]
     }
   end
 
