@@ -174,7 +174,7 @@ class Insured::ConsumerRolesController < ApplicationController
                                                  [:vlp_documents_attributes =>
                                                   [:subject, :citizenship_number, :naturalization_number,
                                                    :alien_number, :passport_number, :sevis_id, :visa_number,
-                                                   :receipt_number, :expiration_date, :card_number, :i94_number]]})
+                                                   :receipt_number, :expiration_date, :card_number, :i94_number, :country_of_citizenship]]})
     @vlp_doc_subject = doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject]
     document = find_document(@consumer_role, @vlp_doc_subject)
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)
