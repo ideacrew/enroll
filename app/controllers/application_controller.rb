@@ -134,6 +134,7 @@ class ApplicationController < ActionController::Base
     user = user_token && User.find_by_authentication_token(user_token.to_s)
     if user
       sign_in user, store: false
+      flash[:notice] = "Signed in Successfully."
     end
   end
 

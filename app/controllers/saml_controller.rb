@@ -27,7 +27,7 @@ class SamlController < ApplicationController
           ::IdpAccountManager::ENROLL_NAVIGATION_FLAG
         )
         sign_in(:user, user_with_email)
-        redirect_to user_with_email.last_portal_visited
+        redirect_to user_with_email.last_portal_visited, flash: {notice: "Signed in Successfully."}
       else
         new_password = User.generate_valid_password
         new_user = User.new(email: email, password: new_password, idp_verified: true, oim_id: email)
@@ -38,7 +38,7 @@ class SamlController < ApplicationController
           ::IdpAccountManager::ENROLL_NAVIGATION_FLAG
         )
         sign_in(:user, new_user)
-        redirect_to search_insured_consumer_role_index_path
+        redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
       end
     else
       log("ERROR: SAMLResponse assertion errors #{response.errors}", {:severity => "error"})
