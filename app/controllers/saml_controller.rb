@@ -55,7 +55,8 @@ class SamlController < ApplicationController
       current_user.email,
       ::IdpAccountManager::CURAM_NAVIGATION_FLAG
     )
-    redirect_to SamlInformation.curam_landing_page_url
+    redirect_to destroy_user_session_path
+    # redirect_to SamlInformation.curam_landing_page_url
   end
 
   def logout

@@ -3,3 +3,10 @@ $('#<%= @location_id %> .selected-plan').html("<%= escape_javascript(render(part
 $("h2.employer-monthly-cost").html("<%= number_to_currency(@employer_contribution_amount.to_f) %>");
 $(".employee-monthly-cost-min").html("<%= number_to_currency(@min_employee_cost.to_f) %>");
 $(".employee-monthly-cost-max").html("<%= number_to_currency(@max_employee_cost.to_f) %>");
+
+$(function() {
+  $("#employer_cost_info_btn .btn").click(function(){
+    $('.cost-impact-loader').show();
+    calcEmployerContributions($('a#employee_costs_link').attr('href'));
+  })
+})
