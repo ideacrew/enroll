@@ -194,25 +194,32 @@
           background-color: #ffffff;
           padding: 10px 20px;
           text-align: left;
-          border-bottom: solid 2px #fff;
           font-size: 13px;
-          height: 50px;
+          &.confirm-terminate-wrapper {
+            padding: 0;
 
+          }
           &:first-of-type {
             font-size: 15px;
           }
           &:last-of-type {
-            text-align: right;
+
           }
-          &.table-functions .fa {
-            display: none;
-            cursor: pointer;
-            &:first-of-type {
-              padding-right: 10px;
+
+          &.table-functions {
+            padding: 0;
+            text-align: right;
+              .fa {
+                display: none;
+                cursor: pointer;
+                margin: 0;
+              &:last-of-type {
+                padding-right: 10px;
+              }
             }
           }
           &:hover {
-            border-bottom: solid 2px #007bc4;
+            color: #007bc4;
 
           }
 
