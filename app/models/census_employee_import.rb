@@ -62,7 +62,8 @@ class CensusEmployeeImport
   def imported_census_employees
     @imported_census_employees ||= load_imported_census_employees
     @imported_census_employees.each do |census_employee|
-      census_employee.singleton_class.validates_presence_of :email_address
+      census_employee.singleton_class.validates_presence_of :email_address if  census_employee.is_a? CensusEmployee
+      census_employee.singleton_class.validates_presence_of :email if census_employee.is_a? CensusDependent
     end
     @imported_census_employees
   end
@@ -119,9 +120,21 @@ class CensusEmployeeImport
       member = assign_census_employee_attributes(member, record)
       member.terminate_employment(member.employment_terminated_on) if member.employment_terminated_on.present?
       @last_ee_member = member
+      @last_ee_member_record = record
     else
       # Process dependent
-      if record[:employer_assigned_family_id] == @last_ee_member[:employer_assigned_family_id]
+      if record[:employer_assigned_family_id] == @last_ee_member_record[:employer_assigned_family_id]
+        census_dependent = @last_ee_member.census_dependents.detect do |dependent|
+          (dependent.ssn == record[:ssn]) && (dependent.dob == record[:dob])
+        end
+
+        record_slice = record.slice(:employee_relationship, :last_name, :first_name, :name_sfx, :ssn, :dob, :gender)
+        if census_dependent
+          census_dependent.update_attributes(record_slice)
+        else
+          census_dependent = @last_ee_member.census_dependents.build(record_slice)
+        end
+        census_dependent.email = Email.new(:address => record[:email].to_s, :kind=>'work')
         member = census_dependent
       end
     end
