@@ -3587,30 +3587,53 @@ table.table-list-wp tbody tr.brd td {
     margin-bottom: 0px;
 }
 .confirm-terminate-wrapper {
-    text-align: right;
 }
-.confirm-terminate {
-    display: inline-block;
-    text-align: center;
-    float: right;
+#home .employees-tab {
+  .confirm-terminate {
+      display: inline-block;
+      width: 100%;
+      background-color: #f2dede;
+      padding: 20px 0;
+      color: #b94a48;
+      .fa {
+        margin: 0 10px 0 0;
+        color: #b94a48;
+
+      }
+
+      h5 {
+        padding-left: 20px;
+        display: inline-block;
+        color: #b94a48;
+
+      }
+
+  }
 }
 .confirm-terminate-wrapper img {
     display: inline-block;
-    float: right;
 }
-.confirm-terminate-wrapper .confirm-terminate a {
-    color: #000;
-    padding: 0px 15px;
+.confirm-terminate-wrapper a.terminate {
+    color: #b94a48;
+    border-radius: 4px;
+    padding: 10px 10px;
+    border: solid 1px #b94a48;
+    font-size: 14px;
     font-family: 'lato', 'AvenirLTStd-Light';
+    margin-right: 5px;
+    cursor: pointer;
+    &:hover {
+      background-color: #b94a48;
+      color: #fff;
+    }
 }
 .confirm-terminate-wrapper .confirm-terminate .confirm-yes {
     color: #8c0000;
     font-weight: bold;
     font-family: 'lato', 'AvenirLTStd-Light';
+    padding: 0;
 }
-.confirm-terminate {
-    padding: 0px 20px;
-}
+
 table.table-wrapper tbody tr.unbrd td {
     border: 0px;
     display: none;
@@ -3619,8 +3642,12 @@ table.table-wrapper tr td a.btn-default {
     color: #000;
 }
 .confirm-terminate input {
-    width: 250px;
+    width: 125px;
+    border-radius: 4px;
     margin-bottom: 5px;
+    background-color: transparent;
+    border: solid 1px #b94a48;
+    color: #b94a48;
 }
 .confirm-terminate a strong {
     font-weight: bold;
