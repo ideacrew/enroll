@@ -69,7 +69,7 @@ function applyListeners() {
                 showOnly("immigration_naturalization_cert_container");
                 break;
             case "Machine Readable Immigrant Visa (with Temporary I-551 Language)":
-                showOnly("immigration_temporary_i_551_stamp_fields_container");
+                showOnly("machine_readable_immigrant_visa_fields_container");
                 break;
             case "Temporary I-551 Stamp (on passport or I-94)":
                 showOnly("immigration_temporary_i_551_stamp_fields_container");
@@ -105,7 +105,8 @@ function applyListeners() {
             "immigration_temporary_i_551_stamp_fields_container", "immigration_i_94_fields_container",
             "immigration_i_94_in_unexpired_foreign_passport_fields_container", "immigration_unexpired_foreign_passport_fields_container",
             "immigration_temporary_i_20_stamp_fields_container", "immigration_DS_2019_fields_container",
-            "immigration_other_with_alien_number_fields_container", "immigration_other_with_i94_fields_container"]
+            "immigration_other_with_alien_number_fields_container", "immigration_other_with_i94_fields_container",
+            "machine_readable_immigrant_visa_fields_container", "immigration_temporary_i_551_fields_container"]
 
         for (index = 0; index < doc_types.length; index++) {
             $('#' + doc_types[index]).hide();

@@ -1605,7 +1605,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     it "should have an estimated monthly max cost" do
       Caches::PlanDetails.load_record_cache!
-      expect(p(blue_collar_benefit_group).monthly_employer_contribution_amount).to be_within(0.01).of(4308.304)
+      expect(p(blue_collar_benefit_group).monthly_employer_contribution_amount).to be_within(0.01).of(2154.152)
     end
 
     it "should have an estimated min employee cost" do

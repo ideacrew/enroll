@@ -268,7 +268,8 @@ $(function() {
 
 function calcEmployerContributions(url) {
   var reference_plan_id = $("#plan_year_benefit_groups_attributes_0_reference_plan_id").val();
-  var plan_option_kind = $("#plan_year_benefit_groups_attributes_0_plan_option_kind").val();
+  // var plan_option_kind = $("#plan_year_benefit_groups_attributes_0_plan_option_kind").val();
+  var plan_option_kind = $(".nav-tabs input[type=radio]:checked").val();
   if (reference_plan_id == "" || reference_plan_id == undefined) {
     return
   }

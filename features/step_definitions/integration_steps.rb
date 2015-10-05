@@ -561,6 +561,7 @@ When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
 end
 
 When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
+  sleep 3
   click_when_present(@browser.a(text: /#{qle_event}/))
 end
 
@@ -618,4 +619,23 @@ Then(/^I should see the dependents and group selection page$/) do
   @browser.element(text: /Confirm Your Plan Selection/i).wait_until_present
   expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
   scroll_then_click(@browser.a(class: /interaction-click-control-purchase/))
+end
+
+And(/I select three plans to compare/) do
+  sleep 2
+  @browser.a(text: /Select Plan/).wait_until_present
+  compare_options = @browser.spans(class: 'checkbox-custom-label', text: "Compare")
+  if compare_options.count > 3
+    compare_options[0].click
+    compare_options[1].click
+    compare_options[2].click
+    @browser.a(text: "COMPARE PLANS").click
+    @browser.h3(text: /Plan Comparison/).wait_until_present
+    expect(@browser.is(class: "glyphicon glyphicon-download-alt").count).to eq 3
+    @browser.button(text: 'Close').click
+  end
+end
+
+And(/I should not see any plan which premium is 0/) do
+  expect(@browser.h2s(class: "plan-premium", text: "$0.00").count).to eq 0
 end
