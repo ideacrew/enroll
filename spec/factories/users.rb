@@ -28,5 +28,13 @@ FactoryGirl.define do
     roles ["employer_staff"]
   end
 
+  trait "broker" do
+    roles ["broker"]
+  end
+
+  trait "broker_agency_staff" do
+    roles ["broker_agency_staff"]
+  end
+
   factory :invalid_user, traits: [:without_email, :without_password, :without_password_confirmation]
 end

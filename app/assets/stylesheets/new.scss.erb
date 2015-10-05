@@ -1,3 +1,5 @@
+
+// employer portal
 #home {
   nav {
     ul {
@@ -222,6 +224,17 @@
       }
     }
   }
+  .premium-reports-table {
+    table tr th {
+      font-size: 11px;
+      width: auto;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+
+
+  }
   #add_employee_action {
     .col-xs-12 {
       .col-md-6 {
@@ -385,7 +398,7 @@
     }
     .panel.benefitgroup.benefitgroup.referenceplan {
       padding-bottom: 30px;
-      margin-bottom: 15px;
+      margin-bottom: 35px;
       &>h2 {
         font-size: 16px;
       }
@@ -1333,4 +1346,34 @@
       }
 
     }
+}
+
+// plan shopping
+#plans {
+  .current {
+    margin: 0 0 5px 0;
+    .fa {
+      color: #007bc4;
+      margin: 0 5px 0 0;
+      &.published, &.enrolling {
+        color: #FFD700;
+      }
+    }
+    &.bg-title {
+      font-weight: bold;
+      display: inline-block;
+      color: #69A30D;
+      font-size: 14px;
+
+    }
+  }
+  input[type=checkbox] {
+    display: none;
+    &+span {
+      margin-left: 0;
+    }
+  }
+  table {
+    margin-bottom: 10px;
+  }
 }
