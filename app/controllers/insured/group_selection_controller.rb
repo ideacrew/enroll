@@ -3,9 +3,9 @@ class Insured::GroupSelectionController < ApplicationController
   def new
     set_bookmark_url
     initialize_common_vars 
-    if market_kind_is_employee?
+    if @person.try(:has_active_employee_role?) and !@person.try(:has_active_consumer_role?)
       @market_kind = 'shop'
-    elsif market_kind_is_consumer?
+    elsif !@person.try(:has_active_employee_role?) and @person.try(:has_active_consumer_role?)
       @market_kind = 'individual'
     else
       @market_kind = params[:market_kind].present? ? params[:market_kind] : ''
