@@ -7,7 +7,7 @@ module Listeners
 
     def self.queue_name
       config = Rails.application.config.acapi
-      "#{config.hbx_id}.#{config.environment_name}.#{config.app_id}.individual_resource_listener"
+      "#{config.hbx_id}.#{config.environment_name}.q.#{config.app_id}.individual_resource_listener"
     end
 
     def on_message(delivery_info, properties, payload)

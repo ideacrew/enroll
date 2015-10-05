@@ -21,6 +21,8 @@ Feature: Insured Plan Shopping on Individual market
       And Individual again clicks on add member button
       And I click on continue button on household info form
       And I click on continue button on group selection page
+      And I select three plans to compare
+      And I should not see any plan which premium is 0
       And I select a plan on plan shopping page
       And I click on purchase button on confirmation page
       And I click on continue button to go to the individual home page
