@@ -225,21 +225,25 @@ class BenefitGroup
 
 
   def monthly_employer_contribution_amount(plan = reference_plan)
-    plan_year.employer_profile.census_employees.active.collect do |ce|
+    target_object = self
+    target_object = plan_year.employer_profile unless self.persisted?
+    target_object.census_employees.active.collect do |ce|
       pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
       pcd.total_employer_contribution
     end.sum
   end
 
   def monthly_min_employee_cost
-    plan_year.employer_profile.census_employees.active.collect do |ce|
+    target_object = persisted? ? self : plan_year.employer_profile
+    target_object.census_employees.active.collect do |ce|
       pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
       pcd.total_employee_cost
     end.min
   end
 
   def monthly_max_employee_cost
-    plan_year.employer_profile.census_employees.active.collect do |ce|
+    target_object = persisted? ? self : plan_year.employer_profile
+    target_object.census_employees.active.collect do |ce|
       pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
       pcd.total_employee_cost
     end.max
