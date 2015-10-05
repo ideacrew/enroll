@@ -90,15 +90,47 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 $(document).ready(function () {
 
+  // check that dob entered is not a future date
+  $(document).on('blur', '#jq_datepicker_ignore_person_dob', function() {
+    var entered_dob = $(this).val();
+    var entered_year = entered_dob.substring(entered_dob.length -4);
+    var entered_month = entered_dob.substring(0, 2);
+    var entered_day = entered_dob.substring(3, 5);
+    var todays_date = new Date();
+    var todays_year = todays_date.getFullYear();
+    var todays_month = todays_date.getMonth() + 1;
+    var todays_day = todays_date.getDate();
+    if (entered_year > todays_year) {
+      alert("Please enter a birthdate that does not take place in the future.");
+      $(this).val("");
+      $(this).focus();
+    }
+    else if (entered_year == todays_year) {
+      if (entered_month == todays_month) {
+        if (entered_day > todays_day) {
+          alert("Please enter a birthdate that does not take place in the future.");
+          $(this).val("");
+          $(this).focus();
+        } else {
+        }
+      }
+      else if (entered_month > todays_month) {
+        alert("Please enter a birthdate that does not take place in the future.");
+        $(this).val("");
+        $(this).focus();
+      }
+    }
+  });
+
   // init slider
   $('.benefits-fields .slider').bootstrapSlider({
-      formatter: function(value) {
-        return 'Contribution Percentage: ' + value + '%';
-      }
-    });
-    $(".benefits-fields .slider").on("slide", function(slideEvt) {
-      $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
-      $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
+    formatter: function(value) {
+      return 'Contribution Percentage: ' + value + '%';
+    }
+  });
+  $(".benefits-fields .slider").on("slide", function(slideEvt) {
+    $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
+    $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
   });
 
   //hide border bottom
@@ -119,28 +151,36 @@ $(document).ready(function () {
 
   // mimic jquery toggle function
   $.fn.toggleClick=function(){
-  var functions=arguments, iteration=0
-  return this.click(function(){
-    functions[iteration].apply(this,arguments)
-    iteration= (iteration+1) %functions.length
-  })
-}
-
-// details toggler
+    var functions=arguments, iteration=0
+    return this.click(function(){
+      functions[iteration].apply(this,arguments)
+      iteration= (iteration+1) %functions.length
+    })
+  }
+  //employees table table functions
+  $('.table-functions i.fa-trash-o').on('click', function() {
+    $(this).closest("tr").next().show();
+    $(this).closest("tr").hide();
+  });
+  $('a.terminate.cancel').on('click', function() {
+    $(this).closest('tr').prev().show();
+    $(this).closest('tr').hide();
+  });
+  // details toggler
   $('.details').toggleClick(function () {
-        $(this).closest('.referenceplan').find('.plan-details').slideDown();
-        $(this).html('Hide Details <i class="fa fa-chevron-up fa-lg"></i>');
-    }, function () {
-      $(this).closest('.referenceplan').find('.plan-details').slideUp();
-      $(this).html('View Details <i class="fa fa-chevron-down fa-lg"></i>');
+    $(this).closest('.referenceplan').find('.plan-details').slideDown();
+    $(this).html('Hide Details <i class="fa fa-chevron-up fa-lg"></i>');
+  }, function () {
+    $(this).closest('.referenceplan').find('.plan-details').slideUp();
+    $(this).html('View Details <i class="fa fa-chevron-down fa-lg"></i>');
 
 
-        });
+  });
 
 
 
 
-// toggle filter options in employees list
+  // toggle filter options in employees list
   $(document).on('click', '.filter-options label', function()  {
     $('.filter-options').hide();
   });
@@ -171,10 +211,10 @@ $(document).ready(function () {
         dateFormat: 'mm/dd/yy',
         maxDate: "+0d",
         yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear(),
-          onSelect: function(dateText, dpInstance) {
-      $(this).datepicker("hide");
-      $(this).trigger('change');
-    }
+        onSelect: function(dateText, dpInstance) {
+          $(this).datepicker("hide");
+          $(this).trigger('change');
+        }
       });
     }else{
       $(this).datepicker({
@@ -184,10 +224,10 @@ $(document).ready(function () {
         minDate: dateMin,
         maxDate: dateMax,
         yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10),
-          onSelect: function(dateText, dpInstance) {
-      $(this).datepicker("hide");
-      $(this).trigger('change');
-    }
+        onSelect: function(dateText, dpInstance) {
+          $(this).datepicker("hide");
+          $(this).trigger('change');
+        }
       });
     }
   });
@@ -200,22 +240,22 @@ $(document).ready(function () {
   });
   // Add something similar to jqueries deprecated .toggle()
   $.fn.toggleClick=function(){
-	var functions=arguments, iteration=0
-	return this.click(function(){
-		functions[iteration].apply(this,arguments)
-		iteration= (iteration+1) %functions.length
-	})
-}
+    var functions=arguments, iteration=0
+    return this.click(function(){
+      functions[iteration].apply(this,arguments)
+      iteration= (iteration+1) %functions.length
+    })
+  }
 
   $('#address_info + span.form-action').toggleClick(function () {
-        $(this).text('Remove Mailing Address');
-        $('.row-form-wrapper.mailing-div').show();
-    }, function () {
-        $(this).text('Add Mailing Address');
-        $('.mailing-div').hide();
-        $('.mailing-div input').val("");
-        $('.mailing-div .label-floatlabel').hide();
-        });
+    $(this).text('Remove Mailing Address');
+    $('.row-form-wrapper.mailing-div').show();
+  }, function () {
+    $(this).text('Add Mailing Address');
+    $('.mailing-div').hide();
+    $('.mailing-div input').val("");
+    $('.mailing-div .label-floatlabel').hide();
+  });
 
 
   // $('.alert').delay(7000).fadeOut(2000); //Fade Alert Box
@@ -344,7 +384,7 @@ $(document).ready(function () {
     if($('#confirm_plan').length) {
       $("a.nine").css("color", "#00b420");
     } else {
-//      $("a.six").css("color","#999");
+      //      $("a.six").css("color","#999");
     }
 
     $('#top-pad').html(start_progress + '% Complete');
@@ -632,7 +672,7 @@ $(document).on('click', '#search_for_plan_shopping_help', function() {
   $.ajax({
     type: 'GET',
     data: {firstname: $('#help_first_name').val(), lastname: $('#help_last_name').val(), type: $('#help_type').html(),
-           person: $('#help_requestor').html()},
+    person: $('#help_requestor').html()},
     url: '/exchanges/hbx_profiles/request_help?',
   }).done(function(response) {
     $('#help_status').html(response)
@@ -640,10 +680,10 @@ $(document).on('click', '#search_for_plan_shopping_help', function() {
 })
 
 $(document).on('click', '.help_button', function(){
-$.ajax({
+  $.ajax({
     type: 'GET',
     data: {assister: this.getAttribute('data-assister'), broker: this.getAttribute('data-broker'),
-           person: $('#help_requestor').html()},
+    person: $('#help_requestor').html()},
     url: '/exchanges/hbx_profiles/request_help?',
   }).done(function(response) {
     console.log(response)

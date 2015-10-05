@@ -11,6 +11,7 @@ module PdfTemplates
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
     attribute :open_enrollment_end_on, Date
+    attribute :coverage_end_on, Date
 
     def shop?
       return true

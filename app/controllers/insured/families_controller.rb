@@ -74,6 +74,7 @@ class Insured::FamiliesController < FamiliesController
     @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = TimeKeeper.date_of_record - 30.days
     end_date = TimeKeeper.date_of_record + 30.days
+
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
       start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)

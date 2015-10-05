@@ -2,9 +2,9 @@ class ShopNotices::EmployerNotice < Notice
 
   attr_accessor :from, :to, :subject, :template, :notice_data
 
-  def initialize(employer, args = {})
+  def initialize(args = {})
     super
-    @employer = employer
+    @employer = args[:employer]
     @to = 'raghuramg83@gmail.com'
     @template = args[:template] || "notices/shop_notices/employer_renewal"
     @email_notice = args[:email_notice] || true
@@ -42,6 +42,7 @@ class ShopNotices::EmployerNotice < Notice
     employer_profile = EmployerProfile.find(@employer.employer_profile_id)
     @notice.primary_identifier = employer_profile.organization.hbx_id
     @notice.open_enrollment_end_on = employer_profile.try(:active_plan_year).try(:open_enrollment_end_on)
+    @notice.coverage_end_on = employer_profile.try(:active_plan_year).try(:end_on)
 
     if @employer.person.addresses.present?
       append_address(@employer.person.addresses[0])
