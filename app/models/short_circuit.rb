@@ -1,8 +1,8 @@
 class ShortCircuit
   class NoActionSpecifiedError < StandardError; end
 
-  def self.on(*args)
-    self.new(*args)
+  def self.on(*args, &blk)
+    self.new(*args, &blk)
   end
 
   def initialize(signal_name, &sc_blk)
