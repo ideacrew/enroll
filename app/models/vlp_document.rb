@@ -107,7 +107,7 @@ class VlpDocument < Document
         "Temporary I-551 Stamp (on passport or I-94)": [:alien_number],
         "I-94 (Arrival/Departure Record)": [:i94_number],
         "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport": [:i94_number, :passport_number, :country_of_citizenship, :expiration_date],
-        "Unexpired Foreign Passport": [:passport_number],
+        "Unexpired Foreign Passport": [:passport_number, :country_of_citizenship, :expiration_date],
         "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)": [:sevis_id],
         "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)": [:sevis_id],
         "Other (With Alien Number)": [:alien_number],
