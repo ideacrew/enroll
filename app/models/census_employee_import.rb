@@ -61,6 +61,10 @@ class CensusEmployeeImport
 
   def imported_census_employees
     @imported_census_employees ||= load_imported_census_employees
+    @imported_census_employees.each do |census_employee|
+      census_employee.singleton_class.validates_presence_of :email_address
+    end
+    @imported_census_employees
   end
 
   def load_imported_census_employees
@@ -152,7 +156,7 @@ class CensusEmployeeImport
     end
     return if plan_year_found.nil?
     benefit_group_found = plan_year_found.benefit_groups.detect do |bg|
-      bg.title == benefit_group
+      bg.title.casecmp(benefit_group) == 0
     end
     return if benefit_group_found.nil?
     member.benefit_group_assignments << BenefitGroupAssignment.new({benefit_group_id: benefit_group_found.id , start_on: plan_year_found.start_on})
@@ -270,7 +274,7 @@ class CensusEmployeeImport
     else
       imported_census_employees.each_with_index do |census_employee, index|
         census_employee.errors.full_messages.each do |message|
-          errors.add :base, "Row #{index + 2}: #{message}"
+          errors.add :base, "Row #{index + 4}: #{message}"
         end
       end
       false
