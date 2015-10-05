@@ -12,7 +12,7 @@ class Employers::PremiumStatementsController < ApplicationController
       format.html
       format.js
       format.csv do
-        send_data(csv_for(@hbx_enrollments), type: csv_content_type, filename: "dchl_statement.csv")
+        send_data(csv_for(@hbx_enrollments), type: csv_content_type, filename: "DCHealthLink_Premium_Billing_Report.csv")
       end
     end
   end

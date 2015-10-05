@@ -74,6 +74,7 @@ RSpec.describe Employers::PremiumStatementsController do
     it "returns csv content in the file" do
       sign_in(user)
       xhr :get, :show, id: "test", format: :csv
+      expect(response.header["Content-Disposition"]).to match /DCHealthLink_Premium_Billing_Report/
       expect(response.body).to have_content(/#{census_employee.full_name}/)
       expect(response.body).to have_content(/#{census_employee.dob}/)
       expect(response.body).to have_content(/#{census_employee.hired_on}/)
