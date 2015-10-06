@@ -20,7 +20,8 @@
       <% pp = family.primary_applicant.person %>
       <% benefits = family.latest_household.hbx_enrollments %>
       <tr>
-        <td <%= "rowspan=#{benefits.size + 1}" %>>
+        <td >
+        <td >
           <%= link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id) %>
           <%#= link_to prepend_glyph_to_name(name_to_listing(pp)), family_path(family) %>
         </td>
