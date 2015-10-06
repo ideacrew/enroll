@@ -6,8 +6,7 @@ class Insured::FamiliesController < FamiliesController
   def home
     set_bookmark_url
     @hbx_enrollments = @family.enrolled_hbx_enrollments || []
-
-    @employee_role = @person.employee_roles.try(:first) unless market_kind_is_consumer?
+    @employee_role = @person.employee_roles.try(:first)
     respond_to do |format|
       format.html
     end
@@ -110,9 +109,9 @@ class Insured::FamiliesController < FamiliesController
   private
   def init_qualifying_life_events
     @qualifying_life_events = []
-    if market_kind_is_employee?
+    if @person.employee_roles.present?
       @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
-    elsif market_kind_is_consumer?
+    elsif @person.consumer_role.present?
       @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
     end
   end

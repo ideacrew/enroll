@@ -129,7 +129,8 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def show
-    set_consumer_bookmark_url(family_account_path)
+    set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
+    set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''

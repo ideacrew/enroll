@@ -28,7 +28,7 @@ module Subscribers
         verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
         import_home_address(primary_person, verified_new_address)
         family.save!
-        if (family.e_case_id.include? "curam_landing") || family.e_case_id == verified_family.integrated_case_id
+        if !family.e_case_id.present? || (family.e_case_id.include? "curam_landing") || family.e_case_id == verified_family.integrated_case_id
           begin
             family.e_case_id = verified_family.integrated_case_id if family.e_case_id.include? "curam_landing"
             active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
@@ -36,7 +36,7 @@ module Subscribers
             new_dependents.each do |p|
               new_family_member = family.relate_new_member(p[0], p[1])
               if active_verified_tax_households.present?
-                active_verified_tax_household = active_verified_tax_households.select{|vth| vth.id == p[2][0].split('#').last}.first
+                active_verified_tax_household = active_verified_tax_households.select{|vth| vth.id == verified_primary_family_member.id.split('#').last && vth.tax_household_members.any?{|vthm| vthm.id == p[2][0]}}.first
                 if active_verified_tax_household.present?
                   new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
                   active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
@@ -44,7 +44,6 @@ module Subscribers
               end
               family.save!
             end
-
             if active_household.latest_active_tax_household.present?
               unless active_household.latest_active_tax_household.eligibility_determinations.present?
                 log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
@@ -53,6 +52,7 @@ module Subscribers
           rescue
             log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
           end
+          family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each{|chm| chm.save! }}
           family.save!
         else
           log("ERROR: Integrated case id does not match existing family for xml: #{xml}", {:severity => "error"})
