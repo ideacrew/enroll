@@ -14,7 +14,7 @@
     </div>
     <div class="col-md-4 col-sm-4 col-md-offset-4 col-xs-6 form-group form-group-lg no-pd">
       <%= v.label :expiration_date, "Passport Expiration Date:" %>
-      <%= v.date_field :expiration_date, :required => true %>
+      <%= v.date_field :expiration_date %>
     </div>
     <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
       <%= v.text_field :i94_number, :placeholder => "I 94 Number", :pattern => "\\d{11}",
