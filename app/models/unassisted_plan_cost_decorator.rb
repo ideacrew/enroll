@@ -23,7 +23,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def premium_for(member)
-    Caches::PlanDetails.lookup_rate(plan.id, schedule_date, age_of(member))
+    Caches::PlanDetails.lookup_rate(__getobj__.id, schedule_date, age_of(member))
   end
 
   def employer_contribution_for(member)
