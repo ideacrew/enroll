@@ -157,7 +157,15 @@ $(document).ready(function () {
       iteration= (iteration+1) %functions.length
     })
   }
-
+  //employees table table functions
+  $('.table-functions i.fa-trash-o').on('click', function() {
+    $(this).closest("tr").next().show();
+    $(this).closest("tr").hide();
+  });
+  $('a.terminate.cancel').on('click', function() {
+    $(this).closest('tr').prev().show();
+    $(this).closest('tr').hide();
+  });
   // details toggler
   $('.details').toggleClick(function () {
     $(this).closest('.referenceplan').find('.plan-details').slideDown();

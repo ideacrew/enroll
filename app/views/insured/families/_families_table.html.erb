@@ -29,7 +29,7 @@
       <% pp = family.primary_applicant.person %>
       <% benefits = family.latest_household.hbx_enrollments %>
       <tr>
-        <td <%= "rowspan=#{benefits.size + 1}" %>>
+        <td>
           <%= pp.full_name %>
           <%#= link_to prepend_glyph_to_name(name_to_listing(pp)), family_path(family) %>
         </td>

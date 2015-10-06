@@ -561,6 +561,7 @@ When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
 end
 
 When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
+  sleep 3
   click_when_present(@browser.a(text: /#{qle_event}/))
 end
 
@@ -621,6 +622,7 @@ Then(/^I should see the dependents and group selection page$/) do
 end
 
 And(/I select three plans to compare/) do
+  sleep 2
   @browser.a(text: /Select Plan/).wait_until_present
   compare_options = @browser.spans(class: 'checkbox-custom-label', text: "Compare")
   if compare_options.count > 3

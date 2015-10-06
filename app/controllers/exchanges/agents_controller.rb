@@ -64,7 +64,7 @@ class Exchanges::AgentsController < ApplicationController
   end
 
   def check_agent_role
-    unless current_user.has_agent_role?
+    unless current_user.has_agent_role? || current_user.has_hbx_staff_role?
       redirect_to root_path, :flash => { :error => "You must be an Agent:  CSR, CAC, or IPA" }
     end
   end
