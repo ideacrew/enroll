@@ -90,6 +90,7 @@ class VlpDocument < Document
   validates :sevis_id, length: { is: 10 } , :allow_blank => true #first char is N
   validates :visa_number, length: { is: 8 }, :allow_blank => true
   validates :receipt_number, length: { is: 13}, :allow_blank => true #first 3 alpha, remaining 10 string
+  validates :card_number, length: { is: 13 }, :allow_blank => true#first 3 alpha, remaining 10 numeric
 
 
   validate :document_required_fields
@@ -100,7 +101,7 @@ class VlpDocument < Document
         "I-327 (Reentry Permit)":[:alien_number],
         "I-551 (Permanent Resident Card)": [:alien_number, :card_number],
         "I-571 (Refugee Travel Document)": [:alien_number],
-        "I-766 (Employment Authorization Card)": [:alien_number, :card_number],
+        "I-766 (Employment Authorization Card)": [:alien_number, :card_number, :expiration_date],
         "Certificate of Citizenship": [:alien_number, :citizenship_number],
         "Naturalization Certificate": [:alien_number, :naturalization_number],
         "Machine Readable Immigrant Visa (with Temporary I-551 Language)": [:alien_number, :passport_number, :country_of_citizenship],
