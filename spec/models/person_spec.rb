@@ -303,12 +303,24 @@ describe Person do
       DatabaseCleaner.clean
     end
 
-    it 'matches by last_name and dob if no previous ssn and no current ssn' do
-      expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob)).to eq [@p4]
+    it 'matches by last_name, first name and dob if no previous ssn and no current ssn' do
+      expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name)).to eq [@p4]
     end
 
-    it 'does not matches by last_name and dob if previous ssn' do
-      expect(Person.match_by_id_info(last_name: @p0.last_name, dob: @p0.dob)).to eq []
+    it 'matches by last_name, first name and dob if no previous ssn and yes current ssn' do
+      expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name, ssn: '123123123')).to eq [@p4]
+    end
+
+    it 'matches by last_name, first_name and dob if yes previous ssn and no current_ssn' do
+      expect(Person.match_by_id_info(last_name: @p0.last_name, dob: @p0.dob, first_name: @p0.first_name)).to eq [@p0]
+    end
+
+    it 'matches by last_name, first_name and dob if yes previous ssn and no current_ssn and UPPERCASED' do
+      expect(Person.match_by_id_info(last_name: @p0.last_name.upcase, dob: @p0.dob, first_name: @p0.first_name.upcase)).to eq [@p0]
+    end
+
+    it 'matches by last_name, first_name and dob if yes previous ssn and no current_ssn and LOWERCASED' do
+      expect(Person.match_by_id_info(last_name: @p0.last_name.downcase, dob: @p0.dob, first_name: @p0.first_name.downcase)).to eq [@p0]
     end
 
     it 'matches by ssn' do
@@ -320,7 +332,7 @@ describe Person do
     end
 
     it 'not match last_name and dob if not on same record' do
-      expect(Person.match_by_id_info(last_name: @p0.last_name, dob: @p1.dob).size).to eq 0
+      expect(Person.match_by_id_info(last_name: @p0.last_name, dob: @p1.dob, first_name: @p4.first_name).size).to eq 0
     end
 
     it 'returns empty array for non-matches' do
