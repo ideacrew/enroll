@@ -103,7 +103,7 @@ class VlpDocument < Document
         "I-766 (Employment Authorization Card)": [:alien_number, :card_number],
         "Certificate of Citizenship": [:alien_number, :citizenship_number],
         "Naturalization Certificate": [:alien_number, :naturalization_number],
-        "Machine Readable Immigrant Visa (with Temporary I-551 Language)": [:alien_number, :passport_number],
+        "Machine Readable Immigrant Visa (with Temporary I-551 Language)": [:alien_number, :passport_number, :country_of_citizenship],
         "Temporary I-551 Stamp (on passport or I-94)": [:alien_number],
         "I-94 (Arrival/Departure Record)": [:i94_number],
         "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport": [:i94_number, :passport_number, :country_of_citizenship, :expiration_date],
