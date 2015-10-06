@@ -1,0 +1,79 @@
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "<span style='color:#ff0000;'><h3>[SHOP3A]<br>
+  Initial ER Open Enrollment Available to EE</h3></span>".html_safe} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>[To]</h3></td>
+      <td>[Employee Email Address]</td>
+    </tr>
+    <tr>
+      <td><h3>[Subject]</h3></td>
+      <td>Enroll Now: Your Health Plan Open Enrollment Period has Begun</td>
+    </tr>
+    <tr>
+      <td><h3>[Content]</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "Good News!   [Employer Name], has chosen to offer health insurance coverage to its employees through DC Health Link and will contribute to the monthly premium to make the cost of coverage more affordable. ".html_safe} %>
+  
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "In order to enroll into employer-sponsored coverage through DC Health Link, you must complete an application for enrollment by [OE End Date], for coverage to be effective on [Coverage Start Date].".html_safe} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>What is Open Enrollment?</strong><br>
+  Open enrollment is your annual opportunity to enroll in health plans 
+  offered by your employer.  Outside of this annual open enrollment 
+  period, you will only be allowed to make changes to your enrollment if 
+  you experience certain life events such as marriage, birth, or adoption.".html_safe} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>To See Plan Options and Enroll:</strong><br>
+  If you have an existing DC Health Link account, please log in at <HBEURL> to view the plan options chosen by your employer and complete the enrollment process. If you do not have an existing DC Health Link account, please visit <HBEURL> to create an account and proceed with plan shopping and enrollment".html_safe} %>
+
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<strong style='color:#ff0000;'>[If ER has a Broker/Assister]</strong> Contact your employer or your broker for further assistance.<br>  
+   <span style='color:#ff0000;'>[If ER does NOT have a Broker/Assister]
+   </span> Contact your employer further assistance."
+.html_safe], heading: 'For Questions or Assistance:', sub_heading: ''} %> 
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact DC Health Link with any questions:".html_safe} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+  ["Online at [HBEURL];".html_safe,
+   "By email at [HBEEMAIL]; or".html_safe,
+   "By calling [HBEPHONE].".html_safe] } %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<p style='display:flex'>
+    <strong>CC:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <table  class='total_table' border='0' align='right'>
+     <tbody>
+       <tr><td>[Employer Name]</td></tr>
+     </tbody>
+    </table>
+  </p>".html_safe} %> 
+
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong style='color:#ff0000;'>[If ER has a Broker/Assister, include contact info below]</strong><br>
+ <p style='display:flex'><strong>Broker:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ <table  class='total_table' border='0' align='right'>
+   <tbody>
+     <tr><td>[Broker/Assister First Name] [Broker/Assister Last Name]</td></tr>
+     <tr><td>[Broker/Assister Organization]</td></tr>
+     <tr><td>[Broker/Assister Street Address 1]</td></tr>
+     <tr><td>[Broker/Assister Apt/Suite]</td></tr>
+     <tr><td>[Broker/Assister City], [Broker/Assister State] [Broker/Assister Zip]</td></tr>
+     <tr><td>[Broker/Assister Direct Phone #]</td></tr>
+     <tr><td>[Broker/Assister Email]</td></tr>
+     <tr><td>[Broker/Assister Web]</td></tr> 
+   </tbody>
+ </table></p>".html_safe} %> 
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "This notice is being provided in accordance with 45 C.F.R. 155.725(f)".html_safe} %>
