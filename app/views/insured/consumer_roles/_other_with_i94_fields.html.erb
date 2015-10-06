@@ -2,33 +2,9 @@
 <%= c.fields_for 'vlp_documents', document do |v| %>
     <%= v.hidden_field :subject %>
     <%= v.hidden_field :id %>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= v.text_field :i94_number, :placeholder => "I 94 Number", :pattern => "\\d{11}",
-      :title => "
-      • When entering the I-94 Number, only include numbers.  Do not enter any other characters, letters, or spaces.
-      • You must enter exactly 11 digits into the I-94 Number field.
-      How to find the I-94 Number:
-      The I-94 Number is also called an admission number. It is an 11 digit number found printed on Arrival/Departure Records (Form I-94 or Form I-94A). It can also be found on Form I-9." %>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= v.text_field :passport_number, :placeholder => "Passport Number", :pattern => "[a-zA-Z0-9]{6,12}",
-      :title => "
-      • When entering a Passport Number, include all numbers and letters. Do not enter any other characters or spaces.
-      • The Passport Number that you enter must have between 6 and 12 numbers and letters." %>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= v.label :country_of_citizenship, "Country of Citizenship" %>
-      <%= v.select :country_of_citizenship, options_for_select(::VlpDocument::COUNTRIES_LIST) %>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= v.label :expiration_date, "Passport Expiration Date:" %>
-      <%= v.date_field :expiration_date %>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 col-md-offset-4 form-group form-group-lg no-pd">
-      <%= v.text_field :sevis_id, :placeholder => "SEVIS ID", :pattern => "\\d{10}",
-      :title => "
-      • When entering a SEVIS ID, only include the numbers. Do not enter the 'N' or any other characters or letters. For example: If your SEVIS ID is 'N1234567891' then please enter '1234567891'.
-      • The SEVIS ID entered must have 10 digits.
-      How to find the SEVIS ID: On the DS-2019, the number is on the top right hand side of the page in the box above the barcode." %>
-    </div>
+    <%= render :partial => "insured/consumer_roles/docs_shared/i_94_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/passport_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/country_of_citizenship", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/expiration_date", locals: {v: v, name: "Passport"} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/servis_id", locals: {v: v} %>
 <% end %>
