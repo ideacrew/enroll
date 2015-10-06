@@ -31,7 +31,7 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     expect(rendered).to match(/immigration_naturalization_cert_container/)
     expect(rendered).to match(/immigration_citizenship_cert_container/)
     expect(rendered).to match(/immigration_i_327_fields_container/)
-    expect(rendered).to match(/immigration_i_551_fields_container/)
+    expect(rendered).to match(/immigration_i_766_fields_container/)
     expect(rendered).to match(/immigration_i_571_fields_container/)
     expect(rendered).to match(/immigration_i_94_fields_container/)
     expect(rendered).to match(/immigration_i_94_2_fields_container/)
