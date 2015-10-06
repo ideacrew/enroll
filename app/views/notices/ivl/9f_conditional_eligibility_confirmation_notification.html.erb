@@ -20,19 +20,25 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<b>Congratulations!</b>  Based on the health insurance application you submitted on [application/renewal date]:"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[IF Anyone Does not have Inconsistencies]</font></strong> The following person(s) qualify for health coverage through DC Health Link."} %>
+<% if notice.verified_individuals.any? %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "[UnAssisted 1 First Name] [] UnAssisted 1 Last Name]"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "The following person(s) qualify for health coverage through DC Health Link."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[IF Person N field populated]</font></b> [UnAssisted N First Name] [] UnAssisted N Last Name]"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { 
+  content: notice.verified_individuals.map(&:full_name).join("<br>")
+} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[IF Anyone Has Inconsistencies]</font></strong> The following person(s) conditionally qualify for health coverage through DC Health Link. "} %>
+<% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[IF Anyone Has Inconsistencies]</font></strong> The following person(s) conditionally qualify for health coverage through DC Health Link. "} %>
+<% if notice.unverified_individuals.any? %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "[Conditional UnAssisted 1 First Name] [ Conditional UnAssisted 1 Last Name]<br>
-<strong><font color = 'red'>[IF Person N field populated]</font></strong> [Conditional UnAssisted N First Name] [Conditional UnAssisted N Last Name]
-"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "The following person(s) conditionally qualify for health coverage through DC Health Link. "} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { 
+  content: notice.unverified_individuals.map(&:full_name).join("<br>")
+} %>
+
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "Your eligibility has been approved <strong>conditionally</strong> until the discrepancies between the information you provided and our records have been resolved. To resolve these discrepancies, <u>we need documentation from you</u>. (See sections below).  If you do not provide this information, <u>your health insurance may be cancelled</u>."} %>
 
@@ -106,22 +112,30 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<u>We accept scanned or photocopied versions of all these documents.</u>"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[PICK one or multiple of the following, based on which persons have inconsistencies and which areas are inconsistent]</font></strong>"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "Here is the information that we need:"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[IF SSN Unverified]</font></strong> <strong><i>Documents Showing Social Security Number</i></strong>. The Social Security Administration could not confirm that the Social Security Number provided for the following applicant household members is correct:"} %>
+<% if notice.ssn_unverified.any? %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "[First SSN Inconsistent First  Name][First SSN Inconsistent Last Name]<br>
-  <strong><font color='red'>[IF Person N field populated]</font></strong> [Person N SSN Inconsistent First Name][Person N SSN Inconsistent Last Name]
-"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>Documents Showing Social Security Number</i></strong>. The Social Security Administration could not confirm that the Social Security Number provided for the following applicant household members is correct:"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { 
+  content: notice.ssn_unverified.map(&:full_name).join("<br>")
+} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "Under federal law, 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number of every person who is applying for DC Health Link. We will only use your Social Security Number to verify the information you told us on your application. We will check your information in the District and Federal databases, and the databases of other District, Federal agencies, and a consumer reporting agency."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "You can use a Social Security card to verify the Social Security Number(s) you provided to us.  If you do not have a Social Security Number or cannot remember you social security number, we can help you obtain one. You may not need to provide a Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact DC Health Link Customer Service at 1-855-532-5465."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[IF Citizenship/Immigration Unverified]</font></strong> <i>Documents of Citizenship or Immigration Status</i></strong>. We need proof of the U.S. citizenship or immigration status for the following applicant household members is correct:"} %>
+<% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "[First Citizen/Immigration Inconsistent First Name][First Citizen/Immigration Inconsistent Last Name]<br>
-  <strong><font color='red'>[IF Person N field populated]</font></strong> [Person N Citizen/Immigration Inconsistent First Name][Person N Citizen/Immigration Inconsistent Last Name]"} %>
+
+<% if notice.citizenship_unverified.any? %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>Documents of Citizenship or Immigration Status</i></strong>. We need proof of the U.S. citizenship or immigration status for the following applicant household members is correct:"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { 
+  content: notice.citizenship_unverified.map(&:full_name).join("<br>")
+} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "Two types of documentation are accepted to confirm citizenship/immigration status.  We call the two types “primary” and “secondary”. If you provide primary documentation, no other documents are required. If you provide secondary documentation, other identification (ID) is required for verification. Secondary documentation must be accompanied with an identification card containing a recent photo and other identifying information."} %>
 
@@ -178,10 +192,16 @@
     "Documents showing Honorable Discharge from the military (DD Form 214)",
     "Documents showing current active duty military service (DD Form 2 (Active)"] } %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[IF Residency Unverified]</font> <i>Documents Showing D.C. Residency</i></strong>. A document that shows that the following household members live in the District of Columbia:"} %>
+<% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "[First Residency Inconsistent First  Name][First Residency Inconsistent Last Name]<br>
-<strong><font color='red'>[IF Person N field populated]</font></strong> [Person N Residency Inconsistent First Name][Person N Residency Inconsistent Last Name]"} %>
+
+<% if notice.residency_unverified.any? %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>Documents Showing D.C. Residency</i></strong>. A document that shows that the following household members live in the District of Columbia:"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { 
+  content: notice.residency_unverified.map(&:full_name).join("<br>")
+} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "This can include;"} %>
 
@@ -192,10 +212,16 @@
     "Current Utility Bill",
     "Current Letter from Landlord"] } %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[IF Indian Conflict]</font> <i>American Indian Status</i></strong>. On your application, you indicated the following individual(s) were American Indian."} %>
+<% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "[First Indian Inconsistent First  Name][First Indian Inconsistent Last Name]<br>
-<strong><font color='red'>[IF Person N field populated]</font></strong> [Person N Indian Inconsistent First Name][Person N Indian Inconsistent Last Name]"} %>
+
+<% if notice.indian_conflict.any? %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>American Indian Status</i></strong>. On your application, you indicated the following individual(s) were American Indian."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { 
+  content: notice.indian_conflict.map(&:full_name).join("<br>")
+} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "Please provide one of the following documents to confirm this status."} %>
 
@@ -210,6 +236,9 @@
         "I-551 Permanent Resident Card stamped “S1-3” ;",
         "Temporary I-551 stamp coded “S1-3” in a Canadian passport;",
         "A Tribal Record or document certifying at least 50% American Indian blood, as required by Section 289 of the Immigration and Nationality Act (INA); and satisfactory evidence of birth in Canada, such as the following: Birth certificate or Baptismal; Certificate issued on a reservation; Letter from Canadian Department of Indian Affairs; or School Records."]]] } %>
+
+<% end %>
+
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You can send the necessary documents either online, through U.S. Postal mail, or in-person."], heading: 'How to Send the Documents Requested', sub_heading: ''} %>
 

@@ -25,6 +25,14 @@ class IvlNotices::NoticeBuilder
     })
   end
 
+  def append_enrollments(hbx_enrollments)
+    @notice.enrollments << build_enrollment(@hbx_enrollment)
+    other_enrollments = hbx_enrollments.reject{|hbx_enrollment| hbx_enrollment.id.to_s == @hbx_enrollment_id}
+    other_enrollments.each do |hbx_enrollment|
+      @notice.enrollments << build_enrollment(hbx_enrollment)
+    end
+  end
+
   def build_enrollment(hbx_enrollment)
     PdfTemplates::Enrollment.new({
       plan_name: hbx_enrollment.plan.name,

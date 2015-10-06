@@ -376,6 +376,22 @@ private
     is_state_resident?
   end
 
+  def ssn_verified?
+    if lawful_presence_determination.vlp_document_id == 'ssa'
+      lawful_presence_authorized?
+    else
+      true
+    end
+  end
+
+  def citizenship_verified?
+    lawful_presence_authorized?
+  end
+
+  def indian_conflict?
+    citizen_status == "indian_tribe_member"
+  end
+
   def mark_lp_authorized(*args)
     if aasm.current_event == :authorize_lawful_presence!
       lawful_presence_determination.authorize!(*args)
