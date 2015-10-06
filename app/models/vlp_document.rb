@@ -32,6 +32,34 @@ class VlpDocument < Document
       "Other (With I-94 Number)"
     ]
 
+    COUNTRIES_LIST = [ "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
+		"Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
+		"Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina",
+		"Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon",
+		"Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China", "Colombi",
+		"Comoros", "Congo (Brazzaville)", "Congo", "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba",
+		"Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "East Timor (Timor Timur)",
+		"Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Fiji", "Finland",
+		"France", "Gabon", "Gambia, The", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala",
+		"Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia",
+		"Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya",
+		"Kiribati", "Korea, North", "Korea, South", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon",
+		"Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Madagascar",
+		"Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius",
+		"Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Morocco", "Mozambique", "Myanmar",
+		"Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Norway",
+		"Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines",
+		"Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis",
+		"Saint Lucia", "Saint Vincent", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia",
+		"Senegal", "Serbia and Montenegro", "Seychelles", "Sierra Leone", "Singapore", "Slovakia",
+		"Slovenia", "Solomon Islands", "Somalia", "South Africa", "Spain", "Sri Lanka", "Sudan",
+		"Suriname", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
+		"Tanzania", "Thailand", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey",
+		"Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom",
+		"United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam",
+		"Yemen", "Zambia","Zimbabwe"
+  ]
+
   field :alien_number, type: String
   field :i94_number, type: String
   field :visa_number, type: String
@@ -41,6 +69,8 @@ class VlpDocument < Document
   field :receipt_number, type: String
   field :citizenship_number, type: String
   field :card_number, type: String
+  field :country_of_citizenship, type: String
+
 
   # date of expiration of the document. e.g. passport / documentexpiration date
   field :expiration_date, type: Date
@@ -57,7 +87,7 @@ class VlpDocument < Document
   validates :i94_number, length: { is: 11 }, :allow_blank => true
   validates :naturalization_number, length: { within: 7..12 }, :allow_blank => true
   validates :passport_number, length: { within: 6..12 }, :allow_blank => true
-  validates :sevis_id, length: { is: 11 } , :allow_blank => true #first char is N
+  validates :sevis_id, length: { is: 10 } , :allow_blank => true #first char is N
   validates :visa_number, length: { is: 8 }, :allow_blank => true
   validates :receipt_number, length: { is: 13}, :allow_blank => true #first 3 alpha, remaining 10 string
 
@@ -76,12 +106,12 @@ class VlpDocument < Document
         "Machine Readable Immigrant Visa (with Temporary I-551 Language)": [:alien_number, :passport_number],
         "Temporary I-551 Stamp (on passport or I-94)": [:alien_number],
         "I-94 (Arrival/Departure Record)": [:i94_number],
-        "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport": [:i94_number, :passport_number],
-        "Unexpired Foreign Passport": [:passport_number],
+        "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport": [:i94_number, :passport_number, :country_of_citizenship, :expiration_date],
+        "Unexpired Foreign Passport": [:passport_number, :country_of_citizenship, :expiration_date],
         "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)": [:sevis_id],
         "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)": [:sevis_id],
-        "Other (With Alien Number)": [:alien_number, :description],
-        "Other (With I-94 Number)": [:i94_number,:description]
+        "Other (With Alien Number)": [:alien_number],
+        "Other (With I-94 Number)": [:i94_number]
     }
   end
 
