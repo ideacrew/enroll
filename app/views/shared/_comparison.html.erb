@@ -52,7 +52,6 @@
             <% if matching_benefit %>
               <% deductible = matching_benefit.find_deductible %>
               <td  colspan="2"><%= deductible.copay_in_network_tier_1 %></td>
-              <!--<td><%= deductible.copay_out_of_network %></td>-->
             <% end %>
           <% end %>
         </tr>
