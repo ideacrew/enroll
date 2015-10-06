@@ -357,6 +357,7 @@
       }
     }
   }
+
   .benefits-tab, .home-tab {
 
     .plan-details {
@@ -460,10 +461,13 @@
       }
     }
   }
-  .benefits-setup-tab .form-inputs fieldset.benefit-group-fields:last-of-type {
-    margin-bottom: 100px;
-  }
+
   .benefits-setup-tab {
+    .benefit-group-fields {
+      &:last-of-type {
+        margin-bottom: 145px;
+      }
+    }
     .selectric-hide-select {
       display: none;
     }
@@ -700,6 +704,11 @@
     .plan-options {
       background-color: #ffffff;
       border: solid 1px #b7b7b7;
+      .metals-tab {
+        >.col-xs-3:last-of-type {
+          display: none;
+        }
+      }
       span:first-of-type {
         text-align: center;
         font-size: 16px;
@@ -1272,6 +1281,9 @@
       }
     }
 
+  }
+  .planyear-add-tab {
+    margin-bottom: 50px;
   }
   .premium-reports-tab {
     form {

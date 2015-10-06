@@ -22,5 +22,6 @@
           %id
             %id= individual.broker_role.broker_agency_profile.id
           %name= individual.broker_role.broker_agency_profile.legal_name
-          %npn= individual.broker_role.broker_agency_profile.corporate_npn
+          - if !individual.broker_role.broker_agency_profile.corporate_npn.blank?
+            %npn= individual.broker_role.broker_agency_profile.corporate_npn
         = render :partial => "events/shared/versioned_resource", :object => individual.broker_role

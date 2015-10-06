@@ -72,7 +72,7 @@ class Household
 
       if tax_households.present?
         latest_tax_household = tax_households.where(effective_ending_on: nil).last
-        latest_tax_household.update_attributes(effective_ending_on: verified_tax_household.start_date - 1.day )
+        latest_tax_household.update_attributes(effective_ending_on: verified_tax_household.start_date)
       end
 
       th = tax_households.build(
@@ -128,6 +128,7 @@ class Household
       is_subscriber: false,
       is_ia_eligible: verified_tax_household_member.is_insurance_assistance_eligible
       )
+    th.save!
   end
 
   def effective_ending_on_gt_effective_starting_on

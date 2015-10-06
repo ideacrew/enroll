@@ -45,6 +45,8 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
         Then Employee should see the group selection page
         When Employee clicks continue on the group selection page
         Then Employee should see the list of plans
+        And I select three plans to compare
+        And I should not see any plan which premium is 0
         When Employee selects a plan on the plan shopping page
         When Employee clicks on Confirm button on the coverage summary page
         Then Employee should see the receipt page

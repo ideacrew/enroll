@@ -41,9 +41,8 @@
         Employee Costs
       </div>
       <%= link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "employee_costs_link", class: "hidden" %>
-    </div>
 
-    <%= render "employers/plan_years/employee_costs_modal" %>
+    </div>
 
     <div class="col-xs-12 offerings">
       <div class="row row-form-wrapper no-buffer heading">
@@ -61,10 +60,6 @@
       </div>
     </div>
 
-
-
-
-
     <div class="col-md-12 col-sm-12 col-xs-12 top-pd">
       <div class="reference_plan_info" style='clear: both;'>
         <h4></h4>
@@ -77,11 +72,16 @@
   <!-- Select Plan:  -->
 
   <%= render "shared/reference_plans_list", f: f, p: p %>
+
+  <div class='cost-impact-loader row' style="text-align: center; display:none;">
+    <div class='col-xs-12'><br/>
+            <i class='fa fa-refresh fa-spin fa-2x'></i><h4>Loading employee costs...</h4>
+    </div>
+  </div>
+
   <div class="col-xs-12">
     <br><br>
     <div class="selected-plan row" style="display: none;"></div>
   </div>
-
-
 
 </fieldset>

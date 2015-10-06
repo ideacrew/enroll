@@ -257,18 +257,19 @@ $(function() {
     });
   });
 
-  $("#employer_cost_info_btn .btn").click(function(){
-    var reference_plan_id = $("#plan_year_benefit_groups_attributes_0_reference_plan_id").val();
-    if (reference_plan_id == "" || reference_plan_id == undefined) {
-      return
-    }
-    calcEmployerContributions($('a#employee_costs_link').attr('href'));
-  })
+  // $("#employer_cost_info_btn .btn").click(function(){
+  //   var reference_plan_id = $("#plan_year_benefit_groups_attributes_0_reference_plan_id").val();
+  //   if (reference_plan_id == "" || reference_plan_id == undefined) {
+  //     return
+  //   }
+  //   calcEmployerContributions($('a#employee_costs_link').attr('href'));
+  // })
 });
 
 function calcEmployerContributions(url) {
   var reference_plan_id = $("#plan_year_benefit_groups_attributes_0_reference_plan_id").val();
-  var plan_option_kind = $("#plan_year_benefit_groups_attributes_0_plan_option_kind").val();
+  // var plan_option_kind = $("#plan_year_benefit_groups_attributes_0_plan_option_kind").val();
+  var plan_option_kind = $(".nav-tabs input[type=radio]:checked").val();
   if (reference_plan_id == "" || reference_plan_id == undefined) {
     return
   }
@@ -322,7 +323,8 @@ function calcEmployerContributions(url) {
         "relation_benefits": relation_benefits
       }
     }).done(function() {
-      $("fieldset#"+ location_id +" .employer_cost_info .loader").hide();
+      $('.cost-impact-loader').hide();
+      // $("fieldset#"+ location_id +" .employer_cost_info .loader").hide();
     });;
 }
 
