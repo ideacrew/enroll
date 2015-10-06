@@ -52,4 +52,14 @@ RSpec.describe ApplicationController do
       expect(session[:portal]).not_to be
     end
   end
+
+  context "authenticate_user_from_token!" do
+    let(:user) { FactoryGirl.create(:user) }
+
+    it "should get signed in flash notice" do
+      allow(controller).to receive(:authentication_not_required?).and_return true
+      get :index, user_token: user.authentication_token
+      expect(flash[:notice]).to eq "Signed in Successfully."
+    end
+  end
 end

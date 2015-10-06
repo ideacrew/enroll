@@ -4,6 +4,7 @@ FactoryGirl.define do
     gen_pass = User.generate_valid_password
     password gen_pass
     password_confirmation gen_pass
+    sequence(:authentication_token) {|n| "j#{n}-#{n}DwiJY4XwSnmywdMW"}
     approved true
     roles ['web_service']
   end
