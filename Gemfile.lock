@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/dchbx/acapi.git
-  revision: c8ccbd14031fa5edb75b844dad19a516502df185
+  revision: e6e880bc930867923bbaff8f6dbffd45810fe9d9
   branch: development
   specs:
     acapi (0.0.1)
@@ -55,12 +55,12 @@ GEM
     animate-rails (1.0.8)
       rails
     arel (6.0.3)
-    aws-sdk (2.1.24)
-      aws-sdk-resources (= 2.1.24)
-    aws-sdk-core (2.1.24)
+    aws-sdk (2.1.26)
+      aws-sdk-resources (= 2.1.26)
+    aws-sdk-core (2.1.26)
       jmespath (~> 1.0)
-    aws-sdk-resources (2.1.24)
-      aws-sdk-core (= 2.1.24)
+    aws-sdk-resources (2.1.26)
+      aws-sdk-core (= 2.1.26)
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
@@ -330,6 +330,7 @@ GEM
     raindrops (0.15.0)
     rake (10.4.2)
     rdoc (4.2.0)
+      json (~> 1.4)
     redis (3.2.1)
     redis-actionpack (4.0.1)
       actionpack (~> 4)
