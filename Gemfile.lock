@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/dchbx/acapi.git
-  revision: bc2e69d42b3f8f238f0a3b039b0a6796a4a77055
+  revision: e6e880bc930867923bbaff8f6dbffd45810fe9d9
   branch: development
   specs:
     acapi (0.0.1)
