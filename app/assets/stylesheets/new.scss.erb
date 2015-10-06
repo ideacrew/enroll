@@ -209,13 +209,14 @@
           &.table-functions {
             padding: 0;
             text-align: right;
+
               .fa {
                 display: none;
                 cursor: pointer;
                 margin: 0;
-              &:last-of-type {
-                padding-right: 10px;
-              }
+                &.fa-trash-o {
+                  padding-right: 20px;
+                }
             }
           }
           &:hover {
@@ -1285,6 +1286,29 @@
   }
 
 
+}
+#add_employee_action {
+  table {
+    &.table-striped {
+      table-layout: fixed;
+      overflow-x: hidden;
+      margin: 0;
+      width: 100%;
+      padding: 0;
+      th {
+        padding: 0;
+        text-align: center;
+        font-size: 12px;
+
+        font-weight: bold;
+        text-transform: capitalize;
+        padding-bottom: 5px;
+      }
+      td {
+
+      }
+    }
+  }
 }
 .selected-plan {
   .col-xs-12 {
