@@ -732,7 +732,6 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
 
       } else {
         $('#btn-continue').addClass('disabled');
-        alert(1);
 
       }
     }
