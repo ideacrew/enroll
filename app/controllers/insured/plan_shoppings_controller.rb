@@ -43,6 +43,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def receipt
     person = @person
+
     @enrollment = HbxEnrollment.find(params.require(:id))
     plan = @enrollment.plan
     if @enrollment.employee_role.present?
@@ -50,7 +51,7 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
     else
-      tax_household = current_user.person.primary_family.latest_household.latest_active_tax_household
+      tax_household = person.primary_family.latest_household.latest_active_tax_household
       @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.elected_aptc_pct, tax_household)
       @market_kind = "individual"
     end
