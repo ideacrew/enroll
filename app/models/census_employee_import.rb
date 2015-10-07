@@ -61,6 +61,7 @@ class CensusEmployeeImport
 
   def imported_census_employees
     @imported_census_employees ||= load_imported_census_employees
+    @imported_census_employees.compact!
     @imported_census_employees.each do |census_employee|
       census_employee.singleton_class.validates_presence_of :email_address if  census_employee.is_a? CensusEmployee
       census_employee.singleton_class.validates_presence_of :email if census_employee.is_a? CensusDependent
