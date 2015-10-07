@@ -238,9 +238,9 @@ class CensusEmployeeImport
                   when "domestic partner"
                     "domestic_partner"
                   when "child"
-                    "child"
+                    "child_under_26"
                   when "disabled child"
-                    "disabled_child"
+                    "disabled_child_26_and_over"
                   else
                     nil
                 end
