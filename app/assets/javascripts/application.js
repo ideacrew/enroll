@@ -729,8 +729,11 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
     if($("#terms_check_thank_you").prop("checked") == true){
       if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
         $('#btn-continue').removeClass('disabled');
+
       } else {
         $('#btn-continue').addClass('disabled');
+        alert(1);
+
       }
     }
   }
