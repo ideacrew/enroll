@@ -164,7 +164,7 @@ module Factories
 
     def self.initialize_person(user, name_pfx, first_name, middle_name,
                                last_name, name_sfx, ssn, dob, gender, role_type, no_ssn=nil)
-      people = Person.match_by_id_info(ssn: ssn, dob: dob, last_name: last_name)
+      people = Person.match_by_id_info(ssn: ssn, dob: dob, last_name: last_name, first_name: first_name)
       person, is_new = nil, nil
       case people.count
       when 1

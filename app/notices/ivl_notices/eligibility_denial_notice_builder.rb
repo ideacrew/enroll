@@ -1,10 +1,9 @@
-class IvlNotices::ConditionalEligibilityNoticeBuilder < IvlNotices::NoticeBuilder
+class IvlNotices::EligibilityDenialNoticeBuilder < IvlNotices::NoticeBuilder
 
-  def initialize(hbx_enrollment_id)
+  def initialize(consumer)
     super(PdfTemplates::ConditionalEligibilityNotice, {
-      template: "notices/ivl/9f_conditional_eligibility_confirmation_notification.html.erb"
+      template: "notices/ivl/11_individual_total_ineligibility.html.erb"
     })
-    @hbx_enrollment_id = hbx_enrollment_id
   end
 
   def build
@@ -13,7 +12,6 @@ class IvlNotices::ConditionalEligibilityNoticeBuilder < IvlNotices::NoticeBuilde
     super
     @family = @consumer.primary_family
     hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active rescue []  
-    append_enrollments(hbx_enrollments)
     append_individuals(hbx_enrollments)
   end
 end

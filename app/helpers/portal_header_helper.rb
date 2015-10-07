@@ -24,6 +24,14 @@ module PortalHeaderHelper
     end
   end
 
+  def enrollment_name
+    begin 
+      person = Person.find(session[:person_id])
+      name=  'Enrollment assistance for: ' + person.full_name
+    rescue
+      name = ''
+    end
+  end
   def agent_header 
     if current_user.person.assister_role
     	agent = "I'm an In Person Assister"
@@ -32,19 +40,14 @@ module PortalHeaderHelper
     else
     	agent = "I'm a Customer Service Representative" 
     end
-    begin 
-      person = Person.find(session[:person_id])
-      name=  'Enrollment assistance for: ' + person.full_name
-    rescue
-      name = ''
-    end
-    header_text = "<div style='display:inline-block'>&nbsp; #{agent}<br/>&nbsp; #{name}</div>" 
+    header_text = "<div style='display:inline-block'>&nbsp; #{agent}<br/>&nbsp; #{enrollment_name}</div>" 
     link_to "#{image_tag 'icons/icon-expert.png'}#{header_text}".html_safe,
       home_exchanges_agents_path
   end
 
   def hbx_staff_header
-    link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm HBX Staff".html_safe,
+    header_text = "<div style='display:inline-block'>&nbsp; I'm HBX Staff<br/>&nbsp; #{enrollment_name}</div>" 
+    link_to "#{image_tag 'icons/icon-exchange-admin.png'} #{header_text}".html_safe,
       exchanges_hbx_profiles_root_path
   end
 end  
