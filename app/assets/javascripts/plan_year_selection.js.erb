@@ -1,8 +1,8 @@
 
 $(document).on('ready', function() {
 
-  // nav tabs radios on change for plan selection
-    $('#choose-coverage > * select').val("");
+
+
     $('.plan-options > * input, .reference-plans > * input').prop('checked', false);
 
     $(document).on('change', '.offerings .fte:first input, .offerings .pte:first input, .offerings .msp:first input', function() {
@@ -25,7 +25,6 @@ $(document).on('ready', function() {
     });
 
 
-    $('.nav-tabs li input[type=radio]').prop('checked', false);
     $(document).on('click', '.nav-tabs li label', function() {
       $(this).closest('.benefit-group-fields').find('.select-reference').remove();
       $(this).closest('.benefit-group-fields').find('.selected-plan, .referenceplan').hide();
@@ -196,6 +195,7 @@ $(document).on('click', '.reference-plan input + label', function() {
     }).done(function() {
     });
   }
+  
 
   $(document).on("click", ".reference_plan_info h4 span", function() {
     $(this).parents(".reference_plan_info").find('.content').toggle();

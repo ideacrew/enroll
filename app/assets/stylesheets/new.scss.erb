@@ -415,6 +415,8 @@
         font-size: 16px;
       }
       table {
+        table-layout: fixed;
+
         tr {
           th {
             font-weight: normal;
@@ -1433,5 +1435,14 @@
   }
   table {
     margin-bottom: 10px;
+  }
+}
+.edit-offering, .reference-steps {
+  h4.change-plan, h4.cancel-plan-change {
+    color: #007bc4;
+    &:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
   }
 }

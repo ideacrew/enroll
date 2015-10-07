@@ -19,5 +19,5 @@ var reference_plan_remainder = reference_plan_count % 4;
 if (reference_plan_remainder > 0 ) {
   $('#benefit-group-<%= @benefit_group.to_s %> .reference-plan').slice(-reference_plan_remainder).css({"border-bottom":"none" });
 } else {
-  
+
 }
