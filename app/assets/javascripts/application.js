@@ -90,11 +90,12 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 $(document).ready(function () {
   // js that runs on edit view
-  if(window.location.href.indexOf("edit") > -1) {
+  if(window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
 
     alert('edit');
     $('.add_fields').remove();
     $('.reference-steps').hide();
+    $('.planyear-add-tab .controls:last').show();
 
     $('.change-plan').on('click', function() {
       $(this).closest('.benefit-group-fields').find('.reference-steps input').prop('checked', false);
@@ -110,13 +111,24 @@ $(document).ready(function () {
       $(this).closest('.benefit-group-fields').find('.plan-options').hide();
       $(this).closest('.benefit-group-fields').find('.nav-tabs li').removeClass('active');
       $(this).closest('.benefit-group-fields').find('.ref-plan').val(original_ref);
+      $(this).closest('.benefit-group-fields').find('.select-reference').hide();
+      $(this).closest('.benefit-group-fields').find('.reference-plans').hide();
       $(this).closest('.reference-steps').hide();
+
 
     });
       start_on = $("#plan_year_start_on").val().substr(0,4);
       $('.plan-options a').each(function() {
         var url = $(this).attr('href');
         $(this).attr('href', url+"&start_on="+start_on);
+      });
+      $("#plan_year_start_on").on('change', function() {
+        start_on = $(this).val().substr(0,4);
+        $('.plan-options a').each(function() {
+          var url = $(this).attr('href');
+          $(this).attr('href', url+"&start_on="+start_on);
+        });
+
       });
 
 

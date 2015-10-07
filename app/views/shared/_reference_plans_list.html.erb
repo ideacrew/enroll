@@ -24,14 +24,9 @@
   <div class="reference-steps">
     <% if @plan_year.new_record == false %>
     <h1>Edit Your Plan Offering</h1>
-    <% if @offered_option == "single_carrier" %>
-    <h4 style="max-width: 660px; display: inline-block;">You currently offer <%= @offered_plan.name %> from a <%= @offered_option.humanize.downcase %>.</h4>
-    <% elsif @offered_option == "metal_level"%>
-    <h4 style="max-width: 660px; display: inline-block;">You currently offer <%= @offered_plan.name %> from a given <%= @offered_option.humanize.downcase %>.</h4>
-    <% elsif @offered_option == "single_plan" %>
-    <h4 style="max-width: 660px; display: inline-block;">You currently offer a single plan: <%= @offered_plan.name %>.</h4>
+    <h4 class="currently-offering" style="max-width: 660px; display: inline-block;">
+    </h4>
 
-    <% end %>
     <h4 class="cancel-plan-change pull-right" style="display: inline-block;">Cancel</h4>
 
     <br/><br/>
