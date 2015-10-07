@@ -4,7 +4,7 @@ require "rails_helper"
 describe CensusEmployeePolicy do
   subject { described_class }
   let(:employer_profile){ FactoryGirl.create(:employer_profile)}
-
+  let(:person) { FactoryGirl.create(:person) }
 
   permissions :delink? do
     context "already linked" do
@@ -65,20 +65,6 @@ describe CensusEmployeePolicy do
       end
     end
 
-    context "when is broker user" do
-      let(:user) { FactoryGirl.create(:user, :broker) }
-
-      it "grants access when change dob" do
-        employee.dob = TimeKeeper.date_of_record
-        expect(subject).to permit(user, employee)
-      end
-
-      it "grants access when change ssn" do
-        employee.ssn = "123321456"
-        expect(subject).to permit(user, employee)
-      end
-    end
-
     context "when is normal user" do
       let(:user) { FactoryGirl.create(:user) }
 
@@ -93,12 +79,13 @@ describe CensusEmployeePolicy do
       end
     end
 
-    context "when is employer_staff user" do
-      let(:user) { FactoryGirl.create(:user, :employer_staff) }
+    context "when is broker user" do
+      let(:user) { FactoryGirl.create(:user, :broker, person: person) }
 
-      context "not linked" do
-        before do
-          allow(employee).to receive(:eligible?).and_return(true)
+      context "current user is broker of employer_profile" do
+        before :each do
+          allow(employer_profile).to receive(:active_broker).and_return person
+          allow(employee).to receive(:employer_profile).and_return employer_profile
         end
 
         it "grants access when change dob" do
@@ -112,19 +99,116 @@ describe CensusEmployeePolicy do
         end
       end
 
+      context "current user is not broker of employer_profile" do
+        before :each do
+          allow(employer_profile).to receive(:active_broker).and_return FactoryGirl.build(:person)
+          allow(employee).to receive(:employer_profile).and_return employer_profile
+        end
+
+        it "denies access when change dob" do
+          employee.dob = TimeKeeper.date_of_record
+          expect(subject).not_to permit(user, employee)
+        end
+
+        it "denies access when change ssn" do
+          employee.ssn = "123321456"
+          expect(subject).not_to permit(user, employee)
+        end
+      end
+    end
+
+    context "when is employer_staff user" do
+      let(:user) { FactoryGirl.create(:user, :employer_staff) }
+
+      context "not linked" do
+        before do
+          allow(employee).to receive(:eligible?).and_return(true)
+        end
+
+        context "when employee is staff of current user" do
+          let(:employer_staff_role) {double(employer_profile_id: employer_profile.id)}
+          let(:employer_staff_roles) { [employer_staff_role] }
+          before :each do
+            allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
+            allow(user).to receive(:person).and_return person
+            allow(employee).to receive(:employer_profile).and_return employer_profile
+          end
+
+          it "grants access when change dob" do
+            employee.dob = TimeKeeper.date_of_record
+            expect(subject).to permit(user, employee)
+          end
+
+          it "grants access when change ssn" do
+            employee.ssn = "123321456"
+            expect(subject).to permit(user, employee)
+          end
+        end
+
+        context "when employee is not staff of current user" do
+          let(:employer_staff_role) {double(employer_profile_id: EmployerProfile.new.id)}
+          let(:employer_staff_roles) { [employer_staff_role] }
+          before :each do
+            allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
+            allow(user).to receive(:person).and_return person
+            allow(employee).to receive(:employer_profile).and_return employer_profile
+          end
+
+          it "denies access when change dob" do
+            employee.dob = TimeKeeper.date_of_record
+            expect(subject).not_to permit(user, employee)
+          end
+
+          it "denies access when change ssn" do
+            employee.ssn = "123321456"
+            expect(subject).not_to permit(user, employee)
+          end
+        end
+      end
+
       context "has linked" do
         before do
           allow(employee).to receive(:eligible?).and_return(false)
         end
 
-        it "grants access when change dob" do
-          employee.dob = TimeKeeper.date_of_record
-          expect(subject).to permit(user, employee)
+        context "when employee is staff of current user" do
+          let(:employer_staff_role) {double(employer_profile_id: employer_profile.id)}
+          let(:employer_staff_roles) { [employer_staff_role] }
+          before :each do
+            allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
+            allow(user).to receive(:person).and_return person
+            allow(employee).to receive(:employer_profile).and_return employer_profile
+          end
+
+          it "grants access when change dob" do
+            employee.dob = TimeKeeper.date_of_record
+            expect(subject).to permit(user, employee)
+          end
+
+          it "grants access when change ssn" do
+            employee.ssn = "123321456"
+            expect(subject).to permit(user, employee)
+          end
         end
 
-        it "grants access when change ssn" do
-          employee.ssn = "123321456"
-          expect(subject).to permit(user, employee)
+        context "when employee is not staff of current user" do
+          let(:employer_staff_role) {double(employer_profile_id: EmployerProfile.new.id)}
+          let(:employer_staff_roles) { [employer_staff_role] }
+          before :each do
+            allow(person).to receive(:employer_staff_roles).and_return employer_staff_roles
+            allow(user).to receive(:person).and_return person
+            allow(employee).to receive(:employer_profile).and_return employer_profile
+          end
+
+          it "denies access when change dob" do
+            employee.dob = TimeKeeper.date_of_record
+            expect(subject).not_to permit(user, employee)
+          end
+
+          it "denies access when change ssn" do
+            employee.ssn = "123321456"
+            expect(subject).not_to permit(user, employee)
+          end
         end
       end
     end
