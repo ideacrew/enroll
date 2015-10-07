@@ -40,5 +40,9 @@ module PdfTemplates
     def indian_conflict
       individuals.select{|individual| individual.indian_conflict}
     end
+
+    def incarcerated
+      individuals.select{|individual| individual.incarcerated}
+    end
   end
 end

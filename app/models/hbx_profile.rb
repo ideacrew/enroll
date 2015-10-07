@@ -107,6 +107,8 @@ class HbxProfile
   CallCenterName = "DC Health Link's Customer Care Center"
   CallCenterPhoneNumber = "1-855-532-5465"
 
+  # FIXME
+  IndividualEnrollmentDueDayOfMonth = 15
 
   ## Carriers
   # hbx_id, hbx_carrier_id, name, abbrev,

@@ -91,7 +91,7 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 $(document).ready(function () {
 
   // check that dob entered is not a future date
-  $(document).on('blur', '#jq_datepicker_ignore_person_dob', function() {
+  $(document).on('blur', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob', function() {
     var entered_dob = $(this).val();
     var entered_year = entered_dob.substring(entered_dob.length -4);
     var entered_month = entered_dob.substring(0, 2);
@@ -517,7 +517,7 @@ $(document).ready(function () {
   $(".npn_field").mask("9999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
-  $("#jq_datepicker_ignore_person_dob").mask("99/99/9999");
+  $("#jq_datepicker_ignore_census_employee_dob, #jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob").mask("99/99/9999");
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
   $("#tribal_id").mask("999999999");
@@ -697,8 +697,11 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
     if($("#terms_check_thank_you").prop("checked") == true){
       if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
         $('#btn-continue').removeClass('disabled');
+
       } else {
         $('#btn-continue').addClass('disabled');
+        alert(1);
+
       }
     }
   }
