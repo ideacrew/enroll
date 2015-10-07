@@ -124,7 +124,8 @@ class BrokerRole
     end
 
     def find_by_npn(npn_value)
-      Person.where("broker_role.npn" => npn_value).first.broker_role
+      person = Person.where("broker_role.npn" => npn_value)
+      person.first.broker_role unless person.blank?
     end
 
     def list_brokers(person_list)
