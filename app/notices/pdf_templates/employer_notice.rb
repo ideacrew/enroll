@@ -12,6 +12,7 @@ module PdfTemplates
     attribute :hbe, PdfTemplates::Hbe
     attribute :open_enrollment_end_on, Date
     attribute :coverage_end_on, Date
+    attribute :to, String
 
     def shop?
       return true

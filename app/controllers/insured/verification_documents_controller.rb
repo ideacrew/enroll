@@ -4,8 +4,14 @@ class Insured::VerificationDocumentsController < ApplicationController
   before_action :get_family
 
   def upload
+    @doc_errors = []
     doc_params = params_clean_vlp_documents
-    if params.permit![:file]
+
+    if doc_params.empty?
+      flash[:error] = "File not uploaded. Document type and/or document fields not provided "
+      redirect_to(:back)
+      return
+    elsif params.permit![:file]
       doc_uri = Aws::S3Storage.save(file_path, 'dchbx-id-verification')
 
       if doc_uri.present?

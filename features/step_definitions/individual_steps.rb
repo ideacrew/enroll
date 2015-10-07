@@ -61,7 +61,7 @@ Then(/Individual should see a form to enter personal information$/) do
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-city/).set("Washington")
   @browser.p(text: /GA/).fire_event("onclick") if @browser.p(text: /GA/).present?
   @browser.p(text: /SELECT STATE/).fire_event("onclick") if @browser.p(text: /SELECT STATE/).present?
-  scroll_then_click(@browser.li(text: /DC/))
+  scroll_then_click(@browser.li(text: /DC/, class: /interaction-choice-control-state-id-9/))
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-zip/).set("20002")
   @browser.text_field(class: /interaction-field-control-person-phones-attributes-0-full-phone-number/).set("1110009999")
   @browser.text_field(class: /interaction-field-control-person-emails-attributes-0-address/).set(@u.find :email1)
@@ -95,9 +95,8 @@ Then (/Individual fixes a VLP error message/) do
   @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-true/).fire_event("onclick")
   @browser.p(text: /Select document type/i).wait_until_present
   @browser.p(text: /Select document type/i).click
-  @browser.li(text: /Certificate of Citizenship/i).wait_until_present
-  @browser.li(text: /Certificate of Citizenship/i).click
-  click_when_present(@browser.button(class: /interaction-click-control-continue/))
+  click_when_present(@browser.li(text: "Certificate of Citizenship", class: "interaction-choice-control-state-id-1"))
+  click_when_present(@browser.button(class: "interaction-click-control-continue"))
   wait_and_confirm_text(/errors/)
   wait_and_confirm_text(/alien_number value is required/)
   #@browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).wait_while_present

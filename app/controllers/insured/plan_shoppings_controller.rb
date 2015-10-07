@@ -43,6 +43,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def receipt
     person = @person
+
     @enrollment = HbxEnrollment.find(params.require(:id))
     plan = @enrollment.plan
     if @enrollment.employee_role.present?
@@ -50,7 +51,7 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
     else
-      tax_household = current_user.person.primary_family.latest_household.latest_active_tax_household
+      tax_household = person.primary_family.latest_household.latest_active_tax_household
       @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.elected_aptc_pct, tax_household)
       @market_kind = "individual"
     end
@@ -129,7 +130,8 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def show
-    set_consumer_bookmark_url(family_account_path)
+    set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
+    set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''

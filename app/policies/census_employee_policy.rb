@@ -1,11 +1,16 @@
 class CensusEmployeePolicy < ApplicationPolicy
   def update?
-    if @user.has_role? :employer_staff or
-       @user.has_role? :broker or
-       @user.has_role? :hbx_staff
+    if @user.has_role? :hbx_staff
       true
     else
-      !@record.dob_changed? and !@record.ssn_changed?
+      can_change = if @user.has_role? :employer_staff
+                     @user.person.employer_staff_roles.map(&:employer_profile_id).map(&:to_s).include? @record.employer_profile_id.try(:to_s) rescue false
+                   elsif @user.has_role? :broker
+                     @record.employer_profile.try(:active_broker) == @user.person
+                   else
+                     false
+                   end
+      can_change || (!@record.dob_changed? && !@record.ssn_changed?)
     end
   end
 

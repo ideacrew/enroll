@@ -63,7 +63,12 @@
       <tr>
         <td>Summary of Benefits and Coverage (SBC) PDF</td>
         <td>
-          <%= link_to(root_path + "sbc/#{@plan.sbc_file}", class: "download") do %>
+          <% if @plan.sbc_document.present? %>
+              <% key, bucket = get_key_and_bucket(@plan.sbc_document.identifier) %>
+              <%= link_to(document_download_path(bucket, key), class: "download") do %>
+                  <i class="glyphicon glyphicon-download-alt"></i> Download
+              <% end %>
+          <% else %>
               <i class="glyphicon glyphicon-download-alt"></i> Download
           <% end %>
         </td>

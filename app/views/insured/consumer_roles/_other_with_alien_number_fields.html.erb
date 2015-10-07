@@ -2,32 +2,9 @@
 <%= c.fields_for 'vlp_documents', document do |v| %>
     <%= v.hidden_field :subject %>
     <%= v.hidden_field :id %>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= v.text_field :alien_number, :placeholder => "Alien Number", :pattern => "\\d{9}",
-      :title => "
-      • When entering an Alien Number, only include the numbers. Do not enter the 'A' or any other characters or letters. For example: If your Alien Number is 'A123456789' then please enter '123456789'.
-      • You must enter exactly 9 digits into the Alien Number field. For Alien Numbers with fewer than 9 digits, add one zero (0) to the beginning of an 8-digit Alien Number and two zeroes (00) to the beginning of a 7-digit Alien Number. For example: If your Alien Number is 'A1234567' then please enter '001234567'.
-      • Pre-1956 certificates do not contain an Alien Number. In this case, enter “999999999” for the Alien Number. (check for 9 digit numbers)." %>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= v.text_field :passport_number, :placeholder => "Passport Number", :pattern => "[a-zA-Z0-9]{6,12}",
-      :title => "
-      • When entering a Passport Number, include all numbers and letters. Do not enter any other characters or spaces.
-      • The Passport Number that you enter must have between 6 and 12 numbers and letters." %>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= v.label :country_of_citizenship, "Country of Citizenship" %>
-      <%= v.select :country_of_citizenship, options_for_select(::VlpDocument::COUNTRIES_LIST) %>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= v.label :expiration_date, "Passport Expiration Date:" %>
-      <%= v.date_field :expiration_date %>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 col-md-offset-4 form-group form-group-lg no-pd">
-      <%= v.text_field :sevis_id, :placeholder => "SEVIS ID", :pattern => "\\d{10}",
-      :title => "
-      • When entering a SEVIS ID, only include the numbers. Do not enter the 'N' or any other characters or letters. For example: If your SEVIS ID is 'N1234567891' then please enter '1234567891'.
-      • The SEVIS ID entered must have 10 digits.
-      How to find the SEVIS ID: On the DS-2019, the number is on the top right hand side of the page in the box above the barcode." %>
-    </div>
+    <%= render :partial => "insured/consumer_roles/docs_shared/alien_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/passport_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/country_of_citizenship", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/expiration_date", locals: {v: v, name: "Passport"} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/servis_id", locals: {v: v} %>
 <% end %>

@@ -19,21 +19,22 @@ class Exchanges::AgentsController < ApplicationController
        }
        create_secure_message message_params, current_user.person, :inbox
      else
-     	@person=nil
+       @person=nil
      end
      session[:person_id] = nil
+     session[:original_application_type] = nil
      render 'home'
   end
 
   def begin_employee_enrollment
     session[:person_id] = nil
-    session[:original_application_type] = params['original_application_type'] unless session[:original_application_type]
+    session[:original_application_type] = params['original_application_type']
     redirect_to search_insured_employee_index_path
   end
 
   def begin_consumer_enrollment
     session[:person_id] = nil
-    session[:original_application_type] = params['original_application_type'] unless session[:original_application_type]
+    session[:original_application_type] = params['original_application_type']
     redirect_to search_insured_consumer_role_index_path
   end
 
@@ -64,7 +65,7 @@ class Exchanges::AgentsController < ApplicationController
   end
 
   def check_agent_role
-    unless current_user.has_agent_role?
+    unless current_user.has_agent_role? || current_user.has_hbx_staff_role?
       redirect_to root_path, :flash => { :error => "You must be an Agent:  CSR, CAC, or IPA" }
     end
   end

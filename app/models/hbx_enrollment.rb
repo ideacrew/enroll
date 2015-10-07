@@ -359,10 +359,6 @@ class HbxEnrollment
     benefit_group.effective_on_for(employee_role.hired_on)
   end
 
-  def self.calculate_start_date_by_qle(household)
-    household.family.current_sep.effective_on
-  end
-
   def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false)
     enrollment = HbxEnrollment.new
     case
@@ -371,11 +367,11 @@ class HbxEnrollment
       enrollment.household = coverage_household.household
       enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
-      enrollment.effective_on = if qle
-                                  calculate_start_date_by_qle(coverage_household.household)
-                                else
-                                  calculate_start_date_from(employee_role, coverage_household, benefit_group)
-                                end
+      if enrollment.family.is_under_special_enrollment_period?
+        enrollment.effective_on = enrollment.family.current_sep.effective_on
+      else
+        enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+      end
       # benefit_group.plan_year.start_on
       enrollment.benefit_group = benefit_group
       census_employee = employee_role.census_employee
@@ -388,15 +384,10 @@ class HbxEnrollment
       enrollment.kind = "individual"
       enrollment.consumer_role = consumer_role
       enrollment.benefit_package_id = benefit_package.try(:id)
-      # if qle
-      #   enrollment.effective_on = calculate_start_date_by_qle(coverage_household.household)
-      # else
-
       
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-      family = consumer_role.person.primary_family
-      if family.is_under_special_enrollment_period?
-        enrollment.effective_on = family.current_sep.effective_on
+      if enrollment.family.is_under_special_enrollment_period?
+        enrollment.effective_on = enrollment.family.current_sep.effective_on
       else
         enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
       end
