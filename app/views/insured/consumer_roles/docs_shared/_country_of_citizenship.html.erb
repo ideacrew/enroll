@@ -1,0 +1,4 @@
+<div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+  <%= v.label :country_of_citizenship, "Country of Citizenship" %>
+  <%= v.select :country_of_citizenship, options_for_select(::VlpDocument::COUNTRIES_LIST) %>
+</div>

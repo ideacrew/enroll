@@ -42,6 +42,7 @@ RSpec.describe SamlController do
         it "should redirect back to their last portal" do
           post :login, :SAMLResponse => sample_xml
           expect(response).to redirect_to(user.last_portal_visited)
+          expect(flash[:notice]).to eq "Signed in Successfully."
           expect(User.where(email: user.email).first.oim_id).to eq name_id
           expect(User.where(email: user.email).first.idp_verified).to be_truthy
         end
@@ -54,6 +55,7 @@ RSpec.describe SamlController do
         it "should claim the invitation" do
           post :login, :SAMLResponse => sample_xml
           expect(response).to redirect_to(search_insured_consumer_role_index_path)
+          expect(flash[:notice]).to eq "Signed in Successfully."
           expect(User.where(email: attributes_double['mail']).first.oim_id).to eq name_id
           expect(User.where(email: attributes_double['mail']).first.idp_verified).to be_truthy
         end

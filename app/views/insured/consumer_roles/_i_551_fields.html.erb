@@ -2,10 +2,7 @@
 <%= c.fields_for 'vlp_documents', document do |v| %>
     <%= v.hidden_field :subject %>
     <%= v.hidden_field :id %>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= v.text_field :card_number, :placeholder => "Card Number" %>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-      <%= v.text_field :alien_number, :placeholder => "Alien Number" %>
-    </div>
+    <%= render :partial => "insured/consumer_roles/docs_shared/alien_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/card_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/expiration_date", locals: {v: v, name: "I-551"} %>
 <% end %>

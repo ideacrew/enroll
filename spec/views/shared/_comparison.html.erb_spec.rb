@@ -50,6 +50,11 @@ describe "shared/_comparison.html.erb" do
   it "should have download link" do
     expect(rendered).to have_selector('a', text: 'Download')
   end
+  
+  it "should not have Out of Network text" do
+    expect(rendered).to_not have_selector('th', text: 'Out of Network')
+  end
+  
 
   it "should have print link" do
     expect(rendered).to have_selector('button', text: 'Print')

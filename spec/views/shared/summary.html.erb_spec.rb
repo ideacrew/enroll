@@ -15,7 +15,9 @@ describe "shared/_summary.html.erb" do
       :total_employer_contribution => 0,
       :total_employee_cost => 0,
       :id => "1234234234",
-      :sbc_file => "THE SBC FILE.PDF"
+      :sbc_file => "THE SBC FILE.PDF",
+      :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
+                                     :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-sbc#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
       ) }
   let(:mock_qhp) { instance_double("Products::Qhp", :qhp_benefits => []) }
 
@@ -27,7 +29,7 @@ describe "shared/_summary.html.erb" do
   end
 
   it "should have a link to download the sbc pdf" do
-    expect(rendered).to have_selector("a[href='#{root_path + "sbc/THE SBC FILE.PDF"}']")
+    expect(rendered).to have_selector("a[href='#{root_path + "document/download/dchbx-sbc/7816ce0f-a138-42d5-89c5-25c5a3408b82"}']")
   end
 
   it "should have a label 'Summary of Benefits and Coverage (SBC)'" do

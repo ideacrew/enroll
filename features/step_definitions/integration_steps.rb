@@ -629,7 +629,7 @@ And(/I select three plans to compare/) do
     compare_options[0].click
     compare_options[1].click
     compare_options[2].click
-    @browser.a(text: "COMPARE PLANS").click
+    click_when_present(@browser.a(text: "COMPARE PLANS"))
     @browser.h3(text: /Plan Comparison/).wait_until_present
     expect(@browser.is(class: "glyphicon glyphicon-download-alt").count).to eq 3
     @browser.button(text: 'Close').click

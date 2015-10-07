@@ -1,14 +1,6 @@
-<% @style_color_text = "style='color: #FF0000;'" %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<span #{@style_color_text}>[SHOP1A]</span><br>
-<span #{@style_color_text}>Initial Employer SHOP Application Approval</span> "} %>
-
 <%= render partial: 'notices/shared/logo' %>
 <%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
-
-
 
 <table class="total_table" border="0">
   <tbody>
@@ -27,18 +19,18 @@ content: "<span #{@style_color_text}>[SHOP1A]</span><br>
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Good News! [Employer Name], has chosen to renew the offer of health insurance coverage to its employees through
+  content: "Good News! #{notice.employer_name}, has chosen to renew the offer of health insurance coverage to its employees through
 DC Health Link and will contribute to the monthly premium to make the cost of coverage more affordable."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Your Current Plan Election Will Automatically Renew</strong><br>
 Since you already enrolled in employer-sponsored coverage through DC Health Link, your current plan selection will automatically
-be renewed  for the upcoming plan year beginning on [Coverage Start Date] unless you change your choice prior to [OE End Date]. "} %>
+be renewed  for the upcoming plan year beginning on #{notice.plan.try(:coverage_start_on).try(:to_s)} unless you change your choice prior to #{notice.plan.try(:open_enrollment_end_on).try(:to_s)}. "} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>You Are Able to Change Your Plan Selection during Open Enrollment</strong><br>
 In order to make a change to your employer-sponsored coverage through DC Health Link, you must complete your plan selection for enrollment
-by [OE End Date], for coverage effective [Coverage Start Date]. Please log-in to your existing DC Health Link account at [HBEURL]
+by #{notice.plan.try(:open_enrollment_end_on).try(:to_s)}, for coverage effective #{notice.plan.try(:coverage_start_on).try(:to_s)}. Please log-in to your existing DC Health Link account at #{notice.hbe.try(:url)}
 to view your plan options and complete the enrollment process. "} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -51,20 +43,30 @@ life events such as marriage, birth, or adoption."} %>
   contents: [""],
   heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Contact your employer or your broker for further assistance. "} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Contact your employer further assistance."} %>
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "Contact your employer or your broker for further assistance. "} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "Contact your employer further assistance."} %>
+<% end %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "You can also contact DC Health Link with any questions:",
-  listings: ["Online at <a href='http://www.DCHealthLink.com'>www.DCHealthLink.com</a>;",
-             "By email at employer.hbx@dc.gov; or",
-             "By calling 855-532-5465."] } %>
+  listings: ["Online at <a href='#{notice.hbe.url}'>#{notice.hbe.url}</a>;",
+             "By email at #{notice.hbe.email}; or",
+             "By calling #{notice.hbe.phone}."] } %>
 
-<%= render partial: 'notices/shared/broker_contact_info' %>
+<table style="width: 100%">
+	<tr>
+		<td style="width: 15%"><strong>CC:&nbsp;&nbsp;&nbsp;&nbsp;</strong></td>
+    <td style="width: 85%"><%= notice.employer_name %></td>
+	</tr>
+</table>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% end %>
 
  <%= render partial: 'notices/shared/paragraph', :locals => {
  content: "This notice is being provided in accordance with 45 C.F.R. 155.715(d) & (e)"} %>
