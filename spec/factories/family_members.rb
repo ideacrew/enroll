@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :family_member do
-    family
-    person
+    association :person
+    association :family
     is_primary_applicant false
     is_coverage_applicant true
 

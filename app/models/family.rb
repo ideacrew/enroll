@@ -183,19 +183,19 @@ class Family
   # Life events trigger special enrollment periods
   def is_under_special_enrollment_period?
     return false if special_enrollment_periods.size == 0
-    sep = special_enrollment_periods.order_by(:begin_on.desc).limit(1).only(:special_enrollment_periods).first
+    sep = special_enrollment_periods.order_by(:start_on.desc).limit(1).only(:special_enrollment_periods).first
     sep.is_active?
   end
 
   def current_special_enrollment_periods
     return [] if special_enrollment_periods.size == 0
-    seps = special_enrollment_periods.order_by(:begin_on.desc).only(:special_enrollment_periods)
+    seps = special_enrollment_periods.order_by(:start_on.desc).only(:special_enrollment_periods)
     seps.reduce([]) { |list, event| list << event if event.is_active?; list }
   end
 
   # List of SEPs active for this Application Group today, or passed date
-  def active_seps(day = TimeKeeper.date_of_record)
-    special_enrollment_periods.find_all { |sep| (sep.begin_on..sep.end_on).include?(day) }
+  def active_seps
+    special_enrollment_periods.find_all { |sep| sep.is_active? }
   end
 
   # single SEP with latest end date from list of active SEPs
@@ -370,6 +370,10 @@ class Family
 
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
+  end
+
+  def self.by_special_enrollment_period_id(special_enrollment_period_id)
+    Family.where("special_enrollment_periods._id" => special_enrollment_period_id)
   end
 
 private

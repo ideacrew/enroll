@@ -304,7 +304,7 @@ private
 
   def check_employment_terminated_on
     if employment_terminated_on and employment_terminated_on <= hired_on
-      errors.add(:employment_terminated_on, "can't occur before rehiring date")
+      errors.add(:employment_terminated_on, "can't occur before hiring date")
     end
   end
 

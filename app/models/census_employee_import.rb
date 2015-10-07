@@ -61,6 +61,12 @@ class CensusEmployeeImport
 
   def imported_census_employees
     @imported_census_employees ||= load_imported_census_employees
+    @imported_census_employees.compact!
+    @imported_census_employees.each do |census_employee|
+      census_employee.singleton_class.validates_presence_of :email_address if  census_employee.is_a? CensusEmployee
+      census_employee.singleton_class.validates_presence_of :email if census_employee.is_a? CensusDependent
+    end
+    @imported_census_employees
   end
 
   def load_imported_census_employees
@@ -115,9 +121,21 @@ class CensusEmployeeImport
       member = assign_census_employee_attributes(member, record)
       member.terminate_employment(member.employment_terminated_on) if member.employment_terminated_on.present?
       @last_ee_member = member
+      @last_ee_member_record = record
     else
       # Process dependent
-      if record[:employer_assigned_family_id] == @last_ee_member[:employer_assigned_family_id]
+      if record[:employer_assigned_family_id] == @last_ee_member_record[:employer_assigned_family_id]
+        census_dependent = @last_ee_member.census_dependents.detect do |dependent|
+          (dependent.ssn == record[:ssn]) && (dependent.dob == record[:dob])
+        end
+
+        record_slice = record.slice(:employee_relationship, :last_name, :first_name, :name_sfx, :ssn, :dob, :gender)
+        if census_dependent
+          census_dependent.update_attributes(record_slice)
+        else
+          census_dependent = @last_ee_member.census_dependents.build(record_slice)
+        end
+        census_dependent.email = Email.new(:address => record[:email].to_s, :kind=>'work')
         member = census_dependent
       end
     end
@@ -152,7 +170,7 @@ class CensusEmployeeImport
     end
     return if plan_year_found.nil?
     benefit_group_found = plan_year_found.benefit_groups.detect do |bg|
-      bg.title == benefit_group
+      bg.title.casecmp(benefit_group) == 0
     end
     return if benefit_group_found.nil?
     member.benefit_group_assignments << BenefitGroupAssignment.new({benefit_group_id: benefit_group_found.id , start_on: plan_year_found.start_on})
@@ -270,7 +288,7 @@ class CensusEmployeeImport
     else
       imported_census_employees.each_with_index do |census_employee, index|
         census_employee.errors.full_messages.each do |message|
-          errors.add :base, "Row #{index + 2}: #{message}"
+          errors.add :base, "Row #{index + 4}: #{message}"
         end
       end
       false
