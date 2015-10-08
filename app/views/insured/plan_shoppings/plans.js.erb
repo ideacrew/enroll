@@ -1,1 +1,11 @@
 $('#plans').html("<%= escape_javascript(render partial: "insured/plan_shoppings/plan_details", collection: @plans, as: :plan) %>")
+
+$(document).ready(function(){
+  if ($('.aptc').length > 0){
+    var elected_pct = $("input[name='elected_pct']").val();
+    if ($("output[name='pct']").text()/100 != elected_pct){
+      $("output[name='pct']").text(elected_pct*100);
+      updatePlanCost(elected_pct);
+    };
+  }
+});

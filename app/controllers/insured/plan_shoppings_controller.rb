@@ -148,16 +148,16 @@ class Insured::PlanShoppingsController < ApplicationController
       if @tax_household.present?
         @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
         session[:max_aptc] = @max_aptc
-        session[:selected_aptc_pct] = 0.85
+        @selected_aptc_pct = session[:selected_aptc_pct] = 0.85
       else
-        session[:max_aptc] = 0
-        session[:selected_aptc_pct] = 0
+        @max_aptc = session[:max_aptc] = 0
+        @selected_aptc_pct = session[:selected_aptc_pct] = 0
       end
     end
   end
 
   def set_elected_pct
-    session[:elected_aptc_pct] = params[:elected_pct].to_f rescue 0.8
+    session[:elected_aptc_pct] = params[:elected_pct].to_f rescue 0.85
     render json: 'ok'
   end
 
@@ -169,6 +169,13 @@ class Insured::PlanShoppingsController < ApplicationController
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(plan_ids: @plans.map(&:id))
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    if @person.has_active_consumer_role? and session["individual_assistance_path"].present?
+      @selected_aptc_pct = session[:selected_aptc_pct].to_f
+      @max_aptc = session[:max_aptc].to_f
+    else
+      @selected_aptc_pct = 0
+      @max_aptc = 0
+    end
   end
 
   private

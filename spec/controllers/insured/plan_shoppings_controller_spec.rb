@@ -304,23 +304,46 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     context "when user has_active_consumer_role" do
       let(:tax_household) {double("TaxHousehold")}
-      let(:household) {double(latest_active_tax_household: tax_household)}
       let(:family) {double("Family",latest_household: household)}
       let(:person) {double("Person",primary_family: family, has_active_consumer_role?: true)}
       let(:user) {double("user",person: person)}
-      before :each do
-        session[:individual_assistance_path] = "assistance"
-        allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
-        allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
-        get :show, id: "hbx_id"
+
+      context "with tax_household" do
+        before :each do
+          session[:individual_assistance_path] = "assistance"
+          allow(household).to receive(:latest_active_tax_household).and_return tax_household
+          allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
+          allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+          get :show, id: "hbx_id"
+        end
+
+        it "should get max_aptc" do
+          expect(assigns(:max_aptc)).to eq 111
+        end
+
+        it "should get default selected_aptc_pct" do
+          expect(assigns(:selected_aptc_pct)).to eq 0.85
+          expect(session[:selected_aptc_pct]).to eq 0.85
+        end
       end
 
-      it "should get max_aptc" do
-        expect(assigns(:max_aptc)).to eq 111
-      end
+      context "without tax_household" do
+        before :each do
+          session[:individual_assistance_path] = "assistance"
+          allow(household).to receive(:latest_active_tax_household).and_return nil
+          allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+          get :show, id: "hbx_id"
+        end
 
-      it "should get default selected_aptc_pct" do
-        expect(session[:selected_aptc_pct]).to eq 0.85
+        it "should get max_aptc" do
+          expect(assigns(:max_aptc)).to eq 0
+          expect(session[:max_aptc]).to eq 0
+        end
+
+        it "should get default selected_aptc_pct" do
+          expect(assigns(:selected_aptc_pct)).to eq 0
+          expect(session[:selected_aptc_pct]).to eq 0
+        end
       end
     end
   end
