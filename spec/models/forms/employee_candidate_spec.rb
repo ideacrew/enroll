@@ -138,7 +138,7 @@ describe Forms::EmployeeCandidate, "asked to match a person" do
 
   context "future date of birth" do
     it "gives error on dob" do
-      subject.dob = "2022-10-12"
+      subject.dob = TimeKeeper.date_of_record + 20.years
       expect(subject.valid?).to be_falsey
       expect(subject).to have_errors_on(:dob)
     end
