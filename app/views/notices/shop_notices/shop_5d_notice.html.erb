@@ -30,7 +30,7 @@ content: "<span #{@style_color_text}>[SHOP5C]</span><br>
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "Your employees have completed open enrollment.
 Unfortunately, you did not have enrollment for a non-owner employee.
-As a result, coverage will not be available to your employees as of [Requested Coverage Start Date].
+As a result, coverage will not be available to your employees as of #{notice.plan.try(:coverage_start_on).try(:to_s)}.
 Minimum participation requirements are necessary to ensure the viability of DC Health Link for all employers and their employees."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {

@@ -16,7 +16,7 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "Congratulations!  Your employees have completed open enrollment and have satisfied the requirements to participate in group health coverage through DC Health Link.  Your group health plan coverage will take effect as of <Coverage Start Date>.  ".html_safe} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "Congratulations!  Your employees have completed open enrollment and have satisfied the requirements to participate in group health coverage through DC Health Link.  Your group health plan coverage will take effect as of #{notice.plan.try(:coverage_start_on).try(:to_s)}.".html_safe} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "Your bill will continue to be due on the last day of the month for the next month’s coverage.  The billing cycle and late payment grace period will remain the same for this coverage year.".html_safe} %>
 
@@ -39,7 +39,7 @@
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', locals: {broker: notice.broker} %>
 <% else %>
-  <%= render partial: 'notices/shared/paragraph', locals: {content: "If you do not currently work with a broker, you may choose to work with one at any time at no additional cost to you or your employees.  To find a broker or assister, go to #{notice.hbe.url} or call #{notice.hbe.phone}.   If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the 'Find a Broker' link in your employer account or calling #{notice.hbe.phone}."} %>
+  <%= render partial: 'notices/shared/paragraph', locals: {content: "If you do not currently work with a broker, you may choose to work with one at any time at no additional cost to you or your employees.  To find a broker or assister, go to #{notice.hbe.url} or call #{notice.hbe.phone}. If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the 'Find a Broker' link in your employer account or calling #{notice.hbe.phone}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "This notice is being provided in accordance with 45 C.F.R. 155.725(f)".html_safe} %>
