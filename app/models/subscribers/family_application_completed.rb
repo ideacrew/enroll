@@ -136,9 +136,10 @@ module Subscribers
 
     def search_person(verified_family_member)
       ssn = verified_family_member.person_demographics.ssn
-      ssn = "" if ssn == "999999999"
+      ssn = '' if ssn == "999999999"
       dob = verified_family_member.person_demographics.birth_date
-      last_name = verified_family_member.person.name_last
+      last_name_regex = /^#{verified_family_member.person.name_last}$/i
+      first_name_regex = /^#{verified_family_member.person.name_first}$/i
 
       if !ssn.blank?
         Person.where({
@@ -148,7 +149,8 @@ module Subscribers
       else
         Person.where({
                        :dob => dob,
-                       :last_name => last_name
+                       :last_name => last_name_regex,
+                       :first_name => first_name_regex
                    }).first
       end
     end
