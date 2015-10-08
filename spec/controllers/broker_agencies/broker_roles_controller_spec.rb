@@ -95,41 +95,42 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         email: 'useraccount@gmail.com',
         npn: "8422323232",
         legal_name: 'useragency',
-        fein: "223232323", 
+        fein: "223232323",
         entity_kind: "c_corporation",
         market_kind: "individual",
-        working_hours: "0", 
+        working_hours: "0",
         accept_new_clients: "0",
         office_locations_attributes: office_locations
       } }
 
-      let(:office_locations) { { 
-        "0" => { 
-          address_attributes: address_attributes, 
+      let(:office_locations) { {
+        "0" => {
+          address_attributes: address_attributes,
           phone_attributes: phone_attributes
         }
       }}
 
       let(:address_attributes) {
-        { 
+        {
           kind: "primary",
-          address_1: "99 N ST", 
-          city: "washignton", 
+          address_1: "99 N ST",
+          city: "washignton",
           state: "dc",
           zip: "20006"
         }
       }
 
       let(:phone_attributes) {
-        { 
-          kind: "phone main", 
-          area_code: "202", 
+        {
+          kind: "phone main",
+          area_code: "202",
           number: "324-2232"
         }
       }
 
-      context "when valid" do 
+      context "when valid" do
         before :each do
+          allow(controller).to receive(:verify_recaptcha).and_return(true)
           allow(::Forms::BrokerAgencyProfile).to receive(:new).and_return(organization)
           allow(organization).to receive(:save).and_return(true)
           post :create, :organization => organization_params
@@ -145,10 +146,27 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
       end
 
-      context "when invalid" do 
+      context "when invalid" do
         before :each do
           allow(::Forms::BrokerAgencyProfile).to receive(:new).and_return(organization)
           allow(organization).to receive(:save).and_return(false)
+          post :create, :organization => organization_params
+        end
+
+        it "should be a redirect" do
+          expect(response).to render_template('new')
+        end
+
+        it "should assign variables" do
+          expect(assigns(:agency_type)).to eq "new"
+        end
+      end
+
+      context "when recaptcha fails" do
+        before :each do
+          allow(controller).to receive(:verify_recaptcha).and_return(false)
+          allow(::Forms::BrokerAgencyProfile).to receive(:new).and_return(organization)
+          allow(organization).to receive(:save).and_return(true)
           post :create, :organization => organization_params
         end
 
@@ -167,17 +185,18 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
       let(:person) { instance_double("Person") }
 
       let(:person_params) { {
-        broker_applicant_type: "broker", 
-        first_name: "firstname", 
-        last_name: "lastname", 
-        dob: "1993-06-03", 
-        email: "useraccount@gmail.com", 
-        npn: "8323232323", 
+        broker_applicant_type: "broker",
+        first_name: "firstname",
+        last_name: "lastname",
+        dob: "1993-06-03",
+        email: "useraccount@gmail.com",
+        npn: "8323232323",
         broker_agency_id: "55929d867261670838550000"
       } }
 
-      context "when valid" do 
+      context "when valid" do
         before :each do
+          allow(controller).to receive(:verify_recaptcha).and_return(true)
           allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
           allow(person).to receive(:save).and_return(true)
           post :create, :person => person_params
@@ -192,10 +211,27 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
       end
 
-      context "when invalid" do 
+      context "when invalid" do
         before :each do
           allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
           allow(person).to receive(:save).and_return(false)
+          post :create, :person => person_params
+        end
+
+        it "should be a redirect" do
+          expect(response).to render_template('new')
+        end
+
+        it "should assign variables" do
+          expect(assigns(:filter)).to eq "broker"
+        end
+      end
+
+      context "when recaptcha fails" do
+        before :each do
+          allow(controller).to receive(:verify_recaptcha).and_return(false)
+          allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
+          allow(person).to receive(:save).and_return(true)
           post :create, :person => person_params
         end
 
@@ -214,15 +250,15 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
       let(:person) { instance_double("Person") }
 
       let(:person_params) { {
-        broker_applicant_type: "staff", 
-        first_name: "firstname", 
-        last_name: "lastname", 
-        dob: "1993-06-03", 
-        email: "useraccount@gmail.com", 
+        broker_applicant_type: "staff",
+        first_name: "firstname",
+        last_name: "lastname",
+        dob: "1993-06-03",
+        email: "useraccount@gmail.com",
         broker_agency_id: "55929d867261670838550000"
       } }
 
-      context "when valid" do 
+      context "when valid" do
         before :each do
           allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
           allow(person).to receive(:save).and_return(true)
@@ -238,7 +274,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
       end
 
-      context "when invalid" do 
+      context "when invalid" do
         before :each do
           allow(::Forms::BrokerCandidate).to receive(:new).and_return(person)
           allow(person).to receive(:save).and_return(false)
@@ -252,12 +288,12 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         it "should assign variables" do
           expect(assigns(:filter)).to eq "staff"
         end
-      end 
+      end
     end
   end
 
   context "search_broker_agency" do
-    before :all do 
+    before :all do
       @organization = FactoryGirl.create(:broker_agency)
       @broker_agency_profile = @organization.broker_agency_profile
     end
