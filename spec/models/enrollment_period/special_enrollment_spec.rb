@@ -72,21 +72,21 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
       let(:params) { valid_params }
       let(:special_enrollment_period) { EnrollmentPeriod::SpecialEnrollment.new(**params) }
 
-      it "should save" do
-        expect(special_enrollment_period.save).to be_truthy
-      end
+      # it "should save" do
+      #   expect(special_enrollment_period.save).to be_truthy
+      # end
 
-      context "and it is saved" do
-        let!(:saved_sep) do
-          sep = special_enrollment_period
-          sep.save
-          sep
-        end
+    #   context "and it is saved" do
+    #     let!(:saved_sep) do
+    #       sep = special_enrollment_period
+    #       sep.save
+    #       sep
+    #     end
 
-        it "and should be findable" do
-          expect(EnrollmentPeriod::SpecialEnrollment.find(saved_sep._id).id).to eq saved_sep.id
-        end
-      end
+    #     it "and should be findable" do
+    #       expect(EnrollmentPeriod::SpecialEnrollment.find(saved_sep._id).id).to eq saved_sep.id
+    #     end
+    #   end
     end
   end
 
