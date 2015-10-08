@@ -42,16 +42,19 @@ module Etl::Csv
 
         record = parse_row(row)
         records << record
-puts record.inspect
 
         document = map_attributes(record)
+        puts "processed: #{document.npn}"
+# puts "***"
+# puts "#{document.inspect} #{document.person.inspect}  #{document.broker_agency_profile.inspect}"
+# puts " "
         documents << document
       end
 
       puts "Processed #{records.size} records from spreadsheet."
       puts "Successfully added or updated #{documents.size} database documents"
 
-      [records, documents]
+      documents
     end
 
     # Override this method with content-specific logic
@@ -85,6 +88,7 @@ puts record.inspect
       if phone_number.size < 10 || phone_number.size > 11
         raise ImportErrorValue, "invalid phone number length (#{phone_number.size}): #{phone_number}"
       end
+      phone_number
     end
 
     def parse_employee_relationship(cell)

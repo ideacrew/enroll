@@ -6,7 +6,7 @@ module Etl::Csv
     PRACTICE_AREA_KINDS = {
                             "Small Business Insurance Only" => "shop",
                             "Individual and Family Insurance Only" => "individual", 
-                            "both" => "both"
+                            "Both" => "both"
                           }
     NAME_SUFFIX_KINDS = %w(jr sr ii iii iv clu ltcp cfp mhsa chfc)
 
@@ -59,14 +59,13 @@ module Etl::Csv
         fax_number:             parse_phone_number(row["fax_number"]),
 
         provider_type:          parse_text(row["provider_type"].to_s.downcase),
-        practice_area:          parse_text(row["practice_area"]),
+        practice_area:          parse_practice_area(row["practice_area"]),
         languages:              parse_language(row["languages"]),
 
         latitude:               parse_number(row["latitude"]),
         longitude:              parse_number(row["longitude"]),
         # created_date:           parse_date(row["created_date"])
       }
-
     end
 
     def map_attributes(record)
@@ -74,23 +73,29 @@ module Etl::Csv
     end
 
     def add_or_update_broker_role(record)
-      broker_role = BrokerRole.find_by_npn(record[:npn]) || BrokerRole.new
-      broker_agency_profile = broker_role.broker_agency_profile || BrokerAgencyProfile.new
+      broker_role = BrokerRole.find_by_npn(record[:npn])#  || BrokerRole.new
+      person = nil
+      if broker_role
+         person = broker_role.person
+      else
+        person = Person.new
+      end
 
       # built_broker_role = assign_broker_role_attributes(broker_role, record)
       # built_broker_role.save
 
-      person = assign_broker_role_attributes(broker_role, record)
+      person = assign_broker_role_attributes(person, record)
       person.save!
 
       built_broker_role = person.broker_role
-
+      
+      broker_agency_profile = built_broker_role.broker_agency_profile || BrokerAgencyProfile.new
       built_broker_agency_profile = assign_broker_agency_profile_attributes(broker_agency_profile, record)
-      built_broker_agency_profile.save
+      built_broker_agency_profile.save!
 
       if built_broker_agency_profile.primary_broker_role.blank?
         built_broker_agency_profile.primary_broker_role = built_broker_role
-        built_broker_agency_profile.save
+        built_broker_agency_profile.save!
       end
 
       if built_broker_role.broker_agency_profile.blank?
@@ -102,32 +107,14 @@ module Etl::Csv
     end
 
 
-    def assign_broker_role_attributes(broker_role, record)
+    def assign_broker_role_attributes(person, record)
       
-      fax     = Phone.new(
-                  kind: "fax",
-                  full_phone_number: record[:fax_number]
-                )
+      fax     = Phone.new(kind: "fax", full_phone_number: record[:fax_number] )
+      mobile  = Phone.new(kind: "mobile", full_phone_number: record[:mobile_phone] )
+      direct  = Phone.new(kind: "work", full_phone_number: record[:direct_phone] )
 
-      mobile  = Phone.new(
-                  kind: "mobile",
-                  full_phone_number: record[:mobile_phone]
-                )
-
-      direct  = Phone.new(
-                  kind: "work",
-                  full_phone_number: record[:direct_phone]
-                )
-      phones = [fax, mobile, direct].reduce([]) { |list, kind| list << kind if kind.full_phone_number.present? }
-
-      emails = [
-                  Email.new(
-                      kind: "work",
-                      address: record[:email]
-                    )
-                ] 
-
-      person = broker_role.person || Person.new
+      phones = [fax, mobile, direct].select { |kind| kind.full_phone_number.present? }
+      emails = [Email.new(kind: "work", address: record[:email])]
 
       person.assign_attributes(
           {
@@ -139,8 +126,13 @@ module Etl::Csv
             emails: emails
           }
         )
+      person.save!
 
-      broker_role.assign_attributes(
+      if !person.broker_role.present?
+        person.broker_role = BrokerRole.new
+      end
+
+      person.broker_role.assign_attributes(
           {
             npn: record[:npn],
             provider_kind: record[:provider_type],
@@ -150,7 +142,6 @@ module Etl::Csv
           }
         )
 
-      person.broker_role = broker_role
       person
     end
 
@@ -169,30 +160,55 @@ module Etl::Csv
               ),
             phone: Phone.new(
                 kind: "work",
-                area_code: record[:work_phone].to_s[0,3],
-                number: record[:work_phone].to_s[3,7],
+                full_phone_number: record[:work_phone] || record[:direct_phone], 
                 extension: record[:work_phone_extension]
               ),
             is_primary: true
           )
+
+        fein = get_next_fein
+
         organization = Organization.new(
-            legal_name: record[:organization_name], 
-            fein: "", 
+            legal_name: record[:organization_name] || "#{record[:provider_name][:first_name]} #{record[:provider_name][:last_name]}", 
+            fein: fein, 
             home_page: record[:web_url],
             office_locations: [office_location]
           )
+
         broker_agency_profile = organization.build_broker_agency_profile(
-            market_kind: PRACTICE_AREA_KINDS[record[:practice_area]],
+            market_kind: record[:practice_area],
             entity_kind: "s_corporation" ,
             accept_new_clients: true,
           )
       end
-
+# binding.pry
+      raise StandardError, "BrokerAgency is invalid for NPN: #{record[:npn]}" unless broker_agency_profile.valid?
+      raise StandardError, "BrokerAgency organization is invalid for NPN: #{record[:npn]}" unless broker_agency_profile.organization.valid?
       broker_agency_profile
+    end
+
+    def get_next_fein
+      seed = 999990001
+
+      org = Organization.unscoped.order(:fein.desc).limit(1).first
+      db_max_fein = org.fein.to_i
+      next_fein = db_max_fein + 1
+
+      [seed, next_fein].max
     end
 
     def ordered_column_names
       ORDERED_COLUMN_NAMES
+    end
+
+    def parse_practice_area(cell)
+      return nil unless cell.present?
+
+      practice_area = parse_text(cell)
+      key = PRACTICE_AREA_KINDS[practice_area]
+
+      raise "Unknown practice_area: #{practice_area}" if key.blank?
+      key
     end
 
     def parse_person_name(cell)
