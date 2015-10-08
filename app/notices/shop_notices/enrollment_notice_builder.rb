@@ -35,7 +35,17 @@ class ShopNotices::EnrollmentNoticeBuilder < ShopNotices::ShopPdfNotice
 
     append_hbe
     append_broker(employer_profile.broker_agency_profile)
+    plan_year = employer_profile.active_plan_year || employer_profile.latest_plan_year
+    append_plan(plan_year)
+  end
 
+  def append_plan(plan_year)
+    @notice.plan = PdfTemplates::Plan.new({
+      open_enrollment_start_on: plan_year.open_enrollment_start_on,
+      open_enrollment_end_on: plan_year.open_enrollment_end_on,
+      coverage_start_on: plan_year.start_on,
+      coverage_end_on: plan_year.end_on
+    })
   end
   
   def append_broker(broker)
