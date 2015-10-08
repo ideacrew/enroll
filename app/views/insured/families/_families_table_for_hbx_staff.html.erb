@@ -18,18 +18,19 @@
       <%= table_empty_to_human if families.count == 0 %>
       <% families.each do |family| %>
       <% pp = family.primary_applicant.person %>
-      <% benefits = family.latest_household.hbx_enrollments %>
+  
       <tr>
         <td >
-          <%= link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id) %>
-          <%#= link_to prepend_glyph_to_name(name_to_listing(pp)), family_path(family) %>
+          <%=pp.full_name%> <br/>
+          <%= link_to 'paper', resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'paper'), class: 'btn btn-normal'%>
+          <%= link_to 'phone', resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'phone'), class: 'btn btn-normal'%>
         </td>
         <td><%= number_to_obscured_ssn(pp.ssn) %></td>
         <td><%= format_date(pp.dob) %></td>
         <td><%= pp.hbx_id %></td>
         <td><%= family.active_family_members.size %></td>
         <td><%= pp.user.present? ? "Yes" : "No" %></td>
-        <% if pp.user.present? || pp.emails.present? %>
+        <% if (pp.user.present? || pp.emails.present?) && current_user.person.hbx_staff_role %>
           <td><%= link_to 'Send Secure Message'.html_safe,
                new_insured_inbox_path(id: family.primary_applicant.person.id,
                 profile_id: current_user.person.hbx_staff_role.hbx_profile.id,

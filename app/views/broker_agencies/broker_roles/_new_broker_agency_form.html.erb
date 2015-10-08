@@ -17,6 +17,9 @@
         <div class="row no-buffer row-form-wrapper">
           <%= render "shared/broker_agency_profile_fields", f: f%>
         </div><br>
+        <div class="row no-buffer row-form-wrapper">
+          <%= recaptcha_tags %>
+        </div><br>
         <div class="action-group">
           <%= render "shared/office_locations", f: f %>
           <div class="row no-buffer">
@@ -28,4 +31,3 @@
   </div>
 <% end %>
 </div>
-

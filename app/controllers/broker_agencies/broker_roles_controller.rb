@@ -34,9 +34,10 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   def create
+    failed_recaptcha_message = "We were unable to verify your reCAPTCHA.  Please try again."
     if params[:person].present?
       @broker_candidate = ::Forms::BrokerCandidate.new(applicant_params)
-      if @broker_candidate.save
+      if verify_recaptcha(model: @broker_candidate, message: failed_recaptcha_message) && @broker_candidate.save
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
         redirect_to broker_registration_path
       else
@@ -46,7 +47,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
     else
       @organization = ::Forms::BrokerAgencyProfile.new(primary_broker_role_params)
       @organization.languages_spoken = params.require(:organization)[:languages_spoken].reject!(&:empty?) if params.require(:organization)[:languages_spoken].present?
-      if @organization.save
+      if verify_recaptcha(model: @organization, message: failed_recaptcha_message) && @organization.save
         flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
         redirect_to broker_registration_path
       else
@@ -70,11 +71,11 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
 
   def primary_broker_role_params
     params.require(:organization).permit(
-      :first_name, :last_name, :dob, :email, :npn, :legal_name, :dba, 
+      :first_name, :last_name, :dob, :email, :npn, :legal_name, :dba,
       :fein, :entity_kind, :home_page, :market_kind, :languages_spoken,
       :working_hours, :accept_new_clients,
-      :office_locations_attributes => [ 
-        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip], 
+      :office_locations_attributes => [
+        :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
         :phone_attributes => [:kind, :area_code, :number, :extension]
       ]
     )

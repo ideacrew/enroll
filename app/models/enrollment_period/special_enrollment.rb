@@ -1,6 +1,4 @@
-class SpecialEnrollmentPeriod
-  include Mongoid::Document
-  include Mongoid::Timestamps
+class EnrollmentPeriod::SpecialEnrollment < EnrollmentPeriod::Base
 
   embedded_in :family
 
@@ -21,34 +19,9 @@ class SpecialEnrollmentPeriod
   # Timestamp when SEP was reported to HBX
   field :submitted_at, type: DateTime
 
-  field :title, type: String
-
-  # Date Enrollment Period starts
-  field :start_on, type: Date  
-
-  # Date Enrollment Period ends
-  field :end_on, type: Date
-
-  validates_presence_of :start_on, :end_on, :message => "is invalid"
   validates_presence_of :qualifying_life_event_kind_id, :qle_on
-  validate :end_date_follows_start_date
 
   before_create :set_submitted_at
-
-  def start_on=(new_date)
-    new_date = Date.parse(new_date) if new_date.is_a? String
-    write_attribute(:start_on, new_date.beginning_of_day)
-  end
-
-  def end_on=(new_date)
-    new_date = Date.parse(new_date) if new_date.is_a? String
-    write_attribute(:end_on, new_date.end_of_day)
-  end
-
-  def contains?(compare_date)
-    return false unless start_on.present? && end_on.present?
-    (start_on <= compare_date) && (compare_date <= end_on)
-  end
 
   def qualifying_life_event_kind=(new_qualifying_life_event_kind)
     raise ArgumentError.new("expected QualifyingLifeEventKind") unless new_qualifying_life_event_kind.is_a?(QualifyingLifeEventKind)
@@ -162,12 +135,6 @@ private
         qle_on.end_of_month + 1.day
       end
     end
-  end
-
-  def end_date_follows_start_date
-    return false unless start_on.present? && end_on.present?
-    # Passes validation if end_on == start_date
-    errors.add(:end_on, "end_on cannot preceed start_on date") if self.end_on < self.start_on
   end
 
 end

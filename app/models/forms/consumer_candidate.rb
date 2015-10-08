@@ -44,15 +44,16 @@ module Forms
       else
         Person.where({
                        :dob => dob,
-                       :last_name => last_name
+                       :last_name => /^#{last_name}$/i,
+                       :first_name => /^#{first_name}$/i,
                    }).first 
       end
     end
 
     def uniq_ssn
       return true if ssn.blank?
-
-      if Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).present?
+      same_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn))
+      if same_ssn.present? && same_ssn.first.try(:user) 
         errors.add(:base,
                   "This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
       end
