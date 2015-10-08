@@ -111,7 +111,7 @@ class Insured::ConsumerRolesController < ApplicationController
   def ridp_agreement
     if session[:original_application_type] == 'paper'
       set_current_person
-      redirect_to manage_family_insured_families_path(:consumer_role_id => @person.consumer_role.id)
+      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
       return
     else 
       set_consumer_bookmark_url
