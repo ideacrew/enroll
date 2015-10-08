@@ -239,6 +239,10 @@
       text-align: center;
       padding: 10px 0;
     }
+    table tr td {
+      padding: 0;
+      text-align: center;
+    }
 
 
 
@@ -362,6 +366,15 @@
 
     .plan-details {
       display: none;
+      .col-xs-4 {
+        padding-left: 0;
+      }
+      .col-xs-8 {
+        padding-right: 0;
+        table {
+          table-layout: fixed;
+        }
+      }
     }
     .details {
       cursor: pointer;
@@ -427,6 +440,7 @@
           td {
             color: #333333;
             font-size: 16px;
+            word-wrap: break-word;
             &:last-of-type {
               padding-left: 0;
             }

@@ -131,24 +131,25 @@
         </td>
       </tr>
     </table>
-    <div class="col-xs-12 row plan-details">
+    <div class="plan-details">
       <hr>
-      <div class="col-xs-4 row">
+      <div class="col-xs-4">
         <span>Employer Estimated Maximum Monthly Cost</span>
         <h2><%= number_to_currency(bg.monthly_employer_contribution_amount) %></h2>
       </div>
       <div class="col-xs-8">
         <table>
           <tr>
-            <th></th>
-            <th>Minimum</th>
-            <th>Maximum</th>
+            <th colspan="2"></th>
+            <th>Min</th>
+            <th>Max</th>
           </tr>
           <tr>
-            <td>Total Estimated Monthly Cost for Plan Participants</td>
+            <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
             <td><%= number_to_currency(bg.monthly_min_employee_cost) %></td>
             <td><%= number_to_currency(bg.monthly_max_employee_cost) %></td>
           </tr>
+
 
 
         </table>
