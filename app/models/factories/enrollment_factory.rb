@@ -177,6 +177,7 @@ module Factories
           person.gender = gender
         end
         person.save
+        user = person.user if role_type == User::ROLES[:consumer]
         person, is_new = person, false
       when 0
         if user.try(:person).try(:present?)
