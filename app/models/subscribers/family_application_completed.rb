@@ -35,6 +35,11 @@ module Subscribers
             update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
             new_dependents.each do |p|
               new_family_member = family.relate_new_member(p[0], p[1])
+              unless new_family_member.is_active?
+                new_family_member.is_active = true
+                new_family_member.save!
+                active_household.add_household_coverage_member(new_family_member)
+              end
               if active_verified_tax_households.present?
                 active_verified_tax_household = active_verified_tax_households.select{|vth| vth.id == verified_primary_family_member.id.split('#').last && vth.tax_household_members.any?{|vthm| vthm.id == p[2][0]}}.first
                 if active_verified_tax_household.present?
@@ -42,7 +47,6 @@ module Subscribers
                   active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
                 end
               end
-              family.save!
             end
             if active_household.latest_active_tax_household.present?
               unless active_household.latest_active_tax_household.eligibility_determinations.present?
