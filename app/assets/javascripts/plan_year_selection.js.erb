@@ -154,28 +154,28 @@ $(document).on('click', '.reference-plan input + label', function() {
     var relation_benefits = {
       "0": {
         "relationship": "employee",
-        "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_premium_pct').val(),
-        "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').is(":checked")
+        "premium_pct": $('#'+location+' #plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_premium_pct').val(),
+        "offered": $('#'+location+' #plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').is(":checked")
       },
       "1": {
         "relationship": "spouse",
-        "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_premium_pct').val(),
-        "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').is(":checked")
+        "premium_pct": $('#'+location+' #plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_premium_pct').val(),
+        "offered": $('#'+location+' #plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').is(":checked")
       },
       "2": {
         "relationship": "domestic_partner",
-        "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_premium_pct').val(),
-        "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_offered').is(":checked")
+        "premium_pct": $('#'+location+' #plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_premium_pct').val(),
+        "offered": $('#'+location+' #plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_offered').is(":checked")
       },
       "3": {
         "relationship": "child_under_26",
-        "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_premium_pct').val(),
-        "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').is(":checked")
+        "premium_pct": $('#'+location+' #plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_premium_pct').val(),
+        "offered": $('#'+location+' #plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').is(":checked")
       },
       "4": {
         "relationship": "child_26_and_over",
-        "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_premium_pct').val(),
-        "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_offered').is(":checked")
+        "premium_pct": $('#'+location+' #plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_premium_pct').val(),
+        "offered": $('#'+location+' #plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_offered').is(":checked")
       }
     }
 
@@ -195,7 +195,7 @@ $(document).on('click', '.reference-plan input + label', function() {
     }).done(function() {
     });
   }
-  
+
 
   $(document).on("click", ".reference_plan_info h4 span", function() {
     $(this).parents(".reference_plan_info").find('.content').toggle();

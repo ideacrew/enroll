@@ -1,7 +1,7 @@
 $('#<%= @location_id %> .selected-plan').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/plan_details")).html_safe %>")
-$("h2.employer-monthly-cost").html("<%= number_to_currency(@employer_contribution_amount.to_f) %>");
-$(".employee-monthly-cost-min").html("<%= number_to_currency(@min_employee_cost.to_f) %>");
-$(".employee-monthly-cost-max").html("<%= number_to_currency(@max_employee_cost.to_f) %>");
+$("#<%= @location_id %> .selected-plan h2.employer-monthly-cost").html("<%= number_to_currency(@employer_contribution_amount.to_f) %>");
+$("#<%= @location_id %> .selected-plan .employee-monthly-cost-min").html("<%= number_to_currency(@min_employee_cost.to_f) %>");
+$("#<%= @location_id %> .selected-plan .employee-monthly-cost-max").html("<%= number_to_currency(@max_employee_cost.to_f) %>");
 
 $(function() {
   $("#employer_cost_info_btn .btn").click(function(){
