@@ -166,7 +166,7 @@ class HbxEnrollment
 
 
   def benefit_sponsored?
-    employee_role.present?
+    benefit_group.present?
   end
 
   def currently_active?
@@ -230,6 +230,7 @@ class HbxEnrollment
       if !is_shop_sep?
         notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
         self.published_to_bus_at = Time.now
+        self.save!
       end
     end
   end

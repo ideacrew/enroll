@@ -28,7 +28,7 @@ content: "<span #{@style_color_text}>[SHOP4B]</span><br>
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "This is a reminder that you have until <OE End Date>to enroll into health coverage offered by #{notice.primary_fullname} through DC Health Link.".html_safe} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "This is a reminder that you have until #{notice.plan.try(:open_enrollment_end_on).try(:to_s)} to enroll into health coverage offered by #{notice.primary_fullname} through DC Health Link.".html_safe} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>To See Plan Options and Enroll:</strong><br>
   To complete the enrollment process, please complete the following steps:".html_safe} %>
@@ -43,14 +43,13 @@ content: "<span #{@style_color_text}>[SHOP4B]</span><br>
    Open enrollment is your annual opportunity to enroll in your employer’s health plan and change plan selections.  Outside of this annual open enrollment period, you will only be allowed to make changes to your health plan enrollment if you experience certain life events such as marriage, birth, adoption, etc.".html_safe} %>
 
    <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>If You Are Currently Enrolled, Go to DC Health Link to See Available Plans</strong><br>
-      If you are already enrolled in employer-sponsored coverage through DC Health Link and your health plan is still offered by your employer, your current plan selection will automatically continue into the next plan year, beginning on <Coverage Start Date>, unless you change your choice prior to <OE End Date>.  To see all available plans and your new cost for the upcoming plan year, log in to your DC Health Link account.".html_safe} %>
+      If you are already enrolled in employer-sponsored coverage through DC Health Link and your health plan is still offered by your employer, your current plan selection will automatically continue into the next plan year, beginning on #{notice.plan.try(:coverage_start_on).try(:to_s)}, unless you change your choice prior to #{notice.plan.try(:open_enrollment_end_on).try(:to_s)}.  To see all available plans and your new cost for the upcoming plan year, log in to your DC Health Link account.".html_safe} %>
 
         <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>IMPORTANT:  If Your Current Plan is No Longer Available, You MUST Select a New Plan to Continue Coverage into Upcoming Plan Year</strong><br>".html_safe} %>
 
-        <%= render partial: 'notices/shared/paragraph', :locals => { content: "If your current plan selection will no longer be available and you do not make a new plan selection by <OE End Date>, your current coverage will be terminated on <Coverage Start Date – 1> and you will not have coverage for the upcoming plan year beginning on <Coverage Start Date>.".html_safe} %>
+        <%= render partial: 'notices/shared/paragraph', :locals => { content: "If your current plan selection will no longer be available and you do not make a new plan selection by #{notice.plan.try(:open_enrollment_end_on).try(:to_s)}, your current coverage will be terminated on #{notice.plan.try(:coverage_start_on).try(:to_s)} and you will not have coverage for the upcoming plan year beginning on #{notice.plan.try(:coverage_start_on).try(:to_s)}.".html_safe} %>
 
-
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<span style='color:#ff0000; font-weight:bold;'> [If ER has a Broker/Assister] </span> Contact your employer or your broker for further assistance.<br/><span style='color:#ff0000; font-weight:bold;'> [If ER does NOT have a Broker/Assister] </span> Contact your employer further assistance.".html_safe], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["#{notice.broker.present? ? 'Contact your employer or your broker for further assistance.': 'Contact your employer further assistance'}".html_safe], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
  previous: "You can also contact DC Health Link with any questions:",
