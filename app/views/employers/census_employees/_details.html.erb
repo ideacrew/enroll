@@ -93,14 +93,18 @@
       <h4>Dependents</h4>
       <div class="form-border">
         <% if dependents.present? %>
-        <table style='width:100%;'>
-          <tr>
-            <th>Name</th>
-            <th>DOB</th>
-            <th>Relationship</th>
-            <th>Gender</th>
-          </tr>
+
           <% dependents.each do |dependent| %>
+          <% if dependent.relationship == "self" && dependents.count == 1 %>
+          <h4>You have no dependents at this time.</h4>
+          <% else %>
+          <table style='width:100%;'>
+            <tr>
+              <th>Name</th>
+              <th>DOB</th>
+              <th>Relationship</th>
+              <th>Gender</th>
+            </tr>
           <tr>
             <td>
               <%= dependent.first_name + " " + dependent.last_name %>
@@ -118,6 +122,8 @@
           </tr>
           <% end %>
         </table>
+          <% end %>
+
         <% else %>
         <p>No Dependents</p>
         <% end %>
