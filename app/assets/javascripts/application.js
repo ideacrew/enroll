@@ -91,7 +91,7 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 $(document).ready(function () {
 
   // check that dob entered is not a future date
-  $(document).on('blur', '#jq_datepicker_ignore_person_dob', function() {
+  $(document).on('blur', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob', function() {
     var entered_dob = $(this).val();
     var entered_year = entered_dob.substring(entered_dob.length -4);
     var entered_month = entered_dob.substring(0, 2);
@@ -517,7 +517,7 @@ $(document).ready(function () {
   $(".npn_field").mask("9999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
-  $("#jq_datepicker_ignore_person_dob").mask("99/99/9999");
+  $("#jq_datepicker_ignore_census_employee_dob, #jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob").mask("99/99/9999");
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
   $("#tribal_id").mask("999999999");
@@ -668,38 +668,6 @@ $(document).on('change', '#waive_confirm select#waiver_reason', function() {
   }
 })
 
-$(document).on('click', '#search_for_plan_shopping_help', function() {
-  $.ajax({
-    type: 'GET',
-    data: {firstname: $('#help_first_name').val(), lastname: $('#help_last_name').val(), type: $('#help_type').html(),
-    person: $('#help_requestor').html()},
-    url: '/exchanges/hbx_profiles/request_help?',
-  }).done(function(response) {
-    $('#help_status').html(response)
-  });
-})
-
-$(document).on('click', '.help_button', function(){
-  $.ajax({
-    type: 'GET',
-    data: {assister: this.getAttribute('data-assister'), broker: this.getAttribute('data-broker'),
-    person: $('#help_requestor').html()},
-    url: '/exchanges/hbx_profiles/request_help?',
-  }).done(function(response) {
-    console.log(response)
-    console.log('here')
-    $('#help_index_status').html(response).removeClass('hide')
-  });
-})
-
-$(document).on('click', '.name_search_only', function() {
-  $('#help_list').addClass('hide')
-  $('#help_search').removeClass('hide')
-  $('#help_type').html(this.id)
-})
-$(document).on('click', '[data-target="#help_with_plan_shopping"]',function(){$('.help_reset').addClass("hide"); $('#help_list').removeClass("hide") })
-
-
 $(document).on('click', '#terms_check_thank_you', function() {
   first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
@@ -729,8 +697,10 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
     if($("#terms_check_thank_you").prop("checked") == true){
       if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
         $('#btn-continue').removeClass('disabled');
+
       } else {
         $('#btn-continue').addClass('disabled');
+
       }
     }
   }

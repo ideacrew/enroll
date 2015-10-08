@@ -3,22 +3,6 @@ puts "::: Cleaning QualifyingLifeEventKinds :::"
 QualifyingLifeEventKind.delete_all
 
 QualifyingLifeEventKind.create!(
-    title: "I've started a new job", 
-    action_kind: "add_benefit",
-    reason: " ",
-    edi_code: "28-INITIAL ENROLLMENT", 
-    market_kind: "shop", 
-    effective_on_kinds: ["first_of_month"],
-    pre_event_sep_in_days: 0,
-    post_event_sep_in_days: 30, 
-    is_self_attested: true, 
-    ordinal_position: 10,
-    event_kind_label: 'Date of start a new job',
-    tool_tip: "Enroll due to becoming newly eligibile"
-  )
-
-
-QualifyingLifeEventKind.create!(
     title: "I've married",
     action_kind: "add_benefit",
     reason: " ",
@@ -139,7 +123,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "drop self due to new eligibility", 
+    title: "Drop self due to new eligibility", 
     action_kind: "drop_member",
     reason: "terminate_benefit",
     edi_code: "07-TERMINATION OF BENEFITS", 
@@ -154,9 +138,9 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "drop family member due to new elgibility", 
+    title: "Drop family member due to new eligibility", 
     action_kind: "drop_member",
-    reason: "drop_family_member_due_to_new_elgibility",
+    reason: "drop_family_member_due_to_new_eligibility",
     edi_code: "07-TERMINATION OF BENEFITS", 
     market_kind: "shop", 
     effective_on_kinds: ["first_of_month"],
@@ -184,7 +168,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "exceptional circumstances", 
+    title: "Exceptional circumstances", 
     action_kind: "administrative",
     reason: "exceptional_circumstances",
     edi_code: "EX-EXCEPTIONAL CIRCUMSTANCES", 
@@ -199,7 +183,7 @@ QualifyingLifeEventKind.create!(
   )
 
 QualifyingLifeEventKind.create!(
-    title: "contract violation", 
+    title: "Contract violation", 
     action_kind: "administrative",
     reason: "contract_violation",
     edi_code: "33-CONTRACT VIOLATION", 
@@ -212,6 +196,23 @@ QualifyingLifeEventKind.create!(
     event_kind_label: "Date of contract violation",
     tool_tip: "Enroll due to contract violation"
   )
+
+QualifyingLifeEventKind.create!(
+    title: "I've started a new job", 
+    action_kind: "add_benefit",
+    reason: " ",
+    edi_code: "28-INITIAL ENROLLMENT", 
+    market_kind: "shop", 
+    effective_on_kinds: ["first_of_month"],
+    pre_event_sep_in_days: 0,
+    post_event_sep_in_days: 30, 
+    is_self_attested: true, 
+    ordinal_position: 10,
+    event_kind_label: 'Date of start a new job',
+    tool_tip: "Enroll due to becoming newly eligibile"
+  )
+
+
 
 puts "::: QualifyingLifeEventKinds Complete :::"
 puts "*"*80
