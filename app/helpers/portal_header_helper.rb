@@ -27,7 +27,7 @@ module PortalHeaderHelper
   def enrollment_name
     begin 
       person = Person.find(session[:person_id])
-      name=  'Enrollment assistance for: ' + person.full_name
+      name=  'Assisting: ' + person.full_name
     rescue
       name = ''
     end
