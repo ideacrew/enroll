@@ -92,7 +92,7 @@ $(document).ready(function () {
   // js that runs on edit view
   if(window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
 
-    alert('edit');
+    //alert('edit');
     $('.add_fields').remove();
     $('.reference-steps').hide();
     $('.planyear-add-tab .controls:last').show();

@@ -23,7 +23,10 @@
           <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate:false} %>
           <% end %>
         </div>
-        <span class="btn btn-trans" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
+        <% if @enrollment.employee_role.present? %>
+        <% else %>
+          <span class="btn btn-trans" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
+        <% end %>
         <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-trans interaction-click-control-print-purchase-confirmation" %>
       </div>
 
