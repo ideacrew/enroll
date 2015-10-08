@@ -211,6 +211,7 @@ Rails.application.routes.draw do
       get :inbox
 
       collection do
+        get :family_index
         get :employers
         get :messages
         get :staff_index

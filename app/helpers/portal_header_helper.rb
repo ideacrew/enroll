@@ -5,10 +5,8 @@ module PortalHeaderHelper
       "Welcome to the District's Health Insurance Marketplace"
     elsif current_user.try(:has_hbx_staff_role?)
       hbx_staff_header
-    elsif current_user.try(:has_broker_agency_staff_role?) && current_user.person.broker_role
-      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe,
-      broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id)
-
+    elsif current_user.person.try(:broker_role)
+      broker_header
     elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
       agent_header  
     
@@ -27,7 +25,7 @@ module PortalHeaderHelper
   def enrollment_name
     begin 
       person = Person.find(session[:person_id])
-      name=  'Enrollment assistance for: ' + person.full_name
+      name=  'Assisting: ' + person.full_name
     rescue
       name = ''
     end
@@ -49,5 +47,11 @@ module PortalHeaderHelper
     header_text = "<div style='display:inline-block'>&nbsp; I'm HBX Staff<br/>&nbsp; #{enrollment_name}</div>" 
     link_to "#{image_tag 'icons/icon-exchange-admin.png'} #{header_text}".html_safe,
       exchanges_hbx_profiles_root_path
+  end
+
+  def broker_header
+    header_text = "<div style='display:inline-block'>&nbsp; I'm a Broker<br/>&nbsp; #{enrollment_name}</div>" 
+    link_to "#{image_tag 'icons/icon-expert.png'} #{header_text}".html_safe,
+      broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id)
   end
 end  

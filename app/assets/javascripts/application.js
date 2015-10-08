@@ -782,38 +782,6 @@ $(document).on('change', '#waive_confirm select#waiver_reason', function() {
   }
 })
 
-$(document).on('click', '#search_for_plan_shopping_help', function() {
-  $.ajax({
-    type: 'GET',
-    data: {firstname: $('#help_first_name').val(), lastname: $('#help_last_name').val(), type: $('#help_type').html(),
-    person: $('#help_requestor').html()},
-    url: '/exchanges/hbx_profiles/request_help?',
-  }).done(function(response) {
-    $('#help_status').html(response)
-  });
-})
-
-$(document).on('click', '.help_button', function(){
-  $.ajax({
-    type: 'GET',
-    data: {assister: this.getAttribute('data-assister'), broker: this.getAttribute('data-broker'),
-    person: $('#help_requestor').html()},
-    url: '/exchanges/hbx_profiles/request_help?',
-  }).done(function(response) {
-    console.log(response)
-    console.log('here')
-    $('#help_index_status').html(response).removeClass('hide')
-  });
-})
-
-$(document).on('click', '.name_search_only', function() {
-  $('#help_list').addClass('hide')
-  $('#help_search').removeClass('hide')
-  $('#help_type').html(this.id)
-})
-$(document).on('click', '[data-target="#help_with_plan_shopping"]',function(){$('.help_reset').addClass("hide"); $('#help_list').removeClass("hide") })
-
-
 $(document).on('click', '#terms_check_thank_you', function() {
   first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();

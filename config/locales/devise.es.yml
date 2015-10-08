@@ -42,7 +42,7 @@ es:
     sessions:
       already_signed_out: Sesión finalizada.
       signed_in: Sesión iniciada.
-      signed_out: Sesión finalizada.
+      signed_out: ""
     unlocks:
       send_instructions: Vas a recibir instrucciones para desbloquear tu cuenta en unos pocos minutos.
       send_paranoid_instructions: Si tu cuenta existe, vas a recibir instrucciones para desbloquear tu cuenta en unos pocos minutos.

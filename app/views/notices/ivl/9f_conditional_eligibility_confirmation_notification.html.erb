@@ -18,7 +18,7 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<b>Congratulations!</b>  Based on the health insurance application you submitted on [application/renewal date]:"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<b>Congratulations!</b>  Based on the health insurance application you submitted on #{notice.enrollments[0].selected_on.strftime('%m/%d/%Y')}:"} %>
 
 <% if notice.verified_individuals.any? %>
 
@@ -42,56 +42,46 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "Your eligibility has been approved <strong>conditionally</strong> until the discrepancies between the information you provided and our records have been resolved. To resolve these discrepancies, <u>we need documentation from you</u>. (See sections below).  If you do not provide this information, <u>your health insurance may be cancelled</u>."} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["On [date of plan selection], the following individual(s) selected the <plan 1 name> health insurance plan."], heading: 'Your Private Health Plan Selection', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["On #{notice.enrollments[0].selected_on.strftime('%m/%d/%Y')}, the following individual(s) selected the #{notice.enrollments[0].plan_name} health insurance plan."], heading: 'Your Private Health Plan Selection', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "
-  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-  [Plan 1 Enrollee First Name][Plan 1 Enrollee Last Name]<br>
-  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-  <strong><font color='red'>[IF More than One Enrollee in Plan 1]</font></strong> [Plan 1 Enrollee 2 First Name][Plan 1 Enrollee  
-    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
-    2 Last Name]
-"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: notice.enrollments[0].enrollees.join("<br>") } %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "You will start getting health insurance benefits through [Plan Name] on  [Coverage Effective Date], as long as you make the first premium payment by the due date. You will receive an invoice directly from your plan within 3 – 10 business days and the due date for the first premium will be listed on the invoice. If you get any health care services before <Coverage Effective Date>, you may have to pay the costs for those services on your own if you have not yet paid your premium."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You will start getting health insurance benefits through #{notice.enrollments[0].plan_name} on #{notice.enrollments[0].effective_on.strftime('%m/%d/%Y')}, as long as you make the first premium payment by the due date. You will receive an invoice directly from your plan within 3 – 10 business days and the due date for the first premium will be listed on the invoice. If you get any health care services before #{notice.enrollments[0].effective_on.strftime('%m/%d/%Y')}, you may have to pay the costs for those services on your own if you have not yet paid your premium."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "For any questions about your health plan’s covered services and providers, you need to contact:"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "[plan 1 name] at [plan 1 main phone number]"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "#{notice.enrollments[0].plan_name} at [plan 1 main phone number]"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[IF More than One Plan Selected]</font></strong>  Additionally, the following individual(s) selected the <plan N name> health insurance plan."} %>
+<% notice.other_enrollments.each do |enrollment| %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "
-  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-  [Plan N Enrollee First Name][Plan N Enrollee Last Name]<br>
-  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-  <strong><font color='red'>[IF More than One Enrollee in Plan N]</font></strong> [Plan N Enrollee 2 First Name][Plan N   
-    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    Enrollee 2 Last Name]
-"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "Additionally, the following individual(s) selected the #{enrollment.plan_name} health insurance plan."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "You will start getting health insurance benefits through [Plan Name]  on  [Coverage Effective Date], as long as you make the first premium payment by the due date. You will receive an invoice directly from your plan within 3 – 10 business days and the due date for the first premium will be listed on the invoice. If you get any health care services before [Coverage Effective Date], you may have to pay the costs for those services on your own if you have not yet paid your premium."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: enrollment.enrollees.join("<br>") } %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You will start getting health insurance benefits through #{enrollment.plan_name} on #{enrollment.effective_on.strftime('%m/%d/%Y')}, as long as you make the first premium payment by the due date. You will receive an invoice directly from your plan within 3 – 10 business days and the due date for the first premium will be listed on the invoice. If you get any health care services before #{enrollment.effective_on.strftime('%m/%d/%Y')}, you may have to pay the costs for those services on your own if you have not yet paid your premium."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "For any questions about your health plan’s covered services and providers, you need to contact:"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "[plan N name] at [plan N main phone number]"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "#{enrollment.plan_name} at [plan N main phone number]"} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<strong><font color = 'red'>[Plan 1]</font></strong>"], heading: 'What You Must Pay Each Month', sub_heading: ''} %>
+<% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<u>[Plan 1 Name]</u>"} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: [""], heading: 'What You Must Pay Each Month', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<u>#{notice.enrollments[0].plan_name}</u>"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
   ["Your Total Monthly Premium Cost:
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
     $ [Plan 1 Consumer Monthly Premium]"] } %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[IF More than One Plan Selected; Plan N]</font></strong> <u>[Plan N Name]</u>"} %>
+<% notice.other_enrollments.each do |enrollment| %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<u>#{enrollment.plan_name}</u>"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
   ["Your Total Monthly Premium Cost:
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
     $ [Plan N Consumer Monthly Premium]"] } %>
-
+<% end %>
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>If you do not make your monthly premium payments on time, you could lose your health insurance</strong>. 45 C.F.R. 155.430(b)(2)(ii). You will receive a separate invoice with instructions on how to make that payment. <strong>You must pay your premiums directly to the health plan or dental plan <b>by the date indicated on that invoice</b></strong>.  DC Health Link is not responsible for collecting your premiums.  Additionally, any auto-payments you may have previously established with the carrier prior to enrolling through DC Health Link will not carry-over; you must make new payment arrangements."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "The fastest way to pay the premium is by calling the health plan or dental plan directly at the numbers listed below.  <u>Call these numbers to ensure your premium is paid even if you have not received an invoice.</u>"} %>
