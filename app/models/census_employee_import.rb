@@ -64,7 +64,6 @@ class CensusEmployeeImport
     @imported_census_employees.compact!
     @imported_census_employees.each do |census_employee|
       census_employee.singleton_class.validates_presence_of :email_address if  census_employee.is_a? CensusEmployee
-      census_employee.singleton_class.validates_presence_of :email if census_employee.is_a? CensusDependent
     end
     @imported_census_employees
   end
@@ -135,7 +134,6 @@ class CensusEmployeeImport
         else
           census_dependent = @last_ee_member.census_dependents.build(record_slice)
         end
-        census_dependent.email = Email.new(:address => record[:email].to_s, :kind=>'work')
         member = census_dependent
       end
     end
@@ -238,9 +236,9 @@ class CensusEmployeeImport
                   when "domestic partner"
                     "domestic_partner"
                   when "child"
-                    "child"
+                    "child_under_26"
                   when "disabled child"
-                    "disabled_child"
+                    "disabled_child_26_and_over"
                   else
                     nil
                 end
