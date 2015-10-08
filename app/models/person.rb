@@ -179,7 +179,7 @@ class Person
     if self.is_consumer_role.to_s == "true"
       if !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
         self.errors.add(:base, "Tribal id is required when native american / alaskan native is selected")
-      elsif tribal_id.present? && !!@us_citizen && !!@indian_tribe_member && tribal_id.match("[0-9]{9}")
+      elsif tribal_id.present? && !!@us_citizen && !!@indian_tribe_member && !tribal_id.match("[0-9]{9}")
         self.errors.add(:base, "Tribal id must be 9 digits")
       end
     end
@@ -448,15 +448,17 @@ class Person
       ssn_query = options[:ssn]
       dob_query = options[:dob]
       last_name = options[:last_name]
+      first_name = options[:first_name]
 
-      raise ArgumentError, "must provide an ssn, last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank?))
+      raise ArgumentError, "must provide an ssn or first_name/last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank? || first_name.blank?))
       
       matches = Array.new
       matches.concat Person.active.where(encrypted_ssn: encrypt_ssn(ssn_query)).to_a unless ssn_query.blank?
       #matches.concat Person.where(last_name: last_name, dob: dob_query).active.to_a unless (dob_query.blank? || last_name.blank?)
-
-      if ssn_query.blank? && !dob_query.blank? && !last_name.blank?
-        matches.concat Person.where(last_name: last_name, dob: dob_query, encrypted_ssn: {:$exists => false}).active.to_a
+      if first_name.present? && last_name.present? && dob_query.present?
+        first_exp = /^#{first_name}$/i
+        last_exp = /^#{last_name}$/i
+        matches.concat Person.where(dob: dob_query, last_name: last_exp, first_name: first_exp).active.to_a.select{|person| person.ssn.blank? || ssn_query.blank?}
       end
       matches.uniq
     end

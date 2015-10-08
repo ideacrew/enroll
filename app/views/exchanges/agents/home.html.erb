@@ -1,45 +1,32 @@
 <div class='content'>
-  <div class='container top-pd'>
-	<h4> <%= @title%> </h4>
-
-     <ul class='col-xs-12 col-md-5 col-lg-5'> 
-      <li> <%=link_to 'New Consumer Phone Application', begin_consumer_enrollment_exchanges_agents_path(
-      original_application_type: 'phone')  %> <br/></li>
-
-      <li> <%=link_to 'New Consumer Paper Application', begin_consumer_enrollment_exchanges_agents_path(
-      original_application_type: 'paper')  %> </li>
-     </ul>
-     <%- unless @assister %>
-     <ul class='col-xs-12 col-md-5 col-lg-5'>
-     	<li> <%=link_to 'New Employee Phone Application', begin_employee_enrollment_exchanges_agents_path(
-     	original_application_type: 'phone')  %> <br/></li>
-
-     	<li> <%=link_to 'New Employee Paper Application', begin_employee_enrollment_exchanges_agents_path(
-     	original_application_type: 'paper')  %> <br/>&nbsp;</li>
-     </ul>
-     <% end %>
-     <br/>
-    <div class='col-md-12 col-lg-12'> 
-    <% if @person %>
-         <div>
-         	<br/>
-            <h4>Your secure mailbox contains a link to the account for <%=@person.first_name%> <%=@person.last_name %>. </h4>
-            <br/>
-         </div>
-    <% end %>
-    <div id='sent_email_status'></div>  
-    <br/> 
-    <div>
-<div id='inbox'>
-    <div class="row col-md-10">
-
-<%=render 'message_list', provider: current_user.person %>
-
-     </div>
-   </div>
-</div>
-
-
-</div>
-
+   <div class='container top-pd'>
+       <h4> <%= @title%> </h4>
+       <%= render 'consumer_application_links' %>
+       <%- unless @assister %>
+          <%= render 'employee_application_links' %> 
+       <% end %>
+       <br/>
+       <div class='col-md-12 col-lg-12'>
+         <p> After working on an enrollment return to this page via the person icon in the header </p>
+         <br/>
+       </div>
+        <div class='col-md-12 col-lg-12'>
+          <% if @person %>
+            <div>
+                <br/>
+                <h4>Your secure mailbox contains a link to the account for <%=@person.first_name%> <%=@person.last_name %>. </h4>
+                <br/>
+            </div>
+          <% end %>
+        </div>
+        <div id='sent_email_status'></div>
+        <br/>
+        <div>
+            <div id='inbox'>
+            <div class="row col-md-10">
+               <%=render 'message_list', provider: current_user.person %>
+            </div>
+           </div>
+        </div>
+    </div>
 </div>

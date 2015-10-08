@@ -64,7 +64,7 @@ gem 'roo', '~> 2.1.0'
 
 gem 'devise', '~> 3.4.1'
 # gem 'devise_ldap_authenticatable', '~> 0.8.1'
-gem 'cancancan', '~> 1.9.2'
+gem "pundit", '~> 1.0.1'
 
 # will provide fast group premium plan fetch
 gem 'redis-rails'
@@ -119,7 +119,7 @@ group :test do
   gem 'watir'
   gem 'cucumber-rails', '~> 1.4.2', :require => false
   gem 'database_cleaner', '1.3.0'
-  gem 'shoulda-matchers', require: false
+  gem 'shoulda-matchers'
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
 #  gem 'headless'
 end

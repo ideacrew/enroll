@@ -4,8 +4,7 @@ class Insured::FamilyMembersController < ApplicationController
 
   before_action :set_current_person, :set_family
   def index
-    set_consumer_bookmark_url
-    set_employee_bookmark_url
+    set_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
     if @type == "employee"
       emp_role_id = params.require(:employee_role_id)
@@ -20,8 +19,8 @@ class Insured::FamilyMembersController < ApplicationController
       qle = QualifyingLifeEventKind.find(params[:qle_id])
       special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
       special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
-      special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
       special_enrollment_period.qualifying_life_event_kind = qle
+      special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
       special_enrollment_period.save
     end
   end

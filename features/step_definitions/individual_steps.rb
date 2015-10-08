@@ -1,4 +1,4 @@
-When(/I visit the Insured portal$/) do
+When(/^\w+ visits? the Insured portal$/) do
   @browser.goto("http://localhost:3000/")
   @browser.a(text: /consumer\/family portal/i).wait_until_present
   @browser.a(text: /consumer\/family portal/i).click
@@ -46,7 +46,7 @@ Then(/Individual should click on Individual market for plan shopping/) do
   @browser.a(text: /continue/i).click
 end
 
-Then(/Individual should see a form to enter personal information/) do
+Then(/Individual should see a form to enter personal information$/) do
   @browser.button(class: /interaction-click-control-continue/).wait_until_present
   screenshot("personal_form_top")
   @browser.radio(class: /interaction-choice-control-value-person-us-citizen-true/).fire_event("onclick")
@@ -59,8 +59,9 @@ Then(/Individual should see a form to enter personal information/) do
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-1/).set("4900 USAA BLVD")
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-address-2/).set("Suite 220")
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-city/).set("Washington")
-  @browser.p(text: /SELECT STATE/).click
-  scroll_then_click(@browser.li(text: /DC/))
+  @browser.p(text: /GA/).fire_event("onclick") if @browser.p(text: /GA/).present?
+  @browser.p(text: /SELECT STATE/).fire_event("onclick") if @browser.p(text: /SELECT STATE/).present?
+  scroll_then_click(@browser.li(text: /DC/, class: /interaction-choice-control-state-id-9/))
   @browser.text_field(class: /interaction-field-control-person-addresses-attributes-0-zip/).set("20002")
   @browser.text_field(class: /interaction-field-control-person-phones-attributes-0-full-phone-number/).set("1110009999")
   @browser.text_field(class: /interaction-field-control-person-emails-attributes-0-address/).set(@u.find :email1)
@@ -94,9 +95,8 @@ Then (/Individual fixes a VLP error message/) do
   @browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-true/).fire_event("onclick")
   @browser.p(text: /Select document type/i).wait_until_present
   @browser.p(text: /Select document type/i).click
-  @browser.li(text: /Certificate of Citizenship/i).wait_until_present
-  @browser.li(text: /Certificate of Citizenship/i).click
-  click_when_present(@browser.button(class: /interaction-click-control-continue/))
+  click_when_present(@browser.li(text: "Certificate of Citizenship", class: "interaction-choice-control-state-id-1"))
+  click_when_present(@browser.button(class: "interaction-click-control-continue"))
   wait_and_confirm_text(/errors/)
   wait_and_confirm_text(/alien_number value is required/)
   #@browser.radio(class: /interaction-choice-control-value-person-naturalized-citizen-false/).wait_while_present
@@ -187,11 +187,9 @@ And(/I click on continue button on group selection page/) do
     @browser.text_field(id: /qle_date/).wait_until_present
     @browser.text_field(id: /qle_date/).set(5.days.ago.strftime('%m/%d/%Y'))
 
-    qle_form = @browser.div(class: /qle-form/)
-    click_when_present(qle_form.a(class: /interaction-click-control-continue/))
+    click_when_present @browser.a(class: 'interaction-click-control-continue')
 
     wait_and_confirm_text /SELECT EFFECTIVE ON KIND/i
-
 
     effective_field = @browser.div(class: /selectric-wrapper/, text: /SELECT EFFECTIVE ON KIND/i)
 
@@ -313,7 +311,7 @@ Then(/CSR clicks on Resume Application via phone/) do
 end
 
 When(/I click on the header link to return to CSR page/) do
-  wait_and_confirm_text /Enrollment assistance for: Second/
+  wait_and_confirm_text /Assisting/
   @browser.a(text: /I'm a Customer Service/i).click
 end
 
@@ -330,3 +328,129 @@ Then(/^click continue again$/) do
   wait_and_confirm_text /continue/i
   scroll_then_click(@browser.a(text: /continue/i))
 end
+
+Given(/^\w+ visits the Employee portal$/) do
+  @browser.goto("http://localhost:3000/")
+  @browser.a(text: /employee portal/i).wait_until_present
+  screenshot("start")
+  scroll_then_click(@browser.a(text: /employee portal/i))
+  @browser.button(text: "Create account").wait_until_present
+end
+
+Then(/^(\w+) creates a new account$/) do |person|
+  @browser.button(class: /interaction-click-control-create-account/).wait_until_present
+  @browser.text_field(class: /interaction-field-control-user-email/).set(@u.email 'email' + person)
+  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
+  @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!aA1!")
+  scroll_then_click(@browser.input(value: "Create account"))
+end
+
+When(/^\w+ clicks continue$/) do
+  click_when_present(@browser.button(class: /interaction-click-control-continue/))
+end
+
+When(/^\w+ selects Company match for (\w+)$/) do |company|
+  @browser.dd(text: /#{company}/).wait_until_present
+  expect(@browser.dd(text: /#{company}/).visible?).to be_truthy
+  scroll_then_click(@browser.input(value: /This is my employer/))
+end
+
+When(/^\w+ sees the (.*) page$/) do |title|
+  wait_and_confirm_text /#{title}/
+end
+
+When(/^\w+ visits the Consumer portal$/i) do
+  step "I visit the Insured portal"
+end
+
+When(/^(\w+) signs in$/) do |person|
+  wait_and_confirm_text /Sign in/i
+  scroll_then_click(@browser.a(text: /Sign In/i))
+  @browser.h1(text: /Sign In/).wait_until_present
+  @browser.text_field(class: /interaction-field-control-user-email/).set(@u.find 'email' + person)
+  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
+  scroll_then_click(@browser.input(value: "Sign in"))
+end
+
+Given(/^Company Tronics is created with benefits$/) do
+  step "I visit the Employer portal"
+  step "Tronics creates an HBX account"
+  step "Tronics should see a successful sign up message"
+  step "I should click on employer portal"
+  step "Tronics creates a new employer profile"
+  step "Tronics creates and publishes a plan year"
+  step "Tronics should see a published success message without employee"
+end
+
+Then(/^(\w+) enters person search data$/) do |insured|
+  step "#{insured} sees the Personal Information page"
+  person = people[insured]
+  @browser.text_field(name: "person[first_name]").wait_until_present
+  @browser.text_field(name: "person[first_name]").set(person[:first_name])
+  @browser.text_field(name: "person[last_name]").set(person[:last_name])
+  @browser.text_field(class: /interaction-field-control-jq-datepicker-ignore-person-dob/).set(person[:dob])
+  @browser.text_field(name: "person[first_name]").click
+  @browser.text_field(name: "person[ssn]").set(person[:ssn])
+  @browser.radio(id: /radio_female/).fire_event("onclick")
+  @browser.button(text: /continue/i).fire_event("onclick")
+end
+
+Then(/^\w+ continues$/) do
+  wait_and_confirm_text /Continue/i
+  @browser.a(text: /Continue/i).fire_event("onclick")
+end
+
+Then(/^\w+ continues again$/) do
+  wait_and_confirm_text /Continue/i
+  @browser.button(text: /Continue/i).fire_event("onclick")
+end
+
+Then(/^\w+ enters demographic information$/) do
+  step "Individual should see a form to enter personal information"
+  @browser.text_field(class: /interaction-field-control-person-emails-attributes-0-address/).set("user#{rand(1000)}@example.com")
+end
+
+And(/^\w+ is an Employee$/) do
+  wait_and_confirm_text /Employer/i
+end
+
+And(/^\w+ is a Consumer$/) do
+  wait_and_confirm_text /Verify Identity/i
+end
+
+And(/(\w+) clicks on the purchase button on the confirmation page/) do |insured|
+  person = people[insured]
+  click_when_present(@browser.checkbox(class: /interaction-choice-control-value-terms-check-thank-you/))
+  @browser.text_field(class: /interaction-field-control-first-name-thank-you/).set(person[:first_name])
+  @browser.text_field(class: /interaction-field-control-last-name-thank-you/).set(person[:last_name])
+  screenshot("purchase")
+  click_when_present(@browser.a(text: /confirm/i))
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

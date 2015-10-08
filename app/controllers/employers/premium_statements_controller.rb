@@ -6,13 +6,13 @@ class Employers::PremiumStatementsController < ApplicationController
     @employer_profile = EmployerProfile.find(params.require(:id))
     @current_plan_year = @employer_profile.published_plan_year
     @hbx_enrollments = @current_plan_year.hbx_enrollments rescue []
-    @hbx_enrollments = HbxEnrollment.covered(@hbx_enrollments)
+    # @hbx_enrollments = HbxEnrollment.covered(@hbx_enrollments)
 
     respond_to do |format|
       format.html
       format.js
       format.csv do
-        send_data(csv_for(@hbx_enrollments), type: csv_content_type, filename: "dchl_statement.csv")
+        send_data(csv_for(@hbx_enrollments), type: csv_content_type, filename: "DCHealthLink_Premium_Billing_Report.csv")
       end
     end
   end

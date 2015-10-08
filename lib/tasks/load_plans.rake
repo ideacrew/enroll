@@ -88,18 +88,10 @@ namespace :xml do
           puts "plan not present: #{hios_id}"
         end
       end
-      sheet_data = result.sheet("IVL CSR IDs")
-      (2..94).each do |row_number|
-        carrier, hios_id, plan_name, metal_level, csr_variation_type = sheet_data.row(row_number)
-        hios_base_id = hios_id.split("-").first
-        csr_variant_id = hios_id.split("-").last
-        plan = Plan.where(active_year: 2016, hios_base_id: /#{hios_base_id}/, csr_variant_id: /#{csr_variant_id}/).first
-        if plan
-          plan.update(is_standard_plan: true)
-          puts "plan with hios id #{hios_base_id}-#{csr_variant_id} updated to standard plan."
-        else
-          puts "plan with hios id #{hios_base_id}-#{csr_variant_id} was not found and not updated to standard plan."
-        end
+      standard_hios_ids = ["94506DC0390001-01","94506DC0390005-01","94506DC0390007-01","94506DC0390011-01","86052DC0400001-01","86052DC0400002-01","86052DC0400007-01","86052DC0400008-01","78079DC0210001-01","78079DC0210002-01","78079DC0210003-01","78079DC0210004-01"]
+      Plan.by_active_year(2016).where(:hios_id.in => standard_hios_ids).each do |plan|
+        plan.update(is_standard_plan: true)
+        puts "Plan with hios_id #{plan.hios_id} updated to standard plan."
       end
     end
   end

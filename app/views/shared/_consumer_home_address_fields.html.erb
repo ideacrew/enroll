@@ -1,34 +1,6 @@
 <div id="address_info" class="row no-buffer focus_effect personal-info-row">
   <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-    <div class="row row-form-wrapper no-buffer">
-      <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
-        <button class="btn btn-new-address">NEW ADDRESS</button>
-      </div>
 
-      <div class="col-md-7 col-sm-7 col-xs-12 form-group form-group-lg no-pd address">
-        <div class="form-group form-group-lg">
-          <div class="row" style="margin: 0;">
-            <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
-            <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
-              <div class="dropdown">
-                <button class="form-control floatlabel adderess-select-box form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
-                  <label>Home Address</label>
-                </button>
-              </div>
-            </div>
-            <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-        <%= f.check_box :no_dc_address, {id: 'no_dc_address'}, "true", "false" %> 
-        <%= f.label :no_dc_address do %>
-          <span class='no_dc_address'>&nbsp;NO DC ADDRESS</span>
-        <% end %>
-        <span><i class='fa fa-question-circle'></i></span>
-      </div>
-    </div>
 
     <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true, :include_id => false do |address| %>
       <% kind = address.object.kind %>
@@ -38,6 +10,35 @@
       <% if kind != 'home' %>
         <% style="display:none;" %>
       <% end %>
+      <div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">
+        <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+          <button class="btn btn-new-address">NEW ADDRESS</button>
+        </div>
+
+        <div class="col-md-7 col-sm-7 col-xs-12 form-group form-group-lg no-pd address">
+          <div class="form-group form-group-lg">
+            <div class="row" style="margin: 0;">
+              <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+              <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
+                <div class="dropdown">
+                  <button class="form-control floatlabel adderess-select-box form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                    <label><%= kind.capitalize %> Address</label>
+                  </button>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="<%= style %>"class="col-lg-3 col-md-3 col-sm-3 col-xs-5 form-group form-group-lg no-pd top-buffer" >
+          <%= f.check_box :no_dc_address, {id: 'no_dc_address'}, "true", "false" %>
+          <%= f.label :no_dc_address do %>
+            <span class='no_dc_address'>&nbsp;NO DC ADDRESS</span>
+          <% end %>
+          <span><i class='fa fa-question-circle'></i></span>
+        </div>
+      </div>
       <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
         <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
           <%= address.hidden_field :kind %>
@@ -87,6 +88,7 @@
     <% end%>
   </div>
 </div>
+<span class="form-action btn btn-trans">Add Mailing Address</span>
 <script>
 $(document).ready(function () {
   $('#state_id').change(function(){

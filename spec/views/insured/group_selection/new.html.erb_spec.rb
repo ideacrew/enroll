@@ -133,15 +133,15 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       expect(rendered).to have_selector('label', text: 'Health')
     end
 
-    it "should have dental radio button" do
-      expect(rendered).to have_selector('input[value="dental"]')
-      expect(rendered).to have_selector('label', text: 'Dental')
-    end
+    #it "should have dental radio button" do
+    #  expect(rendered).to have_selector('input[value="dental"]')
+    #  expect(rendered).to have_selector('label', text: 'Dental')
+    #end
 
     it "should have an incarceration warning with more text" do
       expect(rendered).to match /Other family members may still be eligible to enroll/
     end
- 
+
     it "should match the pronoun in the text" do
       expect(rendered).to match /, she is not eligible/
     end
@@ -219,7 +219,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:coverage_household) { double(family_members: []) }
     let(:hbx_enrollment) {double(coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day))}
- 
+
     before :each do
       allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
       assign :person, person
@@ -257,7 +257,11 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(false)
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 0)
-      expect(rendered).to have_selector("a", count: 0)
+    end
+
+    it "should have back to my account link" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to have_selector("a[href='/families/home']", text: 'Back to my account')
     end
   end
 

@@ -10,9 +10,3 @@
 <% else %>
   <%= hidden_field_tag 'effective_on_kind', @qle.effective_on_kinds.first %>
 <% end %>
-
-<% if @effective_on_options.present? and @effective_on_options.is_a?(Array) %>
-  <div style='margin: 0 auto;max-width:250px;'>
-    <%= select_tag 'effective_on_date', options_for_select(@effective_on_options.map(&:to_s)), include_blank: 'SELECT EFFECTIVE ON DATE' %>
-  </div>
-<% end %>

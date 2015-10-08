@@ -6,6 +6,8 @@ module Caches
         (pt[:start_on] <= rate_schedule_date) && (pt[:end_on] >= rate_schedule_date)
       end
       age_record[:cost]
+    rescue
+      0
     end 
 
     def self.age_bounding(plan_id, given_age)

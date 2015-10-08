@@ -157,17 +157,16 @@ end
 
 Then(/^.+ clicks? select broker button$/) do
   @browser.a(text: /Select Broker/).wait_until_present
-  @browser.a(text: /Select Broker/).click
+  logistics = @browser.as(text: /Select Broker/).last
+  logistics.click
 end
 
 Then(/^.+ should see confirm modal dialog box$/) do
-  @browser.element(class: /modal-dialog/).wait_until_present
-  expect(@browser.div(class: /modal-body/).p(text: /Click Confirm to hire the selected broker\. Warning\: if you have an existing broker\,/).visible?).to be_truthy
-  expect(@browser.div(class: /modal-body/).p(text: /they will be terminated effective immediately\./).visible?).to be_truthy
+  wait_and_confirm_text /Broker Selection Confirmation/
 end
 
 Then(/^.+ confirms? broker selection$/) do
-  modal = @browser.div(class: 'modal-dialog')
+  modal = @browser.divs(class: 'modal-dialog').last
   modal.input(value: /Confirm/).wait_until_present
   modal.input(value: /Confirm/).click
 end
@@ -187,13 +186,14 @@ When(/^.+ terminates broker$/) do
   @browser.a(text: /Terminate/).wait_until_present
   @browser.a(text: /Terminate/).click
 
-  @browser.text_field(class: "date-picker").wait_until_present
-  @browser.text_field(class: "date-picker").set("07/23/2015")
+  #according to 2096 remove terminate in future
+  #@browser.text_field(class: "date-picker").wait_until_present
+  #@browser.text_field(class: "date-picker").set("07/23/2015")
 
-  2.times { @browser.a(text: /Terminate/).click } # To collapse calender
+  #2.times { @browser.a(text: /Terminate/).click } # To collapse calender
 
-  @browser.a(text: /Submit/).wait_until_present
-  @browser.a(text: /Submit/).click
+  #@browser.a(text: /Submit/).wait_until_present
+  #@browser.a(text: /Submit/).click
 end
 
 Then(/^.+ should see broker terminated message$/) do
@@ -211,7 +211,7 @@ Then(/^.+ should see the Employer Profile page as Broker$/) do
   expect(@browser.element(text: /I'm a Broker/).visible?).to be_truthy
 end
 
-Then(/^Primary Broker creates and publishes a plan year$/) do
+Then(/^.* creates and publishes a plan year$/) do
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-add-plan-year/))
   start_on = @browser.p(text: /SELECT START ON/i)
@@ -227,7 +227,7 @@ Then(/^Primary Broker creates and publishes a plan year$/) do
     @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
   select_field = @browser.div(class: /selectric-wrapper/, text: /Date Of Hire/)
   select_field.click
-  select_field.li(text: /Date of hire/).click
+  select_field.li(text: /Date of hire/i).click
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(50)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]").set(50)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]").set(50)
@@ -246,7 +246,7 @@ Then(/^Primary Broker creates and publishes a plan year$/) do
   @browser.element(class: /alert-notice/, text: /Plan Year successfully created./).wait_until_present
   click_when_present(@browser.element(class: /interaction-click-control-benefits/))
   click_when_present(@browser.element(class: /interaction-click-control-publish-plan-year/))
-  @browser.refresh
+  # @browser.refresh
 end
 
 Then(/^.+ sees employer census family created$/) do

@@ -1,35 +1,68 @@
 $(function () {
+	function check_qle_date() {
+		var date_value = $('#qle_date').val();
+		if(date_value == "" || isNaN(Date.parse(date_value))) { return false; }
+		return true;
+	}
+
+  function init_qle_message() {
+    $('#qle-details .success-info').addClass('hidden');
+    $('#qle-details .error-info').addClass('hidden');
+    $('#qle-details #qle-date-chose').removeClass('hidden');
+    $("#qle_date").val("");
+
+    var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at 1-855-532-5465 to give us more information so we can see if you qualify.";
+    $("#qle-details .error-text").html(errorNotice);
+  }
+
+  function get_qle_date() {
+    $.ajax({
+      type: "GET",
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val()},
+      url: "/insured/families/check_qle_date.js"
+    });
+  }
+
+  function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days) {
+    var target = $('.qle-date-picker');
+    var dateMin = '-' + post_event_sep_in_days + 'd';
+    var dateMax = '+' + pre_event_sep_in_days + 'd';
+    var cur_qle_title = $('.qle-details-title').html();
+
+    $(target).val('');
+    $(target).datepicker('destroy');
+    $(target).datepicker({
+      changeMonth: true,
+      changeYear: true,
+      dateFormat: 'mm/dd/yy',
+      minDate: dateMin,
+      maxDate: dateMax});
+  }
+
   $(document).on('click', 'a.qle-menu-item', function() {
+    init_qle_message();
     $('#qle_flow_info #qle-menu').hide();
     $('.qle-details-title').html($(this).data('title'));
     $('.qle-label').html($(this).data('label'));
     $('.qle-date-hint').html($(this).data('date-hint'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
-    var pre_event_sep_in_days = '+'+$(this).data('pre-event-sep-in-days')+'d';
-    var post_event_sep_in_days = '-'+$(this).data('post-event-sep-in-days')+'d';
 
-    init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days);
-    $('#qle-details').removeClass('hidden');
     var is_self_attested = $(this).data('is-self-attested');
     if (!is_self_attested) {
-      $('.qle-form').addClass('hidden');
-      $('.csr-form').removeClass('hidden');
+      $('#qle-date-chose').addClass('hidden');
+      $('#qle-details .error-info').removeClass('hidden');
     } else {
-      $('.qle-form').removeClass('hidden');
-      $('.csr-form').addClass('hidden');
+      init_datepicker_for_qle_date($(this).data('pre-event-sep-in-days'), $(this).data('post-event-sep-in-days'));
+      $('#qle-date-chose').removeClass('hidden');
     };
-    $('form#qle_form.success-info').addClass('hidden');
-    $('form#qle_form.error-info').addClass('hidden');
+
+    $('#qle-details').removeClass('hidden');
   });
 
 	$(document).on('click', '#qle-details .close-popup, #qle-details .cancel, #existing_coverage, #new_plan', function() {
+    init_qle_message();
 		$('#qle-details').addClass('hidden');
-    $('.csr-form').addClass('hidden');
-		$('#qle-details .success-info, #qle-details .error-info').addClass('hidden');
-    $('#qle-details .qle-form').removeClass('hidden');
-    $("#qle_date").val("");
-
 		$('#qle_flow_info #qle-menu').show();
 	});
 
@@ -50,43 +83,10 @@ $(function () {
 			get_qle_date();
 		} else {
 			$('#qle_date').addClass('input-error');
-			$('.success-info').addClass('hidden');
-			$('.error-info').addClass('hidden');
 		}
 	});
 
-	function check_qle_date() {
-		var date_value = $('#qle_date').val();
-		if(date_value == "" || isNaN(Date.parse(date_value))) { return false; }
-		return true;
-	}
-
-  function get_qle_date() {
-    qle_type = $(".qle-details-title").text();
-
-    $.ajax({
-      type: "GET",
-      data:{date_val: $("#qle_date").val(), qle_type: qle_type, qle_id: $("#qle_id").val()},
-      url: "/insured/families/check_qle_date.js"
-    });
-  }
-
-  function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days) {
-    var target = $('.qle-date-picker');
-    var dateMin = post_event_sep_in_days;
-    var dateMax = pre_event_sep_in_days;
-    var cur_qle_title = $('.qle-details-title').html();
-
-    $(target).val('');
-    $(target).datepicker('destroy');
-    $(target).datepicker({
-      changeMonth: true,
-      changeYear: true,
-      dateFormat: 'mm/dd/yy',
-      minDate: dateMin,
-      maxDate: dateMax});
-  }
-
+  /* for Family member */
 	$(document).on('click', '#qle_continue_button', function() {
 		$('#qle_flow_info .initial-info').hide();
 		$('#qle_flow_info .qle-info').removeClass('hidden');

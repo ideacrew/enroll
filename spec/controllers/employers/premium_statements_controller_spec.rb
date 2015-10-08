@@ -43,7 +43,6 @@ RSpec.describe Employers::PremiumStatementsController do
       allow(EmployerProfile).to receive(:find).and_return(employer_profile)
       allow(employer_profile).to receive(:published_plan_year).and_return(current_plan_year)
       allow(current_plan_year).to receive(:hbx_enrollments).and_return(hbx_enrollments)
-      allow(HbxEnrollment).to receive(:covered).and_return(hbx_enrollments)
     end
 
     it "should return contribution" do
@@ -65,7 +64,6 @@ RSpec.describe Employers::PremiumStatementsController do
       allow(subscriber).to receive(:person).and_return(person)
       allow(person).to receive(:employee_roles).and_return(employee_roles)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
-      allow(HbxEnrollment).to receive(:covered).and_return(hbx_enrollments)
     end
     it "returns a text/csv content type" do
       sign_in(user)
@@ -76,6 +74,7 @@ RSpec.describe Employers::PremiumStatementsController do
     it "returns csv content in the file" do
       sign_in(user)
       xhr :get, :show, id: "test", format: :csv
+      expect(response.header["Content-Disposition"]).to match /DCHealthLink_Premium_Billing_Report/
       expect(response.body).to have_content(/#{census_employee.full_name}/)
       expect(response.body).to have_content(/#{census_employee.dob}/)
       expect(response.body).to have_content(/#{census_employee.hired_on}/)

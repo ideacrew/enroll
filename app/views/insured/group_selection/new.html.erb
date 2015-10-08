@@ -45,7 +45,7 @@
           </div>
 
           <br>
-          
+
           <div id="coverage_kinds" class='row no-buffer'>
             <div class="col-md-3 col-lg-3 col-sm-6">
               <strong>Coverage Kind: </strong>
@@ -54,10 +54,13 @@
               <%= radio_button_tag 'coverage_kind', 'health', true, id: 'coverage_kind_health' %>
               <label for="coverage_kind_health">Health</label>
             </div>
+            <!--
+            Hide Dental Radio Button
             <div class="col-md-3 col-lg-3 col-sm-6">
               <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental' %>
               <label for="coverage_kind_dental">Dental</label>
             </div>
+          -->
           </div>
 
           <% if @market_kind.present? %>
@@ -110,9 +113,10 @@
             <h3>Select a plan</h3>
             <p class="text-justify"><%= t('welcome.employee.select_plan') %></p>
           <% end %>
+          <%= link_to "Back to my account", family_account_path, class: 'btn btn-lg btn-primary' %>
         </div>
 
-        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">            
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
           <% if @change_plan.blank?  && @market_kind == "individual" %>
             <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
               <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>

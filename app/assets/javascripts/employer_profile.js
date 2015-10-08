@@ -22,8 +22,10 @@ $(document).on('click', ".show_confirm", function(){
 });
 
 $(document).on('click', ".delete_confirm", function(){
-  var termination_date = $(this).siblings().val();
+  var termination_date = $(this).closest('div').find('input').val();
   var link_to_delete = $(this).data('link');
+  console.log(termination_date);
+  console.log(link_to_delete);
   $.ajax({
     type: 'get',
     datatype : 'js',

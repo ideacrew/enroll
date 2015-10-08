@@ -128,7 +128,7 @@ class QhpBuilder
     plans_to_update.each do |up_plan|
       nation_wide, dc_in_network = parse_nation_wide_and_dc_in_network
       up_plan.update_attributes(
-          name: @qhp.plan_marketing_name,
+          name: @qhp.plan_marketing_name.squish!,
           plan_type: @qhp.plan_type.downcase,
           deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_individual,
           family_deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_family,
@@ -161,7 +161,7 @@ class QhpBuilder
         csr_variant_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').last}/).to_a
       next if plan.present?
       new_plan = Plan.new(
-        name: @qhp.plan_marketing_name,
+        name: @qhp.plan_marketing_name.squish!,
         hios_id: cost_share_variance.hios_plan_and_variant_id,
         hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
         csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,

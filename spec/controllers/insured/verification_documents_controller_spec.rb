@@ -10,6 +10,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
     it "redirects" do
       allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
       allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:person_consumer_role)
+      allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:params_clean_vlp_documents).and_return({sample:'sample'})
 
       sign_in user
       post :upload, consumer_role: consumer_role

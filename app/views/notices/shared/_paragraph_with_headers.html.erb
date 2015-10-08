@@ -4,9 +4,11 @@
       <tr>
         <td></br></td>
       </tr>
+      <% if heading.present? %>
       <tr>
         <td><h2 style="color:rgb(54,95,145);"><%= heading.html_safe %></h2></td>
       </tr>
+    <% end %>
       <% if sub_heading.present? %>
       <tr>
         <td><h3 style="color:black;"><%= sub_heading.html_safe %></h3></td>

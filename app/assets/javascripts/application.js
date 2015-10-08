@@ -40,7 +40,6 @@ function applyFloatLabels() {
   });
 }
 
-
 function applySelectric() {
   $("select[multiple!='multiple']").selectric();
 };
@@ -51,6 +50,7 @@ function applyMultiLanguateSelect() {
     maxHeight: 300
   });
   $('#broker_agency_language_select').multiselect('select', 'en', true);
+
 };
 
 $(document).on('page:update', function(){
@@ -90,20 +90,52 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 $(document).ready(function () {
 
+  // check that dob entered is not a future date
+  $(document).on('blur', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob', function() {
+    var entered_dob = $(this).val();
+    var entered_year = entered_dob.substring(entered_dob.length -4);
+    var entered_month = entered_dob.substring(0, 2);
+    var entered_day = entered_dob.substring(3, 5);
+    var todays_date = new Date();
+    var todays_year = todays_date.getFullYear();
+    var todays_month = todays_date.getMonth() + 1;
+    var todays_day = todays_date.getDate();
+    if (entered_year > todays_year) {
+      alert("Please enter a birthdate that does not take place in the future.");
+      $(this).val("");
+      $(this).focus();
+    }
+    else if (entered_year == todays_year) {
+      if (entered_month == todays_month) {
+        if (entered_day > todays_day) {
+          alert("Please enter a birthdate that does not take place in the future.");
+          $(this).val("");
+          $(this).focus();
+        } else {
+        }
+      }
+      else if (entered_month > todays_month) {
+        alert("Please enter a birthdate that does not take place in the future.");
+        $(this).val("");
+        $(this).focus();
+      }
+    }
+  });
+
   // init slider
   $('.benefits-fields .slider').bootstrapSlider({
-      formatter: function(value) {
-        return 'Contribution Percentage: ' + value + '%';
-      }
-    });
-    $(".benefits-fields .slider").on("slide", function(slideEvt) {
-      $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
-      $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
+    formatter: function(value) {
+      return 'Contribution Percentage: ' + value + '%';
+    }
+  });
+  $(".benefits-fields .slider").on("slide", function(slideEvt) {
+    $(this).closest('.form-group').find('.hidden-param').val(slideEvt.value).attr('value', slideEvt.value);
+    $(this).closest('.form-group').find('.slide-label').text(slideEvt.value + "%");
   });
 
   //hide border bottom
-  $('input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: 0px;');
-
+  $('input[value="child_under_26"]').closest('.row-form-wrapper').attr('style','border-bottom: none;');
+  $(".package-offering tr:contains('Child under 26')").closest('tr').attr('style','border-bottom: none;');
   // move start date to url for plan options
   $("#plan_year_start_on").on('change', function() {
     start_on = $(this).val().substr(0,4);
@@ -119,28 +151,36 @@ $(document).ready(function () {
 
   // mimic jquery toggle function
   $.fn.toggleClick=function(){
-  var functions=arguments, iteration=0
-  return this.click(function(){
-    functions[iteration].apply(this,arguments)
-    iteration= (iteration+1) %functions.length
-  })
-}
-
-// details toggler
+    var functions=arguments, iteration=0
+    return this.click(function(){
+      functions[iteration].apply(this,arguments)
+      iteration= (iteration+1) %functions.length
+    })
+  }
+  //employees table table functions
+  $('.table-functions i.fa-trash-o').on('click', function() {
+    $(this).closest("tr").next().show();
+    $(this).closest("tr").hide();
+  });
+  $('a.terminate.cancel').on('click', function() {
+    $(this).closest('tr').prev().show();
+    $(this).closest('tr').hide();
+  });
+  // details toggler
   $('.details').toggleClick(function () {
-        $(this).closest('.referenceplan').find('.plan-details').slideDown();
-        $(this).html('Hide Details <i class="fa fa-chevron-up fa-lg"></i>');
-    }, function () {
-      $(this).closest('.referenceplan').find('.plan-details').slideUp();
-      $(this).html('View Details <i class="fa fa-chevron-down fa-lg"></i>');
+    $(this).closest('.referenceplan').find('.plan-details').slideDown();
+    $(this).html('Hide Details <i class="fa fa-chevron-up fa-lg"></i>');
+  }, function () {
+    $(this).closest('.referenceplan').find('.plan-details').slideUp();
+    $(this).html('View Details <i class="fa fa-chevron-down fa-lg"></i>');
 
 
-        });
+  });
 
 
 
 
-// toggle filter options in employees list
+  // toggle filter options in employees list
   $(document).on('click', '.filter-options label', function()  {
     $('.filter-options').hide();
   });
@@ -171,10 +211,10 @@ $(document).ready(function () {
         dateFormat: 'mm/dd/yy',
         maxDate: "+0d",
         yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear(),
-          onSelect: function(dateText, dpInstance) {
-      $(this).datepicker("hide");
-      $(this).trigger('change');
-    }
+        onSelect: function(dateText, dpInstance) {
+          $(this).datepicker("hide");
+          $(this).trigger('change');
+        }
       });
     }else{
       $(this).datepicker({
@@ -184,10 +224,10 @@ $(document).ready(function () {
         minDate: dateMin,
         maxDate: dateMax,
         yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10),
-          onSelect: function(dateText, dpInstance) {
-      $(this).datepicker("hide");
-      $(this).trigger('change');
-    }
+        onSelect: function(dateText, dpInstance) {
+          $(this).datepicker("hide");
+          $(this).trigger('change');
+        }
       });
     }
   });
@@ -198,6 +238,25 @@ $(document).ready(function () {
     divtoshow = $(this).data("value") + "-div";
     $("."+divtoshow).show();
   });
+  // Add something similar to jqueries deprecated .toggle()
+  $.fn.toggleClick=function(){
+    var functions=arguments, iteration=0
+    return this.click(function(){
+      functions[iteration].apply(this,arguments)
+      iteration= (iteration+1) %functions.length
+    })
+  }
+
+  $('#address_info + span.form-action').toggleClick(function () {
+    $(this).text('Remove Mailing Address');
+    $('.row-form-wrapper.mailing-div').show();
+  }, function () {
+    $(this).text('Add Mailing Address');
+    $('.mailing-div').hide();
+    $('.mailing-div input').val("");
+    $('.mailing-div .label-floatlabel').hide();
+  });
+
 
   // $('.alert').delay(7000).fadeOut(2000); //Fade Alert Box
   // $('#plan_year input,select').click(function(){
@@ -325,7 +384,7 @@ $(document).ready(function () {
     if($('#confirm_plan').length) {
       $("a.nine").css("color", "#00b420");
     } else {
-//      $("a.six").css("color","#999");
+      //      $("a.six").css("color","#999");
     }
 
     $('#top-pad').html(start_progress + '% Complete');
@@ -458,6 +517,7 @@ $(document).ready(function () {
   $(".npn_field").mask("9999999999");
   $(".address-state").mask("AA");
   $(".mask-ssn").mask("999-99-9999");
+  $("#jq_datepicker_ignore_census_employee_dob, #jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob").mask("99/99/9999");
   $(".area_code").mask("999");
   $(".phone_number7").mask("999-9999");
   $("#tribal_id").mask("999999999");
@@ -498,9 +558,6 @@ $(document).ready(function () {
     $('#edit_broker_applicant').html('');
     $('#broker_applicants_roster').show();
   });
-});
-
-$(document).ready(function () {
   $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").click(function(){
     $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").addClass('focus_none');
     $("#contact > #address_info > div, #contact > #phone_info > div, #contact > #email_info > .email > div").removeClass('add_focus');
@@ -611,38 +668,6 @@ $(document).on('change', '#waive_confirm select#waiver_reason', function() {
   }
 })
 
-$(document).on('click', '#search_for_plan_shopping_help', function() {
-  $.ajax({
-    type: 'GET',
-    data: {firstname: $('#help_first_name').val(), lastname: $('#help_last_name').val(), type: $('#help_type').html(),
-           person: $('#help_requestor').html()},
-    url: '/exchanges/hbx_profiles/request_help?',
-  }).done(function(response) {
-    $('#help_status').html(response)
-  });
-})
-
-$(document).on('click', '.help_button', function(){
-$.ajax({
-    type: 'GET',
-    data: {assister: this.getAttribute('data-assister'), broker: this.getAttribute('data-broker'),
-           person: $('#help_requestor').html()},
-    url: '/exchanges/hbx_profiles/request_help?',
-  }).done(function(response) {
-    console.log(response)
-    console.log('here')
-    $('#help_index_status').html(response).removeClass('hide')
-  });
-})
-
-$(document).on('click', '.name_search_only', function() {
-  $('#help_list').addClass('hide')
-  $('#help_search').removeClass('hide')
-  $('#help_type').html(this.id)
-})
-$(document).on('click', '[data-target="#help_with_plan_shopping"]',function(){$('.help_reset').addClass("hide"); $('#help_list').removeClass("hide") })
-
-
 $(document).on('click', '#terms_check_thank_you', function() {
   first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
@@ -672,8 +697,10 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
     if($("#terms_check_thank_you").prop("checked") == true){
       if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
         $('#btn-continue').removeClass('disabled');
+
       } else {
         $('#btn-continue').addClass('disabled');
+
       }
     }
   }

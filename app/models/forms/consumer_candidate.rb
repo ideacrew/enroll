@@ -22,6 +22,7 @@ module Forms
               numericality: true
     validate :dob_not_in_future
     validate :ssn_or_checkbox
+    validate :uniq_ssn
     attr_reader :dob
 
     def ssn_or_checkbox
@@ -43,8 +44,18 @@ module Forms
       else
         Person.where({
                        :dob => dob,
-                       :last_name => last_name
+                       :last_name => /^#{last_name}$/i,
+                       :first_name => /^#{first_name}$/i,
                    }).first 
+      end
+    end
+
+    def uniq_ssn
+      return true if ssn.blank?
+
+      if Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).present?
+        errors.add(:base,
+                  "This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
       end
     end
 

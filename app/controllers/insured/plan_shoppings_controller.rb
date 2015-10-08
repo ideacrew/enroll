@@ -34,7 +34,7 @@ class Insured::PlanShoppingsController < ApplicationController
     elsif hbx_enrollment.may_select_coverage?
       hbx_enrollment.update_current(aasm_state: "coverage_selected")
       hbx_enrollment.propogate_selection
-      UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now if hbx_enrollment.employee_role.present?
+      #UserMailer.plan_shopping_completed(current_user, hbx_enrollment, decorated_plan).deliver_now if hbx_enrollment.employee_role.present?
       redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
     else
       redirect_to :back
@@ -43,6 +43,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def receipt
     person = @person
+
     @enrollment = HbxEnrollment.find(params.require(:id))
     plan = @enrollment.plan
     if @enrollment.employee_role.present?
@@ -50,7 +51,7 @@ class Insured::PlanShoppingsController < ApplicationController
       reference_plan = benefit_group.reference_plan
       @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
     else
-      tax_household = current_user.person.primary_family.latest_household.latest_active_tax_household
+      tax_household = person.primary_family.latest_household.latest_active_tax_household
       @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.elected_aptc_pct, tax_household)
       @market_kind = "individual"
     end
@@ -129,7 +130,8 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def show
-    set_consumer_bookmark_url(family_account_path)
+    set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
+    set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -163,6 +165,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @plans = @plans.sort_by(&:total_employee_cost)
+    @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(plan_ids: @plans.map(&:id))
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -186,6 +189,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def set_plans_by(hbx_enrollment_id:)
+    @enrolled_hbx_enrollment_plan_ids = @person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:id)
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     if @market_kind == 'shop'

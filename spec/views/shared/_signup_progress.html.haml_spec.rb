@@ -83,7 +83,7 @@ RSpec.describe "shared/_signup_progress.html.haml" do
 
       it "should disable the purchase button" do
         render "shared/signup_progress", step: 6
-        expect(rendered).to match /<a[^>]*disabled="disabled"[^>]*>Purchase/
+        expect(rendered).to match /<a[^>]*disabled="disabled"[^>]*>Confirm/
       end
     end
   end

@@ -31,6 +31,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(family).to receive(:active_household).and_return(household)
     allow(person).to receive(:consumer_role).and_return(nil)
     allow(person).to receive(:consumer_role?).and_return(false)
+    allow(user).to receive(:last_portal_visited).and_return('/')
   end
 
   context "GET new" do

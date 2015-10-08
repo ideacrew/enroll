@@ -9,16 +9,33 @@ RSpec.describe "insured/families/_qle_detail.html.erb" do
     expect(rendered).to have_selector('#qle-details.hidden')
   end
 
-  it "should have error message" do
-    expect(rendered).to have_content "The date you submitted does not qualify for special enrollment."
-    expect(rendered).to have_content "Please double check the date or contact DC Health Link's Customer Care Center: 1-855-532-5465."
+  it "should have qle form" do
+    expect(rendered).to have_selector("form#qle_form")
   end
 
-  it "should have csr alert message" do
+  it "should have qle date chose area" do
+    expect(rendered).to have_selector("#qle-date-chose")
+  end
+
+  it "should have qle_message area" do
+    expect(rendered).to have_selector("#qle_message")
+  end
+
+  it "should have success info" do
+    expect(rendered).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time."
+    expect(rendered).to have_selector(".success-info.hidden")
+  end
+
+  it "should have error message" do
+    expect(rendered).to have_selector(".error-info.hidden")
     expect(rendered).to have_content "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at 1-855-532-5465 to give us more information so we can see if you qualify."
   end
 
-  it "should have csr-form" do
-    expect(rendered).to have_selector('.csr-form.hidden')
+  it "should not have csr-form" do
+    expect(rendered).not_to have_selector('.csr-form.hidden')
+  end
+
+  it "should have two qle-details-title" do
+    expect(rendered).to have_selector(".qle-details-title", count: 2)
   end
 end

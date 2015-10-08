@@ -27,38 +27,14 @@
         </div>
       </div>
 
-
       <div class="row row-form-wrapper no-buffer">
-        <div class="col-xs-12 form-group benefit-group-offset" data-toggle="popover" data-placement="top" title="" data-content="For dates of hire on the 1st day of the month, coverage would start on the date of hire" data-trigger="hover">
+        <div class="col-xs-12 form-group benefit-group-offset">
           <!-- Offset :  -->
           <label class="title">When would you like your newly hired employees to start their coverage? <!--<i class="fa fa-chevron-down">--></i></label>
-          <%= f.select(:effective_on_offset, options_for_select([["Date of hire", 0], ["30 days after date of hire", 30], ["60 days after date of hire", 60]], selected: f.object.effective_on_offset), { :class => ''}) %>
+          <%= f.select(:effective_on_offset, options_for_select([["First of the month following or coinciding with date of hire", 0], ["First of the month following 30 days", 30], ["First of the month following 60 days", 60]], selected: f.object.effective_on_offset), { :class => ''}) %>
         </div>
       </div>
-
-
     </div>
-
-    <div class="col-md-12 col-sm-12 col-xs-12" style="display: none;">
-      <div class="employer_cost_info" style='clear: both;'>
-        <div class='loader' style="display:none">
-          <button class="btn btn-md btn-warning">
-            <span class="glyphicon glyphicon-refresh spinning"></span> Loading...
-          </button>
-        </div>
-        <h4></h4>
-        <div class="content"></div>
-      </div>
-    </div>
-
-    <div id="employer_cost_info_btn" class="col-md-12 col-sm-12 col-xs-12" style="display: none;">
-      <div class="btn btn-select disabled pull-right">
-        Employee Costs
-      </div>
-      <%= link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "employee_costs_link", class: "hidden" %>
-    </div>
-
-    <%= render "employers/plan_years/employee_costs_modal" %>
 
     <div class="col-xs-12 offerings">
       <div class="row row-form-wrapper no-buffer heading">
@@ -75,10 +51,6 @@
       </div>
     </div>
 
-
-
-
-
     <div class="col-md-12 col-sm-12 col-xs-12 top-pd">
       <div class="reference_plan_info" style='clear: both;'>
         <h4></h4>
@@ -91,11 +63,16 @@
   <!-- Select Plan:  -->
 
   <%= render "shared/reference_plans_list", f: f, p: p %>
+
+  <div class='cost-impact-loader row' style="text-align: center; display:none;">
+    <div class='col-xs-12'>
+      <i class='fa fa-refresh fa-spin fa-2x'></i><h4>Loading employee costs...</h4>
+    </div>
+  </div>
+
   <div class="col-xs-12">
     <br><br>
     <div class="selected-plan row" style="display: none;"></div>
   </div>
-
-
 
 </fieldset>

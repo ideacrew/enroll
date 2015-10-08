@@ -71,6 +71,7 @@ class HbxEnrollment
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
   scope :my_enrolled_plans, -> { where(:aasm_state.ne => "shopping", :plan_id.ne => nil ) } # a dummy plan has no plan id
   scope :current_year, -> { where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
+  scope :enrolled, ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
@@ -358,10 +359,6 @@ class HbxEnrollment
     benefit_group.effective_on_for(employee_role.hired_on)
   end
 
-  def self.calculate_start_date_by_qle(household)
-    household.family.current_sep.effective_on
-  end
-
   def self.new_from(employee_role: nil, coverage_household:, benefit_group: nil, consumer_role: nil, benefit_package: nil, qle: false)
     enrollment = HbxEnrollment.new
     case
@@ -370,11 +367,11 @@ class HbxEnrollment
       enrollment.household = coverage_household.household
       enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
-      enrollment.effective_on = if qle
-                                  calculate_start_date_by_qle(coverage_household.household)
-                                else
-                                  calculate_start_date_from(employee_role, coverage_household, benefit_group)
-                                end
+      if enrollment.family.is_under_special_enrollment_period?
+        enrollment.effective_on = enrollment.family.current_sep.effective_on
+      else
+        enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+      end
       # benefit_group.plan_year.start_on
       enrollment.benefit_group = benefit_group
       census_employee = employee_role.census_employee
@@ -387,17 +384,12 @@ class HbxEnrollment
       enrollment.kind = "individual"
       enrollment.consumer_role = consumer_role
       enrollment.benefit_package_id = benefit_package.try(:id)
-      # if qle
-      #   enrollment.effective_on = calculate_start_date_by_qle(coverage_household.household)
-      # else
-
       
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-      family = consumer_role.person.primary_family
-      if family.is_under_special_enrollment_period?
-        enrollment.effective_on = family.current_sep.effective_on
+      if enrollment.family.is_under_special_enrollment_period?
+        enrollment.effective_on = enrollment.family.current_sep.effective_on
       else
-        enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date_max
+        enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
       end
 
       # end
@@ -454,52 +446,38 @@ class HbxEnrollment
   def self.find_by_benefit_groups(benefit_groups = [])
     id_list = benefit_groups.collect(&:_id).uniq
 
-    # families = nil
-    # if id_list.size == 1
-    #   families = Family.where(:"households.hbx_enrollments.benefit_group_id" => id_list.first)
-    # else
-    #   families = Family.any_in(:"households.hbx_enrollments.benefit_group_id" => id_list )
-    # end
-
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-
-    enrollment_list = []
-    families.each do |family|
-      family.households.each do |household|
-        household.hbx_enrollments.each do |enrollment|
-          enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_id)
-        end
-      end
+    families.inject([]) do |enrollments, family|
+      enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).active.enrolled.to_a
     end
-    enrollment_list
   end
 
-  def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
-    id_list = benefit_group_assignments.collect(&:_id)
+  # def self.find_by_benefit_group_assignments(benefit_group_assignments = [])
+  #   id_list = benefit_group_assignments.collect(&:_id)
 
-    # families = nil
-    # if id_list.size == 1
-    #   families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list.first)
-    # else
-    #   families = Family.any_in(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list )
-    # end
+  #   # families = nil
+  #   # if id_list.size == 1
+  #   #   families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list.first)
+  #   # else
+  #   #   families = Family.any_in(:"households.hbx_enrollments.benefit_group_assignment_id" => id_list )
+  #   # end
 
-    families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id".in => id_list)
+  #   families = Family.where(:"households.hbx_enrollments.benefit_group_assignment_id".in => id_list)
 
-    enrollment_list = []
-    families.each do |family|
-      family.households.each do |household|
-        household.hbx_enrollments.each do |enrollment|
-          enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_assignment_id)
-        end
-      end
-    end
-    enrollment_list
-  end
+  #   enrollment_list = []
+  #   families.each do |family|
+  #     family.households.each do |household|
+  #       household.hbx_enrollments.active.each do |enrollment|
+  #         enrollment_list << enrollment if id_list.include?(enrollment.benefit_group_assignment_id)
+  #       end
+  #     end
+  #   end
+  #   enrollment_list
+  # end
 
-  def self.covered(enrollments)
-    enrollments.select{|e| ENROLLED_STATUSES.include?(e.aasm_state) && e.is_active? }
-  end
+  # def self.covered(enrollments)
+  #   enrollments.select{|e| ENROLLED_STATUSES.include?(e.aasm_state) && e.is_active? }
+  # end
 
   private
 

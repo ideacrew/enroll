@@ -3,7 +3,7 @@ class IvlNotices::DocumentsVerification < IvlPdfNotice
   attr_reader :notice
 
   def initialize(consumer, args = {})
-    super
+    super(args)
     @consumer = consumer
     # @to = (@consumer.home_email || @consumer.work_email).address
     @template = args[:template] || "notices/ivl/documents_verification_reminder1.html.erb"

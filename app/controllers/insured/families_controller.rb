@@ -4,16 +4,16 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_for_address_info, only: [:find_sep]
 
   def home
-    set_consumer_bookmark_url(family_account_path)
+    set_bookmark_url
     @hbx_enrollments = @family.enrolled_hbx_enrollments || []
     @employee_role = @person.employee_roles.try(:first)
-
     respond_to do |format|
       format.html
     end
   end
 
   def manage_family
+    set_bookmark_url
     @family_members = @family.active_family_members
     # @employee_role = @person.employee_roles.first
 
@@ -23,9 +23,9 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def find_sep
-    set_consumer_bookmark_url(family_account_path)
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
+    @employee_role_id = params[:employee_role_id]
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     render :layout => 'application'
@@ -36,12 +36,12 @@ class Insured::FamiliesController < FamiliesController
       qle = QualifyingLifeEventKind.find(params[:qle_id])
       special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
       special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
-      special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
       special_enrollment_period.qualifying_life_event_kind = qle
+      special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
       special_enrollment_period.save
     end
 
-    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), enrollment_kind: 'sep'}
+    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep'}
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
@@ -73,6 +73,7 @@ class Insured::FamiliesController < FamiliesController
     @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = TimeKeeper.date_of_record - 30.days
     end_date = TimeKeeper.date_of_record + 30.days
+
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
       start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)

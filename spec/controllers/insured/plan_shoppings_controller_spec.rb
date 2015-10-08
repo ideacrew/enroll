@@ -1,20 +1,20 @@
 require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller do
-  let(:plan) { double(id: "plan_id") }
+  let(:plan) { double("Plan", id: "plan_id") }
   let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id") }
   let(:household){ double("Household") }
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember", dob: 28.years.ago) }
   let(:family_members){ [family_member, family_member] }
-  let(:benefit_group) {double}
-  let(:reference_plan) {double}
-  let(:usermailer) {double}
+  let(:benefit_group) {double("BenefitGroup")}
+  let(:reference_plan) {double("Plan")}
+  let(:usermailer) {double("UserMailer")}
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:employee_role) { EmployeeRole.new }
-  let(:household) {double(hbx_enrollments: hbx_enrollments)}
-  let(:hbx_enrollments) {double}
+  let(:household) {double("Household", hbx_enrollments: hbx_enrollments)}
+  let(:hbx_enrollments) {double("HbxEnrollment")}
 
   context "POST checkout" do
     before do
@@ -213,9 +213,10 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   context "GET show" do
-    let(:plan1) {double(id: '10', deductible: '$10', total_employee_cost: 1000, carrier_profile_id: '12345')}
-    let(:plan2) {double(id: '11', deductible: '$20', total_employee_cost: 2000, carrier_profile_id: '12346')}
-    let(:plan3) {double(id: '12', deductible: '$30', total_employee_cost: 3000, carrier_profile_id: '12347')}
+    let(:plan1) {double("Plan1", id: '10', deductible: '$10', total_employee_cost: 1000, carrier_profile_id: '12345')}
+    let(:plan2) {double("Plan2", id: '11', deductible: '$20', total_employee_cost: 2000, carrier_profile_id: '12346')}
+    let(:plan3) {double("Plan3", id: '12', deductible: '$30', total_employee_cost: 3000, carrier_profile_id: '12347')}
+    let(:plans) {[plan1, plan2, plan3]}
 
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
@@ -224,8 +225,14 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:household).and_return(household)
       allow(household).to receive(:family).and_return(family)
       allow(family).to receive(:family_members).and_return(family_members)
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
-      allow(benefit_group).to receive(:decorated_elected_plans).with(hbx_enrollment).and_return([plan1, plan2, plan3])
+      allow(plan1).to receive(:[]).with(:id)
+      allow(plan2).to receive(:[]).with(:id)
+      allow(plan3).to receive(:[]).with(:id)
+      allow(benefit_group).to receive(:decorated_elected_plans).with(hbx_enrollment).and_return(plans)
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
       sign_in user
     end
@@ -262,6 +269,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       before do
         allow(plan3).to receive(:total_employee_cost).and_return(3333)
         allow(plan3).to receive(:deductible).and_return("$998")
+        allow(user).to receive(:person).and_return(person)
+        allow(person).to receive(:primary_family).and_return(family)
+        allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
         allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(false)
         get :show, id: "hbx_id"
       end
@@ -276,6 +286,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         [plan1, plan2, plan3].each do |plan|
           allow(plan).to receive(:total_employee_cost).and_return(nil)
           allow(plan).to receive(:deductible).and_return(nil)
+          allow(user).to receive(:person).and_return(person)
+          allow(person).to receive(:primary_family).and_return(family)
+          allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
         end
         get :show, id: "hbx_id"
       end
@@ -290,14 +303,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
 
     context "when user has_active_consumer_role" do
-      let(:tax_household) {double}
+      let(:tax_household) {double("TaxHousehold")}
       let(:household) {double(latest_active_tax_household: tax_household)}
-      let(:family) {double(latest_household: household)}
-      let(:person) {double(primary_family: family, has_active_consumer_role?: true)}
-      let(:user) {double(person: person)}
+      let(:family) {double("Family",latest_household: household)}
+      let(:person) {double("Person",primary_family: family, has_active_consumer_role?: true)}
+      let(:user) {double("user",person: person)}
       before :each do
         session[:individual_assistance_path] = "assistance"
         allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
+        allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
         get :show, id: "hbx_id"
       end
 

@@ -15,7 +15,7 @@ end
 When(/I use unique values/) do
   require 'test/unique_value_stash.rb'
   include UniqueValueStash
-  @u = UniqueValueStash::UniqueValues.new
+  @u = UniqueValueStash::UniqueValues.new unless defined?(@u)
 end
 
 Before "@watir" do
@@ -32,8 +32,9 @@ After "@watir" do
   @take_screens = false if @take_screens
 end
 
-def people
-  {
+def people 
+  return @a if defined?(@a)
+  @a = {
     "Soren White" => {
       first_name: "Soren",
       last_name: "White",
@@ -60,6 +61,22 @@ def people
       dob: "05/02/1976",
       ssn: "761234567",
       email: 'broker.assisted@dc.gov',
+      password: 'aA1!aA1!aA1!'
+    },
+    "Fred" => {
+      first_name: 'Fred',
+      last_name: 'Thirteen',
+      dob: defined?(@u) ? @u.adult_dob : "08/13/1979",
+      ssn: defined?(@u) ? @u.ssn : "761234567",
+      email: defined?(@u) ? @u.email : 'fred@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
+    "Megan" => {
+      first_name: 'Megan',
+      last_name: 'Smith',
+      dob: defined?(@u) ? @u.adult_dob : "08/13/1979",
+      ssn: defined?(@u) ? @u.ssn : "761234567",
+      email: defined?(@u) ? @u.email : 'megan@example.com',
       password: 'aA1!aA1!aA1!'
     },
     "Hbx Admin" => {
@@ -90,6 +107,16 @@ def people
       dba: "Legal LLC",
       fein: "890000223",
       email: 'tim.wood@example.com',
+      password: 'aA1!aA1!aA1!'
+    },
+    "Tronics" => {
+      first_name: "Tronics",
+      last_name: "Rocks#{rand(1000)}",
+      dob: defined?(@u) ?  @u.adult_dob : "08/13/1979",
+      legal_name: "Tronics",
+      dba: "Tronics",
+      fein: defined?(@u) ? @u.fein : '123123123',
+      email: defined?(@u) ? @u.email : 'tronics@example.com',
       password: 'aA1!aA1!aA1!'
     },
   }
@@ -222,6 +249,7 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
 end
 
 Given(/^(.+) has not signed up as an HBX user$/) do |actor|
+  step "I use unique values"
 end
 
 When(/^I visit the Employer portal$/) do
@@ -440,15 +468,15 @@ When(/^.+ selects? a plan on the plan shopping page$/) do
 end
 
 Then(/^.+ should see the coverage summary page$/) do
-  @browser.element(class: /interaction-click-control-purchase/).wait_until_present
+  @browser.element(class: /interaction-click-control-confirm/).wait_until_present
   screenshot("summary_page")
   expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
 end
 
-When(/^.+ clicks? on purchase button on the coverage summary page$/) do
+When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
   # @browser.execute_script('$(".interaction-click-control-purchase").trigger("click")')
-  @browser.element(class: /interaction-click-control-purchase/).wait_until_present
-  scroll_then_click(@browser.element(class: /interaction-click-control-purchase/))
+  @browser.element(class: /interaction-click-control-confirm/).wait_until_present
+  scroll_then_click(@browser.element(class: /interaction-click-control-confirm/))
 end
 
 Then(/^.+ should see the receipt page$/) do
@@ -508,8 +536,6 @@ When(/^Employer publishes a plan year$/) do
 end
 
 When(/^.+ should see a published success message$/) do
-  # @browser.element(class: /mainmenu/).wait_until_present
-  @browser.refresh
   @browser.element(text: /plan year successfully published/i).wait_until_present
   expect(@browser.element(text: /Plan Year successfully published/).visible?).to be_truthy
 end
@@ -535,6 +561,7 @@ When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
 end
 
 When(/^I click the "(.*?)" in qle carousel$/) do |qle_event|
+  sleep 3
   click_when_present(@browser.a(text: /#{qle_event}/))
 end
 
@@ -592,4 +619,23 @@ Then(/^I should see the dependents and group selection page$/) do
   @browser.element(text: /Confirm Your Plan Selection/i).wait_until_present
   expect(@browser.element(text: /Confirm Your Plan Selection/i).visible?).to be_truthy
   scroll_then_click(@browser.a(class: /interaction-click-control-purchase/))
+end
+
+And(/I select three plans to compare/) do
+  sleep 2
+  @browser.a(text: /Select Plan/).wait_until_present
+  compare_options = @browser.spans(class: 'checkbox-custom-label', text: "Compare")
+  if compare_options.count > 3
+    compare_options[0].click
+    compare_options[1].click
+    compare_options[2].click
+    click_when_present(@browser.a(text: "COMPARE PLANS"))
+    @browser.h3(text: /Plan Comparison/).wait_until_present
+    expect(@browser.is(class: "glyphicon glyphicon-download-alt").count).to eq 3
+    @browser.button(text: 'Close').click
+  end
+end
+
+And(/I should not see any plan which premium is 0/) do
+  expect(@browser.h2s(class: "plan-premium", text: "$0.00").count).to eq 0
 end

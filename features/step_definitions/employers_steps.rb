@@ -323,7 +323,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][title]").set("Silver PPO Group")
   select_field = @browser.div(class: /selectric-wrapper/, text: /Date Of Hire/)
   select_field.click
-  select_field.li(text: /Date of hire/).click
+  select_field.li(text: /Date of hire/i).click
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]").set(50)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]").set(50)
   @browser.text_field(name: "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]").set(50)

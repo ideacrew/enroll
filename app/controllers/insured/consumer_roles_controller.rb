@@ -109,7 +109,13 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def ridp_agreement
-    set_consumer_bookmark_url
+    if session[:original_application_type] == 'paper'
+      set_current_person
+      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      return
+    else 
+      set_consumer_bookmark_url
+    end
   end
 
   private
@@ -174,7 +180,7 @@ class Insured::ConsumerRolesController < ApplicationController
                                                  [:vlp_documents_attributes =>
                                                   [:subject, :citizenship_number, :naturalization_number,
                                                    :alien_number, :passport_number, :sevis_id, :visa_number,
-                                                   :receipt_number, :expiration_date, :card_number, :i94_number]]})
+                                                   :receipt_number, :expiration_date, :card_number, :i94_number, :country_of_citizenship]]})
     @vlp_doc_subject = doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last[:subject]
     document = find_document(@consumer_role, @vlp_doc_subject)
     document.update_attributes(doc_params[:consumer_role_attributes][:vlp_documents_attributes].first.last)

@@ -1,3 +1,5 @@
+
+// employer portal
 #home {
   nav {
     ul {
@@ -192,25 +194,32 @@
           background-color: #ffffff;
           padding: 10px 20px;
           text-align: left;
-          border-bottom: solid 2px #fff;
           font-size: 13px;
-          height: 50px;
+          &.confirm-terminate-wrapper {
+            padding: 0;
 
+          }
           &:first-of-type {
             font-size: 15px;
           }
           &:last-of-type {
-            text-align: right;
+
           }
-          &.table-functions .fa {
-            display: none;
-            cursor: pointer;
-            &:first-of-type {
-              padding-right: 10px;
+
+          &.table-functions {
+            padding: 0;
+            text-align: right;
+              .fa {
+                display: none;
+                cursor: pointer;
+                margin: 0;
+              &:last-of-type {
+                padding-right: 10px;
+              }
             }
           }
           &:hover {
-            border-bottom: solid 2px #007bc4;
+            color: #007bc4;
 
           }
 
@@ -221,6 +230,17 @@
         }
       }
     }
+  }
+  .premium-reports-table {
+    table tr th {
+      font-size: 11px;
+      width: auto;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+
+
   }
   #add_employee_action {
     .col-xs-12 {
@@ -377,6 +397,7 @@
         }
         &:last-of-type {
           border-bottom: none;
+          display: none;
         }
       }
 
@@ -384,7 +405,7 @@
     }
     .panel.benefitgroup.benefitgroup.referenceplan {
       padding-bottom: 30px;
-      margin-bottom: 15px;
+      margin-bottom: 35px;
       &>h2 {
         font-size: 16px;
       }
@@ -666,6 +687,11 @@
     .plan-options {
       background-color: #ffffff;
       border: solid 1px #b7b7b7;
+      .metals-tab {
+        >.col-xs-3:last-of-type {
+          display: none;
+        }
+      }
       span:first-of-type {
         text-align: center;
         font-size: 16px;
@@ -1332,4 +1358,34 @@
       }
 
     }
+}
+
+// plan shopping
+#plans {
+  .current {
+    margin: 0 0 5px 0;
+    .fa {
+      color: #007bc4;
+      margin: 0 5px 0 0;
+      &.published, &.enrolling {
+        color: #FFD700;
+      }
+    }
+    &.bg-title {
+      font-weight: bold;
+      display: inline-block;
+      color: #69A30D;
+      font-size: 14px;
+
+    }
+  }
+  input[type=checkbox] {
+    display: none;
+    &+span {
+      margin-left: 0;
+    }
+  }
+  table {
+    margin-bottom: 10px;
+  }
 }

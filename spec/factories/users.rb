@@ -4,6 +4,7 @@ FactoryGirl.define do
     gen_pass = User.generate_valid_password
     password gen_pass
     password_confirmation gen_pass
+    sequence(:authentication_token) {|n| "j#{n}-#{n}DwiJY4XwSnmywdMW"}
     approved true
     roles ['web_service']
   end
@@ -26,6 +27,14 @@ FactoryGirl.define do
 
   trait :employer_staff do
     roles ["employer_staff"]
+  end
+
+  trait "broker" do
+    roles ["broker"]
+  end
+
+  trait "broker_agency_staff" do
+    roles ["broker_agency_staff"]
   end
 
   factory :invalid_user, traits: [:without_email, :without_password, :without_password_confirmation]

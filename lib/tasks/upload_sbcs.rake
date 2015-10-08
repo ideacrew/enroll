@@ -7,8 +7,11 @@ namespace :sbc do
     sbc_processor.run
   end
 
+  # USAGE rake sbc:export
+  # This will export a map of plan and sbc pdfs in S3 to plans-sbcs.csv
+  # A CSV with plan.id, plan.hios_id, plan.active_year, plan.sbc_document.identifier, plan.sbc_document.title
   task :export => :environment do
-    file_path = "plans-sbc-export.csv"
+    file_path = "plans-sbcs.csv"
     plans = Plan.all
     csv = CSV.open(file_path, "w") do |csv|
       plans.each do |plan|
@@ -19,6 +22,9 @@ namespace :sbc do
     puts "CSV written #{file_path} with schema plan.id, plan.hios_id, plan.active_year, plan.sbc_document.identifier, plan.sbc_document.title"
   end
 
+  # USAGE rake sbc:export
+  # Seeds the SBC documents in Plans. SBCs are already uploaded to S3 before this runs.
+  # Should run while seeding.
   task :map => :environment do
     file_path = Rails.root.join("db","seedfiles","plans-sbcs.csv").to_s
     counter = 0

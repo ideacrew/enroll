@@ -4,8 +4,8 @@ module PdfTemplates
 
     attribute :url, String
     attribute :phone, String
-    attribute :fax, Date
-    attribute :email, Date
+    attribute :fax, String
+    attribute :email, String
     attribute :address, PdfTemplates::NoticeAddress
 
   end

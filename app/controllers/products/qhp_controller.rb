@@ -22,9 +22,20 @@ class Products::QhpController < ApplicationController
       elected_aptc_pct = session[:elected_aptc_pct]
       elected_aptc_pct = elected_aptc_pct.present? ? elected_aptc_pct.to_f : 0.85
 
+      # fetch only one of the same hios plan
+      uniq_hios_ids = []
       @qhps = Products::Qhp.where(:standard_component_id.in => found_params, active_year: @active_year.to_i).to_a.select do |qhp|
-        @standard_component_ids.include? qhp.plan.try(:hios_id).try(:to_s)
+        hios_id = qhp.plan.try(:hios_id).try(:to_s)
+        hios_id = hios_id.present? ? hios_id[0..13] : nil
+
+        if found_params.include? hios_id and !uniq_hios_ids.include?(hios_id)
+          uniq_hios_ids << hios_id
+          true
+        else
+          false
+        end 
       end
+
       @qhps = @qhps.each do |qhp|
         qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.plan, @hbx_enrollment, elected_aptc_pct, tax_household).total_employee_cost
       end
@@ -60,8 +71,7 @@ class Products::QhpController < ApplicationController
     @new_params = params.permit(:standard_component_id, :hbx_enrollment_id)
     hbx_enrollment_id = @new_params[:hbx_enrollment_id]
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
-    params[:market_kind] = params[:market_kind] == "shop" ? @hbx_enrollment.kind : params[:market_kind]
-    @market_kind = params[:market_kind].present? ? params[:market_kind] : 'employer_sponsored'
+    @market_kind = params[:market_kind] == "shop" ? "employer_sponsored" : "individual"
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
   end
 

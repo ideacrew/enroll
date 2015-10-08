@@ -18,8 +18,9 @@
           <% end %>
 
           <th>Status</th>
-          <th>Enrollment Status</th>
           <th>Linked?</th>
+
+          <th>Enrollment Status</th>
 
           <th>
           </th>
@@ -44,19 +45,19 @@
           <% end %>
 
           <td style="text-transform: capitalize;"><%= census_employee.aasm_state.humanize %></td>
-          <td><%= enrollment_state(census_employee) %></td>
           <td><%= boolean_to_human census_employee.employee_role_linked? %></td>
+          <td><%= enrollment_state(census_employee) %></td>
 
           <td class="table-functions">
             <!--<i class="fa fa-times-circle-o fa-2x"></i>-->
             <% if census_employee.employment_terminated? %>
-            <%= link_to ('javascript:;'), class: "show_confirm btn btn-green-2", id: "show_confirm_#{census_employee.id}" do %>
-            <span class="hidden-xs hidden-sm visible-md visible-lg" onclick="$(this).closest('tr').next().show();">Rehire</span>
-            <span aria-hidden="true" class="glyphicon glyphicon-pencil hidden-md hidden-lg visible-sm visible-xs"></span>
-            <% end %>
+            <a class="show_confirm btn btn-green-2" id="show_confirm_#{census_employee.id}">
+              <span class="hidden-xs hidden-sm visible-md visible-lg" onclick="$(this).closest('tr').next().show();">Rehire</span>
+            </a>
+
             <% else %>
             <%= link_to raw('<i class="fa fa-pencil fa-2x"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
-            <%= link_to raw('<i class="fa fa-trash-o fa-2x"></i>'), employers_employer_profile_census_employee_terminate_path(@employer_profile, census_employee.id), remote: true, onclick: '$(this).closest("tr").next().toggle();' %>
+            <i class="fa fa-trash-o fa-2x"></i>
             <% end %>
 
           </td>
@@ -80,12 +81,19 @@
         <tr class="unbrd  remove_<%= census_employee.id %>" style="display: none;">
           <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>" colspan="8" id="enter-date">
             <div class="confirm-terminate">
-              <input class="text-center date-picker" data-date-min="<%= (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="e.g. 5/1/2015" type="text"><br/>
-              <a class="delete_confirm" data-link="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="remove_<%= census_employee.id %>">
-                <strong>Submit</strong>
+
+
+              <h5><strong>Enter termination date to remove <%= name_to_listing(census_employee) %></strong></h5>
+
+              <div class="pull-right">
+              <!--<h5>Enter termination date to remove this employee:</h5>-->
+              <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 %>d" placeholder="MM/DD/YYYY" type="text">
+              <a class="delete_confirm terminate" data-link="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="remove_<%= census_employee.id %>">
+              Terminate Employee
               </a>
+              <a class="terminate cancel" style="margin-right: 15px;">Cancel</a>
             </div>
-            <%=image_tag "enter_date_termination.png", width: "300", height: "" %>
+            </div>
           </td>
         </tr>
 

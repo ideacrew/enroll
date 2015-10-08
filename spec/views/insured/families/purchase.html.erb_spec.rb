@@ -26,8 +26,8 @@ RSpec.describe "insured/families/purchase.html.erb" do
       expect(rendered).to have_selector('p', text: 'Your enrollment is not complete until you purchase your plan selection below.')
     end
 
-    it "should display the purchase button" do
-      expect(rendered).to have_selector('a', text: 'Purchase')
+    it "should display the confirm button" do
+      expect(rendered).to have_selector('a', text: 'Confirm')
       expect(rendered).not_to have_selector('a', text: 'Terminate Plan')
     end
   end

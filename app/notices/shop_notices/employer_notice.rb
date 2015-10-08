@@ -1,11 +1,9 @@
-class ShopNotices::EmployerNotice < Notice
-
-  attr_accessor :from, :to, :subject, :template, :notice_data
+class ShopNotices::EmployerNotice < ShopNotices::ShopPdfNotice
 
   def initialize(employer, args = {})
-    super
+    super(args)
     @employer = employer
-    @to = 'raghuramg83@gmail.com'
+    @to = @employer.try(:person).try(:home_email).try(:address)
     @template = args[:template] || "notices/shop_notices/employer_renewal"
     @email_notice = args[:email_notice] || true
     @paper_notice = args[:paper_notice] || true
@@ -15,24 +13,7 @@ class ShopNotices::EmployerNotice < Notice
     # send_email_notice if @email_notice
     # send_pdf_notice if @paper_notice
     # send_email_notice
-    #mock_notice_object
-    build
-    generate_pdf_notice
-  end
-
-  def mock_notice_object
-    @notice = PdfTemplates::EmployerNotice.new({ 
-      primary_fullname: 'Shane Levy', 
-      primary_identifier: '642323233', 
-      employer_name: 'Legal Inc',
-      primary_address: PdfTemplates::NoticeAddress.new({
-        street_1: "100 K ST NE",
-        street_2: "Suite 100",
-        city: "Washington DC",
-        state: "DC",
-        zip: "20005"
-      })
-    })
+    super
   end
 
   def build
@@ -42,31 +23,16 @@ class ShopNotices::EmployerNotice < Notice
     employer_profile = EmployerProfile.find(@employer.employer_profile_id)
     @notice.primary_identifier = employer_profile.organization.hbx_id
     @notice.open_enrollment_end_on = employer_profile.try(:active_plan_year).try(:open_enrollment_end_on)
+    @notice.coverage_end_on = employer_profile.try(:active_plan_year).try(:end_on)
 
-    if @employer.person.addresses.present?
-      append_address(@employer.person.addresses[0])
+    if @employer.person.mailing_address.present?
+      append_primary_address(@employer.person.mailing_address)
     else
-      append_address(employer_profile.organization.try(:primary_office_location).try(:address))
+      append_primary_address(employer_profile.organization.try(:primary_office_location).try(:address))
     end
 
     append_hbe
     append_broker(employer_profile.broker_agency_profile)
-  end
-
-  def append_hbe
-    @notice.hbe = PdfTemplates::Hbe.new({
-      url: "www.dhs.dc.gov",
-      phone: "(855) 532-5465",
-      fax: "(855) 532-5465",
-      email: "info@dchealthlink.com",
-      address: PdfTemplates::NoticeAddress.new({
-        street_1: "100 K ST NE",
-        street_2: "Suite 100",
-        city: "Washington DC",
-        state: "DC",
-        zip: "20005"
-      })
-    })
   end
 
   def append_broker(broker)
@@ -88,15 +54,5 @@ class ShopNotices::EmployerNotice < Notice
         zip: location.try(:address).try(:zip)
       })
     })
-  end
-
-  def append_address(primary_address)
-    @notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: primary_address.address_1.titleize,
-      street_2: primary_address.address_2.titleize,
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
-      })
   end
 end 
