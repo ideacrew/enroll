@@ -34,10 +34,18 @@ module Forms
     end
 
     def match_person
-      Person.where({
+      if !ssn.blank?
+        Person.where({
                        :dob => dob,
                        :encrypted_ssn => Person.encrypt_ssn(ssn)
                    }).first
+      else
+        Person.where({
+                       :dob => dob,
+                       :last_name => /^#{last_name}$/i,
+                       :first_name => /^#{first_name}$/i,
+                   }).first
+      end
     end
 
     def does_not_match_a_different_users_person
