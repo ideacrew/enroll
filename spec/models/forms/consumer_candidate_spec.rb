@@ -11,19 +11,28 @@ describe Forms::ConsumerCandidate, "asked to match a person" do
                                      :user_id => 20
                                  })
   }
-
+  let(:person) {FactoryGirl.create(:person)}
   context "uniq ssn" do 
     it "return true when ssn is blank" do 
       allow(subject).to receive(:ssn).and_return(nil)
       expect(subject.uniq_ssn).to eq true
     end
 
-    it "add errors when duplicated ssn" do
+    it "add errors when duplicated ssn with a user account" do
       allow(subject).to receive(:ssn).and_return("123456789") 
-      allow(Person).to receive(:where).and_return(true)
-
+      allow(Person).to receive(:where).and_return([person])
+      allow(person).to receive(:user).and_return(true)
       subject.uniq_ssn
       expect(subject.errors[:base]).to eq ["This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}."]
     end
+
+    it "does not add errors when duplicated ssn and no account" do
+      allow(subject).to receive(:ssn).and_return("123456789")
+      allow(Person).to receive(:where).and_return([person])
+      allow(person).to receive(:user).and_return(false)
+      subject.uniq_ssn
+      expect(subject.errors[:base]).to eq []
+    end
+
   end
 end
