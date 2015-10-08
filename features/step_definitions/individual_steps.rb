@@ -311,7 +311,7 @@ Then(/CSR clicks on Resume Application via phone/) do
 end
 
 When(/I click on the header link to return to CSR page/) do
-  wait_and_confirm_text /Enrollment assistance for: Second/
+  wait_and_confirm_text /Assisting/
   @browser.a(text: /I'm a Customer Service/i).click
 end
 
