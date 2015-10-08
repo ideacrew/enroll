@@ -44,7 +44,8 @@ module Forms
       else
         Person.where({
                        :dob => dob,
-                       :last_name => last_name
+                       :last_name => /^#{last_name}$/i,
+                       :first_name => /^#{first_name}$/i,
                    }).first 
       end
     end
