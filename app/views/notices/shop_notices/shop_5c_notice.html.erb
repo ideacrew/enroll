@@ -29,12 +29,12 @@ content: "<span #{@style_color_text}>[SHOP5C]</span><br>
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "Your employees have completed open enrollment.
 Unfortunately, the number of employees enrolling in your group health plan did not satisfy DC Health Link’s 2/3 minimum participation requirements.
-As a result, coverage will not be available to your employees as of [Requested Coverage Start Date].
+As a result, coverage will not be available to your employees as of #{notice.plan.try(:coverage_start_on).try(:to_s)}.
 Minimum participation requirements are necessary to ensure the viability of DC Health Link for all employers and their employees."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "If you would like to re-structure your benefit offering to encourage more employees to participate, you may do so by
-creating a new open enrollment period. "} %>
+creating a new open enrollment period."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "In addition, there is a special annual enrollment period at the end of each year during which employers can offer group
