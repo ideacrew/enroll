@@ -380,7 +380,6 @@ describe Subscribers::FamilyApplicationCompleted do
   end
 end
 
-
 describe '.search_person' do
   let(:subject) {Subscribers::FamilyApplicationCompleted.new}
   let(:verified_family_member) {
@@ -396,9 +395,15 @@ describe '.search_person' do
   end
 
   context "with a person with a first name, last name, dob and no SSN" do
-    let(:db_person) { Person.create!(first_name: "Joe", last_name: "Kramer", dob: "1993-03-30")}
+    let(:db_person) { Person.create!(first_name: "Joe", last_name: "Kramer", dob: "1993-03-30") }
+    let(:person_case) { double(name_last: db_person.last_name.upcase, name_first: db_person.first_name.downcase) }
 
     it 'finds the person by last_name, first name and dob if both payload and person have no ssn' do
+      expect(subject.search_person(verified_family_member)).to eq db_person
+    end
+
+    it 'finds the person by ignoring case in payload' do
+      allow(verified_family_member).to receive(:person).and_return(person_case)
       expect(subject.search_person(verified_family_member)).to eq db_person
     end
 
