@@ -11,6 +11,10 @@ describe Subscribers::FamilyApplicationCompleted do
     allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile_organization)
   end
 
+  after(:all) do
+    DatabaseCleaner.clean
+  end
+
   describe "errors logged given a payload" do
     let(:message) { { "body" => xml } }
 
