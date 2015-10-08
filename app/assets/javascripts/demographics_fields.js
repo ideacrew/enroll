@@ -103,7 +103,7 @@ function applyListeners() {
             "immigration_i_327_fields_container", "immigration_i_551_fields_container", "immigration_i_571_fields_container",
             "immigration_i_766_fields_container", "immigration_i_566_fields_container",
             "immigration_temporary_i_551_stamp_fields_container", "immigration_i_94_fields_container",
-            "immigration_i_94_in_unexpired_foreign_passport_fields_container", "immigration_unexpired_foreign_passport_fields_container",
+            "immigration_i_94_2_fields_container", "immigration_unexpired_foreign_passport_fields_container",
             "immigration_temporary_i_20_stamp_fields_container", "immigration_DS_2019_fields_container",
             "immigration_other_with_alien_number_fields_container", "immigration_other_with_i94_fields_container",
             "machine_readable_immigrant_visa_fields_container", "immigration_temporary_i_551_fields_container"]
