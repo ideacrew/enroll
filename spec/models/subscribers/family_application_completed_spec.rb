@@ -171,7 +171,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.effective_ending_on).to be_truthy
       end
 
-      it "should have a new tax household with the same data" do
+      it "should have a new tax household with the same aptc data" do
         updated_tax_household = tax_household_db.household.latest_active_tax_household
         expect(updated_tax_household).to be_truthy
         expect(updated_tax_household.primary_applicant.family_member.person).to eq person
@@ -233,7 +233,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.current_max_aptc).to eq 71
       end
 
-      it "has all 4 tax household members with primary person as primary tax household member" do
+      it "has 4 tax household members with primary person as primary tax household member" do
         expect(tax_household_db.tax_household_members.length).to eq 4
         expect(tax_household_db.tax_household_members.map(&:is_primary_applicant?)).to eq [true,false,false,false]
         expect(tax_household_db.tax_household_members.select{|thm| thm.is_primary_applicant?}.first.family_member).to eq person.primary_family.primary_family_member
