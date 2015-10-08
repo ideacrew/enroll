@@ -26,7 +26,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Thank you for the application you submitted and we processed on [application date].
+  content: "Thank you for the application you submitted and we processed on #{notice.enrollments[0].selected_on.strftime('%m/%d/%Y')}.
   Unfortunately, the following individual(s) are not qualified to enroll in health insurance through DC Health
   Link based on the information you provided to us."} %>
 
@@ -91,6 +91,6 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["If you disagree with any determination about the amount or type of health care coverage benefits you or any of the other person in your household was found
     eligible for, you have the right to appeal the determination(s). You may request an appeal by phone, in person, online, and by mail.
-    You must request an appeal <strong>by [Date of Notice+95 calendar days]</strong>.  45 C.F.R. §155.520.
+    You must request an appeal <strong>by #{(TimeKeeper.date_of_record + 95.days).strftime('%m/%d/%Y')}</strong>.  45 C.F.R. §155.520.
     <strong>See the insert for more information on your appeal rights.</strong>"],
     heading: 'If You Think We Made a Mistake', sub_heading: ''} %>

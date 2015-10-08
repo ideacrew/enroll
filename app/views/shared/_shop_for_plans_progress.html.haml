@@ -20,7 +20,7 @@
     Complete
 
 - if step == 2 and !no_purchase
-  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary btn-br btn-block disabled', id: 'btn-continue', :method => :post
+  = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary btn-br btn-block', id: 'btn-continue', :method => :post
   %ul.list-unstyled.list-right-section
     %li
       %a.back{href: '#'}

@@ -26,6 +26,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def show
+    session[:person_id] = nil
      @provider = current_user.person
      @staff_role = current_user.has_broker_agency_staff_role?
   end
@@ -60,6 +61,18 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end 
   end
 
+  def family_index
+    @q = params.permit(:q)[:q]
+    page_string = params.permit(:families_page)[:families_page]
+    page_no = page_string.blank? ? nil : page_string.to_i
+    total_families = Family.by_writing_agent_id(current_user.id)
+    @total = total_families.count
+    @families = total_families.page page_no
+    respond_to do |format|
+      format.html { render "insured/families/index" }
+      format.js {}
+    end
+  end
 
   def employers
     if current_user.has_broker_agency_staff_role?
