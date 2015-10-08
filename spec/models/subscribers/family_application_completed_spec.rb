@@ -322,6 +322,102 @@ describe Subscribers::FamilyApplicationCompleted do
       it "updates the address for the primary applicant's person" do
         expect(person_db.addresses).to be_truthy
       end
+
+      context "recieving a new payload with one family member removed" do
+        let(:minus_message) { { "body" => minus_xml } }
+        let(:minus_xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_4_member_family_minus_one_sample.xml")) }
+
+        it "should not log any errors" do
+          expect(subject).not_to receive(:log)
+          subject.call(nil, nil, nil, nil, minus_message)
+        end
+
+        it "should build a new household" do
+
+        end
+
+        # it "does should contain both tax households with one of them having an end on date" do
+        #   expect(family_db.active_household.tax_households.length).to eq 2
+        #   expect(family_db.active_household.tax_households.select{|th| th.effective_ending_on.present? }).to be_truthy
+        # end
+
+        # it "maintain the old household and tax households" do
+        #   expect(tax_household_db).to be_truthy
+        #   expect(tax_household_db.primary_applicant.family_member.person).to eq person
+        #   expect(tax_household_db.allocated_aptc).to eq 0
+        #   expect(tax_household_db.is_eligibility_determined).to be_truthy
+        #   expect(tax_household_db.current_max_aptc).to eq 71
+        #   expect(tax_household_db.effective_ending_on).to be_truthy
+        # end
+
+        # it "has 3 tax household members with primary person as primary tax household member" do
+        #   updated_tax_household = tax_household_db.household.latest_active_tax_household
+        #   expect(tax_household_db.tax_household_members.length).to eq 3
+        #   expect(tax_household_db.tax_household_members.map(&:is_primary_applicant?)).to eq [true,false,false]
+        #   expect(tax_household_db.tax_household_members.select{|thm| thm.is_primary_applicant?}.first.family_member).to eq person.primary_family.primary_family_member
+        # end
+
+        # it "has 2 coverage household with just the primary" do
+        #   expect(tax_household_db.household.coverage_households.length).to eq 2
+        #   expect(tax_household_db.household.coverage_households.first.coverage_household_members.length).to eq 1
+        #   expect(tax_household_db.household.coverage_households.first.coverage_household_members.select{|thm| thm.is_subscriber?}.first.family_member).to eq person.primary_family.primary_family_member
+        # end
+
+        it "updates all consumer role verifications" do
+          expect(consumer_role_db.fully_verified?).to be_truthy
+          expect(consumer_role_db.vlp_authority).to eq "curam"
+          expect(consumer_role_db.residency_determined_at).to eq primary.created_at
+          expect(consumer_role_db.citizen_status).to eq primary.verifications.citizen_status.split('#').last
+          expect(consumer_role_db.is_state_resident).to eq primary.verifications.is_lawfully_present
+          expect(consumer_role_db.is_incarcerated).to eq primary.person_demographics.is_incarcerated
+        end
+
+        it "updates the address for the primary applicant's person" do
+          expect(person_db.addresses).to be_truthy
+        end
+      end
+    end
+  end
+end
+
+
+describe '.search_person' do
+  let(:subject) {Subscribers::FamilyApplicationCompleted.new}
+  let(:verified_family_member) {
+    double(
+      person: double(name_last: db_person.last_name, name_first: db_person.first_name),
+      person_demographics: double(birth_date: db_person.dob, ssn: db_person.ssn)
+    )
+  }
+  let(:ssn_demographics) { double(birth_date: db_person.dob, ssn: '123123123') }
+
+  after(:each) do
+    DatabaseCleaner.clean
+  end
+
+  context "with a person with a first name, last name, dob and no SSN" do
+    let(:db_person) { Person.create!(first_name: "Joe", last_name: "Kramer", dob: "1993-03-30")}
+
+    it 'finds the person by last_name, first name and dob if both payload and person have no ssn' do
+      expect(subject.search_person(verified_family_member)).to eq db_person
+    end
+
+    it 'does not find the person if payload has ssn and person has ssn' do
+      allow(verified_family_member).to receive(:person_demographics).and_return(ssn_demographics)
+      expect(subject.search_person(verified_family_member)).to eq nil
+    end
+  end
+
+  context "with a person with a first name, last name, dob and ssn" do
+    let(:db_person) { Person.create!(first_name: "Jack",   last_name: "Weiner",   dob: "1943-05-14", ssn: "517994321")}
+
+    it 'finds the person by ssn name and dob if both payload and person have a ssn' do
+      expect(subject.search_person(verified_family_member)).to eq db_person
+    end
+
+    it 'does not find the person if payload has a different ssn from the person' do
+      allow(verified_family_member).to receive(:person_demographics).and_return(ssn_demographics)
+      expect(subject.search_person(verified_family_member)).to eq nil
     end
   end
 end
