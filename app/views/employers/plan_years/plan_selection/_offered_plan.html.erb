@@ -1,18 +1,4 @@
-<div class="row">
-<div class="col-xs-6">
-  <h1>Your Reference Plan</h1>
-</div>
-
-<div id="employer_cost_info_btn" class="col-xs-6" style="padding-top: 10px;">
-  <div class="btn btn-trans btn-right pull-right" style="margin-right: 0;">
-    Employee Detail Costs
-  </div>
-  <%= link_to "Employee Costs", employee_costs_employers_employer_profile_plan_years_path(@employer_profile), id: "employee_costs_link", class: "hidden" %>
-</div>
-</div>
-<%= render "employers/plan_years/employee_costs_modal" %>
-
-<div class="panel benefitgroup col-xs-12 referenceplan">
+<div class="panel benefitgroup col-xs-12">
   <section class="col-xs-6">
     <header class="row">
       <h5 style="color: #69A30D; font-size: 18px;"><%= @plan.name %></h5>
@@ -50,7 +36,7 @@
       </td>
       <td style="padding-left: 0;">
         <p style="text-transform: capitalize;">
-          <%= @plan.nationwide ? 'Nationwide' : 'DC Metro' %></span>
+          <%= @plan.nationwide ? 'Nationwide' : 'DC Metro' %>
         </p>
       </td>
 

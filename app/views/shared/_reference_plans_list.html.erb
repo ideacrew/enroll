@@ -1,133 +1,165 @@
+
 <% selected_kind_carrier = f.object.plan_option_kind == 'single_carrier' %>
 <% selected_kind_metal_level = f.object.plan_option_kind == 'metal_level' %>
 <% selected_kind_plan = f.object.plan_option_kind == 'single_plan' %>
-<h1>Select Your Plan Offering</h1>
-<h4 style="max-width: 660px;">Let your plan participants choose any plan they want offered by a single carrier, from a given metal level, or offer just a single plan.
-</h4>
-<br>
-<ul class="nav nav-tabs row">
-  <li role="presentation" class="col-xs-4">
-    <%= f.radio_button :plan_option_kind, "single_carrier" %>
-    <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
-    <i class="fa fa-circle-o"></i>
-    <i class="fa fa-dot-circle-o"></i>
-    By carrier
-    <% end %>
-  </li>
-  <li role="presentation" class="col-xs-4 <%= f.object.id %>">
-    <%= f.radio_button :plan_option_kind, "metal_level" %>
-    <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
-    <i class="fa fa-circle-o"></i>
-    <i class="fa fa-dot-circle-o"></i>
-    By metal level
-  </li>
-  <% end %>
-  <li role="presentation" class="col-xs-4">
-    <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
-    <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
-    <i class="fa fa-circle-o"></i>
-    <i class="fa fa-dot-circle-o"></i>
-    Single plan
-    <% end %>
-  </li>
-</ul>
-<div class="col-xs-12 plan-options" style="display: none;">
-  <div class="col-xs-12 carriers-tab" style="display: none;">
-    <br><br>
-    <h4>Let your plan participants choose any plan they want offered by a single carrier.<br/>It will not cost you more to let them choose.</h4>
-    <br/><br/>
-    <% @carrier_names.each_pair do |ck, cv| %>
-    <div class="col-xs-3" class="carriers">
-      <div class="col-xs-12 row">
-        <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_carrier", benefit_group:f.object.id ), remote: true do %>
-        <div class="col-xs-3">
-          <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
-          <%= f.label "carrier_for_elected_plan_#{ck}" do %>
-          <i class="fa fa-circle-o"></i>
-          <i class="fa fa-dot-circle-o"></i>
-          <% end %>
-        </div>
-        <% end %>
-        <div class="col-xs-9">
-          <div class="panel">
-            <div class="panel-heading">
-              <h3><%= cv %></h3>
-            </div>
-          </div>
-        </div>
-      </div>
+<% if @plan_year.new_record? %>
+  <h1>Select Your Plan Offering</h1>
+  <h4 style="max-width: 660px;">Let your plan participants choose any plan they want offered by a single carrier, from a given metal level, or offer just a single plan.</h4>
+  <br/>
+<% else %>
+<div class="edit-offering">
+
+  <h1>Edit Your Plan Offering</h1>
+
+  <h4 class="currently-offered" style="max-width: 660px; display: inline-block;">
+  </h4>
+
+  <h4 class="change-plan pull-right" style="display: inline-block;">Change Plan?</h4>
+<br/><br/>
+    <div class="offered-plan">
     </div>
-    <% end %>
-  </div>
-  <div class="col-xs-12 metals-tab" style="display: none;">
-    <br><br>
-    <h4>Let your plan participants choose any plan from a given metal level.<br/>It will not cost you more to let them choose.</h4>
-    <br/><br/>
-    <% Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
-    <div class="col-xs-3" class="metals">
-      <div class="col-xs-12 row">
-        <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, plan_option_kind: "metal_level", metal_level: kind, benefit_group:f.object.id ), remote: true do %>
-
-        <div class="col-xs-3">
-          <%= f.radio_button :metal_level_for_elected_plan, kind %>
-          <%= f.label "metal_level_for_elected_plan_#{kind}" do %>
-          <i class="fa fa-circle-o"></i>
-          <i class="fa fa-dot-circle-o"></i>
-          <% end %>
-        </div>
-        <% end %>
-
-        <div class="col-xs-9">
-          <div class="panel">
-            <div class="panel-heading">
-              <h3><%= kind %></h3>
-            </div>
-          </div>
-        </div>
-
-
-
-      </div>
-    </div>
-
-    <% end %>
-    <%= f.hidden_field :reference_plan_id, value: "", class: "ref-plan hidden-param" %>
-  </div>
-  <div class="col-xs-12 single-plan-tab" style="display: none;">
-    <br><br>
-    <h4>Choose a single plan for your plan participants.</h4>
-    <br/><br/>
-    <% @carrier_names.each_pair do |ck, cv| %>
-    <div class="col-xs-3" class="carriers">
-      <div class="col-xs-12 row">
-        <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_plan", benefit_group:f.object.id ), remote: true do %>
-
-        <div class="col-xs-3">
-          <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
-          <%= f.label "carrier_for_elected_plan_#{ck}" do %>
-          <i class="fa fa-circle-o"></i>
-          <i class="fa fa-dot-circle-o"></i>
-          <% end %>
-        </div>
-        <% end %>
-        <div class="col-xs-9">
-          <div class="panel">
-            <div class="panel-heading">
-              <h3><%= cv %></h3>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <% end %>
-  </div>
-  <div class="col-xs-12 row plans-tab" style="display: none;">
-    <br><br>
-  </div>
 </div>
-<div class="reference-plans col-xs-12" style="display: none;">
-  <div class="col-xs-12 loading">
-    <i class='fa fa-refresh fa-spin fa-2x'></i>
-    <span></span>
+<% end %>
+
+  <div class="reference-steps">
+    <% if @plan_year.new_record == false %>
+    <h1>Edit Your Plan Offering</h1>
+    <h4 class="currently-offering" style="max-width: 660px; display: inline-block;">
+    </h4>
+
+    <h4 class="cancel-plan-change pull-right" style="display: inline-block;">Cancel</h4>
+
+    <br/><br/>
+    <% end %>
+
+  <ul class="nav nav-tabs row">
+    <li role="presentation" class="col-xs-4">
+      <%= f.radio_button :plan_option_kind, "single_carrier" %>
+      <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
+      <i class="fa fa-circle-o"></i>
+      <i class="fa fa-dot-circle-o"></i>
+      By carrier
+      <% end %>
+    </li>
+    <li role="presentation" class="col-xs-4 <%= f.object.id %>">
+      <%= f.radio_button :plan_option_kind, "metal_level" %>
+      <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
+      <i class="fa fa-circle-o"></i>
+      <i class="fa fa-dot-circle-o"></i>
+      By metal level
+    </li>
+    <% end %>
+    <li role="presentation" class="col-xs-4">
+      <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
+      <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
+      <i class="fa fa-circle-o"></i>
+      <i class="fa fa-dot-circle-o"></i>
+      Single plan
+      <% end %>
+    </li>
+  </ul>
+  <div class="col-xs-12 plan-options" style="display: none;">
+    <div class="col-xs-12 carriers-tab" style="display: none;">
+      <br><br>
+      <h4>Let your plan participants choose any plan they want offered by a single carrier.<br/>It will not cost you more to let them choose.</h4>
+      <br/>
+      <% @carrier_names.each_pair do |ck, cv| %>
+      <div class="col-xs-3" class="carriers">
+        <div class="col-xs-12 row">
+          <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_carrier", benefit_group:f.object.id ), remote: true do %>
+          <div class="col-xs-3">
+            <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
+            <%= f.label "carrier_for_elected_plan_#{ck}" do %>
+            <i class="fa fa-circle-o"></i>
+            <i class="fa fa-dot-circle-o"></i>
+            <% end %>
+          </div>
+          <% end %>
+          <div class="col-xs-9">
+            <div class="panel">
+              <div class="panel-heading">
+                <h3><%= cv %></h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% end %>
+    </div>
+    <div class="col-xs-12 metals-tab" style="display: none;">
+      <br><br>
+      <h4>Let your plan participants choose any plan from a given metal level.<br/>It will not cost you more to let them choose.</h4>
+      <br/>
+      <% Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
+      <div class="col-xs-3" class="metals">
+        <div class="col-xs-12 row">
+          <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, plan_option_kind: "metal_level", metal_level: kind, benefit_group:f.object.id ), remote: true do %>
+
+          <div class="col-xs-3">
+            <%= f.radio_button :metal_level_for_elected_plan, kind %>
+            <%= f.label "metal_level_for_elected_plan_#{kind}" do %>
+            <i class="fa fa-circle-o"></i>
+            <i class="fa fa-dot-circle-o"></i>
+            <% end %>
+          </div>
+          <% end %>
+
+          <div class="col-xs-9">
+            <div class="panel">
+              <div class="panel-heading">
+                <h3><%= kind %></h3>
+              </div>
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+
+      <% end %>
+      <% if @plan_year.new_record? %>
+        <%= f.hidden_field :reference_plan_id, value: "", class: "ref-plan hidden-param" %>
+      <% else %>
+        <%= f.hidden_field :reference_plan_id, class: "ref-plan hidden-param" %>
+      <% end %>
+    </div>
+    <div class="col-xs-12 single-plan-tab" style="display: none;">
+      <br><br>
+      <h4>Choose a single plan for your plan participants.</h4>
+      <br/>
+      <% @carrier_names.each_pair do |ck, cv| %>
+      <div class="col-xs-3" class="carriers">
+        <div class="col-xs-12 row">
+          <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_plan", benefit_group:f.object.id ), remote: true do %>
+
+          <div class="col-xs-3">
+            <%= f.radio_button :carrier_for_elected_plan, "#{ck}" %>
+            <%= f.label "carrier_for_elected_plan_#{ck}" do %>
+            <i class="fa fa-circle-o"></i>
+            <i class="fa fa-dot-circle-o"></i>
+            <% end %>
+          </div>
+          <% end %>
+          <div class="col-xs-9">
+            <div class="panel">
+              <div class="panel-heading">
+                <h3><%= cv %></h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% end %>
+    </div>
+    <div class="col-xs-12 row plans-tab" style="display: none;">
+      <br><br>
+    </div>
+  </div>
+  <div class="reference-plans col-xs-12" style="display: none;">
+    <div class="col-xs-12 loading">
+      <i class='fa fa-refresh fa-spin fa-2x'></i>
+      <span></span>
+    </div>
   </div>
 </div>
