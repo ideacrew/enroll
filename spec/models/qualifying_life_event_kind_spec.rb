@@ -63,6 +63,31 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
       expect(moved_qlek.is_moved_to_dc?).to eq true
     end
 
+    context "individual?" do
+      it "return true" do
+        qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
+        expect(qle.individual?).to eq true
+      end
+
+      it "return false" do
+        qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "shop")
+        expect(qle.individual?).to eq false
+      end
+    end
+
+    context "family_structure_changed?" do
+      it "return true" do
+        ["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].each do |title|
+          qle = FactoryGirl.build(:qualifying_life_event_kind, title: title)
+          expect(qle.family_structure_changed?).to eq true
+        end
+      end
+
+      it "return false" do
+        expect(moved_qlek.family_structure_changed?).to eq false
+      end
+    end
+
     context "employee_gaining_medicare" do
       let(:qle) {QualifyingLifeEventKind.new}
 

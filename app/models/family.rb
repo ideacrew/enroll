@@ -378,6 +378,18 @@ class Family
     latest_household.try(:enrolled_hbx_enrollments)
   end
 
+  def is_blocked_by_qle_and_assistance?(qle=nil, assistance=nil)
+    return false if assistance.blank? or qle.blank?
+
+    max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
+
+    if max_aptc > 0 and qle.individual? and qle.family_structure_changed?
+      true
+    else
+      false
+    end
+  end
+
   def self.by_special_enrollment_period_id(special_enrollment_period_id)
     Family.where("special_enrollment_periods._id" => special_enrollment_period_id)
   end
