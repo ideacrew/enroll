@@ -51,6 +51,7 @@ module Forms
         @employer_profile = existing_org.employer_profile
       else
         org = create_new_organization
+        org.save!
         @employer_profile = org.employer_profile
       end
       create_employer_staff_role(current_user, @employer_profile)
