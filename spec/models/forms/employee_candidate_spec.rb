@@ -176,6 +176,17 @@ describe "match a person in db" do
       subject.last_name.downcase!
       expect(subject.match_person).to eq db_person
     end
+
+    context "with a person who has no ssn but an employer staff role" do
+      let(:employer_staff_role) { EmployerStaffRole.create(person: db_person, employer_profile_id: "1") }
+
+      it 'matches person by last name, first name and dob' do
+        db_person.employer_staff_roles << employer_staff_role
+        db_person.save!
+        allow(search_params).to receive(:ssn).and_return("517991234")
+        expect(subject.match_person).to eq db_person
+      end
+    end
   end
 
   context "with a person with a first name, last name, dob and ssn" do
