@@ -24,6 +24,7 @@ RSpec.describe Insured::FamiliesController do
   describe "GET home" do
     before :each do
       allow(family).to receive(:enrolled_hbx_enrollments).and_return(hbx_enrollments)
+      allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
       allow(user).to receive(:has_employee_role?).and_return(true)
       allow(user).to receive(:has_consumer_role?).and_return(true)
       allow(user).to receive(:last_portal_visited=).and_return("test.com")

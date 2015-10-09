@@ -1,5 +1,5 @@
 module LegacyImporters
-  class ShopPolicy
+  class IndividualPolicy
     attr_reader :errors
 
     def initialize(data_row)
@@ -18,29 +18,34 @@ module LegacyImporters
         @person = locate_head_of_family(d_hash)
         @family = locate_family(@person)
         @plan = find_plan(d_hash)
-        @employer = find_employer(d_hash)
         @applicant_lookup = construct_applicant_lookup(@family)
         @household = @family.households.first
         @coverage_houselhold = @household.coverage_households.first
-        @plan_year = @employer.plan_years.first
-        @benefit_group = @plan_year.benefit_groups.first
-        @census_record = find_roster_entry(@employer, @person, @benefit_group)
         @member_properties = construct_member_properties(d_hash, @applicant_lookup, @person)
-        props_hash = enrollment_properties_hash(@benefit_group, @census_record, @plan, @coverage_household, @member_properties)
-        true
+        @consumer_role = create_consumer_role(@person)
+        props_hash = enrollment_properties_hash(@consumer_role, @plan, @coverage_household, @member_properties)
         @household.hbx_enrollments.create!(props_hash)
+        true
       end
       sc.call(@data_hash)
     end
 
-    def enrollment_properties_hash(bg, ce, plan, ch, member_props)
+    def create_consumer_role(person)
+      cr = person.consumer_role
+      if cr.nil?
+        cr = ConsumerRole.create!(:person => person, :is_applicant => true)
+      end
+      cr
+    end
+
+    def enrollment_properties_hash(cr, plan, ch, member_props)
       e_on = member_props.map { |mp| mp[:coverage_start] }.min
       {
+           :applied_aptc_amount => @aptc,
+           :consumer_role_id => cr.id,
            :hbx_id => @hbx_id,
            :hbx_enrollment_members_attributes => member_props,
-           :kind => "employer_sponsored",
-           :benefit_group_id => bg.id,
-           :benefit_group_assignment_id => ce.active_benefit_group_assignment.id,
+           :kind => "individual",
            :plan_id => plan.id,
            :effective_on => e_on,
            :aasm_state => "coverage_enrolled"
@@ -65,12 +70,6 @@ module LegacyImporters
       end
     end
 
-    def find_roster_entry(employer, person, bg)
-      CensusEmployee.by_benefit_group_ids([bg.id]).by_ssn(person.ssn).first.tap do |er|
-        throw :missing_object, "Could not match employee for FEIN #{employer.fein}, SSN #{person.ssn}" if er.nil?
-      end
-    end
-
     def construct_applicant_lookup(family)
       applicant_lookup = {}
       family.family_members.each do |app|
@@ -81,7 +80,7 @@ module LegacyImporters
 
     def extract_policy_properties
       @hbx_id = @data_hash["hbx_id"]
-      @employer_contribution = @data_hash["employer_contribution"]
+      @aptc = @data_hash["applied_aptc"]
       @premium_total = @data_hash["pre_amt_tot"]
       @tot_res_amount = @data_hash["tot_res_amount"]
     end
@@ -102,15 +101,6 @@ module LegacyImporters
       @hios = data["plan"]["hios_id"]
       @active_year = data["plan"]["active_year"]
       Plan.where({hios_id: @hios, active_year: @active_year.to_i}).first
-    end
-
-    def find_employer(data)
-      @employer_fein = data["employer_fein"]
-      org = Organization.where(fein: @employer_fein).first
-      throw :missing_object, "No organization with fein: #{@employer_fein}" if org.nil?
-      org.employer_profile.tap do |ep|
-        throw :missing_object, "No employer_profile for organization with fein: #{@employer_fein}" if ep.nil?
-      end
     end
   end
 end

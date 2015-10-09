@@ -29,7 +29,7 @@ module Forms
       if ssn.blank? && no_ssn == "0"
         errors.add(:base, 'Check No SSN box or enter a valid SSN')
       end
-    end        
+    end
 
     def dob=(val)
       @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
@@ -40,20 +40,30 @@ module Forms
         Person.where({
                        :dob => dob,
                        :encrypted_ssn => Person.encrypt_ssn(ssn)
-                   }).first
+                   }).first || match_ssn_employer_person
       else
         Person.where({
                        :dob => dob,
                        :last_name => /^#{last_name}$/i,
                        :first_name => /^#{first_name}$/i,
-                   }).first 
+                   }).first
       end
+    end
+
+    def match_ssn_employer_person
+      potential_person = Person.where({
+                       :dob => dob,
+                       :last_name => /^#{last_name}$/i,
+                       :first_name => /^#{first_name}$/i,
+                   }).first
+      return potential_person if potential_person.present? && potential_person.employer_staff_roles?
+      nil
     end
 
     def uniq_ssn
       return true if ssn.blank?
       same_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn))
-      if same_ssn.present? && same_ssn.first.try(:user) 
+      if same_ssn.present? && same_ssn.first.try(:user)
         errors.add(:base,
                   "This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
       end
