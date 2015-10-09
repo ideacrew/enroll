@@ -11,7 +11,6 @@
   $("input#plan_year_open_enrollment_end_on_jq_datepicker_plain_field").val("<%= @open_enrollment_dates[:open_enrollment_end_on].to_s(:db) %>");
   if(window.location.href.indexOf("edit") > -1) {
     $('.recommend .btn-primary').remove();
-    alert('edit');
   } else {
   }
 <% else %>

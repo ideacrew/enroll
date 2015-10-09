@@ -1,5 +1,5 @@
 $('#<%= @location_id %> .offered-plan').html("<%= escape_javascript(render(partial: "employers/plan_years/plan_selection/offered_plan")).html_safe %>")
-$('#<%= @location_id %> .currently-offered').html('You currently offer <%= @plan.name %>. To change your reference plan, begin by selecting "Change Plan?" to right and then select your plan options.');
+$('#<%= @location_id %> .currently-offered').html('You currently offer <%= @plan.name %>. To change your reference plan, begin by selecting "Change Plan?" to the right and then select your plan options.');
 
 $('#<%= @location_id %> .currently-offering').html('You currently offer <%= @plan.name %>. You can reselect your reference plan below, or click "Cancel" to keep your existing plan.');
 
