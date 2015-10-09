@@ -47,7 +47,8 @@ module LegacyImporters
            :hbx_enrollment_members_attributes => member_props,
            :kind => "individual",
            :plan_id => plan.id,
-           :effective_on => e_on
+           :effective_on => e_on,
+           :aasm_state => "coverage_enrolled"
       }
     end
 
