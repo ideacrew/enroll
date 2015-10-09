@@ -80,7 +80,7 @@ class Family
 #    ViewFunctions::Family.run_after_save_search_update(self.id)
   end
 
-  def coverage_vaived?
+  def coverage_waived?
     enrolled_hbx_enrollments.to_a.all?{|e| e.aasm_state == 'inactive'}
   end
 
