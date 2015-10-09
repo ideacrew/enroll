@@ -24,7 +24,7 @@ RSpec.describe Products::QhpController, :type => :controller do
   end
 
   context "GET summary" do
-    let(:hbx_enrollment){ double("HbxEnrollment", id: double("id"), kind: "shop") }
+    let(:hbx_enrollment){ double("HbxEnrollment", id: double("id")) }
     let(:benefit_group){ double("BenefitGroup") }
     let(:reference_plan){ double("Plan") }
     let(:qhp) { [double("Qhp", plan: double("Plan"))] }
@@ -37,10 +37,24 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(Products::Qhp).to receive(:by_hios_id_and_active_year).and_return(qhp)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
     end
-    it "should return summary of a plan" do
+    it "should return summary of a plan for shop" do
+      allow(hbx_enrollment).to receive(:kind).and_return("shop")
       sign_in(user)
-      get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015"
+      get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "shop"
       expect(response).to have_http_status(:success)
+      expect(assigns(:market_kind)).to eq "employer_sponsored"
+      expect(assigns(:benefit_group)).to be_truthy
+      expect(assigns(:reference_plan)).to be_truthy
+    end
+
+    it "should return summary of a plan for ivl" do
+      allow(hbx_enrollment).to receive(:kind).and_return("individual")
+      sign_in(user)
+      get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "individual"
+      expect(response).to have_http_status(:success)
+      expect(assigns(:market_kind)).to eq "individual"
+      expect(assigns(:benefit_group)).to be_falsey
+      expect(assigns(:reference_plan)).to be_falsey
     end
   end
 
