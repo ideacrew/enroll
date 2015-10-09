@@ -254,6 +254,7 @@ module HbxImport
       plan_year.open_enrollment_end_on = open_enrollment_end
       plan_year.fte_count = census_count
       plan_year.aasm_state = "active"
+      plan_year.imported_plan_year = true
     end
 
     def build_benefit_groups
