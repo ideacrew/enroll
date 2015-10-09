@@ -42,7 +42,8 @@ module LegacyImporters
            :benefit_group_id => bg.id,
            :benefit_group_assignment_id => ce.active_benefit_group_assignment.id,
            :plan_id => plan.id,
-           :effective_on => e_on
+           :effective_on => e_on,
+           :aasm_state => "coverage_enrolled"
       }
     end
 
