@@ -50,7 +50,7 @@
         <div class="col-xs-4">
           <div class="family-plan-selection">
             <div class="status">
-              <%= render partial: "enrollment_progress", locals: {step: 2, hbx_enrollment: hbx_enrollment} %>
+              <%= render partial: "enrollment_progress", locals: {step: hbx_enrollment.status_step} %>
             </div>
           </div>
         </div>
