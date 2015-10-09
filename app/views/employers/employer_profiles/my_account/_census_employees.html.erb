@@ -108,9 +108,11 @@
     </div>
     <% else %>
     <div class="row">
-    <h4 class="starter">You haven't added any employees to your roster. Click "Add New Employee" below to add your first one.</h4>
+    <h4 class="starter">You haven't added any employees to your roster. Click "Add New Employee" to add your first one. Or, upload you entire employee roster from a csv file by clicking "Upload Employee Roster" below.</h4>
     <br/>
     <%= link_to 'Add New Employee', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-primary btn-br"  %>
+    <%= link_to 'Upload Employee Roster', new_employers_employer_profile_census_employee_path(@employer_profile, modal: 'upload'), remote: 'true', class: "btn btn-primary btn-br" %>
+
 
   </div>
 <% end %>

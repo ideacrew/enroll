@@ -89,7 +89,121 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 
 $(document).ready(function () {
+  // js that runs on edit view
+  if(window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
 
+    //alert('edit');
+    $('.add_fields').remove();
+    $('.reference-steps').hide();
+    $('.planyear-add-tab .controls:last').show();
+
+    $('.change-plan').on('click', function() {
+      $(this).closest('.benefit-group-fields').find('.reference-steps input').prop('checked', false);
+      $(this).closest('.edit-offering').hide();
+      $(this).closest('.benefit-group-fields').find('.reference-steps').show();
+      original_ref = $(this).closest('.benefit-group-fields').find('.ref-plan').val();
+    });
+    $('.cancel-plan-change').on('click', function() {
+
+      $(this).closest('.benefit-group-fields').find('.edit-offering').show();
+      $(this).closest('.benefit-group-fields').find('.reference-steps input').prop('checked', false);
+      $(this).closest('.benefit-group-fields').find('.selected-plan').hide();
+      $(this).closest('.benefit-group-fields').find('.plan-options').hide();
+      $(this).closest('.benefit-group-fields').find('.nav-tabs li').removeClass('active');
+      $(this).closest('.benefit-group-fields').find('.ref-plan').val(original_ref);
+      $(this).closest('.benefit-group-fields').find('.select-reference').hide();
+      $(this).closest('.benefit-group-fields').find('.reference-plans').hide();
+      $(this).closest('.reference-steps').hide();
+
+
+    });
+      start_on = $("#plan_year_start_on").val().substr(0,4);
+      $('.plan-options a').each(function() {
+        var url = $(this).attr('href');
+        $(this).attr('href', url+"&start_on="+start_on);
+      });
+      $("#plan_year_start_on").on('change', function() {
+        start_on = $(this).val().substr(0,4);
+        $('.plan-options a').each(function() {
+          var url = $(this).attr('href');
+          $(this).attr('href', url+"&start_on="+start_on);
+        });
+
+      });
+
+
+
+
+
+      function calcOfferedPlanContributions(url, location) {
+        var reference_plan_id = $('#'+location+' .ref-plan').val();
+        console.log(reference_plan_id);
+        var plan_option_kind = $("#"+location+" .nav-tabs input[type=radio]:checked").val();
+        console.log(plan_option_kind);
+        var location_id = location;
+
+        if (reference_plan_id == "" || reference_plan_id == undefined) {
+          return
+        }
+
+        var start_date = $("#plan_year_start_on").val();
+        if (start_date == "") {
+          return
+        }
+
+        var relation_benefits = {
+          "0": {
+            "relationship": "employee",
+            "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_premium_pct').val(),
+            "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').is(":checked")
+          },
+          "1": {
+            "relationship": "spouse",
+            "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_premium_pct').val(),
+            "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').is(":checked")
+          },
+          "2": {
+            "relationship": "domestic_partner",
+            "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_premium_pct').val(),
+            "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_offered').is(":checked")
+          },
+          "3": {
+            "relationship": "child_under_26",
+            "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_premium_pct').val(),
+            "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').is(":checked")
+          },
+          "4": {
+            "relationship": "child_26_and_over",
+            "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_premium_pct').val(),
+            "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_offered').is(":checked")
+          }
+        }
+
+        $.ajax({
+          type: "GET",
+          url: url,
+          dataType: 'script',
+          data: {
+            "start_on": $("#plan_year_start_on").val(),
+            "reference_plan_id": reference_plan_id,
+            "plan_option_kind": plan_option_kind,
+            "relation_benefits": relation_benefits,
+            "location_id": location_id
+
+          }
+        }).done(function() {
+        });
+      }
+      $('.benefit-group-fields').each(function() {
+        calcOfferedPlanContributions($('a#calc_offered_plan_contributions_link').data('href'), $(this).attr('id'));
+      });
+
+
+
+  } else {
+      $('.nav-tabs li input[type=radio]').prop('checked', false);
+      $('#choose-coverage > * select').val("");
+  }
   // check that dob entered is not a future date
   $(document).on('blur', '#jq_datepicker_ignore_person_dob, #family_member_dob_, #jq_datepicker_ignore_organization_dob, #jq_datepicker_ignore_census_employee_dob', function() {
     var entered_dob = $(this).val();
