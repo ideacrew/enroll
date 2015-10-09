@@ -6,7 +6,10 @@
 
           <h3>Confirm Your Plan Selection</h3>
           <p>Your current plan selection is displayed below. Click the Previous button if you want to change your selection. Click Purchase button to complete your enrollment.</p>
-          <p>Your enrollment is not complete until you purchase your plan selection below.</p>
+          <% if @enrollment.employee_role.present? %>
+          <% else %>
+            <p>Your enrollment is not complete until you purchase your plan selection below.</p>
+          <% end %>
           <p>
             <% if @employer_profile.present? %>
             <strong><%= @employer_profile.legal_name %></strong><br>

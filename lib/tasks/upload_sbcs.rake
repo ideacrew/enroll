@@ -16,7 +16,7 @@ namespace :sbc do
     csv = CSV.open(file_path, "w") do |csv|
       plans.each do |plan|
         next unless plan.sbc_document
-        csv << [plan.id, plan.hios_id, plan.active_year, plan.sbc_document.identifier, plan.sbc_document.title]
+        csv << [plan.name, plan.hios_id, plan.active_year, plan.sbc_document.identifier, plan.sbc_document.title]
       end
     end
     puts "CSV written #{file_path} with schema plan.id, plan.hios_id, plan.active_year, plan.sbc_document.identifier, plan.sbc_document.title"

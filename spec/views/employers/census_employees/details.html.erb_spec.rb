@@ -13,6 +13,7 @@ RSpec.describe "employers/census_employees/_details.html.erb" do
     assign(:benefit_group_assignment, benefit_group_assignment)
     assign(:hbx_enrollment, hbx_enrollment)
     assign(:benefit_group, benefit_group)
+    assign(:plan, plan)
     allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
   end
 
@@ -94,11 +95,11 @@ RSpec.describe "employers/census_employees/_details.html.erb" do
       render template: "employers/census_employees/_details.html.erb"
       expect(rendered).to match /child_26_and_over/
     end
-    
+
     it "should get the Owner info" do
       render template: "employers/census_employees/_details.html.erb"
       expect(rendered).to match /Owner:/
     end
-  
+
   end
 end

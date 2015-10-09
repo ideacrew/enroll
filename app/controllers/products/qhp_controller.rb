@@ -71,7 +71,7 @@ class Products::QhpController < ApplicationController
     @new_params = params.permit(:standard_component_id, :hbx_enrollment_id)
     hbx_enrollment_id = @new_params[:hbx_enrollment_id]
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
-    @market_kind = params[:market_kind] == "shop" ? "employer_sponsored" : "individual"
+    @market_kind = (params[:market_kind] == "shop" || @hbx_enrollment.kind == "shop") ? "employer_sponsored" : "individual"
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
   end
 
