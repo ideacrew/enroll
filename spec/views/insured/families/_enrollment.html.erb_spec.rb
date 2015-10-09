@@ -5,14 +5,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:plan) {FactoryGirl.build(:plan)}
     let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
-                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: nil)}
+                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: nil, employer_profile: nil)}
 
     before :each do
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
 
     it "should display the title" do
-      expect(rendered).to match /#{plan.active_year} Health Coverage/
+      expect(rendered).to match /#{plan.active_year} health Coverage/
       expect(rendered).to match /DCHL/
     end
 
@@ -30,14 +30,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:plan) {FactoryGirl.build(:plan)}
     let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
-                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: double, applied_aptc_amount: 100)}
+                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: double, applied_aptc_amount: 100, employer_profile: nil)}
 
     before :each do
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment
     end
 
     it "should display the title" do
-      expect(rendered).to match /#{plan.active_year} Health Coverage/
+      expect(rendered).to match /#{plan.active_year} health Coverage/
       expect(rendered).to match /DCHL/
     end
 
