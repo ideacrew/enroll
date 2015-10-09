@@ -24,7 +24,6 @@ RSpec.describe "insured/thankyou.html.erb" do
     it 'should display the correct plan selection text' do
       expect(rendered).to have_selector('h3', text: 'Confirm Your Plan Selection')
       expect(rendered).to have_selector('p', text: 'Your current plan selection is displayed below. Click the Previous button if you want to change your selection. Click Purchase button to complete your enrollment.')
-      expect(rendered).to have_selector('p', text: 'Your enrollment is not complete until you purchase your plan selection below.')
     end
 
     it 'should render coverage_information partial' do

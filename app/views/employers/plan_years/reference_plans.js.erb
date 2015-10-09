@@ -4,7 +4,7 @@ $('#benefit-group-<%= @benefit_group.to_s %> .reference-plans').html("<%= escape
 $('#benefit-group-<%= @benefit_group.to_s %> .reference-plans').css({ "height": "450px", "y-overflow": "scroll" })
 $('#benefit-group-<%= @benefit_group.to_s %> .reference-plans').show();
 
-$('#benefit-group-<%= @benefit_group.to_s %> .reference-plan .col-xs-3').on('click', function() {
+$('#benefit-group-<%= @benefit_group.to_s %> .reference-plan').on('click', function() {
   if ($(this).find('input[type=radio]').is(':checked')) {
   } else {
       $(this).find('input[type=radio]').prop('checked', true )
@@ -14,3 +14,10 @@ $('#benefit-group-<%= @benefit_group.to_s %> .reference-plan .col-xs-3').on('cli
 
 });
 $('.controls').show();
+var reference_plan_count = $('#benefit-group-<%= @benefit_group.to_s %> .reference-plan').length
+var reference_plan_remainder = reference_plan_count % 4;
+if (reference_plan_remainder > 0 ) {
+  $('#benefit-group-<%= @benefit_group.to_s %> .reference-plan').slice(-reference_plan_remainder).css({"border-bottom":"none" });
+} else {
+
+}

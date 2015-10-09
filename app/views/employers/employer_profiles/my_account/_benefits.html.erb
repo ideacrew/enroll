@@ -131,39 +131,48 @@
         </td>
       </tr>
     </table>
-    <div class="col-xs-12 row plan-details">
+    <div class="plan-details">
+      <% if number_to_currency(bg.monthly_employer_contribution_amount) > '0' %>
       <hr>
-      <div class="col-xs-4 row">
+      <div class="col-xs-4">
         <span>Employer Estimated Maximum Monthly Cost</span>
         <h2><%= number_to_currency(bg.monthly_employer_contribution_amount) %></h2>
       </div>
       <div class="col-xs-8">
         <table>
           <tr>
-            <th></th>
-            <th>Minimum</th>
-            <th>Maximum</th>
+            <th colspan="2"></th>
+            <th>Min</th>
+            <th>Max</th>
           </tr>
           <tr>
-            <td>Total Estimated Monthly Cost for Plan Participants</td>
+            <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
             <td><%= number_to_currency(bg.monthly_min_employee_cost) %></td>
             <td><%= number_to_currency(bg.monthly_max_employee_cost) %></td>
           </tr>
 
 
+
         </table>
       </div>
+      <% else %>
+        <br/>
+        <h4 class="starter">After you have added an employee, you can view your estimated monthly costs here. To add your first employee, <%= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees')%>.</h4>
+      <% end %>
     </div>
   </div>
-  <% end %>
-  <div class="pull-left bottom-mgn-xs">
-    <% if plan_year.draft? && @current_plan_year.nil? %>
-    <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
-    <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans right"%>
-    <% elsif plan_year.draft? %>
-    <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans right"%>
 
-    <% end %>
+
+      <% end %>
+      <div class="pull-left bottom-mgn-xs">
+
+      <% if plan_year.draft? && @current_plan_year.nil? %>
+      <%= link_to "Publish Plan Year", employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-trans" %>
+      <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans right"%>
+      <% elsif plan_year.draft? %>
+      <%= link_to "Edit Plan Year", edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-trans right"%>
+
+      <% end %>
   </br></br></br>
   </div>
   <div class="col-xs-12"><br><br></div>

@@ -209,13 +209,14 @@
           &.table-functions {
             padding: 0;
             text-align: right;
+
               .fa {
                 display: none;
                 cursor: pointer;
-                margin: 0;
-              &:last-of-type {
-                padding-right: 10px;
-              }
+                margin: 0 5px 0 0;
+                &.fa-trash-o {
+                  padding-right: 20px;
+                }
             }
           }
           &:hover {
@@ -237,6 +238,10 @@
       width: auto;
       text-align: center;
       padding: 10px 0;
+    }
+    table tr td {
+      padding: 0;
+      text-align: center;
     }
 
 
@@ -262,6 +267,9 @@
     .fa {
       color: #007bc4;
       cursor: pointer;
+    }
+    .plan-title {
+      border-bottom: none;
     }
     .row-form-wrapper {
       &:first-of-type {
@@ -353,10 +361,20 @@
       }
     }
   }
+
   .benefits-tab, .home-tab {
 
     .plan-details {
       display: none;
+      .col-xs-4 {
+        padding-left: 0;
+      }
+      .col-xs-8 {
+        padding-right: 0;
+        table {
+          table-layout: fixed;
+        }
+      }
     }
     .details {
       cursor: pointer;
@@ -410,6 +428,8 @@
         font-size: 16px;
       }
       table {
+        table-layout: fixed;
+
         tr {
           th {
             font-weight: normal;
@@ -420,6 +440,7 @@
           td {
             color: #333333;
             font-size: 16px;
+            word-wrap: break-word;
             &:last-of-type {
               padding-left: 0;
             }
@@ -458,17 +479,16 @@
   }
 
   .benefits-setup-tab {
+
+    .selectric-hide-select {
+      display: none;
+    }
     .remove_fields {
       display: none;
     }
-    .benefit-group-offset label.title {
-      position: relative;
-      margin-left: 0;
-      margin-top: 0;
-    }
+
     .row-form-wrapper {
       margin: 0;
-      padding: 15px 0 20px;
 
       &.active {
         box-shadow: none;
@@ -476,6 +496,7 @@
       .form-group-lg .form-control .form-control {
         input {
           font-weight: normal !important;
+          height: auto;
         }
       }
 
@@ -515,12 +536,12 @@
 
       input {
         font-size: 18px !important;
-        padding: 10px 0 0 !important;
+        padding: 0 0 !important;
         color: #444;
         font-family: 'Open Sans', sans-serif !important;
         line-height: 28px;
         &.hidden-param {
-          padding: 10px !important;
+          padding: 5px !important;
         }
 
         &:focus {
@@ -530,7 +551,7 @@
       .selectric {
         p.label {
           font-size: 18px !important;
-          margin-top: 5px;
+          margin: 0;
           text-transform: capitalize;
         }
       }
@@ -550,7 +571,7 @@
       .row-form-wrapper.heading {
         text-transform: uppercase;
         font-size: 14px;
-        padding: 10px 0;
+        padding: 10px 0 0 0;
 
         color: rgb(131, 135, 128);
         border-bottom: none;
@@ -597,6 +618,14 @@
             border-top: none;
 
 
+        }
+      }
+      .benefits-fields {
+        .row-form-wrapper {
+          padding: 15px 0;
+          &:last-of-type {
+            display: none;
+          }
         }
       }
     .row-form-wrapper {
@@ -744,14 +773,17 @@
 
       .loading {
         position: relative;
-        padding-top: 25px;
+        padding-top: 30px;
         top: 50%;
         text-align: center;
       }
       .reference-plan {
-        height: 150px;
-        padding: 25px 0 0 0;
-        border-bottom: solid 1px #b7b7b7;
+        height: 155px;
+        padding: 0;
+        cursor: pointer;
+        padding-top: 20px;
+        border-bottom: solid 1px #d7d7d7;
+
         &:hover {
           border-bottom: solid 1px #007bc4;
         }
@@ -762,9 +794,11 @@
           -webkit-box-shadow: none;
           box-shadow: none;
           border: none;
+          background-color: transparent;
           .panel-heading {
             padding: 0 0 5px 0;
             color: #333333;
+            background-color: transparent;
             h3 {
               font-size: 12px;
               weight: 700;
@@ -791,6 +825,8 @@
           display: none;
         }
         input[type=radio] + label {
+          position: relative;
+          top: 50%;
 
           &>i {
             font-size: 28px;
@@ -909,6 +945,7 @@
       border-left: none;
       border-right: none;
       margin-top: 5px;
+      margin-right: 5px;
       &.mtz {
         margin-top: 0;
       }
@@ -1258,6 +1295,9 @@
     }
 
   }
+  .planyear-add-tab {
+    margin-bottom: 50px;
+  }
   .premium-reports-tab {
     form {
       display: inline;
@@ -1271,6 +1311,29 @@
   }
 
 
+}
+#add_employee_action {
+  table {
+    &.table-striped {
+      table-layout: fixed;
+      overflow-x: hidden;
+      margin: 0;
+      width: 100%;
+      padding: 0;
+      th {
+        padding: 0;
+        text-align: center;
+        font-size: 12px;
+
+        font-weight: bold;
+        text-transform: capitalize;
+        padding-bottom: 5px;
+      }
+      td {
+
+      }
+    }
+  }
 }
 .selected-plan {
   .col-xs-12 {
@@ -1387,5 +1450,20 @@
   }
   table {
     margin-bottom: 10px;
+  }
+}
+.edit-offering, .reference-steps {
+  h4.change-plan, h4.cancel-plan-change {
+    color: #007bc4;
+    &:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+}
+.benefit-group-fields {
+  padding-bottom: 50px;
+  &:last-of-type {
+    padding-bottom: 0;
   }
 }
