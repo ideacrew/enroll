@@ -80,6 +80,10 @@ class Family
 #    ViewFunctions::Family.run_after_save_search_update(self.id)
   end
 
+  def coverage_vaived?
+    enrolled_hbx_enrollments.to_a.all?{|e| e.aasm_state == 'inactive'}
+  end
+
   def remove_family_search_record
     Searches::FamilySearch.where("id" => self.id).delete_all
   end
