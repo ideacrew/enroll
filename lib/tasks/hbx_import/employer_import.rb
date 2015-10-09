@@ -243,7 +243,7 @@ module HbxImport
     def build_employer_profile
       self.employer_profile = organization.build_employer_profile
       employer_profile.entity_kind = "c_corporation" # TODO: fix, this should probably come from the data
-      employer_profile.aasm_state = "binder_paid"
+      # employer_profile.aasm_state = "binder_paid"
     end
 
     def build_plan_year
@@ -253,8 +253,8 @@ module HbxImport
       plan_year.open_enrollment_start_on = open_enrollment_start
       plan_year.open_enrollment_end_on = open_enrollment_end
       plan_year.fte_count = census_count
-      plan_year.aasm_state = "active"
-      plan_year.imported_plan_year = true
+      # plan_year.aasm_state = "active"
+      # plan_year.imported_plan_year = true
     end
 
     def build_benefit_groups
