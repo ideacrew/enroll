@@ -3,7 +3,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_hbx_staff_role, except: [:welcome, :show, :request_help, :staff_index, :assister_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox, :configuration, :show]
-  before_action :authorize_for, except: [:edit, :update, :destroy]
+  before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   before_action :authorize_for_instance, only: [:edit, :update, :destroy]
 
   # GET /exchanges/hbx_profiles

@@ -13,18 +13,6 @@ class HbxProfilePolicy < ApplicationPolicy
     index?
   end
 
-  def staff_index?
-    index?
-  end
-
-  def assister_index?
-    index?
-  end
-
-  def request_help?
-    index?
-  end
-
   def family_index?
     index?
   end
