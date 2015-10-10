@@ -38,10 +38,10 @@
 <script>
    // function subst() {
    //    var vars = {};
-      
+
    //    // explode the URL query string
    //    var x = document.location.search.substring(1).split('&');
-      
+
    //    // loop through each query string segment and get keys/values
    //    for (var i in x)
    //    {
@@ -51,7 +51,7 @@
 
    //    // an array of all the parameters passed into the footer file
    //    var x = ['frompage', 'topage', 'page', 'webpage', 'section', 'subsection', 'subsubsection'];
-      
+
    //    // each page will have an element with class 'section' from the body of the footer HTML
    //    var y = document.getElementsByClassName('footer-section');
    //    var m = document.getElementsByClassName('mpi-indicator');
@@ -76,7 +76,7 @@
 <body onload="subst()">
   <table class="footer-section" style="background:rgb(198,217,241); padding:3px 15px;" border="1" bordercolor="#000">
     <tr>
-      <td style="padding:3px 10px; font-size:11px; line-height:15px;"><strong style="color:rgb(54,95,145);">Questions?</strong> Call DC Health Link Customer Service at (855) 532-5465/TTY (855) 532-5465 or go online to <a href="www.DCHealthLink.com">www.DCHealthLink.com</a>. You may also contact DC Health Link Customer Service or go online to search for a broker or in-person assister to help you.</td>
+      <td style="padding:3px 10px; font-size:11px; line-height:15px;"><strong style="color:rgb(54,95,145);">Questions?</strong> Call <%= HbxProfile::CallCenterName %> at <%= HbxProfile::CallCenterPhoneNumber %>/TTY <%= HbxProfile::CallCenterPhoneNumber %> or go online to <a href="www.DCHealthLink.com">www.DCHealthLink.com</a>. You may also contact <%= HbxProfile::CallCenterName %> or go online to search for a broker or in-person assister to help you.</td>
     </tr>
   </table>
 

@@ -40,7 +40,7 @@
     $(".interaction-choice-control-value-agreement-disagree").click(function(){
       $(".interaction-click-control-continue").attr("disabled", true);
         // $(".disagree_placeholder_text").show();
-        alert("Please contact DC Healthlink at 1-855-532-5465 for more info");
+        alert("Please contact DC Healthlink at <%= HbxProfile::CallCenterPhoneNumber %> for more info");
       });
   });
 </script>
