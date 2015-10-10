@@ -1,17 +1,15 @@
 <thead>
   <tr>
-    <th>First Name</th>
-    <th>Last Name</th>
-    <th>email</th>
-    <th>Request Help </th>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Signup </th>
   </tr>
 </thead>
 
 <tbody>
   <% @staff.each do |staff| %>
     <tr>
-      <td><%= staff.first_name%></td>
-      <td><%= staff.last_name %></td>
+      <td><%= staff.first_name + " " + staff.last_name %></td>
       <td><%= staff.try(:user).try(:email) %></td>
       <td><a href='#' data-assister='<%=staff.id%>' class='help_button'> Request Help </a></td>
     </tr>

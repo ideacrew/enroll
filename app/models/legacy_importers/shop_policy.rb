@@ -35,7 +35,7 @@ module LegacyImporters
     end
 
     def enrollment_properties_hash(bg, ce, plan, ch, member_props)
-      e_on = member_props.map { |mp| mp[:coverage_start] }.min
+      e_on = member_props.map { |mp| mp[:coverage_start_on] }.min
       {
            :hbx_id => @hbx_id,
            :hbx_enrollment_members_attributes => member_props,
