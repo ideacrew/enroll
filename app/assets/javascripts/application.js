@@ -92,8 +92,14 @@ $(document).ready(function () {
   // js that runs on edit view
   if(window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
 
+    // give slider a starting place based on persisted form
+    var slider_starting_values = $('.benefits-fields input.hidden-param').each(function() {
+      $(this).closest('.form-group').find('.slider').attr('data-slider-value', $(this).val());
+      $(this).closest('.form-group').find('.slide-label').html($(this).val()+"%");
+    });
+
     //alert('edit');
-    $('.add_fields').remove();
+    // $('.add_fields').remove();
     $('.reference-steps').hide();
     $('.planyear-add-tab .controls:last').show();
 
@@ -151,31 +157,39 @@ $(document).ready(function () {
           return
         }
 
+        var premium_pcts = $('#'+location+' .benefits-fields input.hidden-param').map(function() {
+          return $(this).val();
+        }).get();
+
+        var is_offered = $('#'+location+' .benefits-fields .checkbox label > input[type=checkbox]').map(function() {
+          return $(this).is(":checked");
+        }).get();
+
         var relation_benefits = {
           "0": {
             "relationship": "employee",
-            "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_premium_pct').val(),
-            "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_0_offered').is(":checked")
+            "premium_pct": premium_pcts[0],
+            "offered": is_offered[0]
           },
           "1": {
             "relationship": "spouse",
-            "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_premium_pct').val(),
-            "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_1_offered').is(":checked")
+            "premium_pct": premium_pcts[1],
+            "offered": is_offered[1]
           },
           "2": {
             "relationship": "domestic_partner",
-            "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_premium_pct').val(),
-            "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_2_offered').is(":checked")
+            "premium_pct": premium_pcts[2],
+            "offered": is_offered[2]
           },
           "3": {
             "relationship": "child_under_26",
-            "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_premium_pct').val(),
-            "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_3_offered').is(":checked")
+            "premium_pct": premium_pcts[3],
+            "offered": is_offered[3]
           },
           "4": {
             "relationship": "child_26_and_over",
-            "premium_pct": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_premium_pct').val(),
-            "offered": $('#plan_year_benefit_groups_attributes_0_relationship_benefits_attributes_4_offered').is(":checked")
+            "premium_pct": 0,
+            "offered": false
           }
         }
 

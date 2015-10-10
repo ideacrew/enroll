@@ -132,7 +132,8 @@
       </tr>
     </table>
     <div class="plan-details">
-      <% if number_to_currency(bg.monthly_employer_contribution_amount) > '0' %>
+
+      <% if bg.census_employees.present? %>
       <hr>
       <div class="col-xs-4">
         <span>Employer Estimated Maximum Monthly Cost</span>
