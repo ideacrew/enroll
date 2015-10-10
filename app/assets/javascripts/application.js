@@ -99,7 +99,7 @@ $(document).ready(function () {
     });
 
     //alert('edit');
-    $('.add_fields').remove();
+    // $('.add_fields').remove();
     $('.reference-steps').hide();
     $('.planyear-add-tab .controls:last').show();
 
