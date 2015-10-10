@@ -195,6 +195,10 @@ class Family
     seps.reduce([]) { |list, event| list << event if event.is_active?; list }
   end
 
+  def earliest_effective_sep
+    special_enrollment_periods.order_by(:effective_on.asc).to_a.detect{ |sep| sep.is_active? }
+  end
+
   # List of SEPs active for this Application Group today, or passed date
   def active_seps
     special_enrollment_periods.find_all { |sep| sep.is_active? }
