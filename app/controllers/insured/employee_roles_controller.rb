@@ -45,7 +45,7 @@ class Insured::EmployeeRolesController < ApplicationController
     if @employee_role.present? && @employee_role.try(:census_employee).try(:employee_role_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
       session[:person_id] = @person.id
-      create_sso_account(current_user, @employee_role.person, 15,"individual") do
+      create_sso_account(current_user, @employee_role.person, 15,"employee") do
         build_nested_models
         respond_to do |format|
           format.html { redirect_to :action => "edit", :id => @employee_role.id }
