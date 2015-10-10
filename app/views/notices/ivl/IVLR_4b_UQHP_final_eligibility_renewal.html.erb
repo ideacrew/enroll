@@ -99,7 +99,7 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["You must continue to pay your premium for your 2015 plan to be renewed for 2016. <strong>If you miss a payment or do not
     pay the full amount each month, your coverage will not be automatically renewed.</strong> If you believe your 2015 plan has been terminated and you
-    want to enroll in plan for 2016, please call DC Health Link Customer Service at 1-855-532-5465.<br><br>
+    want to enroll in plan for 2016, please call DC Health Link Customer Service at #{HbxProfile::CallCenterPhoneNumber}.<br><br>
     Your monthly premium amount will be different in 2016. <strong>If you have auto-pay set up for your health insurance plan(s),
     you must contact your health insurance plan to update the amount withdrawn every month.</strong> If you do not make an update,
     your plan may be terminated."],
@@ -138,7 +138,7 @@
     content: "You can use a Social Security card to verify the Social Security Number(s) you provided to us. If you do not have a
     Social Security Number or cannot remember you Social Security Number, we can help you obtain one. You may not need to provide a
     Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact
-    DC Health Link Customer Service at 1-855-532-5465.  "} %>
+    DC Health Link Customer Service at #{HbxProfile::CallCenterPhoneNumber}.  "} %>
 
     <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "<span #{@style_color_text}>[IF Citizenship/Immigration Unverified]</span>
@@ -415,7 +415,7 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["You have the right to terminate your health insurance coverage. You can terminate your plan in your account
-  on <a href='http://www.DCHealthLink.com'>www.DCHealthLink.com</a> or by calling DC Health Link Customer Service toll-free at 1-855-532-5465.
+  on <a href='http://www.DCHealthLink.com'>www.DCHealthLink.com</a> or by calling DC Health Link Customer Service toll-free at #{HbxProfile::CallCenterPhoneNumber}.
   You must tell us that you want us to terminate your plan at least 14 days before you want your plan to end.<br><br>
 
   Your health insurance may also be terminated without your request if you don’t pay your premiums or if our data indicates
@@ -428,7 +428,7 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already,
     you can create one by going to <a href='http://www.DCHealthLink.com'>www.DCHealthLink.com</a>. You can get help with logging in or creating an account by calling
-    DC Health Link Customer Service toll-free at 1-855-532-5465."],
+    DC Health Link Customer Service toll-free at #{HbxProfile::CallCenterPhoneNumber}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {

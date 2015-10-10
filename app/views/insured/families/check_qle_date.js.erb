@@ -7,7 +7,7 @@ $('#qle-details #qle-date-chose').addClass('hidden');
 
   <% case %>
   <% when (@effective_on_options.present? && @effective_on_options.is_a?(Array)) %>
-    var mecNotice = "Because your other health insurance is ending in the middle of the month, you can opt to have your coverage start on <%= @qle_date.beginning_of_month %> instead of <%= (@qle_date + 1.month).beginning_of_month %>. Please call us at 1-855-532-5465 by <%= (@qle_date.beginning_of_month - 1.day) %> to use this option";
+    var mecNotice = "Because your other health insurance is ending in the middle of the month, you can opt to have your coverage start on <%= @qle_date.beginning_of_month %> instead of <%= (@qle_date + 1.month).beginning_of_month %>. Please call us at <%= HbxProfile::CallCenterPhoneNumber %> by <%= (@qle_date.beginning_of_month - 1.day) %> to use this option";
     $("#qle-details .error-text").html(mecNotice);
 
     $('#qle-details .error-info').removeClass('hidden');
@@ -17,7 +17,7 @@ $('#qle-details #qle-date-chose').addClass('hidden');
     $(".effective_on_kinds").html("<%= escape_javascript(render 'effective_on_kind_fields') %>");
   <% end %>
 <% else %>
-  var errorNotice = "The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact DC Health Link's Customer Care Center: 1-855-532-5465.";
+  var errorNotice = "The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact <%= HbxProfile::CallCenterName %>: <%= HbxProfile::CallCenterPhoneNumber %>.";
   $("#qle-details .error-text").html(errorNotice);
 
   $('#qle-details .error-info').removeClass('hidden');

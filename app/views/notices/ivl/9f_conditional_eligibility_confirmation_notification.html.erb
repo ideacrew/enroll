@@ -24,7 +24,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "The following person(s) qualify for health coverage through DC Health Link."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { 
+<%= render partial: 'notices/shared/paragraph', :locals => {
   content: notice.verified_individuals.map(&:full_name).join("<br>")
 } %>
 
@@ -34,7 +34,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "The following person(s) conditionally qualify for health coverage through DC Health Link. "} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { 
+<%= render partial: 'notices/shared/paragraph', :locals => {
   content: notice.unverified_individuals.map(&:full_name).join("<br>")
 } %>
 
@@ -70,14 +70,14 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<u>#{notice.enrollments[0].plan_name}</u>"} %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["Your Total Monthly Premium Cost:
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
     $ [Plan 1 Consumer Monthly Premium]"] } %>
 <% notice.other_enrollments.each do |enrollment| %>
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<u>#{enrollment.plan_name}</u>"} %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["Your Total Monthly Premium Cost:
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
     $ [Plan N Consumer Monthly Premium]"] } %>
@@ -86,7 +86,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "The fastest way to pay the premium is by calling the health plan or dental plan directly at the numbers listed below.  <u>Call these numbers to ensure your premium is paid even if you have not received an invoice.</u>"} %>
 
-<%= render partial: 'notices/shared/table', locals: { 
+<%= render partial: 'notices/shared/table', locals: {
   headers: [],
   rows: [['CareFirst', '(855) 444-3119'],
          ['Kaiser', '(866) 475-3925'],
@@ -108,13 +108,13 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>Documents Showing Social Security Number</i></strong>. The Social Security Administration could not confirm that the Social Security Number provided for the following applicant household members is correct:"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { 
+<%= render partial: 'notices/shared/paragraph', :locals => {
   content: notice.ssn_unverified.map(&:full_name).join("<br>")
 } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "Under federal law, 45 C.F.R. §155.310(a)(3), we are required to obtain the Social Security Number of every person who is applying for DC Health Link. We will only use your Social Security Number to verify the information you told us on your application. We will check your information in the District and Federal databases, and the databases of other District, Federal agencies, and a consumer reporting agency."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can use a Social Security card to verify the Social Security Number(s) you provided to us.  If you do not have a Social Security Number or cannot remember you social security number, we can help you obtain one. You may not need to provide a Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact DC Health Link Customer Service at 1-855-532-5465."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can use a Social Security card to verify the Social Security Number(s) you provided to us.  If you do not have a Social Security Number or cannot remember you social security number, we can help you obtain one. You may not need to provide a Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact DC Health Link Customer Service at #{HbxProfile::CallCenterPhoneNumber}."} %>
 
 <% end %>
 
@@ -123,7 +123,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>Documents of Citizenship or Immigration Status</i></strong>. We need proof of the U.S. citizenship or immigration status for the following applicant household members is correct:"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { 
+<%= render partial: 'notices/shared/paragraph', :locals => {
   content: notice.citizenship_unverified.map(&:full_name).join("<br>")
 } %>
 
@@ -131,22 +131,22 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<u>Primary documentation</u>:  (Only One (1) is needed) "} %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   [["U.S. Passport", ["<i>Note</i>: Expired passports are acceptable."]],
    "Certificate of Naturalization",
    "Certificate of Citizenship",
    "Consular report of Birth Abroad of U.S. Citizen",
    "A valid Driver’s License from a state that requires proof of citizenship and verification of Social Security Number prior to issuance of the license",
    ["A tribal document issued by a federally-recognized Indian Tribe, which must:",
-      ["Identify the Tribe issuing the document;", 
-        "Identify the individual by name; and", 
+      ["Identify the Tribe issuing the document;",
+        "Identify the individual by name; and",
         "Confirm the individual’s enrollment in or affiliation with the Tribe.",
         "<strong>Examples:</strong> Tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document"]]
   ] } %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "<u>Secondary documentation</u>:  (Must Present One (1) of the following, along with ID)"} %>
 
-  <%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
+  <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["A U.S. birth certificate showing birth in one of the 50 states, DC, Guam, American Samoa, Swain’s Island, Puerto Rico, the Virgin Islands, or the Commonwealth of the Northern Mariana Islands.  If born in the Puerto Rico, the Virgin Islands, or CNMI prior to the time these areas became part of the U.S., the individual will satisfy the citizenship requirement if he or she is a collectively naturalized citizen.",
     "A Northern Marianas ID Card, issued to a collectively naturalized citizen, who was born in the Commonwealth of the Northern Mariana Islands  before November 4, 1986",
     "A certification of Report of Birth, issued to U.S. citizens born outside the U.S.",
@@ -168,7 +168,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<b>The documents that you may be able to use to verify your immigration status include, but are not limited to:</b>"} %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["Lawful permanent resident card (DHS Form I-551)",
     "Arrival/Departure Record (DHS Form I-94)",
     "Temporary I-551 Stamp in a foreign passport or on an I-94 card",
@@ -189,13 +189,13 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>Documents Showing D.C. Residency</i></strong>. A document that shows that the following household members live in the District of Columbia:"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { 
+<%= render partial: 'notices/shared/paragraph', :locals => {
   content: notice.residency_unverified.map(&:full_name).join("<br>")
 } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "This can include;"} %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["Current Driver License",
     "Current Lease (signed within the last year)",
     "Current Rent Receipt/Mortgage Statement",
@@ -209,18 +209,18 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>American Indian Status</i></strong>. On your application, you indicated the following individual(s) were American Indian."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { 
+<%= render partial: 'notices/shared/paragraph', :locals => {
   content: notice.indian_conflict.map(&:full_name).join("<br>")
 } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "Please provide one of the following documents to confirm this status."} %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
-  [["Any formal documentation from a tribe, Indian Health Services, or the Bureau of Indian Affairs that verifies American Indian status. Examples of such verifications include, but are not limited to the following:", 
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+  [["Any formal documentation from a tribe, Indian Health Services, or the Bureau of Indian Affairs that verifies American Indian status. Examples of such verifications include, but are not limited to the following:",
       ["A document issued by a federally-recognized American Indian/Alaska Native tribe, such as an enrollment or membership card, a tribal census document, or a document issued by a tribe indicating the person’s affiliation with the Tribe;",
         "A document issued by the Indian Health Services indicating that the person is eligible for Indian Health Services as an American Indian; and",
         "A document obtained from the Bureau of Indian Affairs recognizing the person as an American Indian."]]] } %>
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   [["For Indians born outside of the United States, we will accept the following documents:",
       ["A Form I-94 with a notation of “S1-3”;",
         "I-551 Permanent Resident Card stamped “S1-3” ;",
@@ -232,7 +232,7 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You can send the necessary documents either online, through U.S. Postal mail, or in-person."], heading: 'How to Send the Documents Requested', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["Online:  Log into your account on DCHealthLink.com. You can upload a scanned copy of the document.",
     "U.S. Postal Mail  -   DC Health Link<br>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -247,26 +247,26 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["We need the documents above <b>by [Date=Date of Notice +95 days]</b> in order to make a final decision on your eligibility for your health plan. If you do not provide the documents by this deadline, we will assume that our records are correct. <u>Your health insurance coverage may be terminated.</u>"], heading: 'How Soon We Need Your Documents', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "If you think you will not be able to submit the requested documentation <b>by [Date=Date of Notice +95 days]</b> due to circumstances outside of your control, please call DC Health Link Customer Service toll-free at 1-855-532-5465 (TTY/TDD 711).  If you truly have a special need, a Department of Human Services representative will work with you to complete the verification process."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "If you think you will not be able to submit the requested documentation <b>by [Date=Date of Notice +95 days]</b> due to circumstances outside of your control, please call DC Health Link Customer Service toll-free at #{HbxProfile::CallCenterPhoneNumber} (TTY/TDD 711).  If you truly have a special need, a Department of Human Services representative will work with you to complete the verification process."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You must report any changes that might affect you or your household member’s health coverage such as if:"], heading: 'Reporting Changes', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["You move;",
     "Your immigration status changes;",
     "You or a family member becomes incarcerated.",] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "45 C.F.R. § 155.330(b)"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "To report changes, you can log in to your account on www.DCHealthLink.com or call DC Health Link Customer Service toll free at 1-855-532-5465."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "To report changes, you can log in to your account on www.DCHealthLink.com or call DC Health Link Customer Service toll free at #{HbxProfile::CallCenterPhoneNumber}."} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You will be able to change plans during the annual open enrollment period at the end of each year.  45 C.F.R. §155.410(e). You can get the date of the next open enrollment period by going to www.DCHealthLink.com or calling DC Health Link Customer Service at 1-855-532-5465. If you have a change in circumstances during [coverage year], you may also qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include: "], heading: 'Changing Plans', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You will be able to change plans during the annual open enrollment period at the end of each year.  45 C.F.R. §155.410(e). You can get the date of the next open enrollment period by going to www.DCHealthLink.com or calling DC Health Link Customer Service at #{HbxProfile::CallCenterPhoneNumber}. If you have a change in circumstances during [coverage year], you may also qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include: "], heading: 'Changing Plans', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["Getting married",
    ["Changes in your household size",
-      ["New Birth or Adoption", 
-       "Death", 
+      ["New Birth or Adoption",
+       "Death",
        "New tax dependents"]],
    "A change in income for you or others in your household.",
    "A change in the immigration status of your household members",
@@ -275,11 +275,11 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "45 C.F.R. §155.420"} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You have the right to terminate your health insurance coverage. You can terminate your coverage by logging into your account on www.DCHealthLink.com or by calling DC Health Link Customer Service toll-free at 1-855-532-5465. You need to tell us at least fourteen (14) days before you want your coverage to end."], heading: 'Ending Your Health Insurance Coverage', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You have the right to terminate your health insurance coverage. You can terminate your coverage by logging into your account on www.DCHealthLink.com or by calling DC Health Link Customer Service toll-free at #{HbxProfile::CallCenterPhoneNumber}. You need to tell us at least fourteen (14) days before you want your coverage to end."], heading: 'Ending Your Health Insurance Coverage', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "Your health insurance may also be terminated without your request if you don’t pay your premiums or if our data indicates that the information you put on your application has changed and you are no longer eligible for coverage. If your health insurance is going to be terminated without your request because it has been determined that you are no longer eligible for coverage, you will receive a notice in advance telling you the basis for the decision and you will be provided with information about how to contest the decision."} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already, you can create one by going to www.DCHealthLink.com. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free at 1-855-532-5465."], heading: 'Your Secure User Account', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already, you can create one by going to www.DCHealthLink.com. You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free at #{HbxProfile::CallCenterPhoneNumber}."], heading: 'Your Secure User Account', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<b>Annual Renewal</b>: DC Health Link will notify you during the fall of each year if additional information is needed from you to renew your health insurance.  You can respond with new information if you believe any of the information we used is wrong. You can also pick a new plan during this time period if you want. 45 C.F.R. §155.335."], heading: 'Other Information', sub_heading: ''} %>
 

@@ -91,7 +91,7 @@
           <% if show_residency_alert %>
           <div class='row top-pd'>
             <div class="col-sm-12">
-              <p>Since <%= @person.full_name %> is not a resident of the District of Columbia she/he is not eligible to purchase a plan through DC Health Link. Other members may still be eligible to enroll. Please call us at 1-855-532-5465 to learn about other health insurance options for <%= @person.full_name %>.</p>
+              <p>Since <%= @person.full_name %> is not a resident of the District of Columbia she/he is not eligible to purchase a plan through DC Health Link. Other members may still be eligible to enroll. Please call us at <%= HbxProfile::CallCenterPhoneNumber %> to learn about other health insurance options for <%= @person.full_name %>.</p>
             </div>
           </div>
           <% end %>

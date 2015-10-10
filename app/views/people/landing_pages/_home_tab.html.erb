@@ -30,7 +30,7 @@
                 <%= render partial: 'people/landing_pages/member_address', locals: {person: @person} %>
               </div>
             </div>
-            
+
           </div>
           <div class="row bottom">
             <p class="head">
@@ -51,7 +51,7 @@
             </ul>
           </div>
         </div>
-        
+
         <div class="col-md-6 col-sm-6 col-xs-12 right-side">
           <div class="row no-buffer">
           <p class="head">
@@ -59,7 +59,7 @@
             <span></span>
           </p>
             <ul class="list-group panel panel-default panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-            <% if @qualifying_life_events %> 
+            <% if @qualifying_life_events %>
               <% @qualifying_life_events.each_with_index do |qle, index| %>
                 <li class="list-group-item qle-item">
                   <div class="row panel-heading" role="tab" id="heading1">
@@ -92,7 +92,7 @@
                               <p class="success-text"><strong>Success!</strong> You have created a special enrollment period.<br>Click continue go to the add your new family member and select your plan.</p><div class="text-center"><a href="#profile" role="tab" data-toggle="tab" aria-controls="profile" aria-expanded="true" class="btn btn-success btn-lg add_success">Continue</a></div>
                             </div>
                             <div class="error-info hidden">
-                              <p class="error-text">The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact DC Health Link's Customer Care Center: 1-855-532-5465.</p><div class="text-center"><a href="#" class="btn btn-danger btn-lg marriage_back">Back</a></div>
+                              <p class="error-text">The date you submitted does not qualify for special enrollment.<br>Please double check the date or contact <%= HbxProfile::CallCenterName %>: <%= HbxProfile::CallCenterPhoneNumber %></p><div class="text-center"><a href="#" class="btn btn-danger btn-lg marriage_back">Back</a></div>
                             </div>
                           </div>
                         <% else %>

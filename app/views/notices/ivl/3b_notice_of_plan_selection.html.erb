@@ -74,7 +74,7 @@
   contents: ["Important information is stored in your account on the DC Health Link website.
     If you don’t have an account already, you can create one by going to <a href='http://www.DCHealthLink.com'>www.DCHealthLink.com</a>.
     You can get help with logging in or creating an account by calling DC Health Link Customer
-    Service toll-free at 1-855-532-5465."],
+    Service toll-free at #{HbxProfile::CallCenterPhoneNumber}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -144,7 +144,7 @@
   your income is higher than expected, you will have to pay back the extra premium tax credits you received. If your income is
   lower than expected, you will receive a refund for the difference. If you know your income is changing, it may be in your best
   interest to increase or decrease your premium tax credit amount. If you would like to make a change to your premium tax credit amount,
-  call the DC Health Link Customer Service toll-free at 1-855-532-5465."} %>
+  call the DC Health Link Customer Service toll-free at #{HbxProfile::CallCenterPhoneNumber}."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["[PICK ONE]"],
@@ -201,7 +201,7 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["You will be able to change plans during the annual open enrollment period at the end of each year.
     45 C.F.R. §155.410(e). You can get the date of the next open enrollment period by going to <a href='http://www.DCHealthLink.com'>www.DCHealthLink.com</a>
-    or calling DC Health Link Customer Service at 1-855-532-5465. If you have a change in circumstances during [coverage year], you may also
+    or calling DC Health Link Customer Service at #{HbxProfile::CallCenterPhoneNumber}. If you have a change in circumstances during [coverage year], you may also
     qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include: "],
     heading: 'Changing Plans', sub_heading: ''} %>
 
@@ -219,7 +219,7 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["You have the right to terminate your health insurance coverage. You can terminate your coverage by
     logging into your account on <a href='http://www.DCHealthLink.com'>www.DCHealthLink.com</a> or by calling DC Health Link Customer Service
-    toll-free at 1-855-532-5465. You need to tell us at least fourteen (14) days before you want your coverage to end.<br><br>
+    toll-free at #{HbxProfile::CallCenterPhoneNumber}. You need to tell us at least fourteen (14) days before you want your coverage to end.<br><br>
    Your health insurance may also be terminated without your request if you don’t pay your premiums or if our data indicates
    that the information you put on your application has changed and you are no longer eligible for coverage.
    If your health insurance is going to be terminated without your request because it has been determined that you are no
