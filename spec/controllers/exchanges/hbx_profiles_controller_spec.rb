@@ -9,6 +9,7 @@ RSpec.describe Exchanges::HbxProfilesController do
     let(:hbx_profile) { double("HbxProfile")}
 
     before :each do
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
@@ -45,6 +46,7 @@ RSpec.describe Exchanges::HbxProfilesController do
     let(:person) { double("Person")}
 
     it "renders new" do
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       sign_in(user)
       get :new
@@ -60,6 +62,7 @@ RSpec.describe Exchanges::HbxProfilesController do
 
     it "renders inbox" do
       allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
@@ -80,6 +83,7 @@ RSpec.describe Exchanges::HbxProfilesController do
 
     before :each do
       sign_in(user)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(Organization).to receive(:new).and_return(organization)
       allow(organization).to receive(:build_hbx_profile).and_return(hbx_profile)
@@ -99,15 +103,20 @@ RSpec.describe Exchanges::HbxProfilesController do
   end
 
   describe "#update" do
-    let(:user) { double("User")}
-    let(:person) { double("Person")}
+    let(:user) { FactoryGirl.create(:user, :hbx_staff) }
+    let(:person) { double }
     let(:new_hbx_profile){ HbxProfile.new }
-    let(:hbx_profile) { double("HbxProfile", id: double("id")) }
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
     let(:hbx_profile_params) { {hbx_profile: new_hbx_profile.attributes, id: hbx_profile.id }}
+    let(:hbx_staff_role) {double}
 
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:person).and_return person
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(HbxProfile).to receive(:find).and_return(hbx_profile)
+      allow(person).to receive(:hbx_staff_role).and_return hbx_staff_role
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return hbx_profile
       sign_in(user)
     end
 
@@ -127,10 +136,15 @@ RSpec.describe Exchanges::HbxProfilesController do
   describe "#destroy" do
     let(:user){ double("User") }
     let(:person){ double("Person") }
-    let(:hbx_profile){ double("hbx_profile", id: double("id")) }
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:hbx_staff_role) {double}
 
     it "destroys hbx_profile" do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:person).and_return person
+      allow(person).to receive(:hbx_staff_role).and_return hbx_staff_role
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return hbx_profile
       allow(HbxProfile).to receive(:find).and_return(hbx_profile)
       allow(hbx_profile).to receive(:destroy).and_return(true)
       sign_in(user)
@@ -146,6 +160,7 @@ RSpec.describe Exchanges::HbxProfilesController do
 
     it "should render the new template" do
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       sign_in(user)
       get :new
       expect(response).to have_http_status(:redirect)
@@ -161,6 +176,7 @@ RSpec.describe Exchanges::HbxProfilesController do
 
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
@@ -182,6 +198,8 @@ RSpec.describe Exchanges::HbxProfilesController do
 
     before :each do
       allow(user).to receive(:has_csr_role?).and_return(true)
+      allow(user).to receive(:has_role?).with(:csr).and_return true
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return false
       allow(user).to receive(:person).and_return(person)
       sign_in(user)
       get :show
@@ -200,6 +218,7 @@ RSpec.describe Exchanges::HbxProfilesController do
 
     before :each do
       expect(controller).to receive(:find_hbx_profile)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
@@ -222,6 +241,7 @@ RSpec.describe Exchanges::HbxProfilesController do
 
     before :each do
       expect(controller).to receive(:find_hbx_profile)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
@@ -245,6 +265,7 @@ RSpec.describe Exchanges::HbxProfilesController do
     before :each do
       expect(controller).to receive(:find_hbx_profile)
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
@@ -263,6 +284,7 @@ RSpec.describe Exchanges::HbxProfilesController do
 
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       sign_in(user)
     end
 

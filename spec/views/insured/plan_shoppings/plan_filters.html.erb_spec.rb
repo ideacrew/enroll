@@ -41,6 +41,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_aptc, 330)
       assign(:hbx_enrollment, hbx_enrollment)
       assign(:tax_household, true)
+      assign(:selected_aptc_pct, 0.85)
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
 
@@ -60,6 +61,11 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       expect(rendered).to match /APTC/
       expect(rendered).to match /Available/
       expect(rendered).to match /330/
+    end
+
+    it "should have selected aptc pct amount" do
+      expect(rendered).to match /85/
+      expect(rendered).to have_selector("input#aptc-used[value='280.50']")
     end
   end
 
