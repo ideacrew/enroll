@@ -61,12 +61,12 @@ $(document).on('change', '.dependent_info input.dob-picker', function(){
   year = parseInt(element[2]);
   month = parseInt(element[0]);
   day = parseInt(element[1]);
-  var mydate = new Date();
+  var mydate = dchbx_enroll_date_of_record();
   mydate.setFullYear(year + 26,month-1,day);
   var target = $(this).parents('.dependent_info').find('select');
   selected_option_index = $(target).get(0).selectedIndex
 
-  if (mydate > new Date()){
+  if (mydate > dchbx_enroll_date_of_record()){
     data = "<option value=''>SELECT RELATIONSHIP</option><option value='spouse'>Spouse</option><option value='domestic_partner'>Domestic partner</option><option value='child_under_26'>Child</option>";
   }else{
     data = "<option value=''>SELECT RELATIONSHIP</option><option value='spouse'>Spouse</option><option value='domestic_partner'>Domestic partner</option><option value='child_26_and_over'>Child</option>";
