@@ -12,6 +12,8 @@
         <th>HBX ID</th>
         <th>Family Ct</th>
         <th>Registered?</th>
+        <th></th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -19,7 +21,7 @@
       <% families.each do |family| %>
       <% pp = family.primary_applicant.person %>
   
-      <tr>
+      <tr id="family_<%= family.id %>">
         <td >
           <%=pp.full_name%> <br/>
           <%= link_to 'paper', resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'paper'), class: 'btn btn-normal'%>
@@ -30,6 +32,9 @@
         <td><%= pp.hbx_id %></td>
         <td><%= family.active_family_members.size %></td>
         <td><%= pp.user.present? ? "Yes" : "No" %></td>
+        <td class='unblock'>
+          <%= link_to "Unblock", unblock_insured_family_path(family), method: :post, class: 'btn btn-default btn-sm', remote: true if family.aptc_blocked? %>
+        </td>
         <% if (pp.user.present? || pp.emails.present?) && current_user.person.hbx_staff_role %>
           <td><%= link_to 'Send Secure Message'.html_safe,
                new_insured_inbox_path(id: family.primary_applicant.person.id,

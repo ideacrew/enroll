@@ -86,6 +86,9 @@ Rails.application.routes.draw do
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
       get 'new'
+      member do
+        post 'unblock'
+      end
 
       collection do
         get 'home'

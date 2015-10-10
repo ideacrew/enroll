@@ -55,7 +55,7 @@ private
   # Use callbacks to share common setup or constraints between actions.
   def set_family
     set_current_person
-    @family = @person.primary_family
+    @family = @person.primary_family if @person.present?
     # @family = Family.find(params[:id])
   end
 

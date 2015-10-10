@@ -957,6 +957,16 @@ describe Family, "is_blocked_by_qle_and_assistance" do
     expect(family.is_blocked_by_qle_and_assistance?(qle)).to eq false
   end
 
+  it "return true when status is aptc_block" do
+    family.status = "aptc_block"
+    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq true
+  end
+
+  it "return false when status is aptc_block" do
+    family.status = "aptc_unblock"
+    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
+  end
+
   context "when max_aptc greater than 0" do
     before :each do
       allow(family).to receive(:latest_household).and_return household
@@ -985,5 +995,37 @@ describe Family, "is_blocked_by_qle_and_assistance" do
     allow(family).to receive(:latest_household).and_return household
     allow(eligibility_determination).to receive(:max_aptc).and_return 0
     expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
+  end
+end
+
+describe Family, "aptc_blocked?" do
+  let(:family) {Family.new}
+
+  it "return false" do
+    expect(family.aptc_blocked?).to eq false
+  end
+
+  it "return true" do
+    family.status = "aptc_block"
+    expect(family.aptc_blocked?).to eq true
+  end
+end
+
+describe Family, "update_aptc_block_status?" do
+  let(:family) {Family.new}
+  let(:household) {double(latest_active_tax_household: double(latest_eligibility_determination: eligibility_determination))}
+  let(:eligibility_determination) {double(max_aptc: 0)}
+
+  it "set aptc_block when max_aptc more than 0" do
+    allow(family).to receive(:latest_household).and_return household
+    allow(eligibility_determination).to receive(:max_aptc).and_return 100
+    allow(family).to receive(:is_under_special_enrollment_period?).and_return true
+    family.update_aptc_block_status
+    expect(family.status).to eq "aptc_block"
+  end
+
+  it "set status with blank" do
+    family.update_aptc_block_status
+    expect(family.status).to eq ""
   end
 end

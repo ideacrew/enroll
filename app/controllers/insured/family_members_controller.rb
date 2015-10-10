@@ -37,6 +37,7 @@ class Insured::FamilyMembersController < ApplicationController
     doc_params = params_clean_vlp_documents
     @dependent = Forms::FamilyMember.new(params.require(:dependent).permit!)
     if @dependent.save
+      @dependent.family.try(:update_aptc_block_status) if session["individual_assistance_path"].present?
       update_vlp_documents(doc_params)
       @created = true
       respond_to do |format|
@@ -56,6 +57,7 @@ class Insured::FamilyMembersController < ApplicationController
   def destroy
     @dependent = Forms::FamilyMember.find(params.require(:id))
     @dependent.destroy!
+    @dependent.family.try(:update_aptc_block_status) if session["individual_assistance_path"].present?
 
     respond_to do |format|
       format.html { render 'index' }
