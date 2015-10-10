@@ -21,7 +21,7 @@ RSpec.describe UserMailer do
     it 'should have body text' do
       expect(email.body).to match(/DC Health Link is strongly committed/)
       expect(email.body).to match(/Your Account/)
-      expect(email.body).to match(/Questions\?  Call DC Health Link Customer Service/)
+      expect(email.body).to match(/Customer Care Center/)
     end
   end
 end
