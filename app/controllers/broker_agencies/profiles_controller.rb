@@ -50,8 +50,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
  
   def staff_index
     @q = params.permit(:q)[:q]
-    @staff = Person.where(broker_role: {:$exists => true})
-    #brokers = brokers.where(:'broker_role.aasm_state'=> 'active')   #FIXME TODO
+    @staff = Person.where('broker_role.broker_agency_profile_id': {:$exists => true})
+    @staff = @staff.where(:'broker_role.aasm_state'=> 'active')
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
     if @q.nil?
