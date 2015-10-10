@@ -153,8 +153,23 @@ class Plan
   scope :valid_shop_by_metal_level, ->(metal_level) {valid_shop_by_metal_level_and_year(metal_level, TimeKeeper.date_of_record.year)}
   # END DEPRECATED
 
-  scope :valid_shop_by_carrier_and_year, ->(carrier_profile_id, year) {where(carrier_profile_id: carrier_profile_id, active_year: year, market: "shop",  metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
-  scope :valid_shop_by_metal_level_and_year, ->(metal_level, year) {where(active_year: year, market: "shop", metal_level: metal_level)}
+  scope :valid_shop_by_carrier_and_year, ->(carrier_profile_id, year) {
+    where(
+        carrier_profile_id: carrier_profile_id,
+        active_year: year,
+        market: "shop",
+        hios_id: /-01$/,
+        metal_level: { "$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS }
+      )
+  }
+  scope :valid_shop_by_metal_level_and_year, ->(metal_level, year) {
+    where(
+        active_year: year,
+        market: "shop",
+        hios_id: /-01$/,
+        metal_level: metal_level
+      )
+  }
 
   scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
 
@@ -163,7 +178,8 @@ class Plan
       where(
           active_year: active_year,
           market: "shop",
-          coverage_kind: "health"
+          coverage_kind: "health",
+          hios_id: /-01$/
         )
     }
 
@@ -171,7 +187,8 @@ class Plan
       where(
           active_year: active_year,
           market: "shop",
-          coverage_kind: "dental"
+          coverage_kind: "dental",
+          hios_id: /-01$/
         )
     }
 
@@ -188,7 +205,8 @@ class Plan
       where(
           active_year: active_year,
           market: "individual",
-          coverage_kind: "dental"
+          coverage_kind: "dental",
+          hios_id: /-01$/
         )
     }
 
