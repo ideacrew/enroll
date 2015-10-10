@@ -31,7 +31,7 @@
   Link based on the information you provided to us."} %>
 
 <% if notice.unverified_individuals.any? %>
-<%= render partial: 'notices/shared/paragraph', :locals => { 
+<%= render partial: 'notices/shared/paragraph', :locals => {
   content: notice.unverified_individuals.map(&:full_name).join("<br>")
 } %>
 <% end %>
@@ -48,7 +48,7 @@
   for the state where they live. You can find these applications at <a href='http://www.HealthCare.gov'>www.HealthCare.gov</a>.
     45 C.F.R. §155.305(a)(3)."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { 
+<%= render partial: 'notices/shared/paragraph', :locals => {
   content: notice.residency_unverified.map(&:full_name).join("<br>")
 } %>
 
@@ -71,7 +71,7 @@
  Link because our records did not indicate that they were a U.S. Citizen or had another qualifying immigration status.
  45 C.F.R. §155.305(a)(1)."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { 
+<%= render partial: 'notices/shared/paragraph', :locals => {
   content: notice.citizenship_unverified.map(&:full_name).join("<br>")
 } %>
 
@@ -85,7 +85,7 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["Important information is stored in your account on the DC Health Link website.
     If you don’t have an account already, you can create one by going to <a href='http://www.DCHealthLink.com'>www.DCHealthLink.com</a>.
-    You can get help with logging in or creating an account by calling DC Health Link Customer Service toll-free at 1-855-532-5465."],
+    You can get help with logging in or creating an account by calling #{HbxProfile::CallCenterName} toll-free at #{HbxProfile::CallCenterPhoneNumber}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {

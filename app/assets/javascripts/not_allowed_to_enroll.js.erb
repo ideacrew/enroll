@@ -19,7 +19,7 @@ function ineligible_alert(){
       var not_citizen = " is not a citizen and does not have an eligible immigration status, "
       var not_free = " is currently incarcerated, "
       var beginning = ineligible_incarcerated() ? not_free : not_citizen
-      var ending = " is not eligible to purchase a plan on DC Health Link. Other family members may still be eligible to enroll. Please call us at 1-855-532-5465 to learn about other health insurance options for "
+      var ending = " is not eligible to purchase a plan on DC Health Link. Other family members may still be eligible to enroll. Please call us at <%= HbxProfile::CallCenterPhoneNumber %> to learn about other health insurance options for "
       alert("Since " + name + beginning + pronoun + ending + name + '.')
 }
 

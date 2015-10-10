@@ -35,7 +35,7 @@
   content: "You can use a Social Security card to verify the Social Security Number(s) you provided to us. If you do not have a
   Social Security Number or cannot remember you Social Security Number, we can help you obtain one. You may not need to provide a
   Social Security Number if you have a well-established religious objection. If you need help or have any questions, please contact
-  DC Health Link Customer Service at 1-855-532-5465.  "} %>
+  #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.  "} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<span #{@style_color_text}>[IF Citizenship/Immigration Unverified]</span>
@@ -289,13 +289,13 @@
              <span style='margin-left:96px;'>Washington, DC 20090</span><br>
              <i>Be sure to write your account number (<account number>) on your submission.</i>",
             "<strong>In-Person:</strong> Take the document(s) to any Economic Security Administration Office
-            (call the DC Health Link Customer Service at (855) 532-5465 for locations)."]
+            (call the #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber} for locations)."]
 } %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["Important information is stored in your account on the DC Health Link website.  If you don’t have an account already,
     you can create one by going to <a href='http://www.DCHealthLink.com'>www.DCHealthLink.com</a>. You can get help with logging in or creating an account by calling
-    DC Health Link Customer Service toll-free at 1-855-532-5465."],
+    #{HbxProfile::CallCenterName} toll-free at #{HbxProfile::CallCenterPhoneNumber}."],
     heading: 'Your Secure User Account', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {

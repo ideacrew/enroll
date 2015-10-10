@@ -5,7 +5,9 @@ class Insured::FamiliesController < FamiliesController
 
   def home
     set_bookmark_url
+    
     @hbx_enrollments = @family.enrolled_hbx_enrollments.active || []
+    @waived = @family.coverage_waived?
     @employee_role = @person.employee_roles.try(:first)
     respond_to do |format|
       format.html
@@ -76,6 +78,7 @@ class Insured::FamiliesController < FamiliesController
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
+      @qle_aptc_block = @family.is_blocked_by_qle_and_assistance?(@qle, session["individual_assistance_path"])
       start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?

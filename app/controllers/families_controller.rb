@@ -10,6 +10,7 @@ class FamiliesController < ApplicationController
     # page_no = page_string.blank? ? nil : page_string.to_i
     # @families = Family.search(@q).exists(employer_profile: true).page page_no
     @families = Family.all
+    
   end
 
   def show
