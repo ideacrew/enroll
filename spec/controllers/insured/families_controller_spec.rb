@@ -276,6 +276,14 @@ RSpec.describe Insured::FamiliesController do
     end
 
     context "GET check_qle_date" do
+      let(:user) {FactoryGirl.create(:user)}
+      let(:person) {FactoryGirl.build(:person)}
+      let(:family) {FactoryGirl.build(:family)}
+      before :each do
+        allow(user).to receive(:person).and_return person
+        allow(person).to receive(:primary_family).and_return family
+      end
+
       context "normal qle event" do
         it "should return true" do
           date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
