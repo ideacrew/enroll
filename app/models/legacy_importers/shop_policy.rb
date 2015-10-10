@@ -28,7 +28,8 @@ module LegacyImporters
         @member_properties = construct_member_properties(d_hash, @applicant_lookup, @person)
         props_hash = enrollment_properties_hash(@benefit_group, @census_record, @plan, @coverage_household, @member_properties)
         true
-        @household.hbx_enrollments.create!(props_hash)
+        enrollment = @household.hbx_enrollments.create!(props_hash)
+        enrollment.select_coverage!
       end
       sc.call(@data_hash)
     end
@@ -42,8 +43,7 @@ module LegacyImporters
            :benefit_group_id => bg.id,
            :benefit_group_assignment_id => ce.active_benefit_group_assignment.id,
            :plan_id => plan.id,
-           :effective_on => e_on,
-           :aasm_state => "coverage_enrolled"
+           :effective_on => e_on
       }
     end
 

@@ -25,6 +25,22 @@ FactoryGirl.define do
     roles ["hbx_staff"]
   end
 
+  trait :consumer do
+    roles ["consumer"]
+  end
+
+  trait "assister" do
+    roles ["assister"]
+  end
+
+  trait "csr" do
+    roles ["csr"]
+  end
+
+  trait "employee" do
+    roles ["employee"]
+  end
+
   trait :employer_staff do
     roles ["employer_staff"]
   end

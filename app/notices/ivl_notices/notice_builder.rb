@@ -12,6 +12,8 @@ class IvlNotices::NoticeBuilder
     @notice = @builder_template.new
     @notice.primary_fullname = @consumer.full_name.titleize
     @notice.primary_identifier = @consumer.hbx_id
+    @notice.first_name = @consumer.first_name.titleize
+    @notice.last_name = @consumer.last_name.titleize
     append_mailing_address(@consumer.mailing_address)
   end
 
@@ -64,9 +66,9 @@ class IvlNotices::NoticeBuilder
       phone: hbx_enrollment.phone_number,
       effective_on: hbx_enrollment.effective_on,
       selected_on: hbx_enrollment.created_at,
-      enrollees: hbx_enrollment.hbx_enrollment_members.inject([]) do |names, member| 
+      enrollees: hbx_enrollment.hbx_enrollment_members.inject([]) do |names, member|
         names << member.person.full_name.titleize
-      end
+        end
     })
   end
 
