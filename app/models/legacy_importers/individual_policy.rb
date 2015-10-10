@@ -51,7 +51,7 @@ module LegacyImporters
     end
 
     def enrollment_properties_hash(cr, plan, ch, member_props)
-      e_on = member_props.map { |mp| mp[:coverage_start] }.min
+      e_on = member_props.map { |mp| mp[:coverage_start_on] }.min
       {
            :applied_aptc_amount => @aptc,
            :consumer_role_id => cr.id,

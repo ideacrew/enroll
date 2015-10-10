@@ -66,7 +66,7 @@ class LawfulPresenceDetermination
     denial_information = args.first
     self.vlp_verified_at = denial_information.determined_at
     self.vlp_authority = denial_information.vlp_authority
-    self.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
+#    self.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
   end
 
   def record_transition(*args)
