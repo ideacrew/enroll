@@ -80,6 +80,10 @@ class Family
 #    ViewFunctions::Family.run_after_save_search_update(self.id)
   end
 
+  def coverage_waived?
+    enrolled_hbx_enrollments.to_a.all?{|e| e.aasm_state == 'inactive'}
+  end
+
   def remove_family_search_record
     Searches::FamilySearch.where("id" => self.id).delete_all
   end
@@ -376,6 +380,18 @@ class Family
 
   def enrolled_hbx_enrollments
     latest_household.try(:enrolled_hbx_enrollments)
+  end
+
+  def is_blocked_by_qle_and_assistance?(qle=nil, assistance=nil)
+    return false if assistance.blank? or qle.blank?
+
+    max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
+
+    if max_aptc > 0 and qle.individual? and qle.family_structure_changed?
+      true
+    else
+      false
+    end
   end
 
   def self.by_special_enrollment_period_id(special_enrollment_period_id)

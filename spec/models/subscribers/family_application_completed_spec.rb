@@ -2,6 +2,15 @@ require "rails_helper"
 
 describe Subscribers::FamilyApplicationCompleted do
   let(:hbx_profile_organization) { double("HbxProfile", benefit_sponsorship:  double(current_benefit_coverage_period: double(slcsp: Plan.new.id)))}
+  let(:max_aptc) { parser.households.select do |h|
+    h.integrated_case_id == parser.integrated_case_id
+  end.first.tax_households.select do |th|
+    th.primary_applicant_id == parser.family_members.detect do |fm|
+      fm.id == parser.primary_family_member_id
+    end.id.split('#').last
+  end.select do |th|
+    th.id == th.primary_applicant_id && th.primary_applicant_id == parser.primary_family_member_id.split('#').last
+  end.first.eligibility_determinations.max_by(&:determination_date).maximum_aptc }
 
   it "should subscribe to the correct event" do
     expect(Subscribers::FamilyApplicationCompleted.subscription_details).to eq ["acapi.info.events.family.application_completed"]
@@ -136,7 +145,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.primary_applicant.family_member.person).to eq person
         expect(tax_household_db.allocated_aptc).to eq 0
         expect(tax_household_db.is_eligibility_determined).to be_truthy
-        expect(tax_household_db.current_max_aptc).to eq 20
+        expect(tax_household_db.current_max_aptc).to eq max_aptc
       end
 
       it "updates all consumer role verifications" do
@@ -201,7 +210,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.primary_applicant.family_member.person).to eq person
         expect(tax_household_db.allocated_aptc).to eq 0
         expect(tax_household_db.is_eligibility_determined).to be_truthy
-        expect(tax_household_db.current_max_aptc).to eq 269
+        expect(tax_household_db.current_max_aptc).to eq max_aptc
       end
 
       it "updates all consumer role verifications" do
@@ -232,7 +241,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.primary_applicant.family_member.person).to eq person
         expect(tax_household_db.allocated_aptc).to eq 0
         expect(tax_household_db.is_eligibility_determined).to be_truthy
-        expect(tax_household_db.current_max_aptc).to eq 269
+        expect(tax_household_db.current_max_aptc).to eq max_aptc
         expect(tax_household_db.effective_ending_on).to be_truthy
       end
 
@@ -242,7 +251,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(updated_tax_household.primary_applicant.family_member.person).to eq person
         expect(updated_tax_household.allocated_aptc).to eq 0
         expect(updated_tax_household.is_eligibility_determined).to be_truthy
-        expect(updated_tax_household.current_max_aptc).to eq 269
+        expect(updated_tax_household.current_max_aptc).to eq max_aptc
         expect(updated_tax_household.effective_ending_on).not_to be_truthy
       end
     end
@@ -295,7 +304,7 @@ describe Subscribers::FamilyApplicationCompleted do
         expect(tax_household_db.primary_applicant.family_member.person).to eq person
         expect(tax_household_db.allocated_aptc).to eq 0
         expect(tax_household_db.is_eligibility_determined).to be_truthy
-        expect(tax_household_db.current_max_aptc).to eq 71
+        expect(tax_household_db.current_max_aptc).to eq max_aptc
       end
 
       it "has 4 tax household members with primary person as primary tax household member" do
@@ -332,36 +341,28 @@ describe Subscribers::FamilyApplicationCompleted do
           subject.call(nil, nil, nil, nil, minus_message)
         end
 
-        it "should build a new household" do
-
+        it "should build a new household with 3 coverage household members and 3 taxhousehold members" do
+          # updated_tax_household = tax_household_db.household.latest_active_tax_household
+          # expect(tax_household_db.tax_household_members.length).to eq 3
+          # expect(tax_household_db.tax_household_members.map(&:is_primary_applicant?)).to eq [true,false,false]
+          # expect(tax_household_db.tax_household_members.select{|thm| thm.is_primary_applicant?}.first.family_member).to eq person.primary_family.primary_family_member
+          # expect(tax_household_db.household.coverage_households.length).to eq 2
+          # expect(tax_household_db.household.coverage_households.first.coverage_household_members.length).to eq 1
+          # expect(tax_household_db.household.coverage_households.first.coverage_household_members.select{|thm| thm.is_subscriber?}.first.family_member).to eq person.primary_family.primary_family_member
         end
 
-        # it "does should contain both tax households with one of them having an end on date" do
-        #   expect(family_db.active_household.tax_households.length).to eq 2
-        #   expect(family_db.active_household.tax_households.select{|th| th.effective_ending_on.present? }).to be_truthy
-        # end
 
-        # it "maintain the old household and tax households" do
-        #   expect(tax_household_db).to be_truthy
-        #   expect(tax_household_db.primary_applicant.family_member.person).to eq person
-        #   expect(tax_household_db.allocated_aptc).to eq 0
-        #   expect(tax_household_db.is_eligibility_determined).to be_truthy
-        #   expect(tax_household_db.current_max_aptc).to eq 71
-        #   expect(tax_household_db.effective_ending_on).to be_truthy
-        # end
 
-        # it "has 3 tax household members with primary person as primary tax household member" do
-        #   updated_tax_household = tax_household_db.household.latest_active_tax_household
-        #   expect(tax_household_db.tax_household_members.length).to eq 3
-        #   expect(tax_household_db.tax_household_members.map(&:is_primary_applicant?)).to eq [true,false,false]
-        #   expect(tax_household_db.tax_household_members.select{|thm| thm.is_primary_applicant?}.first.family_member).to eq person.primary_family.primary_family_member
-        # end
-
-        # it "has 2 coverage household with just the primary" do
-        #   expect(tax_household_db.household.coverage_households.length).to eq 2
-        #   expect(tax_household_db.household.coverage_households.first.coverage_household_members.length).to eq 1
-        #   expect(tax_household_db.household.coverage_households.first.coverage_household_members.select{|thm| thm.is_subscriber?}.first.family_member).to eq person.primary_family.primary_family_member
-        # end
+        it "should maintain the old household as inactive and give the tax household an end on date" do
+          #   expect(family_db.active_household.tax_households.length).to eq 2
+          #   expect(family_db.active_household.tax_households.select{|th| th.effective_ending_on.present? }).to be_truthy
+          #   expect(tax_household_db).to be_truthy
+          #   expect(tax_household_db.primary_applicant.family_member.person).to eq person
+          #   expect(tax_household_db.allocated_aptc).to eq 0
+          #   expect(tax_household_db.is_eligibility_determined).to be_truthy
+          #   expect(tax_household_db.current_max_aptc).to eq 71
+          #   expect(tax_household_db.effective_ending_on).to be_truthy
+        end
 
         it "updates all consumer role verifications" do
           expect(consumer_role_db.fully_verified?).to be_truthy

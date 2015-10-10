@@ -28,7 +28,7 @@ This coverage will end on [Termination Effective Date].  <u>You must still pay a
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "The coverage termination dates listed above are based on federal regulations, which require the following termination dates for voluntary terminations when the request is made to DC Health Link:"} %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
 	["The date requested by the customer if the request is made at least 14 days in advance.",
 		"Fourteen days following the date of the request if the request is not made 14 days in advance."] } %>
 
@@ -38,4 +38,4 @@ This coverage will end on [Termination Effective Date].  <u>You must still pay a
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<u>You must still pay all premiums for coverage until [Termination Effective Date]</u>. These payments must be paid directly to your health plan. If you pay these premiums, you will continue to have health insurance coverage until <u>[Termination Request Date]</u>."], heading: 'Next Steps', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["If you want to stop this termination from taking effect, you must contact DC Health Link Customer Service toll free at 1-855-532-5465 <u>as soon as possible</u>.  You cannot reverse this termination once it has taken effect."], heading: 'Stopping the Termination', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["If you want to stop this termination from taking effect, you must contact #{HbxProfile::CallCenterName} toll free at #{HbxProfile::CallCenterPhoneNumber} <u>as soon as possible</u>.  You cannot reverse this termination once it has taken effect."], heading: 'Stopping the Termination', sub_heading: ''} %>

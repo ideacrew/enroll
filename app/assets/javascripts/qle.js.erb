@@ -11,7 +11,7 @@ $(function () {
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
 
-    var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at 1-855-532-5465 to give us more information so we can see if you qualify.";
+    var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= HbxProfile::CallCenterPhoneNumber %> to give us more information so we can see if you qualify.";
     $("#qle-details .error-text").html(errorNotice);
   }
 
@@ -69,7 +69,7 @@ $(function () {
 	// Disable form submit on pressing Enter, instead click Submit link
   $('#qle_form').on('keyup keypress', function(e) {
     var code = e.keyCode || e.which;
-    if (code == 13) { 
+    if (code == 13) {
       e.preventDefault();
       $("#qle_submit").click();
       return false;

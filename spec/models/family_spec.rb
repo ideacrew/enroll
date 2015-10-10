@@ -945,3 +945,45 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     end
   end
 end
+
+describe Family, "is_blocked_by_qle_and_assistance" do
+  let(:qle) {FactoryGirl.build(:qualifying_life_event_kind)}
+  let(:family) {Family.new}
+  let(:household) {double(latest_active_tax_household: double(latest_eligibility_determination: eligibility_determination))}
+  let(:eligibility_determination) {double(max_aptc: 0)}
+
+  it "return false without parameters" do
+    expect(family.is_blocked_by_qle_and_assistance?()).to eq false
+    expect(family.is_blocked_by_qle_and_assistance?(qle)).to eq false
+  end
+
+  context "when max_aptc greater than 0" do
+    before :each do
+      allow(family).to receive(:latest_household).and_return household
+      allow(eligibility_determination).to receive(:max_aptc).and_return 100
+    end
+
+    it "return false when qle is not individual" do
+      allow(qle).to receive(:individual?).and_return false
+      expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
+    end
+
+    it "return false when qle is not family_structure_changed" do
+      allow(qle).to receive(:individual?).and_return true
+      allow(qle).to receive(:family_structure_changed?).and_return false
+      expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
+    end
+
+    it "return true" do
+      allow(qle).to receive(:individual?).and_return true
+      allow(qle).to receive(:family_structure_changed?).and_return true
+      expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq true
+    end
+  end
+
+  it "return false when max_aptc is 0" do
+    allow(family).to receive(:latest_household).and_return household
+    allow(eligibility_determination).to receive(:max_aptc).and_return 0
+    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
+  end
+end

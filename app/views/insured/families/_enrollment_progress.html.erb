@@ -1,6 +1,6 @@
 <% step = (defined? step) ? step.to_i : 1 %>
 <% percent_complete = 0 %>
-<% percent_complete = (step == 1) ? 25 : ((step == 2) ? 50 : ((step == 3) ? 75 : ((step == 4) ? 100 : 0))) %>
+<% percent_complete = (step == 1) ? 20 : ((step == 2) ? 40 : ((step == 3) ? 60 : ((step == 4) ? 80 : ((step == 5) ? 100 : 0)))) %>
 
 <h4>
   Status
@@ -14,17 +14,22 @@
     <div class="vertical-line-progress"></div>
   </li>
   <li class="<%= add_progress_class(2, step) %>">
-    Received
+    Transmitted
     <span class="circle-progress"></span>
     <div class="vertical-line-progress"></div>
   </li>
   <li class="<%= add_progress_class(3, step) %>">
-    Approved
+    Acknowledged
     <span class="circle-progress"></span>
     <div class="vertical-line-progress"></div>
   </li>
   <li class="<%= add_progress_class(4, step) %>">
     Enrolled
+    <span class="circle-progress"></span>
+    <div class="vertical-line-progress"></div>
+  </li>
+  <li class="<%= add_progress_class(5, step) %>">
+    Canceled/Terminated
     <span class="circle-progress"></span>
     <div class="vertical-line-progress"></div>
   </li>

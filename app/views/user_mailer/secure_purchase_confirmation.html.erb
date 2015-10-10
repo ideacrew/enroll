@@ -8,7 +8,7 @@ Congratulations <%= @person.first_name + ' ' + @person.last_name%>,
 <% if @market_kind == 'individual' %>
 The following have successfully been enrolled in
 <% else %>
-You and the following dependents have successfully enrolled in 
+You and the following dependents have successfully enrolled in
 <% end %>
  <%= @plan.name %>.
 </p>
@@ -20,7 +20,7 @@ You and the following dependents have successfully enrolled in
           <td style='border: 1px solid black; width: 22%'><%= ActionView::Base.new.number_to_currency(@plan.premium_for(member))%> </td>
       </tr>
    <% end %>
-   </table>   
+   </table>
 <br>
 
 <% if @market_kind != 'individual' %>
@@ -43,7 +43,7 @@ You and the following dependents have successfully enrolled in
 <% end %>
 
 DC Health Link <br>
-PHONE: 855-532-5465 (855-532-LINK)<br>
+PHONE: <%= HbxProfile::CallCenterPhoneNumber %> (1-855-532-LINK)<br>
 TTY/TDD 711-1-532-5465<br>
 Monday-Saturday 8:00am - 8:00pm <br>
 E-Mail: info@dchealthlink.com

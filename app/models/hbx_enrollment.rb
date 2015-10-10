@@ -424,6 +424,21 @@ class HbxEnrollment
     end
   end
 
+  def status_step
+    case
+    when coverage_selected?  #submitted
+      1
+    when enrollment_transmitted_to_carrier? #transmitted
+      2
+    when enrolled_contingent? #acknowledged
+      3
+    when coverage_enrolled? #enrolled
+      4
+    when coverage_canceled? || coverage_terminated? #canceled/terminated
+      5
+    end
+  end
+
   def self.find(id)
     id = BSON::ObjectId.from_string(id) if id.is_a? String
     families = Family.where({

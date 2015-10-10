@@ -934,7 +934,7 @@
   .home-tab, .employees-tab, .employee-add-tab, .benefits-tab,
   .planyear-add-tab, .brokers-tab, .employer-tab, .employer-edit-tab,
    .documents-tab, #add_employee_action, .benefits-setup-tab, .messages-tab,
-   .premium-reports-tab {
+   .premium-reports-tab, #account-detail {
     .btn-primary {
       text-transform: uppercase;
       padding: 10px 20px;
@@ -1465,5 +1465,24 @@
   padding-bottom: 50px;
   &:last-of-type {
     padding-bottom: 0;
+  }
+}
+#home #account-detail {
+  .panel.myplanyear h5 {
+    color: #b7b7b7;
+    margin: 0 auto;
+    font-size: 14px;
+  }
+  .panel.myplanyear .panel-heading {
+    margin-bottom: 5px;
+  }
+  .panel.myplanyear table {
+    tr{
+      td:last-of-type {
+        text-align: right;
+        font-weight: bold;
+        color: #69A30D;
+      }
+    }
   }
 }

@@ -10,6 +10,7 @@ RSpec.describe Insured::FamiliesController do
   let(:family_members){[double("FamilyMember")]}
   let(:employee_roles) { [double("EmployeeRole")] }
   let(:consumer_role) { double("ConsumerRole") }
+  # let(:coverage_wavied) { double("CoverageWavied") }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
 
   before :each do
@@ -24,6 +25,7 @@ RSpec.describe Insured::FamiliesController do
   describe "GET home" do
     before :each do
       allow(family).to receive(:enrolled_hbx_enrollments).and_return(hbx_enrollments)
+      allow(family).to receive(:coverage_waived?).and_return(false)
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
       allow(user).to receive(:has_employee_role?).and_return(true)
       allow(user).to receive(:has_consumer_role?).and_return(true)
@@ -39,6 +41,7 @@ RSpec.describe Insured::FamiliesController do
       before :each do
         sign_in user
         allow(person).to receive(:employee_roles).and_return(employee_roles)
+        allow(family).to receive(:coverage_waived?).and_return(true)
         get :home
       end
 
@@ -273,6 +276,14 @@ RSpec.describe Insured::FamiliesController do
     end
 
     context "GET check_qle_date" do
+      let(:user) {FactoryGirl.create(:user)}
+      let(:person) {FactoryGirl.build(:person)}
+      let(:family) {FactoryGirl.build(:family)}
+      before :each do
+        allow(user).to receive(:person).and_return person
+        allow(person).to receive(:primary_family).and_return family
+      end
+
       context "normal qle event" do
         it "should return true" do
           date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")

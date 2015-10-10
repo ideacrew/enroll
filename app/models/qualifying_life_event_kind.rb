@@ -153,6 +153,14 @@ class QualifyingLifeEventKind
   def is_moved_to_dc?
     title == "I'm moving to the District of Columbia"
   end
+  
+  def individual?
+    market_kind == "individual"
+  end
+
+  def family_structure_changed?
+    ["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].include? title
+  end
 
   class << self
     def shop_market_events
