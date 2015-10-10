@@ -31,7 +31,7 @@ class IdpAccountManager
     when "broker"
       account_role_val = "broker"
     else
-      account_role_val = "individual"
+      account_role_val = account_role
     end
     provider.create_account({
       :email => email,
