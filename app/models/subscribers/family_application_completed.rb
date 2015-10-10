@@ -99,7 +99,10 @@ module Subscribers
       if verified_dependents.present?
         verified_dependents.each do |verified_family_member|
           existing_person = search_person(verified_family_member)
-          relationship = verified_primary_family_member.person_relationships.select{|pr| pr.object_individual_id == verified_family_member.id}.first.relationship_uri.split('#').last
+          relationship = verified_primary_family_member.person_relationships.select do |pr|
+            pr.object_individual_id == verified_family_member.id &&
+            pr.subject_individual_id == verified_primary_family_member.id
+          end.first.relationship_uri.split('#').last
 
           if existing_person.present?
             new_people << [existing_person, relationship, [verified_family_member.id]]
