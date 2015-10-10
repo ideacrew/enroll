@@ -3,6 +3,7 @@ class Insured::ConsumerRolesController < ApplicationController
   include ErrorBubble
   before_action :check_consumer_role, only: [:search]
   before_action :find_consumer_role, only: [:edit, :update]
+  before_action :authorize_for, except: [:edit, :update]
 
   def privacy
     set_current_person
@@ -77,12 +78,14 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def edit
+    authorize @consumer_role, :edit?
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
     init_vlp_doc_subject
   end
 
   def update
+    authorize @consumer_role, :update?
     save_and_exit =  params['exit_after_method'] == 'true'
 
     params_clean_vlp_documents
@@ -190,7 +193,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def check_consumer_role
     set_current_person
-    if @person.try(:consumer_role?)
+    if @person.try(:has_active_consumer_role?)
       redirect_to @person.consumer_role.bookmark_url || family_account_path
     else
       current_user.last_portal_visited = search_insured_consumer_role_index_path

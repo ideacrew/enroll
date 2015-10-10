@@ -38,7 +38,7 @@
     </tr>
     <tr>
       <td>
-        <p><%= @plan.plan_type.upcase %></p>
+        <p><%= @plan.plan_type.try(:upcase) %></p>
       </td>
       <td>
         <p><%= @plan.carrier_profile.legal_name %></p>

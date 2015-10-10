@@ -12,6 +12,7 @@ class PlanYear
   field :open_enrollment_start_on, type: Date
   field :open_enrollment_end_on, type: Date
 
+  field :imported_plan_year, type: Boolean, default: false 
   # Number of full-time employees
   field :fte_count, type: Integer, default: 0
 
@@ -607,6 +608,7 @@ private
 
   def open_enrollment_date_checks
     return if start_on.blank? || end_on.blank? || open_enrollment_start_on.blank? || open_enrollment_end_on.blank?
+    return if imported_plan_year
     if start_on.day != 1
       errors.add(:start_on, "must be first day of the month")
     end

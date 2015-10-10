@@ -3,6 +3,8 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_hbx_staff_role, except: [:welcome, :show, :request_help, :staff_index, :assister_index]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :family_index, :broker_agency_index, :inbox, :configuration, :show]
+  before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
+  before_action :authorize_for_instance, only: [:edit, :update, :destroy]
 
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
@@ -112,7 +114,6 @@ class Exchanges::HbxProfilesController < ApplicationController
   def issuer_index
     @issuers = CarrierProfile.all
 
-
     respond_to do |format|
       format.html { render "issuer_index" }
       format.js {}
@@ -120,7 +121,6 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def product_index
-
     respond_to do |format|
       format.html { render "product_index" }
       format.js {}
@@ -128,7 +128,6 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def configuration
-
     @time_keeper = Forms::TimeKeeper.new
 
     respond_to do |format|
@@ -285,6 +284,10 @@ private
     unless current_user.has_hbx_staff_role?
       redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
     end
+  end
+
+  def authorize_for_instance
+    authorize @hbx_profile, "#{action_name}?".to_sym 
   end
 
   def call_customer_service(first_name, last_name)

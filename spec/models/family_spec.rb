@@ -284,6 +284,7 @@ describe Family do
       expect(family.current_special_enrollment_periods).to eq []
     end
   end
+
   context "family has a QLE and is under a SEP" do
     before do
       @current_sep = FactoryGirl.build(:special_enrollment_period)
@@ -300,17 +301,44 @@ describe Family do
     end
    end
 
-    context "and the family is under more than one SEP" do
-      before do
-        current_sep = FactoryGirl.build(:special_enrollment_period)
-        family.special_enrollment_periods << current_sep
-        another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: 4.days.ago.to_date)
-        family.special_enrollment_periods << another_current_sep
-      end
-      it "should return multiple current_special_enrollment" do
-        expect(family.current_special_enrollment_periods.size).to eq 2
-      end
+  context "and the family is under more than one SEP" do
+    before do
+      current_sep = FactoryGirl.build(:special_enrollment_period)
+      family.special_enrollment_periods << current_sep
+      another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: 4.days.ago.to_date)
+      family.special_enrollment_periods << another_current_sep
     end
+    it "should return multiple current_special_enrollment" do
+      expect(family.current_special_enrollment_periods.size).to eq 2
+    end
+  end
+
+  context "earliest_effective_sep" do
+    before do
+      date1 = TimeKeeper.date_of_record - 20.days
+      @current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date1, effective_on: date1)
+      family.special_enrollment_periods << @current_sep
+      date2 = TimeKeeper.date_of_record - 10.days
+      @another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date2, effective_on: date2)
+      family.special_enrollment_periods << @another_current_sep
+    end
+
+    it "should return earliest sep when all active" do
+      expect(@current_sep.is_active?).to eq true
+      expect(@another_current_sep.is_active?).to eq true
+      expect(family.earliest_effective_sep).to eq @current_sep
+    end
+
+    it "should return earliest active sep" do
+      date3 = TimeKeeper.date_of_record - 200.days
+      sep = FactoryGirl.build(:special_enrollment_period, qle_on: date3, effective_on: date3)
+      family.special_enrollment_periods << sep
+      expect(@current_sep.is_active?).to eq true
+      expect(@another_current_sep.is_active?).to eq true
+      expect(sep.is_active?).to eq false
+      expect(family.earliest_effective_sep).to eq @current_sep
+    end
+  end
 end
 
 describe "special enrollment periods" do

@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe Insured::ConsumerRolesController, :type => :controller do
-  let(:user){ double("User", email: "test@example.com") }
-  let(:person){ double("Person") }
+  let(:user){ FactoryGirl.create(:user, :consumer) }
+  let(:person){ FactoryGirl.build(:person) }
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember") }
-  let(:consumer_role){ double("ConsumerRole", id: double("id")) }
+  let(:consumer_role){ FactoryGirl.build(:consumer_role) }
   let(:bookmark_url) {'localhost:3000'}
 
   context "GET privacy" do
@@ -30,17 +30,16 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   end
 
   describe "Get search" do
-    let(:user) { double("User" ) }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", ssn: "333224444", dob: "08/15/1975") }
 
     before(:each) do
       sign_in user
       allow(Forms::EmployeeCandidate).to receive(:new).and_return(mock_employee_candidate)
-      allow(user).to receive(:has_consumer_role?).and_return(false)
       allow(user).to receive(:last_portal_visited=)
       allow(user).to receive(:save!).and_return(true)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
+      allow(person).to receive(:has_active_consumer_role?).and_return(false)
       allow(consumer_role).to receive(:save!).and_return(true)
     end
 
@@ -67,15 +66,14 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   describe "GET match" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:mock_consumer_candidate) { instance_double("Forms::ConsumerCandidate", :valid? => validation_result, ssn: "333224444", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname") }
-    let(:user_id) { "SOMDFINKETHING_ID"}
     let(:found_person){ [] }
     let(:person){ instance_double("Person") }
-    let(:user) { double("User",id: user_id, :idp_verified? => false) }
 
     before(:each) do
+      allow(user).to receive(:idp_verified?).and_return false
       sign_in(user)
       allow(mock_consumer_candidate).to receive(:match_person).and_return(found_person)
-      allow(Forms::ConsumerCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_consumer_candidate)
+      allow(Forms::ConsumerCandidate).to receive(:new).with(person_parameters.merge({user_id: user.id})).and_return(mock_consumer_candidate)
       get :match, :person => person_parameters
     end
 
@@ -118,7 +116,6 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
   end
   context "POST create" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
-    let(:user){FactoryGirl.create(:user)}
     before(:each) do
       allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(consumer_role)
       allow(consumer_role).to receive(:person).and_return(person)
@@ -156,6 +153,8 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
       allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
       allow(consumer_role).to receive(:person).and_return(person)
+      allow(user).to receive(:person).and_return person
+      allow(person).to receive(:consumer_role).and_return consumer_role
       sign_in user
     end
 
