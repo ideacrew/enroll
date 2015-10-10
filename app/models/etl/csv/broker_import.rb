@@ -138,7 +138,8 @@ module Etl::Csv
             provider_kind: record[:provider_type],
             market_kind: record[:practice_area],
             languages_spoken: record[:languages],
-            accept_new_clients: true
+            accept_new_clients: true,
+            aasm_state: "active"
           }
         )
 
@@ -179,11 +180,12 @@ module Etl::Csv
             market_kind: record[:practice_area],
             entity_kind: "s_corporation" ,
             accept_new_clients: true,
+            aasm_state: "is_approved"
           )
       end
 # binding.pry
       raise StandardError, "BrokerAgency is invalid for NPN: #{record[:npn]}" unless broker_agency_profile.valid?
-      raise StandardError, "BrokerAgency organization is invalid for NPN: #{record[:npn]}" unless broker_agency_profile.organization.valid?
+      raise StandardError, "BrokerAgency organization is invalid for NPN: #{record[:npn]}: #{broker_agency_profile.organization.errors.full_messages.inspect}" unless broker_agency_profile.organization.valid?
       broker_agency_profile
     end
 

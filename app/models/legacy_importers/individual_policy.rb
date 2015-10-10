@@ -24,7 +24,9 @@ module LegacyImporters
         @member_properties = construct_member_properties(d_hash, @applicant_lookup, @person)
         @consumer_role = create_consumer_role(@person)
         props_hash = enrollment_properties_hash(@consumer_role, @plan, @coverage_household, @member_properties)
-        @household.hbx_enrollments.create!(props_hash)
+        enrollment = @household.hbx_enrollments.create!(props_hash)
+        enrollment_to_update = HbxEnrollment.find(enrollment.id)
+        enrollment_to_update.select_coverage!
         true
       end
       sc.call(@data_hash)
@@ -33,7 +35,17 @@ module LegacyImporters
     def create_consumer_role(person)
       cr = person.consumer_role
       if cr.nil?
-        cr = ConsumerRole.create!(:person => person, :is_applicant => true)
+        cr = ConsumerRole.create!(
+          :person => person,
+          :is_applicant => true,
+          :lawful_presence_determination => LawfulPresenceDetermination.new(
+             :vlp_authority => "curam",
+             :vlp_verified_at => Time.now,
+             :aasm_state => "verification_successful"
+          ),
+          :aasm_state => "fully_verified",
+          :is_state_resident => true
+        )
       end
       cr
     end
@@ -47,8 +59,7 @@ module LegacyImporters
            :hbx_enrollment_members_attributes => member_props,
            :kind => "individual",
            :plan_id => plan.id,
-           :effective_on => e_on,
-           :aasm_state => "coverage_enrolled"
+           :effective_on => e_on
       }
     end
 
@@ -56,6 +67,9 @@ module LegacyImporters
       data["enrollees"].map do |en|
         m_id = en["hbx_id"]
         is_sub = (m_id == sub.hbx_id)
+        if !(is_sub)
+          create_consumer_role(app_lookup[m_id].person)
+        end
         prop_hash = {
           :applicant_id => app_lookup[m_id].id,
           :premium_amount => en["premium_amount"],
