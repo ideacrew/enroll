@@ -132,7 +132,6 @@
       </tr>
     </table>
     <div class="plan-details">
-      <% if number_to_currency(bg.monthly_employer_contribution_amount) > '0' %>
       <hr>
       <div class="col-xs-4">
         <span>Employer Estimated Maximum Monthly Cost</span>
@@ -155,10 +154,6 @@
 
         </table>
       </div>
-      <% else %>
-        <br/>
-        <h4 class="starter">After you have added an employee, you can view your estimated monthly costs here. To add your first employee, <%= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees')%>.</h4>
-      <% end %>
     </div>
   </div>
 
