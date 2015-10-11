@@ -14,6 +14,7 @@ FactoryGirl.define do
     aasm_state_date {effective_on}
     updated_by "factory"
     is_active true
+    enrollment_kind "open_enrollment"
     # hbx_enrollment_members
     # comments
   end
