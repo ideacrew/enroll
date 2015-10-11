@@ -32,7 +32,7 @@
 
         <tr class="terminated_<%= census_employee.employment_terminated? %> remove_<%= census_employee.id %>">
           <td>
-            <%= link_to name_to_listing(census_employee), employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id), remote: true %>
+            <%= link_to name_to_listing(census_employee), employers_employer_profile_census_employee_path(@employer_profile.id, census_employee.id) %>
           </td>
           <td><%= number_to_obscured_ssn census_employee.ssn %></td>
           <td><%= format_date census_employee.dob %>
