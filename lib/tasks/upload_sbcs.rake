@@ -33,16 +33,27 @@ namespace :sbc do
   task :map => :environment do
     file_path = Rails.root.join("db", "seedfiles", "plans-sbcs.csv").to_s
     counter = 0
+    aws_env = ENV['AWS_ENV'] || 'local'
     CSV.foreach(file_path) do |row|
-      plan = Plan.where(hios_id: row[1]).and(active_year: row[2]).first
+      plan_find_regex = Regexp.compile("^" + row[1].to_s.split("-").first)
+      Plan.where(hios_id: plan_find_regex, active_year: row[2]).each do |plan|
+        bucket_name = "dchbx-enroll-sbc-#{aws_env}"
+        uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{row[3]}"
+        plan.sbc_document = Document.new({title: row[4], subject: "SBC", format: 'application/pdf', identifier: uri})
+        plan.sbc_document.save!
+        plan.save!
+        counter += 1
+      end
+=begin
+      plan = Plan.where(hios_base_id: row[1]).and(active_year: row[2]).first
       next unless plan
-      aws_env = ENV['AWS_ENV'] || 'local'
       bucket_name = "dchbx-enroll-sbc-#{aws_env}"
       uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{row[3]}"
       plan.sbc_document = Document.new({title: row[4], subject: "SBC", format: 'application/pdf', identifier: uri})
       plan.sbc_document.save!
       plan.save!
       counter += 1
+=end
     end
     puts "Total #{counter} plans updated with sbc_documents"
   end
