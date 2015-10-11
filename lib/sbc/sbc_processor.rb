@@ -3,7 +3,7 @@ class SbcProcessor
 
   SHEETS = ['IVL', 'SHOP Q1', 'SHOP Q2', 'SHOP Q3', 'SHOP Q4']
   CARRIERS = ["Dominion", "Aetna", "CareFirst", "Delta Dental", "Dentegra", "MetLife", "Kaiser", "United Health Care"]
-  S3_BUCKET = "dchbx-sbc"
+  S3_BUCKET = "sbc"
 
   def initialize(matrix_path, sbc_dir_path)
     @matrix_path = matrix_path
@@ -31,6 +31,14 @@ class SbcProcessor
         next
       end
       uri = Aws::S3Storage.save(pdf_path(data.sbc_file_name), S3_BUCKET)
+      if uri.nil?
+        uri = Aws::S3Storage.save(pdf_path(data.sbc_file_name.gsub(' ','')), S3_BUCKET)
+      end
+
+      if uri.nil?
+        puts "URI nil #{plan.name} #{plan.hios_id} #{data.sbc_file_name}"
+        next
+      end
       plan.sbc_document = Document.new({title: data.sbc_file_name, subject: "SBC", format: 'application/pdf', identifier: uri})
       plan.sbc_document.save!
       plan.save!

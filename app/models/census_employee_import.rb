@@ -28,6 +28,11 @@ class CensusEmployeeImport
       is_business_owner
       benefit_group
       plan_year
+      kind
+      address_1
+      city
+      state
+      zip
     )
 
   CENSUS_MEMBER_RECORD_TITLES = [
@@ -45,7 +50,12 @@ class CensusEmployeeImport
       "Date of Termination(optional)",
       "Is Business Owner?",
       "Benefit Group(optional)",
-      "Plan Year(Optional)"
+      "Plan Year(Optional)",
+      "Address Kind(Optional)",
+      "Address Line 1(Optional)",
+      "City(Optional)",
+      "State(Optional)",
+      "Zip(Optional)"
   ]
 
   def initialize(attributes = {})
@@ -159,6 +169,9 @@ class CensusEmployeeImport
     member.employee_relationship = record[:employee_relationship].to_s if record[:employee_relationship]
     member.employer_profile = @employer_profile
     assign_benefit_group(member, record[:benefit_group], record[:plan_year])
+    address = Address.new({kind:record[:kind], address_1: record[:address_1], city: record[:city],
+                           state: record[:state], zip: record[:zip] })
+    member.address = address if address.valid?
     member
   end
 
@@ -190,7 +203,11 @@ class CensusEmployeeImport
     is_business_owner = parse_boolean(row["is_business_owner"])
     benefit_group = parse_text(row["benefit_group"])
     plan_year = parse_text(row["plan_year"])
-
+    kind = parse_text(row["kind"])
+    address_1 = parse_text(row["address_1"])
+    city = parse_text(row["city"])
+    state = parse_text(row["state"])
+    zip = parse_text(row["zip"])
     {
         employer_assigned_family_id: employer_assigned_family_id,
         employee_relationship: employee_relationship,
@@ -206,7 +223,12 @@ class CensusEmployeeImport
         termination_date: termination_date,
         is_business_owner: is_business_owner,
         benefit_group: benefit_group,
-        plan_year: plan_year
+        plan_year: plan_year,
+        kind: kind,
+        address_1: address_1,
+        city: city,
+        state: state,
+        zip: zip
     }
   end
 

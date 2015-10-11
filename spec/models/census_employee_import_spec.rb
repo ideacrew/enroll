@@ -2,27 +2,27 @@ require 'rails_helper'
 
 RSpec.describe CensusEmployeeImport, :type => :model do
 
-  let(:tempfile) {double("", path:'spec/test_data/spreadsheet_templates/DCHL Employee Census.xlsx')}
+  let(:tempfile) { double("", path: 'spec/test_data/census_employee_import/DCHL Employee Census.xlsx') }
   let(:file) {
-    double("", :tempfile=>tempfile)
+    double("", :tempfile => tempfile)
   }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:sheet) {
     Roo::Spreadsheet.open(file.tempfile.path).sheet(0)
   }
-  let(:subject){
-    CensusEmployeeImport.new({file:file, employer_profile:employer_profile})
+  let(:subject) {
+    CensusEmployeeImport.new({file: file, employer_profile: employer_profile})
   }
 
   context "initialize without employer_role and file" do
     it "throws exception" do
-      expect{CensusEmployeeImport.new()}.to raise_error(ArgumentError)
+      expect { CensusEmployeeImport.new() }.to raise_error(ArgumentError)
     end
   end
 
   context "initialize with employer_role and file" do
     it "should not throw an exception" do
-      expect{CensusEmployeeImport.new({file:file, employer_profile:employer_profile})}.to_not raise_error
+      expect { CensusEmployeeImport.new({file: file, employer_profile: employer_profile}) }.to_not raise_error
     end
   end
 
@@ -30,5 +30,15 @@ RSpec.describe CensusEmployeeImport, :type => :model do
     sheet_header_row = sheet.row(1)
     column_header_row = sheet.row(2)
     expect(subject.header_valid?(sheet_header_row) && subject.column_header_valid?(column_header_row)).to be_truthy
+  end
+
+  context "One employee with one dependent" do
+    it "should added a employee with a dependent" do
+      expect(subject.save).to be_truthy
+      expect(subject.load_imported_census_employees.count).to eq(2) # 1 employee + 1 dependent
+      expect(subject.load_imported_census_employees.first).to be_a CensusEmployee
+      expect(subject.load_imported_census_employees.first.census_dependents.count).to eq(1)
+      expect(subject.load_imported_census_employees.last).to be_a CensusDependent
+    end
   end
 end

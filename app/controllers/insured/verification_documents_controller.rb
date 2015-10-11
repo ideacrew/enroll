@@ -12,7 +12,7 @@ class Insured::VerificationDocumentsController < ApplicationController
       redirect_to(:back)
       return
     elsif params.permit![:file]
-      doc_uri = Aws::S3Storage.save(file_path, 'dchbx-id-verification')
+      doc_uri = Aws::S3Storage.save(file_path, 'id-verification')
 
       if doc_uri.present?
         if update_vlp_documents(doc_params, file_name, doc_uri)

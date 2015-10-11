@@ -1,5 +1,6 @@
 module Aws
   class S3Storage
+    ENV_LIST = ['local', 'prod', 'preprod', 'test', 'uat']
 
     def initialize
       setup
@@ -8,6 +9,7 @@ module Aws
     # If success, return URI which has the s3 bucket key
     # else return nil
     def save(file_path, bucket_name, key=SecureRandom.uuid)
+      bucket_name = env_bucket_name(bucket_name)
       uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{key}"
       begin
         object = get_object(bucket_name, key)
@@ -35,7 +37,8 @@ module Aws
       begin
         bucket_and_key = uri.split(':').last
         bucket_name, key = bucket_and_key.split('#')
-        object = get_object(bucket_name, key)
+        env_bucket_name = set_correct_env_bucket_name(bucket_name)
+        object = get_object(env_bucket_name, key)
         read_object(object)
       rescue Exception => e
         nil
@@ -58,6 +61,24 @@ module Aws
 
     def get_object(bucket_name, key)
       @resource.bucket(bucket_name).object(key)
+    end
+
+    def set_correct_env_bucket_name(bucket_name)
+      bucket_name_segment = bucket_name.split('-')
+      if ENV_LIST.include? bucket_name_segment.last && bucket_name_segment.last == aws_env
+        return bucket_name
+      else
+        bucket_name_segment[bucket_name_segment.length - 1] = aws_env
+        return bucket_name_segment.join('-')
+      end
+    end
+
+    def aws_env
+      ENV['AWS_ENV'] || "local"
+    end
+
+    def env_bucket_name(bucket_name)
+      "dchbx-enroll-#{bucket_name}-#{aws_env}"
     end
 
     def setup
