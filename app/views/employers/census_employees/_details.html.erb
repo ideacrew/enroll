@@ -49,8 +49,6 @@
         <% end %>
         <% if @plan.present? and @hbx_enrollment.present? %>
 
-        <% end %>
-        <% end %>
       </div>
       <div class="table-border table-responsive">
         <table class="table table-striped">
@@ -93,12 +91,12 @@
       <h4>Dependents</h4>
       <div class="form-border">
         <% if dependents.present? %>
+        <table style='width:100%;'>
 
           <% dependents.each do |dependent| %>
           <% if dependent.relationship == "self" && dependents.count == 1 %>
           <h4>You have no dependents at this time.</h4>
           <% else %>
-          <table style='width:100%;'>
             <tr>
               <th>Name</th>
               <th>DOB</th>
@@ -121,15 +119,17 @@
             </td>
           </tr>
           <% end %>
-        </table>
           <% end %>
+        </table>
 
         <% else %>
-        <p>No Dependents</p>
+        <h4>You Currently have no dependents.</h4>
         <% end %>
       </div>
     </div>
   </div>
+  <% end %>
+  <% end %>
   </div>
 
 </div>

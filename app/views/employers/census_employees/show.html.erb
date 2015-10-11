@@ -1,83 +1,141 @@
-<div class="container">
-  <div class="row">
-    <div class="col-md-12 col-sm-12 col-xs-12">
+<% content_for :navigation do %>
+<%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
+<% end %>
 
-      <% census_employee = @family.census_employee %>
-      <% dependents = @family.census_dependents %>
-      <% address = census_employee.address %>
-      <% benefit_group_assignments = @family.benefit_group_assignments %>
-
-      <h2> Family Details </h2>
-
-      <div class="row">
-        <div class="col-md-6 col-sm-6 col-xs-12 left-side">
-          <h3> Employee Details </h3>
-
-          Name: <%= name_to_listing(census_employee) %> <br>
-          DOB: <%= format_date census_employee.dob %> <br>
-          Hired On: <%= format_date census_employee.hired_on %><br>
+<% dependents = @census_employee.try(:employee_role).try(:person).try(:primary_family).try(:active_family_members) || @census_employee.census_dependents %>
+<% address =  @census_employee.try(:employee_role).try(:person).try(:addresses).try(:last) || @census_employee.address %>
+<div id="add_employee_action">
+  <div class="col-xs-12">
+    <h1>Census Employee Details</h1>
+    <div class="row">
+      <div class="col-xs-6">
+        <h4><%= name_to_listing(@census_employee) %>'s Details</h4>
+        <div class="form-border">
+          <p>
+            Name:
+            <%= name_to_listing(@census_employee) %>
+            <br/>
+            DOB:
+            <%= format_date @census_employee.dob %>
+            <br/>
+            Hired On:
+            <%= format_date @census_employee.hired_on %>
+            <br/>
+            Owner:
+            <%= @census_employee.try(:is_business_owner) ? "Yes" : "No" %>
+          </p>
         </div>
-
-        <div class="col-md-6 col-sm-6 col-xs-12 right-side">
-          <h3> Address </h3>
+      </div>
+      <div class="col-xs-6">
+        <h4>Address</h4>
+        <div class="form-border">
           <% if address.present? %>
-            <%= address.to_s %>
+          <%= address.to_html %>
           <% end %>
         </div>
       </div>
-
-      <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-
-          <h3> Dependents </h3>
-
-          <% if dependents.present? %>
-            <table border = "1", width= "400">
-              <tr>
-                <th> Name </th>
-                <th> DOB </th>
-                <th> Relationship </th>
-                <th> Gender </th>
-              </tr>
-
-              <% dependents.each do |dependent| %>
-                <tr>
-                  <td> <%= dependent.first_name + " " + dependent.last_name %> </td>
-                  <td> <%= format_date dependent.dob %> </td>
-                  <td> <%= dependent.employee_relationship %> </td>
-                  <td> <%= dependent.gender %> </td>
-                </tr>
-              <% end %>
-            </table>
-          <% else %>
-            No Dependents
-          <% end %>
-        </div>
-      </div>
-
-      <% if benefit_group_assignments.present? %>
-        <table border = "1", width= "400">
-          <tr>
-            <th> Name </th>
-            <th> start on </th>
-            <th> end on </th>
-            <th> status </th>
-          </tr>
-
-          <% benefit_group_assignments.each do |bga| %>
-            <tr>
-              <td> <%= bga.benefit_group.try(:title) %> </td>
-              <td> <%= format_date bga.start_on %> </td>
-              <td> <%= format_date bga.end_on %> </td>
-              <td> <%= bga.is_active %> </td>
-            </tr>
-          <% end %>
-        </table>
-      <% else %>
-        No Benefit Group Assignments
-      <% end %>
-
-      <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, employers_employer_profile_path(@employer_profile), class: 'btn btn-primary' %>
     </div>
-  </div>
-</div>
+    <div class="row">
+
+
+      <div class="col-xs-6">
+        <h4>Medical Plan</h4>
+        <div class="form-border">
+          <p>Benefit Group: <%= @benefit_group.try(:title) %></p>
+          <% if @benefit_group_assignment.try(:coverage_waived?) %>
+          <p>Enrollment Status: Coverage Waived</p>
+          <p>Waiver Reason: <%= @hbx_enrollment.try(:waiver_reason) %></p>
+          <% elsif @benefit_group_assignment.try(:coverage_selected?) %>
+          <p>Plan Name: <%= @hbx_enrollment.try(:plan).try(:name) %></p>
+          <p>Plan Start: <%= @hbx_enrollment.try(:effective_on) %></p>
+          <% if @census_employee.employee_role.try(:present?) and employee_role = @census_employee.employee_role %>
+          <p>HIRED: <%= employee_role.try(:hired_on) %></p>
+          <p>ELIGIBLE FOR COVERAGE: <em><%= employee_role.try(:effective_on) %></em></p>
+          <% end %>
+          <% if @plan.present? and @hbx_enrollment.present? %>
+
+        </div>
+        <div class="table-border table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Relationship</th>
+                <th>Age</th>
+                <th>Premium</th>
+                <th>Employer Contribution</th>
+                <th>You Pay</th>
+              </tr>
+            </thead>
+
+              <tbody>
+                <% @hbx_enrollment.hbx_enrollment_members.each do |member| %>
+                  <tr>
+                    <td><%= member.person.full_name %></td>
+                    <td><%= member.primary_relationship %></td>
+                    <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
+                    <td><%= number_to_currency(@plan.premium_for(member)) %></td>
+                    <td><%= number_to_currency(@plan.employer_contribution_for(member)) %></td>
+                    <td><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+                  </tr>
+                <% end %>
+                <tr class="gray-row">
+                  <td class="capital"><strong>Totals</strong></td>
+                  <td></td>
+                  <td></td>
+                  <td><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
+                  <td><strong><%= number_to_currency(@plan.total_employer_contribution) %></strong></td>
+                  <td><strong><%= number_to_currency(@plan.total_employee_cost) %></strong></td>
+
+                </tr>
+              </tbody>
+            </table>
+          </div>
+      </div>
+      <div class="col-xs-6">
+        <h4>Dependents</h4>
+        <div class="form-border">
+          <% if dependents.present? %>
+          <table style='width:100%;'>
+
+            <% dependents.each do |dependent| %>
+            <% if dependent.relationship == "self"%>
+            <% else %>
+              <tr>
+                <th>Name</th>
+                <th>DOB</th>
+                <th>Relationship</th>
+                <th>Gender</th>
+              </tr>
+            <tr>
+              <td>
+                <%= dependent.first_name + " " + dependent.last_name %>
+              </td>
+              <td>
+                <%= format_date dependent.dob %>
+              </td>
+              <td>
+                <% relationship = dependent.try(:relationship) || dependent.try(:employee_relationship) %>
+                <%= relationship == "child_under_26" ? "child" : relationship %>
+              </td>
+              <td>
+                <%= dependent.gender %>
+              </td>
+            </tr>
+            <% end %>
+            <% end %>
+          </table>
+
+          <% else %>
+          <h4>You Currently have no dependents.</h4>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <% end %>
+    <% end %>
+    <div class="col-xs-12 row">
+      <br/>
+      <%= link_to 'Back', employers_employer_profile_path(@employer_profile.id, :tab=>'employees'), class: 'btn btn-trans return_to_employee_roster', "aria-expanded" => "true" %>
+    </div>
+    </div>

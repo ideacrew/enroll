@@ -90,7 +90,7 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 $(document).ready(function () {
   // js that runs on edit view
-  if(window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+  if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
 
     // give slider a starting place based on persisted form
     var slider_starting_values = $('.benefits-fields input.hidden-param').each(function() {
