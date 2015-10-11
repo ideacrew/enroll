@@ -4,7 +4,7 @@ $('#benefit-group-<%= @benefit_group.to_s %> .reference-plans').html("<%= escape
 $('#benefit-group-<%= @benefit_group.to_s %> .reference-plans').css({ "height": "450px", "y-overflow": "scroll" })
 $('#benefit-group-<%= @benefit_group.to_s %> .reference-plans').show();
 
-$('#benefit-group-<%= @benefit_group.to_s %> .reference-plan').on('click', function() {
+$('#benefit-group-<%= @benefit_group.to_s %> .reference-plan .col-xs-3').on('click', function() {
   if ($(this).find('input[type=radio]').is(':checked')) {
   } else {
       $(this).find('input[type=radio]').prop('checked', true )
