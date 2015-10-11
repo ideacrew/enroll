@@ -54,6 +54,17 @@ class FamilyMember
 
   associated_with_one :person, :person_id, "Person"
 
+  after_create :update_family_status_when_create
+  after_update :update_family_status_when_destroy
+
+  def update_family_status_when_create
+    parent.update_aptc_block_status
+  end
+
+  def update_family_status_when_destroy
+    parent.update_aptc_block_status unless is_active
+  end
+
   def parent
     raise "undefined parent family" unless family
     self.family
