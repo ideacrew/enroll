@@ -43,17 +43,18 @@
         <div class="form-border">
           <p>Benefit Group: <%= @benefit_group.try(:title) %></p>
           <% if @benefit_group_assignment.try(:coverage_waived?) %>
-          <p>Enrollment Status: Coverage Waived</p>
-          <p>Waiver Reason: <%= @hbx_enrollment.try(:waiver_reason) %></p>
+            <p>Enrollment Status: Coverage Waived</p>
+            <p>Waiver Reason: <%= @hbx_enrollment.try(:waiver_reason) %></p>
           <% elsif @benefit_group_assignment.try(:coverage_selected?) %>
-          <p>Plan Name: <%= @hbx_enrollment.try(:plan).try(:name) %></p>
-          <p>Plan Start: <%= @hbx_enrollment.try(:effective_on) %></p>
+            <p>Plan Name: <%= @hbx_enrollment.try(:plan).try(:name) %></p>
+            <p>Plan Start: <%= @hbx_enrollment.try(:effective_on) %></p>
           <% if @census_employee.employee_role.try(:present?) and employee_role = @census_employee.employee_role %>
-          <p>HIRED: <%= employee_role.try(:hired_on) %></p>
-          <p>ELIGIBLE FOR COVERAGE: <em><%= employee_role.try(:effective_on) %></em></p>
+            <p>HIRED: <%= employee_role.try(:hired_on) %></p>
+            <p>ELIGIBLE FOR COVERAGE: <em><%= employee_role.try(:effective_on) %></em></p>
           <% end %>
           <% if @plan.present? and @hbx_enrollment.present? %>
-
+          <% end %>
+          <% end %>
         </div>
         <div class="table-border table-responsive">
           <table class="table table-striped">
@@ -127,13 +128,12 @@
           </table>
 
           <% else %>
-          <h4>You Currently have no dependents.</h4>
+          <h4>You currently have no dependents.</h4>
           <% end %>
         </div>
       </div>
     </div>
-    <% end %>
-    <% end %>
+
     <div class="col-xs-12 row">
       <br/>
       <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, employers_employer_profile_path(@employer_profile.id, :tab=>'employees'), class: 'btn btn-trans return_to_employee_roster', "aria-expanded" => "true" %>
