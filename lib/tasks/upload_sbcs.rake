@@ -31,6 +31,11 @@ namespace :sbc do
   # Seeds the SBC documents in Plans. SBCs are already uploaded to S3 before this runs.
   # Should run while seeding.
   task :map => :environment do
+
+    Plan.all.each do |plan|
+      plan.sbc_document = nil
+    end
+
     file_path = Rails.root.join("db", "seedfiles", "plans-sbcs.csv").to_s
     counter = 0
     aws_env = ENV['AWS_ENV'] || 'local'
