@@ -26,9 +26,9 @@ module Forms
     end
 
     def add_broker_role
-      person.broker_role = ::BrokerRole.new({ 
-        :provider_kind => 'broker', 
-        :npn => self.npn 
+      person.broker_role = ::BrokerRole.new({
+        :provider_kind => 'broker',
+        :npn => self.npn
       })
     end
 
@@ -112,7 +112,7 @@ module Forms
         home_page: organization.home_page,
         first_name: person.first_name,
         last_name: person.last_name,
-        dob: person.dob.strftime("%Y-%m-%d"),
+        dob: person.dob.try(:strftime, '%Y-%m-%d'),
         email: person.emails.first.address,
         npn: broker_role.try(:npn),
         entity_kind: broker_agency_profile.entity_kind,

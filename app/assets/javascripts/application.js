@@ -53,6 +53,10 @@ function applyMultiLanguateSelect() {
 
 };
 
+function dchbx_enroll_date_of_record() {
+  return new Date($('#dchbx_enroll_date_of_record').text());
+};
+
 $(document).on('page:update', function(){
   applyFloatLabels();
   applySelectric();
@@ -90,7 +94,7 @@ $(document).on('click', '#modal-wrapper .modal-close', function(){
 
 $(document).ready(function () {
   // js that runs on edit view
-  if(window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
+  if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
 
     // give slider a starting place based on persisted form
     var slider_starting_values = $('.benefits-fields input.hidden-param').each(function() {
@@ -224,7 +228,7 @@ $(document).ready(function () {
     var entered_year = entered_dob.substring(entered_dob.length -4);
     var entered_month = entered_dob.substring(0, 2);
     var entered_day = entered_dob.substring(3, 5);
-    var todays_date = new Date();
+    var todays_date = dchbx_enroll_date_of_record();
     var todays_year = todays_date.getFullYear();
     var todays_month = todays_date.getMonth() + 1;
     var todays_day = todays_date.getDate();
@@ -338,7 +342,7 @@ $(document).ready(function () {
         changeYear: true,
         dateFormat: 'mm/dd/yy',
         maxDate: "+0d",
-        yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear(),
+        yearRange: dchbx_enroll_date_of_record().getFullYear()-110 + ":" + dchbx_enroll_date_of_record().getFullYear(),
         onSelect: function(dateText, dpInstance) {
           $(this).datepicker("hide");
           $(this).trigger('change');
@@ -351,7 +355,7 @@ $(document).ready(function () {
         dateFormat: 'mm/dd/yy',
         minDate: dateMin,
         maxDate: dateMax,
-        yearRange: (new Date).getFullYear()-110 + ":" + ((new Date).getFullYear() + 10),
+        yearRange: dchbx_enroll_date_of_record().getFullYear()-110 + ":" + (dchbx_enroll_date_of_record().getFullYear() + 10),
         onSelect: function(dateText, dpInstance) {
           $(this).datepicker("hide");
           $(this).trigger('change');
