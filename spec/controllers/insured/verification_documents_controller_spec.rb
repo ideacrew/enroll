@@ -25,7 +25,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       let(:temp_file) { double }
       let(:consumer_role_params) {}
       let(:params) { {consumer_role: '', file: file} }
-      let(:bucket_name) { 'dchbx-id-verification'}
+      let(:bucket_name) { 'id-verification'}
       let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}{#sample-key"}
       let(:file_path) {File.dirname(__FILE__)} # a sample file path
       let(:cleaned_params) {{"2"=>{"subject"=>"I-327 (Reentry Permit)", "id"=>"55e7fef5536167bb822e0000", "alien_number"=>"999999999"}}}

@@ -5,11 +5,12 @@ describe Aws::S3Storage do
   #allow(:storage_double) {double}
   #allow(Aws::S3Strorage).to receive(:new).and_respond_with(storage_double)
   let(:subject) { Aws::S3Storage.new }
+  let(:aws_env) { ENV['AWS_ENV'] || "local" }
   let(:object) { double }
-  let(:bucket_name) { 'test-bucket' }
+  let(:bucket_name) { "bucket1" }
   let(:file_path) { File.dirname(__FILE__) }
   let(:key) { SecureRandom.uuid }
-  let(:uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{key}" }
+  let(:uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-#{bucket_name}-#{aws_env}##{key}" }
   let(:invalid_url) { "urn:openhbx:terms:v1:file_storage:s3:bucket:" }
   let(:file_content) { "test content" }
 
