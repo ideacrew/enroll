@@ -501,4 +501,9 @@ module ApplicationHelper
     bucket =splits.first.split(':').last
     [key, bucket]
   end
+
+  def env_bucket_name(bucket_name)
+    aws_env = ENV['AWS_ENV'] || "local"
+    "dchbx-enroll-#{bucket_name}-#{aws_env}"
+  end
 end
