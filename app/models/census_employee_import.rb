@@ -99,7 +99,7 @@ class CensusEmployeeImport
     (4..@sheet.last_row).map do |i|
       row = Hash[[column_header_row, roster.row(i)].transpose]
       record = parse_row(row)
-      break if record[:employer_assigned_family_id].nil?
+      break if record[:employee_relationship].nil?
       if record[:termination_date].present?
         census_employee = terminate_employee(record)
       else
@@ -138,7 +138,8 @@ class CensusEmployeeImport
           (dependent.ssn == record[:ssn]) && (dependent.dob == record[:dob])
         end
 
-        record_slice = record.slice(:employee_relationship, :last_name, :first_name, :name_sfx, :ssn, :dob, :gender)
+        record_slice = record.slice(:employer_assigned_family_id, :employee_relationship, :last_name, :first_name, :name_sfx, :ssn, :dob, :gender)
+        record_slice = record.slice(:employer_assigned_family_id, :employee_relationship, :last_name, :first_name, :name_sfx, :ssn, :dob, :gender)
         if census_dependent
           census_dependent.update_attributes(record_slice)
         else
@@ -152,10 +153,11 @@ class CensusEmployeeImport
   end
 
   def assign_census_employee_attributes(member, record)
+    member.employer_assigned_family_id = record[:employer_assigned_family_id] if record[:employer_assigned_family_id]
     member.ssn = record[:ssn].to_s if record[:ssn]
     member.first_name = record[:first_name].to_s if record[:first_name]
     member.last_name = record[:last_name].to_s if record[:last_name]
-    member.middle_name = record[:middle_initial].to_s if record[:middle_initial]
+    member.middle_name = record[:middle_name].to_s if record[:middle_name]
     member.name_sfx = record[:name_sfx].to_s if record[:name_sfx]
     member.dob = record[:dob].to_s if record[:dob]
     member.hired_on = record[:hire_date] if record[:hire_date]
@@ -192,7 +194,7 @@ class CensusEmployeeImport
     employee_relationship = parse_relationship(row["employee_relationship"])
     last_name = parse_text(row["last_name"])
     first_name = parse_text(row["first_name"])
-    middle_initial = parse_text(row["middle_initial"])
+    middle_name = parse_text(row["middle_name"])
     name_sfx = parse_text(row["name_sfx"])
     email = parse_text(row["email"])
     ssn = parse_ssn(row["ssn"])
@@ -213,7 +215,7 @@ class CensusEmployeeImport
         employee_relationship: employee_relationship,
         last_name: last_name,
         first_name: first_name,
-        middle_initial: middle_initial,
+        middle_name: middle_name,
         name_sfx: name_sfx,
         email: email,
         ssn: ssn,
