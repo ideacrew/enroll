@@ -1,7 +1,3 @@
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[SHOP5A]<br>
-Initial Employee OE Complete<br> 
-(with minimum participation or 1/1 coverage effective date)</font></strong>"} %>
-
 <%= render partial: 'notices/shared/logo' %>
 <%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
@@ -22,7 +18,7 @@ Initial Employee OE Complete<br>
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "Congratulations!  Your employees have completed open enrollment and have satisfied the requirements to participate in group health coverage through DC Health Link.  Your group health plan coverage will take effect as of [Coverage Start Date]."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "Congratulations!  Your employees have completed open enrollment and have satisfied the requirements to participate in group health coverage through DC Health Link.  Your group health plan coverage will take effect as of #{notice.try(:coverage_start_on).try(:to_s)}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "If this is your first time offering coverage through DC Health Link, you must make a binder payment equal to the first month’s premium no later than the 12th of the month prior to your coverage start date or else your coverage will not take effect.  Binder payments must be received, processed, and cleared by the due date in order to be considered on time.   We recommend making initial binder payments online in order to ensure adequate time for processing. You can make this payment by following the steps below:"} %>
 
@@ -68,60 +64,15 @@ Initial Employee OE Complete<br>
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Please contact your broker for further assistance.  You can also contact DC Health Link with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings: 
-  ["Online at [HBEURL];",
-   "By email at [EMPLOYER.HBX@DC.GOV]; or",
-   "By calling [HBEPHONE]."] } %>
+  ["Online at #{notice.hbe.url};",
+   "By email at #{notice.hbe.email}; or",
+   "By calling #{notice.hbe.phone}."] } %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[If ER has a Broker/Assister, include contact info below]</font></strong>"} %>
-
-<table style="width: 100%">
-	<tr>
-		<td style="width: 15%"><strong>Broker:&nbsp;&nbsp;&nbsp;&nbsp;</strong></td>
-		<td style="width: 85%">[Broker/Assister First Name] [Broker/Assister Last Name]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister Organization]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister Street Address 1]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister Apt/Suite]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister City], [ Broker/Assister State] [ Broker/Assister Zip]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister Direct Phone #]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister Email]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%">[Broker/Assister Web]</td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%"></td>
-	</tr>
-	<tr>
-		<td style="width: 15%"></td>
-		<td style="width: 85%"></td>
-	</tr>
-	<tr>
-		<td style="width: 10%"></td>
-		<td style="width: 90%">_________________________________________________________________________</td>
-	</tr>
-</table>
-
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><font color='red'>[If ER does NOT have a Broker/Assister, include:]</font></strong> If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling [Call Center Phone #]."} %>
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
+<% end %>
 
 <hr>
 

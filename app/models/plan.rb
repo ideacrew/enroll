@@ -264,6 +264,13 @@ class Plan
     @renewal_plan = find(renewal_plan_id) unless renewal_plan_id.blank?
   end
 
+  def minimum_age
+    if premium_tables.count > 0
+      premium_tables.min(:age)
+    else
+      read_attribute(:minimum_age)
+    end
+  end
 
   def bound_age(given_age)
     return minimum_age if given_age < minimum_age

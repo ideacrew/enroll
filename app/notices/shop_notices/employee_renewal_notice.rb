@@ -23,6 +23,7 @@ class ShopNotices::EmployeeRenewalNotice < ShopNotices::ShopPdfNotice
     else
       append_primary_address(@employee.new_census_employee.address)
     end
+    @notice.email = @employee.person.user.email
 
     append_hbe
     append_broker(@employee.try(:employer_profile).try(:broker_agency_profile))
