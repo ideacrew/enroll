@@ -53,6 +53,13 @@ class QhpBuilder
     show_qhp_stats
     mark_2015_dental_plans_as_individual
     mark_2015_catastrophic_plans_as_individual
+    mark_one_2015_plan_as_shop
+  end
+
+  def mark_one_2015_plan_as_shop
+    Plan.where(active_year: 2015, hios_id: /94506DC0350012/).each do |plan|
+      plan.update_attribute(:market, "shop")
+    end
   end
 
   def mark_2015_catastrophic_plans_as_individual
@@ -155,26 +162,28 @@ class QhpBuilder
 
   def create_plan_from_serff_data
     @qhp.qhp_cost_share_variances.each do |cost_share_variance|
-      plan = Plan.where(active_year: @plan_year,
-        hios_id: /#{@qhp.standard_component_id.strip}/,
-        hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/,
-        csr_variant_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').last}/).to_a
-      next if plan.present?
-      new_plan = Plan.new(
-        name: @qhp.plan_marketing_name.squish!,
-        hios_id: cost_share_variance.hios_plan_and_variant_id,
-        hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
-        csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
-        active_year: @plan_year,
-        metal_level: parse_metal_level,
-        market: parse_market,
-        ehb: @qhp.ehb_percent_premium,
-        # carrier_profile_id: "53e67210eb899a4603000004",
-        carrier_profile_id: get_carrier_id(@carrier_name),
-        coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental"
-        )
-      if new_plan.valid?
-        new_plan.save!
+      if cost_share_variance.hios_plan_and_variant_id.split("-").last != "00"
+        plan = Plan.where(active_year: @plan_year,
+          hios_id: /#{@qhp.standard_component_id.strip}/,
+          hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/,
+          csr_variant_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').last}/).to_a
+        next if plan.present?
+        new_plan = Plan.new(
+          name: @qhp.plan_marketing_name.squish!,
+          hios_id: cost_share_variance.hios_plan_and_variant_id,
+          hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
+          csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
+          active_year: @plan_year,
+          metal_level: parse_metal_level,
+          market: parse_market,
+          ehb: @qhp.ehb_percent_premium,
+          # carrier_profile_id: "53e67210eb899a4603000004",
+          carrier_profile_id: get_carrier_id(@carrier_name),
+          coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental"
+          )
+        if new_plan.valid?
+          new_plan.save!
+        end
       end
     end
   end

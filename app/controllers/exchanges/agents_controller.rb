@@ -5,8 +5,9 @@ class Exchanges::AgentsController < ApplicationController
      @title = current_user.agent_title
      @assister = current_user.has_assister_role?
      person_id = session[:person_id]
-     if person_id && person_id != ''
-       @person = Person.find(person_id)
+     @person=nil
+     @person = Person.find(person_id) if person_id && person_id != ''
+     if @person && !@person.csr_role && !@person.assister_role
        root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + person_id
        hbx_profile = HbxProfile.find_by_state_abbreviation('DC')
        message_params = {
@@ -18,8 +19,6 @@ class Exchanges::AgentsController < ApplicationController
          body: "<a href='" + root+"'>Link to access #{@person.full_name}</a>  <br>",
        }
        create_secure_message message_params, current_user.person, :inbox
-     else
-       @person=nil
      end
      session[:person_id] = nil
      session[:original_application_type] = nil
